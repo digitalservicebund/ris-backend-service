@@ -133,7 +133,7 @@ sonarqube {
   // NOTE: sonarqube picks up combined coverage correctly without further configuration from:
   // build/reports/jacoco/test/jacocoTestReport.xml
   properties {
-    property "sonar.projectKey", "digitalservice4germany_java-application-template"
+    property "sonar.projectKey", "digitalservice4germany_ris-backend-service"
     property "sonar.organization", "digitalservice4germany"
     property "sonar.host.url", "https://sonarcloud.io"
   }
