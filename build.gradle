@@ -1,0 +1,164 @@
+plugins {
+  id "org.springframework.boot" version "2.6.6"
+  id "io.spring.dependency-management" version "1.0.11.RELEASE"
+  id "java"
+  id "com.diffplug.spotless" version "6.4.1"
+  id "jacoco"
+  id "org.sonarqube" version "3.3"
+  id "com.github.jk1.dependency-license-report" version "2.1"
+}
+
+group = "de.bund.digitalservice"
+version = "0.0.1-SNAPSHOT"
+sourceCompatibility = "11"
+
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
+
+repositories {
+  mavenCentral()
+}
+
+// Force version for transient dependencies...=> CVE-2021-43797
+configurations.all {
+  resolutionStrategy.eachDependency { details ->
+    if (details.requested.group == "io.netty" && details.requested.name != "netty-tcnative-classes") {
+      details.useVersion "4.1.72.Final"
+    }
+  }
+}
+
+dependencies {
+  implementation "org.springframework.boot:spring-boot-starter-actuator"
+  implementation "org.springframework.boot:spring-boot-starter-security"
+  implementation("org.springframework.boot:spring-boot-starter-webflux") {
+    exclude group: "io.netty", module: "netty-tcnative-classes"
+    because("CVE-2021-43797, not using Tomcat")
+  }
+  // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
+  implementation("io.netty:netty-all:4.1.72.Final") {
+    exclude group: "io.netty", module: "netty-tcnative-classes"
+    because("CVE-2021-43797, not using Tomcat")
+  }
+  // => CVE-2021-44228, CVE-2021-45105
+  implementation "org.apache.logging.log4j:log4j-api:2.17.0"
+  // => CVE-2021-44228, CVE-2021-45105
+  implementation "org.apache.logging.log4j:log4j-to-slf4j:2.17.0"
+  // => CVE-2021-42550
+  implementation "ch.qos.logback:logback-classic:1.2.9"
+  implementation "ch.qos.logback:logback-core:1.2.9"
+  compileOnly "org.projectlombok:lombok"
+  developmentOnly "org.springframework.boot:spring-boot-devtools"
+  annotationProcessor "org.projectlombok:lombok"
+  testImplementation "org.springframework.boot:spring-boot-starter-test"
+  testImplementation "io.projectreactor:reactor-test"
+  testImplementation "org.springframework.security:spring-security-test"
+  testImplementation "com.tngtech.archunit:archunit-junit5:0.23.0"
+  testImplementation "org.mockito:mockito-junit-jupiter:4.4.0"
+}
+
+jar {
+  // We have no need for the plain archive, thus skip creation for build speedup!
+  enabled = false
+}
+
+test {
+  useJUnitPlatform {
+    excludeTags "integration"
+  }
+  testLogging {
+    events "passed", "skipped", "failed"
+  }
+}
+
+task integrationTest(type: Test) {
+  description = "Runs the integration tests."
+  group = "verification"
+  useJUnitPlatform {
+    includeTags "integration"
+  }
+  testLogging {
+    events "passed", "skipped", "failed"
+  }
+  // So that running integration test require running unit tests first,
+  // and we won"t even attempt running integration tests when there are
+  // failing unit tests.
+  dependsOn test
+  finalizedBy jacocoTestReport
+}
+
+check.dependsOn integrationTest
+
+jacocoTestReport {
+  // Jacoco hooks into all tasks of type: Test automatically, but results for each of these
+  // tasks are kept separately and are not combined out of the box.. we want to gather
+  // coverage of our unit and integration tests as a single report!
+  executionData fileTree(project.buildDir.absolutePath).include("jacoco/*.exec")
+  reports {
+    xml.required = true
+    html.required = true
+  }
+  dependsOn integrationTest // All tests are required to run before generating a report..
+}
+
+spotless {
+  java {
+    removeUnusedImports()
+    googleJavaFormat()
+  }
+  groovyGradle {
+    greclipse().configFile("greclipse.properties")
+  }
+
+  def prettierVersion = "2.6.1"
+
+  format "misc", {
+    target "**/*.js", "**/*.json", "**/*.md", "**/*.yml"
+    prettier(prettierVersion)
+  }
+  format "properties", {
+    target "**/*.properties"
+    prettier(["prettier": prettierVersion, "prettier-plugin-properties": "0.1.0"]).config(["keySeparator": "="])
+  }
+  format "shellscript", {
+    target "**/*.sh"
+    prettier(["prettier": prettierVersion, "prettier-plugin-sh": "0.7.1"])
+  }
+}
+
+sonarqube {
+  // NOTE: sonarqube picks up combined coverage correctly without further configuration from:
+  // build/reports/jacoco/test/jacocoTestReport.xml
+  properties {
+    property "sonar.projectKey", "digitalservice4germany_java-application-template"
+    property "sonar.organization", "digitalservice4germany"
+    property "sonar.host.url", "https://sonarcloud.io"
+  }
+}
+
+project.tasks["sonarqube"].dependsOn jacocoTestReport
+
+bootBuildImage {
+  def containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
+  def containerImageName = System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservice4germany/${rootProject.name}"
+  def containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
+
+  imageName = "${containerRegistry}/${containerImageName}:${containerImageVersion}"
+  publish = false
+  docker {
+    publishRegistry {
+      username = System.getenv("CONTAINER_REGISTRY_USER") ?: ""
+      password = System.getenv("CONTAINER_REGISTRY_PASSWORD") ?: ""
+      url = "https://${containerRegistry}"
+    }
+  }
+}
+
+licenseReport {
+  // If there's a new dependency with a yet unknown license causing this task to fail
+  // the license(s) will be listed in build/reports/dependency-license/dependencies-without-allowed-license.json
+  allowedLicensesFile = new File("$projectDir/allowed-licenses.json")
+}

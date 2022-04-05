@@ -1,0 +1,166 @@
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+
+name: Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  # Allow to run this workflow manually
+  workflow_dispatch:
+
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_IMAGE_NAME: ${{ github.repository }}
+  CONTAINER_IMAGE_VERSION: ${{ github.sha }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: "11.0"
+          distribution: "temurin"
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build with Gradle
+        run: ./gradlew build
+      - name: Build container image
+        run: ./gradlew bootBuildImage
+      - name: Run Trivy vulnerability scanner
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@a7a829a4345428ddd92ca57b18257440f6a18c90 # => 0.2.2
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        if: always() # Bypass non-zero exit code..
+        with:
+          sarif_file: "trivy-results.sarif"
+      - name: Run license scanner
+        run: ./gradlew checkLicense
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Build :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  analyze:
+    runs-on: ubuntu-latest
+    # We only want to analyze trunk, not pull requests!
+    if: github.event_name != 'pull_request'
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: "11.0"
+          distribution: "temurin"
+          cache: gradle
+      - name: Cache SonarQube packages
+        uses: actions/cache@v2
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Scan with SonarQube
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube --info
+      - name: Check SonarQube Quality Gate
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: sonarsource/sonarqube-quality-gate-action@15767f0e4eb489cfdd989dc717fa78c038d0de8a # == v1.0.0
+        with:
+          scanMetadataReportFile: build/sonar/report-task.txt
+        timeout-minutes: 3 # Force to fail step after specific time
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    # We only want to deploy from trunk, never for pull requests!
+    if: github.event_name != 'pull_request'
+    needs: build
+    permissions:
+      packages: write
+      contents: read
+      # This is used to complete the identity challenge
+      # with sigstore/fulcio.
+      id-token: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: "11.0"
+          distribution: "temurin"
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+      - name: Build and publish container image
+        run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} ./gradlew bootBuildImage --publishImage
+      - name: Install cosign
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: sigstore/cosign-installer@1e95c1de343b5b0c23352d6417ee3e48d5bcd422
+        with:
+          cosign-release: "v1.4.0"
+      - name: Log into container registry
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: docker/login-action@28218f9b04b4f3f62068d7b6ce6ca5b26e35336c
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Sign the published Docker image
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Deploy :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}

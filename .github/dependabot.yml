@@ -1,0 +1,12 @@
+# Please see the documentation for all configuration options:
+# https://help.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+version: 2
+updates:
+  - package-ecosystem: "gradle"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    # Too much noise with patch releases...
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]

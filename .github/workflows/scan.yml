@@ -1,0 +1,55 @@
+name: Scan
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # Every day at 8am
+  # Allow to run this workflow manually
+  workflow_dispatch:
+
+env:
+  CONTAINER_REGISTRY: ghcr.io
+  CONTAINER_IMAGE_NAME: ${{ github.repository }}
+  CONTAINER_IMAGE_VERSION: ${{ github.sha }}
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run Trivy vulnerability scanner
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@a7a829a4345428ddd92ca57b18257440f6a18c90 # => 0.2.2
+        env:
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v1
+        if: always() # Bypass non-zero exit code..
+        with:
+          sarif_file: "trivy-results.sarif"
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Security scan :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
