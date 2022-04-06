@@ -66,9 +66,7 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     # We only want to analyze trunk, not pull requests!
-    if: ${{ github.event_name != 'pull_request' && env.SONAR_TOKEN }}
-    env:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+    if: github.event_name != 'pull_request'
     needs: build
     steps:
       - uses: actions/checkout@v2
@@ -90,6 +88,7 @@ jobs:
       - name: Scan with SonarQube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
       - name: Check SonarQube Quality Gate
         # Third-party action, pin to commit SHA!
@@ -98,6 +97,8 @@ jobs:
         with:
           scanMetadataReportFile: build/sonar/report-task.txt
         timeout-minutes: 3 # Force to fail step after specific time
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
   deploy:
     runs-on: ubuntu-latest
