@@ -1,4 +1,4 @@
-package de.bund.digitalservice.template;
+package de.bund.digitalservice.ris;
 
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 

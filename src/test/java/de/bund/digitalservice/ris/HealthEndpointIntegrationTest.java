@@ -1,4 +1,4 @@
-package de.bund.digitalservice.template;
+package de.bund.digitalservice.ris;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

@@ -1,4 +1,4 @@
-package de.bund.digitalservice.template;
+package de.bund.digitalservice.ris;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
