@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris;
+package de.bund.digitalservice.ris.config;
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
