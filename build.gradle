@@ -112,6 +112,12 @@ jacocoTestReport {
     html.required = true
   }
   dependsOn integrationTest // All tests are required to run before generating a report..
+
+  afterEvaluate {
+    classDirectories.setFrom(files(classDirectories.files.collect {
+      fileTree(dir: it, exclude: ["**/config/*"])
+    }))
+  }
 }
 
 spotless {
