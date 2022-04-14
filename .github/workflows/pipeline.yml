@@ -168,22 +168,6 @@ jobs:
           message: "Bump staging image to ${{ env.CONTAINER_IMAGE_VERSION }}"
           pathspec_error_handling: exitImmediately
           push: true
-      - name: Trigger Argo CD sync
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
-        with:
-          version: 2.3.1
-          command: app sync ris-staging
-      - name: Wait for Argo CD sync
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
-        with:
-          version: 2.3.1
-          command: app wait ris-staging
-      - name: Run journey tests
-        run: ./gradlew journeyTest
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
