@@ -9,9 +9,9 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 @Configuration
 @EnableWebFluxSecurity
+@ConditionalOnProperty(name = "application.security.relax", havingValue = "true")
 public class SecurityConfig {
   @Bean
-  @ConditionalOnProperty(name = "application.security.relax", havingValue = "true")
   public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
     return http.authorizeExchange().anyExchange().permitAll().and().csrf().disable().build();
   }
