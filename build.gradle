@@ -67,7 +67,7 @@ jar {
 
 test {
   useJUnitPlatform {
-    excludeTags "integration"
+    excludeTags "integration", "journey"
   }
   testLogging {
     events "passed", "skipped", "failed"
@@ -89,8 +89,18 @@ task integrationTest(type: Test) {
   dependsOn test
   finalizedBy jacocoTestReport
 }
-
 check.dependsOn integrationTest
+
+task journeyTest(type: Test) {
+  description = "Runs the journey tests."
+  group = "verification"
+  useJUnitPlatform {
+    includeTags "journey"
+  }
+  testLogging {
+    events "passed", "skipped", "failed"
+  }
+}
 
 jacocoTestReport {
   // Jacoco hooks into all tasks of type: Test automatically, but results for each of these
