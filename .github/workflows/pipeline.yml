@@ -177,6 +177,7 @@ jobs:
           command: app sync ris-staging
         env:
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
       - name: Wait for Argo CD sync
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -186,6 +187,7 @@ jobs:
           command: app wait ris-staging
         env:
           ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
       - name: Run journey tests
         run: ./gradlew journeyTest
       - name: Send status to Slack
