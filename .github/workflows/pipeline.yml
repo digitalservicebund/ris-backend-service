@@ -192,6 +192,8 @@ jobs:
           ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
       - name: Run journey tests
         run: ./gradlew journeyTest
+        env:
+          STAGING_URL: ${{ secrets.STAGING_URL }}
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
