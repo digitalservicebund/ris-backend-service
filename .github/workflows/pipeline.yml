@@ -106,18 +106,15 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-  deploy:
+  build-and-push-image:
     runs-on: ubuntu-latest
-    # We only want to deploy from trunk, never for pull requests!
+    # We only want to create images from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
-    environment: staging
     needs: build
     permissions:
-      packages: write
       contents: read
-      # This is used to complete the identity challenge
-      # with sigstore/fulcio.
-      id-token: write
+      id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
+      packages: write
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK 11
@@ -150,6 +147,29 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Build/push image :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    # We only want to deploy from trunk, never for pull requests!
+    if: github.event_name != 'pull_request'
+    environment: staging
+    needs: build-and-push-image
+    steps:
       - name: Checkout infra repository
         uses: actions/checkout@v3
         with:
@@ -203,7 +223,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Deploy :point_right:"
+          job_name: "Deploy staging :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
