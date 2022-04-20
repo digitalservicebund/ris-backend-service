@@ -238,3 +238,66 @@ jobs:
           commit: true
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    # We only want to deploy from trunk, never for pull requests!
+    if: github.event_name != 'pull_request'
+    environment: production
+    needs: deploy-staging
+    steps:
+      - name: Checkout infra repository
+        uses: actions/checkout@v3
+        with:
+          repository: digitalservice4germany/ris-infra
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+          path: ris-infra # Avoid wiping out this pipeline run's original repository contents
+      - name: Update image tag for production
+        run: |
+          cd ris-infra/manifests/overlays/production
+          kustomize edit set image ghcr.io/digitalservice4germany/ris-backend-service:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Commit and push changes for infra repository
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: EndBug/add-and-commit@050a66787244b10a4874a2a5f682130263edc192 # == v9.0.0
+        with:
+          cwd: "./ris-infra"
+          add: manifests/overlays/production/kustomization.yaml
+          message: "Bump production image to ${{ env.CONTAINER_IMAGE_VERSION }}"
+          pathspec_error_handling: exitImmediately
+          push: true
+      - name: Trigger Argo CD sync
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
+        with:
+          version: 2.3.1
+          command: app sync ris-production
+        env:
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
+      - name: Wait for Argo CD sync
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
+        with:
+          version: 2.3.1
+          command: app wait ris-production
+        env:
+          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Deploy production :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
