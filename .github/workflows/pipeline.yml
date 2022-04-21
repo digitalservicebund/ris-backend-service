@@ -191,25 +191,14 @@ jobs:
           pathspec_error_handling: exitImmediately
           push: true
       - name: Trigger Argo CD sync
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
-        with:
-          version: 2.3.1
-          command: app sync ris-staging
+        run: |
+          curl -sSL -o argocd https://${ARGOCD_SERVER}/download/argocd-linux-amd64
+          chmod +x argocd
+          ./argocd login ${ARGOCD_SERVER} --username developer --password ${{ secrets.ARGOCD_DEVELOPER_PASSWORD }}
+          ./argocd app sync ris-staging --auth-token $(./argocd account generate-token --account pipeline --expires-in 300s)
+          ./argocd app wait ris-staging
         env:
-          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
-      - name: Wait for Argo CD sync
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
-        with:
-          version: 2.3.1
-          command: app wait ris-staging
-        env:
-          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
       - uses: actions/checkout@v3
       - name: Set up JDK 11
         uses: actions/setup-java@v2
@@ -267,25 +256,14 @@ jobs:
           pathspec_error_handling: exitImmediately
           push: true
       - name: Trigger Argo CD sync
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
-        with:
-          version: 2.3.1
-          command: app sync ris-production
+        run: |
+          curl -sSL -o argocd https://${ARGOCD_SERVER}/download/argocd-linux-amd64
+          chmod +x argocd
+          ./argocd login ${ARGOCD_SERVER} --username developer --password ${{ secrets.ARGOCD_DEVELOPER_PASSWORD }}
+          ./argocd app sync ris-production --auth-token $(./argocd account generate-token --account pipeline --expires-in 300s)
+          ./argocd app wait ris-production
         env:
-          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
-      - name: Wait for Argo CD sync
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: clowdhaus/argo-cd-action@a6d0a54875a2905b58f873813ebad5c4c251ac37 # == v1.12.0
-        with:
-          version: 2.3.1
-          command: app wait ris-production
-        env:
-          ARGOCD_AUTH_TOKEN: ${{ secrets.ARGOCD_AUTH_TOKEN }}
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER_URL }}
+          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
