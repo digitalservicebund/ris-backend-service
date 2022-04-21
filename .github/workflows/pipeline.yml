@@ -194,8 +194,8 @@ jobs:
         run: |
           curl -sSL -o argocd https://${ARGOCD_SERVER}/download/argocd-linux-amd64
           chmod +x argocd
-          ./argocd login ${ARGOCD_SERVER} --username developer --password ${{ secrets.ARGOCD_DEVELOPER_PASSWORD }}
-          ./argocd app sync ris-staging --auth-token $(./argocd account generate-token --account pipeline --expires-in 300s)
+          ./argocd login ${ARGOCD_SERVER} --username pipeline --password ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
+          ./argocd app sync ris-staging --auth-token $(./argocd account generate-token --account ris-staging-deploy --expires-in 300s)
           ./argocd app wait ris-staging
         env:
           ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
@@ -259,8 +259,8 @@ jobs:
         run: |
           curl -sSL -o argocd https://${ARGOCD_SERVER}/download/argocd-linux-amd64
           chmod +x argocd
-          ./argocd login ${ARGOCD_SERVER} --username developer --password ${{ secrets.ARGOCD_DEVELOPER_PASSWORD }}
-          ./argocd app sync ris-production --auth-token $(./argocd account generate-token --account pipeline --expires-in 300s)
+          ./argocd login ${ARGOCD_SERVER} --username pipeline --password ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
+          ./argocd app sync ris-production --auth-token $(./argocd account generate-token --account ris-production-deploy --expires-in 300s)
           ./argocd app wait ris-production
         env:
           ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
