@@ -9,6 +9,15 @@ on:
       version:
         required: true
         type: string
+      deploying_repo:
+        required: true
+        type: string
+      infra_repo:
+        required: true
+        type: string
+      app:
+        required: true
+        type: string
     secrets:
       deploy_key:
         required: true
@@ -27,12 +36,12 @@ jobs:
       - name: Checkout infra repository
         uses: actions/checkout@v3
         with:
-          repository: digitalservice4germany/ris-infra
+          repository: digitalservice4germany/${{ inputs.infra_repo }}
           ssh-key: ${{ secrets.deploy_key }}
       - name: Update image tag for ${{ inputs.environment }}
         run: |
           cd manifests/overlays/${{ inputs.environment }}
-          kustomize edit set image ghcr.io/digitalservice4germany/ris-backend-service:${{ inputs.version }}
+          kustomize edit set image ghcr.io/digitalservice4germany/${{ inputs.deploying_repo }}:${{ inputs.version }}
       - name: Commit and push changes for infra repository
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -47,8 +56,8 @@ jobs:
           curl -sSL -o argocd https://${ARGOCD_SERVER}/download/argocd-linux-amd64
           chmod +x argocd
           ./argocd login ${ARGOCD_SERVER} --username pipeline --password ${{ secrets.argocd_pipeline_password }}
-          ./argocd app sync ris-${{ inputs.environment }} --auth-token $(./argocd account generate-token --account ris-${{ inputs.environment }}-deploy --expires-in 300s)
-          ./argocd app wait ris-${{ inputs.environment }}
+          ./argocd app sync ${{ inputs.app }} --auth-token $(./argocd account generate-token --account ${{ inputs.app }}-deploy --expires-in 300s)
+          ./argocd app wait ${{ inputs.app }}
         env:
           ARGOCD_SERVER: ${{ secrets.argocd_server }}
       - name: Send status to Slack

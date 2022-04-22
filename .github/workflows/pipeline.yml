@@ -175,6 +175,9 @@ jobs:
     with:
       environment: staging
       version: ${{ needs.build-and-push-image.outputs.version }}
+      deploying_repo: ris-backend-service
+      infra_repo: ris-infra
+      app: ris-staging
     secrets:
       deploy_key: ${{ secrets.DEPLOY_KEY }}
       argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
@@ -224,6 +227,9 @@ jobs:
     with:
       environment: production
       version: ${{ needs.build-and-push-image.outputs.version }}
+      deploying_repo: ris-backend-service
+      infra_repo: ris-infra
+      app: ris-production
     secrets:
       deploy_key: ${{ secrets.DEPLOY_KEY }}
       argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
