@@ -175,17 +175,15 @@ jobs:
         with:
           repository: digitalservice4germany/ris-infra
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-          path: ris-infra # Avoid wiping out this pipeline run's original repository contents
       - name: Update image tag for staging
         run: |
-          cd ris-infra/manifests/overlays/staging
+          cd manifests/overlays/staging
           kustomize edit set image ghcr.io/digitalservice4germany/ris-backend-service:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Commit and push changes for infra repository
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: EndBug/add-and-commit@050a66787244b10a4874a2a5f682130263edc192 # == v9.0.0
         with:
-          cwd: "./ris-infra"
           add: manifests/overlays/staging/kustomization.yaml
           message: "Bump staging image to ${{ env.CONTAINER_IMAGE_VERSION }}"
           pathspec_error_handling: exitImmediately
@@ -240,17 +238,15 @@ jobs:
         with:
           repository: digitalservice4germany/ris-infra
           ssh-key: ${{ secrets.DEPLOY_KEY }}
-          path: ris-infra # Avoid wiping out this pipeline run's original repository contents
       - name: Update image tag for production
         run: |
-          cd ris-infra/manifests/overlays/production
+          cd manifests/overlays/production
           kustomize edit set image ghcr.io/digitalservice4germany/ris-backend-service:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Commit and push changes for infra repository
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: EndBug/add-and-commit@050a66787244b10a4874a2a5f682130263edc192 # == v9.0.0
         with:
-          cwd: "./ris-infra"
           add: manifests/overlays/production/kustomization.yaml
           message: "Bump production image to ${{ env.CONTAINER_IMAGE_VERSION }}"
           pathspec_error_handling: exitImmediately
