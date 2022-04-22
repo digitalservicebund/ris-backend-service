@@ -164,54 +164,18 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-staging:
-    runs-on: ubuntu-latest
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
-    environment: staging
     needs: build-and-push-image
-    steps:
-      - name: Checkout infra repository
-        uses: actions/checkout@v3
-        with:
-          repository: digitalservice4germany/ris-infra
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-      - name: Update image tag for staging
-        run: |
-          cd manifests/overlays/staging
-          kustomize edit set image ghcr.io/digitalservice4germany/ris-backend-service:${{ env.CONTAINER_IMAGE_VERSION }}
-      - name: Commit and push changes for infra repository
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: EndBug/add-and-commit@050a66787244b10a4874a2a5f682130263edc192 # == v9.0.0
-        with:
-          add: manifests/overlays/staging/kustomization.yaml
-          message: "Bump staging image to ${{ env.CONTAINER_IMAGE_VERSION }}"
-          pathspec_error_handling: exitImmediately
-          push: true
-      - name: Trigger Argo CD sync
-        run: |
-          curl -sSL -o argocd https://${ARGOCD_SERVER}/download/argocd-linux-amd64
-          chmod +x argocd
-          ./argocd login ${ARGOCD_SERVER} --username pipeline --password ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
-          ./argocd app sync ris-staging --auth-token $(./argocd account generate-token --account ris-staging-deploy --expires-in 300s)
-          ./argocd app wait ris-staging
-        env:
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          type: ${{ job.status }}
-          job_name: "Deploy staging :point_right:"
-          mention: "here"
-          mention_if: "failure"
-          commit: true
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: staging
+      version: ${{ env.CONTAINER_IMAGE_VERSION }}
+    secrets:
+      deploy_key: ${{ secrets.DEPLOY_KEY }}
+      argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
+      argocd_server: ${{ secrets.ARGOCD_SERVER }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   deploy-staging-verify:
     runs-on: ubuntu-latest
@@ -249,51 +213,15 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-production:
-    runs-on: ubuntu-latest
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
-    environment: production
     needs: deploy-staging-verify
-    steps:
-      - name: Checkout infra repository
-        uses: actions/checkout@v3
-        with:
-          repository: digitalservice4germany/ris-infra
-          ssh-key: ${{ secrets.DEPLOY_KEY }}
-      - name: Update image tag for production
-        run: |
-          cd manifests/overlays/production
-          kustomize edit set image ghcr.io/digitalservice4germany/ris-backend-service:${{ env.CONTAINER_IMAGE_VERSION }}
-      - name: Commit and push changes for infra repository
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: EndBug/add-and-commit@050a66787244b10a4874a2a5f682130263edc192 # == v9.0.0
-        with:
-          add: manifests/overlays/production/kustomization.yaml
-          message: "Bump production image to ${{ env.CONTAINER_IMAGE_VERSION }}"
-          pathspec_error_handling: exitImmediately
-          push: true
-      - name: Trigger Argo CD sync
-        run: |
-          curl -sSL -o argocd https://${ARGOCD_SERVER}/download/argocd-linux-amd64
-          chmod +x argocd
-          ./argocd login ${ARGOCD_SERVER} --username pipeline --password ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
-          ./argocd app sync ris-production --auth-token $(./argocd account generate-token --account ris-production-deploy --expires-in 300s)
-          ./argocd app wait ris-production
-        env:
-          ARGOCD_SERVER: ${{ secrets.ARGOCD_SERVER }}
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          type: ${{ job.status }}
-          job_name: "Deploy production :point_right:"
-          mention: "here"
-          mention_if: "failure"
-          commit: true
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          token: ${{ secrets.GITHUB_TOKEN }}
+    uses: ./.github/workflows/deploy.yml
+    with:
+      environment: production
+      version: ${{ env.CONTAINER_IMAGE_VERSION }}
+    secrets:
+      deploy_key: ${{ secrets.DEPLOY_KEY }}
+      argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
+      argocd_server: ${{ secrets.ARGOCD_SERVER }}
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
