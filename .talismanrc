@@ -10,4 +10,4 @@ fileignoreconfig:
   - filename: .github/workflows/scan.yml
     checksum: 0e868ce9c94b51467fb0d9573635297d7d188460b3abae5ac1fb1363a8971756
   - filename: .github/workflows/deploy.yml
-    checksum: 4e77566c1c42cc13738088ac9d1790286e14b8992585504fb54a43f798a28718
+    checksum: 186ffd9190a79caf595b8e3f1b017b2fa45dc2522962d973bd39948e1b63f329
