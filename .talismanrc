@@ -1,11 +1,17 @@
 fileignoreconfig:
+  - filename: web/README.md
+    checksum: cf88055d62f75b93bb467bdcfba89fe9cf7bb596acc8a78cb43ffea0e6c9c1fe
   - filename: README.md
     checksum: 11c36522dca2dedca6871011c1df9df8f191d71d20f6d87c4ae3c0d503dc18fd
   - filename: build.gradle
-    checksum: ecd592adc72430e7740c84a9c323e40dba8ca3064840be169a0c6e1f66af17bf
+    checksum: c3a3900c9dbbfb92db65ddb97959e35bb9b61aa0f27fa53c6f542745b225f908
   - filename: .github/workflows/pipeline.yml
     checksum: 42a27db2a8e2c174d7f090f6ba7c12018d63ca2a4052121b58caa7196a02fb03
   - filename: .github/workflows/secrets-check.yml
     checksum: 836ea67ce7c67ecfb56519ff7f65ff461821cc221797f15c635108f212646664
   - filename: .github/workflows/scan.yml
     checksum: 0e868ce9c94b51467fb0d9573635297d7d188460b3abae5ac1fb1363a8971756
+  - filename: web/src/vite-env.d.ts
+    checksum: bd01dac4d1d5f67203c86b80002ad369b8dee49778e68d16530122b325b61f7c
+  - filename: web/package-lock.json
+    checksum: f77e6bcf2fbc8471c663be1bda4a95ad0fd6d77f9f3f4e4ef81dd98d48579393
