@@ -171,7 +171,7 @@ jobs:
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
     needs: build-and-push-image
-    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@7d48d7cad7af7b2d6c6a61780b74966b8227fe46
+    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@6107d6752cd3e8b81a6cafb5cc7d205adb487b63
     with:
       environment: staging
       version: ${{ needs.build-and-push-image.outputs.version }}
@@ -225,7 +225,7 @@ jobs:
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
     needs: [build-and-push-image, deploy-staging-verify]
-    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@7d48d7cad7af7b2d6c6a61780b74966b8227fe46
+    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@6107d6752cd3e8b81a6cafb5cc7d205adb487b63
     with:
       environment: production
       version: ${{ needs.build-and-push-image.outputs.version }}
