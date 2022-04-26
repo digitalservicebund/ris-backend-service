@@ -171,7 +171,7 @@ jobs:
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
     needs: build-and-push-image
-    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@8d971fb49b1425a099f1a244dae0b4eb955673bb
+    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@7d48d7cad7af7b2d6c6a61780b74966b8227fe46
     with:
       environment: staging
       version: ${{ needs.build-and-push-image.outputs.version }}
@@ -182,6 +182,8 @@ jobs:
       deploy_key: ${{ secrets.DEPLOY_KEY }}
       argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
       argocd_server: ${{ secrets.ARGOCD_SERVER }}
+      metrics_deployment_webhook_url: ${{ secrets.METRICS_DEPLOYMENT_WEBHOOK_URL }}
+      metrics_webhook_token: ${{ secrets.METRICS_WEBHOOK_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
 
   deploy-staging-verify:
@@ -223,7 +225,7 @@ jobs:
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
     needs: [build-and-push-image, deploy-staging-verify]
-    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@8d971fb49b1425a099f1a244dae0b4eb955673bb
+    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@7d48d7cad7af7b2d6c6a61780b74966b8227fe46
     with:
       environment: production
       version: ${{ needs.build-and-push-image.outputs.version }}
@@ -234,4 +236,6 @@ jobs:
       deploy_key: ${{ secrets.DEPLOY_KEY }}
       argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
       argocd_server: ${{ secrets.ARGOCD_SERVER }}
+      metrics_deployment_webhook_url: ${{ secrets.METRICS_DEPLOYMENT_WEBHOOK_URL }}
+      metrics_webhook_token: ${{ secrets.METRICS_WEBHOOK_TOKEN }}
       slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
