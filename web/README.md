@@ -1,4 +1,4 @@
-# typescript-vite-application-template
+# frontend
 
 Bootstrap a TypeScript application with Vite dev server and Continuous Delivery
 
@@ -7,6 +7,12 @@ Bootstrap a TypeScript application with Vite dev server and Continuous Delivery
 **Node.js 16.14.2**
 
 The repository contains a `.node-version` file to set up the required Node.js version automatically with [nodenv](https://github.com/nodenv/nodenv).
+
+Install dependencies:
+
+```bash
+npm i
+```
 
 For E2E and a11y testing with [Playwright](https://playwright.dev/docs/intro) you will need to install the supported browsers:
 
@@ -22,14 +28,6 @@ brew install lefthook talisman
 ```
 
 ## Development
-
-### Getting started
-
-**Optional - install [Git hooks](#git-hooks):**
-
-```bash
-./run.sh init
-```
 
 ### Dev server
 
