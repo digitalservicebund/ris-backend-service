@@ -27,4 +27,17 @@ class ApplicationJourneyTest {
         .expectStatus()
         .isOk();
   }
+
+  @Test
+  void webAppTest() {
+    WebTestClient.bindToServer()
+        .baseUrl(stagingUrl)
+        .build()
+        .get()
+        .uri("/index.html")
+        .exchange()
+        .expectBody()
+        .xpath("//html[contains(body, 'Hello World!')]")
+        .exists();
+  }
 }
