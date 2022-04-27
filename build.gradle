@@ -132,7 +132,7 @@ spotless {
   def prettierVersion = "2.6.1"
 
   format "misc", {
-    target "**/*.js", "**/*.json", "**/*.md", "**/*.yml", "**/*.ts"
+    target "**/*.html", "**/*.js", "**/*.json", "**/*.md", "**/*.ts", "**/*.yml"
     prettier(prettierVersion).configFile("web/.prettierrc.js")
   }
   format "properties", {
