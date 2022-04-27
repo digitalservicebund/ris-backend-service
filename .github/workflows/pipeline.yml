@@ -168,23 +168,43 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-staging:
+    runs-on: ubuntu-latest
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
+    environment: staging
     needs: build-and-push-image
-    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@6107d6752cd3e8b81a6cafb5cc7d205adb487b63
-    with:
-      environment: staging
-      version: ${{ needs.build-and-push-image.outputs.version }}
-      deploying_repo: ris-backend-service
-      infra_repo: ris-infra
-      app: ris-staging
-    secrets:
-      deploy_key: ${{ secrets.DEPLOY_KEY }}
-      argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
-      argocd_server: ${{ secrets.ARGOCD_SERVER }}
-      metrics_deployment_webhook_url: ${{ secrets.METRICS_DEPLOYMENT_WEBHOOK_URL }}
-      metrics_webhook_token: ${{ secrets.METRICS_WEBHOOK_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: digitalservice4germany/github-actions/argocd-deploy@b51920b9fdeeb0c8721c210853aee955bd7cefc0
+        with:
+          environment: staging
+          version: ${{ needs.build-and-push-image.outputs.version }}
+          deploying_repo: ris-backend-service
+          infra_repo: ris-infra
+          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          app: ris-staging
+          argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
+          argocd_server: ${{ secrets.ARGOCD_SERVER }}
+      - uses: digitalservice4germany/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
+        with:
+          project: RIS
+          environment: staging
+          metrics_deployment_webhook_url: ${{ secrets.METRICS_DEPLOYMENT_WEBHOOK_URL }}
+          metrics_webhook_token: ${{ secrets.METRICS_WEBHOOK_TOKEN }}
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Deploy staging :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-staging-verify:
     runs-on: ubuntu-latest
@@ -222,20 +242,40 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-production:
+    runs-on: ubuntu-latest
     # We only want to deploy from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
+    environment: production
     needs: [build-and-push-image, deploy-staging-verify]
-    uses: digitalservice4germany/github-actions-workflows/.github/workflows/argocd-deploy.yml@6107d6752cd3e8b81a6cafb5cc7d205adb487b63
-    with:
-      environment: production
-      version: ${{ needs.build-and-push-image.outputs.version }}
-      deploying_repo: ris-backend-service
-      infra_repo: ris-infra
-      app: ris-production
-    secrets:
-      deploy_key: ${{ secrets.DEPLOY_KEY }}
-      argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
-      argocd_server: ${{ secrets.ARGOCD_SERVER }}
-      metrics_deployment_webhook_url: ${{ secrets.METRICS_DEPLOYMENT_WEBHOOK_URL }}
-      metrics_webhook_token: ${{ secrets.METRICS_WEBHOOK_TOKEN }}
-      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - uses: digitalservice4germany/github-actions/argocd-deploy@b51920b9fdeeb0c8721c210853aee955bd7cefc0
+        with:
+          environment: production
+          version: ${{ needs.build-and-push-image.outputs.version }}
+          deploying_repo: ris-backend-service
+          infra_repo: ris-infra
+          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          app: ris-production
+          argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
+          argocd_server: ${{ secrets.ARGOCD_SERVER }}
+      - uses: digitalservice4germany/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
+        with:
+          project: RIS
+          environment: production
+          metrics_deployment_webhook_url: ${{ secrets.METRICS_DEPLOYMENT_WEBHOOK_URL }}
+          metrics_webhook_token: ${{ secrets.METRICS_WEBHOOK_TOKEN }}
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Deploy production :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
