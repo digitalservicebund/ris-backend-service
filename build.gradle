@@ -102,18 +102,6 @@ task journeyTest(type: Test) {
   }
 }
 
-task buildWebDependencies(type: Exec) {
-  workingDir "web"
-  commandLine 'npm', 'i'
-}
-
-task buildWeb(type: Exec) {
-  workingDir "web"
-  commandLine 'npm', 'run', 'build'
-}
-
-project.tasks["buildWeb"].dependsOn buildWebDependencies
-
 jacocoTestReport {
   // Jacoco hooks into all tasks of type: Test automatically, but results for each of these
   // tasks are kept separately and are not combined out of the box.. we want to gather

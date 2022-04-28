@@ -34,6 +34,30 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+      - name: Setup Node for web
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16.14.2"
+          cache: "npm"
+      - name: Install dependencies for web
+        run: |
+          npm install
+          npx --yes playwright install-deps
+          npx --yes playwright install
+          npx --yes playwright install msedge
+        working-directory: ./web
+      - name: Check style for web
+        run: npm run style:check
+        working-directory: ./web
+      - name: Run build for web
+        run: npm run build
+        working-directory: ./web
+      - name: Run tests for web
+        run: |
+          npm test
+          npm run test:e2e
+          npm run test:a11y
+        working-directory: ./web
       - name: Build container image
         run: ./gradlew bootBuildImage
       - name: Run Trivy vulnerability scanner
