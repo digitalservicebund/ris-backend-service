@@ -150,6 +150,18 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
+      - name: Setup Node for web
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.14.2"
+          cache: "npm"
+          cache-dependency-path: ./web/package-lock.json
+      - name: Install dependencies for web
+        run: npm install
+        working-directory: ./web
+      - name: Run build for web
+        run: npm run build
+        working-directory: ./web
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build and publish container image
