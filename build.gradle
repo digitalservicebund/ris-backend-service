@@ -132,16 +132,13 @@ spotless {
   def prettierVersion = "2.6.1"
 
   format "misc", {
-    target "**/*.html", "**/*.js", "**/*.json", "**/*.md", "**/*.ts", "**/*.yml"
-    prettier(prettierVersion).configFile("web/.prettierrc.js")
+    target "**/*.html", "**/*.js", "**/*.json", "**/*.md", "**/*.ts", "**/*.yml", "**/*.sh"
+    targetExclude "**/node_modules/**", "**/dist/**"
+    prettier(["prettier": prettierVersion, "prettier-plugin-sh": "0.7.1"]).configFile(".prettierrc.js")
   }
   format "properties", {
     target "**/*.properties"
     prettier(["prettier": prettierVersion, "prettier-plugin-properties": "0.1.0"]).config(["keySeparator": "="])
-  }
-  format "shellscript", {
-    target "**/*.sh"
-    prettier(["prettier": prettierVersion, "prettier-plugin-sh": "0.7.1"])
   }
 }
 
