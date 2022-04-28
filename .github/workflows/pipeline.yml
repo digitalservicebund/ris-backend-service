@@ -35,10 +35,11 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
       - name: Setup Node for web
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: "16.14.2"
           cache: "npm"
+          cache-dependency-path: ./web/package-lock.json
       - name: Install dependencies for web
         run: |
           npm install
