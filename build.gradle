@@ -22,6 +22,10 @@ repositories {
   mavenCentral()
 }
 
+jacoco {
+  toolVersion = "0.8.8"
+}
+
 // Force version for transient dependencies...=> CVE-2021-43797
 configurations.all {
   resolutionStrategy.eachDependency { details ->
