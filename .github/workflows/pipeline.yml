@@ -42,7 +42,7 @@ jobs:
           cache-dependency-path: ./web/package-lock.json
       - name: Install dependencies for web
         run: |
-          npm install
+          npm ci
           npx --yes playwright install-deps
           npx --yes playwright install
           npx --yes playwright install msedge
