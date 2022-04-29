@@ -37,7 +37,7 @@ jobs:
       - id: node-version
         run: |
           version=$(cat .node-version)
-          echo "::set-output name=version::version"
+          echo "::set-output name=version::$version"
         shell: bash
         working-directory: ./web
       - name: Setup Node for web
@@ -156,7 +156,7 @@ jobs:
       - id: node-version
         run: |
           version=$(cat .node-version)
-          echo "::set-output name=version::version"
+          echo "::set-output name=version::$version"
         shell: bash
         working-directory: ./web
       - name: Setup Node for web
