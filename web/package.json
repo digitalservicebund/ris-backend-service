@@ -22,7 +22,7 @@
     "check": "tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y"
   },
   "devDependencies": {
-    "@playwright-testing-library/test": "^4.2.0",
+    "@playwright-testing-library/test": "^4.2.1",
     "@playwright/test": "^1.21.1",
     "@testing-library/dom": "^8.13.0",
     "@testing-library/jest-dom": "^5.16.3",
