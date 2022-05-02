@@ -13,5 +13,5 @@ fileignoreconfig:
     checksum: 496d18cb49cf0b40e85347c9cb9e5f9a06931eca53896fd10d440835f598d603
   - filename: web/src/vite-env.d.ts
     checksum: bd01dac4d1d5f67203c86b80002ad369b8dee49778e68d16530122b325b61f7c
-  - filename: web/package-lock.json
-    checksum: 75738197675d80a664c500c064f004df3fcfe18ec2e782348784917314e89ad6
+scopeconfig:
+  - scope: node
