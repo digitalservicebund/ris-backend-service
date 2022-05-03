@@ -71,7 +71,7 @@ Subject
 
 Some context/description
 
-Addresses VER-${1#VER-}
+Addresses RISDEV-${1#RISDEV-}
 EOF
 }
 
@@ -81,7 +81,7 @@ _help() {
   echo "Available commands:"
   echo "init                  Set up repository for development"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
-  echo "                      issue number can be with or without prefix: 1234, VER-1234."
+  echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
 }
 
 cmd="${1:-}"
