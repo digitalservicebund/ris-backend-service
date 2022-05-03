@@ -77,7 +77,7 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  vulnerability-scan:
+  vulnerability-scan-image:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -118,7 +118,47 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Vulnerability scan :point_right:"
+          job_name: "Vulnerability scan image :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  vulnerability-scan-npm:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Trivy vulnerability scanner
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@a7a829a4345428ddd92ca57b18257440f6a18c90 # => 0.2.2
+        with:
+          scan-type: "fs"
+          scan-ref: "./web"
+          skip-dirs: "node_modules" # See https://github.com/aquasecurity/trivy/issues/1283
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always() # Bypass non-zero exit code..
+        with:
+          sarif_file: "trivy-results.sarif"
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Vulnerability scan npm :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
@@ -129,7 +169,7 @@ jobs:
     runs-on: ubuntu-latest
     # We only want to analyze trunk, not pull requests!
     if: github.event_name != 'pull_request'
-    needs: [build, vulnerability-scan]
+    needs: [build, vulnerability-scan-image, vulnerability-scan-npm]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -166,7 +206,7 @@ jobs:
     runs-on: ubuntu-latest
     # We only want to create images from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
-    needs: [build, vulnerability-scan]
+    needs: [build, vulnerability-scan-image, vulnerability-scan-npm]
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
