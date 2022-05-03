@@ -63,14 +63,31 @@ _init() {
   _setup_git_hooks
 }
 
+_commit_message_template() {
+  template="$PWD/.git/.gitmessage.txt"
+  git config commit.template "$template"
+  cat << EOF > "$template"
+Subject
+Some context/description
+Addresses VER-${1#VER-}
+EOF
+}
+
 _help() {
   echo "Usage: ./run.sh [command]"
   echo ""
   echo "Available commands:"
-  echo "init                Set up repository for development"
+  echo "init                  Set up repository for development"
+  echo "cm <issue-number>     Configure commit message template with given issue number;"
+  echo "                      issue number can be with or without prefix: 1234, VER-1234."
 }
 
-case "$@" in
+cmd="${1:-}"
+case "$cmd" in
   "init") _init ;;
+  "cm")
+    shift
+    _commit_message_template "$@"
+    ;;
   *) _help ;;
 esac
