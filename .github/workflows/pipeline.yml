@@ -166,7 +166,7 @@ jobs:
     runs-on: ubuntu-latest
     # We only want to create images from trunk, never for pull requests!
     if: github.event_name != 'pull_request'
-    needs: build
+    needs: [build, vulnerability-scan]
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
