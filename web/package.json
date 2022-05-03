@@ -18,7 +18,7 @@
     "format:fix": "prettier --write --ignore-unknown .",
     "style:check": "npm run format:check && npm run lint:check",
     "style:fix": "npm run format:fix && npm run lint:fix",
-    "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow 'MIT;ISC;BSD-3-Clause;Apache-2.0'",
+    "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''",
     "check": "tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y"
   },
   "devDependencies": {
