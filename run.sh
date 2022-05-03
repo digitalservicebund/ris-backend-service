@@ -68,7 +68,9 @@ _commit_message_template() {
   git config commit.template "$template"
   cat << EOF > "$template"
 Subject
+
 Some context/description
+
 Addresses VER-${1#VER-}
 EOF
 }
