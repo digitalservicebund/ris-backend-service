@@ -60,7 +60,9 @@ jobs:
           npm run test:a11y
         working-directory: ./web
       - name: Run license scanner
-        run: ./gradlew checkLicense
+        run: |
+          ./gradlew checkLicense
+          cd web && npm run audit:licences
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
