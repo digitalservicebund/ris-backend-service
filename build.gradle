@@ -132,17 +132,12 @@ spotless {
   groovyGradle {
     greclipse().configFile("greclipse.properties")
   }
-
-  def prettierVersion = "2.6.1"
-
   format "misc", {
-    target "**/*.html", "**/*.js", "**/*.json", "**/*.md", "**/*.ts", "**/*.yml", "**/*.sh"
+    target "**/*.html", "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.ts", "**/*.yml"
     targetExclude "**/node_modules/**", "**/dist/**", "**/static/**"
-    prettier(["prettier": prettierVersion, "prettier-plugin-sh": "0.7.1"]).configFile(".prettierrc.js")
-  }
-  format "properties", {
-    target "**/*.properties"
-    prettier(["prettier": prettierVersion, "prettier-plugin-properties": "0.1.0"]).config(["keySeparator": "="])
+    prettier(["prettier": "2.6.1", "prettier-plugin-properties": "0.1.0", "prettier-plugin-sh": "0.7.1"])
+    .configFile(".prettierrc.js")
+    .config(["keySeparator": "="])
   }
 }
 
