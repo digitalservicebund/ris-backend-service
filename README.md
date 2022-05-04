@@ -113,12 +113,12 @@ SONAR_TOKEN=[sonar-token] ./gradlew sonarqube
 Go to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservice4germany_ris-backend-service)
 for the analysis results.
 
-## Containers
+## Container image
 
-Container images running the application are automatically published to
+Container images running the application are automatically published by the pipeline to
 the [GitHub Packages Container registry](https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry).
 
-**To run the latest deployed image:**
+**To run the latest published image:**
 
 ```bash
 docker run -p8080:8080 "ghcr.io/digitalservice4germany/ris-backend-service:$(git log -1 origin/main --format='%H')"
@@ -141,10 +141,7 @@ Container images in the registry are [signed with keyless signatures](https://gi
 COSIGN_EXPERIMENTAL=1 cosign verify "ghcr.io/digitalservice4germany/ris-backend-service:$(git log -1 origin/main --format='%H')"
 ```
 
-## Deployment
-
-Deployment is performed automatically by the pipeline's `deploy` job. If you need to push a new container
-image to the registry manually there are two ways to do this:
+If you need to push a new container image to the registry manually there are two ways to do this:
 
 **Via built-in Gradle task:**
 
@@ -165,6 +162,22 @@ docker push "ghcr.io/digitalservice4germany/ris-backend-service:$(git log -1 --f
 ```
 
 **Note:** Make sure you're using a GitHub token with the necessary `write:packages` scope for this to work.
+
+## Deployment
+
+Changes in trunk are continuously deployed in the pipeline. After the staging deployment, the pipeline runs a verification step
+in form of journey tests against staging, to ensure we can safely proceed with deploying to production.
+
+Denoting a journey test is accomplished by using a JUnit 5 tag annotation: `@Tag("journey")`. Journey tests are excluded
+from unit and integration test sets.
+
+**To run the journey tests:**
+
+```bash
+STAGING_URL=[staging-url] ./gradlew journeyTest
+```
+
+When omitting the `STAGING_URL` env variable journey tests run against the local spring application.
 
 ## Vulnerability Scanning
 
