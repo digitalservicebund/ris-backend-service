@@ -15,6 +15,6 @@
     "noImplicitReturns": true,
     "types": ["@types/jest", "axe-playwright", "node"]
   },
-  "include": ["src", "test/**/*.ts", "jest.setup.ts"],
+  "include": ["src", "test/**/*.ts"],
   "exclude": ["test/e2e/**/*.ts", "test/a11y/**/*.ts"]
 }

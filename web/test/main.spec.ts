@@ -1,12 +1,10 @@
-import { getByText } from "@testing-library/dom"
+import { describe, it, expect } from 'vitest'
+
+const exampleDiv = document.createElement("h1")
+exampleDiv.innerHTML = "Hello DigitalService"
 
 describe("App", () => {
-  const exampleDiv = document.createElement("div")
-  exampleDiv.innerHTML = `
-  <h1>Hello DigitalService<h1>
-  `
-
   it("shows Hello ds", () => {
-    expect(getByText(exampleDiv, "Hello DigitalService")).toBeTruthy()
+    expect(exampleDiv.innerHTML).toBe("Hello DigitalService")
   })
 })
