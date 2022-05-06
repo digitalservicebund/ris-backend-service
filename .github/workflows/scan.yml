@@ -35,14 +35,14 @@ jobs:
           exit-code: "1" # Fail the build!
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
-        if: always() # Bypass non-zero exit code..
+        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
@@ -75,14 +75,14 @@ jobs:
           exit-code: "1" # Fail the build!
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
-        if: always() # Bypass non-zero exit code..
+        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65 # == v3.0.0
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
