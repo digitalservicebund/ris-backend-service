@@ -117,7 +117,6 @@ spotless {
         "**/dist/**", "**/static/**"
     // spotless:off
     prettier(["prettier": "2.6.1", "prettier-plugin-properties": "0.1.0", "prettier-plugin-sh": "0.7.1"])
-        .configFile(".prettierrc.js")
         .config(["keySeparator": "="])
     // spotless:on
   }
