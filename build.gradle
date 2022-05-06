@@ -112,8 +112,9 @@ spotless {
     toggleOffOn()
   }
   format "misc", {
-    target "**/*.html", "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.ts", "**/*.yml"
-    targetExclude "**/node_modules/**", "**/dist/**", "**/static/**"
+    target "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.yml"
+    targetExclude "web/**", // Has its own prettier setup!
+        "**/dist/**", "**/static/**"
     // spotless:off
     prettier(["prettier": "2.6.1", "prettier-plugin-properties": "0.1.0", "prettier-plugin-sh": "0.7.1"])
       .configFile(".prettierrc.js")
