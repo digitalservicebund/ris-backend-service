@@ -12,19 +12,11 @@ group = "de.bund.digitalservice"
 version = "0.0.1-SNAPSHOT"
 sourceCompatibility = "17"
 
-configurations {
-  compileOnly {
-    extendsFrom annotationProcessor
-  }
-}
+configurations { compileOnly { extendsFrom annotationProcessor } }
 
-repositories {
-  mavenCentral()
-}
+repositories { mavenCentral() }
 
-jacoco {
-  toolVersion = "0.8.8"
-}
+jacoco { toolVersion = "0.8.8" }
 
 // Force version for transient dependencies...=> CVE-2021-43797
 configurations.all {
@@ -64,29 +56,19 @@ dependencies {
   testImplementation "org.mockito:mockito-junit-jupiter:4.5.0"
 }
 
-jar {
-  // We have no need for the plain archive, thus skip creation for build speedup!
-  enabled = false
-}
+jar { // We have no need for the plain archive, thus skip creation for build speedup!
+  enabled = false }
 
 test {
-  useJUnitPlatform {
-    excludeTags "integration", "journey"
-  }
-  testLogging {
-    events "passed", "skipped", "failed"
-  }
+  useJUnitPlatform { excludeTags "integration", "journey" }
+  testLogging { events "passed", "skipped", "failed" }
 }
 
 task integrationTest(type: Test) {
   description = "Runs the integration tests."
   group = "verification"
-  useJUnitPlatform {
-    includeTags "integration"
-  }
-  testLogging {
-    events "passed", "skipped", "failed"
-  }
+  useJUnitPlatform { includeTags "integration" }
+  testLogging { events "passed", "skipped", "failed" }
   // So that running integration test require running unit tests first,
   // and we won"t even attempt running integration tests when there are
   // failing unit tests.
@@ -98,12 +80,8 @@ check.dependsOn integrationTest
 task journeyTest(type: Test) {
   description = "Runs the journey tests."
   group = "verification"
-  useJUnitPlatform {
-    includeTags "journey"
-  }
-  testLogging {
-    events "passed", "skipped", "failed"
-  }
+  useJUnitPlatform { includeTags "journey" }
+  testLogging { events "passed", "skipped", "failed" }
 }
 
 jacocoTestReport {
@@ -130,14 +108,17 @@ spotless {
     googleJavaFormat()
   }
   groovyGradle {
-    greclipse().configFile("greclipse.properties")
+    greclipse("4.6.3").configFile("greclipse.properties")
+    toggleOffOn()
   }
   format "misc", {
     target "**/*.html", "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.ts", "**/*.yml"
     targetExclude "**/node_modules/**", "**/dist/**", "**/static/**"
+    // spotless:off
     prettier(["prettier": "2.6.1", "prettier-plugin-properties": "0.1.0", "prettier-plugin-sh": "0.7.1"])
-    .configFile(".prettierrc.js")
-    .config(["keySeparator": "="])
+      .configFile(".prettierrc.js")
+      .config(["keySeparator": "="])
+    // spotless:on
   }
 }
 
