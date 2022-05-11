@@ -6,11 +6,11 @@ fileignoreconfig:
   - filename: build.gradle
     checksum: 9176a3e46a2fc875d1aa5870809215b30f4260efba3faba4caafb31329e5fc80
   - filename: .github/workflows/pipeline.yml
-    checksum: 35dd1592cc9c7bd063caa91007f0327fbe2f900b76f67b0f316867a43bd46b71
+    checksum: 59ecaf60b78f096b185d61c107eefa35110a4bd269ef193c62b85091e308093e
   - filename: .github/workflows/secrets-check.yml
     checksum: d7fbfab653dad354f2854b45545faed3a604e3ba356446e0f92f5889826e4a09
   - filename: .github/workflows/scan.yml
-    checksum: 3f1fc43e58961d7331e1d810a753bd7ad13d834803813a0788885f2a1497598a
+    checksum: 5fc24772dec7f3b93bc01117c1758ee6fdfea3163af3cdf448253f3ea4795cf4
   - filename: web/src/vite-env.d.ts
     checksum: bd01dac4d1d5f67203c86b80002ad369b8dee49778e68d16530122b325b61f7c
 scopeconfig:
