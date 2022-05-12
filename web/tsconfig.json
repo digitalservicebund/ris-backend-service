@@ -14,8 +14,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "types": ["@types/jest", "axe-playwright", "node"]
+    "types": ["axe-playwright", "node"]
   },
-  "include": ["src", "src/**/*.vue", "test/**/*.ts", "jest.setup.ts"],
+  "include": ["src", "src/**/*.vue", "test/**/*.ts"],
   "exclude": ["test/e2e/**/*.ts", "test/a11y/**/*.ts"]
 }
