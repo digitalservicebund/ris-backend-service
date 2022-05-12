@@ -293,8 +293,8 @@ jobs:
       - name: Checkout infra repository
         uses: actions/checkout@v3
         with:
-          repository: digitalservice4germany/${{ inputs.infra_repo }}
-          ssh-key: ${{ inputs.deploy_key }}
+          repository: digitalservice4germany/neuris-infra
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
       - name: Apply Terraform
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.OS_ACCESS_KEY }}
