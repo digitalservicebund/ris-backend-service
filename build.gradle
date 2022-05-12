@@ -46,6 +46,9 @@ dependencies {
   // => CVE-2021-42550
   implementation "ch.qos.logback:logback-classic:1.2.9"
   implementation "ch.qos.logback:logback-core:1.2.9"
+  implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
+  implementation "com.h2database:h2"
+  implementation "io.r2dbc:r2dbc-h2"
   compileOnly "org.projectlombok:lombok"
   developmentOnly "org.springframework.boot:spring-boot-devtools"
   annotationProcessor "org.projectlombok:lombok"
