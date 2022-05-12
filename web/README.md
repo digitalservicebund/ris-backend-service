@@ -1,6 +1,6 @@
 # frontend
 
-Bootstrap a TypeScript application with Vite dev server and Continuous Delivery
+Built with Vue
 
 ## Prerequisites
 
@@ -43,7 +43,7 @@ npm run dev
 
 The application has
 
-- unit tests (using [Jest](https://jestjs.io/docs/getting-started))
+- unit tests (using [Vitest](https://github.com/vitest-dev/vitest))
 - end-to-end tests (using [Playwright](https://playwright.dev/docs/intro))
 - accessibility tests (using [Axe](https://github.com/abhinaba-ghosh/axe-playwright#readme) and [Playwright](https://playwright.dev/docs/intro))
 
@@ -56,7 +56,7 @@ npm test
 **With watcher:**
 
 ```bash
-npm test -- --watch
+npx vitest
 ```
 
 **Gather coverage**:
@@ -94,28 +94,3 @@ npm run style:fix
 ```
 
 (Some problems might not autofix.)
-
-### Git hooks
-
-The repo contains a [Lefthook](https://github.com/evilmartians/lefthook/blob/master/docs/full_guide.md) configuration, providing a Git hooks setup out of the box.
-
-**To install these hooks, run:**
-
-```bash
-./run.sh init
-```
-
-The hooks are supposed to help to:
-
-- commit properly formatted and linted source code only (and not break the build otherwise)
-- write [conventional commit messages](https://chris.beams.io/posts/git-commit/)
-- not accidentally push [secrets and sensitive information](https://thoughtworks.github.io/talisman/)
-
-## Architecture Decision Records
-
-The `docs/adr` directory contains [architecture decisions](https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions).
-For adding new records the [adr-tools](https://github.com/npryce/adr-tools) command-line tool is useful but not strictly necessary:
-
-```bash
-brew install adr-tools
-```
