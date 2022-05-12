@@ -1,8 +1,8 @@
+import { createApp } from "vue"
+import App from "./App.vue"
+
 import "./style.css"
 
-const app = document.querySelector<HTMLDivElement>("#app")!
+const app = createApp(App)
 
-app.innerHTML = `
-  <h1>Hello DigitalService :)</h1>
-  <a href="https://vitejs.dev/guide/features.html" target="_blank">Vite Documentation</a>
-`
+app.mount("#app")

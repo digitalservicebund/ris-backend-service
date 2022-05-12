@@ -11,7 +11,7 @@ fileignoreconfig:
     checksum: d7fbfab653dad354f2854b45545faed3a604e3ba356446e0f92f5889826e4a09
   - filename: .github/workflows/scan.yml
     checksum: 5fc24772dec7f3b93bc01117c1758ee6fdfea3163af3cdf448253f3ea4795cf4
-  - filename: web/src/vite-env.d.ts
-    checksum: bd01dac4d1d5f67203c86b80002ad369b8dee49778e68d16530122b325b61f7c
+  - filename: web/src/env.d.ts
+    checksum: 2fc7947589e1b31ce952ff6c1b2997729aeb03fb151c38da56f01d51b26c2cc7
 scopeconfig:
   - scope: node
