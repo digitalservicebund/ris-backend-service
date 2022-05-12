@@ -1,6 +1,4 @@
 fileignoreconfig:
-  - filename: web/README.md
-    checksum: 3058c9d4de41051a9affde9ee3b47a938bb4e1b1d1eb775fcc628dfaaed6510d
   - filename: README.md
     checksum: 6b21d61d525624a47c6dd39cc8bd7f80e9392522c200dacbf66ce67346a07c25
   - filename: build.gradle
