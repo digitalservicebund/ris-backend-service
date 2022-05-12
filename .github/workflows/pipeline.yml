@@ -326,7 +326,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: staging
-    needs: deploy-infra-staging
+    needs: [build-and-push-image, deploy-infra-staging]
     steps:
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@e5a88da4a7c71de837e1d813ba6d90faf5ca0c83
@@ -400,7 +400,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: production
-    needs: [build-and-push-image, deploy-staging-verify]
+    needs: deploy-staging-verify
     steps:
       - name: Checkout infra repository
         uses: actions/checkout@v3
@@ -438,7 +438,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: production
-    needs: deploy-infra-production
+    needs: [build-and-push-image, deploy-infra-production]
     steps:
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@e5a88da4a7c71de837e1d813ba6d90faf5ca0c83
