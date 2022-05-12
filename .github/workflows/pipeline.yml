@@ -305,7 +305,7 @@ jobs:
           cd terraform/opentelekomcloud
           terraform init
           terraform workspace select staging
-          terraform plan
+          terraform apply -auto-approve
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
