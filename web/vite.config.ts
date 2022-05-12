@@ -6,4 +6,10 @@ export default defineConfig({
   build: {
     outDir: "../src/main/resources/static",
   },
+  test: {
+    globals: true,
+    environment: "jsdom",
+    include: ["test/**/*.ts"],
+    exclude: ["test/e2e/**/*.ts", "test/a11y/**/*.ts"],
+  },
 })
