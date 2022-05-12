@@ -302,6 +302,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.OS_SECRET_KEY }}
           OS_SECRET_KEY: ${{ secrets.OS_SECRET_KEY }}
         run: |
+          cd terraform/opentelekomcloud
           terraform workspace select staging
           terraform plan
       - name: Send status to Slack
