@@ -396,11 +396,49 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-production:
+  deploy-infra-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: production
     needs: [build-and-push-image, deploy-staging-verify]
+    steps:
+      - name: Checkout infra repository
+        uses: actions/checkout@v3
+        with:
+          repository: digitalservice4germany/neuris-infra
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
+      - name: Apply Terraform
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.OS_ACCESS_KEY }}
+          OS_ACCESS_KEY: ${{ secrets.OS_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.OS_SECRET_KEY }}
+          OS_SECRET_KEY: ${{ secrets.OS_SECRET_KEY }}
+        run: |
+          cd terraform/opentelekomcloud
+          terraform init
+          terraform workspace select production
+          terraform apply -auto-approve
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Deploy infra production :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    environment: production
+    needs: deploy-infra-production
     steps:
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@e5a88da4a7c71de837e1d813ba6d90faf5ca0c83
