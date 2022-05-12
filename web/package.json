@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vue-tsc && vite build",
     "preserve": "vite build",
     "serve": "vite preview",
     "clean": "rm -rf dist/",
@@ -12,14 +12,17 @@
     "test:e2e": "playwright test",
     "test:a11y": "playwright test --config=test/a11y/playwright.config.ts",
     "coverage": "jest test --coverage",
-    "lint:check": "eslint --ext .js,.ts --ignore-path .gitignore .",
+    "lint:check": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:fix": "npm run lint:check -- --fix",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write --ignore-unknown .",
     "style:check": "npm run format:check && npm run lint:check",
     "style:fix": "npm run format:fix && npm run lint:fix",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''",
-    "check": "tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y"
+    "check": "vue-tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y"
+  },
+  "dependencies": {
+    "vue": "^3.2.33"
   },
   "devDependencies": {
     "@playwright-testing-library/test": "^4.2.0",
@@ -38,6 +41,7 @@
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-vue": "^8.7.1",
+    "eslint-plugin-vuejs-accessibility": "^1.1.1",
     "jest": "^27.5.1",
     "license-checker": "^25.0.1",
     "playwright": "^1.21.1",
@@ -47,8 +51,5 @@
     "typescript": "^4.5.4",
     "vite": "^2.9.0",
     "vue-tsc": "^0.34.13"
-  },
-  "dependencies": {
-    "vue": "^3.2.33"
   }
 }

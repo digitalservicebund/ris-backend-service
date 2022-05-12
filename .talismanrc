@@ -12,6 +12,6 @@ fileignoreconfig:
   - filename: .github/workflows/scan.yml
     checksum: 5fc24772dec7f3b93bc01117c1758ee6fdfea3163af3cdf448253f3ea4795cf4
   - filename: web/src/env.d.ts
-    checksum: 2fc7947589e1b31ce952ff6c1b2997729aeb03fb151c38da56f01d51b26c2cc7
+    checksum: a41b58d348b4c500a19c84b7e961f74d4d1084dad1faf238621d7fc5d512f2f8
 scopeconfig:
   - scope: node

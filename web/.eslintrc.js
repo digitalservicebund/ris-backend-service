@@ -28,8 +28,16 @@ module.exports = {
   overrides: [
     // Avoid linting JavaScript config files with TypeScript rules...
     {
-      files: ["**/*.ts"],
-      extends: ["plugin:import/recommended", "plugin:import/typescript"],
+      files: ["**/*.{ts,vue}"],
+      extends: [
+        "plugin:import/recommended",
+        "plugin:import/typescript",
+        "plugin:vue/vue3-recommended",
+        "plugin:vuejs-accessibility/recommended",
+        "@vue/typescript/recommended",
+        "@vue/prettier",
+        "@vue/eslint-config-prettier",
+      ],
       rules: { ...moduleImportRules },
     },
     // ...and avoid linting TypeScript files with ES rules for JavaScript config files!
