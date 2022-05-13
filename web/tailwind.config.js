@@ -4,4 +4,5 @@ module.exports = {
     extend: {},
   },
   plugins: [],
+  presets: [require("@digitalservice4germany/style-dictionary/tailwind")],
 }
