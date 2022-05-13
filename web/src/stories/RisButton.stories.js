@@ -1,28 +1,29 @@
-import RisButton from '../components/RisButton.vue';
-
+import RisButton from "../components/RisButton.vue"
+/* eslint-disable import/exports-last*/
 export default {
-  title: 'Components/Button',
+  title: "Components/Button",
   component: RisButton,
   argTypes: {
-    backgroundColor: { control: 'color' },
+    backgroundColor: { control: "color" },
     onClick: {},
     size: {
-      control: { type: 'select' },
-      options: ['small', 'medium', 'large'],
+      control: { type: "select" },
+      options: ["small", "medium", "large"],
     },
   },
-};
+}
 
 const Template = (args) => ({
   components: { RisButton },
   setup() {
-    return { args };
+    return { args }
   },
   template: '<ris-button v-bind="args" />',
-});
+})
 
-export const Primary = Template.bind({});
+export const Primary = Template.bind({})
 Primary.args = {
   primary: true,
-  label: 'Button',
-};
+  label: "Button",
+}
+/* eslint-enable import/exports-last*/
