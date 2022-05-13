@@ -1,5 +1,5 @@
 import RisButton from "../components/RisButton.vue"
-/* eslint-disable import/exports-last*/
+
 export default {
   title: "Components/Button",
   component: RisButton,
@@ -26,4 +26,3 @@ Primary.args = {
   primary: true,
   label: "Button",
 }
-/* eslint-enable import/exports-last*/
