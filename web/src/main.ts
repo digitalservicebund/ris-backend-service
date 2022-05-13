@@ -1,7 +1,7 @@
 import { createApp } from "vue"
-import { VuesticPluginsWithoutComponents } from "vuestic-ui"
+import { VuesticPlugin } from "vuestic-ui"
 import App from "./App.vue"
 
 import "./index.css"
 
-createApp(App).use(VuesticPluginsWithoutComponents).mount("#app")
+createApp(App).use(VuesticPlugin).mount("#app")

@@ -1,6 +1,6 @@
 // See https://github.com/import-js/eslint-plugin-import
 const moduleImportRules = {
-  "import/exports-last": 2,
+  "import/exports-last": 1,
   "import/first": 2,
   "import/newline-after-import": 2,
   "import/no-duplicates": 2,
