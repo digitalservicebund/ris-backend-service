@@ -14,7 +14,6 @@ const moduleImportRules = {
     },
   ],
 }
-
 module.exports = {
   root: true,
   env: {
@@ -39,12 +38,12 @@ module.exports = {
         "@vue/eslint-config-prettier",
       ],
       rules: { ...moduleImportRules },
-    },
-    // ...and avoid linting TypeScript files with ES rules for JavaScript config files!
+    }, // ...and avoid linting TypeScript files with ES rules for JavaScript config files!
     {
       files: ["**/*.js"],
       extends: ["eslint:recommended", "plugin:import/recommended"],
       rules: { ...moduleImportRules },
     },
   ],
+  extends: ["plugin:storybook/recommended"],
 }
