@@ -1,5 +1,9 @@
 package de.bund.digitalservice.ris.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.*;
+
 import de.bund.digitalservice.ris.datamodel.DocUnit;
 import de.bund.digitalservice.ris.repository.DocUnitRepository;
 import org.junit.jupiter.api.Test;
@@ -10,10 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
 
 @SpringBootTest
 class DocUnitServiceTest {
