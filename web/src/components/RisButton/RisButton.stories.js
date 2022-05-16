@@ -1,10 +1,9 @@
-import RisButton from "../components/RisButton.vue"
+import RisButton from "./RisButton.vue"
 
 export default {
   title: "Components/Button",
   component: RisButton,
   argTypes: {
-    backgroundColor: { control: "color" },
     onClick: {},
     size: {
       control: { type: "select" },

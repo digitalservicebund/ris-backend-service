@@ -1,0 +1,13 @@
+:root {
+    --va-button-font-size: 1rem;
+    --va-button-lg-font-size: 1.125rem;
+    --va-button-sm-font-size: 1rem;
+
+    --va-button-square-border-radius: none;
+    --va-button-lg-square-border-radius: none;
+    --va-button-sm-square-border-radius: none;
+
+    --va-button-size: 3rem;
+    --va-button-lg-size: 4rem;
+    --va-button-sm-size: 2.5rem;
+}

@@ -1,3 +1,5 @@
+import "../src/services/vuestic-ui/overrides.css"
+
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
   controls: {
