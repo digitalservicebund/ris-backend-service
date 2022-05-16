@@ -1,0 +1,5 @@
+CREATE TABLE doc_unit (
+    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    s3path VARCHAR(255),
+    filetype VARCHAR(30)
+);

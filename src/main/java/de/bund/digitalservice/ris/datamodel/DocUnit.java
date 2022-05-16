@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+public
 class DocUnit {
   @Id Integer id;
   String s3path;
