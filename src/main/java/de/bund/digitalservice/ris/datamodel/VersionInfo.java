@@ -1,7 +1,10 @@
 package de.bund.digitalservice.ris.datamodel;
 
+import lombok.Data;
+
+@Data
 public class VersionInfo {
 
-  public String version = "0.0.1";
-  public String commit = "abcdef";
+  private String version;
+  private String commitSHA;
 }

@@ -242,6 +242,10 @@ jobs:
       - name: Run build for web
         run: npm run build
         working-directory: ./web
+      - name: Store commit SHA that triggered workflow run
+        run: |
+          echo 'commit SHA: ${{ github.sha }}'
+          echo '${{ github.sha }}' > .commit-sha
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build and publish container image
