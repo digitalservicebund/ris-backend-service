@@ -22,7 +22,7 @@ public class VersionController {
   }
 
   @GetMapping(value = "version")
-  public Mono<ResponseEntity<String>> getVersion() {
+  public Mono<ResponseEntity<Object>> getVersion() {
     log.info("version info requested");
 
     return service.generateVersionInfo();
