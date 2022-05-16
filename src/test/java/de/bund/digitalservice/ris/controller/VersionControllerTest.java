@@ -23,7 +23,7 @@ class VersionControllerTest {
         .expectBody()
         .jsonPath("$.version")
         .isEqualTo("0.0.1")
-        .jsonPath("$.commit")
-        .isEqualTo("abcdef");
+        .jsonPath("$.commitSHA")
+        .exists();
   }
 }
