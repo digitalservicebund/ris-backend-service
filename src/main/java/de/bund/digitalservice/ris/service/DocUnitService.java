@@ -12,28 +12,28 @@ import reactor.core.publisher.Mono;
 @Service
 @Slf4j
 public class DocUnitService {
-    private final DocUnitRepository repository;
+  private final DocUnitRepository repository;
 
-    public DocUnitService(DocUnitRepository repository) {
-        Assert.notNull(repository, "doc unit repository is null");
+  public DocUnitService(DocUnitRepository repository) {
+    Assert.notNull(repository, "doc unit repository is null");
 
-        this.repository = repository;
-    }
+    this.repository = repository;
+  }
 
-    public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(FilePart filePart) {
-        log.debug("generate doc unit for {}", filePart.filename());
-        var docUnitEntity = generateDataObject(filePart.filename(), "docx");
+  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(FilePart filePart) {
+    log.debug("generate doc unit for {}", filePart.filename());
+    var docUnitEntity = generateDataObject(filePart.filename(), "docx");
 
-        log.debug("save doc unit");
-        var docUnit = repository.save(docUnitEntity);
+    log.debug("save doc unit");
+    var docUnit = repository.save(docUnitEntity);
 
-        return docUnit.map(ResponseEntity::ok);
-    }
+    return docUnit.map(ResponseEntity::ok);
+  }
 
-    private DocUnit generateDataObject(String filename, String type) {
-        var docUnit = new DocUnit();
-        docUnit.setS3path(filename);
-        docUnit.setFiletype(type);
-        return docUnit;
-    }
+  private DocUnit generateDataObject(String filename, String type) {
+    var docUnit = new DocUnit();
+    docUnit.setS3path(filename);
+    docUnit.setFiletype(type);
+    return docUnit;
+  }
 }

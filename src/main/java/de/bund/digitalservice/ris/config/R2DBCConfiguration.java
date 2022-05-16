@@ -18,8 +18,8 @@ import java.util.HashMap;
 public class R2DBCConfiguration extends AbstractR2dbcConfiguration {
   @Bean
   public ConnectionFactory connectionFactory() {
-    return ConnectionFactoryBuilder
-            .withUrl("r2dbc:h2:mem:///testdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
-            .build();
+    return ConnectionFactoryBuilder.withUrl(
+            "r2dbc:h2:mem:///testdb?options=DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE")
+        .build();
   }
 }

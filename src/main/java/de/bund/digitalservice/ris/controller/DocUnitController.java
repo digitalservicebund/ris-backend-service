@@ -16,18 +16,18 @@ import reactor.core.publisher.Mono;
 @RequestMapping("api/v1/docunit")
 @Slf4j
 public class DocUnitController {
-    private final DocUnitService service;
+  private final DocUnitService service;
 
-    public DocUnitController(DocUnitService service) {
-        Assert.notNull(service, "DocUnitService is null");
+  public DocUnitController(DocUnitService service) {
+    Assert.notNull(service, "DocUnitService is null");
 
-        this.service = service;
-    }
+    this.service = service;
+  }
 
-    @PostMapping(value = "upload")
-    public Mono<ResponseEntity<DocUnit>> uploadFile(@RequestPart("fileToUpload") FilePart filePart) {
-        log.info("uploaded file name {}", filePart.filename());
+  @PostMapping(value = "upload")
+  public Mono<ResponseEntity<DocUnit>> uploadFile(@RequestPart("fileToUpload") FilePart filePart) {
+    log.info("uploaded file name {}", filePart.filename());
 
-        return service.generateNewDocUnit(filePart);
-    }
+    return service.generateNewDocUnit(filePart);
+  }
 }

@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
 @Component
-public
-interface DocUnitRepository extends ReactiveCrudRepository<DocUnit, Integer> {
+public interface DocUnitRepository extends ReactiveCrudRepository<DocUnit, Integer> {
 
   @Query("select id, s3path, filetype from DOC_UNIT where filetype = $1")
   Flux<DocUnit> findByFileType(String filetype);
