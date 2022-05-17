@@ -1,5 +1,13 @@
-<script setup lang="ts"></script>
-
 <template>
-  <h1 class="text-2xl text-center text-blue-800 m-4">Hello DigitalService!</h1>
+  <v-app>
+    <v-main>
+      <HelloWorld />
+      <RisButton></RisButton>
+    </v-main>
+  </v-app>
 </template>
+
+<script lang="ts" setup>
+import HelloWorld from "./components/HelloWorld.vue"
+import RisButton from "./components/RisButton.vue"
+</script>

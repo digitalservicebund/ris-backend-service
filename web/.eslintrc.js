@@ -13,6 +13,7 @@ const moduleImportRules = {
       },
     },
   ],
+  "import/no-unresolved": [0, { caseSensitive: false }],
 }
 module.exports = {
   root: true,
@@ -44,12 +45,5 @@ module.exports = {
       extends: ["eslint:recommended", "plugin:import/recommended"],
       rules: { ...moduleImportRules },
     },
-    {
-      files: ["*.stories.@(ts|tsx|js|jsx|mjs|cjs)"],
-      rules: {
-        "import/exports-last": 0,
-      },
-    },
   ],
-  extends: ["plugin:storybook/recommended"],
 }
