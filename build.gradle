@@ -145,6 +145,8 @@ bootBuildImage {
   def containerImageName = System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservice4germany/${rootProject.name}"
   def containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
+  environment = ["COMMIT_SHA" : "${containerImageVersion}"]
+
   imageName = "${containerRegistry}/${containerImageName}:${containerImageVersion}"
   publish = false
   docker {
