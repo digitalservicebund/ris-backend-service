@@ -14,6 +14,6 @@ fileignoreconfig:
   - filename: src/main/resources/schema.sql
     checksum: 42fab4fa1fbe25d8f80abe82634d3b06de91e132b9a2d9d101c6c03a16686688
   - filename: web/.env.development
-    checksum: eb4aa5ac7c97f2d63b2ab2decd19e4c70d96bec84f54170626f78c10c3c83441
+    checksum: 7443587c94ecd708b8e562b7b017164a9aecd6f1c8dec9740dc22db7ca2ab89a
 scopeconfig:
   - scope: node
