@@ -1,15 +1,19 @@
 package de.bund.digitalservice.ris.controller;
 
+import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.service.DocUnitService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -39,5 +43,9 @@ class DocUnitControllerTest {
         .exchange()
         .expectStatus()
         .isOk();
+
+    ArgumentCaptor<FilePart> captor = ArgumentCaptor.forClass(FilePart.class);
+    verify(service).generateNewDocUnit(captor.capture());
+    Assertions.assertEquals("test.docx", captor.getValue().filename());
   }
 }
