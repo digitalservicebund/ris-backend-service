@@ -6,11 +6,15 @@ import de.bund.digitalservice.ris.datamodel.VersionInfo;
 import java.util.Objects;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
+@SpringBootTest(properties = "api.version.version=dummyVersionValue")
 class VersionServiceTest {
+
+  @Value("${api.version.version}")
+  private String VERSION;
 
   @Autowired private VersionService service;
 
@@ -22,7 +26,7 @@ class VersionServiceTest {
               assertNotNull(responseEntity);
               assertTrue(responseEntity.getStatusCode().is2xxSuccessful());
               VersionInfo versionInfo = (VersionInfo) responseEntity.getBody();
-              assertEquals(Objects.requireNonNull(versionInfo).getVersion(), "0.0.1");
+              assertEquals(Objects.requireNonNull(versionInfo).getVersion(), VERSION);
               assertNotNull(versionInfo.getCommitSHA());
             })
         .verifyComplete();

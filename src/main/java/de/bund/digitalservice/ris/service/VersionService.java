@@ -15,12 +15,15 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class VersionService {
 
+  @Value("${api.version.version}")
+  private String VERSION;
+
   @Value("${api.version.commit-sha-file:#{null}}")
   private Path COMMIT_SHA_FILE;
 
   public Mono<ResponseEntity<Object>> generateVersionInfo() {
     VersionInfo info = new VersionInfo();
-    info.setVersion("0.0.1");
+    info.setVersion(VERSION);
     String commitSha = "Commit SHA not available";
     if (Objects.nonNull(COMMIT_SHA_FILE) && COMMIT_SHA_FILE.toFile().exists()) {
       try {
