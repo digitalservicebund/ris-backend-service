@@ -10,8 +10,10 @@ fileignoreconfig:
   - filename: .github/workflows/scan.yml
     checksum: 5fc24772dec7f3b93bc01117c1758ee6fdfea3163af3cdf448253f3ea4795cf4
   - filename: web/src/env.d.ts
-    checksum: a41b58d348b4c500a19c84b7e961f74d4d1084dad1faf238621d7fc5d512f2f8
+    checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
   - filename: src/main/resources/schema.sql
     checksum: 42fab4fa1fbe25d8f80abe82634d3b06de91e132b9a2d9d101c6c03a16686688
+  - filename: web/.env.development
+    checksum: eb4aa5ac7c97f2d63b2ab2decd19e4c70d96bec84f54170626f78c10c3c83441
 scopeconfig:
   - scope: node
