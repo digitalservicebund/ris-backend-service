@@ -246,6 +246,8 @@ jobs:
         run: |
           echo 'commit SHA: ${{ github.sha }}'
           export COMMIT_SHA='${{ github.sha }}'
+          echo '${{ github.sha }}' > .commit-sha
+        working-directory: ./src/main/resources
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Build and publish container image
