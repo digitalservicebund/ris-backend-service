@@ -24,6 +24,7 @@ class VersionServiceTest {
               VersionInfo versionInfo = (VersionInfo) responseEntity.getBody();
               assertEquals(Objects.requireNonNull(versionInfo).getVersion(), "0.0.1");
               assertNotNull(versionInfo.getCommitSHA());
+              assertNotNull(versionInfo.getRepository());
             })
         .verifyComplete();
   }
