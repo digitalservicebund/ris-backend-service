@@ -13,8 +13,4 @@ export default defineConfig({
     include: ["test/**/*.ts"],
     exclude: ["test/e2e/**/*.ts", "test/a11y/**/*.ts"],
   },
-  // [vuestic-ui] Add alias for ~normalize.css.
-  resolve: {
-    alias: [{ find: /^~(.*)$/, replacement: "$1" }],
-  },
 })

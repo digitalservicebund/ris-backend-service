@@ -1,10 +1,9 @@
 <template>
-  <va-button> {{ label }} </va-button>
+  <button>{{ label }}</button>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue"
-import { VaButton } from "vuestic-ui"
 
 const label = ref("button")
 </script>
