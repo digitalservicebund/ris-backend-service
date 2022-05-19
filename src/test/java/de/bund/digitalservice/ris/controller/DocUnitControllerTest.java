@@ -48,4 +48,15 @@ class DocUnitControllerTest {
     verify(service).generateNewDocUnit(captor.capture());
     Assertions.assertEquals("test.docx", captor.getValue().filename());
   }
+
+  @Test
+  public void testGetAll() {
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/docunit/getAll")
+        .exchange()
+        .expectStatus()
+        .isOk();
+  }
 }

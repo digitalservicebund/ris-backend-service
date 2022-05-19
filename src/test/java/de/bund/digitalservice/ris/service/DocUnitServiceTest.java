@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 
 import de.bund.digitalservice.ris.datamodel.DocUnit;
 import de.bund.digitalservice.ris.repository.DocUnitRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -43,5 +44,14 @@ class DocUnitServiceTest {
               assertEquals(ResponseEntity.ok(savedDocUnit), docUnit);
             })
         .verifyComplete();
+  }
+
+  @Test
+  public void testGetAll() {
+    StepVerifier.create(service.getAllDocUnits())
+        .consumeNextWith(Assertions::assertNotNull)
+        .verifyComplete();
+
+    verify(repository, times(1)).findAll();
   }
 }
