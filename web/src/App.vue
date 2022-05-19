@@ -10,7 +10,14 @@
       </v-row>
       <v-row class="text-center">
         <v-col class="mb-4">
-          <v-btn @click="updateVersion">update API version</v-btn>
+          <v-btn
+            :ripple="false"
+            :flat="true"
+            color="blue800"
+            @click="updateVersion"
+          >
+            {{ label }}
+          </v-btn>
         </v-col>
       </v-row>
     </v-main>
@@ -23,8 +30,15 @@ import { getVersion } from "./api"
 import HelloWorld from "./components/HelloWorld.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
+const label = ref("update API version")
 
 const updateVersion = async () => {
   version.value = await getVersion()
 }
 </script>
+
+<style scoped lang="scss">
+.v-btn {
+  border-radius: $btn-border-radius;
+}
+</style>

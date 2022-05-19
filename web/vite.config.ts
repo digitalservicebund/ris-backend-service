@@ -31,4 +31,13 @@ export default defineConfig({
       "@": path.resolve(__dirname, "src"),
     },
   },
+  css: {
+    preprocessorOptions: {
+      scss: {
+        // Make the variables defined in these files available to all components, without requiring an explicit
+        // @import of the files themselves
+        additionalData: '@import "@/styles/_variables.scss";',
+      },
+    },
+  },
 })
