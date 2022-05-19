@@ -6,10 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -29,5 +27,12 @@ public class DocUnitController {
     log.info("uploaded file name {}", filePart.filename());
 
     return service.generateNewDocUnit(filePart);
+  }
+
+  @GetMapping(value = "getAll")
+  public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
+    log.info("All DocUnits were requested");
+
+    return service.getAllDocUnits();
   }
 }

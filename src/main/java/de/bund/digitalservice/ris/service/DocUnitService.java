@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Service
@@ -35,5 +36,9 @@ public class DocUnitService {
     docUnit.setS3path(filename);
     docUnit.setFiletype(type);
     return docUnit;
+  }
+
+  public Mono<ResponseEntity<Flux<DocUnit>>> getAllDocUnits() {
+    return Mono.just(ResponseEntity.ok(repository.findAll()));
   }
 }
