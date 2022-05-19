@@ -58,5 +58,7 @@ class DocUnitControllerTest {
         .exchange()
         .expectStatus()
         .isOk();
+
+    verify(service).getAll();
   }
 }

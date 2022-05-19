@@ -48,10 +48,10 @@ class DocUnitServiceTest {
 
   @Test
   public void testGetAll() {
-    StepVerifier.create(service.getAllDocUnits())
+    StepVerifier.create(service.getAll())
         .consumeNextWith(Assertions::assertNotNull)
         .verifyComplete();
 
-    verify(repository, times(1)).findAll();
+    verify(repository).findAll();
   }
 }

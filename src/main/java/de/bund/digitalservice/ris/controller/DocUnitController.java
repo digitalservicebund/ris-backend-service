@@ -33,6 +33,6 @@ public class DocUnitController {
   public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
     log.info("All DocUnits were requested");
 
-    return service.getAllDocUnits();
+    return service.getAll();
   }
 }

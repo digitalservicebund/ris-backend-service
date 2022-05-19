@@ -38,7 +38,7 @@ public class DocUnitService {
     return docUnit;
   }
 
-  public Mono<ResponseEntity<Flux<DocUnit>>> getAllDocUnits() {
+  public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
     return Mono.just(ResponseEntity.ok(repository.findAll()));
   }
 }
