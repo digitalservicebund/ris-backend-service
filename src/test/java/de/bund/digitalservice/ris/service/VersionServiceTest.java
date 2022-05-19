@@ -4,14 +4,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import de.bund.digitalservice.ris.datamodel.VersionInfo;
 import java.util.Objects;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.test.StepVerifier;
 
-@SpringBootTest
+@SpringBootTest(properties = { "otc.obs.bucket-name=testBucket" })
+@Tag("test")
 class VersionServiceTest {
-
   @Autowired private VersionService service;
 
   @Test

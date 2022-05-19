@@ -51,10 +51,18 @@ dependencies {
   implementation "io.r2dbc:r2dbc-h2:0.9.1.RELEASE"
   implementation "io.r2dbc:r2dbc-spi:1.0.0.RELEASE"
   implementation "io.r2dbc:r2dbc-pool:0.9.0.RELEASE"
+
+  implementation platform("software.amazon.awssdk:bom:2.17.191")
+  implementation "software.amazon.awssdk:netty-nio-client"
+  implementation "software.amazon.awssdk:s3"
+
   compileOnly "org.projectlombok:lombok"
   developmentOnly "org.springframework.boot:spring-boot-devtools"
   annotationProcessor "org.projectlombok:lombok"
-  testImplementation "org.springframework.boot:spring-boot-starter-test"
+  testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    exclude group: "org.mockito", module: "mockito-core"
+  }
+  testImplementation "org.mockito:mockito-inline:4.0.0"
   testImplementation "io.projectreactor:reactor-test"
   testImplementation "org.springframework.security:spring-security-test"
   testImplementation "com.tngtech.archunit:archunit-junit5:0.23.0"
