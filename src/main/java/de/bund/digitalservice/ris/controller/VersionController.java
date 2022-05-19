@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.controller;
 
+import de.bund.digitalservice.ris.datamodel.VersionInfo;
 import de.bund.digitalservice.ris.service.VersionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,7 @@ public class VersionController {
   }
 
   @GetMapping(value = "version")
-  public Mono<ResponseEntity<Object>> getVersion() {
+  public Mono<ResponseEntity<VersionInfo>> getVersion() {
     log.info("version info requested");
 
     return service.generateVersionInfo();
