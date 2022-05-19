@@ -40,7 +40,7 @@
     "@storybook/addon-essentials": "^6.4.22",
     "@storybook/addon-links": "^6.4.22",
     "@storybook/storybook-deployer": "^2.8.11",
-    "@storybook/vue3": "^6.4.22",
+    "@storybook/vue3": "^6.5.0",
     "@testing-library/dom": "^8.13.0",
     "@types/node": "^17.0.23",
     "@types/webfontloader": "^1.0.0",
