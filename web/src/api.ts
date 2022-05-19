@@ -1,4 +1,4 @@
-type Endpoint = "version"
+type Endpoint = "version" | "docunit/upload"
 
 const makeRequest = async (
   endpoint: Endpoint,
@@ -20,4 +20,14 @@ const makeRequest = async (
 
 export const getVersion = async () => {
   return await makeRequest("version")
+}
+
+export const uploadDocUnit = async (file: File) => {
+  const data = new FormData()
+  data.append("fileToUpload", file)
+
+  return await makeRequest("docunit/upload", {
+    method: "post",
+    body: data,
+  })
 }
