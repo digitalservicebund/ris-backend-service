@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vite preview",
-    "build": "vite build",
+    "build": "vue-tsc && vite build",
     "test:e2e": "playwright test",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''",
     "check": "vue-tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y",
@@ -28,6 +28,7 @@
     "@mdi/font": "5.9.55",
     "roboto-fontface": "*",
     "vue": "^3.2.33",
+    "vue-router": "^4.0.15",
     "vuetify": "^3.0.0-beta.0",
     "webfontloader": "^1.0.0"
   },
