@@ -1,3 +1,16 @@
+<script lang="ts" setup>
+import { ref } from "vue"
+import { getVersion } from "./api"
+import HelloWorld from "./components/HelloWorld.vue"
+
+const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
+const label = ref("update API version")
+
+const updateVersion = async () => {
+  version.value = await getVersion()
+}
+</script>
+
 <template>
   <v-app>
     <v-main>
@@ -23,19 +36,6 @@
     </v-main>
   </v-app>
 </template>
-
-<script lang="ts" setup>
-import { ref } from "vue"
-import { getVersion } from "./api"
-import HelloWorld from "./components/HelloWorld.vue"
-
-const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
-const label = ref("update API version")
-
-const updateVersion = async () => {
-  version.value = await getVersion()
-}
-</script>
 
 <style scoped lang="scss">
 .v-btn {
