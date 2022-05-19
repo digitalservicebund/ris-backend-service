@@ -60,9 +60,9 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  private Mono<PutObjectResponse> putObjectIntoBucket(String fileKey, Flux<ByteBuffer> byteBufferFlux) {
+  private Mono<PutObjectResponse> putObjectIntoBucket(String fileUuid, Flux<ByteBuffer> byteBufferFlux) {
     var putObjectRequest =
-        PutObjectRequest.builder().bucket(bucketName).key(fileKey).build();
+        PutObjectRequest.builder().bucket(bucketName).key(fileUuid).build();
     var asyncRequestBody = AsyncRequestBody.fromPublisher(byteBufferFlux);
     return Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody));
   }
