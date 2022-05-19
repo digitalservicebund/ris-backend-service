@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vite preview",
-    "build": "vue-tsc && vite build",
+    "build": "vite build",
     "test:e2e": "playwright test",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''",
     "check": "vue-tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y",
@@ -25,7 +25,11 @@
     "test:a11y": "playwright test --config=test/a11y/playwright.config.ts"
   },
   "dependencies": {
-    "vue": "^3.2.33"
+    "@mdi/font": "5.9.55",
+    "roboto-fontface": "*",
+    "vue": "^3.2.33",
+    "vuetify": "^3.0.0-beta.0",
+    "webfontloader": "^1.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.17.10",
@@ -39,12 +43,14 @@
     "@storybook/vue3": "^6.4.22",
     "@testing-library/dom": "^8.13.0",
     "@types/node": "^17.0.23",
+    "@types/webfontloader": "^1.0.0",
     "@typescript-eslint/eslint-plugin": "^5.25.0",
     "@typescript-eslint/parser": "^5.23.0",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^10.0.0",
     "@vue/test-utils": "^2.0.0-rc.21",
+    "@vuetify/vite-plugin": "^1.0.0-alpha.0",
     "autoprefixer": "^10.4.7",
     "axe-playwright": "^1.1.11",
     "babel-loader": "^8.2.5",
@@ -60,12 +66,16 @@
     "playwright": "^1.22.0",
     "postcss": "^8.4.13",
     "prettier": "2.6.2",
+    "sass": "^1.38.0",
+    "sass-loader": "^10.0.0",
     "tailwindcss": "^3.0.24",
     "ts-node": "^10.7.0",
     "typescript": "^4.5.4",
     "vite": "^2.9.0",
     "vitest": "^0.12.4",
+    "vue-cli-plugin-vuetify": "~2.4.8",
     "vue-loader": "^17.0.0",
-    "vue-tsc": "^0.34.13"
+    "vue-tsc": "^0.34.13",
+    "vuetify-loader": "^2.0.0-alpha.0"
   }
 }

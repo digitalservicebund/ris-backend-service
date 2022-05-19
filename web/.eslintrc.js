@@ -13,6 +13,7 @@ const moduleImportRules = {
       },
     },
   ],
+  "import/no-unresolved": 0,
 }
 module.exports = {
   root: true,
