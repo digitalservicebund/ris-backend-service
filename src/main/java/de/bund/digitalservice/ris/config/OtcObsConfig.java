@@ -23,15 +23,13 @@ public class OtcObsConfig {
 
   @Bean
   public S3AsyncClient amazonS3Async() throws URISyntaxException {
-    SdkAsyncHttpClient httpClient = NettyNioAsyncHttpClient.builder()
-            .writeTimeout(Duration.ZERO)
-            .maxConcurrency(64)
-            .build();
+    SdkAsyncHttpClient httpClient =
+        NettyNioAsyncHttpClient.builder().writeTimeout(Duration.ZERO).maxConcurrency(64).build();
 
     return S3AsyncClient.builder()
-            .endpointOverride(new URI("https://obs.eu-de.otc.t-systems.com"))
-            .region(Region.of("eu-de"))
-            .httpClient(httpClient)
-            .build();
+        .endpointOverride(new URI("https://obs.eu-de.otc.t-systems.com"))
+        .region(Region.of("eu-de"))
+        .httpClient(httpClient)
+        .build();
   }
 }

@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DocUnit {
-  public final static DocUnit EMPTY = new DocUnit();
+  public static final DocUnit EMPTY = new DocUnit();
 
   @Id Integer id;
   String s3path;

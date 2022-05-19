@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import reactor.test.StepVerifier;
 
-@SpringBootTest(properties = { "otc.obs.bucket-name=testBucket" })
+@SpringBootTest(properties = {"otc.obs.bucket-name=testBucket"})
 @Tag("test")
 class VersionServiceTest {
   @Autowired private VersionService service;

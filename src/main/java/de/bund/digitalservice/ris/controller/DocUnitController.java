@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("api/v1/docunit")
 @Slf4j
@@ -29,7 +27,8 @@ public class DocUnitController {
   }
 
   @PostMapping(value = "upload")
-  public Mono<ResponseEntity<DocUnit>> uploadFile(@RequestPart("fileToUpload") Mono<FilePart> filePart) {
+  public Mono<ResponseEntity<DocUnit>> uploadFile(
+      @RequestPart("fileToUpload") Mono<FilePart> filePart) {
     return service.generateNewDocUnit(filePart);
   }
 

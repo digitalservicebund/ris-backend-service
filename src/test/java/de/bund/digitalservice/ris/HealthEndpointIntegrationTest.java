@@ -9,8 +9,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(
     webEnvironment = WebEnvironment.RANDOM_PORT,
-    properties = { "otc.obs.bucket-name=testBucket" }
-)
+    properties = {"otc.obs.bucket-name=testBucket"})
 @Tag("integration")
 class HealthEndpointIntegrationTest {
 

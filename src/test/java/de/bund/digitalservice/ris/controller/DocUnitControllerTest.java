@@ -31,8 +31,8 @@ class DocUnitControllerTest {
 
   @MockBean private DocUnitService service;
 
-  @Captor
-  private ArgumentCaptor<Mono<FilePart>> captor;
+  @Captor private ArgumentCaptor<Mono<FilePart>> captor;
+
   @Test
   public void testUploadFile() {
     var bodyBuilder = new MultipartBodyBuilder();

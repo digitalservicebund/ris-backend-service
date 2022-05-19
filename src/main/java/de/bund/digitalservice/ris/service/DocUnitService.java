@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.service;
 
 import de.bund.digitalservice.ris.datamodel.DocUnit;
 import de.bund.digitalservice.ris.repository.DocUnitRepository;
+import java.nio.ByteBuffer;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -14,16 +16,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.ListObjectsRequest;
-import software.amazon.awssdk.services.s3.model.ListObjectsResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Object;
-
-import java.nio.ByteBuffer;
-import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -35,8 +29,7 @@ public class DocUnitService {
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DocUnitService(
-      DocUnitRepository repository, S3AsyncClient s3AsyncClient) {
+  public DocUnitService(DocUnitRepository repository, S3AsyncClient s3AsyncClient) {
     Assert.notNull(repository, "doc unit repository is null");
     Assert.notNull(s3AsyncClient, "s3 async client is null");
 
@@ -49,7 +42,7 @@ public class DocUnitService {
 
     return filePartMono
         .doOnNext(filePart -> log.info("uploaded file name {}", filePart.filename()))
-        .map(filePart ->filePart.content().map(DataBuffer::asByteBuffer))
+        .map(filePart -> filePart.content().map(DataBuffer::asByteBuffer))
         .map(byteBufferFlux -> putObjectIntoBucket(fileUuid, byteBufferFlux))
         .doOnNext(putObjectResponseMono -> log.debug("generate doc unit for {}", fileUuid))
         .map(putObjectResponseMono -> generateDataObject(fileUuid, "docx"))
@@ -60,9 +53,9 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  private Mono<PutObjectResponse> putObjectIntoBucket(String fileUuid, Flux<ByteBuffer> byteBufferFlux) {
-    var putObjectRequest =
-        PutObjectRequest.builder().bucket(bucketName).key(fileUuid).build();
+  private Mono<PutObjectResponse> putObjectIntoBucket(
+      String fileUuid, Flux<ByteBuffer> byteBufferFlux) {
+    var putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(fileUuid).build();
     var asyncRequestBody = AsyncRequestBody.fromPublisher(byteBufferFlux);
     return Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody));
   }

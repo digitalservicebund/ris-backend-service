@@ -12,14 +12,12 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
-import org.mockito.verification.VerificationMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.test.context.TestPropertySource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -29,7 +27,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
-@SpringBootTest(properties = { "otc.obs.bucket-name=testBucket" })
+@SpringBootTest(properties = {"otc.obs.bucket-name=testBucket"})
 @Tag("test")
 class DocUnitServiceTest {
   @Autowired private DocUnitService service;
@@ -51,8 +49,8 @@ class DocUnitServiceTest {
     savedDocUnit.setFiletype("docx");
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(savedDocUnit));
 
-    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class))).thenReturn(
-        CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
+    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
+        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
 
     var filePart = mock(FilePart.class);
     doReturn("filename").when(filePart).filename();
@@ -109,8 +107,8 @@ class DocUnitServiceTest {
   @Test
   public void testGenerateNewDocUnit_withExceptionFromRepository() {
     // given
-    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class))).thenReturn(
-        CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
+    when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
+        .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnit.class));
 
     var filePart = mock(FilePart.class);
