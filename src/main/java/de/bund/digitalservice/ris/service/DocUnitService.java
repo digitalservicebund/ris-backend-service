@@ -45,14 +45,14 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(Mono<FilePart> filePartMono) {
-    var fileKey = UUID.randomUUID().toString();
+    var fileUuid = UUID.randomUUID().toString();
 
     return filePartMono
         .doOnNext(filePart -> log.info("uploaded file name {}", filePart.filename()))
         .map(filePart ->filePart.content().map(DataBuffer::asByteBuffer))
-        .map(byteBufferFlux -> putObjectIntoBucket(fileKey, byteBufferFlux))
-        .doOnNext(putObjectResponseMono -> log.debug("generate doc unit for {}", fileKey))
-        .map(putObjectResponseMono -> generateDataObject(fileKey, "docx"))
+        .map(byteBufferFlux -> putObjectIntoBucket(fileUuid, byteBufferFlux))
+        .doOnNext(putObjectResponseMono -> log.debug("generate doc unit for {}", fileUuid))
+        .map(putObjectResponseMono -> generateDataObject(fileUuid, "docx"))
         .doOnNext(docUnitMono -> log.debug("save doc unit"))
         .flatMap(repository::save)
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
