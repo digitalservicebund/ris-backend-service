@@ -28,7 +28,7 @@ public class R2DBCConfiguration extends AbstractR2dbcConfiguration {
   @EventListener(ContextRefreshedEvent.class)
   public void start() throws java.sql.SQLException {
     log.info("Starting h2-console at port 8078");
-    // Settings to use on localhost:8078 --> Generic H2 (Server), jdbc:h2:memo:testdb
+    // Settings to use on localhost:8078 --> Generic H2 (Server), org.h2.Driver, jdbc:h2:mem:testdb
     this.webServer =
         org.h2.tools.Server.createWebServer("-webPort", "8078", "-tcpAllowOthers").start();
   }
