@@ -4,15 +4,15 @@ import { getVersion, getAllDocUnits } from "./api"
 import HelloWorld from "./components/HelloWorld.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
-const docUnits = ref([])
+// const docUnits = ref([])
 
 const updateVersion = async () => {
   version.value = await getVersion()
 }
 
 const updateDocUnits = async () => {
-  docUnits.value = await getAllDocUnits()
-  console.log(docUnits.value)
+  let docUnits = await getAllDocUnits()
+  console.log("docUnits", docUnits)
 }
 </script>
 
@@ -44,11 +44,6 @@ const updateDocUnits = async () => {
           >
             fetch all doc units
           </v-btn>
-        </v-col>
-      </v-row>
-      <v-row v-for="docUnit in docUnits" :key="docUnit.id" class="text-center">
-        <v-col class="mb-4">
-          {{ docUnit.id }}, {{ docUnit.s3path }}, {{ docUnit.filetype }}
         </v-col>
       </v-row>
     </v-main>
