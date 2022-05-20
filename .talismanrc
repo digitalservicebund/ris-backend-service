@@ -15,5 +15,7 @@ fileignoreconfig:
     checksum: 42fab4fa1fbe25d8f80abe82634d3b06de91e132b9a2d9d101c6c03a16686688
   - filename: web/.env.development
     checksum: 7443587c94ecd708b8e562b7b017164a9aecd6f1c8dec9740dc22db7ca2ab89a
+  - filename: web/src/App.vue
+    checksum: 8645e35a6cfc29d953237b49e0fc6e7115ec6129736a9bd39f76e217dc7f2464
 scopeconfig:
   - scope: node

@@ -46,6 +46,11 @@ const updateDocUnits = async () => {
           </v-btn>
         </v-col>
       </v-row>
+      <v-row v-for="docUnit in docUnits" :key="docUnit.id" class="text-center">
+        <v-col class="mb-4">
+          {{ docUnit.id }}, {{ docUnit.s3path }}, {{ docUnit.filetype }}
+        </v-col>
+      </v-row>
     </v-main>
   </v-app>
 </template>
