@@ -479,7 +479,7 @@ jobs:
 
   audit:
     runs-on: ubuntu-latest
-    needs: deploy
+    needs: deploy-production
     steps:
       - uses: actions/checkout@v2
       - name: Audit URLs using Lighthouse
