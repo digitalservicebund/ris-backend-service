@@ -13,8 +13,8 @@ const updateVersion = async () => {
 }
 
 const updateDocUnits = async () => {
-  const docUnits = await getAllDocUnits();
-  console.log("docUnits:", docUnits);
+  const docUnits = await getAllDocUnits()
+  console.log("docUnits:", docUnits)
 }
 </script>
 
@@ -39,10 +39,10 @@ const updateDocUnits = async () => {
             {{ versionLabel }}
           </v-btn>
           <v-btn
-              :ripple="false"
-              :flat="true"
-              color="blue800"
-              @click="updateDocUnits"
+            :ripple="false"
+            :flat="true"
+            color="blue800"
+            @click="updateDocUnits"
           >
             {{ docsLabel }}
           </v-btn>

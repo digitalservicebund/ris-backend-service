@@ -17,7 +17,9 @@ const makeRequest = async (
   )
     .then((response) => {
       if (fluxFlag && response.body) {
-        return getReadableStreamResponse(response.body).then(response => response.json());
+        return getReadableStreamResponse(response.body).then((response) =>
+          response.json()
+        )
       }
       return response.json()
     })
@@ -25,22 +27,24 @@ const makeRequest = async (
 }
 
 const getReadableStreamResponse = async (responseBody: any) => {
-  const reader = responseBody.getReader();
-  return new Response(new ReadableStream({
-    start(controller) {
-      return pump();
+  const reader = responseBody.getReader()
+  return new Response(
+    new ReadableStream({
+      start(controller) {
+        return pump()
         function pump() {
           return reader.read().then(({ done, value }) => {
             if (done) {
-              controller.close();
-              return;
+              controller.close()
+              return
             }
-            controller.enqueue(value);
-            return pump();
-          });
+            controller.enqueue(value)
+            return pump()
+          })
         }
-    }
-  }))
+      },
+    })
+  )
 }
 
 export const getVersion = async () => {
@@ -48,7 +52,7 @@ export const getVersion = async () => {
 }
 
 export const getAllDocUnits = async () => {
-  return await makeRequest("docunit/getAll", {}, true);
+  return await makeRequest("docunit/getAll", {}, true)
 }
 
 export const uploadDocUnit = async (file: File) => {
