@@ -26,14 +26,13 @@ const makeRequest = async (
     .catch((error) => console.error(error))
 }
 
-const getReadableStreamResponse = async (responseBody: any) => {
+const getReadableStreamResponse = async (responseBody: ReadableStream) => {
   const reader = responseBody.getReader()
   return new Response(
     new ReadableStream({
       start(controller) {
         return pump()
-        function pump() {
-          // @ts-ignore
+        function pump(): any {
           return reader.read().then(({ done, value }) => {
             if (done) {
               controller.close()
