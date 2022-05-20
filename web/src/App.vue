@@ -1,13 +1,20 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import { getVersion } from "./api"
+import { getVersion, getAllDocUnits } from "./api"
 import HelloWorld from "./components/HelloWorld.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
-const label = ref("update API version")
+const versionLabel = ref("update API version")
+// const docUnits = ref([]) TODO
+const docsLabel = ref("fetch all doc units")
 
 const updateVersion = async () => {
   version.value = await getVersion()
+}
+
+const updateDocUnits = async () => {
+  const docUnits = await getAllDocUnits();
+  console.log("docUnits:", docUnits);
 }
 </script>
 
@@ -29,7 +36,15 @@ const updateVersion = async () => {
             color="blue800"
             @click="updateVersion"
           >
-            {{ label }}
+            {{ versionLabel }}
+          </v-btn>
+          <v-btn
+              :ripple="false"
+              :flat="true"
+              color="blue800"
+              @click="updateDocUnits"
+          >
+            {{ docsLabel }}
           </v-btn>
         </v-col>
       </v-row>
@@ -40,5 +55,6 @@ const updateVersion = async () => {
 <style scoped lang="scss">
 .v-btn {
   border-radius: $btn-border-radius;
+  margin: 0 10px 0 10px;
 }
 </style>
