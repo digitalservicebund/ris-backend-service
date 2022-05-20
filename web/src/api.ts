@@ -2,8 +2,7 @@ type Endpoint = "version" | "docunit/upload" | "docunit/getAll"
 
 const makeRequest = async (
   endpoint: Endpoint,
-  options?: Partial<RequestInit>,
-  fluxFlag?: boolean
+  options?: Partial<RequestInit>
 ) => {
   const defaultOptions: Partial<RequestInit> = {
     method: "get",
@@ -16,7 +15,7 @@ const makeRequest = async (
     }
   )
     .then((response) => {
-      if (fluxFlag && response.body) {
+      if (response.body instanceof ReadableStream) {
         return getReadableStreamResponse(response.body).then((response) =>
           response.json()
         )
@@ -52,7 +51,7 @@ export const getVersion = async () => {
 }
 
 export const getAllDocUnits = async () => {
-  return await makeRequest("docunit/getAll", {}, true)
+  return await makeRequest("docunit/getAll", {})
 }
 
 export const uploadDocUnit = async (file: File) => {
