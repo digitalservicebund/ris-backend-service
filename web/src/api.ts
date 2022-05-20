@@ -33,6 +33,7 @@ const getReadableStreamResponse = async (responseBody: any) => {
       start(controller) {
         return pump()
         function pump() {
+          // @ts-ignore
           return reader.read().then(({ done, value }) => {
             if (done) {
               controller.close()
