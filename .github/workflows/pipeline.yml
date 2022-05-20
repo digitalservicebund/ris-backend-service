@@ -489,6 +489,7 @@ jobs:
         with:
           urls: |
             ${{ secrets.PRODUCTION_URL }}
+          budgetPath: ./web/budget.json
           uploadArtifacts: true
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
