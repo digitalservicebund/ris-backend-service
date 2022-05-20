@@ -12,6 +12,7 @@ const updateVersion = async () => {
 
 const updateDocUnits = async () => {
   docUnits.value = await getAllDocUnits()
+  console.log(docUnits.value)
 }
 </script>
 
