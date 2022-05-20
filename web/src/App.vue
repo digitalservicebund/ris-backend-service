@@ -4,17 +4,14 @@ import { getVersion, getAllDocUnits } from "./api"
 import HelloWorld from "./components/HelloWorld.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
-const versionLabel = ref("update API version")
-// const docUnits = ref([]) TODO
-const docsLabel = ref("fetch all doc units")
+const docUnits = ref([])
 
 const updateVersion = async () => {
   version.value = await getVersion()
 }
 
 const updateDocUnits = async () => {
-  const docUnits = await getAllDocUnits()
-  console.log("docUnits:", docUnits)
+  docUnits.value = await getAllDocUnits()
 }
 </script>
 
@@ -36,7 +33,7 @@ const updateDocUnits = async () => {
             color="blue800"
             @click="updateVersion"
           >
-            {{ versionLabel }}
+            update API version
           </v-btn>
           <v-btn
             :ripple="false"
@@ -44,7 +41,7 @@ const updateDocUnits = async () => {
             color="blue800"
             @click="updateDocUnits"
           >
-            {{ docsLabel }}
+            fetch all doc units
           </v-btn>
         </v-col>
       </v-row>
