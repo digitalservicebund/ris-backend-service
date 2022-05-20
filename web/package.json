@@ -25,7 +25,7 @@
     "test:a11y": "playwright test --config=test/a11y/playwright.config.ts"
   },
   "dependencies": {
-    "@mdi/font": "5.9.55",
+    "@mdi/font": "6.7.96",
     "roboto-fontface": "*",
     "vue": "^3.2.33",
     "vue-router": "^4.0.15",
