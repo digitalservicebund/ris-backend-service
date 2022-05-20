@@ -1,0 +1,11 @@
+[
+  {
+    "path": "/*",
+    "resourceSizes": [
+      {
+        "resourceType": "stylesheet",
+        "budget": 1
+      }
+    ]
+  }
+]
