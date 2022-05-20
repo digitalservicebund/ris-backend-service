@@ -39,7 +39,7 @@
     "@playwright/test": "^1.22.0",
     "@storybook/addon-actions": "^6.4.22",
     "@storybook/addon-essentials": "^6.4.22",
-    "@storybook/addon-links": "^6.4.22",
+    "@storybook/addon-links": "^6.5.3",
     "@storybook/storybook-deployer": "^2.8.11",
     "@storybook/vue3": "^6.5.3",
     "@testing-library/dom": "^8.13.0",
