@@ -7,6 +7,9 @@ pre-commit:
     check-format:
       tags: style
       run: ./gradlew spotlessCheck
+    check-web-format:
+      tags: style
+      run: cd web && npm run style:check
 pre-push:
   commands:
     secrets-audit:
