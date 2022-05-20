@@ -33,7 +33,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.10",
+    "@babel/core": "^7.18.0",
     "@digitalservice4germany/style-dictionary": "^0.0.4",
     "@playwright-testing-library/test": "^4.2.0",
     "@playwright/test": "^1.22.0",
