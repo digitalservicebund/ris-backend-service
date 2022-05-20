@@ -5,14 +5,12 @@ import de.bund.digitalservice.ris.service.VersionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("api/v1")
 @Slf4j
 public class VersionController {
