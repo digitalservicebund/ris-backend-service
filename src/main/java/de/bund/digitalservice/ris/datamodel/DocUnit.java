@@ -12,6 +12,29 @@ public class DocUnit {
   public static final DocUnit EMPTY = new DocUnit();
 
   @Id Integer id;
+
+  // Original file
   String s3path;
   String filetype;
+
+  // Stammdaten
+  String aktenzeichen;
+  String entscheidungsdatum;
+  String gericht;
+  String dokumenttyp;
+  String gerichtssitz;
+  String spruchkoerper;
+  String vorgang;
+  String eclinummer;
+  String eingangsart;
+
+  // Rubrikenfelder
+  String tenor;
+  String gruende;
+  String tatbestand;
+  String entscheidungsgruende;
+  String abweichendemeinung;
+  String sonstigerlangtext;
+  String gliederung;
+  String berichtigung;
 }

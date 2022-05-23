@@ -1,12 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, Ref, ref } from "vue"
 import { getAllDocUnits } from "../api"
-
-type DocUnit = {
-  id: number
-  s3path: string
-  filetype: string
-}
+import { DocUnit } from "../types/DocUnit"
 
 const docUnits: Ref<DocUnit[]> = ref([])
 
