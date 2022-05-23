@@ -1,12 +1,16 @@
 <script lang="ts" setup>
-defineProps<{
+interface Props {
   label: string
-}>()
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  label: "Absenden",
+})
 </script>
 
 <template>
   <v-btn class="ris-btn" :rounded="0" :ripple="false" :flat="true">
-    {{ label }}
+    {{ props.label }}
   </v-btn>
 </template>
 

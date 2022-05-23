@@ -36,8 +36,7 @@ const updateVersion = async () => {
           </RisButton>
         </v-col>
         <v-col>
-          <RisButton label="button small" size="small" color="blue800">
-          </RisButton>
+          <RisButton size="small" color="blue800"> </RisButton>
         </v-col>
       </v-row>
       <DocUnitList />

@@ -8,7 +8,7 @@ import RisButton from "../src/components/RisButton.vue"
 describe("RisButton", () => {
   const vuetify = createVuetify({ components, directives })
 
-  it("renders properly", () => {
+  it("renders with label prop", () => {
     const wrapper = mount(RisButton, {
       global: {
         plugins: [vuetify],
@@ -18,5 +18,14 @@ describe("RisButton", () => {
       },
     })
     expect(wrapper.props().label).toBe("foo")
+  })
+
+  it("renders with default label prop", () => {
+    const wrapper = mount(RisButton, {
+      global: {
+        plugins: [vuetify],
+      },
+    })
+    expect(wrapper.props().label).toBe("Absenden")
   })
 })
