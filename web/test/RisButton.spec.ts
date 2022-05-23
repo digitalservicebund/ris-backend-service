@@ -13,7 +13,7 @@ describe("RisButton", () => {
       global: {
         plugins: [vuetify],
       },
-      propsData: {
+      props: {
         label: "foo",
       },
     })
