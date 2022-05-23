@@ -62,7 +62,7 @@ dependencies {
   testImplementation("org.springframework.boot:spring-boot-starter-test") {
     exclude group: "org.mockito", module: "mockito-core"
   }
-  testImplementation "org.mockito:mockito-inline:4.0.0"
+  testImplementation "org.mockito:mockito-inline:4.5.1"
   testImplementation "io.projectreactor:reactor-test"
   testImplementation "org.springframework.security:spring-security-test"
   testImplementation "com.tngtech.archunit:archunit-junit5:0.23.0"
