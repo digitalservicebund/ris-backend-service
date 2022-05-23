@@ -5,7 +5,7 @@ const makeRequest = async (
   options?: Partial<RequestInit>
 ) => {
   const defaultOptions: Partial<RequestInit> = {
-    method: "get",
+    method: "GET",
   }
   return await fetch(
     `${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}`,
@@ -59,7 +59,7 @@ export const uploadDocUnit = async (file: File) => {
   data.append("fileToUpload", file)
 
   return await makeRequest("docunit/upload", {
-    method: "post",
+    method: "POST",
     body: data,
   })
 }
