@@ -23,7 +23,11 @@ export default defineConfig({
     globals: true,
     environment: "jsdom",
     include: ["test/**/*.ts"],
-    exclude: ["test/e2e/**/*.ts", "test/a11y/**/*.ts"],
+    exclude: [
+      "test/e2e/**/*.ts",
+      "test/a11y/**/*.ts",
+      "test/test-helper/**/*.ts",
+    ],
   },
   define: { "process.env": {} },
   resolve: {

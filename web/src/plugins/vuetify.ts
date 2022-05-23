@@ -13,6 +13,7 @@ export const risLightTheme = {
     white: "#FFFFFF",
     black: "#000000",
     blue800: "#004B76",
+    blue700: "#336F91",
     background: "#FFFFFF",
     surface: "#FFFFFF",
     primary: "#6200EE",

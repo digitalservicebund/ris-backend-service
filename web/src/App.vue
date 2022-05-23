@@ -2,6 +2,7 @@
 import { ref } from "vue"
 import { getVersion, getAllDocUnits } from "./api"
 import HelloWorld from "./components/HelloWorld.vue"
+import RisButton from "./components/RisButton.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
 // const docUnits = ref([])
@@ -28,31 +29,36 @@ const updateDocUnits = async () => {
       </v-row>
       <v-row class="text-center">
         <v-col class="mb-4">
-          <v-btn
-            :ripple="false"
-            :flat="true"
+          <RisButton
+            label="update API version"
             color="blue800"
             @click="updateVersion"
           >
-            update API version
-          </v-btn>
-          <v-btn
-            :ripple="false"
-            :flat="true"
+          </RisButton>
+        </v-col>
+        <v-col>
+          <RisButton
+            label="fetch all doc units"
             color="blue800"
             @click="updateDocUnits"
           >
-            fetch all doc units
-          </v-btn>
+          </RisButton>
+        </v-col>
+        <v-col>
+          <RisButton label="button large" size="large" color="blue800">
+          </RisButton>
+        </v-col>
+        <v-col>
+          <RisButton label="button small" size="small" color="blue800">
+          </RisButton>
         </v-col>
       </v-row>
     </v-main>
   </v-app>
 </template>
 
-<style scoped lang="scss">
-.v-btn {
-  border-radius: $btn-border-radius;
-  margin: 0 10px 0 10px;
+<style lang="scss">
+body {
+  font-size: $font-size-root;
 }
 </style>
