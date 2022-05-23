@@ -4,7 +4,7 @@ import "vuetify/styles"
 
 // Vuetify
 import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
+import { VBtn } from "vuetify/components"
 import * as directives from "vuetify/directives"
 
 export const risLightTheme = {
@@ -26,7 +26,9 @@ export const risLightTheme = {
 }
 
 export default createVuetify({
-  components,
+  components: {
+    VBtn,
+  },
   directives,
   theme: {
     defaultTheme: "risLightTheme",
