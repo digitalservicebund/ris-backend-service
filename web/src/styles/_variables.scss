@@ -7,3 +7,8 @@ $font-size-root: 16px;
 $blue500: #b3c9d6;
 $blue700: #336f91;
 $blue800: #004b76;
+
+// Font Settings
+$font-fallback: "Arial Narrow", "Arial Nova", sans-serif;
+$font-main: "BundesSansWeb", $font-fallback;
+$font-bold: "BundesSansWeb Bold", $font-fallback;

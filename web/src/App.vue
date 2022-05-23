@@ -48,5 +48,6 @@ const updateVersion = async () => {
 <style lang="scss">
 body {
   font-size: $font-size-root;
+  font-family: $font-main;
 }
 </style>

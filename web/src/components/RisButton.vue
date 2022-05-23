@@ -12,6 +12,8 @@ defineProps<{
 
 <style lang="scss">
 .ris-btn {
+  font-family: $font-bold;
+
   &.v-btn {
     text-transform: none;
     font-size: var(--v-btn-size);

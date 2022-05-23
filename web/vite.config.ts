@@ -40,7 +40,7 @@ export default defineConfig({
       scss: {
         // Make the variables defined in these files available to all components, without requiring an explicit
         // @import of the files themselves
-        additionalData: '@import "@/styles/_variables.scss";',
+        additionalData: `@import "@/styles/main.scss";`,
       },
     },
   },
