@@ -38,12 +38,10 @@
     },
     {
       "moduleLicense": null,
-      "moduleVersion": "2.13.3",
       "moduleName": "com.fasterxml.jackson:jackson-bom"
     },
     {
       "moduleLicense": null,
-      "moduleVersion": "2.17.191",
       "moduleName": "software.amazon.awssdk:bom"
     }
   ]
