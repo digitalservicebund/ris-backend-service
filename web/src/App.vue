@@ -1,19 +1,24 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { ref, Ref } from "vue"
 import { getVersion, getAllDocUnits } from "./api"
 import HelloWorld from "./components/HelloWorld.vue"
 import RisButton from "./components/RisButton.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
-// const docUnits = ref([])
 
+type DocUnit = {
+  id: number
+  s3path: string
+  filetype: string
+}
+
+const docUnits: Ref<DocUnit[]> = ref([])
 const updateVersion = async () => {
   version.value = await getVersion()
 }
 
 const updateDocUnits = async () => {
-  let docUnits = await getAllDocUnits()
-  console.log("docUnits", docUnits)
+  docUnits.value = await getAllDocUnits()
 }
 </script>
 
@@ -51,6 +56,11 @@ const updateDocUnits = async () => {
         <v-col>
           <RisButton label="button small" size="small" color="blue800">
           </RisButton>
+        </v-col>
+      </v-row>
+      <v-row v-for="docUnit in docUnits" :key="docUnit.id" class="text-center">
+        <v-col class="mb-4">
+          {{ docUnit.id }}, {{ docUnit.s3path }}, {{ docUnit.filetype }}
         </v-col>
       </v-row>
     </v-main>
