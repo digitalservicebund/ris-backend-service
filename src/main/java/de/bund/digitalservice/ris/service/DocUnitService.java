@@ -3,13 +3,15 @@ package de.bund.digitalservice.ris.service;
 import de.bund.digitalservice.ris.datamodel.DocUnit;
 import de.bund.digitalservice.ris.repository.DocUnitRepository;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
@@ -18,6 +20,7 @@ import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @Slf4j
@@ -37,16 +40,15 @@ public class DocUnitService {
     this.s3AsyncClient = s3AsyncClient;
   }
 
-  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(Mono<FilePart> filePartMono) {
+  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(
+      Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
 
-    return filePartMono
-        .doOnNext(filePart -> log.info("uploaded file name {}", filePart.filename()))
-        .map(filePart -> filePart.content().map(DataBuffer::asByteBuffer))
-        .map(byteBufferFlux -> putObjectIntoBucket(fileUuid, byteBufferFlux))
-        .doOnNext(putObjectResponseMono -> log.debug("generate doc unit for {}", fileUuid))
-        .map(putObjectResponseMono -> generateDataObject(fileUuid, "docx"))
-        .doOnNext(docUnitMono -> log.debug("save doc unit"))
+    return Mono.just(fileUuid)
+        .flatMap(u -> putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders))
+        .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
+        .map(putObjectResponse -> generateDataObject(fileUuid, "docx"))
+        .doOnNext(docUnit -> log.debug("save doc unit"))
         .flatMap(repository::save)
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
         .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex))
@@ -54,9 +56,33 @@ public class DocUnitService {
   }
 
   private Mono<PutObjectResponse> putObjectIntoBucket(
-      String fileUuid, Flux<ByteBuffer> byteBufferFlux) {
-    var putObjectRequest = PutObjectRequest.builder().bucket(bucketName).key(fileUuid).build();
+      String fileUuid, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders)
+      throws S3Exception {
+
+    var contentLength = httpHeaders.getContentLength();
+
+    Map<String, String> metadata = new HashMap<>();
+    MediaType mediaType = httpHeaders.getContentType();
+    if (mediaType == null) {
+      mediaType = MediaType.APPLICATION_OCTET_STREAM;
+    }
+
+    log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
+
     var asyncRequestBody = AsyncRequestBody.fromPublisher(byteBufferFlux);
+    var putObjectRequestBuilder =
+        PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key(fileUuid)
+            .contentType(mediaType.toString())
+            .metadata(metadata);
+
+    if (contentLength >= 0) {
+      putObjectRequestBuilder.contentLength(contentLength);
+    }
+
+    var putObjectRequest = putObjectRequestBuilder.build();
+
     return Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody));
   }
 
