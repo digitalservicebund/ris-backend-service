@@ -7,13 +7,10 @@ const makeRequest = async (
   const defaultOptions: Partial<RequestInit> = {
     method: "GET",
   }
-  return await fetch(
-    `${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}`,
-    {
-      ...defaultOptions,
-      ...options,
-    }
-  )
+  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}`, {
+    ...defaultOptions,
+    ...options,
+  })
     .then((response) => {
       if (response.body instanceof ReadableStream) {
         return getReadableStreamResponse(response.body).then((response) =>
@@ -47,18 +44,18 @@ const getReadableStreamResponse = async (responseBody: ReadableStream) => {
 }
 
 export const getVersion = async () => {
-  return await makeRequest("version")
+  return makeRequest("version")
 }
 
 export const getAllDocUnits = async () => {
-  return await makeRequest("docunit/getAll", {})
+  return makeRequest("docunit/getAll", {})
 }
 
 export const uploadDocUnit = async (file: File) => {
   const data = new FormData()
   data.append("fileToUpload", file)
 
-  return await makeRequest("docunit/upload", {
+  return makeRequest("docunit/upload", {
     method: "POST",
     body: data,
   })
