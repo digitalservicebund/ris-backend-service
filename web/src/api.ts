@@ -1,4 +1,4 @@
-type Endpoint = "version" | "docunit/upload" | "docunit/getAll"
+type Endpoint = "docunit/upload" | "docunit/getAll"
 
 const makeRequest = async (
   endpoint: Endpoint,
@@ -41,10 +41,6 @@ const getReadableStreamResponse = async (responseBody: ReadableStream) => {
       },
     })
   )
-}
-
-export const getVersion = async () => {
-  return makeRequest("version")
 }
 
 export const getAllDocUnits = async () => {
