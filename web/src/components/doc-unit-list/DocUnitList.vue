@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, Ref, ref } from "vue"
-import { getAllDocUnits } from "../api"
-import { DocUnit } from "../types/DocUnit"
+import { getAllDocUnits } from "../../api"
+import { DocUnit } from "../../types/DocUnit"
 
 const docUnits: Ref<DocUnit[]> = ref([])
 

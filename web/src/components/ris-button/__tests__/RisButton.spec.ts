@@ -3,7 +3,7 @@ import { describe, it, expect } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import RisButton from "../src/components/RisButton.vue"
+import RisButton from "../RisButton.vue"
 
 describe("RisButton", () => {
   const vuetify = createVuetify({ components, directives })

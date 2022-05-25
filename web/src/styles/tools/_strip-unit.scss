@@ -1,0 +1,20 @@
+// Strip Unit Function
+// https://css-tricks.com/snippets/sass/strip-unit-function/
+// usage:
+// Remove the unit of a length
+// @param {Number} $number - Number to remove unit from
+// @return {Number} - Unitless number
+//
+// $length: 42px;
+// $value: strip-unit($length);
+// -> 42
+
+@use "sass:math";
+
+@function strip-unit($number) {
+  @if type-of($number) == "number" and not unitless($number) {
+    @return math.div($number, $number * 0 + 1);
+  }
+
+  @return $number;
+}

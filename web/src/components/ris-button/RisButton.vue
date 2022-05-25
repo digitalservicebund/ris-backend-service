@@ -25,20 +25,20 @@ const props = withDefaults(defineProps<Props>(), {
     &--size-default {
       --v-btn-height: 48px;
       --v-btn-size: 1rem;
-      padding: 13px 24px;
+      padding: rem(13px) rem(24px);
     }
 
     &--size-small {
       --v-btn-height: 40px;
       --v-btn-size: 1rem;
-      padding: 9px 24px;
+      padding: rem(9px) rem(24px);
     }
 
     &--size-large,
     &--size-x-large {
       --v-btn-height: 64px;
       --v-btn-size: 1.125rem;
-      padding: 19px 24px;
+      padding: rem(19px) rem(24px);
     }
 
     &:not(.v-btn--icon) {

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { getVersion } from "./api"
-import DocUnitList from "./components/DocUnitList.vue"
-import HelloWorld from "./components/HelloWorld.vue"
-import RisButton from "./components/RisButton.vue"
+import DocUnitList from "./components/doc-unit-list/DocUnitList.vue"
+import HelloWorld from "./components/hello-world/HelloWorld.vue"
+import RisButton from "./components/ris-button/RisButton.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
 
