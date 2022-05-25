@@ -2,8 +2,8 @@
 import { ref } from "vue"
 import { getVersion } from "./api"
 import DocUnitList from "./components/doc-unit-list/DocUnitList.vue"
+import HelloWorld from "./components/hello-world/HelloWorld.vue"
 import RisButton from "./components/ris-button/RisButton.vue"
-import RisStammDaten from "./components/ris-stammdaten/RisStammDaten.vue"
 
 const version = ref({ version: "🤷‍♂️", commitSHA: "🤷‍♀️" })
 
@@ -14,15 +14,8 @@ const updateVersion = async () => {
 
 <template>
   <v-app>
-    <v-app-bar color="grey-lighten-2"></v-app-bar>
-    <v-navigation-drawer color="grey-darken-2" permanent></v-navigation-drawer>
     <v-main>
-      <v-row>
-        <v-col class="mb-4">
-          <h2>RandomNumber123</h2>
-        </v-col>
-      </v-row>
-      <RisStammDaten />
+      <HelloWorld />
       <v-row class="text-center">
         <v-col class="mb-4">
           <em>version:</em>{{ version.version }}, <em>commit:</em
@@ -35,7 +28,15 @@ const updateVersion = async () => {
             label="update API version"
             color="blue800"
             @click="updateVersion"
-          />
+          >
+          </RisButton>
+        </v-col>
+        <v-col>
+          <RisButton label="button large" size="large" color="blue800">
+          </RisButton>
+        </v-col>
+        <v-col>
+          <RisButton size="small" color="blue800"> </RisButton>
         </v-col>
       </v-row>
       <DocUnitList />
