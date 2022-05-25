@@ -2,6 +2,7 @@
 import { ref } from "vue"
 import { getVersion } from "./api"
 import DocUnitList from "./components/doc-unit-list/DocUnitList.vue"
+import HelloWorld from "./components/hello-world/HelloWorld.vue"
 import RisButton from "./components/ris-button/RisButton.vue"
 import RisStammDaten from "./components/ris-stammdaten/RisStammDaten.vue"
 
@@ -17,6 +18,11 @@ const updateVersion = async () => {
     <v-app-bar color="grey-lighten-2"></v-app-bar>
     <v-navigation-drawer color="grey-darken-2" permanent></v-navigation-drawer>
     <v-main>
+      <v-row>
+        <v-col class="mb-4">
+          <HelloWorld />
+        </v-col>
+      </v-row>
       <v-row>
         <v-col class="mb-4">
           <h2>RandomNumber123</h2>
