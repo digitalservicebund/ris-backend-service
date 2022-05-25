@@ -6,120 +6,75 @@
       <v-row><h3>Stammdaten</h3></v-row>
       <v-row>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Vorgang">
-              <input
-                id="Vorgang"
-                type="text"
-                placeholder="Vorgang"
-                name="Vorgang"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Vorgang"
+            label="Vorgang"
+            aria-labelledby="Vorgang"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Entscheidungsdatum">
-              <input
-                id="Entscheidungsdatum"
-                type="text"
-                placeholder="Entscheidungsdatum"
-                name="Entscheidungsdatum"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Entscheidungsdatum"
+            label="Entscheidungsdatum"
+            aria-labelledby="Entscheidungsdatum"
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Gerichtssitz">
-              <input
-                id="Gerichtssitz"
-                type="text"
-                placeholder="Gerichtssitz"
-                name="Gerichtssitz"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Gerichtssitz"
+            label="Gerichtssitz"
+            aria-labelledby="Gerichtssitz"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Gerichtstyp">
-              <input
-                id="Gerichtstyp"
-                type="text"
-                placeholder="Gerichtstyp"
-                name="Gerichtstyp"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Gerichtstyp"
+            label="Gerichtstyp"
+            aria-labelledby="Gerichtstyp"
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Aktenzeichen">
-              <input
-                id="Aktenzeichen"
-                type="text"
-                placeholder="Aktenzeichen"
-                name="Aktenzeichen"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Aktenzeichen"
+            label="Aktenzeichen"
+            aria-labelledby="Aktenzeichen"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Spruchkörper">
-              <input
-                id="Spruchkörper"
-                type="text"
-                placeholder="Spruchkörper"
-                name="Spruchkörper"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Spruchkörper"
+            label="Spruchkörper"
+            aria-labelledby="Spruchkörper"
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Eingangsart">
-              <input
-                id="Eingangsart"
-                type="text"
-                placeholder="Eingangsart"
-                name="Eingangsart"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Eingangsart"
+            label="Eingangsart"
+            aria-labelledby="Eingangsart"
+          ></v-text-field>
         </v-col>
         <v-col cols="12" md="4">
-          <div>
-            <label for="ECLI-Nummer">
-              <input
-                id="ECLI-Nummer"
-                type="text"
-                placeholder="ECLI-Nummer"
-                name="ECLI-Nummer"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="ECLI-Nummer"
+            label="ECLI-Nummer"
+            aria-labelledby="ECLI-Nummer"
+          ></v-text-field>
         </v-col>
       </v-row>
       <v-row>
         <v-col cols="12" md="4">
-          <div>
-            <label for="Rechtskraft">
-              <input
-                id="Rechtskraft"
-                type="text"
-                placeholder="Rechtskraft"
-                name="Rechtskraft"
-              />
-            </label>
-          </div>
+          <v-text-field
+            name="Rechtskraft"
+            label="Rechtskraft"
+            aria-labelledby="ECLI-Nummer"
+          ></v-text-field>
         </v-col>
       </v-row>
     </v-container>
