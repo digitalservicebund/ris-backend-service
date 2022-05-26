@@ -1,18 +1,15 @@
 <script lang="ts" setup>
-import { onMounted, Ref, ref } from "vue"
-import { getAllDocUnits } from "../../api"
-import { DocUnit } from "../../types/DocUnit"
+import { onMounted } from "vue"
+import { store } from "../../store"
 
-const docUnits: Ref<DocUnit[]> = ref([])
-
-onMounted(async () => {
-  docUnits.value = await getAllDocUnits()
+onMounted(() => {
+  store.getAllDocUnits()
 })
 </script>
 
 <template>
-  <ul v-if="docUnits.length">
-    <li v-for="docUnit in docUnits" :key="docUnit.id">
+  <ul v-if="store.hasDocUnits()">
+    <li v-for="docUnit in store.getDocUnits()" :key="docUnit.id">
       {{ docUnit.id }}, {{ docUnit.s3path }}, {{ docUnit.filetype }}
     </li>
   </ul>
