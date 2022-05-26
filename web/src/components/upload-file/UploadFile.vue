@@ -13,9 +13,10 @@ const upload = async (file: File) => {
 </script>
 
 <template>
-  <v-file-input
+  here should be the upload component
+  <!--<v-file-input
     v-model="file"
     label="Select .docx file"
     @change="upload"
-  ></v-file-input>
+  ></v-file-input>-->
 </template>
