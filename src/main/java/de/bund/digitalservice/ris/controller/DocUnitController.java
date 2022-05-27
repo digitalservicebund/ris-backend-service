@@ -7,12 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -28,17 +23,22 @@ public class DocUnitController {
     this.service = service;
   }
 
-  @PostMapping(value = "upload")
+  @PostMapping(value = "/")
   public Mono<ResponseEntity<DocUnit>> uploadFile(
       @RequestBody Flux<ByteBuffer> byteBufferFlux, @RequestHeader HttpHeaders httpHeaders) {
 
     return service.generateNewDocUnit(byteBufferFlux, httpHeaders);
   }
 
-  @GetMapping(value = "getAll")
+  @GetMapping(value = "/")
   public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
     log.info("All DocUnits were requested");
 
     return service.getAll();
+  }
+
+  @GetMapping(value = "/{id}")
+  public Mono<ResponseEntity<Mono<DocUnit>>> getById(@PathVariable int id) {
+    return service.getById(id);
   }
 }

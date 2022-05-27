@@ -96,4 +96,8 @@ public class DocUnitService {
   public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
     return Mono.just(ResponseEntity.ok(repository.findAll()));
   }
+
+  public Mono<ResponseEntity<Mono<DocUnit>>> getById(int id) {
+    return Mono.just(ResponseEntity.ok(repository.findById(id)));
+  }
 }

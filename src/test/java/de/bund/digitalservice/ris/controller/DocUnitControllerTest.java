@@ -34,13 +34,13 @@ class DocUnitControllerTest {
   @Captor private ArgumentCaptor<Flux<ByteBuffer>> fluxCaptor;
 
   @Test
-  public void testUploadFile() {
+  void testUploadFile() {
     var headersCaptor = ArgumentCaptor.forClass(HttpHeaders.class);
 
     webClient
         .mutateWith(csrf())
         .post()
-        .uri("/api/v1/docunit/upload")
+        .uri("/api/v1/docunit/")
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
@@ -52,15 +52,16 @@ class DocUnitControllerTest {
   }
 
   @Test
-  public void testGetAll() {
-    webClient
-        .mutateWith(csrf())
-        .get()
-        .uri("/api/v1/docunit/getAll")
-        .exchange()
-        .expectStatus()
-        .isOk();
+  void testGetAll() {
+    webClient.mutateWith(csrf()).get().uri("/api/v1/docunit/").exchange().expectStatus().isOk();
 
     verify(service).getAll();
+  }
+
+  @Test
+  void testGetById() {
+    webClient.mutateWith(csrf()).get().uri("/api/v1/docunit/1").exchange().expectStatus().isOk();
+
+    verify(service).getById(1);
   }
 }

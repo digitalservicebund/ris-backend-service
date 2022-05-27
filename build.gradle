@@ -58,6 +58,7 @@ dependencies {
   implementation platform("software.amazon.awssdk:bom:2.17.191")
   implementation "software.amazon.awssdk:netty-nio-client"
   implementation "software.amazon.awssdk:s3"
+  implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.6.8'
 
   compileOnly "org.projectlombok:lombok"
   developmentOnly "org.springframework.boot:spring-boot-devtools"
