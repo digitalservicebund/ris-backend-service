@@ -1,15 +1,17 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
-import { store } from "../../store"
+import { useDocUnitsStore } from "../../store"
+
+const docUnitsStore = useDocUnitsStore()
 
 onMounted(() => {
-  store.getAllDocUnits()
+  docUnitsStore.fetchAll()
 })
 </script>
 
 <template>
-  <ul v-if="store.hasDocUnits()">
-    <li v-for="docUnit in store.getDocUnits()" :key="docUnit.id">
+  <ul v-if="!docUnitsStore.isEmpty()">
+    <li v-for="docUnit in docUnitsStore.getAll()" :key="docUnit.id">
       {{ docUnit.id }}, {{ docUnit.s3path }}, {{ docUnit.filetype }}
     </li>
   </ul>

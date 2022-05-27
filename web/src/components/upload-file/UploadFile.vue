@@ -1,14 +1,15 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { uploadDocUnit } from "../../api"
-import { store } from "../../store"
+import { useDocUnitsStore } from "../../store"
 
+const docUnitsStore = useDocUnitsStore()
 const file = ref()
 
 const upload = async (file: File) => {
   let docUnit = await uploadDocUnit(file)
   console.log("file uploaded, response:", docUnit)
-  store.addDocUnit(docUnit)
+  docUnitsStore.add(docUnit)
 }
 </script>
 

@@ -1,26 +1,27 @@
-import { reactive } from "vue"
+import { defineStore } from "pinia"
 import { getAllDocUnits } from "./api"
 import { DocUnit } from "./types/DocUnit"
 
-// TODO wire up with local storage
-export const store = reactive({
-  docUnits: <DocUnit[]>[],
-
-  getAllDocUnits() {
-    getAllDocUnits().then((_docUnits) => {
-      this.docUnits = _docUnits
-    })
+export const useDocUnitsStore = defineStore("docUnitsStore", {
+  state: () => {
+    return {
+      docUnits: <DocUnit[]>[],
+    }
   },
-
-  addDocUnit(docUnit: DocUnit) {
-    this.docUnits.push(docUnit)
-  },
-
-  getDocUnits() {
-    return this.docUnits
-  },
-
-  hasDocUnits() {
-    return this.docUnits.length > 0
+  actions: {
+    fetchAll() {
+      getAllDocUnits().then((all) => {
+        this.docUnits = all
+      })
+    },
+    getAll() {
+      return this.docUnits
+    },
+    isEmpty() {
+      return this.docUnits.length === 0
+    },
+    add(docUnit: DocUnit) {
+      this.docUnits.push(docUnit)
+    },
   },
 })
