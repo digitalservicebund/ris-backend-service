@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import App from "./App.vue"
 import vuetify from "./plugins/vuetify"
 import Home from "./views/HomePage.vue"
+import Upload from "./views/UpLoad.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,6 +22,11 @@ const router = createRouter({
       // which is lazy-loaded when the route is visited.
       component: () =>
         import(/* webpackChunkName: "stammdaten" */ "./views/StammDaten.vue"),
+    },
+    {
+      path: "/upload",
+      name: "Upload",
+      component: Upload,
     },
   ],
 })

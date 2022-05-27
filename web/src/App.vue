@@ -3,7 +3,10 @@
     <v-app-bar color="blue800"></v-app-bar>
     <v-navigation-drawer color="grey-lighten-2" permanent>
       <router-link to="/">Home</router-link>
+      <br />
       <router-link to="/stammdaten">Stammdaten</router-link>
+      <br />
+      <router-link to="/upload">Upload</router-link>
     </v-navigation-drawer>
     <v-main>
       <router-view></router-view>
