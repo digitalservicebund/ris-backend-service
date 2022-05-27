@@ -28,7 +28,7 @@ public class DocUnit {
   String eclinummer;
   String eingangsart;
 
-  // Rubrikenfelder
+  // Rubrikenfelder fuer Langtexte
   String tenor;
   String gruende;
   String tatbestand;
