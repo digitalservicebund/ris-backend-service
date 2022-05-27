@@ -11,7 +11,10 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
   actions: {
     fetchAll() {
       getAllDocUnits().then((all) => {
-        this.docUnits = all
+        if (all) {
+          // can be undefined if endpoint is offline
+          this.docUnits = all
+        }
       })
     },
     getAll() {
