@@ -1,4 +1,4 @@
-type Endpoint = "docunit/upload" | "docunit/getAll"
+type Endpoint = "docunit"
 
 const makeRequest = async (
   endpoint: Endpoint,
@@ -7,7 +7,7 @@ const makeRequest = async (
   const defaultOptions: Partial<RequestInit> = {
     method: "GET",
   }
-  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}`, {
+  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}/`, {
     ...defaultOptions,
     ...options,
   })
@@ -44,14 +44,14 @@ const getReadableStreamResponse = async (responseBody: ReadableStream) => {
 }
 
 export const getAllDocUnits = async () => {
-  return makeRequest("docunit/getAll", {})
+  return makeRequest("docunit", {})
 }
 
 export const uploadDocUnit = async (file: File) => {
   const data = new FormData()
   data.append("fileToUpload", file)
 
-  return makeRequest("docunit/upload", {
+  return makeRequest("docunit", {
     method: "POST",
     body: data,
   })
