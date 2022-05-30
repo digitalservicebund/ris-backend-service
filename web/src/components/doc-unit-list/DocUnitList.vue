@@ -12,7 +12,10 @@ onMounted(() => {
 <template>
   <ul v-if="!docUnitsStore.isEmpty()">
     <li v-for="docUnit in docUnitsStore.getAll()" :key="docUnit.id">
-      {{ docUnit.id }}, {{ docUnit.s3path }}, {{ docUnit.filetype }}
+      <router-link :to="{ name: 'DocUnit', params: { id: docUnit.id } }"
+        >{{ docUnit.id }}, {{ docUnit.s3path }},
+        {{ docUnit.filetype }}</router-link
+      >
     </li>
   </ul>
   <span v-else>No doc units found</span>
