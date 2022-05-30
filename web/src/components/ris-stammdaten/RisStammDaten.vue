@@ -1,5 +1,12 @@
 <script lang="ts" setup>
+import { DocUnit } from "../../types/DocUnit"
 import RisButton from "../ris-button/RisButton.vue"
+
+interface Props {
+  docUnit?: DocUnit
+}
+
+const props = defineProps<Props>()
 
 const stammDatenList = [
   {
@@ -60,10 +67,12 @@ const stammDatenList = [
 
 const onSubmit = () => {
   alert("Daten gespeichert")
+  console.log(props.docUnit)
 }
 </script>
 
 <template>
+  <!-- {{ props.docUnit.id }} -->
   <form novalidate class="ris-form" @submit.prevent="onSubmit">
     <v-row>
       <v-col cols="12" md="6">
