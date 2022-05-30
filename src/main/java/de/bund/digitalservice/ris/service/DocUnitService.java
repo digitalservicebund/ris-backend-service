@@ -6,6 +6,7 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -20,7 +21,6 @@ import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @Service
 @Slf4j
@@ -44,8 +44,7 @@ public class DocUnitService {
       Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
 
-    return Mono.just(fileUuid)
-        .flatMap(u -> putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders))
+    return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
         .map(putObjectResponse -> generateDataObject(fileUuid, "docx"))
         .doOnNext(docUnit -> log.debug("save doc unit"))
@@ -56,8 +55,7 @@ public class DocUnitService {
   }
 
   private Mono<PutObjectResponse> putObjectIntoBucket(
-      String fileUuid, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders)
-      throws S3Exception {
+      String fileUuid, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
 
     var contentLength = httpHeaders.getContentLength();
 
@@ -83,7 +81,9 @@ public class DocUnitService {
 
     var putObjectRequest = putObjectRequestBuilder.build();
 
-    return Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody));
+    return Mono.fromCallable(
+            () -> Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody)))
+        .flatMap(Function.identity());
   }
 
   private DocUnit generateDataObject(String filename, String type) {

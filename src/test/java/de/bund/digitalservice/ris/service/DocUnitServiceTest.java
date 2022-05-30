@@ -33,6 +33,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @SpringBootTest(properties = {"otc.obs.bucket-name=testBucket"})
+// @ExtendWith(SpringExtension.class)
 @Tag("test")
 class DocUnitServiceTest {
   @Autowired private DocUnitService service;
