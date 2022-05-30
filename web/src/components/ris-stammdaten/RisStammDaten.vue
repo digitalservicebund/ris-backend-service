@@ -58,42 +58,76 @@ const stammDatenList = [
   },
 ]
 
-const safeData = () => {
+const onSubmit = () => {
   alert("Daten gespeichert")
 }
 </script>
 
 <template>
-  <v-form>
-    <v-container>
-      <v-row><h3>Stammdaten</h3></v-row>
-      <v-row>
-        <v-col cols="12" md="6">
-          <template v-for="(item, index) in stammDatenList">
-            <v-text-field
-              v-if="index <= 4"
-              :key="item.id"
-              :name="item.name"
-              :label="item.label"
-              :aria-labelledby="item.aria"
-            ></v-text-field>
-          </template>
-        </v-col>
-        <v-col cols="12" md="6">
-          <template v-for="(item, index) in stammDatenList">
-            <v-text-field
-              v-if="index > 4"
-              :key="item.id"
-              :name="item.name"
-              :label="item.label"
-              :aria-labelledby="item.aria"
-            ></v-text-field>
-          </template>
-          <ris-button color="blue800" @click="safeData" />
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-form>
+  <form novalidate class="ris-form" @submit.prevent="onSubmit">
+    <v-row>
+      <v-col cols="12" md="6">
+        <template v-for="(item, index) in stammDatenList">
+          <div v-if="index <= 4" :key="item.id" class="ris-form__textfield">
+            <label :for="item.name" class="ris-form__label">
+              {{ item.label }}
+              <input
+                :id="item.name"
+                class="ris-form__input"
+                type="text"
+                :name="item.name"
+                :aria-labelledby="item.aria"
+              />
+            </label>
+          </div>
+        </template>
+      </v-col>
+      <v-col cols="12" md="6">
+        <template v-for="(item, index) in stammDatenList">
+          <div v-if="index > 4" :key="item.id" class="ris-form__textfield">
+            <label :for="item.name" class="ris-form__label">
+              {{ item.label }}
+              <input
+                :id="item.name"
+                class="ris-form__input"
+                type="text"
+                :name="item.name"
+                :aria-labelledby="item.aria"
+              />
+            </label>
+          </div>
+        </template>
+        <div class="ris-form__textfield">
+          <RisButton type="submit" color="blue800" />
+        </div>
+      </v-col>
+    </v-row>
+  </form>
 </template>
 
-<style lang="scss"></style>
+<style lang="scss">
+.ris-form {
+  padding: rem(20px);
+
+  &__textfield {
+    padding: rem(20px);
+  }
+
+  &__input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 4px;
+    outline: 2px solid $blue800;
+    resize: vertical;
+
+    &:hover,
+    &:focus {
+      outline-width: 4px;
+    }
+  }
+
+  &__label {
+    padding: 12px 12px 12px 0;
+  }
+}
+</style>
