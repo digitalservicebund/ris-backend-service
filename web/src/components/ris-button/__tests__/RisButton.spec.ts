@@ -26,6 +26,6 @@ describe("RisButton", () => {
         plugins: [vuetify],
       },
     })
-    expect(wrapper.props().label).toBe("Absenden")
+    expect(wrapper.props().label).toBe("Speichern")
   })
 })

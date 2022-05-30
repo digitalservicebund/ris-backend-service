@@ -4,7 +4,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  label: "Absenden",
+  label: "Speichern",
 })
 </script>
 
