@@ -58,7 +58,9 @@ const drop = (e: DragEvent) => {
           <v-row align="center">
             <v-col cols="1" />
             <v-col cols="2">
-              <img src="../../assets/DriveFolderUpload.svg" alt="upload-icon" />
+              <v-icon class="icon" size="50px">
+                mdi-folder-upload-outline
+              </v-icon>
             </v-col>
             <v-col cols="7"> Datei in diesen Bereich ziehen </v-col>
           </v-row>
@@ -92,5 +94,8 @@ const drop = (e: DragEvent) => {
   &__in-drag {
     border: $border-style-active;
   }
+}
+.icon {
+  color: $blue800;
 }
 </style>
