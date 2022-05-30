@@ -49,6 +49,17 @@ const drop = (e: DragEvent) => {
     upload(e.dataTransfer.files[0])
   }
 }
+
+const openFileDialog = () => {
+  const inputEl = document.createElement("input")
+  inputEl.setAttribute("type", "file")
+  inputEl.addEventListener("change", (e: Event) => {
+    let files = (e.target as HTMLInputElement).files
+    if (!files) return
+    upload(files[0])
+  })
+  inputEl.click()
+}
 </script>
 
 <template>
@@ -95,7 +106,11 @@ const drop = (e: DragEvent) => {
             <v-row>
               <v-col cols="1" />
               <v-col cols="9">
-                <ris-button color="blue800" label="Festplatte durchsuchen" />
+                <ris-button
+                  color="blue800"
+                  label="Festplatte durchsuchen"
+                  @click="openFileDialog"
+                />
               </v-col>
             </v-row>
           </span>
