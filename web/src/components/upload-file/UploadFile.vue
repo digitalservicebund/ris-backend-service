@@ -35,7 +35,7 @@ const drop = (e: DragEvent) => {
   Upload
   <div
     class="upload-drop-area"
-    :class="{ 'in-drag': inDrag }"
+    :class="{ 'upload-drop-area__in-drag': inDrag }"
     @dragover="dragover"
     @dragleave="dragleave"
     @drop="drop"
@@ -44,25 +44,25 @@ const drop = (e: DragEvent) => {
     <br />
     oder
     <br />
-    <ris-button label="Festplatte durchsuchen" />
+    <ris-button color="blue800" label="Festplatte durchsuchen" />
   </div>
 </template>
 
 <style lang="scss">
 .upload-drop-area {
-  border-radius: 10px;
-  border: 3px solid $blue300;
-  background: white;
-  width: 640px;
-  height: 313px;
-  margin: 20px;
-  padding: 20px;
+  border-radius: $border-radius;
+  border: $border-style-inactive;
+  background: $white;
+  max-width: 640px;
+  margin: 20px; // define globally
+  padding: 20px; // define globally
 
   &:hover {
-    border: 3px solid $blue500 !important;
+    border: $border-style-active;
   }
-}
-.in-drag {
-  border: 3px solid $blue500 !important;
+
+  &__in-drag {
+    border: $border-style-active;
+  }
 }
 </style>

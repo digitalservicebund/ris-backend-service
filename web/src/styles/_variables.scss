@@ -8,6 +8,11 @@ $blue300: #dce8ef;
 $blue500: #b3c9d6;
 $blue700: #336f91;
 $blue800: #004b76;
+$white: #ffffff;
+
+$border-radius: 10px;
+$border-style-inactive: 3px solid $blue300;
+$border-style-active: 3px solid $blue500 !important;
 
 // Font Settings
 $font-fallback: "Arial Narrow", "Arial Nova", sans-serif;
