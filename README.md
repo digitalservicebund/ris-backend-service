@@ -32,6 +32,23 @@ brew install lefthook node talisman
 
 This will replace placeholders in the application template and install a couple of Git hooks.
 
+### Local development setup
+
+#### Backend
+
+```bash
+AWS_ACCESS_KEY_ID=insert-yours AWS_SECRET_ACCESS_KEY=insert-yours ./gradlew bootRun --args='--spring.profiles.active=local'
+```
+
+If you use IntelliJ: the run configuration _Application_ should be automatically created. Edit that and:
+
+- add `local` to _Active profiles_
+- enable the _Environment variables_ field under _Modify options_ and add `AWS_ACCESS_KEY_ID=insert-yours;AWS_SECRET_ACCESS_KEY=insert-yours`
+
+#### Frontend
+
+See `web/README.md`
+
 ## Tests
 
 The project has distinct unit and integration test sets.
