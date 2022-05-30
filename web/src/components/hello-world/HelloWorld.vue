@@ -12,10 +12,6 @@ const message = ref("Hello DigitalService")
           {{ message }}
         </h1>
       </v-col>
-
-      <v-col class="mb-5" cols="12">
-        <h2 class="headline font-weight-bold mb-5">What's next?</h2>
-      </v-col>
     </v-row>
   </v-container>
 </template>

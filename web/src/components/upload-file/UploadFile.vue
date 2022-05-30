@@ -7,9 +7,13 @@ import RisButton from "../ris-button/RisButton.vue"
 const docUnitsStore = useDocUnitsStore()
 const inDrag = ref(false)
 const inDragError = ref("")
+const uploadStatus = ref("")
 
 const upload = async (file: File) => {
+  uploadStatus.value = "Die Datei " + file.name + " wird hochgeladen..."
   let docUnit = await uploadDocUnit(file)
+  uploadStatus.value =
+    "Die Datei " + file.name + " wurde erfolgreich hochgeladen"
   console.log("file uploaded, response:", docUnit)
   docUnitsStore.add(docUnit)
 }
@@ -34,17 +38,18 @@ const checkForInDragError = (e: DragEvent): string => {
 }
 
 const dragleave = () => {
-  resetDrag()
+  reset()
 }
 
-const resetDrag = () => {
+const reset = () => {
   inDrag.value = false
   inDragError.value = ""
+  uploadStatus.value = ""
 }
 
 const drop = (e: DragEvent) => {
   e.preventDefault()
-  resetDrag()
+  reset()
   if (e.dataTransfer) {
     upload(e.dataTransfer.files[0])
   }
@@ -56,6 +61,7 @@ const openFileDialog = () => {
   inputEl.addEventListener("change", (e: Event) => {
     let files = (e.target as HTMLInputElement).files
     if (!files) return
+    reset()
     upload(files[0])
   })
   inputEl.click()
@@ -120,6 +126,9 @@ const openFileDialog = () => {
         </v-container>
       </v-col>
       <v-col cols="4"></v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="10">{{ uploadStatus }}</v-col>
     </v-row>
   </v-container>
 </template>
