@@ -2,21 +2,28 @@
 import { onMounted, ref } from "vue"
 import { useRoute } from "vue-router"
 import RisStammDaten from "../components/ris-stammdaten/RisStammDaten.vue"
+import { useDocUnitsStore } from "../store"
+import { DocUnit } from "../types/DocUnit"
 
+const docUnitsStore = useDocUnitsStore()
 const route = useRoute()
-const docUnitId = ref()
+const docUnit = ref<DocUnit>()
 
 onMounted(() => {
-  docUnitId.value = route.params.id
+  docUnitsStore.getDocUnit(Number(route.params.id)).then((du) => {
+    docUnit.value = du
+  })
 })
 </script>
 
 <template>
-  DocUnit {{ docUnitId }}
-  <v-row>
-    <v-col class="mb-4">
-      <h2>RandomNumber123</h2>
-    </v-col>
-  </v-row>
-  <RisStammDaten />
+  <span v-if="docUnit">
+    <v-row>
+      <v-col class="mb-4">
+        <h2>DocUnit {{ docUnit.id }}</h2>
+      </v-col>
+    </v-row>
+    <RisStammDaten />
+  </span>
+  <span v-else> Dokumentationseinheit wird geladen... </span>
 </template>

@@ -1,7 +1,7 @@
-type Endpoint = "docunit"
+// type Endpoint = "docunit"
 
 const makeRequest = async (
-  endpoint: Endpoint,
+  endpoint: string,
   options?: Partial<RequestInit>
 ) => {
   const defaultOptions: Partial<RequestInit> = {
@@ -43,8 +43,12 @@ const getReadableStreamResponse = async (responseBody: ReadableStream) => {
   )
 }
 
-export const getAllDocUnits = async () => {
+export const fetchAllDocUnits = async () => {
   return makeRequest("docunit", {})
+}
+
+export const fetchDocUnitById = async (id: number) => {
+  return makeRequest("docunit/" + id, {})
 }
 
 export const uploadDocUnit = async (file: File) => {
