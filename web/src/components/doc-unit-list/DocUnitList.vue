@@ -12,7 +12,7 @@ onMounted(() => {
 <template>
   <ul v-if="!docUnitsStore.isEmpty()">
     <li v-for="docUnit in docUnitsStore.getAll()" :key="docUnit.id">
-      <router-link :to="{ name: 'DocUnit', params: { id: docUnit.id } }"
+      <router-link :to="{ name: 'Stammdaten', params: { id: docUnit.id } }"
         >{{ docUnit.id }}, {{ docUnit.s3path }},
         {{ docUnit.filetype }}</router-link
       >

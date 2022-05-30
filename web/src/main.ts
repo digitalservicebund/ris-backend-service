@@ -3,7 +3,6 @@ import { createApp } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import App from "./App.vue"
 import vuetify from "./plugins/vuetify"
-import DocUnit from "./views/DocUnit.vue"
 import Home from "./views/HomePage.vue"
 import Upload from "./views/UpLoad.vue"
 
@@ -16,7 +15,7 @@ const router = createRouter({
       component: Home,
     },
     {
-      path: "/stammdaten",
+      path: "/stammdaten/:id",
       name: "Stammdaten",
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
@@ -28,11 +27,6 @@ const router = createRouter({
       path: "/upload",
       name: "Upload",
       component: Upload,
-    },
-    {
-      path: "/docUnit/:id",
-      name: "DocUnit",
-      component: DocUnit,
     },
   ],
 })
