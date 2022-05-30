@@ -32,20 +32,51 @@ const drop = (e: DragEvent) => {
 </script>
 
 <template>
-  Upload
-  <div
-    class="upload-drop-area"
-    :class="{ 'upload-drop-area__in-drag': inDrag }"
-    @dragover="dragover"
-    @dragleave="dragleave"
-    @drop="drop"
-  >
-    Datei in diesen Bereich ziehen
-    <br />
-    oder
-    <br />
-    <ris-button color="blue800" label="Festplatte durchsuchen" />
-  </div>
+  <v-container>
+    <v-row>
+      <v-col cols="10"><h3>Original Dokument</h3></v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="10">
+        Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
+        Originaldokumentes aus
+      </v-col>
+    </v-row>
+    <v-row><v-col></v-col></v-row>
+    <v-row>
+      <v-col cols="10"><h3>Upload</h3></v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="6">
+        <v-container
+          class="upload-drop-area"
+          :class="{ 'upload-drop-area__in-drag': inDrag }"
+          @dragover="dragover"
+          @dragleave="dragleave"
+          @drop="drop"
+        >
+          <v-row align="center">
+            <v-col cols="1" />
+            <v-col cols="2">
+              <img src="../../assets/DriveFolderUpload.svg" alt="upload-icon" />
+            </v-col>
+            <v-col cols="7"> Datei in diesen Bereich ziehen </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="1" />
+            <v-col cols="9"> oder </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="1" />
+            <v-col cols="9">
+              <ris-button color="blue800" label="Festplatte durchsuchen" />
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-col>
+      <v-col cols="4"></v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <style lang="scss">
@@ -53,9 +84,6 @@ const drop = (e: DragEvent) => {
   border-radius: $border-radius;
   border: $border-style-inactive;
   background: $white;
-  max-width: 640px;
-  margin: 20px; // define globally
-  padding: 20px; // define globally
 
   &:hover {
     border: $border-style-active;
