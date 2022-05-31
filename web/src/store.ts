@@ -5,36 +5,32 @@ import { DocUnit } from "./types/DocUnit"
 export const useDocUnitsStore = defineStore("docUnitsStore", {
   state: () => {
     return {
-      docUnits: <DocUnit[]>[],
+      docUnits: new Map<number, DocUnit>(),
     }
   },
   actions: {
     fetchAll() {
       fetchAllDocUnits().then((all) => {
-        if (all) {
-          // can be undefined if endpoint is offline
-          this.docUnits = all
+        if (!all) return
+        for (const docUnit of all) {
+          this.docUnits.set(docUnit.id, docUnit)
         }
       })
     },
     getAll() {
-      return this.docUnits
+      return this.docUnits.values()
     },
     isEmpty() {
-      return this.docUnits.length === 0
+      return this.docUnits.size === 0
     },
     add(docUnit: DocUnit) {
-      this.docUnits.push(docUnit)
+      this.docUnits.set(docUnit.id, docUnit)
     },
     getDocUnit(id: number): Promise<DocUnit> {
-      const result = this.docUnits.filter((du) => du.id === id)
-      if (result.length > 0) {
-        console.log("DocUnit " + id + " was already present in the store")
-        return Promise.resolve(result[0])
+      const docUnit = this.docUnits.get(id)
+      if (docUnit) {
+        return Promise.resolve(docUnit)
       }
-      console.log(
-        "DocUnit " + id + " wasn't present in the store and is getting fetched"
-      )
       return fetchDocUnitById(id).then((du) => {
         this.add(du)
         return du
