@@ -1,20 +1,23 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
 import { updateDocUnit } from "../../api"
+import { useDocUnitsStore } from "../../store"
 import { DocUnit } from "../../types/DocUnit"
 import RisButton from "../ris-button/RisButton.vue"
 
 interface Props {
-  docUnit?: DocUnit
+  docUnitId?: number
 }
 
 const props = defineProps<Props>()
+const docUnitsStore = useDocUnitsStore()
 const docUnit = ref<DocUnit>()
 
 onMounted(() => {
-  // can't work directly on props.docUnit because it creates prop-mutation errors
-  // is there a better way to deep copy?
-  docUnit.value = JSON.parse(JSON.stringify(props.docUnit))
+  if (!props.docUnitId) return
+  docUnitsStore.getDocUnit(props.docUnitId).then((du) => {
+    docUnit.value = du
+  })
 })
 
 const stammDatenList = [
