@@ -40,7 +40,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .post()
-        .uri("/api/v1/docunit/")
+        .uri("/api/v1/docunits/")
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
@@ -53,14 +53,14 @@ class DocUnitControllerTest {
 
   @Test
   void testGetAll() {
-    webClient.mutateWith(csrf()).get().uri("/api/v1/docunit/").exchange().expectStatus().isOk();
+    webClient.mutateWith(csrf()).get().uri("/api/v1/docunits/").exchange().expectStatus().isOk();
 
     verify(service).getAll();
   }
 
   @Test
   void testGetById() {
-    webClient.mutateWith(csrf()).get().uri("/api/v1/docunit/1").exchange().expectStatus().isOk();
+    webClient.mutateWith(csrf()).get().uri("/api/v1/docunits/1").exchange().expectStatus().isOk();
 
     verify(service).getById(1);
   }

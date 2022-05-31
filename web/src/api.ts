@@ -1,4 +1,4 @@
-// type Endpoint = "docunit"
+// type Endpoint = "docunits"
 
 import { DocUnit } from "./types/DocUnit"
 
@@ -9,7 +9,7 @@ const makeRequest = async (
   const defaultOptions: Partial<RequestInit> = {
     method: "GET",
   }
-  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}/`, {
+  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}`, {
     ...defaultOptions,
     ...options,
   })
@@ -46,15 +46,15 @@ const getReadableStreamResponse = async (responseBody: ReadableStream) => {
 }
 
 export const fetchAllDocUnits = async () => {
-  return makeRequest("docunit", {})
+  return makeRequest("docunits", {})
 }
 
 export const fetchDocUnitById = async (id: number) => {
-  return makeRequest("docunit/" + id, {})
+  return makeRequest("docunits/" + id, {})
 }
 
 export const updateDocUnit = async (docUnit: DocUnit) => {
-  return makeRequest("docunit/" + docUnit.id, {
+  return makeRequest("docunits/" + docUnit.id, {
     method: "POST",
     body: JSON.stringify(docUnit),
   })
@@ -64,7 +64,7 @@ export const uploadDocUnit = async (file: File) => {
   const data = new FormData()
   data.append("fileToUpload", file)
 
-  return makeRequest("docunit", {
+  return makeRequest("docunits", {
     method: "POST",
     body: data,
   })

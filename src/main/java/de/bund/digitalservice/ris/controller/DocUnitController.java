@@ -12,7 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("api/v1/docunit")
+@RequestMapping("api/v1/docunits")
 @Slf4j
 public class DocUnitController {
   private final DocUnitService service;
@@ -23,14 +23,14 @@ public class DocUnitController {
     this.service = service;
   }
 
-  @PostMapping(value = "/")
+  @PostMapping(value = "")
   public Mono<ResponseEntity<DocUnit>> uploadFile(
       @RequestBody Flux<ByteBuffer> byteBufferFlux, @RequestHeader HttpHeaders httpHeaders) {
 
     return service.generateNewDocUnit(byteBufferFlux, httpHeaders);
   }
 
-  @GetMapping(value = "/")
+  @GetMapping(value = "")
   public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
     log.info("All DocUnits were requested");
 
