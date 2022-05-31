@@ -130,8 +130,8 @@ const onSubmit = () => {
 
   &__input {
     width: 100%;
-    padding: 12px;
-    margin-top: 4px;
+    padding: 17px 24px;
+    margin-top: 5px;
     outline: 2px solid $blue800;
     resize: vertical;
 
@@ -142,7 +142,7 @@ const onSubmit = () => {
   }
 
   &__label {
-    padding: 12px 12px 12px 0;
+    padding: 12px 12px 20px 0;
   }
 }
 </style>
