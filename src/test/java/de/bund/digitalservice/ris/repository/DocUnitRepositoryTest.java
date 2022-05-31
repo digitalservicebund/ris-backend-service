@@ -35,7 +35,7 @@ class DocUnitRepositoryTest {
   @Test // as used in service.updateDocUnit()
   void testUpdateByOverSaving() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setFiletype("docx");
+    docUnit.setFiletype("txt");
     docUnitRepo.save(docUnit).subscribe();
     docUnitRepo.save(docUnit).subscribe();
     assertEquals(docUnitRepo.count().block(), 1);
