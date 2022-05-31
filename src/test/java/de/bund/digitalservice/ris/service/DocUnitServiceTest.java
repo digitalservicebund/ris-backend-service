@@ -153,7 +153,7 @@ class DocUnitServiceTest {
     when(repository.findById(id)).thenReturn(Mono.just(DocUnit.EMPTY));
     StepVerifier.create(service.getById(id))
         .consumeNextWith(
-            monoResponse -> assertEquals(monoResponse.getBody().block().getClass(), DocUnit.class))
+            monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnit.class))
         .verifyComplete();
     verify(repository).findById(id);
   }

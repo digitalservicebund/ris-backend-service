@@ -97,8 +97,8 @@ public class DocUnitService {
     return Mono.just(ResponseEntity.ok(repository.findAll()));
   }
 
-  public Mono<ResponseEntity<Mono<DocUnit>>> getById(int id) {
-    return Mono.just(ResponseEntity.ok(repository.findById(id)));
+  public Mono<ResponseEntity<DocUnit>> getById(int id) {
+    return repository.findById(id).map(ResponseEntity::ok);
   }
 
   public Mono<ResponseEntity<DocUnit>> updateDocUnit(DocUnit docUnit) {

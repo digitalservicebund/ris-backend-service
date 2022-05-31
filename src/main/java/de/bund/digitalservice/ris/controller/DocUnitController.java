@@ -39,7 +39,7 @@ public class DocUnitController {
   }
 
   @GetMapping(value = "/{id}")
-  public Mono<ResponseEntity<Mono<DocUnit>>> getById(@PathVariable int id) {
+  public Mono<ResponseEntity<DocUnit>> getById(@PathVariable int id) {
     return service.getById(id);
   }
 
