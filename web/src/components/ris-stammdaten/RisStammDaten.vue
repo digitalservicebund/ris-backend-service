@@ -28,10 +28,10 @@ const stammDatenList = [
     aria: "Gerichtssitz",
   },
   {
-    id: "Gerichtstyp",
-    name: "Gerichtstyp",
-    label: "Gerichtstyp",
-    aria: "Gerichtstyp",
+    id: "Gericht",
+    name: "Gericht",
+    label: "Gericht",
+    aria: "Gericht",
   },
   {
     id: "Aktenzeichen",
@@ -50,6 +50,12 @@ const stammDatenList = [
     name: "Eingangsart",
     label: "Eingangsart",
     aria: "Eingangsart",
+  },
+  {
+    id: "Dokumenttyp",
+    name: "Dokumenttyp",
+    label: "Dokumenttyp",
+    aria: "Dokumenttyp",
   },
   {
     id: "ECLI-Nummer",
