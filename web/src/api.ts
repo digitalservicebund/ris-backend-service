@@ -57,6 +57,10 @@ export const updateDocUnit = async (docUnit: DocUnit) => {
   return makeRequest(`docunits/${docUnit.id}`, {
     method: "POST",
     body: JSON.stringify(docUnit),
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
   })
 }
 

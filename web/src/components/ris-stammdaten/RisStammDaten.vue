@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
+import { updateDocUnit } from "../../api"
 import { DocUnit } from "../../types/DocUnit"
 import RisButton from "../ris-button/RisButton.vue"
 
@@ -75,7 +76,7 @@ const stammDatenList = [
 
 const onSubmit = () => {
   if (!docUnit.value) return
-  // updateDocUnit(docUnit.value)
+  updateDocUnit(docUnit.value)
   alert("Daten gespeichert")
   console.log(docUnit.value)
 }

@@ -100,4 +100,12 @@ public class DocUnitService {
   public Mono<ResponseEntity<Mono<DocUnit>>> getById(int id) {
     return Mono.just(ResponseEntity.ok(repository.findById(id)));
   }
+
+  public Mono<ResponseEntity<DocUnit>> updateDocUnit(DocUnit docUnit) {
+    return repository
+        .save(docUnit)
+        .map(ResponseEntity::ok)
+        .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+  }
 }

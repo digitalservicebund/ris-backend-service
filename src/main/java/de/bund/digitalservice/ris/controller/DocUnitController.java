@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.service.DocUnitService;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
@@ -42,11 +43,12 @@ public class DocUnitController {
     return service.getById(id);
   }
 
-  @PostMapping(value = "/{id}")
-  public Mono<ResponseEntity<Boolean>> updateById(
+  @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<ResponseEntity<DocUnit>> updateById(
       @PathVariable int id, @RequestBody DocUnit docUnit) {
-    // TODO
-    System.out.println(id + ": " + docUnit.toString());
-    return Mono.just(ResponseEntity.ok(true));
+    if (id != docUnit.getId()) {
+      return Mono.just(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+    }
+    return service.updateDocUnit(docUnit);
   }
 }
