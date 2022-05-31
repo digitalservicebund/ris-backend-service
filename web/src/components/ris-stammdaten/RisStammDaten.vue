@@ -10,64 +10,58 @@ const props = defineProps<Props>()
 
 const stammDatenList = [
   {
-    id: "Vorgang",
+    id: "vorgang",
     name: "Vorgang",
     label: "Vorgang",
     aria: "Vorgang",
   },
   {
-    id: "Entscheidungsdatum",
+    id: "entscheidungsdatum",
     name: "Entscheidungsdatum",
     label: "Entscheidungsdatum",
     aria: "Entscheidungsdatum",
   },
   {
-    id: "Gerichtssitz",
+    id: "gerichtssitz",
     name: "Gerichtssitz",
     label: "Gerichtssitz",
     aria: "Gerichtssitz",
   },
   {
-    id: "Gericht",
+    id: "gericht",
     name: "Gericht",
     label: "Gericht",
     aria: "Gericht",
   },
   {
-    id: "Aktenzeichen",
+    id: "aktenzeichen",
     name: "Aktenzeichen",
     label: "Aktenzeichen",
     aria: "Aktenzeichen",
   },
   {
-    id: "Spruchkörper",
+    id: "spruchkoerper",
     name: "Spruchkörper",
     label: "Spruchkörper",
     aria: "Spruchkörper",
   },
   {
-    id: "Eingangsart",
+    id: "eingangsart",
     name: "Eingangsart",
     label: "Eingangsart",
     aria: "Eingangsart",
   },
   {
-    id: "Dokumenttyp",
+    id: "dokumenttyp",
     name: "Dokumenttyp",
     label: "Dokumenttyp",
     aria: "Dokumenttyp",
   },
   {
-    id: "ECLI-Nummer",
+    id: "eclinummer",
     name: "ECLI-Nummer",
     label: "ECLI-Nummer",
     aria: "ECLI-Nummer",
-  },
-  {
-    id: "Rechtskraft",
-    name: "Rechtskraft",
-    label: "Rechtskraft",
-    aria: "Rechtskraft",
   },
 ]
 
