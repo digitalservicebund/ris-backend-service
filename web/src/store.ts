@@ -36,5 +36,8 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
         return du
       })
     },
+    update(docUnit: DocUnit) {
+      this.docUnits.set(docUnit.id, docUnit)
+    },
   },
 })

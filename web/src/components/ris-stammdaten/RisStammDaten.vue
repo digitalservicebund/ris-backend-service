@@ -79,9 +79,11 @@ const stammDatenList = [
 
 const onSubmit = () => {
   if (!docUnit.value) return
-  updateDocUnit(docUnit.value)
+  updateDocUnit(docUnit.value).then((updatedDocUnit) => {
+    docUnit.value = updatedDocUnit
+    docUnitsStore.update(updatedDocUnit)
+  })
   alert("Daten gespeichert")
-  console.log(docUnit.value)
 }
 </script>
 
