@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.datamodel.DocUnit;
 import de.bund.digitalservice.ris.service.DocUnitService;
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -63,5 +64,21 @@ class DocUnitControllerTest {
     webClient.mutateWith(csrf()).get().uri("/api/v1/docunits/1").exchange().expectStatus().isOk();
 
     verify(service).getById(1);
+  }
+
+  @Test
+  void testUpdateById() {
+    DocUnit docUnit = new DocUnit();
+    docUnit.setId(1);
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/docunits/1")
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(docUnit)
+        .exchange()
+        .expectStatus()
+        .isOk();
+    verify(service).updateDocUnit(docUnit);
   }
 }

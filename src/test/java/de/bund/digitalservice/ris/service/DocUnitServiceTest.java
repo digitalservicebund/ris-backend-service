@@ -157,4 +157,14 @@ class DocUnitServiceTest {
         .verifyComplete();
     verify(repository).findById(id);
   }
+
+  @Test
+  public void testUpdateDocUnit() {
+    var docUnit = DocUnit.EMPTY;
+    when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+    StepVerifier.create(service.updateDocUnit(docUnit))
+        .consumeNextWith(monoResponse -> assertEquals(monoResponse.getBody(), docUnit))
+        .verifyComplete();
+    verify(repository).save(docUnit);
+  }
 }
