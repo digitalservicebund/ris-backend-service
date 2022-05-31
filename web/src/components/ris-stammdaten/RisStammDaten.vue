@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { onMounted, ref } from "vue"
 import { DocUnit } from "../../types/DocUnit"
 import RisButton from "../ris-button/RisButton.vue"
 
@@ -7,6 +8,13 @@ interface Props {
 }
 
 const props = defineProps<Props>()
+const docUnit = ref<DocUnit>()
+
+onMounted(() => {
+  // can't work directly on props.docUnit because it creates prop-mutation errors
+  // is there a better way to deep copy?
+  docUnit.value = JSON.parse(JSON.stringify(props.docUnit))
+})
 
 const stammDatenList = [
   {
@@ -66,52 +74,58 @@ const stammDatenList = [
 ]
 
 const onSubmit = () => {
+  if (!docUnit.value) return
+  // updateDocUnit(docUnit.value)
   alert("Daten gespeichert")
-  console.log(props.docUnit)
+  console.log(docUnit.value)
 }
 </script>
 
 <template>
-  <!-- {{ props.docUnit.id }} -->
-  <form novalidate class="ris-form" @submit.prevent="onSubmit">
-    <v-row>
-      <v-col cols="12" md="6">
-        <template v-for="(item, index) in stammDatenList">
-          <div v-if="index <= 4" :key="item.id" class="ris-form__textfield">
-            <label :for="item.name" class="ris-form__label">
-              {{ item.label }}
-              <input
-                :id="item.name"
-                class="ris-form__input"
-                type="text"
-                :name="item.name"
-                :aria-labelledby="item.aria"
-              />
-            </label>
+  <div v-if="!docUnit">Loading...</div>
+  <div v-else>
+    <form novalidate class="ris-form" @submit.prevent="onSubmit">
+      <v-row>
+        <v-col cols="12" md="6">
+          <template v-for="(item, index) in stammDatenList">
+            <div v-if="index <= 4" :key="item.id" class="ris-form__textfield">
+              <label :for="item.name" class="ris-form__label">
+                {{ item.label }}
+                <input
+                  :id="item.name"
+                  v-model="docUnit[item.id]"
+                  class="ris-form__input"
+                  type="text"
+                  :name="item.name"
+                  :aria-labelledby="item.aria"
+                />
+              </label>
+            </div>
+          </template>
+        </v-col>
+        <v-col cols="12" md="6">
+          <template v-for="(item, index) in stammDatenList">
+            <div v-if="index > 4" :key="item.id" class="ris-form__textfield">
+              <label :for="item.name" class="ris-form__label">
+                {{ item.label }}
+                <input
+                  :id="item.name"
+                  v-model="docUnit[item.id]"
+                  class="ris-form__input"
+                  type="text"
+                  :name="item.name"
+                  :aria-labelledby="item.aria"
+                />
+              </label>
+            </div>
+          </template>
+          <div class="ris-form__textfield">
+            <RisButton type="submit" color="blue800" />
           </div>
-        </template>
-      </v-col>
-      <v-col cols="12" md="6">
-        <template v-for="(item, index) in stammDatenList">
-          <div v-if="index > 4" :key="item.id" class="ris-form__textfield">
-            <label :for="item.name" class="ris-form__label">
-              {{ item.label }}
-              <input
-                :id="item.name"
-                class="ris-form__input"
-                type="text"
-                :name="item.name"
-                :aria-labelledby="item.aria"
-              />
-            </label>
-          </div>
-        </template>
-        <div class="ris-form__textfield">
-          <RisButton type="submit" color="blue800" />
-        </div>
-      </v-col>
-    </v-row>
-  </form>
+        </v-col>
+      </v-row>
+    </form>
+  </div>
 </template>
 
 <style lang="scss">

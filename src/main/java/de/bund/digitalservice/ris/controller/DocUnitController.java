@@ -41,4 +41,12 @@ public class DocUnitController {
   public Mono<ResponseEntity<Mono<DocUnit>>> getById(@PathVariable int id) {
     return service.getById(id);
   }
+
+  @PostMapping(value = "/{id}")
+  public Mono<ResponseEntity<Boolean>> updateById(
+      @PathVariable int id, @RequestBody DocUnit docUnit) {
+    // TODO
+    System.out.println(id + ": " + docUnit.toString());
+    return Mono.just(ResponseEntity.ok(true));
+  }
 }

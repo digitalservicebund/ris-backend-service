@@ -1,5 +1,7 @@
 // type Endpoint = "docunit"
 
+import { DocUnit } from "./types/DocUnit"
+
 const makeRequest = async (
   endpoint: string,
   options?: Partial<RequestInit>
@@ -49,6 +51,13 @@ export const fetchAllDocUnits = async () => {
 
 export const fetchDocUnitById = async (id: number) => {
   return makeRequest("docunit/" + id, {})
+}
+
+export const updateDocUnit = async (docUnit: DocUnit) => {
+  return makeRequest("docunit/" + docUnit.id, {
+    method: "POST",
+    body: JSON.stringify(docUnit),
+  })
 }
 
 export const uploadDocUnit = async (file: File) => {
