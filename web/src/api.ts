@@ -46,15 +46,15 @@ const getReadableStreamResponse = async (responseBody: ReadableStream) => {
 }
 
 export const fetchAllDocUnits = async () => {
-  return makeRequest("docunits", {})
+  return makeRequest("docunits")
 }
 
 export const fetchDocUnitById = async (id: number) => {
-  return makeRequest("docunits/" + id, {})
+  return makeRequest(`docunits/${id}`)
 }
 
 export const updateDocUnit = async (docUnit: DocUnit) => {
-  return makeRequest("docunits/" + docUnit.id, {
+  return makeRequest(`docunits/${docUnit.id}`, {
     method: "POST",
     body: JSON.stringify(docUnit),
   })
