@@ -29,6 +29,11 @@ const reset = () => {
 const status = ref<Status>(emptyStatus)
 
 const upload = async (file: File) => {
+  let extension = file.name.split(".").pop()
+  if (!extension || extension.toLowerCase() !== "docx") {
+    alert("Aktuell werden nur DOCX Dateien unterstützt")
+    return
+  }
   status.value.file = file
   status.value.uploadStatus = "uploading"
   let docUnit = await uploadDocUnit(file)
