@@ -5,26 +5,47 @@ import { useDocUnitsStore } from "../../store"
 import RisButton from "../ris-button/RisButton.vue"
 
 const docUnitsStore = useDocUnitsStore()
-const inDrag = ref(false)
-const inDragError = ref("")
-const uploadStatus = ref("")
+
+interface Status {
+  file: File | null
+  inDrag: boolean
+  inDragError: string
+  uploadStatus: "none" | "uploading" | "succeeded" | "failed"
+  docUnitId: number | null
+}
+
+const emptyStatus: Status = {
+  file: null,
+  inDrag: false,
+  inDragError: "",
+  uploadStatus: "none",
+  docUnitId: null,
+}
+
+const reset = () => {
+  status.value = emptyStatus
+}
+
+const status = ref<Status>(emptyStatus)
 
 const upload = async (file: File) => {
-  uploadStatus.value = "Die Datei " + file.name + " wird hochgeladen..."
+  status.value.file = file
+  status.value.uploadStatus = "uploading"
   let docUnit = await uploadDocUnit(file)
-  uploadStatus.value =
-    "Die Datei " + file.name + " wurde erfolgreich hochgeladen"
-  console.log("file uploaded, response:", docUnit)
   docUnitsStore.add(docUnit)
+  status.value.docUnitId = docUnit.id
+  status.value.uploadStatus = "succeeded" // error handling TODO
+  console.log("file uploaded, response:", docUnit)
 }
 
 const dragover = (e: DragEvent) => {
   e.preventDefault()
-  inDragError.value = checkForInDragError(e)
-  inDrag.value = true
+  status.value.inDragError = checkForInDragError(e)
+  status.value.inDrag = true
 }
 
 const checkForInDragError = (e: DragEvent): string => {
+  //  this doesn't work on Windows, the type is not included TODO
   if (!e.dataTransfer) return ""
   let items = e.dataTransfer.items
   if (items.length !== 1) return "Nur eine Datei auf einmal ist möglich"
@@ -39,12 +60,6 @@ const checkForInDragError = (e: DragEvent): string => {
 
 const dragleave = () => {
   reset()
-}
-
-const reset = () => {
-  inDrag.value = false
-  inDragError.value = ""
-  uploadStatus.value = ""
 }
 
 const drop = (e: DragEvent) => {
@@ -95,7 +110,7 @@ const openFileDialog = () => {
           @dragleave="dragleave"
           @drop="drop"
         >
-          <span v-if="!inDragError">
+          <span v-if="!status.inDragError">
             <v-row align="center">
               <v-col cols="1" />
               <v-col cols="2">
@@ -121,14 +136,28 @@ const openFileDialog = () => {
             </v-row>
           </span>
           <span v-else>
-            {{ inDragError }}
+            {{ status.inDragError }}
           </span>
         </v-container>
       </v-col>
       <v-col cols="4"></v-col>
     </v-row>
     <v-row>
-      <v-col cols="10">{{ uploadStatus }}</v-col>
+      <v-col cols="10">
+        <span v-if="status.uploadStatus === 'uploading'">
+          Die Datei {{ status.file ? status.file.name : "" }} wird
+          hochgeladen...
+        </span>
+        <span v-if="status.uploadStatus === 'succeeded'">
+          Die Datei {{ status.file ? status.file.name : "" }} wurde erfolgreich
+          hochgeladen,
+          <router-link
+            :to="{ name: 'Stammdaten', params: { id: status.docUnitId } }"
+          >
+            zur Stammdaten-Ansicht</router-link
+          >
+        </span>
+      </v-col>
     </v-row>
   </v-container>
 </template>
