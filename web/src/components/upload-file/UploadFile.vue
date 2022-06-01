@@ -53,11 +53,12 @@ const checkForInDragError = (e: DragEvent): string => {
   //  this doesn't work on Windows, the type is not included TODO
   if (!e.dataTransfer) return ""
   let items = e.dataTransfer.items
-  if (items.length !== 1) return "Nur eine Datei auf einmal ist möglich"
+  if (items.length > 1) return "Nur eine Datei auf einmal ist möglich"
   if (items[0].kind !== "file") return "Dies scheint keine Datei zu sein"
   if (
+    items[0].type &&
     items[0].type !==
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   )
     return "Aktuell werden nur DOCX Dateien unterstützt"
   return ""
