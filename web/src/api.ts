@@ -64,7 +64,7 @@ export const updateDocUnit = async (docUnit: DocUnit) => {
   })
 }
 
-export const uploadDocUnit = async (file: File) => {
+export const uploadFile = async (file: File) => {
   const data = new FormData()
   data.append("fileToUpload", file)
 

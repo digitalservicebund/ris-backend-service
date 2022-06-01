@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import { uploadDocUnit } from "../../api"
+import { uploadFile } from "../../api"
 import { useDocUnitsStore } from "../../store"
 import RisButton from "../ris-button/RisButton.vue"
 
@@ -36,7 +36,7 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  let docUnit = await uploadDocUnit(file)
+  let docUnit = await uploadFile(file)
   docUnitsStore.add(docUnit)
   status.value.docUnitId = docUnit.id
   status.value.uploadStatus = "succeeded" // error handling TODO
