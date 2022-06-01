@@ -22,11 +22,11 @@ const emptyStatus: Status = {
   docUnitId: null,
 }
 
+const status = ref<Status>(emptyStatus)
+
 const reset = () => {
   status.value = emptyStatus
 }
-
-const status = ref<Status>(emptyStatus)
 
 const upload = async (file: File) => {
   let extension = file.name.split(".").pop()
@@ -64,7 +64,8 @@ const checkForInDragError = (e: DragEvent): string => {
 }
 
 const dragleave = () => {
-  reset()
+  status.value.inDragError = ""
+  status.value.inDrag = false
 }
 
 const drop = (e: DragEvent) => {
@@ -108,8 +109,8 @@ const openFileDialog = () => {
         <v-container
           class="upload-drop-area"
           :class="{
-            'upload-drop-area__in-drag': inDrag,
-            'upload-drop-area__in-drag-error': inDragError,
+            'upload-drop-area__in-drag': status.inDrag,
+            'upload-drop-area__in-drag-error': status.inDragError,
           }"
           @dragover="dragover"
           @dragleave="dragleave"
