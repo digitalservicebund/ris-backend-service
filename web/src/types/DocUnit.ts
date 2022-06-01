@@ -4,6 +4,7 @@ export type DocUnit = {
   // Original file
   s3path: string
   filetype: string
+  filename: string
 
   // Stammdaten
   aktenzeichen: string

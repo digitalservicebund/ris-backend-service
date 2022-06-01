@@ -16,6 +16,7 @@ public class DocUnit {
   // Original file
   String s3path;
   String filetype;
+  String filename;
 
   // Stammdaten
   String aktenzeichen;

@@ -12,7 +12,7 @@ fileignoreconfig:
   - filename: web/src/env.d.ts
     checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
   - filename: src/main/resources/schema.sql
-    checksum: 894d2ea8da514cdd5b9262ebc4f1ca4afd7b83186d8b850f9e2764695e11cf4a
+    checksum: ed7767483b02e7c1ff47d6e7afb7f6374eb2de0617a714f1758bd467ab906b65
   - filename: web/.env.development
     checksum: 7443587c94ecd708b8e562b7b017164a9aecd6f1c8dec9740dc22db7ca2ab89a
 scopeconfig:

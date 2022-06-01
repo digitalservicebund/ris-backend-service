@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS doc_unit (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     s3path VARCHAR(255),
     filetype VARCHAR(30),
+    filename VARCHAR(255),
     aktenzeichen VARCHAR(255),
     entscheidungsdatum VARCHAR(255),
     gericht VARCHAR(255),
