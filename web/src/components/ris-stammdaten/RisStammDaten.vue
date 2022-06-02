@@ -22,10 +22,40 @@ onMounted(() => {
 
 const stammDatenList = [
   {
+    id: "aktenzeichen",
+    name: "Aktenzeichen",
+    label: "Aktenzeichen",
+    aria: "Aktenzeichen",
+  },
+  {
+    id: "gerichtstyp",
+    name: "Gerichtstyp",
+    label: "Gerichtstyp",
+    aria: "Gerichtstyp",
+  },
+  {
+    id: "dokumenttyp",
+    name: "Dokumenttyp",
+    label: "Dokumenttyp",
+    aria: "Dokumenttyp",
+  },
+  {
     id: "vorgang",
     name: "Vorgang",
     label: "Vorgang",
     aria: "Vorgang",
+  },
+  {
+    id: "ecli",
+    name: "ECLI",
+    label: "ECLI",
+    aria: "ECLI",
+  },
+  {
+    id: "spruchkoerper",
+    name: "Spruchkörper",
+    label: "Spruchkörper",
+    aria: "Spruchkörper",
   },
   {
     id: "entscheidungsdatum",
@@ -40,22 +70,10 @@ const stammDatenList = [
     aria: "Gerichtssitz",
   },
   {
-    id: "gericht",
-    name: "Gericht",
-    label: "Gericht",
-    aria: "Gericht",
-  },
-  {
-    id: "aktenzeichen",
-    name: "Aktenzeichen",
-    label: "Aktenzeichen",
-    aria: "Aktenzeichen",
-  },
-  {
-    id: "spruchkoerper",
-    name: "Spruchkörper",
-    label: "Spruchkörper",
-    aria: "Spruchkörper",
+    id: "rechtskraft",
+    name: "Rechtskraft",
+    label: "Rechtskraft",
+    aria: "Rechtskraft",
   },
   {
     id: "eingangsart",
@@ -64,16 +82,16 @@ const stammDatenList = [
     aria: "Eingangsart",
   },
   {
-    id: "dokumenttyp",
-    name: "Dokumenttyp",
-    label: "Dokumenttyp",
-    aria: "Dokumenttyp",
+    id: "dokumentationsstelle",
+    name: "Dokumentationsstelle",
+    label: "Dokumentationsstelle",
+    aria: "Dokumentationsstelle",
   },
   {
-    id: "eclinummer",
-    name: "ECLI-Nummer",
-    label: "ECLI-Nummer",
-    aria: "ECLI-Nummer",
+    id: "region",
+    name: "Region",
+    label: "Region",
+    aria: "Region",
   },
 ]
 

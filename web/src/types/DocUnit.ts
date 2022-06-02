@@ -8,14 +8,17 @@ export type DocUnit = {
 
   // Stammdaten
   aktenzeichen: string
-  entscheidungsdatum: string
-  gericht: string
+  gerichtstyp: string
   dokumenttyp: string
-  gerichtssitz: string
-  spruchkoerper: string
   vorgang: string
-  eclinummer: string
+  ecli: string
+  spruchkoerper: string
+  entscheidungsdatum: string
+  gerichtssitz: string
+  rechtskraft: string
   eingangsart: string
+  dokumentationsstelle: string
+  region: string
 
   // Rubrikenfelder
   tenor: string

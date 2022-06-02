@@ -20,14 +20,17 @@ public class DocUnit {
 
   // Stammdaten
   String aktenzeichen;
-  String entscheidungsdatum;
-  String gericht;
+  String gerichtstyp;
   String dokumenttyp;
-  String gerichtssitz;
-  String spruchkoerper;
   String vorgang;
-  String eclinummer;
+  String ecli;
+  String spruchkoerper;
+  String entscheidungsdatum;
+  String gerichtssitz;
+  String rechtskraft;
   String eingangsart;
+  String dokumentationsstelle;
+  String region;
 
   // Rubrikenfelder fuer Langtexte
   String tenor;
