@@ -15,7 +15,7 @@ const docUnit = ref<DocUnit>()
 
 onMounted(() => {
   if (!props.docUnitId) return
-  docUnitsStore.getDocUnit(props.docUnitId).then((du) => {
+  docUnitsStore.getAndSetSelected(props.docUnitId).then((du) => {
     docUnit.value = du
   })
 })

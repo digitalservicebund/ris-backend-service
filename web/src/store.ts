@@ -2,12 +2,16 @@ import { defineStore } from "pinia"
 import { fetchAllDocUnits, fetchDocUnitById } from "./api"
 import { DocUnit } from "./types/DocUnit"
 
+type State = {
+  docUnits: Map<number, DocUnit>
+  selected: DocUnit | null
+}
+
 export const useDocUnitsStore = defineStore("docUnitsStore", {
-  state: () => {
-    return {
-      docUnits: new Map<number, DocUnit>(),
-    }
-  },
+  state: (): State => ({
+    docUnits: new Map<number, DocUnit>(),
+    selected: null,
+  }),
   actions: {
     fetchAll() {
       fetchAllDocUnits().then((all) => {
@@ -26,18 +30,26 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     add(docUnit: DocUnit) {
       this.docUnits.set(docUnit.id, docUnit)
     },
-    getDocUnit(id: number): Promise<DocUnit> {
+    getAndSetSelected(id: number): Promise<DocUnit> {
       const docUnit = this.docUnits.get(id)
       if (docUnit) {
+        this.selected = docUnit
         return Promise.resolve(docUnit)
       }
       return fetchDocUnitById(id).then((du) => {
         this.add(du)
+        this.selected = du
         return du
       })
     },
     update(docUnit: DocUnit) {
       this.docUnits.set(docUnit.id, docUnit)
+    },
+    getSelected(): DocUnit | null {
+      return this.selected
+    },
+    hasSelected(): boolean {
+      return this.selected !== null
     },
   },
 })
