@@ -65,11 +65,12 @@ export const updateDocUnit = async (docUnit: DocUnit) => {
 }
 
 export const uploadFile = async (file: File) => {
-  const data = new FormData()
-  data.append("fileToUpload", file)
-
   return makeRequest("docunits", {
     method: "POST",
-    body: data,
+    body: file,
+    headers: {
+      "Content-Type":
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    },
   })
 }
