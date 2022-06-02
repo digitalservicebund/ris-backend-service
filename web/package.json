@@ -25,7 +25,7 @@
     "test:a11y": "playwright test --config=test/a11y/playwright.config.ts"
   },
   "dependencies": {
-    "@mdi/font": "6.7.96",
+    "material-design-icons-iconfont": "^6.7.0",
     "pinia": "^2.0.14",
     "roboto-fontface": "*",
     "upath": "^2.0.1",

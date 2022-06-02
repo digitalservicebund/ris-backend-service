@@ -121,8 +121,8 @@ const openFileDialog = () => {
             <v-row align="center">
               <v-col cols="1" />
               <v-col cols="2">
-                <v-icon class="icon" size="50px">
-                  mdi-folder-upload-outline
+                <v-icon class="icon_upload" size="50px">
+                  drive_folder_upload
                 </v-icon>
               </v-col>
               <v-col cols="7"> Datei in diesen Bereich ziehen </v-col>
@@ -189,7 +189,7 @@ const openFileDialog = () => {
     text-align: center;
   }
 }
-.icon {
+.icon_upload {
   color: $blue800;
 }
 </style>

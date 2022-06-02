@@ -1,11 +1,12 @@
 // Styles
-import "@mdi/font/css/materialdesignicons.css"
+import "material-design-icons-iconfont/dist/material-design-icons.css"
 import "vuetify/styles"
 
 // Vuetify
 import { createVuetify } from "vuetify"
 import { VBtn } from "vuetify/components"
 import * as directives from "vuetify/directives"
+import { aliases, md } from "vuetify/iconsets/md"
 
 export const risLightTheme = {
   dark: false,
@@ -34,6 +35,13 @@ export default createVuetify({
     defaultTheme: "risLightTheme",
     themes: {
       risLightTheme,
+    },
+  },
+  icons: {
+    defaultSet: "md",
+    aliases,
+    sets: {
+      md,
     },
   },
 })
