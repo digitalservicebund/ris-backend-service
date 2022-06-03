@@ -48,8 +48,5 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     getSelected(): DocUnit | null {
       return this.selected
     },
-    hasSelected(): boolean {
-      return this.selected !== null
-    },
   },
 })

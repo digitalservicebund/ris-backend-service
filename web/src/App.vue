@@ -11,7 +11,7 @@ const docUnitsStore = useDocUnitsStore()
       <router-link to="/">Home</router-link>
       <br />
       <router-link to="/upload">Upload</router-link>
-      <span v-if="docUnitsStore.hasSelected()">
+      <span v-if="docUnitsStore.getSelected() !== null">
         <br /><br />
         DocUnit {{ docUnitsStore.getSelected().id }}
         <br />
