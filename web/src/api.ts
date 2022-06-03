@@ -1,5 +1,3 @@
-// type Endpoint = "docunits"
-
 import { DocUnit } from "./types/DocUnit"
 
 const makeRequest = async (
@@ -9,7 +7,7 @@ const makeRequest = async (
   const defaultOptions: Partial<RequestInit> = {
     method: "GET",
   }
-  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}`, {
+  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}/`, {
     ...defaultOptions,
     ...options,
   })
@@ -73,4 +71,13 @@ export const uploadFile = async (file: File) => {
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
     },
   })
+}
+
+export const getAllDocxFiles = async () => {
+  return makeRequest("docunitdocx")
+}
+
+export const getDocxFileAsHtml = async (fileName: string) => {
+  console.log(fileName)
+  return makeRequest(`docunitdocx/${fileName}`)
 }
