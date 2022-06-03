@@ -11,14 +11,14 @@ const docUnitsStore = useDocUnitsStore()
       <router-link to="/">Home</router-link>
       <br />
       <router-link to="/upload">Upload</router-link>
-      <span v-if="docUnitsStore.getSelected() !== null">
+      <span v-if="docUnitsStore.hasSelected()">
         <br /><br />
-        DocUnit {{ docUnitsStore.getSelected().id }}
+        DocUnit {{ docUnitsStore.getSelected()?.id }}
         <br />
         <router-link
           :to="{
             name: 'Stammdaten',
-            params: { id: docUnitsStore.getSelected().id },
+            params: { id: docUnitsStore.getSelected()?.id },
           }"
           >Stammdaten</router-link
         >

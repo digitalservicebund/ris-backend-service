@@ -20,92 +20,38 @@ onMounted(() => {
   })
 })
 
-const stammDatenList = [
-  {
-    id: "aktenzeichen",
-    name: "Aktenzeichen",
-    label: "Aktenzeichen",
-    aria: "Aktenzeichen",
-    icon: "grid_3x3",
-  },
-  {
-    id: "gerichtstyp",
-    name: "Gerichtstyp",
-    label: "Gerichtstyp",
-    aria: "Gerichtstyp",
-    icon: "home",
-  },
-  {
-    id: "dokumenttyp",
-    name: "Dokumenttyp",
-    label: "Dokumenttyp",
-    aria: "Dokumenttyp",
-    icon: "category",
-  },
-  {
-    id: "vorgang",
-    name: "Vorgang",
-    label: "Vorgang",
-    aria: "Vorgang",
-    icon: "inventory_2",
-  },
-  {
-    id: "ecli",
-    name: "ECLI",
-    label: "ECLI",
-    aria: "ECLI",
-    icon: "translate",
-  },
-  {
-    id: "spruchkoerper",
-    name: "Spruchkörper",
-    label: "Spruchkörper",
-    aria: "Spruchkörper",
-    icon: "people_alt",
-  },
-  {
-    id: "entscheidungsdatum",
-    name: "Entscheidungsdatum",
-    label: "Entscheidungsdatum",
-    aria: "Entscheidungsdatum",
-    icon: "calendar_today",
-  },
-  {
-    id: "gerichtssitz",
-    name: "Gerichtssitz",
-    label: "Gerichtssitz",
-    aria: "Gerichtssitz",
-    icon: "location_on",
-  },
-  {
-    id: "rechtskraft",
-    name: "Rechtskraft",
-    label: "Rechtskraft",
-    aria: "Rechtskraft",
-    icon: "gavel",
-  },
-  {
-    id: "eingangsart",
-    name: "Eingangsart",
-    label: "Eingangsart",
-    aria: "Eingangsart",
-    icon: "markunread_mailbox",
-  },
-  {
-    id: "dokumentationsstelle",
-    name: "Dokumentationsstelle",
-    label: "Dokumentationsstelle",
-    aria: "Dokumentationsstelle",
-    icon: "school",
-  },
-  {
-    id: "region",
-    name: "Region",
-    label: "Region",
-    aria: "Region",
-    icon: "map",
-  },
-]
+interface StammDatenListEntry {
+  id: keyof DocUnit
+  name: string
+  label: string
+  aria: string
+  icon: string
+}
+
+const stammdatenDef: StammDatenListEntry[] = []
+
+const add = (id: keyof DocUnit, name: string, icon: string) => {
+  stammdatenDef.push({
+    id: id,
+    name: name,
+    label: name,
+    aria: name, // use these on the input fields, :aria-labelledby="abc" doesn't work anymore since vue-tsc 0.36.0 TODO
+    icon: icon,
+  })
+}
+
+add("aktenzeichen", "Aktenzeichen", "grid_3x3")
+add("gerichtstyp", "Gerichtstyp", "home")
+add("dokumenttyp", "Dokumenttyp", "category")
+add("vorgang", "Vorgang", "inventory_2")
+add("ecli", "ECLI", "translate")
+add("spruchkoerper", "Spruchkörper", "people_alt")
+add("entscheidungsdatum", "Entscheidungsdatum", "calendar_today")
+add("gerichtssitz", "Gerichtssitz", "location_on")
+add("rechtskraft", "Rechtskraft", "gavel")
+add("eingangsart", "Eingangsart", "markunread_mailbox")
+add("dokumentationsstelle", "Dokumentationsstelle", "school")
+add("region", "Region", "map")
 
 const onSubmit = () => {
   if (!docUnit.value) return
@@ -122,8 +68,9 @@ const onSubmit = () => {
   <div v-else>
     <form novalidate class="ris-form" @submit.prevent="onSubmit">
       <v-row>
-        <v-col cols="12" md="6">
-          <template v-for="(item, index) in stammDatenList">
+        <v-col cols="12">
+          <!-- ^ removed md="6" because vue-tsc 0.36.0 throws an error TODO -->
+          <template v-for="(item, index) in stammdatenDef">
             <div v-if="index <= 5" :key="item.id" class="ris-form__textfield">
               <v-icon class="icon_stammdaten">
                 {{ item.icon }}
@@ -136,14 +83,13 @@ const onSubmit = () => {
                   class="ris-form__input"
                   type="text"
                   :name="item.name"
-                  :aria-labelledby="item.aria"
                 />
               </label>
             </div>
           </template>
         </v-col>
-        <v-col cols="12" md="6">
-          <template v-for="(item, index) in stammDatenList">
+        <v-col cols="12">
+          <template v-for="(item, index) in stammdatenDef">
             <div v-if="index > 5" :key="item.id" class="ris-form__textfield">
               <v-icon class="icon_stammdaten">
                 {{ item.icon }}
@@ -156,13 +102,12 @@ const onSubmit = () => {
                   class="ris-form__input"
                   type="text"
                   :name="item.name"
-                  :aria-labelledby="item.aria"
                 />
               </label>
             </div>
           </template>
           <div class="ris-form__textfield">
-            <RisButton type="submit" color="blue800" />
+            <RisButton @click="onSubmit" />
           </div>
         </v-col>
       </v-row>

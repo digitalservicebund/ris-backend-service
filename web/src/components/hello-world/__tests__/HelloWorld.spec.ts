@@ -9,7 +9,7 @@ describe("HelloWorld", () => {
   const vuetify = createVuetify({ components, directives })
 
   it("renders properly", () => {
-    const wrapper = mount(HelloWorld, {
+    const wrapper = mount(new HelloWorld(), {
       global: {
         plugins: [vuetify],
       },

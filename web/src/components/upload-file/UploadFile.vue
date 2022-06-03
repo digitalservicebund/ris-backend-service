@@ -135,7 +135,6 @@ const openFileDialog = () => {
               <v-col cols="1" />
               <v-col cols="9">
                 <ris-button
-                  color="blue800"
                   label="Festplatte durchsuchen"
                   @click="openFileDialog"
                 />

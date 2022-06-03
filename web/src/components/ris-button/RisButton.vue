@@ -3,13 +3,21 @@ interface Props {
   label?: string
 }
 
+// pass type input (is it needed or just use @click?) and color via props TODO
+
 const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
 })
 </script>
 
 <template>
-  <v-btn class="ris-btn" :rounded="0" :ripple="false" :flat="true">
+  <v-btn
+    class="ris-btn"
+    :rounded="0"
+    :ripple="false"
+    :flat="true"
+    color="blue800"
+  >
     {{ props.label }}
   </v-btn>
 </template>
