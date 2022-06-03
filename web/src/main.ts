@@ -3,9 +3,9 @@ import { createApp } from "vue"
 import { createRouter, createWebHistory } from "vue-router"
 import App from "./App.vue"
 import vuetify from "./plugins/vuetify"
-import DocUnitDocx from "./views/DocUnitDocx.vue"
 import Home from "./views/HomePage.vue"
 import Upload from "./views/UpLoad.vue"
+import DocUnitDocx from "./views/DocUnitDocx.vue"
 
 const router = createRouter({
   history: createWebHistory(),
