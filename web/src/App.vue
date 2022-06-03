@@ -23,8 +23,6 @@ const docUnitsStore = useDocUnitsStore()
           >Stammdaten</router-link
         >
       </span>
-      <br />
-      <router-link to="/docx">docx -> html</router-link>
     </v-navigation-drawer>
     <v-main>
       <router-view></router-view>

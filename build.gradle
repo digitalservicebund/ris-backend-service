@@ -60,10 +60,6 @@ dependencies {
   implementation "software.amazon.awssdk:s3"
   implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.6.8'
 
-  implementation 'org.docx4j:docx4j-JAXB-MOXy:11.4.6'
-  implementation 'org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.6'
-  implementation 'jakarta.xml.bind:jakarta.xml.bind-api:3.0.1'
-
   compileOnly "org.projectlombok:lombok"
   developmentOnly "org.springframework.boot:spring-boot-devtools"
   annotationProcessor "org.projectlombok:lombok"
