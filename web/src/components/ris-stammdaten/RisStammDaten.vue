@@ -78,7 +78,7 @@ const onSubmit = () => {
               <label :for="item.name" class="ris-form__label">
                 {{ item.label }}
                 <input
-                  :id="item.name"
+                  :id="item.id"
                   v-model="docUnit[item.id]"
                   class="ris-form__input"
                   type="text"
@@ -97,7 +97,7 @@ const onSubmit = () => {
               <label :for="item.name" class="ris-form__label">
                 {{ item.label }}
                 <input
-                  :id="item.name"
+                  :id="item.id"
                   v-model="docUnit[item.id]"
                   class="ris-form__input"
                   type="text"

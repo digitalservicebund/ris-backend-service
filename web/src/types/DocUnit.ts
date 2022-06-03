@@ -30,3 +30,33 @@ export type DocUnit = {
   gliederung: string
   berichtigung: string
 }
+
+// worth adding this dependency to make this shorter? https://stackoverflow.com/a/53995901 TODO
+export function buildEmptyDocUnit(): DocUnit {
+  return {
+    id: -1,
+    s3path: "",
+    filetype: "",
+    filename: "",
+    aktenzeichen: "",
+    gerichtstyp: "",
+    dokumenttyp: "",
+    vorgang: "",
+    ecli: "",
+    spruchkoerper: "",
+    entscheidungsdatum: "",
+    gerichtssitz: "",
+    rechtskraft: "",
+    eingangsart: "",
+    dokumentationsstelle: "",
+    region: "",
+    tenor: "",
+    gruende: "",
+    tatbestand: "",
+    entscheidungsgruende: "",
+    abweichendemeinung: "",
+    sonstigerlangtext: "",
+    gliederung: "",
+    berichtigung: "",
+  }
+}

@@ -1,23 +1,39 @@
 import { createTestingPinia } from "@pinia/testing"
-import { mount } from "@vue/test-utils"
-import { describe, it, expect } from "vitest"
+import { mount, flushPromises } from "@vue/test-utils"
+import { describe, test, expect } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
+import { useDocUnitsStore } from "../../../store"
+import { buildEmptyDocUnit } from "../../../types/DocUnit"
 import RisStammDaten from "../RisStammDaten.vue"
 
+// vitest run --testNamePattern RisStammDaten
 describe("RisStammDaten", () => {
   const vuetify = createVuetify({ components, directives })
 
-  it("renders properly", () => {
+  test("renders correctly with given docUnitId", async () => {
+    const pinia = createTestingPinia({ stubActions: false })
+    const store = useDocUnitsStore()
+    const docUnit = buildEmptyDocUnit()
+    docUnit.id = 1
+    docUnit.aktenzeichen = "abc"
+    store.add(docUnit)
+
     const wrapper = mount(RisStammDaten, {
       global: {
-        plugins: [vuetify, createTestingPinia()],
+        plugins: [vuetify, pinia],
+      },
+      props: {
+        docUnitId: 1,
       },
     })
+    await flushPromises() // gives onMounted() time to run
 
-    expect(wrapper.text()).toContain("Loading")
-
-    // TODO
+    expect(
+      (wrapper.find("#aktenzeichen").element as HTMLInputElement).value
+    ).toBe("abc")
+    expect(wrapper.get("button").text()).toBe("Speichern")
+    // what else? TODO
   })
 })
