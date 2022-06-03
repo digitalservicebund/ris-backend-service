@@ -9,7 +9,7 @@ describe("RisButton", () => {
   const vuetify = createVuetify({ components, directives })
 
   it("renders with label prop", () => {
-    const wrapper = mount(new RisButton(), {
+    const wrapper = mount(RisButton, {
       global: {
         plugins: [vuetify],
       },
@@ -21,7 +21,7 @@ describe("RisButton", () => {
   })
 
   it("renders with default label prop", () => {
-    const wrapper = mount(new RisButton(), {
+    const wrapper = mount(RisButton, {
       global: {
         plugins: [vuetify],
       },

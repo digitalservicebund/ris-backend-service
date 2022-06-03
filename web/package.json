@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "serve": "vite preview",
-    "build": "vue-tsc && vite build",
+    "build": "vue-tsc --noEmit --skipLibCheck && vite build",
     "test:e2e": "playwright test",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''",
     "check": "vue-tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y",
@@ -51,7 +51,7 @@
     "@vitejs/plugin-vue": "^2.3.3",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^10.0.0",
-    "@vue/test-utils": "^2.0.0-rc.21",
+    "@vue/test-utils": "^2.0.0",
     "@vuetify/vite-plugin": "^1.0.0-alpha.0",
     "autoprefixer": "^10.4.7",
     "axe-playwright": "^1.1.11",
