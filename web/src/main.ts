@@ -5,6 +5,7 @@ import App from "./App.vue"
 import vuetify from "./plugins/vuetify"
 import Home from "./views/HomePage.vue"
 import Upload from "./views/UpLoad.vue"
+import DocUnitDocx from "./views/DocUnitDocx.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -27,6 +28,11 @@ const router = createRouter({
       path: "/upload",
       name: "Upload",
       component: Upload,
+    },
+    {
+      path: "/docx",
+      name: "DocUnitDocx",
+      component: DocUnitDocx,
     },
   ],
 })
