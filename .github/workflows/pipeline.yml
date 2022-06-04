@@ -51,7 +51,7 @@ jobs:
         run: |
           npm test
           npm run test:e2e
-        # npm run test:a11y
+          npm run test:a11y
         working-directory: ./web
       - name: Run license scanner
         run: |
