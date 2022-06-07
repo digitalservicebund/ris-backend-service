@@ -68,7 +68,7 @@ const onSubmit = () => {
   <div v-else>
     <form novalidate class="ris-form" @submit.prevent="onSubmit">
       <v-row>
-        <v-col cols="12">
+        <v-col cols="6">
           <!-- ^ removed md="6" because vue-tsc 0.36.0 throws an error TODO -->
           <template v-for="(item, index) in stammdatenDef">
             <div v-if="index <= 5" :key="item.id" class="ris-form__textfield">
@@ -88,7 +88,7 @@ const onSubmit = () => {
             </div>
           </template>
         </v-col>
-        <v-col cols="12">
+        <v-col cols="6">
           <template v-for="(item, index) in stammdatenDef">
             <div v-if="index > 5" :key="item.id" class="ris-form__textfield">
               <v-icon class="icon_stammdaten">
