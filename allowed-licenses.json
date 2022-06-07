@@ -55,6 +55,21 @@
       "moduleLicense": "GPL2 w/ CPE"
     },
     {
+      "moduleLicense": "BSD License",
+      "moduleVersion": "2.7.7",
+      "moduleName": "antlr:antlr"
+    },
+    {
+      "moduleLicense": "BSD licence",
+      "moduleVersion": "3.5.2",
+      "moduleName": "org.antlr:antlr-runtime"
+    },
+    {
+      "moduleLicense": "BSD licence",
+      "moduleVersion": "3.2.1",
+      "moduleName": "org.antlr:stringtemplate"
+    },
+    {
       "moduleLicense": null,
       "moduleName": "com.fasterxml.jackson:jackson-bom"
     },
