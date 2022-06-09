@@ -93,7 +93,7 @@ const openFileDialog = () => {
 <template>
   <v-container>
     <v-row>
-      <v-col cols="10"><h3>Original Dokument</h3></v-col>
+      <v-col cols="10"><h3>Dokumente</h3></v-col>
     </v-row>
     <v-row>
       <v-col cols="10">
@@ -102,9 +102,6 @@ const openFileDialog = () => {
       </v-col>
     </v-row>
     <v-row><v-col></v-col></v-row>
-    <v-row>
-      <v-col cols="10"><h3>Upload</h3></v-col>
-    </v-row>
     <v-row>
       <v-col cols="6">
         <v-container

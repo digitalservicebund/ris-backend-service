@@ -12,19 +12,28 @@ const docUnitsStore = useDocUnitsStore()
       color="grey-lighten-2"
       permanent
     >
-      <router-link to="/">Home</router-link>
-      <br />
-      <router-link to="/upload">Upload</router-link>
-      <br /><br />
-      DocUnit {{ docUnitsStore.getSelected()?.id }}
-      <br />
       <router-link
         :to="{
-          name: 'Stammdaten',
+          name: 'Rubriken',
           params: { id: docUnitsStore.getSelected()?.id },
         }"
-        >Stammdaten</router-link
       >
+        RUBRIKEN
+      </router-link>
+      <ul>
+        <li>- Stammdaten</li>
+        <li>- Rubriken</li>
+      </ul>
+      <router-link
+        :to="{
+          name: 'Dokumente',
+          params: { id: docUnitsStore.getSelected()?.id },
+        }"
+        >DOKUMENTE</router-link
+      >
+      <br />
+      BEARBEITUNGSSTAND
+      <br />
       <br />
       <router-link to="/docx">docx -> html</router-link>
     </v-navigation-drawer>
