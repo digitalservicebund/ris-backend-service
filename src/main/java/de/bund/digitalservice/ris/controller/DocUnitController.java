@@ -30,11 +30,13 @@ public class DocUnitController {
     return service.generateNewDocUnit();
   }
 
-  @PostMapping(value = "/upload")
-  public Mono<ResponseEntity<DocUnit>> uploadFile(
-      @RequestBody Flux<ByteBuffer> byteBufferFlux, @RequestHeader HttpHeaders httpHeaders) {
+  @PutMapping(value = "/{id}/file")
+  public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
+      @PathVariable int id,
+      @RequestBody Flux<ByteBuffer> byteBufferFlux,
+      @RequestHeader HttpHeaders httpHeaders) {
 
-    return service.generateNewDocUnitAndAttachFile(byteBufferFlux, httpHeaders);
+    return service.attachFileToDocUnit(id, byteBufferFlux, httpHeaders);
   }
 
   @GetMapping(value = "")

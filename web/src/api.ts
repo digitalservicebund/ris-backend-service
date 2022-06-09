@@ -68,13 +68,15 @@ export const createNewDocUnit = async () => {
   })
 }
 
-export const uploadFile = async (file: File) => {
-  return makeRequest("docunits/upload", {
-    method: "POST",
+export const uploadFile = async (docUnitId: number | undefined, file: File) => {
+  if (!docUnitId) return // not cool, do this properly TODO
+  return makeRequest(`docunits/${docUnitId}/file`, {
+    method: "PUT",
     body: file,
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      filename: file.name,
     },
   })
 }

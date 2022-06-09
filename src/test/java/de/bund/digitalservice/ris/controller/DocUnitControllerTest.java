@@ -45,19 +45,23 @@ class DocUnitControllerTest {
   @Test
   void testUploadFile() {
     var headersCaptor = ArgumentCaptor.forClass(HttpHeaders.class);
+    var docUnitIdCaptor = ArgumentCaptor.forClass(Integer.class);
 
     webClient
         .mutateWith(csrf())
-        .post()
-        .uri("/api/v1/docunits/upload")
+        .put()
+        .uri("/api/v1/docunits/1/file")
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).generateNewDocUnitAndAttachFile(fluxCaptor.capture(), headersCaptor.capture());
+    verify(service)
+        .attachFileToDocUnit(
+            docUnitIdCaptor.capture(), fluxCaptor.capture(), headersCaptor.capture());
     assertEquals(0, Objects.requireNonNull(fluxCaptor.getValue().blockFirst()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
+    assertEquals(1, docUnitIdCaptor.getValue());
   }
 
   @Test

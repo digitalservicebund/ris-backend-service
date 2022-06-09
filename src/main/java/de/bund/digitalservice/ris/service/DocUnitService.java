@@ -48,13 +48,25 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  public Mono<ResponseEntity<DocUnit>> generateNewDocUnitAndAttachFile(
-      Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
+  public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
+      int docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
 
     return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
-        .map(putObjectResponse -> generateDataObjectForGivenFile(fileUuid, "docx"))
+        .flatMap(
+            putObjectResponse ->
+                repository
+                    .findById(docUnitId)
+                    .map(
+                        docUnit -> {
+                          docUnit.setS3path(fileUuid);
+                          docUnit.setFilename(
+                              httpHeaders.containsKey("filename")
+                                  ? httpHeaders.getFirst("filename")
+                                  : "no filename found");
+                          return docUnit;
+                        }))
         .doOnNext(docUnit -> log.debug("save doc unit"))
         .flatMap(repository::save)
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
@@ -99,13 +111,6 @@ public class DocUnitService {
     // if I don't set anything, I get the error "Column count does not match; SQL statement"
     // it should be possible to not set anything though TODO
     docUnit.setFiletype("docx");
-    return docUnit;
-  }
-
-  private DocUnit generateDataObjectForGivenFile(String filename, String type) {
-    var docUnit = new DocUnit();
-    docUnit.setS3path(filename);
-    docUnit.setFiletype(type);
     return docUnit;
   }
 

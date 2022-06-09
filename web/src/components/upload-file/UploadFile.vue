@@ -11,7 +11,6 @@ interface Status {
   inDrag: boolean
   inDragError: string
   uploadStatus: "none" | "uploading" | "succeeded" | "failed"
-  docUnitId: number | null
 }
 
 const emptyStatus: Status = {
@@ -19,7 +18,6 @@ const emptyStatus: Status = {
   inDrag: false,
   inDragError: "",
   uploadStatus: "none",
-  docUnitId: null,
 }
 
 const status = ref<Status>(emptyStatus)
@@ -36,9 +34,8 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  let docUnit = await uploadFile(file)
+  let docUnit = await uploadFile(docUnitsStore.getSelected()?.id, file)
   docUnitsStore.add(docUnit)
-  status.value.docUnitId = docUnit.id
   status.value.uploadStatus = "succeeded" // error handling TODO
   console.log("file uploaded, response:", docUnit)
 }
@@ -155,7 +152,10 @@ const openFileDialog = () => {
           Die Datei {{ status.file ? status.file.name : "" }} wurde erfolgreich
           hochgeladen,
           <router-link
-            :to="{ name: 'Stammdaten', params: { id: status.docUnitId } }"
+            :to="{
+              name: 'Rubriken',
+              params: { id: docUnitsStore.getSelected()?.id },
+            }"
           >
             zur Stammdaten-Ansicht</router-link
           >

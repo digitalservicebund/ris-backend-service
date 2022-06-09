@@ -63,22 +63,26 @@ class DocUnitServiceTest {
   // @Test public void testGenerateNewDocUnit_withException() {} TODO
 
   @Test
-  public void testGenerateNewDocUnitAndAttachFile() {
+  public void testAttachFileToDocUnit() {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of("content/type"));
+    headerMap.put("filename", List.of("testfile.docx"));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
 
     var toSave = new DocUnit();
+    toSave.setId(1);
     toSave.setS3path("88888888-4444-4444-4444-121212121212");
     toSave.setFiletype("docx");
+    toSave.setFilename("testfile.docx");
 
     var savedDocUnit = new DocUnit();
     savedDocUnit.setId(1);
     savedDocUnit.setS3path("88888888-4444-4444-4444-121212121212");
     savedDocUnit.setFiletype("docx");
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(savedDocUnit));
+    when(repository.findById(1)).thenReturn(Mono.just(savedDocUnit));
 
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
@@ -91,7 +95,7 @@ class DocUnitServiceTest {
       mockedUUIDStatic.when(UUID::randomUUID).thenReturn(testUuid);
 
       // when and then
-      StepVerifier.create(service.generateNewDocUnitAndAttachFile(byteBufferFlux, httpHeaders))
+      StepVerifier.create(service.attachFileToDocUnit(1, byteBufferFlux, httpHeaders))
           .consumeNextWith(
               docUnit -> {
                 assertNotNull(docUnit);
@@ -120,7 +124,7 @@ class DocUnitServiceTest {
         .thenThrow(SdkException.create("exception", null));
 
     // when and then
-    StepVerifier.create(service.generateNewDocUnitAndAttachFile(byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocUnit(1, byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);
@@ -142,9 +146,10 @@ class DocUnitServiceTest {
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnit.class));
+    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
 
     // when and then
-    StepVerifier.create(service.generateNewDocUnitAndAttachFile(byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocUnit(1, byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);
