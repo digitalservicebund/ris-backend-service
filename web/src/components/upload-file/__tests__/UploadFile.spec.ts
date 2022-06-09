@@ -17,7 +17,7 @@ describe("UploadFile", () => {
       },
     })
 
-    expect(wrapper.text()).toContain("Dokumente")
+    expect(wrapper.text()).toContain("Aktuell")
 
     // TODO
   })

@@ -4,7 +4,7 @@ import { uploadFile } from "../../api"
 import { useDocUnitsStore } from "../../store"
 import RisButton from "../ris-button/RisButton.vue"
 
-const docUnitsStore = useDocUnitsStore()
+const store = useDocUnitsStore()
 
 interface Status {
   file: File | null
@@ -34,8 +34,8 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  let docUnit = await uploadFile(docUnitsStore.getSelected()?.id, file)
-  docUnitsStore.add(docUnit)
+  let docUnit = await uploadFile(store.getSelected()?.id, file)
+  store.update(docUnit)
   status.value.uploadStatus = "succeeded" // error handling TODO
   console.log("file uploaded, response:", docUnit)
 }
@@ -89,9 +89,6 @@ const openFileDialog = () => {
 
 <template>
   <v-container>
-    <v-row>
-      <v-col cols="10"><h3>Dokumente</h3></v-col>
-    </v-row>
     <v-row>
       <v-col cols="10">
         Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
@@ -150,15 +147,7 @@ const openFileDialog = () => {
         </span>
         <span v-if="status.uploadStatus === 'succeeded'">
           Die Datei {{ status.file ? status.file.name : "" }} wurde erfolgreich
-          hochgeladen,
-          <router-link
-            :to="{
-              name: 'Rubriken',
-              params: { id: docUnitsStore.getSelected()?.id },
-            }"
-          >
-            zur Stammdaten-Ansicht</router-link
-          >
+          hochgeladen
         </span>
       </v-col>
     </v-row>

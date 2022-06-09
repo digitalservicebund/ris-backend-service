@@ -49,6 +49,10 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     },
     update(docUnit: DocUnit) {
       this.docUnits.set(docUnit.id, docUnit)
+      // the docUnit object here can get completely replaced, that's why we need to update selected too
+      if (this.selected && this.selected.id === docUnit.id) {
+        this.selected = docUnit
+      }
     },
     hasSelected(): boolean {
       return this.selected !== null
@@ -63,6 +67,10 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
         return buildEmptyDocUnit()
       }
       return this.selected
+    },
+    selectedHasFileAttached(): boolean {
+      if (!this.selected) return false
+      return this.selected.s3path !== null
     },
   },
 })
