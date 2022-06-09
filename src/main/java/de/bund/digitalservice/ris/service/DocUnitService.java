@@ -40,6 +40,14 @@ public class DocUnitService {
     this.s3AsyncClient = s3AsyncClient;
   }
 
+  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
+    return repository
+        .save(generateDateObject())
+        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
+        .doOnError(ex -> log.error("Couldn't create empty doc unit", ex))
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+  }
+
   public Mono<ResponseEntity<DocUnit>> generateNewDocUnitAndAttachFile(
       Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
@@ -84,6 +92,14 @@ public class DocUnitService {
     return Mono.fromCallable(
             () -> Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody)))
         .flatMap(Function.identity());
+  }
+
+  private DocUnit generateDateObject() {
+    var docUnit = new DocUnit();
+    // if I don't set anything, I get the error "Column count does not match; SQL statement"
+    // it should be possible to not set anything though TODO
+    docUnit.setFiletype("docx");
+    return docUnit;
   }
 
   private DocUnit generateDataObjectForGivenFile(String filename, String type) {

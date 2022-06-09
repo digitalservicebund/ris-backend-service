@@ -62,6 +62,12 @@ export const updateDocUnit = async (docUnit: DocUnit) => {
   })
 }
 
+export const createNewDocUnit = async () => {
+  return makeRequest("docunits", {
+    method: "POST",
+  })
+}
+
 export const uploadFile = async (file: File) => {
   return makeRequest("docunits/upload", {
     method: "POST",

@@ -24,6 +24,12 @@ public class DocUnitController {
     this.service = service;
   }
 
+  @PostMapping(value = "")
+  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
+
+    return service.generateNewDocUnit();
+  }
+
   @PostMapping(value = "/upload")
   public Mono<ResponseEntity<DocUnit>> uploadFile(
       @RequestBody Flux<ByteBuffer> byteBufferFlux, @RequestHeader HttpHeaders httpHeaders) {
