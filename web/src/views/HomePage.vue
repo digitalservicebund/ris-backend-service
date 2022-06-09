@@ -8,7 +8,9 @@ import HelloWorld from "../components/hello-world/HelloWorld.vue"
   </v-row>
   <v-row class="text-center">
     <v-col>
-      <router-link to="/rechtssprechung">Rechtssprechung</router-link>
+      <router-link :to="{ name: 'Rechtssprechung' }"
+        >Rechtssprechung</router-link
+      >
     </v-col>
   </v-row>
 </template>

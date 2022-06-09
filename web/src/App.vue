@@ -6,7 +6,15 @@ const docUnitsStore = useDocUnitsStore()
 
 <template>
   <v-app>
-    <v-app-bar color="blue800"></v-app-bar>
+    <v-app-bar color="white">
+      <v-row class="text-center">
+        <v-col>
+          <router-link :to="{ name: 'Rechtssprechung' }"
+            >RECHTSSPRECHUNG</router-link
+          >
+        </v-col>
+      </v-row>
+    </v-app-bar>
     <v-navigation-drawer
       v-if="docUnitsStore.hasSelected()"
       color="grey-lighten-2"
