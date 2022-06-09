@@ -116,6 +116,35 @@ class DocUnitServiceTest {
   }
 
   @Test
+  public void testRemoveFileFromDocUnit() {
+    // TODO implement and test removal from bucket
+
+    var docUnitBefore = new DocUnit();
+    docUnitBefore.setId(1);
+    docUnitBefore.setS3path("88888888-4444-4444-4444-121212121212");
+    docUnitBefore.setFilename("testfile.docx");
+
+    var docUnitAfter = new DocUnit();
+    docUnitAfter.setId(1);
+
+    when(repository.findById(1)).thenReturn(Mono.just(docUnitBefore));
+    // is the thenReturn ok? Or am I bypassing the actual functionality-test? TODO
+    when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(docUnitAfter));
+
+    StepVerifier.create(service.removeFileFromDocUnit(1))
+        .consumeNextWith(
+            docUnitResponseEntity -> {
+              assertNotNull(docUnitResponseEntity);
+              assertEquals(HttpStatus.OK, docUnitResponseEntity.getStatusCode());
+            })
+        .verifyComplete();
+
+    ArgumentCaptor<DocUnit> docUnitCaptor = ArgumentCaptor.forClass(DocUnit.class);
+    verify(repository).save(docUnitCaptor.capture());
+    assertEquals(docUnitCaptor.getValue(), docUnitAfter);
+  }
+
+  @Test
   public void testGenerateNewDocUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));

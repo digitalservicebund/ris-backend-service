@@ -43,7 +43,7 @@ class DocUnitControllerTest {
   }
 
   @Test
-  void testUploadFile() {
+  void testAttachFileToDocUnit() {
     var headersCaptor = ArgumentCaptor.forClass(HttpHeaders.class);
     var docUnitIdCaptor = ArgumentCaptor.forClass(Integer.class);
 
@@ -62,6 +62,19 @@ class DocUnitControllerTest {
     assertEquals(0, Objects.requireNonNull(fluxCaptor.getValue().blockFirst()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
     assertEquals(1, docUnitIdCaptor.getValue());
+  }
+
+  @Test
+  void testRemoveFileFromDocUnit() {
+    webClient
+        .mutateWith(csrf())
+        .delete()
+        .uri("/api/v1/docunits/1/file")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).removeFileFromDocUnit(1);
   }
 
   @Test
