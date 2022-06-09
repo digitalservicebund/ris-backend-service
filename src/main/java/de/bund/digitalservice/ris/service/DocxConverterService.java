@@ -46,12 +46,14 @@ public class DocxConverterService {
   private WordprocessingMLPackage mlPackage;
 
   private final S3AsyncClient client;
+  private final DocumentBuilderFactory documentBuilderFactory;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DocxConverterService(S3AsyncClient client) {
+  public DocxConverterService(S3AsyncClient client, DocumentBuilderFactory documentBuilderFactory) {
     this.client = client;
+    this.documentBuilderFactory = documentBuilderFactory;
   }
 
   private Mono<List<DocUnitDocx>> getDocumentParagraphs(InputStream inputStream) {
@@ -99,8 +101,7 @@ public class DocxConverterService {
     originalText = mlPackage.getMainDocumentPart().getXML();
 
     try {
-      DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-      DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+      DocumentBuilder dBuilder = documentBuilderFactory.newDocumentBuilder();
       Document doc = dBuilder.parse(new InputSource(new StringReader(originalText)));
       XPath xPath = XPathFactory.newInstance().newXPath();
       String expression = "/document//t";
