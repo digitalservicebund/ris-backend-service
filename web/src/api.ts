@@ -51,7 +51,8 @@ export const fetchDocUnitById = async (id: number) => {
   return makeRequest(`docunits/${id}`)
 }
 
-export const updateDocUnit = async (docUnit: DocUnit) => {
+export const updateDocUnit = async (docUnit: DocUnit | null) => {
+  if (!docUnit) return
   return makeRequest(`docunits/${docUnit.id}/docx`, {
     method: "PUT",
     body: JSON.stringify(docUnit),

@@ -1,24 +1,10 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue"
 import { updateDocUnit } from "../../api"
 import { useDocUnitsStore } from "../../store"
 import { DocUnit } from "../../types/DocUnit"
 import RisButton from "../ris-button/RisButton.vue"
 
-interface Props {
-  docUnitId?: number
-}
-
-const props = defineProps<Props>()
-const docUnitsStore = useDocUnitsStore()
-const docUnit = ref<DocUnit>()
-
-onMounted(() => {
-  if (!props.docUnitId) return
-  docUnitsStore.getAndSetSelected(props.docUnitId).then((du) => {
-    docUnit.value = du
-  })
-})
+const store = useDocUnitsStore()
 
 interface StammDatenListEntry {
   id: keyof DocUnit
@@ -54,17 +40,15 @@ add("dokumentationsstelle", "Dokumentationsstelle", "school")
 add("region", "Region", "map")
 
 const onSubmit = () => {
-  if (!docUnit.value) return
-  updateDocUnit(docUnit.value).then((updatedDocUnit) => {
-    docUnit.value = updatedDocUnit
-    docUnitsStore.update(updatedDocUnit)
+  updateDocUnit(store.getSelected()).then((updatedDocUnit) => {
+    store.update(updatedDocUnit)
   })
   alert("Daten gespeichert")
 }
 </script>
 
 <template>
-  <div v-if="!docUnit">Loading...</div>
+  <div v-if="!store.hasSelected()">Loading...</div>
   <div v-else>
     <form novalidate class="ris-form" @submit.prevent="onSubmit">
       <v-row>
@@ -79,7 +63,7 @@ const onSubmit = () => {
                 {{ item.label }}
                 <input
                   :id="item.id"
-                  v-model="docUnit[item.id]"
+                  v-model="store.getSelectedSafe()[item.id]"
                   class="ris-form__input"
                   type="text"
                   :name="item.name"
@@ -98,7 +82,7 @@ const onSubmit = () => {
                 {{ item.label }}
                 <input
                   :id="item.id"
-                  v-model="docUnit[item.id]"
+                  v-model="store.getSelectedSafe()[item.id]"
                   class="ris-form__input"
                   type="text"
                   :name="item.name"

@@ -1,5 +1,5 @@
 import { createTestingPinia } from "@pinia/testing"
-import { mount, flushPromises } from "@vue/test-utils"
+import { mount } from "@vue/test-utils"
 import { describe, test, expect } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -19,16 +19,13 @@ describe("RisStammDaten", () => {
     docUnit.id = 1
     docUnit.aktenzeichen = "abc"
     store.add(docUnit)
+    store.setSelected("1")
 
     const wrapper = mount(RisStammDaten, {
       global: {
         plugins: [vuetify, pinia],
       },
-      props: {
-        docUnitId: 1,
-      },
     })
-    await flushPromises() // gives onMounted() time to run
 
     expect(
       (wrapper.find("#aktenzeichen").element as HTMLInputElement).value
