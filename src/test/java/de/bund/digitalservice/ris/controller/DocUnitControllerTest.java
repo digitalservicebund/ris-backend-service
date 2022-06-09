@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -33,6 +34,13 @@ class DocUnitControllerTest {
   @MockBean private DocUnitService service;
 
   @Captor private ArgumentCaptor<Flux<ByteBuffer>> fluxCaptor;
+
+  @Test
+  void testGenerateNewDocUnit() {
+    webClient.mutateWith(csrf()).post().uri("/api/v1/docunits").exchange().expectStatus().isOk();
+
+    verify(service, times(1)).generateNewDocUnit();
+  }
 
   @Test
   void testUploadFile() {

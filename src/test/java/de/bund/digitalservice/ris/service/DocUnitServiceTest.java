@@ -43,6 +43,27 @@ class DocUnitServiceTest {
 
   @Test
   public void testGenerateNewDocUnit() {
+    var docUnit = new DocUnit();
+    docUnit.setFiletype("docx");
+    ArgumentCaptor<DocUnit> docUnitCaptor = ArgumentCaptor.forClass(DocUnit.class);
+    when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(DocUnit.EMPTY));
+
+    StepVerifier.create(service.generateNewDocUnit())
+        .consumeNextWith(
+            docUnitResponseEntity -> {
+              assertNotNull(docUnitResponseEntity);
+              assertEquals(HttpStatus.CREATED, docUnitResponseEntity.getStatusCode());
+            })
+        .verifyComplete();
+
+    verify(repository).save(docUnitCaptor.capture());
+    assertEquals(docUnitCaptor.getValue(), docUnit);
+  }
+
+  // @Test public void testGenerateNewDocUnit_withException() {} TODO
+
+  @Test
+  public void testGenerateNewDocUnitAndAttachFile() {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
     var headerMap = new LinkedMultiValueMap<String, String>();
@@ -91,7 +112,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  public void testGenerateNewDocUnit_withExceptionFromBucket() throws S3Exception {
+  public void testGenerateNewDocUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
 
@@ -114,7 +135,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  public void testGenerateNewDocUnit_withExceptionFromRepository() {
+  public void testGenerateNewDocUnitAndAttachFile_withExceptionFromRepository() {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
 
