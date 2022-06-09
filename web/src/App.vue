@@ -1,29 +1,44 @@
 <script lang="ts" setup>
 import { useDocUnitsStore } from "./store"
 
-const docUnitsStore = useDocUnitsStore()
+const store = useDocUnitsStore()
 </script>
 
 <template>
   <v-app>
     <v-app-bar color="white">
-      <v-row class="text-center">
-        <v-col>
-          <router-link :to="{ name: 'Rechtssprechung' }"
-            >RECHTSSPRECHUNG</router-link
-          >
-        </v-col>
-      </v-row>
+      <v-container>
+        <v-layout>
+          <v-row>
+            <v-col> ZURÜCK </v-col>
+            <v-col>
+              <router-link :to="{ name: 'Rechtssprechung' }"
+                >RECHTSSPRECHUNG</router-link
+              >
+            </v-col>
+          </v-row>
+        </v-layout>
+        <v-layout v-if="store.hasSelected()" style="background-color: #eee">
+          <v-row>
+            <v-col>
+              Rechtssprechung: {{ store.getSelected()?.id }}, Aktenzeichen:
+              {{ store.getSelected()?.aktenzeichen }}, Entscheidungsdatum:
+              {{ store.getSelected()?.entscheidungsdatum }}, Gerichtstyp:
+              {{ store.getSelected()?.gerichtstyp }}
+            </v-col>
+          </v-row>
+        </v-layout>
+      </v-container>
     </v-app-bar>
     <v-navigation-drawer
-      v-if="docUnitsStore.hasSelected()"
+      v-if="store.hasSelected()"
       color="grey-lighten-2"
       permanent
     >
       <router-link
         :to="{
           name: 'Rubriken',
-          params: { id: docUnitsStore.getSelected()?.id },
+          params: { id: store.getSelected()?.id },
         }"
       >
         RUBRIKEN
@@ -35,7 +50,7 @@ const docUnitsStore = useDocUnitsStore()
       <router-link
         :to="{
           name: 'Dokumente',
-          params: { id: docUnitsStore.getSelected()?.id },
+          params: { id: store.getSelected()?.id },
         }"
         >DOKUMENTE</router-link
       >

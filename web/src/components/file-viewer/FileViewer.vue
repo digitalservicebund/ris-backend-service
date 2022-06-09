@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { deleteFile, uploadFile } from "../../api"
+import { deleteFile } from "../../api"
 import { useDocUnitsStore } from "../../store"
 import RisButton from "../ris-button/RisButton.vue"
 
