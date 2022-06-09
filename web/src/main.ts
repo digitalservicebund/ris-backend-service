@@ -5,6 +5,7 @@ import App from "./App.vue"
 import vuetify from "./plugins/vuetify"
 import DocUnitDocx from "./views/DocUnitDocx.vue"
 import Home from "./views/HomePage.vue"
+import Rechtssprechung from "./views/RechtsSprechung.vue"
 import Upload from "./views/UpLoad.vue"
 
 const router = createRouter({
@@ -14,6 +15,11 @@ const router = createRouter({
       path: "/",
       name: "Home",
       component: Home,
+    },
+    {
+      path: "/rechtssprechung",
+      name: "Rechtssprechung",
+      component: Rechtssprechung,
     },
     {
       path: "/stammdaten/:id",

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import DocUnitList from "../components/doc-unit-list/DocUnitList.vue"
 import HelloWorld from "../components/hello-world/HelloWorld.vue"
 </script>
 
@@ -8,8 +7,8 @@ import HelloWorld from "../components/hello-world/HelloWorld.vue"
     <HelloWorld></HelloWorld>
   </v-row>
   <v-row class="text-center">
-    <v-col class="mb-4">
-      <DocUnitList />
+    <v-col>
+      <router-link to="/rechtssprechung">Rechtssprechung</router-link>
     </v-col>
   </v-row>
 </template>

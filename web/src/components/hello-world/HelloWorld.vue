@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 
-const message = ref("Hello DigitalService")
+const message = ref("Hello NeuRIS")
 </script>
 
 <template>
