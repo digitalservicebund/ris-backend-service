@@ -30,6 +30,9 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     add(docUnit: DocUnit) {
       this.docUnits.set(docUnit.id, docUnit)
     },
+    clearSelected() {
+      this.selected = null
+    },
     setSelected(idStr: string | string[]) {
       if (Array.isArray(idStr)) return
       const id = Number(idStr)
@@ -42,18 +45,6 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       fetchDocUnitById(id).then((du) => {
         this.add(du)
         this.selected = du
-      })
-    },
-    getAndSetSelected(id: number): Promise<DocUnit> {
-      const docUnit = this.docUnits.get(id)
-      if (docUnit) {
-        this.selected = docUnit
-        return Promise.resolve(docUnit)
-      }
-      return fetchDocUnitById(id).then((du) => {
-        this.add(du)
-        this.selected = du
-        return du
       })
     },
     update(docUnit: DocUnit) {
