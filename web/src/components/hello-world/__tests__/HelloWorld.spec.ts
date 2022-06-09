@@ -14,6 +14,6 @@ describe("HelloWorld", () => {
         plugins: [vuetify],
       },
     })
-    expect(wrapper.text()).toContain("Hello DigitalService")
+    expect(wrapper.text()).toContain("Hello NeuRIS")
   })
 })
