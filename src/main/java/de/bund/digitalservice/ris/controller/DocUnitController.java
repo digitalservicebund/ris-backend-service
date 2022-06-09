@@ -39,6 +39,12 @@ public class DocUnitController {
     return service.attachFileToDocUnit(id, byteBufferFlux, httpHeaders);
   }
 
+  @DeleteMapping(value = "/{id}/file")
+  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(@PathVariable int id) {
+
+    return service.removeFileFromDocUnit(id);
+  }
+
   @GetMapping(value = "")
   public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
     log.info("All DocUnits were requested");

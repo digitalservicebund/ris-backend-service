@@ -74,6 +74,22 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
+  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(int docUnitId) {
+    // TODO delete from bucket
+    return repository
+        .findById(docUnitId)
+        .flatMap(
+            docUnit -> {
+              docUnit.setS3path(null);
+              docUnit.setFilename(null);
+              return repository.save(docUnit);
+            })
+        .doOnNext(docUnit -> log.debug("removed file from doc unit"))
+        .map(docUnit -> ResponseEntity.status(HttpStatus.OK).body(docUnit))
+        .doOnError(ex -> log.error("Couldn't remove the file from the doc unit", ex))
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+  }
+
   private Mono<PutObjectResponse> putObjectIntoBucket(
       String fileUuid, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
 

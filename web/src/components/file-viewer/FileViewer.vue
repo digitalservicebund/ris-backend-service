@@ -1,11 +1,14 @@
 <script lang="ts" setup>
+import { deleteFile, uploadFile } from "../../api"
 import { useDocUnitsStore } from "../../store"
 import RisButton from "../ris-button/RisButton.vue"
 
 const store = useDocUnitsStore()
 
-const onSubmit = () => {
-  // TODO
+const onSubmit = async () => {
+  let docUnit = await deleteFile(store.getSelected()?.id)
+  console.log("file delete from doc unit, response:", docUnit)
+  store.update(docUnit)
 }
 </script>
 

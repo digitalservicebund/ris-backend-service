@@ -82,6 +82,13 @@ export const uploadFile = async (docUnitId: number | undefined, file: File) => {
   })
 }
 
+export const deleteFile = async (docUnitId: number | undefined) => {
+  if (!docUnitId) return
+  return makeRequest(`docunits/${docUnitId}/file`, {
+    method: "DELETE",
+  })
+}
+
 export const getAllDocxFiles = async () => {
   return makeRequest("docunitdocx")
 }
