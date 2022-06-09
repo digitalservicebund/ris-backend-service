@@ -33,7 +33,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @SpringBootTest(properties = {"otc.obs.bucket-name=testBucket"})
-// @ExtendWith(SpringExtension.class)
 @Tag("test")
 class DocUnitServiceTest {
   @Autowired private DocUnitService service;
@@ -71,7 +70,7 @@ class DocUnitServiceTest {
       mockedUUIDStatic.when(UUID::randomUUID).thenReturn(testUuid);
 
       // when and then
-      StepVerifier.create(service.generateNewDocUnit(byteBufferFlux, httpHeaders))
+      StepVerifier.create(service.generateNewDocUnitAndAttachFile(byteBufferFlux, httpHeaders))
           .consumeNextWith(
               docUnit -> {
                 assertNotNull(docUnit);
@@ -100,7 +99,7 @@ class DocUnitServiceTest {
         .thenThrow(SdkException.create("exception", null));
 
     // when and then
-    StepVerifier.create(service.generateNewDocUnit(byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.generateNewDocUnitAndAttachFile(byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);
@@ -124,7 +123,7 @@ class DocUnitServiceTest {
     doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnit.class));
 
     // when and then
-    StepVerifier.create(service.generateNewDocUnit(byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.generateNewDocUnitAndAttachFile(byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);

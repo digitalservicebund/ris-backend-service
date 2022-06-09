@@ -40,13 +40,13 @@ public class DocUnitService {
     this.s3AsyncClient = s3AsyncClient;
   }
 
-  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(
+  public Mono<ResponseEntity<DocUnit>> generateNewDocUnitAndAttachFile(
       Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
 
     return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
-        .map(putObjectResponse -> generateDataObject(fileUuid, "docx"))
+        .map(putObjectResponse -> generateDataObjectForGivenFile(fileUuid, "docx"))
         .doOnNext(docUnit -> log.debug("save doc unit"))
         .flatMap(repository::save)
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
@@ -86,7 +86,7 @@ public class DocUnitService {
         .flatMap(Function.identity());
   }
 
-  private DocUnit generateDataObject(String filename, String type) {
+  private DocUnit generateDataObjectForGivenFile(String filename, String type) {
     var docUnit = new DocUnit();
     docUnit.setS3path(filename);
     docUnit.setFiletype(type);

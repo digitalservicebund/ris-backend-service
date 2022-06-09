@@ -41,13 +41,13 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .post()
-        .uri("/api/v1/docunits/")
+        .uri("/api/v1/docunits/upload")
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).generateNewDocUnit(fluxCaptor.capture(), headersCaptor.capture());
+    verify(service).generateNewDocUnitAndAttachFile(fluxCaptor.capture(), headersCaptor.capture());
     assertEquals(0, Objects.requireNonNull(fluxCaptor.getValue().blockFirst()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
   }
@@ -72,8 +72,8 @@ class DocUnitControllerTest {
     docUnit.setId(1);
     webClient
         .mutateWith(csrf())
-        .post()
-        .uri("/api/v1/docunits/1")
+        .put()
+        .uri("/api/v1/docunits/1/docx")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(docUnit)
         .exchange()

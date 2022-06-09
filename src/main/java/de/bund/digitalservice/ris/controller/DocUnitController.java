@@ -24,11 +24,11 @@ public class DocUnitController {
     this.service = service;
   }
 
-  @PostMapping(value = "")
+  @PostMapping(value = "/upload")
   public Mono<ResponseEntity<DocUnit>> uploadFile(
       @RequestBody Flux<ByteBuffer> byteBufferFlux, @RequestHeader HttpHeaders httpHeaders) {
 
-    return service.generateNewDocUnit(byteBufferFlux, httpHeaders);
+    return service.generateNewDocUnitAndAttachFile(byteBufferFlux, httpHeaders);
   }
 
   @GetMapping(value = "")
@@ -43,7 +43,7 @@ public class DocUnitController {
     return service.getById(id);
   }
 
-  @PostMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{id}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<DocUnit>> updateById(
       @PathVariable int id, @RequestBody DocUnit docUnit) {
     if (id != docUnit.getId()) {

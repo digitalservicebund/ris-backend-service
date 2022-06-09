@@ -52,8 +52,8 @@ export const fetchDocUnitById = async (id: number) => {
 }
 
 export const updateDocUnit = async (docUnit: DocUnit) => {
-  return makeRequest(`docunits/${docUnit.id}`, {
-    method: "POST",
+  return makeRequest(`docunits/${docUnit.id}/docx`, {
+    method: "PUT",
     body: JSON.stringify(docUnit),
     headers: {
       Accept: "application/json",
@@ -63,7 +63,7 @@ export const updateDocUnit = async (docUnit: DocUnit) => {
 }
 
 export const uploadFile = async (file: File) => {
-  return makeRequest("docunits", {
+  return makeRequest("docunits/upload", {
     method: "POST",
     body: file,
     headers: {
