@@ -69,6 +69,15 @@ export const createNewDocUnit = async () => {
   })
 }
 
+// this throws "SyntaxError: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data" TODO
+// in makeRequest(), maybe has to do with just one String in the ReadableStream? does the right thing though
+export const deleteDocUnit = async (docUnitId: number | undefined) => {
+  if (!docUnitId) return
+  return makeRequest(`docunits/${docUnitId}`, {
+    method: "DELETE",
+  })
+}
+
 export const uploadFile = async (docUnitId: number | undefined, file: File) => {
   if (!docUnitId) return // not cool, do this properly TODO
   return makeRequest(`docunits/${docUnitId}/file`, {

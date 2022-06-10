@@ -76,6 +76,14 @@ public class DocUnitController {
     return service.getById(id);
   }
 
+  @DeleteMapping(value = "/{id}")
+  public Mono<ResponseEntity<String>> deleteById(@PathVariable String id) {
+    if (isInvalidId(id)) {
+      return Mono.just(ResponseEntity.unprocessableEntity().body("invalid DocUnit id"));
+    }
+    return service.deleteById(id);
+  }
+
   @PutMapping(value = "/{id}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<DocUnit>> updateById(
       @PathVariable String id, @RequestBody DocUnit docUnit) {

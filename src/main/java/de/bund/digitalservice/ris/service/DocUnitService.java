@@ -138,6 +138,16 @@ public class DocUnitService {
     return repository.findById(Integer.valueOf(docUnitId)).map(ResponseEntity::ok);
   }
 
+  public Mono<ResponseEntity<String>> deleteById(String docUnitId) {
+    // TODO if file attached --> delete from bucket
+    return repository
+        .deleteById(Integer.valueOf(docUnitId))
+        .doOnNext(docUnit -> log.debug("deleted doc unit"))
+        .map(_void -> ResponseEntity.status(HttpStatus.OK).body("done"))
+        .doOnError(ex -> log.error("Couldn't delete the DocUnit", ex))
+        .onErrorReturn(ResponseEntity.internalServerError().body("Couldn't delete the DocUnit"));
+  }
+
   public Mono<ResponseEntity<DocUnit>> updateDocUnit(DocUnit docUnit) {
     return repository
         .save(docUnit)

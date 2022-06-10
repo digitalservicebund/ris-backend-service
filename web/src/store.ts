@@ -30,6 +30,12 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     add(docUnit: DocUnit) {
       this.docUnits.set(docUnit.id, docUnit)
     },
+    removeById(id: number) {
+      if (this.selected && this.selected.id === id) {
+        this.selected = null
+      }
+      this.docUnits.delete(id)
+    },
     clearSelected() {
       this.selected = null
     },

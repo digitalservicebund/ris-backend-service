@@ -1,26 +1,34 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
+import { deleteDocUnit } from "../../api"
 import { useDocUnitsStore } from "../../store"
 
-const docUnitsStore = useDocUnitsStore()
+const store = useDocUnitsStore()
 
 onMounted(() => {
-  docUnitsStore.fetchAll()
+  store.fetchAll()
 })
+
+const onDelete = (docUnitId: number) => {
+  deleteDocUnit(docUnitId).then(() => {
+    store.removeById(docUnitId)
+  })
+}
 </script>
 
 <template>
-  <v-table v-if="!docUnitsStore.isEmpty()">
+  <v-table v-if="!store.isEmpty()">
     <thead>
       <tr>
         <th class="text-center">Dok.-Nummer</th>
         <th class="text-center">Angelegt am</th>
         <th class="text-center">Aktenzeichen</th>
         <th class="text-center">Dokumente</th>
+        <th class="text-center">Löschen</th>
       </tr>
     </thead>
     <tbody>
-      <tr v-for="docUnit in docUnitsStore.getAll()" :key="docUnit.id">
+      <tr v-for="docUnit in store.getAll()" :key="docUnit.id">
         <td>
           <router-link :to="{ name: 'Rubriken', params: { id: docUnit.id } }">
             {{ docUnit.id }}
@@ -35,6 +43,9 @@ onMounted(() => {
           >
             {{ docUnit.filename }}
           </router-link>
+        </td>
+        <td>
+          <v-icon @click="onDelete(docUnit.id)"> delete </v-icon>
         </td>
       </tr>
     </tbody>
