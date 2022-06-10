@@ -10,7 +10,11 @@ const store = useDocUnitsStore()
       <v-container>
         <v-layout>
           <v-row>
-            <v-col> ZURÜCK </v-col>
+            <v-col>
+              <router-link :to="{ name: 'Rechtssprechung' }"
+                >ZURÜCK</router-link
+              >
+            </v-col>
             <v-col>
               <router-link :to="{ name: 'Rechtssprechung' }"
                 >RECHTSSPRECHUNG</router-link
@@ -45,7 +49,7 @@ const store = useDocUnitsStore()
       </router-link>
       <ul>
         <li>- Stammdaten</li>
-        <li>- Rubriken</li>
+        <li>- Langtexte</li>
       </ul>
       <router-link
         :to="{
