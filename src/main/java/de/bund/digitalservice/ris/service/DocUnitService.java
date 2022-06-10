@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.service;
 import de.bund.digitalservice.ris.datamodel.DocUnit;
 import de.bund.digitalservice.ris.repository.DocUnitRepository;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -44,7 +45,7 @@ public class DocUnitService {
 
   public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
     return repository
-        .save(generateDateObject())
+        .save(createDocUnit())
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
@@ -62,7 +63,9 @@ public class DocUnitService {
                     .findById(Integer.valueOf(docUnitId))
                     .map(
                         docUnit -> {
+                          docUnit.setFileuploadtimestamp(Instant.now());
                           docUnit.setS3path(fileUuid);
+                          docUnit.setFiletype("docx");
                           docUnit.setFilename(
                               httpHeaders.containsKey("X-Filename")
                                   ? httpHeaders.getFirst("X-Filename")
@@ -89,6 +92,7 @@ public class DocUnitService {
                       deleteObjectResponse -> {
                         docUnit.setS3path(null);
                         docUnit.setFilename(null);
+                        docUnit.setFileuploadtimestamp(null);
                         return docUnit;
                       });
             })
@@ -139,7 +143,7 @@ public class DocUnitService {
         .flatMap(Function.identity());
   }
 
-  private DocUnit generateDateObject() {
+  private DocUnit createDocUnit() {
     var docUnit = new DocUnit();
     // if I don't set anything, I get the error "Column count does not match; SQL statement"
     // it should be possible to not set anything though

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { deleteFile } from "../../api"
 import { useDocUnitsStore } from "../../store"
+import { instantToDate } from "../../util"
 import RisButton from "../ris-button/RisButton.vue"
 
 const store = useDocUnitsStore()
@@ -16,8 +17,9 @@ const onSubmit = async () => {
   <v-container>
     <v-row>
       <v-col>
-        Dateiname: {{ store.getSelectedSafe().filename }}, Format:
-        {{ store.getSelectedSafe().filetype.toUpperCase() }}
+        Dateiname: {{ store.getSelectedSafe().filename }}, Hochgeladen am
+        {{ instantToDate(store.getSelectedSafe().fileuploadtimestamp) }},
+        Format: {{ store.getSelectedSafe().filetype }}
       </v-col>
     </v-row>
     <v-row>

@@ -114,6 +114,7 @@ class DocUnitServiceTest {
       StepVerifier.create(asyncRequestBodyCaptor.getValue())
           .expectNext(ByteBuffer.wrap(new byte[] {}))
           .verifyComplete();
+      toSave.setFileuploadtimestamp(savedDocUnit.getFileuploadtimestamp());
       verify(repository).save(toSave);
     }
   }

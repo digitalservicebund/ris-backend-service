@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.datamodel;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,8 +13,10 @@ public class DocUnit {
   public static final DocUnit EMPTY = new DocUnit();
 
   @Id Integer id;
+  Instant creationtimestamp;
 
   // Original file
+  Instant fileuploadtimestamp;
   String s3path;
   String filetype;
   String filename;
