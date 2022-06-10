@@ -142,7 +142,7 @@ public class DocUnitService {
   private DocUnit generateDateObject() {
     var docUnit = new DocUnit();
     // if I don't set anything, I get the error "Column count does not match; SQL statement"
-    // it should be possible to not set anything though TODO
+    // it should be possible to not set anything though
     docUnit.setFiletype("docx");
     return docUnit;
   }

@@ -63,7 +63,7 @@ class DocUnitServiceTest {
     assertEquals(docUnitCaptor.getValue(), docUnit);
   }
 
-  // @Test public void testGenerateNewDocUnit_withException() {} TODO
+  // @Test public void testGenerateNewDocUnit_withException() {}
 
   @Test
   void testAttachFileToDocUnit() {
@@ -120,8 +120,6 @@ class DocUnitServiceTest {
 
   @Test
   void testRemoveFileFromDocUnit() {
-    // TODO implement and test removal from bucket
-
     var docUnitBefore = new DocUnit();
     docUnitBefore.setId(1);
     docUnitBefore.setS3path("88888888-4444-4444-4444-121212121212");
@@ -131,17 +129,17 @@ class DocUnitServiceTest {
     docUnitAfter.setId(1);
 
     when(repository.findById(1)).thenReturn(Mono.just(docUnitBefore));
-    // is the thenReturn ok? Or am I bypassing the actual functionality-test? TODO
+    // is the thenReturn ok? Or am I bypassing the actual functionality-test?
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(docUnitAfter));
-    CompletableFuture<DeleteObjectResponse> completableFuture =
-        CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
-    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class))).thenReturn(completableFuture);
+    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(buildEmptyDeleteObjectResponse());
 
     StepVerifier.create(service.removeFileFromDocUnit("1"))
         .consumeNextWith(
             docUnitResponseEntity -> {
               assertNotNull(docUnitResponseEntity);
               assertEquals(HttpStatus.OK, docUnitResponseEntity.getStatusCode());
+              assertEquals(docUnitAfter, docUnitResponseEntity.getBody());
             })
         .verifyComplete();
 
