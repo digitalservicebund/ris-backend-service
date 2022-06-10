@@ -5,12 +5,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import de.bund.digitalservice.ris.datamodel.DocUnit;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
 import org.springframework.r2dbc.core.DatabaseClient;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
 
-@SpringBootTest(properties = {"otc.obs.bucket-name=testBucket"})
+@ExtendWith(SpringExtension.class)
+@DataR2dbcTest
 @Tag("test")
 class DocUnitRepositoryTest {
   @Autowired DocUnitRepository docUnitRepo;
