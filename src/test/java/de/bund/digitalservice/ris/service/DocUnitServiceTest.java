@@ -28,9 +28,7 @@ import reactor.test.StepVerifier;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectResponse;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.*;
 
 @SpringBootTest(properties = {"otc.obs.bucket-name=testBucket"})
 @Tag("test")
@@ -68,7 +66,7 @@ class DocUnitServiceTest {
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of("content/type"));
-    headerMap.put("filename", List.of("testfile.docx"));
+    headerMap.put("X-Filename", List.of("testfile.docx"));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
 
     var toSave = new DocUnit();
@@ -130,6 +128,9 @@ class DocUnitServiceTest {
     when(repository.findById(1)).thenReturn(Mono.just(docUnitBefore));
     // is the thenReturn ok? Or am I bypassing the actual functionality-test? TODO
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(docUnitAfter));
+    CompletableFuture<DeleteObjectResponse> completableFuture =
+        CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
+    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class))).thenReturn(completableFuture);
 
     StepVerifier.create(service.removeFileFromDocUnit("1"))
         .consumeNextWith(
