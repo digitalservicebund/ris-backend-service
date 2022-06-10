@@ -40,7 +40,7 @@ class DocUnitServiceTest {
   @MockBean private S3AsyncClient s3AsyncClient;
 
   @Test
-  public void testGenerateNewDocUnit() {
+  void testGenerateNewDocUnit() {
     var docUnit = new DocUnit();
     docUnit.setFiletype("docx");
     ArgumentCaptor<DocUnit> docUnitCaptor = ArgumentCaptor.forClass(DocUnit.class);
@@ -61,7 +61,7 @@ class DocUnitServiceTest {
   // @Test public void testGenerateNewDocUnit_withException() {} TODO
 
   @Test
-  public void testAttachFileToDocUnit() {
+  void testAttachFileToDocUnit() {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
     var headerMap = new LinkedMultiValueMap<String, String>();
@@ -109,12 +109,12 @@ class DocUnitServiceTest {
       StepVerifier.create(asyncRequestBodyCaptor.getValue())
           .expectNext(ByteBuffer.wrap(new byte[] {}))
           .verifyComplete();
-      verify(repository).save(eq(toSave));
+      verify(repository).save(toSave);
     }
   }
 
   @Test
-  public void testRemoveFileFromDocUnit() {
+  void testRemoveFileFromDocUnit() {
     // TODO implement and test removal from bucket
 
     var docUnitBefore = new DocUnit();
@@ -146,7 +146,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  public void testGenerateNewDocUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
+  void testGenerateNewDocUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
 
@@ -169,7 +169,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  public void testGenerateNewDocUnitAndAttachFile_withExceptionFromRepository() {
+  void testGenerateNewDocUnitAndAttachFile_withExceptionFromRepository() {
     // given
     var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
 
@@ -194,7 +194,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  public void testGetAll() {
+  void testGetAll() {
     StepVerifier.create(service.getAll())
         .consumeNextWith(Assertions::assertNotNull)
         .verifyComplete();
@@ -203,7 +203,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  public void testGetById() {
+  void testGetById() {
     when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
     StepVerifier.create(service.getById("1"))
         .consumeNextWith(
@@ -213,7 +213,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  public void testUpdateDocUnit() {
+  void testUpdateDocUnit() {
     var docUnit = DocUnit.EMPTY;
     when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
     StepVerifier.create(service.updateDocUnit(docUnit))

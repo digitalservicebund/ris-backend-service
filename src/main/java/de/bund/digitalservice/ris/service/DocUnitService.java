@@ -167,7 +167,7 @@ public class DocUnitService {
                   .flatMap(deleteObjectResponse -> repository.delete(docUnit));
             })
         .doOnNext(docUnit -> log.debug("deleted doc unit"))
-        .map(_void -> ResponseEntity.status(HttpStatus.OK).body("done"))
+        .map(v -> ResponseEntity.status(HttpStatus.OK).body("done"))
         .doOnError(ex -> log.error("Couldn't delete the DocUnit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body("Couldn't delete the DocUnit"));
   }

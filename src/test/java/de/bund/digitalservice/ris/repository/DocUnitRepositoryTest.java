@@ -38,6 +38,6 @@ class DocUnitRepositoryTest {
     docUnit.setFiletype("txt");
     docUnitRepo.save(docUnit).subscribe();
     docUnitRepo.save(docUnit).subscribe();
-    assertEquals(docUnitRepo.count().block(), 1);
+    assertEquals(1, docUnitRepo.count().block());
   }
 }
