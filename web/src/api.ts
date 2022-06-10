@@ -77,7 +77,7 @@ export const uploadFile = async (docUnitId: number | undefined, file: File) => {
     headers: {
       "Content-Type":
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      filename: file.name,
+      "X-Filename": file.name,
     },
   })
 }

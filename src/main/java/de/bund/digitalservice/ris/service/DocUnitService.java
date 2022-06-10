@@ -62,8 +62,8 @@ public class DocUnitService {
                         docUnit -> {
                           docUnit.setS3path(fileUuid);
                           docUnit.setFilename(
-                              httpHeaders.containsKey("filename")
-                                  ? httpHeaders.getFirst("filename")
+                              httpHeaders.containsKey("X-Filename")
+                                  ? httpHeaders.getFirst("X-Filename")
                                   : "Kein Dateiname gefunden");
                           return docUnit;
                         }))
