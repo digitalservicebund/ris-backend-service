@@ -49,7 +49,7 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
-      int docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
+      String docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
 
     return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
@@ -57,14 +57,14 @@ public class DocUnitService {
         .flatMap(
             putObjectResponse ->
                 repository
-                    .findById(docUnitId)
+                    .findById(Integer.valueOf(docUnitId))
                     .map(
                         docUnit -> {
                           docUnit.setS3path(fileUuid);
                           docUnit.setFilename(
                               httpHeaders.containsKey("filename")
                                   ? httpHeaders.getFirst("filename")
-                                  : "no filename found");
+                                  : "Kein Dateiname gefunden");
                           return docUnit;
                         }))
         .doOnNext(docUnit -> log.debug("save doc unit"))
@@ -74,10 +74,10 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(int docUnitId) {
+  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(String docUnitId) {
     // TODO delete from bucket
     return repository
-        .findById(docUnitId)
+        .findById(Integer.valueOf(docUnitId))
         .flatMap(
             docUnit -> {
               docUnit.setS3path(null);
@@ -134,8 +134,8 @@ public class DocUnitService {
     return Mono.just(ResponseEntity.ok(repository.findAll()));
   }
 
-  public Mono<ResponseEntity<DocUnit>> getById(int id) {
-    return repository.findById(id).map(ResponseEntity::ok);
+  public Mono<ResponseEntity<DocUnit>> getById(String docUnitId) {
+    return repository.findById(Integer.valueOf(docUnitId)).map(ResponseEntity::ok);
   }
 
   public Mono<ResponseEntity<DocUnit>> updateDocUnit(DocUnit docUnit) {

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -45,7 +46,6 @@ class DocUnitControllerTest {
   @Test
   void testAttachFileToDocUnit() {
     var headersCaptor = ArgumentCaptor.forClass(HttpHeaders.class);
-    var docUnitIdCaptor = ArgumentCaptor.forClass(Integer.class);
 
     webClient
         .mutateWith(csrf())
@@ -56,12 +56,9 @@ class DocUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service)
-        .attachFileToDocUnit(
-            docUnitIdCaptor.capture(), fluxCaptor.capture(), headersCaptor.capture());
+    verify(service).attachFileToDocUnit(eq("1"), fluxCaptor.capture(), headersCaptor.capture());
     assertEquals(0, Objects.requireNonNull(fluxCaptor.getValue().blockFirst()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
-    assertEquals(1, docUnitIdCaptor.getValue());
   }
 
   @Test
@@ -74,7 +71,7 @@ class DocUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).removeFileFromDocUnit(1);
+    verify(service, times(1)).removeFileFromDocUnit("1");
   }
 
   @Test
@@ -88,7 +85,7 @@ class DocUnitControllerTest {
   void testGetById() {
     webClient.mutateWith(csrf()).get().uri("/api/v1/docunits/1").exchange().expectStatus().isOk();
 
-    verify(service).getById(1);
+    verify(service).getById("1");
   }
 
   @Test

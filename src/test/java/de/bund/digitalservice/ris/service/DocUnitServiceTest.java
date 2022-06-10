@@ -95,7 +95,7 @@ class DocUnitServiceTest {
       mockedUUIDStatic.when(UUID::randomUUID).thenReturn(testUuid);
 
       // when and then
-      StepVerifier.create(service.attachFileToDocUnit(1, byteBufferFlux, httpHeaders))
+      StepVerifier.create(service.attachFileToDocUnit("1", byteBufferFlux, httpHeaders))
           .consumeNextWith(
               docUnit -> {
                 assertNotNull(docUnit);
@@ -131,7 +131,7 @@ class DocUnitServiceTest {
     // is the thenReturn ok? Or am I bypassing the actual functionality-test? TODO
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(docUnitAfter));
 
-    StepVerifier.create(service.removeFileFromDocUnit(1))
+    StepVerifier.create(service.removeFileFromDocUnit("1"))
         .consumeNextWith(
             docUnitResponseEntity -> {
               assertNotNull(docUnitResponseEntity);
@@ -153,7 +153,7 @@ class DocUnitServiceTest {
         .thenThrow(SdkException.create("exception", null));
 
     // when and then
-    StepVerifier.create(service.attachFileToDocUnit(1, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocUnit("1", byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);
@@ -178,7 +178,7 @@ class DocUnitServiceTest {
     when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
 
     // when and then
-    StepVerifier.create(service.attachFileToDocUnit(1, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocUnit("1", byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);
@@ -203,13 +203,12 @@ class DocUnitServiceTest {
 
   @Test
   public void testGetById() {
-    int id = 1;
-    when(repository.findById(id)).thenReturn(Mono.just(DocUnit.EMPTY));
-    StepVerifier.create(service.getById(id))
+    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    StepVerifier.create(service.getById("1"))
         .consumeNextWith(
             monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnit.class))
         .verifyComplete();
-    verify(repository).findById(id);
+    verify(repository).findById(1);
   }
 
   @Test
