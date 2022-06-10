@@ -34,14 +34,15 @@ const editor = new Editor({
     DocUnitParagraphExtension,
   ],
 })
-console.log(editor.schema)
 </script>
 
 <template>
   <div v-if="!!fileName">
     <a @click="fileName = null" @keyup="fileName = null">zurück zur Liste</a>
     <br />
-    <editor-content :editor="editor" />
+    <div v-if="editor">
+      <editor-content :editor="editor" />
+    </div>
   </div>
   <div v-if="!fileName">
     <div v-for="file in fileNames" :key="file">

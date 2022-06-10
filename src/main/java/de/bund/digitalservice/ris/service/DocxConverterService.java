@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.datamodel.docx.DocUnitDocx;
 import de.bund.digitalservice.ris.datamodel.docx.DocUnitRandnummer;
 import de.bund.digitalservice.ris.datamodel.docx.DocUnitTextElement;
 import de.bund.digitalservice.ris.datamodel.docx.Docx2Html;
+import de.bund.digitalservice.ris.exception.DocxConverterException;
 import de.bund.digitalservice.ris.utils.DocxParagraphConverter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -34,17 +35,11 @@ import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
+import software.amazon.awssdk.services.s3.model.*;
 
 @Service
 @Slf4j
 public class DocxConverterService {
-  private WordprocessingMLPackage mlPackage;
-
   private final S3AsyncClient client;
   private final DocumentBuilderFactory documentBuilderFactory;
 
@@ -56,43 +51,7 @@ public class DocxConverterService {
     this.documentBuilderFactory = documentBuilderFactory;
   }
 
-  private Mono<List<DocUnitDocx>> getDocumentParagraphs(InputStream inputStream) {
-    if (inputStream == null) {
-      return Mono.empty();
-    }
-
-    List<DocUnitDocx> packedList = new ArrayList<>();
-    final DocUnitRandnummer[] lastRandnummer = {null};
-
-    try {
-      mlPackage = WordprocessingMLPackage.load(inputStream);
-    } catch (Docx4JException e) {
-      throw new RuntimeException(e);
-    }
-
-    mlPackage.getMainDocumentPart().getContent().stream()
-        .map(DocxParagraphConverter::convert)
-        .filter(Objects::nonNull)
-        .forEach(
-            element -> {
-              if (lastRandnummer[0] == null && !(element instanceof DocUnitRandnummer)) {
-                packedList.add(element);
-              } else if (element instanceof DocUnitRandnummer randnummer) {
-                if (lastRandnummer[0] != null) {
-                  packedList.add(lastRandnummer[0]);
-                }
-                lastRandnummer[0] = randnummer;
-              } else if (element instanceof DocUnitTextElement textElement) {
-                lastRandnummer[0].setTextContent(textElement.getText());
-                packedList.add(lastRandnummer[0]);
-                lastRandnummer[0] = null;
-              }
-            });
-
-    return Mono.just(packedList);
-  }
-
-  public String getOriginalText() {
+  public String getOriginalText(WordprocessingMLPackage mlPackage) {
     if (mlPackage == null) {
       return "<no word file selected>";
     }
@@ -117,7 +76,7 @@ public class DocxConverterService {
         | IOException
         | SAXException
         | XPathExpressionException e) {
-      throw new RuntimeException(e);
+      throw new DocxConverterException("Couldn't read all text elements of docx xml!", e);
     }
 
     return originalText;
@@ -129,9 +88,11 @@ public class DocxConverterService {
     CompletableFuture<ListObjectsV2Response> futureResponse = client.listObjectsV2(request);
 
     return Mono.fromFuture(futureResponse)
-        .map(ListObjectsV2Response::contents)
-        .map(s3Objects -> s3Objects.stream().map(S3Object::key).collect(Collectors.toList()))
-        .map(ResponseEntity::ok);
+        .map(
+            response -> {
+              List<String> keys = response.contents().stream().map(S3Object::key).toList();
+              return ResponseEntity.ok(keys);
+            });
   }
 
   public Mono<Docx2Html> getHtml(String fileName) {
@@ -141,13 +102,46 @@ public class DocxConverterService {
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
     return Mono.fromFuture(futureResponse)
-        .flatMap(response -> getDocumentParagraphs(response.asInputStream()))
-        .map(list -> list.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining()))
-        .map(
-            content -> {
-              Docx2Html docx2Html = new Docx2Html();
-              docx2Html.setContent(content);
-              return docx2Html;
+        .map(response -> getDocumentParagraphs(response.asInputStream()));
+  }
+
+  private Docx2Html getDocumentParagraphs(InputStream inputStream) {
+    if (inputStream == null) {
+      return Docx2Html.EMPTY;
+    }
+
+    List<DocUnitDocx> packedList = new ArrayList<>();
+    final DocUnitRandnummer[] lastRandnummer = {null};
+
+    WordprocessingMLPackage mlPackage;
+    try {
+      mlPackage = WordprocessingMLPackage.load(inputStream);
+    } catch (Docx4JException e) {
+      throw new DocxConverterException("Couldn't load docx file!", e);
+    }
+
+    mlPackage.getMainDocumentPart().getContent().stream()
+        .map(DocxParagraphConverter::convert)
+        .filter(Objects::nonNull)
+        .forEach(
+            element -> {
+              if (lastRandnummer[0] == null && !(element instanceof DocUnitRandnummer)) {
+                packedList.add(element);
+              } else if (element instanceof DocUnitRandnummer randnummer) {
+                if (lastRandnummer[0] != null) {
+                  packedList.add(lastRandnummer[0]);
+                }
+                lastRandnummer[0] = randnummer;
+              } else if (element instanceof DocUnitTextElement textElement) {
+                lastRandnummer[0].setTextContent(textElement.getText());
+                packedList.add(lastRandnummer[0]);
+                lastRandnummer[0] = null;
+              }
             });
+
+    Docx2Html docx2Html = new Docx2Html();
+    docx2Html.setContent(
+        packedList.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining()));
+    return docx2Html;
   }
 }

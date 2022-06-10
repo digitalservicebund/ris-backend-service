@@ -8,6 +8,14 @@ interface RandnummerOptions {
   HTMLAttributes: Record<string, unknown>
 }
 
+declare module "@tiptap/core" {
+  interface Commands<ReturnType> {
+    heading: {
+      setRandnummer: (attributes: { number: number }) => ReturnType
+    }
+  }
+}
+
 export const DocUnitParagraphExtension = Extension.create<DocUnitOptions>({
   name: "docUnit",
   addOptions() {
@@ -48,6 +56,20 @@ export const DocUnitParagraphExtension = Extension.create<DocUnitOptions>({
               }
             },
           },
+          fontWeight: {
+            default: null,
+            parseHTML: (element) =>
+              element.style.fontWeight.replace(/['"]+/g, ""),
+            renderHTML: (attributes) => {
+              if (!attributes.fontWeight) {
+                return {}
+              }
+
+              return {
+                style: `font-weight: ${attributes.fontWeight}`,
+              }
+            },
+          },
         },
       },
     ]
@@ -78,10 +100,19 @@ export const Randnummer = Node.create<RandnummerOptions>({
       mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
       [
         "div",
-        { style: "padding-top: 20px; min-width: 40px;" },
+        { style: "padding-top: 10px; padding-left: 10px; min-width: 40px;" },
         HTMLAttributes.number.toString(),
       ],
       ["div", 0],
     ]
+  },
+  addCommands() {
+    return {
+      setRandnummer:
+        (attributes) =>
+        ({ commands }) => {
+          return commands.setNode(this.name, attributes)
+        },
+    }
   },
 })

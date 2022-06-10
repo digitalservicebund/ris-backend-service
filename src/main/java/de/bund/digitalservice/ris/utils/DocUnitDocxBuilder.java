@@ -15,8 +15,8 @@ import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
 
 public class DocUnitDocxBuilder {
-  private P paragraph;
-  private Tbl table;
+  P paragraph;
+  Tbl table;
 
   private DocUnitDocxBuilder() {}
 
@@ -53,12 +53,8 @@ public class DocUnitDocxBuilder {
   private boolean isRandnummer() {
     var isText = isText();
 
-    if (isText) {
-      if (paragraph.getPPr() != null) {
-        if (paragraph.getPPr().getPStyle() != null) {
-          return paragraph.getPPr().getPStyle().getVal().equals("RandNummer");
-        }
-      }
+    if (isText && paragraph.getPPr() != null && paragraph.getPPr().getPStyle() != null) {
+      return paragraph.getPPr().getPStyle().getVal().equals("RandNummer");
     }
 
     return false;
@@ -68,8 +64,8 @@ public class DocUnitDocxBuilder {
     DocUnitRandnummer randnummer = new DocUnitRandnummer();
 
     paragraph.getContent().stream()
-        .filter(part -> part instanceof R)
-        .map(part -> (R) part)
+        .filter(R.class::isInstance)
+        .map(R.class::cast)
         .forEach(r -> randnummer.addNumberText(parseTextFromRun(r)));
 
     return randnummer;
@@ -80,7 +76,7 @@ public class DocUnitDocxBuilder {
       return false;
     }
 
-    var hasRElement = paragraph.getContent().stream().anyMatch(tag -> tag instanceof R);
+    var hasRElement = paragraph.getContent().stream().anyMatch(R.class::isInstance);
 
     if (!hasRElement) {
       return paragraph.getPPr() != null;
@@ -111,10 +107,8 @@ public class DocUnitDocxBuilder {
     var pPr = paragraph.getPPr();
     if (pPr != null) {
       var jc = pPr.getJc();
-      if (jc != null) {
-        if (jc.getVal() == JcEnumeration.CENTER) {
-          textElement.setAlignment("center");
-        }
+      if (jc != null && jc.getVal() == JcEnumeration.CENTER) {
+        textElement.setAlignment("center");
       }
 
       var rPr = pPr.getRPr();
@@ -130,8 +124,8 @@ public class DocUnitDocxBuilder {
     }
 
     paragraph.getContent().stream()
-        .filter(part -> part instanceof R)
-        .map(part -> (R) part)
+        .filter(R.class::isInstance)
+        .map(R.class::cast)
         .forEach(r -> textElement.addText(parseTextFromRun(r)));
 
     return textElement;

@@ -6,13 +6,13 @@ import org.docx4j.wml.P;
 import org.docx4j.wml.Tbl;
 
 public class DocxParagraphConverter {
+  private DocxParagraphConverter() {}
+
   public static DocUnitDocx convert(Object part) {
-    if (part instanceof P) {
-      return convertP((P) part);
-    } else if (part instanceof JAXBElement<?> element) {
-      if (element.getDeclaredType() == Tbl.class) {
-        return convertTbl((Tbl) element.getValue());
-      }
+    if (part instanceof P p) {
+      return convertP(p);
+    } else if (part instanceof JAXBElement<?> element && element.getDeclaredType() == Tbl.class) {
+      return convertTbl((Tbl) element.getValue());
     }
 
     return new DocUnitDocx() {
