@@ -19,6 +19,8 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
@@ -75,18 +77,25 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(String docUnitId) {
-    // TODO delete from bucket
     return repository
         .findById(Integer.valueOf(docUnitId))
         .flatMap(
             docUnit -> {
-              docUnit.setS3path(null);
-              docUnit.setFilename(null);
-              return repository.save(docUnit);
+              var fileUuid = docUnit.getS3path();
+              return deleteObjectFromBucket(fileUuid)
+                  .doOnNext(
+                      deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
+                  .map(
+                      deleteObjectResponse -> {
+                        docUnit.setS3path(null);
+                        docUnit.setFilename(null);
+                        return docUnit;
+                      });
             })
-        .doOnNext(docUnit -> log.debug("removed file from doc unit"))
+        .doOnNext(docUnit -> log.debug("removed file from DocUnit {}", docUnitId))
+        .flatMap(repository::save)
         .map(docUnit -> ResponseEntity.status(HttpStatus.OK).body(docUnit))
-        .doOnError(ex -> log.error("Couldn't remove the file from the doc unit", ex))
+        .doOnError(ex -> log.error("Couldn't remove the file from the DocUnit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
@@ -122,6 +131,14 @@ public class DocUnitService {
         .flatMap(Function.identity());
   }
 
+  private Mono<DeleteObjectResponse> deleteObjectFromBucket(String fileUuid) {
+    var deleteObjectRequest =
+        DeleteObjectRequest.builder().bucket(bucketName).key(fileUuid).build();
+    s3AsyncClient.deleteObject(deleteObjectRequest);
+    return Mono.fromCallable(() -> Mono.fromFuture(s3AsyncClient.deleteObject(deleteObjectRequest)))
+        .flatMap(Function.identity());
+  }
+
   private DocUnit generateDateObject() {
     var docUnit = new DocUnit();
     // if I don't set anything, I get the error "Column count does not match; SQL statement"
@@ -139,9 +156,16 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<String>> deleteById(String docUnitId) {
-    // TODO if file attached --> delete from bucket
     return repository
-        .deleteById(Integer.valueOf(docUnitId))
+        .findById(Integer.valueOf(docUnitId))
+        .flatMap(
+            docUnit -> {
+              var fileUuid = docUnit.getS3path();
+              return deleteObjectFromBucket(fileUuid)
+                  .doOnNext(
+                      deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
+                  .flatMap(deleteObjectResponse -> repository.delete(docUnit));
+            })
         .doOnNext(docUnit -> log.debug("deleted doc unit"))
         .map(_void -> ResponseEntity.status(HttpStatus.OK).body("done"))
         .doOnError(ex -> log.error("Couldn't delete the DocUnit", ex))
