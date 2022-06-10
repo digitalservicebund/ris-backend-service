@@ -62,6 +62,17 @@ class DocUnitControllerTest {
   }
 
   @Test
+  void testAttachFileToDocUnit_withInvalidId() {
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/docunits/abc/file")
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+  }
+
+  @Test
   void testRemoveFileFromDocUnit() {
     webClient
         .mutateWith(csrf())
@@ -72,6 +83,17 @@ class DocUnitControllerTest {
         .isOk();
 
     verify(service, times(1)).removeFileFromDocUnit("1");
+  }
+
+  @Test
+  void testRemoveFileFromDocUnit_withInvalidId() {
+    webClient
+        .mutateWith(csrf())
+        .delete()
+        .uri("/api/v1/docunits/abc/file")
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
   }
 
   @Test
@@ -89,6 +111,17 @@ class DocUnitControllerTest {
   }
 
   @Test
+  void testGetById_withInvalidId() {
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/docunits/abc")
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+  }
+
+  @Test
   void testUpdateById() {
     DocUnit docUnit = new DocUnit();
     docUnit.setId(1);
@@ -102,5 +135,20 @@ class DocUnitControllerTest {
         .expectStatus()
         .isOk();
     verify(service).updateDocUnit(docUnit);
+  }
+
+  @Test
+  void testUpdateById_withInvalidId() {
+    DocUnit docUnit = new DocUnit();
+    docUnit.setId(1);
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/docunits/abc/docx")
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(docUnit)
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
   }
 }
