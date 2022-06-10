@@ -218,6 +218,55 @@ class DocUnitServiceTest {
   }
 
   @Test
+  void testDeleteById() {
+    // can we also test that the fileUuid from the DocUnit is used? with a captor somehow?
+    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.delete(DocUnit.EMPTY)).thenReturn(Mono.just(mock(Void.class)));
+    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
+        .thenReturn(buildEmptyDeleteObjectResponse());
+
+    StepVerifier.create(service.deleteById("1"))
+        .consumeNextWith(
+            stringResponseEntity -> {
+              assertNotNull(stringResponseEntity);
+              assertEquals(HttpStatus.OK, stringResponseEntity.getStatusCode());
+              assertEquals("done", stringResponseEntity.getBody());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  void testDeleteById_withExceptionFromBucket() {
+    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
+        .thenThrow(SdkException.create("exception", null));
+
+    StepVerifier.create(service.deleteById("1"))
+        .consumeNextWith(
+            stringResponseEntity -> {
+              assertNotNull(stringResponseEntity);
+              assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, stringResponseEntity.getStatusCode());
+              assertEquals("Couldn't delete the DocUnit", stringResponseEntity.getBody());
+            })
+        .verifyComplete();
+  }
+
+  @Test
+  void testDeleteById_withExceptionFromRepository() {
+    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    doThrow(new IllegalArgumentException()).when(repository).delete(DocUnit.EMPTY);
+
+    StepVerifier.create(service.deleteById("1"))
+        .consumeNextWith(
+            stringResponseEntity -> {
+              assertNotNull(stringResponseEntity);
+              assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, stringResponseEntity.getStatusCode());
+              assertEquals("Couldn't delete the DocUnit", stringResponseEntity.getBody());
+            })
+        .verifyComplete();
+  }
+
+  @Test
   void testUpdateDocUnit() {
     var docUnit = DocUnit.EMPTY;
     when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
@@ -225,5 +274,9 @@ class DocUnitServiceTest {
         .consumeNextWith(monoResponse -> assertEquals(monoResponse.getBody(), docUnit))
         .verifyComplete();
     verify(repository).save(docUnit);
+  }
+
+  private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
+    return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
   }
 }

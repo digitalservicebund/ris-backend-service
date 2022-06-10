@@ -122,6 +122,30 @@ class DocUnitControllerTest {
   }
 
   @Test
+  void testDeleteById() {
+    webClient
+        .mutateWith(csrf())
+        .delete()
+        .uri("/api/v1/docunits/1")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service).deleteById("1");
+  }
+
+  @Test
+  void testDeleteById_withInvalidId() {
+    webClient
+        .mutateWith(csrf())
+        .delete()
+        .uri("/api/v1/docunits/abc")
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
+  }
+
+  @Test
   void testUpdateById() {
     DocUnit docUnit = new DocUnit();
     docUnit.setId(1);
