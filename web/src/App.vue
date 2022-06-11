@@ -51,6 +51,8 @@ const store = useDocUnitsStore()
         <li>- Stammdaten</li>
         <li>- Langtexte</li>
       </ul>
+      RECHTSZUG
+      <br />
       <router-link
         :to="{
           name: 'Dokumente',

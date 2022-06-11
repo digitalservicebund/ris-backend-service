@@ -31,7 +31,14 @@ const onDelete = (docUnitId: number) => {
     <tbody>
       <tr v-for="docUnit in store.getAll()" :key="docUnit.id">
         <td>
-          <router-link :to="{ name: 'Rubriken', params: { id: docUnit.id } }">
+          <router-link
+            :to="{
+              name: store.hasFileAttached(docUnit.id)
+                ? 'Rubriken'
+                : 'Dokumente',
+              params: { id: docUnit.id },
+            }"
+          >
             {{ docUnit.id }}
           </router-link>
         </td>

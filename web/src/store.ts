@@ -74,6 +74,9 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       }
       return this.selected
     },
+    hasFileAttached(id: number): boolean {
+      return this.docUnits.has(id) && this.docUnits.get(id)?.s3path !== null
+    },
     selectedHasFileAttached(): boolean {
       if (!this.selected) return false
       return this.selected.s3path !== null
