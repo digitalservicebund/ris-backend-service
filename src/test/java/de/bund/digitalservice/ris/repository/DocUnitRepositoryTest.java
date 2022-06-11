@@ -22,12 +22,12 @@ class DocUnitRepositoryTest {
 
   @Test
   void testFindByFileType() {
-    DocUnit docx = new DocUnit();
+    DocUnit docx = DocUnit.createNew();
     docx.setS3path("bucket1/originalA.docx");
     docx.setFiletype("docx");
     docUnitRepo.save(docx).subscribe();
 
-    DocUnit pdf = new DocUnit();
+    DocUnit pdf = DocUnit.createNew();
     pdf.setS3path("bucket1/originalB.pdf");
     pdf.setFiletype("pdf");
     docUnitRepo.save(pdf).subscribe();
@@ -37,8 +37,7 @@ class DocUnitRepositoryTest {
 
   @Test // as used in service.updateDocUnit()
   void testUpdateByOverSaving() {
-    DocUnit docUnit = new DocUnit();
-    docUnit.setFiletype("txt");
+    DocUnit docUnit = DocUnit.createNew();
     docUnitRepo.save(docUnit).subscribe();
     docUnitRepo.save(docUnit).subscribe();
     assertEquals(1, docUnitRepo.count().block());

@@ -45,7 +45,7 @@ public class DocUnitService {
 
   public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
     return repository
-        .save(createDocUnit())
+        .save(DocUnit.createNew())
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
@@ -141,14 +141,6 @@ public class DocUnitService {
     s3AsyncClient.deleteObject(deleteObjectRequest);
     return Mono.fromCallable(() -> Mono.fromFuture(s3AsyncClient.deleteObject(deleteObjectRequest)))
         .flatMap(Function.identity());
-  }
-
-  private DocUnit createDocUnit() {
-    var docUnit = new DocUnit();
-    // if I don't set anything, I get the error "Column count does not match; SQL statement"
-    // it should be possible to not set anything though
-    docUnit.setFiletype("docx");
-    return docUnit;
   }
 
   public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {

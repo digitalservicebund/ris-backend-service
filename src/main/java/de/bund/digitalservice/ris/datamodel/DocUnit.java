@@ -12,6 +12,12 @@ import org.springframework.data.annotation.Id;
 public class DocUnit {
   public static final DocUnit EMPTY = new DocUnit();
 
+  public static DocUnit createNew() {
+    DocUnit docUnit = new DocUnit();
+    docUnit.setCreationtimestamp(Instant.now());
+    return docUnit;
+  }
+
   @Id Integer id;
   Instant creationtimestamp;
 
