@@ -8,7 +8,8 @@ export type DocUnit = {
   filetype: string
   filename: string
 
-  // Stammdaten
+  // RUBRIKEN
+  // - Stammdaten
   aktenzeichen: string
   gerichtstyp: string
   dokumenttyp: string
@@ -22,15 +23,15 @@ export type DocUnit = {
   dokumentationsstelle: string
   region: string
 
-  // Rubrikenfelder
+  // - Kurz- & Langtexte
+  entscheidungsname: string
+  titelzeile: string
+  leitsatz: string
+  orientierungssatz: string
   tenor: string
   gruende: string
   tatbestand: string
   entscheidungsgruende: string
-  abweichendemeinung: string
-  sonstigerlangtext: string
-  gliederung: string
-  berichtigung: string
 }
 
 // worth adding this dependency to make this shorter? https://stackoverflow.com/a/53995901
@@ -54,13 +55,13 @@ export function buildEmptyDocUnit(): DocUnit {
     eingangsart: "",
     dokumentationsstelle: "",
     region: "",
+    entscheidungsname: "",
+    titelzeile: "",
+    leitsatz: "",
+    orientierungssatz: "",
     tenor: "",
     gruende: "",
     tatbestand: "",
     entscheidungsgruende: "",
-    abweichendemeinung: "",
-    sonstigerlangtext: "",
-    gliederung: "",
-    berichtigung: "",
   }
 }

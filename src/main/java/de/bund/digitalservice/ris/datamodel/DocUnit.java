@@ -27,7 +27,8 @@ public class DocUnit {
   String filetype;
   String filename;
 
-  // Stammdaten
+  // RUBRIKEN
+  // - Stammdaten
   String aktenzeichen;
   String gerichtstyp;
   String dokumenttyp;
@@ -41,13 +42,13 @@ public class DocUnit {
   String dokumentationsstelle;
   String region;
 
-  // Rubrikenfelder fuer Langtexte
+  // - Kurz- & Langtexte
+  String entscheidungsname;
+  String titelzeile;
+  String leitsatz;
+  String orientierungssatz;
   String tenor;
   String gruende;
   String tatbestand;
   String entscheidungsgruende;
-  String abweichendemeinung;
-  String sonstigerlangtext;
-  String gliederung;
-  String berichtigung;
 }

@@ -17,12 +17,12 @@ CREATE TABLE IF NOT EXISTS doc_unit (
     eingangsart VARCHAR(255),
     dokumentationsstelle VARCHAR(255),
     region VARCHAR(255),
+    entscheidungsname VARCHAR(255),
+    titelzeile VARCHAR(255),
+    leitsatz VARCHAR(255),
+    orientierungssatz VARCHAR(255),
     tenor VARCHAR(255),
     gruende VARCHAR(255),
     tatbestand VARCHAR(255),
-    entscheidungsgruende VARCHAR(255),
-    abweichendemeinung VARCHAR(255),
-    sonstigerlangtext VARCHAR(255),
-    gliederung VARCHAR(255),
-    berichtigung VARCHAR(255)
+    entscheidungsgruende VARCHAR(255)
 );
