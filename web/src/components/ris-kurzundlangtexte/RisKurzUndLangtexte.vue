@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import StarterKit from "@tiptap/starter-kit"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { useDocUnitsStore } from "../../store"
 import { DocUnit } from "../../types/DocUnit"
@@ -29,7 +28,7 @@ const add = (id: keyof DocUnit, name: string, editor: Editor) => {
 
 const buildEditor = () => {
   return new Editor({
-    extensions: [StarterKit],
+    extensions: [],
   })
 }
 
@@ -72,7 +71,6 @@ const onSaveClick = () => {
                   :class="{
                     'editor-btn__active': item.editor.isActive('bold'),
                   }"
-                  @click="item.editor.chain().focus().toggleBold().run()"
                 >
                   bold
                 </button>
@@ -81,7 +79,6 @@ const onSaveClick = () => {
                   :class="{
                     'editor-btn__active': item.editor.isActive('italic'),
                   }"
-                  @click="item.editor.chain().focus().toggleItalic().run()"
                 >
                   italic
                 </button>

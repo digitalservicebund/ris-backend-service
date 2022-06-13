@@ -28,7 +28,6 @@
     "@tiptap/extension-document": "^2.0.0-beta.15",
     "@tiptap/extension-paragraph": "^2.0.0-beta.23",
     "@tiptap/extension-text": "^2.0.0-beta.15",
-    "@tiptap/starter-kit": "^2.0.0-beta.185",
     "@tiptap/vue-3": "^2.0.0-beta.91",
     "@pinia/testing": "^0.0.12",
     "material-design-icons-iconfont": "^6.7.0",
