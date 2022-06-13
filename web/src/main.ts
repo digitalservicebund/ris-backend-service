@@ -6,7 +6,7 @@ import vuetify from "./plugins/vuetify"
 import DocUnitDocx from "./views/DocUnitDocx.vue"
 import DokumenteView from "./views/DokumenteView.vue"
 import Home from "./views/HomePage.vue"
-import Rechtssprechung from "./views/RechtsSprechung.vue"
+import Rechtsprechung from "./views/RechtSprechung.vue"
 
 const router = createRouter({
   history: createWebHistory(),
@@ -17,12 +17,12 @@ const router = createRouter({
       component: Home,
     },
     {
-      path: "/rechtssprechung",
-      name: "Rechtssprechung",
-      component: Rechtssprechung,
+      path: "/rechtsprechung",
+      name: "Rechtsprechung",
+      component: Rechtsprechung,
     },
     {
-      path: "/rechtssprechung/:id/rubriken",
+      path: "/rechtsprechung/:id/rubriken",
       name: "Rubriken",
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
@@ -31,7 +31,7 @@ const router = createRouter({
         import(/* webpackChunkName: "stammdaten" */ "./views/RubrikenView.vue"),
     },
     {
-      path: "/rechtssprechung/:id/dokumente",
+      path: "/rechtsprechung/:id/dokumente",
       name: "Dokumente",
       component: DokumenteView,
     },

@@ -11,13 +11,11 @@ const store = useDocUnitsStore()
         <v-layout>
           <v-row>
             <v-col>
-              <router-link :to="{ name: 'Rechtssprechung' }"
-                >ZURÜCK</router-link
-              >
+              <router-link :to="{ name: 'Rechtsprechung' }">ZURÜCK</router-link>
             </v-col>
             <v-col>
-              <router-link :to="{ name: 'Rechtssprechung' }"
-                >RECHTSSPRECHUNG</router-link
+              <router-link :to="{ name: 'Rechtsprechung' }"
+                >RECHTSPRECHUNG</router-link
               >
             </v-col>
           </v-row>
@@ -25,7 +23,7 @@ const store = useDocUnitsStore()
         <v-layout v-if="store.hasSelected()" style="background-color: #eee">
           <v-row>
             <v-col>
-              Rechtssprechung: {{ store.getSelected()?.id }}, Aktenzeichen:
+              Rechtsprechung: {{ store.getSelected()?.id }}, Aktenzeichen:
               {{ store.getSelected()?.aktenzeichen }}, Entscheidungsdatum:
               {{ store.getSelected()?.entscheidungsdatum }}, Gerichtstyp:
               {{ store.getSelected()?.gerichtstyp }}
