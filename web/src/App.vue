@@ -49,7 +49,7 @@ const store = useDocUnitsStore()
       </router-link>
       <ul>
         <li>- Stammdaten</li>
-        <li>- Langtexte</li>
+        <li>- Kurz- & Langtexte</li>
       </ul>
       RECHTSZUG
       <br />
