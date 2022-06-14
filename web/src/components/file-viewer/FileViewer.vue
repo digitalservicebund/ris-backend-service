@@ -7,7 +7,7 @@ import RisButton from "../ris-button/RisButton.vue"
 const store = useDocUnitsStore()
 
 const onSubmit = async () => {
-  let docUnit = await deleteFile(store.getSelected()?.id)
+  const docUnit = await deleteFile(store.getSelected()?.id)
   console.log("file delete from doc unit, response:", docUnit)
   store.update(docUnit)
 }

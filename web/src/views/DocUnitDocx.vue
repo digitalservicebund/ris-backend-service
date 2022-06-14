@@ -10,12 +10,12 @@ import {
   DocUnitParagraphExtension,
 } from "../editor/DocUnitExtension"
 
-var fileNames = ref()
+const fileNames = ref()
 getAllDocxFiles().then((list) => {
   fileNames.value = list
 })
 
-var fileName = ref()
+const fileName = ref()
 function getHtml(name: string) {
   fileName.value = name
 

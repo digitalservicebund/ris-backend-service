@@ -27,14 +27,14 @@ const reset = () => {
 }
 
 const upload = async (file: File) => {
-  let extension = file.name.split(".").pop()
+  const extension = file.name.split(".").pop()
   if (!extension || extension.toLowerCase() !== "docx") {
     alert("Aktuell werden nur DOCX Dateien unterstützt")
     return
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  let docUnit = await uploadFile(store.getSelected()?.id, file)
+  const docUnit = await uploadFile(store.getSelected()?.id, file)
   store.update(docUnit)
   status.value.uploadStatus = "succeeded" // error handling TODO
   console.log("file uploaded, response:", docUnit)
@@ -49,7 +49,7 @@ const dragover = (e: DragEvent) => {
 const checkForInDragError = (e: DragEvent): string => {
   //  this doesn't work on Windows, the type is not included TODO
   if (!e.dataTransfer) return ""
-  let items = e.dataTransfer.items
+  const items = e.dataTransfer.items
   if (items.length > 1) return "Nur eine Datei auf einmal ist möglich"
   if (items[0].kind !== "file") return "Dies scheint keine Datei zu sein"
   if (
@@ -78,7 +78,7 @@ const openFileDialog = () => {
   const inputEl = document.createElement("input")
   inputEl.setAttribute("type", "file")
   inputEl.addEventListener("change", (e: Event) => {
-    let files = (e.target as HTMLInputElement).files
+    const files = (e.target as HTMLInputElement).files
     if (!files) return
     reset()
     upload(files[0])
