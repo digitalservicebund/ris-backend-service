@@ -34,8 +34,8 @@ jobs:
       - name: Setup Node for web
         uses: actions/setup-node@v3
         with:
-          node-version-file: "./web/.node-version"
-          cache: "npm"
+          node-version-file: ./web/.node-version
+          cache: npm
           cache-dependency-path: ./web/package-lock.json
       - name: Install dependencies for web
         run: |
@@ -233,8 +233,8 @@ jobs:
       - name: Setup Node for web
         uses: actions/setup-node@v3
         with:
-          node-version-file: "./web/.node-version"
-          cache: "npm"
+          node-version-file: ./web/.node-version
+          cache: npm
           cache-dependency-path: ./web/package-lock.json
       - name: Install dependencies for web
         run: npm ci
