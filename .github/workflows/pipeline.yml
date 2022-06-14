@@ -287,7 +287,6 @@ jobs:
   deploy-infra-staging:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    environment: staging
     needs: build-and-push-image
     steps:
       - name: Get infra repo access token
@@ -410,7 +409,6 @@ jobs:
   deploy-infra-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    environment: production
     needs: deploy-staging-verify
     steps:
       - name: Get infra repo access token
