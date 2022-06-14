@@ -1,8 +1,8 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { onMounted } from "vue"
 import { deleteDocUnit } from "../../api"
 import { useDocUnitsStore } from "../../store"
-import { instantToDate } from "../../util"
 
 const store = useDocUnitsStore()
 
@@ -42,7 +42,7 @@ const onDelete = (docUnitId: number) => {
             {{ docUnit.id }}
           </router-link>
         </td>
-        <td>{{ instantToDate(docUnit.creationtimestamp) }}</td>
+        <td>{{ dayjs(docUnit.creationtimestamp).format("DD.MM.YYYY") }}</td>
         <td>{{ docUnit.aktenzeichen }}</td>
         <td>
           <router-link

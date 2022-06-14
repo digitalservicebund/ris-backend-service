@@ -1,7 +1,7 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { deleteFile } from "../../api"
 import { useDocUnitsStore } from "../../store"
-import { instantToDate } from "../../util"
 import RisButton from "../ris-button/RisButton.vue"
 
 const store = useDocUnitsStore()
@@ -18,8 +18,11 @@ const onSubmit = async () => {
     <v-row>
       <v-col>
         Dateiname: {{ store.getSelectedSafe().filename }}, Hochgeladen am
-        {{ instantToDate(store.getSelectedSafe().fileuploadtimestamp) }},
-        Format: {{ store.getSelectedSafe().filetype }}
+        {{
+          dayjs(store.getSelectedSafe().fileuploadtimestamp).format(
+            "DD.MM.YYYY"
+          )
+        }}, Format: {{ store.getSelectedSafe().filetype }}
       </v-col>
     </v-row>
     <v-row>
