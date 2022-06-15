@@ -10,7 +10,7 @@ onMounted(() => {
   store.fetchAll()
 })
 
-const onDelete = (docUnitId: number) => {
+const onDelete = (docUnitId: string) => {
   deleteDocUnit(docUnitId).then(() => {
     store.removeById(docUnitId)
   })

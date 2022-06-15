@@ -1,5 +1,5 @@
 export type DocUnit = {
-  id: number
+  id: string
   creationtimestamp: string
 
   // Original file
@@ -37,7 +37,7 @@ export type DocUnit = {
 // worth adding this dependency to make this shorter? https://stackoverflow.com/a/53995901
 export function buildEmptyDocUnit(): DocUnit {
   return {
-    id: -1,
+    id: "",
     creationtimestamp: "",
     fileuploadtimestamp: "",
     s3path: "",

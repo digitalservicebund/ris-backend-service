@@ -3,13 +3,13 @@ import { fetchAllDocUnits, fetchDocUnitById } from "./api"
 import { buildEmptyDocUnit, DocUnit } from "./types/DocUnit"
 
 type State = {
-  docUnits: Map<number, DocUnit>
+  docUnits: Map<string, DocUnit>
   selected: DocUnit | null
 }
 
 export const useDocUnitsStore = defineStore("docUnitsStore", {
   state: (): State => ({
-    docUnits: new Map<number, DocUnit>(),
+    docUnits: new Map<string, DocUnit>(),
     selected: null,
   }),
   actions: {
@@ -30,7 +30,7 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     add(docUnit: DocUnit) {
       this.docUnits.set(docUnit.id, docUnit)
     },
-    removeById(id: number) {
+    removeById(id: string) {
       if (this.selected && this.selected.id === id) {
         this.selected = null
       }
@@ -39,10 +39,8 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     clearSelected() {
       this.selected = null
     },
-    setSelected(idStr: string | string[]) {
-      if (Array.isArray(idStr)) return
-      const id = Number(idStr)
-      if (!Number.isInteger(Number(id))) return
+    setSelected(id: string | string[]) {
+      if (Array.isArray(id)) return
       const docUnit = this.docUnits.get(id)
       if (docUnit) {
         this.selected = docUnit
@@ -74,7 +72,7 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       }
       return this.selected
     },
-    hasFileAttached(id: number): boolean {
+    hasFileAttached(id: string): boolean {
       return this.docUnits.has(id) && this.docUnits.get(id)?.s3path !== null
     },
     selectedHasFileAttached(): boolean {

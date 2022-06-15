@@ -16,7 +16,7 @@ describe("RisStammDaten", () => {
     const pinia = createTestingPinia({ stubActions: false })
     const store = useDocUnitsStore()
     const docUnit = buildEmptyDocUnit()
-    docUnit.id = 1
+    docUnit.id = "1"
     docUnit.aktenzeichen = "abc"
     store.add(docUnit)
     store.setSelected("1")
