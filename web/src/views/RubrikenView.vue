@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import RisKurzUndLangtexte from "../components/ris-kurzundlangtexte/RisKurzUndLangtexte.vue"
 import RisStammDaten from "../components/ris-stammdaten/RisStammDaten.vue"
 import RouteHelper from "../components/RouteHelper.vue"
 import { useDocUnitsStore } from "../store"
@@ -10,6 +11,6 @@ const store = useDocUnitsStore()
   <RouteHelper />
   <span v-if="store.hasSelected()">
     <RisStammDaten />
-    <!--<RisKurzUndLangtexte />-->
+    <RisKurzUndLangtexte />
   </span>
 </template>

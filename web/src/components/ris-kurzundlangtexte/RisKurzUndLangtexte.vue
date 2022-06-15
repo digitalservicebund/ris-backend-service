@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { Document } from "@tiptap/extension-document"
+import { Paragraph } from "@tiptap/extension-paragraph"
+import { Text } from "@tiptap/extension-text"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { useDocUnitsStore } from "../../store"
 import { DocUnit } from "../../types/DocUnit"
@@ -28,7 +31,7 @@ const add = (id: keyof DocUnit, name: string, editor: Editor) => {
 
 const buildEditor = () => {
   return new Editor({
-    extensions: [],
+    extensions: [Document, Paragraph, Text],
   })
 }
 
