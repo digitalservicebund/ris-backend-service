@@ -1,10 +1,8 @@
 <script lang="ts" setup>
-import { Document } from "@tiptap/extension-document"
-import { Paragraph } from "@tiptap/extension-paragraph"
-import { Text } from "@tiptap/extension-text"
-import { EditorContent, Editor } from "@tiptap/vue-3"
+import { updateDocUnit } from "../../api"
 import { useDocUnitsStore } from "../../store"
 import { DocUnit } from "../../types/DocUnit"
+import EditorVmodel from "../EditorVmodel.vue"
 import RisButton from "../ris-button/RisButton.vue"
 
 const store = useDocUnitsStore()
@@ -14,41 +12,33 @@ interface KurzUndLangtexteListEntry {
   name: string
   label: string
   aria: string
-  editor: Editor
 }
 
 const kurzUndLangtexteDef: KurzUndLangtexteListEntry[] = []
 
-const add = (id: keyof DocUnit, name: string, editor: Editor) => {
+const add = (id: keyof DocUnit, name: string) => {
   kurzUndLangtexteDef.push({
     id: id,
     name: name,
     label: name,
     aria: name,
-    editor: editor,
   })
 }
 
-const buildEditor = () => {
-  return new Editor({
-    extensions: [Document, Paragraph, Text],
-  })
-}
-
-add("entscheidungsname", "Entscheidungsname", buildEditor())
-add("titelzeile", "Titelzeile", buildEditor())
-add("leitsatz", "Leitsatz", buildEditor())
-add("orientierungssatz", "Orientierungssatz", buildEditor())
-add("tenor", "Tenor", buildEditor())
-add("gruende", "Gründe", buildEditor())
-add("tatbestand", "Tatbestand", buildEditor())
-add("entscheidungsgruende", "Entscheidungsgründe", buildEditor())
+add("entscheidungsname", "Entscheidungsname")
+add("titelzeile", "Titelzeile")
+add("leitsatz", "Leitsatz")
+add("orientierungssatz", "Orientierungssatz")
+add("tenor", "Tenor")
+add("gruende", "Gründe")
+add("tatbestand", "Tatbestand")
+add("entscheidungsgruende", "Entscheidungsgründe")
 
 const onSaveClick = () => {
-  // updateDocUnit(store.getSelected()).then((updatedDocUnit) => {
-  //   store.update(updatedDocUnit)
-  // })
-  alert("Daten wurden (noch) nicht gespeichert, work in progress :)")
+  updateDocUnit(store.getSelected()).then((updatedDocUnit) => {
+    store.update(updatedDocUnit)
+  })
+  alert("Kurz- & Langtexte wurden gespeichert")
 }
 </script>
 
@@ -69,8 +59,8 @@ const onSaveClick = () => {
             <span class="ris-texte-form__label">
               {{ item.label }}
               <div>
-                <editor-content
-                  :editor="item.editor"
+                <EditorVmodel
+                  v-model="store.getSelectedSafe()[item.id]"
                   class="ris-texte-form__input"
                 />
               </div>
@@ -86,13 +76,6 @@ const onSaveClick = () => {
 </template>
 
 <style lang="scss">
-.ProseMirror {
-  height: 100px;
-  background: #eee;
-  color: #000;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-}
 .editor-btn {
   border: 1px solid black;
   background: white;

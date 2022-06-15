@@ -43,7 +43,7 @@ const onSubmit = () => {
   updateDocUnit(store.getSelected()).then((updatedDocUnit) => {
     store.update(updatedDocUnit)
   })
-  alert("Daten gespeichert")
+  alert("Stammdaten wurden gespeichert")
 }
 </script>
 
