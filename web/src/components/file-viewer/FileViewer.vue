@@ -14,15 +14,13 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <v-container>
+  <v-container v-if="store.hasSelected()">
     <v-row>
       <v-col>
-        Dateiname: {{ store.getSelectedSafe().filename }}, Hochgeladen am
+        Dateiname: {{ store.getSelected()?.filename }}, Hochgeladen am
         {{
-          dayjs(store.getSelectedSafe().fileuploadtimestamp).format(
-            "DD.MM.YYYY"
-          )
-        }}, Format: {{ store.getSelectedSafe().filetype }}
+          dayjs(store.getSelected()?.fileuploadtimestamp).format("DD.MM.YYYY")
+        }}, Format: {{ store.getSelected()?.filetype }}
       </v-col>
     </v-row>
     <v-row>

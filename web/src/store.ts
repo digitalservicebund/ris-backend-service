@@ -67,7 +67,7 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       return this.selected
     },
     getSelectedSafe(): DocUnit {
-      // is this an ok workaround to avoid null as a possible return value?
+      // remove this workaround TODO
       if (this.selected === null) {
         // we should never end up in here because in the <template>s I check for hasSelected() before accessing selected
         return buildEmptyDocUnit()
