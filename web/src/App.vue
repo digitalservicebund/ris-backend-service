@@ -10,7 +10,7 @@ const store = useDocUnitsStore()
       <v-container>
         <v-layout>
           <v-row>
-            <v-col>
+            <v-col v-if="store.hasSelected()">
               <router-link :to="{ name: 'Rechtsprechung' }">ZURÜCK</router-link>
             </v-col>
             <v-col>
