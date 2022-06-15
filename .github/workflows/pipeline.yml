@@ -297,7 +297,6 @@ jobs:
         with:
           application_id: ${{ secrets.DEPLOY_GITHUB_APPLICATION_ID }}
           application_private_key: ${{ secrets.DEPLOY_GITHUB_APPLICATION_PRIVATE_KEY }}
-          organization: digitalservice4germany
       - name: Deploy infra
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
@@ -309,8 +308,7 @@ jobs:
           while [[ "${status}" != "in_progress" ]]; do
             echo "Waiting for queued workflow"
             sleep 2
-            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status"
-          )"
+            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
           done
           echo "Done waiting"
           run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
@@ -431,8 +429,7 @@ jobs:
           while [[ "${status}" != "in_progress" ]]; do
             echo "Waiting for queued workflow"
             sleep 2
-            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status"
-          )"
+            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
           done
           echo "Done waiting"
           run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
