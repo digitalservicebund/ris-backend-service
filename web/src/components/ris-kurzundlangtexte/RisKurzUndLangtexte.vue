@@ -2,6 +2,7 @@
 import { updateDocUnit } from "../../api"
 import { useDocUnitsStore } from "../../store"
 import { DocUnit } from "../../types/DocUnit"
+import { FieldSize } from "../../types/FieldSize"
 import EditorVmodel from "../EditorVmodel.vue"
 import RisButton from "../ris-button/RisButton.vue"
 
@@ -12,27 +13,29 @@ interface KurzUndLangtexteListEntry {
   name: string
   label: string
   aria: string
+  fieldSize: FieldSize
 }
 
 const kurzUndLangtexteDef: KurzUndLangtexteListEntry[] = []
 
-const add = (id: keyof DocUnit, name: string) => {
+const add = (id: keyof DocUnit, name: string, fieldSize: FieldSize) => {
   kurzUndLangtexteDef.push({
     id: id,
     name: name,
     label: name,
     aria: name,
+    fieldSize: fieldSize,
   })
 }
 
-add("entscheidungsname", "Entscheidungsname")
-add("titelzeile", "Titelzeile")
-add("leitsatz", "Leitsatz")
-add("orientierungssatz", "Orientierungssatz")
-add("tenor", "Tenor")
-add("gruende", "Gründe")
-add("tatbestand", "Tatbestand")
-add("entscheidungsgruende", "Entscheidungsgründe")
+add("entscheidungsname", "Entscheidungsname", "small")
+add("titelzeile", "Titelzeile", "small")
+add("leitsatz", "Leitsatz", "medium")
+add("orientierungssatz", "Orientierungssatz", "small")
+add("tenor", "Tenor", "medium")
+add("gruende", "Gründe", "large")
+add("tatbestand", "Tatbestand", "large")
+add("entscheidungsgruende", "Entscheidungsgründe", "large")
 
 const onSaveClick = () => {
   updateDocUnit(store.getSelected()).then((updatedDocUnit) => {
@@ -62,6 +65,7 @@ const onSaveClick = () => {
                 <EditorVmodel
                   v-model="store.getSelectedSafe()[item.id]"
                   class="ris-texte-form__input"
+                  :field-size="item.fieldSize"
                 />
               </div>
             </span>
