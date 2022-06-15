@@ -66,22 +66,6 @@ const onSaveClick = () => {
             <span class="ris-texte-form__label">
               {{ item.label }}
               <div>
-                <button
-                  class="editor-btn"
-                  :class="{
-                    'editor-btn__active': item.editor.isActive('bold'),
-                  }"
-                >
-                  bold
-                </button>
-                <button
-                  class="editor-btn"
-                  :class="{
-                    'editor-btn__active': item.editor.isActive('italic'),
-                  }"
-                >
-                  italic
-                </button>
                 <editor-content
                   :editor="item.editor"
                   class="ris-texte-form__input"
