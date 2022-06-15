@@ -215,10 +215,36 @@ class DocUnitServiceTest {
   }
 
   @Test
-  void testDeleteById() {
+  void testDeleteById_withoutFileAttached() {
+    // I think I shouldn't have to insert a specific DocUnit object here?
+    // But if I don't, the test by itself succeeds, but fails if all tests in this class run
+    // something flaky with the repository mock? Investigate this later
+    DocUnit docUnit = new DocUnit();
+    docUnit.setId(1);
     // can we also test that the fileUuid from the DocUnit is used? with a captor somehow?
-    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
-    when(repository.delete(DocUnit.EMPTY)).thenReturn(Mono.just(mock(Void.class)));
+    when(repository.findById(1)).thenReturn(Mono.just(docUnit));
+    when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
+
+    StepVerifier.create(service.deleteById("1"))
+        .consumeNextWith(
+            stringResponseEntity -> {
+              System.out.println(stringResponseEntity);
+              assertNotNull(stringResponseEntity);
+              assertEquals(HttpStatus.OK, stringResponseEntity.getStatusCode());
+              assertEquals("done", stringResponseEntity.getBody());
+            })
+        .verifyComplete();
+
+    verify(s3AsyncClient, times(0)).deleteObject(any(DeleteObjectRequest.class));
+  }
+
+  @Test
+  void testDeleteById_withFileAttached() {
+    DocUnit docUnit = new DocUnit();
+    docUnit.setId(1);
+    docUnit.setS3path("88888888-4444-4444-4444-121212121212");
+    when(repository.findById(1)).thenReturn(Mono.just(docUnit));
+    when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -230,10 +256,12 @@ class DocUnitServiceTest {
               assertEquals("done", stringResponseEntity.getBody());
             })
         .verifyComplete();
+
+    verify(s3AsyncClient, times(1)).deleteObject(any(DeleteObjectRequest.class));
   }
 
   @Test
-  void testDeleteById_withExceptionFromBucket() {
+  void testDeleteById_withoutFileAttached_withExceptionFromBucket() {
     when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
@@ -249,7 +277,7 @@ class DocUnitServiceTest {
   }
 
   @Test
-  void testDeleteById_withExceptionFromRepository() {
+  void testDeleteById_withoutFileAttached_withExceptionFromRepository() {
     when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocUnit.EMPTY);
 

@@ -138,7 +138,6 @@ public class DocUnitService {
   private Mono<DeleteObjectResponse> deleteObjectFromBucket(String fileUuid) {
     var deleteObjectRequest =
         DeleteObjectRequest.builder().bucket(bucketName).key(fileUuid).build();
-    s3AsyncClient.deleteObject(deleteObjectRequest);
     return Mono.fromCallable(() -> Mono.fromFuture(s3AsyncClient.deleteObject(deleteObjectRequest)))
         .flatMap(Function.identity());
   }
@@ -156,13 +155,16 @@ public class DocUnitService {
         .findById(Integer.valueOf(docUnitId))
         .flatMap(
             docUnit -> {
-              var fileUuid = docUnit.getS3path();
-              return deleteObjectFromBucket(fileUuid)
-                  .doOnNext(
-                      deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
-                  .flatMap(deleteObjectResponse -> repository.delete(docUnit));
+              if (docUnit.hasFileAttached()) {
+                var fileUuid = docUnit.getS3path();
+                return deleteObjectFromBucket(fileUuid)
+                    .doOnNext(
+                        deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
+                    .flatMap(deleteObjectResponse -> repository.delete(docUnit));
+              }
+              return repository.delete(docUnit);
             })
-        .doOnNext(docUnit -> log.debug("deleted doc unit"))
+        .doOnNext(v -> log.debug("deleted doc unit"))
         .map(v -> ResponseEntity.status(HttpStatus.OK).body("done"))
         .doOnError(ex -> log.error("Couldn't delete the DocUnit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body("Couldn't delete the DocUnit"));

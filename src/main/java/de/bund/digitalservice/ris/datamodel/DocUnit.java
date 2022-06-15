@@ -51,4 +51,8 @@ public class DocUnit {
   String gruende;
   String tatbestand;
   String entscheidungsgruende;
+
+  public boolean hasFileAttached() {
+    return s3path != null;
+  }
 }
