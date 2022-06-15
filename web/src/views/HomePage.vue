@@ -1,5 +1,13 @@
 <script lang="ts" setup>
+import { onMounted } from "vue"
+import { useRouter } from "vue-router"
 import HelloWorld from "../components/hello-world/HelloWorld.vue"
+
+const router = useRouter()
+
+onMounted(() => {
+  router.push({ name: "Rechtsprechung" })
+})
 </script>
 
 <template>
