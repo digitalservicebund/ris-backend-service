@@ -300,6 +300,7 @@ jobs:
       - name: Deploy infra
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          GITHUB_ACTOR: ${{ github.actor }}
         shell: bash
         run: |
           gh workflow run deploy-infra.yml --repo digitalservice4germany/neuris-infra -f environment=staging
@@ -307,10 +308,10 @@ jobs:
           while [[ "${status}" != "in_progress" ]]; do
             echo "Waiting for queued workflow"
             sleep 2
-            status="$(gh run list --workflow deploy-infra.yml --limit 1 --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
+            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
           done
           echo "Done waiting"
-          run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
+          run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
           echo "Watching workflow run $run_id"
           gh run watch $run_id --exit-status --repo digitalservice4germany/neuris-infra
       - name: Send status to Slack
@@ -420,6 +421,7 @@ jobs:
       - name: Deploy infra
         env:
           GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
+          GITHUB_ACTOR: ${{ github.actor }}
         shell: bash
         run: |
           gh workflow run deploy-infra.yml --repo digitalservice4germany/neuris-infra -f environment=production
@@ -427,10 +429,10 @@ jobs:
           while [[ "${status}" != "in_progress" ]]; do
             echo "Waiting for queued workflow"
             sleep 2
-            status="$(gh run list --workflow deploy-infra.yml --limit 1 --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
+            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
           done
           echo "Done waiting"
-          run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
+          run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
           echo "Watching workflow run $run_id"
           gh run watch $run_id --exit-status --repo digitalservice4germany/neuris-infra
       - name: Send status to Slack
