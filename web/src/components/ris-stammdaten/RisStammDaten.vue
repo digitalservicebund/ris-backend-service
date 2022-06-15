@@ -93,6 +93,10 @@ const onSubmit = () => {
               </label>
             </div>
           </template>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
           <div class="ris-form__textfield">
             <RisButton @click="onSubmit" />
           </div>
