@@ -21,6 +21,11 @@ const props = defineProps({
     required: false,
     default: "small" as FieldSize,
   },
+  editable: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
 })
 
 const emit = defineEmits(["update:modelValue"])
@@ -38,6 +43,7 @@ const editor = new Editor({
     // outgoing changes
     emit("update:modelValue", editor.getHTML())
   },
+  editable: props.editable,
 })
 
 watch(

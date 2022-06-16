@@ -44,6 +44,7 @@ onMounted(() => {
         <EditorVmodel
           v-model="store.getSelectedSafe().originalFileAsHTML"
           field-size="max"
+          :editable="false"
         />
       </v-col>
     </v-row>
