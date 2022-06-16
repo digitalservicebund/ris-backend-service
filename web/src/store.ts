@@ -79,5 +79,9 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       if (!this.selected) return false
       return this.selected.s3path !== null
     },
+    setHTMLOnSelected(htmlStr: string) {
+      if (!this.selected) return
+      this.selected.originalFileAsHTML = htmlStr
+    },
   },
 })

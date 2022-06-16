@@ -4,6 +4,10 @@ import { Paragraph } from "@tiptap/extension-paragraph"
 import { Text } from "@tiptap/extension-text"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { PropType, watch } from "vue"
+import {
+  DocUnitParagraphExtension,
+  Randnummer,
+} from "../editor/DocUnitExtension"
 import { FieldSize } from "../types/FieldSize"
 
 const props = defineProps({
@@ -23,8 +27,15 @@ const emit = defineEmits(["update:modelValue"])
 
 const editor = new Editor({
   content: props.modelValue,
-  extensions: [Document, Paragraph, Text],
+  extensions: [
+    Document,
+    Paragraph,
+    Text,
+    Randnummer,
+    DocUnitParagraphExtension,
+  ],
   onUpdate: () => {
+    // outgoing changes
     emit("update:modelValue", editor.getHTML())
   },
 })
@@ -35,6 +46,7 @@ watch(
     if (!value || value === editor.getHTML()) {
       return
     }
+    // incoming changes
     editor.commands.setContent(value, false)
   }
 )
@@ -61,6 +73,10 @@ watch(
 
   &__large {
     height: 320px;
+  }
+
+  &__max {
+    height: 640px; // ? TODO
   }
 }
 </style>

@@ -1,1 +1,1 @@
-export type FieldSize = "small" | "medium" | "large"
+export type FieldSize = "small" | "medium" | "large" | "max"

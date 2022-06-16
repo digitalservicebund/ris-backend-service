@@ -7,6 +7,7 @@ export type DocUnit = {
   s3path: string
   filetype: string
   filename: string
+  originalFileAsHTML: string // this field is FE-only, doesn't exist in the BE data model
 
   // RUBRIKEN
   // - Stammdaten
@@ -43,6 +44,7 @@ export function buildEmptyDocUnit(): DocUnit {
     s3path: "",
     filetype: "",
     filename: "",
+    originalFileAsHTML: "",
     aktenzeichen: "",
     gerichtstyp: "",
     dokumenttyp: "",

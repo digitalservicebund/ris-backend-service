@@ -1,7 +1,9 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { deleteFile } from "../../api"
+import { onMounted } from "vue"
+import { deleteFile, getDocxFileAsHtml } from "../../api"
 import { useDocUnitsStore } from "../../store"
+import EditorVmodel from "../EditorVmodel.vue"
 import RisButton from "../ris-button/RisButton.vue"
 
 const store = useDocUnitsStore()
@@ -11,6 +13,15 @@ const onSubmit = async () => {
   console.log("file delete from doc unit, response:", docUnit)
   store.update(docUnit)
 }
+
+onMounted(() => {
+  if (!store.hasSelected() || !store.selectedHasFileAttached()) {
+    return
+  }
+  getDocxFileAsHtml(store.getSelectedSafe().s3path).then((response) => {
+    store.setHTMLOnSelected(response.content)
+  })
+})
 </script>
 
 <template>
@@ -29,7 +40,12 @@ const onSubmit = async () => {
       </v-col>
     </v-row>
     <v-row>
-      <v-col> TODO: Dokument anzeigen </v-col>
+      <v-col>
+        <EditorVmodel
+          v-model="store.getSelectedSafe().originalFileAsHTML"
+          field-size="max"
+        />
+      </v-col>
     </v-row>
   </v-container>
 </template>
