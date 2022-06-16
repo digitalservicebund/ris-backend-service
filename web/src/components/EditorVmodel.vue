@@ -68,6 +68,8 @@ watch(
   color: #000;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
+  overflow-y: auto;
+  height: 100%;
 
   &__small {
     height: 60px;
