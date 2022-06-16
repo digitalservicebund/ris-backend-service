@@ -362,7 +362,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: production
-    needs: [build-and-push-image]
+    needs: [build-and-push-image, deploy-staging-verify]
     steps:
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@b68de6be80319084d2e1a7afe3194be6e3fbd8bd
