@@ -291,7 +291,7 @@ jobs:
     needs: [build-and-push-image]
     steps:
       - name: Deploy new image
-        uses: digitalservice4germany/github-actions/argocd-deploy@1de39e71a17982f6019217ff558223eb47f37e3d
+        uses: digitalservice4germany/github-actions/argocd-deploy@d972fdf13169a310e6689fe2d7f524f68d4557d7
         with:
           environment: staging
           version: ${{ needs.build-and-push-image.outputs.version }}
@@ -365,7 +365,7 @@ jobs:
     needs: [build-and-push-image, deploy-staging-verify]
     steps:
       - name: Deploy new image
-        uses: digitalservice4germany/github-actions/argocd-deploy@1de39e71a17982f6019217ff558223eb47f37e3d
+        uses: digitalservice4germany/github-actions/argocd-deploy@d972fdf13169a310e6689fe2d7f524f68d4557d7
         with:
           environment: production
           version: ${{ needs.build-and-push-image.outputs.version }}
