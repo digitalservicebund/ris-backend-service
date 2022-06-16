@@ -10,7 +10,7 @@ const store = useDocUnitsStore()
 <template>
   <RouteHelper />
   <span v-if="store.hasSelected()">
-    <RisStammDaten />
-    <RisKurzUndLangtexte />
+    <RisStammDaten id="stammdaten" />
+    <RisKurzUndLangtexte id="kurzUndLangtexte" />
   </span>
 </template>

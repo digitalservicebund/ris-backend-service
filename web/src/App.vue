@@ -46,8 +46,26 @@ const store = useDocUnitsStore()
         RUBRIKEN
       </router-link>
       <ul>
-        <li>- Stammdaten</li>
-        <li>- Kurz- & Langtexte</li>
+        <li>
+          <router-link
+            :to="{
+              name: 'Rubriken',
+              params: { id: store.getSelected()?.id },
+              hash: '#stammdaten',
+            }"
+            >- Stammdaten</router-link
+          >
+        </li>
+        <li>
+          <router-link
+            :to="{
+              name: 'Rubriken',
+              params: { id: store.getSelected()?.id },
+              hash: '#kurzUndLangtexte',
+            }"
+            >- Kurz- & Langtexte</router-link
+          >
+        </li>
       </ul>
       RECHTSZUG
       <br />

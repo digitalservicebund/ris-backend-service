@@ -41,6 +41,16 @@ const router = createRouter({
       component: DocUnitDocx,
     },
   ],
+  scrollBehavior(to) {
+    if (to.hash) {
+      return {
+        // in our case this hides the header we are scrolling to, so a few pixels up? TODO
+        el: to.hash,
+        behavior: "smooth", // does this cause problems on browsers that don't support it? https://router.vuejs.org/guide/advanced/scroll-behavior.html#scroll-behavior
+      }
+    }
+    return { top: 0 }
+  },
 })
 
 createApp(App).use(router).use(vuetify).use(createPinia()).mount("#app")
