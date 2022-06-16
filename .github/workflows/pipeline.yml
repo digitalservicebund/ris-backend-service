@@ -284,57 +284,11 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-infra-staging:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: build-and-push-image
-    steps:
-      - name: Get infra repo access token
-        id: get_workflow_token
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: peter-murray/workflow-application-token-action@e8782d687a306fb13d733244d0f2a50e272d3752
-        with:
-          application_id: ${{ secrets.DEPLOY_GITHUB_APPLICATION_ID }}
-          application_private_key: ${{ secrets.DEPLOY_GITHUB_APPLICATION_PRIVATE_KEY }}
-      - name: Deploy infra
-        env:
-          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
-          GITHUB_ACTOR: ${{ github.actor }}
-        shell: bash
-        run: |
-          gh workflow run deploy-infra.yml --repo digitalservice4germany/neuris-infra -f environment=staging
-          status=
-          while [[ "${status}" != "in_progress" ]]; do
-            echo "Waiting for queued workflow"
-            sleep 2
-            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
-          done
-          echo "Done waiting"
-          run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
-          echo "Watching workflow run $run_id"
-          gh run watch $run_id --exit-status --repo digitalservice4germany/neuris-infra
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          type: ${{ job.status }}
-          job_name: "Deploy infra staging :point_right:"
-          mention: "here"
-          mention_if: "failure"
-          commit: true
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   deploy-staging:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: staging
-    needs: [build-and-push-image, deploy-infra-staging]
+    needs: [build-and-push-image]
     steps:
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@b68de6be80319084d2e1a7afe3194be6e3fbd8bd
@@ -404,58 +358,11 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-infra-production:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: deploy-staging-verify
-    steps:
-      - name: Get infra repo access token
-        id: get_workflow_token
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: peter-murray/workflow-application-token-action@e8782d687a306fb13d733244d0f2a50e272d3752
-        with:
-          application_id: ${{ secrets.DEPLOY_GITHUB_APPLICATION_ID }}
-          application_private_key: ${{ secrets.DEPLOY_GITHUB_APPLICATION_PRIVATE_KEY }}
-          organization: digitalservice4germany
-      - name: Deploy infra
-        env:
-          GITHUB_TOKEN: ${{ steps.get_workflow_token.outputs.token }}
-          GITHUB_ACTOR: ${{ github.actor }}
-        shell: bash
-        run: |
-          gh workflow run deploy-infra.yml --repo digitalservice4germany/neuris-infra -f environment=production
-          status=
-          while [[ "${status}" != "in_progress" ]]; do
-            echo "Waiting for queued workflow"
-            sleep 2
-            status="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json status --jq ".[0].status")"
-          done
-          echo "Done waiting"
-          run_id="$(gh run list --workflow deploy-infra.yml --limit 1 --user $GITHUB_ACTOR --repo digitalservice4germany/neuris-infra --json databaseId --jq ".[0].databaseId")"
-          echo "Watching workflow run $run_id"
-          gh run watch $run_id --exit-status --repo digitalservice4germany/neuris-infra
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          type: ${{ job.status }}
-          job_name: "Deploy infra production :point_right:"
-          mention: "here"
-          mention_if: "failure"
-          commit: true
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: production
-    needs: [build-and-push-image, deploy-infra-production]
+    needs: [build-and-push-image]
     steps:
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@b68de6be80319084d2e1a7afe3194be6e3fbd8bd
