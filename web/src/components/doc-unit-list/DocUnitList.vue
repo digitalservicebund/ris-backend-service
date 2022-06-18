@@ -20,7 +20,7 @@ const onDelete = (docUnitId: string) => {
 <template>
   <v-table v-if="!store.isEmpty()">
     <thead>
-      <tr>
+      <tr class="table-header">
         <th class="text-center">Dok.-Nummer</th>
         <th class="text-center">Angelegt am</th>
         <th class="text-center">Aktenzeichen</th>
@@ -60,3 +60,9 @@ const onDelete = (docUnitId: string) => {
   </v-table>
   <span v-else>Keine Dokumentationseinheiten gefunden</span>
 </template>
+
+<style lang="scss">
+.table-header {
+  background-color: $gray400;
+}
+</style>

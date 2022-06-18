@@ -22,17 +22,31 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-row>
-    <v-col></v-col>
-  </v-row>
-  <v-row class="text-center">
-    <v-col>
-      <RisButton label="Neue Dokumentationseinheit" @click="onSubmit" />
-    </v-col>
-  </v-row>
-  <v-row class="text-center">
-    <v-col class="mb-4">
-      <DocUnitList />
-    </v-col>
-  </v-row>
+  <v-container fluid class="rechtsprechung-main">
+    <v-row>
+      <v-col> </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="rechtsprechung-header"> Rechtsprechung </v-col>
+    </v-row>
+    <v-row class="text-right">
+      <v-col>
+        <RisButton label="Neue Dokumentationseinheit" @click="onSubmit" />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col> </v-col>
+    </v-row>
+    <v-row class="text-center">
+      <v-col class="mb-4">
+        <DocUnitList />
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
+
+<style lang="scss">
+.rechtsprechung-header {
+  font-size: x-large;
+}
+</style>

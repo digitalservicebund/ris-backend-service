@@ -42,6 +42,6 @@ a {
   color: black;
 }
 .panel_and_main_area {
-  background-color: $panelAndMainAreaBackground;
+  background-color: $gray100;
 }
 </style>
