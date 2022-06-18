@@ -58,5 +58,5 @@ const onDelete = (docUnitId: string) => {
       </tr>
     </tbody>
   </v-table>
-  <span v-else>No doc units found</span>
+  <span v-else>Keine Dokumentationseinheiten gefunden</span>
 </template>

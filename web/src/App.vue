@@ -11,7 +11,7 @@ const store = useDocUnitsStore()
   <v-app>
     <TopNavbar />
     <v-main>
-      <v-container>
+      <v-container fluid>
         <v-row v-if="store.hasSelected()">
           <v-col cols="12" class="panel_and_main_area">
             <DocInfoPanel />

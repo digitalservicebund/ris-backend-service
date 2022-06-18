@@ -5,7 +5,7 @@ const store = useDocUnitsStore()
 </script>
 
 <template>
-  <v-container v-if="store.hasSelected()">
+  <v-container v-if="store.hasSelected()" fluid>
     <v-row>
       <v-col>
         <router-link

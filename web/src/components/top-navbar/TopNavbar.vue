@@ -7,7 +7,7 @@ const store = useDocUnitsStore()
 
 <template>
   <!--<v-app-bar :flat=true :floating=false height="auto">-->
-  <v-container>
+  <v-container fluid>
     <v-row>
       <v-col cols="1">
         <div class="ris_rectangle">Rechts informations system</div>
