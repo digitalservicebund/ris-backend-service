@@ -16,6 +16,10 @@ const store = useDocUnitsStore()
         >
           RUBRIKEN
         </router-link>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="sub-rubriken">
         <ul>
           <li>
             <router-link
@@ -38,8 +42,23 @@ const store = useDocUnitsStore()
             >
           </li>
         </ul>
-        RECHTSZUG
-        <br />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-divider />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col> RECHTSZUG </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-divider />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <router-link
           :to="{
             name: 'Dokumente',
@@ -47,12 +66,34 @@ const store = useDocUnitsStore()
           }"
           >DOKUMENTE</router-link
         >
-        <br />
-        BEARBEITUNGSSTAND
-        <br />
-        <br />
-        <router-link to="/docx">docx -> html</router-link>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-divider />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col> BEARBEITUNGSSTAND </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <v-divider />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col> </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <router-link style="color: gray" to="/docx">docx --> html</router-link>
       </v-col>
     </v-row>
   </v-container>
 </template>
+
+<style lang="scss">
+.sub-rubriken {
+  margin-left: 20px;
+}
+</style>
