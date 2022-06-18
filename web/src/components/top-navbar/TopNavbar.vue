@@ -1,5 +1,8 @@
 <script lang="ts" setup>
 import bmjLogo from "../../assets/BMJ_Logo.png"
+import { useDocUnitsStore } from "../../store"
+
+const store = useDocUnitsStore()
 </script>
 
 <template>
@@ -17,12 +20,16 @@ import bmjLogo from "../../assets/BMJ_Logo.png"
     <v-divider />
     <v-row>
       <v-col cols="2">
-        <v-icon class="icon_topnavbar"> west </v-icon>
-        ZURÜCK
+        <span v-if="store.hasSelected()">
+          <v-icon class="icon_topnavbar"> west </v-icon>
+          <router-link :to="{ name: 'Rechtsprechung' }">ZURÜCK</router-link>
+        </span>
       </v-col>
       <v-col cols="2"></v-col>
       <v-col cols="1">
-        <div>RECHTSPRECHUNG</div>
+        <router-link :to="{ name: 'Rechtsprechung' }"
+          >RECHTSPRECHUNG</router-link
+        >
       </v-col>
       <v-col cols="5"></v-col>
       <v-col cols="2">

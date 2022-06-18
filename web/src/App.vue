@@ -2,6 +2,9 @@
 import DocInfoPanel from "./components/doc-info-panel/DocInfoPanel.vue"
 import SideNavbar from "./components/side-navbar/SideNavbar.vue"
 import TopNavbar from "./components/top-navbar/TopNavbar.vue"
+import { useDocUnitsStore } from "./store"
+
+const store = useDocUnitsStore()
 </script>
 
 <template>
@@ -9,16 +12,19 @@ import TopNavbar from "./components/top-navbar/TopNavbar.vue"
     <TopNavbar />
     <v-main>
       <v-container>
-        <v-row>
+        <v-row v-if="store.hasSelected()">
           <v-col cols="12" class="panel_and_main_area">
             <DocInfoPanel />
           </v-col>
         </v-row>
         <v-row>
-          <v-col cols="2">
+          <v-col v-if="store.hasSelected()" cols="2">
             <SideNavbar />
           </v-col>
-          <v-col cols="10" class="panel_and_main_area">
+          <v-col
+            :cols="store.hasSelected() ? 10 : 12"
+            class="panel_and_main_area"
+          >
             <router-view />
           </v-col>
         </v-row>
