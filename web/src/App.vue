@@ -1,89 +1,28 @@
 <script lang="ts" setup>
-import { useDocUnitsStore } from "./store"
-
-const store = useDocUnitsStore()
+import DocInfoPanel from "./components/doc-info-panel/DocInfoPanel.vue"
+import SideNavbar from "./components/side-navbar/SideNavbar.vue"
+import TopNavbar from "./components/top-navbar/TopNavbar.vue"
 </script>
 
 <template>
   <v-app>
-    <v-app-bar color="white">
-      <v-container>
-        <v-layout>
-          <v-row>
-            <v-col v-if="store.hasSelected()">
-              <router-link :to="{ name: 'Rechtsprechung' }">ZURÜCK</router-link>
-            </v-col>
-            <v-col>
-              <router-link :to="{ name: 'Rechtsprechung' }"
-                >RECHTSPRECHUNG</router-link
-              >
-            </v-col>
-          </v-row>
-        </v-layout>
-        <v-layout v-if="store.hasSelected()" style="background-color: #eee">
-          <v-row>
-            <v-col>
-              Rechtsprechung: {{ store.getSelected()?.id }}, Aktenzeichen:
-              {{ store.getSelected()?.aktenzeichen }}, Entscheidungsdatum:
-              {{ store.getSelected()?.entscheidungsdatum }}, Gerichtstyp:
-              {{ store.getSelected()?.gerichtstyp }}
-            </v-col>
-          </v-row>
-        </v-layout>
-      </v-container>
-    </v-app-bar>
-    <v-navigation-drawer
-      v-if="store.hasSelected()"
-      color="grey-lighten-2"
-      permanent
-    >
-      <router-link
-        :to="{
-          name: 'Rubriken',
-          params: { id: store.getSelected()?.id },
-        }"
-      >
-        RUBRIKEN
-      </router-link>
-      <ul>
-        <li>
-          <router-link
-            :to="{
-              name: 'Rubriken',
-              params: { id: store.getSelected()?.id },
-              hash: '#stammdaten',
-            }"
-            >- Stammdaten</router-link
-          >
-        </li>
-        <li>
-          <router-link
-            :to="{
-              name: 'Rubriken',
-              params: { id: store.getSelected()?.id },
-              hash: '#kurzUndLangtexte',
-            }"
-            >- Kurz- & Langtexte</router-link
-          >
-        </li>
-      </ul>
-      RECHTSZUG
-      <br />
-      <router-link
-        :to="{
-          name: 'Dokumente',
-          params: { id: store.getSelected()?.id },
-        }"
-        >DOKUMENTE</router-link
-      >
-      <br />
-      BEARBEITUNGSSTAND
-      <br />
-      <br />
-      <router-link to="/docx">docx -> html</router-link>
-    </v-navigation-drawer>
+    <TopNavbar />
     <v-main>
-      <router-view></router-view>
+      <v-container>
+        <v-row>
+          <v-col cols="12" class="panel_and_main_area">
+            <DocInfoPanel />
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="2">
+            <SideNavbar />
+          </v-col>
+          <v-col cols="10" class="panel_and_main_area">
+            <router-view />
+          </v-col>
+        </v-row>
+      </v-container>
     </v-main>
   </v-app>
 </template>
@@ -95,5 +34,8 @@ body {
 }
 a {
   color: black;
+}
+.panel_and_main_area {
+  background-color: $panelAndMainAreaBackground;
 }
 </style>
