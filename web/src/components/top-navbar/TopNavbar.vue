@@ -1,8 +1,16 @@
 <script lang="ts" setup>
+import { useRouter } from "vue-router"
 import bmjLogo from "../../assets/BMJ_Logo.png"
 import { useDocUnitsStore } from "../../store"
 
 const store = useDocUnitsStore()
+const router = useRouter()
+
+const linkStyling = (componentName: string) => {
+  return router.currentRoute.value.path.includes(componentName.toLowerCase())
+    ? "top-navbar_active-link"
+    : ""
+}
 </script>
 
 <template>
@@ -27,7 +35,9 @@ const store = useDocUnitsStore()
       </v-col>
       <v-col cols="2"></v-col>
       <v-col cols="1">
-        <router-link :to="{ name: 'Rechtsprechung' }"
+        <router-link
+          :class="linkStyling('Rechtsprechung')"
+          :to="{ name: 'Rechtsprechung' }"
           >RECHTSPRECHUNG</router-link
         >
       </v-col>
@@ -52,5 +62,8 @@ const store = useDocUnitsStore()
 }
 .icon_topnavbar {
   color: $blue800;
+}
+.top-navbar_active-link {
+  text-decoration: underline;
 }
 </style>

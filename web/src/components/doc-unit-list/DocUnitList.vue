@@ -32,6 +32,7 @@ const onDelete = (docUnitId: string) => {
       <tr v-for="docUnit in store.getAll()" :key="docUnit.id">
         <td>
           <router-link
+            class="doc-unit-list-active-link"
             :to="{
               name: store.hasFileAttached(docUnit.id)
                 ? 'Rubriken'
@@ -63,5 +64,8 @@ const onDelete = (docUnitId: string) => {
 .doc-unit-list-table td,
 th {
   font-size: medium !important;
+}
+.doc-unit-list-active-link {
+  text-decoration: underline;
 }
 </style>

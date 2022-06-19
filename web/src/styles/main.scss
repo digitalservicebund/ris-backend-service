@@ -2,3 +2,7 @@
 @import "variables";
 @import "tools/strip-unit";
 @import "tools/rem-function";
+
+a {
+  text-decoration: none;
+}

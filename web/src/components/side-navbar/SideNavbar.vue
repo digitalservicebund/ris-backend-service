@@ -1,7 +1,15 @@
 <script lang="ts" setup>
+import { useRouter } from "vue-router"
 import { useDocUnitsStore } from "../../store"
 
 const store = useDocUnitsStore()
+const router = useRouter()
+
+const linkStyling = (componentName: string) => {
+  return router.currentRoute.value.name === componentName
+    ? "side-navbar-active-link"
+    : ""
+}
 </script>
 
 <template>
@@ -9,6 +17,7 @@ const store = useDocUnitsStore()
     <v-row>
       <v-col>
         <router-link
+          :class="linkStyling('Rubriken')"
           :to="{
             name: 'Rubriken',
             params: { id: store.getSelected()?.id },
@@ -60,6 +69,7 @@ const store = useDocUnitsStore()
     <v-row>
       <v-col>
         <router-link
+          :class="linkStyling('Dokumente')"
           :to="{
             name: 'Dokumente',
             params: { id: store.getSelected()?.id },
@@ -95,5 +105,8 @@ const store = useDocUnitsStore()
 <style lang="scss">
 .sub-rubriken {
   margin-left: 20px;
+}
+.side-navbar-active-link {
+  text-decoration: underline;
 }
 </style>
