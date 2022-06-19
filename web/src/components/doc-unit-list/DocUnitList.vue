@@ -18,7 +18,7 @@ const onDelete = (docUnitId: string) => {
 </script>
 
 <template>
-  <v-table v-if="!store.isEmpty()">
+  <v-table v-if="!store.isEmpty()" class="doc-unit-list-table">
     <thead>
       <tr class="table-header">
         <th class="text-center">Dok.-Nummer</th>
@@ -43,14 +43,9 @@ const onDelete = (docUnitId: string) => {
           </router-link>
         </td>
         <td>{{ dayjs(docUnit.creationtimestamp).format("DD.MM.YYYY") }}</td>
-        <td>{{ docUnit.aktenzeichen }}</td>
+        <td>{{ docUnit.aktenzeichen ? docUnit.aktenzeichen : "-" }}</td>
         <td>
-          <router-link
-            v-if="docUnit.filename"
-            :to="{ name: 'Dokumente', params: { id: docUnit.id } }"
-          >
-            {{ docUnit.filename }}
-          </router-link>
+          {{ docUnit.filename ? docUnit.filename : "-" }}
         </td>
         <td>
           <v-icon @click="onDelete(docUnit.id)"> delete </v-icon>
@@ -64,5 +59,9 @@ const onDelete = (docUnitId: string) => {
 <style lang="scss">
 .table-header {
   background-color: $gray400;
+}
+.doc-unit-list-table td,
+th {
+  font-size: medium !important;
 }
 </style>
