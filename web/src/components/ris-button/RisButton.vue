@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 interface Props {
   label?: string
+  icon: string | null
 }
 
 // pass type input (is it needed or just use @click?) and color via props TODO
 
 const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
+  icon: null,
 })
 </script>
 
@@ -18,6 +20,7 @@ const props = withDefaults(defineProps<Props>(), {
     :flat="true"
     color="blue800"
   >
+    <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
     {{ props.label }}
   </v-btn>
 </template>

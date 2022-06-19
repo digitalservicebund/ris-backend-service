@@ -25,28 +25,69 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-container v-if="store.hasSelected()">
-    <v-row>
-      <v-col>
-        Dateiname: {{ store.getSelected()?.filename }}, Hochgeladen am
-        {{
-          dayjs(store.getSelected()?.fileuploadtimestamp).format("DD.MM.YYYY")
-        }}, Format: {{ store.getSelected()?.filetype }}
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <ris-button label="Datei löschen" @click="onSubmit" />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <EditorVmodel
-          v-model="store.getSelectedSafe().originalFileAsHTML"
-          field-size="max"
-          :editable="false"
-        />
-      </v-col>
-    </v-row>
-  </v-container>
+  <span v-if="store.hasSelected()">
+    <v-container class="fileviewer-info-panel">
+      <v-row>
+        <v-col cols="2">
+          Dateiname
+          <div class="fileviewer-info-panel-value">
+            {{ store.getSelected()?.filename }}
+          </div>
+        </v-col>
+        <v-col cols="2">
+          Hochgeladen am
+          <div class="fileviewer-info-panel-value">
+            {{
+              dayjs(store.getSelected()?.fileuploadtimestamp).format(
+                "DD.MM.YYYY"
+              )
+            }}
+          </div>
+        </v-col>
+        <v-col cols="2">
+          Format
+          <div class="fileviewer-info-panel-value">
+            {{ store.getSelected()?.filetype }}
+          </div>
+        </v-col>
+        <v-col cols="2">
+          Von
+          <div class="fileviewer-info-panel-value">USER NAME</div>
+        </v-col>
+        <v-col cols="4" />
+      </v-row>
+      <v-row>
+        <v-col></v-col>
+      </v-row>
+      <v-row>
+        <v-col></v-col>
+      </v-row>
+      <v-row class="fileviewer-info-panel">
+        <v-col cols="12">
+          <ris-button icon="delete" label="Datei löschen" @click="onSubmit" />
+        </v-col>
+      </v-row>
+    </v-container>
+    <v-container>
+      <v-row>
+        <v-col cols="12">
+          <EditorVmodel
+            v-model="store.getSelectedSafe().originalFileAsHTML"
+            field-size="max"
+            :editable="false"
+          />
+        </v-col>
+      </v-row>
+    </v-container>
+  </span>
 </template>
+
+<style lang="scss">
+.fileviewer-info-panel {
+  background-color: $white;
+}
+.fileviewer-info-panel-value {
+  color: $gray900;
+  font-weight: bold;
+}
+</style>
