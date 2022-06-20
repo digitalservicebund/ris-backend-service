@@ -132,7 +132,7 @@ const linkStyling = (componentName: string) => {
 }
 .back-button {
   color: $blue800;
-  padding-bottom: 40px;
+  padding-bottom: 49px;
   font-size: small;
   &__icon {
     margin-bottom: 4px;

@@ -38,6 +38,6 @@ a {
   color: black;
 }
 .panel_and_main_area {
-  background-color: $gray100;
+  background-color: $white;
 }
 </style>
