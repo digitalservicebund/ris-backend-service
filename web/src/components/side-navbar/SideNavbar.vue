@@ -15,6 +15,18 @@ const linkStyling = (componentName: string) => {
 <template>
   <v-container v-if="store.hasSelected()" fluid>
     <v-row>
+      <v-col class="back-button">
+        <span v-if="store.hasSelected()">
+          <v-icon class="back-button__icon" size="22px"> arrow_back </v-icon>
+          <router-link class="back-button" :to="{ name: 'Rechtsprechung' }"
+            >ZURÜCK</router-link
+          >
+        </span>
+      </v-col>
+    </v-row>
+    <v-divider />
+    <v-row><v-col></v-col></v-row>
+    <v-row>
       <v-col class="sidebar_headline">
         <router-link
           :class="linkStyling('Rubriken')"
@@ -51,7 +63,6 @@ const linkStyling = (componentName: string) => {
         >
       </v-col>
     </v-row>
-
     <v-row>
       <v-col>
         <v-divider />
@@ -118,5 +129,14 @@ const linkStyling = (componentName: string) => {
 }
 .side-navbar-active-link {
   text-decoration: underline;
+}
+.back-button {
+  color: $blue800;
+  padding-bottom: 40px;
+  font-size: small;
+  &__icon {
+    margin-bottom: 4px;
+    margin-right: 8px;
+  }
 }
 </style>

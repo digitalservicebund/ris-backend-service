@@ -12,11 +12,6 @@ const store = useDocUnitsStore()
     <TopNavbar />
     <v-main>
       <v-container fluid>
-        <v-row v-if="store.hasSelected()">
-          <v-col cols="12" class="panel_and_main_area">
-            <DocInfoPanel />
-          </v-col>
-        </v-row>
         <v-row>
           <v-col v-if="store.hasSelected()" cols="2">
             <SideNavbar />
@@ -25,6 +20,7 @@ const store = useDocUnitsStore()
             :cols="store.hasSelected() ? 10 : 12"
             class="panel_and_main_area"
           >
+            <DocInfoPanel />
             <router-view />
           </v-col>
         </v-row>
