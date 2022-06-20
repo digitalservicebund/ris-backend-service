@@ -1,16 +1,8 @@
 <script lang="ts" setup>
-import { useRouter } from "vue-router"
 import bmjLogo from "../../assets/BMJ_Logo.png"
 import { useDocUnitsStore } from "../../store"
 
 const store = useDocUnitsStore()
-const router = useRouter()
-
-const linkStyling = (componentName: string) => {
-  return router.currentRoute.value.path.includes(componentName.toLowerCase())
-    ? "top-navbar_active-link"
-    : ""
-}
 </script>
 
 <template>
@@ -34,17 +26,15 @@ const linkStyling = (componentName: string) => {
         </span>
       </v-col>
       <v-col cols="2"></v-col>
-      <v-col cols="1">
-        <router-link
-          :class="linkStyling('Rechtsprechung')"
-          :to="{ name: 'Rechtsprechung' }"
-          >RECHTSPRECHUNG</router-link
+      <v-col cols="2" class="topbar_headline">
+        <router-link :to="{ name: 'Rechtsprechung' }"
+          >Rechtsprechung</router-link
         >
       </v-col>
-      <v-col cols="5"></v-col>
+      <v-col cols="4"></v-col>
       <v-col cols="2">
         <v-icon> perm_identity </v-icon>
-        USER NAME
+        User Name
       </v-col>
     </v-row>
     <v-divider />
@@ -60,10 +50,14 @@ const linkStyling = (componentName: string) => {
   padding: 10px 0 0 10px;
   line-height: 120%;
 }
+.topbar_headline {
+  font-weight: bold;
+  text-decoration: none;
+  &:hover {
+    text-decoration: underline;
+  }
+}
 .icon_topnavbar {
   color: $blue800;
-}
-.top-navbar_active-link {
-  text-decoration: underline;
 }
 </style>

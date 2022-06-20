@@ -12,12 +12,6 @@ const getValueOrFallback = (field: keyof DocUnit) => {
 <template>
   <v-container v-if="store.hasSelected()" fluid class="panel-default">
     <v-row>
-      <v-col cols="12">
-        <v-icon> gavel </v-icon>
-        <span>RECHTSPRECHUNG</span>
-      </v-col>
-    </v-row>
-    <v-row>
       <v-col cols="2" class="panel-id">
         {{ getValueOrFallback("id") }}
       </v-col>
@@ -46,8 +40,7 @@ const getValueOrFallback = (field: keyof DocUnit) => {
 
 <style lang="scss">
 .panel-default {
-  color: $gray900;
-
+  background-color: $navbar-hover-gray;
   &__values {
     font-weight: bold;
   }

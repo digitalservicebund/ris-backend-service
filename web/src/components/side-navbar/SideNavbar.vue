@@ -15,7 +15,7 @@ const linkStyling = (componentName: string) => {
 <template>
   <v-container v-if="store.hasSelected()" fluid>
     <v-row>
-      <v-col>
+      <v-col class="sidebar_headline">
         <router-link
           :class="linkStyling('Rubriken')"
           :to="{
@@ -23,35 +23,42 @@ const linkStyling = (componentName: string) => {
             params: { id: store.getSelected()?.id },
           }"
         >
-          RUBRIKEN
+          Rubriken
         </router-link>
       </v-col>
     </v-row>
     <v-row>
       <v-col class="sub-rubriken">
-        <ul>
-          <li>
-            <router-link
-              :to="{
-                name: 'Rubriken',
-                params: { id: store.getSelected()?.id },
-                hash: '#stammdaten',
-              }"
-              >Stammdaten</router-link
-            >
-          </li>
-          <li>
-            <router-link
-              :to="{
-                name: 'Rubriken',
-                params: { id: store.getSelected()?.id },
-                hash: '#kurzUndLangtexte',
-              }"
-              >Kurz- & Langtexte</router-link
-            >
-          </li>
-        </ul>
+        <router-link
+          :to="{
+            name: 'Rubriken',
+            params: { id: store.getSelected()?.id },
+            hash: '#stammdaten',
+          }"
+          >Stammdaten</router-link
+        >
       </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="sub-rubriken">
+        <router-link
+          :to="{
+            name: 'Rubriken',
+            params: { id: store.getSelected()?.id },
+            hash: '#kurzUndLangtexte',
+          }"
+          >Kurz- & Langtexte</router-link
+        >
+      </v-col>
+    </v-row>
+
+    <v-row>
+      <v-col>
+        <v-divider />
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col class="sidebar_headline"> Rechtszug </v-col>
     </v-row>
     <v-row>
       <v-col>
@@ -59,22 +66,14 @@ const linkStyling = (componentName: string) => {
       </v-col>
     </v-row>
     <v-row>
-      <v-col> RECHTSZUG </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <v-divider />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col>
+      <v-col class="sidebar_headline">
         <router-link
           :class="linkStyling('Dokumente')"
           :to="{
             name: 'Dokumente',
             params: { id: store.getSelected()?.id },
           }"
-          >DOKUMENTE</router-link
+          >Dokumente</router-link
         >
       </v-col>
     </v-row>
@@ -84,7 +83,7 @@ const linkStyling = (componentName: string) => {
       </v-col>
     </v-row>
     <v-row>
-      <v-col> BEARBEITUNGSSTAND </v-col>
+      <v-col class="sidebar_headline"> Bearbeitungsstand </v-col>
     </v-row>
     <v-row>
       <v-col>
@@ -103,8 +102,19 @@ const linkStyling = (componentName: string) => {
 </template>
 
 <style lang="scss">
+.sidebar_headline {
+  font-weight: bold;
+  &:hover {
+    background-color: $navbar-hover-gray;
+    text-decoration: underline;
+  }
+}
 .sub-rubriken {
   margin-left: 20px;
+  &:hover {
+    background-color: $navbar-hover-gray;
+    text-decoration: underline;
+  }
 }
 .side-navbar-active-link {
   text-decoration: underline;
