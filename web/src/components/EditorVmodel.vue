@@ -58,7 +58,7 @@ watch(
 )
 
 const showButtons = () => {
-  return props.editable // && in focus
+  return false // props.editable // && in focus TODO
 }
 </script>
 
