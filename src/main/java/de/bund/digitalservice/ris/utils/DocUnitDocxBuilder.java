@@ -13,6 +13,7 @@ import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
+import org.docx4j.wml.UnderlineEnumeration;
 
 public class DocUnitDocxBuilder {
   P paragraph;
@@ -111,6 +112,11 @@ public class DocUnitDocxBuilder {
         textElement.setAlignment("center");
       }
 
+      var pStyle = pPr.getPStyle();
+      if (pStyle != null && pStyle.getVal().equals("Zentriert")) {
+        textElement.setAlignment("center");
+      }
+
       var rPr = pPr.getRPr();
       if (rPr != null) {
         if (rPr.getB() != null) {
@@ -119,6 +125,10 @@ public class DocUnitDocxBuilder {
 
         if (rPr.getSz() != null) {
           textElement.setSize(rPr.getSz().getVal());
+        }
+
+        if (rPr.getU() != null && rPr.getU().getVal() == UnderlineEnumeration.SINGLE) {
+          textElement.setUnderline("single");
         }
       }
     }

@@ -70,6 +70,20 @@ export const DocUnitParagraphExtension = Extension.create<DocUnitOptions>({
               }
             },
           },
+          textDecoration: {
+            default: null,
+            parseHTML: (element) =>
+              element.style.textDecoration.replace(/['"]+/g, ""),
+            renderHTML: (attributes) => {
+              if (!attributes.textDecoration) {
+                return {}
+              }
+
+              return {
+                style: `text-decoration: ${attributes.textDecoration}`,
+              }
+            },
+          },
         },
       },
     ]

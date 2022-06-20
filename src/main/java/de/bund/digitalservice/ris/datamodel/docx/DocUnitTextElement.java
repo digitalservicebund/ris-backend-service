@@ -6,6 +6,7 @@ public class DocUnitTextElement implements DocUnitDocx {
   private String alignment;
   private Boolean bold;
   private BigInteger size;
+  private String underline;
   private final StringBuilder text = new StringBuilder();
 
   public String getAlignment() {
@@ -30,6 +31,14 @@ public class DocUnitTextElement implements DocUnitDocx {
 
   public BigInteger getSize() {
     return size;
+  }
+
+  public String getUnderline() {
+    return underline;
+  }
+
+  public void setUnderline(String underline) {
+    this.underline = underline;
   }
 
   public void addText(String text) {
@@ -67,6 +76,10 @@ public class DocUnitTextElement implements DocUnitDocx {
 
       if (alignment != null) {
         sb.append("text-align: " + alignment + ";");
+      }
+
+      if (underline != null) {
+        sb.append("text-decoration: underline;");
       }
 
       sb.append("\"");
