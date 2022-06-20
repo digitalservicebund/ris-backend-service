@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.domain;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,13 +30,5 @@ class DocUnitRepositoryTest {
     docUnitRepo.save(pdf).subscribe();
 
     docUnitRepo.findByFileType("docx").as(StepVerifier::create).expectNextCount(1).verifyComplete();
-  }
-
-  @Test // as used in service.updateDocUnit()
-  void testUpdateByOverSaving() {
-    DocUnit docUnit = DocUnit.createNew();
-    docUnitRepo.save(docUnit).subscribe();
-    docUnitRepo.save(docUnit).subscribe();
-    assertEquals(1, docUnitRepo.count().block());
   }
 }
