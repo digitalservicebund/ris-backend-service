@@ -1,52 +1,73 @@
 <script lang="ts" setup>
-import bmjLogo from "../../assets/BMJ_Logo.png"
+import { useRouter } from "vue-router"
+
+const router = useRouter()
+const linkStyling = (componentName: string) => {
+  return router.currentRoute.value.name === componentName
+    ? "topbar-link-active"
+    : ""
+}
 </script>
 
 <template>
   <!--<v-app-bar :flat=true :floating=false height="auto">-->
-  <v-container fluid>
+  <v-container fluid class="topbar-main">
     <v-row>
       <v-col cols="1">
-        <div class="ris_rectangle">Rechts informations system</div>
+        <v-icon class="topbar-logo-circle" size="56px">circle</v-icon>
       </v-col>
-      <v-col cols="9"></v-col>
-      <v-col cols="2">
-        <v-img :src="bmjLogo"></v-img>
+      <v-col class="topbar-header vertically-centered" cols="2">
+        Rechtsinformationssystem<br />
+        des Bundes [Platzhalter]
       </v-col>
-    </v-row>
-    <v-divider />
-    <v-row>
-      <v-col cols="2"> </v-col>
-      <v-col cols="2"></v-col>
-      <v-col cols="2" class="topbar_headline">
-        <router-link :to="{ name: 'Rechtsprechung' }"
+      <v-col cols="2" class="topbar-link-box">
+        <router-link
+          :class="linkStyling('Rechtsprechung')"
+          class="topbar-link"
+          :to="{ name: 'Rechtsprechung' }"
           >Rechtsprechung</router-link
         >
       </v-col>
-      <v-col cols="4"></v-col>
-      <v-col cols="2">
-        <v-icon> perm_identity </v-icon>
+      <v-col cols="5"></v-col>
+      <v-col cols="2" class="vertically-centered">
+        <v-icon class="topbar-user-icon"> perm_identity </v-icon>
         User Name
       </v-col>
     </v-row>
-    <v-divider />
   </v-container>
 </template>
 
 <style lang="scss">
-.ris_rectangle {
-  font-weight: bold;
-  background: $yellow500;
-  height: 120px;
-  width: 120px;
-  padding: 10px 0 0 10px;
-  line-height: 120%;
+.vertically-centered {
+  display: flex;
+  align-items: center;
 }
-.topbar_headline {
+.topbar-header {
   font-weight: bold;
-  text-decoration: none;
+  line-height: 120%;
+  border-right: $gray400 solid 1px;
+}
+.topbar-logo-circle {
+  color: $yellow500;
+  float: right;
+}
+.topbar-link-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+.topbar-link {
+  padding: 10px 10px 10px 10px;
   &:hover {
+    background-color: $yellow500;
     text-decoration: underline;
   }
+}
+.topbar-link-active {
+  text-decoration: underline !important;
+}
+.topbar-user-icon {
+  margin-right: 8px;
 }
 </style>
