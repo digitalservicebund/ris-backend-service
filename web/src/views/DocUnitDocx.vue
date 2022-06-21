@@ -8,7 +8,7 @@ import { getAllDocxFiles, getDocxFileAsHtml } from "../api"
 import {
   Randnummer,
   DocUnitParagraphExtension,
-} from "../editor/DocUnitExtension"
+} from "../editor/docUnitExtension"
 
 const fileNames = ref()
 getAllDocxFiles().then((list) => {

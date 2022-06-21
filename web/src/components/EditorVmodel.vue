@@ -7,7 +7,7 @@ import { PropType, watch } from "vue"
 import {
   DocUnitParagraphExtension,
   Randnummer,
-} from "../editor/DocUnitExtension"
+} from "../editor/docUnitExtension"
 import { FieldSize } from "../types/FieldSize"
 
 const props = defineProps({
