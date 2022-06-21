@@ -11,7 +11,7 @@ const store = useDocUnitsStore()
   <RouteHelper />
   <v-container>
     <v-row>
-      <v-col><h1>Dokumente</h1></v-col>
+      <v-col><h2>Dokumente</h2></v-col>
     </v-row>
   </v-container>
   <span v-if="store.hasSelected()">

@@ -39,6 +39,7 @@ const getValueOrFallback = (field: keyof DocUnit) => {
 
 <style lang="scss">
 .panel-default {
+  height: 65px; // doesn't keep the content vertically centered TODO
   background-color: $navbar-hover-gray;
   border-bottom: $gray400 solid 1px;
   &__values {

@@ -52,7 +52,7 @@ const onSubmit = () => {
   <div v-else>
     <form novalidate class="ris-form" @submit.prevent="onSubmit">
       <v-row>
-        <v-col><h1>Stammdaten</h1></v-col>
+        <v-col><h2>Stammdaten</h2></v-col>
       </v-row>
       <v-row>
         <v-col cols="6">

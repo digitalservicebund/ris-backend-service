@@ -50,7 +50,7 @@ const onSaveClick = () => {
   <div v-else>
     <form novalidate class="ris-texte-form">
       <v-row>
-        <v-col><h1>Kurz- & Langtexte</h1></v-col>
+        <v-col><h2>Kurz- & Langtexte</h2></v-col>
       </v-row>
       <v-row>
         <v-col>

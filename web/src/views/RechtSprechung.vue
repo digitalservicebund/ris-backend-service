@@ -27,7 +27,7 @@ onMounted(() => {
       <v-col> </v-col>
     </v-row>
     <v-row>
-      <v-col class="rechtsprechung-header"> Rechtsprechung </v-col>
+      <v-col class="rechtsprechung-header"><h1>Rechtsprechung</h1></v-col>
     </v-row>
     <v-row class="text-right">
       <v-col>
@@ -45,8 +45,4 @@ onMounted(() => {
   </v-container>
 </template>
 
-<style lang="scss">
-.rechtsprechung-header {
-  font-size: x-large;
-}
-</style>
+<style lang="scss"></style>

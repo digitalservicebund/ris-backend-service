@@ -3,7 +3,7 @@ import { useRouter } from "vue-router"
 
 const router = useRouter()
 const linkStyling = (componentName: string) => {
-  return router.currentRoute.value.name === componentName
+  return router.currentRoute.value.path.includes(componentName.toLowerCase())
     ? "topbar-link-active"
     : ""
 }
