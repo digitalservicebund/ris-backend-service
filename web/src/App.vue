@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import DocInfoPanel from "./components/doc-info-panel/DocInfoPanel.vue"
-import SideNavbar from "./components/side-navbar/SideNavbar.vue"
-import TopNavbar from "./components/top-navbar/TopNavbar.vue"
+import DocInfoPanel from "./components/DocUnitInfoPanel.vue"
+import NavbarSide from "./components/NavbarSide.vue"
+import NavbarTop from "./components/NavbarTop.vue"
 import { useDocUnitsStore } from "./store"
 
 const store = useDocUnitsStore()
@@ -9,12 +9,12 @@ const store = useDocUnitsStore()
 
 <template>
   <v-app>
-    <TopNavbar />
+    <NavbarTop />
     <v-main>
       <v-container fluid>
         <v-row>
           <v-col v-if="store.hasSelected()" cols="2">
-            <SideNavbar />
+            <NavbarSide />
           </v-col>
           <v-col
             :cols="store.hasSelected() ? 10 : 12"

@@ -22,7 +22,7 @@ export default defineConfig({
     },
     globals: true,
     environment: "jsdom",
-    include: ["test/**/*.ts", "src/**/*.spec.ts"],
+    include: ["test/**/*.ts"],
     exclude: [
       "test/e2e/**/*.ts",
       "test/a11y/**/*.ts",

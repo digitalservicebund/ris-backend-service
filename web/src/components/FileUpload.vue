@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import { uploadFile } from "../../api"
-import { useDocUnitsStore } from "../../store"
-import RisButton from "../ris-button/RisButton.vue"
+import { uploadFile } from "../api"
+import { useDocUnitsStore } from "../store"
+import SimpleButton from "./SimpleButton.vue"
 
 const store = useDocUnitsStore()
 
@@ -125,7 +125,7 @@ const openFileDialog = () => {
             <v-row>
               <v-col cols="1" />
               <v-col cols="9">
-                <ris-button
+                <SimpleButton
                   label="Festplatte durchsuchen"
                   @click="openFileDialog"
                 />

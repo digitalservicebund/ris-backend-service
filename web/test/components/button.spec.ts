@@ -3,13 +3,13 @@ import { describe, it, expect } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import RisButton from "../RisButton.vue"
+import SimpleButton from "../../src/components/SimpleButton.vue"
 
-describe("RisButton", () => {
+describe("SimpleButton", () => {
   const vuetify = createVuetify({ components, directives })
 
   it("renders with label prop", () => {
-    const wrapper = mount(RisButton, {
+    const wrapper = mount(SimpleButton, {
       global: {
         plugins: [vuetify],
       },
@@ -21,7 +21,7 @@ describe("RisButton", () => {
   })
 
   it("renders with default label prop", () => {
-    const wrapper = mount(RisButton, {
+    const wrapper = mount(SimpleButton, {
       global: {
         plugins: [vuetify],
       },

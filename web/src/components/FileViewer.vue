@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { onMounted } from "vue"
-import { deleteFile, getDocxFileAsHtml } from "../../api"
-import { useDocUnitsStore } from "../../store"
-import EditorVmodel from "../EditorVmodel.vue"
-import RisButton from "../ris-button/RisButton.vue"
+import { deleteFile, getDocxFileAsHtml } from "../api"
+import { useDocUnitsStore } from "../store"
+import EditorVmodel from "./EditorVmodel.vue"
+import SimpleButton from "./SimpleButton.vue"
 
 const store = useDocUnitsStore()
 
@@ -64,7 +64,7 @@ onMounted(() => {
       </v-row>
       <v-row class="fileviewer-info-panel">
         <v-col cols="12">
-          <ris-button icon="delete" label="Datei löschen" @click="onSubmit" />
+          <SimpleButton icon="delete" label="Datei löschen" @click="onSubmit" />
         </v-col>
       </v-row>
     </v-container>

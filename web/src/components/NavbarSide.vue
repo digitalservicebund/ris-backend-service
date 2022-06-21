@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { useRouter } from "vue-router"
-import { useDocUnitsStore } from "../../store"
+import { useDocUnitsStore } from "../store"
 
 const store = useDocUnitsStore()
 const router = useRouter()

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { onMounted } from "vue"
-import { deleteDocUnit } from "../../api"
-import { useDocUnitsStore } from "../../store"
+import { deleteDocUnit } from "../api"
+import { useDocUnitsStore } from "../store"
 
 const store = useDocUnitsStore()
 

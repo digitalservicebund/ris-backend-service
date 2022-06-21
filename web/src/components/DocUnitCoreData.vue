@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { updateDocUnit } from "../../api"
-import { useDocUnitsStore } from "../../store"
-import { DocUnit } from "../../types/DocUnit"
-import RisButton from "../ris-button/RisButton.vue"
+import { updateDocUnit } from "../api"
+import { useDocUnitsStore } from "../store"
+import { DocUnit } from "../types/DocUnit"
+import SimpleButton from "./SimpleButton.vue"
 
 const store = useDocUnitsStore()
 
@@ -98,7 +98,7 @@ const onSubmit = () => {
       <v-row>
         <v-col>
           <div class="ris-form__textfield">
-            <RisButton @click="onSubmit" />
+            <SimpleButton @click="onSubmit" />
           </div>
         </v-col>
       </v-row>

@@ -4,12 +4,12 @@ import { describe, test, expect } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import { useDocUnitsStore } from "../../../store"
-import { buildEmptyDocUnit } from "../../../types/DocUnit"
-import RisStammDaten from "../RisStammDaten.vue"
+import DocUnitCoreData from "../../src/components/DocUnitCoreData.vue"
+import { useDocUnitsStore } from "../../src/store"
+import { buildEmptyDocUnit } from "../../src/types/DocUnit"
 
-// vitest run --testNamePattern RisStammDaten
-describe("RisStammDaten", () => {
+// vitest run --testNamePattern CoreData
+describe("Core Data", () => {
   const vuetify = createVuetify({ components, directives })
 
   test("renders correctly with given docUnitId", async () => {
@@ -21,7 +21,7 @@ describe("RisStammDaten", () => {
     store.add(docUnit)
     store.setSelected("1")
 
-    const wrapper = mount(RisStammDaten, {
+    const wrapper = mount(DocUnitCoreData, {
       global: {
         plugins: [vuetify, pinia],
       },

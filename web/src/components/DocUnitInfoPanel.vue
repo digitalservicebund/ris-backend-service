@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { useDocUnitsStore } from "../../store"
-import { DocUnit } from "../../types/DocUnit"
+import { useDocUnitsStore } from "../store"
+import { DocUnit } from "../types/DocUnit"
 
 const store = useDocUnitsStore()
 

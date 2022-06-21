@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import { updateDocUnit } from "../../api"
-import { useDocUnitsStore } from "../../store"
-import { DocUnit } from "../../types/DocUnit"
-import { FieldSize } from "../../types/FieldSize"
-import EditorVmodel from "../EditorVmodel.vue"
-import RisButton from "../ris-button/RisButton.vue"
+import { updateDocUnit } from "../api"
+import { useDocUnitsStore } from "../store"
+import { DocUnit } from "../types/DocUnit"
+import { FieldSize } from "../types/FieldSize"
+import EditorVmodel from "./EditorVmodel.vue"
+import SimpleButton from "./SimpleButton.vue"
 
 const store = useDocUnitsStore()
 
@@ -71,7 +71,7 @@ const onSaveClick = () => {
             </span>
           </div>
           <div class="ris-texte-form__textfield">
-            <RisButton @click="onSaveClick" />
+            <SimpleButton @click="onSaveClick" />
           </div>
         </v-col>
       </v-row>

@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
 import { useRouter } from "vue-router"
-import HelloWorld from "../components/hello-world/HelloWorld.vue"
 
 const router = useRouter()
 
@@ -11,9 +10,6 @@ onMounted(() => {
 </script>
 
 <template>
-  <v-row>
-    <HelloWorld></HelloWorld>
-  </v-row>
   <v-row class="text-center">
     <v-col>
       <router-link :to="{ name: 'Rechtsprechung' }">Rechtsprechung</router-link>

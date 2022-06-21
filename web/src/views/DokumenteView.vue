@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import FileViewer from "../components/file-viewer/FileViewer.vue"
+import FileUpload from "../components/FileUpload.vue"
+import FileViewer from "../components/FileViewer.vue"
 import RouteHelper from "../components/RouteHelper.vue"
-import UploadFile from "../components/upload-file/UploadFile.vue"
 import { useDocUnitsStore } from "../store"
 
 const store = useDocUnitsStore()
@@ -16,6 +16,6 @@ const store = useDocUnitsStore()
   </v-container>
   <span v-if="store.hasSelected()">
     <FileViewer v-if="store.selectedHasFileAttached()" />
-    <UploadFile v-else />
+    <FileUpload v-else />
   </span>
 </template>

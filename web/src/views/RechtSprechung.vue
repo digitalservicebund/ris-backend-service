@@ -2,8 +2,8 @@
 import { onMounted } from "vue"
 import { useRouter } from "vue-router"
 import { createNewDocUnit } from "../api"
-import DocUnitList from "../components/doc-unit-list/DocUnitList.vue"
-import RisButton from "../components/ris-button/RisButton.vue"
+import DocUnitList from "../components/DocUnitList.vue"
+import SimpleButton from "../components/SimpleButton.vue"
 import { useDocUnitsStore } from "../store"
 
 const store = useDocUnitsStore()
@@ -31,7 +31,7 @@ onMounted(() => {
     </v-row>
     <v-row class="text-right">
       <v-col>
-        <RisButton label="Neue Dokumentationseinheit" @click="onSubmit" />
+        <SimpleButton label="Neue Dokumentationseinheit" @click="onSubmit" />
       </v-col>
     </v-row>
     <v-row>
