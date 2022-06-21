@@ -148,8 +148,8 @@ sonarqube {
   // NOTE: sonarqube picks up combined coverage correctly without further configuration from:
   // build/reports/jacoco/test/jacocoTestReport.xml
   properties {
-    property "sonar.projectKey", "digitalservice4germany_ris-backend-service"
-    property "sonar.organization", "digitalservice4germany"
+    property "sonar.projectKey", "digitalservicebund_ris-backend-service"
+    property "sonar.organization", "digitalservicebund"
     property "sonar.host.url", "https://sonarcloud.io"
     property "sonar.coverage.exclusions", "**/config/**,**/datamodel/**,**/exception/**"
   }
@@ -159,7 +159,7 @@ project.tasks["sonarqube"].dependsOn jacocoTestReport
 
 bootBuildImage {
   def containerRegistry = System.getenv("CONTAINER_REGISTRY") ?: "ghcr.io"
-  def containerImageName = System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservice4germany/${rootProject.name}"
+  def containerImageName = System.getenv("CONTAINER_IMAGE_NAME") ?: "digitalservicebund/${rootProject.name}"
   def containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
   imageName = "${containerRegistry}/${containerImageName}:${containerImageVersion}"
