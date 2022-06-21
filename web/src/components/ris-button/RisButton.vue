@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 interface Props {
   label?: string
-  icon: string | null
+  icon?: string
 }
 
 // pass type input (is it needed or just use @click?) and color via props TODO
 
 const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
-  icon: null,
+  icon: undefined,
 })
 </script>
 
