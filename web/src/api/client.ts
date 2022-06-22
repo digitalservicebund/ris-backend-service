@@ -1,3 +1,5 @@
+import { ReadableStream } from "stream/web"
+
 const getReadableStreamResponse = async (responseBody: ReadableStream) => {
   const reader = responseBody.getReader()
   return new Response(

@@ -56,11 +56,10 @@ export const deleteFile = async (docUnitId: string | undefined) => {
   })
 }
 
-export const getAllDocxFiles = () => {
+export const getAllDocxFiles = async () => {
   return apiClient("docunitdocx")
 }
 
 export const getDocxFileAsHtml = async (fileName: string) => {
-  console.log(fileName)
-  return `docunitdocx/${fileName}`
+  return apiClient(`docunitdocx/${fileName}`)
 }
