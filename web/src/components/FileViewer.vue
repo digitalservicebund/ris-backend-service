@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { onMounted } from "vue"
-import { deleteFile, getDocxFileAsHtml } from "../api"
+import { deleteFile, getDocxFileAsHtml } from "../api/docUnitService"
 import { useDocUnitsStore } from "../store"
 import EditorVmodel from "./EditorVmodel.vue"
 import SimpleButton from "./SimpleButton.vue"

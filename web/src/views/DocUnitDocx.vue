@@ -4,7 +4,7 @@ import { Paragraph } from "@tiptap/extension-paragraph"
 import { Text } from "@tiptap/extension-text"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { ref } from "vue"
-import { getAllDocxFiles, getDocxFileAsHtml } from "../api"
+import { getAllDocxFiles, getDocxFileAsHtml } from "../api/docUnitService"
 import {
   Randnummer,
   DocUnitParagraphExtension,

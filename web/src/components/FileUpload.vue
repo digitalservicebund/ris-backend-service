@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import { uploadFile } from "../api"
+import { uploadFile } from "../api/docUnitService"
 import { useDocUnitsStore } from "../store"
 import SimpleButton from "./SimpleButton.vue"
 

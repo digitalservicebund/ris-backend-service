@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
 import { useRouter } from "vue-router"
-import { createNewDocUnit } from "../api"
+import { createNewDocUnit } from "../api/docUnitService"
 import DocUnitList from "../components/DocUnitList.vue"
 import SimpleButton from "../components/SimpleButton.vue"
 import { useDocUnitsStore } from "../store"

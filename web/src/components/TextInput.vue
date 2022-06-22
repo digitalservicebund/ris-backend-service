@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { updateDocUnit } from "../api"
+import { updateDocUnit } from "../api/docUnitService"
 import { useDocUnitsStore } from "../store"
 import { DocUnit } from "../types/DocUnit"
 import { FieldSize } from "../types/FieldSize"

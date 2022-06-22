@@ -1,5 +1,5 @@
 import { defineStore } from "pinia"
-import { fetchAllDocUnits, fetchDocUnitById } from "./api"
+import { fetchAllDocUnits, fetchDocUnitById } from "./api/docUnitService"
 import { buildEmptyDocUnit, DocUnit } from "./types/DocUnit"
 
 type State = {
