@@ -40,9 +40,6 @@ jobs:
       - name: Install dependencies for web
         run: |
           npm ci
-          npx --yes playwright install-deps
-          npx --yes playwright install
-          npx --yes playwright install msedge
         working-directory: ./web
       - name: Check style for web
         run: npm run style:check
@@ -50,7 +47,6 @@ jobs:
       - name: Run tests for web
         run: |
           npm test
-          npm run test:e2e
           npm run test:a11y
         working-directory: ./web
       - name: Run license scanner
@@ -342,6 +338,23 @@ jobs:
         run: ./gradlew journeyTest
         env:
           STAGING_URL: ${{ secrets.STAGING_URL }}
+      - name: Setup Node for web
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ./web/.node-version
+          cache: npm
+          cache-dependency-path: ./web/package-lock.json
+      - name: Install dependencies for web
+        run: |
+          npm ci
+          npx --yes playwright install-deps
+          npx --yes playwright install
+          npx --yes playwright install msedge
+        working-directory: ./web
+      - name: Run e2e tests on staging
+        run: |
+          npm run test:e2e
+        working-directory: ./web
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
