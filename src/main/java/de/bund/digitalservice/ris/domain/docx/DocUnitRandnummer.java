@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.datamodel.docx;
+package de.bund.digitalservice.ris.domain.docx;
 
 public class DocUnitRandnummer implements DocUnitDocx {
   private final StringBuilder number = new StringBuilder();

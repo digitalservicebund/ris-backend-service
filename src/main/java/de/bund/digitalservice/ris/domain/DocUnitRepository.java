@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.repository;
+package de.bund.digitalservice.ris.domain;
 
-import de.bund.digitalservice.ris.datamodel.DocUnit;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.utils;
 
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
 import jakarta.xml.bind.JAXBElement;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Tbl;

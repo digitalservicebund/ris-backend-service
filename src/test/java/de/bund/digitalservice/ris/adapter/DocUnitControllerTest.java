@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.controller;
+package de.bund.digitalservice.ris.adapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -6,8 +6,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-import de.bund.digitalservice.ris.datamodel.DocUnit;
-import de.bund.digitalservice.ris.service.DocUnitService;
+import de.bund.digitalservice.ris.domain.DocUnit;
+import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import org.junit.jupiter.api.Tag;

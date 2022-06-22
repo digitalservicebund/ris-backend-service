@@ -1,10 +1,9 @@
-package de.bund.digitalservice.ris.service;
+package de.bund.digitalservice.ris.domain;
 
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitRandnummer;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitTextElement;
-import de.bund.digitalservice.ris.datamodel.docx.Docx2Html;
-import de.bund.digitalservice.ris.exception.DocxConverterException;
+import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
+import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.utils.DocxParagraphConverter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -35,7 +34,11 @@ import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
 @Slf4j
@@ -111,7 +114,7 @@ public class DocxConverterService {
     }
 
     List<DocUnitDocx> packedList = new ArrayList<>();
-    final DocUnitRandnummer[] lastRandnummer = {null};
+    DocUnitRandnummer[] lastRandnummer = {null};
 
     WordprocessingMLPackage mlPackage;
     try {

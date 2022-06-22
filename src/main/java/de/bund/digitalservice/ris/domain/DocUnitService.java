@@ -1,7 +1,5 @@
-package de.bund.digitalservice.ris.service;
+package de.bund.digitalservice.ris.domain;
 
-import de.bund.digitalservice.ris.datamodel.DocUnit;
-import de.bund.digitalservice.ris.repository.DocUnitRepository;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.HashMap;

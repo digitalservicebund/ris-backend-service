@@ -1,14 +1,28 @@
 package de.bund.digitalservice.ris.utils;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitRandnummer;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitTable;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitTextElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import javax.xml.namespace.QName;
-import org.docx4j.wml.*;
+import org.docx4j.wml.BooleanDefaultTrue;
+import org.docx4j.wml.HpsMeasure;
+import org.docx4j.wml.Jc;
+import org.docx4j.wml.JcEnumeration;
+import org.docx4j.wml.P;
+import org.docx4j.wml.PPr;
+import org.docx4j.wml.PPrBase;
+import org.docx4j.wml.ParaRPr;
+import org.docx4j.wml.R;
+import org.docx4j.wml.Tbl;
+import org.docx4j.wml.Tc;
+import org.docx4j.wml.Text;
+import org.docx4j.wml.Tr;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 

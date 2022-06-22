@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.datamodel.docx;
+package de.bund.digitalservice.ris.domain.docx;
 
 import java.math.BigInteger;
 

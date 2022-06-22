@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.utils;
 
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitRandnummer;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitTable;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitTextElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.util.stream.Collectors;
 import org.docx4j.wml.JcEnumeration;

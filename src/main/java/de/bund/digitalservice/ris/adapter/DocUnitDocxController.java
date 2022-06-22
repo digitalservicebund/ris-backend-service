@@ -1,7 +1,7 @@
-package de.bund.digitalservice.ris.controller;
+package de.bund.digitalservice.ris.adapter;
 
-import de.bund.digitalservice.ris.datamodel.docx.Docx2Html;
-import de.bund.digitalservice.ris.service.DocxConverterService;
+import de.bund.digitalservice.ris.domain.DocxConverterService;
+import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

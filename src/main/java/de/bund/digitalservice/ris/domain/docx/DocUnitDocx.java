@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.datamodel.docx;
+package de.bund.digitalservice.ris.domain.docx;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

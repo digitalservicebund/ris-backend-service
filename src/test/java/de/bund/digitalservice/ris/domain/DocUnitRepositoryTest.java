@@ -1,8 +1,7 @@
-package de.bund.digitalservice.ris.repository;
+package de.bund.digitalservice.ris.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import de.bund.digitalservice.ris.datamodel.DocUnit;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

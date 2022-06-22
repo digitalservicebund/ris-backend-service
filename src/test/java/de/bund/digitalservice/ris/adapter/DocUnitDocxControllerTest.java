@@ -1,10 +1,9 @@
-package de.bund.digitalservice.ris.controller;
+package de.bund.digitalservice.ris.adapter;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.verify;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-import de.bund.digitalservice.ris.service.DocxConverterService;
+import de.bund.digitalservice.ris.domain.DocxConverterService;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

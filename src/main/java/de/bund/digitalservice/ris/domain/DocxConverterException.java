@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.exception;
+package de.bund.digitalservice.ris.domain;
 
 public class DocxConverterException extends RuntimeException {
   public DocxConverterException(String message, Exception exception) {

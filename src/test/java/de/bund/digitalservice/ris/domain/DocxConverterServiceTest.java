@@ -1,15 +1,17 @@
-package de.bund.digitalservice.ris.service;
+package de.bund.digitalservice.ris.domain;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.config.ConverterConfiguration;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitRandnummer;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitTable;
-import de.bund.digitalservice.ris.datamodel.docx.DocUnitTextElement;
-import de.bund.digitalservice.ris.datamodel.docx.Docx2Html;
-import de.bund.digitalservice.ris.exception.DocxConverterException;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
+import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.utils.DocxParagraphConverter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -34,7 +36,11 @@ import reactor.test.StepVerifier;
 import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.model.S3Object;
 
 @ExtendWith(SpringExtension.class)
 @Import({DocxConverterService.class, ConverterConfiguration.class})

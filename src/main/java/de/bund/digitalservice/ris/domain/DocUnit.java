@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.datamodel;
+package de.bund.digitalservice.ris.domain;
 
 import java.time.Instant;
 import lombok.AllArgsConstructor;
