@@ -54,19 +54,12 @@ class DocUnitServiceTest {
 
   @Test
   void testGenerateNewDocUnit() {
-    ArgumentCaptor<DocUnit> docUnitCaptor = ArgumentCaptor.forClass(DocUnit.class);
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(DocUnit.EMPTY));
 
     StepVerifier.create(service.generateNewDocUnit())
-        .consumeNextWith(
-            docUnitResponseEntity -> {
-              assertNotNull(docUnitResponseEntity);
-              assertEquals(HttpStatus.CREATED, docUnitResponseEntity.getStatusCode());
-            })
+        .expectNextCount(1) // That it's a DocUnit is given by the generic type..
         .verifyComplete();
-
-    verify(repository).save(docUnitCaptor.capture());
-    assertEquals(DocUnit.class, docUnitCaptor.getValue().getClass());
+    verify(repository).save(any(DocUnit.class));
   }
 
   // @Test public void testGenerateNewDocUnit_withException() {}

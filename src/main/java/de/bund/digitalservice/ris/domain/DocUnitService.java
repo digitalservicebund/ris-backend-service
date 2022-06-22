@@ -41,12 +41,10 @@ public class DocUnitService {
     this.s3AsyncClient = s3AsyncClient;
   }
 
-  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
+  public Mono<DocUnit> generateNewDocUnit() {
     return repository
         .save(DocUnit.createNew())
-        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
-        .doOnError(ex -> log.error("Couldn't create empty doc unit", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+        .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
   public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(

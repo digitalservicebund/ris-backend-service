@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.Assert;
@@ -45,8 +46,10 @@ public class DocUnitController {
 
   @PostMapping(value = "")
   public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
-
-    return service.generateNewDocUnit();
+    return service
+        .generateNewDocUnit()
+        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
   @PutMapping(value = "/{id}/file")

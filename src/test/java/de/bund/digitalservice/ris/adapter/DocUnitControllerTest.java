@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.domain.DocUnit;
@@ -24,6 +25,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocUnitController.class)
@@ -38,7 +40,15 @@ class DocUnitControllerTest {
 
   @Test
   void testGenerateNewDocUnit() {
-    webClient.mutateWith(csrf()).post().uri("/api/v1/docunits").exchange().expectStatus().isOk();
+    when(service.generateNewDocUnit()).thenReturn(Mono.just(DocUnit.EMPTY));
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/docunits")
+        .exchange()
+        .expectStatus()
+        .isCreated();
 
     verify(service, times(1)).generateNewDocUnit();
   }
