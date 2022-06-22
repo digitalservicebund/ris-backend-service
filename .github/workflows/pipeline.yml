@@ -40,6 +40,8 @@ jobs:
       - name: Install dependencies for web
         run: |
           npm ci
+          npx --yes playwright install-deps
+          npx --yes playwright install
         working-directory: ./web
       - name: Check style for web
         run: npm run style:check
