@@ -13,7 +13,7 @@ const getValueOrFallback = (field: keyof DocUnit) => {
   <v-container v-if="store.hasSelected()" fluid class="panel-default">
     <v-row class="doc-info-row">
       <v-col class="vert-centered panel-id" cols="3">
-        {{ getValueOrFallback("id") }}
+        {{ getValueOrFallback("documentnumber") }}
       </v-col>
       <v-col class="vert-centered" cols="3">
         Aktenzeichen
@@ -39,7 +39,7 @@ const getValueOrFallback = (field: keyof DocUnit) => {
 
 <style lang="scss">
 .panel-default {
-  height: 65px; // doesn't keep the content vertically centered TODO
+  height: 65px; // is a fix value ok?
   background-color: $navbar-hover-gray;
   border-bottom: $gray400 solid 1px;
   &__values {
@@ -49,7 +49,7 @@ const getValueOrFallback = (field: keyof DocUnit) => {
 }
 .panel-id {
   color: $black;
-  font-size: xx-large;
+  font-size: x-large;
 }
 .vert-centered {
   display: flex;

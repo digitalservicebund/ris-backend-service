@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS doc_unit (
     id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    documentnumber VARCHAR(255) NOT NULL,
     creationtimestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     fileuploadtimestamp TIMESTAMP WITH TIME ZONE,
     s3path VARCHAR(255),

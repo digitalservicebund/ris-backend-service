@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.domain.DocUnit;
+import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
 import java.util.Objects;
@@ -40,17 +41,20 @@ class DocUnitControllerTest {
 
   @Test
   void testGenerateNewDocUnit() {
-    when(service.generateNewDocUnit()).thenReturn(Mono.just(DocUnit.EMPTY));
+    DocUnitCreationInfo docUnitCreationInfo = DocUnitCreationInfo.EMPTY;
+    when(service.generateNewDocUnit(DocUnitCreationInfo.EMPTY))
+        .thenReturn(Mono.just(DocUnit.EMPTY));
 
     webClient
         .mutateWith(csrf())
         .post()
         .uri("/api/v1/docunits")
+        .bodyValue(docUnitCreationInfo)
         .exchange()
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocUnit();
+    verify(service, times(1)).generateNewDocUnit(DocUnitCreationInfo.EMPTY);
   }
 
   @Test

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.domain;
 
 import java.time.Instant;
+import java.util.Calendar;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +13,21 @@ import org.springframework.data.annotation.Id;
 public class DocUnit {
   public static final DocUnit EMPTY = new DocUnit();
 
-  public static DocUnit createNew() {
+  public static DocUnit createNew(DocUnitCreationInfo docUnitCreationInfo) {
     DocUnit docUnit = new DocUnit();
     docUnit.setCreationtimestamp(Instant.now());
+    // build document number
+    String documentNumberBuilder =
+        docUnitCreationInfo.getDocumentationCenterAbbreviation()
+            + docUnitCreationInfo.getDocumentType()
+            + Calendar.getInstance().get(Calendar.YEAR)
+            + "000001"; // TODO
+    docUnit.setDocumentnumber(documentNumberBuilder);
     return docUnit;
   }
 
   @Id Integer id;
+  String documentnumber;
   Instant creationtimestamp;
 
   // Original file

@@ -41,9 +41,9 @@ public class DocUnitService {
     this.s3AsyncClient = s3AsyncClient;
   }
 
-  public Mono<DocUnit> generateNewDocUnit() {
+  public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
     return repository
-        .save(DocUnit.createNew())
+        .save(DocUnit.createNew(docUnitCreationInfo))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 

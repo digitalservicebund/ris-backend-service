@@ -10,10 +10,17 @@ const store = useDocUnitsStore()
 const router = useRouter()
 
 const onSubmit = () => {
-  createNewDocUnit().then((docUnit) => {
-    store.add(docUnit)
-    router.push({ name: "Dokumente", params: { id: docUnit.id } })
-  })
+  // this will be derived from the logged-in user
+  // might be known in the backend too - take it from there?
+  const documentationCenterAbbreviation = "BGH"
+  //  this will be derived from the current context
+  const documentType = "RE"
+  createNewDocUnit(documentationCenterAbbreviation, documentType).then(
+    (docUnit) => {
+      store.add(docUnit)
+      router.push({ name: "Dokumente", params: { id: docUnit.id } })
+    }
+  )
 }
 
 onMounted(() => {

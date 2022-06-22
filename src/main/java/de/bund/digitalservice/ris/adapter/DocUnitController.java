@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.adapter;
 
 import de.bund.digitalservice.ris.domain.DocUnit;
+import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +46,10 @@ public class DocUnitController {
   }
 
   @PostMapping(value = "")
-  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
+  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(
+      @RequestBody DocUnitCreationInfo docUnitCreationInfo) {
     return service
-        .generateNewDocUnit()
+        .generateNewDocUnit(docUnitCreationInfo)
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }

@@ -56,7 +56,7 @@ class DocUnitServiceTest {
   void testGenerateNewDocUnit() {
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(DocUnit.EMPTY));
 
-    StepVerifier.create(service.generateNewDocUnit())
+    StepVerifier.create(service.generateNewDocUnit(DocUnitCreationInfo.EMPTY))
         .expectNextCount(1) // That it's a DocUnit is given by the generic type..
         .verifyComplete();
     verify(repository).save(any(DocUnit.class));

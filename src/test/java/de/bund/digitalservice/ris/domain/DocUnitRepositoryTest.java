@@ -19,12 +19,12 @@ class DocUnitRepositoryTest {
 
   @Test
   void testFindByFileType() {
-    DocUnit docx = DocUnit.createNew();
+    DocUnit docx = DocUnit.createNew(DocUnitCreationInfo.EMPTY);
     docx.setS3path("bucket1/originalA.docx");
     docx.setFiletype("docx");
     docUnitRepo.save(docx).subscribe();
 
-    DocUnit pdf = DocUnit.createNew();
+    DocUnit pdf = DocUnit.createNew(DocUnitCreationInfo.EMPTY);
     pdf.setS3path("bucket1/originalB.pdf");
     pdf.setFiletype("pdf");
     docUnitRepo.save(pdf).subscribe();

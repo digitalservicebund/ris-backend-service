@@ -21,9 +21,20 @@ export const updateDocUnit = async (docUnit: DocUnit | null) => {
   })
 }
 
-export const createNewDocUnit = async () => {
+export const createNewDocUnit = async (
+  documentationCenterAbbreviation: string,
+  documentType: string
+) => {
   return apiClient("docunits", {
     method: "POST",
+    body: JSON.stringify({
+      documentationCenterAbbreviation: documentationCenterAbbreviation,
+      documentType: documentType,
+    }),
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json",
+    },
   })
 }
 
