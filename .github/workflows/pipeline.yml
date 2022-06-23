@@ -289,10 +289,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: staging
     needs: [build-and-push-image]
-    permissions:
-      id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
         with:
@@ -368,10 +365,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: production
     needs: [build-and-push-image, deploy-staging-verify]
-    permissions:
-      id-token: write # Enable OIDC for gitsign
     steps:
-      - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
       - name: Deploy new image
         uses: digitalservice4germany/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
         with:
