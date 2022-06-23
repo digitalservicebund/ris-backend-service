@@ -11,6 +11,13 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 public class SecurityConfig {
   @Bean
   public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
-    return http.authorizeExchange().anyExchange().permitAll().and().csrf().disable().build();
+    return http.authorizeExchange()
+        .anyExchange()
+        .permitAll()
+        .and()
+        .csrf()
+        .disable()
+        .headers(headers -> headers.contentSecurityPolicy("default-src 'self'"))
+        .build();
   }
 }
