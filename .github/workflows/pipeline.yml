@@ -354,6 +354,8 @@ jobs:
           npx --yes playwright install msedge
         working-directory: ./web
       - name: Run e2e tests on staging
+        env:
+          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
         run: |
           npm run test:e2e
         working-directory: ./web
