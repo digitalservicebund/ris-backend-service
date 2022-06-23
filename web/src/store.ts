@@ -21,7 +21,7 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       fetchAllDocUnits().then((all) => {
         if (!all) return
         for (const docUnit of all) {
-          this.docUnits.set(docUnit.id, docUnit)
+          this.docUnits.set(String(docUnit.id), docUnit)
         }
       })
     },
