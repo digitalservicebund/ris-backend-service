@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,14 +19,28 @@ class ApplicationJourneyTest {
   private String stagingUrl;
 
   @Test
-  void applicationHealthTest() {
+  void applicationHealthTest() throws MalformedURLException {
+    URL url = new URL(stagingUrl);
+
     WebTestClient.bindToServer()
-        .baseUrl(stagingUrl)
+        .baseUrl(plainBaseUrl(url))
         .build()
         .get()
         .uri("/actuator/health")
+        .headers(headers -> headers.setBasicAuth(userInfo(url)[0], userInfo(url)[1]))
         .exchange()
         .expectStatus()
         .isOk();
+  }
+
+  private String plainBaseUrl(URL url) {
+    if (url.getPort() > 0) {
+      return String.format("%s://%s:%s", url.getProtocol(), url.getHost(), url.getPort());
+    }
+    return String.format("%s://%s", url.getProtocol(), url.getHost());
+  }
+
+  private String[] userInfo(URL url) {
+    return url.getUserInfo().split(":");
   }
 }
