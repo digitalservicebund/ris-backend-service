@@ -14,7 +14,7 @@ test.describe("generate and delete doc units", () => {
     docUnitId = match![1] || ""
   })
 
-  test("upload docx", async ({ page }) => {
+  test("upload original file", async ({ page }) => {
     await page.goto("/")
 
     const selectDocUnit = page.locator(
@@ -33,7 +33,7 @@ test.describe("generate and delete doc units", () => {
     )
   })
 
-  test("delete docx", async ({ page }) => {
+  test("delete delete original file", async ({ page }) => {
     await page.goto("/")
 
     await page
