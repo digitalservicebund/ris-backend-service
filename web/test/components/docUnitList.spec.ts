@@ -6,7 +6,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import DocUnitList from "../../src/components/docUnitList.vue"
+import DocUnitList from "../../src/components/DocUnitList.vue"
 import { buildEmptyDocUnit } from "../../src/types/DocUnit"
 
 describe("docUnit list", () => {
