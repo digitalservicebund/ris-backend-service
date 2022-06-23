@@ -13,16 +13,14 @@ import org.springframework.data.annotation.Id;
 public class DocUnit {
   public static final DocUnit EMPTY = new DocUnit();
 
-  public static DocUnit createNew(DocUnitCreationInfo docUnitCreationInfo) {
+  public static DocUnit createNew(DocUnitCreationInfo docUnitCreationInfo, int documentNumber) {
     DocUnit docUnit = new DocUnit();
     docUnit.setCreationtimestamp(Instant.now());
-    // build document number
-    String documentNumberBuilder =
+    docUnit.setDocumentnumber(
         docUnitCreationInfo.getDocumentationCenterAbbreviation()
             + docUnitCreationInfo.getDocumentType()
             + Calendar.getInstance().get(Calendar.YEAR)
-            + "000001"; // TODO
-    docUnit.setDocumentnumber(documentNumberBuilder);
+            + String.format("%06d", documentNumber));
     return docUnit;
   }
 

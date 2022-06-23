@@ -33,7 +33,7 @@ const onDelete = (docUnit: DocUnit) => {
               params: { id: docUnit.id },
             }"
           >
-            {{ docUnit.id }}
+            {{ docUnit.documentnumber }}
           </router-link>
         </td>
         <td>{{ dayjs(docUnit.creationtimestamp).format("DD.MM.YYYY") }}</td>

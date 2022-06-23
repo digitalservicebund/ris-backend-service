@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.domain;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -27,23 +28,44 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @Slf4j
 public class DocUnitService {
   private final DocUnitRepository repository;
+  private final DocumentNumberCounterRepository counterRepository;
 
   private final S3AsyncClient s3AsyncClient;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DocUnitService(DocUnitRepository repository, S3AsyncClient s3AsyncClient) {
+  public DocUnitService(
+      DocUnitRepository repository,
+      DocumentNumberCounterRepository counterRepository,
+      S3AsyncClient s3AsyncClient) {
     Assert.notNull(repository, "doc unit repository is null");
     Assert.notNull(s3AsyncClient, "s3 async client is null");
 
     this.repository = repository;
+    this.counterRepository = counterRepository;
     this.s3AsyncClient = s3AsyncClient;
   }
 
   public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
-    return repository
-        .save(DocUnit.createNew(docUnitCreationInfo))
+    int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+    return counterRepository
+        .findById(1)
+        .flatMap(
+            outdatedDocumentNumberCounter -> {
+              // this is the switch happening when the first new DocUnit in a new year gets created
+              if (outdatedDocumentNumberCounter.currentyear != currentYear) {
+                outdatedDocumentNumberCounter.currentyear = currentYear;
+                outdatedDocumentNumberCounter.nextnumber = 1;
+              }
+              outdatedDocumentNumberCounter.nextnumber += 1;
+              return counterRepository.save(outdatedDocumentNumberCounter);
+            })
+        .flatMap(
+            updatedDocumentNumberCounter ->
+                repository.save(
+                    DocUnit.createNew(
+                        docUnitCreationInfo, updatedDocumentNumberCounter.nextnumber - 1)))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 

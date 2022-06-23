@@ -48,11 +48,19 @@ class DocUnitServiceTest {
 
   @MockBean private DocUnitRepository repository;
 
+  @MockBean private DocumentNumberCounterRepository counterRepository;
+
   @MockBean private S3AsyncClient s3AsyncClient;
 
   @Test
   void testGenerateNewDocUnit() {
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(counterRepository.findById(1)).thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
+    when(counterRepository.save(any(DocumentNumberCounter.class)))
+        .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
+    // Can we use a captor to check if the document number was correctly created?
+    // The chicken-egg-problem is, that we are dictating what happens when
+    // repository.save(), so we can't just use a captor at the same time
 
     StepVerifier.create(service.generateNewDocUnit(DocUnitCreationInfo.EMPTY))
         .expectNextCount(1) // That it's a DocUnit is given by the generic type..
