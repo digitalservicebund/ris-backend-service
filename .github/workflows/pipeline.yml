@@ -291,7 +291,7 @@ jobs:
     needs: [build-and-push-image]
     steps:
       - name: Deploy new image
-        uses: digitalservice4germany/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
+        uses: digitalservicebund/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
         with:
           environment: staging
           version: ${{ needs.build-and-push-image.outputs.version }}
@@ -302,7 +302,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Track deploy
-        uses: digitalservice4germany/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
+        uses: digitalservicebund/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
         with:
           project: RIS
           environment: staging
@@ -367,7 +367,7 @@ jobs:
     needs: [build-and-push-image, deploy-staging-verify]
     steps:
       - name: Deploy new image
-        uses: digitalservice4germany/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
+        uses: digitalservicebund/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
         with:
           environment: production
           version: ${{ needs.build-and-push-image.outputs.version }}
@@ -378,7 +378,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Track deploy
-        uses: digitalservice4germany/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
+        uses: digitalservicebund/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
         with:
           project: RIS
           environment: production
