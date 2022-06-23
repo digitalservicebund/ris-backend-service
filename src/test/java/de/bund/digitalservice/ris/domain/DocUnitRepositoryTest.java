@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.domain;
 
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
 @DataR2dbcTest
-@Tag("test")
 class DocUnitRepositoryTest {
   @Autowired DocUnitRepository docUnitRepo;
 

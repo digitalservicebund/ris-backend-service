@@ -11,10 +11,8 @@ import org.docx4j.wml.P;
 import org.docx4j.wml.R;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Text;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-@Tag("test")
 class DocxParagraphConverterTest {
   @Test
   void testConvert_withTbl() {

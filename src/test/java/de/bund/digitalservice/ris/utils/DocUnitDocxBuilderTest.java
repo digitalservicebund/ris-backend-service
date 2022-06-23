@@ -23,10 +23,8 @@ import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-@Tag("test")
 class DocUnitDocxBuilderTest {
   @Test
   void test_withoutConvertableElements() {

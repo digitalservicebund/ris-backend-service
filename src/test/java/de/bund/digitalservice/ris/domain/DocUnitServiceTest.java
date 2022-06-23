@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -44,7 +43,6 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @ExtendWith(SpringExtension.class)
 @Import(DocUnitService.class)
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
-@Tag("test")
 class DocUnitServiceTest {
   @Autowired private DocUnitService service;
 

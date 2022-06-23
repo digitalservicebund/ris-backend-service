@@ -12,7 +12,6 @@ import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
 import java.util.Objects;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -31,7 +30,6 @@ import reactor.core.publisher.Mono;
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocUnitController.class)
 @WithMockUser
-@Tag("test")
 class DocUnitControllerTest {
   @Autowired private WebTestClient webClient;
 

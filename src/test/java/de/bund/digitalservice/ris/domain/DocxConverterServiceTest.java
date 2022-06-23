@@ -22,7 +22,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -44,7 +43,6 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 
 @ExtendWith(SpringExtension.class)
 @Import({DocxConverterService.class, ConverterConfiguration.class})
-@Tag("test")
 class DocxConverterServiceTest {
   @Autowired DocxConverterService service;
 
