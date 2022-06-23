@@ -4,15 +4,17 @@ fileignoreconfig:
   - filename: build.gradle
     checksum: 05e3b19eca04a237ce7dd5f14c9d22bd133fb240465fcf596a4bee035352f93a
   - filename: .github/workflows/pipeline.yml
-    checksum: 89c4dee34c8ceaff063488729c98d2a4798fc8dc88319a57a06b61c730beba66
+    checksum: 42a9311ec77e3bc1c97d8b3bfaf656141166f46b03337042691344fa1b3dc187
   - filename: .github/workflows/secrets-check.yml
     checksum: d7fbfab653dad354f2854b45545faed3a604e3ba356446e0f92f5889826e4a09
   - filename: .github/workflows/scan.yml
     checksum: 28f800e97a1469d8a84dec1b5873241753ec54a5eb93b4fd6d10674d47dd3f6d
-  - filename: web/src/env.d.ts
-    checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
   - filename: src/main/resources/schema.sql
     checksum: b89bdd80f6bc3f6b888e89468a6fb0ae7b28dd5c11fc6f0247e565ed8baf255d
+  - filename: src/test/resources/application.properties
+    checksum: e07d67031eae380a8f1b5d5fda57128729dd10a49ad684c8dcc0deb905b34a1f
+  - filename: web/src/env.d.ts
+    checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
   - filename: web/.env.development
     checksum: 7443587c94ecd708b8e562b7b017164a9aecd6f1c8dec9740dc22db7ca2ab89a
 scopeconfig:

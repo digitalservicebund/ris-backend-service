@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,32 +14,25 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @TestPropertySource(locations = "classpath:application.properties")
 class ApplicationJourneyTest {
 
+  @Value("${application.staging.password}")
+  private String stagingPassword;
+
   @Value("${application.staging.url}")
   private String stagingUrl;
 
+  @Value("${application.staging.user}")
+  private String stagingUser;
+
   @Test
   void applicationHealthTest() throws MalformedURLException {
-    URL url = new URL(stagingUrl);
-
     WebTestClient.bindToServer()
-        .baseUrl(plainBaseUrl(url))
+        .baseUrl(stagingUrl)
         .build()
         .get()
         .uri("/actuator/health")
-        .headers(headers -> headers.setBasicAuth(userInfo(url)[0], userInfo(url)[1]))
+        .headers(headers -> headers.setBasicAuth(stagingUser, stagingPassword))
         .exchange()
         .expectStatus()
         .isOk();
-  }
-
-  private String plainBaseUrl(URL url) {
-    if (url.getPort() > 0) {
-      return String.format("%s://%s:%s", url.getProtocol(), url.getHost(), url.getPort());
-    }
-    return String.format("%s://%s", url.getProtocol(), url.getHost());
-  }
-
-  private String[] userInfo(URL url) {
-    return url.getUserInfo().split(":");
   }
 }
