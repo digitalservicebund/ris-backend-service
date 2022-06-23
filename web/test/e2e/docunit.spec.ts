@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, chromium } from "@playwright/test"
 
 test.describe("generate and delete doc units", () => {
   let docUnitId: string
@@ -6,22 +6,21 @@ test.describe("generate and delete doc units", () => {
   test("generate doc unit", async ({ page }) => {
     await page.goto("/")
 
-    const newDocUnitButton = await page.waitForSelector(
-      "button >> text=Neue Dokumentationseinheit"
-    )
-    newDocUnitButton.click()
+    await page.locator("button >> text=Neue Dokumentationseinheit").click()
 
-    await page.waitForSelector("text=Rechtsprechung")
-    docUnitId = await page.locator(".panel-id").innerText()
+    await page.waitForSelector("text=Festplatte durchsuchen")
+    const regex = /rechtsprechung\/(.*)\/dokumente/g
+    const match = regex.exec(page.url())
+    docUnitId = match![1] || ""
   })
 
   test("upload docx", async ({ page }) => {
     await page.goto("/")
 
-    const selectDocUnit = await page.waitForSelector(
+    const selectDocUnit = page.locator(
       `tr td:nth-child(1) a[href*="/rechtsprechung/${docUnitId}/dokumente"]`
     )
-    selectDocUnit.click()
+    await selectDocUnit.click()
 
     const [fileChooser] = await Promise.all([
       page.waitForEvent("filechooser"),
@@ -37,25 +36,23 @@ test.describe("generate and delete doc units", () => {
   test("delete docx", async ({ page }) => {
     await page.goto("/")
 
-    const selectDocUnit = await page.waitForSelector(
-      `tr td:nth-child(1) a[href*="/rechtsprechung/${docUnitId}/rubriken"]`
-    )
-    selectDocUnit.click()
+    await page
+      .locator(`a[href*="/rechtsprechung/${docUnitId}/rubriken"]`)
+      .click()
 
-    const documentLink = await page.waitForSelector(
+    const documentLink = page.locator(
       'a[href*="/rechtsprechung/' + docUnitId + '/dokumente"] >> text=DOKUMENTE'
     )
-    documentLink.click()
+    await documentLink.click()
 
-    const deleteDocx = await page.waitForSelector("text=Datei löschen")
-    deleteDocx.click()
+    await page.locator("text=Datei löschen").click()
 
     await page.waitForSelector("text=Festplatte durchsuchen")
 
     await page.goto("/")
 
     await page.waitForSelector(
-      `tr td:nth-child(1) a[href*="/rechtsprechung/${docUnitId}/dokumente"]`
+      `a[href*="/rechtsprechung/${docUnitId}/dokumente"]`
     )
   })
 
