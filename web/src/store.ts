@@ -1,5 +1,9 @@
 import { defineStore } from "pinia"
-import { fetchAllDocUnits, fetchDocUnitById } from "./api/docUnitService"
+import {
+  deleteDocUnit,
+  fetchAllDocUnits,
+  fetchDocUnitById,
+} from "./api/docUnitService"
 import { buildEmptyDocUnit, DocUnit } from "./types/DocUnit"
 
 type State = {
@@ -31,6 +35,7 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       this.docUnits.set(docUnit.id, docUnit)
     },
     removeById(id: string) {
+      deleteDocUnit(id)
       if (this.selected && this.selected.id === id) {
         this.selected = null
       }
