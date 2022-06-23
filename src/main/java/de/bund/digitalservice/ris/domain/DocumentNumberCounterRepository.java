@@ -5,4 +5,4 @@ import org.springframework.stereotype.Component;
 
 @Component
 public interface DocumentNumberCounterRepository
-    extends ReactiveCrudRepository<DocumentNumberCounter, Integer> {}
+    extends ReactiveCrudRepository<DocumentNumberCounter, Long> {}

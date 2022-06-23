@@ -50,7 +50,7 @@ public class DocUnitService {
   public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
     return counterRepository
-        .findById(1)
+        .findById(1L)
         .flatMap(
             outdatedDocumentNumberCounter -> {
               // this is the switch happening when the first new DocUnit in a new year gets created
@@ -78,7 +78,7 @@ public class DocUnitService {
         .flatMap(
             putObjectResponse ->
                 repository
-                    .findById(Integer.valueOf(docUnitId))
+                    .findById(Long.valueOf(docUnitId))
                     .map(
                         docUnit -> {
                           docUnit.setFileuploadtimestamp(Instant.now());
@@ -99,7 +99,7 @@ public class DocUnitService {
 
   public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(String docUnitId) {
     return repository
-        .findById(Integer.valueOf(docUnitId))
+        .findById(Long.valueOf(docUnitId))
         .flatMap(
             docUnit -> {
               var fileUuid = docUnit.getS3path();
@@ -165,12 +165,12 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<DocUnit>> getById(String docUnitId) {
-    return repository.findById(Integer.valueOf(docUnitId)).map(ResponseEntity::ok);
+    return repository.findById(Long.valueOf(docUnitId)).map(ResponseEntity::ok);
   }
 
   public Mono<ResponseEntity<String>> deleteById(String docUnitId) {
     return repository
-        .findById(Integer.valueOf(docUnitId))
+        .findById(Long.valueOf(docUnitId))
         .flatMap(
             docUnit -> {
               if (docUnit.hasFileAttached()) {

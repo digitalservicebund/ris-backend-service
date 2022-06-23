@@ -10,7 +10,7 @@ fileignoreconfig:
   - filename: .github/workflows/scan.yml
     checksum: 28f800e97a1469d8a84dec1b5873241753ec54a5eb93b4fd6d10674d47dd3f6d
   - filename: src/main/resources/schema.sql
-    checksum: 1c46c14019e9b4a573bc6b9206b8f671901dcc92941bdab4124ad7f06b3aca46
+    checksum: 8d7757087f0473a060fa44388372d1ff1c4200417cfa5caaddaa1bbff1af69fc
   - filename: src/test/resources/application.properties
     checksum: e07d67031eae380a8f1b5d5fda57128729dd10a49ad684c8dcc0deb905b34a1f
   - filename: web/src/env.d.ts

@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS doc_unit (
-    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    id Long AUTO_INCREMENT NOT NULL PRIMARY KEY,
     documentnumber VARCHAR(255) NOT NULL,
     creationtimestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     fileuploadtimestamp TIMESTAMP WITH TIME ZONE,
@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS doc_unit (
     entscheidungsgruende TEXT
 );
 CREATE TABLE IF NOT EXISTS document_number_counter (
-    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    id Long AUTO_INCREMENT NOT NULL PRIMARY KEY,
     nextnumber INT NOT NULL,
     currentyear INT NOT NULL
 );

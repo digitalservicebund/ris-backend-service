@@ -55,7 +55,8 @@ class DocUnitServiceTest {
   @Test
   void testGenerateNewDocUnit() {
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(DocUnit.EMPTY));
-    when(counterRepository.findById(1)).thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
+    when(counterRepository.findById(1L))
+        .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
     when(counterRepository.save(any(DocumentNumberCounter.class)))
         .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
     // Can we use a captor to check if the document number was correctly created?
@@ -80,17 +81,17 @@ class DocUnitServiceTest {
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
 
     var toSave = new DocUnit();
-    toSave.setId(1);
+    toSave.setId(1L);
     toSave.setS3path("88888888-4444-4444-4444-121212121212");
     toSave.setFiletype("docx");
     toSave.setFilename("testfile.docx");
 
     var savedDocUnit = new DocUnit();
-    savedDocUnit.setId(1);
+    savedDocUnit.setId(1L);
     savedDocUnit.setS3path("88888888-4444-4444-4444-121212121212");
     savedDocUnit.setFiletype("docx");
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(savedDocUnit));
-    when(repository.findById(1)).thenReturn(Mono.just(savedDocUnit));
+    when(repository.findById(1L)).thenReturn(Mono.just(savedDocUnit));
 
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
@@ -127,14 +128,14 @@ class DocUnitServiceTest {
   @Test
   void testRemoveFileFromDocUnit() {
     var docUnitBefore = new DocUnit();
-    docUnitBefore.setId(1);
+    docUnitBefore.setId(1L);
     docUnitBefore.setS3path("88888888-4444-4444-4444-121212121212");
     docUnitBefore.setFilename("testfile.docx");
 
     var docUnitAfter = new DocUnit();
-    docUnitAfter.setId(1);
+    docUnitAfter.setId(1L);
 
-    when(repository.findById(1)).thenReturn(Mono.just(docUnitBefore));
+    when(repository.findById(1L)).thenReturn(Mono.just(docUnitBefore));
     // is the thenReturn ok? Or am I bypassing the actual functionality-test?
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(docUnitAfter));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
@@ -185,7 +186,7 @@ class DocUnitServiceTest {
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnit.class));
-    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findById(1L)).thenReturn(Mono.just(DocUnit.EMPTY));
 
     // when and then
     StepVerifier.create(service.attachFileToDocUnit("1", byteBufferFlux, HttpHeaders.EMPTY))
@@ -213,12 +214,12 @@ class DocUnitServiceTest {
 
   @Test
   void testGetById() {
-    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findById(1L)).thenReturn(Mono.just(DocUnit.EMPTY));
     StepVerifier.create(service.getById("1"))
         .consumeNextWith(
             monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnit.class))
         .verifyComplete();
-    verify(repository).findById(1);
+    verify(repository).findById(1L);
   }
 
   @Test
@@ -227,9 +228,9 @@ class DocUnitServiceTest {
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
     DocUnit docUnit = new DocUnit();
-    docUnit.setId(1);
+    docUnit.setId(1L);
     // can we also test that the fileUuid from the DocUnit is used? with a captor somehow?
-    when(repository.findById(1)).thenReturn(Mono.just(docUnit));
+    when(repository.findById(1L)).thenReturn(Mono.just(docUnit));
     when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
 
     StepVerifier.create(service.deleteById("1"))
@@ -248,9 +249,9 @@ class DocUnitServiceTest {
   @Test
   void testDeleteById_withFileAttached() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setId(1);
+    docUnit.setId(1L);
     docUnit.setS3path("88888888-4444-4444-4444-121212121212");
-    when(repository.findById(1)).thenReturn(Mono.just(docUnit));
+    when(repository.findById(1L)).thenReturn(Mono.just(docUnit));
     when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
@@ -269,7 +270,7 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteById_withoutFileAttached_withExceptionFromBucket() {
-    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findById(1L)).thenReturn(Mono.just(DocUnit.EMPTY));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
@@ -285,7 +286,7 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteById_withoutFileAttached_withExceptionFromRepository() {
-    when(repository.findById(1)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findById(1L)).thenReturn(Mono.just(DocUnit.EMPTY));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocUnit.EMPTY);
 
     StepVerifier.create(service.deleteById("1"))

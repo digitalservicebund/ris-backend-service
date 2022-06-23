@@ -160,7 +160,7 @@ class DocUnitControllerTest {
   @Test
   void testUpdateById() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setId(1);
+    docUnit.setId(1L);
     webClient
         .mutateWith(csrf())
         .put()
@@ -176,7 +176,7 @@ class DocUnitControllerTest {
   @Test
   void testUpdateById_withInvalidId() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setId(1);
+    docUnit.setId(1L);
     webClient
         .mutateWith(csrf())
         .put()

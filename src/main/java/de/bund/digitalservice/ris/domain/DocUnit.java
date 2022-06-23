@@ -24,7 +24,7 @@ public class DocUnit {
     return docUnit;
   }
 
-  @Id Integer id;
+  @Id Long id;
   String documentnumber;
   Instant creationtimestamp;
 

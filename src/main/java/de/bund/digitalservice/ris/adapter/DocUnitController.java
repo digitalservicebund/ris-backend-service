@@ -36,9 +36,8 @@ public class DocUnitController {
 
   // only general check, the service will check if such a doc unit exists
   private boolean isInvalidId(String id) {
-    // this validation has to change once we use non-integer Ids
     try {
-      Integer.parseInt(id);
+      Long.parseLong(id);
       return false;
     } catch (NumberFormatException e) {
       return true;
@@ -100,7 +99,7 @@ public class DocUnitController {
   @PutMapping(value = "/{id}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<DocUnit>> updateById(
       @PathVariable String id, @RequestBody DocUnit docUnit) {
-    if (isInvalidId(id) || !Integer.valueOf(id).equals(docUnit.getId())) {
+    if (isInvalidId(id) || !Long.valueOf(id).equals(docUnit.getId())) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
     }
     return service.updateDocUnit(docUnit);
