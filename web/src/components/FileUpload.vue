@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import { uploadFile } from "../api/docUnitService"
-import { useDocUnitsStore } from "../store"
 import SimpleButton from "./SimpleButton.vue"
+import fileService from "@/services/fileService"
 
-const store = useDocUnitsStore()
+const props = defineProps<{ docUnitId: string }>()
 
 interface Status {
   file: File | null
@@ -34,8 +33,7 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  const docUnit = await uploadFile(store.getSelected()?.id, file)
-  store.update(docUnit)
+  const docUnit = await fileService.uploadFile(props.docUnitId, file)
   status.value.uploadStatus = "succeeded" // error handling TODO
   console.log("file uploaded, response:", docUnit)
 }

@@ -4,24 +4,17 @@ import { Paragraph } from "@tiptap/extension-paragraph"
 import { Text } from "@tiptap/extension-text"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { ref } from "vue"
-import { getAllDocxFiles, getDocxFileAsHtml } from "../api/docUnitService"
 import {
   Randnummer,
   DocUnitParagraphExtension,
 } from "../editor/docUnitExtension"
+import fileService from "@/services/fileService"
 
-const fileNames = ref()
-getAllDocxFiles().then((list) => {
-  fileNames.value = list
-})
-
+const fileNames = ref(await fileService.getAllDocxFiles())
 const fileName = ref()
-function getHtml(name: string) {
+async function getHtml(name: string) {
   fileName.value = name
-
-  getDocxFileAsHtml(name).then((html) => {
-    editor.commands.setContent(html.content)
-  })
+  editor.commands.setContent(await fileService.getAllDocxFiles())
 }
 
 const editor = new Editor({

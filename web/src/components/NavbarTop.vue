@@ -24,7 +24,7 @@ const linkStyling = (componentName: string) => {
         <router-link
           :class="linkStyling('Rechtsprechung')"
           class="topbar-link"
-          :to="{ name: 'Rechtsprechung' }"
+          :to="{ name: 'jurisdiction' }"
           >Rechtsprechung</router-link
         >
       </v-col>

@@ -11,6 +11,9 @@ describe("FileUpload", () => {
 
   it("renders properly", () => {
     const wrapper = mount(FileUpload, {
+      props: {
+        docUnitId: "1",
+      },
       global: {
         stubs: ["router-link"],
         plugins: [vuetify, createTestingPinia()],

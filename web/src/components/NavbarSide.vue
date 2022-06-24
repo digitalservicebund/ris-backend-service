@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { useRouter } from "vue-router"
-import { useDocUnitsStore } from "../store"
 
-const store = useDocUnitsStore()
+defineProps<{ id: string }>()
 const router = useRouter()
 
 const linkStyling = (componentName: string) => {
@@ -13,12 +12,12 @@ const linkStyling = (componentName: string) => {
 </script>
 
 <template>
-  <v-container v-if="store.hasSelected()" fluid>
+  <v-container fluid>
     <v-row>
       <v-col class="back-button">
-        <span v-if="store.hasSelected()">
+        <span>
           <v-icon class="back-button__icon" size="22px"> arrow_back </v-icon>
-          <router-link class="back-button" :to="{ name: 'Rechtsprechung' }"
+          <router-link class="back-button" :to="{ name: 'jurisdiction' }"
             >ZURÜCK</router-link
           >
         </span>
@@ -29,10 +28,10 @@ const linkStyling = (componentName: string) => {
     <v-row>
       <v-col class="sidebar_headline">
         <router-link
-          :class="linkStyling('Rubriken')"
+          :class="linkStyling('jurisdiction-docUnit-:id-categories')"
           :to="{
-            name: 'Rubriken',
-            params: { id: store.getSelected()?.id },
+            name: 'jurisdiction-docUnit-:id-categories',
+            params: { id: id },
           }"
         >
           Rubriken
@@ -43,9 +42,9 @@ const linkStyling = (componentName: string) => {
       <v-col class="sub-rubriken">
         <router-link
           :to="{
-            name: 'Rubriken',
-            params: { id: store.getSelected()?.id },
-            hash: '#stammdaten',
+            name: 'jurisdiction-docUnit-:id-categories',
+            params: { id: id },
+            hash: '#coreData',
           }"
           >Stammdaten</router-link
         >
@@ -55,9 +54,9 @@ const linkStyling = (componentName: string) => {
       <v-col class="sub-rubriken">
         <router-link
           :to="{
-            name: 'Rubriken',
-            params: { id: store.getSelected()?.id },
-            hash: '#kurzUndLangtexte',
+            name: 'jurisdiction-docUnit-:id-categories',
+            params: { id: id },
+            hash: '#texts',
           }"
           >Kurz- & Langtexte</router-link
         >
@@ -79,10 +78,10 @@ const linkStyling = (componentName: string) => {
     <v-row>
       <v-col class="sidebar_headline">
         <router-link
-          :class="linkStyling('Dokumente')"
+          :class="linkStyling('jurisdiction-docUnit-:id-files')"
           :to="{
-            name: 'Dokumente',
-            params: { id: store.getSelected()?.id },
+            name: 'jurisdiction-docUnit-:id-files',
+            params: { id: id },
           }"
           >Dokumente</router-link
         >
@@ -106,7 +105,13 @@ const linkStyling = (componentName: string) => {
     </v-row>
     <v-row>
       <v-col>
-        <router-link style="color: gray" to="/docx">docx --> html</router-link>
+        <router-link
+          style="color: gray"
+          :to="{
+            name: 'docUnitDocx',
+          }"
+          >docx --> html</router-link
+        >
       </v-col>
     </v-row>
   </v-container>

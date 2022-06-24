@@ -15,7 +15,11 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "types": ["axe-playwright", "node", "vitest"]
+    "types": ["axe-playwright", "node", "vitest"],
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    }
   },
   "include": ["src", "src/**/*.vue", "test/**/*.ts", "vite.config.ts"],
   "exclude": ["test/e2e/**/*.ts", "test/a11y/**/*.ts"]

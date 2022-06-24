@@ -1,63 +1,47 @@
 <script lang="ts" setup>
-import { updateDocUnit } from "../api/docUnitService"
-import { useDocUnitsStore } from "../store"
-import { DocUnit } from "../types/DocUnit"
+import { computed } from "vue"
+import { CoreData } from "../domain/docUnit"
+import * as iconsAndLabels from "../iconsAndLabels.json"
 import SimpleButton from "./SimpleButton.vue"
 
-const store = useDocUnitsStore()
+const props = defineProps<{ coreData: CoreData }>()
+const emit = defineEmits<{
+  (e: "updateValue", updatedValue: [keyof CoreData, string]): void
+  (e: "updateDocUnit"): void
+}>()
 
-interface StammDatenListEntry {
-  id: keyof DocUnit
-  name: string
-  label: string
-  aria: string
-  icon: string
-}
-
-const stammdatenDef: StammDatenListEntry[] = []
-
-const add = (id: keyof DocUnit, name: string, icon: string) => {
-  stammdatenDef.push({
-    id: id,
-    name: name,
-    label: name,
-    aria: name, // use these on the input fields, :aria-labelledby="abc" doesn't work anymore since vue-tsc 0.36.0 TODO
-    icon: icon,
+const data = computed(() =>
+  iconsAndLabels.coreData.map((item) => {
+    return {
+      id: item.name as keyof CoreData,
+      name: item.name,
+      label: item.label,
+      aria: item.label,
+      icon: item.icon,
+      value: props.coreData[item.name as keyof CoreData],
+    }
   })
-}
+)
 
-add("aktenzeichen", "Aktenzeichen", "grid_3x3")
-add("gerichtstyp", "Gerichtstyp", "home")
-add("dokumenttyp", "Dokumenttyp", "category")
-add("vorgang", "Vorgang", "inventory_2")
-add("ecli", "ECLI", "translate")
-add("spruchkoerper", "Spruchkörper", "people_alt")
-add("entscheidungsdatum", "Entscheidungsdatum", "calendar_today")
-add("gerichtssitz", "Gerichtssitz", "location_on")
-add("rechtskraft", "Rechtskraft", "gavel")
-add("eingangsart", "Eingangsart", "markunread_mailbox")
-add("dokumentationsstelle", "Dokumentationsstelle", "school")
-add("region", "Region", "map")
-
-const onSubmit = () => {
-  updateDocUnit(store.getSelected()).then((updatedDocUnit) => {
-    store.update(updatedDocUnit)
-  })
-  alert("Stammdaten wurden gespeichert")
+const updateValue = (event: Event, index: number) => {
+  emit("updateValue", [
+    data.value[index].id,
+    (event.target as HTMLInputElement).value,
+  ])
 }
 </script>
 
 <template>
-  <div v-if="!store.hasSelected()">Loading...</div>
+  <div v-if="!coreData">Loading...</div>
   <div v-else>
-    <form novalidate class="ris-form" @submit.prevent="onSubmit">
+    <form novalidate class="ris-form" @submit="emit('updateDocUnit')">
       <v-row>
-        <v-col><h2>Stammdaten</h2></v-col>
+        <v-col><h2 id="coreData">Stammdaten</h2></v-col>
       </v-row>
       <v-row>
         <v-col cols="6">
           <!-- ^ removed md="6" because vue-tsc 0.36.0 throws an error TODO -->
-          <template v-for="(item, index) in stammdatenDef">
+          <template v-for="(item, index) in data">
             <div v-if="index <= 5" :key="item.id" class="ris-form__textfield">
               <v-icon class="icon_stammdaten">
                 {{ item.icon }}
@@ -66,17 +50,18 @@ const onSubmit = () => {
                 {{ item.label }}
                 <input
                   :id="item.id"
-                  v-model="store.getSelectedSafe()[item.id]"
+                  :value="item.value"
                   class="ris-form__input"
                   type="text"
                   :name="item.name"
+                  @change="updateValue($event, index)"
                 />
               </label>
             </div>
           </template>
         </v-col>
         <v-col cols="6">
-          <template v-for="(item, index) in stammdatenDef">
+          <template v-for="(item, index) in data">
             <div v-if="index > 5" :key="item.id" class="ris-form__textfield">
               <v-icon class="icon_stammdaten">
                 {{ item.icon }}
@@ -85,10 +70,11 @@ const onSubmit = () => {
                 {{ item.label }}
                 <input
                   :id="item.id"
-                  v-model="store.getSelectedSafe()[item.id]"
+                  :value="item.value"
                   class="ris-form__input"
                   type="text"
                   :name="item.name"
+                  @change="updateValue($event, index)"
                 />
               </label>
             </div>
@@ -98,7 +84,7 @@ const onSubmit = () => {
       <v-row>
         <v-col>
           <div class="ris-form__textfield">
-            <SimpleButton @click="onSubmit" />
+            <SimpleButton @click="emit('updateDocUnit')" />
           </div>
         </v-col>
       </v-row>

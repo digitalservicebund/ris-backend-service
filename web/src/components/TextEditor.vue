@@ -3,21 +3,21 @@ import { Document } from "@tiptap/extension-document"
 import { Paragraph } from "@tiptap/extension-paragraph"
 import { Text } from "@tiptap/extension-text"
 import { EditorContent, Editor } from "@tiptap/vue-3"
-import { PropType, watch } from "vue"
+import { watch } from "vue"
 import {
   DocUnitParagraphExtension,
   Randnummer,
 } from "../editor/docUnitExtension"
-import { FieldSize } from "../types/FieldSize"
+import { FieldSize } from "@/domain/FieldSize"
 
 const props = defineProps({
-  modelValue: {
+  value: {
     type: String,
-    required: true,
-    default: "",
+    required: false,
+    default: undefined,
   },
   fieldSize: {
-    type: Object as PropType<FieldSize>,
+    type: String,
     required: false,
     default: "small" as FieldSize,
   },
@@ -28,10 +28,12 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(["update:modelValue"])
+const emit = defineEmits<{
+  (e: "updateValue", newValue: string): void
+}>()
 
 const editor = new Editor({
-  content: props.modelValue,
+  content: props.value,
   extensions: [
     Document,
     Paragraph,
@@ -41,13 +43,13 @@ const editor = new Editor({
   ],
   onUpdate: () => {
     // outgoing changes
-    emit("update:modelValue", editor.getHTML())
+    emit("updateValue", editor.getHTML())
   },
   editable: props.editable,
 })
 
 watch(
-  () => props.modelValue,
+  () => props.value,
   (value) => {
     if (!value || value === editor.getHTML()) {
       return
@@ -58,7 +60,7 @@ watch(
 )
 
 const showButtons = () => {
-  return false // props.editable // && in focus TODO
+  return false
 }
 </script>
 

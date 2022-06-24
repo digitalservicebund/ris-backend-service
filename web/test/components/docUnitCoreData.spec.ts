@@ -1,29 +1,24 @@
-import { createTestingPinia } from "@pinia/testing"
 import { mount } from "@vue/test-utils"
 import { describe, test, expect } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import DocUnitCoreData from "../../src/components/DocUnitCoreData.vue"
-import { useDocUnitsStore } from "../../src/store"
-import { buildEmptyDocUnit } from "../../src/types/DocUnit"
+import DocUnit from "../../src/domain/docUnit"
 
 // vitest run --testNamePattern CoreData
 describe("Core Data", () => {
   const vuetify = createVuetify({ components, directives })
 
   test("renders correctly with given docUnitId", async () => {
-    const pinia = createTestingPinia({ stubActions: false })
-    const store = useDocUnitsStore()
-    const docUnit = buildEmptyDocUnit()
-    docUnit.id = "1"
-    docUnit.aktenzeichen = "abc"
-    store.add(docUnit)
-    store.setSelected("1")
+    const docUnit = new DocUnit("1", { aktenzeichen: "abc" })
 
     const wrapper = mount(DocUnitCoreData, {
+      props: {
+        coreData: docUnit.coreData,
+      },
       global: {
-        plugins: [vuetify, pinia],
+        plugins: [vuetify],
       },
     })
 
