@@ -23,9 +23,13 @@
   },
   "dependencies": {
     "@pinia/testing": "^0.0.12",
+    "@tiptap/extension-bold": "^2.0.0-beta.28",
     "@tiptap/extension-document": "^2.0.0-beta.15",
+    "@tiptap/extension-italic": "^2.0.0-beta.28",
     "@tiptap/extension-paragraph": "^2.0.0-beta.23",
+    "@tiptap/extension-strike": "^2.0.0-beta.29",
     "@tiptap/extension-text": "^2.0.0-beta.15",
+    "@tiptap/extension-underline": "^2.0.0-beta.25",
     "@tiptap/vue-3": "^2.0.0-beta.91",
     "dayjs": "^1.11.3",
     "material-design-icons-iconfont": "^6.7.0",

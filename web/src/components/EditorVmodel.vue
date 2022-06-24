@@ -1,7 +1,11 @@
 <script lang="ts" setup>
+import { Bold } from "@tiptap/extension-bold"
 import { Document } from "@tiptap/extension-document"
+import { Italic } from "@tiptap/extension-italic"
 import { Paragraph } from "@tiptap/extension-paragraph"
+import { Strike } from "@tiptap/extension-strike"
 import { Text } from "@tiptap/extension-text"
+import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { PropType, watch } from "vue"
 import {
@@ -38,6 +42,10 @@ const editor = new Editor({
     Text,
     Randnummer,
     DocUnitParagraphExtension,
+    Bold,
+    Italic,
+    Underline,
+    Strike,
   ],
   onUpdate: () => {
     // outgoing changes
@@ -58,17 +66,41 @@ watch(
 )
 
 const showButtons = () => {
-  return false // props.editable // && in focus TODO
+  return props.editable // && in focus TODO
 }
 </script>
 
 <template>
   <v-container fluid>
     <v-row v-if="showButtons()">
-      <v-col cols="1"><v-icon>format_bold</v-icon></v-col>
-      <v-col cols="1"><v-icon>format_italic</v-icon></v-col>
-      <v-col cols="1"><v-icon>format_underlined</v-icon></v-col>
-      <v-col cols="1"><v-icon>strikethrough_s</v-icon></v-col>
+      <v-col cols="1"
+        ><v-icon
+          :class="{ 'editor-btn-active': editor.isActive('bold') }"
+          @click="editor.chain().focus().toggleBold().run()"
+          >format_bold</v-icon
+        ></v-col
+      >
+      <v-col cols="1"
+        ><v-icon
+          :class="{ 'editor-btn-active': editor.isActive('italic') }"
+          @click="editor.chain().focus().toggleItalic().run()"
+          >format_italic</v-icon
+        ></v-col
+      >
+      <v-col cols="1"
+        ><v-icon
+          :class="{ 'editor-btn-active': editor.isActive('underline') }"
+          @click="editor.chain().focus().toggleUnderline().run()"
+          >format_underlined</v-icon
+        ></v-col
+      >
+      <v-col cols="1"
+        ><v-icon
+          :class="{ 'editor-btn-active': editor.isActive('strike') }"
+          @click="editor.chain().focus().toggleStrike().run()"
+          >strikethrough_s</v-icon
+        ></v-col
+      >
       <v-col cols="1">Heading</v-col>
       <v-col cols="1"><v-icon>list</v-icon></v-col>
       <v-col cols="3" />
@@ -112,5 +144,8 @@ const showButtons = () => {
   &__max {
     height: 640px; // ? TODO
   }
+}
+.editor-btn-active {
+  color: $blue700;
 }
 </style>
