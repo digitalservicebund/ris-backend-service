@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS doc_unit (
     entscheidungsgruende TEXT
 );
 CREATE TABLE IF NOT EXISTS document_number_counter (
-    id Long AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     nextnumber INT NOT NULL,
     currentyear INT NOT NULL
 );

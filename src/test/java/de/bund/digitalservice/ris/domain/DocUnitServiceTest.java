@@ -55,7 +55,7 @@ class DocUnitServiceTest {
   @Test
   void testGenerateNewDocUnit() {
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(DocUnit.EMPTY));
-    when(counterRepository.findById(1L))
+    when(counterRepository.getDocumentNumberCounterEntry())
         .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
     when(counterRepository.save(any(DocumentNumberCounter.class)))
         .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));

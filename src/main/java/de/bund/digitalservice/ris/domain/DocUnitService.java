@@ -50,7 +50,7 @@ public class DocUnitService {
   public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
     return counterRepository
-        .findById(1L)
+        .getDocumentNumberCounterEntry()
         .flatMap(
             outdatedDocumentNumberCounter -> {
               // this is the switch happening when the first new DocUnit in a new year gets created
