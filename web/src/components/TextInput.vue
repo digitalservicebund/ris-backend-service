@@ -80,18 +80,6 @@ const onSaveClick = () => {
 </template>
 
 <style lang="scss">
-.editor-btn {
-  border: 1px solid black;
-  background: white;
-  color: black;
-  border-radius: 0.3rem;
-  margin: 0.1rem;
-  padding: 0.1rem 0.4rem;
-  &__active {
-    background: black;
-    color: white;
-  }
-}
 .ris-texte-form {
   padding: rem(20px);
 

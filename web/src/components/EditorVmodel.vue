@@ -68,39 +68,38 @@ watch(
 const showButtons = () => {
   return props.editable // && in focus TODO
 }
+
+interface editorBtn {
+  type: string
+  icon: string
+}
+
+const editorBtns: editorBtn[] = []
+
+const add = (type: string, icon: string) => {
+  editorBtns.push({
+    type: type,
+    icon: icon,
+  })
+}
+
+add("bold", "format_bold")
+add("italic", "format_italic")
+add("underline", "format_underlined")
+add("strike", "strikethrough_s")
 </script>
 
 <template>
   <v-container fluid>
     <v-row v-if="showButtons()">
-      <v-col cols="1"
+      <v-col v-for="(btn, index) in editorBtns" :key="index" cols="1"
         ><v-icon
-          :class="{ 'editor-btn-active': editor.isActive('bold') }"
-          @click="editor.chain().focus().toggleBold().run()"
-          >format_bold</v-icon
-        ></v-col
-      >
-      <v-col cols="1"
-        ><v-icon
-          :class="{ 'editor-btn-active': editor.isActive('italic') }"
-          @click="editor.chain().focus().toggleItalic().run()"
-          >format_italic</v-icon
-        ></v-col
-      >
-      <v-col cols="1"
-        ><v-icon
-          :class="{ 'editor-btn-active': editor.isActive('underline') }"
-          @click="editor.chain().focus().toggleUnderline().run()"
-          >format_underlined</v-icon
-        ></v-col
-      >
-      <v-col cols="1"
-        ><v-icon
-          :class="{ 'editor-btn-active': editor.isActive('strike') }"
-          @click="editor.chain().focus().toggleStrike().run()"
-          >strikethrough_s</v-icon
-        ></v-col
-      >
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
       <v-col cols="1">Heading</v-col>
       <v-col cols="1"><v-icon>list</v-icon></v-col>
       <v-col cols="3" />
@@ -145,7 +144,15 @@ const showButtons = () => {
     height: 640px; // ? TODO
   }
 }
-.editor-btn-active {
-  color: $blue700;
+.editor-btn {
+  color: $black;
+  &:hover {
+    color: $text-tertiary;
+    background-color: $button-tertiary-focus;
+  }
+  &__active {
+    color: $white;
+    background-color: $text-tertiary;
+  }
 }
 </style>
