@@ -17,7 +17,7 @@ const router = useRouter()
 const onSubmit = () => {
   // this will be derived from the logged-in user
   // might be known in the backend too - take it from there?
-  const documentationCenterAbbreviation = "BGH"
+  const documentationCenterAbbreviation = "KO"
   //  this will be derived from the current context
   const documentType = "RE"
   createNewDocUnit(documentationCenterAbbreviation, documentType).then(
