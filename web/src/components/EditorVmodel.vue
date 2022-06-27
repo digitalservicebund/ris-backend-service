@@ -7,7 +7,7 @@ import { Strike } from "@tiptap/extension-strike"
 import { Text } from "@tiptap/extension-text"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
-import { PropType, watch } from "vue"
+import { PropType, watch, ref } from "vue"
 import {
   DocUnitParagraphExtension,
   Randnummer,
@@ -34,6 +34,8 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"])
 
+const hasFocus = ref<boolean>(false)
+
 const editor = new Editor({
   content: props.modelValue,
   extensions: [
@@ -51,6 +53,8 @@ const editor = new Editor({
     // outgoing changes
     emit("update:modelValue", editor.getHTML())
   },
+  onFocus: () => (hasFocus.value = true),
+  onBlur: () => (hasFocus.value = false),
   editable: props.editable,
 })
 
@@ -66,7 +70,7 @@ watch(
 )
 
 const showButtons = () => {
-  return props.editable // && in focus TODO
+  return props.editable && hasFocus.value
 }
 
 interface editorBtn {
