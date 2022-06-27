@@ -30,7 +30,7 @@ const onDelete = (docUnit: DocUnit) => {
             class="doc-unit-list-active-link"
             :to="{
               name: docUnit.s3path ? 'Rubriken' : 'Dokumente',
-              params: { id: docUnit.id },
+              params: { id: docUnit.documentnumber },
             }"
           >
             {{ docUnit.documentnumber }}

@@ -213,13 +213,13 @@ class DocUnitServiceTest {
   }
 
   @Test
-  void testGetById() {
-    when(repository.findById(1L)).thenReturn(Mono.just(DocUnit.EMPTY));
-    StepVerifier.create(service.getById("1"))
+  void testGetByDocumentnumber() {
+    when(repository.findByDocumentnumber("ABCDE2022000001")).thenReturn(Mono.just(DocUnit.EMPTY));
+    StepVerifier.create(service.getByDocumentnumber("ABCDE2022000001"))
         .consumeNextWith(
             monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnit.class))
         .verifyComplete();
-    verify(repository).findById(1L);
+    verify(repository).findByDocumentnumber("ABCDE2022000001");
   }
 
   @Test

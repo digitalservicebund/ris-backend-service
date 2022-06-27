@@ -5,8 +5,8 @@ export const fetchAllDocUnits = async () => {
   return apiClient("docunits")
 }
 
-export const fetchDocUnitById = async (id: string) => {
-  return apiClient(`docunits/${id}`)
+export const fetchDocUnitByDocumentnumber = async (documentnumber: string) => {
+  return apiClient(`docunits/${documentnumber}`)
 }
 
 export const updateDocUnit = async (docUnit: DocUnit | null) => {

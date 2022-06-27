@@ -16,10 +16,10 @@ describe("Core Data", () => {
     const pinia = createTestingPinia({ stubActions: false })
     const store = useDocUnitsStore()
     const docUnit = buildEmptyDocUnit()
-    docUnit.id = "1"
+    docUnit.documentnumber = "ABCD2022000001"
     docUnit.aktenzeichen = "abc"
     store.add(docUnit)
-    store.setSelected("1")
+    store.setSelected("ABCD2022000001")
 
     const wrapper = mount(DocUnitCoreData, {
       global: {

@@ -23,7 +23,7 @@ const onSubmit = () => {
   createNewDocUnit(documentationCenterAbbreviation, documentType).then(
     (docUnit) => {
       store.add(docUnit)
-      router.push({ name: "Dokumente", params: { id: docUnit.id } })
+      router.push({ name: "Dokumente", params: { id: docUnit.documentnumber } })
     }
   )
 }

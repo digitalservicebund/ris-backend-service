@@ -2,7 +2,7 @@ import { defineStore } from "pinia"
 import {
   deleteDocUnit,
   fetchAllDocUnits,
-  fetchDocUnitById,
+  fetchDocUnitByDocumentnumber,
 } from "./api/docUnitService"
 import { buildEmptyDocUnit, DocUnit } from "./types/DocUnit"
 
@@ -44,14 +44,17 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
     clearSelected() {
       this.selected = null
     },
-    setSelected(id: string | string[]) {
-      if (Array.isArray(id)) return
-      const docUnit = this.docUnits.get(id)
-      if (docUnit) {
-        this.selected = docUnit
+    setSelected(documentnumber: string | string[]) {
+      if (Array.isArray(documentnumber)) return
+      const docUnitOptional = [...this.docUnits.values()].filter(
+        (du) => du.documentnumber === documentnumber
+      )
+      // if (docUnitOptional.length > 1) {} // error case, should we do something?
+      if (docUnitOptional.length === 1) {
+        this.selected = docUnitOptional[0]
         return
       }
-      fetchDocUnitById(id).then((du) => {
+      fetchDocUnitByDocumentnumber(documentnumber).then((du) => {
         this.add(du)
         this.selected = du
       })

@@ -116,10 +116,16 @@ class DocUnitControllerTest {
   }
 
   @Test
-  void testGetById() {
-    webClient.mutateWith(csrf()).get().uri("/api/v1/docunits/1").exchange().expectStatus().isOk();
+  void testGetByDocumentnumber() {
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/docunits/ABCD2022000001")
+        .exchange()
+        .expectStatus()
+        .isOk();
 
-    verify(service).getById("1");
+    verify(service).getByDocumentnumber("ABCD2022000001");
   }
 
   @Test

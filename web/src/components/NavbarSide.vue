@@ -32,7 +32,7 @@ const linkStyling = (componentName: string) => {
           :class="linkStyling('Rubriken')"
           :to="{
             name: 'Rubriken',
-            params: { id: store.getSelected()?.id },
+            params: { id: store.getSelected()?.documentnumber },
           }"
         >
           Rubriken
@@ -44,7 +44,7 @@ const linkStyling = (componentName: string) => {
         <router-link
           :to="{
             name: 'Rubriken',
-            params: { id: store.getSelected()?.id },
+            params: { id: store.getSelected()?.documentnumber },
             hash: '#stammdaten',
           }"
           >Stammdaten</router-link
@@ -56,7 +56,7 @@ const linkStyling = (componentName: string) => {
         <router-link
           :to="{
             name: 'Rubriken',
-            params: { id: store.getSelected()?.id },
+            params: { id: store.getSelected()?.documentnumber },
             hash: '#kurzUndLangtexte',
           }"
           >Kurz- & Langtexte</router-link
@@ -82,7 +82,7 @@ const linkStyling = (componentName: string) => {
           :class="linkStyling('Dokumente')"
           :to="{
             name: 'Dokumente',
-            params: { id: store.getSelected()?.id },
+            params: { id: store.getSelected()?.documentnumber },
           }"
           >Dokumente</router-link
         >

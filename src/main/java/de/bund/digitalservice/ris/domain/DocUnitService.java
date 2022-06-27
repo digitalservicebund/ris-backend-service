@@ -166,8 +166,8 @@ public class DocUnitService {
     return Mono.just(ResponseEntity.ok(repository.findAll()));
   }
 
-  public Mono<ResponseEntity<DocUnit>> getById(String docUnitId) {
-    return repository.findById(Long.valueOf(docUnitId)).map(ResponseEntity::ok);
+  public Mono<ResponseEntity<DocUnit>> getByDocumentnumber(String documentnumber) {
+    return repository.findByDocumentnumber(documentnumber).map(ResponseEntity::ok);
   }
 
   public Mono<ResponseEntity<String>> deleteById(String docUnitId) {

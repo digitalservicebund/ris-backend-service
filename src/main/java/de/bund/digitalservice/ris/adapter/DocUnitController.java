@@ -9,6 +9,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.NonNull;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,12 +81,13 @@ public class DocUnitController {
     return service.getAll();
   }
 
-  @GetMapping(value = "/{id}")
-  public Mono<ResponseEntity<DocUnit>> getById(@PathVariable String id) {
-    if (isInvalidId(id)) {
+  @GetMapping(value = "/{documentnumber}")
+  public Mono<ResponseEntity<DocUnit>> getByDocumentnumber(
+      @NonNull @PathVariable String documentnumber) {
+    if (documentnumber.length() != 14) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
     }
-    return service.getById(id);
+    return service.getByDocumentnumber(documentnumber);
   }
 
   @DeleteMapping(value = "/{id}")
