@@ -148,6 +148,9 @@ add("strike", "strikethrough_s")
     height: 640px; // ? TODO
   }
 }
+.ProseMirror-focused {
+  outline: 0;
+}
 .editor-btn {
   color: $black;
   &:hover {
