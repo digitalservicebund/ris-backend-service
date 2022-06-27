@@ -68,7 +68,7 @@
     "eslint-plugin-vuejs-accessibility": "^1.2.0",
     "jsdom": "^20.0.0",
     "license-checker": "^25.0.1",
-    "playwright": "^1.22.2",
+    "playwright": "^1.23.0",
     "postcss": "^8.4.14",
     "prettier": "^2.7.0",
     "sass": "^1.53.0",
