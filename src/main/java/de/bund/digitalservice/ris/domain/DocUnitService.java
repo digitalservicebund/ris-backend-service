@@ -170,7 +170,7 @@ public class DocUnitService {
     return repository.findByDocumentnumber(documentnumber).map(ResponseEntity::ok);
   }
 
-  public Mono<ResponseEntity<String>> deleteById(UUID docUnitId) {
+  public Mono<ResponseEntity<String>> deleteByUuid(UUID docUnitId) {
     return repository
         .findByUuid(docUnitId)
         .flatMap(

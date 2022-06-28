@@ -77,13 +77,13 @@ public class DocUnitController {
   }
 
   @DeleteMapping(value = "/{uuid}")
-  public Mono<ResponseEntity<String>> deleteById(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<String>> deleteByUuid(@PathVariable UUID uuid) {
 
-    return service.deleteById(uuid);
+    return service.deleteByUuid(uuid);
   }
 
   @PutMapping(value = "/{uuid}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Mono<ResponseEntity<DocUnit>> updateById(
+  public Mono<ResponseEntity<DocUnit>> updateByUuid(
       @PathVariable UUID uuid, @RequestBody DocUnit docUnit) {
     if (!uuid.equals(docUnit.getUuid())) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
