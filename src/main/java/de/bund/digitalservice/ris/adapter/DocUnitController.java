@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -35,16 +36,6 @@ public class DocUnitController {
     this.service = service;
   }
 
-  // only general check, the service will check if such a doc unit exists
-  private boolean isInvalidId(String id) {
-    try {
-      Long.parseLong(id);
-      return false;
-    } catch (NumberFormatException e) {
-      return true;
-    }
-  }
-
   @PostMapping(value = "")
   public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(
       @RequestBody DocUnitCreationInfo docUnitCreationInfo) {
@@ -54,24 +45,19 @@ public class DocUnitController {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  @PutMapping(value = "/{id}/file")
+  @PutMapping(value = "/{uuid}/file")
   public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
-      @PathVariable String id,
+      @PathVariable UUID uuid,
       @RequestBody Flux<ByteBuffer> byteBufferFlux,
       @RequestHeader HttpHeaders httpHeaders) {
-    if (isInvalidId(id)) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
-    }
 
-    return service.attachFileToDocUnit(id, byteBufferFlux, httpHeaders);
+    return service.attachFileToDocUnit(uuid, byteBufferFlux, httpHeaders);
   }
 
-  @DeleteMapping(value = "/{id}/file")
-  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(@PathVariable String id) {
-    if (isInvalidId(id)) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
-    }
-    return service.removeFileFromDocUnit(id);
+  @DeleteMapping(value = "/{uuid}/file")
+  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(@PathVariable UUID uuid) {
+
+    return service.removeFileFromDocUnit(uuid);
   }
 
   @GetMapping(value = "")
@@ -90,18 +76,16 @@ public class DocUnitController {
     return service.getByDocumentnumber(documentnumber);
   }
 
-  @DeleteMapping(value = "/{id}")
-  public Mono<ResponseEntity<String>> deleteById(@PathVariable String id) {
-    if (isInvalidId(id)) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body("invalid DocUnit id"));
-    }
-    return service.deleteById(id);
+  @DeleteMapping(value = "/{uuid}")
+  public Mono<ResponseEntity<String>> deleteById(@PathVariable UUID uuid) {
+
+    return service.deleteById(uuid);
   }
 
-  @PutMapping(value = "/{id}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{uuid}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<DocUnit>> updateById(
-      @PathVariable String id, @RequestBody DocUnit docUnit) {
-    if (isInvalidId(id) || !Long.valueOf(id).equals(docUnit.getId())) {
+      @PathVariable UUID uuid, @RequestBody DocUnit docUnit) {
+    if (!uuid.equals(docUnit.getUuid())) {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
     }
     return service.updateDocUnit(docUnit);

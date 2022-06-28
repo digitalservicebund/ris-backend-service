@@ -13,7 +13,7 @@ type State = {
 
 export const useDocUnitsStore = defineStore("docUnitsStore", {
   state: (): State => ({
-    docUnits: new Map<string, DocUnit>(),
+    docUnits: new Map<string, DocUnit>(), // key: uuid
     selected: null,
   }),
   actions: {
@@ -21,7 +21,7 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       fetchAllDocUnits().then((all) => {
         if (!all) return
         for (const docUnit of all) {
-          this.docUnits.set(docUnit.id, docUnit)
+          this.docUnits.set(docUnit.uuid, docUnit)
         }
       })
     },
@@ -32,14 +32,15 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       return this.docUnits.size === 0
     },
     add(docUnit: DocUnit) {
-      this.docUnits.set(docUnit.id, docUnit)
+      this.docUnits.set(docUnit.uuid, docUnit)
     },
-    removeById(id: string) {
-      deleteDocUnit(id)
-      if (this.selected && this.selected.id === id) {
+    remove(docUnit: DocUnit) {
+      const uuid = docUnit.uuid
+      deleteDocUnit(uuid)
+      if (this.selected && this.selected.uuid === uuid) {
         this.selected = null
       }
-      this.docUnits.delete(id)
+      this.docUnits.delete(uuid)
     },
     clearSelected() {
       this.selected = null
@@ -60,9 +61,9 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       })
     },
     update(docUnit: DocUnit) {
-      this.docUnits.set(docUnit.id, docUnit)
+      this.docUnits.set(docUnit.uuid, docUnit)
       // the docUnit object here can get completely replaced, that's why we need to update selected too
-      if (this.selected && this.selected.id === docUnit.id) {
+      if (this.selected && this.selected.uuid === docUnit.uuid) {
         this.selected = docUnit
       }
     },
@@ -79,9 +80,6 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
         return buildEmptyDocUnit()
       }
       return this.selected
-    },
-    hasFileAttached(id: string): boolean {
-      return this.docUnits.has(id) && this.docUnits.get(id)?.s3path !== null
     },
     selectedHasFileAttached(): boolean {
       if (!this.selected) return false

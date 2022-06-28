@@ -9,7 +9,7 @@ import SimpleButton from "./SimpleButton.vue"
 const store = useDocUnitsStore()
 
 const onSubmit = async () => {
-  const docUnit = await deleteFile(store.getSelected()?.id)
+  const docUnit = await deleteFile(store.getSelected()?.uuid)
   console.log("file delete from doc unit, response:", docUnit)
   store.update(docUnit)
 }

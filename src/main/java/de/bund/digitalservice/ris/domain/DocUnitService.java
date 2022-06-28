@@ -72,7 +72,7 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
-      String docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
+      UUID docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
 
     return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
@@ -80,7 +80,7 @@ public class DocUnitService {
         .flatMap(
             putObjectResponse ->
                 repository
-                    .findById(Long.valueOf(docUnitId))
+                    .findByUuid(docUnitId)
                     .map(
                         docUnit -> {
                           docUnit.setFileuploadtimestamp(Instant.now());
@@ -99,9 +99,9 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(String docUnitId) {
+  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(UUID docUnitId) {
     return repository
-        .findById(Long.valueOf(docUnitId))
+        .findByUuid(docUnitId)
         .flatMap(
             docUnit -> {
               var fileUuid = docUnit.getS3path();
@@ -170,9 +170,9 @@ public class DocUnitService {
     return repository.findByDocumentnumber(documentnumber).map(ResponseEntity::ok);
   }
 
-  public Mono<ResponseEntity<String>> deleteById(String docUnitId) {
+  public Mono<ResponseEntity<String>> deleteById(UUID docUnitId) {
     return repository
-        .findById(Long.valueOf(docUnitId))
+        .findByUuid(docUnitId)
         .flatMap(
             docUnit -> {
               if (docUnit.hasFileAttached()) {

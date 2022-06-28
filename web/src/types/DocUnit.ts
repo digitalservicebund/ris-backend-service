@@ -1,5 +1,6 @@
 export type DocUnit = {
   id: string
+  uuid: string
   documentnumber: string
   creationtimestamp: string
 
@@ -40,6 +41,7 @@ export type DocUnit = {
 export function buildEmptyDocUnit(): DocUnit {
   return {
     id: "",
+    uuid: "",
     documentnumber: "",
     creationtimestamp: "",
     fileuploadtimestamp: "",

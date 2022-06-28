@@ -29,7 +29,7 @@ const onSubmit = () => {
 }
 
 const handleDelete = (docUnit: DocUnit) => {
-  store.removeById(docUnit.id)
+  store.remove(docUnit)
 }
 
 onMounted(() => {

@@ -11,7 +11,7 @@ export const fetchDocUnitByDocumentnumber = async (documentnumber: string) => {
 
 export const updateDocUnit = async (docUnit: DocUnit | null) => {
   if (!docUnit) return
-  return apiClient(`docunits/${docUnit.id}/docx`, {
+  return apiClient(`docunits/${docUnit.uuid}/docx`, {
     method: "PUT",
     body: JSON.stringify(docUnit),
     headers: {
@@ -40,16 +40,19 @@ export const createNewDocUnit = async (
 
 // this throws "SyntaxError: JSON.parse: unexpected end of data at line 1 column 1 of the JSON data" TODO
 // in apiClient(), maybe has to do with just one String in the ReadableStream? does the right thing though
-export const deleteDocUnit = async (docUnitId: string | undefined) => {
-  if (!docUnitId) return
-  return apiClient(`docunits/${docUnitId}`, {
+export const deleteDocUnit = async (docUnitUuid: string | undefined) => {
+  if (!docUnitUuid) return
+  return apiClient(`docunits/${docUnitUuid}`, {
     method: "DELETE",
   })
 }
 
-export const uploadFile = async (docUnitId: string | undefined, file: File) => {
-  if (!docUnitId) return // not cool, do this properly TODO
-  return apiClient(`docunits/${docUnitId}/file`, {
+export const uploadFile = async (
+  docUnitUuid: string | undefined,
+  file: File
+) => {
+  if (!docUnitUuid) return // not cool, do this properly TODO
+  return apiClient(`docunits/${docUnitUuid}/file`, {
     method: "PUT",
     body: file,
     headers: {
@@ -60,9 +63,9 @@ export const uploadFile = async (docUnitId: string | undefined, file: File) => {
   })
 }
 
-export const deleteFile = async (docUnitId: string | undefined) => {
-  if (!docUnitId) return
-  return apiClient(`docunits/${docUnitId}/file`, {
+export const deleteFile = async (docUnitUuid: string | undefined) => {
+  if (!docUnitUuid) return
+  return apiClient(`docunits/${docUnitUuid}/file`, {
     method: "DELETE",
   })
 }
