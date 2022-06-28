@@ -1,17 +1,20 @@
 package de.bund.digitalservice.ris.domain;
 
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
-import de.bund.digitalservice.ris.utils.DocxParagraphConverter;
+import de.bund.digitalservice.ris.utils.DocxConverter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -23,6 +26,7 @@ import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.wml.Style;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -45,13 +49,18 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 public class DocxConverterService {
   private final S3AsyncClient client;
   private final DocumentBuilderFactory documentBuilderFactory;
+  private final DocxConverter converter;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DocxConverterService(S3AsyncClient client, DocumentBuilderFactory documentBuilderFactory) {
+  public DocxConverterService(
+      S3AsyncClient client,
+      DocumentBuilderFactory documentBuilderFactory,
+      DocxConverter converter) {
     this.client = client;
     this.documentBuilderFactory = documentBuilderFactory;
+    this.converter = converter;
   }
 
   public String getOriginalText(WordprocessingMLPackage mlPackage) {
@@ -123,8 +132,21 @@ public class DocxConverterService {
       throw new DocxConverterException("Couldn't load docx file!", e);
     }
 
+    Map<String, Style> styles = Collections.emptyMap();
+    if (mlPackage.getMainDocumentPart().getStyleDefinitionsPart() != null) {
+      styles =
+          mlPackage
+              .getMainDocumentPart()
+              .getStyleDefinitionsPart()
+              .getJaxbElement()
+              .getStyle()
+              .stream()
+              .collect(Collectors.toMap(k -> k.getName().getVal(), Function.identity()));
+    }
+    converter.setStyles(styles);
+
     mlPackage.getMainDocumentPart().getContent().stream()
-        .map(DocxParagraphConverter::convert)
+        .map(converter::convert)
         .filter(Objects::nonNull)
         .forEach(
             element -> {
@@ -135,8 +157,8 @@ public class DocxConverterService {
                   packedList.add(lastRandnummer[0]);
                 }
                 lastRandnummer[0] = randnummer;
-              } else if (element instanceof DocUnitTextElement textElement) {
-                lastRandnummer[0].setTextContent(textElement.getText());
+              } else if (element instanceof DocUnitParagraphTextElement textElement) {
+                lastRandnummer[0].addParagraphTextElement(textElement);
                 packedList.add(lastRandnummer[0]);
                 lastRandnummer[0] = null;
               }

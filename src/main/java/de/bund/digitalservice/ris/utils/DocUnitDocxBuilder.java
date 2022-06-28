@@ -1,14 +1,22 @@
 package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import jakarta.xml.bind.JAXBElement;
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
-import org.docx4j.wml.JcEnumeration;
+import org.docx4j.wml.Jc;
 import org.docx4j.wml.P;
+import org.docx4j.wml.PPr;
 import org.docx4j.wml.R;
+import org.docx4j.wml.RPrAbstract;
+import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
@@ -18,11 +26,18 @@ import org.docx4j.wml.UnderlineEnumeration;
 public class DocUnitDocxBuilder {
   P paragraph;
   Tbl table;
+  Map<String, Style> styles = new HashMap<>();
 
   private DocUnitDocxBuilder() {}
 
   public static DocUnitDocxBuilder newInstance() {
     return new DocUnitDocxBuilder();
+  }
+
+  public DocUnitDocxBuilder setStyles(Map<String, Style> styles) {
+    this.styles = styles;
+
+    return this;
   }
 
   public DocUnitDocxBuilder setParagraph(P paragraph) {
@@ -44,8 +59,10 @@ public class DocUnitDocxBuilder {
 
     if (isRandnummer()) {
       return convertToRandnummer();
+      //    } else if (isImage()) {
+      //      return convertToImageElement();
     } else if (isText()) {
-      return convertToTextElement();
+      return convertToParagraphTextElement();
     }
 
     return null;
@@ -102,43 +119,212 @@ public class DocUnitDocxBuilder {
             });
   }
 
-  private DocUnitTextElement convertToTextElement() {
-    var textElement = new DocUnitTextElement();
+  private DocUnitParagraphTextElement convertToParagraphTextElement() {
+    var textElement = new DocUnitParagraphTextElement();
 
     var pPr = paragraph.getPPr();
-    if (pPr != null) {
-      var jc = pPr.getJc();
-      if (jc != null && jc.getVal() == JcEnumeration.CENTER) {
-        textElement.setAlignment("center");
-      }
-
-      var pStyle = pPr.getPStyle();
-      if (pStyle != null && pStyle.getVal().equals("Zentriert")) {
-        textElement.setAlignment("center");
-      }
-
-      var rPr = pPr.getRPr();
-      if (rPr != null) {
-        if (rPr.getB() != null) {
-          textElement.setBold(rPr.getB().isVal());
-        }
-
-        if (rPr.getSz() != null) {
-          textElement.setSize(rPr.getSz().getVal());
-        }
-
-        if (rPr.getU() != null && rPr.getU().getVal() == UnderlineEnumeration.SINGLE) {
-          textElement.setUnderline("single");
-        }
-      }
+    String alignment = getAlignment(pPr);
+    if (alignment != null) {
+      textElement.setAlignment(alignment);
     }
+
+    addParagraphStyle(textElement, pPr);
 
     paragraph.getContent().stream()
         .filter(R.class::isInstance)
         .map(R.class::cast)
-        .forEach(r -> textElement.addText(parseTextFromRun(r)));
+        .forEach(
+            r -> {
+              var text = parseTextElementFromRun(r);
+              if (text != null) {
+                textElement.addRunTextElement(text);
+              }
+            });
 
     return textElement;
+  }
+
+  //  private boolean isImage() {
+  //    if (paragraph == null) {
+  //      return false;
+  //    }
+  //
+  //    return paragraph.getContent().stream()
+  //        .anyMatch(
+  //            tag -> {
+  //              if (tag instanceof R r) {
+  //                return r.getContent().stream()
+  //                    .anyMatch(
+  //                        subTag -> {
+  //                          if (subTag instanceof JAXBElement<?> element) {
+  //                            return element.getDeclaredType() == Drawing.class;
+  //                          }
+  //
+  //                          return false;
+  //                        });
+  //              }
+  //
+  //              return false;
+  //            });
+  //  }
+  //
+  //  private DocUnitDocx convertToImageElement() {
+  //    paragraph.getContent().stream()
+  //        .filter(R.class::isInstance)
+  //        .map(R.class::cast)
+  //        .map(run -> {
+  //          return
+  // run.getContent().stream().filter(Drawing.class::isInstance).map(Drawing.class::cast);
+  //        })
+  //        .count();
+  //    return null;
+  //  }
+
+  private String getAlignment(PPr pPr) {
+    if (pPr == null) {
+      return null;
+    }
+
+    Jc jc = null;
+
+    var pStyle = pPr.getPStyle();
+    if (pStyle != null && pStyle.getVal() != null) {
+      Style style = styles.get(pStyle.getVal());
+      if (style != null && style.getPPr() != null) {
+        jc = style.getPPr().getJc();
+      }
+    }
+
+    if (pPr.getJc() != null) {
+      jc = pPr.getJc();
+    }
+
+    if (jc != null && jc.getVal() != null) {
+      switch (jc.getVal()) {
+        case CENTER:
+          return "center";
+      }
+    }
+
+    return null;
+  }
+
+  private void addParagraphStyle(DocUnitTextElement textElement, PPr pPr) {
+    if (pPr == null) {
+      return;
+    }
+
+    RPrAbstract styleRPr = null;
+    var pStyle = pPr.getPStyle();
+    if (pStyle != null && pStyle.getVal() != null) {
+      var style = styles.get(pStyle.getVal());
+      if (style != null) {
+        styleRPr = style.getRPr();
+      }
+    }
+
+    textElement.setBold(isBold(styleRPr, pPr.getRPr()));
+
+    var size = getSize(styleRPr, pPr.getRPr());
+    if (size != null) {
+      textElement.setSize(size);
+    }
+
+    var underline = getUnderline(styleRPr, pPr.getRPr());
+    if (underline != null) {
+      textElement.setUnderline(underline);
+    }
+  }
+
+  private boolean isBold(RPrAbstract styleRPr, RPrAbstract rPr) {
+    if (styleRPr == null && rPr == null) {
+      return false;
+    }
+
+    boolean bold = false;
+    if (styleRPr != null && styleRPr.getB() != null) {
+      bold = styleRPr.getB().isVal();
+    }
+
+    if (rPr != null && rPr.getB() != null && rPr.getB().isVal()) {
+      bold = rPr.getB().isVal();
+    }
+
+    return bold;
+  }
+
+  private BigInteger getSize(RPrAbstract styleRPr, RPrAbstract rPr) {
+    if (styleRPr == null && rPr == null) {
+      return null;
+    }
+
+    BigInteger size = null;
+    if (styleRPr != null && styleRPr.getSz() != null && styleRPr.getSz().getVal() != null) {
+      size = styleRPr.getSz().getVal();
+    }
+
+    if (rPr != null && rPr.getSz() != null && rPr.getSz().getVal() != null) {
+      size = rPr.getSz().getVal();
+    }
+
+    return size;
+  }
+
+  private String getUnderline(RPrAbstract styleRPr, RPrAbstract rPr) {
+    if (styleRPr == null && rPr == null) {
+      return null;
+    }
+
+    UnderlineEnumeration underline = null;
+    if (styleRPr != null && styleRPr.getU() != null && styleRPr.getU().getVal() != null) {
+      underline = styleRPr.getU().getVal();
+    }
+
+    if (rPr != null && rPr.getU() != null && rPr.getU().getVal() != null) {
+      underline = rPr.getU().getVal();
+    }
+
+    if (underline != null) {
+      switch (underline) {
+        case SINGLE:
+          return "single";
+      }
+    }
+
+    return null;
+  }
+
+  private void addStyle(DocUnitTextElement textElement, RPrAbstract rPr) {
+    if (rPr == null) {
+      return;
+    }
+
+    if (rPr.getB() != null && rPr.getB().isVal()) {
+      textElement.setBold(rPr.getB().isVal());
+    }
+
+    if (rPr.getSz() != null) {
+      textElement.setSize(rPr.getSz().getVal());
+    }
+
+    if (rPr.getU() != null && rPr.getU().getVal() == UnderlineEnumeration.SINGLE) {
+      textElement.setUnderline("single");
+    }
+  }
+
+  private DocUnitRunTextElement parseTextElementFromRun(R r) {
+    var runTextElement = new DocUnitRunTextElement();
+
+    var text = parseTextFromRun(r);
+    if (!text.isEmpty()) {
+      runTextElement.setText(text);
+
+      addStyle(runTextElement, r.getRPr());
+
+      return runTextElement;
+    }
+
+    return null;
   }
 
   private String parseTextFromRun(R r) {

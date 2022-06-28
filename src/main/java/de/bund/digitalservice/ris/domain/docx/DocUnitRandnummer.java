@@ -1,19 +1,18 @@
 package de.bund.digitalservice.ris.domain.docx;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DocUnitRandnummer implements DocUnitDocx {
   private final StringBuilder number = new StringBuilder();
-  private String textContent;
+  private List<DocUnitParagraphTextElement> textElements = new ArrayList<>();
 
   public String getNumber() {
     return number.toString();
   }
 
-  public String getTextContent() {
-    return textContent;
-  }
-
-  public void setTextContent(String textContent) {
-    this.textContent = textContent;
+  public void addParagraphTextElement(DocUnitParagraphTextElement textElement) {
+    textElements.add(textElement);
   }
 
   public void addNumberText(String text) {
@@ -22,7 +21,13 @@ public class DocUnitRandnummer implements DocUnitDocx {
 
   @Override
   public String toString() {
-    return number + "" + (textContent != null ? textContent : "");
+    StringBuilder sb = new StringBuilder();
+    sb.append(number);
+    sb.append(" ");
+    for (DocUnitParagraphTextElement textElement : textElements) {
+      sb.append(textElement.toString());
+    }
+    return sb.toString();
   }
 
   @Override
@@ -32,8 +37,8 @@ public class DocUnitRandnummer implements DocUnitDocx {
     sb.append("<randnummer number=\"");
     sb.append(number);
     sb.append("\">");
-    if (textContent != null) {
-      sb.append(textContent);
+    for (DocUnitParagraphTextElement textElement : textElements) {
+      sb.append(textElement.toHtmlString());
     }
     sb.append("</randnummer>");
 

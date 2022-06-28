@@ -8,11 +8,12 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.config.ConverterConfiguration;
+import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
-import de.bund.digitalservice.ris.utils.DocxParagraphConverter;
+import de.bund.digitalservice.ris.utils.DocxConverter;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.List;
@@ -54,6 +55,8 @@ class DocxConverterServiceTest {
 
   @Autowired DocumentBuilderFactory documentBuilderFactory;
 
+  @MockBean DocxConverter converter;
+
   @Test
   void testGetOriginalText() {
     MainDocumentPart mockedMainDocumentPart = mock(MainDocumentPart.class);
@@ -94,39 +97,25 @@ class DocxConverterServiceTest {
     MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
     when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
     when(mainDocumentPart.getContent()).thenReturn(List.of("1", "2", "3", "4", "5", "6"));
+    when(converter.convert("1")).thenReturn(generateText("test"));
+    when(converter.convert("2")).thenReturn(generateRandnummer("1"));
+    when(converter.convert("3")).thenReturn(generateText("randnummer 1"));
+    when(converter.convert("4")).thenReturn(generateRandnummer("2"));
+    when(converter.convert("5")).thenReturn(generateText("randnummer 2"));
+    when(converter.convert("6")).thenReturn(generateTable("table content"));
 
     try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-            mockStatic(WordprocessingMLPackage.class);
-        MockedStatic<DocxParagraphConverter> mockedConverter =
-            mockStatic(DocxParagraphConverter.class)) {
+        mockStatic(WordprocessingMLPackage.class)) {
       mockedMLPackageStatic
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("1"))
-          .thenReturn(generateText("test"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("2"))
-          .thenReturn(generateRandnummer("1"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("3"))
-          .thenReturn(generateText("randnummer 1"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("4"))
-          .thenReturn(generateRandnummer("2"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("5"))
-          .thenReturn(generateText("randnummer 2"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("6"))
-          .thenReturn(generateTable("table content"));
 
       StepVerifier.create(service.getHtml("test.docx"))
           .consumeNextWith(
               docx2Html -> {
                 assertNotNull(docx2Html);
                 assertEquals(
-                    "<p>test</p><randnummer number=\"1\">randnummer 1</randnummer><randnummer number=\"2\">randnummer 2</randnummer>table content",
+                    "<p>test</p><randnummer number=\"1\"><p>randnummer 1</p></randnummer><randnummer number=\"2\"><p>randnummer 2</p></randnummer>table content",
                     docx2Html.getContent());
               })
           .verifyComplete();
@@ -144,30 +133,21 @@ class DocxConverterServiceTest {
 
     try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
             mockStatic(WordprocessingMLPackage.class);
-        MockedStatic<DocxParagraphConverter> mockedConverter =
-            mockStatic(DocxParagraphConverter.class)) {
+        MockedStatic<DocxConverter> mockedConverter = mockStatic(DocxConverter.class)) {
       mockedMLPackageStatic
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("1"))
-          .thenReturn(generateText("test"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("2"))
-          .thenReturn(generateRandnummer("1"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("3"))
-          .thenReturn(generateRandnummer("2"));
-      mockedConverter
-          .when(() -> DocxParagraphConverter.convert("4"))
-          .thenReturn(generateText("randnummer 2"));
+      mockedConverter.when(() -> converter.convert("1")).thenReturn(generateText("test"));
+      mockedConverter.when(() -> converter.convert("2")).thenReturn(generateRandnummer("1"));
+      mockedConverter.when(() -> converter.convert("3")).thenReturn(generateRandnummer("2"));
+      mockedConverter.when(() -> converter.convert("4")).thenReturn(generateText("randnummer 2"));
 
       StepVerifier.create(service.getHtml("test.docx"))
           .consumeNextWith(
               docx2Html -> {
                 assertNotNull(docx2Html);
                 assertEquals(
-                    "<p>test</p><randnummer number=\"1\"></randnummer><randnummer number=\"2\">randnummer 2</randnummer>",
+                    "<p>test</p><randnummer number=\"1\"></randnummer><randnummer number=\"2\"><p>randnummer 2</p></randnummer>",
                     docx2Html.getContent());
               })
           .verifyComplete();
@@ -206,9 +186,11 @@ class DocxConverterServiceTest {
     }
   }
 
-  private DocUnitTextElement generateText(String text) {
-    DocUnitTextElement textElement = new DocUnitTextElement();
-    textElement.addText(text);
+  private DocUnitParagraphTextElement generateText(String text) {
+    var textElement = new DocUnitParagraphTextElement();
+    var runTextElement = new DocUnitRunTextElement();
+    runTextElement.setText(text);
+    textElement.addRunTextElement(runTextElement);
     return textElement;
   }
 

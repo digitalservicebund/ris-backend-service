@@ -11,15 +11,23 @@ import org.docx4j.wml.P;
 import org.docx4j.wml.R;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Text;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class DocxParagraphConverterTest {
+  private DocxConverter converter;
+
+  @BeforeEach
+  void setup() {
+    converter = new DocxConverter();
+  }
+
   @Test
   void testConvert_withTbl() {
     Tbl table = new Tbl();
     JAXBElement<Tbl> tblElement = new JAXBElement<>(new QName("table"), Tbl.class, table);
 
-    var result = DocxParagraphConverter.convert(tblElement);
+    var result = converter.convert(tblElement);
 
     assertTrue(result instanceof DocUnitTable);
   }
@@ -34,7 +42,7 @@ class DocxParagraphConverterTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = DocxParagraphConverter.convert(paragraph);
+    var result = converter.convert(paragraph);
 
     assertTrue(result instanceof DocUnitTextElement);
   }
@@ -42,7 +50,7 @@ class DocxParagraphConverterTest {
   @Test
   void testConvert_withUnknownElement() {
 
-    var result = DocxParagraphConverter.convert(new Object());
+    var result = converter.convert(new Object());
 
     assertEquals("java.lang.Object", result.toString());
     assertEquals("<div style=\"color: #FF0000;\">java.lang.Object</div>", result.toHtmlString());

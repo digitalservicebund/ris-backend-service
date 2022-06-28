@@ -4,9 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import javax.xml.namespace.QName;
@@ -19,10 +20,13 @@ import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase;
 import org.docx4j.wml.ParaRPr;
 import org.docx4j.wml.R;
+import org.docx4j.wml.RPr;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
+import org.docx4j.wml.U;
+import org.docx4j.wml.UnderlineEnumeration;
 import org.junit.jupiter.api.Test;
 
 class DocUnitDocxBuilderTest {
@@ -160,20 +164,10 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitTextElement);
-    assertEquals("text", ((DocUnitTextElement) result).getText());
-  }
-
-  @Test
-  void testBuild_withTextPossibleRandnummer() {
-    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    paragraph.setPPr(new PPr());
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof DocUnitTextElement);
-    assertEquals("", ((DocUnitTextElement) result).getText());
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    var paragraphTextElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, paragraphTextElement.getRunTextElements().size());
+    assertEquals("text", paragraphTextElement.getRunTextElements().get(0).getText());
   }
 
   @Test
@@ -190,7 +184,7 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndAlignment() {
+  void testBuild_withTextAndParagraphAlignment() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
@@ -207,14 +201,15 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitTextElement);
-    DocUnitTextElement textElement = (DocUnitTextElement) result;
-    assertEquals("text", textElement.getText());
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, textElement.getRunTextElements().size());
+    assertEquals("text", textElement.getRunTextElements().get(0).getText());
     assertEquals("center", textElement.getAlignment());
   }
 
   @Test
-  void testBuild_withTextAndSize() {
+  void testBuild_withTextAndParagraphSize() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
@@ -233,14 +228,41 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitTextElement);
-    DocUnitTextElement textElement = (DocUnitTextElement) result;
-    assertEquals("text", textElement.getText());
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, textElement.getRunTextElements().size());
+    assertEquals("text", textElement.getRunTextElements().get(0).getText());
     assertEquals("48", textElement.getSize().toString());
   }
 
   @Test
-  void testBuild_withTextAndWeight() {
+  void testBuild_withTextAndRunSize() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    RPr rPr = new RPr();
+    HpsMeasure size = new HpsMeasure();
+    size.setVal(new BigInteger("48"));
+    rPr.setSz(size);
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, textElement.getRunTextElements().size());
+    DocUnitRunTextElement runTextElement = textElement.getRunTextElements().get(0);
+    assertEquals("text", runTextElement.getText());
+    assertEquals("48", runTextElement.getSize().toString());
+  }
+
+  @Test
+  void testBuild_withTextAndParagraphWeight() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
@@ -259,10 +281,90 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitTextElement);
-    DocUnitTextElement textElement = (DocUnitTextElement) result;
-    assertEquals("text", textElement.getText());
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, textElement.getRunTextElements().size());
+    assertEquals("text", textElement.getRunTextElements().get(0).getText());
     assertEquals(true, textElement.getBold());
+  }
+
+  @Test
+  void testBuild_withTextAndRunWeight() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    RPr rPr = new RPr();
+    BooleanDefaultTrue bold = new BooleanDefaultTrue();
+    bold.setVal(true);
+    rPr.setB(bold);
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, textElement.getRunTextElements().size());
+    DocUnitRunTextElement runTextElement = textElement.getRunTextElements().get(0);
+    assertEquals("text", runTextElement.getText());
+    assertEquals(true, runTextElement.getBold());
+  }
+
+  @Test
+  void testBuild_withTextAndParagraphUnderline() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    ParaRPr rPr = new ParaRPr();
+    U underline = new U();
+    underline.setVal(UnderlineEnumeration.SINGLE);
+    rPr.setU(underline);
+    pPr.setRPr(rPr);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, textElement.getRunTextElements().size());
+    assertEquals("text", textElement.getRunTextElements().get(0).getText());
+    assertEquals("single", textElement.getUnderline());
+  }
+
+  @Test
+  void testBuild_withTextAndRunUnderline() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    RPr rPr = new RPr();
+    U underline = new U();
+    underline.setVal(UnderlineEnumeration.SINGLE);
+    rPr.setU(underline);
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(1, textElement.getRunTextElements().size());
+    DocUnitRunTextElement runTextElement = textElement.getRunTextElements().get(0);
+    assertEquals("text", runTextElement.getText());
+    assertEquals("single", runTextElement.getUnderline());
   }
 
   @Test
@@ -271,21 +373,24 @@ class DocUnitDocxBuilderTest {
     P paragraph = new P();
     R run = new R();
     Text text = new Text();
-    text.setValue("combined");
+    text.setValue("run text 1");
     JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
     R run2 = new R();
     Text text2 = new Text();
-    text2.setValue("text");
+    text2.setValue("run text 2");
     JAXBElement<Text> element2 = new JAXBElement<>(new QName("text"), Text.class, text2);
     run2.getContent().add(element2);
     paragraph.getContent().add(run2);
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitTextElement);
-    assertEquals("combinedtext", ((DocUnitTextElement) result).getText());
+    assertTrue(result instanceof DocUnitParagraphTextElement);
+    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
+    assertEquals(2, textElement.getRunTextElements().size());
+    assertEquals("run text 1", textElement.getRunTextElements().get(0).getText());
+    assertEquals("run text 2", textElement.getRunTextElements().get(1).getText());
   }
 }

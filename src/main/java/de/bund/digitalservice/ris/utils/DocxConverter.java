@@ -2,13 +2,19 @@ package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
 import jakarta.xml.bind.JAXBElement;
+import java.util.Map;
 import org.docx4j.wml.P;
+import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 
-public class DocxParagraphConverter {
-  private DocxParagraphConverter() {}
+public class DocxConverter {
+  Map<String, Style> styles;
 
-  public static DocUnitDocx convert(Object part) {
+  public void setStyles(Map<String, Style> styles) {
+    this.styles = styles;
+  }
+
+  public DocUnitDocx convert(Object part) {
     if (part instanceof P p) {
       return convertP(p);
     } else if (part instanceof JAXBElement<?> element && element.getDeclaredType() == Tbl.class) {
@@ -28,14 +34,14 @@ public class DocxParagraphConverter {
     };
   }
 
-  private static DocUnitDocx convertP(P part) {
-    var builder = DocUnitDocxBuilder.newInstance().setParagraph(part);
+  private DocUnitDocx convertP(P part) {
+    var builder = DocUnitDocxBuilder.newInstance().setStyles(styles).setParagraph(part);
 
     return builder.build();
   }
 
-  private static DocUnitDocx convertTbl(Tbl part) {
-    var builder = DocUnitDocxBuilder.newInstance().setTable(part);
+  private DocUnitDocx convertTbl(Tbl part) {
+    var builder = DocUnitDocxBuilder.newInstance().setStyles(styles).setTable(part);
 
     return builder.build();
   }
