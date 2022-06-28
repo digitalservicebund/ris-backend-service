@@ -50,7 +50,7 @@
     "@testing-library/vue": "^6.6.0",
     "@types/node": "^18.0.0",
     "@types/webfontloader": "^1.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.29.0",
+    "@typescript-eslint/eslint-plugin": "^5.30.0",
     "@typescript-eslint/parser": "^5.30.0",
     "@vitejs/plugin-vue": "^2.3.3",
     "@vue/eslint-config-prettier": "^7.0.0",
