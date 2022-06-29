@@ -3,15 +3,27 @@ package de.bund.digitalservice.ris.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
+import de.bund.digitalservice.ris.domain.docx.DocUnitImageElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
+import java.util.HashMap;
 import javax.xml.namespace.QName;
+import org.docx4j.dml.CTBlip;
+import org.docx4j.dml.CTBlipFillProperties;
+import org.docx4j.dml.Graphic;
+import org.docx4j.dml.GraphicData;
+import org.docx4j.dml.picture.Pic;
+import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.BooleanDefaultTrue;
+import org.docx4j.wml.Drawing;
 import org.docx4j.wml.HpsMeasure;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
@@ -125,7 +137,7 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withRandnummer() {
+  void testBuild_withBorderNumber() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();
@@ -142,8 +154,8 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitRandnummer);
-    assertEquals("1", ((DocUnitRandnummer) result).getNumber());
+    assertTrue(result instanceof DocUnitBorderNumber);
+    assertEquals("1", ((DocUnitBorderNumber) result).getNumber());
   }
 
   @Test
@@ -164,10 +176,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    var paragraphTextElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, paragraphTextElement.getRunTextElements().size());
-    assertEquals("text", paragraphTextElement.getRunTextElements().get(0).getText());
+    assertTrue(result instanceof DocUnitParagraphElement);
+    var paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
   }
 
   @Test
@@ -180,7 +194,9 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertNull(result);
+    assertTrue(result instanceof DocUnitParagraphElement);
+    var paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(paragraphElement.getRunElements().isEmpty());
   }
 
   @Test
@@ -201,11 +217,13 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, textElement.getRunTextElements().size());
-    assertEquals("text", textElement.getRunTextElements().get(0).getText());
-    assertEquals("center", textElement.getAlignment());
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("center", paragraphElement.getAlignment());
   }
 
   @Test
@@ -228,11 +246,13 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, textElement.getRunTextElements().size());
-    assertEquals("text", textElement.getRunTextElements().get(0).getText());
-    assertEquals("48", textElement.getSize().toString());
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("48", paragraphElement.getSize().toString());
   }
 
   @Test
@@ -253,10 +273,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, textElement.getRunTextElements().size());
-    DocUnitRunTextElement runTextElement = textElement.getRunTextElements().get(0);
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = ((DocUnitRunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
     assertEquals("48", runTextElement.getSize().toString());
   }
@@ -281,11 +303,13 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, textElement.getRunTextElements().size());
-    assertEquals("text", textElement.getRunTextElements().get(0).getText());
-    assertEquals(true, textElement.getBold());
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(true, paragraphElement.getBold());
   }
 
   @Test
@@ -306,10 +330,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, textElement.getRunTextElements().size());
-    DocUnitRunTextElement runTextElement = textElement.getRunTextElements().get(0);
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = (DocUnitRunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertEquals(true, runTextElement.getBold());
   }
@@ -334,11 +360,13 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, textElement.getRunTextElements().size());
-    assertEquals("text", textElement.getRunTextElements().get(0).getText());
-    assertEquals("single", textElement.getUnderline());
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("single", paragraphElement.getUnderline());
   }
 
   @Test
@@ -359,10 +387,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(1, textElement.getRunTextElements().size());
-    DocUnitRunTextElement runTextElement = textElement.getRunTextElements().get(0);
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = (DocUnitRunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertEquals("single", runTextElement.getUnderline());
   }
@@ -387,10 +417,57 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphTextElement);
-    DocUnitParagraphTextElement textElement = (DocUnitParagraphTextElement) result;
-    assertEquals(2, textElement.getRunTextElements().size());
-    assertEquals("run text 1", textElement.getRunTextElements().get(0).getText());
-    assertEquals("run text 2", textElement.getRunTextElements().get(1).getText());
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(2, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals("run text 1", runTextElement.getText());
+    runElement = paragraphElement.getRunElements().get(1);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals("run text 2", runTextElement.getText());
+  }
+
+  @Test
+  void testBuild_withInlineImage() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    Inline inline = new Inline();
+    Graphic graphic = new Graphic();
+    GraphicData graphicData = new GraphicData();
+    Pic pic = new Pic();
+    CTBlipFillProperties blibFill = new CTBlipFillProperties();
+    CTBlip blib = new CTBlip();
+    blib.setEmbed("image-ref");
+    blibFill.setBlip(blib);
+    pic.setBlipFill(blibFill);
+    graphicData.getAny().add(pic);
+    graphic.setGraphicData(graphicData);
+    inline.setGraphic(graphic);
+    drawing.getAnchorOrInline().add(inline);
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    HashMap<String, BinaryPartAbstractImage> images = new HashMap<>();
+    BinaryPartAbstractImage image = mock(BinaryPartAbstractImage.class);
+    when(image.getContentType()).thenReturn("content-type");
+    when(image.getBytes()).thenReturn(new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).setImages(images).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitImageElement) runElement;
+    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("AQI=", runImageElement.getBase64Representation());
   }
 }

@@ -1,17 +1,18 @@
 <script lang="ts" setup>
 import { Bold } from "@tiptap/extension-bold"
+import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
+import { Image } from "@tiptap/extension-image"
 import { Italic } from "@tiptap/extension-italic"
 import { Paragraph } from "@tiptap/extension-paragraph"
 import { Strike } from "@tiptap/extension-strike"
 import { Text } from "@tiptap/extension-text"
+import { TextAlign } from "@tiptap/extension-text-align"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { PropType, watch, ref } from "vue"
-import {
-  DocUnitParagraphExtension,
-  Randnummer,
-} from "../editor/docUnitExtension"
+import { BorderNumber } from "../editor/border-number"
+import { FontSize } from "../editor/font-size"
 import { FieldSize } from "../types/FieldSize"
 
 const props = defineProps({
@@ -42,12 +43,20 @@ const editor = new Editor({
     Document,
     Paragraph,
     Text,
-    Randnummer,
-    DocUnitParagraphExtension,
+    BorderNumber,
     Bold,
+    Color,
+    FontSize,
     Italic,
     Underline,
     Strike,
+    TextAlign.configure({
+      types: ["paragraph", "span"],
+    }),
+    Image.configure({
+      allowBase64: true,
+      inline: true,
+    }),
   ],
   onUpdate: () => {
     // outgoing changes

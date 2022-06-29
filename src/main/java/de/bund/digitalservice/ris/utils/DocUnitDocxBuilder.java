@@ -1,16 +1,21 @@
 package de.bund.digitalservice.ris.utils;
 
+import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitImageElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.wml.Drawing;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
@@ -22,11 +27,16 @@ import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
 import org.docx4j.wml.UnderlineEnumeration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DocUnitDocxBuilder {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocUnitDocxBuilder.class);
+
   P paragraph;
   Tbl table;
   Map<String, Style> styles = new HashMap<>();
+  Map<String, BinaryPartAbstractImage> images = new HashMap<>();
 
   private DocUnitDocxBuilder() {}
 
@@ -36,6 +46,12 @@ public class DocUnitDocxBuilder {
 
   public DocUnitDocxBuilder setStyles(Map<String, Style> styles) {
     this.styles = styles;
+
+    return this;
+  }
+
+  public DocUnitDocxBuilder setImages(Map<String, BinaryPartAbstractImage> images) {
+    this.images = images;
 
     return this;
   }
@@ -59,10 +75,8 @@ public class DocUnitDocxBuilder {
 
     if (isRandnummer()) {
       return convertToRandnummer();
-      //    } else if (isImage()) {
-      //      return convertToImageElement();
-    } else if (isText()) {
-      return convertToParagraphTextElement();
+    } else if (isParagraph()) {
+      return convertToParagraphElement();
     }
 
     return null;
@@ -78,8 +92,8 @@ public class DocUnitDocxBuilder {
     return false;
   }
 
-  private DocUnitRandnummer convertToRandnummer() {
-    DocUnitRandnummer randnummer = new DocUnitRandnummer();
+  private DocUnitBorderNumber convertToRandnummer() {
+    DocUnitBorderNumber randnummer = new DocUnitBorderNumber();
 
     paragraph.getContent().stream()
         .filter(R.class::isInstance)
@@ -87,6 +101,10 @@ public class DocUnitDocxBuilder {
         .forEach(r -> randnummer.addNumberText(parseTextFromRun(r)));
 
     return randnummer;
+  }
+
+  private boolean isParagraph() {
+    return paragraph != null;
   }
 
   private boolean isText() {
@@ -119,66 +137,100 @@ public class DocUnitDocxBuilder {
             });
   }
 
-  private DocUnitParagraphTextElement convertToParagraphTextElement() {
-    var textElement = new DocUnitParagraphTextElement();
+  private DocUnitParagraphElement convertToParagraphElement() {
+    var paragraphElement = new DocUnitParagraphElement();
 
     var pPr = paragraph.getPPr();
     String alignment = getAlignment(pPr);
     if (alignment != null) {
-      textElement.setAlignment(alignment);
+      paragraphElement.setAlignment(alignment);
     }
 
-    addParagraphStyle(textElement, pPr);
+    addParagraphStyle(paragraphElement, pPr);
 
     paragraph.getContent().stream()
         .filter(R.class::isInstance)
         .map(R.class::cast)
         .forEach(
             r -> {
-              var text = parseTextElementFromRun(r);
-              if (text != null) {
-                textElement.addRunTextElement(text);
+              StringBuilder textValue = new StringBuilder();
+              r.getContent()
+                  .forEach(
+                      element -> {
+                        if (element instanceof JAXBElement<?> jaxbElement) {
+                          var declaredType = jaxbElement.getDeclaredType();
+                          if (declaredType == Text.class) {
+                            var text = ((Text) jaxbElement.getValue()).getValue();
+                            if (!text.isEmpty()) {
+                              textValue.append(text);
+                            }
+                          } else if (declaredType == Drawing.class) {
+                            if (!textValue.isEmpty()) {
+                              paragraphElement.addRunElement(
+                                  generateRunTextElement(textValue.toString(), r.getRPr()));
+                            }
+                            paragraphElement.addRunElement(
+                                parseDrawing((Drawing) jaxbElement.getValue()));
+                          } else {
+                            LOGGER.error("unknown run element: {}", declaredType.getName());
+                          }
+                        }
+                      });
+              if (!textValue.isEmpty()) {
+                paragraphElement.addRunElement(
+                    generateRunTextElement(textValue.toString(), r.getRPr()));
               }
             });
 
-    return textElement;
+    return paragraphElement;
   }
 
-  //  private boolean isImage() {
-  //    if (paragraph == null) {
-  //      return false;
-  //    }
-  //
-  //    return paragraph.getContent().stream()
-  //        .anyMatch(
-  //            tag -> {
-  //              if (tag instanceof R r) {
-  //                return r.getContent().stream()
-  //                    .anyMatch(
-  //                        subTag -> {
-  //                          if (subTag instanceof JAXBElement<?> element) {
-  //                            return element.getDeclaredType() == Drawing.class;
-  //                          }
-  //
-  //                          return false;
-  //                        });
-  //              }
-  //
-  //              return false;
-  //            });
-  //  }
-  //
-  //  private DocUnitDocx convertToImageElement() {
-  //    paragraph.getContent().stream()
-  //        .filter(R.class::isInstance)
-  //        .map(R.class::cast)
-  //        .map(run -> {
-  //          return
-  // run.getContent().stream().filter(Drawing.class::isInstance).map(Drawing.class::cast);
-  //        })
-  //        .count();
-  //    return null;
-  //  }
+  private DocUnitRunTextElement generateRunTextElement(String text, RPrAbstract rPr) {
+    DocUnitRunTextElement runTextElement = new DocUnitRunTextElement();
+
+    runTextElement.setText(text);
+    addStyle(runTextElement, rPr);
+
+    return runTextElement;
+  }
+
+  private DocUnitImageElement parseDrawing(Drawing drawing) {
+    if (drawing.getAnchorOrInline().size() != 1) {
+      throw new DocxConverterException("more than one graphic data in a drawing");
+    }
+
+    var drawingObject = drawing.getAnchorOrInline().get(0);
+    if (drawingObject instanceof Inline inline) {
+      return parseInlineImageElement(inline);
+    } else {
+      throw new DocxConverterException("unsupported drawing object");
+    }
+  }
+
+  private DocUnitImageElement parseInlineImageElement(Inline inline) {
+    if (inline == null
+        || inline.getGraphic() == null
+        || inline.getGraphic().getGraphicData() == null) {
+      throw new DocxConverterException("no graphic data");
+    }
+
+    DocUnitImageElement imageElement = new DocUnitImageElement();
+
+    var pic = inline.getGraphic().getGraphicData().getPic();
+
+    if (pic != null) {
+      var embed = pic.getBlipFill().getBlip().getEmbed();
+      var image = images.get(embed);
+
+      var base64 = Base64.getEncoder().encodeToString(image.getBytes());
+      imageElement.setBase64Representation(base64);
+      imageElement.setContentType(image.getContentType());
+    } else {
+      throw new DocxConverterException("not a picture");
+    }
+
+    return imageElement;
+  }
 
   private String getAlignment(PPr pPr) {
     if (pPr == null) {
@@ -310,21 +362,6 @@ public class DocUnitDocxBuilder {
     if (rPr.getU() != null && rPr.getU().getVal() == UnderlineEnumeration.SINGLE) {
       textElement.setUnderline("single");
     }
-  }
-
-  private DocUnitRunTextElement parseTextElementFromRun(R r) {
-    var runTextElement = new DocUnitRunTextElement();
-
-    var text = parseTextFromRun(r);
-    if (!text.isEmpty()) {
-      runTextElement.setText(text);
-
-      addStyle(runTextElement, r.getRPr());
-
-      return runTextElement;
-    }
-
-    return null;
   }
 
   private String parseTextFromRun(R r) {

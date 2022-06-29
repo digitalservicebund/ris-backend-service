@@ -1,16 +1,11 @@
 <script lang="ts" setup>
-import { Document } from "@tiptap/extension-document"
-import { Paragraph } from "@tiptap/extension-paragraph"
-import { Text } from "@tiptap/extension-text"
-import { EditorContent, Editor } from "@tiptap/vue-3"
 import { ref } from "vue"
 import { getAllDocxFiles, getDocxFileAsHtml } from "../api/docUnitService"
-import {
-  Randnummer,
-  DocUnitParagraphExtension,
-} from "../editor/docUnitExtension"
+import EditorVmodel from "../components/EditorVmodel.vue"
 
 const fileNames = ref()
+const htmlContent = ref()
+
 getAllDocxFiles().then((list) => {
   fileNames.value = list
 })
@@ -20,29 +15,16 @@ function getHtml(name: string) {
   fileName.value = name
 
   getDocxFileAsHtml(name).then((html) => {
-    editor.commands.setContent(html.content)
+    htmlContent.value = html.content
   })
 }
-
-const editor = new Editor({
-  content: "<p>I’m running Tiptap with Vue.js. 🎉</p>",
-  extensions: [
-    Document,
-    Paragraph,
-    Text,
-    Randnummer,
-    DocUnitParagraphExtension,
-  ],
-})
 </script>
 
 <template>
   <div v-if="!!fileName">
     <a @click="fileName = null" @keyup="fileName = null">zurück zur Liste</a>
     <br />
-    <div v-if="editor">
-      <editor-content :editor="editor" />
-    </div>
+    <EditorVmodel v-model="htmlContent" field-size="max" :editable="false" />
   </div>
   <div v-if="!fileName">
     <div v-for="file in fileNames" :key="file">

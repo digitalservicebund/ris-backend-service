@@ -3,15 +3,15 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocUnitRandnummer implements DocUnitDocx {
+public class DocUnitBorderNumber implements DocUnitDocx {
   private final StringBuilder number = new StringBuilder();
-  private List<DocUnitParagraphTextElement> textElements = new ArrayList<>();
+  private List<DocUnitParagraphElement> textElements = new ArrayList<>();
 
   public String getNumber() {
     return number.toString();
   }
 
-  public void addParagraphTextElement(DocUnitParagraphTextElement textElement) {
+  public void addParagraphTextElement(DocUnitParagraphElement textElement) {
     textElements.add(textElement);
   }
 
@@ -24,7 +24,7 @@ public class DocUnitRandnummer implements DocUnitDocx {
     StringBuilder sb = new StringBuilder();
     sb.append(number);
     sb.append(" ");
-    for (DocUnitParagraphTextElement textElement : textElements) {
+    for (DocUnitParagraphElement textElement : textElements) {
       sb.append(textElement.toString());
     }
     return sb.toString();
@@ -34,13 +34,13 @@ public class DocUnitRandnummer implements DocUnitDocx {
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
 
-    sb.append("<randnummer number=\"");
+    sb.append("<border-number number=\"");
     sb.append(number);
     sb.append("\">");
-    for (DocUnitParagraphTextElement textElement : textElements) {
+    for (DocUnitParagraphElement textElement : textElements) {
       sb.append(textElement.toHtmlString());
     }
-    sb.append("</randnummer>");
+    sb.append("</border-number>");
 
     return sb.toString();
   }

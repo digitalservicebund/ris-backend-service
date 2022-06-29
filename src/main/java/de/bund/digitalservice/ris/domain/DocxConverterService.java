@@ -1,15 +1,17 @@
 package de.bund.digitalservice.ris.domain;
 
+import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitRandnummer;
+import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.utils.DocxConverter;
+import de.bund.digitalservice.ris.utils.DocxConverterException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -26,6 +28,10 @@ import javax.xml.xpath.XPathFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.wml.Style;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
@@ -123,7 +129,7 @@ public class DocxConverterService {
     }
 
     List<DocUnitDocx> packedList = new ArrayList<>();
-    DocUnitRandnummer[] lastRandnummer = {null};
+    DocUnitBorderNumber[] lastRandnummer = {null};
 
     WordprocessingMLPackage mlPackage;
     try {
@@ -145,19 +151,53 @@ public class DocxConverterService {
     }
     converter.setStyles(styles);
 
+    Map<String, BinaryPartAbstractImage> images = new HashMap<>();
+    if (mlPackage.getParts() != null && mlPackage.getParts().getParts() != null) {
+      mlPackage
+          .getParts()
+          .getParts()
+          .values()
+          .forEach(
+              part -> {
+                if (part instanceof ImageJpegPart jpegPart) {
+                  part.getSourceRelationships()
+                      .forEach(
+                          relationship -> {
+                            images.put(relationship.getId(), jpegPart);
+                          });
+                } else if (part instanceof MetafileEmfPart emfPart) {
+                  part.getSourceRelationships()
+                      .forEach(
+                          relationship -> {
+                            images.put(relationship.getId(), emfPart);
+                          });
+                } else if (part instanceof ImagePngPart pngPart) {
+                  part.getSourceRelationships()
+                      .forEach(
+                          relationship -> {
+                            images.put(relationship.getId(), pngPart);
+                          });
+                } else if (part instanceof BinaryPartAbstractImage imagePart) {
+                  throw new DocxConverterException(
+                      "unknown image file format: " + imagePart.getClass().getName());
+                }
+              });
+    }
+    converter.setImages(images);
+
     mlPackage.getMainDocumentPart().getContent().stream()
         .map(converter::convert)
         .filter(Objects::nonNull)
         .forEach(
             element -> {
-              if (lastRandnummer[0] == null && !(element instanceof DocUnitRandnummer)) {
+              if (lastRandnummer[0] == null && !(element instanceof DocUnitBorderNumber)) {
                 packedList.add(element);
-              } else if (element instanceof DocUnitRandnummer randnummer) {
+              } else if (element instanceof DocUnitBorderNumber randnummer) {
                 if (lastRandnummer[0] != null) {
                   packedList.add(lastRandnummer[0]);
                 }
                 lastRandnummer[0] = randnummer;
-              } else if (element instanceof DocUnitParagraphTextElement textElement) {
+              } else if (element instanceof DocUnitParagraphElement textElement) {
                 lastRandnummer[0].addParagraphTextElement(textElement);
                 packedList.add(lastRandnummer[0]);
                 lastRandnummer[0] = null;

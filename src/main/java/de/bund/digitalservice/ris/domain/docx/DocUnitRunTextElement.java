@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-public class DocUnitRunTextElement extends DocUnitTextElement {
+public class DocUnitRunTextElement extends DocUnitTextElement implements DocUnitRunElement {
   private String text;
 
   public String getText() {

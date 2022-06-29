@@ -3,9 +3,9 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocUnitParagraphTextElement extends DocUnitTextElement {
+public class DocUnitParagraphElement extends DocUnitTextElement {
   private String alignment;
-  private final List<DocUnitRunTextElement> runTextElements = new ArrayList<>();
+  private final List<DocUnitRunElement> runElements = new ArrayList<>();
 
   public String getAlignment() {
     return alignment;
@@ -15,17 +15,17 @@ public class DocUnitParagraphTextElement extends DocUnitTextElement {
     this.alignment = alignment;
   }
 
-  public void addRunTextElement(DocUnitRunTextElement text) {
-    this.runTextElements.add(text);
+  public void addRunElement(DocUnitRunElement element) {
+    this.runElements.add(element);
   }
 
-  public List<DocUnitRunTextElement> getRunTextElements() {
-    return runTextElements;
+  public List<DocUnitRunElement> getRunElements() {
+    return runElements;
   }
 
   @Override
   public String toString() {
-    return runTextElements.toString();
+    return runElements.toString();
   }
 
   @Override
@@ -49,8 +49,8 @@ public class DocUnitParagraphTextElement extends DocUnitTextElement {
     }
     sb.append(">");
 
-    for (DocUnitRunTextElement textElement : runTextElements) {
-      sb.append(textElement.toHtmlString());
+    for (DocUnitRunElement element : runElements) {
+      sb.append(element.toHtmlString());
     }
     sb.append("</p>");
 

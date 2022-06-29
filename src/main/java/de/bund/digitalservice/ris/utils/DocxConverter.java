@@ -3,12 +3,18 @@ package de.bund.digitalservice.ris.utils;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 
 public class DocxConverter {
   Map<String, Style> styles;
+  Map<String, BinaryPartAbstractImage> images;
+
+  public void setImages(Map<String, BinaryPartAbstractImage> images) {
+    this.images = images;
+  }
 
   public void setStyles(Map<String, Style> styles) {
     this.styles = styles;
@@ -35,13 +41,15 @@ public class DocxConverter {
   }
 
   private DocUnitDocx convertP(P part) {
-    var builder = DocUnitDocxBuilder.newInstance().setStyles(styles).setParagraph(part);
+    var builder =
+        DocUnitDocxBuilder.newInstance().setStyles(styles).setImages(images).setParagraph(part);
 
     return builder.build();
   }
 
   private DocUnitDocx convertTbl(Tbl part) {
-    var builder = DocUnitDocxBuilder.newInstance().setStyles(styles).setTable(part);
+    var builder =
+        DocUnitDocxBuilder.newInstance().setStyles(styles).setImages(images).setTable(part);
 
     return builder.build();
   }
