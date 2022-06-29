@@ -79,7 +79,8 @@ watch(
 )
 
 const showButtons = () => {
-  return props.editable && hasFocus.value
+  // focus doesn't work yet: upon click on a formatting button, the editor loses focus and the buttons disappear
+  return props.editable // && hasFocus.value
 }
 
 interface editorBtn {
