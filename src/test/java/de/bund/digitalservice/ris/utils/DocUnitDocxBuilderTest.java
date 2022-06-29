@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -20,6 +21,7 @@ import org.docx4j.dml.CTBlipFillProperties;
 import org.docx4j.dml.Graphic;
 import org.docx4j.dml.GraphicData;
 import org.docx4j.dml.picture.Pic;
+import org.docx4j.dml.wordprocessingDrawing.Anchor;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.BooleanDefaultTrue;
@@ -155,7 +157,11 @@ class DocUnitDocxBuilderTest {
     var result = builder.setParagraph(paragraph).build();
 
     assertTrue(result instanceof DocUnitBorderNumber);
-    assertEquals("1", ((DocUnitBorderNumber) result).getNumber());
+    var borderNumberElement = (DocUnitBorderNumber) result;
+    assertEquals("1", borderNumberElement.getNumber());
+
+    var htmlString = borderNumberElement.toHtmlString();
+    assertEquals("<border-number number=\"1\"></border-number>", htmlString);
   }
 
   @Test
@@ -182,6 +188,9 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p>text</p>", htmlString);
   }
 
   @Test
@@ -197,6 +206,9 @@ class DocUnitDocxBuilderTest {
     assertTrue(result instanceof DocUnitParagraphElement);
     var paragraphElement = (DocUnitParagraphElement) result;
     assertTrue(paragraphElement.getRunElements().isEmpty());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p></p>", htmlString);
   }
 
   @Test
@@ -224,6 +236,9 @@ class DocUnitDocxBuilderTest {
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
     assertEquals("center", paragraphElement.getAlignment());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"text-align: center;\">text</p>", htmlString);
   }
 
   @Test
@@ -253,6 +268,9 @@ class DocUnitDocxBuilderTest {
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
     assertEquals("48", paragraphElement.getSize().toString());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"font-size: 24px;\">text</p>", htmlString);
   }
 
   @Test
@@ -281,6 +299,9 @@ class DocUnitDocxBuilderTest {
     var runTextElement = ((DocUnitRunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
     assertEquals("48", runTextElement.getSize().toString());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"font-size: 24px;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -310,6 +331,9 @@ class DocUnitDocxBuilderTest {
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
     assertEquals(true, paragraphElement.getBold());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"font-weight: bold;\">text</p>", htmlString);
   }
 
   @Test
@@ -338,6 +362,9 @@ class DocUnitDocxBuilderTest {
     var runTextElement = (DocUnitRunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertEquals(true, runTextElement.getBold());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"font-weight: bold;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -367,6 +394,9 @@ class DocUnitDocxBuilderTest {
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
     assertEquals("single", paragraphElement.getUnderline());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"text-decoration: underline;\">text</p>", htmlString);
   }
 
   @Test
@@ -395,6 +425,9 @@ class DocUnitDocxBuilderTest {
     var runTextElement = (DocUnitRunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertEquals("single", runTextElement.getUnderline());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"text-decoration: underline;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -428,6 +461,9 @@ class DocUnitDocxBuilderTest {
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     runTextElement = (DocUnitRunTextElement) runElement;
     assertEquals("run text 2", runTextElement.getText());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p>run text 1run text 2</p>", htmlString);
   }
 
   @Test
@@ -469,5 +505,78 @@ class DocUnitDocxBuilderTest {
     var runImageElement = (DocUnitImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><img src=\"data:content-type;base64, AQI=\" /></p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withAnchorGraphic() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    Anchor anchor = new Anchor();
+    drawing.getAnchorOrInline().add(anchor);
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    Exception exception =
+        assertThrows(
+            DocxConverterException.class,
+            () -> {
+              builder.setParagraph(paragraph).build();
+            });
+
+    assertEquals("unsupported drawing object", exception.getMessage());
+  }
+
+  @Test
+  void testBuild_withMultipleGraphicObjects() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    Anchor anchor = new Anchor();
+    drawing.getAnchorOrInline().add(anchor);
+    Inline inline = new Inline();
+    drawing.getAnchorOrInline().add(inline);
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    Exception exception =
+        assertThrows(
+            DocxConverterException.class,
+            () -> {
+              builder.setParagraph(paragraph).build();
+            });
+
+    assertEquals("more than one graphic data in a drawing", exception.getMessage());
+  }
+
+  @Test
+  void testBuild_withInlineImageWithoutGraphicData() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    Inline inline = new Inline();
+    Graphic graphic = new Graphic();
+    inline.setGraphic(graphic);
+    drawing.getAnchorOrInline().add(inline);
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    Exception exception =
+        assertThrows(
+            DocxConverterException.class,
+            () -> {
+              builder.setParagraph(paragraph).build();
+            });
+
+    assertEquals("no graphic data", exception.getMessage());
   }
 }

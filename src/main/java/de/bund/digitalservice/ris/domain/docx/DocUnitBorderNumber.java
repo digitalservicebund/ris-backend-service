@@ -20,17 +20,6 @@ public class DocUnitBorderNumber implements DocUnitDocx {
   }
 
   @Override
-  public String toString() {
-    StringBuilder sb = new StringBuilder();
-    sb.append(number);
-    sb.append(" ");
-    for (DocUnitParagraphElement textElement : textElements) {
-      sb.append(textElement.toString());
-    }
-    return sb.toString();
-  }
-
-  @Override
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
 

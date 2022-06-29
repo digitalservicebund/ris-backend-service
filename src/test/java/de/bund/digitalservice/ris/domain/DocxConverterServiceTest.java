@@ -2,9 +2,11 @@ package de.bund.digitalservice.ris.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.config.ConverterConfiguration;
@@ -17,15 +19,34 @@ import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
+import org.docx4j.openpackaging.exceptions.InvalidFormatException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
+import org.docx4j.openpackaging.parts.Part;
+import org.docx4j.openpackaging.parts.PartName;
+import org.docx4j.openpackaging.parts.Parts;
+import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
+import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
+import org.docx4j.relationships.Relationship;
+import org.docx4j.wml.Style;
+import org.docx4j.wml.Style.Name;
+import org.docx4j.wml.Styles;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +78,10 @@ class DocxConverterServiceTest {
   @Autowired DocumentBuilderFactory documentBuilderFactory;
 
   @MockBean DocxConverter converter;
+
+  @Captor ArgumentCaptor<Map<String, Style>> styleMapCaptor;
+
+  @Captor ArgumentCaptor<Map<String, BinaryPartAbstractImage>> imageMapCaptor;
 
   @Test
   void testGetOriginalText() {
@@ -120,6 +145,96 @@ class DocxConverterServiceTest {
                     docx2Html.getContent());
               })
           .verifyComplete();
+    }
+  }
+
+  @Test
+  void testGetHtml_withStyleInformation() throws Docx4JException {
+    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
+        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+    MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
+    StyleDefinitionsPart styleDefinitionsPart = mock(StyleDefinitionsPart.class);
+    Styles styles = mock(Styles.class);
+    Style style = mock(Style.class);
+    Name name = mock(Name.class);
+    when(name.getVal()).thenReturn("test-style");
+    when(style.getName()).thenReturn(name);
+    when(styles.getStyle()).thenReturn(List.of(style));
+    when(styleDefinitionsPart.getJaxbElement()).thenReturn(styles);
+    when(mainDocumentPart.getStyleDefinitionsPart()).thenReturn(styleDefinitionsPart);
+    when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
+    when(mainDocumentPart.getContent()).thenReturn(Collections.emptyList());
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getHtml("test.docx"))
+          .consumeNextWith(
+              docx2Html -> {
+                assertNotNull(docx2Html);
+              })
+          .verifyComplete();
+
+      verify(converter).setStyles(styleMapCaptor.capture());
+      assertTrue(styleMapCaptor.getValue().containsKey("test-style"));
+      assertEquals(style, styleMapCaptor.getValue().get("test-style"));
+    }
+  }
+
+  @Test
+  void testGetHtml_withImages() throws InvalidFormatException {
+    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
+        .thenReturn(CompletableFuture.completedFuture(responseBytes));
+    when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+    MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
+    Parts parts = mock(Parts.class);
+    HashMap<PartName, Part> partMap = new HashMap<>();
+    PartName partName = new PartName("/emfPart");
+    Part part = new MetafileEmfPart(partName);
+    Relationship relationship = new Relationship();
+    relationship.setId("emfPart");
+    part.getSourceRelationships().add(relationship);
+    partMap.put(partName, part);
+    partName = new PartName("/jpegPart");
+    part = new ImageJpegPart(partName);
+    relationship = new Relationship();
+    relationship.setId("jpegPart");
+    part.getSourceRelationships().add(relationship);
+    partMap.put(partName, part);
+    partName = new PartName("/pngPart");
+    part = new ImagePngPart(partName);
+    relationship = new Relationship();
+    relationship.setId("pngPart");
+    part.getSourceRelationships().add(relationship);
+    partMap.put(partName, part);
+    when(parts.getParts()).thenReturn(partMap);
+    when(mlPackage.getParts()).thenReturn(parts);
+    when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
+    when(mainDocumentPart.getContent()).thenReturn(Collections.emptyList());
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getHtml("test.docx"))
+          .consumeNextWith(Assertions::assertNotNull)
+          .verifyComplete();
+
+      verify(converter).setImages(imageMapCaptor.capture());
+      Map<String, BinaryPartAbstractImage> imageMapValue = imageMapCaptor.getValue();
+      assertEquals(3, imageMapValue.values().size());
+      assertTrue(imageMapValue.containsKey("emfPart"));
+      assertEquals(MetafileEmfPart.class, imageMapValue.get("emfPart").getClass());
+      assertTrue(imageMapValue.containsKey("jpegPart"));
+      assertEquals(ImageJpegPart.class, imageMapValue.get("jpegPart").getClass());
+      assertTrue(imageMapValue.containsKey("pngPart"));
+      assertEquals(ImagePngPart.class, imageMapValue.get("pngPart").getClass());
     }
   }
 

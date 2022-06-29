@@ -24,11 +24,6 @@ public class DocUnitParagraphElement extends DocUnitTextElement {
   }
 
   @Override
-  public String toString() {
-    return runElements.toString();
-  }
-
-  @Override
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
 
