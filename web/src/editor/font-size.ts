@@ -4,13 +4,13 @@ import { Extension } from "@tiptap/core"
 
 declare module "@tiptap/core" {
   interface Commands<ReturnType> {
-    color: {
+    fontSize: {
       /**
        * Set the font size
        */
       setFontSize: (fontSize: string) => ReturnType
       /**
-       * Unset the text color
+       * Unset the font size
        */
       unsetFontSize: () => ReturnType
     }
