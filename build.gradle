@@ -123,6 +123,7 @@ spotless {
   groovyGradle {
     greclipse("4.6.3").configFile("greclipse.properties")
     toggleOffOn()
+    replaceRegex("quotes", "(['])(.*)\\1", "\"\$2\"")
   }
   format "misc", {
     target "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.yml"
