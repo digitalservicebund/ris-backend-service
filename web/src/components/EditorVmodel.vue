@@ -157,6 +157,10 @@ add("strike", "strikethrough_s")
   &__max {
     height: 640px; // ? TODO
   }
+
+  &__100percent {
+    height: 100%;
+  }
 }
 .ProseMirror-focused {
   outline: 0;
