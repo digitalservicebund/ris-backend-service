@@ -76,6 +76,86 @@
     {
       "moduleLicense": null,
       "moduleName": "software.amazon.awssdk:bom"
+    },
+    {
+      "moduleLicense": "\"Apache-2.0\";link=\"https://www.apache.org/licenses/LICENSE-2.0.txt\"",
+      "moduleVersion": "2.9.0",
+      "moduleName": "com.google.code.gson:gson"
+    },
+    {
+      "moduleLicense": "Apache-2.0",
+      "moduleVersion": "2.9.0",
+      "moduleName": "com.google.code.gson:gson"
+    },
+    {
+      "moduleLicense": "3-Clause BSD License",
+      "moduleVersion": "3.17.3",
+      "moduleName": "com.google.protobuf:protobuf-java"
+    },
+    {
+      "moduleLicense": "\"Apache-2.0\";link=\"https://www.apache.org/licenses/LICENSE-2.0.txt\"",
+      "moduleVersion": "1.8.5",
+      "moduleName": "io.gsonfire:gson-fire"
+    },
+    {
+      "moduleLicense": "Apache-2.0",
+      "moduleVersion": "1.8.5",
+      "moduleName": "io.gsonfire:gson-fire"
+    },
+    {
+      "moduleLicense": "Apache License 2.0",
+      "moduleVersion": "1.6.2",
+      "moduleName": "io.swagger:swagger-annotations"
+    },
+    {
+      "moduleLicense": "CDDL + GPLv2 with classpath exception",
+      "moduleVersion": "1.3.2",
+      "moduleName": "javax.annotation:javax.annotation-api"
+    },
+    {
+      "moduleLicense": "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0",
+      "moduleVersion": "1.3.2",
+      "moduleName": "javax.annotation:javax.annotation-api"
+    },
+    {
+      "moduleLicense": "Bouncy Castle Licence",
+      "moduleVersion": "1.69",
+      "moduleName": "org.bouncycastle:bcpkix-jdk15on"
+    },
+    {
+      "moduleLicense": "Bouncy Castle Licence",
+      "moduleVersion": "1.69",
+      "moduleName": "org.bouncycastle:bcprov-ext-jdk15on"
+    },
+    {
+      "moduleLicense": "Bouncy Castle Licence",
+      "moduleVersion": "1.69",
+      "moduleName": "org.bouncycastle:bcprov-jdk15on"
+    },
+    {
+      "moduleLicense": "Bouncy Castle Licence",
+      "moduleVersion": "1.69",
+      "moduleName": "org.bouncycastle:bcutil-jdk15on"
+    },
+    {
+      "moduleLicense": "The Apache License, Version 2.0",
+      "moduleVersion": "1.6.21",
+      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib"
+    },
+    {
+      "moduleLicense": "The Apache License, Version 2.0",
+      "moduleVersion": "1.6.21",
+      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib-common"
+    },
+    {
+      "moduleLicense": "The Apache License, Version 2.0",
+      "moduleVersion": "1.6.21",
+      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk7"
+    },
+    {
+      "moduleLicense": "The Apache License, Version 2.0",
+      "moduleVersion": "1.6.21",
+      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     }
   ]
 }
