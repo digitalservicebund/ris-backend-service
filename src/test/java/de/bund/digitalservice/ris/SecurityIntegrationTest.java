@@ -21,6 +21,8 @@ class SecurityIntegrationTest {
         .uri("/")
         .exchange()
         .expectHeader()
-        .valueEquals("Content-Security-Policy", "default-src 'self'");
+        .valueEquals(
+            "Content-Security-Policy",
+            "default-src 'self'; image-src 'self' data:; style-src 'unsafe-inline'");
   }
 }
