@@ -40,14 +40,14 @@ const onOdocCloseClick = () => {
       <v-col v-if="!showOdocPanel" cols="3" align="right">
         <div class="odoc-open" :onclick="onOdocOpenClick">
           <div class="odoc-open-text">Originaldokument</div>
-          <div class="odoc-open-icon-wrapper">
+          <div class="odoc-open-icon-background">
             <v-icon class="odoc-open-icon"> arrow_back_ios_new </v-icon>
           </div>
         </div>
       </v-col>
       <v-col v-else cols="5">
         <h3 class="odoc-editor-header">
-          <div class="odoc-close-icon-wrapper" :onclick="onOdocCloseClick">
+          <div class="odoc-close-icon-background" :onclick="onOdocCloseClick">
             <v-icon class="odoc-close-icon"> close </v-icon>
           </div>
           Originaldokument
@@ -82,20 +82,19 @@ const onOdocCloseClick = () => {
 .odoc-open-text {
   margin-left: 30px;
 }
-.odoc-open-icon-wrapper {
+.odoc-open-icon-background {
   background-color: $blue800;
   border-radius: 50%;
   width: 40px;
   height: 40px;
-  transform: rotate(90deg);
-  translate: 25px;
+  transform: rotate(90deg) translateX(-2px) translateY(-25px);
 }
 .odoc-open-icon {
   color: white;
   margin-right: 9px;
   margin-top: 8px;
 }
-.odoc-close-icon-wrapper {
+.odoc-close-icon-background {
   background-color: $blue800;
   border-radius: 50%;
   width: 40px;
