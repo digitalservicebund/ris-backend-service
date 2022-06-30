@@ -14,6 +14,8 @@ import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableColumn;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
@@ -141,8 +143,11 @@ class DocxConverterServiceTest {
               docx2Html -> {
                 assertNotNull(docx2Html);
                 assertEquals(
-                    "<p>test</p><border-number number=\"1\"><p>border number 1</p></border-number><border-number number=\"2\"><p>border number 2</p></border-number>table content",
-                    docx2Html.getContent());
+                    "<p>test</p>"
+                        + "<border-number number=\"1\"><p>border number 1</p></border-number>"
+                        + "<border-number number=\"2\"><p>border number 2</p></border-number>"
+                        + "<table><tr><td><p>table content</p></td></tr></table>",
+                    docx2Html.content());
               })
           .verifyComplete();
     }
@@ -173,10 +178,7 @@ class DocxConverterServiceTest {
           .thenReturn(mlPackage);
 
       StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-              })
+          .consumeNextWith(Assertions::assertNotNull)
           .verifyComplete();
 
       verify(converter).setStyles(styleMapCaptor.capture());
@@ -266,7 +268,7 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>test</p><border-number number=\"1\"></border-number><border-number number=\"2\"><p>border number 2</p></border-number>",
-                    docx2Html.getContent());
+                    docx2Html.content());
               })
           .verifyComplete();
     }
@@ -319,8 +321,10 @@ class DocxConverterServiceTest {
   }
 
   private DocUnitTable generateTable(String text) {
-    DocUnitTable table = new DocUnitTable();
-    table.setTextContent(text);
-    return table;
+    List<DocUnitParagraphElement> paragraphElements = List.of(generateText(text));
+    List<DocUnitTableColumn> columns = List.of(new DocUnitTableColumn(paragraphElements));
+    List<DocUnitTableRow> rows = List.of(new DocUnitTableRow(columns));
+
+    return new DocUnitTable(rows);
   }
 }

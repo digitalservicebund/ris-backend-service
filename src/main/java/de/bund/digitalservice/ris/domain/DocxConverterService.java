@@ -129,7 +129,7 @@ public class DocxConverterService {
     }
 
     List<DocUnitDocx> packedList = new ArrayList<>();
-    DocUnitBorderNumber[] lastRandnummer = {null};
+    DocUnitBorderNumber[] lastBorderNumber = {null};
 
     WordprocessingMLPackage mlPackage;
     try {
@@ -138,75 +138,80 @@ public class DocxConverterService {
       throw new DocxConverterException("Couldn't load docx file!", e);
     }
 
-    Map<String, Style> styles = Collections.emptyMap();
-    if (mlPackage.getMainDocumentPart().getStyleDefinitionsPart() != null) {
-      styles =
-          mlPackage
-              .getMainDocumentPart()
-              .getStyleDefinitionsPart()
-              .getJaxbElement()
-              .getStyle()
-              .stream()
-              .collect(Collectors.toMap(k -> k.getName().getVal(), Function.identity()));
-    }
-    converter.setStyles(styles);
-
-    Map<String, BinaryPartAbstractImage> images = new HashMap<>();
-    if (mlPackage.getParts() != null && mlPackage.getParts().getParts() != null) {
-      mlPackage
-          .getParts()
-          .getParts()
-          .values()
-          .forEach(
-              part -> {
-                if (part instanceof ImageJpegPart jpegPart) {
-                  part.getSourceRelationships()
-                      .forEach(
-                          relationship -> {
-                            images.put(relationship.getId(), jpegPart);
-                          });
-                } else if (part instanceof MetafileEmfPart emfPart) {
-                  part.getSourceRelationships()
-                      .forEach(
-                          relationship -> {
-                            images.put(relationship.getId(), emfPart);
-                          });
-                } else if (part instanceof ImagePngPart pngPart) {
-                  part.getSourceRelationships()
-                      .forEach(
-                          relationship -> {
-                            images.put(relationship.getId(), pngPart);
-                          });
-                } else if (part instanceof BinaryPartAbstractImage imagePart) {
-                  throw new DocxConverterException(
-                      "unknown image file format: " + imagePart.getClass().getName());
-                }
-              });
-    }
-    converter.setImages(images);
+    converter.setStyles(readStyles(mlPackage));
+    converter.setImages(readImages(mlPackage));
 
     mlPackage.getMainDocumentPart().getContent().stream()
         .map(converter::convert)
         .filter(Objects::nonNull)
         .forEach(
             element -> {
-              if (lastRandnummer[0] == null && !(element instanceof DocUnitBorderNumber)) {
+              if (lastBorderNumber[0] == null && !(element instanceof DocUnitBorderNumber)) {
                 packedList.add(element);
               } else if (element instanceof DocUnitBorderNumber randnummer) {
-                if (lastRandnummer[0] != null) {
-                  packedList.add(lastRandnummer[0]);
+                if (lastBorderNumber[0] != null) {
+                  packedList.add(lastBorderNumber[0]);
                 }
-                lastRandnummer[0] = randnummer;
+                lastBorderNumber[0] = randnummer;
               } else if (element instanceof DocUnitParagraphElement textElement) {
-                lastRandnummer[0].addParagraphTextElement(textElement);
-                packedList.add(lastRandnummer[0]);
-                lastRandnummer[0] = null;
+                lastBorderNumber[0].addParagraphTextElement(textElement);
+                packedList.add(lastBorderNumber[0]);
+                lastBorderNumber[0] = null;
               }
             });
 
-    Docx2Html docx2Html = new Docx2Html();
-    docx2Html.setContent(
-        packedList.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining()));
+    var content = packedList.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining());
+    Docx2Html docx2Html = new Docx2Html(content);
+
     return docx2Html;
+  }
+
+  private Map<String, Style> readStyles(WordprocessingMLPackage mlPackage) {
+    if (mlPackage == null
+        || mlPackage.getMainDocumentPart() == null
+        || mlPackage.getMainDocumentPart().getStyleDefinitionsPart() == null) {
+      return Collections.emptyMap();
+    }
+
+    return mlPackage
+        .getMainDocumentPart()
+        .getStyleDefinitionsPart()
+        .getJaxbElement()
+        .getStyle()
+        .stream()
+        .collect(Collectors.toMap(k -> k.getName().getVal(), Function.identity()));
+  }
+
+  private Map<String, BinaryPartAbstractImage> readImages(WordprocessingMLPackage mlPackage) {
+    if (mlPackage == null
+        || mlPackage.getParts() == null
+        || mlPackage.getParts().getParts() == null) {
+      return Collections.emptyMap();
+    }
+
+    Map<String, BinaryPartAbstractImage> images = new HashMap<>();
+
+    mlPackage
+        .getParts()
+        .getParts()
+        .values()
+        .forEach(
+            part -> {
+              if (part instanceof ImageJpegPart jpegPart) {
+                part.getSourceRelationships()
+                    .forEach(relationship -> images.put(relationship.getId(), jpegPart));
+              } else if (part instanceof MetafileEmfPart emfPart) {
+                part.getSourceRelationships()
+                    .forEach(relationship -> images.put(relationship.getId(), emfPart));
+              } else if (part instanceof ImagePngPart pngPart) {
+                part.getSourceRelationships()
+                    .forEach(relationship -> images.put(relationship.getId(), pngPart));
+              } else if (part instanceof BinaryPartAbstractImage imagePart) {
+                throw new DocxConverterException(
+                    "unknown image file format: " + imagePart.getClass().getName());
+              }
+            });
+
+    return images;
   }
 }

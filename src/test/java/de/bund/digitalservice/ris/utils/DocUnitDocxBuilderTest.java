@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.List;
 import javax.xml.namespace.QName;
 import org.docx4j.dml.CTBlip;
 import org.docx4j.dml.CTBlipFillProperties;
@@ -78,52 +79,42 @@ class DocUnitDocxBuilderTest {
   void testBuild_withTable() {
     // check every possible field because correct converting is not ready yet
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
-    Tbl table = new Tbl();
-
-    Tr rightTr = new Tr();
-    Text rightTrText = new Text();
-    rightTrText.setValue("text in tr;");
-    JAXBElement<Text> rightTrTextElement =
-        new JAXBElement<>(new QName("text"), Text.class, rightTrText);
-    rightTr.getContent().add(rightTrTextElement);
-    table.getContent().add(rightTr);
-
-    Tr wrongTr = new Tr();
-    wrongTr.getContent().add(new Object());
-    table.getContent().add(wrongTr);
-
-    Tc tc = new Tc();
-    Text tcText = new Text();
-    tcText.setValue(";tc text;");
-    tc.getContent().add(tcText);
-    table.getContent().add(tc);
-
-    P paragraph = new P();
-    R paragraphRun = new R();
-    Text pText = new Text();
-    pText.setValue("p text;");
-    JAXBElement<Text> pTextElement = new JAXBElement<>(new QName("text"), Text.class, pText);
-    paragraphRun.getContent().add(pTextElement);
-    paragraph.getContent().add(paragraphRun);
-    table.getContent().add(paragraph);
-
-    R rightRun = new R();
-    Text rightRText = new Text();
-    rightRText.setValue("r text;");
-    JAXBElement<Text> rTextElement = new JAXBElement<>(new QName("text"), Text.class, rightRText);
-    rightRun.getContent().add(rTextElement);
-    table.getContent().add(rightRun);
-
-    R wrongRun = new R();
-    wrongRun.getContent().add(new Object());
-    table.getContent().add(wrongRun);
+    Tbl table =
+        generateTable(
+            List.of(
+                List.of("cell r1c1", "cell r1c2", "cell r1c3"),
+                List.of("cell r2c1", "cell r2c2", "cell r2c3"),
+                List.of("cell r3c1", "cell r3c2", "cell r3c3")));
 
     var result = builder.setTable(table).build();
 
     assertTrue(result instanceof DocUnitTable);
-    assertEquals(
-        "text in tr;java.lang.Object;tc text;p text;r text;java.lang.Object",
-        ((DocUnitTable) result).getTextContent());
+    DocUnitTable tableElement = (DocUnitTable) result;
+    assertEquals(3, tableElement.rows().size());
+    var columns = tableElement.rows().get(0).columns();
+    assertEquals(3, columns.size());
+    assertEquals(1, columns.get(0).paragraphElements().size());
+    assertEquals("<p>cell r1c1</p>", columns.get(0).paragraphElements().get(0).toHtmlString());
+    assertEquals(1, columns.get(1).paragraphElements().size());
+    assertEquals("<p>cell r1c2</p>", columns.get(1).paragraphElements().get(0).toHtmlString());
+    assertEquals(1, columns.get(2).paragraphElements().size());
+    assertEquals("<p>cell r1c3</p>", columns.get(2).paragraphElements().get(0).toHtmlString());
+    columns = tableElement.rows().get(1).columns();
+    assertEquals(3, columns.size());
+    assertEquals(1, columns.get(0).paragraphElements().size());
+    assertEquals("<p>cell r2c1</p>", columns.get(0).paragraphElements().get(0).toHtmlString());
+    assertEquals(1, columns.get(1).paragraphElements().size());
+    assertEquals("<p>cell r2c2</p>", columns.get(1).paragraphElements().get(0).toHtmlString());
+    assertEquals(1, columns.get(2).paragraphElements().size());
+    assertEquals("<p>cell r2c3</p>", columns.get(2).paragraphElements().get(0).toHtmlString());
+    columns = tableElement.rows().get(2).columns();
+    assertEquals(3, columns.size());
+    assertEquals(1, columns.get(0).paragraphElements().size());
+    assertEquals("<p>cell r3c1</p>", columns.get(0).paragraphElements().get(0).toHtmlString());
+    assertEquals(1, columns.get(1).paragraphElements().size());
+    assertEquals("<p>cell r3c2</p>", columns.get(1).paragraphElements().get(0).toHtmlString());
+    assertEquals(1, columns.get(2).paragraphElements().size());
+    assertEquals("<p>cell r3c3</p>", columns.get(2).paragraphElements().get(0).toHtmlString());
   }
 
   @Test
@@ -135,7 +126,7 @@ class DocUnitDocxBuilderTest {
     var result = builder.setTable(table).build();
 
     assertTrue(result instanceof DocUnitTable);
-    assertEquals("<no table elements found>", ((DocUnitTable) result).getTextContent());
+    assertTrue(((DocUnitTable) result).rows().isEmpty());
   }
 
   @Test
@@ -522,12 +513,8 @@ class DocUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    Exception exception =
-        assertThrows(
-            DocxConverterException.class,
-            () -> {
-              builder.setParagraph(paragraph).build();
-            });
+    builder = builder.setParagraph(paragraph);
+    Exception exception = assertThrows(DocxConverterException.class, builder::build);
 
     assertEquals("unsupported drawing object", exception.getMessage());
   }
@@ -546,12 +533,8 @@ class DocUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    Exception exception =
-        assertThrows(
-            DocxConverterException.class,
-            () -> {
-              builder.setParagraph(paragraph).build();
-            });
+    builder = builder.setParagraph(paragraph);
+    Exception exception = assertThrows(DocxConverterException.class, builder::build);
 
     assertEquals("more than one graphic data in a drawing", exception.getMessage());
   }
@@ -570,13 +553,38 @@ class DocUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    Exception exception =
-        assertThrows(
-            DocxConverterException.class,
-            () -> {
-              builder.setParagraph(paragraph).build();
-            });
+    builder = builder.setParagraph(paragraph);
+    Exception exception = assertThrows(DocxConverterException.class, builder::build);
 
     assertEquals("no graphic data", exception.getMessage());
+  }
+
+  private Tbl generateTable(List<List<String>> cells) {
+    Tbl table = new Tbl();
+
+    for (List<String> rows : cells) {
+      Tr row = new Tr();
+      for (String cellText : rows) {
+        Tc cell = new Tc();
+        cell.getContent().add(generateParagraph(cellText));
+        JAXBElement<Tc> tcElement = new JAXBElement<>(new QName("tc"), Tc.class, cell);
+        row.getContent().add(tcElement);
+      }
+      table.getContent().add(row);
+    }
+
+    return table;
+  }
+
+  private P generateParagraph(String cellText) {
+    P paragraph = new P();
+    R run = new R();
+    Text text = new Text();
+    text.setValue(cellText);
+    JAXBElement<Text> textElement = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(textElement);
+    paragraph.getContent().add(run);
+
+    return paragraph;
   }
 }

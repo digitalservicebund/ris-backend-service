@@ -6,6 +6,10 @@ import { Image } from "@tiptap/extension-image"
 import { Italic } from "@tiptap/extension-italic"
 import { Paragraph } from "@tiptap/extension-paragraph"
 import { Strike } from "@tiptap/extension-strike"
+import { Table } from "@tiptap/extension-table"
+import { TableCell } from "@tiptap/extension-table-cell"
+import { TableHeader } from "@tiptap/extension-table-header"
+import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
 import { TextAlign } from "@tiptap/extension-text-align"
 import { Underline } from "@tiptap/extension-underline"
@@ -50,6 +54,10 @@ const editor = new Editor({
     Italic,
     Underline,
     Strike,
+    Table,
+    TableCell,
+    TableHeader,
+    TableRow,
     TextAlign.configure({
       types: ["paragraph", "span"],
     }),

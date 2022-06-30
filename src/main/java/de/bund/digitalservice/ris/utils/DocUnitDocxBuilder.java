@@ -6,17 +6,22 @@ import de.bund.digitalservice.ris.domain.docx.DocUnitImageElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableColumn;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.Jc;
+import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.R;
@@ -76,7 +81,7 @@ public class DocUnitDocxBuilder {
     if (isRandnummer()) {
       return convertToRandnummer();
     } else if (isParagraph()) {
-      return convertToParagraphElement();
+      return convertToParagraphElement(paragraph);
     }
 
     return null;
@@ -137,7 +142,11 @@ public class DocUnitDocxBuilder {
             });
   }
 
-  private DocUnitParagraphElement convertToParagraphElement() {
+  private DocUnitParagraphElement convertToParagraphElement(P paragraph) {
+    if (paragraph == null) {
+      return null;
+    }
+
     var paragraphElement = new DocUnitParagraphElement();
 
     var pPr = paragraph.getPPr();
@@ -251,11 +260,8 @@ public class DocUnitDocxBuilder {
       jc = pPr.getJc();
     }
 
-    if (jc != null && jc.getVal() != null) {
-      switch (jc.getVal()) {
-        case CENTER:
-          return "center";
-      }
+    if (jc != null && jc.getVal() != null && jc.getVal() == JcEnumeration.CENTER) {
+      return "center";
     }
 
     return null;
@@ -336,11 +342,8 @@ public class DocUnitDocxBuilder {
       underline = rPr.getU().getVal();
     }
 
-    if (underline != null) {
-      switch (underline) {
-        case SINGLE:
-          return "single";
-      }
+    if (underline != null && underline == UnderlineEnumeration.SINGLE) {
+      return "single";
     }
 
     return null;
@@ -379,46 +382,59 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitDocx convertToTable() {
-    DocUnitTable docUnitDocx = new DocUnitTable();
-
-    var result =
-        table.getContent().stream().map(this::convertTableElements).collect(Collectors.joining());
-    docUnitDocx.setTextContent(result);
-
-    return docUnitDocx;
+    return new DocUnitTable(parseTable(table));
   }
 
-  private String convertTableElements(Object tableElement) {
-    if (tableElement instanceof Tr tr) {
-      return tr.getContent().stream()
-          .map(
-              el -> {
-                if (el instanceof JAXBElement<?> element) {
-                  return convertTableElements(element.getValue());
+  private List<DocUnitTableRow> parseTable(Tbl table) {
+    List<DocUnitTableRow> rows = new ArrayList<>();
+
+    table
+        .getContent()
+        .forEach(
+            element -> {
+              if (element instanceof Tr tr) {
+                rows.add(parseTr(tr));
+              } else {
+                LOGGER.error("unknown table element: {}", element.getClass());
+              }
+            });
+
+    return rows;
+  }
+
+  private DocUnitTableRow parseTr(Tr tr) {
+    List<DocUnitTableColumn> columns = new ArrayList<>();
+
+    tr.getContent()
+        .forEach(
+            element -> {
+              if (element instanceof JAXBElement<?> jaxbElement) {
+                if (jaxbElement.getDeclaredType() == Tc.class) {
+                  columns.add(parseTc((Tc) jaxbElement.getValue()));
+                } else {
+                  LOGGER.error("unknown tr element: {}", jaxbElement.getDeclaredType());
                 }
+              } else {
+                LOGGER.error("unknown tr element: {}", element.getClass());
+              }
+            });
 
-                return el.getClass().getName();
-              })
-          .collect(Collectors.joining());
-    } else if (tableElement instanceof Tc tc) {
-      return tc.getContent().stream().map(this::convertTableElements).collect(Collectors.joining());
-    } else if (tableElement instanceof P p) {
-      return p.getContent().stream().map(this::convertTableElements).collect(Collectors.joining());
-    } else if (tableElement instanceof R r) {
-      return r.getContent().stream()
-          .map(
-              el -> {
-                if (el instanceof JAXBElement<?> element) {
-                  return convertTableElements(element.getValue());
-                }
+    return new DocUnitTableRow(columns);
+  }
 
-                return el.getClass().getName();
-              })
-          .collect(Collectors.joining());
-    } else if (tableElement instanceof Text text) {
-      return text.getValue();
-    }
+  private DocUnitTableColumn parseTc(Tc tc) {
+    List<DocUnitParagraphElement> paragraphElements = new ArrayList<>();
 
-    return "<no table elements found>";
+    tc.getContent()
+        .forEach(
+            element -> {
+              if (element instanceof P p) {
+                paragraphElements.add(convertToParagraphElement(p));
+              } else {
+                LOGGER.error("unknown tr element");
+              }
+            });
+
+    return new DocUnitTableColumn(paragraphElements);
   }
 }
