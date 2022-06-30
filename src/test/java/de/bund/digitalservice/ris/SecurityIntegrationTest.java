@@ -23,6 +23,6 @@ class SecurityIntegrationTest {
         .expectHeader()
         .valueEquals(
             "Content-Security-Policy",
-            "default-src 'self'; image-src 'self' data:; style-src 'unsafe-inline'");
+            "default-src 'self'; image-src 'self' data:; style-src 'self' 'unsafe-inline'");
   }
 }
