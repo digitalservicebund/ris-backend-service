@@ -3,6 +3,7 @@ import {
   deleteDocUnit,
   fetchAllDocUnits,
   fetchDocUnitByDocumentnumber,
+  getDocxFileAsHtml,
 } from "./api/docUnitService"
 import { buildEmptyDocUnit, DocUnit } from "./types/DocUnit"
 
@@ -85,9 +86,16 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       if (!this.selected) return false
       return this.selected.s3path !== null
     },
-    setHTMLOnSelected(htmlStr: string) {
-      if (!this.selected) return
-      this.selected.originalFileAsHTML = htmlStr
+    fetchOriginalFileAsHTML() {
+      if (
+        !this.selected ||
+        this.selected.s3path === null ||
+        this.selected.originalFileAsHTML
+      )
+        return
+      getDocxFileAsHtml(this.selected.s3path).then((response) => {
+        if (this.selected) this.selected.originalFileAsHTML = response.content
+      })
     },
   },
 })
