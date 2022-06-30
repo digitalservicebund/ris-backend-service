@@ -17,7 +17,10 @@ public class SecurityConfig {
         .and()
         .csrf()
         .disable()
-        .headers(headers -> headers.contentSecurityPolicy("default-src 'self'"))
+        .headers(
+            headers ->
+                headers.contentSecurityPolicy(
+                    "default-src 'self'; image-src 'self' data:; style-src 'unsafe-inline'"))
         .build();
   }
 }
