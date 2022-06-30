@@ -20,7 +20,7 @@ public class SecurityConfig {
         .headers(
             headers ->
                 headers.contentSecurityPolicy(
-                    "default-src 'self'; image-src 'self' data:; style-src 'self' 'unsafe-inline'"))
+                    "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"))
         .build();
   }
 }
