@@ -1,73 +1,49 @@
 {
   "allowedLicenses": [
     {
-      "moduleLicense": "MIT License"
-    },
-    {
-      "moduleLicense": "MIT license"
-    },
-    {
-      "moduleLicense": "The MIT License"
-    },
-    {
-      "moduleLicense": "The MIT License (MIT)"
-    },
-    {
-      "moduleLicense": "MIT"
-    },
-    {
-      "moduleLicense": "The Apache Software License, Version 2.0"
-    },
-    {
       "moduleLicense": "Apache License, Version 2.0"
     },
     {
-      "moduleLicense": "Apache 2.0"
+      "moduleLicense": "MIT License"
     },
     {
-      "moduleLicense": "Apache 2"
+      "moduleLicense": "Eclipse Public License 2.0"
     },
     {
-      "moduleLicense": "Public Domain, per Creative Commons CC0"
+      "moduleLicense": "Eclipse Public License 1.0"
     },
     {
-      "moduleLicense": "CC0"
+      "moduleLicense": "BSD 4-Clause \"Original\" or \"Old\" License"
     },
     {
-      "moduleLicense": "Eclipse Public License - v 1.0"
+      "moduleLicense": "BSD 3-Clause \"New\" or \"Revised\" License"
     },
     {
-      "moduleLicense": "EPL 1.0"
+      "moduleLicense": "Creative Commons Public Domain Dedication and Certification"
     },
     {
-      "moduleLicense": "Eclipse Public License v. 2.0"
-    },
-    {
-      "moduleLicense": "EPL 2.0"
+      "moduleLicense": "GNU General Public License v2.0 w/Classpath exception"
     },
     {
       "moduleLicense": "GNU Lesser General Public License"
     },
     {
-      "moduleLicense": "GNU General Public License, version 2 with the GNU Classpath Exception"
+      "moduleLicense": "Bouncy Castle Licence"
     },
     {
-      "moduleLicense": "GPL2 w/ CPE"
+      "moduleLicense": "BSD Zero Clause License"
     },
     {
-      "moduleLicense": "BSD License",
-      "moduleVersion": "2.7.7",
-      "moduleName": "antlr:antlr"
+      "moduleLicense": "CDDL + GPLv2 with classpath exception"
     },
     {
-      "moduleLicense": "BSD licence",
-      "moduleVersion": "3.5.2",
-      "moduleName": "org.antlr:antlr-runtime"
+      "moduleLicense": "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0"
     },
     {
-      "moduleLicense": "BSD licence",
-      "moduleVersion": "3.2.1",
-      "moduleName": "org.antlr:stringtemplate"
+      "moduleLicense": "Creative Commons Legal Code"
+    },
+    {
+      "moduleLicense": "PUBLIC DOMAIN"
     },
     {
       "moduleLicense": null,
@@ -76,86 +52,6 @@
     {
       "moduleLicense": null,
       "moduleName": "software.amazon.awssdk:bom"
-    },
-    {
-      "moduleLicense": "\"Apache-2.0\";link=\"https://www.apache.org/licenses/LICENSE-2.0.txt\"",
-      "moduleVersion": "2.9.0",
-      "moduleName": "com.google.code.gson:gson"
-    },
-    {
-      "moduleLicense": "Apache-2.0",
-      "moduleVersion": "2.9.0",
-      "moduleName": "com.google.code.gson:gson"
-    },
-    {
-      "moduleLicense": "3-Clause BSD License",
-      "moduleVersion": "3.17.3",
-      "moduleName": "com.google.protobuf:protobuf-java"
-    },
-    {
-      "moduleLicense": "\"Apache-2.0\";link=\"https://www.apache.org/licenses/LICENSE-2.0.txt\"",
-      "moduleVersion": "1.8.5",
-      "moduleName": "io.gsonfire:gson-fire"
-    },
-    {
-      "moduleLicense": "Apache-2.0",
-      "moduleVersion": "1.8.5",
-      "moduleName": "io.gsonfire:gson-fire"
-    },
-    {
-      "moduleLicense": "Apache License 2.0",
-      "moduleVersion": "1.6.2",
-      "moduleName": "io.swagger:swagger-annotations"
-    },
-    {
-      "moduleLicense": "CDDL + GPLv2 with classpath exception",
-      "moduleVersion": "1.3.2",
-      "moduleName": "javax.annotation:javax.annotation-api"
-    },
-    {
-      "moduleLicense": "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0",
-      "moduleVersion": "1.3.2",
-      "moduleName": "javax.annotation:javax.annotation-api"
-    },
-    {
-      "moduleLicense": "Bouncy Castle Licence",
-      "moduleVersion": "1.69",
-      "moduleName": "org.bouncycastle:bcpkix-jdk15on"
-    },
-    {
-      "moduleLicense": "Bouncy Castle Licence",
-      "moduleVersion": "1.69",
-      "moduleName": "org.bouncycastle:bcprov-ext-jdk15on"
-    },
-    {
-      "moduleLicense": "Bouncy Castle Licence",
-      "moduleVersion": "1.69",
-      "moduleName": "org.bouncycastle:bcprov-jdk15on"
-    },
-    {
-      "moduleLicense": "Bouncy Castle Licence",
-      "moduleVersion": "1.69",
-      "moduleName": "org.bouncycastle:bcutil-jdk15on"
-    },
-    {
-      "moduleLicense": "The Apache License, Version 2.0",
-      "moduleVersion": "1.6.21",
-      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib"
-    },
-    {
-      "moduleLicense": "The Apache License, Version 2.0",
-      "moduleVersion": "1.6.21",
-      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib-common"
-    },
-    {
-      "moduleLicense": "The Apache License, Version 2.0",
-      "moduleVersion": "1.6.21",
-      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk7"
-    },
-    {
-      "moduleLicense": "The Apache License, Version 2.0",
-      "moduleVersion": "1.6.21",
-      "moduleName": "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     }
   ]
 }

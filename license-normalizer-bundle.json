@@ -1,0 +1,126 @@
+{
+  "bundles": [
+    {
+      "bundleName": "apache2",
+      "licenseName": "Apache License, Version 2.0",
+      "licenseUrl": "http://www.apache.org/licenses/LICENSE-2.0"
+    },
+    {
+      "bundleName": "mit",
+      "licenseName": "MIT License",
+      "licenseUrl": "https://opensource.org/licenses/MIT"
+    },
+    {
+      "bundleName": "epl2",
+      "licenseName": "Eclipse Public License 2.0",
+      "licenseUrl": "https://www.eclipse.org/legal/epl-2.0"
+    },
+    {
+      "bundleName": "epl1",
+      "licenseName": "Eclipse Public License 1.0",
+      "licenseUrl": "http://www.eclipse.org/legal/epl-v10.html"
+    },
+    {
+      "bundleName": "bsd4",
+      "licenseName": "BSD 4-Clause \"Original\" or \"Old\" License",
+      "licenseUrl": "http://directory.fsf.org/wiki/License:BSD_4Clause"
+    },
+    {
+      "bundleName": "bsd3",
+      "licenseName": "BSD 3-Clause \"New\" or \"Revised\" License",
+      "licenseUrl": "https://opensource.org/licenses/BSD-3-Clause"
+    },
+    {
+      "bundleName": "cc0",
+      "licenseName": "Creative Commons Public Domain Dedication and Certification",
+      "licenseUrl": "https://creativecommons.org/licenses/publicdomain/"
+    },
+    {
+      "bundleName": "gpl2classpath",
+      "licenseName": "GNU General Public License v2.0 w/Classpath exception",
+      "licenseUrl": "https://www.gnu.org/software/classpath/license.html"
+    }
+  ],
+  "transformationRules": [
+    {
+      "bundleName": "apache2",
+      "licenseNamePattern": ".*The Apache Software License, Version 2.0.*"
+    },
+    {
+      "bundleName": "apache2",
+      "licenseNamePattern": "Apache 2"
+    },
+    {
+      "bundleName": "apache2",
+      "licenseNamePattern": "Apache-2.0"
+    },
+    {
+      "bundleName": "apache2",
+      "licenseNamePattern": "Apache License 2.0"
+    },
+    {
+      "bundleName": "apache2",
+      "licenseNamePattern": "The Apache License, Version 2.0"
+    },
+    {
+      "bundleName": "apache2",
+      "licenseUrlPattern": "http://www.apache.org/licenses/LICENSE-2.0.txt"
+    },
+    {
+      "bundleName": "mit",
+      "licenseNamePattern": ".*MIT License.*"
+    },
+    {
+      "bundleName": "mit",
+      "licenseNamePattern": ".*MIT license.*"
+    },
+    {
+      "bundleName": "mit",
+      "licenseNamePattern": "MIT"
+    },
+    {
+      "bundleName": "epl2",
+      "licenseNamePattern": "Eclipse Public License.*2.0"
+    },
+    {
+      "bundleName": "epl2",
+      "licenseNamePattern": "EPL 2.0"
+    },
+    {
+      "bundleName": "epl1",
+      "licenseNamePattern": "Eclipse Public License.*1.0"
+    },
+    {
+      "bundleName": "epl1",
+      "licenseNamePattern": "EPL 1.0"
+    },
+    {
+      "bundleName": "bsd4",
+      "licenseNamePattern": "BSD License"
+    },
+    {
+      "bundleName": "bsd4",
+      "licenseNamePattern": "BSD licence"
+    },
+    {
+      "bundleName": "bsd4",
+      "licenseNamePattern": ".*3-Clause BSD License"
+    },
+    {
+      "bundleName": "cc0",
+      "licenseNamePattern": "Public Domain, per Creative Commons CC0"
+    },
+    {
+      "bundleName": "cc0",
+      "licenseNamePattern": "CC0"
+    },
+    {
+      "bundleName": "gpl2classpath",
+      "licenseNamePattern": "GNU General Public License, version 2 with the GNU Classpath Exception"
+    },
+    {
+      "bundleName": "gpl2classpath",
+      "licenseNamePattern": "GPL2 w/ CPE"
+    }
+  ]
+}
