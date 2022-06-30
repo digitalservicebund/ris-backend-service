@@ -71,7 +71,7 @@
     "c8": "^7.11.3",
     "eslint": "^8.18.0",
     "eslint-plugin-import": "^2.26.0",
-    "eslint-plugin-prettier": "^4.1.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.1.1",
     "eslint-plugin-vuejs-accessibility": "^1.2.0",
     "jsdom": "^20.0.0",
