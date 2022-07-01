@@ -9,7 +9,7 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.config.ConverterConfiguration;
+import de.bund.digitalservice.ris.config.ConverterConfig;
 import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
@@ -67,7 +67,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @ExtendWith(SpringExtension.class)
-@Import({DocxConverterService.class, ConverterConfiguration.class})
+@Import({DocxConverterService.class, ConverterConfig.class})
 class DocxConverterServiceTest {
   @Autowired DocxConverterService service;
 

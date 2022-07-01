@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ConverterConfiguration {
+public class ConverterConfig {
   @Bean
   public DocxConverter docxConverter() {
     return new DocxConverter();
