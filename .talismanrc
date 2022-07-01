@@ -13,6 +13,8 @@ fileignoreconfig:
     checksum: 1b34b1ef959550042a2adc31dab0a01ab9e7715d8e06eb43d325186420a27cdf
   - filename: src/test/resources/application.properties
     checksum: e07d67031eae380a8f1b5d5fda57128729dd10a49ad684c8dcc0deb905b34a1f
+  - filename: src/main/resources/bootstrap.properties
+    checksum: 82454989161112d3b4794ff764c2f363686a8d308df7fd43ec3887768c2bb443
   - filename: web/src/env.d.ts
     checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
   - filename: web/.env.development
