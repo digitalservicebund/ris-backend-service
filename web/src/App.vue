@@ -1,20 +1,14 @@
 <script lang="ts" setup>
-import { ref } from "vue"
 import DocInfoPanel from "./components/DocUnitInfoPanel.vue"
 import NavbarSide from "./components/NavbarSide.vue"
 import NavbarTop from "./components/NavbarTop.vue"
-import { useDocUnitsStore } from "./store"
+import { useDocUnitsStore, useLayoutStateStore } from "./store"
 
 const store = useDocUnitsStore()
+const layoutStore = useLayoutStateStore()
 
-const showSidebar = ref<boolean>(true)
-
-const onSidebarCloseClick = () => {
-  showSidebar.value = false
-}
-
-const onSidebarOpenClick = () => {
-  showSidebar.value = true
+const toggleSidebar = () => {
+  layoutStore.showSidebar = !layoutStore.showSidebar
 }
 </script>
 
@@ -24,17 +18,20 @@ const onSidebarOpenClick = () => {
     <v-main>
       <v-container fluid>
         <v-row>
-          <v-col v-if="store.hasSelected()" :cols="showSidebar ? 2 : 1">
-            <span v-if="showSidebar">
+          <v-col
+            v-if="store.hasSelected()"
+            :cols="layoutStore.showSidebar ? 2 : 1"
+          >
+            <span v-if="layoutStore.showSidebar">
               <div
                 class="sidebar-close-icon-background"
-                :onclick="onSidebarCloseClick"
+                :onclick="toggleSidebar"
               >
                 <v-icon class="sidebar-close-icon"> close </v-icon>
               </div>
               <NavbarSide />
             </span>
-            <div v-else class="sidebar-open" :onclick="onSidebarOpenClick">
+            <div v-else class="sidebar-open" :onclick="toggleSidebar">
               <div class="sidebar-open-text">Menü</div>
               <div class="sidebar-open-icon-background">
                 <v-icon class="sidebar-open-icon"> arrow_forward_ios </v-icon>
@@ -42,7 +39,9 @@ const onSidebarOpenClick = () => {
             </div>
           </v-col>
           <v-col
-            :cols="store.hasSelected() ? (showSidebar ? 10 : 11) : 12"
+            :cols="
+              store.hasSelected() ? (layoutStore.showSidebar ? 10 : 11) : 12
+            "
             class="panel_and_main_area"
           >
             <DocInfoPanel />

@@ -1,18 +1,16 @@
 <script lang="ts" setup>
-import { ref } from "vue"
 import { useRouter } from "vue-router"
 import DocUnitCoreData from "../components/DocUnitCoreData.vue"
 import EditorVmodel from "../components/EditorVmodel.vue"
 import RouteHelper from "../components/RouteHelper.vue"
 import TextInput from "../components/TextInput.vue"
-import { useDocUnitsStore } from "../store"
+import { useDocUnitsStore, useLayoutStateStore } from "../store"
 
 const store = useDocUnitsStore()
+const layoutStore = useLayoutStateStore()
 const router = useRouter()
 
-const showOdocPanel = ref<boolean>(false) // odoc as in original document
-
-const onOdocOpenClick = () => {
+const toggleOdocPanel = () => {
   if (!store.selectedHasFileAttached()) {
     router.push({
       name: "Dokumente",
@@ -20,12 +18,10 @@ const onOdocOpenClick = () => {
     })
     return
   }
-  store.fetchOriginalFileAsHTML()
-  showOdocPanel.value = true
-}
-
-const onOdocCloseClick = () => {
-  showOdocPanel.value = false
+  if (!layoutStore.showOdocPanel) {
+    store.fetchOriginalFileAsHTML()
+  }
+  layoutStore.showOdocPanel = !layoutStore.showOdocPanel
 }
 </script>
 
@@ -33,12 +29,12 @@ const onOdocCloseClick = () => {
   <RouteHelper />
   <span v-if="store.hasSelected()">
     <v-row>
-      <v-col :cols="showOdocPanel ? 7 : 9">
+      <v-col :cols="layoutStore.showOdocPanel ? 7 : 9">
         <DocUnitCoreData id="stammdaten" />
         <TextInput id="kurzUndLangtexte" />
       </v-col>
-      <v-col v-if="!showOdocPanel" cols="3" align="right">
-        <div class="odoc-open" :onclick="onOdocOpenClick">
+      <v-col v-if="!layoutStore.showOdocPanel" cols="3" align="right">
+        <div class="odoc-open" :onclick="toggleOdocPanel">
           <div class="odoc-open-text">Originaldokument</div>
           <div class="odoc-open-icon-background">
             <v-icon class="odoc-open-icon"> arrow_back_ios_new </v-icon>
@@ -47,7 +43,7 @@ const onOdocCloseClick = () => {
       </v-col>
       <v-col v-else cols="5">
         <h3 class="odoc-editor-header">
-          <div class="odoc-close-icon-background" :onclick="onOdocCloseClick">
+          <div class="odoc-close-icon-background" :onclick="toggleOdocPanel">
             <v-icon class="odoc-close-icon"> close </v-icon>
           </div>
           Originaldokument
