@@ -10,4 +10,10 @@ public class PostgresConfig {
 
   @Value("${database.password:test}")
   private String password;
+
+  @Value("${database.host:localhost}")
+  private String host;
+
+  @Value("${database.database:neuris}")
+  private String database;
 }
