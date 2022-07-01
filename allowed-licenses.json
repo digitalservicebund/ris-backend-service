@@ -7,22 +7,22 @@
       "moduleLicense": "MIT License"
     },
     {
-      "moduleLicense": "Eclipse Public License 2.0"
+      "moduleLicense": "Eclipse Public License - v 2.0"
     },
     {
-      "moduleLicense": "Eclipse Public License 1.0"
+      "moduleLicense": "Eclipse Public License - v 1.0"
+    },
+    {
+      "moduleLicense": "The 3-Clause BSD License"
     },
     {
       "moduleLicense": "BSD 4-Clause \"Original\" or \"Old\" License"
     },
     {
-      "moduleLicense": "BSD 3-Clause \"New\" or \"Revised\" License"
+      "moduleLicense": "Creative Commons Legal Code"
     },
     {
-      "moduleLicense": "Creative Commons Public Domain Dedication and Certification"
-    },
-    {
-      "moduleLicense": "GNU General Public License v2.0 w/Classpath exception"
+      "moduleLicense": "GNU GENERAL PUBLIC LICENSE, Version 2 + Classpath Exception"
     },
     {
       "moduleLicense": "GNU Lesser General Public License"
@@ -31,19 +31,7 @@
       "moduleLicense": "Bouncy Castle Licence"
     },
     {
-      "moduleLicense": "BSD Zero Clause License"
-    },
-    {
       "moduleLicense": "CDDL + GPLv2 with classpath exception"
-    },
-    {
-      "moduleLicense": "COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0"
-    },
-    {
-      "moduleLicense": "Creative Commons Legal Code"
-    },
-    {
-      "moduleLicense": "PUBLIC DOMAIN"
     },
     {
       "moduleLicense": null,
