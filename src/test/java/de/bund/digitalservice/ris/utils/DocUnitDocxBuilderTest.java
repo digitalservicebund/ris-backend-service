@@ -359,6 +359,69 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
+  void testBuild_withTextAndParagraphStrike() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    ParaRPr rPr = new ParaRPr();
+    BooleanDefaultTrue strike = new BooleanDefaultTrue();
+    strike.setVal(true);
+    rPr.setStrike(strike);
+    pPr.setRPr(rPr);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(true, paragraphElement.getStrike());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"text-decoration: line-through;\">text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndRunStrike() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    RPr rPr = new RPr();
+    BooleanDefaultTrue strike = new BooleanDefaultTrue();
+    strike.setVal(true);
+    rPr.setStrike(strike);
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals("text", runTextElement.getText());
+    assertEquals(true, runTextElement.getStrike());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"text-decoration: line-through;\">text</span></p>", htmlString);
+  }
+
+  @Test
   void testBuild_withTextAndParagraphUnderline() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
@@ -486,7 +549,7 @@ class DocUnitDocxBuilderTest {
     when(image.getBytes()).thenReturn(new byte[] {1, 2});
     images.put("image-ref", image);
 
-    var result = builder.setParagraph(paragraph).setImages(images).build();
+    var result = builder.setParagraph(paragraph).useImages(images).build();
 
     assertTrue(result instanceof DocUnitParagraphElement);
     DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;

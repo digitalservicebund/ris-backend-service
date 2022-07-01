@@ -25,6 +25,7 @@ import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.R;
+import org.docx4j.wml.RPr;
 import org.docx4j.wml.RPrAbstract;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
@@ -49,13 +50,13 @@ public class DocUnitDocxBuilder {
     return new DocUnitDocxBuilder();
   }
 
-  public DocUnitDocxBuilder setStyles(Map<String, Style> styles) {
+  public DocUnitDocxBuilder useStyles(Map<String, Style> styles) {
     this.styles = styles;
 
     return this;
   }
 
-  public DocUnitDocxBuilder setImages(Map<String, BinaryPartAbstractImage> images) {
+  public DocUnitDocxBuilder useImages(Map<String, BinaryPartAbstractImage> images) {
     this.images = images;
 
     return this;
@@ -78,38 +79,13 @@ public class DocUnitDocxBuilder {
       return convertToTable();
     }
 
-    if (isRandnummer()) {
-      return convertToRandnummer();
+    if (isBorderNumber()) {
+      return convertToBorderNumber();
     } else if (isParagraph()) {
       return convertToParagraphElement(paragraph);
     }
 
     return null;
-  }
-
-  private boolean isRandnummer() {
-    var isText = isText();
-
-    if (isText && paragraph.getPPr() != null && paragraph.getPPr().getPStyle() != null) {
-      return paragraph.getPPr().getPStyle().getVal().equals("RandNummer");
-    }
-
-    return false;
-  }
-
-  private DocUnitBorderNumber convertToRandnummer() {
-    DocUnitBorderNumber randnummer = new DocUnitBorderNumber();
-
-    paragraph.getContent().stream()
-        .filter(R.class::isInstance)
-        .map(R.class::cast)
-        .forEach(r -> randnummer.addNumberText(parseTextFromRun(r)));
-
-    return randnummer;
-  }
-
-  private boolean isParagraph() {
-    return paragraph != null;
   }
 
   private boolean isText() {
@@ -142,6 +118,31 @@ public class DocUnitDocxBuilder {
             });
   }
 
+  private boolean isBorderNumber() {
+    var isText = isText();
+
+    if (isText && paragraph.getPPr() != null && paragraph.getPPr().getPStyle() != null) {
+      return paragraph.getPPr().getPStyle().getVal().equals("RandNummer");
+    }
+
+    return false;
+  }
+
+  private DocUnitBorderNumber convertToBorderNumber() {
+    DocUnitBorderNumber borderNumber = new DocUnitBorderNumber();
+
+    paragraph.getContent().stream()
+        .filter(R.class::isInstance)
+        .map(R.class::cast)
+        .forEach(r -> borderNumber.addNumberText(parseTextFromRun(r)));
+
+    return borderNumber;
+  }
+
+  private boolean isParagraph() {
+    return paragraph != null;
+  }
+
   private DocUnitParagraphElement convertToParagraphElement(P paragraph) {
     if (paragraph == null) {
       return null;
@@ -160,38 +161,33 @@ public class DocUnitDocxBuilder {
     paragraph.getContent().stream()
         .filter(R.class::isInstance)
         .map(R.class::cast)
-        .forEach(
-            r -> {
-              StringBuilder textValue = new StringBuilder();
-              r.getContent()
-                  .forEach(
-                      element -> {
-                        if (element instanceof JAXBElement<?> jaxbElement) {
-                          var declaredType = jaxbElement.getDeclaredType();
-                          if (declaredType == Text.class) {
-                            var text = ((Text) jaxbElement.getValue()).getValue();
-                            if (!text.isEmpty()) {
-                              textValue.append(text);
-                            }
-                          } else if (declaredType == Drawing.class) {
-                            if (!textValue.isEmpty()) {
-                              paragraphElement.addRunElement(
-                                  generateRunTextElement(textValue.toString(), r.getRPr()));
-                            }
-                            paragraphElement.addRunElement(
-                                parseDrawing((Drawing) jaxbElement.getValue()));
-                          } else {
-                            LOGGER.error("unknown run element: {}", declaredType.getName());
-                          }
-                        }
-                      });
-              if (!textValue.isEmpty()) {
-                paragraphElement.addRunElement(
-                    generateRunTextElement(textValue.toString(), r.getRPr()));
-              }
-            });
+        .forEach(run -> parseRunElement(run, paragraphElement));
 
     return paragraphElement;
+  }
+
+  private void parseRunElement(R run, DocUnitParagraphElement paragraphElement) {
+    run.getContent()
+        .forEach(element -> parseRunChildrenElement(element, run.getRPr(), paragraphElement));
+  }
+
+  private void parseRunChildrenElement(
+      Object element, RPr rPr, DocUnitParagraphElement paragraphElement) {
+    if (element instanceof JAXBElement<?> jaxbElement) {
+      var declaredType = jaxbElement.getDeclaredType();
+
+      if (declaredType == Text.class) {
+        var text = ((Text) jaxbElement.getValue()).getValue();
+
+        if (!text.isEmpty()) {
+          paragraphElement.addRunElement(generateRunTextElement(text, rPr));
+        }
+      } else if (declaredType == Drawing.class) {
+        paragraphElement.addRunElement(parseDrawing((Drawing) jaxbElement.getValue()));
+      } else {
+        LOGGER.error("unknown run element: {}", declaredType.getName());
+      }
+    }
   }
 
   private DocUnitRunTextElement generateRunTextElement(String text, RPrAbstract rPr) {
@@ -282,6 +278,7 @@ public class DocUnitDocxBuilder {
     }
 
     textElement.setBold(isBold(styleRPr, pPr.getRPr()));
+    textElement.setStrike(isStrike(styleRPr, pPr.getRPr()));
 
     var size = getSize(styleRPr, pPr.getRPr());
     if (size != null) {
@@ -342,11 +339,28 @@ public class DocUnitDocxBuilder {
       underline = rPr.getU().getVal();
     }
 
-    if (underline != null && underline == UnderlineEnumeration.SINGLE) {
+    if (underline == UnderlineEnumeration.SINGLE) {
       return "single";
     }
 
     return null;
+  }
+
+  private boolean isStrike(RPrAbstract styleRPr, RPrAbstract rPr) {
+    if (styleRPr == null && rPr == null) {
+      return false;
+    }
+
+    boolean strike = false;
+    if (styleRPr != null && styleRPr.getStrike() != null) {
+      strike = styleRPr.getStrike().isVal();
+    }
+
+    if (rPr != null && rPr.getStrike() != null) {
+      strike = rPr.getStrike().isVal();
+    }
+
+    return strike;
   }
 
   private void addStyle(DocUnitTextElement textElement, RPrAbstract rPr) {
@@ -356,6 +370,10 @@ public class DocUnitDocxBuilder {
 
     if (rPr.getB() != null && rPr.getB().isVal()) {
       textElement.setBold(rPr.getB().isVal());
+    }
+
+    if (rPr.getStrike() != null && rPr.getStrike().isVal()) {
+      textElement.setStrike(rPr.getStrike().isVal());
     }
 
     if (rPr.getSz() != null) {

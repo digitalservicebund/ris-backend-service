@@ -42,14 +42,14 @@ public class DocxConverter {
 
   private DocUnitDocx convertP(P part) {
     var builder =
-        DocUnitDocxBuilder.newInstance().setStyles(styles).setImages(images).setParagraph(part);
+        DocUnitDocxBuilder.newInstance().useStyles(styles).useImages(images).setParagraph(part);
 
     return builder.build();
   }
 
   private DocUnitDocx convertTbl(Tbl part) {
     var builder =
-        DocUnitDocxBuilder.newInstance().setStyles(styles).setImages(images).setTable(part);
+        DocUnitDocxBuilder.newInstance().useStyles(styles).useImages(images).setTable(part);
 
     return builder.build();
   }

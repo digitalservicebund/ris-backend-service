@@ -4,6 +4,7 @@ import java.math.BigInteger;
 
 public abstract class DocUnitTextElement implements DocUnitDocx {
   Boolean bold;
+  Boolean strike;
   BigInteger size;
   String underline;
 
@@ -13,6 +14,14 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
 
   public Boolean getBold() {
     return bold;
+  }
+
+  public void setStrike(Boolean strike) {
+    this.strike = strike;
+  }
+
+  public Boolean getStrike() {
+    return strike;
   }
 
   public void setSize(BigInteger size) {
@@ -33,6 +42,7 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
 
   boolean hasStyle() {
     var hasStyle = bold != null && bold;
+    hasStyle |= strike != null && strike;
     hasStyle |= size != null;
     hasStyle |= underline != null;
     return hasStyle;
@@ -41,6 +51,10 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
   void addStyle(StringBuilder sb) {
     if (bold != null && bold) {
       sb.append("font-weight: bold;");
+    }
+
+    if (strike != null && strike) {
+      sb.append("text-decoration: line-through;");
     }
 
     if (size != null) {
