@@ -16,7 +16,7 @@ const updateLayout = () => {
   layoutStore.showSidebar = window.innerWidth > 1280
   layoutStore.sidebarAsOverlay = window.innerWidth <= 1280
   layoutStore.showOdocPanel =
-    window.innerWidth > 1024 && store.selectedHasFileAttached()
+    window.innerWidth > 1024 && store.canShowOdocPanel()
   layoutStore.odocPanelAsOverlay = window.innerWidth <= 1024
 }
 
@@ -33,9 +33,11 @@ onUnmounted(() => window.removeEventListener("resize", updateLayout))
     <v-main>
       <v-container fluid>
         <v-row>
+          <v-col v-if="layoutStore.sidebarAsOverlay" cols="1"></v-col>
           <v-col
             v-if="store.hasSelected()"
             :cols="layoutStore.showSidebar ? 2 : 1"
+            :class="{ 'sidebar-as-overlay': layoutStore.sidebarAsOverlay }"
           >
             <span v-if="layoutStore.showSidebar">
               <div
@@ -119,5 +121,11 @@ a {
   color: white;
   margin-left: 9px;
   margin-top: 8px;
+}
+.sidebar-as-overlay {
+  position: fixed;
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.85);
+  // height: 100%;
 }
 </style>

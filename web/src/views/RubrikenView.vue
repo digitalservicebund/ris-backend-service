@@ -29,7 +29,15 @@ const toggleOdocPanel = () => {
   <RouteHelper />
   <span v-if="store.hasSelected()">
     <v-row>
-      <v-col :cols="layoutStore.showOdocPanel ? 7 : 9">
+      <v-col
+        :cols="
+          layoutStore.showOdocPanel
+            ? layoutStore.odocPanelAsOverlay
+              ? 12
+              : 7
+            : 9
+        "
+      >
         <DocUnitCoreData id="stammdaten" />
         <TextInput id="kurzUndLangtexte" />
       </v-col>
@@ -41,7 +49,11 @@ const toggleOdocPanel = () => {
           </div>
         </div>
       </v-col>
-      <v-col v-else cols="5">
+      <v-col
+        v-else
+        cols="5"
+        :class="{ 'odoc-as-overlay': layoutStore.odocPanelAsOverlay }"
+      >
         <h3 class="odoc-editor-header">
           <div class="odoc-close-icon-background" :onclick="toggleOdocPanel">
             <v-icon class="odoc-close-icon"> close </v-icon>
@@ -107,5 +119,11 @@ const toggleOdocPanel = () => {
 }
 .odoc-editor-wrapper {
   border: 1px solid $gray400;
+}
+.odoc-as-overlay {
+  position: fixed;
+  right: 0;
+  z-index: 1;
+  background-color: rgba(255, 255, 255, 0.85);
 }
 </style>

@@ -86,6 +86,11 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       if (!this.selected) return false
       return this.selected.s3path !== null
     },
+    canShowOdocPanel(): boolean {
+      if (!this.selectedHasFileAttached()) return false
+      this.fetchOriginalFileAsHTML()
+      return true
+    },
     fetchOriginalFileAsHTML() {
       if (
         !this.selected ||
