@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue"
+import { onMounted, onUnmounted, watch } from "vue"
+import { useRoute, useRouter } from "vue-router"
 import DocInfoPanel from "./components/DocUnitInfoPanel.vue"
 import NavbarSide from "./components/NavbarSide.vue"
 import NavbarTop from "./components/NavbarTop.vue"
@@ -7,9 +8,21 @@ import { useDocUnitsStore, useLayoutStateStore } from "./store"
 
 const store = useDocUnitsStore()
 const layoutStore = useLayoutStateStore()
+const router = useRouter()
+const route = useRoute()
 
 const toggleSidebar = () => {
   layoutStore.showSidebar = !layoutStore.showSidebar
+  const url = new URL(route.path, window.location.origin)
+  url.searchParams.set(
+    "showOdocPanel",
+    layoutStore.showOdocPanel ? "true" : "false"
+  )
+  url.searchParams.set(
+    "showSidebar",
+    layoutStore.showSidebar ? "true" : "false"
+  )
+  history.pushState({}, "", url)
 }
 
 const updateLayout = () => {
@@ -20,11 +33,39 @@ const updateLayout = () => {
   layoutStore.odocPanelAsOverlay = window.innerWidth <= 1024
 }
 
-onMounted(() => {
+onMounted(async () => {
   updateLayout()
   window.addEventListener("resize", updateLayout)
+  await router.isReady()
+  if (route.query.showSidebar) {
+    layoutStore.showSidebar = route.query.showSidebar === "true"
+  }
+  routerReady = true
+  tryDecideShowingOdocPanel()
 })
 onUnmounted(() => window.removeEventListener("resize", updateLayout))
+
+let routerReady = false
+let storeReady = false
+
+// Is there a more elegant way to do this?
+// We have to wait for the router to be ready, otherwise we can't get the query params.
+// And we have to wait for "selected" to be loaded, otherwise we don't know if it has an original file attached.
+const tryDecideShowingOdocPanel = () => {
+  if (!routerReady || !storeReady || !route.query.showOdocPanel) return
+  layoutStore.showOdocPanel =
+    route.query.showOdocPanel === "true" && store.canShowOdocPanel()
+  routerReady = false // close door to this function
+}
+
+watch(
+  () => store.selected,
+  () => {
+    if (!store.selected) return
+    storeReady = true
+    tryDecideShowingOdocPanel()
+  }
+)
 </script>
 
 <template>

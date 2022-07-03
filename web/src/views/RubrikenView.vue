@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useRouter } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import DocUnitCoreData from "../components/DocUnitCoreData.vue"
 import EditorVmodel from "../components/EditorVmodel.vue"
 import RouteHelper from "../components/RouteHelper.vue"
@@ -9,6 +9,7 @@ import { useDocUnitsStore, useLayoutStateStore } from "../store"
 const store = useDocUnitsStore()
 const layoutStore = useLayoutStateStore()
 const router = useRouter()
+const route = useRoute()
 
 const toggleOdocPanel = () => {
   if (!store.selectedHasFileAttached()) {
@@ -22,6 +23,16 @@ const toggleOdocPanel = () => {
     store.fetchOriginalFileAsHTML()
   }
   layoutStore.showOdocPanel = !layoutStore.showOdocPanel
+  const url = new URL(route.path, window.location.origin)
+  url.searchParams.set(
+    "showOdocPanel",
+    layoutStore.showOdocPanel ? "true" : "false"
+  )
+  url.searchParams.set(
+    "showSidebar",
+    layoutStore.showSidebar ? "true" : "false"
+  )
+  history.pushState({}, "", url)
 }
 </script>
 
