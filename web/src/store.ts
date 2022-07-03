@@ -103,6 +103,8 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
 export const useLayoutStateStore = defineStore("layoutStateStore", {
   state: () => ({
     showOdocPanel: false, // only on Rubriken page
+    odocPanelAsOverlay: false,
     showSidebar: true,
+    sidebarAsOverlay: false,
   }),
 })

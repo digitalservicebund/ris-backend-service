@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { onMounted, onUnmounted } from "vue"
 import DocInfoPanel from "./components/DocUnitInfoPanel.vue"
 import NavbarSide from "./components/NavbarSide.vue"
 import NavbarTop from "./components/NavbarTop.vue"
@@ -10,6 +11,20 @@ const layoutStore = useLayoutStateStore()
 const toggleSidebar = () => {
   layoutStore.showSidebar = !layoutStore.showSidebar
 }
+
+const updateLayout = () => {
+  layoutStore.showSidebar = window.innerWidth > 1280
+  layoutStore.sidebarAsOverlay = window.innerWidth <= 1280
+  layoutStore.showOdocPanel =
+    window.innerWidth > 1024 && store.selectedHasFileAttached()
+  layoutStore.odocPanelAsOverlay = window.innerWidth <= 1024
+}
+
+onMounted(() => {
+  updateLayout()
+  window.addEventListener("resize", updateLayout)
+})
+onUnmounted(() => window.removeEventListener("resize", updateLayout))
 </script>
 
 <template>
