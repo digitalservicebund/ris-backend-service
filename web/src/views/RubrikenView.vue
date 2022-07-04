@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { onMounted, onUnmounted, onUpdated } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocUnitCoreData from "../components/DocUnitCoreData.vue"
 import EditorVmodel from "../components/EditorVmodel.vue"
@@ -34,6 +35,25 @@ const toggleOdocPanel = () => {
   )
   history.pushState({}, "", url)
 }
+
+let originalOdocPanelYPos = 0
+
+onUpdated(() => {
+  let element = document.getElementById("odoc-panel-element")
+  if (!element) element = document.getElementById("odoc-open-element")
+  if (element) originalOdocPanelYPos = element.getBoundingClientRect().y
+})
+
+const handleScroll = () => {
+  const element = document.getElementById("odoc-panel-element")
+  if (!element) return
+  const pos = originalOdocPanelYPos - window.scrollY
+  const threshold = -40
+  element.style.top = (pos < threshold ? threshold : pos) + "px"
+}
+
+onMounted(() => window.addEventListener("scroll", handleScroll))
+onUnmounted(() => window.removeEventListener("scroll", handleScroll))
 </script>
 
 <template>
@@ -53,7 +73,11 @@ const toggleOdocPanel = () => {
         <TextInput id="kurzUndLangtexte" />
       </v-col>
       <v-col v-if="!layoutStore.showOdocPanel" cols="3" align="right">
-        <div class="odoc-open" :onclick="toggleOdocPanel">
+        <div
+          id="odoc-open-element"
+          class="odoc-open"
+          :onclick="toggleOdocPanel"
+        >
           <div class="odoc-open-text">Originaldokument</div>
           <div class="odoc-open-icon-background">
             <v-icon class="odoc-open-icon"> arrow_back_ios_new </v-icon>
@@ -65,19 +89,23 @@ const toggleOdocPanel = () => {
         cols="5"
         :class="{ 'odoc-as-overlay': layoutStore.odocPanelAsOverlay }"
       >
-        <h3 class="odoc-editor-header">
-          <div class="odoc-close-icon-background" :onclick="toggleOdocPanel">
-            <v-icon class="odoc-close-icon"> close </v-icon>
+        <div id="odoc-panel-element" class="odoc-panel">
+          <h3 class="odoc-editor-header">
+            <div class="odoc-close-icon-background" :onclick="toggleOdocPanel">
+              <v-icon class="odoc-close-icon"> close </v-icon>
+            </div>
+            Originaldokument
+          </h3>
+          <div v-if="!store.getSelectedSafe().originalFileAsHTML">
+            Loading...
           </div>
-          Originaldokument
-        </h3>
-        <div v-if="!store.getSelectedSafe().originalFileAsHTML">Loading...</div>
-        <div v-else class="odoc-editor-wrapper">
-          <EditorVmodel
-            v-model="store.getSelectedSafe().originalFileAsHTML"
-            field-size="100percent"
-            :editable="false"
-          />
+          <div v-else class="odoc-editor-wrapper">
+            <EditorVmodel
+              v-model="store.getSelectedSafe().originalFileAsHTML"
+              field-size="max"
+              :editable="false"
+            />
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -130,6 +158,9 @@ const toggleOdocPanel = () => {
 }
 .odoc-editor-wrapper {
   border: 1px solid $gray400;
+}
+.odoc-panel {
+  position: fixed;
 }
 .odoc-as-overlay {
   position: fixed;
