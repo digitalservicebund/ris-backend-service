@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, watch } from "vue"
+import { onMounted, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocInfoPanel from "./components/DocUnitInfoPanel.vue"
 import NavbarSide from "./components/NavbarSide.vue"
@@ -25,17 +25,17 @@ const toggleSidebar = () => {
   history.pushState({}, "", url)
 }
 
-const updateLayout = () => {
+/*const updateLayout = () => {
   layoutStore.showSidebar = window.innerWidth > 1280
   layoutStore.sidebarAsOverlay = window.innerWidth <= 1280
   layoutStore.showOdocPanel =
     window.innerWidth > 1024 && store.canShowOdocPanel()
   layoutStore.odocPanelAsOverlay = window.innerWidth <= 1024
-}
+}*/
 
 onMounted(async () => {
-  updateLayout()
-  window.addEventListener("resize", updateLayout)
+  // updateLayout()
+  // window.addEventListener("resize", updateLayout)
   await router.isReady()
   if (route.query.showSidebar) {
     layoutStore.showSidebar = route.query.showSidebar === "true"
@@ -43,7 +43,7 @@ onMounted(async () => {
   routerReady = true
   tryDecideShowingOdocPanel()
 })
-onUnmounted(() => window.removeEventListener("resize", updateLayout))
+// onUnmounted(() => window.removeEventListener("resize", updateLayout))
 
 let routerReady = false
 let storeReady = false
