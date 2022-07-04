@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, onUpdated } from "vue"
+import { onMounted, onUnmounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocUnitCoreData from "../components/DocUnitCoreData.vue"
 import EditorVmodel from "../components/EditorVmodel.vue"
@@ -36,19 +36,22 @@ const toggleOdocPanel = () => {
   history.pushState({}, "", url)
 }
 
-let originalOdocPanelYPos = 0
+const originalOdocPanelYPos = 169 // read this dynamically, see onUpdated() TODO
 
-onUpdated(() => {
+/*onUpdated(() => {
   let element = document.getElementById("odoc-panel-element")
+  // this one is around 200 and not 170, that means in the case of loading the
+  // page with the odoc panel closed and then opening the odoc panel, it will
+  // jump a bit while scrolling, that's not ok TODO
   if (!element) element = document.getElementById("odoc-open-element")
   if (element) originalOdocPanelYPos = element.getBoundingClientRect().y
-})
+})*/
 
 const handleScroll = () => {
   const element = document.getElementById("odoc-panel-element")
   if (!element) return
   const pos = originalOdocPanelYPos - window.scrollY
-  const threshold = -40
+  const threshold = -40 // this should also not be hardwired TODO
   element.style.top = (pos < threshold ? threshold : pos) + "px"
 }
 
