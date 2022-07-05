@@ -53,8 +53,8 @@ let storeReady = false
 // And we have to wait for "selected" to be loaded, otherwise we don't know if it has an original file attached.
 const tryDecideShowingOdocPanel = () => {
   if (!routerReady || !storeReady || !route.query.showOdocPanel) return
-  layoutStore.showOdocPanel =
-    route.query.showOdocPanel === "true" && store.canShowOdocPanel()
+  layoutStore.showOdocPanel = route.query.showOdocPanel === "true"
+  if (layoutStore.showOdocPanel) store.fetchOdocInBackgroundIfExistent()
   routerReady = false // close door to this function
 }
 

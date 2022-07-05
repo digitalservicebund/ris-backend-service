@@ -86,7 +86,7 @@ export const useDocUnitsStore = defineStore("docUnitsStore", {
       if (!this.selected) return false
       return this.selected.s3path !== null
     },
-    canShowOdocPanel(): boolean {
+    fetchOdocInBackgroundIfExistent(): boolean {
       if (!this.selectedHasFileAttached()) return false
       this.fetchOriginalFileAsHTML()
       return true

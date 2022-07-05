@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted } from "vue"
-import { useRoute, useRouter } from "vue-router"
+import { useRoute } from "vue-router"
 import DocUnitCoreData from "../components/DocUnitCoreData.vue"
 import EditorVmodel from "../components/EditorVmodel.vue"
 import RouteHelper from "../components/RouteHelper.vue"
@@ -9,17 +9,9 @@ import { useDocUnitsStore, useLayoutStateStore } from "../store"
 
 const store = useDocUnitsStore()
 const layoutStore = useLayoutStateStore()
-const router = useRouter()
 const route = useRoute()
 
 const toggleOdocPanel = () => {
-  if (!store.selectedHasFileAttached()) {
-    router.push({
-      name: "Dokumente",
-      params: { id: store.getSelectedSafe().documentnumber },
-    })
-    return
-  }
   if (!layoutStore.showOdocPanel) {
     store.fetchOriginalFileAsHTML()
   }
@@ -99,10 +91,37 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll))
             </div>
             Originaldokument
           </h3>
-          <div v-if="!store.getSelectedSafe().originalFileAsHTML">
+          <div v-if="!store.selectedHasFileAttached()">
+            <v-icon size="50px" class="odoc-upload-icon"> cloud_upload </v-icon>
+            <div class="odoc-upload-note">
+              Es wurde noch kein Originaldokument hochgeladen.
+            </div>
+            <router-link
+              class="link-to-upload"
+              :to="{
+                name: 'Dokumente',
+                params: { id: store.getSelected()?.documentnumber },
+              }"
+            >
+              <v-icon> arrow_forward </v-icon>
+              Zum Upload
+            </router-link>
+          </div>
+          <div
+            v-if="
+              store.selectedHasFileAttached() &&
+              !store.getSelectedSafe().originalFileAsHTML
+            "
+          >
             Loading...
           </div>
-          <div v-else class="odoc-editor-wrapper">
+          <div
+            v-if="
+              store.selectedHasFileAttached() &&
+              store.getSelectedSafe().originalFileAsHTML
+            "
+            class="odoc-editor-wrapper"
+          >
             <EditorVmodel
               v-model="store.getSelectedSafe().originalFileAsHTML"
               field-size="max"
@@ -170,5 +189,14 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll))
   right: 0;
   z-index: 1;
   background-color: rgba(255, 255, 255, 0.85);
+}
+.odoc-upload-icon {
+  margin-bottom: 15px;
+}
+.odoc-upload-note {
+  margin-bottom: 15px;
+}
+.link-to-upload {
+  color: $blue800;
 }
 </style>
