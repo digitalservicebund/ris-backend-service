@@ -1,7 +1,7 @@
 import { test, expect, chromium } from "@playwright/test"
 
 test.describe("generate and delete doc units", () => {
-  let docUnitId: string
+  let documentNumber: string
 
   test("generate doc unit", async ({ page }) => {
     await page.goto("/")
@@ -11,14 +11,14 @@ test.describe("generate and delete doc units", () => {
     await page.waitForSelector("text=Festplatte durchsuchen")
     const regex = /rechtsprechung\/(.*)\/dokumente/g
     const match = regex.exec(page.url())
-    docUnitId = match![1] || ""
+    documentNumber = match![1] || ""
   })
 
   test("upload original file", async ({ page }) => {
     await page.goto("/")
 
     const selectDocUnit = page.locator(
-      `tr td:nth-child(1) a[href*="/rechtsprechung/${docUnitId}/dokumente"]`
+      `tr td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
     )
     await selectDocUnit.click()
 
@@ -37,11 +37,13 @@ test.describe("generate and delete doc units", () => {
     await page.goto("/")
 
     await page
-      .locator(`a[href*="/rechtsprechung/${docUnitId}/rubriken"]`)
+      .locator(`a[href*="/rechtsprechung/${documentNumber}/rubriken"]`)
       .click()
 
     const documentLink = page.locator(
-      'a[href*="/rechtsprechung/' + docUnitId + '/dokumente"] >> text=DOKUMENTE'
+      'a[href*="/rechtsprechung/' +
+        documentNumber +
+        '/dokumente"] >> text=DOKUMENTE'
     )
     await documentLink.click()
 
@@ -52,7 +54,7 @@ test.describe("generate and delete doc units", () => {
     await page.goto("/")
 
     await page.waitForSelector(
-      `a[href*="/rechtsprechung/${docUnitId}/dokumente"]`
+      `a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
     )
   })
 
@@ -62,7 +64,7 @@ test.describe("generate and delete doc units", () => {
     const selectDocUnit = page
       .locator("tr", {
         has: page.locator(
-          `td:nth-child(1) a[href*="/rechtsprechung/${docUnitId}/dokumente"]`
+          `td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
         ),
       })
       .locator("td:nth-child(5) i")
@@ -74,7 +76,7 @@ test.describe("generate and delete doc units", () => {
     await page.waitForTimeout(2000)
 
     expect(
-      page.locator(`a[href*="/rechtsprechung/${docUnitId}"]`)
+      page.locator(`a[href*="/rechtsprechung/${documentNumber}"]`)
     ).not.toBeVisible()
   })
 })
