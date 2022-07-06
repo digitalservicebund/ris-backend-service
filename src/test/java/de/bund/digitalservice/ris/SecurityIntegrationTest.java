@@ -8,7 +8,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = {"otc.obs.bucket-name=testBucket", "otc.obs.url=testUrl"})
+    properties = {"otc.obs.bucket-name=testBucket", "otc.obs.endpoint=testUrl"})
 @Tag("integration")
 class SecurityIntegrationTest {
 
