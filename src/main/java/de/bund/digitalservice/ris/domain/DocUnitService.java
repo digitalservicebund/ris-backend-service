@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.domain;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,30 +29,50 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @Slf4j
 public class DocUnitService {
   private final DocUnitRepository repository;
+  private final DocumentNumberCounterRepository counterRepository;
 
   private final S3AsyncClient s3AsyncClient;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DocUnitService(DocUnitRepository repository, S3AsyncClient s3AsyncClient) {
+  public DocUnitService(
+      DocUnitRepository repository,
+      DocumentNumberCounterRepository counterRepository,
+      S3AsyncClient s3AsyncClient) {
     Assert.notNull(repository, "doc unit repository is null");
     Assert.notNull(s3AsyncClient, "s3 async client is null");
 
     this.repository = repository;
+    this.counterRepository = counterRepository;
     this.s3AsyncClient = s3AsyncClient;
   }
 
-  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit() {
-    return repository
-        .save(DocUnit.createNew())
-        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
-        .doOnError(ex -> log.error("Couldn't create empty doc unit", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+  @Transactional
+  public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
+    int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+    return counterRepository
+        .getDocumentNumberCounterEntry()
+        .flatMap(
+            outdatedDocumentNumberCounter -> {
+              // this is the switch happening when the first new DocUnit in a new year gets created
+              if (outdatedDocumentNumberCounter.currentyear != currentYear) {
+                outdatedDocumentNumberCounter.currentyear = currentYear;
+                outdatedDocumentNumberCounter.nextnumber = 1;
+              }
+              outdatedDocumentNumberCounter.nextnumber += 1;
+              return counterRepository.save(outdatedDocumentNumberCounter);
+            })
+        .flatMap(
+            updatedDocumentNumberCounter ->
+                repository.save(
+                    DocUnit.createNew(
+                        docUnitCreationInfo, updatedDocumentNumberCounter.nextnumber - 1)))
+        .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
   public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
-      String docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
+      UUID docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
 
     return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
@@ -58,7 +80,7 @@ public class DocUnitService {
         .flatMap(
             putObjectResponse ->
                 repository
-                    .findById(Integer.valueOf(docUnitId))
+                    .findByUuid(docUnitId)
                     .map(
                         docUnit -> {
                           docUnit.setFileuploadtimestamp(Instant.now());
@@ -77,9 +99,9 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(String docUnitId) {
+  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(UUID docUnitId) {
     return repository
-        .findById(Integer.valueOf(docUnitId))
+        .findByUuid(docUnitId)
         .flatMap(
             docUnit -> {
               var fileUuid = docUnit.getS3path();
@@ -144,13 +166,13 @@ public class DocUnitService {
     return Mono.just(ResponseEntity.ok(repository.findAll()));
   }
 
-  public Mono<ResponseEntity<DocUnit>> getById(String docUnitId) {
-    return repository.findById(Integer.valueOf(docUnitId)).map(ResponseEntity::ok);
+  public Mono<ResponseEntity<DocUnit>> getByDocumentnumber(String documentnumber) {
+    return repository.findByDocumentnumber(documentnumber).map(ResponseEntity::ok);
   }
 
-  public Mono<ResponseEntity<String>> deleteById(String docUnitId) {
+  public Mono<ResponseEntity<String>> deleteByUuid(UUID docUnitId) {
     return repository
-        .findById(Integer.valueOf(docUnitId))
+        .findByUuid(docUnitId)
         .flatMap(
             docUnit -> {
               if (docUnit.hasFileAttached()) {

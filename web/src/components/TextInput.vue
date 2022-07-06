@@ -80,18 +80,6 @@ const onSaveClick = () => {
 </template>
 
 <style lang="scss">
-.editor-btn {
-  border: 1px solid black;
-  background: white;
-  color: black;
-  border-radius: 0.3rem;
-  margin: 0.1rem;
-  padding: 0.1rem 0.4rem;
-  &__active {
-    background: black;
-    color: white;
-  }
-}
 .ris-texte-form {
   padding: rem(20px);
 
@@ -103,12 +91,12 @@ const onSaveClick = () => {
     width: 100%;
     // padding: 17px 24px;
     margin-top: 5px;
-    outline: 2px solid $blue800;
+    outline: 2px solid $text-tertiary;
     resize: vertical;
 
     &:hover,
     &:focus {
-      outline-width: 4px;
+      // outline-width: 4px;
     }
   }
 

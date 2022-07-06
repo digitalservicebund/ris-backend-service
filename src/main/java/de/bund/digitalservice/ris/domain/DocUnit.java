@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.domain;
 
 import java.time.Instant;
+import java.util.Calendar;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,13 +14,21 @@ import org.springframework.data.annotation.Id;
 public class DocUnit {
   public static final DocUnit EMPTY = new DocUnit();
 
-  public static DocUnit createNew() {
+  public static DocUnit createNew(DocUnitCreationInfo docUnitCreationInfo, int documentNumber) {
     DocUnit docUnit = new DocUnit();
+    docUnit.setUuid(UUID.randomUUID());
     docUnit.setCreationtimestamp(Instant.now());
+    docUnit.setDocumentnumber(
+        docUnitCreationInfo.getDocumentationCenterAbbreviation()
+            + docUnitCreationInfo.getDocumentType()
+            + Calendar.getInstance().get(Calendar.YEAR)
+            + String.format("%06d", documentNumber));
     return docUnit;
   }
 
-  @Id Integer id;
+  @Id Long id; // remove this, no longer necessary, uuid should be @Id TODO
+  UUID uuid;
+  String documentnumber;
   Instant creationtimestamp;
 
   // Original file

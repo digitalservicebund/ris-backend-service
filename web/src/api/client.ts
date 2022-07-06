@@ -23,20 +23,22 @@ export const apiClient = async (
   endpoint: string,
   options?: Partial<RequestInit>
 ) => {
+  const baseUrl = `${import.meta.env.VITE_API_BASE || ""}/api/v1/`
   const defaultOptions: Partial<RequestInit> = {
     method: "GET",
   }
-  return fetch(`${import.meta.env.VITE_API_BASE || ""}/api/v1/${endpoint}/`, {
+  const response = await fetch(baseUrl + endpoint, {
     ...defaultOptions,
     ...options,
   })
-    .then((response) => {
-      if (response.body instanceof ReadableStream) {
-        return getReadableStreamResponse(response.body).then((response) =>
-          response.json()
-        )
-      }
-      return response.json()
-    })
-    .catch((error) => console.error(error))
+  try {
+    if (response.body instanceof ReadableStream) {
+      return await getReadableStreamResponse(response.body).then((response) =>
+        response.json()
+      )
+    }
+    return response.json()
+  } catch (error) {
+    console.error(error)
+  }
 }

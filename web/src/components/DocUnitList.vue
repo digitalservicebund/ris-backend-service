@@ -1,24 +1,19 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { onMounted } from "vue"
-import { deleteDocUnit } from "../api/docUnitService"
-import { useDocUnitsStore } from "../store"
+import { DocUnit } from "../types/DocUnit"
 
-const store = useDocUnitsStore()
+defineProps<{ docUnits: DocUnit[] }>()
+const emit = defineEmits<{
+  (e: "deleteDocUnit", docUnit: DocUnit): void
+}>()
 
-onMounted(() => {
-  store.fetchAll()
-})
-
-const onDelete = (docUnitId: string) => {
-  deleteDocUnit(docUnitId).then(() => {
-    store.removeById(docUnitId)
-  })
+const onDelete = (docUnit: DocUnit) => {
+  emit("deleteDocUnit", docUnit)
 }
 </script>
 
 <template>
-  <v-table v-if="!store.isEmpty()" class="doc-unit-list-table">
+  <v-table v-if="docUnits.length" class="doc-unit-list-table">
     <thead>
       <tr class="table-header">
         <th class="text-center">Dok.-Nummer</th>
@@ -29,18 +24,16 @@ const onDelete = (docUnitId: string) => {
       </tr>
     </thead>
     <tbody>
-      <tr v-for="docUnit in store.getAll()" :key="docUnit.id">
+      <tr v-for="docUnit in docUnits" :key="docUnit.id">
         <td>
           <router-link
             class="doc-unit-list-active-link"
             :to="{
-              name: store.hasFileAttached(docUnit.id)
-                ? 'Rubriken'
-                : 'Dokumente',
-              params: { id: docUnit.id },
+              name: docUnit.s3path ? 'Rubriken' : 'Dokumente',
+              params: { id: docUnit.documentnumber },
             }"
           >
-            {{ docUnit.id }}
+            {{ docUnit.documentnumber }}
           </router-link>
         </td>
         <td>{{ dayjs(docUnit.creationtimestamp).format("DD.MM.YYYY") }}</td>
@@ -49,7 +42,12 @@ const onDelete = (docUnitId: string) => {
           {{ docUnit.filename ? docUnit.filename : "-" }}
         </td>
         <td>
-          <v-icon @click="onDelete(docUnit.id)"> delete </v-icon>
+          <v-icon
+            aria-label="Dokumentationseinheit löschen"
+            @click="onDelete(docUnit)"
+          >
+            delete
+          </v-icon>
         </td>
       </tr>
     </tbody>

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.config;
 
+import de.bund.digitalservice.ris.utils.DocxConverter;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -8,7 +9,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class ConverterConfiguration {
+public class ConverterConfig {
+  @Bean
+  public DocxConverter docxConverter() {
+    return new DocxConverter();
+  }
+
   @Bean
   public DocumentBuilderFactory documentBuilderFactory() {
     DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();

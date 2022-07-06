@@ -1,13 +1,22 @@
 <script lang="ts" setup>
+import { Bold } from "@tiptap/extension-bold"
+import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
+import { Image } from "@tiptap/extension-image"
+import { Italic } from "@tiptap/extension-italic"
 import { Paragraph } from "@tiptap/extension-paragraph"
+import { Strike } from "@tiptap/extension-strike"
+import { Table } from "@tiptap/extension-table"
+import { TableCell } from "@tiptap/extension-table-cell"
+import { TableHeader } from "@tiptap/extension-table-header"
+import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
+import { TextAlign } from "@tiptap/extension-text-align"
+import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
-import { PropType, watch } from "vue"
-import {
-  DocUnitParagraphExtension,
-  Randnummer,
-} from "../editor/docUnitExtension"
+import { PropType, watch, ref } from "vue"
+import { BorderNumber } from "../editor/border-number"
+import { FontSize } from "../editor/font-size"
 import { FieldSize } from "../types/FieldSize"
 
 const props = defineProps({
@@ -30,19 +39,39 @@ const props = defineProps({
 
 const emit = defineEmits(["update:modelValue"])
 
+const hasFocus = ref<boolean>(false)
+
 const editor = new Editor({
   content: props.modelValue,
   extensions: [
     Document,
     Paragraph,
     Text,
-    Randnummer,
-    DocUnitParagraphExtension,
+    BorderNumber,
+    Bold,
+    Color,
+    FontSize,
+    Italic,
+    Underline,
+    Strike,
+    Table,
+    TableCell,
+    TableHeader,
+    TableRow,
+    TextAlign.configure({
+      types: ["paragraph", "span"],
+    }),
+    Image.configure({
+      allowBase64: true,
+      inline: true,
+    }),
   ],
   onUpdate: () => {
     // outgoing changes
     emit("update:modelValue", editor.getHTML())
   },
+  onFocus: () => (hasFocus.value = true),
+  onBlur: () => (hasFocus.value = false),
   editable: props.editable,
 })
 
@@ -58,17 +87,41 @@ watch(
 )
 
 const showButtons = () => {
-  return false // props.editable // && in focus TODO
+  // focus doesn't work yet: upon click on a formatting button, the editor loses focus and the buttons disappear
+  return props.editable // && hasFocus.value
 }
+
+interface editorBtn {
+  type: string
+  icon: string
+}
+
+const editorBtns: editorBtn[] = []
+
+const add = (type: string, icon: string) => {
+  editorBtns.push({
+    type: type,
+    icon: icon,
+  })
+}
+
+add("bold", "format_bold")
+add("italic", "format_italic")
+add("underline", "format_underlined")
+add("strike", "strikethrough_s")
 </script>
 
 <template>
   <v-container fluid>
     <v-row v-if="showButtons()">
-      <v-col cols="1"><v-icon>format_bold</v-icon></v-col>
-      <v-col cols="1"><v-icon>format_italic</v-icon></v-col>
-      <v-col cols="1"><v-icon>format_underlined</v-icon></v-col>
-      <v-col cols="1"><v-icon>strikethrough_s</v-icon></v-col>
+      <v-col v-for="(btn, index) in editorBtns" :key="index" cols="1"
+        ><v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
       <v-col cols="1">Heading</v-col>
       <v-col cols="1"><v-icon>list</v-icon></v-col>
       <v-col cols="3" />
@@ -111,6 +164,24 @@ const showButtons = () => {
 
   &__max {
     height: 640px; // ? TODO
+  }
+
+  &__100percent {
+    height: 100%;
+  }
+}
+.ProseMirror-focused {
+  outline: 0;
+}
+.editor-btn {
+  color: $black;
+  &:hover {
+    color: $text-tertiary;
+    background-color: $button-tertiary-focus;
+  }
+  &__active {
+    color: $white;
+    background-color: $text-tertiary;
   }
 }
 </style>

@@ -5,15 +5,31 @@ import { createNewDocUnit } from "../api/docUnitService"
 import DocUnitList from "../components/DocUnitList.vue"
 import SimpleButton from "../components/SimpleButton.vue"
 import { useDocUnitsStore } from "../store"
+import { DocUnit } from "../types/DocUnit"
 
 const store = useDocUnitsStore()
+onMounted(() => {
+  store.fetchAll()
+})
+
 const router = useRouter()
 
 const onSubmit = () => {
-  createNewDocUnit().then((docUnit) => {
-    store.add(docUnit)
-    router.push({ name: "Dokumente", params: { id: docUnit.id } })
-  })
+  // this will be derived from the logged-in user
+  // might be known in the backend too - take it from there?
+  const documentationCenterAbbreviation = "KO"
+  //  this will be derived from the current context
+  const documentType = "RE"
+  createNewDocUnit(documentationCenterAbbreviation, documentType).then(
+    (docUnit) => {
+      store.add(docUnit)
+      router.push({ name: "Dokumente", params: { id: docUnit.documentnumber } })
+    }
+  )
+}
+
+const handleDelete = (docUnit: DocUnit) => {
+  store.remove(docUnit)
 }
 
 onMounted(() => {
@@ -39,7 +55,10 @@ onMounted(() => {
     </v-row>
     <v-row class="text-center">
       <v-col class="mb-4">
-        <DocUnitList />
+        <DocUnitList
+          :doc-units="Array.from(store.getAll())"
+          @delete-doc-unit="handleDelete"
+        />
       </v-col>
     </v-row>
   </v-container>

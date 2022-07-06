@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { onMounted } from "vue"
-import { deleteFile, getDocxFileAsHtml } from "../api/docUnitService"
+import { deleteFile } from "../api/docUnitService"
 import { useDocUnitsStore } from "../store"
 import EditorVmodel from "./EditorVmodel.vue"
 import SimpleButton from "./SimpleButton.vue"
@@ -9,19 +9,12 @@ import SimpleButton from "./SimpleButton.vue"
 const store = useDocUnitsStore()
 
 const onSubmit = async () => {
-  const docUnit = await deleteFile(store.getSelected()?.id)
+  const docUnit = await deleteFile(store.getSelected()?.uuid)
   console.log("file delete from doc unit, response:", docUnit)
   store.update(docUnit)
 }
 
-onMounted(() => {
-  if (!store.hasSelected() || !store.selectedHasFileAttached()) {
-    return
-  }
-  getDocxFileAsHtml(store.getSelectedSafe().s3path).then((response) => {
-    store.setHTMLOnSelected(response.content)
-  })
-})
+onMounted(() => store.fetchOriginalFileAsHTML())
 </script>
 
 <template>

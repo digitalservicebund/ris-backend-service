@@ -34,7 +34,7 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  const docUnit = await uploadFile(store.getSelected()?.id, file)
+  const docUnit = await uploadFile(store.getSelected()?.uuid, file)
   store.update(docUnit)
   status.value.uploadStatus = "succeeded" // error handling TODO
   console.log("file uploaded, response:", docUnit)

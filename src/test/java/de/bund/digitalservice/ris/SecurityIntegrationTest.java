@@ -10,12 +10,19 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
     properties = {"otc.obs.bucket-name=testBucket", "otc.obs.endpoint=testUrl"})
 @Tag("integration")
-class HealthEndpointIntegrationTest {
+class SecurityIntegrationTest {
 
   @Autowired WebTestClient webTestClient;
 
   @Test
-  void shouldExposeHealthEndpoint() {
-    webTestClient.get().uri("/actuator/health").exchange().expectStatus().isOk();
+  void shouldHaveEnabledCSPHeader() {
+    webTestClient
+        .get()
+        .uri("/")
+        .exchange()
+        .expectHeader()
+        .valueEquals(
+            "Content-Security-Policy",
+            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'");
   }
 }
