@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris;
 
-import java.net.MalformedURLException;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +23,7 @@ class ApplicationJourneyTest {
   private String stagingUser;
 
   @Test
-  void applicationHealthTest() throws MalformedURLException {
+  void applicationHealthTest() {
     WebTestClient.bindToServer()
         .baseUrl(stagingUrl)
         .build()
