@@ -165,9 +165,6 @@ bootBuildImage {
       url = "https://${containerRegistry}"
     }
   }
-  environment = [
-    "BP_SPRING_CLOUD_BINDINGS_DISABLED" : "true",
-  ]
 }
 
 import com.github.jk1.license.filter.*
