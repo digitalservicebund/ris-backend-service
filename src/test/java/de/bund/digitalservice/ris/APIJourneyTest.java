@@ -36,6 +36,7 @@ class APIJourneyTest {
         .expectStatus()
         .isCreated()
         .expectBody()
-        .jsonPath("$['uuid']");
+        .jsonPath("$['uuid']")
+        .exists();
   }
 }
