@@ -12,7 +12,7 @@ fileignoreconfig:
   - filename: src/main/resources/schema.sql
     checksum: 1b34b1ef959550042a2adc31dab0a01ab9e7715d8e06eb43d325186420a27cdf
   - filename: src/test/resources/application.properties
-    checksum: e07d67031eae380a8f1b5d5fda57128729dd10a49ad684c8dcc0deb905b34a1f
+    checksum: 903cb0d944b0c433403ca9fdc142fc90e243a494218c4547772c1e4fade1300f
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: web/src/env.d.ts
