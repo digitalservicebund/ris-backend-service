@@ -1,4 +1,4 @@
-import { test, expect, chromium } from "@playwright/test"
+import { test, expect } from "@playwright/test"
 
 test.describe("generate and delete doc units", () => {
   let documentNumber: string
@@ -11,7 +11,7 @@ test.describe("generate and delete doc units", () => {
     await page.waitForSelector("text=Festplatte durchsuchen")
     const regex = /rechtsprechung\/(.*)\/dokumente/g
     const match = regex.exec(page.url())
-    documentNumber = match![1] || ""
+    documentNumber = match[1] || ""
   })
 
   test("upload original file", async ({ page }) => {
@@ -69,13 +69,13 @@ test.describe("generate and delete doc units", () => {
       })
       .locator("td:nth-child(5) i")
     await selectDocUnit.waitFor()
-    selectDocUnit.click()
+    selectDocUnit.click() // an await here would break the test
 
     await page.goto("/")
 
     await page.waitForTimeout(2000)
 
-    expect(
+    await expect(
       page.locator(`a[href*="/rechtsprechung/${documentNumber}"]`)
     ).not.toBeVisible()
   })
