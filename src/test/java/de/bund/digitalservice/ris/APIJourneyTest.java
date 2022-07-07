@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris;
 
+import java.util.UUID;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,4 +41,37 @@ class APIJourneyTest {
         .jsonPath("$['uuid']")
         .exists();
   }
+
+  @Test
+  void docUnitFileUploadAPITest() {
+    // Create documentation unit
+    DocUnitResponse response =
+        WebTestClient.bindToServer()
+            .baseUrl(stagingUrl)
+            .build()
+            .post()
+            .uri("/api/v1/docunits")
+            .headers(headers -> headers.setBasicAuth(stagingUser, stagingPassword))
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue("{\"documentationCenterAbbreviation\":\"foo\",\"documentType\":\"X\"}")
+            .exchange()
+            .returnResult(DocUnitResponse.class)
+            .getResponseBody()
+            .blockFirst();
+
+    // Attach docx file
+    WebTestClient.bindToServer()
+        .baseUrl(stagingUrl)
+        .build()
+        .put()
+        .uri("/api/v1/docunits/{uuid}/file", response.uuid())
+        .headers(headers -> headers.setBasicAuth(stagingUser, stagingPassword))
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue("")
+        .exchange()
+        .expectStatus()
+        .isCreated();
+  }
+
+  static record DocUnitResponse(UUID uuid) {}
 }
