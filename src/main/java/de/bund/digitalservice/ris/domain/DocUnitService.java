@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -40,9 +39,6 @@ public class DocUnitService {
       DocUnitRepository repository,
       DocumentNumberCounterRepository counterRepository,
       S3AsyncClient s3AsyncClient) {
-    Assert.notNull(repository, "doc unit repository is null");
-    Assert.notNull(s3AsyncClient, "s3 async client is null");
-
     this.repository = repository;
     this.counterRepository = counterRepository;
     this.s3AsyncClient = s3AsyncClient;

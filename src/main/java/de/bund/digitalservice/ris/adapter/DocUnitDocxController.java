@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import java.util.List;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,8 +18,6 @@ public class DocUnitDocxController {
   private final DocxConverterService service;
 
   public DocUnitDocxController(DocxConverterService service) {
-    Assert.notNull(service, "docx converter service is null");
-
     this.service = service;
   }
 

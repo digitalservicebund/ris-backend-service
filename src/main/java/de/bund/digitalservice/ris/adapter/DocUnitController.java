@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,8 +30,6 @@ public class DocUnitController {
   private final DocUnitService service;
 
   public DocUnitController(DocUnitService service) {
-    Assert.notNull(service, "DocUnitService is null");
-
     this.service = service;
   }
 
