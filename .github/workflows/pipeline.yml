@@ -347,6 +347,12 @@ jobs:
           STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
           STAGING_URL: ${{ secrets.STAGING_URL }}
           STAGING_USER: ${{ secrets.STAGING_USER }}
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: gradle-report
+          path: ${{ github.workspace }}/build/reports/tests/journeyTest/
+          retention-days: 3
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
