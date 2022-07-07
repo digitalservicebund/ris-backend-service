@@ -29,7 +29,7 @@ test.describe("generate and delete doc units", () => {
     await fileChooser.setFiles("./test/e2e/sample.docx")
 
     await page.waitForSelector(
-      "text= Die Datei sample.docx wurde erfolgreich hochgeladen"
+      ".fileviewer-info-panel-value >> text=sample.docx"
     )
   })
 
