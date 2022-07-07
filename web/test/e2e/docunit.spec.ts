@@ -1,7 +1,7 @@
-import { test } from "@playwright/test"
+import { test, expect } from "@playwright/test"
 
 test.describe("generate and delete doc units", () => {
-  /*let documentNumber: string
+  let documentNumber: string
 
   test("generate doc unit", async ({ page }) => {
     await page.goto("/")
@@ -78,5 +78,5 @@ test.describe("generate and delete doc units", () => {
     await expect(
       page.locator(`a[href*="/rechtsprechung/${documentNumber}"]`)
     ).not.toBeVisible()
-  })*/
+  })
 })
