@@ -23,10 +23,13 @@
   },
   "dependencies": {
     "@tiptap/extension-bold": "^2.0.0-beta.28",
+    "@tiptap/extension-bullet-list": "^2.0.0-beta.29",
     "@tiptap/extension-color": "^2.0.0-beta.12",
     "@tiptap/extension-document": "^2.0.0-beta.15",
     "@tiptap/extension-image": "^2.0.0-beta.30",
     "@tiptap/extension-italic": "^2.0.0-beta.28",
+    "@tiptap/extension-list-item": "^2.0.0-beta.23",
+    "@tiptap/extension-ordered-list": "^2.0.0-beta.30",
     "@tiptap/extension-paragraph": "^2.0.0-beta.23",
     "@tiptap/extension-strike": "^2.0.0-beta.29",
     "@tiptap/extension-table": "^2.0.0-beta.54",

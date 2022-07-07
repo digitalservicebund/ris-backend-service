@@ -11,6 +11,9 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.config.ConverterConfig;
 import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
+import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
@@ -21,6 +24,7 @@ import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +73,7 @@ import software.amazon.awssdk.services.s3.model.S3Object;
 @ExtendWith(SpringExtension.class)
 @Import({DocxConverterService.class, ConverterConfig.class})
 class DocxConverterServiceTest {
+
   @Autowired DocxConverterService service;
 
   @MockBean S3AsyncClient client;
@@ -119,18 +124,14 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml() {
-    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-        .thenReturn(CompletableFuture.completedFuture(responseBytes));
-    when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
-    MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
-    when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
-    when(mainDocumentPart.getContent()).thenReturn(List.of("1", "2", "3", "4", "5", "6"));
-    when(converter.convert("1")).thenReturn(generateText("test"));
-    when(converter.convert("2")).thenReturn(generateBorderNumber("1"));
-    when(converter.convert("3")).thenReturn(generateText("border number 1"));
-    when(converter.convert("4")).thenReturn(generateBorderNumber("2"));
-    when(converter.convert("5")).thenReturn(generateText("border number 2"));
-    when(converter.convert("6")).thenReturn(generateTable("table content"));
+    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
+        .addContent("1", generateText("test"))
+        .addContent("2", generateBorderNumber("1"))
+        .addContent("3", generateText("border number 1"))
+        .addContent("4", generateBorderNumber("2"))
+        .addContent("5", generateText("border number 2"))
+        .addContent("6", generateTable("table content"))
+        .generate();
 
     try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
         mockStatic(WordprocessingMLPackage.class)) {
@@ -154,7 +155,7 @@ class DocxConverterServiceTest {
   }
 
   @Test
-  void testGetHtml_withStyleInformation() throws Docx4JException {
+  void testGetHtml_withStyleInformation() {
     when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
         .thenReturn(CompletableFuture.completedFuture(responseBytes));
     when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
@@ -242,25 +243,18 @@ class DocxConverterServiceTest {
 
   @Test
   void testGetHtml_withEmptyBorderNumber() {
-    when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
-        .thenReturn(CompletableFuture.completedFuture(responseBytes));
-    when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
-    MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
-    when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
-    when(mainDocumentPart.getContent()).thenReturn(List.of("1", "2", "3", "4"));
+    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
+        .addContent("1", generateText("test"))
+        .addContent("2", generateBorderNumber("1"))
+        .addContent("3", generateBorderNumber("2"))
+        .addContent("4", generateText("border number 2"))
+        .generate();
 
     try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-            mockStatic(WordprocessingMLPackage.class);
-        MockedStatic<DocxConverter> mockedConverter = mockStatic(DocxConverter.class)) {
+        mockStatic(WordprocessingMLPackage.class)) {
       mockedMLPackageStatic
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
-      mockedConverter.when(() -> converter.convert("1")).thenReturn(generateText("test"));
-      mockedConverter.when(() -> converter.convert("2")).thenReturn(generateBorderNumber("1"));
-      mockedConverter.when(() -> converter.convert("3")).thenReturn(generateBorderNumber("2"));
-      mockedConverter
-          .when(() -> converter.convert("4"))
-          .thenReturn(generateText("border number 2"));
 
       StepVerifier.create(service.getHtml("test.docx"))
           .consumeNextWith(
@@ -268,6 +262,96 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>test</p><border-number number=\"1\"></border-number><border-number number=\"2\"><p>border number 2</p></border-number>",
+                    docx2Html.content());
+              })
+          .verifyComplete();
+    }
+  }
+
+  @Test
+  void testGetHtml_withTwoNumberingListEntries() {
+    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
+        .addContent("1", generateText("start test"))
+        .addContent(
+            "2",
+            generateNumberingListEntry(
+                "bullet list entry 1", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
+        .addContent(
+            "3",
+            generateNumberingListEntry(
+                "bullet list entry 2", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
+        .addContent(
+            "4",
+            generateNumberingListEntry(
+                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
+        .addContent(
+            "5",
+            generateNumberingListEntry(
+                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
+        .addContent("6", generateText("end text"))
+        .generate();
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getHtml("test.docx"))
+          .consumeNextWith(
+              docx2Html -> {
+                assertNotNull(docx2Html);
+                assertEquals(
+                    "<p>start test</p>"
+                        + "<ul><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li></ul>"
+                        + "<ol><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
+                        + "<p>end text</p>",
+                    docx2Html.content());
+              })
+          .verifyComplete();
+    }
+  }
+
+  @Test
+  void testGetHtml_withTwoNumberingListEntriesAndMiddleText() {
+    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
+        .addContent("1", generateText("start test"))
+        .addContent(
+            "2",
+            generateNumberingListEntry(
+                "bullet list entry 1", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
+        .addContent(
+            "3",
+            generateNumberingListEntry(
+                "bullet list entry 2", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
+        .addContent("4", generateText("middle text"))
+        .addContent(
+            "5",
+            generateNumberingListEntry(
+                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
+        .addContent(
+            "6",
+            generateNumberingListEntry(
+                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
+        .addContent("7", generateText("end text"))
+        .generate();
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getHtml("test.docx"))
+          .consumeNextWith(
+              docx2Html -> {
+                assertNotNull(docx2Html);
+                assertEquals(
+                    "<p>start test</p>"
+                        + "<ul><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li></ul>"
+                        + "<p>middle text</p>"
+                        + "<ol><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
+                        + "<p>end text</p>",
                     docx2Html.content());
               })
           .verifyComplete();
@@ -326,5 +410,49 @@ class DocxConverterServiceTest {
     List<DocUnitTableRow> rows = List.of(new DocUnitTableRow(columns));
 
     return new DocUnitTable(rows);
+  }
+
+  private DocUnitDocx generateNumberingListEntry(
+      String text, DocUnitNumberingListNumberFormat numberFormat, String numId, String iLvl) {
+    var paragraphElement = generateText(text);
+
+    return new DocUnitNumberingListEntry(paragraphElement, numberFormat, numId, iLvl);
+  }
+
+  private static class TestDocumentGenerator {
+
+    private final List<Object> ids = new ArrayList<>();
+    private final S3AsyncClient client;
+    private final ResponseBytes<GetObjectResponse> responseBytes;
+    private final WordprocessingMLPackage mlPackage;
+    private final DocxConverter converter;
+
+    public TestDocumentGenerator(
+        S3AsyncClient client,
+        ResponseBytes<GetObjectResponse> responseBytes,
+        WordprocessingMLPackage mlPackage,
+        DocxConverter converter) {
+
+      this.client = client;
+      this.responseBytes = responseBytes;
+      this.mlPackage = mlPackage;
+      this.converter = converter;
+    }
+
+    private TestDocumentGenerator addContent(String id, DocUnitDocx docUnitDocx) {
+      ids.add(id);
+      when(converter.convert(id)).thenReturn(docUnitDocx);
+
+      return this;
+    }
+
+    private void generate() {
+      when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
+          .thenReturn(CompletableFuture.completedFuture(responseBytes));
+      when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
+      MainDocumentPart mainDocumentPart = mock(MainDocumentPart.class);
+      when(mlPackage.getMainDocumentPart()).thenReturn(mainDocumentPart);
+      when(mainDocumentPart.getContent()).thenReturn(ids);
+    }
   }
 }

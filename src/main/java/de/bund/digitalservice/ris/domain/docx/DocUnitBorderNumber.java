@@ -5,14 +5,14 @@ import java.util.List;
 
 public class DocUnitBorderNumber implements DocUnitDocx {
   private final StringBuilder number = new StringBuilder();
-  private List<DocUnitParagraphElement> textElements = new ArrayList<>();
+  private List<DocUnitParagraphElement> paragraphElements = new ArrayList<>();
 
   public String getNumber() {
     return number.toString();
   }
 
-  public void addParagraphTextElement(DocUnitParagraphElement textElement) {
-    textElements.add(textElement);
+  public void addParagraphElement(DocUnitParagraphElement paragraphElement) {
+    paragraphElements.add(paragraphElement);
   }
 
   public void addNumberText(String text) {
@@ -26,7 +26,7 @@ public class DocUnitBorderNumber implements DocUnitDocx {
     sb.append("<border-number number=\"");
     sb.append(number);
     sb.append("\">");
-    for (DocUnitParagraphElement textElement : textElements) {
+    for (DocUnitParagraphElement textElement : paragraphElements) {
       sb.append(textElement.toHtmlString());
     }
     sb.append("</border-number>");
