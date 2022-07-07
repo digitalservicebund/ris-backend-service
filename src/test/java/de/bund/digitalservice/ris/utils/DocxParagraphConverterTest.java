@@ -64,6 +64,7 @@ class DocxParagraphConverterTest {
     var result = converter.convert(new Object());
 
     assertEquals("java.lang.Object", result.toString());
-    assertEquals("<div style=\"color: #FF0000;\">java.lang.Object</div>", result.toHtmlString());
+    assertEquals(
+        "<p><span style=\"color: #FF0000;\">java.lang.Object</span></p>", result.toHtmlString());
   }
 }

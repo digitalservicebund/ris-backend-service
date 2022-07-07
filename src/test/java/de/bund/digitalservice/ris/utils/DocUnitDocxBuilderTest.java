@@ -1,14 +1,21 @@
 package de.bund.digitalservice.ris.utils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
+import de.bund.digitalservice.ris.TestMemoryAppender;
 import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitImageElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
@@ -24,15 +31,22 @@ import org.docx4j.dml.GraphicData;
 import org.docx4j.dml.picture.Pic;
 import org.docx4j.dml.wordprocessingDrawing.Anchor;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
+import org.docx4j.model.listnumbering.ListLevel;
+import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.HpsMeasure;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
+import org.docx4j.wml.NumberFormat;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase;
+import org.docx4j.wml.PPrBase.NumPr;
+import org.docx4j.wml.PPrBase.NumPr.Ilvl;
+import org.docx4j.wml.PPrBase.NumPr.NumId;
 import org.docx4j.wml.ParaRPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
@@ -43,6 +57,7 @@ import org.docx4j.wml.Tr;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.junit.jupiter.api.Test;
+import org.slf4j.LoggerFactory;
 
 class DocUnitDocxBuilderTest {
   @Test
@@ -576,10 +591,19 @@ class DocUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    builder = builder.setParagraph(paragraph);
-    Exception exception = assertThrows(DocxConverterException.class, builder::build);
+    var result = builder.setParagraph(paragraph).build();
 
-    assertEquals("unsupported drawing object", exception.getMessage());
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitImageElement) runElement;
+    assertNull(runImageElement.getContentType());
+    assertNull(runImageElement.getBase64Representation());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"color: #FF0000;\">no image information</span></p>", htmlString);
   }
 
   @Test
@@ -620,6 +644,141 @@ class DocUnitDocxBuilderTest {
     Exception exception = assertThrows(DocxConverterException.class, builder::build);
 
     assertEquals("no graphic data", exception.getMessage());
+  }
+
+  @Test
+  void testBuild_withNumberingList() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    PPr pPr = new PPr();
+    NumPr numPr = new NumPr();
+    NumId numId = new NumId();
+    numId.setVal(new BigInteger("0"));
+    numPr.setNumId(numId);
+    Ilvl ilvl = new Ilvl();
+    ilvl.setVal(new BigInteger("0"));
+    numPr.setIlvl(ilvl);
+    pPr.setNumPr(numPr);
+    P paragraph = new P();
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("test text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var listNumberingDefinitions = new HashMap<String, ListNumberingDefinition>();
+    var listNumberingDefinition = mock(ListNumberingDefinition.class);
+    var abstractListDefinition = mock(AbstractListNumberingDefinition.class);
+    var listLevel = mock(ListLevel.class);
+    when(listLevel.getNumFmt()).thenReturn(NumberFormat.DECIMAL);
+    when(listNumberingDefinition.getAbstractListDefinition()).thenReturn(abstractListDefinition);
+    HashMap<String, ListLevel> listLevels = new HashMap<>();
+    listLevels.put("0", listLevel);
+    when(abstractListDefinition.getListLevels()).thenReturn(listLevels);
+    listNumberingDefinitions.put("0", listNumberingDefinition);
+
+    var result =
+        builder
+            .setParagraph(paragraph)
+            .useListNumberingDefinitions(listNumberingDefinitions)
+            .build();
+
+    assertTrue(result instanceof DocUnitNumberingListEntry);
+    var numberingListEntry = (DocUnitNumberingListEntry) result;
+    assertEquals("0", numberingListEntry.numId());
+    assertEquals("0", numberingListEntry.iLvl());
+    assertEquals(DocUnitNumberingListNumberFormat.DECIMAL, numberingListEntry.numberFormat());
+    assertNotNull(numberingListEntry.paragraphElement());
+    DocUnitParagraphElement paragraphElement =
+        (DocUnitParagraphElement) numberingListEntry.paragraphElement();
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = (DocUnitRunTextElement) runElement;
+
+    var htmlString = numberingListEntry.toHtmlString();
+    assertEquals("<li><p>test text</p></li>", htmlString);
+  }
+
+  @Test
+  void testBuild_withNumberingList_withNotAllowedNumberingFormat() {
+    TestMemoryAppender memoryAppender = addLoggingTestAppender();
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    PPr pPr = new PPr();
+    NumPr numPr = new NumPr();
+    NumId numId = new NumId();
+    numId.setVal(new BigInteger("0"));
+    numPr.setNumId(numId);
+    Ilvl ilvl = new Ilvl();
+    ilvl.setVal(new BigInteger("0"));
+    numPr.setIlvl(ilvl);
+    pPr.setNumPr(numPr);
+    P paragraph = new P();
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("test text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var listNumberingDefinitions = new HashMap<String, ListNumberingDefinition>();
+    var listNumberingDefinition = mock(ListNumberingDefinition.class);
+    var abstractListDefinition = mock(AbstractListNumberingDefinition.class);
+    var listLevel = mock(ListLevel.class);
+    when(listLevel.getNumFmt()).thenReturn(NumberFormat.CHICAGO);
+    when(listNumberingDefinition.getAbstractListDefinition()).thenReturn(abstractListDefinition);
+    HashMap<String, ListLevel> listLevels = new HashMap<>();
+    listLevels.put("0", listLevel);
+    when(abstractListDefinition.getListLevels()).thenReturn(listLevels);
+    listNumberingDefinitions.put("0", listNumberingDefinition);
+
+    var result =
+        builder
+            .setParagraph(paragraph)
+            .useListNumberingDefinitions(listNumberingDefinitions)
+            .build();
+
+    assertTrue(result instanceof DocUnitNumberingListEntry);
+    var numberingListEntry = (DocUnitNumberingListEntry) result;
+    assertEquals("0", numberingListEntry.numId());
+    assertEquals("0", numberingListEntry.iLvl());
+    assertEquals(DocUnitNumberingListNumberFormat.BULLET, numberingListEntry.numberFormat());
+    assertNotNull(numberingListEntry.paragraphElement());
+    DocUnitParagraphElement paragraphElement =
+        (DocUnitParagraphElement) numberingListEntry.paragraphElement();
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = (DocUnitRunTextElement) runElement;
+
+    var htmlString = numberingListEntry.toHtmlString();
+    assertEquals("<li><p>test text</p></li>", htmlString);
+
+    assertEquals(1, memoryAppender.count(Level.ERROR));
+    assertEquals(
+        "not implemented number format (CHICAGO) in list. use default bullet list",
+        memoryAppender.getMessage(Level.ERROR, 0));
+  }
+
+  private TestMemoryAppender addLoggingTestAppender() {
+    TestMemoryAppender memoryAppender = new TestMemoryAppender();
+    memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
+
+    Logger logger = (Logger) LoggerFactory.getLogger(DocUnitDocxBuilder.class);
+    logger.addAppender(memoryAppender);
+
+    memoryAppender.start();
+
+    return memoryAppender;
+  }
+
+  private void detachLoggingTestAppender(TestMemoryAppender memoryAppender) {
+    memoryAppender.stop();
+
+    Logger logger = (Logger) LoggerFactory.getLogger(DocUnitDocxBuilder.class);
+    logger.detachAppender(memoryAppender);
   }
 
   private Tbl generateTable(List<List<String>> cells) {

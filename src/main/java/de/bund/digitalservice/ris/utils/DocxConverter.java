@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.utils;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
+import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Style;
@@ -11,6 +12,7 @@ import org.docx4j.wml.Tbl;
 public class DocxConverter {
   Map<String, Style> styles;
   Map<String, BinaryPartAbstractImage> images;
+  Map<String, ListNumberingDefinition> listNumberingDefinitions;
 
   public void setImages(Map<String, BinaryPartAbstractImage> images) {
     this.images = images;
@@ -18,6 +20,10 @@ public class DocxConverter {
 
   public void setStyles(Map<String, Style> styles) {
     this.styles = styles;
+  }
+
+  public void setNumbering(Map<String, ListNumberingDefinition> listNumberingDefinitions) {
+    this.listNumberingDefinitions = listNumberingDefinitions;
   }
 
   public DocUnitDocx convert(Object part) {
@@ -35,14 +41,18 @@ public class DocxConverter {
 
       @Override
       public String toHtmlString() {
-        return "<div style=\"color: #FF0000;\">" + part.getClass().getName() + "</div>";
+        return "<p><span style=\"color: #FF0000;\">" + part.getClass().getName() + "</span></p>";
       }
     };
   }
 
   private DocUnitDocx convertP(P part) {
     var builder =
-        DocUnitDocxBuilder.newInstance().useStyles(styles).useImages(images).setParagraph(part);
+        DocUnitDocxBuilder.newInstance()
+            .useStyles(styles)
+            .useImages(images)
+            .useListNumberingDefinitions(listNumberingDefinitions)
+            .setParagraph(part);
 
     return builder.build();
   }

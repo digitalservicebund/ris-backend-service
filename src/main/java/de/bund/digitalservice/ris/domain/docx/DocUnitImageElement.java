@@ -23,7 +23,7 @@ public class DocUnitImageElement implements DocUnitRunElement {
   @Override
   public String toHtmlString() {
     if (contentType == null || base64Representation == null) {
-      return "<span style=\"color: #FF0000;\">no image informationen</span>";
+      return "<span style=\"color: #FF0000;\">no image information</span>";
     }
 
     return "<img src=\"data:" + contentType + ";base64, " + base64Representation + "\" />";

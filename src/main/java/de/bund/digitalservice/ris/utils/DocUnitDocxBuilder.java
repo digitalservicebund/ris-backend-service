@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.utils;
 import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.DocUnitImageElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
@@ -18,12 +20,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
+import org.docx4j.model.listnumbering.ListLevel;
+import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
+import org.docx4j.wml.NumberFormat;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
+import org.docx4j.wml.PPrBase.NumPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.RPrAbstract;
@@ -41,8 +48,9 @@ public class DocUnitDocxBuilder {
 
   P paragraph;
   Tbl table;
-  Map<String, Style> styles = new HashMap<>();
-  Map<String, BinaryPartAbstractImage> images = new HashMap<>();
+  private Map<String, Style> styles = new HashMap<>();
+  private Map<String, BinaryPartAbstractImage> images = new HashMap<>();
+  private Map<String, ListNumberingDefinition> listNumberingDefinitions;
 
   private DocUnitDocxBuilder() {}
 
@@ -58,6 +66,13 @@ public class DocUnitDocxBuilder {
 
   public DocUnitDocxBuilder useImages(Map<String, BinaryPartAbstractImage> images) {
     this.images = images;
+
+    return this;
+  }
+
+  public DocUnitDocxBuilder useListNumberingDefinitions(
+      Map<String, ListNumberingDefinition> listNumberingDefinitions) {
+    this.listNumberingDefinitions = listNumberingDefinitions;
 
     return this;
   }
@@ -81,6 +96,8 @@ public class DocUnitDocxBuilder {
 
     if (isBorderNumber()) {
       return convertToBorderNumber();
+    } else if (isNumberingList()) {
+      return convertToNumberingList();
     } else if (isParagraph()) {
       return convertToParagraphElement(paragraph);
     }
@@ -137,6 +154,56 @@ public class DocUnitDocxBuilder {
         .forEach(r -> borderNumber.addNumberText(parseTextFromRun(r)));
 
     return borderNumber;
+  }
+
+  private boolean isNumberingList() {
+    if (!isParagraph() || paragraph.getPPr() == null) {
+      return false;
+    }
+
+    return paragraph.getPPr().getNumPr() != null;
+  }
+
+  private DocUnitNumberingListEntry convertToNumberingList() {
+    if (!isNumberingList()) {
+      return null;
+    }
+
+    NumPr numPr = paragraph.getPPr().getNumPr();
+    String numId = null;
+    String iLvl = null;
+
+    ListNumberingDefinition listNumberingDefinition = null;
+    if (numPr != null && numPr.getNumId() != null && numPr.getNumId().getVal() != null) {
+      numId = numPr.getNumId().getVal().toString();
+      listNumberingDefinition = listNumberingDefinitions.get(numId);
+    }
+
+    DocUnitNumberingListNumberFormat numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+    if (listNumberingDefinition != null) {
+      AbstractListNumberingDefinition abstractListDefinition =
+          listNumberingDefinition.getAbstractListDefinition();
+
+      if (abstractListDefinition != null
+          && numPr.getIlvl() != null
+          && numPr.getIlvl().getVal() != null) {
+        iLvl = numPr.getIlvl().getVal().toString();
+        ListLevel listLevel = abstractListDefinition.getListLevels().get(iLvl);
+
+        if (listLevel != null) {
+          if (listLevel.getNumFmt() == NumberFormat.DECIMAL) {
+            numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+          } else if (listLevel.getNumFmt() != NumberFormat.BULLET) {
+            LOGGER.error(
+                "not implemented number format ({}) in list. use default bullet list",
+                listLevel.getNumFmt());
+          }
+        }
+      }
+    }
+
+    return new DocUnitNumberingListEntry(
+        convertToParagraphElement(paragraph), numberFormat, numId, iLvl);
   }
 
   private boolean isParagraph() {
@@ -208,7 +275,8 @@ public class DocUnitDocxBuilder {
     if (drawingObject instanceof Inline inline) {
       return parseInlineImageElement(inline);
     } else {
-      throw new DocxConverterException("unsupported drawing object");
+      LOGGER.error("unsupported drawing object");
+      return new DocUnitImageElement();
     }
   }
 
