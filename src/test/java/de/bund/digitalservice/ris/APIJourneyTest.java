@@ -30,6 +30,7 @@ class APIJourneyTest {
         .build()
         .post()
         .uri("/api/v1/docunits")
+        .headers(headers -> headers.setBasicAuth(stagingUser, stagingPassword))
         .contentType(MediaType.APPLICATION_JSON)
         .bodyValue("{\"documentationCenterAbbreviation\":\"foo\",\"documentType\":\"X\"}")
         .exchange()
