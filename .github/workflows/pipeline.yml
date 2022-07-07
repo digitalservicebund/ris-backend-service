@@ -350,7 +350,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: failure()
         with:
-          name: gradle-report
+          name: journey-tests-gradle-report
           path: ${{ github.workspace }}/build/reports/tests/journeyTest/
           retention-days: 3
       - name: Send status to Slack
