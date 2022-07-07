@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -11,7 +12,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application.properties")
 @Tag("journey")
-class ApplicationJourneyTest {
+class APIJourneyTest {
 
   @Value("${application.staging.password}")
   private String stagingPassword;
@@ -23,15 +24,18 @@ class ApplicationJourneyTest {
   private String stagingUser;
 
   @Test
-  void applicationHealthTest() {
+  void docUnitCreationAPITest() {
     WebTestClient.bindToServer()
         .baseUrl(stagingUrl)
         .build()
-        .get()
-        .uri("/actuator/health")
-        .headers(headers -> headers.setBasicAuth(stagingUser, stagingPassword))
+        .post()
+        .uri("/api/v1/docunits")
+        .contentType(MediaType.APPLICATION_JSON)
+        .bodyValue("{\"documentationCenterAbbreviation\":\"foo\",\"documentType\":\"X\"}")
         .exchange()
         .expectStatus()
-        .isOk();
+        .isCreated()
+        .expectBody()
+        .jsonPath("$['uuid']");
   }
 }
