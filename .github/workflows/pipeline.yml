@@ -364,12 +364,12 @@ jobs:
           npx --yes playwright install
           npx --yes playwright install msedge
         working-directory: ./web
-      - name: Run e2e tests on staging
-        env:
-          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
-        run: |
-          npm run test:e2e
-        working-directory: ./web
+      #- name: Run e2e tests on staging
+      #  env:
+      #    E2E_BASE_URL: ${{ secrets.STAGING_URL }}
+      #  run: |
+      #    npm run test:e2e
+      #  working-directory: ./web
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
