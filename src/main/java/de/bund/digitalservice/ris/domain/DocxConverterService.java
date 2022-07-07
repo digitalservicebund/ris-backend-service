@@ -149,7 +149,6 @@ public class DocxConverterService {
     converter.setNumbering(readNumbering(mlPackage));
 
     mlPackage.getMainDocumentPart().getContent().stream()
-        .peek(el -> LOGGER.info("element: {}", el))
         .map(converter::convert)
         .filter(Objects::nonNull)
         .forEach(
