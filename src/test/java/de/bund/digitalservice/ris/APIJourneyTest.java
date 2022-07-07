@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris;
 
 import java.util.UUID;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +44,7 @@ class APIJourneyTest {
   }
 
   @Test
+  @Disabled
   void docUnitFileUploadAPITest() {
     // Create documentation unit
     DocUnitResponse response =
