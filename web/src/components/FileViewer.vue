@@ -21,13 +21,13 @@ onMounted(() => store.fetchOriginalFileAsHTML())
   <span v-if="store.hasSelected()">
     <v-container class="fileviewer-info-panel">
       <v-row>
-        <v-col cols="2">
+        <v-col sm="6">
           Dateiname
           <div class="fileviewer-info-panel-value">
             {{ store.getSelected()?.filename }}
           </div>
         </v-col>
-        <v-col cols="2">
+        <v-col sm="3" md="2">
           Hochgeladen am
           <div class="fileviewer-info-panel-value">
             {{
@@ -37,23 +37,17 @@ onMounted(() => store.fetchOriginalFileAsHTML())
             }}
           </div>
         </v-col>
-        <v-col cols="2">
+        <v-col sm="3" md="2">
           Format
           <div class="fileviewer-info-panel-value">
             {{ store.getSelected()?.filetype }}
           </div>
         </v-col>
-        <v-col cols="2">
+        <v-col sm="3" md="2">
           Von
           <div class="fileviewer-info-panel-value">USER NAME</div>
         </v-col>
         <v-col cols="4" />
-      </v-row>
-      <v-row>
-        <v-col></v-col>
-      </v-row>
-      <v-row>
-        <v-col></v-col>
       </v-row>
       <v-row class="fileviewer-info-panel">
         <v-col cols="12">
@@ -79,6 +73,7 @@ onMounted(() => store.fetchOriginalFileAsHTML())
 .fileviewer-info-panel {
   background-color: $white;
 }
+
 .fileviewer-info-panel-value {
   color: $gray900;
   font-weight: bold;
