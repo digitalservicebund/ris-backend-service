@@ -2,7 +2,8 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: "*spec.ts"
-    ignore_detectors: [filecontent]
+    allowed_patterns:
+        - password:\ process.env.STAGING_PASSWORD.*
   - filename: build.gradle
     checksum: 894532dd559c857490848ace7e0330f8612301cb32e2fc1c7b0963ba2324d949
   - filename: .github/workflows/pipeline.yml
