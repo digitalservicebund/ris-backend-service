@@ -1,7 +1,9 @@
-import { test } from "@playwright/test"
+import { test, expect } from "@playwright/test"
+
+let page
 
 test.describe("generate and delete doc units", () => {
-  // let documentNumber: string
+  let documentNumber: string
 
   test("generate doc unit", async ({ browser }) => {
     const context = await browser.newContext({
@@ -10,18 +12,18 @@ test.describe("generate and delete doc units", () => {
         password: process.env.STAGING_PASSWORD ?? "",
       },
     })
-    const page = await context.newPage()
+    page = await context.newPage()
     await page.goto("/")
 
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
 
     await page.waitForSelector("text=Festplatte durchsuchen")
-    // const regex = /rechtsprechung\/(.*)\/dokumente/g
-    // const match = regex.exec(page.url())
-    // documentNumber = match[1] || ""
+    const regex = /rechtsprechung\/(.*)\/dokumente/g
+    const match = regex.exec(page.url())
+    documentNumber = match[1] || ""
   })
 
-  /*test("upload original file", async ({ page }) => {
+  test("upload original file", async () => {
     await page.goto("/")
 
     const selectDocUnit = page.locator(
@@ -40,7 +42,7 @@ test.describe("generate and delete doc units", () => {
     )
   })
 
-  test("delete delete original file", async ({ page }) => {
+  test("delete delete original file", async () => {
     await page.goto("/")
 
     await page
@@ -65,7 +67,7 @@ test.describe("generate and delete doc units", () => {
     )
   })
 
-  test("delete doc unit", async ({ page }) => {
+  test("delete doc unit", async () => {
     await page.goto("/")
 
     const selectDocUnit = page
@@ -85,5 +87,5 @@ test.describe("generate and delete doc units", () => {
     await expect(
       page.locator(`a[href*="/rechtsprechung/${documentNumber}"]`)
     ).not.toBeVisible()
-  })*/
+  })
 })
