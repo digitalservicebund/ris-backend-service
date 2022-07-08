@@ -1,20 +1,27 @@
-import { test, expect } from "@playwright/test"
+import { test } from "@playwright/test"
 
 test.describe("generate and delete doc units", () => {
-  let documentNumber: string
+  // let documentNumber: string
 
-  test("generate doc unit", async ({ page }) => {
+  test("generate doc unit", async ({ browser }) => {
+    const context = await browser.newContext({
+      httpCredentials: {
+        username: process.env.STAGING_USER ?? "",
+        password: process.env.STAGING_PASSWORD ?? "",
+      },
+    })
+    const page = await context.newPage()
     await page.goto("/")
 
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
 
     await page.waitForSelector("text=Festplatte durchsuchen")
-    const regex = /rechtsprechung\/(.*)\/dokumente/g
-    const match = regex.exec(page.url())
-    documentNumber = match[1] || ""
+    // const regex = /rechtsprechung\/(.*)\/dokumente/g
+    // const match = regex.exec(page.url())
+    // documentNumber = match[1] || ""
   })
 
-  test("upload original file", async ({ page }) => {
+  /*test("upload original file", async ({ page }) => {
     await page.goto("/")
 
     const selectDocUnit = page.locator(
@@ -78,5 +85,5 @@ test.describe("generate and delete doc units", () => {
     await expect(
       page.locator(`a[href*="/rechtsprechung/${documentNumber}"]`)
     ).not.toBeVisible()
-  })
+  })*/
 })
