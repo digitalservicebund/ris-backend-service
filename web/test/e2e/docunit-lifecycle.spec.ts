@@ -12,58 +12,12 @@ test.describe("generate and delete a doc unit", () => {
     documentNumber = await generateDocUnit(page)
   })
 
-  test("upload original file", async () => {
-    await page.goto("/rechtsprechung")
-
-    const selectDocUnit = page.locator(
-      `tr td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
-    )
-    await selectDocUnit.click()
-
-    const [fileChooser] = await Promise.all([
-      page.waitForEvent("filechooser"),
-      page.locator("text=Festplatte durchsuchen").click(),
-    ])
-    await fileChooser.setFiles("./test/e2e/sample.docx")
-
-    await page.waitForSelector(
-      ".fileviewer-info-panel-value >> text=sample.docx"
-    )
-  })
-
-  test("delete delete original file", async () => {
-    await page.goto("/rechtsprechung")
-
-    await page
-      .locator(`a[href*="/rechtsprechung/${documentNumber}/rubriken"]`)
-      .click()
-
-    const documentLink = page.locator(
-      'a[href*="/rechtsprechung/' +
-        documentNumber +
-        '/dokumente"] >> text=DOKUMENTE'
-    )
-    await documentLink.click()
-
-    await page.locator("text=Datei löschen").click()
-
-    await page.waitForSelector("text=Festplatte durchsuchen")
-
-    await page.goto("/rechtsprechung")
-
-    await page.waitForSelector(
-      `a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
-    )
-  })
-
   test("delete doc unit", async () => {
     await page.goto("/rechtsprechung")
 
     await deleteDocUnit(page, documentNumber)
 
     await page.goto("/rechtsprechung")
-
-    await page.waitForTimeout(2000)
 
     await expect(
       page.locator(`a[href*="/rechtsprechung/${documentNumber}"]`)
@@ -100,4 +54,6 @@ export const deleteDocUnit = async (page: Page, documentNumber: string) => {
     .locator("td:nth-child(5) i")
   await selectDocUnit.waitFor()
   selectDocUnit.click() // an await here would break the test
+
+  await page.waitForTimeout(2000)
 }
