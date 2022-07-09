@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test"
+import { test, expect, Page } from "@playwright/test"
 import { Browser } from "playwright"
 
 let page
@@ -10,12 +10,7 @@ test.describe("generate and delete a doc unit", () => {
     page = await getAuthenticatedPage(browser)
     await page.goto("/rechtsprechung")
 
-    await page.locator("button >> text=Neue Dokumentationseinheit").click()
-
-    await page.waitForSelector("text=Festplatte durchsuchen")
-    const regex = /rechtsprechung\/(.*)\/dokumente/g
-    const match = regex.exec(page.url())
-    documentNumber = match[1] || ""
+    documentNumber = await generateDocUnit(page)
   })
 
   test("upload original file", async () => {
@@ -65,15 +60,7 @@ test.describe("generate and delete a doc unit", () => {
   test("delete doc unit", async () => {
     await page.goto("/rechtsprechung")
 
-    const selectDocUnit = page
-      .locator("tr", {
-        has: page.locator(
-          `td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
-        ),
-      })
-      .locator("td:nth-child(5) i")
-    await selectDocUnit.waitFor()
-    selectDocUnit.click() // an await here would break the test
+    await deleteDocUnit(page, documentNumber)
 
     await page.goto("/rechtsprechung")
 
@@ -93,4 +80,25 @@ export const getAuthenticatedPage = async (browser: Browser) => {
     },
   })
   return await context.newPage()
+}
+
+export const generateDocUnit = async (page: Page) => {
+  await page.locator("button >> text=Neue Dokumentationseinheit").click()
+  await page.waitForSelector("text=Festplatte durchsuchen")
+
+  const regex = /rechtsprechung\/(.*)\/dokumente/g
+  const match = regex.exec(page.url())
+  return match[1] || ""
+}
+
+export const deleteDocUnit = async (page: Page, documentNumber: string) => {
+  const selectDocUnit = page
+    .locator("tr", {
+      has: page.locator(
+        `td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
+      ),
+    })
+    .locator("td:nth-child(5) i")
+  await selectDocUnit.waitFor()
+  selectDocUnit.click() // an await here would break the test
 }
