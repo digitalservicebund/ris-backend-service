@@ -1,5 +1,5 @@
 import { test, expect, Page } from "@playwright/test"
-import { Browser } from "playwright"
+import { getAuthenticatedPage } from "./e2e-utils"
 
 test.describe("generate and delete a doc unit", () => {
   let documentNumber: string
@@ -21,16 +21,6 @@ test.describe("generate and delete a doc unit", () => {
     ).not.toBeVisible()
   })
 })
-
-export const getAuthenticatedPage = async (browser: Browser) => {
-  const context = await browser.newContext({
-    httpCredentials: {
-      username: process.env.STAGING_USER ?? "",
-      password: process.env.STAGING_PASSWORD ?? "",
-    },
-  })
-  return await context.newPage()
-}
 
 export const generateDocUnit = async (page: Page) => {
   await page.goto("/rechtsprechung")

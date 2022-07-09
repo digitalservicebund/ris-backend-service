@@ -1,9 +1,6 @@
 import { test, Page } from "@playwright/test"
-import {
-  deleteDocUnit,
-  generateDocUnit,
-  getAuthenticatedPage,
-} from "./docunit-lifecycle.spec"
+import { deleteDocUnit, generateDocUnit } from "./docunit-lifecycle.spec"
+import { getAuthenticatedPage } from "./e2e-utils"
 
 test.describe("upload an original document to a doc unit and delete it again", () => {
   let documentNumber: string
