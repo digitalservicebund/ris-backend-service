@@ -1,10 +1,9 @@
 import { test, expect, Page } from "@playwright/test"
 import { Browser } from "playwright"
 
-let page
-
 test.describe("generate and delete a doc unit", () => {
   let documentNumber: string
+  let page: Page
 
   test("generate doc unit", async ({ browser }) => {
     page = await getAuthenticatedPage(browser)
