@@ -14,7 +14,7 @@ test.describe("generate and delete a doc unit", () => {
   test("delete doc unit", async () => {
     await deleteDocUnit(page, documentNumber)
 
-    await page.goto("/rechtsprechung")
+    await page.goto("/")
 
     await expect(
       page.locator(`a[href*="/rechtsprechung/${documentNumber}"]`)
@@ -23,7 +23,7 @@ test.describe("generate and delete a doc unit", () => {
 })
 
 export const generateDocUnit = async (page: Page) => {
-  await page.goto("/rechtsprechung")
+  await page.goto("/")
 
   await page.locator("button >> text=Neue Dokumentationseinheit").click()
   await page.waitForSelector("text=Festplatte durchsuchen")
@@ -34,7 +34,7 @@ export const generateDocUnit = async (page: Page) => {
 }
 
 export const deleteDocUnit = async (page: Page, documentNumber: string) => {
-  await page.goto("/rechtsprechung")
+  await page.goto("/")
 
   const selectDocUnit = page
     .locator("tr", {

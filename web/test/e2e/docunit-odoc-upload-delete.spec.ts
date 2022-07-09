@@ -15,7 +15,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
   test.afterAll(async () => await deleteDocUnit(page, documentNumber))
 
   test("upload original file", async () => {
-    await page.goto("/rechtsprechung")
+    await page.goto("/")
 
     const selectDocUnit = page.locator(
       `tr td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
@@ -35,7 +35,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
   })
 
   test("delete original file", async () => {
-    await page.goto("/rechtsprechung")
+    await page.goto("/")
 
     await page
       .locator(`a[href*="/rechtsprechung/${documentNumber}/rubriken"]`)
@@ -52,7 +52,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
 
     await page.waitForSelector("text=Festplatte durchsuchen")
 
-    await page.goto("/rechtsprechung")
+    await page.goto("/")
 
     await page.waitForSelector(
       `a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
