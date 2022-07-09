@@ -1,18 +1,13 @@
 import { test, expect } from "@playwright/test"
+import { Browser } from "playwright"
 
 let page
 
-test.describe("generate and delete doc units", () => {
+test.describe("generate and delete a doc unit", () => {
   let documentNumber: string
 
   test("generate doc unit", async ({ browser }) => {
-    const context = await browser.newContext({
-      httpCredentials: {
-        username: process.env.STAGING_USER ?? "",
-        password: process.env.STAGING_PASSWORD ?? "",
-      },
-    })
-    page = await context.newPage()
+    page = await getAuthenticatedPage(browser)
     await page.goto("/")
 
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
@@ -89,3 +84,13 @@ test.describe("generate and delete doc units", () => {
     ).not.toBeVisible()
   })
 })
+
+export const getAuthenticatedPage = async (browser: Browser) => {
+  const context = await browser.newContext({
+    httpCredentials: {
+      username: process.env.STAGING_USER ?? "",
+      password: process.env.STAGING_PASSWORD ?? "",
+    },
+  })
+  return await context.newPage()
+}
