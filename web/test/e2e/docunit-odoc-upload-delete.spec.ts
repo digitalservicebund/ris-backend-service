@@ -12,16 +12,10 @@ test.describe("upload an original document to a doc unit and delete it again", (
   test.beforeAll(async ({ browser }) => {
     page = await getAuthenticatedPage(browser)
 
-    await page.goto("/rechtsprechung")
-
     documentNumber = await generateDocUnit(page)
   })
 
-  test.afterAll(async () => {
-    await page.goto("/rechtsprechung")
-
-    await deleteDocUnit(page, documentNumber)
-  })
+  test.afterAll(async () => await deleteDocUnit(page, documentNumber))
 
   test("upload original file", async () => {
     await page.goto("/rechtsprechung")
@@ -43,7 +37,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
     )
   })
 
-  test("delete delete original file", async () => {
+  test("delete original file", async () => {
     await page.goto("/rechtsprechung")
 
     await page

@@ -7,14 +7,11 @@ test.describe("generate and delete a doc unit", () => {
 
   test("generate doc unit", async ({ browser }) => {
     page = await getAuthenticatedPage(browser)
-    await page.goto("/rechtsprechung")
 
     documentNumber = await generateDocUnit(page)
   })
 
   test("delete doc unit", async () => {
-    await page.goto("/rechtsprechung")
-
     await deleteDocUnit(page, documentNumber)
 
     await page.goto("/rechtsprechung")
@@ -36,6 +33,8 @@ export const getAuthenticatedPage = async (browser: Browser) => {
 }
 
 export const generateDocUnit = async (page: Page) => {
+  await page.goto("/rechtsprechung")
+
   await page.locator("button >> text=Neue Dokumentationseinheit").click()
   await page.waitForSelector("text=Festplatte durchsuchen")
 
@@ -45,6 +44,8 @@ export const generateDocUnit = async (page: Page) => {
 }
 
 export const deleteDocUnit = async (page: Page, documentNumber: string) => {
+  await page.goto("/rechtsprechung")
+
   const selectDocUnit = page
     .locator("tr", {
       has: page.locator(
