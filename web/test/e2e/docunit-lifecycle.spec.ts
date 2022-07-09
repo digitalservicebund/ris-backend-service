@@ -8,7 +8,7 @@ test.describe("generate and delete a doc unit", () => {
 
   test("generate doc unit", async ({ browser }) => {
     page = await getAuthenticatedPage(browser)
-    await page.goto("/")
+    await page.goto("/rechtsprechung")
 
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
 
@@ -19,7 +19,7 @@ test.describe("generate and delete a doc unit", () => {
   })
 
   test("upload original file", async () => {
-    await page.goto("/")
+    await page.goto("/rechtsprechung")
 
     const selectDocUnit = page.locator(
       `tr td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
@@ -38,7 +38,7 @@ test.describe("generate and delete a doc unit", () => {
   })
 
   test("delete delete original file", async () => {
-    await page.goto("/")
+    await page.goto("/rechtsprechung")
 
     await page
       .locator(`a[href*="/rechtsprechung/${documentNumber}/rubriken"]`)
@@ -55,7 +55,7 @@ test.describe("generate and delete a doc unit", () => {
 
     await page.waitForSelector("text=Festplatte durchsuchen")
 
-    await page.goto("/")
+    await page.goto("/rechtsprechung")
 
     await page.waitForSelector(
       `a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
@@ -63,7 +63,7 @@ test.describe("generate and delete a doc unit", () => {
   })
 
   test("delete doc unit", async () => {
-    await page.goto("/")
+    await page.goto("/rechtsprechung")
 
     const selectDocUnit = page
       .locator("tr", {
@@ -75,7 +75,7 @@ test.describe("generate and delete a doc unit", () => {
     await selectDocUnit.waitFor()
     selectDocUnit.click() // an await here would break the test
 
-    await page.goto("/")
+    await page.goto("/rechtsprechung")
 
     await page.waitForTimeout(2000)
 
