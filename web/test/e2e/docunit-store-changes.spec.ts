@@ -19,23 +19,19 @@ test.describe("save changes and verify it persists", () => {
   // TESTS
 
   test("save core data change", async () => {
-    await page.goto("/")
-    await page
-      .locator(`a[href*="/rechtsprechung/${documentNumber}/dokumente"]`)
-      .click()
-    await page
-      .locator(`a[href*="/rechtsprechung/${documentNumber}/rubriken"]`)
-      .first()
-      .click()
+    await navigateToRubriken(page, documentNumber)
 
     await page.locator("id=aktenzeichen").fill("abc")
     await page.locator("button >> text=Speichern").first().click()
+
+    await page.waitForTimeout(500) // give server time to process, otherwise this test gets flaky
 
     await page.goto("/")
     await page.reload() // to make sure the data needs to come fresh from the server
     await page.goto("/")
 
-    // verify change is visible in docunit list on /rechtsprechung
+    // 1. verify that the change is visible in docunit list on /rechtsprechung
+
     const aktenzeichenColumn = page
       .locator("tr", {
         has: page.locator(
@@ -45,5 +41,25 @@ test.describe("save changes and verify it persists", () => {
       .locator("td:nth-child(3)")
 
     expect(await aktenzeichenColumn.innerText()).toBe("abc")
+
+    // 2. verify that the change is visible in Rubriken
+
+    await navigateToRubriken(page, documentNumber)
+
+    expect(await page.inputValue("id=aktenzeichen")).toBe("abc")
   })
 })
+
+export const navigateToRubriken = async (
+  page: Page,
+  documentNumber: string
+) => {
+  await page.goto("/")
+  await page
+    .locator(`a[href*="/rechtsprechung/${documentNumber}/dokumente"]`)
+    .click()
+  await page
+    .locator(`a[href*="/rechtsprechung/${documentNumber}/rubriken"]`)
+    .first()
+    .click()
+}
