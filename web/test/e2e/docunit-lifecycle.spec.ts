@@ -43,7 +43,7 @@ export const deleteDocUnit = async (page: Page, documentNumber: string) => {
   const selectDocUnit = page
     .locator("tr", {
       has: page.locator(
-        `td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}/dokumente"]`
+        `td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}"]`
       ),
     })
     .locator("td:nth-child(5) i")
