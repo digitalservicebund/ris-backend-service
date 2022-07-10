@@ -27,11 +27,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
 
     await selectDocUnit.click()
 
-    const [fileChooser] = await Promise.all([
-      page.waitForEvent("filechooser"),
-      page.locator("text=Festplatte durchsuchen").click(),
-    ])
-    await fileChooser.setFiles("./test/e2e/sample.docx")
+    await uploadTestfile(page, "sample.docx")
 
     await page.waitForSelector(
       ".fileviewer-info-panel-value >> text=sample.docx"
@@ -63,3 +59,11 @@ test.describe("upload an original document to a doc unit and delete it again", (
     )
   })
 })
+
+export const uploadTestfile = async (page: Page, filename: string) => {
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    page.locator("text=Festplatte durchsuchen").click(),
+  ])
+  await fileChooser.setFiles("./test/e2e/testfiles/" + filename)
+}
