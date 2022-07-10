@@ -61,13 +61,12 @@ const onSaveClick = () => {
           >
             <span class="ris-texte-form__label">
               {{ item.label }}
-              <div>
-                <EditorVmodel
-                  v-model="store.getSelectedSafe()[item.id]"
-                  class="ris-texte-form__input"
-                  :field-size="item.fieldSize"
-                />
-              </div>
+              <EditorVmodel
+                v-model="store.getSelectedSafe()[item.id]"
+                :element-id="item.id"
+                class="ris-texte-form__input"
+                :field-size="item.fieldSize"
+              />
             </span>
           </div>
           <div class="ris-texte-form__textfield">

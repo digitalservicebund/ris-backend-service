@@ -39,6 +39,11 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  elementId: {
+    type: String,
+    required: false,
+    default: null,
+  },
 })
 
 const emit = defineEmits(["update:modelValue"])
@@ -121,7 +126,10 @@ add("strike", "strikethrough_s")
 
 <template>
   <v-container fluid>
-    <v-row v-if="showButtons()">
+    <v-row
+      v-if="showButtons()"
+      :id="props.elementId ? props.elementId + '_btns' : null"
+    >
       <v-col v-for="(btn, index) in editorBtns" :key="index" cols="1"
         ><v-icon
           class="editor-btn"
@@ -141,6 +149,7 @@ add("strike", "strikethrough_s")
     <v-row>
       <v-col cols="12">
         <editor-content
+          :id="props.elementId ? props.elementId + '_editor' : null"
           :editor="editor"
           :class="'ProseMirror__' + props.fieldSize"
         />
