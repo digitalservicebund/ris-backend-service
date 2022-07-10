@@ -28,4 +28,22 @@ test.describe("test the different layout options", () => {
     // odoc panel closed
     await expect(await page.locator("id=odoc-open-element")).toBeVisible()
   })
+
+  test("open odoc panel without odoc attached and close sidebar menu", async () => {
+    // open odoc panel
+    await page.locator("id=odoc-open-element").click()
+    await expect(await page.locator("id=odoc-panel-element")).toBeVisible()
+    let urlParams = page.url().split("?")[1]
+    expect(urlParams).toEqual("showOdocPanel=true&showSidebar=true")
+
+    await page.waitForSelector(
+      "text=Es wurde noch kein Originaldokument hochgeladen."
+    )
+
+    // close sidebar menu
+    await page.locator("id=sidebar-close-button").click()
+    await expect(await page.locator("id=sidebar-open-button")).toBeVisible()
+    urlParams = page.url().split("?")[1]
+    expect(urlParams).toEqual("showOdocPanel=true&showSidebar=false")
+  })
 })
