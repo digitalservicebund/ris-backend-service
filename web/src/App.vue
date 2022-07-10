@@ -82,6 +82,7 @@ watch(
           >
             <span v-if="layoutStore.showSidebar">
               <div
+                id="sidebar-close-button"
                 class="sidebar-close-icon-background"
                 :onclick="toggleSidebar"
               >
@@ -89,7 +90,12 @@ watch(
               </div>
               <NavbarSide />
             </span>
-            <div v-else class="sidebar-open" :onclick="toggleSidebar">
+            <div
+              v-else
+              id="sidebar-open-button"
+              class="sidebar-open"
+              :onclick="toggleSidebar"
+            >
               <div class="sidebar-open-text">Menü</div>
               <div class="sidebar-open-icon-background">
                 <v-icon class="sidebar-open-icon"> arrow_forward_ios </v-icon>
