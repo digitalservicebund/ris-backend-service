@@ -3,6 +3,8 @@ import { deleteDocUnit, generateDocUnit } from "./docunit-lifecycle.spec"
 import { getAuthenticatedPage } from "./e2e-utils"
 
 test.describe("upload an original document to a doc unit and delete it again", () => {
+  // SETUP
+
   let documentNumber: string
   let page: Page
 
@@ -13,6 +15,8 @@ test.describe("upload an original document to a doc unit and delete it again", (
   })
 
   test.afterAll(async () => await deleteDocUnit(page, documentNumber))
+
+  // TESTS
 
   test("upload original file", async () => {
     await page.goto("/")

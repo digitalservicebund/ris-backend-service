@@ -1,9 +1,13 @@
 import { test, expect, Page } from "@playwright/test"
 import { getAuthenticatedPage } from "./e2e-utils"
 
-test.describe("generate and delete a doc unit", () => {
+test.describe("generate a doc unit and delete it again", () => {
+  // SETUP
+
   let documentNumber: string
   let page: Page
+
+  // TESTS
 
   test("generate doc unit", async ({ browser }) => {
     page = await getAuthenticatedPage(browser)
