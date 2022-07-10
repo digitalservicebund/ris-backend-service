@@ -1,5 +1,6 @@
 import { test, Page, expect } from "@playwright/test"
 import { deleteDocUnit, generateDocUnit } from "./docunit-lifecycle.spec"
+import { uploadTestfile } from "./docunit-odoc-upload-delete.spec"
 import { navigateToRubriken } from "./docunit-store-changes.spec"
 import { getAuthenticatedPage } from "./e2e-utils"
 
@@ -45,5 +46,20 @@ test.describe("test the different layout options", () => {
     await expect(await page.locator("id=sidebar-open-button")).toBeVisible()
     urlParams = page.url().split("?")[1]
     expect(urlParams).toEqual("showOdocPanel=true&showSidebar=false")
+  })
+
+  test("use open odoc panel to go to upload, upload odoc and back to Rubriken", async () => {
+    await page.locator("text=Zum Upload").click()
+
+    await uploadTestfile(page, "sample.docx")
+    await page.waitForSelector(
+      ".fileviewer-info-panel-value >> text=sample.docx"
+    )
+    await page.waitForSelector("text=Die ist ein Test")
+
+    // back to Rubriken with odoc panel open
+    await page.goBack()
+    await expect(await page.locator("id=odoc-panel-element")).toBeVisible()
+    await expect(await page.locator("text=Die ist ein Test")).toBeVisible()
   })
 })
