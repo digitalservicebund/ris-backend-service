@@ -21,12 +21,6 @@ onMounted(() => store.fetchOriginalFileAsHTML())
   <span v-if="store.hasSelected()">
     <v-container class="fileviewer-info-panel">
       <v-row>
-        <v-col sm="6">
-          Dateiname
-          <div class="fileviewer-info-panel-value">
-            {{ store.getSelected()?.filename }}
-          </div>
-        </v-col>
         <v-col sm="3" md="2">
           Hochgeladen am
           <div class="fileviewer-info-panel-value">
@@ -46,6 +40,12 @@ onMounted(() => store.fetchOriginalFileAsHTML())
         <v-col sm="3" md="2">
           Von
           <div class="fileviewer-info-panel-value">USER NAME</div>
+        </v-col>
+        <v-col sm="6">
+          Dateiname
+          <div class="fileviewer-info-panel-value">
+            {{ store.getSelected()?.filename }}
+          </div>
         </v-col>
         <v-col cols="4" />
       </v-row>
