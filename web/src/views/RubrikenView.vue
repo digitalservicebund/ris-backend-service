@@ -124,6 +124,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll))
           >
             <EditorVmodel
               v-model="store.getSelectedSafe().originalFileAsHTML"
+              element-id="odoc"
               field-size="max"
               :editable="false"
             />
