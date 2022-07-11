@@ -76,7 +76,7 @@ class DocUnitDocxBuilderTest {
     var returnedBuilder = builder.setParagraph(paragraph);
 
     assertEquals(builder, returnedBuilder);
-    assertEquals(returnedBuilder.paragraph, paragraph);
+    assertEquals(paragraph, returnedBuilder.paragraph);
   }
 
   @Test
@@ -87,7 +87,7 @@ class DocUnitDocxBuilderTest {
     var returnedBuilder = builder.setTable(table);
 
     assertEquals(builder, returnedBuilder);
-    assertEquals(returnedBuilder.table, table);
+    assertEquals(table, returnedBuilder.table);
   }
 
   @Test
