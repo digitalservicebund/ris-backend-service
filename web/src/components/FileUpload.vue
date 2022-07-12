@@ -109,7 +109,7 @@ const openFileDialog = () => {
         >
           <span v-if="status.inDragError">
             <v-icon class="icon_upload" size="50px">
-              drive_folder_upload
+              upload_file
             </v-icon>
             <span v-if="status.uploadStatus !== 'failed'">
               <div class="upload_status">Datei wird nicht unterstützt.</div>
@@ -132,21 +132,9 @@ const openFileDialog = () => {
           </span>
           <span v-else>
             <v-icon class="icon_upload" size="50px">
-              drive_folder_upload
+              upload_file
             </v-icon>
-            <v-col v-if="status.uploadStatus === 'none'">
-              <div class="upload_status">Datei in diesen Bereich ziehen</div>
-              <div>oder</div>
-              <div>
-                <SimpleButton
-                  class="button_upload"
-                  icon="search"
-                  label="Festplatte durchsuchen"
-                  @click="openFileDialog"
-                />
-              </div>
-            </v-col>
-            <v-col v-else-if="status.uploadStatus === 'uploading'">
+            <span v-if="status.uploadStatus === 'uploading'">
               <div class="upload_status">
                 Die Datei {{ status.file ? status.file.name : "" }} wird
                 hochgeladen ...
@@ -159,18 +147,30 @@ const openFileDialog = () => {
                   @click="openFileDialog"
                 />
               </div>
-            </v-col>
-            <v-col v-else-if="status.uploadStatus === 'succeeded'">
+            </span>
+            <span v-else-if="status.uploadStatus === 'succeeded'">
               <div class="upload_status">
                 Die Datei {{ status.file ? status.file.name : "" }} wurde
                 erfolgreich hochgeladen
               </div>
-            </v-col>
+            </span>
+            <span v-else>
+              <div class="upload_status">Datei in diesen Bereich ziehen</div>
+              <div>oder</div>
+              <div>
+                <SimpleButton
+                  class="button_upload"
+                  icon="search"
+                  label="Festplatte durchsuchen"
+                  @click="openFileDialog"
+                />
+              </div>
+            </span>
           </span>
         </v-container>
       </v-col>
     </v-row>
-    <span v-if="status.uploadStatus === 'failed'">
+    <v-row v-if="status.uploadStatus === 'failed'">
       <v-col md="8" sm="12">
         <v-container class="upload_error">
           <v-row>
@@ -188,7 +188,7 @@ const openFileDialog = () => {
           </v-row>
         </v-container>
       </v-col>
-    </span>
+    </v-row>
   </v-container>
 </template>
 
@@ -197,7 +197,7 @@ const openFileDialog = () => {
   border-radius: $border-radius;
   border: $border-style-inactive;
   background: $white;
-  padding: 50px;
+  padding: 44px;
 
   &:hover {
     border: $border-style-active;
@@ -209,13 +209,18 @@ const openFileDialog = () => {
     }
   }
 
+  &__in-drag-error {
+    border: $border-style-error;
+  }
+
   &__in-drag {
     border: $border-style-active;
   }
 }
 
 .icon_upload {
-  padding: 12px;
+  margin-top: 10px;
+  margin-left: -5px;
   color: $blue800;
 }
 
@@ -226,6 +231,7 @@ const openFileDialog = () => {
 
 .button_upload {
   margin-top: 16px;
+  margin-bottom: 10px;
 }
 
 .upload_error {
