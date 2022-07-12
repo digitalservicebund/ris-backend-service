@@ -48,7 +48,12 @@ defineEmits<{ (e: "togglePanel"): void }>()
         </router-link>
       </div>
       <div v-else class="odoc-editor-wrapper">
-        <TextEditor :value="file" field-size="max" :editable="false" />
+        <TextEditor
+          :value="file"
+          field-size="max"
+          :editable="false"
+          element-id="odoc"
+        />
       </div>
     </div>
   </v-col>

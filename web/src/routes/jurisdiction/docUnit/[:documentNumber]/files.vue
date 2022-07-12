@@ -27,9 +27,9 @@ const handleDeleteFile = async () => {
     <FileViewer
       v-if="docUnit.hasFile"
       :s3-path="(docUnit.s3path as string)"
-      :file-name="docUnit.filename || ' - '"
-      :upload-time-stamp="docUnit.fileuploadtimestamp || ' - '"
-      :file-type="docUnit.filetype || ' - '"
+      :file-name="docUnit.filename"
+      :upload-time-stamp="docUnit.fileuploadtimestamp"
+      :file-type="docUnit.filetype"
       @delete-file="handleDeleteFile"
     />
     <FileUpload

@@ -76,7 +76,7 @@ class DocUnitDocxBuilderTest {
     var returnedBuilder = builder.setParagraph(paragraph);
 
     assertEquals(builder, returnedBuilder);
-    assertEquals(returnedBuilder.paragraph, paragraph);
+    assertEquals(paragraph, returnedBuilder.paragraph);
   }
 
   @Test
@@ -87,7 +87,7 @@ class DocUnitDocxBuilderTest {
     var returnedBuilder = builder.setTable(table);
 
     assertEquals(builder, returnedBuilder);
-    assertEquals(returnedBuilder.table, table);
+    assertEquals(table, returnedBuilder.table);
   }
 
   @Test
@@ -336,7 +336,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
-    assertEquals(true, paragraphElement.getBold());
+    assertTrue(paragraphElement.getBold());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"font-weight: bold;\">text</p>", htmlString);
@@ -367,7 +367,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     var runTextElement = (DocUnitRunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
-    assertEquals(true, runTextElement.getBold());
+    assertTrue(runTextElement.getBold());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"font-weight: bold;\">text</span></p>", htmlString);
@@ -399,7 +399,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
-    assertEquals(true, paragraphElement.getStrike());
+    assertTrue(paragraphElement.getStrike());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"text-decoration: line-through;\">text</p>", htmlString);
@@ -430,7 +430,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     var runTextElement = (DocUnitRunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
-    assertEquals(true, runTextElement.getStrike());
+    assertTrue(runTextElement.getStrike());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"text-decoration: line-through;\">text</span></p>", htmlString);

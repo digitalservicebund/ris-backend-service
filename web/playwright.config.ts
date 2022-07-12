@@ -7,7 +7,7 @@ const config: PlaywrightTestConfig = {
   use: {
     viewport: { width: 1280, height: 720 },
     acceptDownloads: true,
-    baseURL: process.env.E2E_BASE_URL || "http://localhost:3000/",
+    baseURL: process.env.E2E_BASE_URL || "http://localhost:3000",
     screenshot: "only-on-failure",
   },
   projects: [

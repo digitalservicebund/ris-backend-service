@@ -5,10 +5,10 @@ import TextEditor from "./TextEditor.vue"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{
-  fileName: string
   s3Path: string
-  fileType: string
-  uploadTimeStamp: string
+  fileName?: string
+  fileType?: string
+  uploadTimeStamp?: string
 }>()
 
 defineEmits<{ (e: "deleteFile"): void }>()
@@ -19,27 +19,27 @@ const fileAsHtml = await fileService.getDocxFileAsHtml(props.s3Path)
 <template>
   <v-container class="fileviewer-info-panel">
     <v-row>
-      <v-col sm="6">
-        Dateiname
-        <div class="fileviewer-info-panel-value">
-          {{ fileName }}
-        </div>
-      </v-col>
       <v-col sm="3" md="2">
         Hochgeladen am
         <div class="fileviewer-info-panel-value">
-          {{ dayjs(uploadTimeStamp).format("DD.MM.YYYY") }}
+          {{ dayjs(uploadTimeStamp).format("DD.MM.YYYY") || " - " }}
         </div>
       </v-col>
       <v-col sm="3" md="2">
         Format
         <div class="fileviewer-info-panel-value">
-          {{ fileType }}
+          {{ fileType || " - " }}
         </div>
       </v-col>
       <v-col sm="3" md="2">
         Von
         <div class="fileviewer-info-panel-value">USER NAME</div>
+      </v-col>
+      <v-col sm="6">
+        Dateiname
+        <div class="fileviewer-info-panel-value">
+          {{ fileName || " - " }}
+        </div>
       </v-col>
       <v-col cols="4" />
     </v-row>

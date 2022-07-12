@@ -17,10 +17,12 @@ $gray900: #4e596a;
 $navbar-hover-gray: #ecf1f4;
 $text-tertiary: #1d4a73;
 $button-tertiary-focus: #edf1f4;
+$error: #b0243f;
 
 $border-radius: 10px;
 $border-style-inactive: 3px solid $blue300;
 $border-style-active: 3px solid $blue500 !important;
+$border-style-error: 3px solid $error !important;
 
 // Font Settings
 $font-fallback: "Arial Narrow", "Arial Nova", sans-serif;
