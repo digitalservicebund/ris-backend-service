@@ -1,4 +1,3 @@
-import { createTestingPinia } from "@pinia/testing"
 import { fireEvent } from "@testing-library/dom"
 import { render, screen } from "@testing-library/vue"
 import { describe, test, expect } from "vitest"
@@ -10,7 +9,6 @@ import DocUnitList from "../../src/components/DocUnitList.vue"
 import DocUnit from "@/domain/docUnit"
 
 describe("docUnit list", () => {
-  const pinia = createTestingPinia({ stubActions: false })
   const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
@@ -29,7 +27,7 @@ describe("docUnit list", () => {
         docUnits: [],
       },
       global: {
-        plugins: [pinia, vuetify, router],
+        plugins: [vuetify, router],
       },
     })
 
@@ -44,7 +42,7 @@ describe("docUnit list", () => {
         docUnits: [docUnit],
       },
       global: {
-        plugins: [pinia, vuetify, router],
+        plugins: [vuetify, router],
       },
     })
 
@@ -62,7 +60,7 @@ describe("docUnit list", () => {
         docUnits: [docUnit],
       },
       global: {
-        plugins: [pinia, vuetify, router],
+        plugins: [vuetify, router],
       },
     })
 

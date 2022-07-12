@@ -1,4 +1,3 @@
-import { createTestingPinia } from "@pinia/testing"
 import { mount } from "@vue/test-utils"
 import { describe, it, expect } from "vitest"
 import { createVuetify } from "vuetify"
@@ -16,7 +15,7 @@ describe("FileUpload", () => {
       },
       global: {
         stubs: ["router-link"],
-        plugins: [vuetify, createTestingPinia()],
+        plugins: [vuetify],
       },
     })
 
