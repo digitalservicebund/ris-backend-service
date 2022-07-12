@@ -6,12 +6,14 @@ import FileViewer from "@/components/FileViewer.vue"
 import docUnitService from "@/services/docUnitService"
 import fileService from "@/services/fileService"
 
-const props = defineProps<{ id: string }>()
-const docUnit = ref(await docUnitService.getById(String(props.id)))
+const props = defineProps<{ documentNumber: string }>()
+const docUnit = ref(
+  await docUnitService.getByDocumentNumber(props.documentNumber)
+)
 
 const handleDeleteFile = async () => {
-  await fileService.deleteFile(props.id)
-  docUnit.value = await docUnitService.getById(String(props.id))
+  await fileService.deleteFile(docUnit.value.uuid)
+  docUnit.value = await docUnitService.getByDocumentNumber(props.documentNumber)
 }
 </script>
 
@@ -30,6 +32,10 @@ const handleDeleteFile = async () => {
       :file-type="docUnit.filetype || ' - '"
       @delete-file="handleDeleteFile"
     />
-    <FileUpload v-else :doc-unit-id="id" />
+    <FileUpload
+      v-else
+      :doc-unit-uuid="docUnit.uuid"
+      @update-doc-unit="Object.assign(docUnit, $event)"
+    />
   </DocUnitDetail>
 </template>

@@ -11,12 +11,12 @@ export default {
     }
   },
 
-  async getById(id: string): Promise<DocUnit> {
+  async getByDocumentNumber(documentNumber: string): Promise<DocUnit> {
     try {
-      const response = await api().get(`docunits/${id}`)
+      const response = await api().get(`docunits/${documentNumber}`)
       return new DocUnit(response.data.id, response.data)
     } catch (error) {
-      throw new Error(`Could not load docUnit: ${error}`)
+      throw new Error(`Could not load docUnit by documentNumber: ${error}`)
     }
   },
 
@@ -44,7 +44,7 @@ export default {
   async update(docUnit: DocUnit): Promise<number> {
     try {
       const response = await api().put(
-        `docunits/${docUnit.id}/docx`,
+        `docunits/${docUnit.uuid}/docx`,
         JSON.stringify(docUnit),
         {
           headers: {
@@ -59,9 +59,9 @@ export default {
     }
   },
 
-  async delete(docUnitId: string): Promise<number> {
+  async delete(docUnitUuid: string): Promise<number> {
     try {
-      const response = await api().delete(`docunits/${docUnitId}`)
+      const response = await api().delete(`docunits/${docUnitUuid}`)
       return response.status
     } catch (error) {
       throw new Error("Could not delete docUnit")

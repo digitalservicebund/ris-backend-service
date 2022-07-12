@@ -14,7 +14,7 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 @Configuration
 @EnableR2dbcRepositories
 @Slf4j
-public class R2DBCConfiguration extends AbstractR2dbcConfiguration {
+public class R2DBCConfig extends AbstractR2dbcConfiguration {
 
   private Server webServer;
 
@@ -29,13 +29,12 @@ public class R2DBCConfiguration extends AbstractR2dbcConfiguration {
   public void start() throws java.sql.SQLException {
     log.info("Starting h2-console at port 8078");
     // Settings to use on localhost:8078 --> Generic H2 (Server), org.h2.Driver, jdbc:h2:mem:testdb
-    this.webServer =
-        org.h2.tools.Server.createWebServer("-webPort", "8078", "-tcpAllowOthers").start();
+    webServer = org.h2.tools.Server.createWebServer("-webPort", "8078", "-tcpAllowOthers").start();
   }
 
   @EventListener(ContextClosedEvent.class)
   public void stop() {
     log.info("Stopping h2-console at port 8078");
-    this.webServer.stop();
+    webServer.stop();
   }
 }

@@ -1,9 +1,13 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import SimpleButton from "./SimpleButton.vue"
+import DocUnit from "@/domain/docUnit"
 import fileService from "@/services/fileService"
 
-const props = defineProps<{ docUnitId: string }>()
+const props = defineProps<{ docUnitUuid: string }>()
+const emits = defineEmits<{
+  (e: "updateDocUnit", updatedDocUnit: DocUnit): void
+}>()
 
 interface Status {
   file: File | null
@@ -33,9 +37,9 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  const docUnit = await fileService.uploadFile(props.docUnitId, file)
+  const docUnit = await fileService.uploadFile(props.docUnitUuid, file)
   status.value.uploadStatus = "succeeded" // error handling TODO
-  console.log("file uploaded, response:", docUnit)
+  emits("updateDocUnit", docUnit)
 }
 
 const dragover = (e: DragEvent) => {

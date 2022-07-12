@@ -19,35 +19,29 @@ const fileAsHtml = await fileService.getDocxFileAsHtml(props.s3Path)
 <template>
   <v-container class="fileviewer-info-panel">
     <v-row>
-      <v-col cols="2">
+      <v-col sm="6">
         Dateiname
         <div class="fileviewer-info-panel-value">
           {{ fileName }}
         </div>
       </v-col>
-      <v-col cols="2">
+      <v-col sm="3" md="2">
         Hochgeladen am
         <div class="fileviewer-info-panel-value">
           {{ dayjs(uploadTimeStamp).format("DD.MM.YYYY") }}
         </div>
       </v-col>
-      <v-col cols="2">
+      <v-col sm="3" md="2">
         Format
         <div class="fileviewer-info-panel-value">
           {{ fileType }}
         </div>
       </v-col>
-      <v-col cols="2">
+      <v-col sm="3" md="2">
         Von
         <div class="fileviewer-info-panel-value">USER NAME</div>
       </v-col>
       <v-col cols="4" />
-    </v-row>
-    <v-row>
-      <v-col></v-col>
-    </v-row>
-    <v-row>
-      <v-col></v-col>
     </v-row>
     <v-row class="fileviewer-info-panel">
       <v-col cols="12">
@@ -72,6 +66,7 @@ const fileAsHtml = await fileService.getDocxFileAsHtml(props.s3Path)
 .fileviewer-info-panel {
   background-color: $white;
 }
+
 .fileviewer-info-panel-value {
   color: $gray900;
   font-weight: bold;

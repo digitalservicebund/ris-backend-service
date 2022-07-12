@@ -42,7 +42,6 @@ jobs:
           npm ci
           npx --yes playwright install-deps
           npx --yes playwright install
-          npx --yes playwright install msedge
         working-directory: ./web
       - name: Check style for web
         run: npm run style:check
@@ -50,7 +49,6 @@ jobs:
       - name: Run tests for web
         run: |
           npm test
-          npm run test:e2e
           npm run test:a11y
         working-directory: ./web
       - name: Run license scanner
@@ -289,9 +287,12 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: staging
     needs: [build-and-push-image]
+    permissions:
+      id-token: write # Enable OIDC for gitsign
     steps:
+      - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
       - name: Deploy new image
-        uses: digitalservicebund/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
+        uses: digitalservicebund/github-actions/argocd-deploy@cba5d14610f69a7cc9b0aea25e3c2ed96e5425a1
         with:
           environment: staging
           version: ${{ needs.build-and-push-image.outputs.version }}
@@ -344,6 +345,33 @@ jobs:
           STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
           STAGING_URL: ${{ secrets.STAGING_URL }}
           STAGING_USER: ${{ secrets.STAGING_USER }}
+      - uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: journey-tests-gradle-report
+          path: ${{ github.workspace }}/build/reports/tests/journeyTest/
+          retention-days: 3
+      - name: Setup Node for web
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ./web/.node-version
+          cache: npm
+          cache-dependency-path: ./web/package-lock.json
+      - name: Install dependencies for web
+        run: |
+          npm ci
+          npx --yes playwright install-deps
+          npx --yes playwright install
+          npx --yes playwright install msedge
+        working-directory: ./web
+      - name: Run e2e tests on staging
+        env:
+          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
+          STAGING_USER: ${{ secrets.STAGING_USER }}
+          STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
+        run: |
+          npm run test:e2e
+        working-directory: ./web
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -365,9 +393,12 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     environment: production
     needs: [build-and-push-image, deploy-staging-verify]
+    permissions:
+      id-token: write # Enable OIDC for gitsign
     steps:
+      - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
       - name: Deploy new image
-        uses: digitalservicebund/github-actions/argocd-deploy@ed57ae223fac0d578e2261b004b145c39cbdc839
+        uses: digitalservicebund/github-actions/argocd-deploy@cba5d14610f69a7cc9b0aea25e3c2ed96e5425a1
         with:
           environment: production
           version: ${{ needs.build-and-push-image.outputs.version }}

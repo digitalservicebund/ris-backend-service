@@ -18,7 +18,7 @@ public class DocumentNumberCounter {
     return counter;
   }
 
-  @Id Integer id;
+  @Id Long id;
   Integer nextnumber;
   Integer currentyear;
 }

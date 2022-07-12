@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.domain;
 
 import java.time.Instant;
 import java.util.Calendar;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ public class DocUnit {
 
   public static DocUnit createNew(DocUnitCreationInfo docUnitCreationInfo, int documentNumber) {
     DocUnit docUnit = new DocUnit();
+    docUnit.setUuid(UUID.randomUUID());
     docUnit.setCreationtimestamp(Instant.now());
     docUnit.setDocumentnumber(
         docUnitCreationInfo.getDocumentationCenterAbbreviation()
@@ -24,7 +26,8 @@ public class DocUnit {
     return docUnit;
   }
 
-  @Id Integer id;
+  @Id Long id; // remove this, no longer necessary, uuid should be @Id TODO
+  UUID uuid;
   String documentnumber;
   Instant creationtimestamp;
 

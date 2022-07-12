@@ -104,12 +104,12 @@ const updateValue = (event: Event, index: number) => {
     width: 100%;
     padding: 17px 24px;
     margin-top: 5px;
-    outline: 2px solid $blue800;
+    outline: 2px solid $text-tertiary;
     resize: vertical;
 
     &:hover,
     &:focus {
-      outline-width: 4px;
+      // outline-width: 4px;
     }
   }
 

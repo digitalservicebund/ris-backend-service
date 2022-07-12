@@ -1,13 +1,26 @@
 <script lang="ts" setup>
+import { Bold } from "@tiptap/extension-bold"
+import { BulletList } from "@tiptap/extension-bullet-list"
+import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
+import { Image } from "@tiptap/extension-image"
+import { Italic } from "@tiptap/extension-italic"
+import { ListItem } from "@tiptap/extension-list-item"
+import { OrderedList } from "@tiptap/extension-ordered-list"
 import { Paragraph } from "@tiptap/extension-paragraph"
+import { Strike } from "@tiptap/extension-strike"
+import { Table } from "@tiptap/extension-table"
+import { TableCell } from "@tiptap/extension-table-cell"
+import { TableHeader } from "@tiptap/extension-table-header"
+import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
+import { TextAlign } from "@tiptap/extension-text-align"
+import { TextStyle } from "@tiptap/extension-text-style"
+import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
-import { watch } from "vue"
-import {
-  DocUnitParagraphExtension,
-  Randnummer,
-} from "../editor/docUnitExtension"
+import { watch, ref } from "vue"
+import { BorderNumber } from "../editor/border-number"
+import { FontSize } from "../editor/font-size"
 import { FieldSize } from "@/domain/FieldSize"
 
 const props = defineProps({
@@ -26,11 +39,18 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  elementId: {
+    type: String,
+    required: false,
+    default: null,
+  },
 })
 
 const emit = defineEmits<{
   (e: "updateValue", newValue: string): void
 }>()
+
+const hasFocus = ref<boolean>(false)
 
 const editor = new Editor({
   content: props.value,
@@ -38,13 +58,35 @@ const editor = new Editor({
     Document,
     Paragraph,
     Text,
-    Randnummer,
-    DocUnitParagraphExtension,
+    BorderNumber,
+    Bold,
+    Color,
+    FontSize,
+    Italic,
+    ListItem,
+    BulletList,
+    OrderedList,
+    Underline,
+    Strike,
+    Table,
+    TableCell,
+    TableHeader,
+    TableRow,
+    TextStyle,
+    TextAlign.configure({
+      types: ["paragraph", "span"],
+    }),
+    Image.configure({
+      allowBase64: true,
+      inline: true,
+    }),
   ],
   onUpdate: () => {
     // outgoing changes
     emit("updateValue", editor.getHTML())
   },
+  onFocus: () => (hasFocus.value = true),
+  onBlur: () => (hasFocus.value = false),
   editable: props.editable,
 })
 
@@ -60,17 +102,44 @@ watch(
 )
 
 const showButtons = () => {
-  return false
+  // focus doesn't work yet: upon click on a formatting button, the editor loses focus and the buttons disappear
+  return props.editable // && hasFocus.value
 }
+
+interface editorBtn {
+  type: string
+  icon: string
+}
+
+const editorBtns: editorBtn[] = []
+
+const add = (type: string, icon: string) => {
+  editorBtns.push({
+    type: type,
+    icon: icon,
+  })
+}
+
+add("bold", "format_bold")
+add("italic", "format_italic")
+add("underline", "format_underlined")
+add("strike", "strikethrough_s")
 </script>
 
 <template>
   <v-container fluid>
-    <v-row v-if="showButtons()">
-      <v-col cols="1"><v-icon>format_bold</v-icon></v-col>
-      <v-col cols="1"><v-icon>format_italic</v-icon></v-col>
-      <v-col cols="1"><v-icon>format_underlined</v-icon></v-col>
-      <v-col cols="1"><v-icon>strikethrough_s</v-icon></v-col>
+    <v-row
+      v-if="showButtons()"
+      :id="props.elementId ? props.elementId + '_btns' : null"
+    >
+      <v-col v-for="(btn, index) in editorBtns" :key="index" cols="1"
+        ><v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
       <v-col cols="1">Heading</v-col>
       <v-col cols="1"><v-icon>list</v-icon></v-col>
       <v-col cols="3" />
@@ -82,6 +151,7 @@ const showButtons = () => {
     <v-row>
       <v-col cols="12">
         <editor-content
+          :id="props.elementId ? props.elementId + '_editor' : null"
           :editor="editor"
           :class="'ProseMirror__' + props.fieldSize"
         />
@@ -113,6 +183,24 @@ const showButtons = () => {
 
   &__max {
     height: 640px; // ? TODO
+  }
+
+  &__100percent {
+    height: 100%;
+  }
+}
+.ProseMirror-focused {
+  outline: 0;
+}
+.editor-btn {
+  color: $black;
+  &:hover {
+    color: $text-tertiary;
+    background-color: $button-tertiary-focus;
+  }
+  &__active {
+    color: $white;
+    background-color: $text-tertiary;
   }
 }
 </style>

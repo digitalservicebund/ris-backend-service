@@ -8,7 +8,7 @@ import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
 @TestConfiguration
 @EnableR2dbcRepositories
-public class R2DBCConfiguration extends AbstractR2dbcConfiguration {
+public class R2DBCTestConfig extends AbstractR2dbcConfiguration {
 
   @Override
   public ConnectionFactory connectionFactory() {

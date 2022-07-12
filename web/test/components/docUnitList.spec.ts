@@ -17,7 +17,7 @@ describe("docUnit list", () => {
     routes: [
       {
         path: "",
-        name: "jurisdiction-docUnit-:id-files",
+        name: "jurisdiction-docUnit-:documentNumber-files",
         component: {},
       },
     ],

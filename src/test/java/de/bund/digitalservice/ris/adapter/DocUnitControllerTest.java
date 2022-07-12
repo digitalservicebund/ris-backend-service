@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -36,6 +37,8 @@ class DocUnitControllerTest {
   @MockBean private DocUnitService service;
 
   @Captor private ArgumentCaptor<Flux<ByteBuffer>> fluxCaptor;
+
+  private final UUID testUuid = UUID.fromString("88888888-4444-4444-4444-121212121212");
 
   @Test
   void testGenerateNewDocUnit() {
@@ -62,19 +65,20 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/1/file")
+        .uri("/api/v1/docunits/" + testUuid + "/file")
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).attachFileToDocUnit(eq("1"), fluxCaptor.capture(), headersCaptor.capture());
+    verify(service)
+        .attachFileToDocUnit(eq(testUuid), fluxCaptor.capture(), headersCaptor.capture());
     assertEquals(0, Objects.requireNonNull(fluxCaptor.getValue().blockFirst()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
   }
 
   @Test
-  void testAttachFileToDocUnit_withInvalidId() {
+  void testAttachFileToDocUnit_withInvalidUuid() {
     webClient
         .mutateWith(csrf())
         .put()
@@ -89,16 +93,16 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/1/file")
+        .uri("/api/v1/docunits/" + testUuid + "/file")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).removeFileFromDocUnit("1");
+    verify(service, times(1)).removeFileFromDocUnit(testUuid);
   }
 
   @Test
-  void testRemoveFileFromDocUnit_withInvalidId() {
+  void testRemoveFileFromDocUnit_withInvalidUuid() {
     webClient
         .mutateWith(csrf())
         .delete()
@@ -116,14 +120,20 @@ class DocUnitControllerTest {
   }
 
   @Test
-  void testGetById() {
-    webClient.mutateWith(csrf()).get().uri("/api/v1/docunits/1").exchange().expectStatus().isOk();
+  void testGetByDocumentnumber() {
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/docunits/ABCD2022000001")
+        .exchange()
+        .expectStatus()
+        .isOk();
 
-    verify(service).getById("1");
+    verify(service).getByDocumentnumber("ABCD2022000001");
   }
 
   @Test
-  void testGetById_withInvalidId() {
+  void testGetByUuid_withInvalidUuid() {
     webClient
         .mutateWith(csrf())
         .get()
@@ -134,20 +144,20 @@ class DocUnitControllerTest {
   }
 
   @Test
-  void testDeleteById() {
+  void testDeleteByUuid() {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/1")
+        .uri("/api/v1/docunits/" + testUuid)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).deleteById("1");
+    verify(service).deleteByUuid(testUuid);
   }
 
   @Test
-  void testDeleteById_withInvalidId() {
+  void testDeleteByUuid_withInvalidUuid() {
     webClient
         .mutateWith(csrf())
         .delete()
@@ -158,13 +168,13 @@ class DocUnitControllerTest {
   }
 
   @Test
-  void testUpdateById() {
+  void testUpdateByUuid() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setId(1);
+    docUnit.setUuid(testUuid);
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/1/docx")
+        .uri("/api/v1/docunits/" + testUuid + "/docx")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(docUnit)
         .exchange()
@@ -174,9 +184,9 @@ class DocUnitControllerTest {
   }
 
   @Test
-  void testUpdateById_withInvalidId() {
+  void testUpdateByUuid_withInvalidUuid() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setId(1);
+    docUnit.setUuid(testUuid);
     webClient
         .mutateWith(csrf())
         .put()

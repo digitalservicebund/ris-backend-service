@@ -1,11 +1,5 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-import lombok.Data;
-
-@Data
-public class Docx2Html {
-  public static final Docx2Html EMPTY = new Docx2Html();
-
-  private String fileName;
-  private String content;
+public record Docx2Html(String content) {
+  public static final Docx2Html EMPTY = new Docx2Html(null);
 }

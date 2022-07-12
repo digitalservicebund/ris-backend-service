@@ -1,0 +1,19 @@
+{
+  "bundles": [
+    {
+      "bundleName": "bsd4",
+      "licenseName": "BSD 4-Clause \"Original\" or \"Old\" License",
+      "licenseUrl": "http://directory.fsf.org/wiki/License:BSD_4Clause"
+    }
+  ],
+  "transformationRules": [
+    {
+      "bundleName": "EPL-1.0",
+      "licenseNamePattern": "EPL 1.0"
+    },
+    {
+      "bundleName": "bsd4",
+      "licenseNamePattern": "BSD (L|l)icen(s|c)e"
+    }
+  ]
+}

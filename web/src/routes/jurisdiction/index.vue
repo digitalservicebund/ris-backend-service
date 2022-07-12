@@ -10,7 +10,7 @@ const router = useRouter()
 const docUnits = ref(await docUnitService.getAll())
 
 const handleDelete = async (docUnit: DocUnit) => {
-  const status = await docUnitService.delete(docUnit.id)
+  const status = await docUnitService.delete(docUnit.uuid)
   if (status === 200) {
     docUnits.value = docUnits.value.filter((item) => item != docUnit)
   }
@@ -18,29 +18,28 @@ const handleDelete = async (docUnit: DocUnit) => {
 </script>
 
 <template>
-  <v-container fluid class="rechtsprechung-main">
-    <v-row>
-      <v-col> </v-col>
-    </v-row>
-    <v-row>
-      <v-col class="rechtsprechung-header"><h1>Rechtsprechung</h1></v-col>
-    </v-row>
-    <v-row class="text-right">
-      <v-col>
-        <SimpleButton
-          label="Neue Dokumentationseinheit"
-          @click="router.push({ name: 'jurisdiction-docUnit-new' })"
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col> </v-col>
-    </v-row>
-    <v-row class="text-center">
-      <v-col class="mb-4">
-        <DocUnitList :doc-units="docUnits" @delete-doc-unit="handleDelete" />
-      </v-col>
-    </v-row>
-  </v-container>
+  <v-main>
+    <v-container fluid>
+      <v-row>
+        <v-col class="rechtsprechung-header"><h1>Rechtsprechung</h1></v-col>
+      </v-row>
+      <v-row class="text-right">
+        <v-col>
+          <SimpleButton
+            label="Neue Dokumentationseinheit"
+            @click="router.push({ name: 'jurisdiction-docUnit-new' })"
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col> </v-col>
+      </v-row>
+      <v-row class="text-center">
+        <v-col class="mb-4">
+          <DocUnitList :doc-units="docUnits" @delete-doc-unit="handleDelete" />
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-main>
 </template>
 <style lang="scss"></style>

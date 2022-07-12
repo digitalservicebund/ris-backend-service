@@ -2,20 +2,11 @@ package de.bund.digitalservice.ris.domain.docx;
 
 import java.math.BigInteger;
 
-public class DocUnitTextElement implements DocUnitDocx {
-  private String alignment;
-  private Boolean bold;
-  private BigInteger size;
-  private String underline;
-  private final StringBuilder text = new StringBuilder();
-
-  public String getAlignment() {
-    return alignment;
-  }
-
-  public void setAlignment(String alignment) {
-    this.alignment = alignment;
-  }
+public abstract class DocUnitTextElement implements DocUnitDocx {
+  Boolean bold;
+  Boolean strike;
+  BigInteger size;
+  String underline;
 
   public void setBold(Boolean bold) {
     this.bold = bold;
@@ -23,6 +14,14 @@ public class DocUnitTextElement implements DocUnitDocx {
 
   public Boolean getBold() {
     return bold;
+  }
+
+  public void setStrike(Boolean strike) {
+    this.strike = strike;
+  }
+
+  public Boolean getStrike() {
+    return strike;
   }
 
   public void setSize(BigInteger size) {
@@ -41,54 +40,29 @@ public class DocUnitTextElement implements DocUnitDocx {
     this.underline = underline;
   }
 
-  public void addText(String text) {
-    this.text.append(text);
-  }
-
-  public String getText() {
-    return text.toString();
-  }
-
-  @Override
-  public String toString() {
-    return text.toString();
-  }
-
-  @Override
-  public String toHtmlString() {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("<p");
+  boolean hasStyle() {
     var hasStyle = bold != null && bold;
+    hasStyle |= strike != null && strike;
     hasStyle |= size != null;
-    hasStyle |= alignment != null;
+    hasStyle |= underline != null;
+    return hasStyle;
+  }
 
-    if (hasStyle) {
-      sb.append(" style=\"");
-
-      if (bold != null && bold) {
-        sb.append("font-weight: bold;");
-      }
-
-      if (size != null) {
-        sb.append("font-size: " + size.divide(BigInteger.valueOf(2)) + "px;");
-      }
-
-      if (alignment != null) {
-        sb.append("text-align: " + alignment + ";");
-      }
-
-      if (underline != null) {
-        sb.append("text-decoration: underline;");
-      }
-
-      sb.append("\"");
+  void addStyle(StringBuilder sb) {
+    if (bold != null && bold) {
+      sb.append("font-weight: bold;");
     }
 
-    sb.append(">");
-    sb.append(text);
-    sb.append("</p>");
+    if (strike != null && strike) {
+      sb.append("text-decoration: line-through;");
+    }
 
-    return sb.toString();
+    if (size != null) {
+      sb.append("font-size: " + size.divide(BigInteger.valueOf(2)) + "px;");
+    }
+
+    if (underline != null) {
+      sb.append("text-decoration: underline;");
+    }
   }
 }

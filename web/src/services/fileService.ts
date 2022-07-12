@@ -2,9 +2,9 @@ import api from "./api"
 import DocUnit from "@/domain/docUnit"
 
 export default {
-  async uploadFile(docUnitId: string, file: File): Promise<DocUnit> {
+  async uploadFile(docUnitUuid: string, file: File): Promise<DocUnit> {
     try {
-      const response = await api().put(`docunits/${docUnitId}/file`, file, {
+      const response = await api().put(`docunits/${docUnitUuid}/file`, file, {
         headers: {
           "Content-Type":
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -24,9 +24,9 @@ export default {
       throw new Error(`Could not get docx: ${error}`)
     }
   },
-  async deleteFile(docUnitId: string) {
+  async deleteFile(docUnitUuid: string) {
     try {
-      await api().delete(`docunits/${docUnitId}/file`)
+      await api().delete(`docunits/${docUnitUuid}/file`)
     } catch (error) {
       throw new Error(`Could not delete file: ${error}`)
     }

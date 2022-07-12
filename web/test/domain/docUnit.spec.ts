@@ -2,16 +2,10 @@ import { describe, it, expect } from "vitest"
 import DocUnit, { CoreData, Texts } from "../../src/domain/docUnit"
 
 describe("DocUnit", () => {
-  it("instantiates with empty strings", () => {
+  it("instantiates with uuid", () => {
     const docUnit = new DocUnit("foo")
-    expect(docUnit.aktenzeichen).toEqual(undefined)
-    expect(docUnit.uuid).toEqual(undefined)
-  })
-
-  it("instantiates with values", () => {
-    const docUnit = new DocUnit("foo")
-    expect(docUnit.id).toEqual("foo")
-    expect(docUnit.uuid).toEqual(undefined)
+    expect(docUnit.uuid).toEqual("foo")
+    expect(docUnit.id).toEqual(undefined)
   })
 
   it("returns core Data as object", () => {

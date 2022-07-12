@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris;
 
-import java.net.MalformedURLException;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,8 +9,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @ExtendWith(SpringExtension.class)
-@Tag("journey")
 @TestPropertySource(locations = "classpath:application.properties")
+@Tag("journey")
 class ApplicationJourneyTest {
 
   @Value("${application.staging.password}")
@@ -24,7 +23,7 @@ class ApplicationJourneyTest {
   private String stagingUser;
 
   @Test
-  void applicationHealthTest() throws MalformedURLException {
+  void applicationHealthTest() {
     WebTestClient.bindToServer()
         .baseUrl(stagingUrl)
         .build()

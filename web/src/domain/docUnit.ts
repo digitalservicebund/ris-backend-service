@@ -25,16 +25,16 @@ export type Texts = {
 }
 
 export default class DocUnit implements CoreData, Texts {
-  readonly id: string
-  readonly uuid?: string
+  readonly uuid: string
+  readonly id?: string
   readonly documentnumber?: string
   readonly creationtimestamp?: string
 
-  readonly fileuploadtimestamp?: string
-  readonly s3path?: string
-  readonly filetype?: string
-  readonly filename?: string
-  readonly originalFileAsHTML?: string
+  public fileuploadtimestamp?: string
+  public s3path?: string
+  public filetype?: string
+  public filename?: string
+  public originalFileAsHTML?: string
 
   public aktenzeichen?: string
   public gerichtstyp?: string
@@ -58,8 +58,8 @@ export default class DocUnit implements CoreData, Texts {
   public tatbestand?: string
   public entscheidungsgruende?: string
 
-  constructor(id: string, data: Partial<DocUnit> = {}) {
-    this.id = String(id)
+  constructor(uuid: string, data: Partial<DocUnit> = {}) {
+    this.uuid = String(uuid)
 
     let key: keyof DocUnit
     for (key in data) {

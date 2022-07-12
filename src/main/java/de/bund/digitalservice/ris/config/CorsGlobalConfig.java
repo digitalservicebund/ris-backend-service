@@ -7,7 +7,7 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 
 @Configuration
 @ConditionalOnProperty(name = "application.cors.enable", havingValue = "true")
-public class CorsGlobalConfiguration implements WebFluxConfigurer {
+public class CorsGlobalConfig implements WebFluxConfigurer {
 
   @Override
   public void addCorsMappings(CorsRegistry corsRegistry) {

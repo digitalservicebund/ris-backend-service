@@ -11,8 +11,10 @@ describe("Core Data", () => {
   const vuetify = createVuetify({ components, directives })
 
   test("renders correctly with given docUnitId", async () => {
-    const docUnit = new DocUnit("1", { aktenzeichen: "abc" })
-
+    const docUnit = new DocUnit("1", {
+      aktenzeichen: "abc",
+      documentnumber: "ABCD2022000001",
+    })
     const wrapper = mount(DocUnitCoreData, {
       props: {
         coreData: docUnit.coreData,

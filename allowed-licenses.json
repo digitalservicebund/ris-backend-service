@@ -1,73 +1,40 @@
 {
   "allowedLicenses": [
     {
-      "moduleLicense": "MIT License"
-    },
-    {
-      "moduleLicense": "MIT license"
-    },
-    {
-      "moduleLicense": "The MIT License"
-    },
-    {
-      "moduleLicense": "The MIT License (MIT)"
-    },
-    {
-      "moduleLicense": "MIT"
-    },
-    {
-      "moduleLicense": "The Apache Software License, Version 2.0"
-    },
-    {
       "moduleLicense": "Apache License, Version 2.0"
     },
     {
-      "moduleLicense": "Apache 2.0"
+      "moduleLicense": "MIT License"
     },
     {
-      "moduleLicense": "Apache 2"
-    },
-    {
-      "moduleLicense": "Public Domain, per Creative Commons CC0"
-    },
-    {
-      "moduleLicense": "CC0"
+      "moduleLicense": "Eclipse Public License - v 2.0"
     },
     {
       "moduleLicense": "Eclipse Public License - v 1.0"
     },
     {
-      "moduleLicense": "EPL 1.0"
+      "moduleLicense": "The 2-Clause BSD License"
     },
     {
-      "moduleLicense": "Eclipse Public License v. 2.0"
+      "moduleLicense": "The 3-Clause BSD License"
     },
     {
-      "moduleLicense": "EPL 2.0"
+      "moduleLicense": "BSD 4-Clause \"Original\" or \"Old\" License"
+    },
+    {
+      "moduleLicense": "Creative Commons Legal Code"
+    },
+    {
+      "moduleLicense": "GNU GENERAL PUBLIC LICENSE, Version 2 + Classpath Exception"
     },
     {
       "moduleLicense": "GNU Lesser General Public License"
     },
     {
-      "moduleLicense": "GNU General Public License, version 2 with the GNU Classpath Exception"
+      "moduleLicense": "Bouncy Castle Licence"
     },
     {
-      "moduleLicense": "GPL2 w/ CPE"
-    },
-    {
-      "moduleLicense": "BSD License",
-      "moduleVersion": "2.7.7",
-      "moduleName": "antlr:antlr"
-    },
-    {
-      "moduleLicense": "BSD licence",
-      "moduleVersion": "3.5.2",
-      "moduleName": "org.antlr:antlr-runtime"
-    },
-    {
-      "moduleLicense": "BSD licence",
-      "moduleVersion": "3.2.1",
-      "moduleName": "org.antlr:stringtemplate"
+      "moduleLicense": "CDDL + GPLv2 with classpath exception"
     },
     {
       "moduleLicense": null,
