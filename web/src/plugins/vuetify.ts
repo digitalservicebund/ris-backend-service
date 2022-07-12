@@ -7,6 +7,7 @@ import { createVuetify } from "vuetify"
 import { VBtn } from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { aliases, md } from "vuetify/iconsets/md"
+import { custom } from "../iconsets/custom"
 
 export const risLightTheme = {
   dark: false,
@@ -41,6 +42,7 @@ export default createVuetify({
     defaultSet: "md",
     aliases,
     sets: {
+      custom,
       md,
     },
   },
