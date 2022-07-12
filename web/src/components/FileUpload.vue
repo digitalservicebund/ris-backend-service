@@ -108,9 +108,7 @@ const openFileDialog = () => {
           @drop="drop"
         >
           <span v-if="status.inDragError">
-            <v-icon class="icon_upload" size="50px">
-              upload_file
-            </v-icon>
+            <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
             <span v-if="status.uploadStatus !== 'failed'">
               <div class="upload_status">Datei wird nicht unterstützt.</div>
               <div>
@@ -131,9 +129,7 @@ const openFileDialog = () => {
             </span>
           </span>
           <span v-else>
-            <v-icon class="icon_upload" size="50px">
-              upload_file
-            </v-icon>
+            <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
             <span v-if="status.uploadStatus === 'uploading'">
               <div class="upload_status">
                 Die Datei {{ status.file ? status.file.name : "" }} wird
