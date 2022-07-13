@@ -25,27 +25,21 @@ test.describe("generate a doc unit and delete it again", () => {
 
 export const generateDocUnit = async (page: Page) => {
   await page.goto("/")
-
   await page.locator("button >> text=Neue Dokumentationseinheit").click()
   await page.waitForSelector("text=Festplatte durchsuchen")
 
+  await expect(page).toHaveURL(/\/rechtsprechung\/[A-Z0-9]+\/dokumente$/)
   const regex = /rechtsprechung\/(.*)\/dokumente/g
   const match = regex.exec(page.url())
-  return match[1] || ""
+  return match ? match[1] : ""
 }
 
 export const deleteDocUnit = async (page: Page, documentNumber: string) => {
   await page.goto("/")
-
-  const selectDocUnit = page
+  await page
     .locator("tr", {
-      has: page.locator(
-        `td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}"]`
-      ),
+      hasText: documentNumber,
     })
-    .locator("td:nth-child(5) i")
-  await selectDocUnit.waitFor()
-  selectDocUnit.click() // an await here would break the test
-
-  await page.waitForTimeout(2000)
+    .locator("[aria-label='Dokumentationseinheit löschen']")
+    .click({ delay: 2000 })
 }
