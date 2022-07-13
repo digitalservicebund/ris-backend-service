@@ -4,8 +4,6 @@ interface Props {
   icon?: string
 }
 
-// pass type input (is it needed or just use @click?) and color via props TODO
-
 const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
   icon: undefined,

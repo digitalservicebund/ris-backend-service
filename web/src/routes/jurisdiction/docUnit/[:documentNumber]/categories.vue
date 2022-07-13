@@ -56,7 +56,7 @@ onMounted(async () => {
   fetchOriginalFile()
 })
 
-const originalOdocPanelYPos = 169 // read this dynamically, see onUpdated() TODO
+const originalOdocPanelYPos = 169 // read this dynamically TODO
 
 const handleScroll = () => {
   const element = document.getElementById("odoc-panel-element")
