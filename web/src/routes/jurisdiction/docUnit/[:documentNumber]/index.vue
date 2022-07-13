@@ -9,7 +9,7 @@ defineProps<{ docUnit: DocUnit }>()
 const router = useRouter()
 const route = useRoute()
 
-const showNavBar = ref(useRoute().query.showNavBar === "true")
+const showNavBar = ref(route.query.showNavBar !== "false")
 const handleToggleNavBar = async () => {
   showNavBar.value = !showNavBar.value
   await router.push({
