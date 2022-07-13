@@ -13,6 +13,7 @@ const route = useRoute()
     <div
       id="odoc-open-element"
       class="odoc-open"
+      aria-label="Originaldokument öffnen"
       @click="$emit('togglePanel')"
       @keydown.p="$emit('togglePanel')"
     >
@@ -27,6 +28,7 @@ const route = useRoute()
       <h3 class="odoc-editor-header">
         <div
           class="odoc-close-icon-background"
+          aria-label="Originaldokument schließen"
           @click="$emit('togglePanel')"
           @keydown.p="$emit('togglePanel')"
         >

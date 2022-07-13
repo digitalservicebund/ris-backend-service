@@ -19,6 +19,7 @@ const linkStyling = (componentName: string) => {
       <div
         id="sidebar-close-button"
         class="sidebar-close-icon-background"
+        aria-label="Navigation schließen"
         @click="$emit('toggleNavbar')"
         @keydown.m="$emit('toggleNavbar')"
       >
@@ -140,6 +141,7 @@ const linkStyling = (componentName: string) => {
       v-else
       id="sidebar-open-button"
       class="sidebar-open"
+      aria-label="Navigation öffnen"
       @click="$emit('toggleNavbar')"
       @keydown.c="$emit('toggleNavbar')"
     >
