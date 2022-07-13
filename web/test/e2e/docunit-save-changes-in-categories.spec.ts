@@ -2,7 +2,7 @@ import { test, Page, expect } from "@playwright/test"
 import { deleteDocUnit, generateDocUnit } from "./docunit-lifecycle.spec"
 import { getAuthenticatedPage } from "./e2e-utils"
 
-test.describe("save changes and verify it persists", () => {
+test.describe("save changes in core data and texts and verify it persists", () => {
   // SETUP
 
   let documentNumber: string
@@ -18,7 +18,7 @@ test.describe("save changes and verify it persists", () => {
 
   // TESTS
 
-  test("save core data change", async () => {
+  test("test core data change", async () => {
     await navigateToRubriken(page, documentNumber)
     // using the first field: Aktenzeichen
 
@@ -43,7 +43,7 @@ test.describe("save changes and verify it persists", () => {
     expect(await page.inputValue("id=aktenzeichen")).toBe("abc")
   })
 
-  test("save formatted text input data change", async () => {
+  test("test texts data change", async () => {
     await navigateToRubriken(page, documentNumber)
     // using the first field: Entscheidungsname
 
