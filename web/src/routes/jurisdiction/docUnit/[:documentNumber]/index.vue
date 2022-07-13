@@ -11,7 +11,6 @@ const route = useRoute()
 
 const showNavBar = ref(useRoute().query.showNavBar === "true")
 const handleToggleNavBar = async () => {
-  console.log("hello")
   showNavBar.value = !showNavBar.value
   await router.push({
     ...route,

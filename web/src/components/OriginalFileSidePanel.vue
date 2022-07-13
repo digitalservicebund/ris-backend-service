@@ -1,8 +1,11 @@
 <script setup lang="ts">
+import { useRoute } from "vue-router"
 import TextEditor from "@/components/TextEditor.vue"
 
 defineProps<{ visible: boolean; file?: string }>()
 defineEmits<{ (e: "togglePanel"): void }>()
+
+const route = useRoute()
 </script>
 
 <template>
@@ -41,6 +44,7 @@ defineEmits<{ (e: "togglePanel"): void }>()
           :to="{
             name: 'jurisdiction-docUnit-:documentNumber-files',
             params: { documentNumber: $route.params.documentNumber },
+            query: route.query,
           }"
         >
           <v-icon> arrow_forward </v-icon>
