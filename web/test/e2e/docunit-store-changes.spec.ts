@@ -71,17 +71,3 @@ export const pageReload = async (page: Page) => {
   await page.reload()
   await page.goto("/")
 }
-
-export const navigateToRubriken = async (
-  page: Page,
-  documentNumber: string
-) => {
-  await page.goto("/")
-  await page
-    .locator(`a[href*="/rechtsprechung/${documentNumber}/dokumente"]`)
-    .click()
-  await page
-    .locator(`a[href*="/rechtsprechung/${documentNumber}/rubriken"]`)
-    .first()
-    .click()
-}
