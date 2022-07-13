@@ -54,6 +54,7 @@ const updateValue = (event: Event, index: number) => {
                   class="ris-form__input"
                   type="text"
                   :name="item.name"
+                  :aria-label="item.aria"
                   @change="updateValue($event, index)"
                 />
               </label>
@@ -74,6 +75,7 @@ const updateValue = (event: Event, index: number) => {
                   class="ris-form__input"
                   type="text"
                   :name="item.name"
+                  :aria-label="item.aria"
                   @change="updateValue($event, index)"
                 />
               </label>

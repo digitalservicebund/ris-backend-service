@@ -46,7 +46,7 @@ const data = computed(() =>
                 <TextEditor
                   :value="item.value"
                   class="ris-texte-form__input"
-                  :element-id="item.id"
+                  :aria-label="item.aria"
                   :field-size="item.fieldSize"
                   @update-value="emit('updateValue', [item.id, $event])"
                 />

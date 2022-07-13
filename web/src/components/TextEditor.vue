@@ -39,7 +39,7 @@ const props = defineProps({
     required: false,
     default: true,
   },
-  elementId: {
+  ariaLabel: {
     type: String,
     required: false,
     default: null,
@@ -130,7 +130,9 @@ add("strike", "strikethrough_s")
   <v-container fluid>
     <v-row
       v-if="showButtons()"
-      :id="props.elementId ? props.elementId + '_btns' : null"
+      :aria-label="
+        props.ariaLabel ? props.ariaLabel + ' Editor Button Leiste' : null
+      "
     >
       <v-col v-for="(btn, index) in editorBtns" :key="index" cols="1"
         ><v-icon
@@ -151,7 +153,9 @@ add("strike", "strikethrough_s")
     <v-row>
       <v-col cols="12">
         <editor-content
-          :id="props.elementId ? props.elementId + '_editor' : null"
+          :aria-label="
+            props.ariaLabel ? props.ariaLabel + ' Editor Feld' : null
+          "
           :editor="editor"
           :class="'ProseMirror__' + props.fieldSize"
         />
