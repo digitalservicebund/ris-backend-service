@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { DocUnit } from "../types/DocUnit"
+import DocUnit from "../domain/DocUnit"
 
 defineProps<{ docUnits: DocUnit[] }>()
 const emit = defineEmits<{
@@ -29,8 +29,10 @@ const onDelete = (docUnit: DocUnit) => {
           <router-link
             class="doc-unit-list-active-link"
             :to="{
-              name: docUnit.s3path ? 'Rubriken' : 'Dokumente',
-              params: { id: docUnit.documentnumber },
+              name: docUnit.s3path
+                ? 'jurisdiction-docUnit-:documentNumber-categories'
+                : 'jurisdiction-docUnit-:documentNumber-files',
+              params: { documentNumber: docUnit.documentnumber },
             }"
           >
             {{ docUnit.documentnumber }}

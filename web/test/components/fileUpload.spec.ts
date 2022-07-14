@@ -1,4 +1,3 @@
-import { createTestingPinia } from "@pinia/testing"
 import { mount } from "@vue/test-utils"
 import { describe, it, expect } from "vitest"
 import { createVuetify } from "vuetify"
@@ -11,9 +10,12 @@ describe("FileUpload", () => {
 
   it("renders properly", () => {
     const wrapper = mount(FileUpload, {
+      props: {
+        docUnitUuid: "1",
+      },
       global: {
         stubs: ["router-link"],
-        plugins: [vuetify, createTestingPinia()],
+        plugins: [vuetify],
       },
     })
 

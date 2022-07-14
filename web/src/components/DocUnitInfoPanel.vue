@@ -1,36 +1,31 @@
 <script lang="ts" setup>
-import { useDocUnitsStore } from "../store"
-import { DocUnit } from "../types/DocUnit"
+import DocUnit from "../domain/DocUnit"
 
-const store = useDocUnitsStore()
-
-const getValueOrFallback = (field: keyof DocUnit) => {
-  return store.getSelectedSafe()[field] ? store.getSelectedSafe()[field] : " - "
-}
+defineProps<{ docUnit: DocUnit }>()
 </script>
 
 <template>
-  <v-container v-if="store.hasSelected()" fluid class="panel-default">
+  <v-container fluid class="panel-default">
     <v-row class="doc-info-row">
       <v-col class="vert-centered panel-id" sm="6" md="3">
-        {{ getValueOrFallback("documentnumber") }}
+        {{ docUnit.documentnumber || " - " }}
       </v-col>
       <v-col class="vert-centered" sm="6" md="3">
         Aktenzeichen
-        <span class="panel-default__values">{{
-          getValueOrFallback("aktenzeichen")
-        }}</span>
+        <span class="panel-default__values">
+          {{ docUnit.aktenzeichen || " - " }}</span
+        >
       </v-col>
       <v-col class="vert-centered" sm="6" md="3">
         Entscheidungsdatum
-        <span class="panel-default__values">{{
-          getValueOrFallback("entscheidungsdatum")
-        }}</span>
+        <span class="panel-default__values">
+          {{ docUnit.entscheidungsdatum || " - " }}
+        </span>
       </v-col>
       <v-col class="vert-centered" sm="6" md="3">
         Gerichtstyp
         <span class="panel-default__values">{{
-          getValueOrFallback("gerichtstyp")
+          docUnit.gerichtstyp || " - "
         }}</span>
       </v-col>
     </v-row>

@@ -2,13 +2,13 @@
 interface Props {
   label?: string
   icon?: string
+  ariaLabel?: string
 }
-
-// pass type input (is it needed or just use @click?) and color via props TODO
 
 const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
   icon: undefined,
+  ariaLabel: undefined,
 })
 </script>
 
@@ -19,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
     :ripple="false"
     :flat="true"
     color="blue800"
+    :aria-label="ariaLabel"
   >
     <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
     {{ props.label }}

@@ -1,10 +1,13 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import { uploadFile } from "../api/docUnitService"
-import { useDocUnitsStore } from "../store"
-import SimpleButton from "./SimpleButton.vue"
+import TextButton from "./TextButton.vue"
+import DocUnit from "@/domain/docUnit"
+import fileService from "@/services/fileService"
 
-const store = useDocUnitsStore()
+const props = defineProps<{ docUnitUuid: string }>()
+const emits = defineEmits<{
+  (e: "updateDocUnit", updatedDocUnit: DocUnit): void
+}>()
 
 interface Status {
   file: File | null
@@ -34,10 +37,9 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = "uploading"
-  const docUnit = await uploadFile(store.getSelected()?.uuid, file)
-  store.update(docUnit)
+  const docUnit = await fileService.uploadFile(props.docUnitUuid, file)
   status.value.uploadStatus = "succeeded" // error handling TODO
-  console.log("file uploaded, response:", docUnit)
+  emits("updateDocUnit", docUnit)
 }
 
 const dragover = (e: DragEvent) => {
@@ -98,6 +100,7 @@ const openFileDialog = () => {
     <v-row>
       <v-col md="8" sm="12">
         <v-container
+          id="upload-drop-area"
           class="upload-drop-area"
           :class="{
             'upload-drop-area__in-drag': status.inDrag,
@@ -119,7 +122,7 @@ const openFileDialog = () => {
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
-                <SimpleButton
+                <TextButton
                   class="button_upload"
                   icon="search"
                   label="Festplatte durchsuchen"
@@ -136,7 +139,7 @@ const openFileDialog = () => {
                 hochgeladen ...
               </div>
               <div>
-                <SimpleButton
+                <TextButton
                   class="button_upload"
                   icon="refresh"
                   label="Upload läuft"
@@ -154,7 +157,7 @@ const openFileDialog = () => {
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
-                <SimpleButton
+                <TextButton
                   class="button_upload"
                   icon="search"
                   label="Festplatte durchsuchen"

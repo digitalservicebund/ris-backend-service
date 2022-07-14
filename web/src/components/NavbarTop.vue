@@ -22,9 +22,9 @@ const linkStyling = (componentName: string) => {
       </v-col>
       <v-col cols="2" class="topbar-link-box">
         <router-link
-          :class="linkStyling('Rechtsprechung')"
+          :class="linkStyling('jurisdiction')"
           class="topbar-link"
-          :to="{ name: 'Rechtsprechung' }"
+          :to="{ name: 'jurisdiction' }"
           >Rechtsprechung</router-link
         >
       </v-col>
