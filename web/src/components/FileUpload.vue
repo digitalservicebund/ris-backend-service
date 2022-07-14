@@ -100,6 +100,7 @@ const openFileDialog = () => {
     <v-row>
       <v-col md="8" sm="12">
         <v-container
+          id="upload-drop-area"
           class="upload-drop-area"
           :class="{
             'upload-drop-area__in-drag': status.inDrag,

@@ -58,3 +58,11 @@ export const pageReload = async (page: Page) => {
   await page.waitForTimeout(500)
   await page.goto("/")
 }
+
+export const uploadTestfile = async (page: Page, filename: string) => {
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    page.locator("text=Festplatte durchsuchen").click(),
+  ])
+  await fileChooser.setFiles("./test/e2e/testfiles/" + filename)
+}
