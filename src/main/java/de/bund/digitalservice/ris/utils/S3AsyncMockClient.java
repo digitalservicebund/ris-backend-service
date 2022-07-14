@@ -5,33 +5,25 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import software.amazon.awssdk.core.ResponseBytes;
-import software.amazon.awssdk.core.SdkField;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.core.async.AsyncResponseTransformer;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
-import software.amazon.awssdk.services.s3.model.ChecksumAlgorithm;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.ObjectStorageClass;
-import software.amazon.awssdk.services.s3.model.Owner;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Object;
-import software.amazon.awssdk.services.s3.model.S3Object.Builder;
 
 public class S3AsyncMockClient implements S3AsyncClient {
   private static final Logger LOGGER = LoggerFactory.getLogger(S3AsyncMockClient.class);
@@ -56,21 +48,20 @@ public class S3AsyncMockClient implements S3AsyncClient {
     AtomicBoolean append = new AtomicBoolean(false);
     String fileName = putObjectRequest.key();
 
-    requestBody.subscribe(byteBuffer -> {
-        try {
-          File file = new File(localFileDirectory + File.separator + fileName);
-          FileChannel channel = new FileOutputStream(file, append.get()).getChannel();
-          channel.write(byteBuffer);
-          channel.close();
-          append.set(true);
-        }
-        catch (IOException ex) {
-          LOGGER.info("Couldn't write file: {}", fileName, ex);
-        }
-    });
+    requestBody.subscribe(
+        byteBuffer -> {
+          try {
+            File file = new File(localFileDirectory + File.separator + fileName);
+            FileChannel channel = new FileOutputStream(file, append.get()).getChannel();
+            channel.write(byteBuffer);
+            channel.close();
+            append.set(true);
+          } catch (IOException ex) {
+            LOGGER.info("Couldn't write file: {}", fileName, ex);
+          }
+        });
 
     return CompletableFuture.completedFuture(PutObjectResponse.builder().build());
-
   }
 
   @Override
@@ -83,8 +74,10 @@ public class S3AsyncMockClient implements S3AsyncClient {
       nameList = localFileStorage.list();
     }
 
-    var objectList = Arrays.stream(nameList).map(name -> S3Object.builder().key(name).build()).toList();
-    return CompletableFuture.completedFuture(ListObjectsV2Response.builder().contents(objectList).build());
+    var objectList =
+        Arrays.stream(nameList).map(name -> S3Object.builder().key(name).build()).toList();
+    return CompletableFuture.completedFuture(
+        ListObjectsV2Response.builder().contents(objectList).build());
   }
 
   @Override
@@ -98,7 +91,7 @@ public class S3AsyncMockClient implements S3AsyncClient {
       String fileName = getObjectRequest.key();
       File file = new File(localFileDirectory + File.separator + fileName);
       FileInputStream fl = new FileInputStream(file);
-      bytes = new byte[(int)file.length()];
+      bytes = new byte[(int) file.length()];
       fl.read(bytes);
       fl.close();
     } catch (IOException ex) {

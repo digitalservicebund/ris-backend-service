@@ -36,14 +36,16 @@ This will replace placeholders in the application template and install a couple 
 
 #### Backend
 
+Add to your `local application-local.properties` the property `local.file-storage` with the
+directory, which the mocked S3 client should use as local S3 bucket.
+
 ```bash
-AWS_ACCESS_KEY_ID=insert-yours AWS_SECRET_ACCESS_KEY=insert-yours ./gradlew bootRun --args='--spring.profiles.active=local'
+./gradlew bootRun --args='--spring.profiles.active=local'
 ```
 
 If you use IntelliJ: the run configuration _Application_ should be automatically created. Edit that and:
 
 - add `local` to _Active profiles_
-- enable the _Environment variables_ field under _Modify options_ and add `AWS_ACCESS_KEY_ID=insert-yours;AWS_SECRET_ACCESS_KEY=insert-yours`
 
 #### Frontend
 
