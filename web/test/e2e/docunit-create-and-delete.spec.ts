@@ -1,19 +1,13 @@
 import { test, expect } from "@playwright/test"
-import {
-  generateDocUnit,
-  deleteDocUnit,
-  getAuthenticatedPage,
-} from "./e2e-utils"
+import { generateDocUnit, deleteDocUnit } from "./e2e-utils"
 
 test.describe("create a doc unit and delete it again", () => {
-  test("generate doc unit", async ({ browser }) => {
-    const page = await getAuthenticatedPage(browser)
+  test("generate doc unit", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await deleteDocUnit(page, documentNumber)
   })
 
-  test("delete doc unit", async ({ browser }) => {
-    const page = await getAuthenticatedPage(browser)
+  test("delete doc unit", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await page.goto("/")
 
