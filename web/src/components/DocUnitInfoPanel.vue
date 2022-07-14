@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import DocUnit from "../domain/DocUnit"
+import DocUnit from "../domain/docUnit"
 
 defineProps<{ docUnit: DocUnit }>()
 </script>

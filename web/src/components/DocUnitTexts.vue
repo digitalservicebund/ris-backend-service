@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import { Texts } from "../domain/DocUnit"
+import { Texts } from "../domain/docUnit"
 import * as iconsAndLabels from "../iconsAndLabels.json"
 import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"

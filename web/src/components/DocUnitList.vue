@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import DocUnit from "../domain/DocUnit"
+import DocUnit from "../domain/docUnit"
 
 defineProps<{ docUnits: DocUnit[] }>()
 const emit = defineEmits<{
