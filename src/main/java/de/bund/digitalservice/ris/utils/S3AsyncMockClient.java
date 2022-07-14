@@ -5,7 +5,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
@@ -48,11 +51,11 @@ public class S3AsyncMockClient implements S3AsyncClient {
     AtomicBoolean append = new AtomicBoolean(false);
     String fileName = putObjectRequest.key();
 
+    File file = new File(localFileDirectory + File.separator + fileName);
     requestBody.subscribe(
         byteBuffer -> {
-          try {
-            File file = new File(localFileDirectory + File.separator + fileName);
-            FileChannel channel = new FileOutputStream(file, append.get()).getChannel();
+          try (FileOutputStream fos = new FileOutputStream(file, append.get())) {
+            FileChannel channel = fos.getChannel();
             channel.write(byteBuffer);
             channel.close();
             append.set(true);
@@ -74,8 +77,12 @@ public class S3AsyncMockClient implements S3AsyncClient {
       nameList = localFileStorage.list();
     }
 
-    var objectList =
-        Arrays.stream(nameList).map(name -> S3Object.builder().key(name).build()).toList();
+    List<S3Object> objectList = Collections.emptyList();
+    if (nameList != null) {
+      objectList =
+          Arrays.stream(nameList).map(name -> S3Object.builder().key(name).build()).toList();
+    }
+
     return CompletableFuture.completedFuture(
         ListObjectsV2Response.builder().contents(objectList).build());
   }
@@ -87,13 +94,14 @@ public class S3AsyncMockClient implements S3AsyncClient {
 
     byte[] bytes = new byte[] {};
 
-    try {
-      String fileName = getObjectRequest.key();
-      File file = new File(localFileDirectory + File.separator + fileName);
-      FileInputStream fl = new FileInputStream(file);
+    String fileName = getObjectRequest.key();
+    File file = new File(localFileDirectory + File.separator + fileName);
+    try (FileInputStream fl = new FileInputStream(file)) {
       bytes = new byte[(int) file.length()];
-      fl.read(bytes);
-      fl.close();
+      int readBytes = fl.read(bytes);
+      if (readBytes != file.length()) {
+        LOGGER.warn("different size between file length and read bytes");
+      }
     } catch (IOException ex) {
       LOGGER.error("Couldn't get object from local storage.");
     }
@@ -109,7 +117,11 @@ public class S3AsyncMockClient implements S3AsyncClient {
     String fileName = deleteObjectRequest.key();
     File file = new File(localFileDirectory + File.separator + fileName);
     if (file.exists()) {
-      file.delete();
+      try {
+        Files.delete(file.toPath());
+      } catch (IOException ex) {
+        LOGGER.error("Couldn't delete file", ex);
+      }
     }
 
     return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
