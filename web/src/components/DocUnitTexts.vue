@@ -8,8 +8,8 @@ import { FieldSize } from "@/domain/FieldSize"
 
 const props = defineProps<{ texts: Texts }>()
 const emit = defineEmits<{
-  (e: "updateValue", updatedValue: [keyof Texts, string]): void
-  (e: "updateDocUnit"): void
+  (e: "updateValue", updatedValue: [keyof Texts, string]): Promise<void>
+  (e: "updateDocUnit"): Promise<void>
 }>()
 
 const data = computed(() =>
