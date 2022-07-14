@@ -1,73 +1,76 @@
-import { test, Page, expect } from "@playwright/test"
-import { deleteDocUnit, generateDocUnit } from "./docunit-lifecycle.spec"
-import { getAuthenticatedPage } from "./e2e-utils"
+import { test, expect } from "@playwright/test"
+import {
+  authenticate,
+  navigateToCategories,
+  generateDocUnit,
+  deleteDocUnit,
+  pageReload,
+} from "./e2e-utils"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
-  // SETUP
-
-  let documentNumber: string
-  let page: Page
-
   test.beforeAll(async ({ browser }) => {
-    page = await getAuthenticatedPage(browser)
-
-    documentNumber = await generateDocUnit(page)
+    await authenticate(browser)
   })
 
-  test.afterAll(async () => await deleteDocUnit(page, documentNumber))
+  test("test core data change", async ({ page }) => {
+    const documentNumber = await generateDocUnit(page)
+    await navigateToCategories(page, documentNumber)
 
-  // TESTS
+    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
 
-  test("test core data change", async () => {
-    await navigateToRubriken(page, documentNumber)
-    // using the first field: Aktenzeichen
+    page.once("dialog", async (dialog) => {
+      expect(dialog.message()).toBe("Dokumentationseinheit wurde gespeichert")
+      await dialog.accept()
+    })
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+    await page.waitForTimeout(500)
 
-    await page.locator("id=aktenzeichen").fill("abc")
-    await page.locator("button >> text=Speichern").first().click()
-
-    await page.waitForTimeout(500) // give server time to process, otherwise this test gets flaky
     await pageReload(page) // to make sure the data needs to come fresh from the server
 
-    // 1. verify that the change is visible in docunit list on /rechtsprechung
+    // 1. verify that the change is visible in the docunit list on /jurisdiction
     const aktenzeichenColumn = page
       .locator("tr", {
-        has: page.locator(
-          `td:nth-child(1) a[href*="/rechtsprechung/${documentNumber}"]`
-        ),
+        has: page.locator(`a >> text=${documentNumber}`),
       })
-      .locator("td:nth-child(3)")
+      .locator("td >> text=abc")
+
+    await expect(aktenzeichenColumn).toBeVisible()
     expect(await aktenzeichenColumn.innerText()).toBe("abc")
 
     // 2. verify that the change is visible in Rubriken
-    await navigateToRubriken(page, documentNumber)
-    expect(await page.inputValue("id=aktenzeichen")).toBe("abc")
+    await navigateToCategories(page, documentNumber)
+    expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("abc")
+
+    await deleteDocUnit(page, documentNumber)
   })
 
-  test("test texts data change", async () => {
-    await navigateToRubriken(page, documentNumber)
-    // using the first field: Entscheidungsname
+  test("test texts data change", async ({ page }) => {
+    const documentNumber = await generateDocUnit(page)
+    await navigateToCategories(page, documentNumber)
 
     const boldButton = await page
-      .locator("id=entscheidungsname_btns >> div")
+      .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
       .first()
     await boldButton.click()
-    let editorField = await page.locator("id=entscheidungsname_editor >> div")
+
+    let editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
     await editorField.type("this is bold text")
-    await page.locator("button >> text=Speichern").last().click()
+    await page
+      .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
+      .click()
+    await page.waitForTimeout(500)
 
     await pageReload(page)
 
-    // verify that the change is visible in Rubriken
-    await navigateToRubriken(page, documentNumber)
-    editorField = await page.locator("id=entscheidungsname_editor >> div")
+    // verify that the change is visible in the Kurz- und Langtexte field
+    await navigateToCategories(page, documentNumber)
+    editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
     expect(await editorField.innerHTML()).toBe(
       "<p><strong>this is bold text</strong></p>"
     )
   })
 })
-
-export const pageReload = async (page: Page) => {
-  await page.goto("/")
-  await page.reload()
-  await page.goto("/")
-}

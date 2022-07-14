@@ -51,3 +51,10 @@ export const navigateToCategories = async (
     )
     .click()
 }
+
+export const pageReload = async (page: Page) => {
+  await page.goto("/")
+  await page.reload()
+  await page.waitForTimeout(500)
+  await page.goto("/")
+}

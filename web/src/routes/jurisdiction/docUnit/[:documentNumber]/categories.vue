@@ -24,7 +24,7 @@ const handleUpdateValue = async (
 
 const handleUpdateDocUnit = async () => {
   await docUnitService.update(docUnit.value)
-  alert("Dokumentationseinheit wurden gespeichert")
+  alert("Dokumentationseinheit wurde gespeichert")
 }
 
 const router = useRouter()
