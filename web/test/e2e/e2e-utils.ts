@@ -1,5 +1,15 @@
-import { expect } from "@playwright/test"
+import { Browser, expect } from "@playwright/test"
 import { Page } from "playwright"
+
+export const getAuthenticatedPage = async (browser: Browser) => {
+  const context = await browser.newContext({
+    httpCredentials: {
+      username: process.env.STAGING_USER ?? "",
+      password: process.env.STAGING_PASSWORD ?? "",
+    },
+  })
+  return await context.newPage()
+}
 
 export const generateDocUnit = async (page: Page): Promise<string> => {
   await page.goto("/")
