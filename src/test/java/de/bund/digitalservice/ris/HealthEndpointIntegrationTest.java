@@ -8,7 +8,11 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    properties = {"otc.obs.bucket-name=testBucket", "otc.obs.endpoint=testUrl"})
+    properties = {
+      "otc.obs.bucket-name=testBucket",
+      "otc.obs.endpoint=testUrl",
+      "local.file-storage=local-storage"
+    })
 @Tag("integration")
 class HealthEndpointIntegrationTest {
 
