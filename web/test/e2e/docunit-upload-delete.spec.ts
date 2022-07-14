@@ -1,3 +1,4 @@
+import fs from "fs"
 import { test, Page, expect } from "@playwright/test"
 import { authenticate, deleteDocUnit, generateDocUnit } from "./e2e-utils"
 
@@ -20,7 +21,49 @@ test.describe("upload an original document to a doc unit and delete it again", (
 
   test("upload non-docx file per file chooser", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
-    await uploadTestfile(page, "screenshot.png")
+    await uploadTestfile(page, "sample.png")
+    await expect(
+      await page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt.")
+    ).toBeVisible()
+    await deleteDocUnit(page, documentNumber)
+  })
+
+  test("drop docx file in upload area", async ({ page }) => {
+    const documentNumber = await generateDocUnit(page)
+    const docx = await fs.promises.readFile(
+      "./test/e2e/testfiles/sample.docx",
+      "utf-8"
+    )
+    const dataTransfer = await page.evaluateHandle((docx) => {
+      const data = new DataTransfer()
+      const file = new File([`${docx}`], "sample.docx", {
+        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      })
+      data.items.add(file)
+      return data
+    }, docx)
+    await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
+    await expect(
+      await page.locator("text=Die Datei sample.docx wird hochgeladen")
+    ).toBeVisible()
+    await deleteDocUnit(page, documentNumber)
+  })
+
+  test("drop non-docx file in upload area", async ({ page }) => {
+    const documentNumber = await generateDocUnit(page)
+    const png = await fs.promises.readFile(
+      "./test/e2e/testfiles/sample.png",
+      "utf-8"
+    )
+    const dataTransfer = await page.evaluateHandle((png) => {
+      const data = new DataTransfer()
+      const file = new File([`${png}`], "sample.png", {
+        type: "image/png",
+      })
+      data.items.add(file)
+      return data
+    }, png)
+    await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
     await expect(
       await page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt.")
     ).toBeVisible()
