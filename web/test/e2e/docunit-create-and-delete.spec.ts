@@ -1,11 +1,7 @@
 import { test, expect } from "@playwright/test"
-import { authenticate, generateDocUnit, deleteDocUnit } from "./e2e-utils"
+import { generateDocUnit, deleteDocUnit } from "./e2e-utils"
 
 test.describe("create a doc unit and delete it again", () => {
-  test.beforeAll(async ({ browser }) => {
-    await authenticate(browser)
-  })
-
   test("generate doc unit", async ({ page }) => {
     await generateDocUnit(page)
   })

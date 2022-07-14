@@ -1,7 +1,7 @@
 fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
-  - filename: "e2e-utils.ts"
+  - filename: "playwright.config.ts"
     ignore_detectors: [filecontent]
   - filename: build.gradle
     checksum: 894532dd559c857490848ace7e0330f8612301cb32e2fc1c7b0963ba2324d949

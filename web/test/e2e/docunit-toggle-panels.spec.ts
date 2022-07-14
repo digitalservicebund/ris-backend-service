@@ -1,14 +1,7 @@
 import { test, expect } from "@playwright/test"
-import {
-  authenticate,
-  generateDocUnit,
-  navigateToCategories,
-} from "./e2e-utils"
+import { generateDocUnit, navigateToCategories } from "./e2e-utils"
 
 test.describe("test the different layout options", () => {
-  test.beforeAll(async ({ browser }) => {
-    await authenticate(browser)
-  })
   test.beforeEach(async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)

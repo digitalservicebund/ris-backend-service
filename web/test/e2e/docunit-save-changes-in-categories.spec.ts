@@ -1,6 +1,5 @@
 import { test, expect } from "@playwright/test"
 import {
-  authenticate,
   navigateToCategories,
   generateDocUnit,
   deleteDocUnit,
@@ -8,10 +7,6 @@ import {
 } from "./e2e-utils"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
-  test.beforeAll(async ({ browser }) => {
-    await authenticate(browser)
-  })
-
   test("test core data change", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)

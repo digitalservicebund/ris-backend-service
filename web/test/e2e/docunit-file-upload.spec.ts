@@ -1,19 +1,8 @@
 import fs from "fs"
 import { test, expect } from "@playwright/test"
-import {
-  authenticate,
-  deleteDocUnit,
-  generateDocUnit,
-  uploadTestfile,
-} from "./e2e-utils"
+import { deleteDocUnit, generateDocUnit, uploadTestfile } from "./e2e-utils"
 
 test.describe("upload an original document to a doc unit and delete it again", () => {
-  test.beforeAll(async ({ browser }) => {
-    authenticate(browser)
-  })
-
-  // TESTS
-
   test("upload docx file per file chooser", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await uploadTestfile(page, "sample.docx")
