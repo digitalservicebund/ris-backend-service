@@ -39,3 +39,7 @@ out/
 ### Lefthook ###
 .lefthook-local
 lefthook-local.yml
+
+## local ##
+/.config
+src/main/resources/application-local.properties
