@@ -7,7 +7,7 @@ import {
 
 test.describe("test the different layout options", () => {
   test.beforeAll(async ({ browser }) => {
-    authenticate(browser)
+    await authenticate(browser)
   })
   test.beforeEach(async ({ page }) => {
     const documentNumber = await generateDocUnit(page)

@@ -3,7 +3,7 @@ import { authenticate, generateDocUnit, deleteDocUnit } from "./e2e-utils"
 
 test.describe("create a doc unit and delete it again", () => {
   test.beforeAll(async ({ browser }) => {
-    authenticate(browser)
+    await authenticate(browser)
   })
 
   test("generate doc unit", async ({ page }) => {
