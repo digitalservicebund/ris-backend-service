@@ -54,7 +54,6 @@
   "devDependencies": {
     "@babel/core": "^7.18.5",
     "@digitalservice4germany/style-dictionary": "^0.0.4",
-    "@pinia/testing": "^0.0.12",
     "@playwright-testing-library/test": "^4.2.1",
     "@playwright/test": "^1.23.0",
     "@testing-library/dom": "^8.16.0",
