@@ -67,5 +67,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await editorField.innerHTML()).toBe(
       "<p><strong>this is bold text</strong></p>"
     )
+
+    await deleteDocUnit(page, documentNumber)
   })
 })
