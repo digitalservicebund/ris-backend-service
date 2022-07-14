@@ -85,7 +85,10 @@ const updateValue = (event: Event, index: number) => {
       <v-row>
         <v-col>
           <div class="ris-form__textfield">
-            <SimpleButton @click="emit('updateDocUnit')" />
+            <SimpleButton
+              aria-label="Stammdaten Speichern Button"
+              @click="emit('updateDocUnit')"
+            />
           </div>
         </v-col>
       </v-row>

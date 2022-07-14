@@ -2,11 +2,13 @@
 interface Props {
   label?: string
   icon?: string
+  ariaLabel?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
   icon: undefined,
+  ariaLabel: undefined,
 })
 </script>
 
@@ -17,6 +19,7 @@ const props = withDefaults(defineProps<Props>(), {
     :ripple="false"
     :flat="true"
     color="blue800"
+    :aria-label="ariaLabel"
   >
     <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
     {{ props.label }}

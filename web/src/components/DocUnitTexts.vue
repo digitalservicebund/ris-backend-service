@@ -54,7 +54,10 @@ const data = computed(() =>
             </span>
           </div>
           <div class="ris-texte-form__textfield">
-            <SimpleButton @click="emit('updateDocUnit')" />
+            <SimpleButton
+              aria-label="Kurz- und Langtexte Speichern Button"
+              @click="emit('updateDocUnit')"
+            />
           </div>
         </v-col>
       </v-row>
