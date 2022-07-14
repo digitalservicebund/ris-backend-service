@@ -6,11 +6,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,7 +34,9 @@ public class S3AsyncMockClient implements S3AsyncClient {
   private static final Logger LOGGER = LoggerFactory.getLogger(S3AsyncMockClient.class);
 
   @Value("${local.file-storage}")
-  private String localFileDirectory;
+  private Path relativeLocalStorageDirectory;
+
+  private Path localStorageDirectory;
 
   @Override
   public String serviceName() {
@@ -44,6 +48,12 @@ public class S3AsyncMockClient implements S3AsyncClient {
     /* this method is empty because of mock */
   }
 
+  @PostConstruct
+  public void init() {
+    this.localStorageDirectory = relativeLocalStorageDirectory.toAbsolutePath();
+    this.localStorageDirectory.toFile().mkdirs();
+  }
+
   @Override
   public CompletableFuture<PutObjectResponse> putObject(
       PutObjectRequest putObjectRequest, AsyncRequestBody requestBody) {
@@ -51,10 +61,11 @@ public class S3AsyncMockClient implements S3AsyncClient {
     AtomicBoolean append = new AtomicBoolean(false);
     String fileName = putObjectRequest.key();
 
-    File file = new File(localFileDirectory + File.separator + fileName);
     requestBody.subscribe(
         byteBuffer -> {
-          try (FileOutputStream fos = new FileOutputStream(file, append.get())) {
+          try (FileOutputStream fos =
+              new FileOutputStream(
+                  localStorageDirectory.resolve(fileName).toFile(), append.get())) {
             FileChannel channel = fos.getChannel();
             channel.write(byteBuffer);
             channel.close();
@@ -72,7 +83,7 @@ public class S3AsyncMockClient implements S3AsyncClient {
       ListObjectsV2Request listObjectsV2Request) {
 
     String[] nameList = new String[] {};
-    File localFileStorage = new File(localFileDirectory);
+    File localFileStorage = localStorageDirectory.toFile();
     if (localFileStorage.isDirectory()) {
       nameList = localFileStorage.list();
     }
@@ -95,7 +106,7 @@ public class S3AsyncMockClient implements S3AsyncClient {
     byte[] bytes = new byte[] {};
 
     String fileName = getObjectRequest.key();
-    File file = new File(localFileDirectory + File.separator + fileName);
+    File file = localStorageDirectory.resolve(fileName).toFile();
     try (FileInputStream fl = new FileInputStream(file)) {
       bytes = new byte[(int) file.length()];
       int readBytes = fl.read(bytes);
@@ -115,7 +126,7 @@ public class S3AsyncMockClient implements S3AsyncClient {
       DeleteObjectRequest deleteObjectRequest) {
 
     String fileName = deleteObjectRequest.key();
-    File file = new File(localFileDirectory + File.separator + fileName);
+    File file = localStorageDirectory.resolve(fileName).toFile();
     if (file.exists()) {
       try {
         Files.delete(file.toPath());

@@ -42,4 +42,4 @@ lefthook-local.yml
 
 ## local ##
 /.config
-src/main/resources/application-local.properties
+/.local-storage
