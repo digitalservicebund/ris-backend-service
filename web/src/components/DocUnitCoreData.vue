@@ -2,7 +2,7 @@
 import { computed } from "vue"
 import { CoreData } from "../domain/docUnit"
 import * as iconsAndLabels from "../iconsAndLabels.json"
-import SimpleButton from "./SimpleButton.vue"
+import TextButton from "./TextButton.vue"
 
 const props = defineProps<{ coreData: CoreData }>()
 const emit = defineEmits<{
@@ -85,7 +85,7 @@ const updateValue = (event: Event, index: number) => {
       <v-row>
         <v-col>
           <div class="ris-form__textfield">
-            <SimpleButton
+            <TextButton
               aria-label="Stammdaten Speichern Button"
               @click="emit('updateDocUnit')"
             />

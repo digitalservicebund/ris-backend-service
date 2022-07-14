@@ -2,7 +2,7 @@
 import { computed } from "vue"
 import { Texts } from "../domain/DocUnit"
 import * as iconsAndLabels from "../iconsAndLabels.json"
-import SimpleButton from "./SimpleButton.vue"
+import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"
 import { FieldSize } from "@/domain/FieldSize"
 
@@ -54,7 +54,7 @@ const data = computed(() =>
             </span>
           </div>
           <div class="ris-texte-form__textfield">
-            <SimpleButton
+            <TextButton
               aria-label="Kurz- und Langtexte Speichern Button"
               @click="emit('updateDocUnit')"
             />

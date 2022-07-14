@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import SimpleButton from "./SimpleButton.vue"
+import TextButton from "./TextButton.vue"
 import DocUnit from "@/domain/docUnit"
 import fileService from "@/services/fileService"
 
@@ -122,7 +122,7 @@ const openFileDialog = () => {
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
-                <SimpleButton
+                <TextButton
                   class="button_upload"
                   icon="search"
                   label="Festplatte durchsuchen"
@@ -139,7 +139,7 @@ const openFileDialog = () => {
                 hochgeladen ...
               </div>
               <div>
-                <SimpleButton
+                <TextButton
                   class="button_upload"
                   icon="refresh"
                   label="Upload läuft"
@@ -157,7 +157,7 @@ const openFileDialog = () => {
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
-                <SimpleButton
+                <TextButton
                   class="button_upload"
                   icon="search"
                   label="Festplatte durchsuchen"

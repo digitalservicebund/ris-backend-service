@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import DocUnitList from "../../components/DocUnitList.vue"
-import SimpleButton from "../../components/SimpleButton.vue"
-import DocUnit from "../../domain/docUnit"
-import docUnitService from "../../services/docUnitService"
+import DocUnitList from "@/components/DocUnitList.vue"
+import TextButton from "@/components/TextButton.vue"
+import DocUnit from "@/domain/docUnit"
+import docUnitService from "@/services/docUnitService"
 
 const router = useRouter()
 const docUnits = ref(await docUnitService.getAll())
@@ -25,7 +25,7 @@ const handleDelete = async (docUnit: DocUnit) => {
       </v-row>
       <v-row class="text-right">
         <v-col>
-          <SimpleButton
+          <TextButton
             label="Neue Dokumentationseinheit"
             @click="router.push({ name: 'jurisdiction-docUnit-new' })"
           />

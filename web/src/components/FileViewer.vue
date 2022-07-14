@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import SimpleButton from "./SimpleButton.vue"
+import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"
 import fileService from "@/services/fileService"
 
@@ -45,7 +45,7 @@ const fileAsHtml = await fileService.getDocxFileAsHtml(props.s3Path)
     </v-row>
     <v-row class="fileviewer-info-panel">
       <v-col cols="12">
-        <SimpleButton
+        <TextButton
           icon="delete"
           label="Datei löschen"
           @click="$emit('deleteFile')"
