@@ -103,7 +103,7 @@ watch(
 
 const showButtons = () => {
   // focus doesn't work yet: upon click on a formatting button, the editor loses focus and the buttons disappear
-  return props.editable // && hasFocus.value
+  return props.editable && hasFocus.value
 }
 
 interface editorBtn {
@@ -139,6 +139,7 @@ add("strike", "strikethrough_s")
           class="editor-btn"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
           >{{ btn.icon }}</v-icon
         >
       </v-col>
