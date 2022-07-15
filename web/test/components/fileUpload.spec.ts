@@ -1,7 +1,7 @@
-import { describe, test, expect } from "vitest"
-import { createVuetify } from "vuetify"
-import { createRouter, createWebHistory } from "vue-router"
 import { render } from "@testing-library/vue"
+import { describe, test } from "vitest"
+import { createRouter, createWebHistory } from "vue-router"
+import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import FileUpload from "../../src/components/FileUpload.vue"
@@ -20,14 +20,14 @@ describe("FileUpload", () => {
   })
 
   test("renders file upload with default props", async () => {
-    const wrapper = render(FileUpload, {
+    const { getByText } = render(FileUpload, {
       props: {
         docUnitUuid: "1",
       },
       global: { plugins: [vuetify, router] },
     })
 
-    expect(wrapper.text()).toContain("Aktuell")
+    getByText("Aktuell", { exact: false })
   })
 
   // await fireEvent.click(getByText('Click me'))
