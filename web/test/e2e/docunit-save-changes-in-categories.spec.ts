@@ -43,14 +43,17 @@ test.describe("save changes in core data and texts and verify it persists", () =
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
+    let editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+
+    await editorField.click()
+
     const boldButton = await page
       .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
       .first()
     await boldButton.click()
 
-    let editorField = await page.locator(
-      "[aria-label='Entscheidungsname Editor Feld'] >> div"
-    )
     await editorField.type("this is bold text")
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")

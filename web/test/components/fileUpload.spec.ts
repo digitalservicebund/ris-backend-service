@@ -1,26 +1,34 @@
-import { mount } from "@vue/test-utils"
-import { describe, it, expect } from "vitest"
+import { describe, test, expect } from "vitest"
 import { createVuetify } from "vuetify"
+import { createRouter, createWebHistory } from "vue-router"
+import { render } from "@testing-library/vue"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import FileUpload from "../../src/components/FileUpload.vue"
 
 describe("FileUpload", () => {
   const vuetify = createVuetify({ components, directives })
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      {
+        path: "",
+        name: "jurisdiction-docUnit-:documentNumber-categories#coreData",
+        component: {},
+      },
+    ],
+  })
 
-  it("renders properly", () => {
-    const wrapper = mount(FileUpload, {
+  test("renders file upload with default props", async () => {
+    const wrapper = render(FileUpload, {
       props: {
         docUnitUuid: "1",
       },
-      global: {
-        stubs: ["router-link"],
-        plugins: [vuetify],
-      },
+      global: { plugins: [vuetify, router] },
     })
 
     expect(wrapper.text()).toContain("Aktuell")
-
-    // TODO
   })
+
+  // await fireEvent.click(getByText('Click me'))
 })
