@@ -1,7 +1,5 @@
-import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import { describe, expect, test, vi } from "vitest"
-import { h } from "vue"
+import { describe, test } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
@@ -27,41 +25,5 @@ describe("Texts", () => {
     getByText("Gründe")
     getByText("Tatbestand")
     getByText("Entscheidungsgründe")
-  })
-
-  test("emits update Doc Unit event", async () => {
-    const user = userEvent.setup()
-    const spy = vi.fn(() => Promise<void>)
-
-    const { getByLabelText } = render(
-      h(DocUnitTexts, { onUpdateDocUnit: spy }),
-      {
-        global: { plugins: [vuetify] },
-        props: {
-          texts: new DocUnit("foo").texts,
-        },
-      }
-    )
-
-    await user.click(getByLabelText("Kurz- und Langtexte Speichern Button"))
-    expect(spy).toHaveBeenCalledTimes(1)
-  })
-
-  test("emits updateDocUnit event", async () => {
-    const user = userEvent.setup()
-    const spy = vi.fn()
-
-    const { getByLabelText } = render(
-      h(DocUnitTexts, { onUpdateDocUnit: spy }),
-      {
-        global: { plugins: [vuetify] },
-        props: {
-          texts: new DocUnit("foo").texts,
-        },
-      }
-    )
-
-    await user.click(getByLabelText("Kurz- und Langtexte Speichern Button"))
-    expect(spy).toHaveBeenCalledTimes(1)
   })
 })
