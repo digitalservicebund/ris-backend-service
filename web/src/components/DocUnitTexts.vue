@@ -27,42 +27,39 @@ const data = computed(() =>
 </script>
 
 <template>
-  <div v-if="!data">Loading...</div>
-  <div v-else>
-    <form novalidate class="ris-texte-form">
-      <v-row>
-        <v-col><h2>Kurz- & Langtexte</h2></v-col>
-      </v-row>
-      <v-row>
-        <v-col>
-          <div
-            v-for="item in data"
-            :key="item.id"
-            class="ris-texte-form__textfield"
-          >
-            <span class="ris-texte-form__label">
-              {{ item.label }}
-              <div>
-                <TextEditor
-                  :value="item.value"
-                  class="ris-texte-form__input"
-                  :aria-label="item.aria"
-                  :field-size="item.fieldSize"
-                  @update-value="emit('updateValue', [item.id, $event])"
-                />
-              </div>
-            </span>
-          </div>
-          <div class="ris-texte-form__textfield">
-            <TextButton
-              aria-label="Kurz- und Langtexte Speichern Button"
-              @click="emit('updateDocUnit')"
-            />
-          </div>
-        </v-col>
-      </v-row>
-    </form>
-  </div>
+  <form novalidate class="ris-texte-form">
+    <v-row>
+      <v-col><h2>Kurz- & Langtexte</h2></v-col>
+    </v-row>
+    <v-row>
+      <v-col>
+        <div
+          v-for="item in data"
+          :key="item.id"
+          class="ris-texte-form__textfield"
+        >
+          <span class="ris-texte-form__label">
+            {{ item.label }}
+            <div>
+              <TextEditor
+                :value="item.value"
+                class="ris-texte-form__input"
+                :aria-label="item.aria"
+                :field-size="item.fieldSize"
+                @update-value="emit('updateValue', [item.id, $event])"
+              />
+            </div>
+          </span>
+        </div>
+        <div class="ris-texte-form__textfield">
+          <TextButton
+            aria-label="Kurz- und Langtexte Speichern Button"
+            @click="emit('updateDocUnit')"
+          />
+        </div>
+      </v-col>
+    </v-row>
+  </form>
 </template>
 
 <style lang="scss">
