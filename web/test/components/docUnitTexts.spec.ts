@@ -31,7 +31,7 @@ describe("Texts", () => {
 
   test("emits update Doc Unit event", async () => {
     const user = userEvent.setup()
-    const spy = vi.fn()
+    const spy = vi.fn(() => Promise<void>)
 
     const { getByLabelText } = render(
       h(DocUnitTexts, { onUpdateDocUnit: spy }),
