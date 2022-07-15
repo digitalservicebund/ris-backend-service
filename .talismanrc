@@ -1,8 +1,6 @@
 fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
-  - filename: "playwright.config.ts"
-    ignore_detectors: [filecontent]
   - filename: build.gradle
     checksum: 894532dd559c857490848ace7e0330f8612301cb32e2fc1c7b0963ba2324d949
   - filename: .github/workflows/pipeline.yml
@@ -21,6 +19,8 @@ fileignoreconfig:
     checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
   - filename: web/.env.development
     checksum: 7443587c94ecd708b8e562b7b017164a9aecd6f1c8dec9740dc22db7ca2ab89a
+  - filename: web/playwright.config.ts
+    checksum: b99b5aeb57dd346cb2d17dd865043bc6a8c4fc1fdfd18ea6ba89850f4252b8cc
   - filename: web/sonarcloud-upload.js
     checksum: f0baa2bd480bf4990979f5f272a740bfd9174857a6b07e61481575e72e3f21e2
 scopeconfig:
