@@ -21,6 +21,8 @@ fileignoreconfig:
     checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
   - filename: web/.env.development
     checksum: 7443587c94ecd708b8e562b7b017164a9aecd6f1c8dec9740dc22db7ca2ab89a
+  - filename: web/sonarcloud-upload.js
+    checksum: f0baa2bd480bf4990979f5f272a740bfd9174857a6b07e61481575e72e3f21e2
 scopeconfig:
   - scope: node
 allowed_patterns:

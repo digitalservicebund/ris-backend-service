@@ -1,10 +1,11 @@
-# Coverage directory
-coverage
+# coverage & sonarqube-scanner
+coverage/
+.scannerwork/
 
-# Dependency directories
+# dependencies
 node_modules/
 
-# Editor directories and files
+# editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea

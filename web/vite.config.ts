@@ -32,6 +32,9 @@ export default defineConfig({
       "test/a11y/**/*.ts",
       "test/test-helper/**/*.ts",
     ],
+    coverage: {
+      reporter: ["lcov"],
+    },
   },
   define: { "process.env": {} },
   resolve: {
