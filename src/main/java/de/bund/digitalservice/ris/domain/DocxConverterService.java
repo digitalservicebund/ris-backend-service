@@ -6,8 +6,12 @@ import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
+import java.awt.Dimension;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -28,6 +32,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
+import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
@@ -35,6 +40,12 @@ import org.docx4j.openpackaging.parts.WordprocessingML.ImageJpegPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.ImagePngPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.wml.Style;
+import org.freehep.graphics2d.VectorGraphics;
+import org.freehep.graphicsio.ImageConstants;
+import org.freehep.graphicsio.ImageGraphics2D;
+import org.freehep.graphicsio.emf.EMFInputStream;
+import org.freehep.graphicsio.emf.EMFPanel;
+import org.freehep.graphicsio.emf.EMFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -124,18 +135,43 @@ public class DocxConverterService {
     CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
-    return Mono.fromFuture(futureResponse)
-        .map(response -> getDocumentParagraphs(response.asInputStream()));
-  }
-
-  private Docx2Html getDocumentParagraphs(InputStream inputStream) {
-    if (inputStream == null) {
-      return Docx2Html.EMPTY;
-    }
-
     List<DocUnitDocx> packedList = new ArrayList<>();
     DocUnitBorderNumber[] lastBorderNumber = {null};
     DocUnitNumberingList[] lastNumberingList = {null};
+
+    return Mono.fromFuture(futureResponse)
+        .map(response -> getDocumentParagraphs(response.asInputStream()))
+        .map(
+            docUnitDocxList -> {
+              docUnitDocxList.forEach(
+                  element -> {
+                    if (packBorderNumberElements(element, packedList, lastBorderNumber)) {
+                      return;
+                    }
+
+                    if (packNumberingListEntries(element, packedList, lastNumberingList)) {
+                      return;
+                    }
+
+                    packedList.add(element);
+                  });
+
+              String content = null;
+              if (!docUnitDocxList.isEmpty()) {
+                content =
+                    packedList.stream()
+                        .map(DocUnitDocx::toHtmlString)
+                        .collect(Collectors.joining());
+              }
+
+              return new Docx2Html(content);
+            });
+  }
+
+  public List<DocUnitDocx> getDocumentParagraphs(InputStream inputStream) {
+    if (inputStream == null) {
+      return Collections.emptyList();
+    }
 
     WordprocessingMLPackage mlPackage;
     try {
@@ -148,26 +184,10 @@ public class DocxConverterService {
     converter.setImages(readImages(mlPackage));
     converter.setNumbering(readNumbering(mlPackage));
 
-    mlPackage.getMainDocumentPart().getContent().stream()
-        .peek(el -> LOGGER.info("element: {}", el))
+    return mlPackage.getMainDocumentPart().getContent().stream()
         .map(converter::convert)
         .filter(Objects::nonNull)
-        .forEach(
-            element -> {
-              if (packBorderNumberElements(element, packedList, lastBorderNumber)) {
-                return;
-              }
-
-              if (packNumberingListEntries(element, packedList, lastNumberingList)) {
-                return;
-              }
-
-              packedList.add(element);
-            });
-
-    var content = packedList.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining());
-
-    return new Docx2Html(content);
+        .toList();
   }
 
   private boolean packBorderNumberElements(
@@ -258,14 +278,14 @@ public class DocxConverterService {
         .collect(Collectors.toMap(k -> k.getName().getVal(), Function.identity()));
   }
 
-  private Map<String, BinaryPartAbstractImage> readImages(WordprocessingMLPackage mlPackage) {
+  private Map<String, DocxImagePart> readImages(WordprocessingMLPackage mlPackage) {
     if (mlPackage == null
         || mlPackage.getParts() == null
         || mlPackage.getParts().getParts() == null) {
       return Collections.emptyMap();
     }
 
-    Map<String, BinaryPartAbstractImage> images = new HashMap<>();
+    Map<String, DocxImagePart> images = new HashMap<>();
 
     mlPackage
         .getParts()
@@ -275,13 +295,20 @@ public class DocxConverterService {
             part -> {
               if (part instanceof ImageJpegPart jpegPart) {
                 part.getSourceRelationships()
-                    .forEach(relationship -> images.put(relationship.getId(), jpegPart));
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart(jpegPart.getContentType(), jpegPart.getBytes())));
               } else if (part instanceof MetafileEmfPart emfPart) {
-                part.getSourceRelationships()
-                    .forEach(relationship -> images.put(relationship.getId(), emfPart));
+                convertEMF(mlPackage, images, emfPart);
               } else if (part instanceof ImagePngPart pngPart) {
                 part.getSourceRelationships()
-                    .forEach(relationship -> images.put(relationship.getId(), pngPart));
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart(pngPart.getContentType(), pngPart.getBytes())));
               } else if (part instanceof BinaryPartAbstractImage imagePart) {
                 throw new DocxConverterException(
                     "unknown image file format: " + imagePart.getClass().getName());
@@ -289,5 +316,40 @@ public class DocxConverterService {
             });
 
     return images;
+  }
+
+  private void convertEMF(
+      WordprocessingMLPackage mlPackage,
+      Map<String, DocxImagePart> images,
+      MetafileEmfPart emfPart) {
+    try {
+      EMFInputStream emf = new EMFInputStream(new ByteArrayInputStream(emfPart.getBytes()));
+      EMFRenderer renderer = new EMFRenderer(emf);
+
+      EMFPanel emfPanel = new EMFPanel();
+      emfPanel.setRenderer(renderer);
+
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      VectorGraphics g =
+          new ImageGraphics2D(
+              byteArrayOutputStream,
+              new Dimension(emfPanel.getWidth(), emfPanel.getHeight()),
+              ImageConstants.PNG);
+      g.startExport();
+      emfPanel.print(g);
+      g.endExport();
+      byteArrayOutputStream.close();
+
+      emfPart
+          .getSourceRelationships()
+          .forEach(
+              relationship ->
+                  images.put(
+                      relationship.getId(),
+                      new DocxImagePart(
+                          ContentTypes.IMAGE_PNG, byteArrayOutputStream.toByteArray())));
+    } catch (Exception ex) {
+      LOGGER.error("Couldn't convert emf to png", ex);
+    }
   }
 }

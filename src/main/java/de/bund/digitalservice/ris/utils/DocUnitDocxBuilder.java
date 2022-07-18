@@ -1,17 +1,24 @@
 package de.bund.digitalservice.ris.utils;
 
+import de.bund.digitalservice.ris.domain.docx.DocUnitAnchorImageElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitImageElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitErrorElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitErrorRunElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitInlineImageElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitRunElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableColumn;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
+import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import jakarta.xml.bind.JAXBElement;
+import java.awt.Dimension;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -19,11 +26,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import org.docx4j.dml.CTNonVisualDrawingProps;
+import org.docx4j.dml.CTPositiveSize2D;
+import org.docx4j.dml.GraphicData;
+import org.docx4j.dml.wordprocessingDrawing.Anchor;
+import org.docx4j.dml.wordprocessingDrawing.CTPosH;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.dml.wordprocessingDrawing.STAlignH;
 import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
-import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
@@ -49,7 +61,7 @@ public class DocUnitDocxBuilder {
   P paragraph;
   Tbl table;
   private Map<String, Style> styles = new HashMap<>();
-  private Map<String, BinaryPartAbstractImage> images = new HashMap<>();
+  private Map<String, DocxImagePart> images = new HashMap<>();
   private Map<String, ListNumberingDefinition> listNumberingDefinitions;
 
   private DocUnitDocxBuilder() {}
@@ -64,7 +76,7 @@ public class DocUnitDocxBuilder {
     return this;
   }
 
-  public DocUnitDocxBuilder useImages(Map<String, BinaryPartAbstractImage> images) {
+  public DocUnitDocxBuilder useImages(Map<String, DocxImagePart> images) {
     this.images = images;
 
     return this;
@@ -210,7 +222,7 @@ public class DocUnitDocxBuilder {
     return paragraph != null;
   }
 
-  private DocUnitParagraphElement convertToParagraphElement(P paragraph) {
+  private DocUnitDocx convertToParagraphElement(P paragraph) {
     if (paragraph == null) {
       return null;
     }
@@ -223,7 +235,9 @@ public class DocUnitDocxBuilder {
       paragraphElement.setAlignment(alignment);
     }
 
-    addParagraphStyle(paragraphElement, pPr);
+    if (!addParagraphStyle(paragraphElement, pPr)) {
+      return new DocUnitErrorElement("Font size of paragraph is to high.");
+    }
 
     paragraph.getContent().stream()
         .filter(R.class::isInstance)
@@ -250,23 +264,28 @@ public class DocUnitDocxBuilder {
           paragraphElement.addRunElement(generateRunTextElement(text, rPr));
         }
       } else if (declaredType == Drawing.class) {
-        paragraphElement.addRunElement(parseDrawing((Drawing) jaxbElement.getValue()));
+        DocUnitRunElement imageElement =
+            parseDrawing(paragraphElement, (Drawing) jaxbElement.getValue());
+        paragraphElement.addRunElement(imageElement);
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
+        paragraphElement.addRunElement(new DocUnitErrorRunElement(declaredType.getName()));
       }
     }
   }
 
-  private DocUnitRunTextElement generateRunTextElement(String text, RPrAbstract rPr) {
+  private DocUnitRunElement generateRunTextElement(String text, RPrAbstract rPr) {
     DocUnitRunTextElement runTextElement = new DocUnitRunTextElement();
 
     runTextElement.setText(text);
-    addStyle(runTextElement, rPr);
+    if (!addStyle(runTextElement, rPr)) {
+      return new DocUnitErrorRunElement("Size of the font to high!");
+    }
 
     return runTextElement;
   }
 
-  private DocUnitImageElement parseDrawing(Drawing drawing) {
+  private DocUnitRunElement parseDrawing(DocUnitParagraphElement parent, Drawing drawing) {
     if (drawing.getAnchorOrInline().size() != 1) {
       throw new DocxConverterException("more than one graphic data in a drawing");
     }
@@ -274,32 +293,136 @@ public class DocUnitDocxBuilder {
     var drawingObject = drawing.getAnchorOrInline().get(0);
     if (drawingObject instanceof Inline inline) {
       return parseInlineImageElement(inline);
+    } else if (drawingObject instanceof Anchor anchor) {
+      return parseAnchorImageElement(parent, anchor);
     } else {
       LOGGER.error("unsupported drawing object");
-      return new DocUnitImageElement();
+      return new DocUnitErrorRunElement(
+          "anchor drawing object? " + drawingObject.getClass().getSimpleName());
     }
   }
 
-  private DocUnitImageElement parseInlineImageElement(Inline inline) {
+  private DocUnitRunElement parseAnchorImageElement(DocUnitParagraphElement parent, Anchor anchor) {
+    if (anchor == null
+        || anchor.getGraphic() == null
+        || anchor.getGraphic().getGraphicData() == null) {
+      throw new DocxConverterException("no graphic data");
+    }
+
+    DocUnitRunElement runElement =
+        parseGraphicData(anchor.getGraphic().getGraphicData(), DocUnitAnchorImageElement.class);
+
+    if (runElement instanceof DocUnitAnchorImageElement imageElement) {
+      imageElement.setAlternateText(parseImageAlternateText(anchor.getDocPr()));
+      imageElement.setSize(parseImageSize(anchor.getExtent()));
+      String floating = parseFloating(anchor.getPositionH());
+      if (floating != null) {
+        if (floating.equals("error")) {
+          return new DocUnitErrorRunElement(
+              "anchor image with unknown alignment: " + anchor.getPositionH().getAlign().value());
+        }
+        parent.setClearfix(true);
+        imageElement.setFloating(floating);
+      }
+
+      return imageElement;
+    }
+
+    return runElement;
+  }
+
+  private DocUnitRunElement parseInlineImageElement(Inline inline) {
     if (inline == null
         || inline.getGraphic() == null
         || inline.getGraphic().getGraphicData() == null) {
       throw new DocxConverterException("no graphic data");
     }
 
-    DocUnitImageElement imageElement = new DocUnitImageElement();
+    DocUnitRunElement runElement =
+        parseGraphicData(inline.getGraphic().getGraphicData(), DocUnitInlineImageElement.class);
 
-    var pic = inline.getGraphic().getGraphicData().getPic();
+    if (runElement instanceof DocUnitInlineImageElement imageElement) {
+      imageElement.setAlternateText(parseImageAlternateText(inline.getDocPr()));
+      imageElement.setSize(parseImageSize(inline.getExtent()));
+
+      return imageElement;
+    }
+
+    return runElement;
+  }
+
+  private Dimension parseImageSize(CTPositiveSize2D extent) {
+    if (extent == null) {
+      return null;
+    }
+
+    Dimension size = new Dimension();
+    if (extent.getCx() != 0) {
+      size.width = DocxUnitConverter.convertEMUToPixel(extent.getCx());
+    }
+
+    if (extent.getCy() != 0) {
+      size.height = DocxUnitConverter.convertEMUToPixel(extent.getCy());
+    }
+
+    return size;
+  }
+
+  private String parseImageAlternateText(CTNonVisualDrawingProps docPr) {
+    if (docPr == null) {
+      return null;
+    }
+
+    String alternateText = "";
+    alternateText += docPr.getName() != null ? docPr.getName() : "";
+    alternateText += docPr.getDescr() != null ? docPr.getDescr() : "";
+
+    return !alternateText.isBlank() ? alternateText : null;
+  }
+
+  private String parseFloating(CTPosH positionH) {
+    if (positionH == null || positionH.getAlign() == null) {
+      return null;
+    }
+
+    if (positionH.getAlign() == STAlignH.LEFT) {
+      return "left";
+    } else if (positionH.getAlign() == STAlignH.RIGHT) {
+      return "right";
+    } else {
+      return "error";
+    }
+  }
+
+  private DocUnitRunElement parseGraphicData(
+      GraphicData graphicData, Class<? extends DocUnitInlineImageElement> clazz) {
+
+    DocUnitInlineImageElement imageElement = new DocUnitInlineImageElement();
+    try {
+      imageElement = clazz.getDeclaredConstructor().newInstance();
+    } catch (InstantiationException
+        | NoSuchMethodException
+        | IllegalAccessException
+        | InvocationTargetException e) {
+      LOGGER.error("Couldn't instantiate image class: {}", clazz.getSimpleName(), e);
+    }
+
+    var pic = graphicData.getPic();
 
     if (pic != null) {
       var embed = pic.getBlipFill().getBlip().getEmbed();
       var image = images.get(embed);
 
-      var base64 = Base64.getEncoder().encodeToString(image.getBytes());
+      var base64 = Base64.getEncoder().encodeToString(image.bytes());
       imageElement.setBase64Representation(base64);
-      imageElement.setContentType(image.getContentType());
+      imageElement.setContentType(image.contentType());
     } else {
-      throw new DocxConverterException("not a picture");
+      LOGGER.error("no picture");
+      List<Object> anyGraphicElement = graphicData.getAny();
+      StringBuilder stringBuilder = new StringBuilder();
+      anyGraphicElement.forEach(
+          el -> stringBuilder.append(el.getClass().getSimpleName()).append(", "));
+      return new DocUnitErrorRunElement("unknown graphic element: " + stringBuilder);
     }
 
     return imageElement;
@@ -331,9 +454,9 @@ public class DocUnitDocxBuilder {
     return null;
   }
 
-  private void addParagraphStyle(DocUnitTextElement textElement, PPr pPr) {
+  private boolean addParagraphStyle(DocUnitTextElement textElement, PPr pPr) {
     if (pPr == null) {
-      return;
+      return true;
     }
 
     RPrAbstract styleRPr = null;
@@ -350,13 +473,18 @@ public class DocUnitDocxBuilder {
 
     var size = getSize(styleRPr, pPr.getRPr());
     if (size != null) {
-      textElement.setSize(size);
+      if (size.compareTo(new BigInteger(String.valueOf(Integer.MAX_VALUE))) > 0) {
+        return false;
+      }
+      textElement.setSize(size.intValue());
     }
 
     var underline = getUnderline(styleRPr, pPr.getRPr());
     if (underline != null) {
       textElement.setUnderline(underline);
     }
+
+    return true;
   }
 
   private boolean isBold(RPrAbstract styleRPr, RPrAbstract rPr) {
@@ -431,9 +559,9 @@ public class DocUnitDocxBuilder {
     return strike;
   }
 
-  private void addStyle(DocUnitTextElement textElement, RPrAbstract rPr) {
+  private boolean addStyle(DocUnitTextElement textElement, RPrAbstract rPr) {
     if (rPr == null) {
-      return;
+      return true;
     }
 
     if (rPr.getB() != null && rPr.getB().isVal()) {
@@ -445,12 +573,17 @@ public class DocUnitDocxBuilder {
     }
 
     if (rPr.getSz() != null) {
-      textElement.setSize(rPr.getSz().getVal());
+      if (rPr.getSz().getVal().compareTo(new BigInteger(String.valueOf(Integer.MAX_VALUE))) > 0) {
+        return false;
+      }
+      textElement.setSize(rPr.getSz().getVal().intValue());
     }
 
     if (rPr.getU() != null && rPr.getU().getVal() == UnderlineEnumeration.SINGLE) {
       textElement.setUnderline("single");
     }
+
+    return true;
   }
 
   private String parseTextFromRun(R r) {
@@ -509,7 +642,7 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitTableColumn parseTc(Tc tc) {
-    List<DocUnitParagraphElement> paragraphElements = new ArrayList<>();
+    List<DocUnitDocx> paragraphElements = new ArrayList<>();
 
     tc.getContent()
         .forEach(

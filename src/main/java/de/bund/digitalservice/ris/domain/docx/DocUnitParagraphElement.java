@@ -5,6 +5,7 @@ import java.util.List;
 
 public class DocUnitParagraphElement extends DocUnitTextElement {
   private String alignment;
+  private boolean clearfix;
   private final List<DocUnitRunElement> runElements = new ArrayList<>();
 
   public String getAlignment() {
@@ -13,6 +14,14 @@ public class DocUnitParagraphElement extends DocUnitTextElement {
 
   public void setAlignment(String alignment) {
     this.alignment = alignment;
+  }
+
+  public boolean isClearfix() {
+    return clearfix;
+  }
+
+  public void setClearfix(boolean clearfix) {
+    this.clearfix = clearfix;
   }
 
   public void addRunElement(DocUnitRunElement element) {
@@ -32,12 +41,16 @@ public class DocUnitParagraphElement extends DocUnitTextElement {
     var hasStyle = hasStyle();
     hasStyle |= alignment != null;
 
+    if (clearfix) {
+      sb.append(" class=\"clearfix\"");
+    }
+
     if (hasStyle) {
       sb.append(" style=\"");
       addStyle(sb);
 
       if (alignment != null) {
-        sb.append("text-align: " + alignment + ";");
+        sb.append("text-align: ").append(alignment).append(";");
       }
 
       sb.append("\"");

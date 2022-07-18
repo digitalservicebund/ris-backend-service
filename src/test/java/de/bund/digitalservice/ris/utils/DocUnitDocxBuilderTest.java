@@ -12,29 +12,36 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import de.bund.digitalservice.ris.TestMemoryAppender;
+import de.bund.digitalservice.ris.domain.docx.DocUnitAnchorImageElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
-import de.bund.digitalservice.ris.domain.docx.DocUnitImageElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitErrorRunElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitInlineImageElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
+import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import jakarta.xml.bind.JAXBElement;
+import java.awt.Dimension;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import javax.xml.namespace.QName;
 import org.docx4j.dml.CTBlip;
 import org.docx4j.dml.CTBlipFillProperties;
+import org.docx4j.dml.CTNonVisualDrawingProps;
+import org.docx4j.dml.CTPositiveSize2D;
 import org.docx4j.dml.Graphic;
 import org.docx4j.dml.GraphicData;
 import org.docx4j.dml.picture.Pic;
 import org.docx4j.dml.wordprocessingDrawing.Anchor;
+import org.docx4j.dml.wordprocessingDrawing.CTPosH;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
+import org.docx4j.dml.wordprocessingDrawing.STAlignH;
 import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
-import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.HpsMeasure;
@@ -276,13 +283,14 @@ class DocUnitDocxBuilderTest {
     assertEquals("48", paragraphElement.getSize().toString());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"font-size: 24px;\">text</p>", htmlString);
+    assertEquals("<p style=\"font-size: 24pt;\">text</p>", htmlString);
   }
 
   @Test
   void testBuild_withTextAndRunSize() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
+
     RPr rPr = new RPr();
     HpsMeasure size = new HpsMeasure();
     size.setVal(new BigInteger("48"));
@@ -295,11 +303,23 @@ class DocUnitDocxBuilderTest {
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
+    rPr = new RPr();
+    size = new HpsMeasure();
+    size.setVal(new BigInteger("21"));
+    rPr.setSz(size);
+    run = new R();
+    run.setRPr(rPr);
+    text = new Text();
+    text.setValue("text2");
+    element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
     var result = builder.setParagraph(paragraph).build();
 
     assertTrue(result instanceof DocUnitParagraphElement);
     DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
+    assertEquals(2, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
     var runTextElement = ((DocUnitRunTextElement) runElement);
@@ -307,7 +327,9 @@ class DocUnitDocxBuilderTest {
     assertEquals("48", runTextElement.getSize().toString());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"font-size: 24px;\">text</span></p>", htmlString);
+    assertEquals(
+        "<p><span style=\"font-size: 24pt;\">text</span><span style=\"font-size: 10.5pt;\">text2</span></p>",
+        htmlString);
   }
 
   @Test
@@ -541,27 +563,13 @@ class DocUnitDocxBuilderTest {
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
-    Inline inline = new Inline();
-    Graphic graphic = new Graphic();
-    GraphicData graphicData = new GraphicData();
-    Pic pic = new Pic();
-    CTBlipFillProperties blibFill = new CTBlipFillProperties();
-    CTBlip blib = new CTBlip();
-    blib.setEmbed("image-ref");
-    blibFill.setBlip(blib);
-    pic.setBlipFill(blibFill);
-    graphicData.getAny().add(pic);
-    graphic.setGraphicData(graphicData);
-    inline.setGraphic(graphic);
-    drawing.getAnchorOrInline().add(inline);
+    drawing.getAnchorOrInline().add(generateInline(null, null, null));
     JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    HashMap<String, BinaryPartAbstractImage> images = new HashMap<>();
-    BinaryPartAbstractImage image = mock(BinaryPartAbstractImage.class);
-    when(image.getContentType()).thenReturn("content-type");
-    when(image.getBytes()).thenReturn(new byte[] {1, 2});
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
     images.put("image-ref", image);
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
@@ -570,8 +578,8 @@ class DocUnitDocxBuilderTest {
     DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitImageElement) runElement;
+    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitInlineImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -580,30 +588,222 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withAnchorGraphic() {
+  void testBuild_withInlineImage_withAlternateText() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
-    Anchor anchor = new Anchor();
-    drawing.getAnchorOrInline().add(anchor);
+    drawing.getAnchorOrInline().add(generateInline("name", "description", null));
     JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
     run.getContent().add(element);
     paragraph.getContent().add(run);
 
-    var result = builder.setParagraph(paragraph).build();
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).useImages(images).build();
 
     assertTrue(result instanceof DocUnitParagraphElement);
     DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitImageElement) runElement;
-    assertNull(runImageElement.getContentType());
-    assertNull(runImageElement.getBase64Representation());
+    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitInlineImageElement) runElement;
+    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("AQI=", runImageElement.getBase64Representation());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"color: #FF0000;\">no image information</span></p>", htmlString);
+    assertEquals(
+        "<p><img src=\"data:content-type;base64, AQI=\" alt=\"namedescription\" /></p>",
+        htmlString);
+  }
+
+  @Test
+  void testBuild_withInlineImage_withSize() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    drawing.getAnchorOrInline().add(generateInline(null, null, new Dimension(10, 10)));
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).useImages(images).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitInlineImageElement) runElement;
+    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("AQI=", runImageElement.getBase64Representation());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><img src=\"data:content-type;base64, AQI=\" width=\"10\" height=\"10\" /></p>",
+        htmlString);
+  }
+
+  @Test
+  void testBuild_withInlineImage_withAlternateTextAndSize() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    drawing.getAnchorOrInline().add(generateInline("name", "description", new Dimension(10, 10)));
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).useImages(images).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitInlineImageElement) runElement;
+    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("AQI=", runImageElement.getBase64Representation());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><img src=\"data:content-type;base64, AQI=\" alt=\"namedescription\" width=\"10\" height=\"10\" /></p>",
+        htmlString);
+  }
+
+  @Test
+  void testBuild_withAnchorGraphic() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    drawing.getAnchorOrInline().add(generateAnchor(null, null, null, null));
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).useImages(images).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitAnchorImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitAnchorImageElement) runElement;
+    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("AQI=", runImageElement.getBase64Representation());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><img src=\"data:content-type;base64, AQI=\" /></p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withAnchorGraphic_withLeftFloating() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    drawing.getAnchorOrInline().add(generateAnchor(null, null, null, STAlignH.LEFT));
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).useImages(images).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitAnchorImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitAnchorImageElement) runElement;
+    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("AQI=", runImageElement.getBase64Representation());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p class=\"clearfix\"><img src=\"data:content-type;base64, AQI=\" style=\"float: left;\" /></p>",
+        htmlString);
+  }
+
+  @Test
+  void testBuild_withAnchorGraphic_withRightFloating() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    drawing.getAnchorOrInline().add(generateAnchor(null, null, null, STAlignH.RIGHT));
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).useImages(images).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitAnchorImageElement.class, runElement.getClass());
+    var runImageElement = (DocUnitAnchorImageElement) runElement;
+    assertEquals("content-type", runImageElement.getContentType());
+    assertEquals("AQI=", runImageElement.getBase64Representation());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p class=\"clearfix\"><img src=\"data:content-type;base64, AQI=\" style=\"float: right;\" /></p>",
+        htmlString);
+  }
+
+  @Test
+  void testBuild_withAnchorGraphic_withUnknownFloating() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    R run = new R();
+    Drawing drawing = new Drawing();
+    drawing.getAnchorOrInline().add(generateAnchor(null, null, null, STAlignH.CENTER));
+    JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    HashMap<String, DocxImagePart> images = new HashMap<>();
+    DocxImagePart image = new DocxImagePart("content-type", new byte[] {1, 2});
+    images.put("image-ref", image);
+
+    var result = builder.setParagraph(paragraph).useImages(images).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitErrorRunElement.class, runElement.getClass());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><span style=\"color: #FF0000;\">unknown run element: anchor image with unknown alignment: center</span></p>",
+        htmlString);
   }
 
   @Test
@@ -612,10 +812,8 @@ class DocUnitDocxBuilderTest {
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
-    Anchor anchor = new Anchor();
-    drawing.getAnchorOrInline().add(anchor);
-    Inline inline = new Inline();
-    drawing.getAnchorOrInline().add(inline);
+    drawing.getAnchorOrInline().add(generateAnchor(null, null, null, null));
+    drawing.getAnchorOrInline().add(generateInline(null, null, null));
     JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
     run.getContent().add(element);
     paragraph.getContent().add(run);
@@ -632,10 +830,7 @@ class DocUnitDocxBuilderTest {
     P paragraph = new P();
     R run = new R();
     Drawing drawing = new Drawing();
-    Inline inline = new Inline();
-    Graphic graphic = new Graphic();
-    inline.setGraphic(graphic);
-    drawing.getAnchorOrInline().add(inline);
+    drawing.getAnchorOrInline().add(new Inline());
     JAXBElement<Drawing> element = new JAXBElement<>(new QName("drawing"), Drawing.class, drawing);
     run.getContent().add(element);
     paragraph.getContent().add(run);
@@ -808,5 +1003,75 @@ class DocUnitDocxBuilderTest {
     paragraph.getContent().add(run);
 
     return paragraph;
+  }
+
+  private Inline generateInline(String name, String description, Dimension size) {
+    Inline inline = new Inline();
+
+    if (name != null || description != null) {
+      CTNonVisualDrawingProps nvDrawingProps = new CTNonVisualDrawingProps();
+      nvDrawingProps.setName(name);
+      nvDrawingProps.setDescr(description);
+      inline.setDocPr(nvDrawingProps);
+    }
+
+    if (size != null) {
+      CTPositiveSize2D positionSize2D = new CTPositiveSize2D();
+      positionSize2D.setCx(size.width * 9525L);
+      positionSize2D.setCy(size.height * 9525L);
+      inline.setExtent(positionSize2D);
+    }
+
+    Graphic graphic = new Graphic();
+    GraphicData graphicData = new GraphicData();
+    Pic pic = new Pic();
+    CTBlipFillProperties blibFill = new CTBlipFillProperties();
+    CTBlip blib = new CTBlip();
+    blib.setEmbed("image-ref");
+    blibFill.setBlip(blib);
+    pic.setBlipFill(blibFill);
+    graphicData.getAny().add(pic);
+    graphic.setGraphicData(graphicData);
+    inline.setGraphic(graphic);
+
+    return inline;
+  }
+
+  private Anchor generateAnchor(String name, String description, Dimension size, STAlignH alignH) {
+    Anchor anchor = new Anchor();
+
+    if (name != null || description != null) {
+      CTNonVisualDrawingProps nvDrawingProps = new CTNonVisualDrawingProps();
+      nvDrawingProps.setName(name);
+      nvDrawingProps.setDescr(description);
+      anchor.setDocPr(nvDrawingProps);
+    }
+
+    if (size != null) {
+      CTPositiveSize2D positionSize2D = new CTPositiveSize2D();
+      positionSize2D.setCx(size.width * 9525L);
+      positionSize2D.setCy(size.height * 9525L);
+      anchor.setExtent(positionSize2D);
+    }
+
+    if (alignH != null) {
+      CTPosH posH = new CTPosH();
+      posH.setAlign(alignH);
+      anchor.setPositionH(posH);
+    }
+
+    Graphic graphic = new Graphic();
+    GraphicData graphicData = new GraphicData();
+    Pic pic = new Pic();
+    CTBlipFillProperties blibFill = new CTBlipFillProperties();
+    CTBlip blib = new CTBlip();
+    blib.setEmbed("image-ref");
+    blibFill.setBlip(blib);
+    pic.setBlipFill(blibFill);
+    graphicData.getAny().add(pic);
+    graphic.setGraphicData(graphicData);
+    anchor.setGraphic(graphic);
+
+    return anchor;
   }
 }

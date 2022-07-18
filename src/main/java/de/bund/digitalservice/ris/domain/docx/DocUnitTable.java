@@ -20,14 +20,11 @@ public record DocUnitTable(List<DocUnitTableRow> rows) implements DocUnitDocx {
     }
   }
 
-  public record DocUnitTableColumn(List<DocUnitParagraphElement> paragraphElements)
-      implements DocUnitDocx {
+  public record DocUnitTableColumn(List<DocUnitDocx> paragraphElements) implements DocUnitDocx {
     @Override
     public String toHtmlString() {
       return "<td>"
-          + paragraphElements.stream()
-              .map(DocUnitParagraphElement::toHtmlString)
-              .collect(Collectors.joining())
+          + paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining())
           + "</td>";
     }
   }

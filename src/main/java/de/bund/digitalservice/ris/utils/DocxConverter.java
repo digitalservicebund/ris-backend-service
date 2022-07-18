@@ -1,20 +1,21 @@
 package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocUnitErrorElement;
+import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
-import org.docx4j.openpackaging.parts.WordprocessingML.BinaryPartAbstractImage;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 
 public class DocxConverter {
   Map<String, Style> styles;
-  Map<String, BinaryPartAbstractImage> images;
+  Map<String, DocxImagePart> images;
   Map<String, ListNumberingDefinition> listNumberingDefinitions;
 
-  public void setImages(Map<String, BinaryPartAbstractImage> images) {
+  public void setImages(Map<String, DocxImagePart> images) {
     this.images = images;
   }
 
@@ -33,17 +34,7 @@ public class DocxConverter {
       return convertTbl((Tbl) element.getValue());
     }
 
-    return new DocUnitDocx() {
-      @Override
-      public String toString() {
-        return part.getClass().getName();
-      }
-
-      @Override
-      public String toHtmlString() {
-        return "<p><span style=\"color: #FF0000;\">" + part.getClass().getName() + "</span></p>";
-      }
-    };
+    return new DocUnitErrorElement(part.getClass().getName());
   }
 
   private DocUnitDocx convertP(P part) {

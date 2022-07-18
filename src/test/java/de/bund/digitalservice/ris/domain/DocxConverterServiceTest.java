@@ -20,9 +20,11 @@ import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableColumn;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
+import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -88,7 +90,7 @@ class DocxConverterServiceTest {
 
   @Captor ArgumentCaptor<Map<String, Style>> styleMapCaptor;
 
-  @Captor ArgumentCaptor<Map<String, BinaryPartAbstractImage>> imageMapCaptor;
+  @Captor ArgumentCaptor<Map<String, DocxImagePart>> imageMapCaptor;
 
   @Test
   void testGetOriginalText() {
@@ -189,7 +191,7 @@ class DocxConverterServiceTest {
   }
 
   @Test
-  void testGetHtml_withImages() throws InvalidFormatException {
+  void testGetHtml_withImages() throws InvalidFormatException, IOException {
     when(client.getObject(any(GetObjectRequest.class), any(AsyncResponseTransformer.class)))
         .thenReturn(CompletableFuture.completedFuture(responseBytes));
     when(responseBytes.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[] {}));
@@ -197,22 +199,27 @@ class DocxConverterServiceTest {
     Parts parts = mock(Parts.class);
     HashMap<PartName, Part> partMap = new HashMap<>();
     PartName partName = new PartName("/emfPart");
-    Part part = new MetafileEmfPart(partName);
+    BinaryPartAbstractImage part = new MetafileEmfPart(partName);
     Relationship relationship = new Relationship();
     relationship.setId("emfPart");
     part.getSourceRelationships().add(relationship);
+    InputStream emfStream =
+        DocxConverterServiceTest.class.getClassLoader().getResourceAsStream("test.emf");
+    part.setBinaryData(emfStream.readAllBytes());
     partMap.put(partName, part);
     partName = new PartName("/jpegPart");
     part = new ImageJpegPart(partName);
     relationship = new Relationship();
     relationship.setId("jpegPart");
     part.getSourceRelationships().add(relationship);
+    part.setBinaryData(new byte[] {});
     partMap.put(partName, part);
     partName = new PartName("/pngPart");
     part = new ImagePngPart(partName);
     relationship = new Relationship();
     relationship.setId("pngPart");
     part.getSourceRelationships().add(relationship);
+    part.setBinaryData(new byte[] {});
     partMap.put(partName, part);
     when(parts.getParts()).thenReturn(partMap);
     when(mlPackage.getParts()).thenReturn(parts);
@@ -230,14 +237,14 @@ class DocxConverterServiceTest {
           .verifyComplete();
 
       verify(converter).setImages(imageMapCaptor.capture());
-      Map<String, BinaryPartAbstractImage> imageMapValue = imageMapCaptor.getValue();
+      Map<String, DocxImagePart> imageMapValue = imageMapCaptor.getValue();
       assertEquals(3, imageMapValue.values().size());
       assertTrue(imageMapValue.containsKey("emfPart"));
-      assertEquals(MetafileEmfPart.class, imageMapValue.get("emfPart").getClass());
+      assertEquals("image/png", imageMapValue.get("emfPart").contentType());
       assertTrue(imageMapValue.containsKey("jpegPart"));
-      assertEquals(ImageJpegPart.class, imageMapValue.get("jpegPart").getClass());
+      assertEquals("image/jpeg", imageMapValue.get("jpegPart").contentType());
       assertTrue(imageMapValue.containsKey("pngPart"));
-      assertEquals(ImagePngPart.class, imageMapValue.get("pngPart").getClass());
+      assertEquals("image/png", imageMapValue.get("pngPart").contentType());
     }
   }
 
@@ -405,7 +412,7 @@ class DocxConverterServiceTest {
   }
 
   private DocUnitTable generateTable(String text) {
-    List<DocUnitParagraphElement> paragraphElements = List.of(generateText(text));
+    List<DocUnitDocx> paragraphElements = List.of(generateText(text));
     List<DocUnitTableColumn> columns = List.of(new DocUnitTableColumn(paragraphElements));
     List<DocUnitTableRow> rows = List.of(new DocUnitTableRow(columns));
 

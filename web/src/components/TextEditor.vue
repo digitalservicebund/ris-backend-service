@@ -3,11 +3,9 @@ import { Bold } from "@tiptap/extension-bold"
 import { BulletList } from "@tiptap/extension-bullet-list"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
-import { Image } from "@tiptap/extension-image"
 import { Italic } from "@tiptap/extension-italic"
 import { ListItem } from "@tiptap/extension-list-item"
 import { OrderedList } from "@tiptap/extension-ordered-list"
-import { Paragraph } from "@tiptap/extension-paragraph"
 import { Strike } from "@tiptap/extension-strike"
 import { Table } from "@tiptap/extension-table"
 import { TableCell } from "@tiptap/extension-table-cell"
@@ -21,6 +19,8 @@ import { EditorContent, Editor } from "@tiptap/vue-3"
 import { watch, ref } from "vue"
 import { BorderNumber } from "../editor/border-number"
 import { FontSize } from "../editor/font-size"
+import { CustomImage } from "../editor/image"
+import { CustomParagraph } from "../editor/paragraph"
 import { FieldSize } from "@/domain/FieldSize"
 
 const props = defineProps({
@@ -56,7 +56,7 @@ const editor = new Editor({
   content: props.value,
   extensions: [
     Document,
-    Paragraph,
+    CustomParagraph,
     Text,
     BorderNumber,
     Bold,
@@ -76,7 +76,7 @@ const editor = new Editor({
     TextAlign.configure({
       types: ["paragraph", "span"],
     }),
-    Image.configure({
+    CustomImage.configure({
       allowBase64: true,
       inline: true,
     }),
@@ -166,6 +166,8 @@ add("strike", "strikethrough_s")
 </template>
 
 <style lang="scss">
+@import url("https://fonts.googleapis.com/css?family=Open+Sans");
+
 .ProseMirror {
   // background: #eee;
   color: #000;
@@ -207,5 +209,14 @@ add("strike", "strikethrough_s")
     color: $white;
     background-color: $text-tertiary;
   }
+}
+
+.ProseMirror p {
+  margin-bottom: 8pt;
+}
+.ProseMirror .clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
 }
 </style>

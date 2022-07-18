@@ -18,7 +18,7 @@ const getHtml = async (name: string) => {
   <div v-if="!!fileName">
     <a @click="fileName = null" @keyup="fileName = null">zurück zur Liste</a>
     <br />
-    <TextEditor v-model="htmlContent" field-size="max" :editable="false" />
+    <TextEditor :value="htmlContent" field-size="max" :editable="false" />
   </div>
   <div v-if="!fileName">
     <div v-for="file in fileNames" :key="file">

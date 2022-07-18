@@ -32,4 +32,9 @@ public class DocUnitRunTextElement extends DocUnitTextElement implements DocUnit
 
     return sb.toString();
   }
+
+  @Override
+  public String toString() {
+    return text;
+  }
 }
