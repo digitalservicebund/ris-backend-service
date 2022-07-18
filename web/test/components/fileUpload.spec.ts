@@ -1,9 +1,17 @@
-import { render } from "@testing-library/vue"
+import { fireEvent, render, waitFor } from "@testing-library/vue"
+import { describe, test } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import FileUpload from "../../src/components/FileUpload.vue"
+// import DocUnit from "@/domain/docUnit"
+
+// vi.mock("@/services/fileService.ts", () => {
+//   return {
+//     uploadFile: () => Promise.resolve({ data: new DocUnit("123") }),
+//   }
+// })
 
 describe("FileUpload", () => {
   const vuetify = createVuetify({ components, directives })
@@ -26,8 +34,67 @@ describe("FileUpload", () => {
       global: { plugins: [vuetify, router] },
     })
 
-    getByText("Aktuell", { exact: false })
+    getByText(
+      "Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus"
+    )
   })
 
-  // await fireEvent.click(getByText('Click me'))
+  test("upload docx file", async () => {
+    const { getByText, getByLabelText } = render(FileUpload, {
+      props: {
+        docUnitUuid: "1",
+      },
+      global: { plugins: [vuetify, router] },
+    })
+
+    const inputEl = getByLabelText("file-upload")
+
+    const file = new File(["test"], "sample.docx", {
+      type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    })
+
+    Object.defineProperty(inputEl, "files", {
+      value: [file],
+      configurable: true,
+    })
+
+    await waitFor(() =>
+      fireEvent.change(inputEl, {
+        target: { files: [file] },
+      })
+    )
+    //TODO: fileService mocken
+    // expect(emitted().updateDocUnit).toBeTruthy()
+    getByText("Upload läuft", { exact: false })
+  })
+
+  test("upload fails if file has no docx format", async () => {
+    const { getByText, getByLabelText } = render(FileUpload, {
+      props: {
+        docUnitUuid: "1",
+      },
+      global: { plugins: [vuetify, router] },
+    })
+
+    const inputEl = getByLabelText("file-upload")
+
+    const file = new File(["test"], "sample.png", {
+      type: "image/png",
+    })
+
+    Object.defineProperty(inputEl, "files", {
+      value: [file],
+      configurable: true,
+    })
+
+    await waitFor(() =>
+      fireEvent.change(inputEl, {
+        target: { files: [file] },
+      })
+    )
+
+    //TODO: fileService mocken
+    // expect(emitted().updateDocUnit).not.toBeTruthy()
+    getByText("Datei in diesen Bereich ziehen", { exact: false })
+  })
 })

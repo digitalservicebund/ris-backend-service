@@ -76,16 +76,11 @@ const drop = (e: DragEvent) => {
   }
 }
 
-const openFileDialog = () => {
-  const inputEl = document.createElement("input")
-  inputEl.setAttribute("type", "file")
-  inputEl.addEventListener("change", (e: Event) => {
-    const files = (e.target as HTMLInputElement).files
-    if (!files) return
-    reset()
-    upload(files[0])
-  })
-  inputEl.click()
+const onFileSelect = (e: Event) => {
+  const files = (e.target as HTMLInputElement).files
+  if (!files) return
+  reset()
+  upload(files[0])
 }
 </script>
 
@@ -112,57 +107,87 @@ const openFileDialog = () => {
         >
           <span v-if="status.inDragError">
             <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
+            <!-- if still in drag move -->
             <span v-if="status.uploadStatus !== 'failed'">
               <div class="upload_status">Datei wird nicht unterstützt.</div>
               <div>
                 Versuchen Sie eine .docx-Version dieser Datei hochzuladen.
               </div>
             </span>
+            <!-- if file dropped and failed to upload -->
             <span v-else>
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
-                <TextButton
-                  class="button_upload"
-                  icon="search"
-                  label="Festplatte durchsuchen"
-                  @click="openFileDialog"
-                />
+                <v-btn
+                  class="ris-btn"
+                  :rounded="0"
+                  :ripple="false"
+                  :flat="true"
+                  color="blue800"
+                >
+                  <v-icon> search </v-icon>
+                  <label class="custom-file-label" for="file-upload-after-fail">
+                    Festplatte durchsuchen
+                    <input
+                      id="file-upload-after-fail"
+                      class="custom-file-input"
+                      type="file"
+                      name="file-upload-after-fail"
+                      aria-label="file-upload-after-fail"
+                      @change="onFileSelect"
+                    />
+                  </label>
+                </v-btn>
               </div>
             </span>
           </span>
           <span v-else>
-            <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
             <span v-if="status.uploadStatus === 'uploading'">
-              <div class="upload_status">
-                Die Datei {{ status.file ? status.file.name : "" }} wird
-                hochgeladen ...
-              </div>
+              <v-icon class="icon_upload" size="50px"> refresh </v-icon>
+              <div class="upload_status">Upload läuft</div>
+              <div>{{ status.file ? status.file.name : "" }}</div>
               <div>
                 <TextButton
                   class="button_upload"
-                  icon="refresh"
-                  label="Upload läuft"
-                  @click="openFileDialog"
+                  icon="close"
+                  label="Upload abbrechen"
+                  @click="reset"
                 />
               </div>
             </span>
             <span v-else-if="status.uploadStatus === 'succeeded'">
+              <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
               <div class="upload_status">
                 Die Datei {{ status.file ? status.file.name : "" }} wurde
                 erfolgreich hochgeladen
               </div>
             </span>
             <span v-else>
+              <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
-                <TextButton
-                  class="button_upload"
-                  icon="search"
-                  label="Festplatte durchsuchen"
-                  @click="openFileDialog"
-                />
+                <v-btn
+                  class="ris-btn"
+                  :rounded="0"
+                  :ripple="false"
+                  :flat="true"
+                  color="blue800"
+                >
+                  <v-icon> search </v-icon>
+                  <label class="custom-file-label" for="file-upload">
+                    Festplatte durchsuchen
+                    <input
+                      id="file-upload"
+                      class="custom-file-input"
+                      type="file"
+                      name="file-upload"
+                      aria-label="file-upload"
+                      @change="onFileSelect"
+                    />
+                  </label>
+                </v-btn>
               </div>
             </span>
           </span>
@@ -225,7 +250,7 @@ const openFileDialog = () => {
 
 .upload_status {
   font-size: 24px;
-  margin: 24px 0px 16px 0;
+  margin: 16px 0px 10px 0;
 }
 
 .button_upload {
@@ -247,5 +272,84 @@ const openFileDialog = () => {
 .upload_error_icon {
   max-width: 20px;
   margin-right: 10px;
+}
+
+.custom-file-input::-webkit-file-upload-button {
+  visibility: hidden;
+}
+
+.custom-file-input {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+.custom-file-label {
+  cursor: pointer;
+}
+
+.ris-btn {
+  font-family: $font-bold;
+  margin-top: 16px;
+  margin-bottom: 10px;
+
+  &.v-btn {
+    text-transform: none;
+    font-size: var(--v-btn-size);
+
+    &--size-default {
+      --v-btn-height: 48px;
+      --v-btn-size: 1rem;
+      padding: rem(13px) rem(24px);
+    }
+
+    &--size-small {
+      --v-btn-height: 40px;
+      --v-btn-size: 1rem;
+      padding: rem(9px) rem(24px);
+    }
+
+    &--size-large,
+    &--size-x-large {
+      --v-btn-height: 64px;
+      --v-btn-size: 1.125rem;
+      padding: rem(19px) rem(24px);
+    }
+
+    &:not(.v-btn--icon) {
+      .v-icon--start {
+        margin-inline-start: 0;
+      }
+
+      .v-icon--end {
+        margin-inline-end: 0;
+      }
+    }
+
+    &:hover {
+      background-color: $blue700 !important;
+
+      .v-btn__overlay {
+        opacity: 0;
+      }
+    }
+
+    &:active {
+      background-color: $blue500 !important;
+
+      .v-btn__overlay {
+        opacity: 0;
+      }
+    }
+
+    &:focus-visible {
+      outline: 2px solid $blue800;
+      outline-offset: 2px;
+
+      .v-btn__overlay {
+        opacity: 0;
+      }
+    }
+  }
 }
 </style>
