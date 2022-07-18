@@ -1,6 +1,5 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import { describe, test, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"

@@ -85,7 +85,7 @@ const openFileDialog = () => {
     reset()
     upload(files[0])
   })
-  inputEl.click()
+  // inputEl.click()
 }
 </script>
 

@@ -1,5 +1,4 @@
 import { render } from "@testing-library/vue"
-import { describe, test } from "vitest"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"

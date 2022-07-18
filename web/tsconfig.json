@@ -15,7 +15,7 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
-    "types": ["axe-playwright", "node", "vitest"],
+    "types": ["axe-playwright", "node", "vitest", "vitest/globals"],
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]

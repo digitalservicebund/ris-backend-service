@@ -1,5 +1,4 @@
 import { render } from "@testing-library/vue"
-import { describe, it } from "vitest"
 import { createVuetify } from "vuetify"
 import DocUnitInfoPanel from "@/components/DocUnitInfoPanel.vue"
 import DocUnit from "@/domain/docUnit"

@@ -1,6 +1,5 @@
 import { fireEvent } from "@testing-library/dom"
 import { render, screen } from "@testing-library/vue"
-import { describe, test, expect } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
