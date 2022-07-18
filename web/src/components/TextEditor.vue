@@ -166,8 +166,6 @@ add("strike", "strikethrough_s")
 </template>
 
 <style lang="scss">
-@import url("https://fonts.googleapis.com/css?family=Open+Sans");
-
 .ProseMirror {
   // background: #eee;
   color: #000;

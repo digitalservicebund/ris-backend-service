@@ -18,6 +18,7 @@ package de.bund.digitalservice.ris.utils;
  * <p>1 in = 914400 EMU 1 cm = 360000 EMU
  */
 public class DocxUnitConverter {
+  private DocxUnitConverter() {}
 
   public static int convertTwipToPixel(long twip) {
     return (int) (twip / 15); // 1440 / 96
