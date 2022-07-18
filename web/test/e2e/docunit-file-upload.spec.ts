@@ -79,9 +79,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
       return data
     }, docx)
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
-    await expect(
-      page.locator("text=Die Datei sample.docx wird hochgeladen")
-    ).toBeVisible()
+    await expect(page.locator("text=Upload läuft")).toBeVisible()
     await deleteDocUnit(page, documentNumber)
   })
 
