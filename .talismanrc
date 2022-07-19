@@ -22,7 +22,7 @@ fileignoreconfig:
   - filename: web/playwright.config.ts
     checksum: b99b5aeb57dd346cb2d17dd865043bc6a8c4fc1fdfd18ea6ba89850f4252b8cc
   - filename: web/sonar-project.properties
-    checksum: 3c4d97c3cc5df6379ec1b434e09f0a1b796616ae534925f15cd25122640dc3db
+    checksum: 8fa8db24e8b523d44c8b624854e3c478ff22f6b102ecc68c0a764b083bea1383
 scopeconfig:
   - scope: node
 allowed_patterns:
