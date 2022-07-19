@@ -1,4 +1,4 @@
-import { expect } from "@playwright/test"
+import { expect, test as base } from "@playwright/test"
 import { Page } from "playwright"
 
 export const generateDocUnit = async (page: Page): Promise<string> => {
@@ -57,3 +57,14 @@ export const uploadTestfile = async (page: Page, filename: string) => {
   ])
   await fileChooser.setFiles("./test/e2e/testfiles/" + filename)
 }
+
+export const testWithDocUnit = base.extend<{
+  page: Page
+}>({
+  page: async ({ page }, use) => {
+    const documentNumber = await generateDocUnit(page)
+    await navigateToCategories(page, documentNumber)
+    await use(page)
+    await deleteDocUnit(page, documentNumber)
+  },
+})
