@@ -185,15 +185,14 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
+      - name: Install SonarScanner
+        uses: digitalservicebund/github-actions/setup-sonarscanner@edc972c74582c9a1eec793e98a66dc924c43b14e
       - name: Scan with SonarQube - Frontend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
-          npm install vitest
-          npm run coverage
-          curl -LO https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
-          unzip sonar-scanner-cli-4.7.0.2747-linux.zip
+          echo $SONAR_SCANNER_EXEC
           ./sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner
         working-directory: ./web
       - name: Check SonarQube Quality Gate - Backend
