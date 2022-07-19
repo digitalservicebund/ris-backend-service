@@ -52,11 +52,8 @@ describe("FileUpload", () => {
       configurable: true,
     })
 
-    await waitFor(() =>
-      fireEvent.change(inputEl, {
-        target: { files: [file] },
-      })
-    )
+    await waitFor(() => fireEvent.update(inputEl))
+
     getByText("Die Datei sample.docx wurde erfolgreich hochgeladen", {
       exact: false,
     })
@@ -82,11 +79,7 @@ describe("FileUpload", () => {
       configurable: true,
     })
 
-    await waitFor(() =>
-      fireEvent.change(inputEl, {
-        target: { files: [file] },
-      })
-    )
+    await waitFor(() => fireEvent.update(inputEl))
 
     expect(emitted().updateDocUnit).not.toBeTruthy()
     getByText("Datei in diesen Bereich ziehen", { exact: false })
