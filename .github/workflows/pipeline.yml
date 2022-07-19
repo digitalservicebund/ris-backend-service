@@ -186,7 +186,9 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
       - name: Install SonarScanner
-        uses: digitalservicebund/github-actions/setup-sonarscanner@ae05c44b8baf8c9087f2757eb2f16b73a38b712f
+        uses: digitalservicebund/github-actions/setup-sonarscanner@0ecaf8c29f9cfeb841817837e63a50db2833f7bb
+        with:
+          - directory: ./web
       - name: Scan with SonarQube - Frontend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
