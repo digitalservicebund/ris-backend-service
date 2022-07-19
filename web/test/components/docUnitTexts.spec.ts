@@ -1,9 +1,10 @@
+import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import DocUnit from "../../src/domain/docUnit"
 import DocUnitTexts from "@/components/DocUnitTexts.vue"
+import DocUnit from "@/domain/docUnit"
 
 describe("Texts", () => {
   const vuetify = createVuetify({ components, directives })
@@ -24,5 +25,35 @@ describe("Texts", () => {
     getByText("Gründe")
     getByText("Tatbestand")
     getByText("Entscheidungsgründe")
+  })
+
+  test("emits update DocUnit event", async () => {
+    const user = userEvent.setup()
+    const { getByLabelText, emitted } = render(DocUnitTexts, {
+      global: { plugins: [vuetify] },
+      props: {
+        texts: new DocUnit("foo").texts,
+      },
+    })
+
+    await user.click(getByLabelText("Kurz- und Langtexte Speichern Button"))
+    expect(emitted().updateDocUnit).toBeTruthy()
+  })
+
+  test.todo("change in value emits updateValue event", async () => {
+    // const user = userEvent.setup()
+    // const { getByText, getByLabelText, emitted } = render(DocUnitTexts, {
+    //   global: { plugins: [vuetify] },
+    //   props: {
+    //     texts: new DocUnit("foo", { titelzeile: "foo Titelzeile" }).texts,
+    //   },
+    // })
+    // await user.click(getByLabelText("Titelzeile Editor Feld"))
+    // await user.type(getByText("foo Titelzeile"), "new titel{tab}")
+    // expect(emitted().updateValue).toBeCalledWith([
+    //   "titelzeile" as keyof Texts,
+    //   "new titel",
+    // ])
+    // expect(emitted().updateDocUnit).toBeFalsy()
   })
 })

@@ -1,4 +1,4 @@
-import { fireEvent } from "@testing-library/dom"
+import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { createVuetify } from "vuetify"
@@ -52,6 +52,7 @@ describe("docUnit list", () => {
   })
 
   test("delete emits event", async () => {
+    const user = userEvent.setup()
     const docUnit = new DocUnit("1", { aktenzeichen: "foo" })
 
     const { emitted } = render(DocUnitList, {
@@ -63,9 +64,7 @@ describe("docUnit list", () => {
       },
     })
 
-    await fireEvent.click(
-      screen.getByLabelText("Dokumentationseinheit löschen")
-    )
+    await user.click(screen.getByLabelText("Dokumentationseinheit löschen"))
     expect(emitted().deleteDocUnit).toBeTruthy()
   })
 })
