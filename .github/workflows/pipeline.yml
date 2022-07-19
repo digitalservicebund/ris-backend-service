@@ -186,7 +186,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
       - name: Install SonarScanner
-        uses: digitalservicebund/github-actions/setup-sonarscanner@fb014d492a2484ff5e3367539e8273119e4a29c8
+        uses: digitalservicebund/github-actions/setup-sonarscanner@ae05c44b8baf8c9087f2757eb2f16b73a38b712f
       - name: Scan with SonarQube - Frontend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -194,7 +194,6 @@ jobs:
         run: |
           npm install vitest
           npm run coverage
-          echo $SONAR_SCANNER_EXEC
           ./sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner
         working-directory: ./web
       - name: Check SonarQube Quality Gate - Backend
