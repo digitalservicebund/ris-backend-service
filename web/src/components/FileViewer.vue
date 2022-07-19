@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import { onMounted, ref } from "vue"
 import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"
 import fileService from "@/services/fileService"
@@ -13,7 +14,11 @@ const props = defineProps<{
 
 defineEmits<{ (e: "deleteFile"): void }>()
 
-const fileAsHtml = await fileService.getDocxFileAsHtml(props.s3Path)
+const fileAsHtml = ref<string>("Loading data ....")
+
+onMounted(async () => {
+  fileAsHtml.value = await fileService.getDocxFileAsHtml(props.s3Path)
+})
 </script>
 
 <template>
