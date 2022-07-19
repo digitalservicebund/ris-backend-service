@@ -197,7 +197,6 @@ jobs:
         run: |
           npm install vitest
           npm run coverage
-          echo ${{ steps.install-sonarscanner.outputs.exec-loc }}
           ${{ steps.install-sonarscanner.outputs.exec-loc }}
         working-directory: ./web
       - name: Check SonarQube Quality Gate - Backend
