@@ -8,7 +8,7 @@ import NavbarTop from "../../src/components/NavbarTop.vue"
 const HEADER_TEXT_SUB_TEXT = "Rechtsinformationssystem"
 const HEADER_TEXT = " Rechtsinformationssystem des Bundes [Platzhalter] "
 const NAVBAR_TOP_LINK_TEXT = "Rechtsprechung"
-const NAVBAR_TOP_LINK_URL = "/jurisdiction"
+const NAVBAR_TOP_LINK_URL = "/"
 
 describe("navbar top", () => {
   const vuetify = createVuetify({ components, directives })
@@ -16,7 +16,7 @@ describe("navbar top", () => {
     history: createWebHistory(),
     routes: [
       {
-        path: "/jurisdiction",
+        path: "",
         name: "jurisdiction",
         component: {},
       },
