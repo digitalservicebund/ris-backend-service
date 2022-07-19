@@ -187,7 +187,7 @@ jobs:
         run: ./gradlew sonarqube --info
       - name: Install SonarScanner
         id: install-sonarscanner
-        uses: digitalservicebund/github-actions/setup-sonarscanner@dd8eef3dd17aa649ee9d8412ebec98a7f3052591
+        uses: digitalservicebund/github-actions/setup-sonarscanner@6f73c5f311a7b4d2ee08831932c46071475f9d6f
         with:
           directory: ./web
       - name: Scan with SonarQube - Frontend
