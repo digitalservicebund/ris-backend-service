@@ -51,7 +51,6 @@ describe("navbar side", async () => {
       const sidebarText = await screen.findByText(textToMatch, {
         exact: false,
       })
-      console.log(sidebarText.outerHTML)
       expect(sidebarText).toBeTruthy()
     })
   })
