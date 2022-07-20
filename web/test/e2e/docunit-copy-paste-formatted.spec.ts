@@ -50,12 +50,12 @@ test("copy-paste from side panel", async ({ page, browserName }) => {
   await expect(page.locator("text=Entscheidungsgründe")).toBeVisible()
 
   // truncate and compare content of updated input field with content of side panel
+  const removeFirstTag = (html: string) => {
+    return html.substring(html.indexOf(">"))
+  }
   const updatedContent = await inputField.innerHTML()
-  expect(
-    updatedContent.replace(
-      '<p><span style="font-size: 10px">',
-      '<p style="font-size: 10px"><span style="font-size: 10px">'
-    )
-  ).toBe(originalFileContent)
+  expect(removeFirstTag(updatedContent)).toBe(
+    removeFirstTag(originalFileContent)
+  )
   await deleteDocUnit(page, documentNumber)
 })
