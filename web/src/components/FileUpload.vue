@@ -228,13 +228,10 @@ const onFileSelect = (e: Event) => {
   }
 
   &__in-drag-error {
+    border: $border-style-error;
     &:hover {
       border: $border-style-error;
     }
-  }
-
-  &__in-drag-error {
-    border: $border-style-error;
   }
 
   &__in-drag {
