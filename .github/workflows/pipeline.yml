@@ -159,10 +159,10 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  analyze:
+  analyze-backend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build, vulnerability-scan-image, vulnerability-scan-npm]
+    needs: [build, vulnerability-scan-image]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -180,26 +180,12 @@ jobs:
           key: ${{ runner.os }}-sonar
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Scan with SonarQube - Backend
+      - name: Scan with SonarQube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
-      - name: Install SonarScanner
-        id: install-sonarscanner
-        uses: digitalservicebund/github-actions/setup-sonarscanner@26259ff4f567234d3e7420e7be595c495bc80fb4
-        with:
-          directory: ./web
-      - name: Scan with SonarQube - Frontend
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
-          npm install vitest
-          npm run coverage
-          ./sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner
-        working-directory: ./web
-      - name: Check SonarQube Quality Gate - Backend
+      - name: Check SonarQube Quality Gate
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sonarsource/sonarqube-quality-gate-action@15767f0e4eb489cfdd989dc717fa78c038d0de8a
@@ -208,7 +194,45 @@ jobs:
         timeout-minutes: 3 # Force to fail step after specific time
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: Check SonarQube Quality Gate - Frontend
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Analyze backend :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  analyze-frontend:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [build, vulnerability-scan-npm]
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+      - name: Install SonarScanner
+        id: install-sonarscanner
+        uses: digitalservicebund/github-actions/setup-sonarscanner@26259ff4f567234d3e7420e7be595c495bc80fb4
+        with:
+          directory: ./web
+      - name: Scan with SonarQube
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          npm install vitest
+          npm run coverage
+          ./sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner
+        working-directory: ./web
+      - name: Check SonarQube Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@15767f0e4eb489cfdd989dc717fa78c038d0de8a
         with:
           scanMetadataReportFile: web/.scannerwork/report-task.txt
@@ -224,7 +248,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Analyze :point_right:"
+          job_name: "Analyze frontend :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
