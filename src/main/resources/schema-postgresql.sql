@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS doc_unit (
-    id Long AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    id BIGSERIAL NOT NULL PRIMARY KEY,
     uuid uuid NOT NULL UNIQUE,
     documentnumber VARCHAR(14) NOT NULL UNIQUE,
     creationtimestamp TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -29,16 +29,11 @@ CREATE TABLE IF NOT EXISTS doc_unit (
     entscheidungsgruende TEXT
 );
 CREATE TABLE IF NOT EXISTS document_number_counter (
-    id INT AUTO_INCREMENT NOT NULL PRIMARY KEY,
+    id SERIAL NOT NULL PRIMARY KEY,
     nextnumber INT NOT NULL,
     currentyear INT NOT NULL
 );
 
-INSERT INTO document_number_counter (
-    nextnumber,
-    currentyear
-)
-VALUES (
-    1,
-    2022
-);
+INSERT INTO document_number_counter (nextnumber, currentyear)
+SELECT 1, date_part('year', CURRENT_DATE)
+WHERE NOT EXISTS (SELECT id FROM document_number_counter);

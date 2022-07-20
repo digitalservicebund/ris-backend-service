@@ -2,15 +2,17 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 6a0895e7066e0432a1983629a35a9792e47aebd0da852fbb704d42234bd89033
+    checksum: d31d9428eb909057e623eb45d2a1129c03776584e711dc957a30d4d948e2f53c
   - filename: .github/workflows/pipeline.yml
     checksum: 539e988489a16aca0f567bbe56887fcc367a475c26659c3822b3b0fd083220ee
   - filename: .github/workflows/secrets-check.yml
     checksum: d7fbfab653dad354f2854b45545faed3a604e3ba356446e0f92f5889826e4a09
   - filename: .github/workflows/scan.yml
     checksum: 28f800e97a1469d8a84dec1b5873241753ec54a5eb93b4fd6d10674d47dd3f6d
-  - filename: src/main/resources/schema.sql
+  - filename: src/main/resources/schema-h2.sql
     checksum: 1b34b1ef959550042a2adc31dab0a01ab9e7715d8e06eb43d325186420a27cdf
+  - filename: src/main/resources/schema-postgresql.sql
+    checksum: 98f23ac128eeef1872d91c249aa745dc9a5fd195621e02d764e46831693012c4
   - filename: src/test/resources/application.properties
     checksum: 903cb0d944b0c433403ca9fdc142fc90e243a494218c4547772c1e4fade1300f
   - filename: src/main/resources/bootstrap.properties
