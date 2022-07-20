@@ -11,7 +11,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
     properties = {
       "otc.obs.bucket-name=testBucket",
       "otc.obs.endpoint=testUrl",
-      "local.file-storage=local-storage"
+      "local.file-storage=.local-storage"
     })
 @Tag("integration")
 class SecurityIntegrationTest {
