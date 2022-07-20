@@ -4,7 +4,7 @@ fileignoreconfig:
   - filename: build.gradle
     checksum: 6a0895e7066e0432a1983629a35a9792e47aebd0da852fbb704d42234bd89033
   - filename: .github/workflows/pipeline.yml
-    checksum: 062be243819f5ccc23ccd904595767c9c4ce6b3a114e841a85dffab74d8cf6d5
+    checksum: 9a7ba8b51f3856bae2782a39e27cdb84fb6ff194f5533eb1d145d4ed08d3358b
   - filename: .github/workflows/secrets-check.yml
     checksum: d7fbfab653dad354f2854b45545faed3a604e3ba356446e0f92f5889826e4a09
   - filename: .github/workflows/scan.yml

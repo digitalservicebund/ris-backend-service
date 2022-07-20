@@ -219,9 +219,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install SonarScanner
-        uses: digitalservicebund/github-actions/setup-sonarscanner@26259ff4f567234d3e7420e7be595c495bc80fb4
-        with:
-          directory: ./web
+        uses: digitalservicebund/github-actions/setup-sonarscanner@19d5fe5fbd7d25f54eb261afb5b5f5ee223a6478
       - name: Scan with SonarQube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -229,7 +227,7 @@ jobs:
         run: |
           npm install vitest
           npm run coverage
-          ./sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner
+          sonar-scanner
         working-directory: ./web
       - name: Check SonarQube Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@15767f0e4eb489cfdd989dc717fa78c038d0de8a
