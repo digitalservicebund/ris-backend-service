@@ -56,13 +56,13 @@ onMounted(async () => {
   fetchOriginalFile()
 })
 
-const originalOdocPanelYPos = 169 // read this dynamically TODO
+const originalOdocPanelYPos = 169
 
 const handleScroll = () => {
   const element = document.getElementById("odoc-panel-element")
   if (!element) return
   const pos = originalOdocPanelYPos - window.scrollY
-  const threshold = -40 // this should also not be hardwired TODO
+  const threshold = -40
   element.style.top = (pos < threshold ? threshold : pos) + "px"
 }
 

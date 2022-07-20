@@ -37,7 +37,7 @@ const upload = async (file: File) => {
   status.value.file = file
   status.value.uploadStatus = "uploading"
   const docUnit = await fileService.uploadFile(props.docUnitUuid, file)
-  status.value.uploadStatus = "succeeded" // error handling TODO
+  status.value.uploadStatus = "succeeded"
   emits("updateDocUnit", docUnit)
 }
 
@@ -48,7 +48,6 @@ const dragover = (e: DragEvent) => {
 }
 
 const checkForInDragError = (e: DragEvent): string => {
-  //  this doesn't work on Windows, the type is not included TODO
   if (!e.dataTransfer) return ""
   const items = e.dataTransfer.items
   if (items.length > 1) return "Nur eine Datei auf einmal ist möglich"
