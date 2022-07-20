@@ -187,7 +187,7 @@ jobs:
         run: ./gradlew sonarqube --info
       - name: Install SonarScanner
         id: install-sonarscanner
-        uses: digitalservicebund/github-actions/setup-sonarscanner@6b4965a70b8a62b14aaff2f85cfdc28d4e9f1be4
+        uses: digitalservicebund/github-actions/setup-sonarscanner@26259ff4f567234d3e7420e7be595c495bc80fb4
         with:
           directory: ./web
       - name: Scan with SonarQube - Frontend
@@ -197,7 +197,7 @@ jobs:
         run: |
           npm install vitest
           npm run coverage
-          ./sonar-scanner/bin/sonar-scanner
+          ./sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner
         working-directory: ./web
       - name: Check SonarQube Quality Gate - Backend
         # Third-party action, pin to commit SHA!
