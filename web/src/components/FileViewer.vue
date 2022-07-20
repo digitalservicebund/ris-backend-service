@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { onMounted, ref } from "vue"
-import PopupModal from "./PopupModal.vue"
 import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"
 import fileService from "@/services/fileService"
@@ -15,17 +14,6 @@ const props = defineProps<{
 
 defineEmits<{ (e: "deleteFile"): void }>()
 
-// Start: For popup modal to confirm delete action
-const showModal = ref<boolean>(false)
-const popupModalText = ref<string>(
-  ` Möchten Sie diese Datei ${props.fileName} wirklich löschen?`
-)
-const confirmText = ref<string>("Löschen")
-const toggleModal = () => {
-  showModal.value = !showModal.value
-}
-// End: For popup modal to confirm delete action
-
 const fileAsHtml = ref<string>("Loading data ....")
 onMounted(async () => {
   fileAsHtml.value = await fileService.getDocxFileAsHtml(props.s3Path)
@@ -34,13 +22,6 @@ onMounted(async () => {
 
 <template>
   <v-container class="fileviewer-info-panel">
-    <PopupModal
-      v-if="showModal"
-      :content-text="popupModalText"
-      :confirm-text="confirmText"
-      @close-modal="toggleModal"
-      @confirm-action="$emit('deleteFile')"
-    />
     <v-row>
       <v-col sm="3" md="2">
         Hochgeladen am
@@ -68,7 +49,11 @@ onMounted(async () => {
     </v-row>
     <v-row class="fileviewer-info-panel">
       <v-col cols="12">
-        <TextButton icon="delete" label="Datei löschen" @click="toggleModal" />
+        <TextButton
+          icon="delete"
+          label="Datei löschen"
+          @click="$emit('deleteFile')"
+        />
       </v-col>
     </v-row>
   </v-container>
