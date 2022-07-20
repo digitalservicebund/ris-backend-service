@@ -2,14 +2,14 @@
 import { useRoute } from "vue-router"
 import TextEditor from "@/components/TextEditor.vue"
 
-defineProps<{ visible: boolean; file?: string }>()
+defineProps<{ open: boolean; hasFile: boolean; file?: string }>()
 defineEmits<{ (e: "togglePanel"): void }>()
 
 const route = useRoute()
 </script>
 
 <template>
-  <v-col v-if="!visible" cols="3" align="right">
+  <v-col v-if="!open" cols="3" align="right">
     <div
       id="odoc-open-element"
       class="odoc-open"
@@ -36,7 +36,7 @@ const route = useRoute()
         </div>
         Originaldokument
       </h3>
-      <div v-if="!file">
+      <div v-if="!hasFile">
         <v-icon size="50px" class="odoc-upload-icon">cloud_upload</v-icon>
         <div class="odoc-upload-note">
           Es wurde noch kein Originaldokument hochgeladen.
@@ -53,6 +53,7 @@ const route = useRoute()
           Zum Upload
         </router-link>
       </div>
+      <div v-else-if="!file">Dokument wird geladen</div>
       <div v-else class="odoc-editor-wrapper">
         <TextEditor
           :value="file"

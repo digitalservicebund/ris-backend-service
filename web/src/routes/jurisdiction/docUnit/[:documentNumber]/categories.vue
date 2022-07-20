@@ -88,7 +88,8 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll))
         />
       </v-col>
       <OriginalFileSidePanel
-        :visible="showDocPanel"
+        :open="showDocPanel"
+        :has-file="docUnit.hasFile"
         :file="docUnit.originalFileAsHTML"
         @toggle-panel="handleToggleFilePanel"
       />
