@@ -219,7 +219,7 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install SonarScanner
-        uses: digitalservicebund/github-actions/setup-sonarscanner@19d5fe5fbd7d25f54eb261afb5b5f5ee223a6478
+        uses: digitalservicebund/github-actions/setup-sonarscanner@7dc5748165cf877ff44898c4314e1f4085754a66
       - name: Scan with SonarQube
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
