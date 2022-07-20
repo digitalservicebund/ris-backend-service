@@ -106,12 +106,12 @@ const showButtons = () => {
   return props.editable && hasFocus.value
 }
 
-interface editorBtn {
+interface EditorBtn {
   type: string
   icon: string
 }
 
-const editorBtns: editorBtn[] = []
+const editorBtns: EditorBtn[] = []
 
 const add = (type: string, icon: string) => {
   editorBtns.push({
