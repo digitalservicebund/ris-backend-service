@@ -1,5 +1,4 @@
-import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { render, screen, fireEvent } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
@@ -53,61 +52,33 @@ describe("text editor", () => {
     getByLabelText("Testlabel Editor Feld")
   })
 
-  test("update value emits event", async () => {
+  test("show buttons on focus", async () => {
     const { getByLabelText } = render(TextEditor, {
       props: { value: "Test Value", ariaLabel: "Testlabel" },
       global: { plugins: [vuetify, router] },
     })
 
+    await screen.findByText("Test Value")
     const editorField = await getByLabelText("Testlabel Editor Feld")
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
 
-    await userEvent.click(editorField)
-
-    //TBD: Change the editor value text to emit updateValue
-    // expect(emitted().updateValue).toBeTruthy()
+    expect(getByLabelText("Testlabel Editor Button Leiste")).not.toBeNull()
   })
 
-  test("show buttons on focus", async () => {
-    const { getByLabelText, queryByText } = render(TextEditor, {
+  test("hide buttons on blur", async () => {
+    const { getByLabelText, queryByLabelText } = render(TextEditor, {
       props: { value: "Test Value", ariaLabel: "Testlabel" },
       global: { plugins: [vuetify, router] },
     })
 
-    queryByText("Test Value")
-
+    await screen.findByText("Test Value")
     const editorField = await getByLabelText("Testlabel Editor Feld")
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.blur(editorField.firstElementChild)
+    }
 
-    await userEvent.click(editorField)
-
-    //TBD: The click event should trigger the focus event, which should render the buttons. For some reason this is not working.
-
-    // expect(getByLabelText("Testlabel Editor Button Leiste")).not.toBeNull()
-  })
-
-  test("change text attributes via buttons", async () => {
-    const { getByLabelText, queryByText } = render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "Testlabel" },
-      global: { plugins: [vuetify, router] },
-    })
-
-    queryByText("Test Value")
-
-    const editorField = await getByLabelText("Testlabel Editor Feld")
-    editorField.focus()
-
-    //TBD: Select the text to make bold. The buttons will only get visible on focus
-
-    // let boldButton = (await getByLabelText("Testlabel Editor Button Leiste")
-    //   ?.firstChild) as HTMLElement | null
-
-    // if (boldButton != null) {
-    //   boldButton.click()
-    // }
-
-    // if (editorField != null) {
-    //   expect(await editorField.innerHTML).toBe(
-    //     "<p><strong>Test Value</strong></p>"
-    //   )
-    // }
+    expect(queryByLabelText("Testlabel Editor Button Leiste")).toBeNull()
   })
 })
