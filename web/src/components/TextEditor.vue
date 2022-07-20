@@ -111,19 +111,17 @@ interface EditorBtn {
   icon: string
 }
 
-const editorBtns: EditorBtn[] = []
-
-const add = (type: string, icon: string) => {
-  editorBtns.push({
-    type: type,
-    icon: icon,
-  })
-}
-
-add("bold", "format_bold")
-add("italic", "format_italic")
-add("underline", "format_underlined")
-add("strike", "strikethrough_s")
+const editorBtns: EditorBtn[] = [
+  ["bold", "format_bold"],
+  ["italic", "format_italic"],
+  ["underline", "format_underlined"],
+  ["strike", "strikethrough_s"],
+].map((button) => {
+  return {
+    type: button[0],
+    icon: button[1],
+  }
+})
 </script>
 
 <template>
