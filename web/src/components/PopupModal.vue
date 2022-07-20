@@ -74,7 +74,7 @@ defineEmits<{
       display: flex;
       width: 100%;
       flex-direction: row;
-      justify-content: end;
+      justify-content: flex-end;
       column-gap: 20px;
 
       button {
