@@ -40,20 +40,26 @@ test("copy-paste from side panel", async ({ page, browserName }) => {
   )
   await inputField.click()
   await page.keyboard.press(`${modifier}+KeyV`)
+  expect(inputField.locator("text=Subheadline")).toBeVisible()
 
   // save changes and refresh page
   await page
     .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
     .click()
+  page.once("dialog", async (dialog) => {
+    expect(dialog.message()).toBe("Dokumentationseinheit wurde gespeichert")
+    await dialog.accept()
+  })
   await page.locator("a >> text=Dokumente").click()
   await page.locator("a >> text=Rubriken").click()
   await expect(page.locator("text=Entscheidungsgründe")).toBeVisible()
+  expect(inputField.locator("text=Subheadline")).toBeVisible()
 
   // truncate and compare content of updated input field with content of side panel
+  const updatedContent = await inputField.innerHTML()
   const removeFirstTag = (html: string) => {
     return html.substring(html.indexOf(">"))
   }
-  const updatedContent = await inputField.innerHTML()
   expect(removeFirstTag(updatedContent)).toBe(
     removeFirstTag(originalFileContent)
   )

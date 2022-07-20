@@ -14,7 +14,7 @@ const props = defineProps<{
 
 defineEmits<{ (e: "deleteFile"): void }>()
 
-const fileAsHtml = ref<string>("Loading data ....")
+const fileAsHtml = ref<string>("Dokument wird geladen.")
 onMounted(async () => {
   fileAsHtml.value = await fileService.getDocxFileAsHtml(props.s3Path)
 })

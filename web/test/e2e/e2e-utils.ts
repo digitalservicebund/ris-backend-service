@@ -56,6 +56,8 @@ export const uploadTestfile = async (page: Page, filename: string) => {
     page.locator("text=Festplatte durchsuchen").click(),
   ])
   await fileChooser.setFiles("./test/e2e/testfiles/" + filename)
+  expect(page.locator("text=Upload läuft")).not.toBeVisible()
+  expect(page.locator("text=Dokument wird geladen.")).not.toBeVisible()
 }
 
 export const testWithDocUnit = base.extend<{
