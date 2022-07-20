@@ -12,8 +12,15 @@ const FILE_TYPE = "docx"
 const USER_NAME = "USER NAME"
 const LABEL_TEXTES = ["Hochgeladen am", "Format", "Von", "Dateiname"]
 const DELETE_BTN_TEXT = "Datei löschen"
+const DEFAULT_EDITOR_TEXT = "Loading data ...."
 describe("file viewer", async () => {
-  vi.mock("@/services/fileService")
+  vi.mock("@/services/fileService", () => {
+    return {
+      default: {
+        getDocxFileAsHtml: vi.fn().mockReturnValue("<p>foo</p>"),
+      },
+    }
+  })
   const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
@@ -25,8 +32,9 @@ describe("file viewer", async () => {
       },
     ],
   })
+
   test("file viewer should be rendered", async () => {
-    const { emitted, getByText } = render(FileViewer, {
+    const { emitted, getByText, container } = render(FileViewer, {
       props: {
         s3Path: S3PATH,
         fileName: FILE_NAME,
@@ -42,6 +50,9 @@ describe("file viewer", async () => {
     getByText(USER_NAME)
     getByText(DELETE_BTN_TEXT)
     getByText(getUploadTimeStampToCheck())
+    // To check if default value of textEditor in page shoud'nt be found.
+    // Because after mounted, the value will be replaced by docx content.
+    expect(container.textContent?.includes(DEFAULT_EDITOR_TEXT)).toBeFalsy()
     await fireEvent.click(screen.getByText(DELETE_BTN_TEXT, { exact: false }))
     expect(emitted().deleteFile).toBeTruthy()
   })
