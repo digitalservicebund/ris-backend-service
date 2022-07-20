@@ -219,7 +219,6 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
       - name: Install SonarScanner
-        id: install-sonarscanner
         uses: digitalservicebund/github-actions/setup-sonarscanner@26259ff4f567234d3e7420e7be595c495bc80fb4
         with:
           directory: ./web
