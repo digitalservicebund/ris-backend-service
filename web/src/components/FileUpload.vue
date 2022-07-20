@@ -146,15 +146,6 @@ const onFileSelect = (e: Event) => {
               <v-icon class="icon_upload" size="50px"> refresh </v-icon>
               <div class="upload_status">Upload läuft</div>
               <div>{{ status.file ? status.file.name : "" }}</div>
-              <!-- TODO: cancel also the api call  -->
-              <!-- <div>
-                <TextButton
-                  class="button_upload"
-                  icon="close"
-                  label="Upload abbrechen"
-                  @click="reset"
-                />
-              </div> -->
             </span>
             <span v-else-if="status.uploadStatus === 'succeeded'">
               <v-icon class="icon_upload" size="50px"> upload_file </v-icon>

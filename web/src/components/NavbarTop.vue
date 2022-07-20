@@ -10,7 +10,6 @@ const linkStyling = (componentName: string) => {
 </script>
 
 <template>
-  <!--<v-app-bar :flat=true :floating=false height="auto">-->
   <v-container fluid class="topbar-main">
     <v-row>
       <v-col cols="1">
