@@ -42,4 +42,3 @@ const handleDelete = async (docUnit: DocUnit) => {
     </v-container>
   </v-main>
 </template>
-<style lang="scss"></style>
