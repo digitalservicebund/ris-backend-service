@@ -16,11 +16,11 @@ const onDelete = (docUnit: DocUnit) => {
   <v-table v-if="docUnits.length" class="doc-unit-list-table">
     <thead>
       <tr class="table-header">
-        <th class="text-center">Dok.-Nummer</th>
-        <th class="text-center">Angelegt am</th>
-        <th class="text-center">Aktenzeichen</th>
-        <th class="text-center">Dokumente</th>
-        <th class="text-center">Löschen</th>
+        <th class="text-center" scope="col">Dok.-Nummer</th>
+        <th class="text-center" scope="col">Angelegt am</th>
+        <th class="text-center" scope="col">Aktenzeichen</th>
+        <th class="text-center" scope="col">Dokumente</th>
+        <th class="text-center" scope="col">Löschen</th>
       </tr>
     </thead>
     <tbody>
