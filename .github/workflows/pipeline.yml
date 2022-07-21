@@ -404,7 +404,6 @@ jobs:
           npm ci
           npx --yes playwright install-deps
           npx --yes playwright install
-          npx --yes playwright install msedge
         working-directory: ./web
       - name: Run e2e tests on staging
         env:
