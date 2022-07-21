@@ -15,6 +15,7 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
   }
 
   Boolean bold;
+  Boolean italic;
   Boolean strike;
   VerticalAlign vertAlign;
   Integer size;
@@ -26,6 +27,14 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
 
   public Boolean getBold() {
     return bold;
+  }
+
+  public void setItalic(Boolean italic) {
+    this.italic = italic;
+  }
+
+  public Boolean getItalic() {
+    return italic;
   }
 
   public void setStrike(Boolean strike) {
@@ -62,6 +71,7 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
 
   boolean hasStyle() {
     var hasStyle = bold != null && bold;
+    hasStyle = italic != null && italic;
     hasStyle |= strike != null && strike;
     hasStyle |= size != null;
     hasStyle |= underline != null;
@@ -72,6 +82,10 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
   void addStyle(StringBuilder sb) {
     if (bold != null && bold) {
       sb.append("font-weight: bold;");
+    }
+
+    if (italic != null && italic) {
+      sb.append("font-style: italic;");
     }
 
     if (strike != null && strike) {

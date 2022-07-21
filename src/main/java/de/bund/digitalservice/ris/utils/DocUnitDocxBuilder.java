@@ -443,6 +443,7 @@ public class DocUnitDocxBuilder {
     }
 
     textElement.setBold(isBold(styleRPr, pPr.getRPr()));
+    textElement.setItalic(isItalic(styleRPr, pPr.getRPr()));
     textElement.setStrike(isStrike(styleRPr, pPr.getRPr()));
     textElement.setVertAlign(getVertAlign(styleRPr, pPr.getRPr()));
 
@@ -477,6 +478,23 @@ public class DocUnitDocxBuilder {
     }
 
     return bold;
+  }
+
+  private boolean isItalic(RPrAbstract styleRPr, RPrAbstract rPr) {
+    if (styleRPr == null && rPr == null) {
+      return false;
+    }
+
+    boolean italic = false;
+    if (styleRPr != null && styleRPr.getI() != null) {
+      italic = styleRPr.getI().isVal();
+    }
+
+    if (rPr != null && rPr.getI() != null && rPr.getI().isVal()) {
+      italic = rPr.getI().isVal();
+    }
+
+    return italic;
   }
 
   private VerticalAlign getVertAlign(RPrAbstract styleRPr, RPrAbstract rPr) {
@@ -568,6 +586,10 @@ public class DocUnitDocxBuilder {
 
     if (rPr.getB() != null && rPr.getB().isVal()) {
       textElement.setBold(rPr.getB().isVal());
+    }
+
+    if (rPr.getI() != null && rPr.getI().isVal()) {
+      textElement.setItalic(rPr.getI().isVal());
     }
 
     if (rPr.getStrike() != null && rPr.getStrike().isVal()) {
