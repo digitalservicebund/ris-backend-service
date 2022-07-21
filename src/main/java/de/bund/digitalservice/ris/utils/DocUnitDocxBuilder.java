@@ -1,21 +1,9 @@
 package de.bund.digitalservice.ris.utils;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitAnchorImageElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
-import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitErrorElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitErrorRunElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitInlineImageElement;
+import de.bund.digitalservice.ris.domain.docx.*;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitRunElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableColumn;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
@@ -36,22 +24,8 @@ import org.docx4j.dml.wordprocessingDrawing.STAlignH;
 import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
-import org.docx4j.wml.Drawing;
-import org.docx4j.wml.Jc;
-import org.docx4j.wml.JcEnumeration;
-import org.docx4j.wml.NumberFormat;
-import org.docx4j.wml.P;
-import org.docx4j.wml.PPr;
+import org.docx4j.wml.*;
 import org.docx4j.wml.PPrBase.NumPr;
-import org.docx4j.wml.R;
-import org.docx4j.wml.RPr;
-import org.docx4j.wml.RPrAbstract;
-import org.docx4j.wml.Style;
-import org.docx4j.wml.Tbl;
-import org.docx4j.wml.Tc;
-import org.docx4j.wml.Text;
-import org.docx4j.wml.Tr;
-import org.docx4j.wml.UnderlineEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -470,6 +444,7 @@ public class DocUnitDocxBuilder {
 
     textElement.setBold(isBold(styleRPr, pPr.getRPr()));
     textElement.setStrike(isStrike(styleRPr, pPr.getRPr()));
+    textElement.setVertAlign(getVertAlign(styleRPr, pPr.getRPr()));
 
     var size = getSize(styleRPr, pPr.getRPr());
     if (size != null) {
@@ -502,6 +477,33 @@ public class DocUnitDocxBuilder {
     }
 
     return bold;
+  }
+
+  private VerticalAlign getVertAlign(RPrAbstract styleRPr, RPrAbstract rPr) {
+
+    if (styleRPr == null && rPr == null) {
+      return null;
+    }
+
+    STVerticalAlignRun vertAlign = null;
+    if (styleRPr != null
+        && styleRPr.getVertAlign() != null
+        && styleRPr.getVertAlign().getVal() != null) {
+      vertAlign = styleRPr.getVertAlign().getVal();
+    }
+
+    if (rPr != null && rPr.getVertAlign() != null && rPr.getVertAlign().getVal() != null) {
+      vertAlign = styleRPr.getVertAlign().getVal();
+    }
+
+    if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
+      return VerticalAlign.SUBSCRIPT;
+    } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
+      return VerticalAlign.SUPERSCRIPT;
+    } else {
+      LOGGER.error("Unknown vertical align value: {}", vertAlign);
+    }
+    return null;
   }
 
   private BigInteger getSize(RPrAbstract styleRPr, RPrAbstract rPr) {
@@ -570,6 +572,20 @@ public class DocUnitDocxBuilder {
 
     if (rPr.getStrike() != null && rPr.getStrike().isVal()) {
       textElement.setStrike(rPr.getStrike().isVal());
+    }
+
+    if (rPr.getVertAlign() != null) {
+      STVerticalAlignRun vertAlign = rPr.getVertAlign().getVal();
+      VerticalAlign convertedVertAlign = null;
+      if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
+        convertedVertAlign = VerticalAlign.SUBSCRIPT;
+      } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
+        convertedVertAlign = VerticalAlign.SUPERSCRIPT;
+      } else {
+        LOGGER.error("Unknown vertical align value: {}", vertAlign);
+      }
+
+      textElement.setVertAlign(convertedVertAlign);
     }
 
     if (rPr.getSz() != null) {

@@ -7,6 +7,8 @@ import { Italic } from "@tiptap/extension-italic"
 import { ListItem } from "@tiptap/extension-list-item"
 import { OrderedList } from "@tiptap/extension-ordered-list"
 import { Strike } from "@tiptap/extension-strike"
+import { Subscript } from "@tiptap/extension-subscript"
+import { Superscript } from "@tiptap/extension-superscript"
 import { Table } from "@tiptap/extension-table"
 import { TableCell } from "@tiptap/extension-table-cell"
 import { TableHeader } from "@tiptap/extension-table-header"
@@ -68,6 +70,8 @@ const editor = new Editor({
     OrderedList,
     Underline,
     Strike,
+    Subscript,
+    Superscript,
     Table,
     TableCell,
     TableHeader,

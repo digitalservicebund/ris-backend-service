@@ -16,6 +16,7 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
 
   Boolean bold;
   Boolean strike;
+  VerticalAlign vertAlign;
   Integer size;
   String underline;
 
@@ -51,11 +52,20 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
     this.underline = underline;
   }
 
+  public void setVertAlign(VerticalAlign vertAlign) {
+    this.vertAlign = vertAlign;
+  }
+
+  public VerticalAlign getVertAlign() {
+    return vertAlign;
+  }
+
   boolean hasStyle() {
     var hasStyle = bold != null && bold;
     hasStyle |= strike != null && strike;
     hasStyle |= size != null;
     hasStyle |= underline != null;
+    hasStyle |= vertAlign != null;
     return hasStyle;
   }
 
@@ -74,6 +84,12 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
 
     if (underline != null) {
       sb.append("text-decoration: underline;");
+    }
+
+    if (vertAlign == VerticalAlign.SUBSCRIPT) {
+      sb.append("vertical-align: sub");
+    } else if (vertAlign == VerticalAlign.SUPERSCRIPT) {
+      sb.append("vertical-align: super");
     }
   }
 }
