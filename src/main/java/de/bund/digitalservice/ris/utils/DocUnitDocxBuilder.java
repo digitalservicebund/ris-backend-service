@@ -493,7 +493,7 @@ public class DocUnitDocxBuilder {
     }
 
     if (rPr != null && rPr.getVertAlign() != null && rPr.getVertAlign().getVal() != null) {
-      vertAlign = styleRPr.getVertAlign().getVal();
+      vertAlign = rPr.getVertAlign().getVal();
     }
 
     if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
