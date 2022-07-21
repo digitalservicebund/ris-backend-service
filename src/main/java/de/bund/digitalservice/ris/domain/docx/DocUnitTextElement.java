@@ -71,7 +71,7 @@ public abstract class DocUnitTextElement implements DocUnitDocx {
 
   boolean hasStyle() {
     var hasStyle = bold != null && bold;
-    hasStyle = italic != null && italic;
+    hasStyle |= italic != null && italic;
     hasStyle |= strike != null && strike;
     hasStyle |= size != null;
     hasStyle |= underline != null;
