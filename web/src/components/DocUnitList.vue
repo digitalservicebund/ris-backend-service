@@ -1,43 +1,19 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { ref } from "vue"
 import DocUnit from "../domain/docUnit"
-import PopupModal from "./PopupModal.vue"
 
 defineProps<{ docUnits: DocUnit[] }>()
 const emit = defineEmits<{
   (e: "deleteDocUnit", docUnit: DocUnit): void
 }>()
 
-const showModal = ref<boolean>(false)
-const popupModalText = ref<string>(
-  `Diese DE wurde bereits veröffentlicht, möchten Sie diese wirklich löschen?`
-)
-const confirmText = ref<string>("Löschen")
-const selectedDocUnit = ref<DocUnit>()
-const toggleModal = () => {
-  showModal.value = !showModal.value
-}
-const setSelectedDocUnit = (docUnit: DocUnit) => {
-  selectedDocUnit.value = docUnit
-  popupModalText.value = `Diese DE ${selectedDocUnit.value.documentnumber} wurde bereits veröffentlicht, möchten Sie diese wirklich löschen?`
-  toggleModal()
-}
-const onDelete = () => {
-  emit("deleteDocUnit", selectedDocUnit.value)
-  toggleModal()
+const onDelete = (docUnit: DocUnit) => {
+  emit("deleteDocUnit", docUnit)
 }
 </script>
 
 <template>
   <div>
-    <PopupModal
-      v-if="showModal"
-      :content-text="popupModalText"
-      :confirm-text="confirmText"
-      @close-modal="toggleModal"
-      @confirm-action="onDelete"
-    />
     <v-table v-if="docUnits.length" class="doc-unit-list-table">
       <thead>
         <tr class="table-header">
@@ -71,7 +47,7 @@ const onDelete = () => {
           <td>
             <v-icon
               aria-label="Dokumentationseinheit löschen"
-              @click="setSelectedDocUnit(docUnit)"
+              @click="onDelete(docUnit)"
             >
               delete
             </v-icon>
