@@ -398,6 +398,69 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
+  void testBuild_withTextAndParagraphItalic() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    ParaRPr rPr = new ParaRPr();
+    BooleanDefaultTrue italic = new BooleanDefaultTrue();
+    italic.setVal(true);
+    rPr.setI(italic);
+    pPr.setRPr(rPr);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertTrue(paragraphElement.getItalic());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"font-style: italic;\">text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndRunItalic() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    RPr rPr = new RPr();
+    BooleanDefaultTrue italic = new BooleanDefaultTrue();
+    italic.setVal(true);
+    rPr.setI(italic);
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals("text", runTextElement.getText());
+    assertTrue(runTextElement.getItalic());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"font-style: italic;\">text</span></p>", htmlString);
+  }
+
+  @Test
   void testBuild_withTextAndParagraphStrike() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
