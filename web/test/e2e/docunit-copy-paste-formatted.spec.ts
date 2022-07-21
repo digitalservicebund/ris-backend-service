@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test"
 import { generateDocUnit, deleteDocUnit, uploadTestfile } from "./e2e-utils"
 
-test("copy-paste from side panel", async ({ page, browserName }) => {
+test.skip("copy-paste from side panel", async ({ page, browserName }) => {
   if (browserName !== "chromium") return
   // upload file
   const documentNumber = await generateDocUnit(page)
