@@ -43,6 +43,7 @@ import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.wml.BooleanDefaultTrue;
+import org.docx4j.wml.CTVerticalAlignRun;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.HpsMeasure;
 import org.docx4j.wml.Jc;
@@ -57,6 +58,7 @@ import org.docx4j.wml.PPrBase.NumPr.NumId;
 import org.docx4j.wml.ParaRPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
+import org.docx4j.wml.STVerticalAlignRun;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
@@ -519,6 +521,134 @@ class DocUnitDocxBuilderTest {
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"text-decoration: underline;\">text</span></p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndParagraphSubscript() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    ParaRPr rPr = new ParaRPr();
+    CTVerticalAlignRun vertAlign = new CTVerticalAlignRun();
+    vertAlign.setVal(STVerticalAlignRun.SUBSCRIPT);
+    rPr.setVertAlign(vertAlign);
+    pPr.setRPr(rPr);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("SUBSCRIPT", paragraphElement.getVertAlign().toString());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"vertical-align: sub\">text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndRunSubscript() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+
+    RPr rPr = new RPr();
+    CTVerticalAlignRun vertAlign = new CTVerticalAlignRun();
+    vertAlign.setVal(STVerticalAlignRun.SUBSCRIPT);
+    rPr.setVertAlign(vertAlign);
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = ((DocUnitRunTextElement) runElement);
+    assertEquals("text", runTextElement.getText());
+    assertEquals("SUBSCRIPT", runTextElement.getVertAlign().toString());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"vertical-align: sub\">text</span></p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndParagraphSuperscript() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    ParaRPr rPr = new ParaRPr();
+    CTVerticalAlignRun vertAlign = new CTVerticalAlignRun();
+    vertAlign.setVal(STVerticalAlignRun.SUPERSCRIPT);
+    rPr.setVertAlign(vertAlign);
+    pPr.setRPr(rPr);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("SUPERSCRIPT", paragraphElement.getVertAlign().toString());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"vertical-align: super\">text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndRunSuperscript() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+
+    RPr rPr = new RPr();
+    CTVerticalAlignRun vertAlign = new CTVerticalAlignRun();
+    vertAlign.setVal(STVerticalAlignRun.SUPERSCRIPT);
+    rPr.setVertAlign(vertAlign);
+    R run = new R();
+    run.setRPr(rPr);
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    var runTextElement = ((DocUnitRunTextElement) runElement);
+    assertEquals("text", runTextElement.getText());
+    assertEquals("SUPERSCRIPT", runTextElement.getVertAlign().toString());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p><span style=\"vertical-align: super\">text</span></p>", htmlString);
   }
 
   @Test
