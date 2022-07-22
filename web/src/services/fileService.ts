@@ -7,7 +7,7 @@ export default {
     docUnitUuid: string,
     file: File
   ): Promise<{ docUnit?: DocUnit; status: UploadStatus }> {
-    await api()
+    return await api()
       .put(`docunits/${docUnitUuid}/file`, file, {
         headers: {
           "Content-Type":
@@ -23,18 +23,12 @@ export default {
         return { status: UploadStatus.FAILED }
       })
       .catch((error) => {
-        console.log("error as json: " + JSON.stringify(error.toJSON()))
-        console.log("error.request: " + JSON.stringify(error.request))
-        console.log("error.response: " + JSON.stringify(error.response))
-
         if (error.response.status === 413) {
           return { status: UploadStatus.FILE_TOO_LARGE }
         }
 
         return { status: UploadStatus.FAILED }
       })
-
-    return { status: UploadStatus.FAILED }
   },
   async getDocxFileAsHtml(fileName: string) {
     try {
