@@ -3,27 +3,32 @@ import { test, expect } from "@playwright/test"
 import { deleteDocUnit, generateDocUnit, uploadTestfile } from "./e2e-utils"
 
 test.describe("upload an original document to a doc unit and delete it again", () => {
+  let documentNumber: string
+
+  test.beforeEach(async ({ page }) => {
+    documentNumber = await generateDocUnit(page)
+  })
+
+  test.afterEach(async ({ page }) => {
+    await deleteDocUnit(page, documentNumber)
+  })
+
   test("upload docx file per file chooser", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
     await uploadTestfile(page, "sample.docx")
     await page.waitForSelector(
       ".fileviewer-info-panel-value >> text=sample.docx"
     )
     await page.waitForSelector("text=Die ist ein Test")
-    await deleteDocUnit(page, documentNumber)
   })
 
   test("upload non-docx file per file chooser", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
     await uploadTestfile(page, "sample.png")
     await expect(
       page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt.")
     ).toBeVisible()
-    await deleteDocUnit(page, documentNumber)
   })
 
   test("drag over docx file in upload area", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
     const docx = await fs.promises.readFile(
       "./test/e2e/testfiles/sample.docx",
       "utf-8"
@@ -40,11 +45,9 @@ test.describe("upload an original document to a doc unit and delete it again", (
     await expect(
       page.locator("text=Datei in diesen Bereich ziehen")
     ).toBeVisible()
-    await deleteDocUnit(page, documentNumber)
   })
 
   test("drag over non-docx file in upload area", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
     const png = await fs.promises.readFile(
       "./test/e2e/testfiles/sample.png",
       "utf-8"
@@ -61,11 +64,9 @@ test.describe("upload an original document to a doc unit and delete it again", (
     await expect(
       page.locator("text=Datei wird nicht unterstützt.")
     ).toBeVisible()
-    await deleteDocUnit(page, documentNumber)
   })
 
   test("drop docx file in upload area", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
     const docx = await fs.promises.readFile(
       "./test/e2e/testfiles/sample.docx",
       "utf-8"
@@ -80,11 +81,9 @@ test.describe("upload an original document to a doc unit and delete it again", (
     }, docx)
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
     await expect(page.locator("text=Upload läuft")).toBeVisible()
-    await deleteDocUnit(page, documentNumber)
   })
 
   test("drop non-docx file in upload area", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
     const png = await fs.promises.readFile(
       "./test/e2e/testfiles/sample.png",
       "utf-8"
@@ -101,6 +100,5 @@ test.describe("upload an original document to a doc unit and delete it again", (
     await expect(
       page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt.")
     ).toBeVisible()
-    await deleteDocUnit(page, documentNumber)
   })
 })

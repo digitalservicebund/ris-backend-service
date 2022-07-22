@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import ErrorModal from "@/components/ErrorModal.vue"
 import DocUnit from "@/domain/docUnit"
+import { UploadStatus, UploadErrorStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{ docUnitUuid: string }>()
@@ -12,14 +14,14 @@ interface Status {
   file: File | null
   inDrag: boolean
   inDragError: string
-  uploadStatus: "none" | "uploading" | "succeeded" | "failed"
+  uploadStatus: UploadStatus
 }
 
 const emptyStatus: Status = {
   file: null,
   inDrag: false,
   inDragError: "",
-  uploadStatus: "none",
+  uploadStatus: UploadStatus.UNKNOWN,
 }
 
 const status = ref<Status>(emptyStatus)
@@ -29,16 +31,18 @@ const reset = () => {
 }
 
 const upload = async (file: File) => {
-  const extension = file.name.split(".").pop()
+  const extension = file.name?.split(".").pop()
   if (!extension || extension.toLowerCase() !== "docx") {
-    status.value.uploadStatus = "failed"
+    status.value.uploadStatus = UploadStatus.WRONG_FILE_FORMAT
     return
   }
   status.value.file = file
-  status.value.uploadStatus = "uploading"
-  const docUnit = await fileService.uploadFile(props.docUnitUuid, file)
-  status.value.uploadStatus = "succeeded"
-  emits("updateDocUnit", docUnit)
+  status.value.uploadStatus = UploadStatus.UPLOADING
+  const response = await fileService.uploadFile(props.docUnitUuid, file)
+  status.value.uploadStatus = response.status
+  if (response.status == UploadStatus.SUCCESSED && !!response.docUnit) {
+    emits("updateDocUnit", response.docUnit)
+  }
 }
 
 const dragover = (e: DragEvent) => {
@@ -97,7 +101,9 @@ const onFileSelect = (e: Event) => {
           class="upload-drop-area"
           :class="{
             'upload-drop-area__in-drag': status.inDrag,
-            'upload-drop-area__in-drag-error': status.inDragError,
+            'upload-drop-area__in-drag-error':
+              status.inDragError ||
+              UploadErrorStatus.includes(status.uploadStatus),
           }"
           @dragover="dragover"
           @dragleave="dragleave"
@@ -106,7 +112,7 @@ const onFileSelect = (e: Event) => {
           <span v-if="status.inDragError">
             <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
             <!-- if still in drag move -->
-            <span v-if="status.uploadStatus !== 'failed'">
+            <span v-if="status.uploadStatus !== UploadStatus.WRONG_FILE_FORMAT">
               <div class="upload_status">Datei wird nicht unterstützt.</div>
               <div>
                 Versuchen Sie eine .docx-Version dieser Datei hochzuladen.
@@ -141,12 +147,12 @@ const onFileSelect = (e: Event) => {
             </span>
           </span>
           <span v-else>
-            <span v-if="status.uploadStatus === 'uploading'">
+            <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
               <v-icon class="icon_upload" size="50px"> refresh </v-icon>
               <div class="upload_status">Upload läuft</div>
               <div>{{ status.file ? status.file.name : "" }}</div>
             </span>
-            <span v-else-if="status.uploadStatus === 'succeeded'">
+            <span v-else-if="status.uploadStatus === UploadStatus.SUCCESSED">
               <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
               <div class="upload_status">
                 Die Datei {{ status.file ? status.file.name : "" }} wurde
@@ -184,23 +190,22 @@ const onFileSelect = (e: Event) => {
         </v-container>
       </v-col>
     </v-row>
-    <v-row v-if="status.uploadStatus === 'failed'">
+    <v-row v-if="status.uploadStatus === UploadStatus.WRONG_FILE_FORMAT">
       <v-col md="8" sm="12">
-        <v-container class="upload_error">
-          <v-row>
-            <v-col class="upload_error_icon">
-              <v-icon color="#B0243F" size="20px"> error outline </v-icon>
-            </v-col>
-            <v-col align-self="stretch">
-              <div class="upload_error_title">
-                Das ausgewählte Dateiformat ist nicht korrekt.
-              </div>
-              <div>
-                Versuchen Sie eine .docx-Version dieser Datei hochzuladen.
-              </div>
-            </v-col>
-          </v-row>
-        </v-container>
+        <ErrorModal
+          title="Das ausgewählte Dateiformat ist nicht korrekt."
+          description="Versuchen Sie eine .docx-Version dieser Datei hochzuladen."
+        >
+        </ErrorModal>
+      </v-col>
+    </v-row>
+    <v-row v-if="status.uploadStatus === UploadStatus.FILE_TO_LARGE">
+      <v-col md="8" sm="12">
+        <ErrorModal
+          title="Die Datei darf max. 20 MB groß sein."
+          description="Bitte laden Sie eine kleinere Datei hoch."
+        >
+        </ErrorModal>
       </v-col>
     </v-row>
   </v-container>
@@ -243,22 +248,6 @@ const onFileSelect = (e: Event) => {
 .button_upload {
   margin-top: 16px;
   margin-bottom: 10px;
-}
-
-.upload_error {
-  background-color: #f9e5ec;
-  border-left: 8px solid #b0243f;
-  margin-top: 23px;
-}
-
-.upload_error_title {
-  font-size: 16px;
-  font-weight: 700;
-}
-
-.upload_error_icon {
-  max-width: 20px;
-  margin-right: 10px;
 }
 
 .custom-file-input::-webkit-file-upload-button {
