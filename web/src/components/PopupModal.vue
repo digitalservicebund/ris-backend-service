@@ -1,30 +1,46 @@
 <script lang="ts" setup>
+import { onMounted } from "vue"
 import TextButton from "./TextButton.vue"
 
 const props = defineProps<{
+  headerText?: string
   contentText: string
   confirmText: string
+  cancelButtonType?: string
+  confirmButtonType?: string
 }>()
 defineEmits<{
   (e: "closeModal"): void
   (e: "confirmAction"): void
 }>()
+onMounted(() => {
+  ;(
+    document.getElementsByClassName("popup-modal-wrapper")[0] as HTMLElement
+  ).focus()
+})
 </script>
 
 <template>
   <div
     class="popup-modal-wrapper"
+    tabindex="0"
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >
     <div class="modal-container">
-      <div class="modal-text-content">
-        {{ props.contentText }}
+      <div class="modal-text-title">
+        {{ props.headerText }}
       </div>
+      <div class="modal-text-content">{{ props.contentText }}</div>
       <div class="modal-buttons-container">
-        <TextButton label="Abbrechen" @click="$emit('closeModal')" />
+        <TextButton
+          label="Abbrechen"
+          :button-type="props.cancelButtonType"
+          @click="$emit('closeModal')"
+        />
         <TextButton
           :label="props.confirmText"
+          :button-type="props.confirmButtonType"
           @click="$emit('confirmAction')"
         />
       </div>
@@ -39,47 +55,48 @@ defineEmits<{
   left: 0;
   width: 100vw;
   height: 100%;
-  background-color: rgba(175, 175, 175, 0.8);
+  background-color: rgba(217, 217, 217, 0.5);
   z-index: 999;
   display: flex;
   justify-content: center;
   align-items: center;
 
   .modal-container {
-    background: #fff;
-    min-height: 40vh;
-    max-width: 40vw;
-    border-radius: 10px;
+    background: $white;
+    min-height: 222px;
+    max-width: 442px;
+    box-sizing: border-box;
+    border: 2px solid $blue800;
+    padding: 40px 56px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 1.25em;
-    padding: 20px;
+    align-items: flex-start;
+    gap: 16px;
+
+    .modal-text-title {
+      font-weight: 700;
+      font-size: 18px;
+      line-height: 26px;
+      letter-spacing: 0.16px;
+      color: $black;
+    }
 
     .modal-text-content {
+      font-style: normal;
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 18px;
+      letter-spacing: 0.16px;
+      color: $black;
       text-align: left;
-      display: inline-block;
-      padding-top: 30px;
-      -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Safari */
-      -khtml-user-select: none; /* Konqueror HTML */
-      -moz-user-select: none; /* Old versions of Firefox */
-      -ms-user-select: none; /* Internet Explorer/Edge */
-      user-select: none; /* Non-prefixed version, currently
-                                  supported by Chrome, Edge, Opera and Firefox */
     }
 
     .modal-buttons-container {
       display: flex;
-      width: 100%;
+      min-width: 70%;
       flex-direction: row;
-      justify-content: flex-end;
-      column-gap: 20px;
-
-      button {
-        min-width: 150px;
-      }
+      justify-content: space-between;
+      column-gap: 16px;
     }
   }
 }

@@ -3,22 +3,45 @@ interface Props {
   label?: string
   icon?: string
   ariaLabel?: string
+  buttonType?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
   icon: undefined,
   ariaLabel: undefined,
+  buttonType: undefined,
 })
+
+const buttonClass = () => {
+  let classes = "ris-btn"
+  switch (props.buttonType) {
+    case "primary": {
+      classes += " btn-primary"
+      break
+    }
+    case "secondary": {
+      classes += " btn-secondary"
+      break
+    }
+    case "ghost": {
+      classes += " btn-ghost"
+      break
+    }
+    default:
+      classes += " btn-primary"
+      break
+  }
+  return classes
+}
 </script>
 
 <template>
   <v-btn
-    class="ris-btn"
+    :class="buttonClass()"
     :rounded="0"
     :ripple="false"
     :flat="true"
-    color="blue800"
     :aria-label="ariaLabel"
   >
     <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
@@ -64,28 +87,84 @@ const props = withDefaults(defineProps<Props>(), {
     }
 
     &:hover {
-      background-color: $blue700 !important;
-
       .v-btn__overlay {
         opacity: 0;
       }
     }
 
     &:active {
-      background-color: $blue500 !important;
-
       .v-btn__overlay {
         opacity: 0;
       }
     }
 
     &:focus-visible {
-      outline: 2px solid $blue800;
       outline-offset: 2px;
 
       .v-btn__overlay {
         opacity: 0;
       }
+    }
+  }
+}
+.btn-primary {
+  background-color: $blue800 !important;
+  color: $white !important;
+
+  &.v-btn {
+    &:hover {
+      background-color: $blue700 !important;
+    }
+
+    &:active {
+      background-color: $blue500 !important;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $blue800;
+    }
+  }
+}
+.btn-secondary {
+  background-color: #f5e05d !important;
+  color: $blue800 !important;
+  border: solid 2px $blue800;
+
+  &.v-btn {
+    &:hover {
+      background-color: #e5ce5c !important;
+    }
+
+    &:active {
+      background-color: #f7e67d !important;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $blue800;
+      border: none;
+    }
+  }
+}
+.btn-ghost {
+  background: none !important;
+  color: $blue800 !important;
+  border: 2px solid $white !important;
+  text-decoration: underline;
+
+  &.v-btn {
+    &:hover {
+      background-color: $white !important;
+      border: 2px solid #b8bdc3 !important;
+    }
+
+    &:active {
+      background-color: $white !important;
+      border: none;
+    }
+
+    &:focus-visible {
+      outline: 2px solid $blue800;
+      border: 2px solid #b8bdc3 !important;
     }
   }
 }
