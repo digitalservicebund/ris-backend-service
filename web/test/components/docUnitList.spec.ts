@@ -51,7 +51,7 @@ describe("docUnit list", () => {
     ).toBeNull()
   })
 
-  test("delete emits event", async () => {
+  test.skip("delete emits event", async () => {
     const user = userEvent.setup()
     const docUnit = new DocUnit("1", { aktenzeichen: "foo" })
 

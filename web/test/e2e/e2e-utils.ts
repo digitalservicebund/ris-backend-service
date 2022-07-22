@@ -25,6 +25,7 @@ export const deleteDocUnit = async (page: Page, documentNumber: string) => {
     })
     .locator("[aria-label='Dokumentationseinheit löschen']")
     .click()
+  await page.locator('button:has-text("Löschen")').click()
 }
 
 export const navigateToCategories = async (

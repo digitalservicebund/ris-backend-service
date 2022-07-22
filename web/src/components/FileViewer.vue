@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { onMounted, ref } from "vue"
+import PopupModal from "./PopupModal.vue"
 import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"
 import fileService from "@/services/fileService"
@@ -14,6 +15,28 @@ const props = defineProps<{
 
 defineEmits<{ (e: "deleteFile"): void }>()
 
+const showModal = ref<boolean>(false)
+const popupModalText = ref<string>(
+  ` Möchten Sie die ausgewählte Datei ${props.fileName} wirklich löschen?`
+)
+const confirmText = ref<string>("Löschen")
+const modalCancelButtonType = "ghost"
+const modalConfirmButtonType = "secondary"
+const toggleModal = () => {
+  showModal.value = !showModal.value
+  if (showModal.value) {
+    const scrollLeft = document.documentElement.scrollLeft
+    const scrollTop = document.documentElement.scrollTop
+    window.onscroll = () => {
+      window.scrollTo(scrollLeft, scrollTop)
+    }
+  } else {
+    window.onscroll = () => {
+      return
+    }
+  }
+}
+
 const fileAsHtml = ref<string>("Dokument wird geladen.")
 onMounted(async () => {
   fileAsHtml.value = await fileService.getDocxFileAsHtml(props.s3Path)
@@ -23,6 +46,15 @@ onMounted(async () => {
 <template>
   <div>
     <v-container class="fileviewer-info-panel">
+      <PopupModal
+        v-if="showModal"
+        :content-text="popupModalText"
+        :confirm-text="confirmText"
+        :cancel-button-type="modalCancelButtonType"
+        :confirm-button-type="modalConfirmButtonType"
+        @close-modal="toggleModal"
+        @confirm-action="$emit('deleteFile')"
+      />
       <v-row>
         <v-col sm="3" md="2">
           Hochgeladen am
@@ -53,7 +85,7 @@ onMounted(async () => {
           <TextButton
             icon="delete"
             label="Datei löschen"
-            @click="$emit('deleteFile')"
+            @click="toggleModal"
           />
         </v-col>
       </v-row>

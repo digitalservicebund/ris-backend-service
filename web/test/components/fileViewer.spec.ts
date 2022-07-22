@@ -34,7 +34,7 @@ describe("file viewer", async () => {
   })
 
   test("file viewer should be rendered", async () => {
-    const { emitted, getByText, container } = render(FileViewer, {
+    const { getByText, container } = render(FileViewer, {
       props: {
         s3Path: S3PATH,
         fileName: FILE_NAME,
@@ -53,6 +53,19 @@ describe("file viewer", async () => {
     // To check if default value of textEditor in page shoud'nt be found.
     // Because after mounted, the value will be replaced by docx content.
     expect(container.textContent?.includes(DEFAULT_EDITOR_TEXT)).toBeFalsy()
+  })
+
+  test.skip("file viewer emitted delete uploadfile event", async () => {
+    const { emitted } = render(FileViewer, {
+      props: {
+        s3Path: S3PATH,
+        fileName: FILE_NAME,
+        fileType: FILE_TYPE,
+        uploadTimeStamp: getUploadTimeStampToUpload(),
+      },
+      global: { plugins: [vuetify, router] },
+    })
+
     await fireEvent.click(screen.getByText(DELETE_BTN_TEXT, { exact: false }))
     expect(emitted().deleteFile).toBeTruthy()
   })

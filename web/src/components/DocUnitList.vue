@@ -1,19 +1,58 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import { ref } from "vue"
 import DocUnit from "../domain/docUnit"
+import PopupModal from "./PopupModal.vue"
 
 defineProps<{ docUnits: DocUnit[] }>()
 const emit = defineEmits<{
   (e: "deleteDocUnit", docUnit: DocUnit): void
 }>()
 
-const onDelete = (docUnit: DocUnit) => {
-  emit("deleteDocUnit", docUnit)
+const showModal = ref<boolean>(false)
+const popupModalText = ref<string>("")
+const modalConfirmText = ref<string>("Löschen")
+const modalHeaderText = "Dokumentationseinheit löschen"
+const modalCancelButtonType = "ghost"
+const modalConfirmButtonType = "secondary"
+const selectedDocUnit = ref<DocUnit>(new DocUnit("1"))
+const toggleModal = () => {
+  showModal.value = !showModal.value
+  if (showModal.value) {
+    const scrollLeft = document.documentElement.scrollLeft
+    const scrollTop = document.documentElement.scrollTop
+    window.onscroll = () => {
+      window.scrollTo(scrollLeft, scrollTop)
+    }
+  } else {
+    window.onscroll = () => {
+      return
+    }
+  }
+}
+const setSelectedDocUnit = (docUnit: DocUnit) => {
+  selectedDocUnit.value = docUnit
+  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocUnit.value.documentnumber} wirklich dauerhaft löschen?`
+  toggleModal()
+}
+const onDelete = () => {
+  emit("deleteDocUnit", selectedDocUnit.value)
+  toggleModal()
 }
 </script>
 
 <template>
   <div>
+    <PopupModal
+      v-if="showModal"
+      :content-text="popupModalText"
+      :confirm-text="modalConfirmText"
+      :header-text="modalHeaderText"
+      :cancel-button-type="modalCancelButtonType"
+      :confirm-button-type="modalConfirmButtonType"
+      @close-modal="toggleModal"
+      @confirm-action="onDelete"
+    />
     <v-table v-if="docUnits.length" class="doc-unit-list-table">
       <thead>
         <tr class="table-header">
@@ -47,7 +86,7 @@ const onDelete = (docUnit: DocUnit) => {
           <td>
             <v-icon
               aria-label="Dokumentationseinheit löschen"
-              @click="onDelete(docUnit)"
+              @click="setSelectedDocUnit(docUnit)"
             >
               delete
             </v-icon>
