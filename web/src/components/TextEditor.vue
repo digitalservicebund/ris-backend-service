@@ -106,7 +106,6 @@ watch(
 )
 
 const showButtons = () => {
-  // focus doesn't work yet: upon click on a formatting button, the editor loses focus and the buttons disappear
   return props.editable && hasFocus.value
 }
 
@@ -120,6 +119,8 @@ const editorBtns: EditorBtn[] = [
   ["italic", "format_italic"],
   ["underline", "format_underlined"],
   ["strike", "strikethrough_s"],
+  ["superscript", "superscript"],
+  ["subscript", "subscript"],
 ].map((button) => {
   return {
     type: button[0],
@@ -136,7 +137,7 @@ const editorBtns: EditorBtn[] = [
         props.ariaLabel ? props.ariaLabel + ' Editor Button Leiste' : null
       "
     >
-      <v-col v-for="(btn, index) in editorBtns" :key="index" cols="1"
+      <v-col v-for="(btn, index) in editorBtns" :key="index"
         ><v-icon
           class="editor-btn"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
@@ -145,11 +146,11 @@ const editorBtns: EditorBtn[] = [
           >{{ btn.icon }}</v-icon
         >
       </v-col>
-      <v-col cols="1">Heading</v-col>
-      <v-col cols="1"><v-icon>list</v-icon></v-col>
-      <v-col cols="3" />
-      <v-col cols="1"><v-icon>open_in_full</v-icon></v-col>
-      <v-col cols="1">Vergrößern</v-col>
+      <v-col>Heading</v-col>
+      <v-col><v-icon>list</v-icon></v-col>
+
+      <v-col><v-icon>open_in_full</v-icon></v-col>
+      <v-col>Vergrößern</v-col>
     </v-row>
     <v-row v-if="showButtons()"><v-col></v-col></v-row>
     <v-divider v-if="showButtons()" color="black"></v-divider>

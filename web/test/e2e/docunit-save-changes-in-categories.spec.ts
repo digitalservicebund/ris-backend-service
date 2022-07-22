@@ -7,7 +7,7 @@ import {
 } from "./e2e-utils"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
-  test.skip("test core data change", async ({ page }) => {
+  test("test core data change", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
