@@ -55,7 +55,7 @@ describe("file viewer", async () => {
     expect(container.textContent?.includes(DEFAULT_EDITOR_TEXT)).toBeFalsy()
   })
 
-  test.skip("file viewer emitted delete uploadfile event", async () => {
+  test("file viewer emitted delete uploadfile event", async () => {
     const { emitted } = render(FileViewer, {
       props: {
         s3Path: S3PATH,
@@ -67,6 +67,9 @@ describe("file viewer", async () => {
     })
 
     await fireEvent.click(screen.getByText(DELETE_BTN_TEXT, { exact: false }))
+    const confirmButton = screen.getByText("Löschen")
+    expect(confirmButton).toBeTruthy()
+    await fireEvent.click(confirmButton)
     expect(emitted().deleteFile).toBeTruthy()
   })
 })
