@@ -99,9 +99,9 @@ describe("FileUpload", () => {
     getByText("Datei in diesen Bereich ziehen", { exact: false })
   })
 
-  test("upload fails because the file is to large", async () => {
+  test("upload fails because the file is too large", async () => {
     vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
-      Promise.resolve({ status: UploadStatus.FILE_TO_LARGE })
+      Promise.resolve({ status: UploadStatus.FILE_TOO_LARGE })
     )
 
     const { getByText, getByLabelText } = render(FileUpload, {
