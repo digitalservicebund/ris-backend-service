@@ -413,6 +413,12 @@ jobs:
         run: |
           npm run test:e2e
         working-directory: ./web
+      - name: upload screenshots of failed tests
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: failed-tests
+          path: ./web/test-results/**/*.png
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
