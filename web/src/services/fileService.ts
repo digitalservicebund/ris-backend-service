@@ -23,7 +23,9 @@ export default {
         return { status: UploadStatus.FAILED }
       })
       .catch((error) => {
-        console.log(error.toJSON())
+        console.log("error as json: " + error.toJSON())
+        console.log("error.request: " + error.request)
+        console.log("error.response: " + error.response)
 
         if (error.response.status === 413) {
           return { status: UploadStatus.FILE_TOO_LARGE }
