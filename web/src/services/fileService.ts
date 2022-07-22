@@ -7,25 +7,30 @@ export default {
     docUnitUuid: string,
     file: File
   ): Promise<{ docUnit?: DocUnit; status: UploadStatus }> {
-    try {
-      const response = await api().put(`docunits/${docUnitUuid}/file`, file, {
+    await api()
+      .put(`docunits/${docUnitUuid}/file`, file, {
         headers: {
           "Content-Type":
             "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
           "X-Filename": file.name,
         },
       })
+      .then((response) => {
+        if (response.status === 201) {
+          return { docUnit: response.data, status: UploadStatus.SUCCESSED }
+        }
 
-      if (response.status === 201) {
-        return { docUnit: response.data, status: UploadStatus.SUCCESSED }
-      } else if (response.status === 413) {
-        return { status: UploadStatus.FILE_TO_LARGE }
-      }
+        return { status: UploadStatus.FAILED }
+      })
+      .catch((error) => {
+        if (error.response.status === 413) {
+          return { status: UploadStatus.FILE_TOO_LARGE }
+        }
 
-      return { status: UploadStatus.FAILED }
-    } catch (error) {
-      throw new Error(`Could not upload file: ${error}`)
-    }
+        return { status: UploadStatus.FAILED }
+      })
+
+    return { status: UploadStatus.FAILED }
   },
   async getDocxFileAsHtml(fileName: string) {
     try {

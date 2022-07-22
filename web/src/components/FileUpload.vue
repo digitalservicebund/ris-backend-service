@@ -199,7 +199,7 @@ const onFileSelect = (e: Event) => {
         </ErrorModal>
       </v-col>
     </v-row>
-    <v-row v-if="status.uploadStatus === UploadStatus.FILE_TO_LARGE">
+    <v-row v-if="status.uploadStatus === UploadStatus.FILE_TOO_LARGE">
       <v-col md="8" sm="12">
         <ErrorModal
           title="Die Datei darf max. 20 MB groß sein."

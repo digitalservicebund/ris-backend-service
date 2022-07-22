@@ -3,12 +3,12 @@ export enum UploadStatus {
   UPLOADING,
   SUCCESSED,
   FAILED,
-  FILE_TO_LARGE,
+  FILE_TOO_LARGE,
   WRONG_FILE_FORMAT,
 }
 
 export const UploadErrorStatus: UploadStatus[] = [
   UploadStatus.FAILED,
-  UploadStatus.FILE_TO_LARGE,
+  UploadStatus.FILE_TOO_LARGE,
   UploadStatus.WRONG_FILE_FORMAT,
 ]
