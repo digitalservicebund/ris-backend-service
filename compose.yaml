@@ -1,0 +1,25 @@
+services:
+  backend:
+    image: gradle:7-jdk17
+    volumes:
+      - ./:/app
+    working_dir: /app
+    environment:
+      - SPRING_PROFILES_ACTIVE=local
+    command: sh run.sh start
+    ports:
+      - 8080:8080 # service
+      - 5005:5005 # debugger
+  db:
+    image: postgres:12-alpine
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=neuris
+      - POSTGRES_PASSWORD=test
+      - POSTGRES_USER=test
+    ports:
+      - 5432:5432
+volumes:
+  db-data:

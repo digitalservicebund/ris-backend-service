@@ -63,6 +63,12 @@ _init() {
   _setup_git_hooks
 }
 
+_start() {
+  gradle --stop
+  gradle compileJava --continuous --quiet &
+  gradle bootRun
+}
+
 _commit_message_template() {
   template="$PWD/.git/.gitmessage.txt"
   git config commit.template "$template"
@@ -87,6 +93,7 @@ _help() {
 cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
+  "start") _start ;;
   "cm")
     shift
     _commit_message_template "$@"
