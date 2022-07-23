@@ -60,8 +60,10 @@ dependencies {
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
   compileOnly "org.projectlombok:lombok"
-  developmentOnly "org.springframework.boot:spring-boot-devtools"
   annotationProcessor "org.projectlombok:lombok"
+
+  developmentOnly "org.springframework.boot:spring-boot-devtools"
+
   testImplementation("org.springframework.boot:spring-boot-starter-test") {
     exclude group: "org.mockito", module: "mockito-core"
   }
