@@ -13,6 +13,8 @@ fileignoreconfig:
     checksum: 3b330b6390ddb0c4ed3ce344ace2e4a8afc48d3bb4bef4f66f6465f4f2632254
   - filename: src/test/java/de/bund/digitalservice/ris/HealthEndpointIntegrationTest.java
     checksum: 5ca024c91e17a1463887e14675d3a781350451524db9bd71ff11713ea42d0d95
+  - filename: src/test/java/de/bund/digitalservice/ris/SecurityIntegrationTest.java
+    checksum: ed062d61033c95f602ffa30933b15574baf79d3bb01c88cb1322953b4c0fd199
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/data.sql
