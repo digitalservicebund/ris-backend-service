@@ -240,15 +240,17 @@ const editorBtnsGroup5: EditorBtn[] = [
 
       <v-divider inset vertical></v-divider>
 
-      <v-col
-        ><span class="material-icons-outlined"> vertical_split </span></v-col
-      >
-      <v-col
-        ><span class="material-icons-outlined"> vertical_split </span></v-col
-      >
+      <v-col>
+        <v-icon>vertical_split</v-icon>
+      </v-col>
+      <v-col>
+        <v-icon class="mirrored">vertical_split</v-icon>
+      </v-col>
 
       <v-divider inset vertical></v-divider>
-      <v-col><span class="material-icons-outlined"> table_chart </span></v-col>
+      <v-col>
+        <v-icon>table_chart</v-icon>
+      </v-col>
 
       <v-divider inset vertical></v-divider>
       <v-col>
