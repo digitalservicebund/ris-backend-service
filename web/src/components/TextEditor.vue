@@ -114,13 +114,53 @@ interface EditorBtn {
   icon: string
 }
 
-const editorBtns: EditorBtn[] = [
+const editorBtnsGroup1: EditorBtn[] = [
+  ["undo", "undo"],
+  ["redo", "redo"],
+].map((button) => {
+  return {
+    type: button[0],
+    icon: button[1],
+  }
+})
+
+const editorBtnsGroup2: EditorBtn[] = [
   ["bold", "format_bold"],
   ["italic", "format_italic"],
   ["underline", "format_underlined"],
   ["strike", "strikethrough_s"],
+].map((button) => {
+  return {
+    type: button[0],
+    icon: button[1],
+  }
+})
+
+const editorBtnsGroup3: EditorBtn[] = [
+  ["align-left", "format_align_left"],
+  ["align-center", "format_align_center"],
+  ["align-right", "format_align_right"],
+  ["align-justify", "format_align_justify"],
+].map((button) => {
+  return {
+    type: button[0],
+    icon: button[1],
+  }
+})
+
+const editorBtnsGroup4: EditorBtn[] = [
   ["superscript", "superscript"],
   ["subscript", "subscript"],
+].map((button) => {
+  return {
+    type: button[0],
+    icon: button[1],
+  }
+})
+
+const editorBtnsGroup5: EditorBtn[] = [
+  ["numbered-list", "format_list_numbered"],
+  ["bullet-list", "format_list_bulleted"],
 ].map((button) => {
   return {
     type: button[0],
@@ -137,8 +177,8 @@ const editorBtns: EditorBtn[] = [
         props.ariaLabel ? props.ariaLabel + ' Editor Button Leiste' : null
       "
     >
-      <v-col v-for="(btn, index) in editorBtns" :key="index"
-        ><v-icon
+      <v-col v-for="(btn, index) in editorBtnsGroup1" :key="index">
+        <v-icon
           class="editor-btn"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
@@ -146,13 +186,81 @@ const editorBtns: EditorBtn[] = [
           >{{ btn.icon }}</v-icon
         >
       </v-col>
-      <v-col>Heading</v-col>
-      <v-col><v-icon>list</v-icon></v-col>
 
-      <v-col><v-icon>open_in_full</v-icon></v-col>
-      <v-col>Vergrößern</v-col>
+      <v-divider inset vertical></v-divider>
+
+      <v-col v-for="(btn, index) in editorBtnsGroup2" :key="index">
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
+
+      <v-divider inset vertical></v-divider>
+      <v-col>Heading</v-col>
+
+      <v-divider inset vertical></v-divider>
+
+      <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
+
+      <v-divider vertical></v-divider>
+
+      <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
+
+      <v-divider inset vertical></v-divider>
+
+      <v-col v-for="(btn, index) in editorBtnsGroup5" :key="index">
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
+
+      <v-divider inset vertical></v-divider>
+
+      <v-col
+        ><span class="material-icons-outlined"> vertical_split </span></v-col
+      >
+      <v-col
+        ><span class="material-icons-outlined"> vertical_split </span></v-col
+      >
+
+      <v-divider inset vertical></v-divider>
+      <v-col><span class="material-icons-outlined"> table_chart </span></v-col>
+
+      <v-divider inset vertical></v-divider>
+      <v-col>
+        <v-icon>123</v-icon>
+      </v-col>
+      <v-col>
+        <v-icon>open_in_full</v-icon>
+      </v-col>
     </v-row>
-    <v-row v-if="showButtons()"><v-col></v-col></v-row>
+    <v-row v-if="showButtons()">
+      <v-col></v-col>
+    </v-row>
     <v-divider v-if="showButtons()" color="black"></v-divider>
     <v-row>
       <v-col cols="12">
@@ -197,15 +305,19 @@ const editorBtns: EditorBtn[] = [
     height: 100%;
   }
 }
+
 .ProseMirror-focused {
   outline: 0;
 }
+
 .editor-btn {
   color: $black;
+
   &:hover {
     color: $text-tertiary;
     background-color: $button-tertiary-focus;
   }
+
   &__active {
     color: $white;
     background-color: $text-tertiary;
@@ -215,9 +327,14 @@ const editorBtns: EditorBtn[] = [
 .ProseMirror p {
   margin-bottom: 8pt;
 }
+
 .ProseMirror .clearfix::after {
   content: "";
   clear: both;
   display: table;
+}
+
+.mirrored {
+  transform: scaleX(-1);
 }
 </style>

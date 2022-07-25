@@ -51,7 +51,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     const boldButton = await page
       .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
-      .first()
+      .nth(2)
     await boldButton.click()
 
     await editorField.type("this is bold text")
