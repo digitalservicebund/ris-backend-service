@@ -10,6 +10,10 @@ services:
     ports:
       - 8080:8080 # service
       - 5005:5005 # debugger
+    links:
+      - db
+    depends_on:
+      - db
   db:
     image: postgres:12-alpine
     restart: always
