@@ -132,12 +132,15 @@ spotless {
     replaceRegex("quotes", "(['])(.*)\\1", "\"\$2\"")
   }
   format "misc", {
-    target "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.yml"
+    target "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.sql", "**/*.yml"
     targetExclude "web/**", // Has its own prettier setup!
         "**/dist/**", "**/static/**"
     // spotless:off
-    prettier(["prettier": "2.6.1", "prettier-plugin-properties": "0.1.0", "prettier-plugin-sh": "0.7.1"])
-        .config(["keySeparator": "="])
+    prettier(["prettier": "2.6.1", "prettier-plugin-properties": "0.1.0", "prettier-plugin-sh": "0.7.1", "prettier-plugin-sql": "0.10.0"])
+        .config([
+          "keySeparator": "=", // for prettier-plugin-properties
+          "language": "postgresql", // for prettier-plugin-sql
+        ])
     // spotless:on
   }
 }
