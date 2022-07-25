@@ -69,6 +69,14 @@ _start() {
   gradle bootRun
 }
 
+_dev() {
+  if ! command -v docker > /dev/null 2>&1; then
+    _fail "Dev requires docker, please install first: \`brew install docker\`"
+    exit 1
+  fi
+  docker compose up
+}
+
 _commit_message_template() {
   template="$PWD/.git/.gitmessage.txt"
   git config commit.template "$template"
@@ -86,6 +94,7 @@ _help() {
   echo ""
   echo "Available commands:"
   echo "init                  Set up repository for development"
+  echo "dev" Start development environment
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
 }
@@ -93,7 +102,8 @@ _help() {
 cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
-  "start") _start ;;
+  "dev") _dev ;;
+  "_start") _start ;;
   "cm")
     shift
     _commit_message_template "$@"

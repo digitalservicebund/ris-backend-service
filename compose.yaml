@@ -6,7 +6,7 @@ services:
     working_dir: /app
     environment:
       - SPRING_PROFILES_ACTIVE=local,compose
-    command: sh run.sh start
+    command: sh run.sh _start
     ports:
       - 8080:8080 # service
       - 5005:5005 # debugger
