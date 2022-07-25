@@ -5,6 +5,7 @@ import static io.r2dbc.spi.ConnectionFactoryOptions.DRIVER;
 import static io.r2dbc.spi.ConnectionFactoryOptions.HOST;
 import static io.r2dbc.spi.ConnectionFactoryOptions.PASSWORD;
 import static io.r2dbc.spi.ConnectionFactoryOptions.PORT;
+import static io.r2dbc.spi.ConnectionFactoryOptions.PROTOCOL;
 import static io.r2dbc.spi.ConnectionFactoryOptions.USER;
 
 import io.r2dbc.spi.ConnectionFactory;
@@ -41,7 +42,8 @@ public class PostgresConfig extends AbstractR2dbcConfiguration {
   public ConnectionFactory connectionFactory() {
     return ConnectionFactoryBuilder.withOptions(
             ConnectionFactoryOptions.builder()
-                .option(DRIVER, "postgresql")
+                .option(DRIVER, "pool")
+                .option(PROTOCOL, "postgresql")
                 .option(HOST, host)
                 .option(PORT, port)
                 .option(USER, user)
