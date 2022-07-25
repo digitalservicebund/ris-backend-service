@@ -1,4 +1,17 @@
 services:
+  frontend:
+    image: neuris/frontend
+    build: ./web
+    volumes:
+      - ./web/src/:/usr/src/app/src
+    command: npm run dev -- --host
+    ports:
+      - 3000:3000
+    networks:
+      - dev
+    depends_on:
+      - backend
+
   backend:
     image: gradle:7-jdk17
     volumes:
@@ -10,10 +23,11 @@ services:
     ports:
       - 8080:8080 # service
       - 5005:5005 # debugger
-    links:
-      - db
+    networks:
+      - dev
     depends_on:
       - db
+
   db:
     image: postgres:12-alpine
     restart: always
@@ -25,5 +39,9 @@ services:
       - POSTGRES_USER=test
     ports:
       - 5432:5432
+    networks:
+      - dev
 volumes:
   db-data:
+networks:
+  dev:

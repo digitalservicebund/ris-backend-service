@@ -6,6 +6,9 @@ import Pages from "vite-plugin-pages"
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  server: {
+    port: 3000, // Required for vite to be accessible when running as part of docker compose setup
+  },
   plugins: [
     vue(),
     // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
