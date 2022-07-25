@@ -30,7 +30,7 @@ brew install lefthook talisman
 
 ### Dev server
 
-The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://localhost:3000/mitra-frontend/).
+The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://localhost:3000/).
 
 **Start server**:
 
