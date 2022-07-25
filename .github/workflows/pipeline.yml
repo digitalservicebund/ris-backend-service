@@ -327,6 +327,7 @@ jobs:
   deploy-staging:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency: deploy-staging
     environment: staging
     needs: [build-and-push-image]
     permissions:
@@ -370,6 +371,7 @@ jobs:
   deploy-staging-verify:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency: deploy-staging
     needs: [deploy-staging]
     steps:
       - uses: actions/checkout@v3
@@ -438,6 +440,7 @@ jobs:
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
+    concurrency: deploy-production
     environment: production
     needs: [build-and-push-image, deploy-staging-verify]
     permissions:
