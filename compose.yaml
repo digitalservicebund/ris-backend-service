@@ -1,7 +1,6 @@
 services:
   frontend:
     image: neuris/frontend
-    build: ./web
     volumes:
       - ./web/src/:/usr/src/app/src
     command: npm run dev -- --host
