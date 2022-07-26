@@ -34,20 +34,24 @@ This will replace placeholders in the application template and install a couple 
 
 ### Local development setup
 
-#### Backend
-
-Add to your `local application-local.properties` the property `local.file-storage` with the
-directory, which the mocked S3 client should use as local S3 bucket.
+### Full-stack
 
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=local'
+./run.sh dev
 ```
 
-If you use IntelliJ: the run configuration _Application_ should be automatically created. Edit that and:
+This will start the backend with a Postgres database and [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart)
+so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
-- add `local` to _Active profiles_
+#### Backend only
 
-#### Frontend
+```bash
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+```
+
+If you use IntelliJ: the run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
+
+#### Frontend only
 
 See `web/README.md`
 
