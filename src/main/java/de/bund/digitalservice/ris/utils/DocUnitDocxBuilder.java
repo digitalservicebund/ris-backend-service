@@ -526,12 +526,14 @@ public class DocUnitDocxBuilder {
       vertAlign = rPr.getVertAlign().getVal();
     }
 
-    if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
-      return VerticalAlign.SUBSCRIPT;
-    } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
-      return VerticalAlign.SUPERSCRIPT;
-    } else {
-      LOGGER.error("Unknown vertical align value: {}", vertAlign);
+    if (vertAlign != null && vertAlign != STVerticalAlignRun.BASELINE) {
+      if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
+        return VerticalAlign.SUBSCRIPT;
+      } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
+        return VerticalAlign.SUPERSCRIPT;
+      } else {
+        LOGGER.error("Unknown vertical align value: {}", vertAlign);
+      }
     }
     return null;
   }
