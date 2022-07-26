@@ -45,6 +45,8 @@ so changes in the Java sources will be reflected without manually restarting. Si
 
 #### Backend only
 
+Requires the Postgres database to be running: `docker-compose up db`
+
 ```bash
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
