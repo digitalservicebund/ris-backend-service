@@ -74,7 +74,7 @@ _dev() {
     _fail "Dev requires docker, please install first: \`brew install docker\`"
     exit 1
   fi
-  docker build ./web -f web/Dockerfile
+  docker build ./web -f web/Dockerfile -t neuris/frontend --no-cache
   docker compose up
 }
 
