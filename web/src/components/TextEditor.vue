@@ -56,7 +56,7 @@ const emit = defineEmits<{
 const hasFocus = ref<boolean>(false)
 const showMore = ref<boolean>(false)
 
-const { lgAndUp, mdAndDown } = useDisplay()
+const { mdAndDown, lgAndUp } = useDisplay()
 
 const editor = new Editor({
   content: props.value,
@@ -246,59 +246,61 @@ onMounted(() => {
 
       <v-divider inset vertical></v-divider>
 
-      <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
-        <v-icon
-          class="editor-btn"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
+      <v-col v-show="mdAndDown" class="display-group">
+        <v-icon>format_align_left</v-icon>
+        <v-icon>arrow_drop_down</v-icon>
       </v-col>
 
-      <v-divider v-show="lgAndUp" vertical></v-divider>
-      <v-col
-        v-for="(btn, index) in editorBtnsGroup4"
-        v-show="lgAndUp"
-        :key="index"
-      >
-        <v-icon
-          class="editor-btn"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
+      <v-divider inset vertical></v-divider>
 
-      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+      <v-col v-show="lgAndUp" class="display-group pa-0">
+        <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
+          <v-icon
+            class="editor-btn"
+            :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+            @click="editor.chain().focus().toggleMark(btn.type).run()"
+            @mousedown.prevent=""
+            >{{ btn.icon }}</v-icon
+          >
+        </v-col>
 
-      <v-col
-        v-for="(btn, index) in editorBtnsGroup5"
-        v-show="lgAndUp"
-        :key="index"
-      >
-        <v-icon
-          class="editor-btn"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
+        <v-divider inset vertical></v-divider>
 
-      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+        <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
+          <v-icon
+            class="editor-btn"
+            :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+            @click="editor.chain().focus().toggleMark(btn.type).run()"
+            @mousedown.prevent=""
+            >{{ btn.icon }}</v-icon
+          >
+        </v-col>
 
-      <v-col v-show="lgAndUp">
-        <v-icon>vertical_split</v-icon>
-      </v-col>
-      <v-col>
-        <v-icon v-show="lgAndUp" class="mirrored">vertical_split</v-icon>
-      </v-col>
+        <v-divider inset vertical></v-divider>
 
-      <v-divider v-show="lgAndUp" inset vertical></v-divider>
-      <v-col v-show="lgAndUp">
-        <v-icon>table_chart</v-icon>
+        <v-col v-for="(btn, index) in editorBtnsGroup5" :key="index">
+          <v-icon
+            class="editor-btn"
+            :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+            @click="editor.chain().focus().toggleMark(btn.type).run()"
+            @mousedown.prevent=""
+            >{{ btn.icon }}</v-icon
+          >
+        </v-col>
+
+        <v-divider inset vertical></v-divider>
+
+        <v-col>
+          <v-icon>vertical_split</v-icon>
+        </v-col>
+        <v-col>
+          <v-icon class="mirrored">vertical_split</v-icon>
+        </v-col>
+
+        <v-divider inset vertical></v-divider>
+        <v-col>
+          <v-icon>table_chart</v-icon>
+        </v-col>
       </v-col>
 
       <v-col v-show="mdAndDown">
@@ -313,7 +315,7 @@ onMounted(() => {
         <v-icon>open_in_full</v-icon>
       </v-col>
     </v-row>
-    <v-row v-if="showMoreOptions()">
+    <v-row v-show="mdAndDown" v-if="showMoreOptions()">
       <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
         <v-icon
           class="editor-btn"
@@ -422,6 +424,11 @@ onMounted(() => {
   content: "";
   clear: both;
   display: table;
+}
+
+.display-group {
+  display: flex;
+  flex-direction: row;
 }
 
 .mirrored {
