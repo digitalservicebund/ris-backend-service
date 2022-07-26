@@ -23,8 +23,6 @@ fileignoreconfig:
     checksum: a84facaeaf6f5eaa5fb46a77e8e097fdb50ef193eb56aaed51307cc88350f09f
   - filename: web/src/env.d.ts
     checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
-  - filename: web/.env.development
-    checksum: 7443587c94ecd708b8e562b7b017164a9aecd6f1c8dec9740dc22db7ca2ab89a
   - filename: web/playwright.config.ts
     checksum: 6bb2a7e99f6352a4bfd3f5653171eafabb052509307b702d549ffb30f933b6fe
   - filename: web/sonar-project.properties

@@ -8,6 +8,13 @@ import Pages from "vite-plugin-pages"
 export default defineConfig({
   server: {
     port: 3000, // Required for vite to be accessible when running as part of docker compose setup
+    proxy: {
+      "^/api.*": {
+        target: "http://backend:8080",
+        prependPath: true,
+        changeOrigin: true,
+      },
+    },
   },
   plugins: [
     vue(),
@@ -39,7 +46,9 @@ export default defineConfig({
       reporter: ["lcov"],
     },
   },
-  define: { "process.env": {} },
+  define: {
+    "process.env": {},
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),
