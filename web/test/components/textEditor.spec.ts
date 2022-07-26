@@ -5,7 +5,7 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import TextEditor from "../../src/components/TextEditor.vue"
 
-describe("text editor", () => {
+describe("text editor", async () => {
   const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
@@ -57,7 +57,6 @@ describe("text editor", () => {
       props: { value: "Test Value", ariaLabel: "Testlabel" },
       global: { plugins: [vuetify, router] },
     })
-
     await screen.findByText("Test Value")
     const editorField = await getByLabelText("Testlabel Editor Feld")
     if (editorField.firstElementChild !== null) {
@@ -78,7 +77,114 @@ describe("text editor", () => {
     if (editorField.firstElementChild !== null) {
       await fireEvent.blur(editorField.firstElementChild)
     }
-
     expect(queryByLabelText("Testlabel Editor Button Leiste")).toBeNull()
+  })
+
+  test.skip("copy text align right", async () => {
+    const { getByLabelText, emitted } = await render(TextEditor, {
+      props: { value: "Test Value", ariaLabel: "Testlabel" },
+      global: { plugins: [vuetify, router] },
+    })
+    const editorField = await getByLabelText("Testlabel Editor Feld")
+    expect(
+      (screen.getByText("Test Value") as HTMLElement).outerHTML.includes(
+        'style="text-align: right"'
+      )
+    ).not.toBeTruthy()
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+      await fireEvent.paste(editorField.firstElementChild, {
+        clipboardData: {
+          getData: () => '<p style="text-align: right"></p>',
+        },
+      })
+      expect(emitted().updateValue).toBeTruthy()
+    }
+    expect(
+      (
+        screen.getByText("Test Value", { exact: false }) as HTMLElement
+      ).outerHTML.includes('style="text-align: right"')
+    ).toBeTruthy()
+  })
+
+  test.skip("copy text align left", async () => {
+    const { getByLabelText, emitted } = await render(TextEditor, {
+      props: { value: "Test Value", ariaLabel: "Testlabel" },
+      global: { plugins: [vuetify, router] },
+    })
+    const editorField = await getByLabelText("Testlabel Editor Feld")
+    expect(
+      (screen.getByText("Test Value") as HTMLElement).outerHTML.includes(
+        'style="text-align: left"'
+      )
+    ).not.toBeTruthy()
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+      await fireEvent.paste(editorField.firstElementChild, {
+        clipboardData: {
+          getData: () => '<p style="text-align: left"></p>',
+        },
+      })
+      expect(emitted().updateValue).toBeTruthy()
+    }
+    expect(
+      (
+        screen.getByText("Test Value", { exact: false }) as HTMLElement
+      ).outerHTML.includes('style="text-align: left"')
+    ).not.toBeTruthy()
+  })
+
+  test.skip("copy text align center", async () => {
+    const { getByLabelText, emitted } = await render(TextEditor, {
+      props: { value: "Test Value", ariaLabel: "Testlabel" },
+      global: { plugins: [vuetify, router] },
+    })
+    const editorField = await getByLabelText("Testlabel Editor Feld")
+    expect(
+      (screen.getByText("Test Value") as HTMLElement).outerHTML.includes(
+        'style="text-align: center"'
+      )
+    ).not.toBeTruthy()
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+      await fireEvent.paste(editorField.firstElementChild, {
+        clipboardData: {
+          getData: () => '<p style="text-align: center"></p>',
+        },
+      })
+      expect(emitted().updateValue).toBeTruthy()
+    }
+    expect(
+      (
+        screen.getByText("Test Value", { exact: false }) as HTMLElement
+      ).outerHTML.includes('style="text-align: center"')
+    ).toBeTruthy()
+  })
+
+  test.skip("copy text align justify", async () => {
+    const { getByLabelText, emitted } = await render(TextEditor, {
+      props: { value: "Test Value", ariaLabel: "Testlabel" },
+      global: { plugins: [vuetify, router] },
+    })
+    const editorField = await getByLabelText("Testlabel Editor Feld")
+    expect(
+      (screen.getByText("Test Value") as HTMLElement).outerHTML.includes(
+        'style="text-align: justify"'
+      )
+    ).not.toBeTruthy()
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+      await fireEvent.paste(editorField.firstElementChild, {
+        clipboardData: {
+          getData: () => '<p style="text-align: justify"></p>',
+        },
+      })
+      expect(emitted().updateValue).toBeTruthy()
+    }
+    expect(
+      (
+        screen.getByText("Test Value", { exact: false }) as HTMLElement
+      ).outerHTML.includes('style="text-align: justify"')
+    ).toBeTruthy()
   })
 })
