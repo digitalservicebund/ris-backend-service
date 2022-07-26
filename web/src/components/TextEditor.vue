@@ -18,7 +18,7 @@ import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
-import { watch, ref } from "vue"
+import { watch, ref, onMounted } from "vue"
 import { BorderNumber } from "../editor/border-number"
 import { FontSize } from "../editor/font-size"
 import { CustomImage } from "../editor/image"
@@ -167,6 +167,37 @@ const editorBtnsGroup5: EditorBtn[] = [
     icon: button[1],
   }
 })
+const ariaLabel = props.ariaLabel ? props.ariaLabel + " Editor Feld" : null
+
+onMounted(() => {
+  const editorContainer = document.querySelector(`[aria-label="${ariaLabel}"]`)
+  if (editorContainer) {
+    editorContainer.addEventListener("paste", (e) => {
+      const clipboardCoppiedData =
+        (e as ClipboardEvent).clipboardData?.getData("text/html") ?? ""
+      if (clipboardCoppiedData) {
+        const parser = new DOMParser()
+        const pastedContent = parser.parseFromString(
+          clipboardCoppiedData,
+          "text/html"
+        ).body.innerHTML
+        if (pastedContent.includes("text-align: right")) {
+          editor.chain().focus().setTextAlign("right").run()
+        }
+        if (pastedContent.includes("text-align: left")) {
+          editor.chain().focus().setTextAlign("left").run()
+        }
+        if (pastedContent.includes("text-align: center")) {
+          editor.chain().focus().setTextAlign("center").run()
+        }
+        if (pastedContent.includes("text-align: justify")) {
+          editor.chain().focus().setTextAlign("justify").run()
+        }
+        emit("updateValue", editor.getHTML())
+      }
+    })
+  }
+})
 </script>
 
 <template>
@@ -267,9 +298,7 @@ const editorBtnsGroup5: EditorBtn[] = [
     <v-row>
       <v-col cols="12">
         <editor-content
-          :aria-label="
-            props.ariaLabel ? props.ariaLabel + ' Editor Feld' : null
-          "
+          :aria-label="ariaLabel"
           :editor="editor"
           :class="'ProseMirror__' + props.fieldSize"
         />

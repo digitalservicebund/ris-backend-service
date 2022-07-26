@@ -20,4 +20,22 @@ test.describe("create a doc unit and delete it again", () => {
       page.locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
     ).not.toBeVisible()
   })
+  test("cancel delete doc unit", async ({ page }) => {
+    const documentNumber = await generateDocUnit(page)
+    await page.goto("/")
+
+    await expect(
+      page.locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
+    ).toBeVisible()
+    await page
+      .locator("tr", {
+        hasText: documentNumber,
+      })
+      .locator("[aria-label='Dokumentationseinheit löschen']")
+      .click()
+    await page.locator('button:has-text("Abbrechen")').click()
+    await expect(
+      page.locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
+    ).toBeVisible()
+  })
 })
