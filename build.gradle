@@ -132,7 +132,7 @@ spotless {
     replaceRegex("quotes", "(['])(.*)\\1", "\"\$2\"")
   }
   format "misc", {
-    target "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.sql", "**/*.yml"
+    target "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.sql", "**/*.yaml", "**/*.yml"
     targetExclude "web/**", // Has its own prettier setup!
         "**/dist/**", "**/static/**"
     // spotless:off
