@@ -4,11 +4,11 @@ fileignoreconfig:
   - filename: build.gradle
     checksum: 4ee415715baa5ea56edb8330177925cb660341c17ccdf3089fe6d6bcd88b38d3
   - filename: .github/workflows/pipeline.yml
-    checksum: 4c2b97583b5fc1f5156217ec66e4edc2cfedd07de3fbaf84b4cce69274a20b43
+    checksum: 089cd4f20af0c07951c50b95c46e182e41dbc0f8c032260ac184ea63fb50a2d9
   - filename: .github/workflows/secrets-check.yml
     checksum: d7fbfab653dad354f2854b45545faed3a604e3ba356446e0f92f5889826e4a09
   - filename: .github/workflows/scan.yml
-    checksum: 28f800e97a1469d8a84dec1b5873241753ec54a5eb93b4fd6d10674d47dd3f6d
+    checksum: a0fb31c2a1f30b0e0e713c3d0aeacdf127ce0207a006c3eae05eac287389b4b8
   - filename: src/test/resources/application.properties
     checksum: 3b330b6390ddb0c4ed3ce344ace2e4a8afc48d3bb4bef4f66f6465f4f2632254
   - filename: src/test/java/de/bund/digitalservice/ris/HealthEndpointIntegrationTest.java
