@@ -286,7 +286,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@7e0881f8fe90b25e305bbf0309761e9314607e25
+        uses: sigstore/cosign-installer@09a077b27eb1310dcfb21981bee195b30ce09de0
         with:
           cosign-release: "v1.4.0"
       - name: Log into container registry
