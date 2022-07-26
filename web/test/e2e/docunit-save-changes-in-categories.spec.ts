@@ -39,7 +39,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await deleteDocUnit(page, documentNumber)
   })
 
-  test("test bold text input", async ({ page }) => {
+  test.skip("test bold text input", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
@@ -74,7 +74,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await deleteDocUnit(page, documentNumber)
   })
 
-  test("test italic test input", async ({ page }) => {
+  test.skip("test italic test input", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
@@ -109,7 +109,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await deleteDocUnit(page, documentNumber)
   })
 
-  test("test underlined test input", async ({ page }) => {
+  test.skip("test underlined test input", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
@@ -144,7 +144,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await deleteDocUnit(page, documentNumber)
   })
 
-  test("test strike test input", async ({ page }) => {
+  test.skip("test strike test input", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
@@ -179,7 +179,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await deleteDocUnit(page, documentNumber)
   })
 
-  test("test superscript test input", async ({ page }) => {
+  test.skip("test superscript test input", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
@@ -214,7 +214,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await deleteDocUnit(page, documentNumber)
   })
 
-  test("test subscript test input", async ({ page }) => {
+  test.skip("test subscript test input", async ({ page }) => {
     const documentNumber = await generateDocUnit(page)
     await navigateToCategories(page, documentNumber)
 
