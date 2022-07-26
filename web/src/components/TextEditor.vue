@@ -19,6 +19,7 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { watch, ref, onMounted } from "vue"
+import { useDisplay } from "vuetify"
 import { BorderNumber } from "../editor/border-number"
 import { FontSize } from "../editor/font-size"
 import { CustomImage } from "../editor/image"
@@ -53,6 +54,9 @@ const emit = defineEmits<{
 }>()
 
 const hasFocus = ref<boolean>(false)
+const showMore = ref<boolean>(false)
+
+const { lgAndUp, mdAndDown } = useDisplay()
 
 const editor = new Editor({
   content: props.value,
@@ -94,6 +98,8 @@ const editor = new Editor({
   editable: props.editable,
 })
 
+const toggleShowMore = () => (showMore.value = !showMore.value)
+
 watch(
   () => props.value,
   (value) => {
@@ -107,6 +113,11 @@ watch(
 
 const showButtons = () => {
   return props.editable && hasFocus.value
+  // return props.editable
+}
+
+const showMoreOptions = () => {
+  return showMore.value
 }
 
 interface EditorBtn {
@@ -245,8 +256,64 @@ onMounted(() => {
         >
       </v-col>
 
-      <v-divider vertical></v-divider>
+      <v-divider v-show="lgAndUp" vertical></v-divider>
+      <v-col
+        v-for="(btn, index) in editorBtnsGroup4"
+        v-show="lgAndUp"
+        :key="index"
+      >
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
 
+      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+
+      <v-col
+        v-for="(btn, index) in editorBtnsGroup5"
+        v-show="lgAndUp"
+        :key="index"
+      >
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
+
+      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+
+      <v-col v-show="lgAndUp">
+        <v-icon>vertical_split</v-icon>
+      </v-col>
+      <v-col>
+        <v-icon v-show="lgAndUp" class="mirrored">vertical_split</v-icon>
+      </v-col>
+
+      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+      <v-col v-show="lgAndUp">
+        <v-icon>table_chart</v-icon>
+      </v-col>
+
+      <v-col v-show="mdAndDown">
+        <v-icon @click="toggleShowMore()">more_horiz</v-icon>
+      </v-col>
+
+      <v-divider inset vertical></v-divider>
+      <v-col>
+        <v-icon>123</v-icon>
+      </v-col>
+      <v-col>
+        <v-icon>open_in_full</v-icon>
+      </v-col>
+    </v-row>
+    <v-row v-if="showMoreOptions()">
       <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
         <v-icon
           class="editor-btn"
@@ -281,14 +348,6 @@ onMounted(() => {
       <v-divider inset vertical></v-divider>
       <v-col>
         <v-icon>table_chart</v-icon>
-      </v-col>
-
-      <v-divider inset vertical></v-divider>
-      <v-col>
-        <v-icon>123</v-icon>
-      </v-col>
-      <v-col>
-        <v-icon>open_in_full</v-icon>
       </v-col>
     </v-row>
     <v-row v-if="showButtons()">
