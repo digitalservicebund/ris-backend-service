@@ -10,7 +10,7 @@ export default defineConfig({
     port: 3000, // Required for vite to be accessible when running as part of docker compose setup
     proxy: {
       "^/api.*": {
-        target: "http://backend:8080",
+        target: `http://${process.env.BACKEND_HOST || "localhost"}:8080`,
         prependPath: true,
         changeOrigin: true,
       },
