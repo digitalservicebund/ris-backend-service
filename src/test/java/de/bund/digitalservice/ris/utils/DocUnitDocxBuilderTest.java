@@ -227,7 +227,97 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphAlignment() {
+  void testBuild_withTextAndParagraphAlignmentRight() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    Jc jc = new Jc();
+    jc.setVal(JcEnumeration.RIGHT);
+    pPr.setJc(jc);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("right", paragraphElement.getAlignment());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"text-align: right;\">text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndParagraphAlignmentLeft() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    Jc jc = new Jc();
+    jc.setVal(JcEnumeration.LEFT);
+    pPr.setJc(jc);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("left", paragraphElement.getAlignment());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"text-align: left;\">text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndParagraphAlignmentJustify() {
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    Jc jc = new Jc();
+    jc.setVal(JcEnumeration.BOTH);
+    pPr.setJc(jc);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("text");
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
+    run.getContent().add(element);
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof DocUnitParagraphElement);
+    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals("justify", paragraphElement.getAlignment());
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals("<p style=\"text-align: justify;\">text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndParagraphAlignmentCenter() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();
     PPr pPr = new PPr();

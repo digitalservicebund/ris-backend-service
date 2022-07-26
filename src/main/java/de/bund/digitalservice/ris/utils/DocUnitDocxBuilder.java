@@ -425,6 +425,18 @@ public class DocUnitDocxBuilder {
       return "center";
     }
 
+    if (jc != null && jc.getVal() != null && jc.getVal() == JcEnumeration.RIGHT) {
+      return "right";
+    }
+
+    if (jc != null && jc.getVal() != null && jc.getVal() == JcEnumeration.LEFT) {
+      return "left";
+    }
+
+    if (jc != null && jc.getVal() != null && jc.getVal() == JcEnumeration.BOTH) {
+      return "justify";
+    }
+
     return null;
   }
 
@@ -514,14 +526,12 @@ public class DocUnitDocxBuilder {
       vertAlign = rPr.getVertAlign().getVal();
     }
 
-    if (vertAlign != null && vertAlign != STVerticalAlignRun.BASELINE) {
-      if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
-        return VerticalAlign.SUBSCRIPT;
-      } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
-        return VerticalAlign.SUPERSCRIPT;
-      } else {
-        LOGGER.error("Unknown vertical align value: {}", vertAlign);
-      }
+    if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
+      return VerticalAlign.SUBSCRIPT;
+    } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
+      return VerticalAlign.SUPERSCRIPT;
+    } else {
+      LOGGER.error("Unknown vertical align value: {}", vertAlign);
     }
     return null;
   }
