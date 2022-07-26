@@ -127,4 +127,35 @@ describe("FileUpload", () => {
     getByText("Die Datei darf max. 20 MB groß sein.", { exact: false })
     getByText("Bitte laden Sie eine kleinere Datei hoch.", { exact: false })
   })
+
+  test("upload fails because the file is too large", async () => {
+    vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
+      Promise.resolve({ status: UploadStatus.FAILED })
+    )
+
+    const { getByText, getByLabelText } = render(FileUpload, {
+      props: {
+        docUnitUuid: "1",
+      },
+      global: { plugins: [vuetify, router] },
+    })
+
+    const file = new File(["test"], "sample.docx")
+
+    const inputEl = getByLabelText("file-upload")
+
+    Object.defineProperty(inputEl, "files", {
+      value: [file],
+      configurable: true,
+    })
+
+    await waitFor(() => fireEvent.update(inputEl))
+
+    await flushPromises()
+
+    getByText("Leider ist ein Fehler aufgetreten.", { exact: false })
+    getByText("Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.", {
+      exact: false,
+    })
+  })
 })

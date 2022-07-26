@@ -208,6 +208,15 @@ const onFileSelect = (e: Event) => {
         </ErrorModal>
       </v-col>
     </v-row>
+    <v-row v-if="status.uploadStatus === UploadStatus.FAILED">
+      <v-col md="8" sm="12">
+        <ErrorModal
+          title="Leider ist ein Fehler aufgetreten."
+          description="Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+        >
+        </ErrorModal>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
