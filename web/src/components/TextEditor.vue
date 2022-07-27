@@ -55,6 +55,9 @@ const emit = defineEmits<{
 
 const hasFocus = ref<boolean>(false)
 const showMore = ref<boolean>(false)
+const showMoreTextAlign = ref<boolean>(false)
+const showImageAlignment = ref<boolean>(false)
+const showListStyles = ref<boolean>(false)
 
 const { mdAndDown, lg, lgAndUp, lgAndDown, xlAndUp } = useDisplay()
 
@@ -99,6 +102,21 @@ const editor = new Editor({
 })
 
 const toggleShowMore = () => (showMore.value = !showMore.value)
+const toggleShowTextAlignModal = () => {
+  showMoreTextAlign.value = !showMoreTextAlign.value
+  showListStyles.value = false
+  showImageAlignment.value = false
+}
+const toggleShowImageAlignmentModal = () => {
+  showImageAlignment.value = !showImageAlignment.value
+  showListStyles.value = false
+  showMoreTextAlign.value = false
+}
+const toggleShowListStylesModal = () => {
+  showListStyles.value = !showListStyles.value
+  showImageAlignment.value = false
+  showMoreTextAlign.value = false
+}
 
 watch(
   () => props.value,
@@ -148,10 +166,10 @@ const editorBtnsGroup2: EditorBtn[] = [
 })
 
 const editorBtnsGroup3: EditorBtn[] = [
-  ["align-left", "format_align_left"],
-  ["align-center", "format_align_center"],
-  ["align-right", "format_align_right"],
-  ["align-justify", "format_align_justify"],
+  ["left", "format_align_left"],
+  ["center", "format_align_center"],
+  ["right", "format_align_right"],
+  ["justify", "format_align_justify"],
 ].map((button) => {
   return {
     type: button[0],
@@ -247,20 +265,44 @@ onMounted(() => {
       <v-divider inset vertical></v-divider>
 
       <v-col v-show="lgAndDown" class="display-group">
-        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
-          >format_align_left</v-icon
+        <div
+          class="dropdown-container"
+          @click.self="toggleShowTextAlignModal()"
+          @keydown.esc="toggleShowTextAlignModal()"
         >
-        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
-          >arrow_drop_down</v-icon
-        >
+          <div class="dropdown-icons">
+            <v-icon @click="toggleShowTextAlignModal()" @mousedown.prevent=""
+              >format_align_left</v-icon
+            >
+            <v-icon @click="toggleShowTextAlignModal()" @mousedown.prevent=""
+              >arrow_drop_down</v-icon
+            >
+          </div>
+          <div v-if="showMoreTextAlign" class="dropdown-content">
+            <v-col class="display-group pa-0">
+              <v-col
+                v-for="(btn, index) in editorBtnsGroup3"
+                :key="index"
+                class="dropdown-content-items"
+              >
+                <v-icon
+                  class="editor-btn"
+                  :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+                  @click="editor.chain().focus().setTextAlign(btn.type).run()"
+                  @mousedown.prevent=""
+                  >{{ btn.icon }}</v-icon
+                >
+              </v-col>
+            </v-col>
+          </div>
+        </div>
       </v-col>
-
       <v-col v-show="xlAndUp" class="display-group pa-0">
         <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
           <v-icon
             class="editor-btn"
             :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-            @click="editor.chain().focus().toggleMark(btn.type).run()"
+            @click="editor.chain().focus().setTextAlign(btn.type).run()"
             @mousedown.prevent=""
             >{{ btn.icon }}</v-icon
           >
@@ -286,15 +328,38 @@ onMounted(() => {
       <v-divider v-show="lgAndUp" inset vertical></v-divider>
 
       <v-col v-show="lg" class="display-group">
-        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
-          >format_list_bulleted</v-icon
+        <div
+          class="dropdown-container"
+          @click.self="toggleShowListStylesModal()"
+          @keydown.esc="toggleShowListStylesModal()"
         >
-        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
-          >arrow_drop_down</v-icon
-        >
+          <div class="dropdown-icons">
+            <v-icon @click="toggleShowListStylesModal()" @mousedown.prevent=""
+              >format_list_bulleted</v-icon
+            >
+            <v-icon @click="toggleShowListStylesModal()" @mousedown.prevent=""
+              >arrow_drop_down</v-icon
+            >
+          </div>
+          <div v-if="showListStyles" class="dropdown-content">
+            <v-col class="display-group pa-0">
+              <v-col
+                v-for="(btn, index) in editorBtnsGroup5"
+                :key="index"
+                class="dropdown-content-items"
+              >
+                <v-icon
+                  class="editor-btn"
+                  :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+                  @click="editor.chain().focus().toggleMark(btn.type).run()"
+                  @mousedown.prevent=""
+                  >{{ btn.icon }}</v-icon
+                >
+              </v-col>
+            </v-col>
+          </div>
+        </div>
       </v-col>
-
-      <v-divider v-show="lgAndUp" inset vertical></v-divider>
 
       <v-col
         v-for="(btn, index) in editorBtnsGroup5"
@@ -310,14 +375,37 @@ onMounted(() => {
         >
         <v-divider inset vertical></v-divider>
       </v-col>
-
       <v-col v-show="lg" class="display-group">
-        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
-          >vertical_split</v-icon
+        <div
+          class="dropdown-container"
+          @click.self="toggleShowImageAlignmentModal()"
+          @keydown.esc="toggleShowImageAlignmentModal()"
         >
-        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
-          >arrow_drop_down</v-icon
-        >
+          <div class="dropdown-icons">
+            <v-icon
+              @click="toggleShowImageAlignmentModal()"
+              @mousedown.prevent=""
+              >vertical_split</v-icon
+            >
+            <v-icon
+              @click="toggleShowImageAlignmentModal()"
+              @mousedown.prevent=""
+              >arrow_drop_down</v-icon
+            >
+          </div>
+          <div v-if="showImageAlignment" class="dropdown-content">
+            <div class="dropdown-content-items">
+              <v-col class="display-group pa-0">
+                <v-col>
+                  <v-icon>vertical_split</v-icon>
+                </v-col>
+                <v-col>
+                  <v-icon class="mirrored">vertical_split</v-icon>
+                </v-col>
+              </v-col>
+            </div>
+          </div>
+        </div>
       </v-col>
 
       <v-col v-show="xlAndUp" class="display-group pa-0">
@@ -482,5 +570,24 @@ onMounted(() => {
   border-color: #004b76;
   margin-left: -16px;
   margin-right: -16px;
+}
+
+.dropdown-container {
+  width: max-content;
+  position: relative;
+  display: inline-block;
+  .dropdown-icons  {
+    display: flex;
+    flex-direction: row;
+  }
+  .dropdown-content {
+    display: flex;
+    flex-direction: row;
+    background: $white;
+    border: 1px solid #004b76;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+  }
 }
 </style>
