@@ -294,6 +294,8 @@ onMounted(() => {
         >
       </v-col>
 
+      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+
       <v-col
         v-for="(btn, index) in editorBtnsGroup5"
         v-show="xlAndUp"
@@ -329,7 +331,7 @@ onMounted(() => {
       </v-col>
 
       <v-divider v-show="lgAndUp" inset vertical></v-divider>
-      <v-col>
+      <v-col v-show="lgAndUp">
         <v-icon>table_chart</v-icon>
       </v-col>
 
