@@ -165,15 +165,16 @@ public class DocUnitDocxBuilder {
       listNumberingDefinition = listNumberingDefinitions.get(numId);
     }
 
+    if (numPr != null && numPr.getIlvl() != null && numPr.getIlvl().getVal() != null) {
+      iLvl = numPr.getIlvl().getVal().toString();
+    }
+
     DocUnitNumberingListNumberFormat numberFormat = DocUnitNumberingListNumberFormat.BULLET;
     if (listNumberingDefinition != null) {
       AbstractListNumberingDefinition abstractListDefinition =
           listNumberingDefinition.getAbstractListDefinition();
 
-      if (abstractListDefinition != null
-          && numPr.getIlvl() != null
-          && numPr.getIlvl().getVal() != null) {
-        iLvl = numPr.getIlvl().getVal().toString();
+      if (abstractListDefinition != null && iLvl != null) {
         ListLevel listLevel = abstractListDefinition.getListLevels().get(iLvl);
 
         if (listLevel != null) {
