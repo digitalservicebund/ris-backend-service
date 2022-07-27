@@ -179,7 +179,12 @@ const editorBtnsGroup5: EditorBtn[] = [
   }
 })
 const ariaLabel = props.ariaLabel ? props.ariaLabel + " Editor Feld" : null
-
+const alignText = [
+  { style: "text-align: right", align: "right" },
+  { style: "text-align: left", align: "left" },
+  { style: "text-align: center", align: "center" },
+  { style: "text-align: justify", align: "justify" },
+]
 onMounted(() => {
   const editorContainer = document.querySelector(`[aria-label="${ariaLabel}"]`)
   if (editorContainer) {
@@ -192,19 +197,13 @@ onMounted(() => {
           clipboardCoppiedData,
           "text/html"
         ).body.innerHTML
-        if (pastedContent.includes("text-align: right")) {
-          editor.chain().focus().setTextAlign("right").run()
+        const applyStyle = alignText.filter((alignTextElement) =>
+          pastedContent.includes(alignTextElement.style)
+        )
+        if (applyStyle.length === 1) {
+          editor.chain().focus().setTextAlign(applyStyle[0].align).run()
+          emit("updateValue", editor.getHTML())
         }
-        if (pastedContent.includes("text-align: left")) {
-          editor.chain().focus().setTextAlign("left").run()
-        }
-        if (pastedContent.includes("text-align: center")) {
-          editor.chain().focus().setTextAlign("center").run()
-        }
-        if (pastedContent.includes("text-align: justify")) {
-          editor.chain().focus().setTextAlign("justify").run()
-        }
-        emit("updateValue", editor.getHTML())
       }
     })
   }
