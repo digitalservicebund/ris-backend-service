@@ -350,13 +350,13 @@ onMounted(() => {
     </v-row>
 
     <!-- Small layout second row on showMore button click-->
-    <v-row v-show="mdAndDown" v-if="showMoreOptions()">
+    <v-row v-show="mdAndDown" v-if="showMoreOptions() && showButtons()">
       <v-col>
-        <v-divider v-if="showButtons()" class="horizontal-divider"></v-divider>
+        <v-divider class="horizontal-divider"></v-divider>
       </v-col>
     </v-row>
 
-    <v-row v-show="mdAndDown" v-if="showMoreOptions()">
+    <v-row v-show="mdAndDown" v-if="showMoreOptions() && showButtons()">
       <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
         <v-icon
           class="editor-btn"
