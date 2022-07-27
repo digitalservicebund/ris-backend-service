@@ -1,14 +1,21 @@
-import { test, expect } from "@playwright/test"
-import {
-  navigateToCategories,
-  generateDocUnit,
-  deleteDocUnit,
-  pageReload,
-} from "./e2e-utils"
+import { test as base, expect } from "@playwright/test"
+import { navigateToCategories, pageReload } from "./e2e-utils"
+
+const test = base.extend<{ documentNumber: string }>({
+  documentNumber: async ({ request }, use) => {
+    const response = await request.post("api/v1/docunits", {
+      data: { documentationCenterAbbreviation: "foo", documentType: "X" },
+    })
+    const { uuid, documentnumber: documentNumber } = await response.json()
+
+    await use(documentNumber)
+
+    await request.delete(`api/v1/docunits/${uuid}`)
+  },
+})
 
 test.describe("save changes in core data and texts and verify it persists", () => {
-  test("test core data change", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
+  test("test core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
@@ -35,12 +42,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     // 2. verify that the change is visible in Rubriken
     await navigateToCategories(page, documentNumber)
     expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("abc")
-
-    await deleteDocUnit(page, documentNumber)
   })
 
-  test.skip("test bold text input", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
+  test.skip("test bold text input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -70,12 +74,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await editorField.innerHTML()).toBe(
       "<p><strong>this is bold text</strong></p>"
     )
-
-    await deleteDocUnit(page, documentNumber)
   })
 
-  test.skip("test italic test input", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
+  test.skip("test italic test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -105,12 +106,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await editorField.innerHTML()).toBe(
       "<p><em>this is italic text</em></p>"
     )
-
-    await deleteDocUnit(page, documentNumber)
   })
 
-  test.skip("test underlined test input", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
+  test.skip("test underlined test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -140,12 +138,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await editorField.innerHTML()).toBe(
       "<p><u>this is underlined text</u></p>"
     )
-
-    await deleteDocUnit(page, documentNumber)
   })
 
-  test.skip("test strike test input", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
+  test.skip("test strike test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -175,12 +170,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await editorField.innerHTML()).toBe(
       "<p><s>this is striked text</s></p>"
     )
-
-    await deleteDocUnit(page, documentNumber)
   })
 
-  test.skip("test superscript test input", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
+  test.skip("test superscript test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -210,12 +202,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await editorField.innerHTML()).toBe(
       "<p><sup>this is superscript text</sup></p>"
     )
-
-    await deleteDocUnit(page, documentNumber)
   })
 
-  test.skip("test subscript test input", async ({ page }) => {
-    const documentNumber = await generateDocUnit(page)
+  test.skip("test subscript test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -245,7 +234,5 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await editorField.innerHTML()).toBe(
       "<p><sub>this is subscript text</sub></p>"
     )
-
-    await deleteDocUnit(page, documentNumber)
   })
 })
