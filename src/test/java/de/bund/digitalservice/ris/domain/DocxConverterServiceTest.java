@@ -48,7 +48,6 @@ import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
 import org.docx4j.relationships.Relationship;
 import org.docx4j.wml.Style;
-import org.docx4j.wml.Style.Name;
 import org.docx4j.wml.Styles;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -165,9 +164,7 @@ class DocxConverterServiceTest {
     StyleDefinitionsPart styleDefinitionsPart = mock(StyleDefinitionsPart.class);
     Styles styles = mock(Styles.class);
     Style style = mock(Style.class);
-    Name name = mock(Name.class);
-    when(name.getVal()).thenReturn("test-style");
-    when(style.getName()).thenReturn(name);
+    when(style.getStyleId()).thenReturn("test-style");
     when(styles.getStyle()).thenReturn(List.of(style));
     when(styleDefinitionsPart.getJaxbElement()).thenReturn(styles);
     when(mainDocumentPart.getStyleDefinitionsPart()).thenReturn(styleDefinitionsPart);

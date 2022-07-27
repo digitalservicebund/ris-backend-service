@@ -275,7 +275,7 @@ public class DocxConverterService {
         .getJaxbElement()
         .getStyle()
         .stream()
-        .collect(Collectors.toMap(k -> k.getName().getVal(), Function.identity()));
+        .collect(Collectors.toMap(k -> k.getStyleId(), Function.identity()));
   }
 
   private Map<String, DocxImagePart> readImages(WordprocessingMLPackage mlPackage) {
