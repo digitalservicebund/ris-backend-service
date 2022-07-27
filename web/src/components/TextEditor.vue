@@ -247,8 +247,12 @@ onMounted(() => {
       <v-divider inset vertical></v-divider>
 
       <v-col v-show="mdAndDown" class="display-group">
-        <v-icon>format_align_left</v-icon>
-        <v-icon>arrow_drop_down</v-icon>
+        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+          >format_align_left</v-icon
+        >
+        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+          >arrow_drop_down</v-icon
+        >
       </v-col>
 
       <v-divider inset vertical></v-divider>
@@ -304,7 +308,9 @@ onMounted(() => {
       </v-col>
 
       <v-col v-show="mdAndDown">
-        <v-icon @click="toggleShowMore()">more_horiz</v-icon>
+        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+          >more_horiz</v-icon
+        >
       </v-col>
 
       <v-divider inset vertical></v-divider>
@@ -315,6 +321,12 @@ onMounted(() => {
         <v-icon>open_in_full</v-icon>
       </v-col>
     </v-row>
+    <v-row v-show="mdAndDown" v-if="showMoreOptions()">
+      <v-col
+        ><v-divider v-if="showButtons()" class="horizontal-divider"></v-divider
+      ></v-col>
+    </v-row>
+
     <v-row v-show="mdAndDown" v-if="showMoreOptions()">
       <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
         <v-icon
@@ -355,7 +367,7 @@ onMounted(() => {
     <v-row v-if="showButtons()">
       <v-col></v-col>
     </v-row>
-    <v-divider v-if="showButtons()" color="black"></v-divider>
+    <v-divider v-if="showButtons()" class="horizontal-divider"></v-divider>
     <v-row>
       <v-col cols="12">
         <editor-content
@@ -433,5 +445,11 @@ onMounted(() => {
 
 .mirrored {
   transform: scaleX(-1);
+}
+
+.horizontal-divider {
+  border-color: #004b76;
+  margin-left: -16px;
+  margin-right: -16px;
 }
 </style>
