@@ -130,7 +130,13 @@ watch(
 )
 
 const showButtons = () => {
-  return props.editable && hasFocus.value
+  const isShowButtons = props.editable && hasFocus.value
+  if (!isShowButtons) {
+    showListStyles.value = false
+    showImageAlignment.value = false
+    showMoreTextAlign.value = false
+  }
+  return isShowButtons
   // return props.editable
 }
 
@@ -265,11 +271,7 @@ onMounted(() => {
       <v-divider inset vertical></v-divider>
 
       <v-col v-show="lgAndDown" class="display-group">
-        <div
-          class="dropdown-container"
-          @click.self="toggleShowTextAlignModal()"
-          @keydown.esc="toggleShowTextAlignModal()"
-        >
+        <div class="dropdown-container">
           <div class="dropdown-icons">
             <v-icon @click="toggleShowTextAlignModal()" @mousedown.prevent=""
               >format_align_left</v-icon
@@ -328,11 +330,7 @@ onMounted(() => {
       <v-divider v-show="lgAndUp" inset vertical></v-divider>
 
       <v-col v-show="lg" class="display-group">
-        <div
-          class="dropdown-container"
-          @click.self="toggleShowListStylesModal()"
-          @keydown.esc="toggleShowListStylesModal()"
-        >
+        <div class="dropdown-container">
           <div class="dropdown-icons">
             <v-icon @click="toggleShowListStylesModal()" @mousedown.prevent=""
               >format_list_bulleted</v-icon
@@ -376,11 +374,7 @@ onMounted(() => {
         <v-divider inset vertical></v-divider>
       </v-col>
       <v-col v-show="lg" class="display-group">
-        <div
-          class="dropdown-container"
-          @click.self="toggleShowImageAlignmentModal()"
-          @keydown.esc="toggleShowImageAlignmentModal()"
-        >
+        <div class="dropdown-container">
           <div class="dropdown-icons">
             <v-icon
               @click="toggleShowImageAlignmentModal()"
@@ -576,10 +570,6 @@ onMounted(() => {
   width: max-content;
   position: relative;
   display: inline-block;
-  .dropdown-icons  {
-    display: flex;
-    flex-direction: row;
-  }
   .dropdown-content {
     display: flex;
     flex-direction: row;
