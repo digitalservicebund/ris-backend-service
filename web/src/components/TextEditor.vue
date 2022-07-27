@@ -56,7 +56,7 @@ const emit = defineEmits<{
 const hasFocus = ref<boolean>(false)
 const showMore = ref<boolean>(false)
 
-const { mdAndDown, lgAndUp } = useDisplay()
+const { mdAndDown, lg, lgAndUp, lgAndDown, xlAndUp } = useDisplay()
 
 const editor = new Editor({
   content: props.value,
@@ -242,11 +242,12 @@ onMounted(() => {
       </v-col>
 
       <v-divider inset vertical></v-divider>
+
       <v-col>Heading</v-col>
 
       <v-divider inset vertical></v-divider>
 
-      <v-col v-show="mdAndDown" class="display-group">
+      <v-col v-show="lgAndDown" class="display-group">
         <v-icon @click="toggleShowMore()" @mousedown.prevent=""
           >format_align_left</v-icon
         >
@@ -255,9 +256,7 @@ onMounted(() => {
         >
       </v-col>
 
-      <v-divider inset vertical></v-divider>
-
-      <v-col v-show="lgAndUp" class="display-group pa-0">
+      <v-col v-show="xlAndUp" class="display-group pa-0">
         <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
           <v-icon
             class="editor-btn"
@@ -267,44 +266,72 @@ onMounted(() => {
             >{{ btn.icon }}</v-icon
           >
         </v-col>
+      </v-col>
 
+      <v-divider inset vertical></v-divider>
+
+      <v-col
+        v-for="(btn, index) in editorBtnsGroup4"
+        v-show="lgAndUp"
+        :key="index"
+      >
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
+      </v-col>
+
+      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+
+      <v-col v-show="lg" class="display-group">
+        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+          >format_list_bulleted</v-icon
+        >
+        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+          >arrow_drop_down</v-icon
+        >
+      </v-col>
+
+      <v-col
+        v-for="(btn, index) in editorBtnsGroup5"
+        v-show="xlAndUp"
+        :key="index"
+      >
+        <v-icon
+          class="editor-btn"
+          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
+          @click="editor.chain().focus().toggleMark(btn.type).run()"
+          @mousedown.prevent=""
+          >{{ btn.icon }}</v-icon
+        >
         <v-divider inset vertical></v-divider>
+      </v-col>
 
-        <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
-          <v-icon
-            class="editor-btn"
-            :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-            @click="editor.chain().focus().toggleMark(btn.type).run()"
-            @mousedown.prevent=""
-            >{{ btn.icon }}</v-icon
-          >
-        </v-col>
+      <v-col v-show="lg" class="display-group">
+        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+          >vertical_split</v-icon
+        >
+        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+          >arrow_drop_down</v-icon
+        >
+      </v-col>
 
-        <v-divider inset vertical></v-divider>
-
-        <v-col v-for="(btn, index) in editorBtnsGroup5" :key="index">
-          <v-icon
-            class="editor-btn"
-            :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-            @click="editor.chain().focus().toggleMark(btn.type).run()"
-            @mousedown.prevent=""
-            >{{ btn.icon }}</v-icon
-          >
-        </v-col>
-
-        <v-divider inset vertical></v-divider>
-
+      <v-col v-show="xlAndUp" class="display-group pa-0">
         <v-col>
           <v-icon>vertical_split</v-icon>
         </v-col>
         <v-col>
           <v-icon class="mirrored">vertical_split</v-icon>
         </v-col>
-
         <v-divider inset vertical></v-divider>
-        <v-col>
-          <v-icon>table_chart</v-icon>
-        </v-col>
+      </v-col>
+
+      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+      <v-col>
+        <v-icon>table_chart</v-icon>
       </v-col>
 
       <v-col v-show="mdAndDown">
@@ -321,10 +348,12 @@ onMounted(() => {
         <v-icon>open_in_full</v-icon>
       </v-col>
     </v-row>
+
+    <!-- Small layout second row on showMore button click-->
     <v-row v-show="mdAndDown" v-if="showMoreOptions()">
-      <v-col
-        ><v-divider v-if="showButtons()" class="horizontal-divider"></v-divider
-      ></v-col>
+      <v-col>
+        <v-divider v-if="showButtons()" class="horizontal-divider"></v-divider>
+      </v-col>
     </v-row>
 
     <v-row v-show="mdAndDown" v-if="showMoreOptions()">
@@ -364,6 +393,7 @@ onMounted(() => {
         <v-icon>table_chart</v-icon>
       </v-col>
     </v-row>
+
     <v-row v-if="showButtons()">
       <v-col></v-col>
     </v-row>
