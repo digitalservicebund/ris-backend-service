@@ -95,7 +95,7 @@ _help() {
   echo ""
   echo "Available commands:"
   echo "init                  Set up repository for development"
-  echo "dev" Start development environment
+  echo "dev                   Start full-stack development environment"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
 }
