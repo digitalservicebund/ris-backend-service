@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 
 @RestController
 @RequestMapping("api/v1/docunits")
@@ -38,6 +40,7 @@ public class DocUnitController {
       @RequestBody DocUnitCreationInfo docUnitCreationInfo) {
     return service
         .generateNewDocUnit(docUnitCreationInfo)
+        .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }

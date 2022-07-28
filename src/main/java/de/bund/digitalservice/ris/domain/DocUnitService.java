@@ -14,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -44,7 +43,6 @@ public class DocUnitService {
     this.s3AsyncClient = s3AsyncClient;
   }
 
-  @Transactional
   public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
     return counterRepository
