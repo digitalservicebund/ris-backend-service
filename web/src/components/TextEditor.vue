@@ -238,6 +238,7 @@ onMounted(() => {
   <v-container fluid>
     <v-row
       v-if="showButtons()"
+      class="d-flex flex-nowrap"
       :aria-label="
         props.ariaLabel ? props.ariaLabel + ' Editor Button Leiste' : null
       "
@@ -371,8 +372,9 @@ onMounted(() => {
           @mousedown.prevent=""
           >{{ btn.icon }}</v-icon
         >
-        <v-divider inset vertical></v-divider>
       </v-col>
+
+      <v-divider inset vertical></v-divider>
       <v-col v-show="lg" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
@@ -402,6 +404,8 @@ onMounted(() => {
         </div>
       </v-col>
 
+      <v-divider v-show="xlAndUp" inset vertical></v-divider>
+
       <v-col v-show="xlAndUp" class="display-group pa-0">
         <v-col>
           <v-icon>vertical_split</v-icon>
@@ -423,7 +427,6 @@ onMounted(() => {
         >
       </v-col>
 
-      <v-divider inset vertical></v-divider>
       <v-col>
         <v-icon>123</v-icon>
       </v-col>
