@@ -22,6 +22,8 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -210,7 +212,7 @@ class DocUnitServiceTest {
         .consumeNextWith(Assertions::assertNotNull)
         .verifyComplete();
 
-    verify(repository).findAll();
+    verify(repository).findAll(Sort.by(Order.desc("documentnumber")));
   }
 
   @Test

@@ -9,6 +9,8 @@ import java.util.UUID;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -157,7 +159,7 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
-    return Mono.just(ResponseEntity.ok(repository.findAll()));
+    return Mono.just(ResponseEntity.ok(repository.findAll(Sort.by(Order.desc("documentnumber")))));
   }
 
   public Mono<ResponseEntity<DocUnit>> getByDocumentnumber(String documentnumber) {
