@@ -1,16 +1,14 @@
 import fs from "fs"
-import { test, expect } from "@playwright/test"
-import { deleteDocUnit, generateDocUnit, uploadTestfile } from "./e2e-utils"
+import { expect } from "@playwright/test"
+import { uploadTestfile } from "./e2e-utils"
+import { testWithDocUnit as test } from "./fixtures"
 
-test.describe("upload an original document to a doc unit and delete it again", () => {
-  let documentNumber: string
-
-  test.beforeEach(async ({ page }) => {
-    documentNumber = await generateDocUnit(page)
-  })
-
-  test.afterEach(async ({ page }) => {
-    await deleteDocUnit(page, documentNumber)
+test.describe("upload an original document to a doc unit", () => {
+  test.beforeEach(async ({ page, documentNumber }) => {
+    await page.goto("/")
+    await page
+      .locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
+      .click()
   })
 
   test("upload docx file per file chooser", async ({ page }) => {
@@ -41,6 +39,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
       data.items.add(file)
       return data
     }, docx)
+
     await page.dispatchEvent(".upload-drop-area", "dragover", { dataTransfer })
     await expect(
       page.locator("text=Datei in diesen Bereich ziehen")
@@ -60,6 +59,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
       data.items.add(file)
       return data
     }, png)
+
     await page.dispatchEvent(".upload-drop-area", "dragover", { dataTransfer })
     await expect(
       page.locator("text=Datei wird nicht unterstützt.")
@@ -79,6 +79,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
       data.items.add(file)
       return data
     }, docx)
+
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
     await expect(page.locator("text=Upload läuft")).toBeVisible()
   })
@@ -96,6 +97,7 @@ test.describe("upload an original document to a doc unit and delete it again", (
       data.items.add(file)
       return data
     }, png)
+
     await page.dispatchEvent("#upload-drop-area", "drop", { dataTransfer })
     await expect(
       page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt.")
