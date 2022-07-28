@@ -464,7 +464,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     concurrency: deploy-production
     environment: production
-    needs: [deploy-staging-verify]
+    needs: [build-and-push-image, deploy-staging-verify]
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
