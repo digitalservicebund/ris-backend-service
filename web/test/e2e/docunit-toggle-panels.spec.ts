@@ -1,8 +1,10 @@
 import { expect } from "@playwright/test"
-import { testWithDocUnit as test } from "./e2e-utils"
+import { navigateToCategories } from "./e2e-utils"
+import { testWithDocUnit as test } from "./fixtures"
 
 test.describe("test the different layout options", () => {
-  test("ensure default layout", async ({ page }) => {
+  test("ensure default layout", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
     await expect(
       page.locator("[aria-label='Navigation schließen']")
     ).toBeVisible()
@@ -16,7 +18,9 @@ test.describe("test the different layout options", () => {
 
   test("open and close original document panel without attached files", async ({
     page,
+    documentNumber,
   }) => {
+    await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Originaldokument öffnen']").click()
     await expect(
       page.locator("text=Es wurde noch kein Originaldokument hochgeladen")
@@ -24,7 +28,11 @@ test.describe("test the different layout options", () => {
     await expect(page).toHaveURL(/showDocPanel=true/)
   })
 
-  test("close and open navigation sidebar", async ({ page }) => {
+  test("close and open navigation sidebar", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Navigation schließen']").click()
     await expect(page).toHaveURL(/showNavBar=false/)
     await expect(page.locator("text=Bearbeitungsstand")).not.toBeVisible()
@@ -34,7 +42,11 @@ test.describe("test the different layout options", () => {
     await expect(page.locator("text=Bearbeitungsstand")).toBeVisible()
   })
 
-  test("persist toggle queries for new pages", async ({ page }) => {
+  test("persist toggle queries for new pages", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Originaldokument öffnen']").click()
     await expect(page).toHaveURL(/showDocPanel=true/)
 
