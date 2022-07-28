@@ -19,7 +19,7 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { watch, ref, onMounted } from "vue"
-import { useDisplay } from "vuetify"
+import { onBeforeRouteUpdate } from "vue-router"
 import { BorderNumber } from "../editor/border-number"
 import { FontSize } from "../editor/font-size"
 import { CustomImage } from "../editor/image"
@@ -58,8 +58,9 @@ const showMore = ref<boolean>(false)
 const showMoreTextAlign = ref<boolean>(false)
 const showImageAlignment = ref<boolean>(false)
 const showListStyles = ref<boolean>(false)
-
-const { mdAndDown, lg, lgAndUp, lgAndDown, xlAndUp } = useDisplay()
+const sm = ref<boolean>(false)
+const md = ref<boolean>(false)
+const lg = ref<boolean>(false)
 
 const editor = new Editor({
   content: props.value,
@@ -97,9 +98,40 @@ const editor = new Editor({
     emit("updateValue", editor.getHTML())
   },
   onFocus: () => (hasFocus.value = true),
-  onBlur: () => (hasFocus.value = false),
+  onBlur: () => ((hasFocus.value = false), onResize()),
   editable: props.editable,
 })
+
+const onResize = () => {
+  // console.log("resize triggered")
+  let containerWidth
+  const containerElement = document.getElementById("container")
+  if (containerElement)
+    containerWidth = containerElement.getBoundingClientRect().width
+  // console.log(containerWidth)
+  calculateBreakpoints(containerWidth)
+}
+
+const calculateBreakpoints = (containerWidth: number | undefined) => {
+  if (containerWidth) {
+    if (containerWidth < 830) {
+      // console.log("small")
+      sm.value = true
+      md.value = false
+      lg.value = false
+    } else if (containerWidth >= 830 && containerWidth < 950) {
+      // console.log("medium")
+      sm.value = false
+      md.value = true
+      lg.value = false
+    } else {
+      // console.log("large")
+      sm.value = false
+      md.value = false
+      lg.value = true
+    }
+  }
+}
 
 const toggleShowMore = () => (showMore.value = !showMore.value)
 const toggleShowTextAlignModal = () => {
@@ -131,6 +163,8 @@ watch(
 
 const showButtons = () => {
   const isShowButtons = props.editable && hasFocus.value
+  // const isShowButtons = props.editable
+
   if (!isShowButtons) {
     showListStyles.value = false
     showImageAlignment.value = false
@@ -210,6 +244,7 @@ const alignText = [
   { style: "text-align: justify", align: "justify" },
 ]
 onMounted(() => {
+  onResize()
   const editorContainer = document.querySelector(`[aria-label="${ariaLabel}"]`)
   if (editorContainer) {
     editorContainer.addEventListener("paste", (e) => {
@@ -232,13 +267,18 @@ onMounted(() => {
     })
   }
 })
+
+// same as beforeRouteUpdate option with no access to `this`
+onBeforeRouteUpdate(async () => {
+  // only fetch the user if the id changed as maybe only the query or the hash changed
+  onResize()
+})
 </script>
 
 <template>
-  <v-container fluid>
+  <v-container id="container" v-resize="onResize" fluid>
     <v-row
       v-if="showButtons()"
-      class="d-flex flex-nowrap"
       :aria-label="
         props.ariaLabel ? props.ariaLabel + ' Editor Button Leiste' : null
       "
@@ -271,7 +311,7 @@ onMounted(() => {
 
       <v-divider inset vertical></v-divider>
 
-      <v-col v-show="lgAndDown" class="display-group">
+      <v-col v-show="!lg" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
             <v-icon @click="toggleShowTextAlignModal()" @mousedown.prevent=""
@@ -293,14 +333,14 @@ onMounted(() => {
                   :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
                   @click="editor.chain().focus().setTextAlign(btn.type).run()"
                   @mousedown.prevent=""
-                  >{{ btn.icon }}</v-icon
-                >
+                  >{{ btn.icon }}
+                </v-icon>
               </v-col>
             </v-col>
           </div>
         </div>
       </v-col>
-      <v-col v-show="xlAndUp" class="display-group pa-0">
+      <v-col v-show="lg" class="display-group pa-0">
         <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
           <v-icon
             class="editor-btn"
@@ -314,11 +354,7 @@ onMounted(() => {
 
       <v-divider inset vertical></v-divider>
 
-      <v-col
-        v-for="(btn, index) in editorBtnsGroup4"
-        v-show="lgAndUp"
-        :key="index"
-      >
+      <v-col v-for="(btn, index) in editorBtnsGroup4" v-show="!sm" :key="index">
         <v-icon
           class="editor-btn"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
@@ -328,9 +364,9 @@ onMounted(() => {
         >
       </v-col>
 
-      <v-divider v-show="lgAndUp" inset vertical></v-divider>
+      <v-divider v-show="!sm" inset vertical></v-divider>
 
-      <v-col v-show="lg" class="display-group">
+      <v-col v-show="md" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
             <v-icon @click="toggleShowListStylesModal()" @mousedown.prevent=""
@@ -352,19 +388,15 @@ onMounted(() => {
                   :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
                   @click="editor.chain().focus().toggleMark(btn.type).run()"
                   @mousedown.prevent=""
-                  >{{ btn.icon }}</v-icon
-                >
+                  >{{ btn.icon }}
+                </v-icon>
               </v-col>
             </v-col>
           </div>
         </div>
       </v-col>
 
-      <v-col
-        v-for="(btn, index) in editorBtnsGroup5"
-        v-show="xlAndUp"
-        :key="index"
-      >
+      <v-col v-for="(btn, index) in editorBtnsGroup5" v-show="lg" :key="index">
         <v-icon
           class="editor-btn"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
@@ -375,7 +407,7 @@ onMounted(() => {
       </v-col>
 
       <v-divider inset vertical></v-divider>
-      <v-col v-show="lg" class="display-group">
+      <v-col v-show="md" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
             <v-icon
@@ -404,9 +436,9 @@ onMounted(() => {
         </div>
       </v-col>
 
-      <v-divider v-show="xlAndUp" inset vertical></v-divider>
+      <v-divider v-show="lg" inset vertical></v-divider>
 
-      <v-col v-show="xlAndUp" class="display-group pa-0">
+      <v-col v-show="lg" class="display-group pa-0">
         <v-col>
           <v-icon>vertical_split</v-icon>
         </v-col>
@@ -416,12 +448,12 @@ onMounted(() => {
         <v-divider inset vertical></v-divider>
       </v-col>
 
-      <v-divider v-show="lgAndUp" inset vertical></v-divider>
-      <v-col v-show="lgAndUp">
+      <v-divider v-show="md" inset vertical></v-divider>
+      <v-col v-show="md">
         <v-icon>table_chart</v-icon>
       </v-col>
 
-      <v-col v-show="mdAndDown">
+      <v-col v-show="sm">
         <v-icon @click="toggleShowMore()" @mousedown.prevent=""
           >more_horiz</v-icon
         >
@@ -436,13 +468,13 @@ onMounted(() => {
     </v-row>
 
     <!-- Small layout second row on showMore button click-->
-    <v-row v-show="mdAndDown" v-if="showMoreOptions() && showButtons()">
+    <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
       <v-col>
         <v-divider class="horizontal-divider"></v-divider>
       </v-col>
     </v-row>
 
-    <v-row v-show="mdAndDown" v-if="showMoreOptions() && showButtons()">
+    <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
       <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
         <v-icon
           class="editor-btn"
@@ -573,6 +605,7 @@ onMounted(() => {
   width: max-content;
   position: relative;
   display: inline-block;
+
   .dropdown-content {
     display: flex;
     flex-direction: row;
