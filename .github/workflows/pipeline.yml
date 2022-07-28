@@ -28,6 +28,8 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run license scanner
         run: ./gradlew checkLicense
       - name: Send status to Slack
