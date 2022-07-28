@@ -34,6 +34,15 @@ This will replace placeholders in the application template and install a couple 
 
 ### Local development setup
 
+One dependency is coming from a private GitHub repository. To be able to download it in the gradle build process, you need to add the following to your `.bashrc` (or `.zshrc`, or ...) file. Then restart IntelliJ and reload Gradle.
+
+```bash
+export GITHUB_USERNAME=<insert-yours>
+export GITHUB_PERSONAL_ACCESS_TOKEN=<insert-yours>
+```
+
+You can generate a personal access token [here](https://github.com/settings/tokens). The scope `read:packages` is enough.
+
 ### Full-stack
 
 ```bash
