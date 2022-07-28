@@ -1,8 +1,12 @@
 import { test, expect } from "@playwright/test"
 import { generateDocUnit, deleteDocUnit, uploadTestfile } from "./e2e-utils"
 
-test.skip("copy-paste from side panel", async ({ page, browserName }) => {
-  if (browserName !== "chromium") return
+test.skip(
+  ({ browserName }) => browserName !== "chromium",
+  "Skipping in engines other than chromium, reason unknown"
+)
+
+test.skip("copy-paste from side panel", async ({ page }) => {
   // upload file
   const documentNumber = await generateDocUnit(page)
   await uploadTestfile(page, "some-formatting.docx")
