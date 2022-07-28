@@ -1,5 +1,6 @@
-import { test, expect } from "@playwright/test"
-import { generateDocUnit, deleteDocUnit, uploadTestfile } from "./e2e-utils"
+import { expect } from "@playwright/test"
+import { uploadTestfile } from "./e2e-utils"
+import { testWithDocUnit as test } from "./fixtures"
 
 test.skip(
   ({ browserName }) => browserName !== "chromium",
@@ -8,7 +9,6 @@ test.skip(
 
 test.skip("copy-paste from side panel", async ({ page }) => {
   // upload file
-  const documentNumber = await generateDocUnit(page)
   await uploadTestfile(page, "some-formatting.docx")
   await page.waitForSelector("text=some-formatting.docx")
   await page.waitForSelector("text=Headline")
@@ -67,5 +67,4 @@ test.skip("copy-paste from side panel", async ({ page }) => {
   expect(removeFirstTag(updatedContent)).toBe(
     removeFirstTag(originalFileContent)
   )
-  await deleteDocUnit(page, documentNumber)
 })
