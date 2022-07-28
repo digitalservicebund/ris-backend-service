@@ -3,7 +3,8 @@ import { devices, PlaywrightTestConfig } from "@playwright/test"
 const config: PlaywrightTestConfig = {
   testDir: "./test/e2e",
   timeout: 40000,
-  retries: process.env.CI === "true" ? 1 : 0,
+  retries: process.env.CI ? 1 : 0,
+  workers: process.env.CI ? 2 : undefined,
   use: {
     viewport: { width: 1280, height: 720 },
     acceptDownloads: true,
