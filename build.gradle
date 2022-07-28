@@ -15,16 +15,7 @@ sourceCompatibility = "17"
 
 configurations { compileOnly { extendsFrom annotationProcessor } }
 
-repositories {
-  mavenCentral()
-  maven {
-    url = uri("https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export")
-    credentials {
-      username = System.getenv("GITHUB_ACTOR") ?: System.getenv("GITHUB_USERNAME")
-      password = System.getenv("GITHUB_TOKEN") ?: System.getenv("GITHUB_PERSONAL_ACCESS_TOKEN")
-    }
-  }
-}
+repositories { mavenCentral() }
 
 jacoco { toolVersion = "0.8.8" }
 
@@ -67,8 +58,6 @@ dependencies {
   implementation "com.sun.activation:jakarta.activation:2.0.1"
   implementation "jakarta.mail:jakarta.mail-api:2.1.0"
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
-
-  implementation "de.bund.digitalservice:neuris-juris-xml-export:0.0.3"
 
   compileOnly "org.projectlombok:lombok"
   annotationProcessor "org.projectlombok:lombok"
