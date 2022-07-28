@@ -233,4 +233,167 @@ test.describe("save changes in core data and texts and verify it persists", () =
       "<p><sub>this is subscript text</sub></p>"
     )
   })
+  test("test right alignment text input", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+
+    let editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+
+    await editorField.click()
+    await editorField.type("this text has right aligment")
+
+    const dropdownShowAlignmentButton = await page
+      .locator(
+        "[aria-label='Entscheidungsname Editor Button Leiste'] >> div:has-text('format_align_leftarrow_drop_down')"
+      )
+      .nth(0)
+    await dropdownShowAlignmentButton.click()
+    // There are 2 icons of subscript button
+    // The frist one shows only in dropdown
+    // The second one shows in screen-xl
+    const rightAligmentButton = await page
+      .locator("text=format_align_right")
+      .nth(0)
+    await rightAligmentButton.click()
+
+    await page
+      .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
+      .click()
+    await page.waitForTimeout(500)
+
+    await pageReload(page)
+
+    // verify that the change is visible in the Kurz- und Langtexte field
+    await navigateToCategories(page, documentNumber)
+    editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+    expect(await editorField.innerHTML()).toBe(
+      '<p style="text-align: right">this text has right aligment</p>'
+    )
+  })
+  test("test center alignment text input", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+
+    let editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+
+    await editorField.click()
+    await editorField.type("this text has center aligment")
+
+    const dropdownShowAlignmentButton = await page
+      .locator(
+        "[aria-label='Entscheidungsname Editor Button Leiste'] >> div:has-text('format_align_leftarrow_drop_down')"
+      )
+      .nth(0)
+    await dropdownShowAlignmentButton.click()
+    // There are 2 icons of subscript button
+    // The frist one shows only in dropdown
+    // The second one shows in screen-xl
+    const centerAligmentButton = await page
+      .locator("text=format_align_center")
+      .nth(0)
+    await centerAligmentButton.click()
+
+    await page
+      .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
+      .click()
+    await page.waitForTimeout(500)
+
+    await pageReload(page)
+
+    // verify that the change is visible in the Kurz- und Langtexte field
+    await navigateToCategories(page, documentNumber)
+    editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+    expect(await editorField.innerHTML()).toBe(
+      '<p style="text-align: center">this text has center aligment</p>'
+    )
+  })
+  test("test left alignment text input", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+
+    let editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+
+    await editorField.click()
+    await editorField.type("this text has left aligment")
+
+    const dropdownShowAlignmentButton = await page
+      .locator(
+        "[aria-label='Entscheidungsname Editor Button Leiste'] >> div:has-text('format_align_leftarrow_drop_down')"
+      )
+      .nth(0)
+    await dropdownShowAlignmentButton.click()
+    // There are 2 icons of subscript button
+    // The frist one shows only in dropdown
+    // The second one shows in screen-xl
+    const leftAligmentButton = await page
+      .locator("text=format_align_left")
+      .nth(0)
+    await leftAligmentButton.click()
+
+    await page
+      .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
+      .click()
+    await page.waitForTimeout(500)
+
+    await pageReload(page)
+
+    // verify that the change is visible in the Kurz- und Langtexte field
+    await navigateToCategories(page, documentNumber)
+    editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+    expect(await editorField.innerHTML()).toBe(
+      "<p>this text has left aligment</p>"
+    )
+  })
+  test("test justify alignment text input", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    let editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+
+    await editorField.click()
+    await editorField.type("this text has justify aligment")
+
+    const dropdownShowAlignmentButton = await page
+      .locator(
+        "[aria-label='Entscheidungsname Editor Button Leiste'] >> div:has-text('format_align_leftarrow_drop_down')"
+      )
+      .nth(0)
+    await dropdownShowAlignmentButton.click()
+    // There are 2 icons of subscript button
+    // The frist one shows only in dropdown
+    // The second one shows in screen-xl
+    const justifyAligmentButton = await page
+      .locator("text=format_align_justify")
+      .nth(0)
+    await justifyAligmentButton.click()
+
+    await page
+      .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
+      .click()
+    await page.waitForTimeout(500)
+
+    await pageReload(page)
+
+    // verify that the change is visible in the Kurz- und Langtexte field
+    await navigateToCategories(page, documentNumber)
+    editorField = await page.locator(
+      "[aria-label='Entscheidungsname Editor Feld'] >> div"
+    )
+    expect(await editorField.innerHTML()).toBe(
+      '<p style="text-align: justify">this text has justify aligment</p>'
+    )
+  })
 })
