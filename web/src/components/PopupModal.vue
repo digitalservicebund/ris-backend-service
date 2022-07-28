@@ -55,7 +55,7 @@ onMounted(() => {
   left: 0;
   width: 100vw;
   height: 100%;
-  background-color: rgba(217, 217, 217, 0.5);
+  background-color: rgba(111, 119, 133, 0.6);
   z-index: 999;
   display: flex;
   justify-content: center;
@@ -67,7 +67,7 @@ onMounted(() => {
     max-width: 442px;
     box-sizing: border-box;
     border: 2px solid $blue800;
-    padding: 40px 56px;
+    padding: 40px 40px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
