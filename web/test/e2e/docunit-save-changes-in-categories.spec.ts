@@ -1,20 +1,10 @@
-import { test as base, expect } from "@playwright/test"
+import { expect, test as base } from "@playwright/test"
 import { navigateToCategories, pageReload } from "./e2e-utils"
+import { testWithDocUnit as test } from "./fixtures"
 
-const test = base.extend<{ documentNumber: string }>({
-  documentNumber: async ({ request }, use) => {
-    const response = await request.post("api/v1/docunits", {
-      data: { documentationCenterAbbreviation: "foo", documentType: "X" },
-    })
-    const { uuid, documentnumber: documentNumber } = await response.json()
+const { describe } = base
 
-    await use(documentNumber)
-
-    await request.delete(`api/v1/docunits/${uuid}`)
-  },
-})
-
-test.describe("save changes in core data and texts and verify it persists", () => {
+describe("save changes in core data and texts and verify it persists", () => {
   test("test core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
