@@ -98,7 +98,7 @@ const editor = new Editor({
     emit("updateValue", editor.getHTML())
   },
   onFocus: () => (hasFocus.value = true),
-  onBlur: () => ((hasFocus.value = false), onResize()),
+  onBlur: () => (hasFocus.value = false),
   editable: props.editable,
 })
 
