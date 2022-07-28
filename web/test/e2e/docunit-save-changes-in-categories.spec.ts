@@ -1,10 +1,8 @@
-import { expect, test as base } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { navigateToCategories, pageReload } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
-const { describe } = base
-
-describe("save changes in core data and texts and verify it persists", () => {
+test.describe("save changes in core data and texts and verify it persists", () => {
   test("test core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
