@@ -32,7 +32,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("abc")
   })
 
-  test.skip("test bold text input", async ({ page, documentNumber }) => {
+  test("test bold text input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -64,7 +64,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     )
   })
 
-  test.skip("test italic test input", async ({ page, documentNumber }) => {
+  test("test italic test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -73,10 +73,10 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await editorField.click()
 
-    const boldButton = await page
+    const italicButton = await page
       .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
       .nth(3)
-    await boldButton.click()
+    await italicButton.click()
 
     await editorField.type("this is italic text")
     await page
@@ -96,7 +96,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     )
   })
 
-  test.skip("test underlined test input", async ({ page, documentNumber }) => {
+  test("test underlined test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -105,10 +105,10 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await editorField.click()
 
-    const boldButton = await page
+    const underlineButton = await page
       .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
       .nth(4)
-    await boldButton.click()
+    await underlineButton.click()
 
     await editorField.type("this is underlined text")
     await page
@@ -128,7 +128,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     )
   })
 
-  test.skip("test strike test input", async ({ page, documentNumber }) => {
+  test("test strike test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -137,10 +137,10 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await editorField.click()
 
-    const boldButton = await page
+    const strikeButton = await page
       .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
       .nth(5)
-    await boldButton.click()
+    await strikeButton.click()
 
     await editorField.type("this is striked text")
     await page
@@ -160,7 +160,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     )
   })
 
-  test.skip("test superscript test input", async ({ page, documentNumber }) => {
+  test("test superscript test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -169,10 +169,15 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await editorField.click()
 
-    const boldButton = await page
-      .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
-      .nth(11)
-    await boldButton.click()
+    const moreButton = await page.locator(
+      "[aria-label='Entscheidungsname Editor Button Leiste'] >> div:has-text('more_horiz')"
+    )
+    await moreButton.click()
+    // There are 2 icons of superscript button
+    // The frist one shows only in screen-xl
+    // The second one shows when more button clicked
+    const superScriptButton = await page.locator("text=superscript").nth(1)
+    await superScriptButton.click()
 
     await editorField.type("this is superscript text")
     await page
@@ -192,7 +197,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     )
   })
 
-  test.skip("test subscript test input", async ({ page, documentNumber }) => {
+  test("test subscript test input", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     let editorField = await page.locator(
@@ -201,10 +206,15 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await editorField.click()
 
-    const boldButton = await page
-      .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
-      .nth(12)
-    await boldButton.click()
+    const moreButton = await page.locator(
+      "[aria-label='Entscheidungsname Editor Button Leiste'] >> div:has-text('more_horiz')"
+    )
+    await moreButton.click()
+    // There are 2 icons of subscript button
+    // The frist one shows only in screen-xl
+    // The second one shows when more button clicked
+    const subScriptButton = await page.locator("text=subscript").nth(1)
+    await subScriptButton.click()
 
     await editorField.type("this is subscript text")
     await page
