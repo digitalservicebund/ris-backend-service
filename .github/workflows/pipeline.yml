@@ -14,7 +14,7 @@ env:
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
 
 jobs:
-  build:
+  build-backend:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -28,30 +28,8 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-      - name: Setup Node for web
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ./web/.node-version
-          cache: npm
-          cache-dependency-path: ./web/package-lock.json
-      - name: Install dependencies for web
-        run: |
-          npm ci
-          npx --yes playwright install-deps
-          npx --yes playwright install
-        working-directory: ./web
-      - name: Check style for web
-        run: npm run style:check
-        working-directory: ./web
-      - name: Run tests for web
-        run: |
-          npm test
-          npm run test:a11y
-        working-directory: ./web
       - name: Run license scanner
-        run: |
-          ./gradlew checkLicense
-          cd web && npm run audit:licences
+        run: ./gradlew checkLicense
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -61,14 +39,57 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Build :point_right:"
+          job_name: "Build backend :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  vulnerability-scan-image:
+  build-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ./web/.node-version
+          cache: npm
+          cache-dependency-path: ./web/package-lock.json
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx --yes playwright install-deps
+          npx --yes playwright install
+        working-directory: ./web
+      - name: Check style
+        run: npm run style:check
+        working-directory: ./web
+      - name: Run tests
+        run: |
+          npm test
+          npm run test:a11y
+        working-directory: ./web
+      - name: Run license scanner
+        run: npm run audit:licences
+        working-directory: ./web
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Build frontend :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  vulnerability-scan-backend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -116,7 +137,7 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  vulnerability-scan-npm:
+  vulnerability-scan-frontend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -159,7 +180,7 @@ jobs:
   analyze-backend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build, vulnerability-scan-image]
+    needs: [build-backend, vulnerability-scan-backend]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -210,7 +231,7 @@ jobs:
   analyze-frontend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build, vulnerability-scan-npm]
+    needs: [build-frontend, vulnerability-scan-frontend]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -252,7 +273,11 @@ jobs:
   build-and-push-image:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build, vulnerability-scan-image, vulnerability-scan-npm]
+    needs:
+      - build-backend
+      - build-frontend
+      - vulnerability-scan-backend
+      - vulnerability-scan-frontend
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
