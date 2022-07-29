@@ -12,6 +12,8 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
+  READ_PACKAGES_PAT_USERNAME: ${{ secrets.READ_PACKAGES_PAT_USERNAME }}
+  READ_PACKAGES_PAT_TOKEN: ${{ secrets.READ_PACKAGES_PAT_TOKEN }}
 
 jobs:
   build-backend:
@@ -28,9 +30,6 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         run: ./gradlew build
-        env:
-          READ_PACKAGES_PAT_USERNAME: ${{ secrets.READ_PACKAGES_PAT_USERNAME }}
-          READ_PACKAGES_PAT_TOKEN: ${{ secrets.READ_PACKAGES_PAT_TOKEN }}
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
