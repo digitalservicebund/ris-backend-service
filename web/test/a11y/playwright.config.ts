@@ -2,8 +2,8 @@ import { devices, PlaywrightTestConfig } from "@playwright/test"
 
 const config: PlaywrightTestConfig = {
   testDir: ".",
-  timeout: 10000,
   retries: process.env.CI === "true" ? 1 : 0,
+  workers: process.env.CI ? 2 : undefined,
   use: {
     viewport: { width: 1280, height: 720 },
     acceptDownloads: true,
