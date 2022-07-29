@@ -1082,11 +1082,11 @@ class DocUnitDocxBuilderTest {
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(DocUnitErrorRunElement.class, runElement.getClass());
+    var errorElement = (DocUnitErrorRunElement) runElement;
 
-    var htmlString = paragraphElement.toHtmlString();
     assertEquals(
-        "<p><span style=\"color: #FF0000;\">unknown run element: anchor image with unknown alignment: center</span></p>",
-        htmlString);
+        "unknown run element: anchor image with unknown alignment: center",
+        errorElement.toString());
   }
 
   @Test

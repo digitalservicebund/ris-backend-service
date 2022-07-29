@@ -64,8 +64,5 @@ class DocxParagraphConverterTest {
     var result = converter.convert(new Object());
 
     assertEquals("unknown element: java.lang.Object", result.toString());
-    assertEquals(
-        "<p><span style=\"color: #FF0000;\">unknown element: java.lang.Object</span></p>",
-        result.toHtmlString());
   }
 }

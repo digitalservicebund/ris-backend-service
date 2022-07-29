@@ -1,6 +1,10 @@
 package de.bund.digitalservice.ris.domain.docx;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class DocUnitErrorElement implements DocUnitDocx {
+  @Value("${error.nodes.active}")
+  private boolean active;
 
   String name;
 
@@ -10,7 +14,11 @@ public class DocUnitErrorElement implements DocUnitDocx {
 
   @Override
   public String toHtmlString() {
-    return "<p><span style=\"color: #FF0000;\">unknown element: " + name + "</span></p>";
+    if (active) {
+      return "<p><span style=\"color: #FF0000;\">unknown element: " + name + "</span></p>";
+    } else {
+      return "";
+    }
   }
 
   @Override
