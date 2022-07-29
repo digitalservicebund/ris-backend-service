@@ -2,69 +2,87 @@ import { expect } from "@playwright/test"
 import { uploadTestfile } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
-test.skip(
-  ({ browserName }) => browserName !== "chromium",
-  "Skipping in engines other than chromium, reason unknown"
-)
+test.beforeEach(async ({ page, documentNumber }) => {
+  await page.goto("/")
+  await page
+    .locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
+    .click()
+})
 
-test.skip("copy-paste from side panel", async ({ page }) => {
+test("copy-paste from side panel", async ({ page, browserName }) => {
+  const leftAlignText = "I am left aligned"
+  const rightAlignText = "I am right aligned"
+  const centerAlignText = "I am centered"
+  const justifyAlignText = "I am justify aligned"
+  const leftAlignTextWithStyle = `<p>${leftAlignText}</p>`
+  const rightAlignTextWithStyle = `<p style="text-align: right">${rightAlignText}</p>`
+  const centerAlignTextWithStyle = `<p style="text-align: center">${centerAlignText}</p>`
+  const justifyAlignTextWithStyle = `<p style="text-align: justify">${justifyAlignText}</p>`
+
   // upload file
-  await uploadTestfile(page, "some-formatting.docx")
-  await page.waitForSelector("text=some-formatting.docx")
-  await page.waitForSelector("text=Headline")
+  await uploadTestfile(page, "some-text-aligment.docx")
+  await page.waitForSelector("text=some-text-aligment.docx")
+  await page.waitForSelector("text=Datei löschen")
+  await page.locator(`text=${leftAlignText}`)
+  await page.locator(`text=${rightAlignText}`)
+  await page.locator(`text=${centerAlignText}`)
+  await page.locator(`text=${justifyAlignText}`)
 
-  // get html content from sidepanel
+  // Click on "Rubriken" und check if original document loaded
   await page.locator("a >> text=Rubriken").click()
   await page.locator("[aria-label='Originaldokument öffnen']").click()
   await expect(page.locator("text=Dokument wird geladen")).not.toBeVisible()
-  const originalFile = page.locator('div[element-id="odoc"] .ProseMirror')
-  const originalFileContent = await originalFile.innerHTML()
+  await page.locator(`text=${rightAlignText}`)
+  await page.locator(`text=${centerAlignText}`)
+  await page.locator(`text=${justifyAlignText}`)
+  const originalFileParagraph = await page.locator(`text=${leftAlignText}`)
 
+  // Selected all text from sidepanel
+  await originalFileParagraph.evaluate((element) => {
+    const originalFile = element.parentElement
+    if (originalFile !== null) {
+      console.log("original File ", originalFile.innerHTML)
+      const selection = window.getSelection()
+      const elementChildsLength = originalFile.childNodes.length
+      const startOffset = 0
+      const range = document.createRange()
+      range.setStart(originalFile.childNodes[0], startOffset)
+      range.setEnd(
+        originalFile.childNodes[elementChildsLength - 1],
+        startOffset
+      )
+      selection?.removeAllRanges()
+      selection?.addRange(range)
+    }
+  })
   // copy from sidepanel to clipboard
   const modifier = (await page.evaluate(() => navigator.platform))
     .toLowerCase()
     .includes("mac")
     ? "Meta"
     : "Control"
-  await originalFile.evaluate((element) => {
-    const selection = window.getSelection()
-    const elementChildsLength = element.childNodes.length
-    const startOffset = 0
-    const range = document.createRange()
-    range.setStart(element.childNodes[0], startOffset)
-    range.setEnd(element.childNodes[elementChildsLength - 1], startOffset)
-    selection?.removeAllRanges()
-    selection?.addRange(range)
-  })
   await page.keyboard.press(`${modifier}+KeyC`)
 
   // paste from clipboard into input field "Entscheidungsgründe"
   const inputField = page.locator(
-    '[aria-label="Entscheidungsgründe Editor Feld"] div.ProseMirror'
+    '[aria-label="Entscheidungsgründe Editor Feld"]'
   )
   await inputField.click()
   await page.keyboard.press(`${modifier}+KeyV`)
-  expect(inputField.locator("text=Subheadline")).toBeVisible()
+  const inputFieldInnerHTML = await inputField.innerHTML()
 
-  // save changes and refresh page
-  await page
-    .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
-    .click()
-  page.once("dialog", async (dialog) => {
-    expect(dialog.message()).toBe("Dokumentationseinheit wurde gespeichert")
-    await dialog.accept()
-  })
-  await page.locator("a >> text=Dokumente").click()
-  await page.locator("a >> text=Rubriken").click()
-  await expect(page.locator("text=Entscheidungsgründe")).toBeVisible()
-  expect(inputField.locator("text=Subheadline")).toBeVisible()
+  // Check all text copied
+  const inputFieldAlleText = await inputField.allTextContents()
+  expect(inputFieldAlleText[0].includes(leftAlignText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(rightAlignText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(centerAlignText)).toBeTruthy()
+  expect(inputFieldAlleText[0].includes(justifyAlignText)).toBeTruthy()
 
-  // truncate and compare content of updated input field with content of side panel
-  const updatedContent = await inputField.innerHTML()
-  const removeFirstTag = (html: string) => {
-    return html.substring(html.indexOf(">"))
+  if (browserName !== "firefox") {
+    // Check all text copied with style
+    expect(inputFieldInnerHTML.includes(leftAlignTextWithStyle)).toBeTruthy()
+    expect(inputFieldInnerHTML.includes(rightAlignTextWithStyle)).toBeTruthy()
+    expect(inputFieldInnerHTML.includes(centerAlignTextWithStyle)).toBeTruthy()
+    expect(inputFieldInnerHTML.includes(justifyAlignTextWithStyle)).toBeTruthy()
   }
-  expect(removeFirstTag(updatedContent)).toBe(
-    removeFirstTag(originalFileContent)
-  )
 })
