@@ -2,6 +2,11 @@ import { expect } from "@playwright/test"
 import { uploadTestfile } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
+test.skip(
+  ({ browserName }) => browserName !== "chromium",
+  "Skipping in engines other than chromium, reason playwright diriven for firefox and safari does not support copy paste type='text/html' from clipboard"
+)
+
 test.beforeEach(async ({ page, documentNumber }) => {
   await page.goto("/")
   await page
@@ -9,7 +14,7 @@ test.beforeEach(async ({ page, documentNumber }) => {
     .click()
 })
 
-test("copy-paste from side panel", async ({ page, browserName }) => {
+test("copy-paste from side panel", async ({ page }) => {
   const leftAlignText = "I am left aligned"
   const rightAlignText = "I am right aligned"
   const centerAlignText = "I am centered"
@@ -78,11 +83,9 @@ test("copy-paste from side panel", async ({ page, browserName }) => {
   expect(inputFieldAlleText[0].includes(centerAlignText)).toBeTruthy()
   expect(inputFieldAlleText[0].includes(justifyAlignText)).toBeTruthy()
 
-  if (browserName !== "firefox") {
-    // Check all text copied with style
-    expect(inputFieldInnerHTML.includes(leftAlignTextWithStyle)).toBeTruthy()
-    expect(inputFieldInnerHTML.includes(rightAlignTextWithStyle)).toBeTruthy()
-    expect(inputFieldInnerHTML.includes(centerAlignTextWithStyle)).toBeTruthy()
-    expect(inputFieldInnerHTML.includes(justifyAlignTextWithStyle)).toBeTruthy()
-  }
+  // Check all text copied with style
+  expect(inputFieldInnerHTML.includes(leftAlignTextWithStyle)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(rightAlignTextWithStyle)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(centerAlignTextWithStyle)).toBeTruthy()
+  expect(inputFieldInnerHTML.includes(justifyAlignTextWithStyle)).toBeTruthy()
 })
