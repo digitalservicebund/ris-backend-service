@@ -1,0 +1,61 @@
+on:
+  workflow_call:
+    inputs:
+      browser:
+        required: false
+        type: string
+        default: chromium
+    secrets:
+      STAGING_PASSWORD:
+        required: true
+      STAGING_URL:
+        required: true
+      STAGING_USER:
+        required: true
+      SLACK_WEBHOOK_URL:
+        required: false
+
+jobs:
+  playwright-e2e-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ./web/.node-version
+          cache: npm
+          cache-dependency-path: ./web/package-lock.json
+      - name: Install dependencies
+        run: |
+          npm ci
+          npx --yes playwright install-deps
+          npx --yes playwright install
+        working-directory: ./web
+      - name: Run E2E tests in ${{ inputs.browser }}
+        env:
+          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
+          STAGING_USER: ${{ secrets.STAGING_USER }}
+          STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
+        run: npm run test:e2e -- --project ${{ inputs.browser }}
+        working-directory: ./web
+      - name: Upload screenshots of failed tests
+        uses: actions/upload-artifact@v3
+        if: ${{ failure() }}
+        with:
+          name: failed-e2e-tests-${{ inputs.browser }}
+          path: ./web/test-results/**/*.png
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Playwright E2E test ${{ inputs.browser }} :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}

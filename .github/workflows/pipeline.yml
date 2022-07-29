@@ -449,10 +449,9 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-staging-verify:
+  deploy-staging-verify-api:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    concurrency: deploy-staging
     needs: [deploy-staging]
     steps:
       - uses: actions/checkout@v3
@@ -476,32 +475,6 @@ jobs:
           name: journey-tests-gradle-report
           path: ${{ github.workspace }}/build/reports/tests/journeyTest/
           retention-days: 3
-      - name: Setup Node for web
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ./web/.node-version
-          cache: npm
-          cache-dependency-path: ./web/package-lock.json
-      - name: Install dependencies for web
-        run: |
-          npm ci
-          npx --yes playwright install-deps
-          npx --yes playwright install
-        working-directory: ./web
-      - name: Run e2e tests on staging
-        env:
-          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
-          STAGING_USER: ${{ secrets.STAGING_USER }}
-          STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
-        run: |
-          npm run test:e2e
-        working-directory: ./web
-      - name: Upload screenshots of failed E2E tests
-        uses: actions/upload-artifact@v3
-        if: ${{ failure() }}
-        with:
-          name: failed-e2e-tests
-          path: ./web/test-results/**/*.png
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -511,19 +484,30 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Staging verify :point_right:"
+          job_name: "Staging verify API :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+  deploy-staging-verify-e2e:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [deploy-staging]
+    uses: ./.github/workflows/playwright-e2e-test.yml
+    with:
+      browser: chromium
+    secrets: inherit
+
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     concurrency: deploy-production
     environment: production
-    needs: [build-and-push-image, deploy-staging-verify]
+    needs:
+      - build-and-push-image
+      - deploy-staging-verify-api
+      - deploy-staging-verify-e2e
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
