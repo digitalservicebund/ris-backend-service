@@ -20,12 +20,6 @@ For E2E and a11y testing with [Playwright](https://playwright.dev/docs/intro) yo
 npx playwright install
 ```
 
-For the provided Git hooks you will need:
-
-```bash
-brew install lefthook talisman
-```
-
 ## Development
 
 ### Dev server
