@@ -507,14 +507,6 @@ jobs:
       browser: firefox
     secrets: inherit
 
-  deploy-staging-verify-e2e-safari:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
-    uses: ./.github/workflows/playwright-e2e-test.yml
-    with:
-      browser: webkit
-    secrets: inherit
-
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -525,7 +517,6 @@ jobs:
       - deploy-staging-verify-api
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
-      - deploy-staging-verify-e2e-safari
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
