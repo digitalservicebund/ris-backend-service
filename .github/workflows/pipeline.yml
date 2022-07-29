@@ -437,11 +437,11 @@ jobs:
         run: |
           npm run test:e2e
         working-directory: ./web
-      - name: upload screenshots of failed tests
+      - name: Upload screenshots of failed E2E tests
         uses: actions/upload-artifact@v3
         if: ${{ failure() }}
         with:
-          name: failed-tests
+          name: failed-e2e-tests
           path: ./web/test-results/**/*.png
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
