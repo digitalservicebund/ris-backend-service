@@ -491,12 +491,20 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-staging-verify-e2e:
+  deploy-staging-verify-e2e-chrome:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [deploy-staging]
     uses: ./.github/workflows/playwright-e2e-test.yml
     with:
       browser: chromium
+    secrets: inherit
+
+  deploy-staging-verify-e2e-firefox:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [deploy-staging]
+    uses: ./.github/workflows/playwright-e2e-test.yml
+    with:
+      browser: firefox
     secrets: inherit
 
   deploy-production:
@@ -507,7 +515,8 @@ jobs:
     needs:
       - build-and-push-image
       - deploy-staging-verify-api
-      - deploy-staging-verify-e2e
+      - deploy-staging-verify-e2e-chrome
+      - deploy-staging-verify-e2e-firefox
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
