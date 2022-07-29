@@ -8,9 +8,15 @@ pre-commit:
     check-format-backend:
       tags: style backend
       run: ./gradlew spotlessCheck
+    audit-licenses-backend:
+      tags: audit backend
+      run: ./gradlew checkLicense
     check-format-frontend:
       tags: style frontend
       run: cd web && npm run style:check
+    audit-licenses-frontend:
+      tags: audit frontend
+      run: cd web && npm run audit:licences > /dev/null;
 pre-push:
   commands:
     secrets-audit:
