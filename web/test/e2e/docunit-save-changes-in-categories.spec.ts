@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, pageReload } from "./e2e-utils"
+import { navigateToCategories } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
@@ -13,9 +13,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
       await dialog.accept()
     })
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-    await page.waitForTimeout(500)
-
-    await pageReload(page) // to make sure the data needs to come fresh from the server
+    await page.goto("/")
 
     // 1. verify that the change is visible in the docunit list on /jurisdiction
     const aktenzeichenColumn = page
@@ -50,9 +48,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -82,9 +79,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -114,9 +110,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -146,9 +141,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -183,9 +177,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -220,9 +213,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -260,9 +252,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -300,9 +291,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -340,9 +330,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
@@ -383,9 +372,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page
       .locator("[aria-label='Kurz- und Langtexte Speichern Button']")
       .click()
-    await page.waitForTimeout(500)
 
-    await pageReload(page)
+    await page.goto("/")
 
     // verify that the change is visible in the Kurz- und Langtexte field
     await navigateToCategories(page, documentNumber)
