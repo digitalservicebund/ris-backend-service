@@ -21,7 +21,6 @@ export const pageReload = async (page: Page) => {
   await page.goto("/")
   await page.reload()
   await page.waitForTimeout(500)
-  await page.goto("/")
 }
 
 export const uploadTestfile = async (page: Page, filename: string) => {
