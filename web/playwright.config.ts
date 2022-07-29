@@ -4,7 +4,7 @@ const config: PlaywrightTestConfig = {
   testDir: "./test/e2e",
   timeout: 40000,
   retries: process.env.CI ? 1 : 0,
-  workers: process.env.CI ? 2 : undefined,
+  workers: process.env.CI ? 4 : undefined,
   use: {
     viewport: { width: 1280, height: 720 },
     acceptDownloads: true,
