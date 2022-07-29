@@ -3,6 +3,7 @@ commit-msg:
     lint-commit-msg:
       run: npx --yes commitlint --edit
 pre-commit:
+  parallel: true
   commands:
     check-format-backend:
       tags: style backend
