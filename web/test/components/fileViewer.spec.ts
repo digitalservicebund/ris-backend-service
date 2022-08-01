@@ -77,7 +77,7 @@ describe("file viewer", async () => {
 // @return "19.07.2019"
 function getUploadTimeStampToCheck(): string {
   const today = new Date()
-  return `${today.getDate()}.${("0" + today.getMonth()).slice(
+  return `${"0" + today.getDate()}.${("0" + today.getMonth()).slice(
     -2
   )}.${today.getFullYear()}`
 }
