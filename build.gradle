@@ -68,7 +68,12 @@ dependencies {
   implementation "jakarta.mail:jakarta.mail-api:2.1.0"
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
-  implementation "de.bund.digitalservice:neuris-juris-xml-export:0.0.4"
+  // needed for the JurisXmlExporter (neuris-juris-xml-export) to work, otherwise: NoClassDefFoundError XmlMapper
+  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3"
+  // package served by private repo, requires authentication
+  implementation "de.bund.digitalservice:neuris-juris-xml-export:0.0.6"
+  // for local development:
+  // implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.0.6.jar")
 
   compileOnly "org.projectlombok:lombok"
   annotationProcessor "org.projectlombok:lombok"

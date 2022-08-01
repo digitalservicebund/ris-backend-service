@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.config;
 
+import de.bund.digitalservice.ris.domain.export.JurisXmlExporter;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -33,5 +34,10 @@ public class ConverterConfig {
     factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 
     return factory;
+  }
+
+  @Bean
+  public JurisXmlExporter jurisXmlExporter() {
+    return new JurisXmlExporter();
   }
 }
