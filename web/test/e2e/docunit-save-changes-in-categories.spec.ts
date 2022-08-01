@@ -3,7 +3,7 @@ import { navigateToCategories } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
-  test("test core data change", async ({ page, documentNumber }) => {
+  test.skip("test core data change", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
