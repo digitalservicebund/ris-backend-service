@@ -3,16 +3,24 @@ import { navigateToCategories } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
-  test("test core data change", async ({ page, documentNumber }) => {
+  test("test core data change", async ({
+    page,
+    documentNumber,
+    browserName,
+  }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-    page.once("dialog", async (dialog) => {
+    await page.once("dialog", async (dialog) => {
       expect(dialog.message()).toBe("Dokumentationseinheit wurde gespeichert")
       await dialog.accept()
     })
+
+    if (browserName === "firefox") {
+      await page.waitForTimeout(500)
+    }
     await page.goto("/")
 
     // 1. verify that the change is visible in the docunit list on /jurisdiction
@@ -21,7 +29,6 @@ test.describe("save changes in core data and texts and verify it persists", () =
         has: page.locator(`a >> text=${documentNumber}`),
       })
       .locator("td >> text=abc")
-
     await expect(aktenzeichenColumn).toBeVisible()
     expect(await aktenzeichenColumn.innerText()).toBe("abc")
 
