@@ -24,7 +24,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.goto("/")
 
     // 1. verify that the change is visible in the docunit list on /jurisdiction
-    const aktenzeichenColumn = await page
+    const aktenzeichenColumn = page
       .locator("tr", {
         has: page.locator(`a >> text=${documentNumber}`),
       })
