@@ -46,7 +46,6 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
   test("test italic test input", async ({ page, editorField }) => {
     await editorField.click()
-
     const italicButton = await page
       .locator("[aria-label='Entscheidungsname Editor Button Leiste'] >> div")
       .nth(3)
@@ -66,7 +65,6 @@ test.describe("save changes in core data and texts and verify it persists", () =
       .nth(4)
     await underlineButton.click()
     await editorField.type("this is underlined text")
-
     expect(await editorField.innerHTML()).toBe(
       "<p>this is text<u>this is underlined text</u></p>"
     )
@@ -111,7 +109,6 @@ test.describe("save changes in core data and texts and verify it persists", () =
     const subScriptButton = await page.locator("text=subscript").nth(1)
     await subScriptButton.click()
     await editorField.type("this is subscript text")
-
     expect(await editorField.innerHTML()).toBe(
       "<p>this is text<sub>this is subscript text</sub></p>"
     )
