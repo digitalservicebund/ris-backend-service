@@ -138,22 +138,8 @@ const calculateBreakpoints = (containerWidth: number | undefined) => {
     }
   }
 }
-const isClickOnEditor = ref<boolean>(false)
-const closeAllDropdown = () => {
-  showListStyles.value = false
-  showImageAlignment.value = false
-  showMoreTextAlign.value = false
-}
-const closeAllDropdownOnSecondClick = () => {
-  if (!isClickOnEditor.value) closeAllDropdown()
-  isClickOnEditor.value = !isClickOnEditor.value
-}
-const toggleShowMore = () => {
-  showMore.value = !showMore.value
-  if (showMore.value) {
-    closeAllDropdown()
-  }
-}
+
+const toggleShowMore = () => (showMore.value = !showMore.value)
 const toggleShowTextAlignModal = () => {
   showMoreTextAlign.value = !showMoreTextAlign.value
   showListStyles.value = false
@@ -186,8 +172,9 @@ const showButtons = () => {
   // const isShowButtons = props.editable
 
   if (!isShowButtons) {
-    closeAllDropdown()
-    showMore.value = false
+    showListStyles.value = false
+    showImageAlignment.value = false
+    showMoreTextAlign.value = false
   }
   return isShowButtons
   // return props.editable
@@ -487,21 +474,13 @@ onBeforeRouteUpdate(async () => {
     </v-row>
 
     <!-- Small layout second row on showMore button click-->
-    <v-row
-      v-show="sm"
-      v-if="showMoreOptions() && showButtons()"
-      class="row-secondary"
-    >
+    <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
       <v-col>
         <v-divider class="horizontal-divider"></v-divider>
       </v-col>
     </v-row>
 
-    <v-row
-      v-show="sm"
-      v-if="showMoreOptions() && showButtons()"
-      class="row-secondary"
-    >
+    <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
       <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
         <v-icon
           class="editor-btn"
@@ -511,6 +490,7 @@ onBeforeRouteUpdate(async () => {
           >{{ btn.icon }}</v-icon
         >
       </v-col>
+
       <v-divider inset vertical></v-divider>
 
       <v-col v-for="(btn, index) in editorBtnsGroup5" :key="index">
@@ -537,6 +517,7 @@ onBeforeRouteUpdate(async () => {
         <v-icon>table_chart</v-icon>
       </v-col>
     </v-row>
+
     <v-row v-if="showButtons()">
       <v-col></v-col>
     </v-row>
@@ -547,7 +528,6 @@ onBeforeRouteUpdate(async () => {
           :aria-label="ariaLabel"
           :editor="editor"
           :class="'ProseMirror__' + props.fieldSize"
-          :click="closeAllDropdownOnSecondClick()"
         />
       </v-col>
     </v-row>
