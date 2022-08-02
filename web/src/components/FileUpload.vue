@@ -312,7 +312,7 @@ const onFileSelect = (e: Event) => {
     }
 
     &:hover {
-      background-color: $blue700 !important;
+      background-color: $blue700;
 
       .v-btn__overlay {
         opacity: 0;
@@ -320,7 +320,7 @@ const onFileSelect = (e: Event) => {
     }
 
     &:active {
-      background-color: $blue500 !important;
+      background-color: $blue500;
 
       .v-btn__overlay {
         opacity: 0;

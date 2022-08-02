@@ -589,7 +589,7 @@ onBeforeRouteUpdate(async () => {
 
   &__active {
     color: $white;
-    background-color: $text-tertiary;
+    background-color: $navbar-hover-gray;
   }
 }
 
