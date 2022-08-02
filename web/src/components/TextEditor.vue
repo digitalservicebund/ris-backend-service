@@ -65,6 +65,7 @@ const showListStyles = ref<boolean>(false)
 const sm = ref<boolean>(false)
 const md = ref<boolean>(false)
 const lg = ref<boolean>(false)
+const isLastItemFlexEnd = ref<boolean>(false)
 
 const editor = new Editor({
   content: props.value,
@@ -119,21 +120,19 @@ const onResize = () => {
 const calculateBreakpoints = (containerWidth: number | undefined) => {
   if (containerWidth) {
     if (containerWidth < 830) {
-      // console.log("small")
       sm.value = true
       md.value = false
       lg.value = false
     } else if (containerWidth >= 830 && containerWidth < 950) {
-      // console.log("medium")
       sm.value = false
       md.value = true
       lg.value = false
     } else {
-      // console.log("large")
       sm.value = false
       md.value = false
       lg.value = true
     }
+    isLastItemFlexEnd.value = containerWidth > 570 ? true : false
   }
 }
 const isClickOnEditor = ref<boolean>(false)
@@ -297,6 +296,7 @@ onBeforeRouteUpdate(async () => {
       :aria-label="
         props.ariaLabel ? props.ariaLabel + ' Editor Button Leiste' : null
       "
+      class="row-primary"
     >
       <v-col v-for="(btn, index) in editorBtnsGroup1" :key="index">
         <v-icon
@@ -475,13 +475,14 @@ onBeforeRouteUpdate(async () => {
       </v-col>
 
       <v-col>
-        <v-icon>123</v-icon>
+        <v-icon :class="{ 'second-last-icon': isLastItemFlexEnd }">123</v-icon>
       </v-col>
       <v-col>
-        <v-icon>open_in_full</v-icon>
+        <v-icon :class="{ 'last-icon': isLastItemFlexEnd }"
+          >open_in_full</v-icon
+        >
       </v-col>
     </v-row>
-
     <!-- Small layout second row on showMore button click-->
     <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
       <v-col>
@@ -553,6 +554,25 @@ onBeforeRouteUpdate(async () => {
 
 <style lang="scss">
 #container {
+  position: relative;
+  .row-primary {
+    .v-col {
+      flex-grow: 0 !important;
+      box-sizing: border-box;
+      .last-icon {
+        position: absolute;
+        right: 15px;
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+      .second-last-icon {
+        position: absolute;
+        right: 50px;
+        margin-top: auto;
+        margin-bottom: auto;
+      }
+    }
+  }
   i {
     color: #004b78;
   }
