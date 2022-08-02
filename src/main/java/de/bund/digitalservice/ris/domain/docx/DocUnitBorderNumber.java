@@ -23,11 +23,16 @@ public class DocUnitBorderNumber implements DocUnitDocx {
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
 
-    sb.append("<border-number number=\"");
+    sb.append("<border-number>");
+    sb.append("<number>");
     sb.append(number);
-    sb.append("\">");
-    for (DocUnitParagraphElement textElement : paragraphElements) {
-      sb.append(textElement.toHtmlString());
+    sb.append("</number>");
+    if (paragraphElements != null && !paragraphElements.isEmpty()) {
+      sb.append("<content>");
+      for (DocUnitParagraphElement textElement : paragraphElements) {
+        sb.append(textElement.toHtmlString());
+      }
+      sb.append("</content>");
     }
     sb.append("</border-number>");
 

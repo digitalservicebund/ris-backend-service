@@ -1,54 +1,44 @@
-import { mergeAttributes, Node } from "@tiptap/vue-3"
+import { Node } from "@tiptap/vue-3"
 
-interface BorderNumberOptions {
-  HTMLAttributes: Record<string, unknown>
-}
-
-declare module "@tiptap/core" {
-  interface Commands<ReturnType> {
-    heading: {
-      setRandnummer: (attributes: { number: number }) => ReturnType
-    }
-  }
-}
-
-export const BorderNumber = Node.create<BorderNumberOptions>({
+export const BorderNumber = Node.create({
   name: "borderNumber",
   priority: 1000,
   group: "block",
-  content: "inline*",
-  addAttributes() {
-    return { number: "1" }
-  },
-  addOptions() {
-    return {
-      HTMLAttributes: {
-        style: "display: flex; margin-bottom: 10px",
-      },
-    }
-  },
+  content: "border+",
   parseHTML() {
     return [{ tag: "border-number" }]
   },
-  renderHTML({ HTMLAttributes }) {
+  renderHTML() {
+    return ["border-number", { style: "display: flex; margin-bottom: 10px" }, 0]
+  },
+})
+
+export const BorderNumberNumber = Node.create({
+  name: "borderNumberNumber",
+  priority: 1000,
+  group: "border",
+  content: "inline",
+  parseHTML() {
+    return [{ tag: "number" }]
+  },
+  renderHTML() {
     return [
-      "div",
-      mergeAttributes(this.options.HTMLAttributes, HTMLAttributes),
-      [
-        "div",
-        { style: "padding-top: 10px; padding-left: 10px; min-width: 40px;" },
-        HTMLAttributes.number.toString(),
-      ],
-      ["div", 0],
+      "number",
+      { style: "padding-top: 10px; padding-left: 10px; min-width: 40px;" },
+      0,
     ]
   },
-  addCommands() {
-    return {
-      setRandnummer:
-        (attributes) =>
-        ({ commands }) => {
-          return commands.setNode(this.name, attributes)
-        },
-    }
+})
+
+export const BorderNumberContent = Node.create({
+  name: "borderNumberContent",
+  priority: 1000,
+  group: "border",
+  content: "inline",
+  parseHTML() {
+    return [{ tag: "content" }]
+  },
+  renderHTML() {
+    return ["content", 0]
   },
 })

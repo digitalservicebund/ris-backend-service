@@ -146,8 +146,8 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>test</p>"
-                        + "<border-number number=\"1\"><p>border number 1</p></border-number>"
-                        + "<border-number number=\"2\"><p>border number 2</p></border-number>"
+                        + "<border-number><number>1</number><content><p>border number 1</p></content></border-number>"
+                        + "<border-number><number>2</number><content><p>border number 2</p></content></border-number>"
                         + "<table><tr><td><p>table content</p></td></tr></table>",
                     docx2Html.content());
               })
@@ -265,7 +265,9 @@ class DocxConverterServiceTest {
               docx2Html -> {
                 assertNotNull(docx2Html);
                 assertEquals(
-                    "<p>test</p><border-number number=\"1\"></border-number><border-number number=\"2\"><p>border number 2</p></border-number>",
+                    "<p>test</p><border-number><number>1</number></border-number>"
+                        + "<border-number><number>2</number><content><p>border number 2</p>"
+                        + "</content></border-number>",
                     docx2Html.content());
               })
           .verifyComplete();

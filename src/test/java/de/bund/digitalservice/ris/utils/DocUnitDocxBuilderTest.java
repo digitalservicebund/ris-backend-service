@@ -176,7 +176,7 @@ class DocUnitDocxBuilderTest {
     assertEquals("1", borderNumberElement.getNumber());
 
     var htmlString = borderNumberElement.toHtmlString();
-    assertEquals("<border-number number=\"1\"></border-number>", htmlString);
+    assertEquals("<border-number><number>1</number></border-number>", htmlString);
   }
 
   @Test
@@ -1173,7 +1173,6 @@ class DocUnitDocxBuilderTest {
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = (DocUnitRunTextElement) runElement;
 
     var htmlString = numberingListEntry.toHtmlString();
     assertEquals("<li><p>test text</p></li>", htmlString);
@@ -1229,7 +1228,6 @@ class DocUnitDocxBuilderTest {
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = (DocUnitRunTextElement) runElement;
 
     var htmlString = numberingListEntry.toHtmlString();
     assertEquals("<li><p>test text</p></li>", htmlString);
@@ -1238,6 +1236,8 @@ class DocUnitDocxBuilderTest {
     assertEquals(
         "not implemented number format (CHICAGO) in list. use default bullet list",
         memoryAppender.getMessage(Level.ERROR, 0));
+
+    detachLoggingTestAppender(memoryAppender);
   }
 
   private TestMemoryAppender addLoggingTestAppender() {

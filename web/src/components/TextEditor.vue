@@ -20,7 +20,11 @@ import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { watch, ref, onMounted } from "vue"
 import { onBeforeRouteUpdate } from "vue-router"
-import { BorderNumber } from "../editor/border-number"
+import {
+  BorderNumber,
+  BorderNumberContent,
+  BorderNumberNumber,
+} from "../editor/border-number"
 import { FontSize } from "../editor/font-size"
 import { CustomImage } from "../editor/image"
 import { CustomParagraph } from "../editor/paragraph"
@@ -69,6 +73,8 @@ const editor = new Editor({
     CustomParagraph,
     Text,
     BorderNumber,
+    BorderNumberNumber,
+    BorderNumberContent,
     Bold,
     Color,
     FontSize,
