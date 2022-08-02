@@ -109,12 +109,10 @@ const editor = new Editor({
 })
 
 const onResize = () => {
-  // console.log("resize triggered")
   let containerWidth
   const containerElement = document.getElementById("container")
   if (containerElement)
     containerWidth = containerElement.getBoundingClientRect().width
-  // console.log(containerWidth)
   calculateBreakpoints(containerWidth)
 }
 
@@ -138,8 +136,20 @@ const calculateBreakpoints = (containerWidth: number | undefined) => {
     }
   }
 }
-
-const toggleShowMore = () => (showMore.value = !showMore.value)
+const isClickOnEditor = ref<boolean>(false)
+const closeAllDropdown = () => {
+  showListStyles.value = false
+  showImageAlignment.value = false
+  showMoreTextAlign.value = false
+}
+const closeAllDropdownOnSecondClick = () => {
+  if (!isClickOnEditor.value) closeAllDropdown()
+  isClickOnEditor.value = !isClickOnEditor.value
+}
+const toggleShowMore = () => {
+  closeAllDropdown()
+  showMore.value = !showMore.value
+}
 const toggleShowTextAlignModal = () => {
   showMoreTextAlign.value = !showMoreTextAlign.value
   showListStyles.value = false
@@ -534,6 +544,7 @@ onBeforeRouteUpdate(async () => {
           :aria-label="ariaLabel"
           :editor="editor"
           :class="'ProseMirror__' + props.fieldSize"
+          :click="closeAllDropdownOnSecondClick()"
         />
       </v-col>
     </v-row>
