@@ -177,7 +177,6 @@ const showButtons = () => {
     showMoreTextAlign.value = false
   }
   return isShowButtons
-  // return props.editable
 }
 
 const showMoreOptions = () => {
@@ -313,7 +312,7 @@ onBeforeRouteUpdate(async () => {
 
       <v-divider inset vertical></v-divider>
 
-      <v-col>Heading</v-col>
+      <v-col style="color: #004b78; font-weight: bold">Heading</v-col>
 
       <v-divider inset vertical></v-divider>
 
@@ -535,6 +534,11 @@ onBeforeRouteUpdate(async () => {
 </template>
 
 <style lang="scss">
+#container {
+  i {
+    color: #004b78;
+  }
+}
 .ProseMirror {
   // background: #eee;
   color: #000;
@@ -569,7 +573,7 @@ onBeforeRouteUpdate(async () => {
 }
 
 .editor-btn {
-  color: $black;
+  color: #004b78;
 
   &:hover {
     color: $text-tertiary;
@@ -602,7 +606,8 @@ onBeforeRouteUpdate(async () => {
 }
 
 .horizontal-divider {
-  border-color: #004b76;
+  border-color: #004b78;
+  border-width: 1px;
   margin-left: -16px;
   margin-right: -16px;
 }
