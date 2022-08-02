@@ -143,8 +143,8 @@ const closeAllDropdown = () => {
   showMoreTextAlign.value = false
 }
 const closeAllDropdownOnSecondClick = () => {
-  if (!isClickOnEditor.value) closeAllDropdown()
   isClickOnEditor.value = !isClickOnEditor.value
+  if (!isClickOnEditor.value) closeAllDropdown()
 }
 const toggleShowMore = () => {
   closeAllDropdown()
@@ -544,7 +544,7 @@ onBeforeRouteUpdate(async () => {
           :aria-label="ariaLabel"
           :editor="editor"
           :class="'ProseMirror__' + props.fieldSize"
-          :click="closeAllDropdownOnSecondClick()"
+          @click="closeAllDropdownOnSecondClick()"
         />
       </v-col>
     </v-row>
