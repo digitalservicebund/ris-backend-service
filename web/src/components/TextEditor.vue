@@ -181,6 +181,7 @@ const showButtons = () => {
 
 const showMoreOptions = () => {
   return showMore.value
+  // return true
 }
 
 interface EditorBtn {
@@ -480,36 +481,38 @@ onBeforeRouteUpdate(async () => {
     </v-row>
 
     <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
-      <v-col v-for="(btn, index) in editorBtnsGroup4" :key="index">
+      <div class="row-secondary">
         <v-icon
+          v-for="(btn, index) in editorBtnsGroup4"
+          :key="index"
           class="editor-btn"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
           >{{ btn.icon }}</v-icon
         >
-      </v-col>
-
+      </div>
       <v-divider inset vertical></v-divider>
 
-      <v-col v-for="(btn, index) in editorBtnsGroup5" :key="index">
+      <div class="row-secondary">
         <v-icon
+          v-for="(btn, index) in editorBtnsGroup5"
+          :key="index"
           class="editor-btn"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
           >{{ btn.icon }}</v-icon
         >
-      </v-col>
+      </div>
 
       <v-divider inset vertical></v-divider>
 
-      <v-col>
+      <div class="row-secondary">
         <v-icon>vertical_split</v-icon>
-      </v-col>
-      <v-col>
+
         <v-icon class="mirrored">vertical_split</v-icon>
-      </v-col>
+      </div>
 
       <v-divider inset vertical></v-divider>
       <v-col>
@@ -626,5 +629,15 @@ onBeforeRouteUpdate(async () => {
     right: 0;
     z-index: 1;
   }
+}
+.row-secondary {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding-right: 20px;
+  margin-left: 10px;
+  margin-right: 20px;
+  column-gap: 40px;
 }
 </style>
