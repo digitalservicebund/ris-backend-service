@@ -53,7 +53,7 @@ onMounted(async () => {
         :cancel-button-type="modalCancelButtonType"
         :confirm-button-type="modalConfirmButtonType"
         @close-modal="toggleModal"
-        @confirm-action="$emit('deleteFile')"
+        @confirm-action="toggleModal(), $emit('deleteFile')"
       />
       <v-row>
         <v-col sm="3" md="2">
