@@ -12,7 +12,7 @@ env:
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
 
 jobs:
-  vulnerability-scan-image:
+  vulnerability-scan-backend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -54,7 +54,7 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  vulnerability-scan-npm:
+  vulnerability-scan-frontend:
     runs-on: ubuntu-latest
     permissions:
       contents: read
