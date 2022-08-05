@@ -675,14 +675,14 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitTableRow parseTr(Tr tr) {
-    List<DocUnitTableCell> columns = new ArrayList<>();
+    List<DocUnitTableCell> cells = new ArrayList<>();
 
     tr.getContent()
         .forEach(
             element -> {
               if (element instanceof JAXBElement<?> jaxbElement) {
                 if (jaxbElement.getDeclaredType() == Tc.class) {
-                  columns.add(parseTc((Tc) jaxbElement.getValue()));
+                  cells.add(parseTc((Tc) jaxbElement.getValue()));
                 } else {
                   LOGGER.error("unknown tr element: {}", jaxbElement.getDeclaredType());
                 }
@@ -691,7 +691,7 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    return new DocUnitTableRow(columns);
+    return new DocUnitTableRow(cells);
   }
 
   private DocUnitTableCell parseTc(Tc tc) {
