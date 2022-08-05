@@ -8,17 +8,18 @@ pre-commit:
     check-format-backend:
       tags: style backend
       run: ./gradlew spotlessCheck
-    audit-licenses-backend:
-      tags: audit backend
-      run: ./gradlew checkLicense
     check-format-frontend:
       tags: style frontend
       run: cd web && npm run style:check
-    audit-licenses-frontend:
-      tags: audit frontend
-      run: cd web && npm run audit:licences > /dev/null;
 pre-push:
+  parallel: true
   commands:
+    licenses-audit-backend:
+      tags: licenses audit backend
+      run: ./gradlew checkLicense
+    licenses-audit-frontend:
+      tags: licenses audit frontend
+      run: cd web && npm run audit:licences > /dev/null;
     secrets-audit:
       # NOTE: there's one caveat with this hook! When pushing, it will only correctly scan the range of
       # outgoing commits when pushing to a matching branch on the remote (e.g. `git push`) - pushing to a
@@ -42,5 +43,5 @@ pre-push:
       # done
       #
       # exit 0
-      tags: security
+      tags: security audit
       run: currentbranch=$(git rev-parse --abbrev-ref HEAD); echo "refs/heads/$currentbranch HEAD refs/heads/$currentbranch $(git log -1 origin/$currentbranch --format='%H')" | talisman --githook pre-push
