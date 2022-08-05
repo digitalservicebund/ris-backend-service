@@ -32,12 +32,14 @@ brew install lefthook node talisman
 
 This will replace placeholders in the application template and install a couple of Git hooks.
 
-### Local development setup
+## Development
+
+### Gradle
 
 The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env:
 
 ```bash
-eval "$(./run.sh ensure-env)"
+eval "$(./run.sh gradle-env)"
 ```
 
 ### Full-stack

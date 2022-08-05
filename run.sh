@@ -69,7 +69,7 @@ _start() {
   gradle bootRun
 }
 
-_ensure_env() {
+_gradle_env() {
   if ! command -v gopass > /dev/null 2>&1; then
     GH_PACKAGES_REPOSITORY_USER=$READ_PACKAGES_PAT_USERNAME
     GH_PACKAGES_REPOSITORY_TOKEN=$READ_PACKAGES_PAT_TOKEN
@@ -87,7 +87,7 @@ _dev() {
     exit 1
   fi
   docker build ./web -f web/Dockerfile -t neuris/frontend --no-cache
-  eval "$(_ensure_env)"
+  eval "$(_gradle_env)"
   docker compose up
 }
 
@@ -108,7 +108,7 @@ _help() {
   echo ""
   echo "Available commands:"
   echo "init                  Set up repository for development"
-  echo "ensure-env            Set up shell env for Java build tooling"
+  echo "gradle-env            Provide shell env for Java build tooling; usage: \`eval \"\$(./run.sh gradle-env)\"\`"
   echo "dev                   Start full-stack development environment"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
@@ -117,7 +117,7 @@ _help() {
 cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
-  "ensure-env") _ensure_env ;;
+  "gradle-env") _gradle_env ;;
   "dev") _dev ;;
   "_start") _start ;;
   "cm")
