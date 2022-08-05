@@ -18,10 +18,17 @@ configurations { compileOnly { extendsFrom annotationProcessor } }
 repositories {
   mavenCentral()
   maven {
+    def user = System.getenv("GH_PACKAGES_REPOSITORY_USER") || System.getenv("READ_PACKAGES_PAT_USERNAME")
+    def token = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN") || System.getenv("READ_PACKAGES_PAT_TOKEN")
+    if (user == null || token == null) {
+      user = "gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username".execute().text.trim()
+      token = "gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token".execute().text.trim()
+    }
+
     url = uri("https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export")
     credentials {
-      username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
-      password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
+      username = user
+      password = token
     }
   }
 }

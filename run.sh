@@ -77,8 +77,8 @@ _ensure_env() {
     GH_PACKAGES_REPOSITORY_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username)
     GH_PACKAGES_REPOSITORY_TOKEN=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token)
   fi
-  echo export GH_PACKAGES_REPOSITORY_USER="$GH_PACKAGES_REPOSITORY_USER"
-  echo export GH_PACKAGES_REPOSITORY_TOKEN="$GH_PACKAGES_REPOSITORY_TOKEN"
+  export GH_PACKAGES_REPOSITORY_USER="$GH_PACKAGES_REPOSITORY_USER"
+  export GH_PACKAGES_REPOSITORY_TOKEN="$GH_PACKAGES_REPOSITORY_TOKEN"
 }
 
 _dev() {
@@ -87,7 +87,7 @@ _dev() {
     exit 1
   fi
   docker build ./web -f web/Dockerfile -t neuris/frontend --no-cache
-  eval "$(_ensure_env)"
+  _ensure_env
   docker compose up
 }
 
@@ -108,7 +108,6 @@ _help() {
   echo ""
   echo "Available commands:"
   echo "init                  Set up repository for development"
-  echo "ensure-env            Set up shell env for Java build tooling"
   echo "dev                   Start full-stack development environment"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
