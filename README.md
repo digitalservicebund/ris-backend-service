@@ -32,7 +32,13 @@ brew install lefthook node talisman
 
 This will replace placeholders in the application template and install a couple of Git hooks.
 
-## Development
+### Local development setup
+
+The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env:
+
+```bash
+eval "$(./run.sh ensure-env)"
+```
 
 ### Full-stack
 
@@ -43,7 +49,7 @@ This will replace placeholders in the application template and install a couple 
 This will start the backend with a Postgres database and [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart)
 so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
-### Backend only
+#### Backend only
 
 Requires the Postgres database to be running: `docker-compose up db`
 
@@ -53,7 +59,7 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 
 If you use IntelliJ: the run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
 
-### Frontend only
+#### Frontend only
 
 See `web/README.md`
 
