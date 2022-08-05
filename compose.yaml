@@ -19,8 +19,8 @@ services:
     working_dir: /app
     environment:
       - SPRING_PROFILES_ACTIVE=local,compose
-      - READ_PACKAGES_PAT_USERNAME=${READ_PACKAGES_PAT_USERNAME}
-      - READ_PACKAGES_PAT_TOKEN=${READ_PACKAGES_PAT_TOKEN}
+      - GH_PACKAGES_REPOSITORY_USER=${GH_PACKAGES_REPOSITORY_USER}
+      - GH_PACKAGES_REPOSITORY_TOKEN=${GH_PACKAGES_REPOSITORY_TOKEN}
     command: sh run.sh _start
     ports:
       - 8080:8080 # service

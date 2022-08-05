@@ -20,8 +20,8 @@ repositories {
   maven {
     url = uri("https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export")
     credentials {
-      username = System.getenv("READ_PACKAGES_PAT_USERNAME")
-      password = System.getenv("READ_PACKAGES_PAT_TOKEN")
+      username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
+      password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
     }
   }
 }

@@ -34,14 +34,11 @@ This will replace placeholders in the application template and install a couple 
 
 ### Local development setup
 
-One dependency is coming from a package registry in a private GitHub repository. To be able to download it in the gradle build process, you need to add the following to your `.bashrc` (or `.zshrc` etc.) file. Then restart IntelliJ and reload Gradle.
+The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env:
 
 ```bash
-export READ_PACKAGES_PAT_USERNAME=insert-your-github-username
-export READ_PACKAGES_PAT_TOKEN=insert-your-generated-pat
+eval "$(./run.sh ensure-env)"
 ```
-
-You can generate a personal access token (PAT) [here](https://github.com/settings/tokens). The scope `read:packages` is enough.
 
 ### Full-stack
 

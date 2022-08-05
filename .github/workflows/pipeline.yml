@@ -12,8 +12,8 @@ env:
   CONTAINER_REGISTRY: ghcr.io
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
-  READ_PACKAGES_PAT_USERNAME: ${{ secrets.READ_PACKAGES_PAT_USERNAME }}
-  READ_PACKAGES_PAT_TOKEN: ${{ secrets.READ_PACKAGES_PAT_TOKEN }}
+  GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
+  GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
 
 jobs:
   build-backend:

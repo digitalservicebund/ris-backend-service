@@ -69,12 +69,20 @@ _start() {
   gradle bootRun
 }
 
+_ensure_env() {
+  GH_PACKAGES_REPOSITORY_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username || $READ_PACKAGES_PAT_USERNAME)
+  echo export GH_PACKAGES_REPOSITORY_USER="$GH_PACKAGES_REPOSITORY_USER"
+  GH_PACKAGES_REPOSITORY_TOKEN=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token || $READ_PACKAGES_PAT_TOKEN)
+  echo export GH_PACKAGES_REPOSITORY_TOKEN="$GH_PACKAGES_REPOSITORY_TOKEN"
+}
+
 _dev() {
   if ! command -v docker > /dev/null 2>&1; then
     _fail "Dev requires docker, please install first: \`brew install docker\`"
     exit 1
   fi
   docker build ./web -f web/Dockerfile -t neuris/frontend --no-cache
+  eval "$(_ensure_env)"
   docker compose up
 }
 
@@ -95,6 +103,7 @@ _help() {
   echo ""
   echo "Available commands:"
   echo "init                  Set up repository for development"
+  echo "ensure-env            Set up shell env for Java build tooling"
   echo "dev                   Start full-stack development environment"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
@@ -103,6 +112,7 @@ _help() {
 cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
+  "ensure-env") _ensure_env ;;
   "dev") _dev ;;
   "_start") _start ;;
   "cm")
