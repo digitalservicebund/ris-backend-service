@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.*;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableColumn;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableCell;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
@@ -675,7 +675,7 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitTableRow parseTr(Tr tr) {
-    List<DocUnitTableColumn> columns = new ArrayList<>();
+    List<DocUnitTableCell> columns = new ArrayList<>();
 
     tr.getContent()
         .forEach(
@@ -694,7 +694,7 @@ public class DocUnitDocxBuilder {
     return new DocUnitTableRow(columns);
   }
 
-  private DocUnitTableColumn parseTc(Tc tc) {
+  private DocUnitTableCell parseTc(Tc tc) {
     List<DocUnitDocx> paragraphElements = new ArrayList<>();
 
     tc.getContent()
@@ -707,6 +707,6 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    return new DocUnitTableColumn(paragraphElements);
+    return new DocUnitTableCell(paragraphElements);
   }
 }

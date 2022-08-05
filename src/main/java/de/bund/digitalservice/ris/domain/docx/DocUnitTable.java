@@ -11,16 +11,16 @@ public record DocUnitTable(List<DocUnitTableRow> rows) implements DocUnitDocx {
         + "</table>";
   }
 
-  public record DocUnitTableRow(List<DocUnitTableColumn> columns) implements DocUnitDocx {
+  public record DocUnitTableRow(List<DocUnitTableCell> columns) implements DocUnitDocx {
     @Override
     public String toHtmlString() {
       return "<tr>"
-          + columns.stream().map(DocUnitTableColumn::toHtmlString).collect(Collectors.joining())
+          + columns.stream().map(DocUnitTableCell::toHtmlString).collect(Collectors.joining())
           + "</tr>";
     }
   }
 
-  public record DocUnitTableColumn(List<DocUnitDocx> paragraphElements) implements DocUnitDocx {
+  public record DocUnitTableCell(List<DocUnitDocx> paragraphElements) implements DocUnitDocx {
     @Override
     public String toHtmlString() {
       return "<td>"
