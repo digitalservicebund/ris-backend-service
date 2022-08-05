@@ -28,6 +28,7 @@ import {
 import { FontSize } from "../editor/font-size"
 import { CustomImage } from "../editor/image"
 import { CustomParagraph } from "../editor/paragraph"
+import { TableStyling } from "../editor/tableStyling"
 import { FieldSize } from "@/domain/FieldSize"
 
 const props = defineProps({
@@ -90,6 +91,7 @@ const editor = new Editor({
     Table,
     TableCell,
     TableHeader,
+    TableStyling,
     TableRow,
     TextStyle,
     TextAlign.configure({

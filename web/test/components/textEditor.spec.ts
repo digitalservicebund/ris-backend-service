@@ -38,7 +38,7 @@ describe("text editor", async () => {
           value: "Test Value",
           fieldSize: "large",
           editable: false,
-          ariaLabel: "Testlabel",
+          ariaLabel: "test label",
         },
         global: { plugins: [vuetify, router] },
       }
@@ -48,35 +48,35 @@ describe("text editor", async () => {
     expect(container.getElementsByClassName("ProseMirror__large").length).toBe(
       1
     )
-    expect(queryByLabelText("Testlabel Editor Button Leiste")).toBeNull()
-    getByLabelText("Testlabel Editor Feld")
+    expect(queryByLabelText("test label Editor Button Leiste")).toBeNull()
+    getByLabelText("test label Editor Feld")
   })
 
   test("show buttons on focus", async () => {
     const { getByLabelText } = render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "Testlabel" },
+      props: { value: "Test Value", ariaLabel: "test label" },
       global: { plugins: [vuetify, router] },
     })
     await screen.findByText("Test Value")
-    const editorField = await getByLabelText("Testlabel Editor Feld")
+    const editorField = getByLabelText("test label Editor Feld")
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
-    expect(getByLabelText("Testlabel Editor Button Leiste")).not.toBeNull()
+    expect(getByLabelText("test label Editor Button Leiste")).not.toBeNull()
   })
 
   test("hide buttons on blur", async () => {
     const { getByLabelText, queryByLabelText } = render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "Testlabel" },
+      props: { value: "Test Value", ariaLabel: "test label" },
       global: { plugins: [vuetify, router] },
     })
 
     await screen.findByText("Test Value")
-    const editorField = await getByLabelText("Testlabel Editor Feld")
+    const editorField = getByLabelText("test label Editor Feld")
     if (editorField.firstElementChild !== null) {
       await fireEvent.blur(editorField.firstElementChild)
     }
-    expect(queryByLabelText("Testlabel Editor Button Leiste")).toBeNull()
+    expect(queryByLabelText("test label Editor Button Leiste")).toBeNull()
   })
 })
