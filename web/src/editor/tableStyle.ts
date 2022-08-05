@@ -1,6 +1,6 @@
 import { Extension } from "@tiptap/core"
 
-export const TableStyling = Extension.create({
+export const TableStyle = Extension.create({
   addGlobalAttributes() {
     return [
       {

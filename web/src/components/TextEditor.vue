@@ -24,11 +24,11 @@ import {
   BorderNumber,
   BorderNumberContent,
   BorderNumberNumber,
-} from "../editor/border-number"
-import { FontSize } from "../editor/font-size"
+} from "../editor/borderNumber"
+import { FontSize } from "../editor/fontSize"
 import { CustomImage } from "../editor/image"
 import { CustomParagraph } from "../editor/paragraph"
-import { TableStyling } from "../editor/tableStyling"
+import { TableStyle } from "../editor/tableStyle"
 import { FieldSize } from "@/domain/FieldSize"
 
 const props = defineProps({
@@ -58,15 +58,15 @@ const emit = defineEmits<{
   (e: "updateValue", newValue: string): void
 }>()
 
-const hasFocus = ref<boolean>(false)
-const showMore = ref<boolean>(false)
-const showMoreTextAlign = ref<boolean>(false)
-const showImageAlignment = ref<boolean>(false)
-const showListStyles = ref<boolean>(false)
-const sm = ref<boolean>(false)
-const md = ref<boolean>(false)
-const lg = ref<boolean>(false)
-const isLastItemFlexEnd = ref<boolean>(false)
+const hasFocus = ref(false)
+const showMore = ref(false)
+const showMoreTextAlign = ref(false)
+const showImageAlignment = ref(false)
+const showListStyles = ref(false)
+const sm = ref(false)
+const md = ref(false)
+const lg = ref(false)
+const isLastItemFlexEnd = ref(false)
 
 const editor = new Editor({
   content: props.value,
@@ -91,8 +91,8 @@ const editor = new Editor({
     Table,
     TableCell,
     TableHeader,
-    TableStyling,
     TableRow,
+    TableStyle,
     TextStyle,
     TextAlign.configure({
       types: ["paragraph", "span"],
