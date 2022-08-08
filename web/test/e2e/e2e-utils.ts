@@ -17,12 +17,6 @@ export const navigateToCategories = async (
     .click()
 }
 
-export const pageReload = async (page: Page) => {
-  await page.goto("/")
-  await page.reload()
-  await page.waitForTimeout(500)
-}
-
 export const uploadTestfile = async (page: Page, filename: string) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
