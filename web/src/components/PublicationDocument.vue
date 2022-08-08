@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue"
 import TextButton from "./TextButton.vue"
 import ErrorModal from "@/components/ErrorModal.vue"
+import CodeSnippet from "@/components/CodeSnippet.vue"
 
 const isFristTimePublication = ref<boolean>(false)
 const hasValidationError = ref<boolean>(true)
@@ -15,7 +16,7 @@ const errorMessage =
 
 onMounted(() => {
   xml.value =
-    '<?xml version="1.0"?><!DOCTYPE juris-r SYSTEM "juris-r.dtd"><juris-r></juris-r>'
+    '<?xml version="1.0"?><!DOCTYPE juris-r SYSTEM "juris-r.dtd"><juris-r><metadaten><gericht><gertyp>Gerichtstyp</gertyp><gerort>Gerichtssitz</gerort></gericht></metadaten><textdaten><titelzeile><body><div><p>Titelzeile</p></div></body></titelzeile><leitsatz><body><div><p>Leitsatz</p></div></body></leitsatz><osatz><body><div><p>Orientierungssatz</p></div></body></osatz><tenor><body><div><p>Tenor</p></div></body></tenor><tatbestand><body><div><p>Tatbestand</p></div></body></tatbestand><entscheidungsgruende><body><div><p>Entscheidungsgründe</p></div></body></entscheidungsgruende><gruende><body><div><p>Gründe</p></div></body></gruende></textdaten></juris-r>'
 })
 </script>
 
@@ -71,10 +72,7 @@ onMounted(() => {
           </p>
         </div>
         <p class="publication-text-label">als</p>
-        <div class="xml-container">
-          <p class="publication-text-body" style="font-weight: 700">XML</p>
-          <code class="xml-viewer">{{ xml }}</code>
-        </div>
+        <CodeSnippet :xml="xml" title="xml" />
       </div>
     </div>
   </div>
@@ -168,12 +166,6 @@ onMounted(() => {
           margin-left: 5px;
         }
       }
-    }
-  }
-
-  .xml-container {
-    code {
-      background-color: $white;
     }
   }
 }
