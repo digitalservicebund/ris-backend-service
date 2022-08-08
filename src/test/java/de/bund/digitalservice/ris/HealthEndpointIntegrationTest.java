@@ -16,7 +16,8 @@ import org.testcontainers.junit.jupiter.Testcontainers;
     properties = {
       "otc.obs.bucket-name=testBucket",
       "otc.obs.endpoint=testUrl",
-      "local.file-storage=.local-storage"
+      "local.file-storage=.local-storage",
+      "mail.from.address=test@test.com"
     })
 @Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)

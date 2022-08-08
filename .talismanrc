@@ -18,9 +18,9 @@ fileignoreconfig:
   - filename: src/test/resources/application.properties
     checksum: 3b330b6390ddb0c4ed3ce344ace2e4a8afc48d3bb4bef4f66f6465f4f2632254
   - filename: src/test/java/de/bund/digitalservice/ris/HealthEndpointIntegrationTest.java
-    checksum: 5ca024c91e17a1463887e14675d3a781350451524db9bd71ff11713ea42d0d95
+    checksum: 84e3e4e6d3ef71f16220dbda3808b6e0943a5c43029a167fa9d89be70fa6db5a
   - filename: src/test/java/de/bund/digitalservice/ris/SecurityIntegrationTest.java
-    checksum: ed062d61033c95f602ffa30933b15574baf79d3bb01c88cb1322953b4c0fd199
+    checksum: 25c731cc32d2496e7299ac1a75e487d9a7d47085a4f0fda90ad063931027a383
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
