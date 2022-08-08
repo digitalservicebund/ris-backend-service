@@ -127,11 +127,13 @@ const linkStyling = (componentName: string) => {
         <v-row>
           <v-col>
             <router-link
-              style="color: gray"
+              class="sidebar_headline public-button"
               :to="{
-                name: 'docUnitDocx',
+                name: 'jurisdiction-docUnit-:documentNumber-publication',
+                params: { documentNumber: documentNumber },
+                query: route.query,
               }"
-              >docx --> html</router-link
+              >Veröfflenlichen</router-link
             >
           </v-col>
         </v-row>
@@ -179,5 +181,8 @@ const linkStyling = (componentName: string) => {
     margin-bottom: 4px;
     margin-right: 8px;
   }
+}
+.public-button {
+  text-decoration: underline;
 }
 </style>
