@@ -1,0 +1,21 @@
+# Allows to run standalone Playwright based E2E tests in particular browser,
+# for debugging...
+name: Playwright test
+
+on:
+  workflow_dispatch:
+    inputs:
+      browser:
+        description: "Playwright browser engine"
+        required: true
+        type: choice
+        options:
+          - chromium
+          - firefox
+
+jobs:
+  playwright-test:
+    uses: ./.github/workflows/playwright-e2e-test.yml
+    with:
+      browser: firefox
+    secrets: inherit

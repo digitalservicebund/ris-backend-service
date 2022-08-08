@@ -13,6 +13,8 @@ fileignoreconfig:
     checksum: 7c91d3adb6e82aa54cb6419982931cb0d1c4e6865b1459b1ee55a3058652614e
   - filename: .github/workflows/playwright-e2e-test.yml
     checksum: 1729ef3ab5e6236012138a225f25f38a22a990c2138854bab129609ed7baf361
+  - filename: .github/workflows/playwright.yml
+    checksum: 72e89586ec4a1c51806d667713f9853cb1099b091c9b8bc3ac37b2b81a6ea428
   - filename: src/test/resources/application.properties
     checksum: 3b330b6390ddb0c4ed3ce344ace2e4a8afc48d3bb4bef4f66f6465f4f2632254
   - filename: src/test/java/de/bund/digitalservice/ris/HealthEndpointIntegrationTest.java
