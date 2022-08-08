@@ -14,11 +14,6 @@ const docUnit = ref(
 
 <template>
   <DocUnitDetail :doc-unit="docUnit">
-    <v-container>
-      <v-row>
-        <v-col><h2>Veröffentlichen</h2></v-col>
-      </v-row>
-    </v-container>
     <PublicationDocument />
   </DocUnitDetail>
 </template>
