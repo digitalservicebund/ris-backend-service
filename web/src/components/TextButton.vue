@@ -123,6 +123,11 @@ const buttonClass = () => {
     &:focus-visible {
       outline: 2px solid $blue800;
     }
+
+    &:disabled {
+      background-color: #dcdee1 !important;
+      color: #4e596a !important;
+    }
   }
 }
 .btn-secondary {

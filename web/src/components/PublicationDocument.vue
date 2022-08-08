@@ -23,7 +23,12 @@ onMounted(() => {
   <div class="flex-col-container publication-container">
     <h2>Veröffenlichen</h2>
     <div class="flex-col-container publication-check-container">
-      <div class="publication-check-infos-container">
+      <div
+        class="publication-check-infos-container"
+        :class="{
+          'publication-check-infos-container__in_error': hasValidationError,
+        }"
+      >
         <p class="publication-text-header">Plausibilitätsprüfung</p>
         <p class="publication-text-body">0 Fehler</p>
         <div class="publication-button-container">
@@ -35,6 +40,7 @@ onMounted(() => {
             <TextButton
               label="Dokumentationseinheit veröffenlichen"
               button-type="primary"
+              :disabled="hasValidationError"
             />
           </div>
         </div>
@@ -127,6 +133,9 @@ onMounted(() => {
       padding: 16px 56px 16px 24px;
       background-color: $white;
       width: 100%;
+      &__in_error {
+        border: solid 1px #b0243f;
+      }
 
       .text-container  {
         display: flex;
