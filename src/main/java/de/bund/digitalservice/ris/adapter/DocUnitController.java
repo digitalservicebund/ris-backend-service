@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.adapter;
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
+import de.bund.digitalservice.ris.domain.ExportObject;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.UUID;
@@ -89,5 +90,13 @@ public class DocUnitController {
       return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
     }
     return service.updateDocUnit(docUnit);
+  }
+
+  @PutMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<ResponseEntity<ExportObject>> publishDocumentUnit(@PathVariable UUID uuid) {
+    return service
+        .publish(uuid)
+        .map(ResponseEntity::ok)
+        .doOnError(ex -> ResponseEntity.internalServerError().build());
   }
 }

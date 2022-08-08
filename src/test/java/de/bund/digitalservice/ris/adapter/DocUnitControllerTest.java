@@ -10,6 +10,8 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
+import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
+import de.bund.digitalservice.ris.domain.XmlMail;
 import java.nio.ByteBuffer;
 import java.util.Objects;
 import java.util.UUID;
@@ -196,5 +198,47 @@ class DocUnitControllerTest {
         .exchange()
         .expectStatus()
         .is4xxClientError();
+  }
+
+  @Test
+  void testPublish() {
+    when(service.publish(testUuid))
+        .thenReturn(Mono.just(new XmlMail(1L, 123L, "mailSubject", "xml")));
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/docunits/" + testUuid + "/publish")
+        .exchange()
+        .expectHeader()
+        .valueEquals("Content-Type", "application/json")
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("id")
+        .isEqualTo("1")
+        .jsonPath("documentUnitId")
+        .isEqualTo("123")
+        .jsonPath("mailSubject")
+        .isEqualTo("mailSubject")
+        .jsonPath("xml")
+        .isEqualTo("xml");
+
+    verify(service).publish(testUuid);
+  }
+
+  @Test
+  void testPublish_withServiceThrowsException() {
+    when(service.publish(testUuid)).thenThrow(DocumentUnitPublishException.class);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/docunits/" + testUuid + "/publish")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+
+    verify(service).publish(testUuid);
   }
 }
