@@ -54,7 +54,6 @@ const getCodeLines = (): Array<CodeLine> => {
     codeLinesObjArr = codeLines.map((codeLine) => {
       const ml = caculateLineMarginLeft(codeLine)
       const codeLineObj = { codeLine: codeLine, marginLeft: ml }
-      console.log(codeLine + "       " + marginLeft.value)
       return codeLineObj
     })
   }

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
 import TextButton from "./TextButton.vue"
-import ErrorModal from "@/components/ErrorModal.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
+import ErrorModal from "@/components/ErrorModal.vue"
 
 const isFristTimePublication = ref<boolean>(false)
 const hasValidationError = ref<boolean>(true)
