@@ -10,7 +10,7 @@ const linkStyling = (componentName: string) => {
 </script>
 
 <template>
-  <v-container fluid class="topbar-main">
+  <v-container fluid class="topbar-main" role="navigation" tag="nav">
     <v-row>
       <v-col cols="1">
         <v-icon class="topbar-logo-circle" size="56px">circle</v-icon>

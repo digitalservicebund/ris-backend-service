@@ -20,7 +20,7 @@ const handleToggleNavBar = async () => {
 </script>
 
 <template>
-  <v-main>
+  <v-main role="main">
     <v-container fluid>
       <v-row>
         <NavbarSide

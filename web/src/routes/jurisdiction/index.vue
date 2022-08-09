@@ -18,7 +18,7 @@ const handleDelete = async (docUnit: DocUnit) => {
 </script>
 
 <template>
-  <v-main>
+  <v-main role="main">
     <v-container fluid>
       <v-row>
         <v-col class="rechtsprechung-header"><h1>Rechtsprechung</h1></v-col>
