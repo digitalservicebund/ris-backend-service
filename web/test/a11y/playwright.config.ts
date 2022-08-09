@@ -1,26 +1,5 @@
-import { devices, PlaywrightTestConfig } from "@playwright/test"
+import config from "../../playwright.config"
 
-const config: PlaywrightTestConfig = {
-  testDir: ".",
-  retries: process.env.CI === "true" ? 1 : 0,
-  workers: process.env.CI ? 2 : undefined,
-  use: {
-    viewport: { width: 1280, height: 720 },
-    acceptDownloads: true,
-    baseURL: "http://localhost:4173",
-    screenshot: "only-on-failure",
-  },
-  projects: [
-    {
-      name: "chromium",
-      use: { ...devices["Desktop Chrome"], channel: "chrome" },
-    },
-  ],
-  webServer: {
-    command: "npm run serve",
-    port: 4173,
-    timeout: parseInt(process.env.WAIT_ON_TIMEOUT) || 20 * 1000,
-  },
-}
+config.testDir = "."
 
 export default config
