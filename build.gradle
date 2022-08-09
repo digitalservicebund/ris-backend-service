@@ -181,6 +181,7 @@ bootBuildImage {
   def containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
   imageName = "${containerRegistry}/${containerImageName}:${containerImageVersion}"
+  builder = "paketobuildpacks/builder:tiny"
   publish = false
   docker {
     publishRegistry {
