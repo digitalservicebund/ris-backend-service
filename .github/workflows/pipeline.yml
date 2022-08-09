@@ -534,6 +534,8 @@ jobs:
       - deploy-staging-verify-api
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
+      - deploy-staging-verify-a11y-chrome
+      - deploy-staging-verify-a11y-firefox
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
