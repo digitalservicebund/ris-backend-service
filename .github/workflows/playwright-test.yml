@@ -43,13 +43,13 @@ jobs:
           STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
         run: npm run test:e2e -- --project ${{ inputs.browser }}
         working-directory: ./web
-      - name: Run A11Y tests in ${{ inputs.browser }}
+      - name: Run A11Y tests
         if: ${{ inputs.is_a11y }}
         env:
           E2E_BASE_URL: ${{ secrets.STAGING_URL }}
           STAGING_USER: ${{ secrets.STAGING_USER }}
           STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
-        run: npm run test:a11y -- --project ${{ inputs.browser }}
+        run: npm run test:a11y
         working-directory: ./web
       - name: Upload screenshots of failed tests
         uses: actions/upload-artifact@v3
