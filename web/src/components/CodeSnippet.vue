@@ -6,65 +6,17 @@ const props = defineProps<{
   xml: string
 }>()
 
-type CodeLine = {
-  codeLine: string
-  marginLeft: number
-}
-const codeLineMarginLeftUnit = 20
-const shouldUpdateMarginLeft = ref<boolean>(false)
-const caculateLineMarginLeft = (line: string): number => {
-  const isXMLTag = line.includes("<?xml")
-  const isDocTypeTag = line.includes("<!DOCTYPE")
-  const hasCloseTag = line.includes("</") || line.includes("/>")
-  const isOpenTag = line.includes("<") && line.includes(">")
-  if (isXMLTag || isDocTypeTag) return 0
-  if (hasCloseTag) {
-    marginLeft.value -= 1
-    shouldUpdateMarginLeft.value = false
-    return marginLeft.value * codeLineMarginLeftUnit
-  }
-  if (isOpenTag) {
-    if (shouldUpdateMarginLeft.value) {
-      marginLeft.value += 1
-    }
-    shouldUpdateMarginLeft.value = true
-    return marginLeft.value * codeLineMarginLeftUnit
-  }
-  marginLeft.value += 1
-  return marginLeft.value * codeLineMarginLeftUnit
-}
-
-const codeLines = ref<Array<CodeLine>>([])
-const marginLeft = ref<number>(0)
-const getCodeLines = (): Array<CodeLine> => {
-  let codeLinesObjArr: Array<CodeLine> = []
+const codeLines = ref<Array<string>>([])
+const getCodeLines = (): Array<string> => {
   if (props.xml.includes("<?xml")) {
-    const codeLines = props.xml
-      .split("<")
-      .map((s) => {
-        return (s.includes(">") ? "<" + s : s)
-          .split(">")
-          .map((s) => (s.includes("<") ? s + ">" : s))
-          .filter((s) => s.length > 0)
-      })
-      .filter((arr) => arr.length > 0)
-      .reduce((arr, curVal) => {
-        return arr.concat(curVal)
-      }, [])
-    codeLinesObjArr = codeLines.map((codeLine) => {
-      const ml = caculateLineMarginLeft(codeLine)
-      const codeLineObj = { codeLine: codeLine, marginLeft: ml }
-      return codeLineObj
-    })
+    return props.xml.split("\n")
   }
-  return codeLinesObjArr
+  return []
 }
 onUpdated(() => {
-  marginLeft.value = 0
   codeLines.value = getCodeLines()
 })
 onMounted(() => {
-  marginLeft.value = 0
   codeLines.value = getCodeLines()
 })
 </script>
@@ -81,8 +33,8 @@ onMounted(() => {
           }"
           ><span>{{ index + 1 }}</span></code
         >
-        <code class="line" :style="{ 'margin-left': `${line.marginLeft}px` }"
-          ><span>{{ line.codeLine }}</span></code
+        <code class="line"
+          ><span>{{ line }}</span></code
         >
       </div>
     </div>
@@ -104,7 +56,6 @@ onMounted(() => {
     overflow: auto;
     white-space: nowrap;
     width: 60vw;
-    height: 300px;
   }
   .code-line {
     display: flex;

@@ -5,7 +5,7 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import ErrorModal from "@/components/ErrorModal.vue"
 
 const isFristTimePublication = ref<boolean>(false)
-const hasValidationError = ref<boolean>(true)
+const hasValidationError = ref<boolean>(false)
 const lastPublicationDate = ref<string>("24.07.2022 16:53 Uhr")
 const receiverEmail = ref<string>("dokmbx@juris.de")
 const emailSubject = ref<string>('id=OVGNW name="knorr" da=r dt=b df=r')
@@ -13,10 +13,13 @@ const xml = ref<string>("xml wird geladet ....")
 const errorMessageTitle = "Leider ist ein Fehler aufgetreten."
 const errorMessage =
   "Die Dokumentationseinheit kann nicht veröffentlich werden."
-
+const showIssuesDetails = ref<boolean>(false)
+const toggleShowIssuesDetails = () => {
+  showIssuesDetails.value = !showIssuesDetails.value
+}
 onMounted(() => {
   xml.value =
-    '<?xml version="1.0"?><!DOCTYPE juris-r SYSTEM "juris-r.dtd"><juris-r><metadaten><gericht><gertyp>Gerichtstyp</gertyp><gerort>Gerichtssitz</gerort></gericht></metadaten><textdaten><titelzeile><body><div><p>Titelzeile</p></div></body></titelzeile><leitsatz><body><div><p>Leitsatz</p></div></body></leitsatz><osatz><body><div><p>Orientierungssatz</p></div></body></osatz><tenor><body><div><p>Tenor</p></div></body></tenor><tatbestand><body><div><p>Tatbestand</p></div></body></tatbestand><entscheidungsgruende><body><div><p>Entscheidungsgründe</p></div></body></entscheidungsgruende><gruende><body><div><p>Gründe</p></div></body></gruende></textdaten></juris-r>'
+    '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<juris-r>\n<metadaten>\n<gericht>\n<gertyp>Gerichtstyp</gertyp\n><gerort>Gerichtssitz</gerort>\n</gericht>\n</metadaten>\n<textdaten>\n<titelzeile>\n<body>\n<div>\n<p>Titelzeile</p>\n</div>\n</body>\n</titelzeile>\n<leitsatz>\n<body>\n<div>\n<p>Leitsatz</p>\n</div>\n</body>\n</leitsatz>\n<osatz>\n<body>\n<div>\n<p>Orientierungssatz</p>\n</div>\n</body>\n</osatz>\n<tenor>\n<body>\n<div>\n<p>Tenor</p>\n</div>\n</body>\n</tenor>\n<tatbestand>\n<body>\n<div>\n<p>Tatbestand</p>\n</div>\n</body>\n</tatbestand>\n<entscheidungsgruende>\n<body>\n<div>\n<p>Entscheidungsgründe</p>\n</div>\n</body>\n</entscheidungsgruende>\n<gruende>\n<body>\n<div>\n<p>Gründe</p>\n</div>\n</body>\n</gruende>\n</textdaten>\n</juris-r>'
 })
 </script>
 
@@ -30,8 +33,52 @@ onMounted(() => {
           'publication-check-infos-container__in_error': hasValidationError,
         }"
       >
-        <p class="publication-text-header">Plausibilitätsprüfung</p>
-        <p class="publication-text-body">0 Fehler</p>
+        <div class="text-icon">
+          <div class="icon">
+            <span
+              v-if="hasValidationError && !showIssuesDetails"
+              class="material-icons"
+            >
+              error
+            </span>
+            <span
+              v-if="hasValidationError && showIssuesDetails"
+              class="material-icons"
+            >
+              priority_high
+            </span>
+            <span v-if="!hasValidationError" class="material-icons">
+              done_all
+            </span>
+          </div>
+          <p class="publication-text-header">Plausibilitätsprüfung</p>
+        </div>
+
+        <div v-if="!hasValidationError" class="text-icon">
+          <div class="icon">
+            <span class="material-icons"> done </span>
+          </div>
+          <p class="publication-text-body">0 Fehler</p>
+        </div>
+        <div v-else class="xml-validation-error-container">
+          <div class="text-icon">
+            <button class="icon" @click="toggleShowIssuesDetails">
+              <span v-if="showIssuesDetails" class="material-icons">
+                keyboard_arrow_up
+              </span>
+              <span v-else class="material-icons"> keyboard_arrow_down </span>
+            </button>
+            <p class="publication-text-body">3 Pflichtfelder nicht befüllt</p>
+          </div>
+          <div
+            v-show="showIssuesDetails"
+            class="xml-validation-error-details flex-col-container"
+          >
+            <p class="publication-text-body">Aktenzeichen</p>
+            <p class="publication-text-body">Entscheidungsname</p>
+            <p class="publication-text-body">Gericht</p>
+          </div>
+        </div>
         <div class="publication-button-container">
           <div v-if="!isFristTimePublication" class="text-container">
             <p class="publication-text-body">Zuletzt veröffentlicht</p>
@@ -41,6 +88,7 @@ onMounted(() => {
             <TextButton
               label="Dokumentationseinheit veröffenlichen"
               button-type="primary"
+              icon="campaign"
               :disabled="hasValidationError"
             />
           </div>
@@ -86,10 +134,19 @@ onMounted(() => {
 }
 .publication-container {
   background-color: #f6f7f8;
-  height: 100vh;
+  min-height: 100vh;
   row-gap: 32px;
   padding-top: 32px;
   padding-left: 32px;
+  padding-bottom: 32px;
+
+  .icon {
+    width: 15px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+  }
 
   p {
     font-style: normal;
@@ -166,6 +223,23 @@ onMounted(() => {
           margin-left: 5px;
         }
       }
+    }
+  }
+  .text-icon {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: center;
+    column-gap: 12px;
+  }
+
+  .xml-validation-error-container {
+    .xml-validation-error-details {
+      padding-top: 16px;
+      padding-left: 27px;
+      padding-bottom: 16px;
+      row-gap: 16px;
     }
   }
 }
