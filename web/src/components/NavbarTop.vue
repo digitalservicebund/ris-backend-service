@@ -47,7 +47,7 @@ const linkStyling = (componentName: string) => {
   border-right: $gray400 solid 1px;
 }
 .topbar-logo-circle {
-  color: $yellow500;
+  color: $blue800;
   float: right;
 }
 .topbar-link-box {
