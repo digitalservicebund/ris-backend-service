@@ -57,7 +57,7 @@
     "@digitalservice4germany/style-dictionary": "^0.0.4",
     "@playwright-testing-library/test": "^4.3.0",
     "@playwright/test": "^1.24.1",
-    "@testing-library/dom": "^8.16.0",
+    "@testing-library/dom": "^8.17.1",
     "@testing-library/user-event": "^14.4.2",
     "@testing-library/vue": "^6.6.0",
     "@types/node": "^18.6.3",
