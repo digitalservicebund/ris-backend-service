@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { ref } from "vue"
 
 const props = defineProps<{
   title: string
@@ -38,7 +38,7 @@ const caculateLineMarginLeft = (line: string): number => {
   }
   return ml
 }
-const codeLines = ref<Array<CodeLine>>([])
+
 const getCodeLines = (): Array<CodeLine> => {
   if (props.xml.includes("<?xml")) {
     return props.xml.split("\n").map((line) => {
@@ -48,9 +48,7 @@ const getCodeLines = (): Array<CodeLine> => {
   }
   return []
 }
-onMounted(() => {
-  codeLines.value = getCodeLines()
-})
+const codeLines = ref<Array<CodeLine>>(getCodeLines())
 </script>
 
 <template>
