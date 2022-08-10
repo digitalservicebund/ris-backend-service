@@ -133,7 +133,7 @@ const linkStyling = (componentName: string) => {
                 params: { documentNumber: documentNumber },
                 query: route.query,
               }"
-              >Veröfflenlichen</router-link
+              >Veröffentlichen</router-link
             >
           </v-col>
         </v-row>
