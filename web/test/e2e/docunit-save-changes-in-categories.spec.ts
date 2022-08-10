@@ -37,6 +37,14 @@ test.describe("save changes in core data and texts and verify it persists", () =
     expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("abc")
   })
 
+  test.skip("test refresh works", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Aktenzeichen']")
+    page.reload()
+    expect(await page.locator("[aria-label='Aktenzeichen']")).toBeVisible()
+  })
+
   test("test bold text input", async ({ page, editorField }) => {
     await editorField.click()
 
