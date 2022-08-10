@@ -1,26 +1,29 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { ref } from "vue"
 import TextButton from "./TextButton.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ErrorModal from "@/components/ErrorModal.vue"
 
-const isFristTimePublication = ref<boolean>(false)
-const hasValidationError = ref<boolean>(false)
-const lastPublicationDate = ref<string>("24.07.2022 16:53 Uhr")
-const receiverEmail = ref<string>("dokmbx@juris.de")
-const emailSubject = ref<string>('id=OVGNW name="knorr" da=r dt=b df=r')
-const xml = ref<string>("xml wird geladet ....")
-const errorMessageTitle = "Leider ist ein Fehler aufgetreten."
-const errorMessage =
+const props = defineProps<{
+  xml: string
+  issues: Array<string>
+  receiverEmail: string
+  emailSubject: string
+  lastPublicationDate: string
+}>()
+
+const isFristTimePublication = ref<boolean>(
+  props.lastPublicationDate.length === 0
+)
+const hasValidationError = ref<boolean>(props.issues.length > 0)
+const errorMessageTitle = ref<string>("Leider ist ein Fehler aufgetreten.")
+const errorMessage = ref<string>(
   "Die Dokumentationseinheit kann nicht veröffentlich werden."
+)
 const showIssuesDetails = ref<boolean>(false)
 const toggleShowIssuesDetails = () => {
   showIssuesDetails.value = !showIssuesDetails.value
 }
-onMounted(() => {
-  xml.value =
-    '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<juris-r>\n<metadaten>\n<gericht>\n<gertyp>Gerichtstyp</gertyp\n><gerort>Gerichtssitz</gerort>\n</gericht>\n</metadaten>\n<textdaten>\n<titelzeile>\n<body>\n<div>\n<p>Titelzeile</p>\n</div>\n</body>\n</titelzeile>\n<leitsatz>\n<body>\n<div>\n<p>Leitsatz</p>\n</div>\n</body>\n</leitsatz>\n<osatz>\n<body>\n<div>\n<p>Orientierungssatz</p>\n</div>\n</body>\n</osatz>\n<tenor>\n<body>\n<div>\n<p>Tenor</p>\n</div>\n</body>\n</tenor>\n<tatbestand>\n<body>\n<div>\n<p>Tatbestand</p>\n</div>\n</body>\n</tatbestand>\n<entscheidungsgruende>\n<body>\n<div>\n<p>Entscheidungsgründe</p>\n</div>\n</body>\n</entscheidungsgruende>\n<gruende>\n<body>\n<div>\n<p>Gründe</p>\n</div>\n</body>\n</gruende>\n</textdaten>\n</juris-r>'
-})
 </script>
 
 <template>
@@ -68,21 +71,29 @@ onMounted(() => {
               </span>
               <span v-else class="material-icons"> keyboard_arrow_down </span>
             </button>
-            <p class="publication-text-body">3 Pflichtfelder nicht befüllt</p>
+            <p class="publication-text-body">
+              {{ props.issues.length }} Pflichtfelder nicht befüllt
+            </p>
           </div>
           <div
             v-show="showIssuesDetails"
             class="xml-validation-error-details flex-col-container"
           >
-            <p class="publication-text-body">Aktenzeichen</p>
-            <p class="publication-text-body">Entscheidungsname</p>
-            <p class="publication-text-body">Gericht</p>
+            <p
+              v-for="issue in issues"
+              :key="issue"
+              class="publication-text-body"
+            >
+              {{ issue }}
+            </p>
           </div>
         </div>
         <div class="publication-button-container">
           <div v-if="!isFristTimePublication" class="text-container">
             <p class="publication-text-body">Zuletzt veröffentlicht</p>
-            <p class="publication-text-subline">24.07.2022</p>
+            <p class="publication-text-subline">
+              {{ props.lastPublicationDate }}
+            </p>
           </div>
           <div class="publication-button">
             <TextButton
@@ -103,24 +114,24 @@ onMounted(() => {
     </div>
     <div class="flex-col-container publication-infos-container">
       <p class="publication-text-header">Letzte Veröffentlichungen</p>
-      <p v-if="isFristTimePublication" class="publication-text-body">
-        Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
-      </p>
-      <div v-else class="flex-col-container email-infos-container">
-        <p class="publication-text-body">
-          Letzte Veröffenlichung am {{ lastPublicationDate }}
+      <div class="flex-col-container email-infos-container">
+        <p v-if="isFristTimePublication" class="publication-text-body">
+          Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
+        </p>
+        <p v-else class="publication-text-body">
+          Letzte Veröffenlichung am {{ props.lastPublicationDate }}
         </p>
         <p class="publication-text-label">über</p>
         <div class="receiver-info">
           <p class="publication-text-body">
-            E-Mail an: <span>{{ receiverEmail }}</span>
+            E-Mail an: <span>{{ props.receiverEmail }}</span>
           </p>
           <p class="publication-text-body">
-            Betreff: <span>{{ emailSubject }}</span>
+            Betreff: <span>{{ props.emailSubject }}</span>
           </p>
         </div>
         <p class="publication-text-label">als</p>
-        <CodeSnippet :xml="xml" title="xml" />
+        <CodeSnippet :xml="props.xml" title="xml" />
       </div>
     </div>
   </div>
@@ -139,7 +150,6 @@ onMounted(() => {
   padding-top: 32px;
   padding-left: 32px;
   padding-bottom: 32px;
-
   .icon {
     width: 15px;
     height: 25px;
@@ -147,7 +157,6 @@ onMounted(() => {
     align-items: center;
     flex-wrap: wrap;
   }
-
   p {
     font-style: normal;
     font-weight: 400;
@@ -166,7 +175,6 @@ onMounted(() => {
     font-size: 11px;
     line-height: 16px;
   }
-
   .publication-text-label {
     font-style: normal;
     font-weight: 700;
@@ -176,10 +184,8 @@ onMounted(() => {
     letter-spacing: 1px;
     color: #4e596a;
   }
-
   .publication-check-container {
     width: fit-content;
-
     .publication-check-infos-container {
       display: flex;
       flex-direction: column;
@@ -191,13 +197,11 @@ onMounted(() => {
       &__in_error {
         border: solid 1px #b0243f;
       }
-
       .text-container  {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
       }
-
       .publication-button-container {
         display: flex;
         flex-direction: row;
@@ -206,11 +210,9 @@ onMounted(() => {
       }
     }
   }
-
   .publication-infos-container {
     width: fit-content;
     row-gap: 16px;
-
     .email-infos-container {
       row-gap: 24px;
 
@@ -233,7 +235,6 @@ onMounted(() => {
     align-items: center;
     column-gap: 12px;
   }
-
   .xml-validation-error-container {
     .xml-validation-error-details {
       padding-top: 16px;

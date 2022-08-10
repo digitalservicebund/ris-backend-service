@@ -1,21 +1,53 @@
 <script lang="ts" setup>
-import { ref, onUpdated, onMounted } from "vue"
+import { ref, onMounted } from "vue"
 
 const props = defineProps<{
   title: string
   xml: string
 }>()
 
-const codeLines = ref<Array<string>>([])
-const getCodeLines = (): Array<string> => {
+type CodeLine = {
+  codeLineText: string
+  marginLeft: number
+}
+const codeLineMarginLeftUnitInPx = 20
+const shouldUpdateMarginLeft = ref<boolean>(false)
+const marginLeft = ref<number>(0)
+const caculateLineMarginLeft = (line: string): number => {
+  const isXMLTag = line.includes("<?xml")
+  const isDocTypeTag = line.includes("<!DOCTYPE")
+  const isCloseTag = line.startsWith("</")
+  const isOpenTag = !isCloseTag && !line.includes("</")
+  const hasBothTag = !isCloseTag && line.includes("</")
+  const isBreakLine = line === "<br/>"
+  let ml = 0
+  if (isXMLTag || isDocTypeTag) return 0
+
+  if (hasBothTag || isBreakLine) {
+    return (marginLeft.value + 1) * codeLineMarginLeftUnitInPx
+  }
+  if (isOpenTag) {
+    if (shouldUpdateMarginLeft.value) marginLeft.value += 1
+    shouldUpdateMarginLeft.value = true
+    ml = marginLeft.value * codeLineMarginLeftUnitInPx
+  }
+  if (isCloseTag) {
+    ml = marginLeft.value * codeLineMarginLeftUnitInPx
+    marginLeft.value -= 1
+    shouldUpdateMarginLeft.value = true
+  }
+  return ml
+}
+const codeLines = ref<Array<CodeLine>>([])
+const getCodeLines = (): Array<CodeLine> => {
   if (props.xml.includes("<?xml")) {
-    return props.xml.split("\n")
+    return props.xml.split("\n").map((line) => {
+      const ml = caculateLineMarginLeft(line)
+      return { codeLineText: line, marginLeft: ml }
+    })
   }
   return []
 }
-onUpdated(() => {
-  codeLines.value = getCodeLines()
-})
 onMounted(() => {
   codeLines.value = getCodeLines()
 })
@@ -33,8 +65,8 @@ onMounted(() => {
           }"
           ><span>{{ index + 1 }}</span></code
         >
-        <code class="line"
-          ><span>{{ line }}</span></code
+        <code class="line" :style="{ 'margin-left': `${line.marginLeft}px` }"
+          ><span>{{ line.codeLineText }}</span></code
         >
       </div>
     </div>
@@ -50,7 +82,6 @@ onMounted(() => {
     text-transform: uppercase;
     color: $black;
   }
-
   .code-lines {
     border: solid 1px $white;
     overflow: auto;
