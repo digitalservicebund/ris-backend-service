@@ -28,7 +28,7 @@ const toggleShowIssuesDetails = () => {
 
 <template>
   <div class="flex-col-container publication-container">
-    <h2>Veröffenlichen</h2>
+    <h2>Veröffentlichen</h2>
     <div class="flex-col-container publication-check-container">
       <div
         class="publication-check-infos-container"

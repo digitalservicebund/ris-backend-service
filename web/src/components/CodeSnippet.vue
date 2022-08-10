@@ -11,7 +11,6 @@ type CodeLine = {
   marginLeft: number
 }
 const codeLineMarginLeftUnitInPx = 20
-const shouldUpdateMarginLeft = ref<boolean>(false)
 const marginLeft = ref<number>(0)
 const caculateLineMarginLeft = (line: string): number => {
   const isXMLTag = line.includes("<?xml")
@@ -21,20 +20,21 @@ const caculateLineMarginLeft = (line: string): number => {
   const hasBothTag = !isCloseTag && line.includes("</")
   const isBreakLine = line === "<br/>"
   let ml = 0
-  if (isXMLTag || isDocTypeTag) return 0
+  if (isXMLTag || isDocTypeTag) {
+    marginLeft.value = -1
+    return 0
+  }
 
   if (hasBothTag || isBreakLine) {
     return (marginLeft.value + 1) * codeLineMarginLeftUnitInPx
   }
   if (isOpenTag) {
-    if (shouldUpdateMarginLeft.value) marginLeft.value += 1
-    shouldUpdateMarginLeft.value = true
+    marginLeft.value += 1
     ml = marginLeft.value * codeLineMarginLeftUnitInPx
   }
   if (isCloseTag) {
     ml = marginLeft.value * codeLineMarginLeftUnitInPx
     marginLeft.value -= 1
-    shouldUpdateMarginLeft.value = true
   }
   return ml
 }
