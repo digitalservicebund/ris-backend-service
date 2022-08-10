@@ -7,6 +7,7 @@ plugins {
   id "org.sonarqube" version "3.4.0.2513"
   id "com.github.jk1.dependency-license-report" version "2.1"
   id "com.gorylenko.gradle-git-properties" version "2.4.1"
+  id "com.adarshr.test-logger" version "3.2.0"
 }
 
 group = "de.bund.digitalservice"
@@ -29,6 +30,8 @@ repositories {
 jacoco { toolVersion = "0.8.8" }
 
 springBoot { buildInfo() }
+
+testlogger { theme "mocha" }
 
 dependencies {
   implementation "org.springframework.boot:spring-boot-starter-actuator"
@@ -97,14 +100,13 @@ jar { // We have no need for the plain archive, thus skip creation for build spe
 
 test {
   useJUnitPlatform { excludeTags "integration", "journey" }
-  testLogging { events "passed", "skipped", "failed" }
 }
 
 task integrationTest(type: Test) {
   description = "Runs the integration tests."
   group = "verification"
   useJUnitPlatform { includeTags "integration" }
-  testLogging { events "passed", "skipped", "failed" }
+
   // So that running integration test require running unit tests first,
   // and we won"t even attempt running integration tests when there are
   // failing unit tests.
@@ -117,7 +119,6 @@ task journeyTest(type: Test) {
   description = "Runs the journey tests."
   group = "verification"
   useJUnitPlatform { includeTags "journey" }
-  testLogging { events "passed", "skipped", "failed" }
 }
 
 jacocoTestReport {
