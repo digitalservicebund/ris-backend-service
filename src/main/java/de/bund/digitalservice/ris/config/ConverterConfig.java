@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import de.bund.digitalservice.ris.utils.DocxConverter;
@@ -44,6 +45,7 @@ public class ConverterConfig {
   public ObjectMapper objectMapper() {
     var objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
     return objectMapper;
   }
 
