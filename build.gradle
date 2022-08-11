@@ -54,10 +54,10 @@ dependencies {
   // => CVE-2021-42550
   implementation "ch.qos.logback:logback-classic:1.2.11"
   implementation "ch.qos.logback:logback-core:1.2.11"
-  implementation "org.springframework.boot:spring-boot-starter-data-r2dbc:2.7.0"
+  implementation "org.springframework.boot:spring-boot-starter-data-r2dbc:2.7.2"
   implementation "io.r2dbc:r2dbc-postgresql:0.8.12.RELEASE"
   implementation "io.r2dbc:r2dbc-spi:1.0.0.RELEASE"
-  implementation "io.r2dbc:r2dbc-pool:0.9.0.RELEASE"
+  implementation "io.r2dbc:r2dbc-pool:0.9.1.RELEASE"
 
   implementation platform("software.amazon.awssdk:bom:2.17.191")
   implementation "software.amazon.awssdk:netty-nio-client"
@@ -70,12 +70,11 @@ dependencies {
   implementation("jakarta.xml.bind:jakarta.xml.bind-api") { version { strictly "3.0.1" } }
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
-  // needed for the JurisXmlExporter (neuris-juris-xml-export) to work, otherwise: NoClassDefFoundError XmlMapper
-  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3"
   // package served by private repo, requires authentication
-  implementation "de.bund.digitalservice:neuris-juris-xml-export:0.0.6"
-  // for local development:
-  // implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.0.6.jar")
+  implementation "de.bund.digitalservice:neuris-juris-xml-export:0.1.5"
+  // for local development (both):
+  //  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3"
+  //  implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 
   compileOnly "org.projectlombok:lombok"
   annotationProcessor "org.projectlombok:lombok"

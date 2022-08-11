@@ -43,6 +43,10 @@
     {
       "moduleLicense": null,
       "moduleName": "software.amazon.awssdk:bom"
+    },
+    {
+      "moduleLicense": null,
+      "moduleName": "org.junit:junit-bom"
     }
   ]
 }

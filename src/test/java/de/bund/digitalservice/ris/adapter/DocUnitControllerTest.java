@@ -12,7 +12,9 @@ import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.XmlMail;
+import de.bund.digitalservice.ris.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -203,7 +205,19 @@ class DocUnitControllerTest {
   @Test
   void testPublish() {
     when(service.publish(testUuid))
-        .thenReturn(Mono.just(new XmlMail(1L, 123L, "mailSubject", "xml")));
+        .thenReturn(
+            Mono.just(
+                new XmlMailResponse(
+                    testUuid,
+                    new XmlMail(
+                        1L,
+                        123L,
+                        "mailSubject",
+                        "xml",
+                        "status-code",
+                        "status-messages",
+                        "test.xml",
+                        Instant.parse("2020-01-01T01:01:01.00Z")))));
 
     webClient
         .mutateWith(csrf())
@@ -215,14 +229,18 @@ class DocUnitControllerTest {
         .expectStatus()
         .isOk()
         .expectBody()
-        .jsonPath("id")
-        .isEqualTo("1")
-        .jsonPath("documentUnitId")
-        .isEqualTo("123")
+        .jsonPath("documentUnitUuid")
+        .isEqualTo(testUuid.toString())
         .jsonPath("mailSubject")
         .isEqualTo("mailSubject")
         .jsonPath("xml")
-        .isEqualTo("xml");
+        .isEqualTo("xml")
+        .jsonPath("statusCode")
+        .isEqualTo("status-code")
+        .jsonPath("statusMessages")
+        .isEqualTo("status-messages")
+        .jsonPath("publishDate")
+        .isEqualTo("2020-01-01T01:01:01Z");
 
     verify(service).publish(testUuid);
   }

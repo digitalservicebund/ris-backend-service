@@ -40,3 +40,15 @@ CREATE TABLE
     nextnumber INT NOT NULL,
     currentyear INT NOT NULL
   );
+
+CREATE TABLE
+  IF NOT EXISTS xml_mail (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    document_unit_id BIGINT NOT NULL,
+    mail_subject VARCHAR(256) NOT NULL,
+    xml TEXT,
+    status_code VARCHAR(20),
+    status_messages TEXT,
+    file_name VARCHAR(50) NOT NULL,
+    publish_date TIMESTAMP NOT NULL
+  );

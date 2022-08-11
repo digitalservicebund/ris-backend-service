@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 185d636db934693a0cd145b3e70d8229643279c5325bfff28d0679dd9f88f9d4
+    checksum: 5802a4347852ebeb2ea85088c1042dd31eae5291c88cf8578c429d5c79e6a379
   - filename: run.sh
     checksum: 4cd69ceff85e156c77fb77ae2e6b88de9edb5e68c1404b3b60b009ffa3adc14a
   - filename: .github/workflows/pipeline.yml
@@ -24,7 +24,7 @@ fileignoreconfig:
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
-    checksum: e64876d7092eceb103170d77aab4d33fd8ba86a1f56e2c4b09ae441303bd4589
+    checksum: 102ca2122a723879ba244923775ef80c87741ff135640778765e5172ff5bc2bb
   - filename: src/main/resources/data.sql
     checksum: a84facaeaf6f5eaa5fb46a77e8e097fdb50ef193eb56aaed51307cc88350f09f
   - filename: web/src/env.d.ts

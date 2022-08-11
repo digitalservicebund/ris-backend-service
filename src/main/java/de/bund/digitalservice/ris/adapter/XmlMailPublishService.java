@@ -1,19 +1,22 @@
 package de.bund.digitalservice.ris.adapter;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishService;
 import de.bund.digitalservice.ris.domain.ExportObject;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
-import de.bund.digitalservice.ris.domain.export.JurisXmlExporter;
+import de.bund.digitalservice.ris.domain.XmlMailResponse;
+import de.bund.digitalservice.ris.domain.export.juris.JurisFormattedXML;
+import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.io.IOException;
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.mail.util.ByteArrayDataSource;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,6 +44,7 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
     this.repository = repository;
     this.mailSender = mailSender;
     this.fromMailAddress = fromMailAddress;
+    this.toMailAddressList = "tester@test.com";
   }
 
   public void setToMailAddressList(String toMailAddressList) {
@@ -49,16 +53,17 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
 
   @Override
   public Mono<? extends ExportObject> publish(DocUnit documentUnit) {
-    String xml;
+    JurisFormattedXML xml;
     try {
       xml = jurisXmlExporter.generateXml(documentUnit);
-    } catch (JsonProcessingException ex) {
+    } catch (ParserConfigurationException | TransformerException ex) {
       return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
     }
 
     return generateMailSubject(documentUnit)
         .flatMap(mailSubject -> savePublishInformation(documentUnit.getId(), mailSubject, xml))
-        .doOnNext(this::generateMail)
+        //        .doOnNext(this::generateMail)
+        .map(xmlMail -> new XmlMailResponse(documentUnit.getUuid(), xmlMail))
         .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex));
   }
 
@@ -114,8 +119,18 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
   }
 
   private Mono<XmlMail> savePublishInformation(
-      Long documentUnitId, String mailSubject, String xml) {
-    XmlMail xmlMail = new XmlMail(null, documentUnitId, mailSubject, xml);
+      Long documentUnitId, String mailSubject, JurisFormattedXML xml) {
+    String statusMessages = String.join("|", xml.status().statusMessages());
+    XmlMail xmlMail =
+        new XmlMail(
+            null,
+            documentUnitId,
+            mailSubject,
+            xml.xml(),
+            xml.status().statusCode(),
+            statusMessages,
+            xml.fileName(),
+            xml.publishDate());
     return repository.save(xmlMail);
   }
 }

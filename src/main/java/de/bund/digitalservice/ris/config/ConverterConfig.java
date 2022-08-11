@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.config;
 
-import de.bund.digitalservice.ris.domain.export.JurisXmlExporter;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -8,6 +10,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.springframework.beans.factory.BeanCreationException;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class ConverterConfig {
@@ -37,7 +40,15 @@ public class ConverterConfig {
   }
 
   @Bean
+  @Primary
+  public ObjectMapper objectMapper() {
+    var objectMapper = new ObjectMapper();
+    objectMapper.registerModule(new JavaTimeModule());
+    return objectMapper;
+  }
+
+  @Bean
   public JurisXmlExporter jurisXmlExporter() {
-    return new JurisXmlExporter();
+    return new JurisXmlExporter(objectMapper());
   }
 }

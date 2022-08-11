@@ -13,6 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -48,6 +49,8 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @Import(DocUnitService.class)
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 class DocUnitServiceTest {
+  private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
+  private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   @Autowired private DocUnitService service;
 
   @MockBean private DocUnitRepository repository;
@@ -57,8 +60,6 @@ class DocUnitServiceTest {
   @MockBean private DocumentUnitPublishService publishService;
 
   @MockBean private S3AsyncClient s3AsyncClient;
-
-  private final UUID testUuid = UUID.fromString("88888888-4444-4444-4444-121212121212");
 
   @Test
   void testGenerateNewDocUnit() {
@@ -89,17 +90,17 @@ class DocUnitServiceTest {
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
 
     var toSave = new DocUnit();
-    toSave.setUuid(testUuid);
-    toSave.setS3path(testUuid.toString());
+    toSave.setUuid(TEST_UUID);
+    toSave.setS3path(TEST_UUID.toString());
     toSave.setFiletype("docx");
     toSave.setFilename("testfile.docx");
 
     var savedDocUnit = new DocUnit();
-    savedDocUnit.setUuid(testUuid);
-    savedDocUnit.setS3path(testUuid.toString());
+    savedDocUnit.setUuid(TEST_UUID);
+    savedDocUnit.setS3path(TEST_UUID.toString());
     savedDocUnit.setFiletype("docx");
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(savedDocUnit));
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(savedDocUnit));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(savedDocUnit));
 
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
@@ -108,10 +109,10 @@ class DocUnitServiceTest {
     var asyncRequestBodyCaptor = ArgumentCaptor.forClass(AsyncRequestBody.class);
 
     try (MockedStatic<UUID> mockedUUIDStatic = mockStatic(UUID.class)) {
-      mockedUUIDStatic.when(UUID::randomUUID).thenReturn(testUuid);
+      mockedUUIDStatic.when(UUID::randomUUID).thenReturn(TEST_UUID);
 
       // when and then
-      StepVerifier.create(service.attachFileToDocUnit(testUuid, byteBufferFlux, httpHeaders))
+      StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, httpHeaders))
           .consumeNextWith(
               docUnit -> {
                 assertNotNull(docUnit);
@@ -122,7 +123,7 @@ class DocUnitServiceTest {
       verify(s3AsyncClient)
           .putObject(putObjectRequestCaptor.capture(), asyncRequestBodyCaptor.capture());
       assertEquals("testBucket", putObjectRequestCaptor.getValue().bucket());
-      assertEquals(testUuid.toString(), putObjectRequestCaptor.getValue().key());
+      assertEquals(TEST_UUID.toString(), putObjectRequestCaptor.getValue().key());
       assertEquals("content/type", putObjectRequestCaptor.getValue().contentType());
       StepVerifier.create(asyncRequestBodyCaptor.getValue())
           .expectNext(ByteBuffer.wrap(new byte[] {}))
@@ -135,20 +136,20 @@ class DocUnitServiceTest {
   @Test
   void testRemoveFileFromDocUnit() {
     var docUnitBefore = new DocUnit();
-    docUnitBefore.setUuid(testUuid);
-    docUnitBefore.setS3path(testUuid.toString());
+    docUnitBefore.setUuid(TEST_UUID);
+    docUnitBefore.setS3path(TEST_UUID.toString());
     docUnitBefore.setFilename("testfile.docx");
 
     var docUnitAfter = new DocUnit();
-    docUnitAfter.setUuid(testUuid);
+    docUnitAfter.setUuid(TEST_UUID);
 
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(docUnitBefore));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnitBefore));
     // is the thenReturn ok? Or am I bypassing the actual functionality-test?
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(docUnitAfter));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
-    StepVerifier.create(service.removeFileFromDocUnit(testUuid))
+    StepVerifier.create(service.removeFileFromDocUnit(TEST_UUID))
         .consumeNextWith(
             docUnitResponseEntity -> {
               assertNotNull(docUnitResponseEntity);
@@ -171,7 +172,7 @@ class DocUnitServiceTest {
         .thenThrow(SdkException.create("exception", null));
 
     // when and then
-    StepVerifier.create(service.attachFileToDocUnit(testUuid, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);
@@ -193,10 +194,10 @@ class DocUnitServiceTest {
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnit.class));
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
 
     // when and then
-    StepVerifier.create(service.attachFileToDocUnit(testUuid, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
         .consumeNextWith(
             responseEntity -> {
               assertNotNull(responseEntity);
@@ -235,12 +236,12 @@ class DocUnitServiceTest {
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
     DocUnit docUnit = new DocUnit();
-    docUnit.setUuid(testUuid);
+    docUnit.setUuid(TEST_UUID);
     // can we also test that the fileUuid from the DocUnit is used? with a captor somehow?
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(docUnit));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
     when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
 
-    StepVerifier.create(service.deleteByUuid(testUuid))
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
             stringResponseEntity -> {
               System.out.println(stringResponseEntity);
@@ -256,14 +257,14 @@ class DocUnitServiceTest {
   @Test
   void testDeleteByUuid_withFileAttached() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setUuid(testUuid);
-    docUnit.setS3path(testUuid.toString());
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(docUnit));
+    docUnit.setUuid(TEST_UUID);
+    docUnit.setS3path(TEST_UUID.toString());
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
     when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
-    StepVerifier.create(service.deleteByUuid(testUuid))
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
             stringResponseEntity -> {
               assertNotNull(stringResponseEntity);
@@ -277,11 +278,11 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
-    StepVerifier.create(service.deleteByUuid(testUuid))
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
             stringResponseEntity -> {
               assertNotNull(stringResponseEntity);
@@ -293,10 +294,10 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocUnit.EMPTY);
 
-    StepVerifier.create(service.deleteByUuid(testUuid))
+    StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
             stringResponseEntity -> {
               assertNotNull(stringResponseEntity);
@@ -319,11 +320,20 @@ class DocUnitServiceTest {
   @Test
   void testPublish() {
     var documentUnit = DocUnit.EMPTY;
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(documentUnit));
-    var xmlMail = new XmlMail(1L, 123L, "mailSubject", "xml");
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    var xmlMail =
+        new XmlMail(
+            1L,
+            123L,
+            "mailSubject",
+            "xml",
+            "status-code",
+            "status-messages",
+            "test.xml",
+            PUBLISH_DATE);
     doReturn(Mono.just(xmlMail)).when(publishService).publish(documentUnit);
 
-    StepVerifier.create(service.publish(testUuid))
+    StepVerifier.create(service.publish(TEST_UUID))
         .consumeNextWith(exportObject -> assertThat(exportObject).isEqualTo(xmlMail))
         .verifyComplete();
 
@@ -333,11 +343,10 @@ class DocUnitServiceTest {
   @Test
   void testPublish_withExceptionFromPublishService() {
     var documentUnit = DocUnit.EMPTY;
-    when(repository.findByUuid(testUuid)).thenReturn(Mono.just(documentUnit));
-    var xmlMail = new XmlMail(1L, 123L, "mailSubject", "xml");
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
     doThrow(DocumentUnitPublishException.class).when(publishService).publish(documentUnit);
 
-    StepVerifier.create(service.publish(testUuid))
+    StepVerifier.create(service.publish(TEST_UUID))
         .expectError(DocumentUnitPublishException.class)
         .verify();
 
