@@ -17,8 +17,10 @@ const validateErrorMessages = (issues: Array<string>): Array<string> => {
     ...new Set(
       issues.map((issue) => {
         const invalidElement = issue.toString().split('"')[1]
-        invalidElement.toLowerCase()
-        return invalidElement.charAt(0).toUpperCase() + invalidElement.slice(1)
+        return (
+          invalidElement.charAt(0).toUpperCase() +
+          invalidElement.toLowerCase().slice(1)
+        )
       })
     ),
   ]
