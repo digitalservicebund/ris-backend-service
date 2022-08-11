@@ -15,7 +15,7 @@ on:
 
 jobs:
   playwright-test:
-    uses: ./.github/workflows/playwright-e2e-test.yml
+    uses: ./.github/workflows/playwright-test.yml
     with:
       browser: firefox
     secrets: inherit

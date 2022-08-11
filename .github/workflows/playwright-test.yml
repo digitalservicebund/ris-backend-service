@@ -5,10 +5,10 @@ on:
         required: false
         type: string
         default: chromium
-      is_a11y:
+      mode:
         required: false
-        type: boolean
-        default: false
+        type: string
+        default: e2e
     secrets:
       STAGING_PASSWORD:
         required: true
@@ -20,7 +20,7 @@ on:
         required: false
 
 jobs:
-  playwright-e2e-test:
+  playwright-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -35,27 +35,18 @@ jobs:
           npm ci
           npx --yes playwright install --with-deps ${{ inputs.browser }}
         working-directory: ./web
-      - name: Run E2E tests in ${{ inputs.browser }}
-        if: ${{ !inputs.is_a11y }}
+      - name: Run ${{ inputs.mode }} tests in ${{ inputs.browser }}
         env:
           E2E_BASE_URL: ${{ secrets.STAGING_URL }}
           STAGING_USER: ${{ secrets.STAGING_USER }}
           STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
-        run: npm run test:e2e -- --project ${{ inputs.browser }}
-        working-directory: ./web
-      - name: Run A11Y tests
-        if: ${{ inputs.is_a11y }}
-        env:
-          E2E_BASE_URL: ${{ secrets.STAGING_URL }}
-          STAGING_USER: ${{ secrets.STAGING_USER }}
-          STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
-        run: npm run test:a11y
+        run: npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
         working-directory: ./web
       - name: Upload screenshots of failed tests
         uses: actions/upload-artifact@v3
         if: ${{ failure() }}
         with:
-          name: failed-e2e-tests-${{ inputs.browser }}
+          name: failed-${{ inputs.mode }}-tests-${{ inputs.browser }}
           path: ./web/test-results/**/*.png
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
@@ -66,7 +57,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Playwright E2E test ${{ inputs.browser }} :point_right:"
+          job_name: "Playwright ${{ inputs.mode }} test ${{ inputs.browser }} :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
