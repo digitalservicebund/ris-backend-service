@@ -1,9 +1,11 @@
 import { expect, test } from "@playwright/test"
-import { injectAxe, checkA11y } from "axe-playwright"
+import { checkA11y, injectAxe } from "axe-playwright"
 
-test("test start page (/jurisdiction)", async ({ page }) => {
-  await page.goto("/")
-  await expect(page.locator("text=Dok.-Nummer")).toBeVisible()
-  await injectAxe(page)
-  await checkA11y(page, null, { detailedReport: true })
+test.describe("a11y of start page (/jurisdiction)", () => {
+  test("docUnit list", async ({ page }) => {
+    await page.goto("/")
+    await expect(page.locator("text=Neue Dokumentationseinheit")).toBeVisible()
+    await injectAxe(page)
+    await checkA11y(page)
+  })
 })
