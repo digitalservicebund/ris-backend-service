@@ -1,0 +1,19 @@
+name: Cleanup staging
+
+on:
+  schedule:
+    - cron: "0 6 * * *" # Every day at 8am
+  # Allow to run this workflow manually
+  workflow_dispatch:
+
+env:
+  STAGING_URL: ${{ secrets.STAGING_URL }}
+  STAGING_USER: ${{ secrets.STAGING_USER }}
+  STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
+
+jobs:
+  remove-all-docunits:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        run: ./run.sh clean-staging
