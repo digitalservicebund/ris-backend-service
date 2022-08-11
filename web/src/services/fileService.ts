@@ -56,7 +56,6 @@ export default {
   async getEmailInfos(docUnitUuid: string) {
     try {
       const response = await api().put(`docunits/${docUnitUuid}/publish`)
-      console.log(response.data)
       return response.data
     } catch (error) {
       throw new Error(`Could not get email from server: ${error}`)

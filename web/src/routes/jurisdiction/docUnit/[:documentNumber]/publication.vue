@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { onMounted, ref } from "vue"
 import DocUnitDetail from "./index.vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import docUnitService from "@/services/docUnitService"
+import fileService from "@/services/fileService"
 
 const props = defineProps<{
   documentNumber: string
@@ -10,28 +11,74 @@ const props = defineProps<{
 const docUnit = ref(
   await docUnitService.getByDocumentNumber(props.documentNumber)
 )
-// const email = ref(await fileService.getEmailInfos(docUnit.value.uuid))
-const xml = ref<string>(
-  '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<juris-r>\n<metadaten>\n<gericht>\n<gertyp>Gerichtstyp</gertyp>\n<gerort>Gerichtssitz</gerort>\n</gericht>\n</metadaten>\n<textdaten>\n<titelzeile>\n<body>\n<div>\n<p>Titelzeile</p>\n</div>\n</body>\n</titelzeile>\n<leitsatz>\n<body>\n<div>\n<p>Leitsatz</p>\n</div>\n</body>\n</leitsatz>\n<osatz>\n<body>\n<div>\n<p>Orientierungssatz</p>\n</div>\n</body>\n</osatz>\n<tenor>\n<body>\n<div>\n<p>Tenor</p>\n</div>\n</body>\n</tenor>\n<tatbestand>\n<body>\n<div>\n<p>Tatbestand</p>\n<br/>\n</div>\n</body>\n</tatbestand>\n<entscheidungsgruende>\n<body>\n<div>\n<p>Entscheidungsgründe</p>\n</div>\n</body>\n</entscheidungsgruende>\n<gruende>\n<body>\n<div>\n<p>Gründe</p>\n</div>\n</body>\n</gruende>\n</textdaten>\n</juris-r>'
-)
-const issues = ref<Array<string>>([
-  "Aktenzeichen",
-  "Entscheidungsname",
-  "Gericht",
-])
-const receiverEmail = ref<string>("dokmbx@juris.de")
-const emailSubject = ref<string>('id=OVGNW name="knorr" da=r dt=b df=r')
-const lastPublicationDate = ref<string>("24.07.2022 16:53 Uhr")
+
+const validateErrorMessages = (issues: Array<string>): Array<string> => {
+  return [
+    ...new Set(
+      issues.map((issue) => {
+        const invalidElement = issue.toString().split('"')[1]
+        invalidElement.toLowerCase()
+        return invalidElement.charAt(0).toUpperCase() + invalidElement.slice(1)
+      })
+    ),
+  ]
+}
+
+const formattedDate = (date: string): string => {
+  const publicationDate = new Date(date)
+  const fullYear = publicationDate.getFullYear()
+  const fullMonth = ("0" + publicationDate.getMonth()).slice(-2)
+  const fullDate = ("0" + publicationDate.getDate()).slice(-2)
+  const fullHour = ("0" + publicationDate.getHours()).slice(-2)
+  const fullMinute = ("0" + publicationDate.getMinutes()).slice(-2)
+  return `${fullYear}-${fullMonth}-${fullDate} ${fullHour}: ${fullMinute} Uhr`
+}
+
+const loadDone = ref<boolean>(false)
+const xml = ref<string>("")
+const issues = ref<Array<string>>([])
+
+const receiverEmail = ref<string>("")
+const emailSubject = ref<string>("")
+const lastPublicationDate = ref<string>("")
+
+onMounted(async () => {
+  const emailInfos = await fileService.getEmailInfos(docUnit.value.uuid)
+  lastPublicationDate.value = formattedDate(emailInfos.publishDate)
+  emailSubject.value = emailInfos.mailSubject
+  receiverEmail.value = "dokmbx@juris.de"
+  issues.value =
+    emailInfos.statusCode === "200"
+      ? []
+      : validateErrorMessages(emailInfos.statusMessages)
+  const xmlText: string = emailInfos.xml ? emailInfos.xml : ""
+  xml.value = xmlText.replaceAll("  ", "")
+  loadDone.value = true
+})
 </script>
 
 <template>
   <DocUnitDetail :doc-unit="docUnit">
     <PublicationDocument
+      v-if="loadDone"
       :xml="xml"
       :issues="issues"
       :receiver-email="receiverEmail"
       :email-subject="emailSubject"
       :last-publication-date="lastPublicationDate"
     />
+    <div v-else class="spinner">
+      <h2>Überprüfung der Daten ...</h2>
+    </div>
   </DocUnitDetail>
 </template>
+
+<style lang="scss" scoped>
+.spinner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 50vh;
+}
+</style>

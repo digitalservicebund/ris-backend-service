@@ -17,15 +17,15 @@ const caculateLineMarginLeft = (line: string): number => {
   const isDocTypeTag = line.includes("<!DOCTYPE")
   const isCloseTag = line.startsWith("</")
   const isOpenTag = !isCloseTag && !line.includes("</")
-  const hasBothTag = !isCloseTag && line.includes("</")
-  const isBreakLine = line === "<br/>"
+  const hasBothTag =
+    (!isCloseTag && line.includes("</")) ||
+    (line.startsWith("<") && line.endsWith("/>"))
   let ml = 0
   if (isXMLTag || isDocTypeTag) {
     marginLeft.value = -1
     return 0
   }
-
-  if (hasBothTag || isBreakLine) {
+  if (hasBothTag) {
     return (marginLeft.value + 1) * codeLineMarginLeftUnitInPx
   }
   if (isOpenTag) {
@@ -41,10 +41,13 @@ const caculateLineMarginLeft = (line: string): number => {
 
 const getCodeLines = (): Array<CodeLine> => {
   if (props.xml.includes("<?xml")) {
-    return props.xml.split("\n").map((line) => {
-      const ml = caculateLineMarginLeft(line)
-      return { codeLineText: line, marginLeft: ml }
-    })
+    return props.xml
+      .split("\n")
+      .filter((line) => line.length > 0)
+      .map((line) => {
+        const ml = caculateLineMarginLeft(line)
+        return { codeLineText: line, marginLeft: ml }
+      })
   }
   return []
 }
