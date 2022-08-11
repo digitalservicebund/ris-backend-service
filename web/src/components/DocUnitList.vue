@@ -64,10 +64,11 @@ const onDelete = () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="docUnit in docUnits" :key="docUnit.id">
+        <tr v-for="(docUnit, index) in docUnits" :key="docUnit.id">
           <td>
             <router-link
               class="doc-unit-list-active-link"
+              :tabindex="index * 2"
               :to="{
                 name: docUnit.s3path
                   ? 'jurisdiction-docUnit-:documentNumber-categories'
@@ -85,8 +86,10 @@ const onDelete = () => {
           </td>
           <td>
             <v-icon
+              :tabindex="index * 2 + 1"
               aria-label="Dokumentationseinheit löschen"
               @click="setSelectedDocUnit(docUnit)"
+              @keyup.enter="setSelectedDocUnit(docUnit)"
             >
               delete
             </v-icon>
