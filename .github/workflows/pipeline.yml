@@ -513,7 +513,7 @@ jobs:
     needs: [deploy-staging]
     uses: ./.github/workflows/playwright-test.yml
     with:
-      browser: chrome
+      browser: chromium
       mode: a11y
     secrets: inherit
 
