@@ -34,7 +34,7 @@ fileignoreconfig:
   - filename: web/sonar-project.properties
     checksum: 8fa8db24e8b523d44c8b624854e3c478ff22f6b102ecc68c0a764b083bea1383
   - filename: .github/workflows/clean-staging.yml
-    checksum: f2deed3db950e1b7a50648bc539a8690efb353f41fbe3fdeef239555cb7043dc
+    checksum: 076c020a1a8a12ed7b1b5a0069ec5e78f7f633126915e1f7d841de456f8d4508
 scopeconfig:
   - scope: node
 allowed_patterns:

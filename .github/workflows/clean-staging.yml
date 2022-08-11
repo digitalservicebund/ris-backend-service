@@ -16,4 +16,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Run script to remove doc units
         run: ./run.sh clean-staging
