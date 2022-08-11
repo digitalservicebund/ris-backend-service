@@ -84,13 +84,14 @@ const onDelete = () => {
             {{ docUnit.filename ? docUnit.filename : "-" }}
           </td>
           <td>
-            <v-icon
-              aria-label="Dokumentationseinheit löschen"
-              @click="setSelectedDocUnit(docUnit)"
-              @keyup.enter="setSelectedDocUnit(docUnit)"
-            >
-              delete
-            </v-icon>
+            <span tabindex="0" @keyup.enter="setSelectedDocUnit(docUnit)">
+              <v-icon
+                aria-label="Dokumentationseinheit löschen"
+                @click="setSelectedDocUnit(docUnit)"
+              >
+                delete
+              </v-icon>
+            </span>
           </td>
         </tr>
       </tbody>
