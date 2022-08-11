@@ -12,10 +12,18 @@ on:
         options:
           - chromium
           - firefox
+      mode:
+        description: "Type of tests"
+        required: true
+        type: choice
+        options:
+          - e2e
+          - a11y
 
 jobs:
   playwright-test:
     uses: ./.github/workflows/playwright-test.yml
     with:
       browser: ${{ inputs.browser }}
+      mode: ${{ inputs.mode }}
     secrets: inherit
