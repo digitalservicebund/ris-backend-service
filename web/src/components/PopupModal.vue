@@ -13,10 +13,36 @@ defineEmits<{
   (e: "closeModal"): void
   (e: "confirmAction"): void
 }>()
+
 onMounted(() => {
-  ;(
-    document.getElementsByClassName("popup-modal-wrapper")[0] as HTMLElement
-  ).focus()
+  const popupModalElem = document.getElementsByClassName(
+    "popup-modal-wrapper"
+  )[0] as HTMLElement
+  popupModalElem.focus()
+  const focusableElemsSelector = ".modal-buttons-container button"
+  const focusableElems = document.querySelectorAll(focusableElemsSelector)
+  /** Modal focus trap event */
+  document.addEventListener("keydown", (e) => {
+    const isTabPressed = e.key === "Tab" || e.keyCode === 9
+    if (isTabPressed) {
+      if (e.shiftKey) {
+        /** Shift + Tab select popupModal */
+        if (document.activeElement === popupModalElem) {
+          ;(focusableElems[focusableElems.length - 1] as HTMLElement).focus()
+          e.preventDefault()
+        }
+      } else {
+        if (
+          /** Jump to frist button */
+          document.activeElement ===
+          (focusableElems[focusableElems.length - 1] as HTMLElement)
+        ) {
+          ;(focusableElems[0] as HTMLElement).focus()
+          e.preventDefault()
+        }
+      }
+    }
+  })
 })
 </script>
 
@@ -24,6 +50,7 @@ onMounted(() => {
   <div
     class="popup-modal-wrapper"
     tabindex="0"
+    role="dialog"
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >
