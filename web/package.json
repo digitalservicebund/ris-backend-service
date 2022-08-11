@@ -93,7 +93,7 @@
     "vitest": "^0.21.0",
     "vue-cli-plugin-vuetify": "^2.5.1",
     "vue-loader": "^17.0.0",
-    "vue-tsc": "^0.39.0",
+    "vue-tsc": "^0.40.1",
     "vuetify-loader": "^2.0.0-alpha.0"
   }
 }
