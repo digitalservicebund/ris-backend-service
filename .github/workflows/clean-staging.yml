@@ -1,9 +1,6 @@
 name: Cleanup staging
 
 on:
-  schedule:
-    - cron: "0 6 * * *" # Every day at 8am
-  # Allow to run this workflow manually
   workflow_dispatch:
 
 env:
