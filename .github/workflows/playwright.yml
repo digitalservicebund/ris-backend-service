@@ -1,6 +1,6 @@
-# Allows to run standalone Playwright based E2E tests in particular browser,
+# Allows to run standalone Playwright based E2E/A11Y tests in particular browser,
 # for debugging...
-name: Playwright test
+name: Manual Playwright test
 
 on:
   workflow_dispatch:
@@ -17,5 +17,5 @@ jobs:
   playwright-test:
     uses: ./.github/workflows/playwright-test.yml
     with:
-      browser: firefox
+      browser: ${{ inputs.browser }}
     secrets: inherit
