@@ -28,9 +28,10 @@ const handleUpdateValueDocUnitTexts = async (
   const divElem = document.createElement("div")
   divElem.innerHTML = updatedValue[1]
   const hasImgElem = divElem.getElementsByTagName("img").length > 0
+  const hasTable = divElem.getElementsByTagName("table").length > 0
   const hasInnerText = divElem.innerText.length > 0
   docUnit.value[updatedValue[0]] =
-    hasInnerText || hasImgElem ? updatedValue[1] : ""
+    hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
 }
 
 const handleUpdateDocUnit = async () => {
