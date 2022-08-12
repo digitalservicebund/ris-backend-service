@@ -16,10 +16,21 @@ const docUnit = ref(
   await docUnitService.getByDocumentNumber(props.documentNumber)
 )
 
-const handleUpdateValue = async (
+const handleUpdateValueDataCores = async (
   updatedValue: [keyof CoreData | keyof Texts, string]
 ) => {
   docUnit.value[updatedValue[0]] = updatedValue[1]
+}
+
+const handleUpdateValueDocUnitTexts = async (
+  updatedValue: [keyof CoreData | keyof Texts, string]
+) => {
+  const divElem = document.createElement("div")
+  divElem.innerHTML = updatedValue[1]
+  const hasImgElem = divElem.getElementsByTagName("img").length > 0
+  const hasInnerText = divElem.innerText.length > 0
+  docUnit.value[updatedValue[0]] =
+    hasInnerText || hasImgElem ? updatedValue[1] : ""
 }
 
 const handleUpdateDocUnit = async () => {
@@ -77,13 +88,13 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll))
         <DocUnitCoreData
           id="coreData"
           :core-data="docUnit.coreData"
-          @update-value="handleUpdateValue"
+          @update-value="handleUpdateValueDataCores"
           @update-doc-unit="handleUpdateDocUnit"
         />
         <DocUnitTexts
           id="texts"
           :texts="docUnit.texts"
-          @update-value="handleUpdateValue"
+          @update-value="handleUpdateValueDocUnitTexts"
           @update-doc-unit="handleUpdateDocUnit"
         />
       </v-col>
