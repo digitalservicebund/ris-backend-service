@@ -168,4 +168,18 @@ class XmlMailPublishServiceTest {
                     && ex.getMessage().equals("Receiver mail address is not correct"))
         .verify();
   }
+
+  @Test
+  void testGetLastPublishedXml() {
+    when(repository.findTopByDocumentUnitIdOrderByPublishDateDesc(123L))
+        .thenReturn(Mono.just(SAVED_XML_MAIL));
+
+    StepVerifier.create(service.getLastPublishedXml(123L, TEST_UUID))
+        .consumeNextWith(
+            response ->
+                assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
+        .verifyComplete();
+
+    verify(repository).findTopByDocumentUnitIdOrderByPublishDateDesc(123L);
+  }
 }

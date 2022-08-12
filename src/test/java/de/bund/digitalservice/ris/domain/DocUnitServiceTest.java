@@ -321,20 +321,11 @@ class DocUnitServiceTest {
   void testPublish() {
     var documentUnit = DocUnit.EMPTY;
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
-    var xmlMail =
-        new XmlMail(
-            1L,
-            123L,
-            "mailSubject",
-            "xml",
-            "status-code",
-            "status-messages",
-            "test.xml",
-            PUBLISH_DATE);
-    doReturn(Mono.just(xmlMail)).when(publishService).publish(documentUnit);
+    var exportObject = new ExportObject() {};
+    doReturn(Mono.just(exportObject)).when(publishService).publish(documentUnit);
 
     StepVerifier.create(service.publish(TEST_UUID))
-        .consumeNextWith(exportObject -> assertThat(exportObject).isEqualTo(xmlMail))
+        .consumeNextWith(response -> assertThat(response).isEqualTo(exportObject))
         .verifyComplete();
 
     verify(publishService).publish(documentUnit);
@@ -351,6 +342,22 @@ class DocUnitServiceTest {
         .verify();
 
     verify(publishService).publish(documentUnit);
+  }
+
+  @Test
+  void testGetLastPublishedXml() {
+    var documentUnit = new DocUnit();
+    documentUnit.setId(123L);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    var exportObject = new ExportObject() {};
+    doReturn(Mono.just(exportObject)).when(publishService).getLastPublishedXml(123L, TEST_UUID);
+
+    StepVerifier.create(service.getLastPublishedXml(TEST_UUID))
+        .consumeNextWith(response -> assertThat(response).isEqualTo(exportObject))
+        .verifyComplete();
+
+    verify(repository).findByUuid(TEST_UUID);
+    verify(publishService).getLastPublishedXml(123L, TEST_UUID);
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

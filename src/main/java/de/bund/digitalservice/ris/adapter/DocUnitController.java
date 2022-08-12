@@ -99,4 +99,12 @@ public class DocUnitController {
         .map(ResponseEntity::ok)
         .doOnError(ex -> ResponseEntity.internalServerError().build());
   }
+
+  @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
+  public Mono<ResponseEntity<ExportObject>> getLastPublishedXml(@PathVariable UUID uuid) {
+    return service
+        .getLastPublishedXml(uuid)
+        .map(ResponseEntity::ok)
+        .doOnError(ex -> ResponseEntity.internalServerError().build());
+  }
 }

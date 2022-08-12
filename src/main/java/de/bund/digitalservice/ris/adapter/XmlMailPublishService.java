@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.domain.XmlMailResponse;
 import de.bund.digitalservice.ris.domain.export.juris.JurisFormattedXML;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.io.IOException;
+import java.util.UUID;
 import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -65,6 +66,14 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
         //        .doOnNext(this::generateMail)
         .map(xmlMail -> new XmlMailResponse(documentUnit.getUuid(), xmlMail))
         .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex));
+  }
+
+  @Override
+  public Mono<? extends ExportObject> getLastPublishedXml(
+      Long documentUnitId, UUID documentUnitUuid) {
+    return repository
+        .findTopByDocumentUnitIdOrderByPublishDateDesc(documentUnitId)
+        .map(xmlMail -> new XmlMailResponse(documentUnitUuid, xmlMail));
   }
 
   private Mono<String> generateMailSubject(DocUnit documentUnit) {

@@ -259,4 +259,19 @@ class DocUnitControllerTest {
 
     verify(service).publish(testUuid);
   }
+
+  @Test
+  void testGetLastPublishedXml_withServiceThrowsException() {
+    when(service.publish(testUuid)).thenThrow(DocumentUnitPublishException.class);
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/docunits/" + testUuid + "/publish")
+        .exchange()
+        .expectStatus()
+        .is5xxServerError();
+
+    verify(service).getLastPublishedXml(testUuid);
+  }
 }

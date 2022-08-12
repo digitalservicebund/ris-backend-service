@@ -199,4 +199,10 @@ public class DocUnitService {
   public Mono<ExportObject> publish(UUID uuid) {
     return repository.findByUuid(uuid).flatMap(publishService::publish);
   }
+
+  public Mono<ExportObject> getLastPublishedXml(UUID uuid) {
+    return repository
+        .findByUuid(uuid)
+        .flatMap(documentUnit -> publishService.getLastPublishedXml(documentUnit.getId(), uuid));
+  }
 }
