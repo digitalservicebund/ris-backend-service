@@ -11,6 +11,37 @@ const props = defineProps<{
 const docUnit = ref(
   await docUnitService.getByDocumentNumber(props.documentNumber)
 )
+const loadDone = ref<boolean>(false)
+const xml = ref<string>("")
+const issues = ref<Array<string>>([])
+const isFristTimePublication = ref<boolean>(true)
+const hasValidationError = ref<boolean>(false)
+
+const receiverEmail = ref<string>("")
+const emailSubject = ref<string>("")
+const lastPublicationDate = ref<string>("")
+
+const publishADocument = async () => {
+  const respone = await fileService.publishADocument(docUnit.value.uuid)
+  loadEmailToJurisInfos(respone)
+}
+
+const loadEmailToJurisInfos = (publishedXML: {
+  xml: string
+  statusMessages: Array<string>
+  statusCode: string
+  mailSubject: string
+  publishDate: string
+}) => {
+  isFristTimePublication.value = false
+  lastPublicationDate.value = formattedDate(publishedXML.publishDate)
+  emailSubject.value = publishedXML.mailSubject
+  receiverEmail.value = "dokmbx@juris.de"
+  hasValidationError.value = publishedXML.statusCode === "400"
+  issues.value = validateErrorMessages(publishedXML.statusMessages)
+  const xmlText: string = publishedXML.xml ? publishedXML.xml : ""
+  xml.value = xmlText.replaceAll("  ", "")
+}
 
 const validateErrorMessages = (issues: Array<string>): Array<string> => {
   return [
@@ -36,25 +67,15 @@ const formattedDate = (date: string): string => {
   return `${fullYear}-${fullMonth}-${fullDate} ${fullHour}: ${fullMinute} Uhr`
 }
 
-const loadDone = ref<boolean>(false)
-const xml = ref<string>("")
-const issues = ref<Array<string>>([])
-
-const receiverEmail = ref<string>("")
-const emailSubject = ref<string>("")
-const lastPublicationDate = ref<string>("")
-
 onMounted(async () => {
-  const emailInfos = await fileService.getEmailInfos(docUnit.value.uuid)
-  lastPublicationDate.value = formattedDate(emailInfos.publishDate)
-  emailSubject.value = emailInfos.mailSubject
-  receiverEmail.value = "dokmbx@juris.de"
-  issues.value =
-    emailInfos.statusCode === "200"
-      ? []
-      : validateErrorMessages(emailInfos.statusMessages)
-  const xmlText: string = emailInfos.xml ? emailInfos.xml : ""
-  xml.value = xmlText.replaceAll("  ", "")
+  const lastPublisedXML = await fileService.getLastPublishedXML(
+    docUnit.value.uuid
+  )
+  if (lastPublisedXML.length === 0) {
+    loadDone.value = true
+    return
+  }
+  loadEmailToJurisInfos(lastPublisedXML)
   loadDone.value = true
 })
 </script>
@@ -68,6 +89,9 @@ onMounted(async () => {
       :receiver-email="receiverEmail"
       :email-subject="emailSubject"
       :last-publication-date="lastPublicationDate"
+      :is-frist-time-publication="isFristTimePublication"
+      :has-validation-error="hasValidationError"
+      @publish-a-document="publishADocument"
     />
     <div v-else class="spinner">
       <h2>Überprüfung der Daten ...</h2>

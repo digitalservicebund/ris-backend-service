@@ -131,7 +131,6 @@ const linkStyling = (componentName: string) => {
               :to="{
                 name: 'jurisdiction-docUnit-:documentNumber-publication',
                 params: { documentNumber: documentNumber },
-                query: route.query,
               }"
               >Veröffentlichen</router-link
             >

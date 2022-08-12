@@ -10,16 +10,14 @@ const props = defineProps<{
   receiverEmail: string
   emailSubject: string
   lastPublicationDate: string
+  isFristTimePublication: boolean
+  hasValidationError: boolean
 }>()
 
-const isFristTimePublication = ref<boolean>(
-  props.lastPublicationDate.length === 0
-)
-const hasValidationError = ref<boolean>(props.issues.length > 0)
-const errorMessageTitle = ref<string>("Leider ist ein Fehler aufgetreten.")
-const errorMessage = ref<string>(
-  "Die Dokumentationseinheit kann nicht veröffentlich werden."
-)
+defineEmits<{
+  (e: "publishADocument"): void
+}>()
+
 const showIssuesDetails = ref<boolean>(false)
 const toggleShowIssuesDetails = () => {
   showIssuesDetails.value = !showIssuesDetails.value
@@ -101,24 +99,25 @@ const toggleShowIssuesDetails = () => {
               button-type="primary"
               icon="campaign"
               :disabled="hasValidationError"
+              @click="$emit('publishADocument')"
             />
           </div>
         </div>
       </div>
       <ErrorModal
         v-if="hasValidationError"
-        :title="errorMessageTitle"
-        :description="errorMessage"
+        title="Leider ist ein Fehler aufgetreten."
+        description="Die Dokumentationseinheit kann nicht veröffentlich werden."
       >
       </ErrorModal>
     </div>
     <div class="flex-col-container publication-infos-container">
       <p class="publication-text-header">Letzte Veröffentlichungen</p>
-      <div class="flex-col-container email-infos-container">
-        <p v-if="isFristTimePublication" class="publication-text-body">
-          Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
-        </p>
-        <p v-else class="publication-text-body">
+      <p v-if="isFristTimePublication" class="publication-text-body">
+        Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
+      </p>
+      <div v-else class="flex-col-container email-infos-container">
+        <p class="publication-text-body">
           Letzte Veröffenlichung am {{ props.lastPublicationDate }}
         </p>
         <p class="publication-text-label">über</p>
