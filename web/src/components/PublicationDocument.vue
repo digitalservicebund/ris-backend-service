@@ -98,7 +98,6 @@ const toggleShowIssuesDetails = () => {
               label="Dokumentationseinheit veröffenlichen"
               button-type="primary"
               icon="campaign"
-              :disabled="hasValidationError"
               @click="$emit('publishADocument')"
             />
           </div>

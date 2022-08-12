@@ -38,9 +38,10 @@ const loadEmailToJurisInfos = (publishedXML: {
   emailSubject.value = publishedXML.mailSubject
   receiverEmail.value = "dokmbx@juris.de"
   hasValidationError.value = publishedXML.statusCode === "400"
-  issues.value = validateErrorMessages(publishedXML.statusMessages)
-  const xmlText: string = publishedXML.xml ? publishedXML.xml : ""
-  xml.value = xmlText.replaceAll("  ", "")
+  issues.value = hasValidationError.value
+    ? validateErrorMessages(publishedXML.statusMessages)
+    : []
+  xml.value = publishedXML.xml ? publishedXML.xml.replaceAll("  ", "") : ""
 }
 
 const validateErrorMessages = (issues: Array<string>): Array<string> => {

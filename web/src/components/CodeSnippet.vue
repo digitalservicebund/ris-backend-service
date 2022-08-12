@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { watch, ref } from "vue"
 
 const props = defineProps<{
   title: string
@@ -52,6 +52,12 @@ const getCodeLines = (): Array<CodeLine> => {
   return []
 }
 const codeLines = ref<Array<CodeLine>>(getCodeLines())
+watch(
+  () => props.xml,
+  () => {
+    codeLines.value = getCodeLines()
+  }
+)
 </script>
 
 <template>
