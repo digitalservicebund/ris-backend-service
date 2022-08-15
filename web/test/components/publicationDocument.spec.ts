@@ -111,7 +111,7 @@ describe("PublicationDocument", () => {
     })
     const labelInfo = document.querySelectorAll(".text-icon p")[1]
     expect(labelInfo.textContent?.trim()).toEqual(
-      "Durch Klick auf veröffentlichen wird die Plausibilitätsprüfung ausgelöst."
+      "Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst."
     )
     expect(labelInfo).toBeTruthy()
     getByText("Diese Dokumentationseinheit wurde bisher nicht veröffentlicht")
