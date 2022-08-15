@@ -7,20 +7,6 @@ import routes from "~pages"
 const router = createRouter({
   history: createWebHistory(),
   routes,
-  scrollBehavior(to) {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (to.hash) {
-          resolve({
-            el: to.hash,
-            behavior: "smooth",
-          })
-          return
-        }
-        return resolve({ left: 0, top: 0 })
-      }, 200)
-    })
-  },
 })
 
 createApp(App).use(router).use(vuetify).mount("#app")

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import { useScrollToHash } from "../../../../composables/scroll"
 import DocUnitDetail from "./index.vue"
 import DocUnitCoreData from "@/components/DocUnitCoreData.vue"
 import DocUnitTexts from "@/components/DocUnitTexts.vue"
@@ -64,9 +65,7 @@ const handleToggleFilePanel = async () => {
   })
 }
 
-onMounted(async () => {
-  fetchOriginalFile()
-})
+useScrollToHash(route)
 
 const originalOdocPanelYPos = 169
 
