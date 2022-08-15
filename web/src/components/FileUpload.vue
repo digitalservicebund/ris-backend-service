@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import ErrorModal from "@/components/ErrorModal.vue"
+import FileInputButton from "@/components/FileInputButton.vue"
 import DocUnit from "@/domain/docUnit"
 import { UploadStatus, UploadErrorStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
@@ -78,11 +79,11 @@ const drop = (e: DragEvent) => {
   }
 }
 
-const onFileSelect = (e: Event) => {
-  const files = (e.target as HTMLInputElement).files
-  if (!files) return
-  reset()
-  upload(files[0])
+const onFileSelect = (files?: FileList | null) => {
+  if (files) {
+    reset()
+    upload(files[0])
+  }
 }
 </script>
 
@@ -123,26 +124,14 @@ const onFileSelect = (e: Event) => {
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
-                <v-btn
+                <FileInputButton
                   class="ris-btn"
-                  :rounded="0"
-                  :ripple="false"
-                  :flat="true"
-                  color="blue800"
+                  identifier="file-upload-after-fail"
+                  @change="onFileSelect"
                 >
-                  <v-icon> search </v-icon>
-                  <label class="custom-file-label" for="file-upload-after-fail">
-                    Festplatte durchsuchen
-                    <input
-                      id="file-upload-after-fail"
-                      class="custom-file-input"
-                      type="file"
-                      name="file-upload-after-fail"
-                      aria-label="file-upload-after-fail"
-                      @change="onFileSelect"
-                    />
-                  </label>
-                </v-btn>
+                  <v-icon>search</v-icon>
+                  Festplatte durchsuchen
+                </FileInputButton>
               </div>
             </span>
           </span>
@@ -163,28 +152,14 @@ const onFileSelect = (e: Event) => {
               <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
-              <div>
-                <v-btn
-                  class="ris-btn"
-                  :rounded="0"
-                  :ripple="false"
-                  :flat="true"
-                  color="blue800"
-                >
-                  <v-icon> search </v-icon>
-                  <label class="custom-file-label" for="file-upload">
-                    Festplatte durchsuchen
-                    <input
-                      id="file-upload"
-                      class="custom-file-input"
-                      type="file"
-                      name="file-upload"
-                      aria-label="file-upload"
-                      @change="onFileSelect"
-                    />
-                  </label>
-                </v-btn>
-              </div>
+              <FileInputButton
+                class="ris-btn"
+                identifier="file-upload"
+                @change="onFileSelect"
+              >
+                <v-icon>search</v-icon>
+                Festplatte durchsuchen
+              </FileInputButton>
             </span>
           </span>
         </v-container>
@@ -233,6 +208,7 @@ const onFileSelect = (e: Event) => {
 
   &__in-drag-error {
     border: $border-style-error;
+
     &:hover {
       border: $border-style-error;
     }
@@ -257,20 +233,6 @@ const onFileSelect = (e: Event) => {
 .button_upload {
   margin-top: 16px;
   margin-bottom: 10px;
-}
-
-.custom-file-input::-webkit-file-upload-button {
-  visibility: hidden;
-}
-
-.custom-file-input {
-  opacity: 0;
-  position: absolute;
-  z-index: -1;
-}
-
-.custom-file-label {
-  cursor: pointer;
 }
 
 .ris-btn {

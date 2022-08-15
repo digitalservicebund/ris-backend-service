@@ -53,7 +53,9 @@ describe("FileUpload", () => {
       global: { plugins: [vuetify, router] },
     })
 
-    const inputEl = getByLabelText("file-upload")
+    const inputEl = getByLabelText("Festplatte durchsuchen", {
+      selector: "input",
+    })
 
     const file = new File(["test"], "sample.docx", {
       type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -113,7 +115,9 @@ describe("FileUpload", () => {
 
     const file = new File(["test"], "sample.docx")
 
-    const inputEl = getByLabelText("file-upload")
+    const inputEl = getByLabelText("Festplatte durchsuchen", {
+      selector: "input",
+    })
 
     Object.defineProperty(inputEl, "files", {
       value: [file],
@@ -128,7 +132,7 @@ describe("FileUpload", () => {
     getByText("Bitte laden Sie eine kleinere Datei hoch.", { exact: false })
   })
 
-  test("upload fails because the file is too large", async () => {
+  test("upload fails due to unknown error while sending via service", async () => {
     vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
       Promise.resolve({ status: UploadStatus.FAILED })
     )
@@ -142,7 +146,9 @@ describe("FileUpload", () => {
 
     const file = new File(["test"], "sample.docx")
 
-    const inputEl = getByLabelText("file-upload")
+    const inputEl = getByLabelText("Festplatte durchsuchen", {
+      selector: "input",
+    })
 
     Object.defineProperty(inputEl, "files", {
       value: [file],
