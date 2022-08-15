@@ -43,22 +43,10 @@ const handleUpdateDocUnit = async () => {
 const router = useRouter()
 const route = useRoute()
 
-const fetchOriginalFile = async () => {
-  if (
-    !docUnit.value.originalFileAsHTML &&
-    showDocPanel.value &&
-    docUnit.value.s3path
-  ) {
-    docUnit.value.originalFileAsHTML = await fileService.getDocxFileAsHtml(
-      docUnit.value.s3path
-    )
-  }
-}
-
+const fileAsHTML = ref<string>("")
 const showDocPanel = ref(useRoute().query.showDocPanel === "true")
 const handleToggleFilePanel = async () => {
   showDocPanel.value = !showDocPanel.value
-  fetchOriginalFile()
   await router.push({
     ...route,
     query: { ...route.query, showDocPanel: String(showDocPanel.value) },
@@ -77,7 +65,12 @@ const handleScroll = () => {
   element.style.top = (pos < threshold ? threshold : pos) + "px"
 }
 
-onMounted(() => window.addEventListener("scroll", handleScroll))
+onMounted(async () => {
+  window.addEventListener("scroll", handleScroll)
+  fileAsHTML.value = docUnit.value.s3path
+    ? await fileService.getDocxFileAsHtml(docUnit.value.s3path)
+    : ""
+})
 onUnmounted(() => window.removeEventListener("scroll", handleScroll))
 </script>
 
@@ -101,7 +94,7 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll))
       <OriginalFileSidePanel
         :open="showDocPanel"
         :has-file="docUnit.hasFile"
-        :file="docUnit.originalFileAsHTML"
+        :file="fileAsHTML"
         @toggle-panel="handleToggleFilePanel"
       />
     </v-row>
