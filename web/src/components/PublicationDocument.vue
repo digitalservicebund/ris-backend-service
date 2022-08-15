@@ -212,6 +212,7 @@ const toggleShowIssuesDetails = () => {
       width: 100%;
       &__in_error {
         border: solid 1px #b0243f;
+        max-width: 50vw;
       }
       .text-container  {
         display: flex;
