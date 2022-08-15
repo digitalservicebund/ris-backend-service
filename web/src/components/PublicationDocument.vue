@@ -66,7 +66,7 @@ const toggleShowIssuesDetails = () => {
             help
           </span>
           <p class="publication-text-body" style="margin-left: -8px">
-            Durch Klick auf <i>veröffentlichen</i> wird die
+            Durch Klick auf <em>Veröffentlichen</em> wird die
             Plausibilitätsprüfung ausgelöst.
           </p>
         </div>
