@@ -36,32 +36,50 @@ const toggleShowIssuesDetails = () => {
       >
         <div class="text-icon">
           <div class="icon">
-            <span
-              v-if="hasValidationError && !showIssuesDetails"
-              class="material-icons"
-            >
-              error
-            </span>
-            <span
-              v-if="hasValidationError && showIssuesDetails"
-              class="material-icons"
-            >
+            <span v-if="hasValidationError" class="material-icons">
               priority_high
             </span>
-            <span v-if="!hasValidationError" class="material-icons">
+            <span
+              v-if="!hasValidationError && !isFristTimePublication"
+              class="material-icons"
+            >
               done_all
+            </span>
+            <span
+              v-if="!hasValidationError && isFristTimePublication"
+              class="material-icons"
+            >
+              spellcheck
             </span>
           </div>
           <p class="publication-text-header">Plausibilitätsprüfung</p>
         </div>
 
-        <div v-if="!hasValidationError" class="text-icon">
+        <div
+          v-if="isFristTimePublication && !hasValidationError"
+          class="text-icon"
+        >
+          <span
+            class="material-icons material-symbols-outlined"
+            style="color: white; background-color: black; border-radius: 50%"
+          >
+            help
+          </span>
+          <p class="publication-text-body" style="margin-left: -8px">
+            Durch Klick auf <i>veröffentlichen</i> wird die
+            Plausibilitätsprüfung ausgelöst.
+          </p>
+        </div>
+        <div
+          v-if="!hasValidationError && !isFristTimePublication"
+          class="text-icon"
+        >
           <div class="icon">
             <span class="material-icons"> done </span>
           </div>
           <p class="publication-text-body">0 Fehler</p>
         </div>
-        <div v-else class="xml-validation-error-container">
+        <div v-if="hasValidationError" class="xml-validation-error-container">
           <div class="text-icon">
             <button class="icon" @click="toggleShowIssuesDetails">
               <span v-if="showIssuesDetails" class="material-icons">

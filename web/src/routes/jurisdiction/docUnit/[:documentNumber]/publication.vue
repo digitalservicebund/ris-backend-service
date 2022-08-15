@@ -33,15 +33,17 @@ const loadEmailToJurisInfos = (publishedXML: {
   mailSubject: string
   publishDate: string
 }) => {
-  isFristTimePublication.value = false
-  lastPublicationDate.value = formattedDate(publishedXML.publishDate)
-  emailSubject.value = publishedXML.mailSubject
-  receiverEmail.value = "dokmbx@juris.de"
   hasValidationError.value = publishedXML.statusCode === "400"
   issues.value = hasValidationError.value
     ? validateErrorMessages(publishedXML.statusMessages)
     : []
-  xml.value = publishedXML.xml ? publishedXML.xml.replaceAll("  ", "") : ""
+  if (!hasValidationError.value) {
+    lastPublicationDate.value = formattedDate(publishedXML.publishDate)
+    emailSubject.value = publishedXML.mailSubject
+    receiverEmail.value = "dokmbx@juris.de"
+    xml.value = publishedXML.xml ? publishedXML.xml.replaceAll("  ", "") : ""
+    isFristTimePublication.value = !(xml.value !== null && xml.value.length > 0)
+  }
 }
 
 const validateErrorMessages = (issues: Array<string>): Array<string> => {

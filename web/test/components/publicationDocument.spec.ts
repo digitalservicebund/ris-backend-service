@@ -109,7 +109,11 @@ describe("PublicationDocument", () => {
         hasValidationError: !HAS_ERROR,
       },
     })
-    getByText("0 Fehler")
+    const labelInfo = document.querySelectorAll(".text-icon p")[1]
+    expect(labelInfo.textContent?.trim()).toEqual(
+      "Durch Klick auf veröffentlichen wird die Plausibilitätsprüfung ausgelöst."
+    )
+    expect(labelInfo).toBeTruthy()
     getByText("Diese Dokumentationseinheit wurde bisher nicht veröffentlicht")
     const buttons = screen.getAllByRole("button")
     const publishButton = buttons.find((button) =>
