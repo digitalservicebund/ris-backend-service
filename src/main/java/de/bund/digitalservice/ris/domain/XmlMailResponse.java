@@ -20,6 +20,10 @@ public class XmlMailResponse implements ExportObject {
     this.publishDate = xmlMail.publishDate();
 
     this.statusCode = xmlMail.statusCode();
-    this.statusMessages = xmlMail.statusMessages().split("\\|");
+    if (xmlMail.statusMessages() != null) {
+      this.statusMessages = xmlMail.statusMessages().split("\\|");
+    } else {
+      this.statusMessages = null;
+    }
   }
 }

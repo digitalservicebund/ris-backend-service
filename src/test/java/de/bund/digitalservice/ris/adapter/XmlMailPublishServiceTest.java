@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -34,33 +36,16 @@ import reactor.test.StepVerifier;
 class XmlMailPublishServiceTest {
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   private static final String MAIL_SUBJECT =
-      "id=BGH name=jDVNAME da=R df=X dt=N mod=A vg=test-document-number";
+      "id=BGH name=jDVNAME da=R df=X dt=N mod=A vg=Testvorgang";
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final XmlMail EXPECTED_BEFORE_SAVE =
-      new XmlMail(
-          null,
-          123L,
-          MAIL_SUBJECT,
-          "xml",
-          "status-code",
-          "status-messages",
-          "test.xml",
-          PUBLISH_DATE);
+      new XmlMail(null, 123L, MAIL_SUBJECT, "xml", "200", "succeed", "test.xml", PUBLISH_DATE);
   private static final XmlMail SAVED_XML_MAIL =
-      new XmlMail(
-          1L,
-          123L,
-          MAIL_SUBJECT,
-          "xml",
-          "status-code",
-          "status-messages",
-          "test.xml",
-          PUBLISH_DATE);
+      new XmlMail(1L, 123L, MAIL_SUBJECT, "xml", "200", "succeed", "test.xml", PUBLISH_DATE);
   private static final XmlMailResponse EXPECTED_RESPONSE =
       new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL);
   private static final JurisFormattedXML FORMATTED_XML =
-      new JurisFormattedXML(
-          "xml", new Status("status-code", List.of("status-messages")), "test.xml", PUBLISH_DATE);
+      new JurisFormattedXML("xml", new Status("200", List.of("succeed")), "test.xml", PUBLISH_DATE);
 
   private DocUnit documentUnit;
 
@@ -97,6 +82,24 @@ class XmlMailPublishServiceTest {
         .verifyComplete();
 
     verify(repository).save(EXPECTED_BEFORE_SAVE);
+  }
+
+  @Test
+  void testPublish_withValidationError() throws ParserConfigurationException, TransformerException {
+    service.setToMailAddressList("test-to@mail.com");
+    var xmlWithValidationError =
+        new JurisFormattedXML(
+            "xml", new Status("400", List.of("status-message")), "test.xml", PUBLISH_DATE);
+    var xmlMail = new XmlMail(null, 123L, null, null, "400", "status-message", null, null);
+    var expected = new XmlMailResponse(TEST_UUID, xmlMail);
+    when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
+
+    StepVerifier.create(service.publish(documentUnit))
+        .consumeNextWith(
+            response -> assertThat(response).usingRecursiveComparison().isEqualTo(expected))
+        .verifyComplete();
+
+    verify(repository, times(0)).save(any(XmlMail.class));
   }
 
   @Test

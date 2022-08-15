@@ -88,7 +88,7 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
     subject += " df=X";
     subject += " dt=N";
     subject += " mod=A";
-    subject += " vg=" + documentUnit.getDocumentnumber();
+    subject += " vg=Testvorgang";
     return Mono.just(subject);
   }
 
@@ -129,7 +129,21 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
 
   private Mono<XmlMail> savePublishInformation(
       Long documentUnitId, String mailSubject, JurisFormattedXML xml) {
+
     String statusMessages = String.join("|", xml.status().statusMessages());
+    if (xml.status().statusCode().equals("400")) {
+      return Mono.just(
+          new XmlMail(
+              null,
+              documentUnitId,
+              null,
+              null,
+              xml.status().statusCode(),
+              statusMessages,
+              null,
+              null));
+    }
+
     XmlMail xmlMail =
         new XmlMail(
             null,
