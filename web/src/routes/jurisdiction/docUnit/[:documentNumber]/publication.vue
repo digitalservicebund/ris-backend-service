@@ -34,9 +34,7 @@ const loadEmailToJurisInfos = (publishedXML: {
   publishDate: string
 }) => {
   hasValidationError.value = publishedXML.statusCode === "400"
-  issues.value = hasValidationError.value
-    ? validateErrorMessages(publishedXML.statusMessages)
-    : []
+  issues.value = hasValidationError.value ? publishedXML.statusMessages : []
   if (!hasValidationError.value) {
     lastPublicationDate.value = formattedDate(publishedXML.publishDate)
     emailSubject.value = publishedXML.mailSubject
@@ -46,19 +44,19 @@ const loadEmailToJurisInfos = (publishedXML: {
   }
 }
 
-const validateErrorMessages = (issues: Array<string>): Array<string> => {
-  return [
-    ...new Set(
-      issues.map((issue) => {
-        const invalidElement = issue.toString().split('"')[1]
-        return (
-          invalidElement.charAt(0).toUpperCase() +
-          invalidElement.toLowerCase().slice(1)
-        )
-      })
-    ),
-  ]
-}
+// const validateErrorMessages = (issues: Array<string>): Array<string> => {
+//   return [
+//     ...new Set(
+//       issues.map((issue) => {
+//         const invalidElement = issue.toString().split('"')[1]
+//         return (
+//           invalidElement.charAt(0).toUpperCase() +
+//           invalidElement.toLowerCase().slice(1)
+//         )
+//       })
+//     ),
+//   ]
+// }
 
 const formattedDate = (date: string): string => {
   const publicationDate = new Date(date)

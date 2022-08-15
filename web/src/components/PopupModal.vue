@@ -23,7 +23,7 @@ onMounted(() => {
   const focusableElems = document.querySelectorAll(focusableElemsSelector)
   /** Modal focus trap event */
   document.addEventListener("keydown", (e) => {
-    const isTabPressed = e.key === "Tab" || e.keyCode === 9
+    const isTabPressed = e.key === "Tab"
     if (isTabPressed) {
       if (e.shiftKey) {
         /** Shift + Tab select popupModal */
