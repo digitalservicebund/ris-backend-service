@@ -69,6 +69,11 @@ const lg = ref(false)
 const isLastItemFlexEnd = ref(false)
 
 const editor = new Editor({
+  editorProps: {
+    attributes: {
+      tabindex: "0",
+    },
+  },
   content: props.value,
   extensions: [
     Document,
