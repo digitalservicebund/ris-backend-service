@@ -10,30 +10,28 @@ const route = useRoute()
 
 <template>
   <v-col v-if="!open" cols="3" align="right">
-    <div
+    <button
       id="odoc-open-element"
       class="odoc-open"
       aria-label="Originaldokument öffnen"
       @click="$emit('togglePanel')"
-      @keydown.p="$emit('togglePanel')"
     >
       <div class="odoc-open-text">Originaldokument</div>
       <div class="odoc-open-icon-background">
         <v-icon class="odoc-open-icon"> arrow_back_ios_new </v-icon>
       </div>
-    </div>
+    </button>
   </v-col>
   <v-col v-else cols="5">
     <div id="odoc-panel-element" class="odoc-panel">
       <h3 class="odoc-editor-header">
-        <div
+        <button
           class="odoc-close-icon-background"
           aria-label="Originaldokument schließen"
           @click="$emit('togglePanel')"
-          @keydown.p="$emit('togglePanel')"
         >
           <v-icon class="odoc-close-icon"> close </v-icon>
-        </div>
+        </button>
         Originaldokument
       </h3>
       <div v-if="!hasFile">
@@ -97,15 +95,11 @@ const route = useRoute()
 }
 .odoc-close-icon-background {
   background-color: $blue800;
+  color: $white;
   border-radius: 50%;
   width: 40px;
   height: 40px;
   transform: translate(-40px, 10px);
-}
-.odoc-close-icon {
-  color: white;
-  margin-left: 8px;
-  margin-top: 8px;
 }
 .odoc-editor-header {
   padding: 40px 0 15px 20px; // top right bottom left
