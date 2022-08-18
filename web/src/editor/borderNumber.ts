@@ -34,7 +34,7 @@ export const BorderNumberContent = Node.create({
   name: "borderNumberContent",
   priority: 1000,
   group: "border",
-  content: "inline",
+  content: "inline*",
   parseHTML() {
     return [{ tag: "content" }]
   },
