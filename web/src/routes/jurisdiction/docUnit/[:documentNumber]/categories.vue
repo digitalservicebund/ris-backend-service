@@ -91,7 +91,8 @@ onMounted(async () => {
     "keydown",
     (e) => {
       const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
-      const isPressCtrlKey = OS.match("Mac") ? e.metaKey : e.ctrlKey
+      let isPressCtrlKey = false
+      isPressCtrlKey = OS.match("Mac") ? e.metaKey : e.ctrlKey
       if (isPressCtrlKey && e.key === "s") {
         if (updateStatus.value !== 1) {
           handleUpdateDocUnit()
