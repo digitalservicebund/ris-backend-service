@@ -7,7 +7,7 @@ const props = defineProps<{
 }>()
 
 type CodeLine = {
-  codeLineText: string
+  text: string
   marginLeft: number
 }
 const codeLineMarginLeftUnitInPx = 20
@@ -17,7 +17,7 @@ const caculateLineMarginLeft = (line: string): number => {
   const isDocTypeTag = line.includes("<!DOCTYPE")
   const isCloseTag = line.startsWith("</")
   const isOpenTag = !isCloseTag && !line.includes("</")
-  const hasBothTag =
+  const hasBothTags =
     (!isCloseTag && line.includes("</")) ||
     (line.startsWith("<") && line.endsWith("/>"))
   let ml = 0
@@ -25,7 +25,7 @@ const caculateLineMarginLeft = (line: string): number => {
     marginLeft.value = -1
     return 0
   }
-  if (hasBothTag) {
+  if (hasBothTags) {
     return (marginLeft.value + 1) * codeLineMarginLeftUnitInPx
   }
   if (isOpenTag) {
@@ -46,7 +46,7 @@ const getCodeLines = (): CodeLine[] => {
       .filter((line) => line.length > 0)
       .map((line) => {
         const ml = caculateLineMarginLeft(line)
-        return { codeLineText: line, marginLeft: ml }
+        return { text: line, marginLeft: ml }
       })
   }
   return []
@@ -73,7 +73,7 @@ watch(
           ><span>{{ index + 1 }}</span></code
         >
         <code class="line" :style="{ 'margin-left': `${line.marginLeft}px` }"
-          ><span>{{ line.codeLineText }}</span></code
+          ><span>{{ line.text }}</span></code
         >
       </div>
     </div>
@@ -106,6 +106,13 @@ watch(
       display: flex;
       justify-content: flex-end;
       padding-right: 5px;
+      /* Disable select line number*/
+      -webkit-touch-callout: none; /* iOS Safari */
+      -webkit-user-select: none; /* Safari */
+      -khtml-user-select: none; /* Konqueror HTML */
+      -moz-user-select: none; /* Old versions of Firefox */
+      -ms-user-select: none; /* Internet Explorer/Edge */
+      user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
     }
     .line {
       padding-left: 20px;
