@@ -90,7 +90,7 @@ onMounted(async () => {
       :receiver-email="receiverEmail"
       :email-subject="emailSubject"
       :last-publication-date="lastPublicationDate"
-      :is-frist-time-publication="isFirstTimePublication"
+      :is-first-time-publication="isFirstTimePublication"
       :has-validation-error="hasValidationError"
       @publish-a-document="publishADocument"
     />

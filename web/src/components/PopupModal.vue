@@ -33,7 +33,7 @@ onMounted(() => {
         }
       } else {
         if (
-          /** Jump to frist button */
+          /** Jump to first button */
           document.activeElement ===
           (focusableElems[focusableElems.length - 1] as HTMLElement)
         ) {
