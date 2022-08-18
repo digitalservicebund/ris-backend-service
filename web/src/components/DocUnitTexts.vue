@@ -2,16 +2,15 @@
 import { computed } from "vue"
 import { Texts } from "../domain/docUnit"
 import * as iconsAndLabels from "../iconsAndLabels.json"
-import TextButton from "./TextButton.vue"
+import SaveDocUnitButton from "./SaveDocUnitButton.vue"
 import TextEditor from "./TextEditor.vue"
 import { FieldSize } from "@/domain/FieldSize"
 
-const props = defineProps<{ texts: Texts }>()
+const props = defineProps<{ texts: Texts; updateStatus: number }>()
 const emit = defineEmits<{
   (e: "updateValue", updatedValue: [keyof Texts, string]): Promise<void>
   (e: "updateDocUnit"): Promise<void>
 }>()
-
 const data = computed(() =>
   iconsAndLabels.texts.map((item) => {
     return {
@@ -52,9 +51,10 @@ const data = computed(() =>
           </span>
         </div>
         <div class="ris-texte-form__textfield">
-          <TextButton
+          <SaveDocUnitButton
             aria-label="Kurz- und Langtexte Speichern Button"
-            @click="emit('updateDocUnit')"
+            :update-status="updateStatus"
+            @update-doc-unit="emit('updateDocUnit')"
           />
         </div>
       </v-col>

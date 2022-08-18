@@ -17,6 +17,7 @@ describe("Core Data", () => {
     const wrapper = mount(DocUnitCoreData, {
       props: {
         coreData: docUnit.coreData,
+        updateStatus: 0,
       },
       global: {
         plugins: [vuetify],

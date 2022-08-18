@@ -14,6 +14,7 @@ describe("Texts", () => {
       global: { plugins: [vuetify] },
       props: {
         texts: new DocUnit("foo").texts,
+        updateStatus: 0,
       },
     })
 
@@ -33,6 +34,7 @@ describe("Texts", () => {
       global: { plugins: [vuetify] },
       props: {
         texts: new DocUnit("foo").texts,
+        updateStatus: 0,
       },
     })
 
@@ -46,6 +48,7 @@ describe("Texts", () => {
     //   global: { plugins: [vuetify] },
     //   props: {
     //     texts: new DocUnit("foo", { titelzeile: "foo Titelzeile" }).texts,
+    //     updateStatus: 0,
     //   },
     // })
     // await user.click(getByLabelText("Titelzeile Editor Feld"))

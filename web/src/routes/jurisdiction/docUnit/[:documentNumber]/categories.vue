@@ -36,14 +36,28 @@ const handleUpdateValueDocUnitTexts = async (
 }
 
 const handleUpdateDocUnit = async () => {
-  await docUnitService.update(docUnit.value)
-  alert("Dokumentationseinheit wurde gespeichert")
+  updateStatus.value = 1
+  const status = await docUnitService.update(docUnit.value)
+  setTimeout(() => {
+    hasDataChange.value = false
+    lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
+    updateStatus.value = status
+    if (updateStatus.value !== 200) return
+    if (isShowUpdatePopup.value) {
+      alert("Dokumentationseinheit wurde gespeichert")
+    }
+    isShowUpdatePopup.value = false
+  }, 3000)
 }
-
 const router = useRouter()
 const route = useRoute()
 
+const isShowUpdatePopup = ref(true)
+const updateStatus = ref(0)
+const lastUpdatedDocUnit = ref(JSON.stringify(docUnit.value))
 const fileAsHTML = ref("")
+const automaticUpload = ref()
+const hasDataChange = ref(false)
 const showDocPanel = ref(useRoute().query.showDocPanel === "true")
 const handleToggleFilePanel = async () => {
   showDocPanel.value = !showDocPanel.value
@@ -71,8 +85,38 @@ onMounted(async () => {
   fileAsHTML.value = docUnit.value.s3path
     ? await fileService.getDocxFileAsHtml(docUnit.value.s3path)
     : ""
+
+  /** Overwrite ctrl + S to update docunit */
+  window.addEventListener(
+    "keydown",
+    (e) => {
+      const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
+      const isPressCtrlKey = OS.match("Mac") ? e.metaKey : e.ctrlKey
+      if (isPressCtrlKey && e.key === "s") {
+        if (updateStatus.value !== 1) {
+          handleUpdateDocUnit()
+          e.preventDefault()
+        }
+      }
+    },
+    false
+  )
+  /** Time interval to automatic update docunit every 30sec */
+  automaticUpload.value = setInterval(() => {
+    hasDataChange.value =
+      JSON.stringify(docUnit.value) !== lastUpdatedDocUnit.value
+    /** Only update Docunit when there is any change after 30sec and last update is done */
+    if (hasDataChange.value && updateStatus.value !== 1) {
+      handleUpdateDocUnit()
+    }
+    lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
+  }, 30000)
 })
-onUnmounted(() => window.removeEventListener("scroll", handleScroll))
+onUnmounted(() => {
+  window.removeEventListener("scroll", handleScroll)
+  /** Clear Interval */
+  clearInterval(automaticUpload.value)
+})
 </script>
 
 <template>
@@ -82,12 +126,14 @@ onUnmounted(() => window.removeEventListener("scroll", handleScroll))
         <DocUnitCoreData
           id="coreData"
           :core-data="docUnit.coreData"
+          :update-status="updateStatus"
           @update-value="handleUpdateValueDataCores"
           @update-doc-unit="handleUpdateDocUnit"
         />
         <DocUnitTexts
           id="texts"
           :texts="docUnit.texts"
+          :update-status="updateStatus"
           @update-value="handleUpdateValueDocUnitTexts"
           @update-doc-unit="handleUpdateDocUnit"
         />
