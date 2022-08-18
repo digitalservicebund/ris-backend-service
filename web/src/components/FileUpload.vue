@@ -25,7 +25,7 @@ const emptyStatus: Status = {
   uploadStatus: UploadStatus.UNKNOWN,
 }
 
-const status = ref<Status>(emptyStatus)
+const status = ref(emptyStatus)
 
 const reset = () => {
   status.value = emptyStatus

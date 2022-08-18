@@ -9,13 +9,13 @@ const emit = defineEmits<{
   (e: "deleteDocUnit", docUnit: DocUnit): void
 }>()
 
-const showModal = ref<boolean>(false)
-const popupModalText = ref<string>("")
-const modalConfirmText = ref<string>("Löschen")
+const showModal = ref(false)
+const popupModalText = ref("")
+const modalConfirmText = ref("Löschen")
 const modalHeaderText = "Dokumentationseinheit löschen"
 const modalCancelButtonType = "ghost"
 const modalConfirmButtonType = "secondary"
-const selectedDocUnit = ref<DocUnit>(new DocUnit("1"))
+const selectedDocUnit = ref(new DocUnit("1"))
 const toggleModal = () => {
   showModal.value = !showModal.value
   if (showModal.value) {

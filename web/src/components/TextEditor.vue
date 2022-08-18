@@ -142,7 +142,7 @@ const calculateBreakpoints = (containerWidth: number | undefined) => {
     isLastItemFlexEnd.value = containerWidth > 570 ? true : false
   }
 }
-const isClickOnEditor = ref<boolean>(false)
+const isClickOnEditor = ref(false)
 const closeAllDropdown = () => {
   showListStyles.value = false
   showImageAlignment.value = false

@@ -43,7 +43,7 @@ const handleUpdateDocUnit = async () => {
 const router = useRouter()
 const route = useRoute()
 
-const fileAsHTML = ref<string>("")
+const fileAsHTML = ref("")
 const showDocPanel = ref(useRoute().query.showDocPanel === "true")
 const handleToggleFilePanel = async () => {
   showDocPanel.value = !showDocPanel.value

@@ -11,15 +11,15 @@ const props = defineProps<{
 const docUnit = ref(
   await docUnitService.getByDocumentNumber(props.documentNumber)
 )
-const loadDone = ref<boolean>(false)
-const xml = ref<string>("")
+const loadDone = ref(false)
+const xml = ref("")
 const issues = ref<Array<string>>([])
-const isFristTimePublication = ref<boolean>(true)
-const hasValidationError = ref<boolean>(false)
+const isFristTimePublication = ref(true)
+const hasValidationError = ref(false)
 
-const receiverEmail = ref<string>("")
-const emailSubject = ref<string>("")
-const lastPublicationDate = ref<string>("")
+const receiverEmail = ref("")
+const emailSubject = ref("")
+const lastPublicationDate = ref("")
 
 const publishADocument = async () => {
   const respone = await fileService.publishADocument(docUnit.value.uuid)

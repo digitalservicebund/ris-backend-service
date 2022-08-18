@@ -11,7 +11,7 @@ type CodeLine = {
   marginLeft: number
 }
 const codeLineMarginLeftUnitInPx = 20
-const marginLeft = ref<number>(0)
+const marginLeft = ref(0)
 const caculateLineMarginLeft = (line: string): number => {
   const isXMLTag = line.includes("<?xml")
   const isDocTypeTag = line.includes("<!DOCTYPE")
@@ -51,7 +51,7 @@ const getCodeLines = (): Array<CodeLine> => {
   }
   return []
 }
-const codeLines = ref<Array<CodeLine>>(getCodeLines())
+const codeLines = ref(getCodeLines())
 watch(
   () => props.xml,
   () => {

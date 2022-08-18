@@ -18,7 +18,7 @@ defineEmits<{
   (e: "publishADocument"): void
 }>()
 
-const showIssuesDetails = ref<boolean>(false)
+const showIssuesDetails = ref(false)
 const toggleShowIssuesDetails = () => {
   showIssuesDetails.value = !showIssuesDetails.value
 }
