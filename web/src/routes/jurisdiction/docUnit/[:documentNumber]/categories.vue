@@ -91,7 +91,14 @@ onMounted(async () => {
     "keydown",
     (e) => {
       const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
-      if ((OS.match("Mac") ? e.metaKey : e.ctrlKey) && e.key === "s") {
+      if (OS === "Mac") {
+        if (!e.metaKey) return
+        if (e.key !== "s") return
+        handleUpdateDocUnit()
+        e.preventDefault()
+      } else {
+        if (!e.ctrlKey) return
+        if (e.key !== "s") return
         handleUpdateDocUnit()
         e.preventDefault()
       }
