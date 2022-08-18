@@ -39,7 +39,7 @@ const loadEmailToJurisInfos = (publishedXML: {
     lastPublicationDate.value = formattedDate(publishedXML.publishDate)
     emailSubject.value = publishedXML.mailSubject
     receiverEmail.value = "dokmbx@juris.de"
-    xml.value = publishedXML.xml ? publishedXML.xml.replace(/( )+/g, "") : ""
+    xml.value = publishedXML.xml ? publishedXML.xml.replace(/(  )/g, "") : ""
     isFirstTimePublication.value = !(xml.value !== null && xml.value.length > 0)
   }
 }
