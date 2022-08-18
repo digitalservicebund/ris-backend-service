@@ -26,9 +26,9 @@ describe("CodeSnippet", () => {
     })
   })
 
-  it("renders with invalid xml", () => {
+  it("does not render with invalid xml", () => {
     const INVALID_XML = "Foo"
-    const { getByText } = render(CodeSnippet, {
+    const { queryByText, getByText } = render(CodeSnippet, {
       global: { plugins: [vuetify] },
       props: {
         title: TITLE,
@@ -36,6 +36,6 @@ describe("CodeSnippet", () => {
       },
     })
     getByText(TITLE)
-    expect(() => getByText(INVALID_XML)).toThrow()
+    expect(queryByText(INVALID_XML)).toBeNull()
   })
 })
