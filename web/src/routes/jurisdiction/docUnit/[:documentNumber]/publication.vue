@@ -13,7 +13,7 @@ const docUnit = ref(
 )
 const loadDone = ref(false)
 const xml = ref("")
-const issues = ref<Array<string>>([])
+const issues = ref<string[]>([])
 const isFristTimePublication = ref(true)
 const hasValidationError = ref(false)
 
@@ -28,7 +28,7 @@ const publishADocument = async () => {
 
 const loadEmailToJurisInfos = (publishedXML: {
   xml: string
-  statusMessages: Array<string>
+  statusMessages: string[]
   statusCode: string
   mailSubject: string
   publishDate: string

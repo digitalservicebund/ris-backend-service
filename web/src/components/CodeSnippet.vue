@@ -39,7 +39,7 @@ const caculateLineMarginLeft = (line: string): number => {
   return ml
 }
 
-const getCodeLines = (): Array<CodeLine> => {
+const getCodeLines = (): CodeLine[] => {
   if (props.xml.includes("<?xml")) {
     return props.xml
       .split("\n")

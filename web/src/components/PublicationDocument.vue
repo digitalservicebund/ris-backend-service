@@ -6,7 +6,7 @@ import ErrorModal from "@/components/ErrorModal.vue"
 
 const props = defineProps<{
   xml: string
-  issues: Array<string>
+  issues: string[]
   receiverEmail: string
   emailSubject: string
   lastPublicationDate: string
