@@ -14,7 +14,7 @@ const docUnit = ref(
 const loadDone = ref(false)
 const xml = ref("")
 const issues = ref<string[]>([])
-const isFristTimePublication = ref(true)
+const isFirstTimePublication = ref(true)
 const hasValidationError = ref(false)
 
 const receiverEmail = ref("")
@@ -22,8 +22,8 @@ const emailSubject = ref("")
 const lastPublicationDate = ref("")
 
 const publishADocument = async () => {
-  const respone = await fileService.publishADocument(docUnit.value.uuid)
-  loadEmailToJurisInfos(respone)
+  const response = await fileService.publishADocument(docUnit.value.uuid)
+  loadEmailToJurisInfos(response)
 }
 
 const loadEmailToJurisInfos = (publishedXML: {
@@ -40,7 +40,7 @@ const loadEmailToJurisInfos = (publishedXML: {
     emailSubject.value = publishedXML.mailSubject
     receiverEmail.value = "dokmbx@juris.de"
     xml.value = publishedXML.xml ? publishedXML.xml.replace(/( )+/g, "") : ""
-    isFristTimePublication.value = !(xml.value !== null && xml.value.length > 0)
+    isFirstTimePublication.value = !(xml.value !== null && xml.value.length > 0)
   }
 }
 
@@ -69,14 +69,14 @@ const formattedDate = (date: string): string => {
 }
 
 onMounted(async () => {
-  const lastPublisedXML = await fileService.getLastPublishedXML(
+  const lastPublishedXML = await fileService.getLastPublishedXML(
     docUnit.value.uuid
   )
-  if (lastPublisedXML.length === 0) {
+  if (lastPublishedXML.length === 0) {
     loadDone.value = true
     return
   }
-  loadEmailToJurisInfos(lastPublisedXML)
+  loadEmailToJurisInfos(lastPublishedXML)
   loadDone.value = true
 })
 </script>
@@ -90,7 +90,7 @@ onMounted(async () => {
       :receiver-email="receiverEmail"
       :email-subject="emailSubject"
       :last-publication-date="lastPublicationDate"
-      :is-frist-time-publication="isFristTimePublication"
+      :is-frist-time-publication="isFirstTimePublication"
       :has-validation-error="hasValidationError"
       @publish-a-document="publishADocument"
     />

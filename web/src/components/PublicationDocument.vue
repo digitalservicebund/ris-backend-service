@@ -10,7 +10,7 @@ const props = defineProps<{
   receiverEmail: string
   emailSubject: string
   lastPublicationDate: string
-  isFristTimePublication: boolean
+  isFirstTimePublication: boolean
   hasValidationError: boolean
 }>()
 
@@ -40,13 +40,13 @@ const toggleShowIssuesDetails = () => {
               priority_high
             </span>
             <span
-              v-if="!hasValidationError && !isFristTimePublication"
+              v-if="!hasValidationError && !isFirstTimePublication"
               class="material-icons"
             >
               done_all
             </span>
             <span
-              v-if="!hasValidationError && isFristTimePublication"
+              v-if="!hasValidationError && isFirstTimePublication"
               class="material-icons"
             >
               spellcheck
@@ -56,7 +56,7 @@ const toggleShowIssuesDetails = () => {
         </div>
 
         <div
-          v-if="isFristTimePublication && !hasValidationError"
+          v-if="isFirstTimePublication && !hasValidationError"
           class="text-icon"
         >
           <span
@@ -71,7 +71,7 @@ const toggleShowIssuesDetails = () => {
           </p>
         </div>
         <div
-          v-if="!hasValidationError && !isFristTimePublication"
+          v-if="!hasValidationError && !isFirstTimePublication"
           class="text-icon"
         >
           <div class="icon">
@@ -105,7 +105,7 @@ const toggleShowIssuesDetails = () => {
           </div>
         </div>
         <div class="publication-button-container">
-          <div v-if="!isFristTimePublication" class="text-container">
+          <div v-if="!isFirstTimePublication" class="text-container">
             <p class="publication-text-body">Zuletzt veröffentlicht</p>
             <p class="publication-text-subline">
               {{ props.lastPublicationDate }}
@@ -130,7 +130,7 @@ const toggleShowIssuesDetails = () => {
     </div>
     <div class="flex-col-container publication-infos-container">
       <p class="publication-text-header">Letzte Veröffentlichungen</p>
-      <p v-if="isFristTimePublication" class="publication-text-body">
+      <p v-if="isFirstTimePublication" class="publication-text-body">
         Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
       </p>
       <div v-else class="flex-col-container email-infos-container">
