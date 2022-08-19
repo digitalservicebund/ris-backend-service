@@ -1,4 +1,4 @@
-import { chromium, expect, firefox } from "@playwright/test"
+import { expect } from "@playwright/test"
 import { navigateToCategories } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
