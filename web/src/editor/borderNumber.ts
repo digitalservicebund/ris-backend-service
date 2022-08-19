@@ -4,7 +4,7 @@ export const BorderNumber = Node.create({
   name: "borderNumber",
   priority: 1000,
   group: "block",
-  content: "border+",
+  content: "borderNumberNumber borderNumberContent",
   parseHTML() {
     return [{ tag: "border-number" }]
   },
@@ -17,7 +17,7 @@ export const BorderNumberNumber = Node.create({
   name: "borderNumberNumber",
   priority: 1000,
   group: "border",
-  content: "inline",
+  content: "inline*",
   parseHTML() {
     return [{ tag: "number" }]
   },
@@ -34,7 +34,7 @@ export const BorderNumberContent = Node.create({
   name: "borderNumberContent",
   priority: 1000,
   group: "border",
-  content: "inline*",
+  content: "block*",
   parseHTML() {
     return [{ tag: "content" }]
   },
