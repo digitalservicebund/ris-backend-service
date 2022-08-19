@@ -16,9 +16,9 @@ import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumber
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableCell;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTableElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTableRowElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTableCellElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.utils.DocxConverter;
@@ -410,12 +410,12 @@ class DocxConverterServiceTest {
     return borderNumber;
   }
 
-  private DocUnitTable generateTable(String text) {
+  private DocUnitTableElement generateTable(String text) {
     List<DocUnitDocx> paragraphElements = List.of(generateText(text));
-    List<DocUnitTableCell> cells = List.of(new DocUnitTableCell(paragraphElements));
-    List<DocUnitTableRow> rows = List.of(new DocUnitTableRow(cells));
+    List<DocUnitTableCellElement> cells = List.of(new DocUnitTableCellElement(paragraphElements));
+    List<DocUnitTableRowElement> rows = List.of(new DocUnitTableRowElement(cells));
 
-    return new DocUnitTable(rows);
+    return new DocUnitTableElement(rows);
   }
 
   private DocUnitDocx generateNumberingListEntry(

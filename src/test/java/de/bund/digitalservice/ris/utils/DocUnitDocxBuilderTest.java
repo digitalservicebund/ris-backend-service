@@ -12,16 +12,8 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import de.bund.digitalservice.ris.TestMemoryAppender;
-import de.bund.digitalservice.ris.domain.docx.DocUnitAnchorImageElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
-import de.bund.digitalservice.ris.domain.docx.DocUnitErrorRunElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitInlineImageElement;
+import de.bund.digitalservice.ris.domain.docx.*;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
-import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.math.BigInteger;
@@ -112,33 +104,33 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setTable(table).build();
 
-    assertTrue(result instanceof DocUnitTable);
-    DocUnitTable tableElement = (DocUnitTable) result;
-    assertEquals(3, tableElement.rows().size());
-    var columns = tableElement.rows().get(0).columns();
-    assertEquals(3, columns.size());
-    assertEquals(1, columns.get(0).paragraphElements().size());
-    assertEquals("<p>cell r1c1</p>", columns.get(0).paragraphElements().get(0).toHtmlString());
-    assertEquals(1, columns.get(1).paragraphElements().size());
-    assertEquals("<p>cell r1c2</p>", columns.get(1).paragraphElements().get(0).toHtmlString());
-    assertEquals(1, columns.get(2).paragraphElements().size());
-    assertEquals("<p>cell r1c3</p>", columns.get(2).paragraphElements().get(0).toHtmlString());
-    columns = tableElement.rows().get(1).columns();
-    assertEquals(3, columns.size());
-    assertEquals(1, columns.get(0).paragraphElements().size());
-    assertEquals("<p>cell r2c1</p>", columns.get(0).paragraphElements().get(0).toHtmlString());
-    assertEquals(1, columns.get(1).paragraphElements().size());
-    assertEquals("<p>cell r2c2</p>", columns.get(1).paragraphElements().get(0).toHtmlString());
-    assertEquals(1, columns.get(2).paragraphElements().size());
-    assertEquals("<p>cell r2c3</p>", columns.get(2).paragraphElements().get(0).toHtmlString());
-    columns = tableElement.rows().get(2).columns();
-    assertEquals(3, columns.size());
-    assertEquals(1, columns.get(0).paragraphElements().size());
-    assertEquals("<p>cell r3c1</p>", columns.get(0).paragraphElements().get(0).toHtmlString());
-    assertEquals(1, columns.get(1).paragraphElements().size());
-    assertEquals("<p>cell r3c2</p>", columns.get(1).paragraphElements().get(0).toHtmlString());
-    assertEquals(1, columns.get(2).paragraphElements().size());
-    assertEquals("<p>cell r3c3</p>", columns.get(2).paragraphElements().get(0).toHtmlString());
+    assertTrue(result instanceof DocUnitTableElement);
+    DocUnitTableElement tableElement = (DocUnitTableElement) result;
+    assertEquals(3, tableElement.rows.size());
+    var cells = tableElement.rows.get(0).cells;
+    assertEquals(3, cells.size());
+    assertEquals(1, cells.get(0).paragraphElements.size());
+    assertEquals("<p>cell r1c1</p>", cells.get(0).paragraphElements.get(0).toHtmlString());
+    assertEquals(1, cells.get(1).paragraphElements.size());
+    assertEquals("<p>cell r1c2</p>", cells.get(1).paragraphElements.get(0).toHtmlString());
+    assertEquals(1, cells.get(2).paragraphElements.size());
+    assertEquals("<p>cell r1c3</p>", cells.get(2).paragraphElements.get(0).toHtmlString());
+    cells = tableElement.rows.get(1).cells;
+    assertEquals(3, cells.size());
+    assertEquals(1, cells.get(0).paragraphElements.size());
+    assertEquals("<p>cell r2c1</p>", cells.get(0).paragraphElements.get(0).toHtmlString());
+    assertEquals(1, cells.get(1).paragraphElements.size());
+    assertEquals("<p>cell r2c2</p>", cells.get(1).paragraphElements.get(0).toHtmlString());
+    assertEquals(1, cells.get(2).paragraphElements.size());
+    assertEquals("<p>cell r2c3</p>", cells.get(2).paragraphElements.get(0).toHtmlString());
+    cells = tableElement.rows.get(2).cells;
+    assertEquals(3, cells.size());
+    assertEquals(1, cells.get(0).paragraphElements.size());
+    assertEquals("<p>cell r3c1</p>", cells.get(0).paragraphElements.get(0).toHtmlString());
+    assertEquals(1, cells.get(1).paragraphElements.size());
+    assertEquals("<p>cell r3c2</p>", cells.get(1).paragraphElements.get(0).toHtmlString());
+    assertEquals(1, cells.get(2).paragraphElements.size());
+    assertEquals("<p>cell r3c3</p>", cells.get(2).paragraphElements.get(0).toHtmlString());
   }
 
   @Test
@@ -149,8 +141,8 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setTable(table).build();
 
-    assertTrue(result instanceof DocUnitTable);
-    assertTrue(((DocUnitTable) result).rows().isEmpty());
+    assertTrue(result instanceof DocUnitTableElement);
+    assertTrue(((DocUnitTableElement) result).rows.isEmpty());
   }
 
   @Test

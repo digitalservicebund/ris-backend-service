@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTableElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Collections;
@@ -30,7 +30,7 @@ class DocxParagraphConverterTest {
 
     var result = converter.convert(tblElement);
 
-    assertTrue(result instanceof DocUnitTable);
+    assertTrue(result instanceof DocUnitTableElement);
   }
 
   @Test

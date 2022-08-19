@@ -2,8 +2,6 @@ package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.*;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableCell;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTable.DocUnitTableRow;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
@@ -656,11 +654,11 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitDocx convertToTable() {
-    return new DocUnitTable(parseTable(table));
+    return new DocUnitTableElement(parseTable(table));
   }
 
-  private List<DocUnitTableRow> parseTable(Tbl table) {
-    List<DocUnitTableRow> rows = new ArrayList<>();
+  private List<DocUnitTableRowElement> parseTable(Tbl table) {
+    List<DocUnitTableRowElement> rows = new ArrayList<>();
 
     table
         .getContent()
@@ -676,8 +674,8 @@ public class DocUnitDocxBuilder {
     return rows;
   }
 
-  private DocUnitTableRow parseTr(Tr tr) {
-    List<DocUnitTableCell> cells = new ArrayList<>();
+  private DocUnitTableRowElement parseTr(Tr tr) {
+    List<DocUnitTableCellElement> cells = new ArrayList<>();
 
     tr.getContent()
         .forEach(
@@ -693,10 +691,10 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    return new DocUnitTableRow(cells);
+    return new DocUnitTableRowElement(cells);
   }
 
-  private DocUnitTableCell parseTc(Tc tc) {
+  private DocUnitTableCellElement parseTc(Tc tc) {
     List<DocUnitDocx> paragraphElements = new ArrayList<>();
 
     tc.getContent()
@@ -709,6 +707,6 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    return new DocUnitTableCell(paragraphElements);
+    return new DocUnitTableCellElement(paragraphElements);
   }
 }
