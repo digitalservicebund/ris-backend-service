@@ -16,9 +16,9 @@ import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumber
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
+import de.bund.digitalservice.ris.domain.docx.DocUnitTableCellElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTableElement;
 import de.bund.digitalservice.ris.domain.docx.DocUnitTableRowElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTableCellElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.utils.DocxConverter;

@@ -13,7 +13,7 @@ public class DocUnitTableCellElement implements DocUnitDocx {
   @Override
   public String toHtmlString() {
     return "<td>"
-            + paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining())
-            + "</td>";
+        + paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining())
+        + "</td>";
   }
 }

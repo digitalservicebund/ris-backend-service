@@ -12,7 +12,7 @@ public class DocUnitTableRowElement implements DocUnitDocx {
 
   public String toHtmlString() {
     return "<tr>"
-            + cells.stream().map(DocUnitTableCellElement::toHtmlString).collect(Collectors.joining())
-            + "</tr>";
+        + cells.stream().map(DocUnitTableCellElement::toHtmlString).collect(Collectors.joining())
+        + "</tr>";
   }
 }
