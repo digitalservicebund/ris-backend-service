@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, toRefs, computed } from "vue"
+import { ref, onMounted, onUnmounted, toRefs } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useScrollToHash } from "../../../../composables/useScrollToHash"
 import DocUnitDetail from "./index.vue"
@@ -80,41 +80,57 @@ const handleScroll = () => {
   const threshold = -40
   element.style.top = (pos < threshold ? threshold : pos) + "px"
 }
-const isMacOS = computed(() => navigator.userAgent.indexOf("Mac") != -1)
-onMounted(async () => {
-  window.addEventListener("scroll", handleScroll)
-  fileAsHTML.value = docUnit.value.s3path
-    ? await fileService.getDocxFileAsHtml(docUnit.value.s3path)
-    : ""
 
-  /** Overwrite ctrl + S to update docunit */
+/** Overwrite ctrl + S to update docunit */
+const updateDocUnitWithShortCut = () => {
   window.addEventListener(
     "keydown",
     (e) => {
-      const isPressCtrlKey = isMacOS.value ? e.metaKey : e.ctrlKey
-      if (!isPressCtrlKey) return
-      if (e.key !== "s") return
-      handleUpdateDocUnit()
-      e.preventDefault()
+      const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
+      if (OS === "Mac") {
+        if (!e.metaKey) return
+        if (e.key !== "s") return
+        handleUpdateDocUnit()
+        e.preventDefault()
+      } else {
+        if (!e.ctrlKey) return
+        if (e.key !== "s") return
+        handleUpdateDocUnit()
+        e.preventDefault()
+      }
     },
     false
   )
+}
 
-  /** Time interval to automatic update docunit every 30sec */
+/** Time interval to automatic update docunit every 30sec */
+/** Only update Docunit when there is any change after 30sec and last update is done */
+const autoUpdate = () => {
   automaticUpload.value = setInterval(() => {
     hasDataChange.value =
       JSON.stringify(docUnit.value) !== lastUpdatedDocUnit.value
-    /** Only update Docunit when there is any change after 30sec and last update is done */
     if (hasDataChange.value && updateStatus.value !== UpdateStatus.ON_UPDATE) {
       handleUpdateDocUnit()
     }
     lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
   }, 30000)
+}
+/** Clear time Interval */
+const removeAutoUpdate = () => {
+  clearInterval(automaticUpload.value)
+}
+
+onMounted(async () => {
+  window.addEventListener("scroll", handleScroll)
+  fileAsHTML.value = docUnit.value.s3path
+    ? await fileService.getDocxFileAsHtml(docUnit.value.s3path)
+    : ""
+  updateDocUnitWithShortCut()
+  autoUpdate()
 })
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll)
-  /** Clear Interval */
-  clearInterval(automaticUpload.value)
+  removeAutoUpdate()
 })
 </script>
 
