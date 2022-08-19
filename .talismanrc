@@ -6,11 +6,11 @@ fileignoreconfig:
   - filename: run.sh
     checksum: 4cd69ceff85e156c77fb77ae2e6b88de9edb5e68c1404b3b60b009ffa3adc14a
   - filename: .github/workflows/pipeline.yml
-    checksum: 8997fa8deac359349e17e96bf710fc8525fa2a9747248fb80e6f3f4e82c9e05a
+    checksum: d8c7c28f8a703e3438060e001404b58964e7983be3668a55e3d56fe409c2aa49
   - filename: .github/workflows/secrets-check.yml
     checksum: d7fbfab653dad354f2854b45545faed3a604e3ba356446e0f92f5889826e4a09
   - filename: .github/workflows/scan.yml
-    checksum: 7c91d3adb6e82aa54cb6419982931cb0d1c4e6865b1459b1ee55a3058652614e
+    checksum: b64bd8828aaf7af38386b867544abfef3e91f59c265ab5097c3130d06b825b0b
   - filename: .github/workflows/playwright-test.yml
     checksum: 0e56d8ddd29e07178752835665b2baa771bfe75de14e164be70989093593943e
   - filename: .github/workflows/playwright.yml
