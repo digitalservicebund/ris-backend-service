@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onMounted, watch, ref } from "vue"
 import TextButton from "./TextButton.vue"
+import { UpdateStatus } from "@/enum/enumUpdateStatus"
 
 const props = defineProps<{
   ariaLabel: string
@@ -31,16 +32,16 @@ const setDefaultStatus = () => {
 }
 const setStatus = () => {
   setDefaultStatus()
-  if (props.updateStatus === 0) {
+  if (props.updateStatus === UpdateStatus.BEFORE_UPDATE) {
     isFristTimeLoad.value = true
     return
   }
-  if (props.updateStatus === 1) {
+  if (props.updateStatus === UpdateStatus.ON_UPDATE) {
     isFristTimeLoad.value = false
     onUpload.value = true
     return
   }
-  if (props.updateStatus === 200) {
+  if (props.updateStatus === UpdateStatus.SUCCEED) {
     isFristTimeLoad.value = false
     updateSucceed.value = true
     lastUpdatedTime.value = getCurrentTime()

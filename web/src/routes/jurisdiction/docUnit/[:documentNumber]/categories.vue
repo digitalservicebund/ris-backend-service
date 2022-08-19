@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, toRefs } from "vue"
+import { ref, onMounted, onUnmounted, toRefs, computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useScrollToHash } from "../../../../composables/useScrollToHash"
 import DocUnitDetail from "./index.vue"
@@ -7,6 +7,7 @@ import DocUnitCoreData from "@/components/DocUnitCoreData.vue"
 import DocUnitTexts from "@/components/DocUnitTexts.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { CoreData, Texts } from "@/domain/docUnit"
+import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import docUnitService from "@/services/docUnitService"
 import fileService from "@/services/fileService"
 
@@ -36,13 +37,13 @@ const handleUpdateValueDocUnitTexts = async (
 }
 
 const handleUpdateDocUnit = async () => {
-  updateStatus.value = 1
+  updateStatus.value = UpdateStatus.ON_UPDATE
   const status = await docUnitService.update(docUnit.value)
   setTimeout(() => {
     hasDataChange.value = false
     lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
     updateStatus.value = status
-    if (updateStatus.value !== 200) return
+    if (updateStatus.value !== UpdateStatus.SUCCEED) return
     if (isShowUpdatePopup.value) {
       alert("Dokumentationseinheit wurde gespeichert")
     }
@@ -53,7 +54,7 @@ const router = useRouter()
 const route = useRoute()
 
 const isShowUpdatePopup = ref(true)
-const updateStatus = ref(0)
+const updateStatus = ref(UpdateStatus.BEFORE_UPDATE)
 const lastUpdatedDocUnit = ref(JSON.stringify(docUnit.value))
 const fileAsHTML = ref("")
 const automaticUpload = ref()
@@ -79,7 +80,7 @@ const handleScroll = () => {
   const threshold = -40
   element.style.top = (pos < threshold ? threshold : pos) + "px"
 }
-
+const isMacOS = computed(() => navigator.userAgent.indexOf("Mac") != -1)
 onMounted(async () => {
   window.addEventListener("scroll", handleScroll)
   fileAsHTML.value = docUnit.value.s3path
@@ -90,8 +91,7 @@ onMounted(async () => {
   window.addEventListener(
     "keydown",
     (e) => {
-      const isPressCtrlKey =
-        navigator.userAgent.indexOf("Mac") != -1 ? e.metaKey : e.ctrlKey
+      const isPressCtrlKey = isMacOS.value ? e.metaKey : e.ctrlKey
       if (!isPressCtrlKey) return
       if (e.key !== "s") return
       handleUpdateDocUnit()
@@ -99,12 +99,13 @@ onMounted(async () => {
     },
     false
   )
+
   /** Time interval to automatic update docunit every 30sec */
   automaticUpload.value = setInterval(() => {
     hasDataChange.value =
       JSON.stringify(docUnit.value) !== lastUpdatedDocUnit.value
     /** Only update Docunit when there is any change after 30sec and last update is done */
-    if (hasDataChange.value && updateStatus.value !== 1) {
+    if (hasDataChange.value && updateStatus.value !== UpdateStatus.ON_UPDATE) {
       handleUpdateDocUnit()
     }
     lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
