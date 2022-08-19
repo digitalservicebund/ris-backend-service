@@ -90,14 +90,12 @@ onMounted(async () => {
   window.addEventListener(
     "keydown",
     (e) => {
-      if (
-        (navigator.userAgent.indexOf("Mac") != -1 ? e.metaKey : e.ctrlKey) &&
-        e.key === "s"
-      ) {
-        handleUpdateDocUnit()
-        e.preventDefault()
-      }
-      return
+      const isPressCtrlKey =
+        navigator.userAgent.indexOf("Mac") != -1 ? e.metaKey : e.ctrlKey
+      if (!isPressCtrlKey) return
+      if (e.key !== "s") return
+      handleUpdateDocUnit()
+      e.preventDefault()
     },
     false
   )
