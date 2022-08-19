@@ -37,9 +37,13 @@ const loadEmailToJurisInfos = (publishedXML: {
   issues.value = hasValidationError.value ? publishedXML.statusMessages : []
   if (!hasValidationError.value) {
     lastPublicationDate.value = formatDate(publishedXML.publishDate)
+    console.log(new Date(publishedXML.publishDate))
+    console.log(new Date(publishedXML.publishDate).getMonth())
     emailSubject.value = publishedXML.mailSubject
     receiverEmail.value = "dokmbx@juris.de"
-    xml.value = publishedXML.xml ? publishedXML.xml.replace(/(  )/g, "") : ""
+    xml.value = publishedXML.xml
+      ? publishedXML.xml.replace(/[ \t]{2,}/g, "")
+      : ""
     isFirstTimePublication.value = !(xml.value !== null && xml.value.length > 0)
   }
 }
@@ -47,7 +51,7 @@ const loadEmailToJurisInfos = (publishedXML: {
 const formatDate = (date: string): string => {
   const publicationDate = new Date(date)
   const fullYear = publicationDate.getFullYear()
-  const fullMonth = ("0" + publicationDate.getMonth()).slice(-2)
+  const fullMonth = ("0" + (publicationDate.getMonth() + 1)).slice(-2)
   const fullDate = ("0" + publicationDate.getDate()).slice(-2)
   const fullHour = ("0" + publicationDate.getHours()).slice(-2)
   const fullMinute = ("0" + publicationDate.getMinutes()).slice(-2)

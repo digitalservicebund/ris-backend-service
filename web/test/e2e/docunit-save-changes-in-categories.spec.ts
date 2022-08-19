@@ -13,10 +13,6 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-    await page.once("dialog", async (dialog) => {
-      expect(dialog.message()).toBe("Dokumentationseinheit wurde gespeichert")
-      await dialog.accept()
-    })
 
     if (browserName === "firefox") {
       await page.waitForTimeout(500)
