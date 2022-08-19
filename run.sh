@@ -111,14 +111,14 @@ _clean_staging() {
   endpoint="https://${STAGING_URL#"https://"}/api/v1/docunits/"
   regex="\"uuid\":\"[a-z0-9-]\{36\}\""
 
-  docUnits=$(echo $(curl -s $endpoint -u $STAGING_USER:$STAGING_PASSWORD) \
-    | grep -o $regex \
+  docUnits=$(curl -s "$endpoint" -u "$STAGING_USER":"$STAGING_PASSWORD" \
+    | grep -o "$regex" \
     | sed "s/\"uuid\":\"//g" \
     | sed "s/\"//g")
 
   n_deleted=0
   for docUnit in $docUnits; do
-    curl -X DELETE $endpoint$docUnit -u $STAGING_USER:$STAGING_PASSWORD
+    curl -X DELETE "$endpoint""$docUnit" -u "$STAGING_USER":"$STAGING_PASSWORD"
     n_deleted=$((n_deleted + 1))
   done
 
