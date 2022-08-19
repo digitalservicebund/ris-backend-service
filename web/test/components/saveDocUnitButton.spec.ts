@@ -49,7 +49,7 @@ describe("SaveDocUnitButton", () => {
         updateStatus: 200,
       },
     })
-    const label = getByText("Zuletzt gespeichert um")
+    const label = getByText("Zuletzt gespeichert um", { exact: false })
     expect(label.firstElementChild?.className).toEqual("on-succeed")
   })
 })

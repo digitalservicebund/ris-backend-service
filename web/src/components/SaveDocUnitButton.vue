@@ -13,21 +13,19 @@ const emit = defineEmits<{
 const isFristTimeLoad = ref(false)
 const onUpload = ref(false)
 const updateSucceed = ref(true)
-const lastUpdate = ref(false)
 const hasUpdateError = ref(false)
 const lastUpdatedTime = ref("")
 const getCurrentTime = () => {
   const uploadTime = new Date()
   const fullHour = ("0" + uploadTime.getHours()).slice(-2)
   const fullMinute = ("0" + uploadTime.getMinutes()).slice(-2)
-  return `${fullHour}: ${fullMinute} Uhr`
+  return `${fullHour}: ${fullMinute}`
 }
 
 const setDefaultStatus = () => {
   isFristTimeLoad.value = false
   onUpload.value = false
   updateSucceed.value = false
-  lastUpdate.value = false
   hasUpdateError.value = false
 }
 const setStatus = () => {
@@ -45,10 +43,6 @@ const setStatus = () => {
     isFristTimeLoad.value = false
     updateSucceed.value = true
     lastUpdatedTime.value = getCurrentTime()
-    setTimeout(() => {
-      updateSucceed.value = false
-      lastUpdate.value = true
-    }, 10000)
     return
   }
   isFristTimeLoad.value = false
@@ -88,12 +82,7 @@ onMounted(() => {
       <div v-if="updateSucceed">
         <p class="status-text">
           Zuletzt gespeichert um
-          <span class="on-succeed">{{ lastUpdatedTime }}</span>
-        </p>
-      </div>
-      <div v-if="lastUpdate">
-        <p class="status-text">
-          Zuletzt gespeichert um <span>{{ lastUpdatedTime }}</span>
+          <span class="on-succeed">{{ lastUpdatedTime }}</span> Uhr
         </p>
       </div>
     </div>
@@ -132,7 +121,17 @@ onMounted(() => {
       line-height: 22px;
     }
     .on-succeed {
+      animation: textFaded;
+      animation-duration: 10s;
+      animation-timing-function: ease-in;
+    }
+  }
+  @keyframes textFaded {
+    from {
       font-size: 16px;
+    }
+    to {
+      font-size: 14px;
     }
   }
 }
