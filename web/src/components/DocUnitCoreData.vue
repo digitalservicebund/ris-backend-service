@@ -99,6 +99,16 @@ const updateValue = (event: Event, index: number) => {
 
 <style lang="scss">
 .ris-form {
+  input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px white inset;
+    box-shadow: 0 0 0 50px white inset;
+    -webkit-text-fill-color: $black;
+  }
+  input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px white inset;
+    box-shadow: 0 0 0 50px white inset;
+    -webkit-text-fill-color: $black;
+  }
   padding: rem(20px);
 
   &__textfield {
