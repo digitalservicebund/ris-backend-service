@@ -1,5 +1,6 @@
 import DocUnit from "../domain/docUnit"
 import api from "./api"
+import { UpdateStatus } from "@/enum/enumUpdateStatus"
 
 export default {
   async getAll(): Promise<DocUnit[]> {
@@ -55,7 +56,7 @@ export default {
       )
       return response.status
     } catch (error) {
-      throw new Error(`Could not update docUnit: ${error}`)
+      return UpdateStatus.ERROR
     }
   },
 

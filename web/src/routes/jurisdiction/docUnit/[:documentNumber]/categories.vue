@@ -44,16 +44,11 @@ const handleUpdateDocUnit = async () => {
     lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
     updateStatus.value = status
     if (updateStatus.value !== UpdateStatus.SUCCEED) return
-    if (isShowUpdatePopup.value) {
-      alert("Dokumentationseinheit wurde gespeichert")
-    }
-    isShowUpdatePopup.value = false
   }, 3000)
 }
 const router = useRouter()
 const route = useRoute()
 
-const isShowUpdatePopup = ref(true)
 const updateStatus = ref(UpdateStatus.BEFORE_UPDATE)
 const lastUpdatedDocUnit = ref(JSON.stringify(docUnit.value))
 const fileAsHTML = ref("")
@@ -82,25 +77,19 @@ const handleScroll = () => {
 }
 
 /** Overwrite ctrl + S to update docunit */
-const updateDocUnitWithShortCut = () => {
-  window.addEventListener(
-    "keydown",
-    (e) => {
-      const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
-      if (OS === "Mac") {
-        if (!e.metaKey) return
-        if (e.key !== "s") return
-        handleUpdateDocUnit()
-        e.preventDefault()
-      } else {
-        if (!e.ctrlKey) return
-        if (e.key !== "s") return
-        handleUpdateDocUnit()
-        e.preventDefault()
-      }
-    },
-    false
-  )
+const handleUpdateDocUnitWithShortCut = (event: KeyboardEvent) => {
+  const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
+  if (OS === "Mac") {
+    if (!event.metaKey) return
+    if (event.key !== "s") return
+    handleUpdateDocUnit()
+    event.preventDefault()
+  } else {
+    if (!event.ctrlKey) return
+    if (event.key !== "s") return
+    handleUpdateDocUnit()
+    event.preventDefault()
+  }
 }
 
 /** Time interval to automatic update docunit every 30sec */
@@ -122,14 +111,15 @@ const removeAutoUpdate = () => {
 
 onMounted(async () => {
   window.addEventListener("scroll", handleScroll)
+  window.addEventListener("keydown", handleUpdateDocUnitWithShortCut, false)
   fileAsHTML.value = docUnit.value.s3path
     ? await fileService.getDocxFileAsHtml(docUnit.value.s3path)
     : ""
-  updateDocUnitWithShortCut()
   autoUpdate()
 })
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll)
+  window.removeEventListener("keydown", handleUpdateDocUnitWithShortCut)
   removeAutoUpdate()
 })
 </script>

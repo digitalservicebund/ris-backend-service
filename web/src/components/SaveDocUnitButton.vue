@@ -30,23 +30,30 @@ const setDefaultStatus = () => {
 }
 const setStatus = () => {
   setDefaultStatus()
-  if (props.updateStatus === UpdateStatus.BEFORE_UPDATE) {
-    isFristTimeLoad.value = true
-    return
+  switch (props.updateStatus) {
+    case UpdateStatus.BEFORE_UPDATE: {
+      isFristTimeLoad.value = true
+      return
+    }
+    case UpdateStatus.ON_UPDATE: {
+      isFristTimeLoad.value = false
+      onUpload.value = true
+      return
+    }
+    case UpdateStatus.SUCCEED: {
+      isFristTimeLoad.value = false
+      updateSucceed.value = true
+      lastUpdatedTime.value = getCurrentTime()
+      return
+    }
+    case UpdateStatus.ERROR: {
+      isFristTimeLoad.value = false
+      hasUpdateError.value = true
+      return
+    }
+    default:
+      return
   }
-  if (props.updateStatus === UpdateStatus.ON_UPDATE) {
-    isFristTimeLoad.value = false
-    onUpload.value = true
-    return
-  }
-  if (props.updateStatus === UpdateStatus.SUCCEED) {
-    isFristTimeLoad.value = false
-    updateSucceed.value = true
-    lastUpdatedTime.value = getCurrentTime()
-    return
-  }
-  isFristTimeLoad.value = false
-  hasUpdateError.value = true
 }
 
 const handleUpdateDocUnit = () => {
@@ -77,7 +84,7 @@ onMounted(() => {
         <div class="icon">
           <span class="material-icons" style="color: red"> error_outline </span>
         </div>
-        <p class="error">Fehler beim Speichern</p>
+        <p class="error-text">Fehler beim Speichern</p>
       </div>
       <div v-if="updateSucceed">
         <p class="status-text">
@@ -116,7 +123,7 @@ onMounted(() => {
       font-size: 14px;
       line-height: 18px;
     }
-    .error {
+    .error-text {
       font-size: 16px;
       line-height: 22px;
     }
