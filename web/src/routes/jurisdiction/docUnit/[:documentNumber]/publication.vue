@@ -37,8 +37,6 @@ const loadEmailToJurisInfos = (publishedXML: {
   issues.value = hasValidationError.value ? publishedXML.statusMessages : []
   if (!hasValidationError.value) {
     lastPublicationDate.value = formatDate(publishedXML.publishDate)
-    console.log(new Date(publishedXML.publishDate))
-    console.log(new Date(publishedXML.publishDate).getMonth())
     emailSubject.value = publishedXML.mailSubject
     receiverEmail.value = "dokmbx@juris.de"
     xml.value = publishedXML.xml
