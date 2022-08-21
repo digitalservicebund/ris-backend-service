@@ -129,7 +129,7 @@ class DocUnitDocxBuilderTest {
   @Test
   void testBuild_withTableAndBorderColor() {
     CTBorder ctBorder = new CTBorder();
-    ctBorder.setColor("green");
+    ctBorder.setColor("a64d79");
     ctBorder.setSz(BigInteger.valueOf(1));
     TblBorders borders = new TblBorders();
     borders.setTop(ctBorder);
@@ -140,7 +140,7 @@ class DocUnitDocxBuilderTest {
 
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     var result = builder.setTable(table).build();
-    assertTrue(result.toHtmlString().contains("border-color: green;"));
+    assertTrue(result.toHtmlString().contains("border-color: #a64d79;"));
   }
 
   @Test

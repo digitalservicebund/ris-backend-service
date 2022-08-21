@@ -15,7 +15,11 @@ public class DocUnitTableElement implements DocUnitDocx {
   }
 
   public void setBorderColor(String color) {
-    this.borderColor = color;
+    if (color.matches("^[0-9a-z]{6}$")) {
+      this.borderColor = "#" + color;
+    } else {
+      this.borderColor = color;
+    }
   }
 
   public void setBorderWidth(Integer width) {
