@@ -34,29 +34,10 @@ import org.docx4j.dml.wordprocessingDrawing.STAlignH;
 import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
-import org.docx4j.wml.BooleanDefaultTrue;
-import org.docx4j.wml.CTVerticalAlignRun;
-import org.docx4j.wml.Drawing;
-import org.docx4j.wml.HpsMeasure;
-import org.docx4j.wml.Jc;
-import org.docx4j.wml.JcEnumeration;
-import org.docx4j.wml.NumberFormat;
-import org.docx4j.wml.P;
-import org.docx4j.wml.PPr;
-import org.docx4j.wml.PPrBase;
+import org.docx4j.wml.*;
 import org.docx4j.wml.PPrBase.NumPr;
 import org.docx4j.wml.PPrBase.NumPr.Ilvl;
 import org.docx4j.wml.PPrBase.NumPr.NumId;
-import org.docx4j.wml.ParaRPr;
-import org.docx4j.wml.R;
-import org.docx4j.wml.RPr;
-import org.docx4j.wml.STVerticalAlignRun;
-import org.docx4j.wml.Tbl;
-import org.docx4j.wml.Tc;
-import org.docx4j.wml.Text;
-import org.docx4j.wml.Tr;
-import org.docx4j.wml.U;
-import org.docx4j.wml.UnderlineEnumeration;
 import org.junit.jupiter.api.Test;
 import org.slf4j.LoggerFactory;
 
@@ -143,6 +124,57 @@ class DocUnitDocxBuilderTest {
 
     assertTrue(result instanceof DocUnitTableElement);
     assertTrue(((DocUnitTableElement) result).rows.isEmpty());
+  }
+
+  @Test
+  void testBuild_withTableAndBorderColor() {
+    CTBorder ctBorder = new CTBorder();
+    ctBorder.setColor("green");
+    ctBorder.setSz(BigInteger.valueOf(1));
+    TblBorders borders = new TblBorders();
+    borders.setTop(ctBorder);
+    TblPr tblPr = new TblPr();
+    tblPr.setTblBorders(borders);
+    Tbl table = new Tbl();
+    table.setTblPr(tblPr);
+
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    var result = builder.setTable(table).build();
+    assertTrue(result.toHtmlString().contains("border-color: green;"));
+  }
+
+  @Test
+  void testBuild_withTableAndBorderWidth() {
+    CTBorder ctBorder = new CTBorder();
+    ctBorder.setColor("green");
+    ctBorder.setSz(BigInteger.valueOf(1));
+    TblBorders borders = new TblBorders();
+    borders.setTop(ctBorder);
+    TblPr tblPr = new TblPr();
+    tblPr.setTblBorders(borders);
+    Tbl table = new Tbl();
+    table.setTblPr(tblPr);
+
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    var result = builder.setTable(table).build();
+    assertTrue(result.toHtmlString().contains("border-width: 1px;"));
+  }
+
+  @Test
+  void testBuild_withTableAndBorderStyle() {
+    CTBorder ctBorder = new CTBorder();
+    ctBorder.setColor("green");
+    ctBorder.setSz(BigInteger.valueOf(1));
+    TblBorders borders = new TblBorders();
+    borders.setTop(ctBorder);
+    TblPr tblPr = new TblPr();
+    tblPr.setTblBorders(borders);
+    Tbl table = new Tbl();
+    table.setTblPr(tblPr);
+
+    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
+    var result = builder.setTable(table).build();
+    assertTrue(result.toHtmlString().contains("border-style: solid;"));
   }
 
   @Test

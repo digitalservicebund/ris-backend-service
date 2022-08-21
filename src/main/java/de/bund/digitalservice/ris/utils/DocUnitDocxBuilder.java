@@ -653,8 +653,19 @@ public class DocUnitDocxBuilder {
     return table != null;
   }
 
+  private void addTableStyle(DocUnitTableElement tableElement, TblPr tblPr) {
+    if (tblPr == null) return;
+
+    tableElement.setBorderColor(tblPr.getTblBorders().getTop().getColor());
+    tableElement.setBorderWidth(tblPr.getTblBorders().getTop().getSz().intValue());
+    tableElement.setBorderStyle("solid");
+  }
+
   private DocUnitDocx convertToTable() {
-    return new DocUnitTableElement(parseTable(table));
+    var tableElement = new DocUnitTableElement(parseTable(table));
+    addTableStyle(tableElement, table.getTblPr());
+
+    return tableElement;
   }
 
   private List<DocUnitTableRowElement> parseTable(Tbl table) {
