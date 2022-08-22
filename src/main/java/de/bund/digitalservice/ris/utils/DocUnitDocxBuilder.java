@@ -6,11 +6,7 @@ import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.docx4j.dml.CTNonVisualDrawingProps;
 import org.docx4j.dml.CTPositiveSize2D;
@@ -656,9 +652,24 @@ public class DocUnitDocxBuilder {
   private void addTableStyle(DocUnitTableElement tableElement, TblPr tblPr) {
     if (tblPr == null) return;
 
-    tableElement.setBorderColor(tblPr.getTblBorders().getTop().getColor());
+    tableElement.setBorderColor(getBorderColor(tblPr));
     tableElement.setBorderWidth(tblPr.getTblBorders().getTop().getSz().intValue());
     tableElement.setBorderStyle("solid");
+  }
+
+  private String getBorderColor(TblPr tblPr) {
+    TblBorders borders = tblPr.getTblBorders();
+
+    List<String> colors = new ArrayList<>();
+    if (borders.getTop() != null) colors.add(borders.getTop().getColor());
+    if (borders.getRight() != null) colors.add(borders.getRight().getColor());
+    if (borders.getBottom() != null) colors.add(borders.getBottom().getColor());
+    if (borders.getLeft() != null) colors.add(borders.getLeft().getColor());
+
+    if (new HashSet<>(colors).size() > 1)
+      LOGGER.info("not all border colors are equal: {}", colors.toString());
+
+    return colors.get(0);
   }
 
   private DocUnitDocx convertToTable() {
