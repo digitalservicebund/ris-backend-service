@@ -54,7 +54,7 @@ const updateValue = (event: Event, index: number) => {
                   type="text"
                   :name="item.name"
                   :aria-label="item.aria"
-                  @change="updateValue($event, index)"
+                  @input="updateValue($event, index)"
                 />
               </label>
             </div>
@@ -75,7 +75,7 @@ const updateValue = (event: Event, index: number) => {
                   type="text"
                   :name="item.name"
                   :aria-label="item.aria"
-                  @change="updateValue($event, index)"
+                  @input="updateValue($event, index)"
                 />
               </label>
             </div>

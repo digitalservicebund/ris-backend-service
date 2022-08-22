@@ -44,7 +44,7 @@ const handleUpdateDocUnit = async () => {
     lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
     updateStatus.value = status
     if (updateStatus.value !== UpdateStatus.SUCCEED) return
-  }, 3000)
+  }, 1000)
 }
 const router = useRouter()
 const route = useRoute()
@@ -57,6 +57,7 @@ const hasDataChange = ref(false)
 const showDocPanel = ref(useRoute().query.showDocPanel === "true")
 const handleToggleFilePanel = async () => {
   showDocPanel.value = !showDocPanel.value
+  getOrignalDocUnit()
   await router.push({
     ...route,
     query: { ...route.query, showDocPanel: String(showDocPanel.value) },
@@ -74,6 +75,13 @@ const handleScroll = () => {
   const pos = originalOdocPanelYPos - window.scrollY
   const threshold = -40
   element.style.top = (pos < threshold ? threshold : pos) + "px"
+}
+
+const getOrignalDocUnit = async () => {
+  if (fileAsHTML.value.length > 0) return
+  fileAsHTML.value = docUnit.value.s3path
+    ? await fileService.getDocxFileAsHtml(docUnit.value.s3path)
+    : ""
 }
 
 /** Overwrite ctrl + S to update docunit */
@@ -112,10 +120,8 @@ const removeAutoUpdate = () => {
 onMounted(async () => {
   window.addEventListener("scroll", handleScroll)
   window.addEventListener("keydown", handleUpdateDocUnitWithShortCut, false)
-  fileAsHTML.value = docUnit.value.s3path
-    ? await fileService.getDocxFileAsHtml(docUnit.value.s3path)
-    : ""
   autoUpdate()
+  getOrignalDocUnit()
 })
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll)

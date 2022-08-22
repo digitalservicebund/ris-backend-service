@@ -17,7 +17,7 @@ test("test save button status change", async ({ page }) => {
   expect(coreDataSaveButtonStatus).toBeVisible()
   expect(textSaveButtonStatus).toBeVisible()
 
-  await page.waitForTimeout(3000)
+  await page.waitForTimeout(1000)
   coreDataSaveButtonStatus = await page
     .locator("text='Zuletzt gespeichert um'")
     .nth(0)
@@ -51,7 +51,7 @@ test("test could not update docunit", async ({ page }) => {
   expect(coreDataSaveButtonStatus).toBeVisible()
   expect(textSaveButtonStatus).toBeVisible()
 
-  await page.waitForTimeout(3000)
+  await page.waitForTimeout(1000)
   coreDataSaveButtonStatus = await page
     .locator("text='Fehler beim Speichern'")
     .nth(0)
@@ -77,7 +77,7 @@ test("test automatic save docunit", async ({ page, editorField }) => {
   expect(coreDataSaveButtonStatus).toBeVisible()
   expect(textSaveButtonStatus).toBeVisible()
 
-  await page.waitForTimeout(3000)
+  await page.waitForTimeout(1000)
   coreDataSaveButtonStatus = await page
     .locator("text='Zuletzt gespeichert um'")
     .nth(0)

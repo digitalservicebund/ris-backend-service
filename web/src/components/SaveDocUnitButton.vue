@@ -46,12 +46,9 @@ const setStatus = () => {
       lastUpdatedTime.value = getCurrentTime()
       return
     }
-    case UpdateStatus.ERROR: {
+    default:
       isFristTimeLoad.value = false
       hasUpdateError.value = true
-      return
-    }
-    default:
       return
   }
 }
@@ -128,9 +125,13 @@ onMounted(() => {
       line-height: 22px;
     }
     .on-succeed {
+      font-size: 16px;
       animation: textFaded;
-      animation-duration: 10s;
+      animation-delay: 1s;
+      animation-duration: 2s;
       animation-timing-function: ease-in;
+      -webkit-animation-fill-mode: forwards;
+      animation-fill-mode: forwards;
     }
   }
   @keyframes textFaded {
