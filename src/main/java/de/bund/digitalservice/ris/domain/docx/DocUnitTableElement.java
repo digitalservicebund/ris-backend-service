@@ -43,15 +43,12 @@ public class DocUnitTableElement implements DocUnitDocx {
   }
 
   void addStyle(StringBuilder sb) {
-    sb.append(" style=\"");
-
     if (hasBorder()) {
       sb.append("border: ");
       sb.append(borderWidth).append("px ");
       sb.append(borderStyle).append(" ");
       sb.append(borderColor).append("; ");
     }
-    sb.append("\"");
   }
 
   private boolean hasStyle() {
@@ -68,13 +65,13 @@ public class DocUnitTableElement implements DocUnitDocx {
   @Override
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("<table");
+    sb.append("<table style=\"border-collapse: collapse;");
 
     if (hasStyle()) {
       addStyle(sb);
     }
 
-    sb.append(">");
+    sb.append("\">");
     sb.append(
         rows.stream().map(DocUnitTableRowElement::toHtmlString).collect(Collectors.joining()));
     sb.append("</table>");

@@ -705,7 +705,16 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitDocx convertToTable() {
-    var tableElement = new DocUnitTableElement(parseTable(table));
+    var rows = parseTable(table);
+    if (table.getTblPr() != null) {
+      rows.forEach(
+          row -> {
+            row.setBorderColor(getBorderColor(table.getTblPr()));
+            row.setBorderWidth(getBorderWidth(table.getTblPr()));
+            row.setBorderStyle(getBorderStyle(table.getTblPr()));
+          });
+    }
+    var tableElement = new DocUnitTableElement(rows);
     addTableStyle(tableElement, table.getTblPr());
 
     return tableElement;
@@ -744,6 +753,15 @@ public class DocUnitDocxBuilder {
                 LOGGER.error("unknown tr element: {}", element.getClass());
               }
             });
+
+    if (table.getTblPr() != null) {
+      cells.forEach(
+          cell -> {
+            cell.setBorderColor(getBorderColor(table.getTblPr()));
+            cell.setBorderWidth(getBorderWidth(table.getTblPr()));
+            cell.setBorderStyle(getBorderStyle(table.getTblPr()));
+          });
+    }
 
     return new DocUnitTableRowElement(cells);
   }
