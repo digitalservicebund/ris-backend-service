@@ -652,9 +652,11 @@ public class DocUnitDocxBuilder {
   private void addTableStyle(DocUnitTableElement tableElement, TblPr tblPr) {
     if (tblPr == null) return;
 
-    tableElement.setBorderColor(getBorderColor(tblPr));
-    tableElement.setBorderWidth(getBorderWidth(tblPr));
-    tableElement.setBorderStyle("solid");
+    if (tblPr.getTblBorders() != null) {
+      tableElement.setBorderColor(getBorderColor(tblPr));
+      tableElement.setBorderWidth(getBorderWidth(tblPr));
+      tableElement.setBorderStyle(getBorderStyle(tblPr));
+    }
   }
 
   private String getBorderColor(TblPr tblPr) {
@@ -667,7 +669,7 @@ public class DocUnitDocxBuilder {
     if (borders.getLeft() != null) colors.add(borders.getLeft().getColor());
 
     if (new HashSet<>(colors).size() > 1)
-      LOGGER.info("not all border colors are equal: {}", colors.toString());
+      LOGGER.info("not all table border colors are equal: {}", colors.toString());
 
     return colors.get(0);
   }
@@ -682,9 +684,24 @@ public class DocUnitDocxBuilder {
     if (borders.getLeft() != null) widths.add(borders.getLeft().getSz().intValue());
 
     if (new HashSet<>(widths).size() > 1)
-      LOGGER.info("not all border sizes are equal: {}", widths.toString());
+      LOGGER.info("not all table border sizes are equal: {}", widths.toString());
 
     return widths.get(0) / 8;
+  }
+
+  private String getBorderStyle(TblPr tblPr) {
+    TblBorders borders = tblPr.getTblBorders();
+
+    List<STBorder> styles = new ArrayList<>();
+    if (borders.getTop() != null) styles.add(borders.getTop().getVal());
+    if (borders.getRight() != null) styles.add(borders.getRight().getVal());
+    if (borders.getBottom() != null) styles.add(borders.getBottom().getVal());
+    if (borders.getLeft() != null) styles.add(borders.getLeft().getVal());
+
+    if (!styles.stream().allMatch(style -> style.equals(STBorder.SINGLE)))
+      LOGGER.error("unsupported table border style.");
+
+    return "solid";
   }
 
   private DocUnitDocx convertToTable() {

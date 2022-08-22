@@ -129,10 +129,14 @@ class DocUnitDocxBuilderTest {
   @Test
   void testBuild_withTableAndBorderColor() {
     CTBorder ctBorder = new CTBorder();
+    ctBorder.setVal(STBorder.SINGLE);
     ctBorder.setColor("a64d79");
     ctBorder.setSz(BigInteger.valueOf(1));
     TblBorders borders = new TblBorders();
     borders.setTop(ctBorder);
+    borders.setRight(ctBorder);
+    borders.setBottom(ctBorder);
+    borders.setLeft(ctBorder);
     TblPr tblPr = new TblPr();
     tblPr.setTblBorders(borders);
     Tbl table = new Tbl();
@@ -146,10 +150,14 @@ class DocUnitDocxBuilderTest {
   @Test
   void testBuild_withTableAndBorderWidth() {
     CTBorder ctBorder = new CTBorder();
+    ctBorder.setVal(STBorder.SINGLE);
     ctBorder.setColor("green");
     ctBorder.setSz(BigInteger.valueOf(24));
     TblBorders borders = new TblBorders();
     borders.setTop(ctBorder);
+    borders.setRight(ctBorder);
+    borders.setBottom(ctBorder);
+    borders.setLeft(ctBorder);
     TblPr tblPr = new TblPr();
     tblPr.setTblBorders(borders);
     Tbl table = new Tbl();
@@ -163,10 +171,14 @@ class DocUnitDocxBuilderTest {
   @Test
   void testBuild_withTableAndBorderStyle() {
     CTBorder ctBorder = new CTBorder();
+    ctBorder.setVal(STBorder.SINGLE);
     ctBorder.setColor("green");
     ctBorder.setSz(BigInteger.valueOf(1));
     TblBorders borders = new TblBorders();
     borders.setTop(ctBorder);
+    borders.setRight(ctBorder);
+    borders.setBottom(ctBorder);
+    borders.setLeft(ctBorder);
     TblPr tblPr = new TblPr();
     tblPr.setTblBorders(borders);
     Tbl table = new Tbl();
