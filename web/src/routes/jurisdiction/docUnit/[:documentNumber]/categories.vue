@@ -49,6 +49,7 @@ const handleUpdateDocUnit = async () => {
 const router = useRouter()
 const route = useRoute()
 
+const isOnline = ref(navigator.onLine)
 const updateStatus = ref(UpdateStatus.BEFORE_UPDATE)
 const lastUpdatedDocUnit = ref(JSON.stringify(docUnit.value))
 const fileAsHTML = ref("")
@@ -106,10 +107,22 @@ const autoUpdate = () => {
   automaticUpload.value = setInterval(() => {
     hasDataChange.value =
       JSON.stringify(docUnit.value) !== lastUpdatedDocUnit.value
-    if (hasDataChange.value && updateStatus.value !== UpdateStatus.ON_UPDATE) {
+    if (
+      isOnline.value &&
+      hasDataChange.value &&
+      updateStatus.value !== UpdateStatus.ON_UPDATE
+    ) {
       handleUpdateDocUnit()
     }
     lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)
+    /** Offline mode */
+    if (isOnline.value && !navigator.onLine) {
+      isOnline.value = false
+    }
+    if (!isOnline.value && navigator.onLine) {
+      isOnline.value = true
+      handleUpdateDocUnit()
+    }
   }, 30000)
 }
 /** Clear time Interval */
