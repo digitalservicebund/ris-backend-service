@@ -147,7 +147,7 @@ class DocUnitDocxBuilderTest {
   void testBuild_withTableAndBorderWidth() {
     CTBorder ctBorder = new CTBorder();
     ctBorder.setColor("green");
-    ctBorder.setSz(BigInteger.valueOf(1));
+    ctBorder.setSz(BigInteger.valueOf(24));
     TblBorders borders = new TblBorders();
     borders.setTop(ctBorder);
     TblPr tblPr = new TblPr();
@@ -157,7 +157,7 @@ class DocUnitDocxBuilderTest {
 
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     var result = builder.setTable(table).build();
-    assertTrue(result.toHtmlString().contains("border-width: 1px;"));
+    assertTrue(result.toHtmlString().contains("border-width: 3px;"));
   }
 
   @Test

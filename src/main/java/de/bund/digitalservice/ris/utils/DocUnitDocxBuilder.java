@@ -653,7 +653,7 @@ public class DocUnitDocxBuilder {
     if (tblPr == null) return;
 
     tableElement.setBorderColor(getBorderColor(tblPr));
-    tableElement.setBorderWidth(tblPr.getTblBorders().getTop().getSz().intValue());
+    tableElement.setBorderWidth(getBorderWidth(tblPr));
     tableElement.setBorderStyle("solid");
   }
 
@@ -670,6 +670,21 @@ public class DocUnitDocxBuilder {
       LOGGER.info("not all border colors are equal: {}", colors.toString());
 
     return colors.get(0);
+  }
+
+  private Integer getBorderWidth(TblPr tblPr) {
+    TblBorders borders = tblPr.getTblBorders();
+
+    List<Integer> widths = new ArrayList<>();
+    if (borders.getTop() != null) widths.add(borders.getTop().getSz().intValue());
+    if (borders.getRight() != null) widths.add(borders.getRight().getSz().intValue());
+    if (borders.getBottom() != null) widths.add(borders.getBottom().getSz().intValue());
+    if (borders.getLeft() != null) widths.add(borders.getLeft().getSz().intValue());
+
+    if (new HashSet<>(widths).size() > 1)
+      LOGGER.info("not all border sizes are equal: {}", widths.toString());
+
+    return widths.get(0) / 8;
   }
 
   private DocUnitDocx convertToTable() {
