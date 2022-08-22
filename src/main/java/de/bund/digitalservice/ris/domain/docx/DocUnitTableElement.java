@@ -44,22 +44,25 @@ public class DocUnitTableElement implements DocUnitDocx {
 
   void addStyle(StringBuilder sb) {
     sb.append(" style=\"");
-    if (borderColor != null) {
-      sb.append("border-color: ").append(borderColor).append("; ");
-    }
-    if (borderWidth != null) {
-      sb.append("border-width: ").append(borderWidth).append("px; ");
-    }
-    if (borderStyle != null) {
-      sb.append("border-style: ").append(borderStyle).append(";");
+
+    if (hasBorder()) {
+      sb.append("border: ");
+      sb.append(borderWidth).append("px ");
+      sb.append(borderStyle).append(" ");
+      sb.append(borderColor).append("; ");
     }
     sb.append("\"");
   }
 
   private boolean hasStyle() {
-    var hasStyle = borderColor != null;
-    hasStyle |= borderWidth != null;
-    return hasStyle;
+    return hasBorder();
+  }
+
+  private boolean hasBorder() {
+    var hasBorder = borderColor != null;
+    hasBorder &= borderWidth != null;
+    hasBorder &= borderStyle != null;
+    return hasBorder;
   }
 
   @Override

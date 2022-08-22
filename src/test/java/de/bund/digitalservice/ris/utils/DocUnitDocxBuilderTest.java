@@ -127,31 +127,10 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTableAndBorderColor() {
+  void testBuild_withTableBorder() {
     CTBorder ctBorder = new CTBorder();
     ctBorder.setVal(STBorder.SINGLE);
     ctBorder.setColor("a64d79");
-    ctBorder.setSz(BigInteger.valueOf(1));
-    TblBorders borders = new TblBorders();
-    borders.setTop(ctBorder);
-    borders.setRight(ctBorder);
-    borders.setBottom(ctBorder);
-    borders.setLeft(ctBorder);
-    TblPr tblPr = new TblPr();
-    tblPr.setTblBorders(borders);
-    Tbl table = new Tbl();
-    table.setTblPr(tblPr);
-
-    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
-    var result = builder.setTable(table).build();
-    assertTrue(result.toHtmlString().contains("border-color: #a64d79;"));
-  }
-
-  @Test
-  void testBuild_withTableAndBorderWidth() {
-    CTBorder ctBorder = new CTBorder();
-    ctBorder.setVal(STBorder.SINGLE);
-    ctBorder.setColor("green");
     ctBorder.setSz(BigInteger.valueOf(24));
     TblBorders borders = new TblBorders();
     borders.setTop(ctBorder);
@@ -165,28 +144,7 @@ class DocUnitDocxBuilderTest {
 
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     var result = builder.setTable(table).build();
-    assertTrue(result.toHtmlString().contains("border-width: 3px;"));
-  }
-
-  @Test
-  void testBuild_withTableAndBorderStyle() {
-    CTBorder ctBorder = new CTBorder();
-    ctBorder.setVal(STBorder.SINGLE);
-    ctBorder.setColor("green");
-    ctBorder.setSz(BigInteger.valueOf(1));
-    TblBorders borders = new TblBorders();
-    borders.setTop(ctBorder);
-    borders.setRight(ctBorder);
-    borders.setBottom(ctBorder);
-    borders.setLeft(ctBorder);
-    TblPr tblPr = new TblPr();
-    tblPr.setTblBorders(borders);
-    Tbl table = new Tbl();
-    table.setTblPr(tblPr);
-
-    DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
-    var result = builder.setTable(table).build();
-    assertTrue(result.toHtmlString().contains("border-style: solid;"));
+    assertTrue(result.toHtmlString().contains("border: 3px solid #a64d79;"));
   }
 
   @Test
