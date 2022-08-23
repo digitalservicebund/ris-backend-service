@@ -6,8 +6,6 @@ import java.util.Map;
 public class BlockBorder {
   private final Map<Position, Border> borders = new EnumMap<>(Position.class);
 
-  public BlockBorder() {}
-
   private void setColor(Position position, String color) {
     if (!borders.containsKey(position)) borders.put(position, new Border());
     borders.get(position).color = color;
