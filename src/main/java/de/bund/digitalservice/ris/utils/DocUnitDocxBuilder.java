@@ -742,21 +742,19 @@ public class DocUnitDocxBuilder {
       cells
           .subList(0, cells.size() - 1)
           .forEach(
-              cell -> {
-                cell.border.setRight(
-                    getBorderColor(verticalBorders),
-                    getBorderWidth(verticalBorders),
-                    getBorderType(verticalBorders));
-              });
+              cell ->
+                  cell.border.setRight(
+                      getBorderColor(verticalBorders),
+                      getBorderWidth(verticalBorders),
+                      getBorderType(verticalBorders)));
       cells
           .subList(1, cells.size())
           .forEach(
-              cell -> {
-                cell.border.setLeft(
-                    getBorderColor(verticalBorders),
-                    getBorderWidth(verticalBorders),
-                    getBorderType(verticalBorders));
-              });
+              cell ->
+                  cell.border.setLeft(
+                      getBorderColor(verticalBorders),
+                      getBorderWidth(verticalBorders),
+                      getBorderType(verticalBorders)));
       cells.forEach(
           cell -> {
             cell.border.setTop(
