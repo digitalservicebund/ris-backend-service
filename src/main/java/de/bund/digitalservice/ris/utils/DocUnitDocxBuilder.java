@@ -710,7 +710,7 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    if (rows.size() > 0) {
+    if (!rows.isEmpty()) {
       rows.get(0).cells.forEach(cell -> cell.border.removeTop());
       rows.get(rows.size() - 1).cells.forEach(cell -> cell.border.removeBottom());
     }
@@ -735,7 +735,7 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    if (cells.size() > 0 & table.getTblPr().getTblBorders() != null) {
+    if (!cells.isEmpty() && table.getTblPr().getTblBorders() != null) {
       var verticalBorders = table.getTblPr().getTblBorders().getInsideV();
       var horizontalBorders = table.getTblPr().getTblBorders().getInsideH();
 
