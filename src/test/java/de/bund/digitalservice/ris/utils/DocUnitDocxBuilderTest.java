@@ -82,7 +82,7 @@ class DocUnitDocxBuilderTest {
                 List.of("cell r1c1", "cell r1c2", "cell r1c3"),
                 List.of("cell r2c1", "cell r2c2", "cell r2c3"),
                 List.of("cell r3c1", "cell r3c2", "cell r3c3")));
-
+    table.setTblPr(new TblPr());
     var result = builder.setTable(table).build();
 
     assertTrue(result instanceof DocUnitTableElement);
@@ -128,15 +128,23 @@ class DocUnitDocxBuilderTest {
 
   @Test
   void testBuild_withTableBorder() {
-    CTBorder ctBorder = new CTBorder();
-    ctBorder.setVal(STBorder.SINGLE);
-    ctBorder.setColor("a64d79");
-    ctBorder.setSz(BigInteger.valueOf(24));
+    var border1 = new CTBorder();
+    border1.setVal(STBorder.SINGLE);
+    border1.setColor("a64d79");
+    border1.setSz(BigInteger.valueOf(24));
+
+    var border2 = new CTBorder();
+    border2.setVal(STBorder.SINGLE);
+    border2.setColor("green");
+    border2.setSz(BigInteger.valueOf(48));
+
     TblBorders borders = new TblBorders();
-    borders.setTop(ctBorder);
-    borders.setRight(ctBorder);
-    borders.setBottom(ctBorder);
-    borders.setLeft(ctBorder);
+    borders.setTop(border1);
+    borders.setRight(border1);
+    borders.setBottom(border2);
+    borders.setLeft(border2);
+    borders.setInsideH(border1);
+    borders.setInsideV(border2);
     TblPr tblPr = new TblPr();
     tblPr.setTblBorders(borders);
     Tbl table = new Tbl();
@@ -144,7 +152,10 @@ class DocUnitDocxBuilderTest {
 
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     var result = builder.setTable(table).build();
-    assertTrue(result.toHtmlString().contains("border: 3px solid #a64d79;"));
+    assertTrue(result.toHtmlString().contains("border-top: 3px solid #a64d79;"));
+    assertTrue(result.toHtmlString().contains("border-right: 3px solid #a64d79;"));
+    assertTrue(result.toHtmlString().contains("border-bottom: 6px solid green;"));
+    assertTrue(result.toHtmlString().contains("border-left: 6px solid green;"));
   }
 
   @Test

@@ -653,54 +653,39 @@ public class DocUnitDocxBuilder {
     if (tblPr == null) return;
 
     if (tblPr.getTblBorders() != null) {
-      tableElement.setBorderColor(getBorderColor(tblPr));
-      tableElement.setBorderWidth(getBorderWidth(tblPr));
-      tableElement.setBorderStyle(getBorderStyle(tblPr));
+      var topBorder = tblPr.getTblBorders().getTop();
+      tableElement.border.setTop(
+          getBorderColor(topBorder), getBorderWidth(topBorder), getBorderType(topBorder));
+
+      var rightBorder = tblPr.getTblBorders().getRight();
+      tableElement.border.setRight(
+          getBorderColor(rightBorder), getBorderWidth(rightBorder), getBorderType(rightBorder));
+
+      var bottomBorder = tblPr.getTblBorders().getBottom();
+      tableElement.border.setBottom(
+          getBorderColor(bottomBorder), getBorderWidth(bottomBorder), getBorderType(bottomBorder));
+
+      var leftBorder = tblPr.getTblBorders().getLeft();
+      tableElement.border.setLeft(
+          getBorderColor(leftBorder), getBorderWidth(leftBorder), getBorderType(leftBorder));
     }
   }
 
-  private String getBorderColor(TblPr tblPr) {
-    TblBorders borders = tblPr.getTblBorders();
-
-    List<String> colors = new ArrayList<>();
-    if (borders.getTop() != null) colors.add(borders.getTop().getColor());
-    if (borders.getRight() != null) colors.add(borders.getRight().getColor());
-    if (borders.getBottom() != null) colors.add(borders.getBottom().getColor());
-    if (borders.getLeft() != null) colors.add(borders.getLeft().getColor());
-
-    if (new HashSet<>(colors).size() > 1)
-      LOGGER.info("not all table border colors are equal: {}", colors.toString());
-
-    return colors.get(0);
+  private String getBorderColor(CTBorder border) {
+    var color = border.getColor();
+    if (color.matches("^[0-9a-z]{6}$")) {
+      return "#" + color;
+    } else {
+      return color;
+    }
   }
 
-  private Integer getBorderWidth(TblPr tblPr) {
-    TblBorders borders = tblPr.getTblBorders();
-
-    List<Integer> widths = new ArrayList<>();
-    if (borders.getTop() != null) widths.add(borders.getTop().getSz().intValue());
-    if (borders.getRight() != null) widths.add(borders.getRight().getSz().intValue());
-    if (borders.getBottom() != null) widths.add(borders.getBottom().getSz().intValue());
-    if (borders.getLeft() != null) widths.add(borders.getLeft().getSz().intValue());
-
-    if (new HashSet<>(widths).size() > 1)
-      LOGGER.info("not all table border sizes are equal: {}", widths.toString());
-
-    return widths.get(0) / 8;
+  private Integer getBorderWidth(CTBorder border) {
+    return border.getSz().intValue() / 8;
   }
 
-  private String getBorderStyle(TblPr tblPr) {
-    TblBorders borders = tblPr.getTblBorders();
-
-    List<STBorder> styles = new ArrayList<>();
-    if (borders.getTop() != null) styles.add(borders.getTop().getVal());
-    if (borders.getRight() != null) styles.add(borders.getRight().getVal());
-    if (borders.getBottom() != null) styles.add(borders.getBottom().getVal());
-    if (borders.getLeft() != null) styles.add(borders.getLeft().getVal());
-
-    if (!styles.stream().allMatch(style -> style.equals(STBorder.SINGLE)))
-      LOGGER.error("unsupported table border style.");
-
+  private String getBorderType(CTBorder border) {
+    if (!border.getVal().equals(STBorder.SINGLE)) LOGGER.error("unsupported table border style");
     return "solid";
   }
 
@@ -725,6 +710,11 @@ public class DocUnitDocxBuilder {
               }
             });
 
+    if (rows.size() > 0) {
+      rows.get(0).cells.forEach(cell -> cell.border.removeTop());
+      rows.get(rows.size() - 1).cells.forEach(cell -> cell.border.removeBottom());
+    }
+
     return rows;
   }
 
@@ -745,12 +735,38 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    if (table.getTblPr() != null) {
+    if (cells.size() > 0 & table.getTblPr().getTblBorders() != null) {
+      var verticalBorders = table.getTblPr().getTblBorders().getInsideV();
+      var horizontalBorders = table.getTblPr().getTblBorders().getInsideH();
+
+      cells
+          .subList(0, cells.size() - 1)
+          .forEach(
+              cell -> {
+                cell.border.setRight(
+                    getBorderColor(verticalBorders),
+                    getBorderWidth(verticalBorders),
+                    getBorderType(verticalBorders));
+              });
+      cells
+          .subList(1, cells.size())
+          .forEach(
+              cell -> {
+                cell.border.setLeft(
+                    getBorderColor(verticalBorders),
+                    getBorderWidth(verticalBorders),
+                    getBorderType(verticalBorders));
+              });
       cells.forEach(
           cell -> {
-            cell.setBorderColor(getBorderColor(table.getTblPr()));
-            cell.setBorderWidth(getBorderWidth(table.getTblPr()));
-            cell.setBorderStyle(getBorderStyle(table.getTblPr()));
+            cell.border.setTop(
+                getBorderColor(horizontalBorders),
+                getBorderWidth(horizontalBorders),
+                getBorderType(horizontalBorders));
+            cell.border.setBottom(
+                getBorderColor(horizontalBorders),
+                getBorderWidth(horizontalBorders),
+                getBorderType(horizontalBorders));
           });
     }
 
