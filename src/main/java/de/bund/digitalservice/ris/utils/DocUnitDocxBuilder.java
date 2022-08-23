@@ -705,16 +705,7 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitDocx convertToTable() {
-    var rows = parseTable(table);
-    if (table.getTblPr() != null) {
-      rows.forEach(
-          row -> {
-            row.setBorderColor(getBorderColor(table.getTblPr()));
-            row.setBorderWidth(getBorderWidth(table.getTblPr()));
-            row.setBorderStyle(getBorderStyle(table.getTblPr()));
-          });
-    }
-    var tableElement = new DocUnitTableElement(rows);
+    var tableElement = new DocUnitTableElement(parseTable(table));
     addTableStyle(tableElement, table.getTblPr());
 
     return tableElement;
