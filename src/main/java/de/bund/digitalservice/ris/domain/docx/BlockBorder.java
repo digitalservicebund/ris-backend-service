@@ -7,17 +7,17 @@ public class BlockBorder {
   private final Map<Position, Border> borders = new EnumMap<>(Position.class);
 
   private void setColor(Position position, String color) {
-    if (!borders.containsKey(position)) borders.put(position, new Border());
+    borders.computeIfAbsent(position, key -> new Border());
     borders.get(position).color = color;
   }
 
   private void setWidth(Position position, Integer width) {
-    if (!borders.containsKey(position)) borders.put(position, new Border());
+    borders.computeIfAbsent(position, key -> new Border());
     borders.get(position).width = width;
   }
 
   private void setType(Position position, String type) {
-    if (!borders.containsKey(position)) borders.put(position, new Border());
+    borders.computeIfAbsent(position, key -> new Border());
     borders.get(position).type = type;
   }
 
