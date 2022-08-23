@@ -16,6 +16,7 @@ public class BlockBorder {
   public void setColor(Position position, String color) {
     borders.get(position).color = color;
   }
+
   public void setColor(String color) {
     setColor(Position.TOP, color);
     setColor(Position.RIGHT, color);
@@ -26,6 +27,7 @@ public class BlockBorder {
   public void setWidth(Position position, Integer width) {
     borders.get(position).width = width;
   }
+
   public void setWidth(Integer width) {
     setWidth(Position.TOP, width);
     setWidth(Position.RIGHT, width);
