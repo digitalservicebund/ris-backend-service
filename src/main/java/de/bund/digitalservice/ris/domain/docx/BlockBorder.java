@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class BlockBorder {
-  private final Map<Position, Border> borders = new HashMap<>();
+  private final Map<Position, Border> borders = new EnumMap<>(Position.class);
 
   public BlockBorder() {}
 
