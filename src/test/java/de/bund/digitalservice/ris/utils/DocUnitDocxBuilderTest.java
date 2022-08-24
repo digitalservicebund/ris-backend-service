@@ -159,6 +159,41 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
+  void testBuild_withTableCell() {
+    var ctBorder = new CTBorder();
+    ctBorder.setVal(STBorder.SINGLE);
+    ctBorder.setSz(BigInteger.valueOf(24));
+    ctBorder.setColor("ABCABC");
+
+    var tcBorders = new TcPrInner.TcBorders();
+    tcBorders.setTop(ctBorder);
+
+    var tcPr = new TcPr();
+    tcPr.setTcBorders(tcBorders);
+
+    var tc = new Tc();
+    tc.setTcPr(tcPr);
+    tc.getContent().add(generateParagraph("foo"));
+    JAXBElement<Tc> tcElement = new JAXBElement<>(new QName("tc"), Tc.class, tc);
+
+    var row = new Tr();
+    row.getContent().add(tcElement);
+
+    var tbl = new Tbl();
+    tbl.setTblPr(new TblPr());
+    tbl.getContent().add(row);
+
+    var builder = DocUnitDocxBuilder.newInstance();
+    builder.setTable(tbl);
+
+    var result = builder.build();
+    assertTrue(
+        result
+            .toHtmlString()
+            .contains("<td style=\"border-top: 3px solid #abcabc;\"><p>foo</p></td>"));
+  }
+
+  @Test
   void testBuild_withBorderNumber() {
     DocUnitDocxBuilder builder = DocUnitDocxBuilder.newInstance();
     P paragraph = new P();

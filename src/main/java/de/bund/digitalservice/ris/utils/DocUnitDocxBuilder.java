@@ -671,7 +671,7 @@ public class DocUnitDocxBuilder {
   private BlockBorder.Border parseCtBorder(CTBorder border) {
     if (border == null) return null;
 
-    var color = border.getColor();
+    var color = border.getColor().toLowerCase();
     if (color.matches("^[0-9a-z]{6}$")) {
       color = "#" + color;
     }
