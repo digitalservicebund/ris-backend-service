@@ -1,28 +1,37 @@
 package de.bund.digitalservice.ris.domain.docx;
 
 public class BlockBorder {
+  private Border topSelf;
+  private Border rightSelf;
+  private Border bottomSelf;
+  private Border leftSelf;
   private Border top;
   private Border right;
   private Border bottom;
   private Border left;
 
+  public BlockBorder(Border topSelf, Border rightSelf, Border bottomSelf, Border leftSelf) {
+    this.topSelf = topSelf;
+    this.rightSelf = rightSelf;
+    this.bottomSelf = bottomSelf;
+    this.leftSelf = leftSelf;
+  }
+
+  public BlockBorder() {}
+
   public void setTop(Border border) {
-    if (top != null) return;
     top = border;
   }
 
   public void setRight(Border border) {
-    if (right != null) return;
     right = border;
   }
 
   public void setBottom(Border border) {
-    if (bottom != null) return;
     bottom = border;
   }
 
   public void setLeft(Border border) {
-    if (left != null) return;
     left = border;
   }
 
@@ -57,10 +66,29 @@ public class BlockBorder {
   public String toHtmlString() {
     var sb = new StringBuilder();
 
-    if (top != null) sb.append(toHtmlString("top", top));
-    if (right != null) sb.append(toHtmlString("right", right));
-    if (bottom != null) sb.append(toHtmlString("bottom", bottom));
-    if (left != null) sb.append(toHtmlString("left", left));
+    if (topSelf != null) {
+      sb.append(toHtmlString("top", topSelf));
+    } else if (top != null) {
+      sb.append(toHtmlString("top", top));
+    }
+
+    if (rightSelf != null) {
+      sb.append(toHtmlString("right", rightSelf));
+    } else if (right != null) {
+      sb.append(toHtmlString("right", right));
+    }
+
+    if (bottomSelf != null) {
+      sb.append(toHtmlString("bottom", bottomSelf));
+    } else if (bottom != null) {
+      sb.append(toHtmlString("bottom", bottom));
+    }
+
+    if (leftSelf != null) {
+      sb.append(toHtmlString("left", leftSelf));
+    } else if (left != null) {
+      sb.append(toHtmlString("left", left));
+    }
 
     return sb.toString();
   }

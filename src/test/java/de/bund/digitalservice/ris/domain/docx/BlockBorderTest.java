@@ -11,35 +11,47 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @Import({BlockBorder.class})
 class BlockBorderTest {
   @Test
-  void testSetBottom() {
-    var blockBorder = new BlockBorder();
-    blockBorder.setBottom(new BlockBorder.Border("green", 1, "solid"));
+  void testSetTop() {
+    var blockBorder =
+        new BlockBorder(new BlockBorder.Border("green", 1, "solid"), null, null, null);
+    assertEquals("border-top: 1px solid green;", blockBorder.toHtmlString());
 
+    // should not overwrite self
+    blockBorder.setTop(new BlockBorder.Border("yellow", 1, "solid"));
+    assertEquals("border-top: 1px solid green;", blockBorder.toHtmlString());
+  }
+
+  @Test
+  void testSetBottom() {
+    var blockBorder =
+        new BlockBorder(null, null, new BlockBorder.Border("green", 1, "solid"), null);
+    assertEquals("border-bottom: 1px solid green;", blockBorder.toHtmlString());
+
+    // should not overwrite self
+    blockBorder.setBottom(new BlockBorder.Border("yellow", 1, "solid"));
     assertEquals("border-bottom: 1px solid green;", blockBorder.toHtmlString());
   }
 
   @Test
   void testSetRight() {
-    var blockBorder = new BlockBorder();
-    blockBorder.setRight(new BlockBorder.Border("green", 1, "solid"));
+    var blockBorder =
+        new BlockBorder(null, new BlockBorder.Border("green", 1, "solid"), null, null);
+    assertEquals("border-right: 1px solid green;", blockBorder.toHtmlString());
 
+    // should not overwrite self
+    blockBorder.setRight(new BlockBorder.Border("yellow", 1, "solid"));
     assertEquals("border-right: 1px solid green;", blockBorder.toHtmlString());
   }
 
   @Test
   void testSetLeft() {
-    var blockBorder = new BlockBorder();
-    blockBorder.setLeft(new BlockBorder.Border("green", 1, "solid"));
-
+    var blockBorder =
+        new BlockBorder(null, null, null, new BlockBorder.Border("green", 1, "solid"));
     assertEquals("border-left: 1px solid green;", blockBorder.toHtmlString());
-  }
 
-  @Test
-  void testSetTop() {
-    var blockBorder = new BlockBorder();
-    blockBorder.setTop(new BlockBorder.Border("green", 1, "solid"));
-
-    assertEquals("border-top: 1px solid green;", blockBorder.toHtmlString());
+    // should not overwrite
+    blockBorder.setLeft(new BlockBorder.Border("yellow", 1, "solid"));
+    assertEquals("border-left: 1px solid green;", blockBorder.toHtmlString());
   }
 
   @Test
