@@ -671,13 +671,14 @@ public class DocUnitDocxBuilder {
   private BlockBorder.Border parseCtBorder(CTBorder border) {
     if (border == null) return null;
 
-    var color = border.getColor().toLowerCase();
-    if (color.matches("^[0-9a-z]{6}$")) {
-      color = "#" + color;
+    var color = border.getColor();
+    if (color != null) {
+      color = color.equals("auto") ? "000" : color;
+      color = "#" + color.toLowerCase();
     }
-    ;
 
-    var width = DocxUnitConverter.convertPointToPixel(border.getSz());
+    var width =
+        border.getSz() != null ? DocxUnitConverter.convertPointToPixel(border.getSz()) : null;
 
     if (!border.getVal().equals(STBorder.SINGLE)) LOGGER.error("unsupported table border style");
     var type = "solid";

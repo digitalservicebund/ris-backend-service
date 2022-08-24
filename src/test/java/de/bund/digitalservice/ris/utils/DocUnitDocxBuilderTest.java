@@ -135,7 +135,7 @@ class DocUnitDocxBuilderTest {
 
     var border2 = new CTBorder();
     border2.setVal(STBorder.SINGLE);
-    border2.setColor("green");
+    border2.setColor("abc");
     border2.setSz(BigInteger.valueOf(48));
 
     TblBorders borders = new TblBorders();
@@ -154,8 +154,8 @@ class DocUnitDocxBuilderTest {
     var result = builder.setTable(table).build();
     assertTrue(result.toHtmlString().contains("border-top: 3px solid #a64d79;"));
     assertTrue(result.toHtmlString().contains("border-right: 3px solid #a64d79;"));
-    assertTrue(result.toHtmlString().contains("border-bottom: 6px solid green;"));
-    assertTrue(result.toHtmlString().contains("border-left: 6px solid green;"));
+    assertTrue(result.toHtmlString().contains("border-bottom: 6px solid #abc;"));
+    assertTrue(result.toHtmlString().contains("border-left: 6px solid #abc;"));
   }
 
   @Test
@@ -164,7 +164,7 @@ class DocUnitDocxBuilderTest {
     var rightCtBorder = new CTBorder();
     rightCtBorder.setVal(STBorder.SINGLE);
     rightCtBorder.setSz(BigInteger.valueOf(24));
-    rightCtBorder.setColor("blue");
+    rightCtBorder.setColor("foo");
     topRightCell.getValue().getTcPr().getTcBorders().setRight(rightCtBorder);
 
     var row = new Tr();
@@ -176,7 +176,7 @@ class DocUnitDocxBuilderTest {
     var tableCtBorder = new CTBorder();
     tableCtBorder.setVal(STBorder.SINGLE);
     tableCtBorder.setSz(BigInteger.valueOf(48));
-    tableCtBorder.setColor("green");
+    tableCtBorder.setColor("auto");
 
     var tableBorders = new TblBorders();
     tableBorders.setInsideV(tableCtBorder);
@@ -196,12 +196,12 @@ class DocUnitDocxBuilderTest {
     // ensure cell takes insideV from table
     assertTrue(
         result.contains(
-            "<td style=\"border-top: 1px solid #ghijkl;border-right: 6px solid green;border-left: 6px solid green;\"><p>foo</p></td>"));
+            "<td style=\"border-top: 1px solid #ghijkl;border-right: 6px solid #000;border-left: 6px solid #000;\"><p>foo</p></td>"));
 
     // ensure insideV from table does not overwrite cells border
     assertTrue(
         result.contains(
-            "<td style=\"border-top: 1px solid #mnopqr;border-right: 3px solid blue;border-left: 6px solid green;\"><p>foo</p></td>"));
+            "<td style=\"border-top: 1px solid #mnopqr;border-right: 3px solid #foo;border-left: 6px solid #000;\"><p>foo</p></td>"));
   }
 
   @Test
