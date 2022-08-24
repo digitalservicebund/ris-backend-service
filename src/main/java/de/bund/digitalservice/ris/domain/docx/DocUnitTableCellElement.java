@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class DocUnitTableCellElement extends Block implements DocUnitDocx {
-  public List<DocUnitDocx> paragraphElements;
+  public final List<DocUnitDocx> paragraphElements;
 
   public DocUnitTableCellElement(List<DocUnitDocx> paragraphElements) {
     this.paragraphElements = paragraphElements;
