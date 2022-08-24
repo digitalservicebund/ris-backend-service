@@ -10,8 +10,4 @@ public class Border {
     this.width = width;
     this.type = type;
   }
-
-  private static Border getEmptyBorder() {
-    return new Border(null, null, null);
-  }
 }
