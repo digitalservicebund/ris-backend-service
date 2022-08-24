@@ -31,6 +31,6 @@ public class DocxUnitConverter {
   }
 
   public static int convertPointToPixel(BigInteger point) {
-    return (point.intValue() / 8);
+    return Math.max(point.intValue() / 8, 1);
   }
 }
