@@ -167,6 +167,10 @@ class DocUnitDocxBuilderTest {
     rightCtBorder.setColor("foo");
     topRightCell.getValue().getTcPr().getTcBorders().setRight(rightCtBorder);
 
+    var gridSpan = new TcPrInner.GridSpan();
+    gridSpan.setVal(BigInteger.valueOf(2));
+    topRightCell.getValue().getTcPr().setGridSpan(gridSpan);
+
     var row = new Tr();
     row.getContent().add(generateTableCellWidthBorder("ABCDEF", 12));
     row.getContent().add(generateTableCellWidthBorder("GHIJKL", 12));
@@ -193,15 +197,18 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.build().toHtmlString();
 
-    // ensure cell takes insideV from table
+    // cell should have colspan
+    assertTrue(result.contains("colspan=\"2\""));
+
+    // cell should take insideV from table
     assertTrue(
         result.contains(
             "<td style=\"border-top: 1px solid #ghijkl;border-right: 6px solid #000;border-left: 6px solid #000;\"><p>foo</p></td>"));
 
-    // ensure insideV from table does not overwrite cells border
+    // insideV from table should not overwrite cell's border
     assertTrue(
         result.contains(
-            "<td style=\"border-top: 1px solid #mnopqr;border-right: 3px solid #foo;border-left: 6px solid #000;\"><p>foo</p></td>"));
+            "<td colspan=\"2\" style=\"border-top: 1px solid #mnopqr;border-right: 3px solid #foo;border-left: 6px solid #000;\"><p>foo</p></td>"));
   }
 
   @Test

@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 public class DocUnitTableCellElement extends Block implements DocUnitDocx {
   public final List<DocUnitDocx> paragraphElements;
+  public Integer columnSpan;
 
   public DocUnitTableCellElement(List<DocUnitDocx> paragraphElements) {
     this.paragraphElements = paragraphElements;
@@ -15,9 +16,18 @@ public class DocUnitTableCellElement extends Block implements DocUnitDocx {
     return hasBorder();
   }
 
+  public void setColumnSpan(Integer columnSpan) {
+    this.columnSpan = columnSpan;
+  }
+
+  private String columnSpanToHtmlString() {
+    return columnSpan != null ? " colspan=\"" + columnSpan + "\"" : "";
+  }
+
   @Override
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder("<td");
+    sb.append(columnSpanToHtmlString());
 
     if (hasStyle()) {
       sb.append(" style=\"");

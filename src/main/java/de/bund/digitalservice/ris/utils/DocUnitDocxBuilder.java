@@ -768,13 +768,16 @@ public class DocUnitDocxBuilder {
     var cell = new DocUnitTableCellElement(paragraphElements);
 
     var tcPr = tc.getTcPr();
-    if (tcPr != null && tcPr.getTcBorders() != null) {
-      var tcBorders = tcPr.getTcBorders();
-      cell.setInitialBorders(
-          parseCtBorder(tcBorders.getTop()),
-          parseCtBorder(tcBorders.getRight()),
-          parseCtBorder(tcBorders.getBottom()),
-          parseCtBorder(tcBorders.getLeft()));
+    if (tcPr != null) {
+      if (tcPr.getTcBorders() != null) {
+        var tcBorders = tcPr.getTcBorders();
+        cell.setInitialBorders(
+            parseCtBorder(tcBorders.getTop()),
+            parseCtBorder(tcBorders.getRight()),
+            parseCtBorder(tcBorders.getBottom()),
+            parseCtBorder(tcBorders.getLeft()));
+      }
+      if (tcPr.getGridSpan() != null) cell.setColumnSpan(tcPr.getGridSpan().getVal().intValue());
     }
 
     return cell;
