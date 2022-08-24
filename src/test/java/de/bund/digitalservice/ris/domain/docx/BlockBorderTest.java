@@ -85,4 +85,11 @@ class BlockBorderTest {
     blockBorder.removeTop();
     assertFalse(blockBorder.isSet());
   }
+
+  @Test
+  void testIsSetWithSelfs() {
+    var blockBorder =
+        new BlockBorder(new BlockBorder.Border("green", 1, "solid"), null, null, null);
+    assertTrue(blockBorder.isSet());
+  }
 }

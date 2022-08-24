@@ -44,7 +44,11 @@ public class BlockBorder {
   }
 
   public Boolean isSet() {
-    var isSet = top != null;
+    var isSet = topSelf != null;
+    isSet |= rightSelf != null;
+    isSet |= bottomSelf != null;
+    isSet |= leftSelf != null;
+    isSet |= top != null;
     isSet |= right != null;
     isSet |= bottom != null;
     isSet |= left != null;
