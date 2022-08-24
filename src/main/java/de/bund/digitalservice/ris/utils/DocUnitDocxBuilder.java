@@ -708,8 +708,8 @@ public class DocUnitDocxBuilder {
             });
 
     if (!rows.isEmpty()) {
-      rows.get(0).cells.forEach(cell -> cell.removeTopBorder());
-      rows.get(rows.size() - 1).cells.forEach(cell -> cell.removeBottomBorder());
+      rows.get(0).cells.forEach(Block::removeTopBorder);
+      rows.get(rows.size() - 1).cells.forEach(Block::removeBottomBorder);
     }
 
     return rows;
