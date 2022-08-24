@@ -66,6 +66,9 @@ dependencies {
 
   implementation "org.docx4j:docx4j-JAXB-MOXy:11.4.7"
   implementation "org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.7"
+  // will be added in docx4j 11.4.8
+  implementation "jakarta.mail:jakarta.mail-api:2.1.0"
+  implementation "jakarta.activation:jakarta.activation-api:2.1.0"
   // docx4j version needs jaxb 3.0.1
   implementation("jakarta.xml.bind:jakarta.xml.bind-api") { version { strictly "3.0.1" } }
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
