@@ -52,6 +52,13 @@ class BlockTest {
   }
 
   @Test
+  void testSetBackgroundColor() {
+    var concreteBlock = generateConcreteBlockElement();
+    concreteBlock.setBackgroundColor("#fff");
+    assertEquals("background-color: #fff;", concreteBlock.backgroundColorToHtmlString());
+  }
+
+  @Test
   void testRemoveTop() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setBottomBorder(new Border("green", 1, "solid"));
@@ -72,7 +79,7 @@ class BlockTest {
   }
 
   @Test
-  void testIsSet() {
+  void testHasBorder() {
     var concreteBlock = generateConcreteBlockElement();
     assertFalse(concreteBlock.hasBorder());
 
@@ -81,6 +88,15 @@ class BlockTest {
 
     concreteBlock.removeTopBorder();
     assertFalse(concreteBlock.hasBorder());
+  }
+
+  @Test
+  void testHasBackgroundColor() {
+    var concreteBlock = generateConcreteBlockElement();
+    assertFalse(concreteBlock.hasBackgroundColor());
+
+    concreteBlock.setBackgroundColor("fff");
+    assertTrue(concreteBlock.hasBackgroundColor());
   }
 
   @Test

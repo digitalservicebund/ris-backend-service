@@ -13,7 +13,9 @@ public class DocUnitTableCellElement extends Block implements DocUnitDocx {
   }
 
   private boolean hasStyle() {
-    return hasBorder();
+    var hasStyle = hasBorder();
+    hasStyle |= hasBackgroundColor();
+    return hasStyle;
   }
 
   public void setColumnSpan(Integer columnSpan) {
@@ -32,6 +34,7 @@ public class DocUnitTableCellElement extends Block implements DocUnitDocx {
     if (hasStyle()) {
       sb.append(" style=\"");
       sb.append(borderToHtmlString());
+      sb.append(backgroundColorToHtmlString());
       sb.append("\"");
     }
     sb.append(">");

@@ -15,6 +15,7 @@ public class DocUnitTableElement extends Block implements DocUnitDocx {
     StringBuilder sb = new StringBuilder();
     sb.append("<table style=\"border-collapse: collapse;");
     sb.append(borderToHtmlString());
+    sb.append(backgroundColorToHtmlString());
 
     sb.append("\">");
     sb.append(

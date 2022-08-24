@@ -10,6 +10,8 @@ public abstract class Block {
   private Border bottom;
   private Border left;
 
+  private String backgroundColor;
+
   public void setInitialBorders(
       Border topSelf, Border rightSelf, Border bottomSelf, Border leftSelf) {
     this.topSelf = topSelf;
@@ -41,6 +43,10 @@ public abstract class Block {
     left = border;
   }
 
+  public void setBackgroundColor(String color) {
+    this.backgroundColor = color;
+  }
+
   public void removeTopBorder() {
     top = null;
   }
@@ -59,6 +65,10 @@ public abstract class Block {
     isSet |= bottom != null;
     isSet |= left != null;
     return isSet;
+  }
+
+  public Boolean hasBackgroundColor() {
+    return backgroundColor != null;
   }
 
   private String borderToHtmlString(String position, Border border) {
@@ -102,5 +112,9 @@ public abstract class Block {
     }
 
     return sb.toString();
+  }
+
+  public String backgroundColorToHtmlString() {
+    return backgroundColor != null ? "background-color: " + backgroundColor + ";" : "";
   }
 }

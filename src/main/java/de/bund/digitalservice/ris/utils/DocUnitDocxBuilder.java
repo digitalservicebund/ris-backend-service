@@ -666,6 +666,8 @@ public class DocUnitDocxBuilder {
       var leftBorder = tblPr.getTblBorders().getLeft();
       tableElement.setLeftBorder(parseCtBorder(leftBorder));
     }
+
+    if (tblPr.getShd() != null) tableElement.setBackgroundColor(parseCTShd(tblPr.getShd()));
   }
 
   private Border parseCtBorder(CTBorder border) {
@@ -684,6 +686,11 @@ public class DocUnitDocxBuilder {
     var type = "solid";
 
     return new Border(color, width, type);
+  }
+
+  private String parseCTShd(CTShd ctShd) {
+    if (!ctShd.getVal().equals(STShd.CLEAR)) LOGGER.error("unsupported shading value (STShd)");
+    return "#" + ctShd.getFill();
   }
 
   private DocUnitDocx convertToTable() {
@@ -778,6 +785,7 @@ public class DocUnitDocxBuilder {
             parseCtBorder(tcBorders.getLeft()));
       }
       if (tcPr.getGridSpan() != null) cell.setColumnSpan(tcPr.getGridSpan().getVal().intValue());
+      if (tcPr.getShd() != null) cell.setBackgroundColor(parseCTShd(tcPr.getShd()));
     }
 
     return cell;
