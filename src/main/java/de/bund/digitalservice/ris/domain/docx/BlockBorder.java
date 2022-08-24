@@ -61,6 +61,7 @@ public class BlockBorder {
   }
 
   private String toHtmlString(String position, Border border) {
+    if (border.width == null || border.type == null || border.color == null) return "";
     return "border-"
         + position
         + ": "
