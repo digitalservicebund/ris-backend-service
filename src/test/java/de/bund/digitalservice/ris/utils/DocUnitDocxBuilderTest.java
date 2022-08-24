@@ -127,7 +127,7 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTableBorder() {
+  void testBuild_withTable_withBorder() {
     var border1 = new CTBorder();
     border1.setVal(STBorder.SINGLE);
     border1.setColor("a64d79");
@@ -159,38 +159,49 @@ class DocUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTableCell() {
-    var ctBorder = new CTBorder();
-    ctBorder.setVal(STBorder.SINGLE);
-    ctBorder.setSz(BigInteger.valueOf(24));
-    ctBorder.setColor("ABCABC");
-
-    var tcBorders = new TcPrInner.TcBorders();
-    tcBorders.setTop(ctBorder);
-
-    var tcPr = new TcPr();
-    tcPr.setTcBorders(tcBorders);
-
-    var tc = new Tc();
-    tc.setTcPr(tcPr);
-    tc.getContent().add(generateParagraph("foo"));
-    JAXBElement<Tc> tcElement = new JAXBElement<>(new QName("tc"), Tc.class, tc);
+  void testBuild_withTable_withCell() {
+    var topRightCell = generateTableCellWidthBorder("MNOPQR", 12);
+    var rightCtBorder = new CTBorder();
+    rightCtBorder.setVal(STBorder.SINGLE);
+    rightCtBorder.setSz(BigInteger.valueOf(24));
+    rightCtBorder.setColor("blue");
+    topRightCell.getValue().getTcPr().getTcBorders().setRight(rightCtBorder);
 
     var row = new Tr();
-    row.getContent().add(tcElement);
+    row.getContent().add(generateTableCellWidthBorder("ABCDEF", 12));
+    row.getContent().add(generateTableCellWidthBorder("GHIJKL", 12));
+    row.getContent().add(topRightCell);
+    row.getContent().add(generateTableCellWidthBorder("MNOPQR", 12));
 
+    var tableCtBorder = new CTBorder();
+    tableCtBorder.setVal(STBorder.SINGLE);
+    tableCtBorder.setSz(BigInteger.valueOf(48));
+    tableCtBorder.setColor("green");
+
+    var tableBorders = new TblBorders();
+    tableBorders.setInsideV(tableCtBorder);
+    tableBorders.setInsideH(tableCtBorder);
+
+    var tblPr = new TblPr();
+    tblPr.setTblBorders(tableBorders);
     var tbl = new Tbl();
-    tbl.setTblPr(new TblPr());
+    tbl.setTblPr(tblPr);
     tbl.getContent().add(row);
 
     var builder = DocUnitDocxBuilder.newInstance();
     builder.setTable(tbl);
 
-    var result = builder.build();
+    var result = builder.build().toHtmlString();
+
+    // ensure cell takes insideV from table
     assertTrue(
-        result
-            .toHtmlString()
-            .contains("<td style=\"border-top: 3px solid #abcabc;\"><p>foo</p></td>"));
+        result.contains(
+            "<td style=\"border-top: 1px solid #ghijkl;border-right: 6px solid green;border-left: 6px solid green;\"><p>foo</p></td>"));
+
+    // ensure insideV from table does not overwrite cells border
+    assertTrue(
+        result.contains(
+            "<td style=\"border-top: 1px solid #mnopqr;border-right: 3px solid blue;border-left: 6px solid green;\"><p>foo</p></td>"));
   }
 
   @Test
@@ -1315,6 +1326,24 @@ class DocUnitDocxBuilderTest {
     }
 
     return table;
+  }
+
+  private JAXBElement<Tc> generateTableCellWidthBorder(String color, Integer width) {
+    var ctBorder = new CTBorder();
+    ctBorder.setVal(STBorder.SINGLE);
+    ctBorder.setSz(BigInteger.valueOf(width));
+    ctBorder.setColor(color);
+
+    var tcBorders = new TcPrInner.TcBorders();
+    tcBorders.setTop(ctBorder);
+
+    var tcPr = new TcPr();
+    tcPr.setTcBorders(tcBorders);
+
+    var tc = new Tc();
+    tc.setTcPr(tcPr);
+    tc.getContent().add(generateParagraph("foo"));
+    return new JAXBElement<>(new QName("tc"), Tc.class, tc);
   }
 
   private P generateParagraph(String cellText) {
