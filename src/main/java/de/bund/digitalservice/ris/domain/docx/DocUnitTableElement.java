@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 public class DocUnitTableElement implements DocUnitDocx {
   public List<DocUnitTableRowElement> rows;
 
-  public BlockBorder border = new BlockBorder();
+  public final BlockBorder border = new BlockBorder();
 
   public DocUnitTableElement(List<DocUnitTableRowElement> rows) {
     this.rows = rows;

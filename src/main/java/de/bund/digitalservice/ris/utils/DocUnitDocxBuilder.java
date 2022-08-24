@@ -3,10 +3,11 @@ package de.bund.digitalservice.ris.utils;
 import de.bund.digitalservice.ris.domain.docx.*;
 import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
 import jakarta.xml.bind.JAXBElement;
-import java.awt.Dimension;
+import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 import org.docx4j.dml.CTNonVisualDrawingProps;
 import org.docx4j.dml.CTPositiveSize2D;
@@ -655,19 +656,27 @@ public class DocUnitDocxBuilder {
     if (tblPr.getTblBorders() != null) {
       var topBorder = tblPr.getTblBorders().getTop();
       tableElement.border.setTop(
-          getBorderColor(topBorder), getBorderWidth(topBorder), getBorderType(topBorder));
+          new BlockBorder.Border(
+              getBorderColor(topBorder), getBorderWidth(topBorder), getBorderType(topBorder)));
 
       var rightBorder = tblPr.getTblBorders().getRight();
       tableElement.border.setRight(
-          getBorderColor(rightBorder), getBorderWidth(rightBorder), getBorderType(rightBorder));
+          new BlockBorder.Border(
+              getBorderColor(rightBorder),
+              getBorderWidth(rightBorder),
+              getBorderType(rightBorder)));
 
       var bottomBorder = tblPr.getTblBorders().getBottom();
       tableElement.border.setBottom(
-          getBorderColor(bottomBorder), getBorderWidth(bottomBorder), getBorderType(bottomBorder));
+          new BlockBorder.Border(
+              getBorderColor(bottomBorder),
+              getBorderWidth(bottomBorder),
+              getBorderType(bottomBorder)));
 
       var leftBorder = tblPr.getTblBorders().getLeft();
       tableElement.border.setLeft(
-          getBorderColor(leftBorder), getBorderWidth(leftBorder), getBorderType(leftBorder));
+          new BlockBorder.Border(
+              getBorderColor(leftBorder), getBorderWidth(leftBorder), getBorderType(leftBorder)));
     }
   }
 
@@ -736,36 +745,30 @@ public class DocUnitDocxBuilder {
             });
 
     if (!cells.isEmpty() && table.getTblPr().getTblBorders() != null) {
-      var verticalBorders = table.getTblPr().getTblBorders().getInsideV();
-      var horizontalBorders = table.getTblPr().getTblBorders().getInsideH();
+      var verticalCtBorder = table.getTblPr().getTblBorders().getInsideV();
+      var horizontalCtBorder = table.getTblPr().getTblBorders().getInsideH();
 
-      cells
-          .subList(0, cells.size() - 1)
-          .forEach(
-              cell ->
-                  cell.border.setRight(
-                      getBorderColor(verticalBorders),
-                      getBorderWidth(verticalBorders),
-                      getBorderType(verticalBorders)));
-      cells
-          .subList(1, cells.size())
-          .forEach(
-              cell ->
-                  cell.border.setLeft(
-                      getBorderColor(verticalBorders),
-                      getBorderWidth(verticalBorders),
-                      getBorderType(verticalBorders)));
+      var verticalBorder =
+          new BlockBorder.Border(
+              getBorderColor(verticalCtBorder),
+              getBorderWidth(verticalCtBorder),
+              getBorderType(verticalCtBorder));
+
+      var horizontalBorder =
+          new BlockBorder.Border(
+              getBorderColor(horizontalCtBorder),
+              getBorderWidth(horizontalCtBorder),
+              getBorderType(horizontalCtBorder));
+
       cells.forEach(
           cell -> {
-            cell.border.setTop(
-                getBorderColor(horizontalBorders),
-                getBorderWidth(horizontalBorders),
-                getBorderType(horizontalBorders));
-            cell.border.setBottom(
-                getBorderColor(horizontalBorders),
-                getBorderWidth(horizontalBorders),
-                getBorderType(horizontalBorders));
+            cell.border.setTop(horizontalBorder);
+            cell.border.setRight(verticalBorder);
+            cell.border.setBottom(horizontalBorder);
+            cell.border.setLeft(verticalBorder);
           });
+      cells.get(0).border.setLeft(null);
+      cells.get(cells.size() - 1).border.setRight(null);
     }
 
     return new DocUnitTableRowElement(cells);

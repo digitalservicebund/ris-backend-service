@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 public class DocUnitTableCellElement implements DocUnitDocx {
   public List<DocUnitDocx> paragraphElements;
 
-  public BlockBorder border = new BlockBorder();
+  public final BlockBorder border = new BlockBorder();
 
   public DocUnitTableCellElement(List<DocUnitDocx> paragraphElements) {
     this.paragraphElements = paragraphElements;

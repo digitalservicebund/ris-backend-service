@@ -1,67 +1,50 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-import java.util.EnumMap;
-import java.util.Map;
-
 public class BlockBorder {
-  private final Map<Position, Border> borders = new EnumMap<>(Position.class);
+  private Border top;
+  private Border right;
+  private Border bottom;
+  private Border left;
 
-  private void setColor(Position position, String color) {
-    borders.computeIfAbsent(position, key -> new Border());
-    borders.get(position).color = color;
+  public void setTop(Border border) {
+    if (top != null) return;
+    top = border;
   }
 
-  private void setWidth(Position position, Integer width) {
-    borders.computeIfAbsent(position, key -> new Border());
-    borders.get(position).width = width;
+  public void setRight(Border border) {
+    if (right != null) return;
+    right = border;
   }
 
-  private void setType(Position position, String type) {
-    borders.computeIfAbsent(position, key -> new Border());
-    borders.get(position).type = type;
+  public void setBottom(Border border) {
+    if (bottom != null) return;
+    bottom = border;
   }
 
-  public void setTop(String color, Integer width, String type) {
-    setColor(Position.TOP, color);
-    setWidth(Position.TOP, width);
-    setType(Position.TOP, type);
-  }
-
-  public void setRight(String color, Integer width, String type) {
-    setColor(Position.RIGHT, color);
-    setWidth(Position.RIGHT, width);
-    setType(Position.RIGHT, type);
-  }
-
-  public void setBottom(String color, Integer width, String type) {
-    setColor(Position.BOTTOM, color);
-    setWidth(Position.BOTTOM, width);
-    setType(Position.BOTTOM, type);
-  }
-
-  public void setLeft(String color, Integer width, String type) {
-    setColor(Position.LEFT, color);
-    setWidth(Position.LEFT, width);
-    setType(Position.LEFT, type);
+  public void setLeft(Border border) {
+    if (left != null) return;
+    left = border;
   }
 
   public void removeTop() {
-    borders.remove(Position.TOP);
+    top = null;
   }
 
   public void removeBottom() {
-    borders.remove(Position.BOTTOM);
+    bottom = null;
   }
 
   public Boolean isSet() {
-    return borders.size() > 0;
+    var isSet = top != null;
+    isSet |= right != null;
+    isSet |= bottom != null;
+    isSet |= left != null;
+    return isSet;
   }
 
-  private String positionToHtmlString(Position position) {
-    var border = borders.get(position);
-
+  private String toHtmlString(String position, Border border) {
     return "border-"
-        + position.name().toLowerCase()
+        + position
         + ": "
         + border.width
         + "px "
@@ -74,24 +57,27 @@ public class BlockBorder {
   public String toHtmlString() {
     var sb = new StringBuilder();
 
-    if (borders.containsKey(Position.TOP)) sb.append(positionToHtmlString(Position.TOP));
-    if (borders.containsKey(Position.RIGHT)) sb.append(positionToHtmlString(Position.RIGHT));
-    if (borders.containsKey(Position.BOTTOM)) sb.append(positionToHtmlString(Position.BOTTOM));
-    if (borders.containsKey(Position.LEFT)) sb.append(positionToHtmlString(Position.LEFT));
+    if (top != null) sb.append(toHtmlString("top", top));
+    if (right != null) sb.append(toHtmlString("right", right));
+    if (bottom != null) sb.append(toHtmlString("bottom", bottom));
+    if (left != null) sb.append(toHtmlString("left", left));
 
     return sb.toString();
   }
 
-  private static class Border {
+  public static class Border {
     protected String color;
     protected Integer width;
     protected String type;
-  }
 
-  private enum Position {
-    TOP,
-    RIGHT,
-    BOTTOM,
-    LEFT
+    public Border(String color, Integer width, String type) {
+      this.color = color;
+      this.width = width;
+      this.type = type;
+    }
+
+    private static Border getEmptyBorder() {
+      return new Border(null, null, null);
+    }
   }
 }
