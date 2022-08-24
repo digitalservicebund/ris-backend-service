@@ -766,7 +766,7 @@ public class DocUnitDocxBuilder {
 
     var tcPr = tc.getTcPr();
     BlockBorder borders = new BlockBorder();
-    if (tcPr != null) {
+    if (tcPr != null && tcPr.getTcBorders() != null) {
       var tcBorders = tcPr.getTcBorders();
       var topBorder = parseCtBorder(tcBorders.getTop());
       var rightBorder = parseCtBorder(tcBorders.getRight());

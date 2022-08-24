@@ -1272,6 +1272,7 @@ class DocUnitDocxBuilderTest {
       for (String cellText : rows) {
         Tc cell = new Tc();
         cell.getContent().add(generateParagraph(cellText));
+        cell.setTcPr(new TcPr());
         JAXBElement<Tc> tcElement = new JAXBElement<>(new QName("tc"), Tc.class, cell);
         row.getContent().add(tcElement);
       }
