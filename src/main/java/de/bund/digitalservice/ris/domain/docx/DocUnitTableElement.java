@@ -3,10 +3,8 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DocUnitTableElement implements DocUnitDocx {
+public class DocUnitTableElement extends Block implements DocUnitDocx {
   public List<DocUnitTableRowElement> rows;
-
-  public final BlockBorder border = new BlockBorder();
 
   public DocUnitTableElement(List<DocUnitTableRowElement> rows) {
     this.rows = rows;
@@ -16,7 +14,7 @@ public class DocUnitTableElement implements DocUnitDocx {
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
     sb.append("<table style=\"border-collapse: collapse;");
-    sb.append(border.toHtmlString());
+    sb.append(borderToHtmlString());
 
     sb.append("\">");
     sb.append(

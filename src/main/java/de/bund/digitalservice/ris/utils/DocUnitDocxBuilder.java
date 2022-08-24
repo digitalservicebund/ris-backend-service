@@ -655,20 +655,20 @@ public class DocUnitDocxBuilder {
 
     if (tblPr.getTblBorders() != null) {
       var topBorder = tblPr.getTblBorders().getTop();
-      tableElement.border.setTop(parseCtBorder(topBorder));
+      tableElement.setTopBorder(parseCtBorder(topBorder));
 
       var rightBorder = tblPr.getTblBorders().getRight();
-      tableElement.border.setRight(parseCtBorder(rightBorder));
+      tableElement.setRightBorder(parseCtBorder(rightBorder));
 
       var bottomBorder = tblPr.getTblBorders().getBottom();
-      tableElement.border.setBottom(parseCtBorder(bottomBorder));
+      tableElement.setBottomBorder(parseCtBorder(bottomBorder));
 
       var leftBorder = tblPr.getTblBorders().getLeft();
-      tableElement.border.setLeft(parseCtBorder(leftBorder));
+      tableElement.setLeftBorder(parseCtBorder(leftBorder));
     }
   }
 
-  private BlockBorder.Border parseCtBorder(CTBorder border) {
+  private Border parseCtBorder(CTBorder border) {
     if (border == null) return null;
 
     var color = border.getColor();
@@ -683,7 +683,7 @@ public class DocUnitDocxBuilder {
     if (!border.getVal().equals(STBorder.SINGLE)) LOGGER.error("unsupported table border style");
     var type = "solid";
 
-    return new BlockBorder.Border(color, width, type);
+    return new Border(color, width, type);
   }
 
   private DocUnitDocx convertToTable() {
@@ -708,8 +708,8 @@ public class DocUnitDocxBuilder {
             });
 
     if (!rows.isEmpty()) {
-      rows.get(0).cells.forEach(cell -> cell.border.removeTop());
-      rows.get(rows.size() - 1).cells.forEach(cell -> cell.border.removeBottom());
+      rows.get(0).cells.forEach(cell -> cell.removeTopBorder());
+      rows.get(rows.size() - 1).cells.forEach(cell -> cell.removeBottomBorder());
     }
 
     return rows;
@@ -741,13 +741,13 @@ public class DocUnitDocxBuilder {
 
       cells.forEach(
           cell -> {
-            cell.border.setTop(horizontalBorder);
-            cell.border.setRight(verticalBorder);
-            cell.border.setBottom(horizontalBorder);
-            cell.border.setLeft(verticalBorder);
+            cell.setTopBorder(horizontalBorder);
+            cell.setRightBorder(verticalBorder);
+            cell.setBottomBorder(horizontalBorder);
+            cell.setLeftBorder(verticalBorder);
           });
-      cells.get(0).border.setLeft(null);
-      cells.get(cells.size() - 1).border.setRight(null);
+      cells.get(0).setLeftBorder(null);
+      cells.get(cells.size() - 1).setRightBorder(null);
     }
 
     return new DocUnitTableRowElement(cells);
@@ -765,17 +765,18 @@ public class DocUnitDocxBuilder {
               }
             });
 
+    var cell = new DocUnitTableCellElement(paragraphElements);
+
     var tcPr = tc.getTcPr();
-    BlockBorder borders = new BlockBorder();
     if (tcPr != null && tcPr.getTcBorders() != null) {
       var tcBorders = tcPr.getTcBorders();
-      var topBorder = parseCtBorder(tcBorders.getTop());
-      var rightBorder = parseCtBorder(tcBorders.getRight());
-      var bottomBorder = parseCtBorder(tcBorders.getBottom());
-      var leftBorder = parseCtBorder(tcBorders.getLeft());
-      borders = new BlockBorder(topBorder, rightBorder, bottomBorder, leftBorder);
+      cell.setInitialBorders(
+          parseCtBorder(tcBorders.getTop()),
+          parseCtBorder(tcBorders.getRight()),
+          parseCtBorder(tcBorders.getBottom()),
+          parseCtBorder(tcBorders.getLeft()));
     }
 
-    return new DocUnitTableCellElement(paragraphElements, borders);
+    return cell;
   }
 }

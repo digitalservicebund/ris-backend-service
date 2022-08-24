@@ -3,23 +3,16 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DocUnitTableCellElement implements DocUnitDocx {
+public class DocUnitTableCellElement extends Block implements DocUnitDocx {
   public List<DocUnitDocx> paragraphElements;
-
-  public final BlockBorder border;
-
-  public DocUnitTableCellElement(List<DocUnitDocx> paragraphElements, BlockBorder border) {
-    this.paragraphElements = paragraphElements;
-    this.border = border != null ? border : new BlockBorder();
-  }
 
   public DocUnitTableCellElement(List<DocUnitDocx> paragraphElements) {
     this.paragraphElements = paragraphElements;
-    this.border = new BlockBorder();
+    setInitialBorders();
   }
 
   private boolean hasStyle() {
-    return border.isSet();
+    return hasBorder();
   }
 
   @Override
@@ -28,7 +21,7 @@ public class DocUnitTableCellElement implements DocUnitDocx {
 
     if (hasStyle()) {
       sb.append(" style=\"");
-      sb.append(border.toHtmlString());
+      sb.append(borderToHtmlString());
       sb.append("\"");
     }
     sb.append(">");

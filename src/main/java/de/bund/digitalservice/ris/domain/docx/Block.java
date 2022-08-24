@@ -1,54 +1,55 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-public class BlockBorder {
-  private final Border topSelf;
-  private final Border rightSelf;
-  private final Border bottomSelf;
-  private final Border leftSelf;
+abstract class Block {
+  private Border topSelf;
+  private Border rightSelf;
+  private Border bottomSelf;
+  private Border leftSelf;
   private Border top;
   private Border right;
   private Border bottom;
   private Border left;
 
-  public BlockBorder(Border topSelf, Border rightSelf, Border bottomSelf, Border leftSelf) {
+  public void setInitialBorders(
+      Border topSelf, Border rightSelf, Border bottomSelf, Border leftSelf) {
     this.topSelf = topSelf;
     this.rightSelf = rightSelf;
     this.bottomSelf = bottomSelf;
     this.leftSelf = leftSelf;
   }
 
-  public BlockBorder() {
+  public void setInitialBorders() {
     this.topSelf = null;
     this.rightSelf = null;
     this.bottomSelf = null;
     this.leftSelf = null;
   }
 
-  public void setTop(Border border) {
+  public void setTopBorder(Border border) {
     top = border;
   }
 
-  public void setRight(Border border) {
+  public void setRightBorder(Border border) {
     right = border;
   }
 
-  public void setBottom(Border border) {
+  public void setBottomBorder(Border border) {
     bottom = border;
   }
 
-  public void setLeft(Border border) {
+  public void setLeftBorder(Border border) {
     left = border;
   }
 
-  public void removeTop() {
+  public void removeTopBorder() {
     top = null;
   }
 
-  public void removeBottom() {
+  public void removeBottomBorder() {
     bottom = null;
   }
 
-  public Boolean isSet() {
+  public Boolean hasBorder() {
     var isSet = topSelf != null;
     isSet |= rightSelf != null;
     isSet |= bottomSelf != null;
@@ -60,7 +61,7 @@ public class BlockBorder {
     return isSet;
   }
 
-  private String toHtmlString(String position, Border border) {
+  private String borderToHtmlString(String position, Border border) {
     if (border.width == null || border.type == null || border.color == null) return "";
     return "border-"
         + position
@@ -73,49 +74,33 @@ public class BlockBorder {
         + ";";
   }
 
-  public String toHtmlString() {
+  public String borderToHtmlString() {
     var sb = new StringBuilder();
 
     if (topSelf != null) {
-      sb.append(toHtmlString("top", topSelf));
+      sb.append(borderToHtmlString("top", topSelf));
     } else if (top != null) {
-      sb.append(toHtmlString("top", top));
+      sb.append(borderToHtmlString("top", top));
     }
 
     if (rightSelf != null) {
-      sb.append(toHtmlString("right", rightSelf));
+      sb.append(borderToHtmlString("right", rightSelf));
     } else if (right != null) {
-      sb.append(toHtmlString("right", right));
+      sb.append(borderToHtmlString("right", right));
     }
 
     if (bottomSelf != null) {
-      sb.append(toHtmlString("bottom", bottomSelf));
+      sb.append(borderToHtmlString("bottom", bottomSelf));
     } else if (bottom != null) {
-      sb.append(toHtmlString("bottom", bottom));
+      sb.append(borderToHtmlString("bottom", bottom));
     }
 
     if (leftSelf != null) {
-      sb.append(toHtmlString("left", leftSelf));
+      sb.append(borderToHtmlString("left", leftSelf));
     } else if (left != null) {
-      sb.append(toHtmlString("left", left));
+      sb.append(borderToHtmlString("left", left));
     }
 
     return sb.toString();
-  }
-
-  public static class Border {
-    protected String color;
-    protected Integer width;
-    protected String type;
-
-    public Border(String color, Integer width, String type) {
-      this.color = color;
-      this.width = width;
-      this.type = type;
-    }
-
-    private static Border getEmptyBorder() {
-      return new Border(null, null, null);
-    }
   }
 }
