@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.utils;
 
+import java.math.BigInteger;
+
 /**
  * TWIP
  *
@@ -26,5 +28,9 @@ public class DocxUnitConverter {
 
   public static int convertEMUToPixel(long emu) {
     return (int) (emu / 9525); // 914400 / 96
+  }
+
+  public static int convertPointToPixel(BigInteger point) {
+    return (point.intValue() / 8);
   }
 }

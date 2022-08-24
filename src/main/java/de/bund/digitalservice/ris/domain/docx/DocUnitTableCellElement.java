@@ -6,10 +6,16 @@ import java.util.stream.Collectors;
 public class DocUnitTableCellElement implements DocUnitDocx {
   public List<DocUnitDocx> paragraphElements;
 
-  public final BlockBorder border = new BlockBorder();
+  public final BlockBorder border;
+
+  public DocUnitTableCellElement(List<DocUnitDocx> paragraphElements, BlockBorder border) {
+    this.paragraphElements = paragraphElements;
+    this.border = border != null ? border : new BlockBorder();
+  }
 
   public DocUnitTableCellElement(List<DocUnitDocx> paragraphElements) {
     this.paragraphElements = paragraphElements;
+    this.border = new BlockBorder();
   }
 
   private boolean hasStyle() {

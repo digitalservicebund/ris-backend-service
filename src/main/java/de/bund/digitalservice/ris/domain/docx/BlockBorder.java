@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.domain.docx;
 
 public class BlockBorder {
-  private Border topSelf;
-  private Border rightSelf;
-  private Border bottomSelf;
-  private Border leftSelf;
+  private final Border topSelf;
+  private final Border rightSelf;
+  private final Border bottomSelf;
+  private final Border leftSelf;
   private Border top;
   private Border right;
   private Border bottom;
@@ -17,7 +17,12 @@ public class BlockBorder {
     this.leftSelf = leftSelf;
   }
 
-  public BlockBorder() {}
+  public BlockBorder() {
+    this.topSelf = null;
+    this.rightSelf = null;
+    this.bottomSelf = null;
+    this.leftSelf = null;
+  }
 
   public void setTop(Border border) {
     top = border;
