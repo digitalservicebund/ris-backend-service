@@ -108,9 +108,7 @@ class BlockTest {
 
   private Block generateConcreteBlockElement() {
     var someElements = new ArrayList<DocUnitDocx>();
-    someElements.add(
-        new DocUnitNumberingList(
-            DocUnitNumberingList.DocUnitNumberingListNumberFormat.BULLET, "2", "foo"));
+    someElements.add(new DocUnitNumberingList());
     return new DocUnitTableCellElement(someElements);
   }
 }
