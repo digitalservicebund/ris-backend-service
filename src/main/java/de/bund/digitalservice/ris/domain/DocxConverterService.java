@@ -138,6 +138,7 @@ public class DocxConverterService {
     List<DocUnitDocx> packedList = new ArrayList<>();
     DocUnitBorderNumber[] lastBorderNumber = {null};
     DocUnitNumberingList[] lastNumberingList = {null};
+    boolean[] isCreateNewList = {false};
 
     return Mono.fromFuture(futureResponse)
         .map(response -> getDocumentParagraphs(response.asInputStream()))
@@ -146,16 +147,21 @@ public class DocxConverterService {
               docUnitDocxList.forEach(
                   element -> {
                     if (packBorderNumberElements(element, packedList, lastBorderNumber)) {
+                      isCreateNewList[0] = true;
                       return;
                     }
 
-                    if (packNumberingListEntries(element, packedList, lastNumberingList)) {
+                    if (packNumberingListEntries(
+                        element, packedList, lastNumberingList, isCreateNewList[0])) {
+                      isCreateNewList[0] = false;
                       return;
                     }
-
+                    isCreateNewList[0] = true;
                     packedList.add(element);
                   });
-
+              if (lastNumberingList[0] != null) {
+                packedList.add(lastNumberingList[0]);
+              }
               String content = null;
               if (!docUnitDocxList.isEmpty()) {
                 content =
@@ -217,7 +223,10 @@ public class DocxConverterService {
   }
 
   private boolean packNumberingListEntries(
-      DocUnitDocx element, List<DocUnitDocx> packedList, DocUnitNumberingList[] lastNumberingList) {
+      DocUnitDocx element,
+      List<DocUnitDocx> packedList,
+      DocUnitNumberingList[] lastNumberingList,
+      boolean isCreateNewList) {
     if (lastNumberingList[0] == null && !(element instanceof DocUnitNumberingListEntry)) {
       return false;
     }
@@ -225,17 +234,11 @@ public class DocxConverterService {
     boolean packed = false;
     DocUnitNumberingList last = lastNumberingList[0];
     if (element instanceof DocUnitNumberingListEntry numberingListEntry) {
-      if (last == null
-          || !last.getNumId().equals(numberingListEntry.numId())
-          || !last.getiLvl().equals(numberingListEntry.iLvl())) {
+      if (last == null || isCreateNewList) {
         if (last != null) {
           packedList.add(last);
         }
-        lastNumberingList[0] =
-            new DocUnitNumberingList(
-                numberingListEntry.numberFormat(),
-                numberingListEntry.numId(),
-                numberingListEntry.iLvl());
+        lastNumberingList[0] = new DocUnitNumberingList();
         lastNumberingList[0].addNumberingListEntry(numberingListEntry);
       } else {
         last.addNumberingListEntry(numberingListEntry);

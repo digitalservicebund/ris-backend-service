@@ -19,7 +19,7 @@ const getCurrentTime = () => {
   const uploadTime = new Date()
   const fullHour = ("0" + uploadTime.getHours()).slice(-2)
   const fullMinute = ("0" + uploadTime.getMinutes()).slice(-2)
-  return `${fullHour}: ${fullMinute}`
+  return `${fullHour}:${fullMinute}`
 }
 
 const setDefaultStatus = () => {

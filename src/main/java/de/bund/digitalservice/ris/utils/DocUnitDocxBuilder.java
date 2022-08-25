@@ -237,6 +237,8 @@ public class DocUnitDocxBuilder {
         DocUnitRunElement imageElement =
             parseDrawing(paragraphElement, (Drawing) jaxbElement.getValue());
         paragraphElement.addRunElement(imageElement);
+      } else if (declaredType == R.Tab.class) {
+        paragraphElement.addRunElement(new DocUnitRunTabElement());
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
         paragraphElement.addRunElement(new DocUnitErrorRunElement(declaredType.getName()));

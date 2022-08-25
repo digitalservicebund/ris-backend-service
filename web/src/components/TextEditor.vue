@@ -562,6 +562,36 @@ onBeforeRouteUpdate(async () => {
 <style lang="scss">
 #container {
   position: relative;
+  ul,
+  ol {
+    padding: 0.5rem 3rem;
+  }
+
+  ol {
+    list-style-type: none;
+    counter-reset: item;
+    margin-left: -1.5rem;
+  }
+
+  ol > li {
+    display: table;
+    counter-increment: item;
+    margin-bottom: 0.5rem;
+  }
+
+  ol > li:before {
+    content: counters(item, ".") ". ";
+    display: table-cell;
+    padding-right: 0.5rem;
+  }
+
+  li ol > li {
+    margin: 0;
+  }
+
+  li ol > li:before {
+    content: counters(item, ".") " ";
+  }
   .row-primary {
     .v-col {
       flex-grow: 0 !important;

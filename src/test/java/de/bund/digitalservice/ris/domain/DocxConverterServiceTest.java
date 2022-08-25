@@ -319,6 +319,186 @@ class DocxConverterServiceTest {
   }
 
   @Test
+  void testGetHtml_withThreeLvlOfNumberingListEntriesBullet() {
+    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
+        .addContent("1", generateText("start test"))
+        .addContent(
+            "2",
+            generateNumberingListEntry(
+                "bullet list entry 1", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
+        .addContent(
+            "3",
+            generateNumberingListEntry(
+                "bullet list entry 2", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
+        .addContent(
+            "4",
+            generateNumberingListEntry(
+                "bullet list entry 2.1", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
+        .addContent(
+            "5",
+            generateNumberingListEntry(
+                "bullet list entry 2.2", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
+        .addContent(
+            "6",
+            generateNumberingListEntry(
+                "bullet list entry 2.2.1", DocUnitNumberingListNumberFormat.BULLET, "1", "2"))
+        .addContent(
+            "7",
+            generateNumberingListEntry(
+                "bullet list entry 2.2.2", DocUnitNumberingListNumberFormat.BULLET, "1", "2"))
+        .generate();
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getHtml("test.docx"))
+          .consumeNextWith(
+              docx2Html -> {
+                assertNotNull(docx2Html);
+                assertEquals(
+                    "<p>start test</p>"
+                        + "<ul>"
+                        + "<li><p>bullet list entry 1</p></li>"
+                        + "<li><p>bullet list entry 2</p></li>"
+                        + "<ul>"
+                        + "<li><p>bullet list entry 2.1</p></li>"
+                        + "<li><p>bullet list entry 2.2</p></li>"
+                        + "<ul>"
+                        + "<li><p>bullet list entry 2.2.1</p></li>"
+                        + "<li><p>bullet list entry 2.2.2</p></li>"
+                        + "</ul>"
+                        + "</ul>"
+                        + "</ul>",
+                    docx2Html.content());
+              })
+          .verifyComplete();
+    }
+  }
+
+  @Test
+  void testGetHtml_withThreeLvlOfNumberingListEntriesDecimal() {
+    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
+        .addContent("1", generateText("start test"))
+        .addContent(
+            "2",
+            generateNumberingListEntry(
+                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
+        .addContent(
+            "3",
+            generateNumberingListEntry(
+                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
+        .addContent(
+            "4",
+            generateNumberingListEntry(
+                "decimal list entry 2.1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "1"))
+        .addContent(
+            "5",
+            generateNumberingListEntry(
+                "decimal list entry 2.2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "1"))
+        .addContent(
+            "6",
+            generateNumberingListEntry(
+                "decimal list entry 2.2.1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
+        .addContent(
+            "7",
+            generateNumberingListEntry(
+                "decimal list entry 2.2.2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
+        .generate();
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getHtml("test.docx"))
+          .consumeNextWith(
+              docx2Html -> {
+                assertNotNull(docx2Html);
+                assertEquals(
+                    "<p>start test</p>"
+                        + "<ol>"
+                        + "<li><p>decimal list entry 1</p></li>"
+                        + "<li><p>decimal list entry 2</p></li>"
+                        + "<ol>"
+                        + "<li><p>decimal list entry 2.1</p></li>"
+                        + "<li><p>decimal list entry 2.2</p></li>"
+                        + "<ol>"
+                        + "<li><p>decimal list entry 2.2.1</p></li>"
+                        + "<li><p>decimal list entry 2.2.2</p></li>"
+                        + "</ol>"
+                        + "</ol>"
+                        + "</ol>",
+                    docx2Html.content());
+              })
+          .verifyComplete();
+    }
+  }
+
+  @Test
+  void testGetHtml_withThreeLvlOfNumberingListEntriesMixed() {
+    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
+        .addContent("1", generateText("start test"))
+        .addContent(
+            "2",
+            generateNumberingListEntry(
+                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
+        .addContent(
+            "3",
+            generateNumberingListEntry(
+                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
+        .addContent(
+            "4",
+            generateNumberingListEntry(
+                "bullet list entry 2.1", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
+        .addContent(
+            "5",
+            generateNumberingListEntry(
+                "bullet list entry 2.2", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
+        .addContent(
+            "6",
+            generateNumberingListEntry(
+                "decimal list entry 2.2.1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
+        .addContent(
+            "7",
+            generateNumberingListEntry(
+                "decimal list entry 2.2.2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
+        .generate();
+
+    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+        mockStatic(WordprocessingMLPackage.class)) {
+      mockedMLPackageStatic
+          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+          .thenReturn(mlPackage);
+
+      StepVerifier.create(service.getHtml("test.docx"))
+          .consumeNextWith(
+              docx2Html -> {
+                assertNotNull(docx2Html);
+                assertEquals(
+                    "<p>start test</p>"
+                        + "<ol>"
+                        + "<li><p>decimal list entry 1</p></li>"
+                        + "<li><p>decimal list entry 2</p></li>"
+                        + "<ul>"
+                        + "<li><p>bullet list entry 2.1</p></li>"
+                        + "<li><p>bullet list entry 2.2</p></li>"
+                        + "<ol>"
+                        + "<li><p>decimal list entry 2.2.1</p></li>"
+                        + "<li><p>decimal list entry 2.2.2</p></li>"
+                        + "</ol>"
+                        + "</ul>"
+                        + "</ol>",
+                    docx2Html.content());
+              })
+          .verifyComplete();
+    }
+  }
+
+  @Test
   void testGetHtml_withTwoNumberingListEntriesAndMiddleText() {
     new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
         .addContent("1", generateText("start test"))
