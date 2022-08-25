@@ -1,6 +1,8 @@
 import axios from "axios"
 
-export default () =>
-  axios.create({
-    baseURL: "/api/v1/",
+export default () => {
+  const backendHost = import.meta.env.VITE_BACKEND_HOST ?? ""
+  return axios.create({
+    baseURL: `${backendHost}/api/v1/`,
   })
+}

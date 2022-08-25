@@ -10,6 +10,7 @@ on:
 
 env:
   CONTAINER_REGISTRY: ghcr.io
+  GITHUB_OWNER: ${{ github.repository_owner }}
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
   GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
@@ -326,7 +327,7 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push-image:
+  build-and-push-images:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
@@ -364,8 +365,10 @@ jobs:
         working-directory: ./web
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build and publish container image
+      - name: Build and publish backend container image
         run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} ./gradlew bootBuildImage --publishImage
+      - name: Build and publish frontend container image
+        run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} npm run build:docker && npm run publish:docker
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -380,12 +383,18 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Sign the published Docker image
+      - name: Sign the published backend Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Sign the published frontend Docker image
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.GITHUB_OWNER }}/ris-frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
         run: echo "::set-output name=version::$CONTAINER_IMAGE_VERSION"
       - name: Send status to Slack
@@ -397,7 +406,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Build/push image :point_right:"
+          job_name: "Build/push images :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
@@ -409,17 +418,28 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     concurrency: deploy-staging
     environment: staging
-    needs: [build-and-push-image]
+    needs: [build-and-push-images]
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
-      - name: Deploy new image
+      - name: Deploy new backend image
         uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
         with:
           environment: staging
-          version: ${{ needs.build-and-push-image.outputs.version }}
+          version: ${{ needs.build-and-push-images.outputs.version }}
           deploying_repo: ris-backend-service
+          infra_repo: neuris-infra
+          deploy_key: ${{ secrets.DEPLOY_KEY }}
+          app: ris-staging
+          argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
+          argocd_server: ${{ secrets.ARGOCD_SERVER }}
+      - name: Deploy new frontend image
+        uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
+        with:
+          environment: staging
+          version: ${{ needs.build-and-push-images.outputs.version }}
+          deploying_repo: ris-frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-staging
@@ -532,7 +552,7 @@ jobs:
     concurrency: deploy-production
     environment: production
     needs:
-      - build-and-push-image
+      - build-and-push-images
       - deploy-staging-verify-api
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
@@ -546,7 +566,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
         with:
           environment: production
-          version: ${{ needs.build-and-push-image.outputs.version }}
+          version: ${{ needs.build-and-push-images.outputs.version }}
           deploying_repo: ris-backend-service
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
