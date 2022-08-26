@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-public abstract class Block {
+public abstract class BlockElement {
   private Border topSelf;
   private Border rightSelf;
   private Border bottomSelf;

@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class DocUnitTableCellElement extends Block implements DocUnitDocx {
+public class DocUnitTableCellElement extends BlockElement implements DocUnitDocx {
   public final List<DocUnitDocx> paragraphElements;
   public Integer columnSpan;
 
@@ -28,19 +28,15 @@ public class DocUnitTableCellElement extends Block implements DocUnitDocx {
 
   @Override
   public String toHtmlString() {
-    StringBuilder sb = new StringBuilder("<td");
-    sb.append(columnSpanToHtmlString());
 
-    sb.append(" style=\"padding: 5px; min-width: 5px;");
-    sb.append(borderToHtmlString());
-    sb.append(backgroundColorToHtmlString());
-    sb.append("\"");
-
-    sb.append(">");
-    sb.append(
-        paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining()));
-    sb.append("</td>");
-
-    return sb.toString();
+    return "<td"
+        + columnSpanToHtmlString()
+        + " style=\"padding: 5px; min-width: 5px;"
+        + borderToHtmlString()
+        + backgroundColorToHtmlString()
+        + "\""
+        + ">"
+        + paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining())
+        + "</td>";
   }
 }

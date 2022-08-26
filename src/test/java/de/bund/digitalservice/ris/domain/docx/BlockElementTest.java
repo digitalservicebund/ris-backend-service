@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 
-class BlockTest {
+class BlockElementTest {
   @Test
   void testSetTop() {
     var concreteBlock = generateConcreteBlockElement();
@@ -106,7 +106,7 @@ class BlockTest {
     assertTrue(concreteBlock.hasBorder());
   }
 
-  private Block generateConcreteBlockElement() {
+  private BlockElement generateConcreteBlockElement() {
     var someElements = new ArrayList<DocUnitDocx>();
     someElements.add(new DocUnitNumberingList());
     return new DocUnitTableCellElement(someElements);
