@@ -17,7 +17,7 @@
     "format:fix": "prettier --write --ignore-unknown .",
     "lint:check": "eslint --ext .js,.ts,.vue --ignore-path .gitignore .",
     "lint:fix": "npm run lint:check -- --fix",
-    "style:check": "npm run format:check && npm run lint:check",
+    "style:check": "vue-tsc && npm run format:check && npm run lint:check",
     "style:fix": "npm run format:fix && npm run lint:fix",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''"
   },
