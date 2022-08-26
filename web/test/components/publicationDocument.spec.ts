@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { fireEvent, getByLabelText, render, screen } from "@testing-library/vue"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createVuetify } from "vuetify/lib/framework.mjs"
@@ -17,24 +17,28 @@ describe("PublicationDocument", () => {
     '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<juris-r>\n<metadaten>\n<gericht>\n<gertyp>Gerichtstyp</gertyp>\n<gerort>Gerichtssitz</gerort>\n</gericht>\n</metadaten>\n<textdaten>\n<titelzeile>\n<body>\n<div>\n<p>Titelzeile</p>\n</div>\n</body>\n</titelzeile>\n<leitsatz>\n<body>\n<div>\n<p>Leitsatz</p>\n</div>\n</body>\n</leitsatz>\n<osatz>\n<body>\n<div>\n<p>Orientierungssatz</p>\n</div>\n</body>\n</osatz>\n<tenor>\n<body>\n<div>\n<p>Tenor</p>\n</div>\n</body>\n</tenor>\n<tatbestand>\n<body>\n<div>\n<p>Tatbestand</p>\n<br/>\n</div>\n</body>\n</tatbestand>\n<entscheidungsgruende>\n<body>\n<div>\n<p>Entscheidungsgründe</p>\n</div>\n</body>\n</entscheidungsgruende>\n<gruende>\n<body>\n<div>\n<p>Gründe</p>\n</div>\n</body>\n</gruende>\n</textdaten>\n</juris-r>'
 
   it("renders with published XML and has error", async () => {
-    const { getAllByText, getByText } = render(PublicationDocument, {
-      global: { plugins: [vuetify] },
-      props: {
-        issues: ISSUES,
-        receiverEmail: RECEIVER_EMAIL,
-        emailSubject: EMAIL_SUBJECT,
-        lastPublicationDate: LAST_PUBLICATION_DATE,
-        xml: XML,
-        isFirstTimePublication: !IS_FIRST_TIME_PUBLICATION,
-        hasValidationError: HAS_ERROR,
-      },
-    })
+    const { getAllByText, getByText, getByLabelText } = render(
+      PublicationDocument,
+      {
+        global: { plugins: [vuetify] },
+        props: {
+          issues: ISSUES,
+          emailSubject: EMAIL_SUBJECT,
+          lastPublicationDate: LAST_PUBLICATION_DATE,
+          xml: XML,
+          isFirstTimePublication: !IS_FIRST_TIME_PUBLICATION,
+          hasValidationError: HAS_ERROR,
+        },
+      }
+    )
 
     const lines = XML.split("\n")
     lines.forEach((line, index) => {
       getAllByText(line)
       getByText(index + 1)
     })
+    const inputReceiverAddress = getByLabelText("Empfängeradresse E-Mail")
+    await fireEvent.update(inputReceiverAddress, RECEIVER_EMAIL)
     getByText(RECEIVER_EMAIL)
     getByText(EMAIL_SUBJECT)
     getByText(`${ISSUES.length} Pflichtfelder nicht befüllt`)
@@ -61,23 +65,27 @@ describe("PublicationDocument", () => {
   })
 
   it("renders without published XML validation errors", async () => {
-    const { getByText, getAllByText, emitted } = render(PublicationDocument, {
-      global: { plugins: [vuetify] },
-      props: {
-        issues: ["succeed"],
-        receiverEmail: RECEIVER_EMAIL,
-        emailSubject: EMAIL_SUBJECT,
-        lastPublicationDate: LAST_PUBLICATION_DATE,
-        xml: XML,
-        isFirstTimePublication: !IS_FIRST_TIME_PUBLICATION,
-        hasValidationError: !HAS_ERROR,
-      },
-    })
+    const { getByText, getAllByText, emitted, getByLabelText } = render(
+      PublicationDocument,
+      {
+        global: { plugins: [vuetify] },
+        props: {
+          issues: ["succeed"],
+          emailSubject: EMAIL_SUBJECT,
+          lastPublicationDate: LAST_PUBLICATION_DATE,
+          xml: XML,
+          isFirstTimePublication: !IS_FIRST_TIME_PUBLICATION,
+          hasValidationError: !HAS_ERROR,
+        },
+      }
+    )
     const lines = XML.split("\n")
     lines.forEach((line, index) => {
       getAllByText(line)
       getByText(index + 1)
     })
+    const inputReceiverAddress = getByLabelText("Empfängeradresse E-Mail")
+    await fireEvent.update(inputReceiverAddress, RECEIVER_EMAIL)
     getByText(RECEIVER_EMAIL)
     getByText(EMAIL_SUBJECT)
     getByText("0 Fehler")
@@ -101,7 +109,6 @@ describe("PublicationDocument", () => {
       global: { plugins: [vuetify] },
       props: {
         issues: ISSUES,
-        receiverEmail: RECEIVER_EMAIL,
         emailSubject: EMAIL_SUBJECT,
         lastPublicationDate: "",
         xml: XML,
