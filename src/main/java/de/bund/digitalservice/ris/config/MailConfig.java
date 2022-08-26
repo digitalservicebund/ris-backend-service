@@ -1,18 +1,50 @@
 package de.bund.digitalservice.ris.config;
 
 import java.io.InputStream;
+import java.util.Properties;
 import javax.mail.internet.MimeMessage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 
 @Configuration
 public class MailConfig {
+  @Value("${mail.exporter.host:host}")
+  private String smtpHost;
+
+  @Value("${mail.exporter.user:test}")
+  private String user;
+
+  @Value("${mail.exporter.password:test}")
+  private String password;
+
   @Bean
+  @Profile({"production", "staging"})
   public JavaMailSender javaMailSender() {
+    JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+    mailSender.setHost(smtpHost);
+    mailSender.setPort(587);
+
+    mailSender.setUsername(user);
+    mailSender.setPassword(password);
+
+    Properties props = mailSender.getJavaMailProperties();
+    props.put("mail.transport.protocol", "smtp");
+    props.put("mail.smtp.auth", "true");
+    props.put("mail.smtp.starttls.enable", "true");
+
+    return mailSender;
+  }
+
+  @Bean
+  @Profile({"!production & !staging"})
+  public JavaMailSender javaMailSenderMock() {
     return new JavaMailSender() {
       @Override
       public MimeMessage createMimeMessage() {

@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
+import de.bund.digitalservice.ris.domain.DocumentUnitPublishService;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
@@ -40,9 +41,11 @@ class DocUnitControllerTest {
 
   @MockBean private DocUnitService service;
 
+  @MockBean private DocumentUnitPublishService publishService;
+
   @Captor private ArgumentCaptor<Flux<ByteBuffer>> fluxCaptor;
 
-  private final UUID testUuid = UUID.fromString("88888888-4444-4444-4444-121212121212");
+  private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
 
   @Test
   void testGenerateNewDocUnit() {
@@ -69,14 +72,14 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + testUuid + "/file")
+        .uri("/api/v1/docunits/" + TEST_UUID + "/file")
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
         .isOk();
 
     verify(service)
-        .attachFileToDocUnit(eq(testUuid), fluxCaptor.capture(), headersCaptor.capture());
+        .attachFileToDocUnit(eq(TEST_UUID), fluxCaptor.capture(), headersCaptor.capture());
     assertEquals(0, Objects.requireNonNull(fluxCaptor.getValue().blockFirst()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
   }
@@ -97,12 +100,12 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/" + testUuid + "/file")
+        .uri("/api/v1/docunits/" + TEST_UUID + "/file")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).removeFileFromDocUnit(testUuid);
+    verify(service, times(1)).removeFileFromDocUnit(TEST_UUID);
   }
 
   @Test
@@ -152,12 +155,12 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/" + testUuid)
+        .uri("/api/v1/docunits/" + TEST_UUID)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).deleteByUuid(testUuid);
+    verify(service).deleteByUuid(TEST_UUID);
   }
 
   @Test
@@ -174,11 +177,11 @@ class DocUnitControllerTest {
   @Test
   void testUpdateByUuid() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setUuid(testUuid);
+    docUnit.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + testUuid + "/docx")
+        .uri("/api/v1/docunits/" + TEST_UUID + "/docx")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(docUnit)
         .exchange()
@@ -190,7 +193,7 @@ class DocUnitControllerTest {
   @Test
   void testUpdateByUuid_withInvalidUuid() {
     DocUnit docUnit = new DocUnit();
-    docUnit.setUuid(testUuid);
+    docUnit.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())
         .put()
@@ -204,11 +207,12 @@ class DocUnitControllerTest {
 
   @Test
   void testPublish() {
-    when(service.publish(testUuid))
+    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(publishService.publish(DocUnit.EMPTY))
         .thenReturn(
             Mono.just(
                 new XmlMailResponse(
-                    testUuid,
+                    TEST_UUID,
                     new XmlMail(
                         1L,
                         123L,
@@ -222,7 +226,8 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + testUuid + "/publish")
+        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
+        .bodyValue("toemailaddress")
         .exchange()
         .expectHeader()
         .valueEquals("Content-Type", "application/json")
@@ -230,7 +235,7 @@ class DocUnitControllerTest {
         .isOk()
         .expectBody()
         .jsonPath("documentUnitUuid")
-        .isEqualTo(testUuid.toString())
+        .isEqualTo(TEST_UUID.toString())
         .jsonPath("mailSubject")
         .isEqualTo("mailSubject")
         .jsonPath("xml")
@@ -242,36 +247,89 @@ class DocUnitControllerTest {
         .jsonPath("publishDate")
         .isEqualTo("2020-01-01T01:01:01Z");
 
-    verify(service).publish(testUuid);
+    verify(service).findByUuid(TEST_UUID);
+    verify(publishService).publish(DocUnit.EMPTY);
   }
 
   @Test
   void testPublish_withServiceThrowsException() {
-    when(service.publish(testUuid)).thenThrow(DocumentUnitPublishException.class);
+    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(publishService.publish(DocUnit.EMPTY)).thenThrow(DocumentUnitPublishException.class);
 
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + testUuid + "/publish")
+        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
+        .bodyValue("toemailaddress")
         .exchange()
         .expectStatus()
         .is5xxServerError();
 
-    verify(service).publish(testUuid);
+    verify(service).findByUuid(TEST_UUID);
+    verify(publishService).publish(DocUnit.EMPTY);
   }
 
   @Test
-  void testGetLastPublishedXml_withServiceThrowsException() {
-    when(service.publish(testUuid)).thenThrow(DocumentUnitPublishException.class);
+  void testGetLastPublishedXml() {
+    var documentUnit = new DocUnit();
+    documentUnit.setId(123L);
+    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(publishService.getLastPublishedXml(123L, TEST_UUID))
+        .thenReturn(
+            Mono.just(
+                new XmlMailResponse(
+                    TEST_UUID,
+                    new XmlMail(
+                        1L,
+                        123L,
+                        "mailSubject",
+                        "xml",
+                        "status-code",
+                        "status-messages",
+                        "test.xml",
+                        Instant.parse("2020-01-01T01:01:01.00Z")))));
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/docunits/" + testUuid + "/publish")
+        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody()
+        .jsonPath("documentUnitUuid")
+        .isEqualTo(TEST_UUID.toString())
+        .jsonPath("mailSubject")
+        .isEqualTo("mailSubject")
+        .jsonPath("xml")
+        .isEqualTo("xml")
+        .jsonPath("statusCode")
+        .isEqualTo("status-code")
+        .jsonPath("statusMessages")
+        .isEqualTo("status-messages")
+        .jsonPath("publishDate")
+        .isEqualTo("2020-01-01T01:01:01Z");
+
+    verify(service).findByUuid(TEST_UUID);
+    verify(publishService).getLastPublishedXml(123L, TEST_UUID);
+  }
+
+  @Test
+  void testGetLastPublishedXml_withServiceThrowsException() {
+    var documentUnit = new DocUnit();
+    documentUnit.setId(123L);
+    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(publishService.getLastPublishedXml(123L, TEST_UUID))
+        .thenThrow(DocumentUnitPublishException.class);
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
         .exchange()
         .expectStatus()
         .is5xxServerError();
 
-    verify(service).getLastPublishedXml(testUuid);
+    verify(publishService).getLastPublishedXml(123L, TEST_UUID);
   }
 }

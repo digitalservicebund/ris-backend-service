@@ -136,7 +136,7 @@ class XmlMailPublishServiceTest {
         .verify();
   }
 
-  //  @Test
+  @Test
   void testPublish_withoutToMailSet() {
 
     StepVerifier.create(service.publish(documentUnit))
@@ -147,7 +147,7 @@ class XmlMailPublishServiceTest {
         .verify();
   }
 
-  //  @Test
+  @Test
   void testPublish_withWrongFormattedFromMailSet() {
     service = new XmlMailPublishService(xmlExporter, repository, mailSender, "<");
     service.setToMailAddressList("to-mail@test.com");
@@ -160,7 +160,7 @@ class XmlMailPublishServiceTest {
         .verify();
   }
 
-  //  @Test
+  @Test
   void testPublish_withWrongFormattedToMailSet() {
     service.setToMailAddressList("<");
 

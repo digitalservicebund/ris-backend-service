@@ -7,7 +7,6 @@ import ErrorModal from "@/components/ErrorModal.vue"
 const props = defineProps<{
   xml: string
   issues: string[]
-  receiverEmail: string
   emailSubject: string
   lastPublicationDate: string
   isFirstTimePublication: boolean
@@ -15,13 +14,14 @@ const props = defineProps<{
 }>()
 
 defineEmits<{
-  (e: "publishADocument"): void
+  (e: "publishADocument", newValue: string): void
 }>()
 
 const showIssuesDetails = ref(false)
 const toggleShowIssuesDetails = () => {
   showIssuesDetails.value = !showIssuesDetails.value
 }
+const receiverEmail = ref("")
 </script>
 
 <template>
@@ -104,6 +104,19 @@ const toggleShowIssuesDetails = () => {
             </p>
           </div>
         </div>
+        <div>
+          <p>
+            <label for="receiverEmailName">
+              Empfänger-E-Mail-Adresse:<br />
+              <input
+                v-model="receiverEmail"
+                name="receiverMailName"
+                aria-label="Empfängeradresse E-Mail"
+                class="receiver-email-input"
+              />
+            </label>
+          </p>
+        </div>
         <div class="publication-button-container">
           <div v-if="!isFirstTimePublication" class="text-container">
             <p class="publication-text-body">Zuletzt veröffentlicht</p>
@@ -116,7 +129,7 @@ const toggleShowIssuesDetails = () => {
               label="Dokumentationseinheit veröffenlichen"
               button-type="primary"
               icon="campaign"
-              @click="$emit('publishADocument')"
+              @click="$emit('publishADocument', receiverEmail)"
             />
           </div>
         </div>
@@ -140,7 +153,7 @@ const toggleShowIssuesDetails = () => {
         <p class="publication-text-label">über</p>
         <div class="receiver-info">
           <p class="publication-text-body">
-            E-Mail an: <span>{{ props.receiverEmail }}</span>
+            E-Mail an: <span>{{ receiverEmail }}</span>
           </p>
           <p class="publication-text-body">
             Betreff: <span>{{ props.emailSubject }}</span>
@@ -259,6 +272,11 @@ const toggleShowIssuesDetails = () => {
       padding-bottom: 16px;
       row-gap: 16px;
     }
+  }
+  .receiver-email-input {
+    outline: 2px solid #1d4a73;
+    padding: 5px;
+    width: 100%;
   }
 }
 </style>

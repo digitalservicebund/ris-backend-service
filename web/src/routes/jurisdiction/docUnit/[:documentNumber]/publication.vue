@@ -21,8 +21,9 @@ const receiverEmail = ref("")
 const emailSubject = ref("")
 const lastPublicationDate = ref("")
 
-const publishADocument = async () => {
-  const response = await fileService.publishADocument(docUnit.value.uuid)
+const publishADocument = async (email: string) => {
+  console.log("email: " + email)
+  const response = await fileService.publishADocument(docUnit.value.uuid, email)
   loadEmailToJurisInfos(response)
 }
 
@@ -38,7 +39,6 @@ const loadEmailToJurisInfos = (publishedXML: {
   if (!hasValidationError.value) {
     lastPublicationDate.value = formatDate(publishedXML.publishDate)
     emailSubject.value = publishedXML.mailSubject
-    receiverEmail.value = "dokmbx@juris.de"
     xml.value = publishedXML.xml
       ? publishedXML.xml.replace(/[ \t]{2,}/g, "")
       : ""
@@ -80,7 +80,7 @@ onMounted(async () => {
       :last-publication-date="lastPublicationDate"
       :is-first-time-publication="isFirstTimePublication"
       :has-validation-error="hasValidationError"
-      @publish-a-document="publishADocument"
+      @publish-a-document="publishADocument($event)"
     />
     <div v-else class="spinner">
       <h2>Überprüfung der Daten ...</h2>

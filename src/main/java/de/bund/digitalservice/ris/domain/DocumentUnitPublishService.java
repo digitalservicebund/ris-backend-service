@@ -4,7 +4,7 @@ import java.util.UUID;
 import reactor.core.publisher.Mono;
 
 public interface DocumentUnitPublishService {
-  Mono<? extends ExportObject> publish(DocUnit documentUnit);
+  Mono<ExportObject> publish(DocUnit documentUnit);
 
-  Mono<? extends ExportObject> getLastPublishedXml(Long documentUnitId, UUID documentUnitUuid);
+  Mono<ExportObject> getLastPublishedXml(Long documentUnitId, UUID documentUnitUuid);
 }

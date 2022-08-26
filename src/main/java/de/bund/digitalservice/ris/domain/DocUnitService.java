@@ -31,7 +31,6 @@ public class DocUnitService {
   private final DocUnitRepository repository;
   private final DocumentNumberCounterRepository counterRepository;
   private final S3AsyncClient s3AsyncClient;
-  private final DocumentUnitPublishService publishService;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -39,12 +38,10 @@ public class DocUnitService {
   public DocUnitService(
       DocUnitRepository repository,
       DocumentNumberCounterRepository counterRepository,
-      S3AsyncClient s3AsyncClient,
-      DocumentUnitPublishService publishService) {
+      S3AsyncClient s3AsyncClient) {
     this.repository = repository;
     this.counterRepository = counterRepository;
     this.s3AsyncClient = s3AsyncClient;
-    this.publishService = publishService;
   }
 
   public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
@@ -196,13 +193,7 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  public Mono<ExportObject> publish(UUID uuid) {
-    return repository.findByUuid(uuid).flatMap(publishService::publish);
-  }
-
-  public Mono<ExportObject> getLastPublishedXml(UUID uuid) {
-    return repository
-        .findByUuid(uuid)
-        .flatMap(documentUnit -> publishService.getLastPublishedXml(documentUnit.getId(), uuid));
+  public Mono<DocUnit> findByUuid(UUID uuid) {
+    return repository.findByUuid(uuid);
   }
 }

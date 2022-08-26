@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -56,8 +55,6 @@ class DocUnitServiceTest {
   @MockBean private DocUnitRepository repository;
 
   @MockBean private DocumentNumberCounterRepository counterRepository;
-
-  @MockBean private DocumentUnitPublishService publishService;
 
   @MockBean private S3AsyncClient s3AsyncClient;
 
@@ -318,46 +315,13 @@ class DocUnitServiceTest {
   }
 
   @Test
-  void testPublish() {
-    var documentUnit = DocUnit.EMPTY;
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
-    var exportObject = new ExportObject() {};
-    doReturn(Mono.just(exportObject)).when(publishService).publish(documentUnit);
+  void testFindByUuid() {
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
 
-    StepVerifier.create(service.publish(TEST_UUID))
-        .consumeNextWith(response -> assertThat(response).isEqualTo(exportObject))
+    StepVerifier.create(service.findByUuid(TEST_UUID))
+        .consumeNextWith(documentUnit -> assertThat(documentUnit).isEqualTo(DocUnit.EMPTY))
         .verifyComplete();
-
-    verify(publishService).publish(documentUnit);
-  }
-
-  @Test
-  void testPublish_withExceptionFromPublishService() {
-    var documentUnit = DocUnit.EMPTY;
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
-    doThrow(DocumentUnitPublishException.class).when(publishService).publish(documentUnit);
-
-    StepVerifier.create(service.publish(TEST_UUID))
-        .expectError(DocumentUnitPublishException.class)
-        .verify();
-
-    verify(publishService).publish(documentUnit);
-  }
-
-  @Test
-  void testGetLastPublishedXml() {
-    var documentUnit = new DocUnit();
-    documentUnit.setId(123L);
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
-    var exportObject = new ExportObject() {};
-    doReturn(Mono.just(exportObject)).when(publishService).getLastPublishedXml(123L, TEST_UUID);
-
-    StepVerifier.create(service.getLastPublishedXml(TEST_UUID))
-        .consumeNextWith(response -> assertThat(response).isEqualTo(exportObject))
-        .verifyComplete();
-
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService).getLastPublishedXml(123L, TEST_UUID);
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

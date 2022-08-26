@@ -21,6 +21,7 @@ import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -40,12 +41,11 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
       JurisXmlExporter jurisXmlExporter,
       XmlMailRepository repository,
       JavaMailSender mailSender,
-      @Value("${mail.from.address}") String fromMailAddress) {
+      @Value("${mail.exporter.user:test}") String fromMailAddress) {
     this.jurisXmlExporter = jurisXmlExporter;
     this.repository = repository;
     this.mailSender = mailSender;
     this.fromMailAddress = fromMailAddress;
-    this.toMailAddressList = "tester@test.com";
   }
 
   public void setToMailAddressList(String toMailAddressList) {
@@ -53,7 +53,7 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
   }
 
   @Override
-  public Mono<? extends ExportObject> publish(DocUnit documentUnit) {
+  public Mono<ExportObject> publish(DocUnit documentUnit) {
     JurisFormattedXML xml;
     try {
       xml = jurisXmlExporter.generateXml(documentUnit);
@@ -63,14 +63,13 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
 
     return generateMailSubject(documentUnit)
         .flatMap(mailSubject -> savePublishInformation(documentUnit.getId(), mailSubject, xml))
-        //        .doOnNext(this::generateMail)
-        .map(xmlMail -> new XmlMailResponse(documentUnit.getUuid(), xmlMail))
-        .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex));
+        .doOnNext(this::generateMail)
+        .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex))
+        .map(xmlMail -> new XmlMailResponse(documentUnit.getUuid(), xmlMail));
   }
 
   @Override
-  public Mono<? extends ExportObject> getLastPublishedXml(
-      Long documentUnitId, UUID documentUnitUuid) {
+  public Mono<ExportObject> getLastPublishedXml(Long documentUnitId, UUID documentUnitUuid) {
     return repository
         .findTopByDocumentUnitIdOrderByPublishDateDesc(documentUnitId)
         .map(xmlMail -> new XmlMailResponse(documentUnitUuid, xmlMail));
@@ -97,6 +96,10 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
       throw new DocumentUnitPublishException("No receiver mail address is set");
     }
 
+    if (xmlMail.statusCode().equals("400")) {
+      return;
+    }
+
     MimeMessage message = mailSender.createMimeMessage();
     MimeMessageHelper helper;
 
@@ -120,11 +123,15 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
     }
 
     try {
-      DataSource dataSource = new ByteArrayDataSource(xmlMail.xml(), "application/xml");
-      helper.addAttachment("test.xml", dataSource);
+      DataSource dataSource =
+          new ByteArrayDataSource(xmlMail.xml(), MediaType.APPLICATION_XML_VALUE);
+      helper.setText("");
+      helper.addAttachment(xmlMail.fileName(), dataSource);
     } catch (MessagingException | IOException ex) {
       throw new DocumentUnitPublishException("Couldn't add xml as attachment.");
     }
+
+    mailSender.send(message);
   }
 
   private Mono<XmlMail> savePublishInformation(
@@ -154,6 +161,7 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
             statusMessages,
             xml.fileName(),
             xml.publishDate());
+
     return repository.save(xmlMail);
   }
 }
