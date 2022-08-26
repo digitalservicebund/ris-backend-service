@@ -74,15 +74,38 @@ public class DocUnitNumberingList implements DocUnitDocx {
 
   public enum DocUnitNumberingListNumberFormat {
     DECIMAL,
-    BULLET
+    BULLET,
+    UPPER_ROMAN,
+    LOWER_ROMAN,
+    UPPER_LETTER,
+    LOWER_LETTER,
   }
 
   private String getOpenListTag(DocUnitNumberingListNumberFormat listNumberFormat) {
-    return listNumberFormat == DocUnitNumberingListNumberFormat.DECIMAL ? "<ol>" : "<ul>";
+    switch (listNumberFormat) {
+      case DECIMAL -> {
+        return "<ol type=\"decimal\">";
+      }
+      case LOWER_ROMAN -> {
+        return "<ol type=\"lower-roman\">";
+      }
+      case UPPER_ROMAN -> {
+        return "<ol type=\"upper-roman\">";
+      }
+      case LOWER_LETTER -> {
+        return "<ol type=\"lower-letter\">";
+      }
+      case UPPER_LETTER -> {
+        return "<ol type=\"upper-letter\">";
+      }
+      default -> {
+        return "<ul>";
+      }
+    }
   }
 
   private String getCloseListTag(DocUnitNumberingListNumberFormat listNumberFormat) {
-    return listNumberFormat == DocUnitNumberingListNumberFormat.DECIMAL ? "</ol>" : "</ul>";
+    return listNumberFormat == DocUnitNumberingListNumberFormat.BULLET ? "</ul>" : "</ol>";
   }
 
   private boolean shouldCreateNewList(

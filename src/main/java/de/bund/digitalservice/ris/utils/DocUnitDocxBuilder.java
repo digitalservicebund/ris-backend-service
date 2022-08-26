@@ -173,12 +173,38 @@ public class DocUnitDocxBuilder {
         ListLevel listLevel = abstractListDefinition.getListLevels().get(iLvl);
 
         if (listLevel != null) {
-          if (listLevel.getNumFmt() == NumberFormat.DECIMAL) {
-            numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
-          } else if (listLevel.getNumFmt() != NumberFormat.BULLET) {
-            LOGGER.error(
-                "not implemented number format ({}) in list. use default bullet list",
-                listLevel.getNumFmt());
+          switch (listLevel.getNumFmt()) {
+            case BULLET -> {
+              numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+              break;
+            }
+            case DECIMAL -> {
+              numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+              break;
+            }
+            case UPPER_LETTER -> {
+              numberFormat = DocUnitNumberingListNumberFormat.UPPER_LETTER;
+              break;
+            }
+            case LOWER_LETTER -> {
+              numberFormat = DocUnitNumberingListNumberFormat.LOWER_LETTER;
+              break;
+            }
+            case UPPER_ROMAN -> {
+              numberFormat = DocUnitNumberingListNumberFormat.UPPER_ROMAN;
+              break;
+            }
+            case LOWER_ROMAN -> {
+              numberFormat = DocUnitNumberingListNumberFormat.LOWER_ROMAN;
+              break;
+            }
+            default -> {
+              LOGGER.error(
+                  "not implemented number format ({}) in list. use default bullet list",
+                  listLevel.getNumFmt());
+              numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+              break;
+            }
           }
         }
       }

@@ -5,7 +5,6 @@ import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
 import { Italic } from "@tiptap/extension-italic"
 import { ListItem } from "@tiptap/extension-list-item"
-import { OrderedList } from "@tiptap/extension-ordered-list"
 import { Strike } from "@tiptap/extension-strike"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
@@ -27,6 +26,7 @@ import {
 } from "../editor/borderNumber"
 import { FontSize } from "../editor/fontSize"
 import { CustomImage } from "../editor/image"
+import { CustomOrderedList } from "../editor/orderedList"
 import { CustomParagraph } from "../editor/paragraph"
 import { TableStyle } from "../editor/tableStyle"
 import { FieldSize } from "@/domain/FieldSize"
@@ -88,7 +88,7 @@ const editor = new Editor({
     Italic,
     ListItem,
     BulletList,
-    OrderedList,
+    CustomOrderedList,
     Underline,
     Strike,
     Subscript,
@@ -567,29 +567,73 @@ onBeforeRouteUpdate(async () => {
     padding: 0.5rem 3rem;
   }
 
-  ol {
+  ol[type="lower-roman"] {
+    list-style-type: lower-roman;
+  }
+  ol[type="upper-roman"] {
+    list-style-type: upper-roman;
+  }
+  ol[type="lower-letter"] {
+    list-style-type: none;
+    counter-reset: list;
+    margin-left: -1.5rem;
+  }
+  ol[type="lower-letter"] > li {
+    display: table;
+    counter-increment: list;
+    margin-bottom: 0.5rem;
+  }
+  /** Lv 1 lower-alpha list */
+  ol[type="lower-letter"] > li:before {
+    content: counter(list, lower-alpha) ") ";
+    display: table-cell;
+    padding-right: 0.5rem;
+  }
+
+  /** Counter-increment = 26 * previours counter-increment +1 */
+  /** Lv 2 lower-alpha list */
+  li ol[type="lower-letter"] > li {
+    counter-increment: list 27;
+    margin: 0;
+  }
+
+  li ol[type="lower-letter"] > li:before {
+    content: counters(list, lower-alpha) ") ";
+  }
+  /** Lv 3 lower-alpha list */
+  li ol[type="lower-letter"] li ol[type="lower-letter"] > li {
+    counter-increment: list 703;
+    margin: 0;
+  }
+  li ol[type="lower-letter"] li ol[type="lower-letter"] > li::before {
+    content: counters(list, lower-alpha) ") ";
+  }
+  ol[type="upper-letter"] {
+    list-style-type: upper-latin;
+  }
+  ol[type="decimal"] {
     list-style-type: none;
     counter-reset: item;
     margin-left: -1.5rem;
   }
 
-  ol > li {
+  ol[type="decimal"] > li {
     display: table;
     counter-increment: item;
     margin-bottom: 0.5rem;
   }
 
-  ol > li:before {
+  ol[type="decimal"] > li:before {
     content: counters(item, ".") ". ";
     display: table-cell;
     padding-right: 0.5rem;
   }
 
-  li ol > li {
+  li ol[type="decimal"] > li {
     margin: 0;
   }
 
-  li ol > li:before {
+  li ol[type="decimal"] > li:before {
     content: counters(item, ".") " ";
   }
   .row-primary {
