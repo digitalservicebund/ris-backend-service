@@ -1,46 +1,46 @@
 package de.bund.digitalservice.ris.domain.docx;
 
 public abstract class BlockElement {
-  private Border topSelf;
-  private Border rightSelf;
-  private Border bottomSelf;
-  private Border leftSelf;
-  private Border top;
-  private Border right;
-  private Border bottom;
-  private Border left;
+  private Border topSelfBorder;
+  private Border rightSelfBorder;
+  private Border bottomSelfBorder;
+  private Border leftSelfBorder;
+  private Border topBorder;
+  private Border rightBorder;
+  private Border bottomBorder;
+  private Border leftBorder;
 
   private String backgroundColor;
 
   public void setInitialBorders(
       Border topSelf, Border rightSelf, Border bottomSelf, Border leftSelf) {
-    this.topSelf = topSelf;
-    this.rightSelf = rightSelf;
-    this.bottomSelf = bottomSelf;
-    this.leftSelf = leftSelf;
+    this.topSelfBorder = topSelf;
+    this.rightSelfBorder = rightSelf;
+    this.bottomSelfBorder = bottomSelf;
+    this.leftSelfBorder = leftSelf;
   }
 
   public void setInitialBorders() {
-    this.topSelf = null;
-    this.rightSelf = null;
-    this.bottomSelf = null;
-    this.leftSelf = null;
+    this.topSelfBorder = null;
+    this.rightSelfBorder = null;
+    this.bottomSelfBorder = null;
+    this.leftSelfBorder = null;
   }
 
   public void setTopBorder(Border border) {
-    top = border;
+    topBorder = border;
   }
 
   public void setRightBorder(Border border) {
-    right = border;
+    rightBorder = border;
   }
 
   public void setBottomBorder(Border border) {
-    bottom = border;
+    bottomBorder = border;
   }
 
   public void setLeftBorder(Border border) {
-    left = border;
+    leftBorder = border;
   }
 
   public void setBackgroundColor(String color) {
@@ -48,22 +48,22 @@ public abstract class BlockElement {
   }
 
   public void removeTopBorder() {
-    top = null;
+    topBorder = null;
   }
 
   public void removeBottomBorder() {
-    bottom = null;
+    bottomBorder = null;
   }
 
   public Boolean hasBorder() {
-    var isSet = topSelf != null;
-    isSet |= rightSelf != null;
-    isSet |= bottomSelf != null;
-    isSet |= leftSelf != null;
-    isSet |= top != null;
-    isSet |= right != null;
-    isSet |= bottom != null;
-    isSet |= left != null;
+    var isSet = topSelfBorder != null;
+    isSet |= rightSelfBorder != null;
+    isSet |= bottomSelfBorder != null;
+    isSet |= leftSelfBorder != null;
+    isSet |= topBorder != null;
+    isSet |= rightBorder != null;
+    isSet |= bottomBorder != null;
+    isSet |= leftBorder != null;
     return isSet;
   }
 
@@ -87,28 +87,28 @@ public abstract class BlockElement {
   public String bordersToHtmlString() {
     var sb = new StringBuilder();
 
-    if (topSelf != null) {
-      sb.append(bordersToHtmlString("top", topSelf));
-    } else if (top != null) {
-      sb.append(bordersToHtmlString("top", top));
+    if (topSelfBorder != null) {
+      sb.append(bordersToHtmlString("top", topSelfBorder));
+    } else if (topBorder != null) {
+      sb.append(bordersToHtmlString("top", topBorder));
     }
 
-    if (rightSelf != null) {
-      sb.append(bordersToHtmlString("right", rightSelf));
-    } else if (right != null) {
-      sb.append(bordersToHtmlString("right", right));
+    if (rightSelfBorder != null) {
+      sb.append(bordersToHtmlString("right", rightSelfBorder));
+    } else if (rightBorder != null) {
+      sb.append(bordersToHtmlString("right", rightBorder));
     }
 
-    if (bottomSelf != null) {
-      sb.append(bordersToHtmlString("bottom", bottomSelf));
-    } else if (bottom != null) {
-      sb.append(bordersToHtmlString("bottom", bottom));
+    if (bottomSelfBorder != null) {
+      sb.append(bordersToHtmlString("bottom", bottomSelfBorder));
+    } else if (bottomBorder != null) {
+      sb.append(bordersToHtmlString("bottom", bottomBorder));
     }
 
-    if (leftSelf != null) {
-      sb.append(bordersToHtmlString("left", leftSelf));
-    } else if (left != null) {
-      sb.append(bordersToHtmlString("left", left));
+    if (leftSelfBorder != null) {
+      sb.append(bordersToHtmlString("left", leftSelfBorder));
+    } else if (leftBorder != null) {
+      sb.append(bordersToHtmlString("left", leftBorder));
     }
 
     return sb.toString();
