@@ -7,8 +7,8 @@ import de.bund.digitalservice.ris.domain.ExportObject;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
-import de.bund.digitalservice.ris.domain.export.juris.JurisFormattedXML;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
+import de.bund.digitalservice.ris.domain.export.juris.ResultObject;
 import java.io.IOException;
 import java.util.UUID;
 import javax.activation.DataSource;
@@ -54,7 +54,7 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
 
   @Override
   public Mono<ExportObject> publish(DocUnit documentUnit) {
-    JurisFormattedXML xml;
+    ResultObject xml;
     try {
       xml = jurisXmlExporter.generateXml(documentUnit);
     } catch (ParserConfigurationException | TransformerException ex) {
@@ -135,7 +135,7 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
   }
 
   private Mono<XmlMail> savePublishInformation(
-      Long documentUnitId, String mailSubject, JurisFormattedXML xml) {
+      Long documentUnitId, String mailSubject, ResultObject xml) {
 
     String statusMessages = String.join("|", xml.status().statusMessages());
     if (xml.status().statusCode().equals("400")) {

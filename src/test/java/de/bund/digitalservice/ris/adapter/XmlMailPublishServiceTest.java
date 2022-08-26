@@ -12,8 +12,8 @@ import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
-import de.bund.digitalservice.ris.domain.export.juris.JurisFormattedXML;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
+import de.bund.digitalservice.ris.domain.export.juris.ResultObject;
 import de.bund.digitalservice.ris.domain.export.juris.Status;
 import java.time.Instant;
 import java.util.List;
@@ -44,8 +44,8 @@ class XmlMailPublishServiceTest {
       new XmlMail(1L, 123L, MAIL_SUBJECT, "xml", "200", "succeed", "test.xml", PUBLISH_DATE);
   private static final XmlMailResponse EXPECTED_RESPONSE =
       new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL);
-  private static final JurisFormattedXML FORMATTED_XML =
-      new JurisFormattedXML("xml", new Status("200", List.of("succeed")), "test.xml", PUBLISH_DATE);
+  private static final ResultObject FORMATTED_XML =
+      new ResultObject("xml", new Status("200", List.of("succeed")), "test.xml", PUBLISH_DATE);
 
   private DocUnit documentUnit;
 
@@ -88,7 +88,7 @@ class XmlMailPublishServiceTest {
   void testPublish_withValidationError() throws ParserConfigurationException, TransformerException {
     service.setToMailAddressList("test-to@mail.com");
     var xmlWithValidationError =
-        new JurisFormattedXML(
+        new ResultObject(
             "xml", new Status("400", List.of("status-message")), "test.xml", PUBLISH_DATE);
     var xmlMail = new XmlMail(null, 123L, null, null, "400", "status-message", null, null);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
