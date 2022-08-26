@@ -13,7 +13,7 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import de.bund.digitalservice.ris.TestMemoryAppender;
 import de.bund.digitalservice.ris.domain.docx.*;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.NumberingList.DocUnitNumberingListNumberFormat;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.math.BigInteger;
@@ -85,8 +85,8 @@ class DocUnitDocxBuilderTest {
     table.setTblPr(new TblPr());
     var result = builder.setTable(table).build();
 
-    assertTrue(result instanceof DocUnitTableElement);
-    DocUnitTableElement tableElement = (DocUnitTableElement) result;
+    assertTrue(result instanceof TableElement);
+    TableElement tableElement = (TableElement) result;
     assertEquals(3, tableElement.rows.size());
     var cells = tableElement.rows.get(0).cells;
     assertEquals(3, cells.size());
@@ -122,8 +122,8 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setTable(table).build();
 
-    assertTrue(result instanceof DocUnitTableElement);
-    assertTrue(((DocUnitTableElement) result).rows.isEmpty());
+    assertTrue(result instanceof TableElement);
+    assertTrue(((TableElement) result).rows.isEmpty());
   }
 
   @Test
@@ -234,8 +234,8 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitBorderNumber);
-    var borderNumberElement = (DocUnitBorderNumber) result;
+    assertTrue(result instanceof BorderNumber);
+    var borderNumberElement = (BorderNumber) result;
     assertEquals("1", borderNumberElement.getNumber());
 
     var htmlString = borderNumberElement.toHtmlString();
@@ -260,12 +260,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    var paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    var paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p>text</p>", htmlString);
@@ -281,8 +281,8 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    var paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    var paragraphElement = (ParagraphElement) result;
     assertTrue(paragraphElement.getRunElements().isEmpty());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -307,12 +307,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("right", paragraphElement.getAlignment());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -337,12 +337,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("left", paragraphElement.getAlignment());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -367,12 +367,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("justify", paragraphElement.getAlignment());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -397,12 +397,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("center", paragraphElement.getAlignment());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -429,12 +429,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("48", paragraphElement.getSize().toString());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -472,12 +472,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(2, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = ((DocUnitRunTextElement) runElement);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = ((RunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
     assertEquals("48", runTextElement.getSize().toString());
 
@@ -507,12 +507,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertTrue(paragraphElement.getBold());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -537,12 +537,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertTrue(runTextElement.getBold());
 
@@ -570,12 +570,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertTrue(paragraphElement.getItalic());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -600,12 +600,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertTrue(runTextElement.getItalic());
 
@@ -633,12 +633,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertTrue(paragraphElement.getStrike());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -663,12 +663,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertTrue(runTextElement.getStrike());
 
@@ -696,12 +696,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("single", paragraphElement.getUnderline());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -726,12 +726,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
     assertEquals("single", runTextElement.getUnderline());
 
@@ -759,12 +759,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("SUBSCRIPT", paragraphElement.getVertAlign().toString());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -790,12 +790,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = ((DocUnitRunTextElement) runElement);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = ((RunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
     assertEquals("SUBSCRIPT", runTextElement.getVertAlign().toString());
 
@@ -823,12 +823,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    assertEquals("text", ((DocUnitRunTextElement) runElement).getText());
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
     assertEquals("SUPERSCRIPT", paragraphElement.getVertAlign().toString());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -854,12 +854,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = ((DocUnitRunTextElement) runElement);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = ((RunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
     assertEquals("SUPERSCRIPT", runTextElement.getVertAlign().toString());
 
@@ -887,16 +887,16 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(2, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    var runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
     assertEquals("run text 1", runTextElement.getText());
     runElement = paragraphElement.getRunElements().get(1);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
-    runTextElement = (DocUnitRunTextElement) runElement;
+    assertEquals(RunTextElement.class, runElement.getClass());
+    runTextElement = (RunTextElement) runElement;
     assertEquals("run text 2", runTextElement.getText());
 
     var htmlString = paragraphElement.toHtmlString();
@@ -920,12 +920,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitInlineImageElement) runElement;
+    assertEquals(InlineImageElement.class, runElement.getClass());
+    var runImageElement = (InlineImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -950,12 +950,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitInlineImageElement) runElement;
+    assertEquals(InlineImageElement.class, runElement.getClass());
+    var runImageElement = (InlineImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -982,12 +982,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitInlineImageElement) runElement;
+    assertEquals(InlineImageElement.class, runElement.getClass());
+    var runImageElement = (InlineImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -1014,12 +1014,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitInlineImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitInlineImageElement) runElement;
+    assertEquals(InlineImageElement.class, runElement.getClass());
+    var runImageElement = (InlineImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -1046,12 +1046,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitAnchorImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitAnchorImageElement) runElement;
+    assertEquals(AnchorImageElement.class, runElement.getClass());
+    var runImageElement = (AnchorImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -1076,12 +1076,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitAnchorImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitAnchorImageElement) runElement;
+    assertEquals(AnchorImageElement.class, runElement.getClass());
+    var runImageElement = (AnchorImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -1108,12 +1108,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitAnchorImageElement.class, runElement.getClass());
-    var runImageElement = (DocUnitAnchorImageElement) runElement;
+    assertEquals(AnchorImageElement.class, runElement.getClass());
+    var runImageElement = (AnchorImageElement) runElement;
     assertEquals("content-type", runImageElement.getContentType());
     assertEquals("AQI=", runImageElement.getBase64Representation());
 
@@ -1140,12 +1140,12 @@ class DocUnitDocxBuilderTest {
 
     var result = builder.setParagraph(paragraph).useImages(images).build();
 
-    assertTrue(result instanceof DocUnitParagraphElement);
-    DocUnitParagraphElement paragraphElement = (DocUnitParagraphElement) result;
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitErrorRunElement.class, runElement.getClass());
-    var errorElement = (DocUnitErrorRunElement) runElement;
+    assertEquals(ErrorRunElement.class, runElement.getClass());
+    var errorElement = (ErrorRunElement) runElement;
 
     assertEquals(
         "unknown run element: anchor image with unknown alignment: center",
@@ -1225,17 +1225,16 @@ class DocUnitDocxBuilderTest {
             .useListNumberingDefinitions(listNumberingDefinitions)
             .build();
 
-    assertTrue(result instanceof DocUnitNumberingListEntry);
-    var numberingListEntry = (DocUnitNumberingListEntry) result;
+    assertTrue(result instanceof NumberingListEntry);
+    var numberingListEntry = (NumberingListEntry) result;
     assertEquals("0", numberingListEntry.numId());
     assertEquals("0", numberingListEntry.iLvl());
     assertEquals(DocUnitNumberingListNumberFormat.DECIMAL, numberingListEntry.numberFormat());
     assertNotNull(numberingListEntry.paragraphElement());
-    DocUnitParagraphElement paragraphElement =
-        (DocUnitParagraphElement) numberingListEntry.paragraphElement();
+    ParagraphElement paragraphElement = (ParagraphElement) numberingListEntry.paragraphElement();
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals(RunTextElement.class, runElement.getClass());
 
     var htmlString = numberingListEntry.toHtmlString();
     assertEquals("<li><p>test text</p></li>", htmlString);
@@ -1280,17 +1279,16 @@ class DocUnitDocxBuilderTest {
             .useListNumberingDefinitions(listNumberingDefinitions)
             .build();
 
-    assertTrue(result instanceof DocUnitNumberingListEntry);
-    var numberingListEntry = (DocUnitNumberingListEntry) result;
+    assertTrue(result instanceof NumberingListEntry);
+    var numberingListEntry = (NumberingListEntry) result;
     assertEquals("0", numberingListEntry.numId());
     assertEquals("0", numberingListEntry.iLvl());
     assertEquals(DocUnitNumberingListNumberFormat.BULLET, numberingListEntry.numberFormat());
     assertNotNull(numberingListEntry.paragraphElement());
-    DocUnitParagraphElement paragraphElement =
-        (DocUnitParagraphElement) numberingListEntry.paragraphElement();
+    ParagraphElement paragraphElement = (ParagraphElement) numberingListEntry.paragraphElement();
     assertEquals(1, paragraphElement.getRunElements().size());
     var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(DocUnitRunTextElement.class, runElement.getClass());
+    assertEquals(RunTextElement.class, runElement.getClass());
 
     var htmlString = numberingListEntry.toHtmlString();
     assertEquals("<li><p>test text</p></li>", htmlString);

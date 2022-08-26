@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.checkdocx;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitErrorElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
+import de.bund.digitalservice.ris.domain.docx.ErrorElement;
+import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -62,7 +62,7 @@ public class CheckDocxConvertedPane extends JPanel implements IView {
           .getConvertedFileContent()
           .forEach(
               el -> {
-                if (el instanceof DocUnitParagraphElement paragraphElement) {
+                if (el instanceof ParagraphElement paragraphElement) {
                   DefaultMutableTreeNode node = new DefaultMutableTreeNode("paragraph");
                   paragraphElement
                       .getRunElements()
@@ -83,7 +83,7 @@ public class CheckDocxConvertedPane extends JPanel implements IView {
           .getConvertedFileContent()
           .forEach(
               el -> {
-                if (el instanceof DocUnitParagraphElement paragraphElement) {
+                if (el instanceof ParagraphElement paragraphElement) {
                   DefaultMutableTreeNode node = new DefaultMutableTreeNode("paragraph");
                   AtomicInteger i = new AtomicInteger(0);
                   paragraphElement
@@ -91,8 +91,7 @@ public class CheckDocxConvertedPane extends JPanel implements IView {
                       .forEach(
                           runElement -> {
                             i.incrementAndGet();
-                            if (!controller.isErrorsOnly()
-                                || runElement instanceof DocUnitErrorElement) {
+                            if (!controller.isErrorsOnly() || runElement instanceof ErrorElement) {
                               node.add(
                                   new DefaultMutableTreeNode(
                                       "run element(" + i.get() + "): " + runElement));

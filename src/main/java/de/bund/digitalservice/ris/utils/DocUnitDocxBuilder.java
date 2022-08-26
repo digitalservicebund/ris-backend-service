@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.*;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.NumberingList.DocUnitNumberingListNumberFormat;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.*;
 import java.lang.reflect.InvocationTargetException;
@@ -126,8 +126,8 @@ public class DocUnitDocxBuilder {
     return false;
   }
 
-  private DocUnitBorderNumber convertToBorderNumber() {
-    DocUnitBorderNumber borderNumber = new DocUnitBorderNumber();
+  private BorderNumber convertToBorderNumber() {
+    BorderNumber borderNumber = new BorderNumber();
 
     paragraph.getContent().stream()
         .filter(R.class::isInstance)
@@ -145,7 +145,7 @@ public class DocUnitDocxBuilder {
     return paragraph.getPPr().getNumPr() != null;
   }
 
-  private DocUnitNumberingListEntry convertToNumberingList() {
+  private NumberingListEntry convertToNumberingList() {
     if (!isNumberingList()) {
       return null;
     }
@@ -210,8 +210,7 @@ public class DocUnitDocxBuilder {
       }
     }
 
-    return new DocUnitNumberingListEntry(
-        convertToParagraphElement(paragraph), numberFormat, numId, iLvl);
+    return new NumberingListEntry(convertToParagraphElement(paragraph), numberFormat, numId, iLvl);
   }
 
   private boolean isParagraph() {
@@ -223,7 +222,7 @@ public class DocUnitDocxBuilder {
       return null;
     }
 
-    var paragraphElement = new DocUnitParagraphElement();
+    var paragraphElement = new ParagraphElement();
 
     var pPr = paragraph.getPPr();
     String alignment = getAlignment(pPr);
@@ -232,7 +231,7 @@ public class DocUnitDocxBuilder {
     }
 
     if (!addParagraphStyle(paragraphElement, pPr)) {
-      return new DocUnitErrorElement("Font size of paragraph is to high.");
+      return new ErrorElement("Font size of paragraph is to high.");
     }
 
     paragraph.getContent().stream()
@@ -243,13 +242,12 @@ public class DocUnitDocxBuilder {
     return paragraphElement;
   }
 
-  private void parseRunElement(R run, DocUnitParagraphElement paragraphElement) {
+  private void parseRunElement(R run, ParagraphElement paragraphElement) {
     run.getContent()
         .forEach(element -> parseRunChildrenElement(element, run.getRPr(), paragraphElement));
   }
 
-  private void parseRunChildrenElement(
-      Object element, RPr rPr, DocUnitParagraphElement paragraphElement) {
+  private void parseRunChildrenElement(Object element, RPr rPr, ParagraphElement paragraphElement) {
     if (element instanceof JAXBElement<?> jaxbElement) {
       var declaredType = jaxbElement.getDeclaredType();
 
@@ -260,30 +258,29 @@ public class DocUnitDocxBuilder {
           paragraphElement.addRunElement(generateRunTextElement(text, rPr));
         }
       } else if (declaredType == Drawing.class) {
-        DocUnitRunElement imageElement =
-            parseDrawing(paragraphElement, (Drawing) jaxbElement.getValue());
+        RunElement imageElement = parseDrawing(paragraphElement, (Drawing) jaxbElement.getValue());
         paragraphElement.addRunElement(imageElement);
       } else if (declaredType == R.Tab.class) {
-        paragraphElement.addRunElement(new DocUnitRunTabElement());
+        paragraphElement.addRunElement(new RunTabElement());
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
-        paragraphElement.addRunElement(new DocUnitErrorRunElement(declaredType.getName()));
+        paragraphElement.addRunElement(new ErrorRunElement(declaredType.getName()));
       }
     }
   }
 
-  private DocUnitRunElement generateRunTextElement(String text, RPrAbstract rPr) {
-    DocUnitRunTextElement runTextElement = new DocUnitRunTextElement();
+  private RunElement generateRunTextElement(String text, RPrAbstract rPr) {
+    RunTextElement runTextElement = new RunTextElement();
 
     runTextElement.setText(text);
     if (!addStyle(runTextElement, rPr)) {
-      return new DocUnitErrorRunElement("Size of the font to high!");
+      return new ErrorRunElement("Size of the font to high!");
     }
 
     return runTextElement;
   }
 
-  private DocUnitRunElement parseDrawing(DocUnitParagraphElement parent, Drawing drawing) {
+  private RunElement parseDrawing(ParagraphElement parent, Drawing drawing) {
     if (drawing.getAnchorOrInline().size() != 1) {
       throw new DocxConverterException("more than one graphic data in a drawing");
     }
@@ -295,28 +292,28 @@ public class DocUnitDocxBuilder {
       return parseAnchorImageElement(parent, anchor);
     } else {
       LOGGER.error("unsupported drawing object");
-      return new DocUnitErrorRunElement(
+      return new ErrorRunElement(
           "anchor drawing object? " + drawingObject.getClass().getSimpleName());
     }
   }
 
-  private DocUnitRunElement parseAnchorImageElement(DocUnitParagraphElement parent, Anchor anchor) {
+  private RunElement parseAnchorImageElement(ParagraphElement parent, Anchor anchor) {
     if (anchor == null
         || anchor.getGraphic() == null
         || anchor.getGraphic().getGraphicData() == null) {
       throw new DocxConverterException("no graphic data");
     }
 
-    DocUnitRunElement runElement =
-        parseGraphicData(anchor.getGraphic().getGraphicData(), DocUnitAnchorImageElement.class);
+    RunElement runElement =
+        parseGraphicData(anchor.getGraphic().getGraphicData(), AnchorImageElement.class);
 
-    if (runElement instanceof DocUnitAnchorImageElement imageElement) {
+    if (runElement instanceof AnchorImageElement imageElement) {
       imageElement.setAlternateText(parseImageAlternateText(anchor.getDocPr()));
       imageElement.setSize(parseImageSize(anchor.getExtent()));
       String floating = parseFloating(anchor.getPositionH());
       if (floating != null) {
         if (floating.equals("error")) {
-          return new DocUnitErrorRunElement(
+          return new ErrorRunElement(
               "anchor image with unknown alignment: " + anchor.getPositionH().getAlign().value());
         }
         parent.setClearfix(true);
@@ -329,17 +326,17 @@ public class DocUnitDocxBuilder {
     return runElement;
   }
 
-  private DocUnitRunElement parseInlineImageElement(Inline inline) {
+  private RunElement parseInlineImageElement(Inline inline) {
     if (inline == null
         || inline.getGraphic() == null
         || inline.getGraphic().getGraphicData() == null) {
       throw new DocxConverterException("no graphic data");
     }
 
-    DocUnitRunElement runElement =
-        parseGraphicData(inline.getGraphic().getGraphicData(), DocUnitInlineImageElement.class);
+    RunElement runElement =
+        parseGraphicData(inline.getGraphic().getGraphicData(), InlineImageElement.class);
 
-    if (runElement instanceof DocUnitInlineImageElement imageElement) {
+    if (runElement instanceof InlineImageElement imageElement) {
       imageElement.setAlternateText(parseImageAlternateText(inline.getDocPr()));
       imageElement.setSize(parseImageSize(inline.getExtent()));
 
@@ -392,10 +389,10 @@ public class DocUnitDocxBuilder {
     }
   }
 
-  private DocUnitRunElement parseGraphicData(
-      GraphicData graphicData, Class<? extends DocUnitInlineImageElement> clazz) {
+  private RunElement parseGraphicData(
+      GraphicData graphicData, Class<? extends InlineImageElement> clazz) {
 
-    DocUnitInlineImageElement imageElement = new DocUnitInlineImageElement();
+    InlineImageElement imageElement = new InlineImageElement();
     try {
       imageElement = clazz.getDeclaredConstructor().newInstance();
     } catch (InstantiationException
@@ -420,7 +417,7 @@ public class DocUnitDocxBuilder {
       StringBuilder stringBuilder = new StringBuilder();
       anyGraphicElement.forEach(
           el -> stringBuilder.append(el.getClass().getSimpleName()).append(", "));
-      return new DocUnitErrorRunElement("unknown graphic element: " + stringBuilder);
+      return new ErrorRunElement("unknown graphic element: " + stringBuilder);
     }
 
     return imageElement;
@@ -464,7 +461,7 @@ public class DocUnitDocxBuilder {
     return null;
   }
 
-  private boolean addParagraphStyle(DocUnitTextElement textElement, PPr pPr) {
+  private boolean addParagraphStyle(TextElement textElement, PPr pPr) {
     if (pPr == null) {
       return true;
     }
@@ -617,7 +614,7 @@ public class DocUnitDocxBuilder {
     return strike;
   }
 
-  private boolean addStyle(DocUnitTextElement textElement, RPrAbstract rPr) {
+  private boolean addStyle(TextElement textElement, RPrAbstract rPr) {
     if (rPr == null) {
       return true;
     }
@@ -678,7 +675,7 @@ public class DocUnitDocxBuilder {
     return table != null;
   }
 
-  private void addTableStyle(DocUnitTableElement tableElement, TblPr tblPr) {
+  private void addTableStyle(TableElement tableElement, TblPr tblPr) {
     if (tblPr == null) return;
 
     if (tblPr.getTblBorders() != null) {
@@ -722,14 +719,14 @@ public class DocUnitDocxBuilder {
   }
 
   private DocUnitDocx convertToTable() {
-    var tableElement = new DocUnitTableElement(parseTable(table));
+    var tableElement = new TableElement(parseTable(table));
     addTableStyle(tableElement, table.getTblPr());
 
     return tableElement;
   }
 
-  private List<DocUnitTableRowElement> parseTable(Tbl table) {
-    List<DocUnitTableRowElement> rows = new ArrayList<>();
+  private List<TableRowElement> parseTable(Tbl table) {
+    List<TableRowElement> rows = new ArrayList<>();
 
     table
         .getContent()
@@ -750,8 +747,8 @@ public class DocUnitDocxBuilder {
     return rows;
   }
 
-  private DocUnitTableRowElement parseTr(Tr tr) {
-    List<DocUnitTableCellElement> cells = new ArrayList<>();
+  private TableRowElement parseTr(Tr tr) {
+    List<TableCellElement> cells = new ArrayList<>();
 
     tr.getContent()
         .forEach(
@@ -785,10 +782,10 @@ public class DocUnitDocxBuilder {
       cells.get(cells.size() - 1).setRightBorder(null);
     }
 
-    return new DocUnitTableRowElement(cells);
+    return new TableRowElement(cells);
   }
 
-  private DocUnitTableCellElement parseTc(Tc tc) {
+  private TableCellElement parseTc(Tc tc) {
     List<DocUnitDocx> paragraphElements = new ArrayList<>();
     tc.getContent()
         .forEach(
@@ -800,7 +797,7 @@ public class DocUnitDocxBuilder {
               }
             });
 
-    var cell = new DocUnitTableCellElement(paragraphElements);
+    var cell = new TableCellElement(paragraphElements);
 
     var tcPr = tc.getTcPr();
     if (tcPr != null) {

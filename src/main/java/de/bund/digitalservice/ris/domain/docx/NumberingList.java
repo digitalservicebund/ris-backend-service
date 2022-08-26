@@ -4,15 +4,15 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class DocUnitNumberingList implements DocUnitDocx {
+public class NumberingList implements DocUnitDocx {
 
-  private final List<DocUnitNumberingListEntry> entries = new ArrayList<>();
+  private final List<NumberingListEntry> entries = new ArrayList<>();
 
-  public DocUnitNumberingList() {
+  public NumberingList() {
     /*Create new instance of docUnitNumberList*/
   }
 
-  public void addNumberingListEntry(DocUnitNumberingListEntry entry) {
+  public void addNumberingListEntry(NumberingListEntry entry) {
     entries.add(entry);
   }
 

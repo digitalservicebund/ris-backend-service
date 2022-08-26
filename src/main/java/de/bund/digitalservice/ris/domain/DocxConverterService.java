@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.domain;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
+import de.bund.digitalservice.ris.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.domain.docx.NumberingList;
+import de.bund.digitalservice.ris.domain.docx.NumberingListEntry;
+import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
 import java.awt.Dimension;
@@ -136,8 +136,8 @@ public class DocxConverterService {
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
     List<DocUnitDocx> packedList = new ArrayList<>();
-    DocUnitBorderNumber[] lastBorderNumber = {null};
-    DocUnitNumberingList[] lastNumberingList = {null};
+    BorderNumber[] lastBorderNumber = {null};
+    NumberingList[] lastNumberingList = {null};
     boolean[] isCreateNewList = {false};
 
     return Mono.fromFuture(futureResponse)
@@ -197,20 +197,20 @@ public class DocxConverterService {
   }
 
   private boolean packBorderNumberElements(
-      DocUnitDocx element, List<DocUnitDocx> packedList, DocUnitBorderNumber[] lastBorderNumber) {
-    if (lastBorderNumber[0] == null && !(element instanceof DocUnitBorderNumber)) {
+      DocUnitDocx element, List<DocUnitDocx> packedList, BorderNumber[] lastBorderNumber) {
+    if (lastBorderNumber[0] == null && !(element instanceof BorderNumber)) {
       return false;
     }
 
-    DocUnitBorderNumber last = lastBorderNumber[0];
+    BorderNumber last = lastBorderNumber[0];
     boolean packed = false;
-    if (element instanceof DocUnitBorderNumber borderNumber) {
+    if (element instanceof BorderNumber borderNumber) {
       lastBorderNumber[0] = borderNumber;
       if (last != null) {
         packedList.add(last);
       }
       packed = true;
-    } else if (element instanceof DocUnitParagraphElement paragraphElement) {
+    } else if (element instanceof ParagraphElement paragraphElement) {
       lastBorderNumber[0] = null;
       last.addParagraphElement(paragraphElement);
       packedList.add(last);
@@ -225,20 +225,20 @@ public class DocxConverterService {
   private boolean packNumberingListEntries(
       DocUnitDocx element,
       List<DocUnitDocx> packedList,
-      DocUnitNumberingList[] lastNumberingList,
+      NumberingList[] lastNumberingList,
       boolean isCreateNewList) {
-    if (lastNumberingList[0] == null && !(element instanceof DocUnitNumberingListEntry)) {
+    if (lastNumberingList[0] == null && !(element instanceof NumberingListEntry)) {
       return false;
     }
 
     boolean packed = false;
-    DocUnitNumberingList last = lastNumberingList[0];
-    if (element instanceof DocUnitNumberingListEntry numberingListEntry) {
+    NumberingList last = lastNumberingList[0];
+    if (element instanceof NumberingListEntry numberingListEntry) {
       if (last == null || isCreateNewList) {
         if (last != null) {
           packedList.add(last);
         }
-        lastNumberingList[0] = new DocUnitNumberingList();
+        lastNumberingList[0] = new NumberingList();
         lastNumberingList[0].addNumberingListEntry(numberingListEntry);
       } else {
         last.addNumberingListEntry(numberingListEntry);

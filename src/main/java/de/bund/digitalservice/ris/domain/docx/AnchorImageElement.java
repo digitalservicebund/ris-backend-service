@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-public class DocUnitAnchorImageElement extends DocUnitInlineImageElement {
+public class AnchorImageElement extends InlineImageElement {
   private String floating;
 
   public void setFloating(String floating) {

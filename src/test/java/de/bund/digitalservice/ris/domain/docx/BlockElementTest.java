@@ -11,44 +11,44 @@ class BlockElementTest {
     var concreteBlock = generateConcreteBlockElement();
 
     concreteBlock.setInitialBorders(new Border("green", 1, "solid"), null, null, null);
-    assertEquals("border-top: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-top: 1px solid green;", concreteBlock.bordersToHtmlString());
 
     // should not overwrite self
     concreteBlock.setTopBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-top: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-top: 1px solid green;", concreteBlock.bordersToHtmlString());
   }
 
   @Test
   void testSetBottom() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setInitialBorders(null, null, new Border("green", 1, "solid"), null);
-    assertEquals("border-bottom: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-bottom: 1px solid green;", concreteBlock.bordersToHtmlString());
 
     // should not overwrite self
     concreteBlock.setBottomBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-bottom: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-bottom: 1px solid green;", concreteBlock.bordersToHtmlString());
   }
 
   @Test
   void testSetRight() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setInitialBorders(null, new Border("green", 1, "solid"), null, null);
-    assertEquals("border-right: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-right: 1px solid green;", concreteBlock.bordersToHtmlString());
 
     // should not overwrite self
     concreteBlock.setRightBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-right: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-right: 1px solid green;", concreteBlock.bordersToHtmlString());
   }
 
   @Test
   void testSetLeft() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setInitialBorders(null, null, null, new Border("green", 1, "solid"));
-    assertEquals("border-left: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-left: 1px solid green;", concreteBlock.bordersToHtmlString());
 
     // should not overwrite
     concreteBlock.setLeftBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-left: 1px solid green;", concreteBlock.borderToHtmlString());
+    assertEquals("border-left: 1px solid green;", concreteBlock.bordersToHtmlString());
   }
 
   @Test
@@ -65,7 +65,7 @@ class BlockElementTest {
     concreteBlock.setTopBorder(new Border("yellow", 2, "solid"));
     concreteBlock.removeTopBorder();
 
-    assertFalse(concreteBlock.borderToHtmlString().contains("border-top: 2px solid yellow;"));
+    assertFalse(concreteBlock.bordersToHtmlString().contains("border-top: 2px solid yellow;"));
   }
 
   @Test
@@ -75,7 +75,7 @@ class BlockElementTest {
     concreteBlock.setTopBorder(new Border("yellow", 2, "solid"));
     concreteBlock.removeBottomBorder();
 
-    assertFalse(concreteBlock.borderToHtmlString().contains("border-bottom: 1px solid green;"));
+    assertFalse(concreteBlock.bordersToHtmlString().contains("border-bottom: 1px solid green;"));
   }
 
   @Test
@@ -108,7 +108,7 @@ class BlockElementTest {
 
   private BlockElement generateConcreteBlockElement() {
     var someElements = new ArrayList<DocUnitDocx>();
-    someElements.add(new DocUnitNumberingList());
-    return new DocUnitTableCellElement(someElements);
+    someElements.add(new NumberingList());
+    return new TableCellElement(someElements);
   }
 }

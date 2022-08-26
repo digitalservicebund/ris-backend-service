@@ -2,11 +2,11 @@ package de.bund.digitalservice.ris.domain.docx;
 
 import org.springframework.beans.factory.annotation.Value;
 
-public class DocUnitErrorRunElement extends DocUnitErrorElement implements DocUnitRunElement {
+public class ErrorRunElement extends ErrorElement implements RunElement {
   @Value("error.nodes.active")
   private boolean active;
 
-  public DocUnitErrorRunElement(String name) {
+  public ErrorRunElement(String name) {
     super(name);
   }
 

@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitErrorElement;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.domain.docx.ErrorElement;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Map;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
@@ -34,7 +34,7 @@ public class DocxConverter {
       return convertTbl((Tbl) element.getValue());
     }
 
-    return new DocUnitErrorElement(part.getClass().getName());
+    return new ErrorElement(part.getClass().getName());
   }
 
   private DocUnitDocx convertP(P part) {

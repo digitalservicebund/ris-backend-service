@@ -71,44 +71,44 @@ public abstract class BlockElement {
     return backgroundColor != null;
   }
 
-  private String borderToHtmlString(String position, Border border) {
-    if (border.width == null || border.type == null || border.color == null) return "";
+  private String bordersToHtmlString(String position, Border border) {
+    if (border.width() == null || border.type() == null || border.color() == null) return "";
     return "border-"
         + position
         + ": "
-        + border.width
+        + border.width()
         + "px "
-        + border.type
+        + border.type()
         + " "
-        + border.color
+        + border.color()
         + ";";
   }
 
-  public String borderToHtmlString() {
+  public String bordersToHtmlString() {
     var sb = new StringBuilder();
 
     if (topSelf != null) {
-      sb.append(borderToHtmlString("top", topSelf));
+      sb.append(bordersToHtmlString("top", topSelf));
     } else if (top != null) {
-      sb.append(borderToHtmlString("top", top));
+      sb.append(bordersToHtmlString("top", top));
     }
 
     if (rightSelf != null) {
-      sb.append(borderToHtmlString("right", rightSelf));
+      sb.append(bordersToHtmlString("right", rightSelf));
     } else if (right != null) {
-      sb.append(borderToHtmlString("right", right));
+      sb.append(bordersToHtmlString("right", right));
     }
 
     if (bottomSelf != null) {
-      sb.append(borderToHtmlString("bottom", bottomSelf));
+      sb.append(bordersToHtmlString("bottom", bottomSelf));
     } else if (bottom != null) {
-      sb.append(borderToHtmlString("bottom", bottom));
+      sb.append(bordersToHtmlString("bottom", bottom));
     }
 
     if (leftSelf != null) {
-      sb.append(borderToHtmlString("left", leftSelf));
+      sb.append(bordersToHtmlString("left", leftSelf));
     } else if (left != null) {
-      sb.append(borderToHtmlString("left", left));
+      sb.append(bordersToHtmlString("left", left));
     }
 
     return sb.toString();

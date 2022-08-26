@@ -3,8 +3,8 @@ package de.bund.digitalservice.ris.utils;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitTableElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTextElement;
+import de.bund.digitalservice.ris.domain.docx.TableElement;
+import de.bund.digitalservice.ris.domain.docx.TextElement;
 import jakarta.xml.bind.JAXBElement;
 import java.util.Collections;
 import javax.xml.namespace.QName;
@@ -30,7 +30,7 @@ class DocxParagraphConverterTest {
 
     var result = converter.convert(tblElement);
 
-    assertTrue(result instanceof DocUnitTableElement);
+    assertTrue(result instanceof TableElement);
   }
 
   @Test
@@ -45,7 +45,7 @@ class DocxParagraphConverterTest {
 
     var result = converter.convert(paragraph);
 
-    assertTrue(result instanceof DocUnitTextElement);
+    assertTrue(result instanceof TextElement);
   }
 
   @Test

@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.NumberingList.DocUnitNumberingListNumberFormat;
 
-public record DocUnitNumberingListEntry(
+public record NumberingListEntry(
     DocUnitDocx paragraphElement,
     DocUnitNumberingListNumberFormat numberFormat,
     String numId,

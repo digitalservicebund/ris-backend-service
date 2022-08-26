@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.checkdocx;
 
 import de.bund.digitalservice.ris.domain.DocxConverterService;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitErrorElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
+import de.bund.digitalservice.ris.domain.docx.ErrorElement;
+import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import java.awt.Component;
 import java.io.File;
@@ -100,10 +100,10 @@ public class CheckDocxController {
       return contentList.stream()
           .filter(
               el -> {
-                if (el instanceof DocUnitParagraphElement paragraphElement) {
+                if (el instanceof ParagraphElement paragraphElement) {
                   return paragraphElement.getRunElements().stream()
-                      .anyMatch(run -> run instanceof DocUnitErrorElement);
-                } else return el instanceof DocUnitErrorElement;
+                      .anyMatch(run -> run instanceof ErrorElement);
+                } else return el instanceof ErrorElement;
               })
           .toList();
     } else {

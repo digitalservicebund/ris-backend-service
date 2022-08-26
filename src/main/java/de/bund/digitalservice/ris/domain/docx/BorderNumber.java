@@ -3,15 +3,15 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocUnitBorderNumber implements DocUnitDocx {
+public class BorderNumber implements DocUnitDocx {
   private final StringBuilder number = new StringBuilder();
-  private List<DocUnitParagraphElement> paragraphElements = new ArrayList<>();
+  private List<ParagraphElement> paragraphElements = new ArrayList<>();
 
   public String getNumber() {
     return number.toString();
   }
 
-  public void addParagraphElement(DocUnitParagraphElement paragraphElement) {
+  public void addParagraphElement(ParagraphElement paragraphElement) {
     paragraphElements.add(paragraphElement);
   }
 
@@ -29,7 +29,7 @@ public class DocUnitBorderNumber implements DocUnitDocx {
     sb.append("</number>");
     if (paragraphElements != null && !paragraphElements.isEmpty()) {
       sb.append("<content>");
-      for (DocUnitParagraphElement textElement : paragraphElements) {
+      for (ParagraphElement textElement : paragraphElements) {
         sb.append(textElement.toHtmlString());
       }
       sb.append("</content>");

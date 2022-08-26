@@ -10,17 +10,17 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.config.ConverterConfig;
-import de.bund.digitalservice.ris.domain.docx.DocUnitBorderNumber;
+import de.bund.digitalservice.ris.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingList.DocUnitNumberingListNumberFormat;
-import de.bund.digitalservice.ris.domain.docx.DocUnitNumberingListEntry;
-import de.bund.digitalservice.ris.domain.docx.DocUnitParagraphElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitRunTextElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTableCellElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTableElement;
-import de.bund.digitalservice.ris.domain.docx.DocUnitTableRowElement;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.domain.docx.NumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.NumberingListEntry;
+import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
+import de.bund.digitalservice.ris.domain.docx.RunTextElement;
+import de.bund.digitalservice.ris.domain.docx.TableCellElement;
+import de.bund.digitalservice.ris.domain.docx.TableElement;
+import de.bund.digitalservice.ris.domain.docx.TableRowElement;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
 import java.io.ByteArrayInputStream;
@@ -876,33 +876,33 @@ class DocxConverterServiceTest {
     }
   }
 
-  private DocUnitParagraphElement generateText(String text) {
-    var textElement = new DocUnitParagraphElement();
-    var runTextElement = new DocUnitRunTextElement();
+  private ParagraphElement generateText(String text) {
+    var textElement = new ParagraphElement();
+    var runTextElement = new RunTextElement();
     runTextElement.setText(text);
     textElement.addRunElement(runTextElement);
     return textElement;
   }
 
-  private DocUnitBorderNumber generateBorderNumber(String text) {
-    DocUnitBorderNumber borderNumber = new DocUnitBorderNumber();
+  private BorderNumber generateBorderNumber(String text) {
+    BorderNumber borderNumber = new BorderNumber();
     borderNumber.addNumberText(text);
     return borderNumber;
   }
 
-  private DocUnitTableElement generateTable(String text) {
+  private TableElement generateTable(String text) {
     List<DocUnitDocx> paragraphElements = List.of(generateText(text));
-    List<DocUnitTableCellElement> cells = List.of(new DocUnitTableCellElement(paragraphElements));
-    List<DocUnitTableRowElement> rows = List.of(new DocUnitTableRowElement(cells));
+    List<TableCellElement> cells = List.of(new TableCellElement(paragraphElements));
+    List<TableRowElement> rows = List.of(new TableRowElement(cells));
 
-    return new DocUnitTableElement(rows);
+    return new TableElement(rows);
   }
 
   private DocUnitDocx generateNumberingListEntry(
       String text, DocUnitNumberingListNumberFormat numberFormat, String numId, String iLvl) {
     var paragraphElement = generateText(text);
 
-    return new DocUnitNumberingListEntry(paragraphElement, numberFormat, numId, iLvl);
+    return new NumberingListEntry(paragraphElement, numberFormat, numId, iLvl);
   }
 
   private static class TestDocumentGenerator {

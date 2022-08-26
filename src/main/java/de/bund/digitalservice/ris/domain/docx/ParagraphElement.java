@@ -3,10 +3,10 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DocUnitParagraphElement extends DocUnitTextElement {
+public class ParagraphElement extends TextElement {
   private String alignment;
   private boolean clearfix;
-  private final List<DocUnitRunElement> runElements = new ArrayList<>();
+  private final List<RunElement> runElements = new ArrayList<>();
 
   public String getAlignment() {
     return alignment;
@@ -24,11 +24,11 @@ public class DocUnitParagraphElement extends DocUnitTextElement {
     this.clearfix = clearfix;
   }
 
-  public void addRunElement(DocUnitRunElement element) {
+  public void addRunElement(RunElement element) {
     this.runElements.add(element);
   }
 
-  public List<DocUnitRunElement> getRunElements() {
+  public List<RunElement> getRunElements() {
     return runElements;
   }
 
@@ -57,7 +57,7 @@ public class DocUnitParagraphElement extends DocUnitTextElement {
     }
     sb.append(">");
 
-    for (DocUnitRunElement element : runElements) {
+    for (RunElement element : runElements) {
       sb.append(element.toHtmlString());
     }
     sb.append("</p>");
