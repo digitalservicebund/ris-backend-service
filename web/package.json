@@ -74,7 +74,6 @@
     "autoprefixer": "^10.4.7",
     "axe-playwright": "^1.1.11",
     "babel-loader": "^8.2.5",
-    "dotenv": "^16.0.1",
     "eslint": "^8.22.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
