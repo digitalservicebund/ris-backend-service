@@ -208,12 +208,12 @@ class DocUnitDocxBuilderTest {
     // cell should take insideV from table
     assertTrue(
         result.contains(
-            "<td style=\"border-top: 1px solid #ghijkl;border-right: 6px solid #000;border-left: 6px solid #000;\"><p>foo</p></td>"));
+            "<td style=\"padding: 5px; min-width: 5px;border-top: 1px solid #ghijkl;border-right: 6px solid #000;border-left: 6px solid #000;\"><p>foo</p></td>"));
 
     // insideV from table should not overwrite cell's border
     assertTrue(
         result.contains(
-            "<td colspan=\"2\" style=\"border-top: 1px solid #mnopqr;border-right: 3px solid #foo;border-left: 6px solid #000;background-color: #111222;\"><p>foo</p></td>"));
+            "<td colspan=\"2\" style=\"padding: 5px; min-width: 5px;border-top: 1px solid #mnopqr;border-right: 3px solid #foo;border-left: 6px solid #000;background-color: #111222;\"><p>foo</p></td>"));
   }
 
   @Test

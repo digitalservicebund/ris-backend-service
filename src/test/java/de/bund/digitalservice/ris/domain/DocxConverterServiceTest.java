@@ -148,7 +148,7 @@ class DocxConverterServiceTest {
                     "<p>test</p>"
                         + "<border-number><number>1</number><content><p>border number 1</p></content></border-number>"
                         + "<border-number><number>2</number><content><p>border number 2</p></content></border-number>"
-                        + "<table style=\"border-collapse: collapse;\"><tr><td><p>table content</p></td></tr></table>",
+                        + "<table style=\"border-collapse: collapse;\"><tr><td style=\"padding: 5px; min-width: 5px;\"><p>table content</p></td></tr></table>",
                     docx2Html.content());
               })
           .verifyComplete();
