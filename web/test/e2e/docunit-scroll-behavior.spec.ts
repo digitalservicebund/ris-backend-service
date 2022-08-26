@@ -18,7 +18,6 @@ test.describe("test the scrolling behavior with hashes", () => {
 
     await textsNavItem.click()
 
-    await page.screenshot({ path: "test/e2e/screenshot.png" })
     // wait for scrolling transition
     await new Promise((resolve) => setTimeout(resolve, 1000))
     await expect(await isInViewport(page, coreDataHeadline)).not.toBeTruthy()
@@ -45,7 +44,6 @@ test.describe("test the scrolling behavior with hashes", () => {
 
     await textsNavItem.click()
 
-    await page.screenshot({ path: "test/e2e/screenshot.png" })
     // wait for scrolling transition
     await new Promise((resolve) => setTimeout(resolve, 1000))
     await expect(await isInViewport(page, coreDataHeadline)).not.toBeTruthy()
