@@ -31,12 +31,11 @@ public class DocUnitTableCellElement extends Block implements DocUnitDocx {
     StringBuilder sb = new StringBuilder("<td");
     sb.append(columnSpanToHtmlString());
 
-    if (hasStyle()) {
-      sb.append(" style=\"");
-      sb.append(borderToHtmlString());
-      sb.append(backgroundColorToHtmlString());
-      sb.append("\"");
-    }
+    sb.append(" style=\"padding: 5px; min-width: 5px;");
+    sb.append(borderToHtmlString());
+    sb.append(backgroundColorToHtmlString());
+    sb.append("\"");
+
     sb.append(">");
     sb.append(
         paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining()));
