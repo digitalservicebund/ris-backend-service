@@ -1,4 +1,4 @@
-import { fireEvent, getByLabelText, render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createVuetify } from "vuetify/lib/framework.mjs"
