@@ -1,7 +1,7 @@
 FROM node:16.14.2 AS builder
 WORKDIR /usr/src/app
 COPY . .
-RUN npm install && vite build --outDir ./dist
+RUN npm install && npx vite build --outDir ./dist
 
 
 FROM nginx:1.23.1
