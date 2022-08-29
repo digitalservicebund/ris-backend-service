@@ -14,10 +14,7 @@ public class ParagraphElement extends TextElement {
 
   public void setAlignment(String alignment) {
     this.alignment = alignment;
-  }
-
-  public boolean isClearfix() {
-    return clearfix;
+    addStyle("text-align", alignment);
   }
 
   public void setClearfix(boolean clearfix) {
@@ -34,27 +31,12 @@ public class ParagraphElement extends TextElement {
 
   @Override
   public String toHtmlString() {
-    StringBuilder sb = new StringBuilder();
-
-    sb.append("<p");
-
-    var hasStyle = hasStyle();
-    hasStyle |= alignment != null;
+    StringBuilder sb = new StringBuilder("<p");
 
     if (clearfix) {
       sb.append(" class=\"clearfix\"");
     }
-
-    if (hasStyle) {
-      sb.append(" style=\"");
-      addStyle(sb);
-
-      if (alignment != null) {
-        sb.append("text-align: ").append(alignment).append(";");
-      }
-
-      sb.append("\"");
-    }
+    sb.append(getStyleString());
     sb.append(">");
 
     for (RunElement element : runElements) {

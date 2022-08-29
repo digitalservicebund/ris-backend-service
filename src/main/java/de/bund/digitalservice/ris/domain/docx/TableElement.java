@@ -8,14 +8,14 @@ public class TableElement extends BlockElement implements DocUnitDocx {
 
   public TableElement(List<TableRowElement> rows) {
     this.rows = rows;
+    addStyle("border-collapse", "collapse");
   }
 
   @Override
   public String toHtmlString() {
-    return "<table style=\"border-collapse: collapse;"
-        + bordersToHtmlString()
-        + backgroundColorToHtmlString()
-        + "\">"
+    return "<table"
+        + super.getStyleString()
+        + ">"
         + rows.stream().map(TableRowElement::toHtmlString).collect(Collectors.joining())
         + "</table>";
   }

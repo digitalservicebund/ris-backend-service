@@ -9,13 +9,8 @@ public class TableCellElement extends BlockElement implements DocUnitDocx {
 
   public TableCellElement(List<DocUnitDocx> paragraphElements) {
     this.paragraphElements = paragraphElements;
-    setInitialBorders();
-  }
-
-  private boolean hasStyle() {
-    var hasStyle = hasBorder();
-    hasStyle |= hasBackgroundColor();
-    return hasStyle;
+    addStyle("min-width", "5px");
+    addStyle("padding", "5px");
   }
 
   public void setColumnSpan(Integer columnSpan) {
@@ -31,10 +26,7 @@ public class TableCellElement extends BlockElement implements DocUnitDocx {
 
     return "<td"
         + columnSpanToHtmlString()
-        + " style=\"padding: 5px; min-width: 5px;"
-        + bordersToHtmlString()
-        + backgroundColorToHtmlString()
-        + "\""
+        + super.getStyleString()
         + ">"
         + paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining())
         + "</td>";

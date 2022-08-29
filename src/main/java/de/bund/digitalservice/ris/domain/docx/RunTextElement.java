@@ -18,9 +18,7 @@ public class RunTextElement extends TextElement implements RunElement {
     var hasStyle = hasStyle();
     if (hasStyle) {
       sb.append("<span");
-      sb.append(" style=\"");
-      addStyle(sb);
-      sb.append("\"");
+      sb.append(getStyleString());
       sb.append(">");
     }
 

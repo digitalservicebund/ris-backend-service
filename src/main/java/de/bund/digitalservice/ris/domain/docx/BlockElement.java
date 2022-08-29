@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-public abstract class BlockElement {
+import java.util.Optional;
+
+public abstract class BlockElement extends Styleable {
   private Border topSelfBorder;
   private Border rightSelfBorder;
   private Border bottomSelfBorder;
@@ -18,13 +20,6 @@ public abstract class BlockElement {
     this.rightSelfBorder = rightSelf;
     this.bottomSelfBorder = bottomSelf;
     this.leftSelfBorder = leftSelf;
-  }
-
-  public void setInitialBorders() {
-    this.topSelfBorder = null;
-    this.rightSelfBorder = null;
-    this.bottomSelfBorder = null;
-    this.leftSelfBorder = null;
   }
 
   public void setTopBorder(Border border) {
@@ -45,6 +40,7 @@ public abstract class BlockElement {
 
   public void setBackgroundColor(String color) {
     this.backgroundColor = color;
+    addStyle("background-color", backgroundColor);
   }
 
   public void removeTopBorder() {
@@ -55,66 +51,21 @@ public abstract class BlockElement {
     bottomBorder = null;
   }
 
-  public Boolean hasBorder() {
-    var isSet = topSelfBorder != null;
-    isSet |= rightSelfBorder != null;
-    isSet |= bottomSelfBorder != null;
-    isSet |= leftSelfBorder != null;
-    isSet |= topBorder != null;
-    isSet |= rightBorder != null;
-    isSet |= bottomBorder != null;
-    isSet |= leftBorder != null;
-    return isSet;
+  private void setBordersStyles() {
+    if (topSelfBorder != null || topBorder != null)
+      addStyle("border-top", Optional.ofNullable(topSelfBorder).orElse(topBorder).toString());
+    if (rightSelfBorder != null || rightBorder != null)
+      addStyle("border-right", Optional.ofNullable(rightSelfBorder).orElse(rightBorder).toString());
+    if (bottomSelfBorder != null || bottomBorder != null)
+      addStyle(
+          "border-bottom", Optional.ofNullable(bottomSelfBorder).orElse(bottomBorder).toString());
+    if (leftSelfBorder != null || leftBorder != null)
+      addStyle("border-left", Optional.ofNullable(leftSelfBorder).orElse(leftBorder).toString());
   }
 
-  public Boolean hasBackgroundColor() {
-    return backgroundColor != null;
-  }
-
-  private String bordersToHtmlString(String position, Border border) {
-    if (border.width() == null || border.type() == null || border.color() == null) return "";
-    return "border-"
-        + position
-        + ": "
-        + border.width()
-        + "px "
-        + border.type()
-        + " "
-        + border.color()
-        + ";";
-  }
-
-  public String bordersToHtmlString() {
-    var sb = new StringBuilder();
-
-    if (topSelfBorder != null) {
-      sb.append(bordersToHtmlString("top", topSelfBorder));
-    } else if (topBorder != null) {
-      sb.append(bordersToHtmlString("top", topBorder));
-    }
-
-    if (rightSelfBorder != null) {
-      sb.append(bordersToHtmlString("right", rightSelfBorder));
-    } else if (rightBorder != null) {
-      sb.append(bordersToHtmlString("right", rightBorder));
-    }
-
-    if (bottomSelfBorder != null) {
-      sb.append(bordersToHtmlString("bottom", bottomSelfBorder));
-    } else if (bottomBorder != null) {
-      sb.append(bordersToHtmlString("bottom", bottomBorder));
-    }
-
-    if (leftSelfBorder != null) {
-      sb.append(bordersToHtmlString("left", leftSelfBorder));
-    } else if (leftBorder != null) {
-      sb.append(bordersToHtmlString("left", leftBorder));
-    }
-
-    return sb.toString();
-  }
-
-  public String backgroundColorToHtmlString() {
-    return backgroundColor != null ? "background-color: " + backgroundColor + ";" : "";
+  @Override
+  public String getStyleString() {
+    setBordersStyles();
+    return super.getStyleString();
   }
 }

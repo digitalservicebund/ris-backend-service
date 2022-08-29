@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-public abstract class TextElement implements DocUnitDocx {
+public abstract class TextElement extends Styleable implements DocUnitDocx {
   private static final DecimalFormat DECIMAL_FORMATTER;
 
   static {
@@ -23,6 +23,7 @@ public abstract class TextElement implements DocUnitDocx {
 
   public void setBold(Boolean bold) {
     this.bold = bold;
+    if (bold) addStyle("font-weight", "bold");
   }
 
   public Boolean getBold() {
@@ -31,6 +32,7 @@ public abstract class TextElement implements DocUnitDocx {
 
   public void setItalic(Boolean italic) {
     this.italic = italic;
+    if (italic) addStyle("font-style", "italic");
   }
 
   public Boolean getItalic() {
@@ -39,6 +41,7 @@ public abstract class TextElement implements DocUnitDocx {
 
   public void setStrike(Boolean strike) {
     this.strike = strike;
+    if (strike) addStyle("text-decoration", "line-through");
   }
 
   public Boolean getStrike() {
@@ -47,63 +50,32 @@ public abstract class TextElement implements DocUnitDocx {
 
   public void setSize(Integer size) {
     this.size = size;
+    addStyle("font-size", DECIMAL_FORMATTER.format(size / 2.0f) + "pt");
   }
 
   public Integer getSize() {
     return size;
   }
 
+  public void setUnderline(String underline) {
+    this.underline = underline;
+    addStyle("text-decoration", "underline");
+  }
+
   public String getUnderline() {
     return underline;
   }
 
-  public void setUnderline(String underline) {
-    this.underline = underline;
-  }
-
   public void setVertAlign(VerticalAlign vertAlign) {
     this.vertAlign = vertAlign;
+    if (vertAlign == VerticalAlign.SUBSCRIPT) {
+      addStyle("vertical-align", "sub");
+    } else if (vertAlign == VerticalAlign.SUPERSCRIPT) {
+      addStyle("vertical-align", "super");
+    }
   }
 
   public VerticalAlign getVertAlign() {
     return vertAlign;
-  }
-
-  boolean hasStyle() {
-    var hasStyle = bold != null && bold;
-    hasStyle |= italic != null && italic;
-    hasStyle |= strike != null && strike;
-    hasStyle |= size != null;
-    hasStyle |= underline != null;
-    hasStyle |= vertAlign != null;
-    return hasStyle;
-  }
-
-  void addStyle(StringBuilder sb) {
-    if (bold != null && bold) {
-      sb.append("font-weight: bold;");
-    }
-
-    if (italic != null && italic) {
-      sb.append("font-style: italic;");
-    }
-
-    if (strike != null && strike) {
-      sb.append("text-decoration: line-through;");
-    }
-
-    if (size != null) {
-      sb.append("font-size: ").append(DECIMAL_FORMATTER.format(size / 2.0f)).append("pt;");
-    }
-
-    if (underline != null) {
-      sb.append("text-decoration: underline;");
-    }
-
-    if (vertAlign == VerticalAlign.SUBSCRIPT) {
-      sb.append("vertical-align: sub");
-    } else if (vertAlign == VerticalAlign.SUPERSCRIPT) {
-      sb.append("vertical-align: super");
-    }
   }
 }

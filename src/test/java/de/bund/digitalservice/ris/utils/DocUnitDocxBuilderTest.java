@@ -208,12 +208,12 @@ class DocUnitDocxBuilderTest {
     // cell should take insideV from table
     assertTrue(
         result.contains(
-            "<td style=\"padding: 5px; min-width: 5px;border-top: 1px solid #ghijkl;border-right: 6px solid #000;border-left: 6px solid #000;\"><p>foo</p></td>"));
+            "<td style=\"min-width: 5px; padding: 5px; border-top: 1px solid #ghijkl; border-right: 6px solid #000; border-left: 6px solid #000;\">"));
 
     // insideV from table should not overwrite cell's border
     assertTrue(
         result.contains(
-            "<td colspan=\"2\" style=\"padding: 5px; min-width: 5px;border-top: 1px solid #mnopqr;border-right: 3px solid #foo;border-left: 6px solid #000;background-color: #111222;\"><p>foo</p></td>"));
+            "<td colspan=\"2\" style=\"min-width: 5px; padding: 5px; background-color: #111222; border-top: 1px solid #mnopqr; border-right: 3px solid #foo; border-left: 6px solid #000;\"><p>foo</p></td>"));
   }
 
   @Test
@@ -768,7 +768,7 @@ class DocUnitDocxBuilderTest {
     assertEquals("SUBSCRIPT", paragraphElement.getVertAlign().toString());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"vertical-align: sub\">text</p>", htmlString);
+    assertEquals("<p style=\"vertical-align: sub;\">text</p>", htmlString);
   }
 
   @Test
@@ -800,7 +800,7 @@ class DocUnitDocxBuilderTest {
     assertEquals("SUBSCRIPT", runTextElement.getVertAlign().toString());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"vertical-align: sub\">text</span></p>", htmlString);
+    assertEquals("<p><span style=\"vertical-align: sub;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -832,7 +832,7 @@ class DocUnitDocxBuilderTest {
     assertEquals("SUPERSCRIPT", paragraphElement.getVertAlign().toString());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"vertical-align: super\">text</p>", htmlString);
+    assertEquals("<p style=\"vertical-align: super;\">text</p>", htmlString);
   }
 
   @Test
@@ -864,7 +864,7 @@ class DocUnitDocxBuilderTest {
     assertEquals("SUPERSCRIPT", runTextElement.getVertAlign().toString());
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"vertical-align: super\">text</span></p>", htmlString);
+    assertEquals("<p><span style=\"vertical-align: super;\">text</span></p>", htmlString);
   }
 
   @Test

@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.domain.docx;
 
 import java.awt.Dimension;
 
-public class InlineImageElement implements RunElement {
+public class InlineImageElement extends Styleable implements RunElement {
   private String contentType;
   private String base64Representation;
   private String alternateText;
@@ -40,10 +40,6 @@ public class InlineImageElement implements RunElement {
     this.size = size;
   }
 
-  String addStyle() {
-    return "";
-  }
-
   @Override
   public String toHtmlString() {
     if (contentType == null || base64Representation == null) {
@@ -63,7 +59,7 @@ public class InlineImageElement implements RunElement {
       html += size.height > 0 ? " height=\"" + size.height + "\"" : "";
     }
 
-    html += addStyle();
+    html += super.getStyleString();
 
     html += " />";
 

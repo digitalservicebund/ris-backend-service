@@ -11,51 +11,51 @@ class BlockElementTest {
     var concreteBlock = generateConcreteBlockElement();
 
     concreteBlock.setInitialBorders(new Border("green", 1, "solid"), null, null, null);
-    assertEquals("border-top: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-top: 1px solid green;"));
 
     // should not overwrite self
     concreteBlock.setTopBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-top: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-top: 1px solid green;"));
   }
 
   @Test
   void testSetBottom() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setInitialBorders(null, null, new Border("green", 1, "solid"), null);
-    assertEquals("border-bottom: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-bottom: 1px solid green;"));
 
     // should not overwrite self
     concreteBlock.setBottomBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-bottom: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-bottom: 1px solid green;"));
   }
 
   @Test
   void testSetRight() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setInitialBorders(null, new Border("green", 1, "solid"), null, null);
-    assertEquals("border-right: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-right: 1px solid green;"));
 
     // should not overwrite self
     concreteBlock.setRightBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-right: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-right: 1px solid green;"));
   }
 
   @Test
   void testSetLeft() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setInitialBorders(null, null, null, new Border("green", 1, "solid"));
-    assertEquals("border-left: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-left: 1px solid green;"));
 
     // should not overwrite
     concreteBlock.setLeftBorder(new Border("yellow", 1, "solid"));
-    assertEquals("border-left: 1px solid green;", concreteBlock.bordersToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("border-left: 1px solid green;"));
   }
 
   @Test
   void testSetBackgroundColor() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setBackgroundColor("#fff");
-    assertEquals("background-color: #fff;", concreteBlock.backgroundColorToHtmlString());
+    assertTrue(concreteBlock.toHtmlString().contains("background-color: #fff;"));
   }
 
   @Test
@@ -65,7 +65,7 @@ class BlockElementTest {
     concreteBlock.setTopBorder(new Border("yellow", 2, "solid"));
     concreteBlock.removeTopBorder();
 
-    assertFalse(concreteBlock.bordersToHtmlString().contains("border-top: 2px solid yellow;"));
+    assertFalse(concreteBlock.toHtmlString().contains("border-top: 2px solid yellow;"));
   }
 
   @Test
@@ -75,35 +75,14 @@ class BlockElementTest {
     concreteBlock.setTopBorder(new Border("yellow", 2, "solid"));
     concreteBlock.removeBottomBorder();
 
-    assertFalse(concreteBlock.bordersToHtmlString().contains("border-bottom: 1px solid green;"));
-  }
-
-  @Test
-  void testHasBorder() {
-    var concreteBlock = generateConcreteBlockElement();
-    assertFalse(concreteBlock.hasBorder());
-
-    concreteBlock.setTopBorder(new Border("yellow", 2, "solid"));
-    assertTrue(concreteBlock.hasBorder());
-
-    concreteBlock.removeTopBorder();
-    assertFalse(concreteBlock.hasBorder());
-  }
-
-  @Test
-  void testHasBackgroundColor() {
-    var concreteBlock = generateConcreteBlockElement();
-    assertFalse(concreteBlock.hasBackgroundColor());
-
-    concreteBlock.setBackgroundColor("fff");
-    assertTrue(concreteBlock.hasBackgroundColor());
+    assertFalse(concreteBlock.toHtmlString().contains("border-bottom: 1px solid green;"));
   }
 
   @Test
   void testIsSetWithSelfs() {
     var concreteBlock = generateConcreteBlockElement();
     concreteBlock.setInitialBorders(new Border("green", 1, "solid"), null, null, null);
-    assertTrue(concreteBlock.hasBorder());
+    assertTrue(concreteBlock.toHtmlString().contains("border-top: 1px solid green"));
   }
 
   private BlockElement generateConcreteBlockElement() {
