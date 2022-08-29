@@ -7,7 +7,7 @@
     "serve": "vite preview",
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
     "build:docker": "docker build --file Dockerfile.prod --tag ${CONTAINER_REGISTRY:-ghcr.io}/${GITHUB_OWNER:-digitalservicebund}/ris-frontend:${CONTAINER_IMAGE_VERSION:-$(git rev-parse HEAD)} .",
-    "publish:docker": "docker push ${CONTAINER_REGISTRY:-ghcr.io}/${GITHUB_OWNER:-digitalservicebund}/ris-frontend:${CONTAINER_IMAGE_VERSION:-$(git rev-parse HEAD)}",
+    "publish:docker": "echo ${CONTAINER_REGISTRY_PASSWORD} | docker login ghcr.io -u ${CONTAINER_REGISTRY_USER} --password-stdin && docker push ${CONTAINER_REGISTRY:-ghcr.io}/${GITHUB_OWNER:-digitalservicebund}/ris-frontend:${CONTAINER_IMAGE_VERSION:-$(git rev-parse HEAD)}",
     "clean": "rm -rf dist/",
     "test": "vitest run",
     "test:a11y": "playwright test --config=test/a11y/playwright.config.ts",
