@@ -567,24 +567,24 @@ onBeforeRouteUpdate(async () => {
     padding: 0.5rem 3rem;
   }
 
-  ol[type="lower-roman"] {
+  ol.lower-roman {
     list-style-type: lower-roman;
   }
-  ol[type="upper-roman"] {
+  ol.upper-roman {
     list-style-type: upper-roman;
   }
-  ol[type="lower-letter"] {
+  ol.lower-letter {
     list-style-type: none;
     counter-reset: list;
     margin-left: -1.5rem;
   }
-  ol[type="lower-letter"] > li {
+  ol.lower-letter > li {
     display: table;
     counter-increment: list;
     margin-bottom: 0.5rem;
   }
   /** Lv 1 lower-alpha list */
-  ol[type="lower-letter"] > li:before {
+  ol.lower-letter > li:before {
     content: counter(list, lower-alpha) ") ";
     display: table-cell;
     padding-right: 0.5rem;
@@ -592,48 +592,48 @@ onBeforeRouteUpdate(async () => {
 
   /** Counter-increment = 26 * previours counter-increment +1 */
   /** Lv 2 lower-alpha list */
-  li ol[type="lower-letter"] > li {
+  li ol.lower-letter > li {
     counter-increment: list 27;
     margin: 0;
   }
 
-  li ol[type="lower-letter"] > li:before {
+  li ol.lower-letter > li:before {
     content: counters(list, lower-alpha) ") ";
   }
   /** Lv 3 lower-alpha list */
-  li ol[type="lower-letter"] li ol[type="lower-letter"] > li {
+  li ol.lower-letter li ol.lower-letter > li {
     counter-increment: list 703;
     margin: 0;
   }
-  li ol[type="lower-letter"] li ol[type="lower-letter"] > li::before {
+  li ol.lower-letter li ol.lower-letter > li::before {
     content: counters(list, lower-alpha) ") ";
   }
-  ol[type="upper-letter"] {
+  ol.upper-letter {
     list-style-type: upper-latin;
   }
-  ol[type="decimal"] {
+  ol.decimal {
     list-style-type: none;
     counter-reset: item;
     margin-left: -1.5rem;
   }
 
-  ol[type="decimal"] > li {
+  ol.decimal > li {
     display: table;
     counter-increment: item;
     margin-bottom: 0.5rem;
   }
 
-  ol[type="decimal"] > li:before {
+  ol.decimal > li:before {
     content: counters(item, ".") ". ";
     display: table-cell;
     padding-right: 0.5rem;
   }
 
-  li ol[type="decimal"] > li {
+  li ol.decimal > li {
     margin: 0;
   }
 
-  li ol[type="decimal"] > li:before {
+  li ol.decimal > li:before {
     content: counters(item, ".") " ";
   }
   .row-primary {

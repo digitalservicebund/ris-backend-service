@@ -310,7 +310,7 @@ class DocxConverterServiceTest {
                 assertEquals(
                     "<p>start test</p>"
                         + "<ul><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li></ul>"
-                        + "<ol type=\"decimal\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
+                        + "<ol class=\"decimal\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
                         + "<p>end text</p>",
                     docx2Html.content());
               })
@@ -432,13 +432,13 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>start test</p>"
-                        + "<ol type=\"lower-roman\">"
+                        + "<ol class=\"lower-roman\">"
                         + "<li><p>lower roman list entry 1</p></li>"
                         + "<li><p>lower roman list entry 2</p></li>"
-                        + "<ol type=\"lower-roman\">"
+                        + "<ol class=\"lower-roman\">"
                         + "<li><p>lower roman list entry 2.1</p></li>"
                         + "<li><p>lower roman list entry 2.2</p></li>"
-                        + "<ol type=\"lower-roman\">"
+                        + "<ol class=\"lower-roman\">"
                         + "<li><p>lower roman list entry 2.2.1</p></li>"
                         + "<li><p>lower roman list entry 2.2.2</p></li>"
                         + "</ol>"
@@ -504,13 +504,13 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>start test</p>"
-                        + "<ol type=\"upper-roman\">"
+                        + "<ol class=\"upper-roman\">"
                         + "<li><p>upper roman list entry 1</p></li>"
                         + "<li><p>upper roman list entry 2</p></li>"
-                        + "<ol type=\"upper-roman\">"
+                        + "<ol class=\"upper-roman\">"
                         + "<li><p>upper roman list entry 2.1</p></li>"
                         + "<li><p>upper roman list entry 2.2</p></li>"
-                        + "<ol type=\"upper-roman\">"
+                        + "<ol class=\"upper-roman\">"
                         + "<li><p>upper roman list entry 2.2.1</p></li>"
                         + "<li><p>upper roman list entry 2.2.2</p></li>"
                         + "</ol>"
@@ -582,13 +582,13 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>start test</p>"
-                        + "<ol type=\"lower-letter\">"
+                        + "<ol class=\"lower-letter\">"
                         + "<li><p>lower letter list entry 1</p></li>"
                         + "<li><p>lower letter list entry 2</p></li>"
-                        + "<ol type=\"lower-letter\">"
+                        + "<ol class=\"lower-letter\">"
                         + "<li><p>lower letter list entry 2.1</p></li>"
                         + "<li><p>lower letter list entry 2.2</p></li>"
-                        + "<ol type=\"lower-letter\">"
+                        + "<ol class=\"lower-letter\">"
                         + "<li><p>lower letter list entry 2.2.1</p></li>"
                         + "<li><p>lower letter list entry 2.2.2</p></li>"
                         + "</ol>"
@@ -660,13 +660,13 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>start test</p>"
-                        + "<ol type=\"upper-letter\">"
+                        + "<ol class=\"upper-letter\">"
                         + "<li><p>upper letter list entry 1</p></li>"
                         + "<li><p>upper letter list entry 2</p></li>"
-                        + "<ol type=\"upper-letter\">"
+                        + "<ol class=\"upper-letter\">"
                         + "<li><p>upper letter list entry 2.1</p></li>"
                         + "<li><p>upper letter list entry 2.2</p></li>"
-                        + "<ol type=\"upper-letter\">"
+                        + "<ol class=\"upper-letter\">"
                         + "<li><p>upper letter list entry 2.2.1</p></li>"
                         + "<li><p>upper letter list entry 2.2.2</p></li>"
                         + "</ol>"
@@ -720,13 +720,13 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>start test</p>"
-                        + "<ol type=\"decimal\">"
+                        + "<ol class=\"decimal\">"
                         + "<li><p>decimal list entry 1</p></li>"
                         + "<li><p>decimal list entry 2</p></li>"
-                        + "<ol type=\"decimal\">"
+                        + "<ol class=\"decimal\">"
                         + "<li><p>decimal list entry 2.1</p></li>"
                         + "<li><p>decimal list entry 2.2</p></li>"
-                        + "<ol type=\"decimal\">"
+                        + "<ol class=\"decimal\">"
                         + "<li><p>decimal list entry 2.2.1</p></li>"
                         + "<li><p>decimal list entry 2.2.2</p></li>"
                         + "</ol>"
@@ -780,13 +780,13 @@ class DocxConverterServiceTest {
                 assertNotNull(docx2Html);
                 assertEquals(
                     "<p>start test</p>"
-                        + "<ol type=\"decimal\">"
+                        + "<ol class=\"decimal\">"
                         + "<li><p>decimal list entry 1</p></li>"
                         + "<li><p>decimal list entry 2</p></li>"
                         + "<ul>"
                         + "<li><p>bullet list entry 2.1</p></li>"
                         + "<li><p>bullet list entry 2.2</p></li>"
-                        + "<ol type=\"decimal\">"
+                        + "<ol class=\"decimal\">"
                         + "<li><p>decimal list entry 2.2.1</p></li>"
                         + "<li><p>decimal list entry 2.2.2</p></li>"
                         + "</ol>"
@@ -836,7 +836,7 @@ class DocxConverterServiceTest {
                     "<p>start test</p>"
                         + "<ul><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li></ul>"
                         + "<p>middle text</p>"
-                        + "<ol type=\"decimal\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
+                        + "<ol class=\"decimal\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
                         + "<p>end text</p>",
                     docx2Html.content());
               })

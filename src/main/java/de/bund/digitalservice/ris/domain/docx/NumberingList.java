@@ -84,19 +84,19 @@ public class NumberingList implements DocUnitDocx {
   private String getOpenListTag(DocUnitNumberingListNumberFormat listNumberFormat) {
     switch (listNumberFormat) {
       case DECIMAL -> {
-        return "<ol type=\"decimal\">";
+        return "<ol class=\"decimal\">";
       }
       case LOWER_ROMAN -> {
-        return "<ol type=\"lower-roman\">";
+        return "<ol class=\"lower-roman\">";
       }
       case UPPER_ROMAN -> {
-        return "<ol type=\"upper-roman\">";
+        return "<ol class=\"upper-roman\">";
       }
       case LOWER_LETTER -> {
-        return "<ol type=\"lower-letter\">";
+        return "<ol class=\"lower-letter\">";
       }
       case UPPER_LETTER -> {
-        return "<ol type=\"upper-letter\">";
+        return "<ol class=\"upper-letter\">";
       }
       default -> {
         return "<ul>";
