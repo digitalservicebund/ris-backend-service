@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.domain.docx;
 
 import java.awt.Dimension;
 
-public class InlineImageElement extends Styleable implements RunElement {
+public class InlineImageElement extends StyledElement implements RunElement {
   private String contentType;
   private String base64Representation;
   private String alternateText;

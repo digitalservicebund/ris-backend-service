@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import org.junit.jupiter.api.Test;
 
-public class StyleableTest {
+public class StyledElementTest {
   @Test
   void testAddStyle() {
     var concreteBlock = new ParagraphElement();

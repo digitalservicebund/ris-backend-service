@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.domain.docx;
 
 import java.util.Optional;
 
-public abstract class BlockElement extends Styleable {
+public abstract class BlockElement extends StyledElement {
   private Border topSelfBorder;
   private Border rightSelfBorder;
   private Border bottomSelfBorder;
