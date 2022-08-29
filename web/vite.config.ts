@@ -20,17 +20,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    // outDir: "../src/main/resources/static",
-    rollupOptions: {
-      output: [
-        {
-          dir: "../src/main/resources/static",
-        },
-        {
-          dir: "./dist",
-        },
-      ],
-    },
+    outDir: "../src/main/resources/static",
   },
   test: {
     setupFiles: "vuetify.config.ts",
