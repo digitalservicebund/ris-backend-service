@@ -399,7 +399,7 @@ jobs:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
-        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.GITHUB_OWNER }}/ris-frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - id: set-version
         run: echo "::set-output name=version::$CONTAINER_IMAGE_VERSION"
       - name: Send status to Slack
@@ -444,7 +444,7 @@ jobs:
         with:
           environment: staging
           version: ${{ needs.build-and-push-images.outputs.version }}
-          deploying_repo: ris-frontend
+          deploying_repo: ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-staging
@@ -583,7 +583,7 @@ jobs:
         with:
           environment: production
           version: ${{ needs.build-and-push-images.outputs.version }}
-          deploying_repo: ris-frontend
+          deploying_repo: ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-production
