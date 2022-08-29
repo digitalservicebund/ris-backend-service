@@ -365,16 +365,6 @@ jobs:
         working-directory: ./web
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
-      - name: Build and publish backend container image
-        run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} ./gradlew bootBuildImage --publishImage
-      - name: Build and publish frontend container image
-        run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} cd web && npm run build:docker && npm run publish:docker
-      - name: Install cosign
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679
-        with:
-          cosign-release: "v1.11.0"
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -383,6 +373,20 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish backend container image
+        run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} ./gradlew bootBuildImage --publishImage
+      - name: Build and publish frontend container image
+        uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94
+        with:
+          push: true
+          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.GITHUB_OWNER }}/ris-frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+          file: web/Dockerfile.prod
+      - name: Install cosign
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679
+        with:
+          cosign-release: "v1.11.0"
       - name: Sign the published backend Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"

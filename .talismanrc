@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: run.sh
     checksum: d5cd319f42fdaff65570d6012e6be49f7011740fde181725d837ba93b5a5efd8
   - filename: .github/workflows/pipeline.yml
-    checksum: 0284205d55639315a86a53e384239a9c26562a79b59723d14ef66dd0c72debab
+    checksum: f9c161dbb868878a3e1b8f23401be954ee0ca197bb6eb3b190131012ebc55047
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
@@ -39,8 +39,6 @@ fileignoreconfig:
     checksum: 131da0ec785871a9d38af7866c14edc7fa4af46bd1030c5eaef8a3b2ea6302fb
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
-  - filename: web/package.json
-    checksum: 7de94182cc00c56bdf523104edf83fadfe90ffeabe66b70dc999fd48eeffbcf3
 scopeconfig:
   - scope: node
 allowed_patterns:
