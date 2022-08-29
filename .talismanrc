@@ -35,6 +35,10 @@ fileignoreconfig:
     checksum: 8fa8db24e8b523d44c8b624854e3c478ff22f6b102ecc68c0a764b083bea1383
   - filename: .github/workflows/clean-staging.yml
     checksum: e9b8503bf53adfc76221d53d0ae0077f1cf64fd597ccc6214f0ea99c24766e40
+  - filename: web/.env.development
+    checksum: 131da0ec785871a9d38af7866c14edc7fa4af46bd1030c5eaef8a3b2ea6302fb
+  - filename: web/src/env.d.ts
+    checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
 scopeconfig:
   - scope: node
 allowed_patterns:
