@@ -72,7 +72,7 @@
     "autoprefixer": "^10.4.7",
     "axe-playwright": "^1.1.11",
     "babel-loader": "^8.2.5",
-    "eslint": "^8.22.0",
+    "eslint": "^8.23.0",
     "eslint-plugin-import": "^2.26.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-vue": "^9.4.0",
