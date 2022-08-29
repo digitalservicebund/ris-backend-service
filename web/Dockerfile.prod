@@ -1,0 +1,9 @@
+FROM node:16.14.2 AS builder
+ARG BUILD_MODE=development
+WORKDIR /usr/src/app
+COPY . .
+RUN npm install && npm run build -- --mode $BUILD_MODE
+
+
+FROM nginx:1.23.1
+COPY --from=builder /usr/src/app/dist /usr/share/nginx/html

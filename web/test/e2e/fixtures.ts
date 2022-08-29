@@ -9,14 +9,15 @@ type MyFixtures = {
 
 export const testWithDocUnit = test.extend<MyFixtures>({
   documentNumber: async ({ request }, use) => {
-    const response = await request.post("api/v1/docunits", {
+    const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
+    const response = await request.post(`${backendHost}/api/v1/docunits`, {
       data: { documentationCenterAbbreviation: "foo", documentType: "X" },
     })
     const { uuid, documentnumber: documentNumber } = await response.json()
 
     await use(documentNumber)
 
-    await request.delete(`api/v1/docunits/${uuid}`)
+    await request.delete(`${backendHost}/api/v1/docunits/${uuid}`)
   },
 
   editorField: async ({ page, documentNumber }, use) => {

@@ -8,13 +8,6 @@ import Pages from "vite-plugin-pages"
 export default defineConfig({
   server: {
     port: 3000, // Required for vite to be accessible when running as part of docker compose setup
-    proxy: {
-      "^/api.*": {
-        target: `http://${process.env.BACKEND_HOST || "localhost"}:8080`,
-        prependPath: true,
-        changeOrigin: true,
-      },
-    },
   },
   plugins: [
     vue(),
@@ -27,7 +20,17 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: "../src/main/resources/static",
+    // outDir: "../src/main/resources/static",
+    rollupOptions: {
+      output: [
+        {
+          dir: "../src/main/resources/static",
+        },
+        {
+          dir: "./dist",
+        },
+      ],
+    },
   },
   test: {
     setupFiles: "vuetify.config.ts",
