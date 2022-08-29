@@ -380,7 +380,7 @@ jobs:
         with:
           push: true
           tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.GITHUB_OWNER }}/ris-frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-          context: web
+          context: ./web
           file: Dockerfile.prod
       - name: Install cosign
         # Third-party action, pin to commit SHA!
