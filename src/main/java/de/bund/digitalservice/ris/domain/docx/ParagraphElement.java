@@ -4,16 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParagraphElement extends TextElement {
-  private String alignment;
   private boolean clearfix;
   private final List<RunElement> runElements = new ArrayList<>();
 
-  public String getAlignment() {
-    return alignment;
-  }
-
   public void setAlignment(String alignment) {
-    this.alignment = alignment;
     addStyle("text-align", alignment);
   }
 

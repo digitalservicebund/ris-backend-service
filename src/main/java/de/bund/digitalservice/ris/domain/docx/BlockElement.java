@@ -12,8 +12,6 @@ public abstract class BlockElement extends StyledElement {
   private Border bottomBorder;
   private Border leftBorder;
 
-  private String backgroundColor;
-
   public void setInitialBorders(
       Border topSelf, Border rightSelf, Border bottomSelf, Border leftSelf) {
     this.topSelfBorder = topSelf;
@@ -39,8 +37,7 @@ public abstract class BlockElement extends StyledElement {
   }
 
   public void setBackgroundColor(String color) {
-    this.backgroundColor = color;
-    addStyle("background-color", backgroundColor);
+    addStyle("background-color", color);
   }
 
   public void removeTopBorder() {

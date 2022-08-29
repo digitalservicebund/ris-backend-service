@@ -5,7 +5,7 @@ import java.util.List;
 
 public class BorderNumber implements DocUnitDocx {
   private final StringBuilder number = new StringBuilder();
-  private List<ParagraphElement> paragraphElements = new ArrayList<>();
+  private final List<ParagraphElement> paragraphElements = new ArrayList<>();
 
   public String getNumber() {
     return number.toString();
@@ -27,7 +27,7 @@ public class BorderNumber implements DocUnitDocx {
     sb.append("<number>");
     sb.append(number);
     sb.append("</number>");
-    if (paragraphElements != null && !paragraphElements.isEmpty()) {
+    if (!paragraphElements.isEmpty()) {
       sb.append("<content>");
       for (ParagraphElement textElement : paragraphElements) {
         sb.append(textElement.toHtmlString());

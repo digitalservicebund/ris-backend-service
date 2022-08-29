@@ -313,7 +313,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("right", paragraphElement.getAlignment());
+    assertTrue(paragraphElement.getStyleString().contains("text-align: right"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"text-align: right;\">text</p>", htmlString);
@@ -343,7 +343,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("left", paragraphElement.getAlignment());
+    assertTrue(paragraphElement.getStyleString().contains("text-align: left"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"text-align: left;\">text</p>", htmlString);
@@ -373,7 +373,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("justify", paragraphElement.getAlignment());
+    assertTrue(paragraphElement.getStyleString().contains("text-align: justify"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"text-align: justify;\">text</p>", htmlString);
@@ -403,7 +403,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("center", paragraphElement.getAlignment());
+    assertTrue(paragraphElement.getStyleString().contains("text-align: center"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"text-align: center;\">text</p>", htmlString);
@@ -435,7 +435,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("48", paragraphElement.getSize().toString());
+    assertTrue(paragraphElement.getStyleString().contains("font-size: 24pt"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"font-size: 24pt;\">text</p>", htmlString);
@@ -479,7 +479,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
     var runTextElement = ((RunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
-    assertEquals("48", runTextElement.getSize().toString());
+    assertTrue(runTextElement.getStyleString().contains("font-size: 24pt"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals(
@@ -513,7 +513,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getBold());
+    assertTrue(paragraphElement.getStyleString().contains("font-weight: bold"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"font-weight: bold;\">text</p>", htmlString);
@@ -544,7 +544,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
     var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
-    assertTrue(runTextElement.getBold());
+    assertTrue(runTextElement.getStyleString().contains("font-weight: bold"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"font-weight: bold;\">text</span></p>", htmlString);
@@ -576,7 +576,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getItalic());
+    assertTrue(paragraphElement.getStyleString().contains("font-style: italic"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"font-style: italic;\">text</p>", htmlString);
@@ -607,7 +607,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
     var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
-    assertTrue(runTextElement.getItalic());
+    assertTrue(runTextElement.getStyleString().contains("font-style: italic"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"font-style: italic;\">text</span></p>", htmlString);
@@ -639,7 +639,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStrike());
+    assertTrue(paragraphElement.getStyleString().contains("text-decoration: line-through"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"text-decoration: line-through;\">text</p>", htmlString);
@@ -670,7 +670,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
     var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
-    assertTrue(runTextElement.getStrike());
+    assertTrue(runTextElement.getStyleString().contains("text-decoration: line-through"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"text-decoration: line-through;\">text</span></p>", htmlString);
@@ -702,7 +702,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("single", paragraphElement.getUnderline());
+    assertTrue(paragraphElement.getStyleString().contains("text-decoration: underline"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"text-decoration: underline;\">text</p>", htmlString);
@@ -733,7 +733,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
     var runTextElement = (RunTextElement) runElement;
     assertEquals("text", runTextElement.getText());
-    assertEquals("single", runTextElement.getUnderline());
+    assertTrue(runTextElement.getStyleString().contains("text-decoration: underline"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"text-decoration: underline;\">text</span></p>", htmlString);
@@ -765,7 +765,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("SUBSCRIPT", paragraphElement.getVertAlign().toString());
+    assertTrue(paragraphElement.getStyleString().contains("vertical-align: sub"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"vertical-align: sub;\">text</p>", htmlString);
@@ -797,7 +797,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
     var runTextElement = ((RunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
-    assertEquals("SUBSCRIPT", runTextElement.getVertAlign().toString());
+    assertTrue(runTextElement.getStyleString().contains("vertical-align: sub"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"vertical-align: sub;\">text</span></p>", htmlString);
@@ -829,7 +829,7 @@ class DocUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertEquals("SUPERSCRIPT", paragraphElement.getVertAlign().toString());
+    assertTrue(paragraphElement.getStyleString().contains("vertical-align: super"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p style=\"vertical-align: super;\">text</p>", htmlString);
@@ -861,7 +861,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
     var runTextElement = ((RunTextElement) runElement);
     assertEquals("text", runTextElement.getText());
-    assertEquals("SUPERSCRIPT", runTextElement.getVertAlign().toString());
+    assertTrue(runTextElement.getStyleString().contains("vertical-align: super"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals("<p><span style=\"vertical-align: super;\">text</span></p>", htmlString);
