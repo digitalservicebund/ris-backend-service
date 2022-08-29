@@ -5,4 +5,5 @@ RUN npm install && npm run build
 
 
 FROM nginx:1.23.1
+EXPOSE 80
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
