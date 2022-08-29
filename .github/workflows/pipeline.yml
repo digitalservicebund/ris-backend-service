@@ -380,7 +380,8 @@ jobs:
         with:
           push: true
           tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.GITHUB_OWNER }}/ris-frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-          file: web/Dockerfile.prod
+          context: web
+          file: Dockerfile.prod
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions

@@ -1,8 +1,7 @@
 FROM node:16.14.2 AS builder
-ARG BUILD_MODE=production
 WORKDIR /usr/src/app
 COPY . .
-RUN npm install && npm run build -- --mode $BUILD_MODE
+RUN npm install && npm run build
 
 
 FROM nginx:1.23.1
