@@ -2,8 +2,8 @@ package de.bund.digitalservice.ris.adapter;
 
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
-import de.bund.digitalservice.ris.domain.DocumentUnitPublishService;
-import de.bund.digitalservice.ris.domain.ExportObject;
+import de.bund.digitalservice.ris.domain.EmailPublishService;
+import de.bund.digitalservice.ris.domain.MailResponse;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
@@ -28,16 +28,15 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 @Service
-public class XmlMailPublishService implements DocumentUnitPublishService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(XmlMailPublishService.class);
+public class XmlEMailPublishService implements EmailPublishService {
+  private static final Logger LOGGER = LoggerFactory.getLogger(XmlEMailPublishService.class);
 
   private final JurisXmlExporter jurisXmlExporter;
   private final XmlMailRepository repository;
   private final JavaMailSender mailSender;
   private final String fromMailAddress;
-  private String toMailAddressList;
 
-  public XmlMailPublishService(
+  public XmlEMailPublishService(
       JurisXmlExporter jurisXmlExporter,
       XmlMailRepository repository,
       JavaMailSender mailSender,
@@ -48,12 +47,8 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
     this.fromMailAddress = fromMailAddress;
   }
 
-  public void setToMailAddressList(String toMailAddressList) {
-    this.toMailAddressList = toMailAddressList;
-  }
-
   @Override
-  public Mono<ExportObject> publish(DocUnit documentUnit) {
+  public Mono<MailResponse> publish(DocUnit documentUnit, String receiverAddress) {
     ResultObject xml;
     try {
       xml = jurisXmlExporter.generateXml(documentUnit);
@@ -63,13 +58,13 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
 
     return generateMailSubject(documentUnit)
         .flatMap(mailSubject -> savePublishInformation(documentUnit.getId(), mailSubject, xml))
-        .doOnNext(this::generateMail)
+        .doOnNext(xmlMail -> generateAndSendMail(xmlMail, receiverAddress))
         .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex))
         .map(xmlMail -> new XmlMailResponse(documentUnit.getUuid(), xmlMail));
   }
 
   @Override
-  public Mono<ExportObject> getLastPublishedXml(Long documentUnitId, UUID documentUnitUuid) {
+  public Mono<MailResponse> getLastPublishedXml(Long documentUnitId, UUID documentUnitUuid) {
     return repository
         .findTopByDocumentUnitIdOrderByPublishDateDesc(documentUnitId)
         .map(xmlMail -> new XmlMailResponse(documentUnitUuid, xmlMail));
@@ -91,8 +86,9 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
     return Mono.just(subject);
   }
 
-  private void generateMail(XmlMail xmlMail) throws DocumentUnitPublishException {
-    if (toMailAddressList == null) {
+  private void generateAndSendMail(XmlMail xmlMail, String receiverAddress)
+      throws DocumentUnitPublishException {
+    if (receiverAddress == null) {
       throw new DocumentUnitPublishException("No receiver mail address is set");
     }
 
@@ -111,7 +107,7 @@ public class XmlMailPublishService implements DocumentUnitPublishService {
     }
 
     try {
-      helper.setTo(InternetAddress.parse(toMailAddressList));
+      helper.setTo(InternetAddress.parse(receiverAddress));
     } catch (MessagingException ex) {
       throw new DocumentUnitPublishException("Receiver mail address is not correct", ex);
     }

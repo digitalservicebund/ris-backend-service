@@ -5,7 +5,7 @@ import java.util.UUID;
 import lombok.Getter;
 
 @Getter
-public class XmlMailResponse implements ExportObject {
+public class XmlMailResponse implements MailResponse {
   private final UUID documentUnitUuid;
   private final String mailSubject;
   private final String xml;

@@ -7,12 +7,12 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.ByteBuffer;
-import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -49,7 +49,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 class DocUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
-  private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
+  private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
   @Autowired private DocUnitService service;
 
   @MockBean private DocUnitRepository repository;
@@ -57,6 +57,8 @@ class DocUnitServiceTest {
   @MockBean private DocumentNumberCounterRepository counterRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
+
+  @MockBean private EmailPublishService publishService;
 
   @Test
   void testGenerateNewDocUnit() {
@@ -315,13 +317,51 @@ class DocUnitServiceTest {
   }
 
   @Test
-  void testFindByUuid() {
+  void testPublishByEmail() {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
+    XmlMail xmlMail =
+        new XmlMail(1L, 123L, "subject", "xml", "200", "status messages", "filename", null);
+    when(publishService.publish(DocUnit.EMPTY, RECEIVER_ADDRESS))
+        .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
 
-    StepVerifier.create(service.findByUuid(TEST_UUID))
-        .consumeNextWith(documentUnit -> assertThat(documentUnit).isEqualTo(DocUnit.EMPTY))
+    StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
+        .consumeNextWith(
+            mailResponse ->
+                assertThat(mailResponse)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
         .verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
+    verify(publishService).publish(DocUnit.EMPTY, RECEIVER_ADDRESS);
+  }
+
+  @Test
+  void testPublishByEmail_withoutDocumentUnitForUuid() {
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.empty());
+
+    StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS)).verifyComplete();
+    verify(repository).findByUuid(TEST_UUID);
+    verify(publishService, never()).publish(DocUnit.EMPTY, RECEIVER_ADDRESS);
+  }
+
+  @Test
+  void testGetLastPublishedXmlMail() {
+    DocUnit documentUnit = new DocUnit();
+    documentUnit.setId(123L);
+    XmlMail xmlMail = new XmlMail(1L, 123L, "subject", "xml", "200", "message", "filename", null);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
+    when(publishService.getLastPublishedXml(123L, TEST_UUID))
+        .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
+
+    StepVerifier.create(service.getLastPublishedXmlMail(TEST_UUID))
+        .consumeNextWith(
+            xmlMailResponse ->
+                assertThat(xmlMailResponse)
+                    .usingRecursiveComparison()
+                    .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
+        .verifyComplete();
+    verify(repository).findByUuid(TEST_UUID);
+    verify(publishService).getLastPublishedXml(123L, TEST_UUID);
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

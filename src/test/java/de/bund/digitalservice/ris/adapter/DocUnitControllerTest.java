@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
-import de.bund.digitalservice.ris.domain.DocumentUnitPublishService;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
@@ -41,11 +40,10 @@ class DocUnitControllerTest {
 
   @MockBean private DocUnitService service;
 
-  @MockBean private DocumentUnitPublishService publishService;
-
   @Captor private ArgumentCaptor<Flux<ByteBuffer>> fluxCaptor;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
+  private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
 
   @Test
   void testGenerateNewDocUnit() {
@@ -206,9 +204,8 @@ class DocUnitControllerTest {
   }
 
   @Test
-  void testPublish() {
-    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
-    when(publishService.publish(DocUnit.EMPTY))
+  void testPublishAsEmail() {
+    when(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
         .thenReturn(
             Mono.just(
                 new XmlMailResponse(
@@ -227,7 +224,7 @@ class DocUnitControllerTest {
         .mutateWith(csrf())
         .put()
         .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
-        .bodyValue("toemailaddress")
+        .bodyValue(RECEIVER_ADDRESS)
         .exchange()
         .expectHeader()
         .valueEquals("Content-Type", "application/json")
@@ -247,34 +244,29 @@ class DocUnitControllerTest {
         .jsonPath("publishDate")
         .isEqualTo("2020-01-01T01:01:01Z");
 
-    verify(service).findByUuid(TEST_UUID);
-    verify(publishService).publish(DocUnit.EMPTY);
+    verify(service).publishAsEmail(TEST_UUID, RECEIVER_ADDRESS);
   }
 
   @Test
-  void testPublish_withServiceThrowsException() {
-    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
-    when(publishService.publish(DocUnit.EMPTY)).thenThrow(DocumentUnitPublishException.class);
+  void testPublishAsEmail_withServiceThrowsException() {
+    when(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
+        .thenThrow(DocumentUnitPublishException.class);
 
     webClient
         .mutateWith(csrf())
         .put()
         .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
-        .bodyValue("toemailaddress")
+        .bodyValue(RECEIVER_ADDRESS)
         .exchange()
         .expectStatus()
         .is5xxServerError();
 
-    verify(service).findByUuid(TEST_UUID);
-    verify(publishService).publish(DocUnit.EMPTY);
+    verify(service).publishAsEmail(TEST_UUID, RECEIVER_ADDRESS);
   }
 
   @Test
   void testGetLastPublishedXml() {
-    var documentUnit = new DocUnit();
-    documentUnit.setId(123L);
-    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
-    when(publishService.getLastPublishedXml(123L, TEST_UUID))
+    when(service.getLastPublishedXmlMail(TEST_UUID))
         .thenReturn(
             Mono.just(
                 new XmlMailResponse(
@@ -310,17 +302,12 @@ class DocUnitControllerTest {
         .jsonPath("publishDate")
         .isEqualTo("2020-01-01T01:01:01Z");
 
-    verify(service).findByUuid(TEST_UUID);
-    verify(publishService).getLastPublishedXml(123L, TEST_UUID);
+    verify(service).getLastPublishedXmlMail(TEST_UUID);
   }
 
   @Test
   void testGetLastPublishedXml_withServiceThrowsException() {
-    var documentUnit = new DocUnit();
-    documentUnit.setId(123L);
-    when(service.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
-    when(publishService.getLastPublishedXml(123L, TEST_UUID))
-        .thenThrow(DocumentUnitPublishException.class);
+    when(service.getLastPublishedXmlMail(TEST_UUID)).thenThrow(DocumentUnitPublishException.class);
 
     webClient
         .mutateWith(csrf())
@@ -330,6 +317,6 @@ class DocUnitControllerTest {
         .expectStatus()
         .is5xxServerError();
 
-    verify(publishService).getLastPublishedXml(123L, TEST_UUID);
+    verify(service).getLastPublishedXmlMail(TEST_UUID);
   }
 }

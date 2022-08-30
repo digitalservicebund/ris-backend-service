@@ -3,8 +3,7 @@ package de.bund.digitalservice.ris.adapter;
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocUnitService;
-import de.bund.digitalservice.ris.domain.DocumentUnitPublishService;
-import de.bund.digitalservice.ris.domain.ExportObject;
+import de.bund.digitalservice.ris.domain.MailResponse;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.UUID;
@@ -33,11 +32,8 @@ import reactor.util.retry.Retry;
 public class DocUnitController {
   private final DocUnitService service;
 
-  private final DocumentUnitPublishService publishService;
-
-  public DocUnitController(DocUnitService service, DocumentUnitPublishService publishService) {
+  public DocUnitController(DocUnitService service) {
     this.service = service;
-    this.publishService = publishService;
   }
 
   @PostMapping(value = "")
@@ -100,26 +96,18 @@ public class DocUnitController {
       value = "/{uuid}/publish",
       produces = MediaType.APPLICATION_JSON_VALUE,
       consumes = MediaType.TEXT_PLAIN_VALUE)
-  public Mono<ResponseEntity<ExportObject>> publishDocumentUnit(
-      @PathVariable UUID uuid, @RequestBody String toEmailAddress) {
+  public Mono<ResponseEntity<MailResponse>> publishDocumentUnitAsEmail(
+      @PathVariable UUID uuid, @RequestBody String receiverAddress) {
     return service
-        .findByUuid(uuid)
-        .flatMap(
-            documentUnit -> {
-              if (publishService instanceof XmlMailPublishService xmlMailPublishService) {
-                xmlMailPublishService.setToMailAddressList(toEmailAddress);
-              }
-              return publishService.publish(documentUnit);
-            })
+        .publishAsEmail(uuid, receiverAddress)
         .map(ResponseEntity::ok)
         .doOnError(ex -> ResponseEntity.internalServerError().build());
   }
 
   @GetMapping(value = "/{uuid}/publish", produces = MediaType.APPLICATION_JSON_VALUE)
-  public Mono<ResponseEntity<ExportObject>> getLastPublishedXml(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<MailResponse>> getLastPublishedXml(@PathVariable UUID uuid) {
     return service
-        .findByUuid(uuid)
-        .flatMap(documentUnit -> publishService.getLastPublishedXml(documentUnit.getId(), uuid))
+        .getLastPublishedXmlMail(uuid)
         .map(ResponseEntity::ok)
         .doOnError(ex -> ResponseEntity.internalServerError().build());
   }

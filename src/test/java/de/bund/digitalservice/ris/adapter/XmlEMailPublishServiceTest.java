@@ -32,8 +32,8 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
-@Import(XmlMailPublishService.class)
-class XmlMailPublishServiceTest {
+@Import(XmlEMailPublishService.class)
+class XmlEMailPublishServiceTest {
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   private static final String MAIL_SUBJECT =
       "id=BGH name=jDVNAME da=R df=X dt=N mod=A vg=Testvorgang";
@@ -46,10 +46,11 @@ class XmlMailPublishServiceTest {
       new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL);
   private static final ResultObject FORMATTED_XML =
       new ResultObject("xml", new Status("200", List.of("succeed")), "test.xml", PUBLISH_DATE);
+  private static final String RECEIVER_ADDRESS = "test-to@mail.com";
 
   private DocUnit documentUnit;
 
-  private XmlMailPublishService service;
+  private XmlEMailPublishService service;
 
   @MockBean private JurisXmlExporter xmlExporter;
 
@@ -59,7 +60,7 @@ class XmlMailPublishServiceTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    service = new XmlMailPublishService(xmlExporter, repository, mailSender, "fromMailAddress");
+    service = new XmlEMailPublishService(xmlExporter, repository, mailSender, "fromMailAddress");
 
     documentUnit = new DocUnit();
     documentUnit.setId(123L);
@@ -73,9 +74,7 @@ class XmlMailPublishServiceTest {
 
   @Test
   void testPublish() {
-    service.setToMailAddressList("test-to@mail.com");
-
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .consumeNextWith(
             response ->
                 assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
@@ -86,7 +85,6 @@ class XmlMailPublishServiceTest {
 
   @Test
   void testPublish_withValidationError() throws ParserConfigurationException, TransformerException {
-    service.setToMailAddressList("test-to@mail.com");
     var xmlWithValidationError =
         new ResultObject(
             "xml", new Status("400", List.of("status-message")), "test.xml", PUBLISH_DATE);
@@ -94,7 +92,7 @@ class XmlMailPublishServiceTest {
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
     when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
 
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .consumeNextWith(
             response -> assertThat(response).usingRecursiveComparison().isEqualTo(expected))
         .verifyComplete();
@@ -107,7 +105,7 @@ class XmlMailPublishServiceTest {
       throws ParserConfigurationException, TransformerException {
     when(xmlExporter.generateXml(documentUnit)).thenThrow(ParserConfigurationException.class);
 
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException
@@ -119,7 +117,7 @@ class XmlMailPublishServiceTest {
   void testPublish_withoutDocumentNumber() {
     documentUnit.setDocumentnumber(null);
 
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException
@@ -131,7 +129,7 @@ class XmlMailPublishServiceTest {
   void testPublish_withExceptionBySaving() {
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenThrow(IllegalArgumentException.class);
 
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
         .verify();
   }
@@ -139,7 +137,7 @@ class XmlMailPublishServiceTest {
   @Test
   void testPublish_withoutToMailSet() {
 
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, null))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException
@@ -149,10 +147,9 @@ class XmlMailPublishServiceTest {
 
   @Test
   void testPublish_withWrongFormattedFromMailSet() {
-    service = new XmlMailPublishService(xmlExporter, repository, mailSender, "<");
-    service.setToMailAddressList("to-mail@test.com");
+    service = new XmlEMailPublishService(xmlExporter, repository, mailSender, "<");
 
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException
@@ -162,9 +159,8 @@ class XmlMailPublishServiceTest {
 
   @Test
   void testPublish_withWrongFormattedToMailSet() {
-    service.setToMailAddressList("<");
 
-    StepVerifier.create(service.publish(documentUnit))
+    StepVerifier.create(service.publish(documentUnit, "<"))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException

@@ -31,6 +31,7 @@ public class DocUnitService {
   private final DocUnitRepository repository;
   private final DocumentNumberCounterRepository counterRepository;
   private final S3AsyncClient s3AsyncClient;
+  private final EmailPublishService publishService;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -38,10 +39,12 @@ public class DocUnitService {
   public DocUnitService(
       DocUnitRepository repository,
       DocumentNumberCounterRepository counterRepository,
-      S3AsyncClient s3AsyncClient) {
+      S3AsyncClient s3AsyncClient,
+      EmailPublishService publishService) {
     this.repository = repository;
     this.counterRepository = counterRepository;
     this.s3AsyncClient = s3AsyncClient;
+    this.publishService = publishService;
   }
 
   public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
@@ -193,7 +196,16 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
-  public Mono<DocUnit> findByUuid(UUID uuid) {
-    return repository.findByUuid(uuid);
+  public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String receiverAddress) {
+    return repository
+        .findByUuid(documentUnitUuid)
+        .flatMap(documentUnit -> publishService.publish(documentUnit, receiverAddress));
+  }
+
+  public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
+    return repository
+        .findByUuid(documentUuid)
+        .flatMap(
+            documentUnit -> publishService.getLastPublishedXml(documentUnit.getId(), documentUuid));
   }
 }

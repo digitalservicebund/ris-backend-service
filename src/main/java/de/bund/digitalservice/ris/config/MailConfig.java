@@ -18,6 +18,9 @@ public class MailConfig {
   @Value("${mail.exporter.host:host}")
   private String smtpHost;
 
+  @Value("${mail.exporter.port:587}")
+  private Integer port;
+
   @Value("${mail.exporter.user:test}")
   private String user;
 
@@ -29,7 +32,7 @@ public class MailConfig {
   public JavaMailSender javaMailSender() {
     JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
     mailSender.setHost(smtpHost);
-    mailSender.setPort(587);
+    mailSender.setPort(port);
 
     mailSender.setUsername(user);
     mailSender.setPassword(password);

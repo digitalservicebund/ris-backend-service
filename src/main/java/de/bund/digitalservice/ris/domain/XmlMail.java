@@ -11,5 +11,4 @@ public record XmlMail(
     String statusCode,
     String statusMessages,
     String fileName,
-    Instant publishDate)
-    implements ExportObject {}
+    Instant publishDate) {}
