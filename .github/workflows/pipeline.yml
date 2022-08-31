@@ -327,16 +327,13 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push-images:
+  build-and-push-backend-image:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - build-backend
-      - build-frontend
       - audit-licenses-backend
-      - audit-licenses-frontend
       - vulnerability-scan-backend
-      - vulnerability-scan-frontend
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
@@ -351,18 +348,6 @@ jobs:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - name: Setup Node for web
-        uses: actions/setup-node@v3
-        with:
-          node-version-file: ./web/.node-version
-          cache: npm
-          cache-dependency-path: ./web/package-lock.json
-      - name: Install dependencies for web
-        run: npm ci
-        working-directory: ./web
-      - name: Run build for web
-        run: npm run build
-        working-directory: ./web
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
       - name: Log into container registry
@@ -375,6 +360,59 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish backend container image
         run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} ./gradlew bootBuildImage --publishImage
+      - name: Install cosign
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679
+        with:
+          cosign-release: "v1.11.0"
+      - name: Sign the published backend Docker image
+        env:
+          COSIGN_EXPERIMENTAL: "true"
+        # This step uses the identity token to provision an ephemeral certificate
+        # against the sigstore community Fulcio instance.
+        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+      - id: set-version
+        run: echo "::set-output name=version::$CONTAINER_IMAGE_VERSION"
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Build/push backend image :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-and-push-frontend-image:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - build-frontend
+      - audit-licenses-frontend
+      - vulnerability-scan-frontend
+    permissions:
+      contents: read
+      id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
+      packages: write
+    outputs:
+      version: ${{ steps.set-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Log into container registry
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: docker/login-action@49ed152c8eca782a232dede0303416e8f356c37b
+        with:
+          registry: ${{ env.CONTAINER_REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish frontend container image
         uses: docker/build-push-action@c84f38281176d4c9cdb1626ffafcd6b3911b5d94
         with:
@@ -392,12 +430,6 @@ jobs:
         uses: sigstore/cosign-installer@b3413d484cc23cf8778c3d2aa361568d4eb54679
         with:
           cosign-release: "v1.11.0"
-      - name: Sign the published backend Docker image
-        env:
-          COSIGN_EXPERIMENTAL: "true"
-        # This step uses the identity token to provision an ephemeral certificate
-        # against the sigstore community Fulcio instance.
-        run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Sign the published frontend Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
@@ -427,7 +459,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     concurrency: deploy-staging
     environment: staging
-    needs: [build-and-push-images]
+    needs: [build-and-push-frontend-image, build-and-push-backend-image]
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
@@ -436,7 +468,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
         with:
           environment: staging
-          version: ${{ needs.build-and-push-images.outputs.version }}
+          version: ${{ needs.build-and-push-backend-image.outputs.version }}
           deploying_repo: ris-backend-service
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
@@ -447,7 +479,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
         with:
           environment: staging
-          version: ${{ needs.build-and-push-images.outputs.version }}
+          version: ${{ needs.build-and-push-frontend-image.outputs.version }}
           deploying_repo: ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
@@ -561,7 +593,8 @@ jobs:
     concurrency: deploy-production
     environment: production
     needs:
-      - build-and-push-images
+      - build-and-push-frontend-image
+      - build-and-push-backend-image
       - deploy-staging-verify-api
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
@@ -575,7 +608,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
         with:
           environment: production
-          version: ${{ needs.build-and-push-images.outputs.version }}
+          version: ${{ needs.build-and-push-backend-image.outputs.version }}
           deploying_repo: ris-backend-service
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
@@ -586,7 +619,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
         with:
           environment: production
-          version: ${{ needs.build-and-push-images.outputs.version }}
+          version: ${{ needs.build-and-push-frontend-image.outputs.version }}
           deploying_repo: ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
