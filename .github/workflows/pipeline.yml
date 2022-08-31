@@ -382,10 +382,6 @@ jobs:
           tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           context: ./web
           file: ./web/Dockerfile.prod
-      - name: Test docker frontend image
-        run: |
-          docker run -d --rm --publish 3000:80 ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-          if ! [[ $(curl --fail localhost:3000) ]]; then exit 1; fi;
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
