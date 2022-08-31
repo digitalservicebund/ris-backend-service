@@ -384,7 +384,7 @@ jobs:
           file: ./web/Dockerfile.prod
       - name: Test docker frontend image
         run: |
-          docker run -d -name frontendTest ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+          docker run -d --name frontendTest ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           docker exec frontendTest curl --fail localhost || exit 1
       - name: Install cosign
         # Third-party action, pin to commit SHA!

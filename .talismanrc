@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: run.sh
     checksum: d5cd319f42fdaff65570d6012e6be49f7011740fde181725d837ba93b5a5efd8
   - filename: .github/workflows/pipeline.yml
-    checksum: d6729f6f19c4b01bed184c8daaef85ac9ff29799f88821099ffbee20598a695d
+    checksum: 32c2595dee052a98c02cf38066165f46686d3bdf85583ee4a008697fc9dc9bd3
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
