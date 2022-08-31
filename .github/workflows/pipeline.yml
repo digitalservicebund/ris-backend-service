@@ -603,7 +603,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
       - name: Deploy new backend image
-        uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
+        uses: zechmeister/github-actions/argocd-deploy@a1db1dde2e51735dbfe3ea57aa30ad8ecd1c0575
         with:
           environment: production
           version: ${{ needs.build-and-push-backend-image.outputs.version }}
