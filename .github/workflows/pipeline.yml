@@ -593,6 +593,8 @@ jobs:
     concurrency: deploy-production
     environment: production
     needs:
+      - build-and-push-frontend-image
+      - build-and-push-backend-image
       - deploy-staging-verify-api
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
