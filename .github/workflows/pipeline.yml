@@ -385,9 +385,8 @@ jobs:
       - name: Test docker frontend image
         run: |
           docker run -d --publish 3000:80 ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-          docker ps -a
-          docker network ls
-          curl -I localhost:3000
+          sleep 5
+          curl --fail localhost:3000 || exit 1
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
