@@ -5,15 +5,6 @@ export const CustomParagraph = Paragraph.extend({
     return {
       ...this.parent?.(),
       class: { default: null },
-      style: {
-        default: null,
-        parseHTML: (element) => element.getAttribute("style"),
-        renderHTML: (attributes) => {
-          return {
-            style: attributes.style,
-          }
-        },
-      },
     }
   },
 })
