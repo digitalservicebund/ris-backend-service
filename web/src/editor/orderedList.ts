@@ -4,12 +4,12 @@ export const CustomOrderedList = OrderedList.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      type: {
+      style: {
         default: null,
-        parseHTML: (element) => element.getAttribute("class"),
+        parseHTML: (element) => element.getAttribute("style"),
         renderHTML: (attributes) => {
           return {
-            class: attributes.type,
+            style: attributes.style,
           }
         },
       },

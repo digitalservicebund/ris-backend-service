@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import { Bold } from "@tiptap/extension-bold"
-import { BulletList } from "@tiptap/extension-bullet-list"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
 import { Italic } from "@tiptap/extension-italic"
-import { ListItem } from "@tiptap/extension-list-item"
 import { Strike } from "@tiptap/extension-strike"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
@@ -24,8 +22,10 @@ import {
   BorderNumberContent,
   BorderNumberNumber,
 } from "../editor/borderNumber"
+import { CustomBulletList } from "../editor/bulletList"
 import { FontSize } from "../editor/fontSize"
 import { CustomImage } from "../editor/image"
+import { CustomListItem } from "../editor/listItem"
 import { CustomOrderedList } from "../editor/orderedList"
 import { CustomParagraph } from "../editor/paragraph"
 import { TableStyle } from "../editor/tableStyle"
@@ -86,8 +86,8 @@ const editor = new Editor({
     Color,
     FontSize,
     Italic,
-    ListItem,
-    BulletList,
+    CustomListItem,
+    CustomBulletList,
     CustomOrderedList,
     Underline,
     Strike,
@@ -562,80 +562,6 @@ onBeforeRouteUpdate(async () => {
 <style lang="scss">
 #container {
   position: relative;
-  ul,
-  ol {
-    padding: 0.5rem 3rem;
-  }
-
-  ol.lower-roman {
-    list-style-type: lower-roman;
-  }
-  ol.upper-roman {
-    list-style-type: upper-roman;
-  }
-  ol.lower-letter {
-    list-style-type: none;
-    counter-reset: list;
-    margin-left: -1.5rem;
-  }
-  ol.lower-letter > li {
-    display: table;
-    counter-increment: list;
-    margin-bottom: 0.5rem;
-  }
-  /** Lv 1 lower-alpha list */
-  ol.lower-letter > li:before {
-    content: counter(list, lower-alpha) ") ";
-    display: table-cell;
-    padding-right: 0.5rem;
-  }
-
-  /** Counter-increment = 26 * previours counter-increment +1 */
-  /** Lv 2 lower-alpha list */
-  li ol.lower-letter > li {
-    counter-increment: list 27;
-    margin: 0;
-  }
-
-  li ol.lower-letter > li:before {
-    content: counters(list, lower-alpha) ") ";
-  }
-  /** Lv 3 lower-alpha list */
-  li ol.lower-letter li ol.lower-letter > li {
-    counter-increment: list 703;
-    margin: 0;
-  }
-  li ol.lower-letter li ol.lower-letter > li::before {
-    content: counters(list, lower-alpha) ") ";
-  }
-  ol.upper-letter {
-    list-style-type: upper-latin;
-  }
-  ol.decimal {
-    list-style-type: none;
-    counter-reset: item;
-    margin-left: -1.5rem;
-  }
-
-  ol.decimal > li {
-    display: table;
-    counter-increment: item;
-    margin-bottom: 0.5rem;
-  }
-
-  ol.decimal > li:before {
-    content: counters(item, ".") ". ";
-    display: table-cell;
-    padding-right: 0.5rem;
-  }
-
-  li ol.decimal > li {
-    margin: 0;
-  }
-
-  li ol.decimal > li:before {
-    content: counters(item, ".") " ";
-  }
   .row-primary {
     .v-col {
       flex-grow: 0 !important;

@@ -1,10 +1,9 @@
-import { Paragraph } from "@tiptap/extension-paragraph"
+import { BulletList } from "@tiptap/extension-bullet-list"
 
-export const CustomParagraph = Paragraph.extend({
+export const CustomBulletList = BulletList.extend({
   addAttributes() {
     return {
       ...this.parent?.(),
-      class: { default: null },
       style: {
         default: null,
         parseHTML: (element) => element.getAttribute("style"),
