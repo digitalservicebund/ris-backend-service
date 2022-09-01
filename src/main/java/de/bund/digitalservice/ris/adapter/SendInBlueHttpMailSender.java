@@ -34,18 +34,6 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String content,
       String fileName) {
 
-    LOGGER.info(
-        "send email from sender '{}' to receiver '{}' with subject '{}' and content '{}' and filename '{}'.",
-        senderAddress,
-        receiverAddress,
-        subject,
-        content,
-        fileName);
-    LOGGER.info(
-        "api key starts with {} and ends with {}",
-        apiKey.substring(0, 3),
-        apiKey.substring(apiKey.length() - 4, apiKey.length() - 1));
-
     ApiClient defaultClient = Configuration.getDefaultApiClient();
     ApiKeyAuth apiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
     apiKeyAuth.setApiKey(apiKey);
