@@ -19,9 +19,6 @@ export default defineConfig({
       dirs: "src/routes",
     }),
   ],
-  build: {
-    outDir: "../src/main/resources/static",
-  },
   test: {
     setupFiles: "vuetify.config.ts",
     deps: {
