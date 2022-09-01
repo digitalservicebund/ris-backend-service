@@ -13,7 +13,6 @@ import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import de.bund.digitalservice.ris.TestMemoryAppender;
 import de.bund.digitalservice.ris.domain.docx.*;
-import de.bund.digitalservice.ris.domain.docx.NumberingList.DocUnitNumberingListNumberFormat;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.math.BigInteger;
@@ -1227,9 +1226,6 @@ class DocUnitDocxBuilderTest {
 
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;
-    assertEquals("0", numberingListEntry.numId());
-    assertEquals("0", numberingListEntry.iLvl());
-    assertEquals(DocUnitNumberingListNumberFormat.DECIMAL, numberingListEntry.numberFormat());
     assertNotNull(numberingListEntry.paragraphElement());
     ParagraphElement paragraphElement = (ParagraphElement) numberingListEntry.paragraphElement();
     assertEquals(1, paragraphElement.getRunElements().size());
@@ -1237,7 +1233,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
 
     var htmlString = numberingListEntry.toHtmlString();
-    assertEquals("<li><p>test text</p></li>", htmlString);
+    assertEquals("<p>test text</p>", htmlString);
   }
 
   @Test
@@ -1281,9 +1277,6 @@ class DocUnitDocxBuilderTest {
 
     assertTrue(result instanceof NumberingListEntry);
     var numberingListEntry = (NumberingListEntry) result;
-    assertEquals("0", numberingListEntry.numId());
-    assertEquals("0", numberingListEntry.iLvl());
-    assertEquals(DocUnitNumberingListNumberFormat.BULLET, numberingListEntry.numberFormat());
     assertNotNull(numberingListEntry.paragraphElement());
     ParagraphElement paragraphElement = (ParagraphElement) numberingListEntry.paragraphElement();
     assertEquals(1, paragraphElement.getRunElements().size());
@@ -1291,7 +1284,7 @@ class DocUnitDocxBuilderTest {
     assertEquals(RunTextElement.class, runElement.getClass());
 
     var htmlString = numberingListEntry.toHtmlString();
-    assertEquals("<li><p>test text</p></li>", htmlString);
+    assertEquals("<p>test text</p>", htmlString);
 
     assertEquals(1, memoryAppender.count(Level.ERROR));
     assertEquals(

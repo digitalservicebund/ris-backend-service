@@ -164,7 +164,20 @@ public class DocUnitDocxBuilder {
       iLvl = numPr.getIlvl().getVal().toString();
     }
 
-    DocUnitNumberingListNumberFormat numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+    NumberingListEntryIndex numberingListEntryIndex =
+        new NumberingListEntryIndex(
+            "",
+            "1",
+            "",
+            "",
+            "",
+            "",
+            false,
+            false,
+            DocUnitNumberingListNumberFormat.BULLET,
+            iLvl,
+            JcEnumeration.RIGHT,
+            "tab");
     if (listNumberingDefinition != null) {
       AbstractListNumberingDefinition abstractListDefinition =
           listNumberingDefinition.getAbstractListDefinition();
@@ -173,44 +186,77 @@ public class DocUnitDocxBuilder {
         ListLevel listLevel = abstractListDefinition.getListLevels().get(iLvl);
 
         if (listLevel != null) {
-          switch (listLevel.getNumFmt()) {
-            case BULLET -> {
-              numberFormat = DocUnitNumberingListNumberFormat.BULLET;
-              break;
-            }
-            case DECIMAL -> {
-              numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
-              break;
-            }
-            case UPPER_LETTER -> {
-              numberFormat = DocUnitNumberingListNumberFormat.UPPER_LETTER;
-              break;
-            }
-            case LOWER_LETTER -> {
-              numberFormat = DocUnitNumberingListNumberFormat.LOWER_LETTER;
-              break;
-            }
-            case UPPER_ROMAN -> {
-              numberFormat = DocUnitNumberingListNumberFormat.UPPER_ROMAN;
-              break;
-            }
-            case LOWER_ROMAN -> {
-              numberFormat = DocUnitNumberingListNumberFormat.LOWER_ROMAN;
-              break;
-            }
-            default -> {
-              LOGGER.error(
-                  "not implemented number format ({}) in list. use default bullet list",
-                  listLevel.getNumFmt());
-              numberFormat = DocUnitNumberingListNumberFormat.BULLET;
-              break;
-            }
-          }
+          numberingListEntryIndex = setNumberingListEntryIndex(listLevel, iLvl);
         }
       }
     }
 
-    return new NumberingListEntry(convertToParagraphElement(paragraph), numberFormat, numId, iLvl);
+    return new NumberingListEntry(convertToParagraphElement(paragraph), numberingListEntryIndex);
+  }
+
+  private NumberingListEntryIndex setNumberingListEntryIndex(ListLevel listLevel, String iLvl) {
+    DocUnitNumberingListNumberFormat numberFormat;
+    switch (listLevel.getNumFmt()) {
+      case BULLET -> numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+      case DECIMAL -> numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      case UPPER_LETTER -> numberFormat = DocUnitNumberingListNumberFormat.UPPER_LETTER;
+      case LOWER_LETTER -> numberFormat = DocUnitNumberingListNumberFormat.LOWER_LETTER;
+      case UPPER_ROMAN -> numberFormat = DocUnitNumberingListNumberFormat.UPPER_ROMAN;
+      case LOWER_ROMAN -> numberFormat = DocUnitNumberingListNumberFormat.LOWER_ROMAN;
+      default -> {
+        LOGGER.error(
+            "not implemented number format ({}) in list. use default bullet list",
+            listLevel.getNumFmt());
+        numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+      }
+    }
+    String restartNummerAfterBreak = "";
+    String lvlText = "";
+    String suff = "tab";
+    String fontColor = "";
+    String fontSize = "";
+    String fontStyle = "";
+    boolean lvlPickBullet = false;
+    String startVal = "1";
+    JcEnumeration lvlJc = JcEnumeration.RIGHT;
+    boolean isLgl = false;
+
+    Lvl lvl = listLevel.getJaxbAbstractLvl();
+    if (lvl != null) {
+      suff = lvl.getSuff() != null ? lvl.getSuff().getVal() : "tab";
+      lvlJc = lvl.getLvlJc() != null ? lvl.getLvlJc().getVal() : JcEnumeration.RIGHT;
+
+      if (listLevel.IsBullet()) {
+        lvlPickBullet = lvl.getLvlPicBulletId() != null;
+      }
+      startVal = lvl.getStart().getVal().toString();
+      lvlText = listLevel.getLevelText().isBlank() ? "" : listLevel.getLevelText();
+      restartNummerAfterBreak =
+          lvl.getLvlRestart() != null ? lvl.getLvlRestart().getVal().toString() : "";
+      isLgl = lvl.getIsLgl() != null && lvl.getIsLgl().isVal();
+
+      if (lvl.getRPr() != null) {
+        fontColor = lvl.getRPr().getColor() != null ? lvl.getRPr().getColor().getVal() : "";
+        fontSize = lvl.getRPr().getSz() != null ? lvl.getRPr().getSz().getVal().toString() : "";
+        fontStyle =
+            lvl.getRPr().getRFonts() != null && lvl.getRPr().getRFonts().getAscii() != null
+                ? lvl.getRPr().getRFonts().getAscii()
+                : "";
+      }
+    }
+    return new NumberingListEntryIndex(
+        lvlText,
+        startVal,
+        restartNummerAfterBreak,
+        fontColor,
+        fontStyle,
+        fontSize,
+        lvlPickBullet,
+        isLgl,
+        numberFormat,
+        iLvl,
+        lvlJc,
+        suff);
   }
 
   private boolean isParagraph() {

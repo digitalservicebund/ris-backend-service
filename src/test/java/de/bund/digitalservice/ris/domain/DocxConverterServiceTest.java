@@ -10,17 +10,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.config.ConverterConfig;
-import de.bund.digitalservice.ris.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
-import de.bund.digitalservice.ris.domain.docx.Docx2Html;
-import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
+import de.bund.digitalservice.ris.domain.docx.*;
 import de.bund.digitalservice.ris.domain.docx.NumberingList.DocUnitNumberingListNumberFormat;
-import de.bund.digitalservice.ris.domain.docx.NumberingListEntry;
-import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
-import de.bund.digitalservice.ris.domain.docx.RunTextElement;
-import de.bund.digitalservice.ris.domain.docx.TableCellElement;
-import de.bund.digitalservice.ris.domain.docx.TableElement;
-import de.bund.digitalservice.ris.domain.docx.TableRowElement;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import de.bund.digitalservice.ris.utils.DocxConverterException;
 import java.io.ByteArrayInputStream;
@@ -47,10 +38,10 @@ import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.MetafileEmfPart;
 import org.docx4j.openpackaging.parts.WordprocessingML.StyleDefinitionsPart;
 import org.docx4j.relationships.Relationship;
+import org.docx4j.wml.JcEnumeration;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Styles;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -274,573 +265,1331 @@ class DocxConverterServiceTest {
     }
   }
 
-  @Test
-  void testGetHtml_withTwoNumberingListEntries() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "bullet list entry 1", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "bullet list entry 2", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
-        .addContent("6", generateText("end text"))
-        .generate();
+  @Nested
+  @DisplayName("Test render List HTML")
+  class TestRenderListHTML {
+    private String lvlText;
+    private String startVal;
+    private String restartNumberingAfterBreak;
+    private String color;
+    private String fontStyle;
+    private String fontSize;
+    private boolean lvlPicBullet;
+    private boolean isLgl;
+    private DocUnitNumberingListNumberFormat numberFormat;
+    private String iLvl;
+    private JcEnumeration lvlJc;
+    private String suff;
+    private List<NumberingListEntry> entries;
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
-
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ul><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li></ul>"
-                        + "<ol class=\"decimal\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
-                        + "<p>end text</p>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+    @BeforeEach
+    void setUp() {
+      lvlText = "";
+      startVal = "1";
+      restartNumberingAfterBreak = "";
+      color = "";
+      fontStyle = "";
+      fontSize = "";
+      lvlPicBullet = false;
+      isLgl = false;
+      numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+      iLvl = "0";
+      lvlJc = JcEnumeration.RIGHT;
+      suff = "space";
+      entries = new ArrayList<>();
     }
-  }
 
-  @Test
-  void testGetHtml_withThreeLvlOfNumberingListEntriesBullet() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "bullet list entry 1", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "bullet list entry 2", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "bullet list entry 2.1", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "bullet list entry 2.2", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "bullet list entry 2.2.1", DocUnitNumberingListNumberFormat.BULLET, "1", "2"))
-        .addContent(
-            "7",
-            generateNumberingListEntry(
-                "bullet list entry 2.2.2", DocUnitNumberingListNumberFormat.BULLET, "1", "2"))
-        .generate();
-
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
-
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ul>"
-                        + "<li><p>bullet list entry 1</p></li>"
-                        + "<li><p>bullet list entry 2</p></li>"
-                        + "<ul>"
-                        + "<li><p>bullet list entry 2.1</p></li>"
-                        + "<li><p>bullet list entry 2.2</p></li>"
-                        + "<ul>"
-                        + "<li><p>bullet list entry 2.2.1</p></li>"
-                        + "<li><p>bullet list entry 2.2.2</p></li>"
-                        + "</ul>"
-                        + "</ul>"
-                        + "</ul>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+    NumberingListEntryIndex createNumberingListEntryIndex() {
+      return new NumberingListEntryIndex(
+          lvlText,
+          startVal,
+          restartNumberingAfterBreak,
+          color,
+          fontStyle,
+          fontSize,
+          lvlPicBullet,
+          isLgl,
+          numberFormat,
+          iLvl,
+          lvlJc,
+          suff);
     }
-  }
 
-  @Test
-  void testGetHtml_withThreeLvlOfNumberingListEntriesLowerRoman() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "lower roman list entry 1", DocUnitNumberingListNumberFormat.LOWER_ROMAN, "0", "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "lower roman list entry 2", DocUnitNumberingListNumberFormat.LOWER_ROMAN, "0", "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "lower roman list entry 2.1",
-                DocUnitNumberingListNumberFormat.LOWER_ROMAN,
-                "1",
-                "1"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "lower roman list entry 2.2",
-                DocUnitNumberingListNumberFormat.LOWER_ROMAN,
-                "1",
-                "1"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "lower roman list entry 2.2.1",
-                DocUnitNumberingListNumberFormat.LOWER_ROMAN,
-                "1",
-                "2"))
-        .addContent(
-            "7",
-            generateNumberingListEntry(
-                "lower roman list entry 2.2.2",
-                DocUnitNumberingListNumberFormat.LOWER_ROMAN,
-                "1",
-                "2"))
-        .generate();
+    @Test
+    void testGetHtml_withTwoNumberingListEntries() {
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 2", createNumberingListEntryIndex()));
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("decimal list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("decimal list entry 2", createNumberingListEntryIndex()));
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
 
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ol class=\"lower-roman\">"
-                        + "<li><p>lower roman list entry 1</p></li>"
-                        + "<li><p>lower roman list entry 2</p></li>"
-                        + "<ol class=\"lower-roman\">"
-                        + "<li><p>lower roman list entry 2.1</p></li>"
-                        + "<li><p>lower roman list entry 2.2</p></li>"
-                        + "<ol class=\"lower-roman\">"
-                        + "<li><p>lower roman list entry 2.2.1</p></li>"
-                        + "<li><p>lower roman list entry 2.2.2</p></li>"
-                        + "</ol>"
-                        + "</ol>"
-                        + "</ol>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 2</p>"
+                          + "</li>"
+                          + "</ul>"
+                          + "<ol style=\"list-style-type:decimal;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p>"
+                          + "<p>decimal list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p>"
+                          + "<p>decimal list entry 2</p>"
+                          + "</li>"
+                          + "</ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
     }
-  }
 
-  @Test
-  void testGetHtml_withThreeLvlOfNumberingListEntriesUpperRoman() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "upper roman list entry 1", DocUnitNumberingListNumberFormat.UPPER_ROMAN, "0", "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "upper roman list entry 2", DocUnitNumberingListNumberFormat.UPPER_ROMAN, "0", "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "upper roman list entry 2.1",
-                DocUnitNumberingListNumberFormat.UPPER_ROMAN,
-                "1",
-                "1"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "upper roman list entry 2.2",
-                DocUnitNumberingListNumberFormat.UPPER_ROMAN,
-                "1",
-                "1"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "upper roman list entry 2.2.1",
-                DocUnitNumberingListNumberFormat.UPPER_ROMAN,
-                "1",
-                "2"))
-        .addContent(
-            "7",
-            generateNumberingListEntry(
-                "upper roman list entry 2.2.2",
-                DocUnitNumberingListNumberFormat.UPPER_ROMAN,
-                "1",
-                "2"))
-        .generate();
+    @Test
+    void testGetHtml_withTwoNumberingListEntriesAndMiddleText() {
+      numberFormat = DocUnitNumberingListNumberFormat.UPPER_LETTER;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.addContent(String.valueOf(++index), generateText("Middle Text"));
+      entries = new ArrayList<>();
+      numberFormat = DocUnitNumberingListNumberFormat.LOWER_LETTER;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.addContent(String.valueOf(++index), generateText("Middle Text"));
+      entries = new ArrayList<>();
+      numberFormat = DocUnitNumberingListNumberFormat.UPPER_ROMAN;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.addContent(String.valueOf(++index), generateText("Middle Text"));
+      entries = new ArrayList<>();
+      numberFormat = DocUnitNumberingListNumberFormat.LOWER_ROMAN;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.addContent(String.valueOf(++index), generateText("Middle Text"));
+      entries = new ArrayList<>();
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ol class=\"upper-roman\">"
-                        + "<li><p>upper roman list entry 1</p></li>"
-                        + "<li><p>upper roman list entry 2</p></li>"
-                        + "<ol class=\"upper-roman\">"
-                        + "<li><p>upper roman list entry 2.1</p></li>"
-                        + "<li><p>upper roman list entry 2.2</p></li>"
-                        + "<ol class=\"upper-roman\">"
-                        + "<li><p>upper roman list entry 2.2.1</p></li>"
-                        + "<li><p>upper roman list entry 2.2.2</p></li>"
-                        + "</ol>"
-                        + "</ol>"
-                        + "</ol>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:lower-latin;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
+                          + "</li></ol>"
+                          + "<p>Middle Text</p>"
+                          + "<ol style=\"list-style-type:upper-latin;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
+                          + "</li></ol>"
+                          + "<p>Middle Text</p>"
+                          + "<ol style=\"list-style-type:upper-roman;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
+                          + "</li></ol>"
+                          + "<p>Middle Text</p>"
+                          + "<ol style=\"list-style-type:lower-roman\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
+                          + "</li></ol>"
+                          + "<p>Middle Text</p>"
+                          + "<ol style=\"list-style-type:decimal;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\"></span><span> </span></p><p>list entry 1</p>"
+                          + "</li></ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
     }
-  }
 
-  @Test
-  void testGetHtml_withThreeLvlOfNumberingListEntriesLowerLetter() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "lower letter list entry 1",
-                DocUnitNumberingListNumberFormat.LOWER_LETTER,
-                "0",
-                "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "lower letter list entry 2",
-                DocUnitNumberingListNumberFormat.LOWER_LETTER,
-                "0",
-                "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "lower letter list entry 2.1",
-                DocUnitNumberingListNumberFormat.LOWER_LETTER,
-                "1",
-                "1"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "lower letter list entry 2.2",
-                DocUnitNumberingListNumberFormat.LOWER_LETTER,
-                "1",
-                "1"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "lower letter list entry 2.2.1",
-                DocUnitNumberingListNumberFormat.LOWER_LETTER,
-                "1",
-                "2"))
-        .addContent(
-            "7",
-            generateNumberingListEntry(
-                "lower letter list entry 2.2.2",
-                DocUnitNumberingListNumberFormat.LOWER_LETTER,
-                "1",
-                "2"))
-        .generate();
+    @Test
+    void testGetHtml_listWithStyle() {
+      fontStyle = "Symbol";
+      fontSize = "28";
+      color = "000000";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 2", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 3", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ol class=\"lower-letter\">"
-                        + "<li><p>lower letter list entry 1</p></li>"
-                        + "<li><p>lower letter list entry 2</p></li>"
-                        + "<ol class=\"lower-letter\">"
-                        + "<li><p>lower letter list entry 2.1</p></li>"
-                        + "<li><p>lower letter list entry 2.2</p></li>"
-                        + "<ol class=\"lower-letter\">"
-                        + "<li><p>lower letter list entry 2.2.1</p></li>"
-                        + "<li><p>lower letter list entry 2.2.2</p></li>"
-                        + "</ol>"
-                        + "</ol>"
-                        + "</ol>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:14pt;color:#000000;\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:14pt;color:#000000;\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 2</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:14pt;color:#000000;\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 3</p>"
+                          + "</li>"
+                          + "</ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
     }
-  }
 
-  @Test
-  void testGetHtml_withThreeLvlOfNumberingListEntriesUpperLetter() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "upper letter list entry 1",
-                DocUnitNumberingListNumberFormat.UPPER_LETTER,
-                "0",
-                "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "upper letter list entry 2",
-                DocUnitNumberingListNumberFormat.UPPER_LETTER,
-                "0",
-                "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "upper letter list entry 2.1",
-                DocUnitNumberingListNumberFormat.UPPER_LETTER,
-                "1",
-                "1"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "upper letter list entry 2.2",
-                DocUnitNumberingListNumberFormat.UPPER_LETTER,
-                "1",
-                "1"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "upper letter list entry 2.2.1",
-                DocUnitNumberingListNumberFormat.UPPER_LETTER,
-                "1",
-                "2"))
-        .addContent(
-            "7",
-            generateNumberingListEntry(
-                "upper letter list entry 2.2.2",
-                DocUnitNumberingListNumberFormat.UPPER_LETTER,
-                "1",
-                "2"))
-        .generate();
+    @Test
+    void testGetHtml_picBulletList() {
+      lvlPicBullet = true;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ol class=\"upper-letter\">"
-                        + "<li><p>upper letter list entry 1</p></li>"
-                        + "<li><p>upper letter list entry 2</p></li>"
-                        + "<ol class=\"upper-letter\">"
-                        + "<li><p>upper letter list entry 2.1</p></li>"
-                        + "<li><p>upper letter list entry 2.2</p></li>"
-                        + "<ol class=\"upper-letter\">"
-                        + "<li><p>upper letter list entry 2.2.1</p></li>"
-                        + "<li><p>upper letter list entry 2.2.2</p></li>"
-                        + "</ol>"
-                        + "</ol>"
-                        + "</ol>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li></ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
     }
-  }
 
-  @Test
-  void testGetHtml_withThreeLvlOfNumberingListEntriesDecimal() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "decimal list entry 2.1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "1"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "decimal list entry 2.2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "1"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "decimal list entry 2.2.1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
-        .addContent(
-            "7",
-            generateNumberingListEntry(
-                "decimal list entry 2.2.2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
-        .generate();
+    @Test
+    void testGetHtml_LglList() {
+      isLgl = true;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ol class=\"decimal\">"
-                        + "<li><p>decimal list entry 1</p></li>"
-                        + "<li><p>decimal list entry 2</p></li>"
-                        + "<ol class=\"decimal\">"
-                        + "<li><p>decimal list entry 2.1</p></li>"
-                        + "<li><p>decimal list entry 2.2</p></li>"
-                        + "<ol class=\"decimal\">"
-                        + "<li><p>decimal list entry 2.2.1</p></li>"
-                        + "<li><p>decimal list entry 2.2.2</p></li>"
-                        + "</ol>"
-                        + "</ol>"
-                        + "</ol>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\"><li style=\"list-style-type:decimal\"><p>bullet list entry 1</p></li></ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
     }
-  }
 
-  @Test
-  void testGetHtml_withThreeLvlOfNumberingListEntriesMixed() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "0", "0"))
-        .addContent(
-            "4",
-            generateNumberingListEntry(
-                "bullet list entry 2.1", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "bullet list entry 2.2", DocUnitNumberingListNumberFormat.BULLET, "1", "1"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "decimal list entry 2.2.1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
-        .addContent(
-            "7",
-            generateNumberingListEntry(
-                "decimal list entry 2.2.2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "2"))
-        .generate();
+    @Test
+    void testGetHtml_IndexLeftAlign() {
+      lvlJc = JcEnumeration.LEFT;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ol class=\"decimal\">"
-                        + "<li><p>decimal list entry 1</p></li>"
-                        + "<li><p>decimal list entry 2</p></li>"
-                        + "<ul>"
-                        + "<li><p>bullet list entry 2.1</p></li>"
-                        + "<li><p>bullet list entry 2.2</p></li>"
-                        + "<ol class=\"decimal\">"
-                        + "<li><p>decimal list entry 2.2.1</p></li>"
-                        + "<li><p>decimal list entry 2.2.2</p></li>"
-                        + "</ol>"
-                        + "</ul>"
-                        + "</ol>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:left;\"><span style=\"\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li></ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
     }
-  }
 
-  @Test
-  void testGetHtml_withTwoNumberingListEntriesAndMiddleText() {
-    new TestDocumentGenerator(client, responseBytes, mlPackage, converter)
-        .addContent("1", generateText("start test"))
-        .addContent(
-            "2",
-            generateNumberingListEntry(
-                "bullet list entry 1", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
-        .addContent(
-            "3",
-            generateNumberingListEntry(
-                "bullet list entry 2", DocUnitNumberingListNumberFormat.BULLET, "0", "0"))
-        .addContent("4", generateText("middle text"))
-        .addContent(
-            "5",
-            generateNumberingListEntry(
-                "decimal list entry 1", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
-        .addContent(
-            "6",
-            generateNumberingListEntry(
-                "decimal list entry 2", DocUnitNumberingListNumberFormat.DECIMAL, "1", "0"))
-        .addContent("7", generateText("end text"))
-        .generate();
+    @Test
+    void testGetHtml_IndexCenterAlign() {
+      lvlJc = JcEnumeration.CENTER;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
 
-    try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
-        mockStatic(WordprocessingMLPackage.class)) {
-      mockedMLPackageStatic
-          .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
-          .thenReturn(mlPackage);
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
-          .consumeNextWith(
-              docx2Html -> {
-                assertNotNull(docx2Html);
-                assertEquals(
-                    "<p>start test</p>"
-                        + "<ul><li><p>bullet list entry 1</p></li><li><p>bullet list entry 2</p></li></ul>"
-                        + "<p>middle text</p>"
-                        + "<ol class=\"decimal\"><li><p>decimal list entry 1</p></li><li><p>decimal list entry 2</p></li></ol>"
-                        + "<p>end text</p>",
-                    docx2Html.content());
-              })
-          .verifyComplete();
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:center;\"><span style=\"\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li></ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_IndexDistanceNothing() {
+      suff = "nothing";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span></span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li></ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_emptyStartValue() {
+      startVal = "";
+      lvlText = "%1.";
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li></ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_IndexDistanceTab() {
+      suff = "tab";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\">"
+                          + "<span style=\"\">&#9679;</span><span>&emsp;</span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li></ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_restartIndexAfterBreak() {
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      iLvl = "0";
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      iLvl = "0";
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      restartNumberingAfterBreak = "5";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
+                          + "<p>list entry 1</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
+                          + "<p>list entry 1</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.</span><span> </span></p>"
+                          + "<p>list entry 1</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">6.</span><span> </span></p>"
+                          + "<p>list entry 1</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "</ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_withThreeLvlOfNumberingListEntriesBullet() {
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      fontStyle = "Courier New";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 2.2", createNumberingListEntryIndex()));
+      iLvl = "2";
+      fontStyle = "Wingdings";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "bullet list entry 2.2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "bullet list entry 2.2.2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      fontStyle = "Courier New";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 2.3", createNumberingListEntryIndex()));
+      iLvl = "0";
+      fontStyle = "Symbol";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("bullet list entry 3", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ul style=\"list-style-type:disc;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 2</p></li><ul style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Courier New;\">&#9675;</span><span> </span></p>"
+                          + "<p>bullet list entry 2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Courier New;\">&#9675;</span><span> </span></p>"
+                          + "<p>bullet list entry 2.2</p>"
+                          + "</li>"
+                          + "<ul style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Wingdings;\">&#9642;</span><span> </span></p>"
+                          + "<p>bullet list entry 2.2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Wingdings;\">&#9642;</span><span> </span></p>"
+                          + "<p>bullet list entry 2.2.2</p>"
+                          + "</li>"
+                          + "</ul>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Courier New;\">&#9675;</span><span> </span></p>"
+                          + "<p>bullet list entry 2.3</p>"
+                          + "</li>"
+                          + "</ul>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\">"
+                          + "<span style=\"font-family:Symbol;\">&#9679;</span><span> </span></p>"
+                          + "<p>bullet list entry 3</p>"
+                          + "</li>"
+                          + "</ul>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_withThreeLvlOfNumberingListEntriesLowerRoman() {
+      numberFormat = DocUnitNumberingListNumberFormat.LOWER_ROMAN;
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 2.2", createNumberingListEntryIndex()));
+      iLvl = "2";
+      lvlText = "%3.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 2.2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 2.2.2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 2.3", createNumberingListEntryIndex()));
+      iLvl = "0";
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower roman list entry 3", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">i.</span><span> </span></p>"
+                          + "<p>lower roman list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\">"
+                          + "<span style=\"\">ii.</span><span> </span></p>"
+                          + "<p>lower roman list entry 2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">i.</span><span> </span></p>"
+                          + "<p>lower roman list entry 2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">ii.</span><span> </span></p>"
+                          + "<p>lower roman list entry 2.2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">i.</span><span> </span></p>"
+                          + "<p>lower roman list entry 2.2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">ii.</span><span> </span></p>"
+                          + "<p>lower roman list entry 2.2.2</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">iii.</span><span> </span></p>"
+                          + "<p>lower roman list entry 2.3</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">iii.</span><span> </span></p>"
+                          + "<p>lower roman list entry 3</p>"
+                          + "</li>"
+                          + "</ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_withThreeLvlOfNumberingListEntriesUpperRoman() {
+      numberFormat = DocUnitNumberingListNumberFormat.UPPER_ROMAN;
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 2.2", createNumberingListEntryIndex()));
+      iLvl = "2";
+      lvlText = "%3.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 2.2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 2.2.2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 2.3", createNumberingListEntryIndex()));
+      iLvl = "0";
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper roman list entry 3", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">I.</span><span> </span></p>"
+                          + "<p>upper roman list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">II.</span><span> </span></p>"
+                          + "<p>upper roman list entry 2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">I.</span><span> </span></p>"
+                          + "<p>upper roman list entry 2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">II.</span><span> </span></p>"
+                          + "<p>upper roman list entry 2.2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">I.</span><span> </span></p>"
+                          + "<p>upper roman list entry 2.2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">II.</span><span> </span></p>"
+                          + "<p>upper roman list entry 2.2.2</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">III.</span><span> </span></p>"
+                          + "<p>upper roman list entry 2.3</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">III.</span><span> </span></p>"
+                          + "<p>upper roman list entry 3</p>"
+                          + "</li>"
+                          + "</ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_withThreeLvlOfNumberingListEntriesLowerLetter() {
+      numberFormat = DocUnitNumberingListNumberFormat.LOWER_LETTER;
+      lvlText = "%1)";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 2.2", createNumberingListEntryIndex()));
+      iLvl = "2";
+      lvlText = "(%3)";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 2.2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 2.2.2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 2.3", createNumberingListEntryIndex()));
+      iLvl = "0";
+      lvlText = "%1)";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "lower letter list entry 3", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">a)</span><span> </span></p>"
+                          + "<p>lower letter list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">b)</span><span> </span></p>"
+                          + "<p>lower letter list entry 2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">a.</span><span> </span></p>"
+                          + "<p>lower letter list entry 2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">b.</span><span> </span></p>"
+                          + "<p>lower letter list entry 2.2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(a)</span><span> </span></p>"
+                          + "<p>lower letter list entry 2.2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(b)</span><span> </span></p>"
+                          + "<p>lower letter list entry 2.2.2</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">c.</span><span> </span></p>"
+                          + "<p>lower letter list entry 2.3</p></li></ol><li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">c)</span><span> </span></p>"
+                          + "<p>lower letter list entry 3</p>"
+                          + "</li>"
+                          + "</ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_withThreeLvlOfNumberingListEntriesUpperLetter() {
+      numberFormat = DocUnitNumberingListNumberFormat.UPPER_LETTER;
+      lvlText = "%1)";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 2.2", createNumberingListEntryIndex()));
+      iLvl = "2";
+      lvlText = "(%3)";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 2.2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 2.2.2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 2.3", createNumberingListEntryIndex()));
+      iLvl = "0";
+      lvlText = "%1)";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "upper letter list entry 3", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">A)</span><span> </span></p>"
+                          + "<p>upper letter list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">B)</span><span> </span></p>"
+                          + "<p>upper letter list entry 2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">A.</span><span> </span></p>"
+                          + "<p>upper letter list entry 2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">B.</span><span> </span></p>"
+                          + "<p>upper letter list entry 2.2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(A)</span><span> </span></p>"
+                          + "<p>upper letter list entry 2.2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">(B)</span><span> </span></p>"
+                          + "<p>upper letter list entry 2.2.2</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">C.</span><span> </span></p>"
+                          + "<p>upper letter list entry 2.3</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">C)</span><span> </span></p>"
+                          + "<p>upper letter list entry 3</p>"
+                          + "</li>"
+                          + "</ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_withThreeLvlOfNumberingListEntriesDecimal() {
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("decimal list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("decimal list entry 2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%1.%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "decimal list entry 2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "decimal list entry 2.2", createNumberingListEntryIndex()));
+      iLvl = "2";
+      lvlText = "%1.%2.%3.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "decimal list entry 2.2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "decimal list entry 2.2.2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%1.%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry(
+                  "decimal list entry 2.3", createNumberingListEntryIndex()));
+      iLvl = "0";
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("decimal list entry 3", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
+                          + "<p>decimal list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.</span><span> </span></p>"
+                          + "<p>decimal list entry 2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.1.</span><span> </span></p>"
+                          + "<p>decimal list entry 2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.2.</span><span> </span></p>"
+                          + "<p>decimal list entry 2.2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.2.1.</span><span> </span></p>"
+                          + "<p>decimal list entry 2.2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.2.2.</span><span> </span></p>"
+                          + "<p>decimal list entry 2.2.2</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.3.</span><span> </span></p>"
+                          + "<p>decimal list entry 2.3</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">3.</span><span> </span></p>"
+                          + "<p>decimal list entry 3</p>"
+                          + "</li>"
+                          + "</ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
+    }
+
+    @Test
+    void testGetHtml_withThreeLvlOfNumberingListEntriesMixed() {
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+      fontStyle = "Symbol";
+      fontSize = "18";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 2.2", createNumberingListEntryIndex()));
+      iLvl = "2";
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      lvlText = "%1.%2.%3.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 2.2.1", createNumberingListEntryIndex()));
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 2.2.2", createNumberingListEntryIndex()));
+      iLvl = "1";
+      lvlText = "%1.%2.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 2.3", createNumberingListEntryIndex()));
+      iLvl = "2";
+      numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+      fontStyle = "Symbol";
+      fontSize = "18";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 2.3.1", createNumberingListEntryIndex()));
+      numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
+      iLvl = "0";
+      lvlText = "%1.";
+      entries.add(
+          (NumberingListEntry)
+              generateNumberingListEntry("list entry 3", createNumberingListEntryIndex()));
+
+      TestDocumentGenerator generator =
+          new TestDocumentGenerator(client, responseBytes, mlPackage, converter);
+      int index = 0;
+      for (DocUnitDocx entry : entries) {
+        generator.addContent(String.valueOf(++index), entry);
+      }
+      generator.generate();
+
+      try (MockedStatic<WordprocessingMLPackage> mockedMLPackageStatic =
+          mockStatic(WordprocessingMLPackage.class)) {
+        mockedMLPackageStatic
+            .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
+            .thenReturn(mlPackage);
+
+        StepVerifier.create(service.getHtml("test.docx"))
+            .consumeNextWith(
+                docx2Html -> {
+                  assertNotNull(docx2Html);
+                  assertEquals(
+                      "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">1.</span><span> </span></p>"
+                          + "<p>list entry 1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"\">2.</span><span> </span></p>"
+                          + "<p>list entry 2</p>"
+                          + "</li>"
+                          + "<ul style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">&#9679;</span><span> </span></p>"
+                          + "<p>list entry 2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">&#9679;</span><span> </span></p>"
+                          + "<p>list entry 2.2</p>"
+                          + "</li>"
+                          + "<ol style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">2..1.</span><span> </span></p>"
+                          + "<p>list entry 2.2.1</p>"
+                          + "</li>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">2..2.</span><span> </span></p>"
+                          + "<p>list entry 2.2.2</p>"
+                          + "</li>"
+                          + "</ol>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">2.1.</span><span> </span></p>"
+                          + "<p>list entry 2.3</p>"
+                          + "</li>"
+                          + "<ul style=\"list-style-type:none;display:table;\">"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">&#9679;</span><span> </span></p>"
+                          + "<p>list entry 2.3.1</p>"
+                          + "</li>"
+                          + "</ul>"
+                          + "</ul>"
+                          + "<li style=\"display:table-row\">"
+                          + "<p style=\"display:table-cell;text-align:right;\"><span style=\"font-family:Symbol;font-size:9pt;\">3.</span><span> </span></p>"
+                          + "<p>list entry 3</p>"
+                          + "</li></ol>",
+                      docx2Html.content());
+                })
+            .verifyComplete();
+      }
     }
   }
 
@@ -899,10 +1648,10 @@ class DocxConverterServiceTest {
   }
 
   private DocUnitDocx generateNumberingListEntry(
-      String text, DocUnitNumberingListNumberFormat numberFormat, String numId, String iLvl) {
+      String text, NumberingListEntryIndex numberingListEntryIndex) {
     var paragraphElement = generateText(text);
 
-    return new NumberingListEntry(paragraphElement, numberFormat, numId, iLvl);
+    return new NumberingListEntry(paragraphElement, numberingListEntryIndex);
   }
 
   private static class TestDocumentGenerator {
