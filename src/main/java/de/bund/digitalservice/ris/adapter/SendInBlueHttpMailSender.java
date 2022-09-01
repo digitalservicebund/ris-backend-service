@@ -5,6 +5,8 @@ import de.bund.digitalservice.ris.domain.HttpMailSender;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sendinblue.ApiClient;
 import sendinblue.ApiException;
 import sendinblue.Configuration;
@@ -16,6 +18,7 @@ import sibModel.SendSmtpEmailSender;
 import sibModel.SendSmtpEmailTo;
 
 public class SendInBlueHttpMailSender implements HttpMailSender {
+  private static final Logger LOGGER = LoggerFactory.getLogger(SendInBlueHttpMailSender.class);
 
   private final String apiKey;
 
@@ -30,6 +33,18 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String subject,
       String content,
       String fileName) {
+
+    LOGGER.info(
+        "send email from sender '{}' to receiver '{}' with subject '{}' and content '{}' and filename '{}'.",
+        senderAddress,
+        receiverAddress,
+        subject,
+        content,
+        fileName);
+    LOGGER.info(
+        "api key starts with {} and ends with {}",
+        apiKey.substring(0, 3),
+        apiKey.substring(apiKey.length() - 4, apiKey.length() - 1));
 
     ApiClient defaultClient = Configuration.getDefaultApiClient();
     ApiKeyAuth apiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
