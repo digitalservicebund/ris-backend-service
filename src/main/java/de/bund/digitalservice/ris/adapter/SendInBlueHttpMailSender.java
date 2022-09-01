@@ -51,7 +51,7 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     SendSmtpEmail sendSmtpEmail = new SendSmtpEmail();
     sendSmtpEmail.setSender(sender);
     sendSmtpEmail.setTo(toList);
-    sendSmtpEmail.setTextContent("");
+    sendSmtpEmail.setTextContent("neuris");
     sendSmtpEmail.setSubject(subject);
     sendSmtpEmail.setAttachment(attachmentList);
 
