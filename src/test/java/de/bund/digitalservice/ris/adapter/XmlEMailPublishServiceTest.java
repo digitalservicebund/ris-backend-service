@@ -2,13 +2,14 @@ package de.bund.digitalservice.ris.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
+import de.bund.digitalservice.ris.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
@@ -18,21 +19,22 @@ import de.bund.digitalservice.ris.domain.export.juris.Status;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import javax.mail.internet.MimeMessage;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
-@Import(XmlEMailPublishService.class)
+@Import({XmlEMailPublishService.class})
+@TestPropertySource(properties = "mail.exporter.senderAddress=export@neuris")
 class XmlEMailPublishServiceTest {
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   private static final String MAIL_SUBJECT =
@@ -47,21 +49,20 @@ class XmlEMailPublishServiceTest {
   private static final ResultObject FORMATTED_XML =
       new ResultObject("xml", new Status("200", List.of("succeed")), "test.xml", PUBLISH_DATE);
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
+  private static final String SENDER_ADDRESS = "export@neuris";
 
   private DocUnit documentUnit;
 
-  private XmlEMailPublishService service;
+  @Autowired private XmlEMailPublishService service;
 
   @MockBean private JurisXmlExporter xmlExporter;
 
   @MockBean private XmlMailRepository repository;
 
-  @MockBean private JavaMailSender mailSender;
+  @MockBean private HttpMailSender mailSender;
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    service = new XmlEMailPublishService(xmlExporter, repository, mailSender, "fromMailAddress");
-
     documentUnit = new DocUnit();
     documentUnit.setId(123L);
     documentUnit.setUuid(TEST_UUID);
@@ -69,7 +70,6 @@ class XmlEMailPublishServiceTest {
     when(xmlExporter.generateXml(documentUnit)).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(Mono.just(SAVED_XML_MAIL));
-    when(mailSender.createMimeMessage()).thenReturn(mock(MimeMessage.class));
   }
 
   @Test
@@ -81,6 +81,13 @@ class XmlEMailPublishServiceTest {
         .verifyComplete();
 
     verify(repository).save(EXPECTED_BEFORE_SAVE);
+    verify(mailSender)
+        .sendMail(
+            SENDER_ADDRESS,
+            RECEIVER_ADDRESS,
+            SAVED_XML_MAIL.mailSubject(),
+            SAVED_XML_MAIL.xml(),
+            SAVED_XML_MAIL.fileName());
   }
 
   @Test
@@ -146,25 +153,13 @@ class XmlEMailPublishServiceTest {
   }
 
   @Test
-  void testPublish_withWrongFormattedFromMailSet() {
-    service = new XmlEMailPublishService(xmlExporter, repository, mailSender, "<");
+  void testPublish_withExceptionBySendingEmail() {
+    doThrow(DocumentUnitPublishException.class)
+        .when(mailSender)
+        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml");
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
-        .expectErrorMatches(
-            ex ->
-                ex instanceof DocumentUnitPublishException
-                    && ex.getMessage().equals("Sender mail address is not correct"))
-        .verify();
-  }
-
-  @Test
-  void testPublish_withWrongFormattedToMailSet() {
-
-    StepVerifier.create(service.publish(documentUnit, "<"))
-        .expectErrorMatches(
-            ex ->
-                ex instanceof DocumentUnitPublishException
-                    && ex.getMessage().equals("Receiver mail address is not correct"))
+        .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
         .verify();
   }
 

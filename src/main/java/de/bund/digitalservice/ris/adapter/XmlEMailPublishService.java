@@ -3,27 +3,19 @@ package de.bund.digitalservice.ris.adapter;
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.EmailPublishService;
+import de.bund.digitalservice.ris.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.MailResponse;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import de.bund.digitalservice.ris.domain.export.juris.ResultObject;
-import java.io.IOException;
 import java.util.UUID;
-import javax.activation.DataSource;
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.MediaType;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -32,19 +24,19 @@ public class XmlEMailPublishService implements EmailPublishService {
   private static final Logger LOGGER = LoggerFactory.getLogger(XmlEMailPublishService.class);
 
   private final JurisXmlExporter jurisXmlExporter;
+
+  private final HttpMailSender mailSender;
+
   private final XmlMailRepository repository;
-  private final JavaMailSender mailSender;
-  private final String fromMailAddress;
+
+  @Value("${mail.exporter.senderAddress:test}")
+  private String senderAddress;
 
   public XmlEMailPublishService(
-      JurisXmlExporter jurisXmlExporter,
-      XmlMailRepository repository,
-      JavaMailSender mailSender,
-      @Value("${mail.exporter.user:test}") String fromMailAddress) {
+      JurisXmlExporter jurisXmlExporter, HttpMailSender mailSender, XmlMailRepository repository) {
     this.jurisXmlExporter = jurisXmlExporter;
-    this.repository = repository;
     this.mailSender = mailSender;
-    this.fromMailAddress = fromMailAddress;
+    this.repository = repository;
   }
 
   @Override
@@ -96,38 +88,8 @@ public class XmlEMailPublishService implements EmailPublishService {
       return;
     }
 
-    MimeMessage message = mailSender.createMimeMessage();
-    MimeMessageHelper helper;
-
-    try {
-      helper = new MimeMessageHelper(message, true);
-      helper.setFrom(fromMailAddress);
-    } catch (MessagingException ex) {
-      throw new DocumentUnitPublishException("Sender mail address is not correct", ex);
-    }
-
-    try {
-      helper.setTo(InternetAddress.parse(receiverAddress));
-    } catch (MessagingException ex) {
-      throw new DocumentUnitPublishException("Receiver mail address is not correct", ex);
-    }
-
-    try {
-      helper.setSubject(xmlMail.mailSubject());
-    } catch (MessagingException ex) {
-      throw new DocumentUnitPublishException("Subject is not correct", ex);
-    }
-
-    try {
-      DataSource dataSource =
-          new ByteArrayDataSource(xmlMail.xml(), MediaType.APPLICATION_XML_VALUE);
-      helper.setText("");
-      helper.addAttachment(xmlMail.fileName(), dataSource);
-    } catch (MessagingException | IOException ex) {
-      throw new DocumentUnitPublishException("Couldn't add xml as attachment.");
-    }
-
-    mailSender.send(message);
+    mailSender.sendMail(
+        senderAddress, receiverAddress, xmlMail.mailSubject(), xmlMail.xml(), xmlMail.fileName());
   }
 
   private Mono<XmlMail> savePublishInformation(

@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 807390e2d4e491f01dcff31e2346717f0180cdc66fd2f251757721488a0113a2
+    checksum: 3c0e2a1aa13a6629aa0ddee098a3c0c0e90e70d9d2590f1b8ff5f8157c87bd12
   - filename: run.sh
     checksum: d5cd319f42fdaff65570d6012e6be49f7011740fde181725d837ba93b5a5efd8
   - filename: .github/workflows/pipeline.yml
@@ -21,6 +21,10 @@ fileignoreconfig:
     checksum: 84e3e4e6d3ef71f16220dbda3808b6e0943a5c43029a167fa9d89be70fa6db5a
   - filename: src/test/java/de/bund/digitalservice/ris/SecurityIntegrationTest.java
     checksum: 25c731cc32d2496e7299ac1a75e487d9a7d47085a4f0fda90ad063931027a383
+  - filename: src/main/java/de/bund/digitalservice/ris/config/MailConfig.java
+    checksum: 409affd3818f16f55c7189a6bc65c550658089f234f53e06faffdd0369af1953
+  - filename: src/main/java/de/bund/digitalservice/ris/adapter/SendInBlueHttpMailSender.java
+    checksum: 5b72de06ac16286839db46fead0e72abbebccb2d213422eefd2523abd0e82fe7
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
