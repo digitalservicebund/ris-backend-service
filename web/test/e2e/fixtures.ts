@@ -1,10 +1,10 @@
-import { test } from "@playwright/test"
+import { Locator, test } from "@playwright/test"
 import { navigateToCategories } from "./e2e-utils"
 
 // Declare the types of your fixtures.
 type MyFixtures = {
   documentNumber: string
-  editorField
+  editorField: Locator
 }
 
 export const testWithDocUnit = test.extend<MyFixtures>({
@@ -22,7 +22,7 @@ export const testWithDocUnit = test.extend<MyFixtures>({
 
   editorField: async ({ page, documentNumber }, use) => {
     await navigateToCategories(page, documentNumber)
-    const editorField = await page.locator(
+    const editorField = page.locator(
       "[aria-label='Entscheidungsname Editor Feld'] >> div"
     )
     await editorField.click()

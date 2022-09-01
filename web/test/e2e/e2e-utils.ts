@@ -5,16 +5,8 @@ export const navigateToCategories = async (
   page: Page,
   documentNumber: string
 ) => {
-  await page.goto("/")
-  await page
-    .locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
-    .click()
-
-  await page
-    .locator(
-      `a[href*="/jurisdiction/docunit/${documentNumber}/categories"] >> text=Rubriken`
-    )
-    .click()
+  await page.goto(`/jurisdiction/docunit/${documentNumber}/categories`)
+  await expect(page.locator("text=Spruchkörper")).toBeVisible()
 }
 
 export const uploadTestfile = async (page: Page, filename: string) => {
