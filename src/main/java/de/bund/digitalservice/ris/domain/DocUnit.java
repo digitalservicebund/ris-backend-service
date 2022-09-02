@@ -28,7 +28,7 @@ public class DocUnit {
         .build();
   }
 
-  @Id Long id; // remove this, no longer necessary, uuid should be @Id TODO
+  @Id Long id;
   UUID uuid;
   String documentnumber;
   Instant creationtimestamp;
