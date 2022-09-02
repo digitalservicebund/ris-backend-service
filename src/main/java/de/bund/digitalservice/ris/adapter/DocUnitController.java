@@ -1,9 +1,6 @@
 package de.bund.digitalservice.ris.adapter;
 
-import de.bund.digitalservice.ris.domain.DocUnit;
-import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
-import de.bund.digitalservice.ris.domain.DocUnitService;
-import de.bund.digitalservice.ris.domain.MailResponse;
+import de.bund.digitalservice.ris.domain.*;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.UUID;
@@ -62,7 +59,7 @@ public class DocUnitController {
   }
 
   @GetMapping(value = "")
-  public Mono<ResponseEntity<Flux<DocUnit>>> getAll() {
+  public Mono<ResponseEntity<Flux<DocumentUnitListEntry>>> getAll() {
     log.info("All DocUnits were requested");
 
     return service.getAll();

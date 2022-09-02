@@ -54,6 +54,8 @@ class DocUnitServiceTest {
 
   @MockBean private DocUnitRepository repository;
 
+  @MockBean private DocumentUnitListEntryRepository listEntryRepository;
+
   @MockBean private DocumentNumberCounterRepository counterRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -216,7 +218,7 @@ class DocUnitServiceTest {
         .consumeNextWith(Assertions::assertNotNull)
         .verifyComplete();
 
-    verify(repository).findAll(Sort.by(Order.desc("documentnumber")));
+    verify(listEntryRepository).findAll(Sort.by(Order.desc("documentnumber")));
   }
 
   @Test
