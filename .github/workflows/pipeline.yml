@@ -10,7 +10,6 @@ on:
 
 env:
   CONTAINER_REGISTRY: ghcr.io
-  GITHUB_OWNER: ${{ github.repository_owner }}
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
   GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
@@ -146,98 +145,10 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  vulnerability-scan-backend:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-          cache: gradle
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build container image
-        run: ./gradlew bootBuildImage
-      - name: Run Trivy vulnerability scanner
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
-        with:
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-          format: "sarif"
-          output: "trivy-results.sarif"
-          severity: "CRITICAL,HIGH"
-          exit-code: "1" # Fail the build!
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
-        with:
-          sarif_file: "trivy-results.sarif"
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
-        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          type: ${{ job.status }}
-          job_name: "Vulnerability scan image :point_right:"
-          mention: "here"
-          mention_if: "failure"
-          commit: true
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  vulnerability-scan-frontend:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
-    steps:
-      - uses: actions/checkout@v3
-      - name: Run Trivy vulnerability scanner
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
-        with:
-          scan-type: "fs"
-          scan-ref: "./web"
-          skip-dirs: "node_modules" # See https://github.com/aquasecurity/trivy/issues/1283
-          format: "sarif"
-          output: "trivy-results.sarif"
-          severity: "CRITICAL,HIGH"
-          exit-code: "1" # Fail the build!
-      - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@v2
-        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
-        with:
-          sarif_file: "trivy-results.sarif"
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
-        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          type: ${{ job.status }}
-          job_name: "Vulnerability scan npm :point_right:"
-          mention: "here"
-          mention_if: "failure"
-          commit: true
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   analyze-backend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build-backend, vulnerability-scan-backend]
+    needs: [build-backend]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -288,7 +199,7 @@ jobs:
   analyze-frontend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build-frontend, vulnerability-scan-frontend]
+    needs: [build-frontend]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -333,7 +244,6 @@ jobs:
     needs:
       - build-backend
       - audit-licenses-backend
-      - vulnerability-scan-backend
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
@@ -396,7 +306,6 @@ jobs:
     needs:
       - build-frontend
       - audit-licenses-frontend
-      - vulnerability-scan-frontend
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
@@ -444,6 +353,83 @@ jobs:
         with:
           type: ${{ job.status }}
           job_name: "Build/push images :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  vulnerability-scan-backend:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-backend-image]
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Run Trivy vulnerability scanner
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
+        with:
+          sarif_file: "trivy-results.sarif"
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Vulnerability scan image :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  vulnerability-scan-frontend:
+    runs-on: ubuntu-latest
+    needs: [build-and-push-frontend-image]
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run Trivy vulnerability scanner
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
+        with:
+          sarif_file: "trivy-results.sarif"
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Vulnerability scan npm :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
