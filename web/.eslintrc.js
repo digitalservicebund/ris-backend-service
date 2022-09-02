@@ -15,6 +15,12 @@ const moduleImportRules = {
   ],
   "import/no-unresolved": 0,
   "@typescript-eslint/array-type": "error",
+  "vuejs-accessibility/label-has-for": [
+    2,
+    {
+      controlComponents: ["TextInput", "TextEditor"],
+    },
+  ],
 }
 module.exports = {
   root: true,

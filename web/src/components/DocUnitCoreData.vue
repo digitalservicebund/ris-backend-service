@@ -3,6 +3,7 @@ import { computed } from "vue"
 import { CoreData } from "../domain/docUnit"
 import * as iconsAndLabels from "../iconsAndLabels.json"
 import SaveDocUnitButton from "./SaveDocUnitButton.vue"
+import TextInput from "./TextInput.vue"
 
 const props = defineProps<{ coreData: CoreData; updateStatus: number }>()
 const emit = defineEmits<{
@@ -45,14 +46,11 @@ const updateValue = (event: Event, index: number) => {
               <v-icon class="icon_stammdaten">
                 {{ item.icon }}
               </v-icon>
-              <label :for="item.name" class="ris-form__label">
+              <label :for="item.id" class="ris-form__label">
                 {{ item.label }}
-                <input
+                <TextInput
                   :id="item.id"
                   :value="item.value"
-                  class="ris-form__input"
-                  type="text"
-                  :name="item.name"
                   :aria-label="item.aria"
                   @input="updateValue($event, index)"
                 />
@@ -66,14 +64,11 @@ const updateValue = (event: Event, index: number) => {
               <v-icon class="icon_stammdaten">
                 {{ item.icon }}
               </v-icon>
-              <label :for="item.name" class="ris-form__label">
+              <label :for="item.id" class="ris-form__label">
                 {{ item.label }}
-                <input
+                <TextInput
                   :id="item.id"
                   :value="item.value"
-                  class="ris-form__input"
-                  type="text"
-                  :name="item.name"
                   :aria-label="item.aria"
                   @input="updateValue($event, index)"
                 />
@@ -113,19 +108,6 @@ const updateValue = (event: Event, index: number) => {
 
   &__textfield {
     padding: rem(20px);
-  }
-
-  &__input {
-    width: 100%;
-    padding: 17px 24px;
-    margin-top: 5px;
-    outline: 2px solid $text-tertiary;
-    resize: vertical;
-
-    &:hover,
-    &:focus {
-      // outline-width: 4px;
-    }
   }
 
   &__label {
