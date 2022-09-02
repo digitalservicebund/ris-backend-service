@@ -612,7 +612,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Deploy new frontend image
-        uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
+        uses: digitalservicebund/github-actions/argocd-deploy@6dacdbcf1e74ea3f93099eb2e961219def896712
         with:
           environment: production
           version: ${{ needs.build-and-push-frontend-image.outputs.version }}
