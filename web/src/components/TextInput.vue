@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { useInputModel } from "@/composables/useInputModel"
 
 interface Props {
   id: string
@@ -26,19 +26,11 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const inputValue = ref<string | undefined>()
 
-watch(props, () => (inputValue.value = props.modelValue ?? props.value), {
-  immediate: true,
-})
-
-watch(inputValue, () => {
-  emit("update:modelValue", inputValue.value)
-})
-
-function emitInputEvent(event: Event): void {
-  emit("input", event)
-}
+const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
+  props,
+  emit
+)
 </script>
 
 <style lang="scss" scoped>

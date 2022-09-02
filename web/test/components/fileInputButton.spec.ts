@@ -4,23 +4,16 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import FileInputButton from "@/components/FileInputButton.vue"
 
-const vuetify = createVuetify({ components, directives })
+function renderComponent(options?: { slot?: string }): RenderResult {
+  const vuetify = createVuetify({ components, directives })
+  const global = { plugins: [vuetify] }
+  const slots = { default: options?.slot ?? "" }
+  const props = {
+    id: "identifier",
+    ariaLabel: "aria-label",
+  }
 
-function renderComponent(options?: {
-  identifier?: string
-  slot?: string
-}): RenderResult {
-  return render(FileInputButton, {
-    props: {
-      identifier: options?.identifier ?? "test-identifier",
-    },
-    slots: {
-      default: options?.slot ?? "",
-    },
-    global: {
-      plugins: [vuetify],
-    },
-  })
+  return render(FileInputButton, { global, slots, props })
 }
 
 describe("FileInputButton", () => {
@@ -58,7 +51,7 @@ describe("FileInputButton", () => {
     expect(input.onclick).toHaveBeenCalledOnce()
   })
 
-  it("emits change event when user uploads files", async () => {
+  it("emits input event when user uploads files", async () => {
     const { emitted, getByLabelText } = renderComponent({ slot: "Select File" })
     const input: HTMLInputElement = getByLabelText("Select File", {
       selector: "input",
@@ -68,6 +61,7 @@ describe("FileInputButton", () => {
 
     await waitFor(() => fireEvent.update(input))
 
-    expect(emitted()).toEqual({ change: [[[file]]] })
+    expect(emitted()["input"]).toHaveLength(1)
+    expect(emitted()["input"]).toEqual([[expect.any(Event)]])
   })
 })

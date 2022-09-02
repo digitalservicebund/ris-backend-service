@@ -84,7 +84,7 @@ describe("FileUpload", () => {
       global: { plugins: [vuetify, router] },
     })
 
-    const inputEl = getByLabelText("file-upload")
+    const inputEl = getByLabelText("Upload File")
 
     const file = new File(["test"], "sample.png", {
       type: "image/png",

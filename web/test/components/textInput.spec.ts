@@ -1,6 +1,5 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import { nextTick } from "vue"
 import TextInput from "@/components/TextInput.vue"
 
 function renderComponent(options?: {
@@ -38,21 +37,6 @@ describe("TextInput", () => {
     expect(input).not.toBeNull()
   })
 
-  it("fills inital value into input by value property", () => {
-    const { getByRole } = renderComponent({ value: "test value" })
-    const input: HTMLInputElement = getByRole("textbox")
-
-    expect(input.value).toBe("test value")
-  })
-
-  it("fills inital value into input by model value property", async () => {
-    const { getByRole } = renderComponent({ modelValue: "test value" })
-    const input: HTMLInputElement = getByRole("textbox")
-    await nextTick()
-
-    expect(input.value).toBe("test value")
-  })
-
   it("allows to type text inside input", async () => {
     const { getByRole, user } = renderComponent({ value: "one" })
     const input: HTMLInputElement = getByRole("textbox")
@@ -80,17 +64,5 @@ describe("TextInput", () => {
     await user.type(input, "ab")
 
     expect(emitted()["update:modelValue"]).toEqual([["a"], ["ab"]])
-  })
-
-  it("updates input value based on injected properties", async () => {
-    const { getByRole, rerender, props } = renderComponent({
-      value: "old",
-    })
-    const input: HTMLInputElement = getByRole("textbox")
-    expect(input.value).toBe("old")
-
-    await rerender({ ...props, value: "new" })
-
-    expect(input.value).toBe("new")
   })
 })

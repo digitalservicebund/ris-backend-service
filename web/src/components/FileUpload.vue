@@ -79,7 +79,9 @@ const drop = (e: DragEvent) => {
   }
 }
 
-const onFileSelect = (files?: FileList | null) => {
+function onFileSelect(event: Event): void {
+  const files = (event.target as HTMLInputElement).files
+
   if (files) {
     reset()
     upload(files[0])
@@ -125,9 +127,10 @@ const onFileSelect = (files?: FileList | null) => {
               <div>oder</div>
               <div>
                 <FileInputButton
+                  id="file-upload-after-fail"
                   class="ris-btn"
-                  identifier="file-upload-after-fail"
-                  @change="onFileSelect"
+                  aria-label="Upload File"
+                  @input="onFileSelect"
                 >
                   <v-icon>search</v-icon>
                   Festplatte durchsuchen
@@ -153,9 +156,10 @@ const onFileSelect = (files?: FileList | null) => {
               <div class="upload_status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <FileInputButton
+                id="file-upload"
                 class="ris-btn"
-                identifier="file-upload"
-                @change="onFileSelect"
+                aria-label="Upload File"
+                @input="onFileSelect"
               >
                 <v-icon>search</v-icon>
                 Festplatte durchsuchen
