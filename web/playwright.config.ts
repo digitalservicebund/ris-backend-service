@@ -1,4 +1,5 @@
-import { devices, PlaywrightTestConfig } from "@playwright/test"
+import { devices, PlaywrightTestConfig, expect, Page } from "@playwright/test"
+import { isInViewport } from "./test/e2e/e2e-utils"
 
 const config: PlaywrightTestConfig = {
   testDir: "./test/e2e",
@@ -25,5 +26,20 @@ const config: PlaywrightTestConfig = {
     },
   ],
 }
+
+expect.extend({
+  async toHaveInsideViewport(page: Page, selector: string) {
+    return {
+      pass: await isInViewport(page, selector, true),
+      message: () => `${selector} is outside viewport!`,
+    }
+  },
+  async toHaveOutsideViewport(page: Page, selector: string) {
+    return {
+      pass: await isInViewport(page, selector, false),
+      message: () => `${selector} is inside viewport!`,
+    }
+  },
+})
 
 export default config

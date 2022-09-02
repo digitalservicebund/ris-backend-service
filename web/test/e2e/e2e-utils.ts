@@ -9,6 +9,11 @@ export const navigateToCategories = async (
   await expect(page.locator("text=Spruchkörper")).toBeVisible()
 }
 
+export const navigateToFiles = async (page: Page, documentNumber: string) => {
+  await page.goto(`/jurisdiction/docunit/${documentNumber}/files`)
+  await expect(page.locator("h2:has-text('Dokumente')")).toBeVisible()
+}
+
 export const uploadTestfile = async (page: Page, filename: string) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
@@ -19,28 +24,34 @@ export const uploadTestfile = async (page: Page, filename: string) => {
   expect(page.locator("text=Dokument wird geladen.")).not.toBeVisible()
 }
 
-export const isInViewport = async (page: Page, selector: string) => {
-  await page.locator(selector).boundingBox() // it contains x, y, width, and height only
-  const isVisible = await page.evaluate((selector) => {
-    let isVisible = false
-    const element = document.querySelector(selector)
-    if (element) {
-      const rect = element.getBoundingClientRect()
-      if (rect.top >= 0 && rect.left >= 0) {
-        const vw = Math.max(
-          document.documentElement.clientWidth || 0,
-          window.innerWidth || 0
-        )
-        const vh = Math.max(
-          document.documentElement.clientHeight || 0,
-          window.innerHeight || 0
-        )
-        if (rect.right <= vw && rect.bottom <= vh) {
-          isVisible = true
+export const isInViewport = (page: Page, selector: string, inside: boolean) => {
+  return page.locator(selector).evaluate((element, inside) => {
+    return new Promise((resolve) => {
+      let observer: IntersectionObserver | undefined
+      const timeout: ReturnType<typeof setTimeout> = setTimeout(() => {
+        stopObserving(false)
+      }, 20 * 1000)
+
+      function stopObserving(result: boolean) {
+        if (observer) {
+          observer.disconnect()
+          observer = undefined
+        }
+        clearTimeout(timeout)
+        resolve(result)
+      }
+
+      function onIntersection(entries: { isIntersecting: boolean }[]) {
+        if (entries[0].isIntersecting == inside) {
+          stopObserving(true)
         }
       }
-    }
-    return isVisible
-  }, selector)
-  return isVisible
+
+      observer = new IntersectionObserver(onIntersection)
+      observer.observe(element)
+      requestAnimationFrame(() => {
+        // Firefox does not call IntersectionObserver without request animation frames
+      })
+    })
+  }, inside)
 }
