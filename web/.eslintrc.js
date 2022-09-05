@@ -15,12 +15,13 @@ const moduleImportRules = {
   ],
   "import/no-unresolved": 0,
   "@typescript-eslint/array-type": "error",
-  "vuejs-accessibility/label-has-for": [
-    2,
-    {
-      controlComponents: ["TextInput", "TextEditor"],
-    },
-  ],
+  /*
+   * This rules restricts our flexibility to write hierarchically separated
+   * components with labels and inputs as it sometimes "can't see" the relation.
+   * We decided to rather depend on the end-to-end accessibility tests which test
+   * this relation too, but are code independent.
+   */
+  "vuejs-accessibility/label-has-for": "off",
 }
 module.exports = {
   root: true,

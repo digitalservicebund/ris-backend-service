@@ -38,5 +38,17 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
   width: 100%;
   padding: 17px 24px;
   outline: 2px solid $text-tertiary;
+
+  &:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 50px white inset;
+    box-shadow: 0 0 0 50px white inset;
+    -webkit-text-fill-color: $black;
+  }
+
+  &:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 50px white inset;
+    box-shadow: 0 0 0 50px white inset;
+    -webkit-text-fill-color: $black;
+  }
 }
 </style>

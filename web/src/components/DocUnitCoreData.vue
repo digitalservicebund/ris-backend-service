@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import { CoreData } from "../domain/docUnit"
 import * as iconsAndLabels from "../iconsAndLabels.json"
+import InputField from "./InputField.vue"
 import SaveDocUnitButton from "./SaveDocUnitButton.vue"
 import TextInput from "./TextInput.vue"
 
@@ -37,49 +38,51 @@ const updateValue = (event: Event, index: number) => {
   <div v-else>
     <form novalidate class="ris-form" @submit="emit('updateDocUnit')">
       <v-row>
-        <v-col><h2 id="coreData">Stammdaten</h2></v-col>
+        <v-col>
+          <h2 id="coreData">Stammdaten</h2>
+        </v-col>
       </v-row>
       <v-row>
-        <v-col cols="6">
+        <v-col cols="6" class="ris-form__column">
           <template v-for="(item, index) in data">
-            <div v-if="index <= 5" :key="item.id" class="ris-form__textfield">
-              <v-icon class="icon_stammdaten">
-                {{ item.icon }}
-              </v-icon>
-              <label :for="item.id" class="ris-form__label">
-                {{ item.label }}
-                <TextInput
-                  :id="item.id"
-                  :value="item.value"
-                  :aria-label="item.aria"
-                  @input="updateValue($event, index)"
-                />
-              </label>
-            </div>
+            <InputField
+              v-if="index <= 5"
+              :id="item.id"
+              :key="item.id"
+              :label="item.label"
+              :icon-name="item.icon"
+            >
+              <TextInput
+                :id="item.id"
+                :value="item.value"
+                :aria-label="item.aria"
+                @input="updateValue($event, index)"
+              />
+            </InputField>
           </template>
         </v-col>
-        <v-col cols="6">
+        <v-col cols="6" class="ris-form__column">
           <template v-for="(item, index) in data">
-            <div v-if="index > 5" :key="item.id" class="ris-form__textfield">
-              <v-icon class="icon_stammdaten">
-                {{ item.icon }}
-              </v-icon>
-              <label :for="item.id" class="ris-form__label">
-                {{ item.label }}
-                <TextInput
-                  :id="item.id"
-                  :value="item.value"
-                  :aria-label="item.aria"
-                  @input="updateValue($event, index)"
-                />
-              </label>
-            </div>
+            <InputField
+              v-if="index > 5"
+              :id="item.id"
+              :key="item.id"
+              :label="item.label"
+              :icon-name="item.icon"
+            >
+              <TextInput
+                :id="item.id"
+                :value="item.value"
+                :aria-label="item.aria"
+                @input="updateValue($event, index)"
+              />
+            </InputField>
           </template>
         </v-col>
       </v-row>
       <v-row>
         <v-col>
-          <div class="ris-form__textfield">
+          <div class="ris-form__column">
             <SaveDocUnitButton
               aria-label="Stammdaten Speichern Button"
               :update-status="updateStatus"
@@ -94,27 +97,13 @@ const updateValue = (event: Event, index: number) => {
 
 <style lang="scss">
 .ris-form {
-  input:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 50px white inset;
-    box-shadow: 0 0 0 50px white inset;
-    -webkit-text-fill-color: $black;
-  }
-  input:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 50px white inset;
-    box-shadow: 0 0 0 50px white inset;
-    -webkit-text-fill-color: $black;
-  }
-  padding: rem(20px);
+  padding: 2rem;
 
-  &__textfield {
-    padding: rem(20px);
+  &__column {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding: 2rem;
   }
-
-  &__label {
-    padding: 12px 12px 20px 0;
-  }
-}
-.icon_stammdaten {
-  margin: 0 5px 5px 0;
 }
 </style>
