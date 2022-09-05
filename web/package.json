@@ -53,7 +53,7 @@
     "webfontloader": "^1.0.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.5",
+    "@babel/core": "^7.19.0",
     "@playwright-testing-library/test": "^4.3.0",
     "@playwright/test": "^1.25.0",
     "@testing-library/dom": "^8.17.1",
