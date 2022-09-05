@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { uploadTestfile } from "./e2e-utils"
+import { navigateToFiles, uploadTestfile } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
 test.skip(
@@ -8,6 +8,7 @@ test.skip(
 )
 
 test.beforeEach(async ({ page, documentNumber }) => {
+  await navigateToFiles(page, documentNumber)
   await page.goto("/")
   await page
     .locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
@@ -28,19 +29,19 @@ test("copy-paste from side panel", async ({ page }) => {
   await uploadTestfile(page, "some-text-aligment.docx")
   await page.waitForSelector("text=some-text-aligment.docx")
   await page.waitForSelector("text=Datei löschen")
-  await page.locator(`text=${leftAlignText}`)
-  await page.locator(`text=${rightAlignText}`)
-  await page.locator(`text=${centerAlignText}`)
-  await page.locator(`text=${justifyAlignText}`)
+  await expect(page.locator(`text=${leftAlignText}`)).toBeVisible()
+  await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
+  await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
+  await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
 
   // Click on "Rubriken" und check if original document loaded
   await page.locator("a >> text=Rubriken").click()
   await page.locator("[aria-label='Originaldokument öffnen']").click()
   await expect(page.locator("text=Dokument wird geladen")).not.toBeVisible()
-  await page.locator(`text=${rightAlignText}`)
-  await page.locator(`text=${centerAlignText}`)
-  await page.locator(`text=${justifyAlignText}`)
-  const originalFileParagraph = await page.locator(`text=${leftAlignText}`)
+  await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
+  await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
+  await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
+  const originalFileParagraph = page.locator(`text=${leftAlignText}`)
 
   // Selected all text from sidepanel
   await originalFileParagraph.evaluate((element) => {
