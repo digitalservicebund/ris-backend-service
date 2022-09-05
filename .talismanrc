@@ -19,6 +19,8 @@ fileignoreconfig:
     checksum: 3b330b6390ddb0c4ed3ce344ace2e4a8afc48d3bb4bef4f66f6465f4f2632254
   - filename: src/test/java/de/bund/digitalservice/ris/HealthEndpointIntegrationTest.java
     checksum: 84e3e4e6d3ef71f16220dbda3808b6e0943a5c43029a167fa9d89be70fa6db5a
+  - filename: src/test/java/de/bund/digitalservice/ris/PrometheusEndpointIntegrationTest.java
+    checksum: 6bcaecac43c4bd7263de4259e7a1cdc7adbaaffa04bf04faccd8e8834bc6515d
   - filename: src/test/java/de/bund/digitalservice/ris/SecurityIntegrationTest.java
     checksum: 25c731cc32d2496e7299ac1a75e487d9a7d47085a4f0fda90ad063931027a383
   - filename: src/main/java/de/bund/digitalservice/ris/config/MailConfig.java
