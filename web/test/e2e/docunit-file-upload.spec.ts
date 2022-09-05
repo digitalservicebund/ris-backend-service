@@ -1,18 +1,16 @@
 import fs from "fs"
 import { expect } from "@playwright/test"
-import { uploadTestfile } from "./e2e-utils"
+import { navigateToFiles, uploadTestfile } from "./e2e-utils"
 import { testWithDocUnit as test } from "./fixtures"
 
 test.describe("upload an original document to a doc unit", () => {
   test.beforeEach(async ({ page, documentNumber }) => {
-    await page.goto("/")
-    await page
-      .locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
-      .click()
+    await navigateToFiles(page, documentNumber)
   })
 
   test("upload docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
+    await expect(page.locator("text=Hochgeladen am")).toBeVisible()
     await page.waitForSelector(
       ".fileviewer-info-panel-value >> text=sample.docx"
     )
@@ -82,6 +80,7 @@ test.describe("upload an original document to a doc unit", () => {
 
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
     await expect(page.locator("text=Upload läuft")).toBeVisible()
+    await expect(page.locator("text=Hochgeladen am")).toBeVisible()
   })
 
   test("drop non-docx file in upload area", async ({ page }) => {
