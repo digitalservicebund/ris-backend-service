@@ -55,9 +55,7 @@ module.exports = {
     },
     {
       files: ["test/**/*.ts"],
-      extends: [
-        "plugin:jest-dom/recommended",
-      ],
+      extends: ["plugin:jest-dom/recommended"],
     },
   ],
 }
