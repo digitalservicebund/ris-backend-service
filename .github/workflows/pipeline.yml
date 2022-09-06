@@ -200,14 +200,14 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v3
+      - name: Build frontend image
+        run: docker build --file Dockerfile.prod --tag ${CONTAINER_REGISTRY:-ghcr.io}/${GITHUB_OWNER:-digitalservicebund}/ris-frontend:${CONTAINER_IMAGE_VERSION:-$(git rev-parse HEAD)} .
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
         with:
-          scan-type: "fs"
-          scan-ref: "./web"
-          skip-dirs: "node_modules" # See https://github.com/aquasecurity/trivy/issues/1283
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
@@ -332,6 +332,7 @@ jobs:
     needs:
       - build-backend
       - audit-licenses-backend
+      - vulnerability-scan-backend
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
@@ -394,6 +395,7 @@ jobs:
     needs:
       - build-frontend
       - audit-licenses-frontend
+      - vulnerability-scan-frontend
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
