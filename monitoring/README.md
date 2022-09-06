@@ -17,3 +17,5 @@ Prometheus is scraping those and makes them available for querying at: `localhos
 Grafana is using Prometheus as a datasource and can be used to explore and visualise metrics: `localhost:3030`.
 
 The login is `admin` / `admin`.
+
+Import the dashboards in `grafana/dashboards` here: `http://localhost:3030/dashboard/import`
