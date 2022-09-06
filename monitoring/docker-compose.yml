@@ -1,0 +1,10 @@
+version: "3"
+services:
+  grafana:
+    image: grafana/grafana-oss
+    ports:
+      - "3030:3000"
+  prometheus:
+    build: ./prometheus
+    ports:
+      - "9090:9090"
