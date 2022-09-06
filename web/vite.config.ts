@@ -20,7 +20,7 @@ export default defineConfig({
     }),
   ],
   test: {
-    setupFiles: "vuetify.config.ts",
+    setupFiles: ["vuetify.config.ts", "test/setup.ts"],
     deps: {
       inline: ["vuetify"],
     },
@@ -31,6 +31,7 @@ export default defineConfig({
       "test/e2e/**/*.ts",
       "test/a11y/**/*.ts",
       "test/test-helper/**/*.ts",
+      "test/setup.ts",
     ],
     coverage: {
       reporter: ["lcov"],
