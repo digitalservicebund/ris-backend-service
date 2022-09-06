@@ -96,9 +96,7 @@ describe("PublicationDocument", () => {
     )
     expect(publishButton).toBeTruthy()
     if (publishButton) {
-      expect(
-        (publishButton as HTMLElement).hasAttribute("disabled")
-      ).toBeFalsy()
+      expect(publishButton as HTMLElement).toBeEnabled()
       await fireEvent.click(publishButton)
       expect(emitted().publishADocument).toBeTruthy()
     }
@@ -128,9 +126,7 @@ describe("PublicationDocument", () => {
     )
     expect(publishButton).toBeTruthy()
     if (publishButton) {
-      expect(
-        (publishButton as HTMLElement).hasAttribute("disabled")
-      ).toBeFalsy()
+      expect(publishButton as HTMLElement).toBeEnabled()
       await fireEvent.click(publishButton)
       expect(emitted().publishADocument).toBeTruthy()
     }

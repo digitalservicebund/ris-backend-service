@@ -48,7 +48,7 @@ describe("docUnit list", () => {
     await screen.findByText("foo")
     expect(
       screen.queryByText("Keine Dokumentationseinheiten gefunden")
-    ).toBeNull()
+    ).not.toBeInTheDocument()
   })
 
   test("delete emits event", async () => {
@@ -67,7 +67,7 @@ describe("docUnit list", () => {
       screen.getByLabelText("Dokumentationseinheit löschen")
     )
     const confirmButton = screen.getByRole("button", { name: "Löschen" })
-    expect(confirmButton).toBeTruthy()
+    expect(confirmButton).toBeInTheDocument()
     await fireEvent.click(confirmButton)
     expect(emitted().deleteDocUnit).toBeTruthy()
   })

@@ -27,7 +27,9 @@ describe("text editor", async () => {
     expect(container.getElementsByClassName("ProseMirror__small").length).toBe(
       1
     )
-    expect(queryByLabelText("Testzeile Editor Button Leiste")).toBeNull()
+    expect(
+      queryByLabelText("Testzeile Editor Button Leiste")
+    ).not.toBeInTheDocument()
   })
 
   test("renders text editor with props", async () => {
@@ -48,7 +50,9 @@ describe("text editor", async () => {
     expect(container.getElementsByClassName("ProseMirror__large").length).toBe(
       1
     )
-    expect(queryByLabelText("test label Editor Button Leiste")).toBeNull()
+    expect(
+      queryByLabelText("test label Editor Button Leiste")
+    ).not.toBeInTheDocument()
     getByLabelText("test label Editor Feld")
   })
 
@@ -63,7 +67,9 @@ describe("text editor", async () => {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
-    expect(getByLabelText("test label Editor Button Leiste")).not.toBeNull()
+    expect(
+      getByLabelText("test label Editor Button Leiste")
+    ).toBeInTheDocument()
   })
 
   test("hide buttons on blur", async () => {
@@ -77,6 +83,8 @@ describe("text editor", async () => {
     if (editorField.firstElementChild !== null) {
       await fireEvent.blur(editorField.firstElementChild)
     }
-    expect(queryByLabelText("test label Editor Button Leiste")).toBeNull()
+    expect(
+      queryByLabelText("test label Editor Button Leiste")
+    ).not.toBeInTheDocument()
   })
 })

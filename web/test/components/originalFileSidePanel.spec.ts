@@ -29,10 +29,10 @@ describe("originalFile SidePanel", () => {
       global: { plugins: [vuetify, router] },
     })
     getByText("Originaldokument")
-    expect(queryByText("Dokument wird geladen")).toBeNull()
+    expect(queryByText("Dokument wird geladen")).not.toBeInTheDocument()
     expect(
       queryByText("Es wurde noch kein Originaldokument hochgeladen.")
-    ).toBeNull()
+    ).not.toBeInTheDocument()
   })
 
   test("renders loading if no file provided", async () => {

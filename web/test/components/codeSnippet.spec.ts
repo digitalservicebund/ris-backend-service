@@ -36,6 +36,6 @@ describe("CodeSnippet", () => {
       },
     })
     getByText(TITLE)
-    expect(queryByText(INVALID_XML)).toBeNull()
+    expect(queryByText(INVALID_XML)).not.toBeInTheDocument()
   })
 })

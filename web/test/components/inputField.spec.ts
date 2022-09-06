@@ -27,7 +27,7 @@ describe("InputField", () => {
 
     const input = queryByLabelText("test label")
 
-    expect(input).not.toBeNull()
+    expect(input).toBeInTheDocument()
   })
 
   it("shows input with given icon", () => {
@@ -35,7 +35,7 @@ describe("InputField", () => {
 
     const icon = queryByTestId("icon")
 
-    expect(icon).not.toBeNull()
+    expect(icon).toBeInTheDocument()
   })
 
   it("injects given input element into slot", () => {
@@ -49,7 +49,7 @@ describe("InputField", () => {
       selector: "input",
     })
 
-    expect(input).not.toBeNull()
+    expect(input).toBeInTheDocument()
     expect(input?.type).toBe("radio")
   })
 })

@@ -15,9 +15,9 @@ describe("SaveDocUnitButton", () => {
       },
     })
     const saveButton = screen.getByRole("button")
-    expect(saveButton).toBeTruthy()
+    expect(saveButton).toBeInTheDocument()
     expect(saveButton.textContent?.replace(/\s/g, "")).toEqual("Speichern")
-    expect(saveButton.getAttribute("aria-label")).toEqual("Foo")
+    expect(saveButton).toHaveAttribute("aria-label", "Foo")
     await fireEvent.click(saveButton)
     expect(emitted().updateDocUnit).toBeTruthy()
   })

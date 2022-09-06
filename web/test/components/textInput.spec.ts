@@ -24,7 +24,7 @@ describe("TextInput", () => {
     const { queryByRole } = renderComponent()
     const input: HTMLInputElement | null = queryByRole("textbox")
 
-    expect(input).not.toBeNull()
+    expect(input).toBeInTheDocument()
     expect(input?.type).toBe("text")
   })
 
@@ -34,17 +34,17 @@ describe("TextInput", () => {
     })
     const input = queryByLabelText("test-label")
 
-    expect(input).not.toBeNull()
+    expect(input).toBeInTheDocument()
   })
 
   it("allows to type text inside input", async () => {
     const { getByRole, user } = renderComponent({ value: "one" })
     const input: HTMLInputElement = getByRole("textbox")
-    expect(input.value).toBe("one")
+    expect(input).toHaveValue("one")
 
     await user.type(input, " two")
 
-    expect(input.value).toBe("one two")
+    expect(input).toHaveValue("one two")
   })
 
   it("emits input events when user types into input", async () => {
