@@ -16,7 +16,7 @@ describe("Core Data", () => {
     })
     const wrapper = mount(DocUnitCoreData, {
       props: {
-        coreData: docUnit.coreData,
+        modelValue: docUnit.coreData,
         updateStatus: 0,
       },
       global: {

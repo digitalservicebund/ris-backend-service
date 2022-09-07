@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, toRefs } from "vue"
+import { computed, ref, onMounted, onUnmounted, toRefs } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useScrollToHash } from "../../../../composables/useScrollToHash"
 import DocUnitDetail from "./index.vue"
@@ -17,12 +17,6 @@ const props = defineProps<{
 const docUnit = ref(
   await docUnitService.getByDocumentNumber(props.documentNumber)
 )
-
-const handleUpdateValueDataCores = async (
-  updatedValue: [keyof CoreData | keyof Texts, string]
-) => {
-  docUnit.value[updatedValue[0]] = updatedValue[1]
-}
 
 const handleUpdateValueDocUnitTexts = async (
   updatedValue: [keyof CoreData | keyof Texts, string]
@@ -64,6 +58,17 @@ const handleToggleFilePanel = async () => {
     query: { ...route.query, showDocPanel: String(showDocPanel.value) },
   })
 }
+
+const coreData = computed({
+  get() {
+    return docUnit.value.coreData
+  },
+  set(newValues: CoreData) {
+    for (const [key, value] of Object.entries(newValues)) {
+      docUnit.value[key as keyof CoreData] = value
+    }
+  },
+})
 
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
@@ -149,9 +154,8 @@ onUnmounted(() => {
       <v-col :cols="showDocPanel ? 7 : 9">
         <DocUnitCoreData
           id="coreData"
-          :core-data="docUnit.coreData"
+          v-model="coreData"
           :update-status="updateStatus"
-          @update-value="handleUpdateValueDataCores"
           @update-doc-unit="handleUpdateDocUnit"
         />
         <DocUnitTexts

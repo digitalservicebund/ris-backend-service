@@ -18,7 +18,8 @@
     "types": ["axe-playwright", "node", "vitest", "vitest/globals"],
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "~/*": ["test/*"]
     }
   },
   "include": ["src", "src/**/*.vue", "test/**/*.ts", "vite.config.ts"],
