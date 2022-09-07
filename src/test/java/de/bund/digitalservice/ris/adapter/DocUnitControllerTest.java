@@ -213,6 +213,7 @@ class DocUnitControllerTest {
                     new XmlMail(
                         1L,
                         123L,
+                        "receiver address",
                         "mailSubject",
                         "xml",
                         "status-code",
@@ -233,6 +234,8 @@ class DocUnitControllerTest {
         .expectBody()
         .jsonPath("documentUnitUuid")
         .isEqualTo(TEST_UUID.toString())
+        .jsonPath("receiverAddress")
+        .isEqualTo("receiver address")
         .jsonPath("mailSubject")
         .isEqualTo("mailSubject")
         .jsonPath("xml")
@@ -274,6 +277,7 @@ class DocUnitControllerTest {
                     new XmlMail(
                         1L,
                         123L,
+                        "receiver address",
                         "mailSubject",
                         "xml",
                         "status-code",
@@ -291,6 +295,8 @@ class DocUnitControllerTest {
         .expectBody()
         .jsonPath("documentUnitUuid")
         .isEqualTo(TEST_UUID.toString())
+        .jsonPath("receiverAddress")
+        .isEqualTo("receiver address")
         .jsonPath("mailSubject")
         .isEqualTo("mailSubject")
         .jsonPath("xml")

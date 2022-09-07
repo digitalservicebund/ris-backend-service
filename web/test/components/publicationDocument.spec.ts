@@ -1,134 +1,155 @@
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { render, RenderResult, fireEvent } from "@testing-library/vue"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createVuetify } from "vuetify/lib/framework.mjs"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 
-describe("PublicationDocument", () => {
+describe("PublicationDocument:", () => {
   const vuetify = createVuetify({ components, directives })
+  let renderResult: RenderResult
 
-  const RECEIVER_EMAIL = "dokmbx@juris.de"
-  const EMAIL_SUBJECT = 'id=OVGNW name="knorr" da=r dt=b df=r'
-  const LAST_PUBLICATION_DATE = "24.07.2022 16:53 Uhr"
-  const ISSUES = ["Aktenzeichen", "Entscheidungsname", "Gericht"]
-  const IS_FIRST_TIME_PUBLICATION = true
-  const HAS_ERROR = true
-  const XML =
-    '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<juris-r>\n<metadaten>\n<gericht>\n<gertyp>Gerichtstyp</gertyp>\n<gerort>Gerichtssitz</gerort>\n</gericht>\n</metadaten>\n<textdaten>\n<titelzeile>\n<body>\n<div>\n<p>Titelzeile</p>\n</div>\n</body>\n</titelzeile>\n<leitsatz>\n<body>\n<div>\n<p>Leitsatz</p>\n</div>\n</body>\n</leitsatz>\n<osatz>\n<body>\n<div>\n<p>Orientierungssatz</p>\n</div>\n</body>\n</osatz>\n<tenor>\n<body>\n<div>\n<p>Tenor</p>\n</div>\n</body>\n</tenor>\n<tatbestand>\n<body>\n<div>\n<p>Tatbestand</p>\n<br/>\n</div>\n</body>\n</tatbestand>\n<entscheidungsgruende>\n<body>\n<div>\n<p>Entscheidungsgründe</p>\n</div>\n</body>\n</entscheidungsgruende>\n<gruende>\n<body>\n<div>\n<p>Gründe</p>\n</div>\n</body>\n</gruende>\n</textdaten>\n</juris-r>'
-
-  it("renders with published XML and has error", async () => {
-    const { getAllByText, getByText, getByLabelText } = render(
-      PublicationDocument,
-      {
+  describe("with earlier published document unit", () => {
+    beforeEach(() => {
+      renderResult = render(PublicationDocument, {
         global: { plugins: [vuetify] },
         props: {
-          issues: ISSUES,
-          emailSubject: EMAIL_SUBJECT,
-          lastPublicationDate: LAST_PUBLICATION_DATE,
-          xml: XML,
-          isFirstTimePublication: !IS_FIRST_TIME_PUBLICATION,
-          hasValidationError: HAS_ERROR,
+          lastPublishedXmlMail: {
+            xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
+            statusMessages: "success",
+            statusCode: "200",
+            receiverAddress: "receiver address",
+            mailSubject: "mail subject",
+            publishDate: "01.02.2000",
+          },
         },
-      }
-    )
-
-    const lines = XML.split("\n")
-    lines.forEach((line, index) => {
-      getAllByText(line)
-      getByText(index + 1)
+      })
     })
-    const inputReceiverAddress = getByLabelText("Empfängeradresse E-Mail")
-    await fireEvent.update(inputReceiverAddress, RECEIVER_EMAIL)
-    getByText(RECEIVER_EMAIL)
-    getByText(EMAIL_SUBJECT)
-    getByText(`${ISSUES.length} Pflichtfelder nicht befüllt`)
-    getByText("Leider ist ein Fehler aufgetreten.")
-    getByText("Die Dokumentationseinheit kann nicht veröffentlich werden.")
-    getByText(`Letzte Veröffenlichung am ${LAST_PUBLICATION_DATE}`)
-    const buttons = screen.getAllByRole("button")
-    const showErrorDetails = buttons.find(
-      (button) =>
-        !button.outerHTML.includes("Dokumentationseinheit veröffenlichen")
-    )
-    const publishButton = buttons.find((button) =>
-      button.outerHTML.includes("Dokumentationseinheit veröffenlichen")
-    )
-    expect(showErrorDetails).toBeTruthy()
-    expect(publishButton).toBeTruthy()
-    // expect((publishButton as HTMLElement).hasAttribute("disabled")).toBeTruthy()
-    // if (showErrorDetails != null) {
-    //   await fireEvent.click(showErrorDetails)
-    //   ISSUES.forEach((issue) => {
-    //     getByText(issue)
-    //   })
-    // }
+
+    it("render text", async () => {
+      expect(renderResult.container.textContent).match(
+        new RegExp(
+          "Veröffentlichen done_all Plausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird " +
+            "die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: Zuletzt veröffentlicht01.02.2000 " +
+            "Dokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am " +
+            "01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1" +
+            '<\\?xml version="1.0"\\?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>'
+        )
+      )
+    })
+
+    describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
+      it("without email address", async () => {
+        const publishButton = renderResult.getByRole("button", {
+          name: "Dokumentationseinheit veröffentlichen",
+        })
+        await fireEvent.click(publishButton)
+
+        expect(renderResult.emitted().publishADocument).toBeFalsy()
+      })
+
+      it("with invalid email address", async () => {
+        const inputReceiverAddress = renderResult.getByLabelText(
+          "Empfängeradresse E-Mail"
+        )
+        await fireEvent.update(inputReceiverAddress, "test-email")
+
+        const publishButton = renderResult.getByRole("button", {
+          name: "Dokumentationseinheit veröffentlichen",
+        })
+        await fireEvent.click(publishButton)
+
+        expect(renderResult.emitted().publishADocument).toBeFalsy()
+      })
+
+      it("with valid email address", async () => {
+        const inputReceiverAddress = renderResult.getByLabelText(
+          "Empfängeradresse E-Mail"
+        )
+        await fireEvent.update(inputReceiverAddress, "test.email@test.com")
+
+        const publishButton = renderResult.getByRole("button", {
+          name: "Dokumentationseinheit veröffentlichen",
+        })
+        await fireEvent.click(publishButton)
+
+        expect(renderResult.emitted().publishADocument).toBeTruthy()
+      })
+    })
   })
 
-  it("renders without published XML validation errors", async () => {
-    const { getByText, getAllByText, emitted, getByLabelText } = render(
-      PublicationDocument,
-      {
-        global: { plugins: [vuetify] },
-        props: {
-          issues: ["succeed"],
-          emailSubject: EMAIL_SUBJECT,
-          lastPublicationDate: LAST_PUBLICATION_DATE,
-          xml: XML,
-          isFirstTimePublication: !IS_FIRST_TIME_PUBLICATION,
-          hasValidationError: !HAS_ERROR,
-        },
-      }
-    )
-    const lines = XML.split("\n")
-    lines.forEach((line, index) => {
-      getAllByText(line)
-      getByText(index + 1)
+  it("without earlier published document unit", async () => {
+    renderResult = render(PublicationDocument, {
+      global: { plugins: [vuetify] },
     })
-    const inputReceiverAddress = getByLabelText("Empfängeradresse E-Mail")
-    await fireEvent.update(inputReceiverAddress, RECEIVER_EMAIL)
-    getByText(RECEIVER_EMAIL)
-    getByText(EMAIL_SUBJECT)
-    getByText("0 Fehler")
-    getByText(`Letzte Veröffenlichung am ${LAST_PUBLICATION_DATE}`)
-    const buttons = screen.getAllByRole("button")
-    const publishButton = buttons.find((button) =>
-      button.outerHTML.includes("Dokumentationseinheit veröffenlichen")
+
+    expect(renderResult.container.textContent).match(
+      new RegExp(
+        "Veröffentlichen spellcheck Plausibilitätsprüfung help  Durch Klick auf Veröffentlichen " +
+          "wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse:  Dokumentationseinheit " +
+          "veröffentlichen"
+      )
     )
-    expect(publishButton).toBeTruthy()
-    if (publishButton) {
-      expect(publishButton as HTMLElement).toBeEnabled()
-      await fireEvent.click(publishButton)
-      expect(emitted().publishADocument).toBeTruthy()
-    }
   })
 
-  it("renders with not yet published document", async () => {
-    const { getByText, emitted } = render(PublicationDocument, {
+  it("with error message", async () => {
+    renderResult = render(PublicationDocument, {
       global: { plugins: [vuetify] },
       props: {
-        issues: ISSUES,
-        emailSubject: EMAIL_SUBJECT,
-        lastPublicationDate: "",
-        xml: XML,
-        isFirstTimePublication: IS_FIRST_TIME_PUBLICATION,
-        hasValidationError: !HAS_ERROR,
+        publishResult: {
+          xml: "xml",
+          statusMessages: ["error message 1", "error message 2"],
+          statusCode: "400",
+          receiverAddress: "receiver address",
+          mailSubject: "mail subject",
+          publishDate: undefined,
+        },
+        errorMessage: {
+          title: "error message title",
+          description: "error message description",
+        },
       },
     })
-    const labelInfo = document.querySelectorAll(".text-icon p")[1]
-    expect(labelInfo.textContent?.trim()).toEqual(
-      "Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst."
+
+    expect(renderResult.container.textContent).match(
+      new RegExp(
+        "Veröffentlichen priority_high Plausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt " +
+          "error message 1error message 2 Empfänger-E-Mail-Adresse:  Dokumentationseinheit veröffentlichenerror " +
+          "message titleerror message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde " +
+          "bisher nicht veröffentlicht"
+      )
     )
-    expect(labelInfo).toBeTruthy()
-    getByText("Diese Dokumentationseinheit wurde bisher nicht veröffentlicht")
-    const buttons = screen.getAllByRole("button")
-    const publishButton = buttons.find((button) =>
-      button.outerHTML.includes("Dokumentationseinheit veröffenlichen")
+  })
+
+  it("with stubbing", () => {
+    renderResult = render(PublicationDocument, {
+      global: {
+        plugins: [vuetify],
+        stubs: {
+          CodeSnippet: true,
+        },
+      },
+      props: {
+        lastPublishedXmlMail: {
+          xml: "xml content",
+          statusMessages: "success",
+          statusCode: "200",
+          receiverAddress: "receiver address",
+          mailSubject: "mail subject",
+          publishDate: "01.02.2000",
+        },
+      },
+    })
+
+    expect(renderResult.container.textContent).match(
+      new RegExp(
+        "Veröffentlichen done_all Plausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die " +
+          "Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: Zuletzt veröffentlicht01.02.2000 " +
+          "Dokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am " +
+          "01.02.2000über E-Mail an: receiver address Betreff: mail subjectals"
+      )
     )
-    expect(publishButton).toBeTruthy()
-    if (publishButton) {
-      expect(publishButton as HTMLElement).toBeEnabled()
-      await fireEvent.click(publishButton)
-      expect(emitted().publishADocument).toBeTruthy()
-    }
+    expect(renderResult.html()).match(
+      /<code-snippet-stub xml="xml content" title="xml"><\/code-snippet-stub>/
+    )
   })
 })

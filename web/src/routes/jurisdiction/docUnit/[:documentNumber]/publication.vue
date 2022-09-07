@@ -2,8 +2,9 @@
 import { onMounted, ref } from "vue"
 import DocUnitDetail from "./index.vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
+import XmlMail from "@/domain/xmlMail"
 import docUnitService from "@/services/docUnitService"
-import fileService from "@/services/fileService"
+import publishService from "@/services/publishService"
 
 const props = defineProps<{
   documentNumber: string
@@ -12,59 +13,70 @@ const docUnit = ref(
   await docUnitService.getByDocumentNumber(props.documentNumber)
 )
 const loadDone = ref(false)
-const xml = ref("")
-const issues = ref<string[]>([])
-const isFirstTimePublication = ref(true)
-const hasValidationError = ref(false)
-
-const receiverEmail = ref("")
-const emailSubject = ref("")
-const lastPublicationDate = ref("")
+const lastPublishedXmlMail = ref<XmlMail>()
+const publishResult = ref<XmlMail>()
+const errorMessage = ref<{ title: string; description: string }>()
 
 const publishADocument = async (email: string) => {
-  console.log("email: " + email)
-  const response = await fileService.publishADocument(docUnit.value.uuid, email)
-  loadEmailToJurisInfos(response)
-}
+  const response = await publishService.publishADocument(
+    docUnit.value.uuid,
+    email
+  )
 
-const loadEmailToJurisInfos = (publishedXML: {
-  xml: string
-  statusMessages: string[]
-  statusCode: string
-  mailSubject: string
-  publishDate: string
-}) => {
-  hasValidationError.value = publishedXML.statusCode === "400"
-  issues.value = hasValidationError.value ? publishedXML.statusMessages : []
-  if (!hasValidationError.value) {
-    lastPublicationDate.value = formatDate(publishedXML.publishDate)
-    emailSubject.value = publishedXML.mailSubject
-    xml.value = publishedXML.xml
-      ? publishedXML.xml.replace(/[ \t]{2,}/g, "")
-      : ""
-    isFirstTimePublication.value = !(xml.value !== null && xml.value.length > 0)
+  if (!!response.xmlMail) {
+    publishResult.value = response.xmlMail
+    if (response.xmlMail.statusCode === "200") {
+      lastPublishedXmlMail.value = response.xmlMail
+
+      lastPublishedXmlMail.value.publishDate = formatDate(
+        lastPublishedXmlMail.value.publishDate
+      )
+      lastPublishedXmlMail.value.xml = lastPublishedXmlMail.value.xml
+        ? lastPublishedXmlMail.value.xml.replace(/[ \t]{2,}/g, "")
+        : ""
+    }
   }
+
+  errorMessage.value = response.errorMessage
 }
 
-const formatDate = (date: string): string => {
+const formatDate = (date?: string): string => {
+  if (!date) {
+    return ""
+  }
+
   const publicationDate = new Date(date)
   const fullYear = publicationDate.getFullYear()
   const fullMonth = ("0" + (publicationDate.getMonth() + 1)).slice(-2)
   const fullDate = ("0" + publicationDate.getDate()).slice(-2)
   const fullHour = ("0" + publicationDate.getHours()).slice(-2)
   const fullMinute = ("0" + publicationDate.getMinutes()).slice(-2)
+
   return `${fullYear}-${fullMonth}-${fullDate} ${fullHour}: ${fullMinute} Uhr`
 }
 
 onMounted(async () => {
-  const lastPublishedXML = await fileService.getLastPublishedXML(
-    docUnit.value.uuid
-  )
-  if (lastPublishedXML.length === 0) {
+  const response = await publishService.getLastPublishedXML(docUnit.value.uuid)
+  if (!!response.errorMessage) {
     loadDone.value = true
     return
   }
-  loadEmailToJurisInfos(lastPublishedXML)
+
+  if (!!response.xmlMail) {
+    lastPublishedXmlMail.value = response.xmlMail
+  }
+
+  if (!!lastPublishedXmlMail.value) {
+    lastPublishedXmlMail.value.publishDate = formatDate(
+      lastPublishedXmlMail.value.publishDate
+    )
+    lastPublishedXmlMail.value.xml = lastPublishedXmlMail.value.xml
+      ? lastPublishedXmlMail.value.xml.replace(/[ \t]{2,}/g, "")
+      : ""
+  }
+
+  errorMessage.value = response.errorMessage
+
   loadDone.value = true
 })
 </script>
@@ -73,13 +85,9 @@ onMounted(async () => {
   <DocUnitDetail :doc-unit="docUnit">
     <PublicationDocument
       v-if="loadDone"
-      :xml="xml"
-      :issues="issues"
-      :receiver-email="receiverEmail"
-      :email-subject="emailSubject"
-      :last-publication-date="lastPublicationDate"
-      :is-first-time-publication="isFirstTimePublication"
-      :has-validation-error="hasValidationError"
+      :publish-result="publishResult"
+      :last-published-xml-mail="lastPublishedXmlMail"
+      :error-message="errorMessage"
       @publish-a-document="publishADocument($event)"
     />
     <div v-else class="spinner">

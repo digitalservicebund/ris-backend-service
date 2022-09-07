@@ -49,8 +49,10 @@ public class XmlEMailPublishService implements EmailPublishService {
     }
 
     return generateMailSubject(documentUnit)
-        .flatMap(mailSubject -> savePublishInformation(documentUnit.getId(), mailSubject, xml))
-        .doOnNext(xmlMail -> generateAndSendMail(xmlMail, receiverAddress))
+        .map(
+            mailSubject -> generateXmlMail(documentUnit.getId(), receiverAddress, mailSubject, xml))
+        .doOnNext(this::generateAndSendMail)
+        .flatMap(this::savePublishInformation)
         .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex))
         .map(xmlMail -> new XmlMailResponse(documentUnit.getUuid(), xmlMail));
   }
@@ -78,47 +80,60 @@ public class XmlEMailPublishService implements EmailPublishService {
     return Mono.just(subject);
   }
 
-  private void generateAndSendMail(XmlMail xmlMail, String receiverAddress)
-      throws DocumentUnitPublishException {
-    if (receiverAddress == null) {
-      throw new DocumentUnitPublishException("No receiver mail address is set");
+  private void generateAndSendMail(XmlMail xmlMail) throws DocumentUnitPublishException {
+    if (xmlMail == null) {
+      throw new DocumentUnitPublishException("No xml mail is set");
     }
 
     if (xmlMail.statusCode().equals("400")) {
       return;
     }
 
+    if (xmlMail.receiverAddress() == null) {
+      throw new DocumentUnitPublishException("No receiver mail address is set");
+    }
+
     mailSender.sendMail(
-        senderAddress, receiverAddress, xmlMail.mailSubject(), xmlMail.xml(), xmlMail.fileName());
+        senderAddress,
+        xmlMail.receiverAddress(),
+        xmlMail.mailSubject(),
+        xmlMail.xml(),
+        xmlMail.fileName());
   }
 
-  private Mono<XmlMail> savePublishInformation(
-      Long documentUnitId, String mailSubject, ResultObject xml) {
+  private XmlMail generateXmlMail(
+      Long documentUnitId, String receiverAddress, String mailSubject, ResultObject xml) {
 
     String statusMessages = String.join("|", xml.status().statusMessages());
     if (xml.status().statusCode().equals("400")) {
-      return Mono.just(
-          new XmlMail(
-              null,
-              documentUnitId,
-              null,
-              null,
-              xml.status().statusCode(),
-              statusMessages,
-              null,
-              null));
+      return new XmlMail(
+          null,
+          documentUnitId,
+          null,
+          null,
+          null,
+          xml.status().statusCode(),
+          statusMessages,
+          null,
+          null);
     }
 
-    XmlMail xmlMail =
-        new XmlMail(
-            null,
-            documentUnitId,
-            mailSubject,
-            xml.xml(),
-            xml.status().statusCode(),
-            statusMessages,
-            xml.fileName(),
-            xml.publishDate());
+    return new XmlMail(
+        null,
+        documentUnitId,
+        receiverAddress,
+        mailSubject,
+        xml.xml(),
+        xml.status().statusCode(),
+        statusMessages,
+        xml.fileName(),
+        xml.publishDate());
+  }
+
+  private Mono<XmlMail> savePublishInformation(XmlMail xmlMail) {
+    if (xmlMail.statusCode().equals("400")) {
+      return Mono.just(xmlMail);
+    }
 
     return repository.save(xmlMail);
   }

@@ -1,19 +1,17 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import TextButton from "./TextButton.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ErrorModal from "@/components/ErrorModal.vue"
+import XmlMail from "@/domain/xmlMail"
 
 const props = defineProps<{
-  xml: string
-  issues: string[]
-  emailSubject: string
-  lastPublicationDate: string
-  isFirstTimePublication: boolean
-  hasValidationError: boolean
+  publishResult?: XmlMail
+  lastPublishedXmlMail?: XmlMail
+  errorMessage?: { title: string; description: string }
 }>()
 
-defineEmits<{
+const emits = defineEmits<{
   (e: "publishADocument", newValue: string): void
 }>()
 
@@ -21,7 +19,30 @@ const showIssuesDetails = ref(false)
 const toggleShowIssuesDetails = () => {
   showIssuesDetails.value = !showIssuesDetails.value
 }
-const receiverEmail = ref("")
+const receiverAddress = ref("")
+const emailAddressInvalid = ref(false)
+const isFirstTimePublication = computed(() => {
+  return !props.lastPublishedXmlMail
+})
+const hasValidationError = computed(() => {
+  return props.publishResult?.statusCode === "400"
+})
+
+function publishDocumentUnit() {
+  if (validateEmailAddress()) {
+    emailAddressInvalid.value = false
+    emits("publishADocument", receiverAddress.value)
+  } else {
+    emailAddressInvalid.value = true
+  }
+}
+
+function validateEmailAddress(): boolean {
+  const EMAIL_REGEX =
+    /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/
+
+  return EMAIL_REGEX.test(receiverAddress.value)
+}
 </script>
 
 <template>
@@ -55,10 +76,7 @@ const receiverEmail = ref("")
           <p class="publication-text-header">Plausibilitätsprüfung</p>
         </div>
 
-        <div
-          v-if="isFirstTimePublication && !hasValidationError"
-          class="text-icon"
-        >
+        <div v-if="!publishResult" class="text-icon">
           <span
             class="material-icons material-symbols-outlined"
             style="color: white; background-color: black; border-radius: 50%"
@@ -70,10 +88,7 @@ const receiverEmail = ref("")
             Plausibilitätsprüfung ausgelöst.
           </p>
         </div>
-        <div
-          v-if="!hasValidationError && !isFirstTimePublication"
-          class="text-icon"
-        >
+        <div v-if="!!publishResult && !hasValidationError" class="text-icon">
           <div class="icon">
             <span class="material-icons"> done </span>
           </div>
@@ -88,7 +103,8 @@ const receiverEmail = ref("")
               <span v-else class="material-icons"> keyboard_arrow_down </span>
             </button>
             <p class="publication-text-body">
-              {{ props.issues.length }} Pflichtfelder nicht befüllt
+              {{ props.publishResult?.statusMessages?.length }} Pflichtfelder
+              nicht befüllt
             </p>
           </div>
           <div
@@ -96,7 +112,7 @@ const receiverEmail = ref("")
             class="xml-validation-error-details flex-col-container"
           >
             <p
-              v-for="issue in issues"
+              v-for="issue in props.publishResult?.statusMessages"
               :key="issue"
               class="publication-text-body"
             >
@@ -107,13 +123,19 @@ const receiverEmail = ref("")
         <div>
           <p>
             <label for="receiverEmailName">
-              Empfänger-E-Mail-Adresse:<br />
+              Empfänger-E-Mail-Adresse:
+              <br />
               <input
-                v-model="receiverEmail"
+                v-model="receiverAddress"
                 name="receiverMailName"
                 aria-label="Empfängeradresse E-Mail"
-                class="receiver-email-input"
+                :class="`receiver-email-input${
+                  emailAddressInvalid ? '__invalid' : ''
+                }`"
               />
+              <span v-if="emailAddressInvalid" class="invalid">
+                <br />keine valide E-Mail-Adresse
+              </span>
             </label>
           </p>
         </div>
@@ -121,23 +143,24 @@ const receiverEmail = ref("")
           <div v-if="!isFirstTimePublication" class="text-container">
             <p class="publication-text-body">Zuletzt veröffentlicht</p>
             <p class="publication-text-subline">
-              {{ props.lastPublicationDate }}
+              {{ props.lastPublishedXmlMail?.publishDate }}
             </p>
           </div>
           <div class="publication-button">
             <TextButton
-              label="Dokumentationseinheit veröffenlichen"
+              label="Dokumentationseinheit veröffentlichen"
+              aria-label="Dokumentationseinheit veröffentlichen"
               button-type="primary"
               icon="campaign"
-              @click="$emit('publishADocument', receiverEmail)"
+              @click="publishDocumentUnit()"
             />
           </div>
         </div>
       </div>
       <ErrorModal
-        v-if="hasValidationError"
-        title="Leider ist ein Fehler aufgetreten."
-        description="Die Dokumentationseinheit kann nicht veröffentlich werden."
+        v-if="!!props.errorMessage"
+        :title="props.errorMessage?.title"
+        :description="props.errorMessage?.description"
       >
       </ErrorModal>
     </div>
@@ -148,19 +171,25 @@ const receiverEmail = ref("")
       </p>
       <div v-else class="flex-col-container email-infos-container">
         <p class="publication-text-body">
-          Letzte Veröffenlichung am {{ props.lastPublicationDate }}
+          Letzte Veröffentlichung am
+          {{ props.lastPublishedXmlMail?.publishDate }}
         </p>
         <p class="publication-text-label">über</p>
         <div class="receiver-info">
           <p class="publication-text-body">
-            E-Mail an: <span>{{ receiverEmail }}</span>
+            E-Mail an:
+            <span>{{ props.lastPublishedXmlMail?.receiverAddress }}</span>
           </p>
           <p class="publication-text-body">
-            Betreff: <span>{{ props.emailSubject }}</span>
+            Betreff: <span>{{ props.lastPublishedXmlMail?.mailSubject }}</span>
           </p>
         </div>
         <p class="publication-text-label">als</p>
-        <CodeSnippet :xml="props.xml" title="xml" />
+        <CodeSnippet
+          v-if="!!props.lastPublishedXmlMail?.xml"
+          :xml="props.lastPublishedXmlMail.xml"
+          title="xml"
+        />
       </div>
     </div>
   </div>
@@ -277,6 +306,16 @@ const receiverEmail = ref("")
     outline: 2px solid #1d4a73;
     padding: 5px;
     width: 100%;
+
+    &__invalid {
+      outline: 2px solid #b0243f;
+      padding: 5px;
+      width: 100%;
+    }
+  }
+  .invalid {
+    color: #b0243f;
+    font-size: 0.75rem;
   }
 }
 </style>

@@ -322,7 +322,16 @@ class DocUnitServiceTest {
   void testPublishByEmail() {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
     XmlMail xmlMail =
-        new XmlMail(1L, 123L, "subject", "xml", "200", "status messages", "filename", null);
+        new XmlMail(
+            1L,
+            123L,
+            "receiver address",
+            "subject",
+            "xml",
+            "200",
+            "status messages",
+            "filename",
+            null);
     when(publishService.publish(DocUnit.EMPTY, RECEIVER_ADDRESS))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
 
@@ -350,7 +359,9 @@ class DocUnitServiceTest {
   void testGetLastPublishedXmlMail() {
     DocUnit documentUnit = new DocUnit();
     documentUnit.setId(123L);
-    XmlMail xmlMail = new XmlMail(1L, 123L, "subject", "xml", "200", "message", "filename", null);
+    XmlMail xmlMail =
+        new XmlMail(
+            1L, 123L, "receiver address", "subject", "xml", "200", "message", "filename", null);
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
     when(publishService.getLastPublishedXml(123L, TEST_UUID))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));

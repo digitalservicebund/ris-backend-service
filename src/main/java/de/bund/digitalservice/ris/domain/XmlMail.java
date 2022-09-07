@@ -6,6 +6,7 @@ import org.springframework.data.annotation.Id;
 public record XmlMail(
     @Id Long id,
     Long documentUnitId,
+    String receiverAddress,
     String mailSubject,
     String xml,
     String statusCode,

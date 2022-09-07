@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class XmlMailResponse implements MailResponse {
   private final UUID documentUnitUuid;
+  private final String receiverAddress;
   private final String mailSubject;
   private final String xml;
   private final String statusCode;
@@ -15,6 +16,7 @@ public class XmlMailResponse implements MailResponse {
 
   public XmlMailResponse(UUID documentUnitUuid, XmlMail xmlMail) {
     this.documentUnitUuid = documentUnitUuid;
+    this.receiverAddress = xmlMail.receiverAddress();
     this.mailSubject = xmlMail.mailSubject();
     this.xml = xmlMail.xml();
     this.publishDate = xmlMail.publishDate();

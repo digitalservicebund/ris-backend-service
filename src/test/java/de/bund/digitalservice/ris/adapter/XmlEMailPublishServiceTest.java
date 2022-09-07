@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.adapter;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -41,9 +42,27 @@ class XmlEMailPublishServiceTest {
       "id=BGH name=jDVNAME da=R df=X dt=N mod=A vg=Testvorgang";
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final XmlMail EXPECTED_BEFORE_SAVE =
-      new XmlMail(null, 123L, MAIL_SUBJECT, "xml", "200", "succeed", "test.xml", PUBLISH_DATE);
+      new XmlMail(
+          null,
+          123L,
+          "test-to@mail.com",
+          MAIL_SUBJECT,
+          "xml",
+          "200",
+          "succeed",
+          "test.xml",
+          PUBLISH_DATE);
   private static final XmlMail SAVED_XML_MAIL =
-      new XmlMail(1L, 123L, MAIL_SUBJECT, "xml", "200", "succeed", "test.xml", PUBLISH_DATE);
+      new XmlMail(
+          1L,
+          123L,
+          "test-to@mail.com",
+          MAIL_SUBJECT,
+          "xml",
+          "200",
+          "succeed",
+          "test.xml",
+          PUBLISH_DATE);
   private static final XmlMailResponse EXPECTED_RESPONSE =
       new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL);
   private static final ResultObject FORMATTED_XML =
@@ -95,7 +114,7 @@ class XmlEMailPublishServiceTest {
     var xmlWithValidationError =
         new ResultObject(
             "xml", new Status("400", List.of("status-message")), "test.xml", PUBLISH_DATE);
-    var xmlMail = new XmlMail(null, 123L, null, null, "400", "status-message", null, null);
+    var xmlMail = new XmlMail(null, 123L, null, null, null, "400", "status-message", null, null);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
     when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
 
@@ -105,6 +124,8 @@ class XmlEMailPublishServiceTest {
         .verifyComplete();
 
     verify(repository, times(0)).save(any(XmlMail.class));
+    verify(mailSender, times(0))
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
   }
 
   @Test
@@ -118,6 +139,10 @@ class XmlEMailPublishServiceTest {
                 ex instanceof DocumentUnitPublishException
                     && ex.getMessage().equals("Couldn't generate xml."))
         .verify();
+
+    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(mailSender, times(0))
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
   }
 
   @Test
@@ -130,6 +155,10 @@ class XmlEMailPublishServiceTest {
                 ex instanceof DocumentUnitPublishException
                     && ex.getMessage().equals("No document number has set in the document unit."))
         .verify();
+
+    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(mailSender, times(0))
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
   }
 
   @Test
@@ -139,10 +168,13 @@ class XmlEMailPublishServiceTest {
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
         .verify();
+
+    verify(repository).save(any(XmlMail.class));
+    verify(mailSender).sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
   }
 
   @Test
-  void testPublish_withoutToMailSet() {
+  void testPublish_withoutToReceiverAddressSet() {
 
     StepVerifier.create(service.publish(documentUnit, null))
         .expectErrorMatches(
@@ -150,6 +182,10 @@ class XmlEMailPublishServiceTest {
                 ex instanceof DocumentUnitPublishException
                     && ex.getMessage().equals("No receiver mail address is set"))
         .verify();
+
+    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(mailSender, times(0))
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
   }
 
   @Test
@@ -161,6 +197,9 @@ class XmlEMailPublishServiceTest {
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
         .verify();
+
+    verify(repository, times(0)).save(any(XmlMail.class));
+    verify(mailSender).sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml");
   }
 
   @Test

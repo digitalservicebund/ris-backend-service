@@ -52,3 +52,8 @@ CREATE TABLE
     file_name VARCHAR(50) NOT NULL,
     publish_date TIMESTAMP NOT NULL
   );
+
+ALTER TABLE
+  xml_mail
+ADD
+  COLUMN IF NOT EXISTS receiver_address VARCHAR(256);
