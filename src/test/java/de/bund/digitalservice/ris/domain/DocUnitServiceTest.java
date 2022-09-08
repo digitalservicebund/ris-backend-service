@@ -1,8 +1,7 @@
 package de.bund.digitalservice.ris.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -13,11 +12,11 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -226,11 +225,290 @@ class DocUnitServiceTest {
   @Test
   void testGetByDocumentnumber() {
     when(repository.findByDocumentnumber("ABCDE2022000001")).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(previousDecisionRepository.findAllByDocumentnumber("ABCDE2022000001"))
+        .thenReturn(Flux.just(new PreviousDecision()));
     StepVerifier.create(service.getByDocumentnumber("ABCDE2022000001"))
         .consumeNextWith(
             monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnit.class))
         .verifyComplete();
     verify(repository).findByDocumentnumber("ABCDE2022000001");
+  }
+
+  @Nested
+  @DisplayName("Test Update DocUnit With PreviousDecisions")
+  class TestUpdateDocUnitWithPreviousDecisions {
+    private List<PreviousDecision> previousDecisionsList;
+    private List<String> previousDecisionsIdsToDelete;
+    private Long count;
+    private final String documentNr = "ABCDE2022000001";
+
+    private List<Long> getRemainsIds() {
+      return previousDecisionsList.stream().map(previousDecision -> previousDecision.id).toList();
+    }
+
+    private Mono<Void> deleteByIds(List<String> ids) {
+      previousDecisionsList.removeAll(
+          previousDecisionsList.stream()
+              .filter(previousDecision -> ids.contains(String.valueOf(previousDecision.id)))
+              .toList());
+      return null;
+    }
+
+    private List<PreviousDecision> saveAll(List<PreviousDecision> pDecisionsList) {
+      System.out.println("Running in to save All");
+      System.out.println("Before");
+      previousDecisionsList.forEach(System.out::println);
+      List<PreviousDecision> pDecisionToInsert =
+          pDecisionsList.stream()
+              .filter(previousDecision -> previousDecision.id == null)
+              .map(
+                  previousDecision -> {
+                    previousDecision.id = Long.valueOf(++count);
+                    return previousDecision;
+                  })
+              .toList();
+      pDecisionToInsert.forEach(previousDecision -> previousDecisionsList.add(previousDecision));
+      List<PreviousDecision> pDecisionToUpdate =
+          pDecisionsList.stream().filter(previousDecision -> previousDecision.id != null).toList();
+      pDecisionToUpdate.forEach(
+          decisionToUpdate -> {
+            previousDecisionsList =
+                new ArrayList<>(
+                    previousDecisionsList.stream()
+                        .map(
+                            pd -> {
+                              if (pd.id == decisionToUpdate.id) {
+                                return decisionToUpdate;
+                              }
+                              return pd;
+                            })
+                        .toList());
+          });
+      System.out.println("After update");
+      previousDecisionsList.forEach(System.out::println);
+      return pDecisionsList;
+    }
+
+    @BeforeEach
+    void setUp() {
+      previousDecisionsIdsToDelete = new ArrayList<>();
+      previousDecisionsList = new ArrayList<>();
+      previousDecisionsList.add(
+          new PreviousDecision(
+              1L, "gerTyp 1", "gerOrt 1", "01.01.2022", "aktenzeichen 1", "ABCDE2022000001"));
+      previousDecisionsList.add(
+          new PreviousDecision(
+              2L, "gerTyp 2", "gerOrt 2", "01.02.2022", "aktenzeichen 2", "ABCDE2022000001"));
+      previousDecisionsList.add(
+          new PreviousDecision(
+              3L, "gerTyp 3", "gerOrt 3", "01.03.2022", "aktenzeichen 3", "ABCDE2022000001"));
+      previousDecisionsList.add(
+          new PreviousDecision(
+              4L, "gerTyp 4", "gerOrt 4", "01.04.2022", "aktenzeichen 4", "ABCDE2022000001"));
+      previousDecisionsList.add(
+          new PreviousDecision(
+              5L, "gerTyp 5", "gerOrt 5", "01.05.2022", "aktenzeichen 5", "ABCDE2022000001"));
+      count = Long.valueOf(previousDecisionsList.size());
+    }
+
+    @Test
+    void testGetByDocumentnumberWithPreviousDecisions() {
+      when(repository.findByDocumentnumber(documentNr)).thenReturn(Mono.just(DocUnit.EMPTY));
+      when(previousDecisionRepository.findAllByDocumentnumber(documentNr))
+          .thenReturn(Flux.fromIterable(previousDecisionsList));
+      StepVerifier.create(service.getByDocumentnumber(documentNr))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(monoResponse.getBody().previousDecisions.size(), count);
+                PreviousDecision previousDecision = monoResponse.getBody().previousDecisions.get(0);
+                assertEquals(previousDecision.id, 1L);
+                assertEquals(previousDecision.gerichtsort, "gerOrt 1");
+                assertEquals(previousDecision.gerichtstyp, "gerTyp 1");
+                assertEquals(previousDecision.datum, "01.01.2022");
+                assertEquals(previousDecision.aktenzeichen, "aktenzeichen 1");
+                assertEquals(previousDecision.documentnumber, documentNr);
+              })
+          .verifyComplete();
+      verify(repository).findByDocumentnumber("ABCDE2022000001");
+    }
+
+    @Test
+    void testUpdateDocUnitWithPreviousDecisionsDelete() {
+      previousDecisionsIdsToDelete.add("2");
+      previousDecisionsIdsToDelete.add("4");
+      var remainPreviousDecision =
+          previousDecisionsList.stream()
+              .filter(
+                  previousDecision -> !previousDecisionsIdsToDelete.contains(previousDecision.id))
+              .toList();
+      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
+          .thenReturn(
+              Flux.fromIterable(
+                  previousDecisionsList.stream()
+                      .map(previousDecision -> previousDecision.id)
+                      .toList()));
+      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
+          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.saveAll(remainPreviousDecision))
+          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
+      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+
+      StepVerifier.create(service.updateDocUnit(docUnit))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(previousDecisionsList.size(), 3);
+                List<Long> remainIds = getRemainsIds();
+                assertTrue(remainIds.contains(1L));
+                assertTrue(remainIds.contains(3L));
+                assertTrue(remainIds.contains(5L));
+                assertFalse(remainIds.contains(2L));
+                assertFalse(remainIds.contains(4L));
+                assertEquals(monoResponse.getBody(), docUnit);
+              })
+          .verifyComplete();
+      verify(repository).save(docUnit);
+    }
+
+    @Test
+    void testUpdateDocUnitWithPreviousDecisionsInsert() {
+      var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
+      remainPreviousDecision.add(
+          new PreviousDecision(
+              null, "gerTyp 6", "gerOrt 6", "01.01.2022", "aktenzeichen 6", documentNr));
+      remainPreviousDecision.add(
+          new PreviousDecision(
+              null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
+      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
+          .thenReturn(
+              Flux.fromIterable(
+                  previousDecisionsList.stream()
+                      .map(previousDecision -> previousDecision.id)
+                      .toList()));
+      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
+          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.saveAll(remainPreviousDecision))
+          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
+      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+
+      StepVerifier.create(service.updateDocUnit(docUnit))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(previousDecisionsList.size(), 7);
+                List<Long> remainIds = getRemainsIds();
+                assertTrue(remainIds.contains(6L));
+                assertTrue(remainIds.contains(7L));
+                PreviousDecision previousDecision =
+                    monoResponse.getBody().previousDecisions.get(previousDecisionsList.size() - 2);
+                assertEquals(previousDecision.id, 6L);
+                assertEquals(previousDecision.gerichtsort, "gerOrt 6");
+                assertEquals(previousDecision.gerichtstyp, "gerTyp 6");
+                assertEquals(previousDecision.datum, "01.01.2022");
+                assertEquals(previousDecision.aktenzeichen, "aktenzeichen 6");
+                previousDecision =
+                    monoResponse.getBody().previousDecisions.get(previousDecisionsList.size() - 1);
+                assertEquals(previousDecision.id, 7L);
+                assertEquals(previousDecision.gerichtsort, "gerOrt 7");
+                assertEquals(previousDecision.gerichtstyp, "gerTyp 7");
+                assertEquals(previousDecision.datum, "01.01.2022");
+                assertEquals(previousDecision.aktenzeichen, "aktenzeichen 7");
+                assertEquals(monoResponse.getBody(), docUnit);
+              })
+          .verifyComplete();
+      verify(repository).save(docUnit);
+    }
+
+    @Test
+    void testUpdateDocUnitWithPreviousDecisionsUpdate() {
+      var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
+      remainPreviousDecision.get(0).gerichtsort = "new gerOrt";
+      remainPreviousDecision.get(0).gerichtstyp = "new gerTyp";
+      remainPreviousDecision.get(0).datum = "30.01.2022";
+      remainPreviousDecision.get(0).aktenzeichen = "new aktenzeichen";
+      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
+          .thenReturn(
+              Flux.fromIterable(
+                  previousDecisionsList.stream()
+                      .map(previousDecision -> previousDecision.id)
+                      .toList()));
+      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
+          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.saveAll(remainPreviousDecision))
+          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
+      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+
+      StepVerifier.create(service.updateDocUnit(docUnit))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(previousDecisionsList.size(), 5);
+                PreviousDecision previousDecision = monoResponse.getBody().previousDecisions.get(0);
+                assertEquals(previousDecision.id, 1L);
+                assertEquals(previousDecision.gerichtsort, "new gerOrt");
+                assertEquals(previousDecision.gerichtstyp, "new gerTyp");
+                assertEquals(previousDecision.datum, "30.01.2022");
+                assertEquals(previousDecision.aktenzeichen, "new aktenzeichen");
+                assertEquals(monoResponse.getBody(), docUnit);
+              })
+          .verifyComplete();
+      verify(repository).save(docUnit);
+    }
+
+    @Test
+    void testUpdateDocUnitWithPreviousDecisionsInsertUpdateDelete() {
+      previousDecisionsIdsToDelete.add("2");
+      previousDecisionsIdsToDelete.add("4");
+      List<PreviousDecision> remainPreviousDecision =
+          new ArrayList<>(
+              previousDecisionsList.stream()
+                  .filter(
+                      previousDecision ->
+                          !previousDecisionsIdsToDelete.contains(previousDecision.id))
+                  .toList());
+      remainPreviousDecision.get(0).gerichtsort = "new gerOrt";
+      remainPreviousDecision.get(0).gerichtstyp = "new gerTyp";
+      remainPreviousDecision.get(0).datum = "30.01.2022";
+      remainPreviousDecision.get(0).aktenzeichen = "new aktenzeichen";
+      remainPreviousDecision.add(
+          new PreviousDecision(
+              null, "gerTyp 6", "gerOrt 6", "01.01.2022", "aktenzeichen 6", documentNr));
+      remainPreviousDecision.add(
+          new PreviousDecision(
+              null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
+      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
+          .thenReturn(
+              Flux.fromIterable(
+                  previousDecisionsList.stream()
+                      .map(previousDecision -> previousDecision.id)
+                      .toList()));
+      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
+          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.saveAll(remainPreviousDecision))
+          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
+      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+
+      StepVerifier.create(service.updateDocUnit(docUnit))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(previousDecisionsList.size(), 5);
+                PreviousDecision previousDecision = monoResponse.getBody().previousDecisions.get(0);
+                assertEquals(previousDecision.id, 1L);
+                List<Long> remainIds = getRemainsIds();
+                assertTrue(remainIds.contains(6L));
+                assertTrue(remainIds.contains(7L));
+                assertFalse(remainIds.contains(2L));
+                assertFalse(remainIds.contains(4L));
+                assertEquals(previousDecision.gerichtsort, "new gerOrt");
+                assertEquals(previousDecision.gerichtstyp, "new gerTyp");
+                assertEquals(previousDecision.datum, "30.01.2022");
+                assertEquals(previousDecision.aktenzeichen, "new aktenzeichen");
+                assertEquals(monoResponse.getBody(), docUnit);
+              })
+          .verifyComplete();
+      verify(repository).save(docUnit);
+    }
   }
 
   @Test
@@ -336,7 +614,8 @@ class DocUnitServiceTest {
             null);
     when(publishService.publish(DocUnit.EMPTY, RECEIVER_ADDRESS))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
-
+    when(previousDecisionRepository.findAllByDocumentnumber(DocUnit.EMPTY.documentnumber))
+        .thenReturn(Flux.just(new PreviousDecision()));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
         .consumeNextWith(
             mailResponse ->
