@@ -2,12 +2,11 @@ package de.bund.digitalservice.ris.domain;
 
 import java.time.Instant;
 import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 
 @Data
 @Builder
@@ -63,6 +62,13 @@ public class DocUnit {
   String gruende;
   String tatbestand;
   String entscheidungsgruende;
+
+  @Transient List<PreviousDecision> previousDecisions;
+
+  public DocUnit setPreviousDecisions(List<PreviousDecision> previousDecisions) {
+    this.previousDecisions = previousDecisions;
+    return this;
+  }
 
   public boolean hasFileAttached() {
     return s3path != null;

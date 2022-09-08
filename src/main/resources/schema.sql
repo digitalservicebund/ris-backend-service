@@ -57,3 +57,14 @@ ALTER TABLE
   xml_mail
 ADD
   COLUMN IF NOT EXISTS receiver_address VARCHAR(256);
+
+CREATE TABLE
+  IF NOT EXISTS previous_decision (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    gerichtstyp VARCHAR(255),
+    gerichtsort VARCHAR(255),
+    datum VARCHAR(255),
+    aktenzeichen VARCHAR(255),
+    documentnumber VARCHAR(14),
+    CONSTRAINT fk_legal_procession_documentnumber FOREIGN KEY (documentnumber) REFERENCES doc_unit (documentnumber) ON DELETE CASCADE
+  );

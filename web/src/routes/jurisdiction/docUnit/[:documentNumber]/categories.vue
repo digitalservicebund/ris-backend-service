@@ -31,6 +31,30 @@ const handleUpdateValueDocUnitTexts = async (
 }
 
 const handleUpdateDocUnit = async () => {
+  // docUnit.value["previousDecisions"].splice(0, 1)
+  // docUnit.value["previousDecisions"][
+  //   docUnit.value["previousDecisions"].length - 1
+  // ]["gerichtstyp"] = "gerichtstyp5"
+  // docUnit.value["previousDecisions"][
+  //   docUnit.value["previousDecisions"].length - 1
+  // ]["gerichtsort"] = "gerichtsort5"
+  // docUnit.value["previousDecisions"][
+  //   docUnit.value["previousDecisions"].length - 1
+  // ]["aktenzeichen"] = "aktenzeichen5"
+  // docUnit.value["previousDecisions"][
+  //   docUnit.value["previousDecisions"].length - 1
+  // ]["datum"] = "datum5"
+  // docUnit.value["previousDecisions"].splice(
+  //   docUnit.value["previousDecisions"].length,
+  //   0,
+  //   {
+  //     id: null,
+  //     gerichtstyp: "gerichtstyp AAA",
+  //     gerichtsort: "gerichtsort AAA",
+  //     datum: "datum AAA",
+  //     aktenzeichen: "aktenzeichen AAA",
+  //   }
+  // )
   updateStatus.value = UpdateStatus.ON_UPDATE
   const status = await docUnitService.update(docUnit.value)
   setTimeout(() => {

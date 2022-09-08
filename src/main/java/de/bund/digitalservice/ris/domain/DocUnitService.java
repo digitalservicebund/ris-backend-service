@@ -2,10 +2,7 @@ package de.bund.digitalservice.ris.domain;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,6 +28,7 @@ public class DocUnitService {
   private final DocUnitRepository repository;
   private final DocumentUnitListEntryRepository listEntryRepository;
   private final DocumentNumberCounterRepository counterRepository;
+  private final PreviousDecisionRepository previousDecisionRepository;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
 
@@ -41,6 +39,7 @@ public class DocUnitService {
       DocUnitRepository repository,
       DocumentUnitListEntryRepository listEntryRepository,
       DocumentNumberCounterRepository counterRepository,
+      PreviousDecisionRepository previousDecisionRepository,
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService) {
     this.repository = repository;
@@ -48,6 +47,7 @@ public class DocUnitService {
     this.counterRepository = counterRepository;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
+    this.previousDecisionRepository = previousDecisionRepository;
   }
 
   public Mono<DocUnit> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
@@ -169,7 +169,17 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<DocUnit>> getByDocumentnumber(String documentnumber) {
-    return repository.findByDocumentnumber(documentnumber).map(ResponseEntity::ok);
+    return repository
+        .findByDocumentnumber(documentnumber)
+        .flatMap(
+            docUnit ->
+                previousDecisionRepository
+                    .findAllByDocumentnumber(documentnumber)
+                    .collectList()
+                    .flatMap(
+                        previousDecisions ->
+                            Mono.just(docUnit.setPreviousDecisions(previousDecisions))))
+        .map(ResponseEntity::ok);
   }
 
   public Mono<ResponseEntity<String>> deleteByUuid(UUID docUnitId) {
@@ -193,17 +203,75 @@ public class DocUnitService {
   }
 
   public Mono<ResponseEntity<DocUnit>> updateDocUnit(DocUnit docUnit) {
-    return repository
-        .save(docUnit)
+    if (docUnit.previousDecisions == null)
+      return repository
+          .save(docUnit)
+          .map(ResponseEntity::ok)
+          .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
+          .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+
+    /* Passing foreign key to object */
+    List<PreviousDecision> previousDecisionsList =
+        docUnit.previousDecisions.stream()
+            .map(previousDecision -> previousDecision.setDocumentnumber(docUnit.documentnumber))
+            .toList();
+    /*Get all id of previous decisions from font-end */
+    List<Long> incomingIds =
+        previousDecisionsList.stream()
+            .filter(previousDecision -> previousDecision.id != null)
+            .map(previousDecision -> previousDecision.id)
+            .toList();
+    /* Create mono publisher object to loop through */
+    Mono<List<PreviousDecision>> listPreviousDecisionMonoObj = Mono.just(previousDecisionsList);
+    return listPreviousDecisionMonoObj
+        .flatMap(
+            previousDecisions ->
+                previousDecisionRepository
+                    .getAllIdsByDocumentnumber(docUnit.documentnumber)
+                    .collectList()
+                    .flatMap(
+                        inDatabaseIds -> {
+                          /* Get all id of deleted decisions */
+                          List<Long> deletedIndexes =
+                              getDeletedPreviousDecisionIds(incomingIds, inDatabaseIds);
+                          /* Insert/Update decisions */
+                          return previousDecisionRepository
+                              .saveAll(
+                                  previousDecisions.stream()
+                                      .filter(
+                                          previousDecision ->
+                                              !deletedIndexes.contains(previousDecision.id))
+                                      .toList())
+                              .then(
+                                  /* Delete decisions */
+                                  previousDecisionRepository.deleteAllById(
+                                      deletedIndexes.stream().map(String::valueOf).toList()));
+                        }))
+        .then(repository.save(docUnit))
         .map(ResponseEntity::ok)
         .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
+  private List<Long> getDeletedPreviousDecisionIds(
+      List<Long> incomingIds, List<Long> inDatabaseIds) {
+    /* Return all ids in database but not in incoming Id from front end */
+    return inDatabaseIds.stream().filter(index -> !incomingIds.contains(index)).toList();
+  }
+
   public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String receiverAddress) {
     return repository
         .findByUuid(documentUnitUuid)
-        .flatMap(documentUnit -> publishService.publish(documentUnit, receiverAddress));
+        .flatMap(
+            documentUnit ->
+                previousDecisionRepository
+                    .findAllByDocumentnumber(documentUnit.documentnumber)
+                    .collectList()
+                    .flatMap(
+                        previousDecisions ->
+                            publishService.publish(
+                                documentUnit.setPreviousDecisions(previousDecisions),
+                                receiverAddress)));
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {

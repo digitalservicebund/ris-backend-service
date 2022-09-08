@@ -58,6 +58,8 @@ class DocUnitServiceTest {
 
   @MockBean private DocumentNumberCounterRepository counterRepository;
 
+  @MockBean private PreviousDecisionRepository previousDecisionRepository;
+
   @MockBean private S3AsyncClient s3AsyncClient;
 
   @MockBean private EmailPublishService publishService;
