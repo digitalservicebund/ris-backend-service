@@ -19,3 +19,8 @@ Grafana is using Prometheus as a datasource and can be used to explore and visua
 The login is `admin` / `admin`.
 
 Import the dashboards in `grafana/dashboards` here: `http://localhost:3030/dashboard/import`
+
+These two could be useful out of the box. They can be imported using their dashboard id:
+
+- https://grafana.com/grafana/dashboards/4701-jvm-micrometer/
+- https://grafana.com/grafana/dashboards/11378-justai-system-monitor/
