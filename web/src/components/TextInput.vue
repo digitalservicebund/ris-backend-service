@@ -2,14 +2,17 @@
   <input
     :id="id"
     v-model="inputValue"
-    :class="!hasError ? 'input' : 'input__error'"
+    class="input"
+    :class="conditionalClasses"
     type="text"
+    :placeholder="placeholder"
     :aria-label="ariaLabel"
     @input="emitInputEvent"
   />
 </template>
 
 <script lang="ts" setup>
+import { computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 
 interface Props {
@@ -17,6 +20,7 @@ interface Props {
   value?: string
   modelValue?: string
   ariaLabel: string
+  placeholder?: string
   hasError?: boolean
 }
 
@@ -32,6 +36,10 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
   props,
   emit
 )
+
+const conditionalClasses = computed(() => ({
+  input__error: props.hasError,
+}))
 </script>
 
 <style lang="scss" scoped>

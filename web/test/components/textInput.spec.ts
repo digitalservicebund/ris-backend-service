@@ -6,7 +6,7 @@ function renderComponent(options?: {
   ariaLabel?: string
   value?: string
   modelValue?: string
-  modeValue?: string
+  placeholder?: string
 }) {
   const user = userEvent.setup()
   const props = {
@@ -14,6 +14,7 @@ function renderComponent(options?: {
     value: options?.value,
     modelValue: options?.modelValue,
     ariaLabel: options?.ariaLabel ?? "aria-label",
+    placeholder: options?.placeholder,
   }
   const renderResult = render(TextInput, { props })
   return { user, props, ...renderResult }
@@ -33,6 +34,15 @@ describe("TextInput", () => {
       ariaLabel: "test-label",
     })
     const input = queryByLabelText("test-label")
+
+    expect(input).toBeInTheDocument()
+  })
+
+  it("shows input with a placeholder", () => {
+    const { queryByPlaceholderText } = renderComponent({
+      placeholder: "Test Placeholder",
+    })
+    const input = queryByPlaceholderText("Test Placeholder")
 
     expect(input).toBeInTheDocument()
   })
