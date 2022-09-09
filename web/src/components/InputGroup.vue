@@ -56,8 +56,6 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const emit = defineEmits<Emits>()
 
-const inputValues = ref<Values>({})
-
 /*
  * As the gap is more versatile than margins/paddings, but does not get
  * includes into the `box-sizing`, it is necessary to put into a custom
@@ -86,12 +84,16 @@ const fieldRows = computed(() => {
   return rows
 })
 
+// A writable computed value (with getter + setter) is not possible due to the depth
+// of the model that gets split across the inputs.
+const inputValues = ref<Values>({})
+
 watch(
   () => props.modelValue,
   () => {
-    inputValues.value = { ...inputValues.value, ...props.modelValue }
+    inputValues.value = props.modelValue
   },
-  { immediate: true }
+  { immediate: true, deep: true }
 )
 
 watch(
