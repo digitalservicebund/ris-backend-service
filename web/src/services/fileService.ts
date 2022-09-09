@@ -7,14 +7,18 @@ export default {
     docUnitUuid: string,
     file: File
   ): Promise<{ docUnit?: DocUnit; status: UploadStatus }> {
-    return await api()
-      .put(`docunits/${docUnitUuid}/file`, file, {
-        headers: {
-          "Content-Type":
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-          "X-Filename": file.name,
+    return await api
+      .put<File, DocUnit>(
+        `docunits/${docUnitUuid}/file`,
+        {
+          headers: {
+            "Content-Type":
+              "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+            "X-Filename": file.name,
+          },
         },
-      })
+        file
+      )
       .then((response) => {
         if (response.status === 201) {
           return { docUnit: response.data, status: UploadStatus.SUCCESSED }
@@ -32,7 +36,9 @@ export default {
   },
   async getDocxFileAsHtml(fileName: string) {
     try {
-      const response = await api().get(`docunitdocx/${fileName}`)
+      const response = await api.get<{ content: string }>(
+        `docunitdocx/${fileName}`
+      )
       return response.data.content
     } catch (error) {
       throw new Error(`Could not get docx: ${error}`)
@@ -40,14 +46,14 @@ export default {
   },
   async deleteFile(docUnitUuid: string) {
     try {
-      await api().delete(`docunits/${docUnitUuid}/file`)
+      await api.delete(`docunits/${docUnitUuid}/file`)
     } catch (error) {
       throw new Error(`Could not delete file: ${error}`)
     }
   },
   async getAllDocxFiles() {
     try {
-      const response = await api().get("docunitdocx")
+      const response = await api.get("docunitdocx")
       return response.data
     } catch (error) {
       throw new Error(`Could not get all docx files: ${error}`)
