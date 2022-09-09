@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { Texts } from "../domain/docUnit"
-import * as iconsAndLabels from "../iconsAndLabels.json"
 import SaveDocUnitButton from "./SaveDocUnitButton.vue"
 import TextEditor from "./TextEditor.vue"
+import { texts } from "@/domain"
 import { FieldSize } from "@/domain/FieldSize"
 
 const props = defineProps<{ texts: Texts; updateStatus: number }>()
@@ -12,7 +12,7 @@ const emit = defineEmits<{
   (e: "updateDocUnit"): Promise<void>
 }>()
 const data = computed(() =>
-  iconsAndLabels.texts.map((item) => {
+  texts.map((item) => {
     return {
       id: item.name as keyof Texts,
       name: item.name,

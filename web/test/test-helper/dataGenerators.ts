@@ -1,3 +1,11 @@
+import { InputType } from "@/domain"
+import type {
+  BaseInputAttributes,
+  BaseInputField,
+  TextInputAttributes,
+  TextInputField,
+} from "@/domain"
+
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
 
 export function generateString(options?: {
@@ -16,4 +24,47 @@ export function generateString(options?: {
   }
 
   return output
+}
+
+export function generateBaseInputAttributes(
+  partialAttributes?: Partial<BaseInputAttributes>
+): BaseInputAttributes {
+  return {
+    ariaLabel: generateString({ prefix: "aria-label-" }),
+    ...partialAttributes,
+  }
+}
+
+export function generateTextInputAttributes(
+  partialAttributes?: Partial<TextInputAttributes>
+): TextInputAttributes {
+  return {
+    ...generateBaseInputAttributes(),
+    placeholder: undefined,
+    ...partialAttributes,
+  }
+}
+
+export function generateBaseInputField(
+  partialField?: Partial<BaseInputField>
+): BaseInputField {
+  return {
+    type: InputType.TEXT,
+    name: generateString({ prefix: "name-" }),
+    label: generateString({ prefix: "Label " }),
+    iconName: generateString({ prefix: "icon-name-" }),
+    inputAttributes: generateBaseInputAttributes(),
+    ...partialField,
+  }
+}
+
+export function generateTextInputField(
+  partialField?: Partial<TextInputField>
+): TextInputField {
+  return {
+    ...generateBaseInputField(),
+    type: InputType.TEXT,
+    inputAttributes: generateTextInputAttributes(),
+    ...partialField,
+  }
 }

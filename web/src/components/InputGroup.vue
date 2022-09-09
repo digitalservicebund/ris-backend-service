@@ -6,49 +6,43 @@
       :style="gapStyle"
       class="input-group__row"
     >
-      <InputField
+      <InputFieldoComponent
         v-for="field in group"
-        :id="field.id"
-        :key="field.id"
+        :id="field.name"
+        :key="field.name"
         :style="fieldStyle"
         class="input-group__row__field"
         :label="field.label"
         :icon-name="field.iconName"
         :required="field.required"
       >
-        <TextInput
-          :id="field.id"
-          v-model="inputValues[field.id]"
-          :aria-label="field.ariaLabel"
+        <InputElement
+          :id="field.name"
+          v-model="inputValues[field.name]"
+          :type="field.type"
+          :attributes="field.inputAttributes"
         />
-      </InputField>
+      </InputFieldoComponent>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import InputField from "@/components/InputField.vue"
-import TextInput from "@/components/TextInput.vue"
+import InputElement from "@/components/InputElement.vue"
+import InputFieldoComponent from "@/components/InputField.vue"
+import type { InputField, ModelType } from "@/domain"
 
-interface Field {
-  id: string
-  label: string
-  ariaLabel: string
-  iconName: string
-  required?: boolean
-}
-
-type Values = { [fieldId: string]: string }
+type InputValues = { [fieldId: string]: ModelType }
 
 interface Props {
-  fields: Field[]
-  modelValue: Values
+  fields: InputField[]
+  modelValue: InputValues
   columnCount?: number
 }
 
 interface Emits {
-  (event: "update:modelValue", value: Values): void
+  (event: "update:modelValue", value: InputValues): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -86,7 +80,7 @@ const fieldRows = computed(() => {
 
 // A writable computed value (with getter + setter) is not possible due to the depth
 // of the model that gets split across the inputs.
-const inputValues = ref<Values>({})
+const inputValues = ref<InputValues>({})
 
 watch(
   () => props.modelValue,

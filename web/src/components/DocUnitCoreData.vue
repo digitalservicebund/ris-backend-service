@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { CoreData } from "../domain/docUnit"
-import * as iconsAndLabels from "../iconsAndLabels.json"
 import InputGroup from "./InputGroup.vue"
 import SaveDocUnitButton from "./SaveDocUnitButton.vue"
+import { coreDataFields } from "@/domain"
 
 interface Props {
   modelValue?: CoreData
@@ -18,24 +18,9 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-// TODO: Remove this once `iconsAndLabels` has been adapted everywhere.
-const fields = computed(() =>
-  iconsAndLabels.coreData.map((item) => ({
-    id: item.name,
-    label: item.label,
-    ariaLabel: item.label,
-    iconName: item.icon,
-    required: item.required,
-  }))
-)
-
 const values = computed({
-  get() {
-    return props.modelValue ?? {}
-  },
-  set(newValues: CoreData) {
-    emit("update:modelValue", newValues)
-  },
+  get: () => props.modelValue ?? {},
+  set: (newValues) => emit("update:modelValue", newValues),
 })
 </script>
 
@@ -46,10 +31,12 @@ const values = computed({
     <h2 id="coreData">Stammdaten</h2>
 
     <div class="form">
-      <InputGroup v-model="values" :fields="fields" :column-count="2" />
-      <span class="form__required-field-infos"
-        >* Pflichtfelder zum Veröffentlichen</span
-      >
+      <InputGroup v-model="values" :fields="coreDataFields" :column-count="2" />
+
+      <span class="form__require-info">
+        * Pflichtfelder zum Veröffentlichen
+      </span>
+
       <SaveDocUnitButton
         class="form__save-button"
         aria-label="Stammdaten Speichern Button"
@@ -67,7 +54,7 @@ const values = computed({
   &__save-button {
     margin-top: 2rem;
   }
-  &__required-field-infos {
+  &__require-info {
     display: inline-block;
     margin: 2rem 0;
   }

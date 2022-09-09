@@ -60,10 +60,8 @@ const handleToggleFilePanel = async () => {
 }
 
 const coreData = computed({
-  get() {
-    return docUnit.value.coreData
-  },
-  set(newValues: CoreData) {
+  get: () => docUnit.value.coreData,
+  set: (newValues) => {
     for (const [key, value] of Object.entries(newValues)) {
       docUnit.value[key as keyof CoreData] = value
     }
