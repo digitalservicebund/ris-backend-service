@@ -255,9 +255,6 @@ class DocUnitServiceTest {
     }
 
     private List<PreviousDecision> saveAll(List<PreviousDecision> pDecisionsList) {
-      System.out.println("Running in to save All");
-      System.out.println("Before");
-      previousDecisionsList.forEach(System.out::println);
       List<PreviousDecision> pDecisionToInsert =
           pDecisionsList.stream()
               .filter(previousDecision -> previousDecision.id == null)
@@ -284,8 +281,6 @@ class DocUnitServiceTest {
                             })
                         .toList());
           });
-      System.out.println("After update");
-      previousDecisionsList.forEach(System.out::println);
       return pDecisionsList;
     }
 
@@ -442,13 +437,10 @@ class DocUnitServiceTest {
       StepVerifier.create(service.updateDocUnit(docUnit))
           .consumeNextWith(
               monoResponse -> {
-                assertEquals(previousDecisionsList.size(), 5);
-                PreviousDecision previousDecision = monoResponse.getBody().previousDecisions.get(0);
-                assertEquals(previousDecision.id, 1L);
-                assertEquals(previousDecision.gerichtsort, "new gerOrt");
-                assertEquals(previousDecision.gerichtstyp, "new gerTyp");
-                assertEquals(previousDecision.datum, "30.01.2022");
-                assertEquals(previousDecision.aktenzeichen, "new aktenzeichen");
+                assertEquals(
+                    monoResponse.getBody().previousDecisions.size(), previousDecisionsList.size());
+                assertTrue(
+                    monoResponse.getBody().previousDecisions.containsAll(previousDecisionsList));
                 assertEquals(monoResponse.getBody(), docUnit);
               })
           .verifyComplete();
@@ -525,7 +517,6 @@ class DocUnitServiceTest {
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
             stringResponseEntity -> {
-              System.out.println(stringResponseEntity);
               assertNotNull(stringResponseEntity);
               assertEquals(HttpStatus.OK, stringResponseEntity.getStatusCode());
               assertEquals("done", stringResponseEntity.getBody());
