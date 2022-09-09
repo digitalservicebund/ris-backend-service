@@ -9,14 +9,10 @@ export default {
     xmlMail?: XmlMail
     errorMessage?: { title: string; description: string }
   }> {
-    return await api
-      .put<string, XmlMail>(
-        `docunits/${docUnitUuid}/publish`,
-        {
-          headers: { "Content-Type": "text/plain" },
-        },
-        receiverEmail
-      )
+    return await api()
+      .put(`docunits/${docUnitUuid}/publish`, receiverEmail, {
+        headers: { "Content-Type": "text/plain" },
+      })
       .then((response) => {
         if (response.status === 200) {
           if (response.data.statusCode === "200") {
@@ -54,8 +50,8 @@ export default {
     xmlMail?: XmlMail
     errorMessage?: { title: string; description: string }
   }> {
-    return await api
-      .get<XmlMail>(`docunits/${docUnitUuid}/publish`)
+    return await api()
+      .get(`docunits/${docUnitUuid}/publish`)
       .then((response) => {
         if (response.status === 200) {
           return {
