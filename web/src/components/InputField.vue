@@ -2,8 +2,7 @@
   <label :for="id" class="input-field">
     <span class="input-field__label">
       <v-icon v-if="!!iconName" data-testid="icon">{{ iconName }}</v-icon>
-      {{ label
-      }}<span v-if="requiredText !== undefined">{{ requiredText }}</span>
+      {{ label }}<span v-if="!!required && required">*</span>
     </span>
 
     <slot :id="id" />
@@ -19,7 +18,7 @@ interface Props {
   label: string
   iconName?: string
   errorMessage?: string
-  requiredText?: string
+  required?: boolean
 }
 
 defineProps<Props>()

@@ -9,7 +9,7 @@ interface Field {
   label: string
   ariaLabel: string
   iconName: string
-  requiredText?: string
+  required?: boolean
 }
 
 function renderComponent(options?: {
@@ -53,9 +53,7 @@ describe("InputFieldGroup", () => {
   })
 
   it("renders an input for each defined field with required text", () => {
-    const fields = [
-      generateField({ ariaLabel: "Foo Label", requiredText: "*" }),
-    ]
+    const fields = [generateField({ ariaLabel: "Foo Label", required: true })]
     const { queryByLabelText } = renderComponent({ fields })
 
     const labelText =

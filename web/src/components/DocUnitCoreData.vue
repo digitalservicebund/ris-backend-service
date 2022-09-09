@@ -25,7 +25,7 @@ const fields = computed(() =>
     label: item.label,
     ariaLabel: item.label,
     iconName: item.icon,
-    requiredText: item.requiredText,
+    required: item.required,
   }))
 )
 

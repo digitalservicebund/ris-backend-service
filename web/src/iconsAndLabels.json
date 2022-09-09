@@ -4,19 +4,19 @@
       "name": "aktenzeichen",
       "label": "Aktenzeichen",
       "icon": "grid_3x3",
-      "requiredText": "*"
+      "required": true
     },
     {
       "name": "gerichtstyp",
       "label": "Gerichtstyp",
       "icon": "home",
-      "requiredText": "*"
+      "required": true
     },
     {
       "name": "dokumenttyp",
       "label": "Dokumenttyp",
       "icon": "category",
-      "requiredText": "*"
+      "required": true
     },
     {
       "name": "vorgang",
@@ -37,7 +37,7 @@
       "name": "entscheidungsdatum",
       "label": "Entscheidungsdatum",
       "icon": "calendar_today",
-      "requiredText": "*"
+      "required": true
     },
     {
       "name": "gerichtssitz",

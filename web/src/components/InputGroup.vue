@@ -14,7 +14,7 @@
         class="input-group__row__field"
         :label="field.label"
         :icon-name="field.iconName"
-        :required-text="field.requiredText"
+        :required="field.required"
       >
         <TextInput
           :id="field.id"
@@ -36,7 +36,7 @@ interface Field {
   label: string
   ariaLabel: string
   iconName: string
-  requiredText?: string
+  required?: boolean
 }
 
 type Values = { [fieldId: string]: string }
