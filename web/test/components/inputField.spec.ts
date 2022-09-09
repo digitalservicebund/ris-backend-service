@@ -7,6 +7,7 @@ function renderComponent(options?: {
   label?: string
   iconName?: string
   slot?: string
+  requiredText?: string
 }) {
   const id = options?.id ?? "identifier"
   const vuetify = createVuetify()
@@ -16,6 +17,7 @@ function renderComponent(options?: {
     id,
     label: options?.label ?? "label",
     iconName: options?.iconName ?? "icon-name",
+    requiredText: options?.requiredText ?? options?.requiredText,
   }
 
   return render(InputField, { global, slots, props })
@@ -26,6 +28,17 @@ describe("InputField", () => {
     const { queryByLabelText } = renderComponent({ label: "test label" })
 
     const input = queryByLabelText("test label")
+
+    expect(input).toBeInTheDocument()
+  })
+
+  it("shows input with given label and required text", () => {
+    const { queryByLabelText } = renderComponent({
+      label: "test label",
+      requiredText: "*",
+    })
+
+    const input = queryByLabelText("test label*")
 
     expect(input).toBeInTheDocument()
   })

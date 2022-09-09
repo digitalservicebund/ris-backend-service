@@ -23,11 +23,15 @@ describe("Core Data", () => {
         plugins: [vuetify],
       },
     })
+    console.log(wrapper.html)
 
     expect(
       (wrapper.find("#aktenzeichen").element as HTMLInputElement).value
     ).toBe("abc")
     expect(wrapper.get("button").text()).toBe("Speichern")
+    expect(wrapper.get(".form").element as HTMLDivElement).toHaveTextContent(
+      "* Pflichtfelder zum Veröffentlichen"
+    )
     // what else? TODO
   })
 })

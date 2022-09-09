@@ -25,6 +25,7 @@ const fields = computed(() =>
     label: item.label,
     ariaLabel: item.label,
     iconName: item.icon,
+    requiredText: item.requiredText,
   }))
 )
 
@@ -46,7 +47,9 @@ const values = computed({
 
     <div class="form">
       <InputGroup v-model="values" :fields="fields" :column-count="2" />
-
+      <span class="form__required-field-infos"
+        >* Pflichtfelder zum Veröffentlichen</span
+      >
       <SaveDocUnitButton
         class="form__save-button"
         aria-label="Stammdaten Speichern Button"
@@ -63,6 +66,10 @@ const values = computed({
 
   &__save-button {
     margin-top: 2rem;
+  }
+  &__required-field-infos {
+    display: inline-block;
+    margin: 2rem 0;
   }
 }
 </style>

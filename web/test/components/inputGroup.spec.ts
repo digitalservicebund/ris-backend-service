@@ -9,6 +9,7 @@ interface Field {
   label: string
   ariaLabel: string
   iconName: string
+  requiredText?: string
 }
 
 function renderComponent(options?: {
@@ -49,6 +50,19 @@ describe("InputFieldGroup", () => {
 
     expect(fooInput).toBeInTheDocument()
     expect(barInput).toBeInTheDocument()
+  })
+
+  it("renders an input for each defined field with required text", () => {
+    const fields = [
+      generateField({ ariaLabel: "Foo Label", requiredText: "*" }),
+    ]
+    const { queryByLabelText } = renderComponent({ fields })
+
+    const labelText =
+      queryByLabelText("Foo Label")?.parentElement?.firstElementChild
+
+    expect(labelText).toBeInTheDocument()
+    expect(labelText?.textContent).toMatch(/^ Label.*\*$/)
   })
 
   it("shows input fields in correct order", () => {
