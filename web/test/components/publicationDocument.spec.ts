@@ -28,8 +28,8 @@ describe("PublicationDocument:", () => {
     it("render text", async () => {
       expect(renderResult.container.textContent).match(
         new RegExp(
-          "Veröffentlichen done_all Plausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird " +
-            "die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: Zuletzt veröffentlicht01.02.2000 " +
+          "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen wird " +
+            "die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: " +
             "Dokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am " +
             "01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1" +
             '<\\?xml version="1.0"\\?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>'
@@ -82,11 +82,13 @@ describe("PublicationDocument:", () => {
       global: { plugins: [vuetify] },
     })
 
+    console.log(renderResult.container.textContent)
+
     expect(renderResult.container.textContent).match(
       new RegExp(
-        "Veröffentlichen spellcheck Plausibilitätsprüfung help  Durch Klick auf Veröffentlichen " +
-          "wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse:  Dokumentationseinheit " +
-          "veröffentlichen"
+        "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen " +
+          "wird die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: Dokumentationseinheit " +
+          "veröffentlichenLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
       )
     )
   })
@@ -112,10 +114,10 @@ describe("PublicationDocument:", () => {
 
     expect(renderResult.container.textContent).match(
       new RegExp(
-        "Veröffentlichen priority_high Plausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt " +
-          "error message 1error message 2 Empfänger-E-Mail-Adresse:  Dokumentationseinheit veröffentlichenerror " +
-          "message titleerror message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde " +
-          "bisher nicht veröffentlicht"
+        "VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt " +
+          "error message 1error message 2 Empfänger-E-Mail-Adresse: Dokumentationseinheit " +
+          "veröffentlichenerror message titleerror message descriptionLetzte " +
+          "Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht"
       )
     )
   })
@@ -142,10 +144,10 @@ describe("PublicationDocument:", () => {
 
     expect(renderResult.container.textContent).match(
       new RegExp(
-        "Veröffentlichen done_all Plausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die " +
-          "Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: Zuletzt veröffentlicht01.02.2000 " +
-          "Dokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am " +
-          "01.02.2000über E-Mail an: receiver address Betreff: mail subjectals"
+        "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen wird die " +
+          "Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: Dokumentationseinheit " +
+          "veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über " +
+          "E-Mail an: receiver address Betreff: mail subjectals"
       )
     )
     expect(renderResult.html()).match(

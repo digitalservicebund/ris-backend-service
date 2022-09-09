@@ -7,6 +7,7 @@ function renderComponent(options?: {
   label?: string
   iconName?: string
   slot?: string
+  errorMessage?: string
   requiredText?: string
 }) {
   const id = options?.id ?? "identifier"
@@ -18,6 +19,7 @@ function renderComponent(options?: {
     label: options?.label ?? "label",
     iconName: options?.iconName ?? "icon-name",
     requiredText: options?.requiredText ?? options?.requiredText,
+    errorMessage: options?.errorMessage,
   }
 
   return render(InputField, { global, slots, props })
@@ -47,6 +49,14 @@ describe("InputField", () => {
     const { queryByTestId } = renderComponent({ iconName: "test-icon" })
 
     const icon = queryByTestId("icon")
+
+    expect(icon).toBeInTheDocument()
+  })
+
+  it("shows input with given error message", () => {
+    const { queryByText } = renderComponent({ errorMessage: "error message" })
+
+    const icon = queryByText("error message")
 
     expect(icon).toBeInTheDocument()
   })

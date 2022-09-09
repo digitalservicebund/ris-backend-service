@@ -2,7 +2,7 @@
   <input
     :id="id"
     v-model="inputValue"
-    class="input"
+    :class="!hasError ? 'input' : 'input__error'"
     type="text"
     :aria-label="ariaLabel"
     @input="emitInputEvent"
@@ -17,6 +17,7 @@ interface Props {
   value?: string
   modelValue?: string
   ariaLabel: string
+  hasError?: boolean
 }
 
 interface Emits {
@@ -49,6 +50,25 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
     -webkit-box-shadow: 0 0 0 50px white inset;
     box-shadow: 0 0 0 50px white inset;
     -webkit-text-fill-color: $black;
+  }
+
+  &__error {
+    outline: 2px solid $error;
+    background-color: $error-background;
+    padding: 17px 24px;
+    width: 100%;
+
+    &:-webkit-autofill {
+      -webkit-box-shadow: 0 0 0 50px $error-background inset;
+      box-shadow: 0 0 0 50px $error-background inset;
+      -webkit-text-fill-color: $black;
+    }
+
+    &:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0 50px $error-background inset;
+      box-shadow: 0 0 0 50px $error-background inset;
+      -webkit-text-fill-color: $black;
+    }
   }
 }
 </style>

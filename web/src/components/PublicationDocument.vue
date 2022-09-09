@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue"
+import InputField from "./InputField.vue"
 import TextButton from "./TextButton.vue"
+import TextInput from "./TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import ErrorModal from "@/components/ErrorModal.vue"
 import XmlMail from "@/domain/xmlMail"
@@ -56,26 +58,7 @@ function validateEmailAddress(): boolean {
           'publication-check-infos-container__in_error': hasValidationError,
         }"
       >
-        <div class="text-icon">
-          <div class="icon">
-            <span v-if="hasValidationError" class="material-icons">
-              priority_high
-            </span>
-            <span
-              v-if="!hasValidationError && !isFirstTimePublication"
-              class="material-icons"
-            >
-              done_all
-            </span>
-            <span
-              v-if="!hasValidationError && isFirstTimePublication"
-              class="material-icons"
-            >
-              spellcheck
-            </span>
-          </div>
-          <p class="publication-text-header">Plausibilitätsprüfung</p>
-        </div>
+        <p class="publication-text-header">Plausibilitätsprüfung</p>
 
         <div v-if="!publishResult" class="text-icon">
           <span
@@ -122,31 +105,23 @@ function validateEmailAddress(): boolean {
           </div>
         </div>
         <div>
-          <p>
-            <label for="receiverEmailName">
-              Empfänger-E-Mail-Adresse:
-              <br />
-              <input
-                v-model="receiverAddress"
-                name="receiverMailName"
-                aria-label="Empfängeradresse E-Mail"
-                :class="`receiver-email-input${
-                  emailAddressInvalid ? '__invalid' : ''
-                }`"
-              />
-              <span v-if="emailAddressInvalid" class="invalid">
-                <br />keine valide E-Mail-Adresse
-              </span>
-            </label>
-          </p>
+          <InputField
+            id="receiverAddress"
+            key="receiverAddress"
+            label="Empfänger-E-Mail-Adresse:"
+            :error-message="
+              emailAddressInvalid ? 'E-Mail-Adresse ungültig' : undefined
+            "
+          >
+            <TextInput
+              id="receiverAddress"
+              v-model="receiverAddress"
+              aria-label="Empfängeradresse E-Mail"
+              :has-error="emailAddressInvalid"
+            />
+          </InputField>
         </div>
         <div class="publication-button-container">
-          <div v-if="!isFirstTimePublication" class="text-container">
-            <p class="publication-text-body">Zuletzt veröffentlicht</p>
-            <p class="publication-text-subline">
-              {{ props.lastPublishedXmlMail?.publishDate }}
-            </p>
-          </div>
           <div class="publication-button">
             <TextButton
               label="Dokumentationseinheit veröffentlichen"
@@ -304,18 +279,12 @@ function validateEmailAddress(): boolean {
     }
   }
   .receiver-email-input {
-    outline: 2px solid #1d4a73;
-    padding: 5px;
+    outline: 2px solid $text-tertiary;
+    padding: 17px 24px;
     width: 100%;
-
-    &__invalid {
-      outline: 2px solid #b0243f;
-      padding: 5px;
-      width: 100%;
-    }
   }
   .invalid {
-    color: #b0243f;
+    color: $error;
     font-size: 0.75rem;
   }
 }

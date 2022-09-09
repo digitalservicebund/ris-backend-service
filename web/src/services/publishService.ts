@@ -9,7 +9,7 @@ export default {
     xmlMail?: XmlMail
     errorMessage?: { title: string; description: string }
   }> {
-    return await api
+    return api
       .put<string, XmlMail>(
         `docunits/${docUnitUuid}/publish`,
         {
@@ -54,7 +54,7 @@ export default {
     xmlMail?: XmlMail
     errorMessage?: { title: string; description: string }
   }> {
-    return await api
+    return api
       .get<XmlMail>(`docunits/${docUnitUuid}/publish`)
       .then((response) => {
         if (response.status === 200) {
