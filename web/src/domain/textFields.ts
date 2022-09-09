@@ -1,42 +1,15 @@
+import { FieldSize } from "./FieldSize"
+
+function defineTextEntry(name: string, label: string, fieldSize: FieldSize) {
+  return { name, label, fieldSize }
+}
 export const texts = [
-  {
-    name: "entscheidungsname",
-    label: "Entscheidungsname",
-    fieldSize: "small",
-  },
-  {
-    name: "titelzeile",
-    label: "Titelzeile",
-    fieldSize: "small",
-  },
-  {
-    name: "leitsatz",
-    label: "Leitsatz",
-    fieldSize: "medium",
-  },
-  {
-    name: "orientierungssatz",
-    label: "Orientierungssatz",
-    fieldSize: "small",
-  },
-  {
-    name: "tenor",
-    label: "Tenor",
-    fieldSize: "medium",
-  },
-  {
-    name: "gruende",
-    label: "Gründe",
-    fieldSize: "large",
-  },
-  {
-    name: "tatbestand",
-    label: "Tatbestand",
-    fieldSize: "large",
-  },
-  {
-    name: "entscheidungsgruende",
-    label: "Entscheidungsgründe",
-    fieldSize: "large",
-  },
+  defineTextEntry("entscheidungsname", "Entscheidungsname", "small"),
+  defineTextEntry("titelzeile", "Titelzeile", "small"),
+  defineTextEntry("leitsatz", "Leitsatz", "medium"),
+  defineTextEntry("orientierungssatz", "Orientierungssatz", "small"),
+  defineTextEntry("tenor", "Tenor", "medium"),
+  defineTextEntry("gruende", "Gründe", "large"),
+  defineTextEntry("tatbestand", "Tatbestand", "large"),
+  defineTextEntry("entscheidungsgruende", "Entscheidungsgründe", "large"),
 ]
