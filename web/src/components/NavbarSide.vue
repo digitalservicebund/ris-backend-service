@@ -76,19 +76,24 @@ const linkStyling = (componentName: string) => {
                 name: 'jurisdiction-docUnit-:documentNumber-categories',
                 params: { documentNumber: documentNumber },
                 query: route.query,
+                hash: '#previousDecisions',
+              }"
+              >Rechtszug</router-link
+            >
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col class="sub-rubriken">
+            <router-link
+              :to="{
+                name: 'jurisdiction-docUnit-:documentNumber-categories',
+                params: { documentNumber: documentNumber },
+                query: route.query,
                 hash: '#texts',
               }"
               >Kurz- & Langtexte</router-link
             >
           </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-divider />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="sidebar_headline"> Rechtszug </v-col>
         </v-row>
         <v-row>
           <v-col>

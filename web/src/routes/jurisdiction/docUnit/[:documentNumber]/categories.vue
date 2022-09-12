@@ -163,7 +163,10 @@ onUnmounted(() => {
           @update-doc-unit="handleUpdateDocUnit"
         />
 
-        <DocUnitPreviousDecisions v-model="previousDecisions" />
+        <DocUnitPreviousDecisions
+          id="previousDecisions"
+          v-model="previousDecisions"
+        />
 
         <DocUnitTexts
           id="texts"
