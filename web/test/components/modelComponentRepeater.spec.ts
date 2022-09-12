@@ -31,7 +31,7 @@ function renderComponent(options?: {
   const props = {
     component: markRaw(TestModelComponent),
     modelValue: options?.modelValue ?? [],
-    defaultValue: options?.defaultValue ?? null,
+    defaultValue: options?.defaultValue ?? "",
   }
   const slots = {
     addButton: options?.addButtonSlot ?? "",

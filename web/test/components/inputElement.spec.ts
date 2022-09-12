@@ -11,7 +11,10 @@ function renderComponent(options?: {
   const props = {
     type: options?.type,
     modelValue: options?.modelValue,
-    attributes: {},
+    attributes: {
+      id: "test-id",
+      ariaLabel: "test-label",
+    },
   }
   const renderResult = render(InputElement, { props })
   const user = userEvent.setup()
