@@ -2,7 +2,7 @@ import service from "@/services/docUnitService"
 import { ServiceResponse } from "@/services/httpClient"
 
 describe("docUnitService", () => {
-  vi.mock("@/services/api", () => {
+  vi.mock("@/services/httpClient", () => {
     const testResponse: ServiceResponse<string> = {
       status: 500,
       data: "foo",
