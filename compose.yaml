@@ -21,6 +21,7 @@ services:
       - SPRING_PROFILES_ACTIVE=local,compose
       - GH_PACKAGES_REPOSITORY_USER=${GH_PACKAGES_REPOSITORY_USER}
       - GH_PACKAGES_REPOSITORY_TOKEN=${GH_PACKAGES_REPOSITORY_TOKEN}
+      - JAVA_OPTS=-XX:MaxDirectMemorySize=100M
     command: sh run.sh _start
     ports:
       - 8080:8080 # service

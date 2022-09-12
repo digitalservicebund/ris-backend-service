@@ -1,9 +1,13 @@
 package de.bund.digitalservice.ris.domain;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.*;
 import java.util.function.Function;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -13,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
@@ -56,7 +61,8 @@ public class DocUnitService {
         .getDocumentNumberCounterEntry()
         .flatMap(
             outdatedDocumentNumberCounter -> {
-              // this is the switch happening when the first new DocUnit in a new year gets created
+              // this is the switch happening when the first new DocUnit in a new year gets
+              // created
               if (outdatedDocumentNumberCounter.currentyear != currentYear) {
                 outdatedDocumentNumberCounter.currentyear = currentYear;
                 outdatedDocumentNumberCounter.nextnumber = 1;
@@ -72,10 +78,10 @@ public class DocUnitService {
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
-  public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
-      UUID docUnitId, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
+  public Mono<DocUnit> attachFileToDocUnit(
+      UUID docUnitId, ByteBuffer byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
-
+    checkDocx(byteBufferFlux);
     return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
         .flatMap(
@@ -94,10 +100,7 @@ public class DocUnitService {
                           return docUnit;
                         }))
         .doOnNext(docUnit -> log.debug("save doc unit"))
-        .flatMap(repository::save)
-        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
-        .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+        .flatMap(repository::save);
   }
 
   public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(UUID docUnitId) {
@@ -124,8 +127,23 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
+  void checkDocx(ByteBuffer byteBufferFlux) {
+    var zip = new ZipInputStream(new ByteArrayInputStream(byteBufferFlux.array()));
+    ZipEntry entry;
+    try {
+      while ((entry = zip.getNextEntry()) != null) {
+        if (entry.getName().equals("word/document.xml")) {
+          return;
+        }
+      }
+    } catch (IOException e) {
+      throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+    }
+    throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+  }
+
   private Mono<PutObjectResponse> putObjectIntoBucket(
-      String fileUuid, Flux<ByteBuffer> byteBufferFlux, HttpHeaders httpHeaders) {
+      String fileUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
 
     var contentLength = httpHeaders.getContentLength();
 
@@ -137,7 +155,7 @@ public class DocUnitService {
 
     log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
 
-    var asyncRequestBody = AsyncRequestBody.fromPublisher(byteBufferFlux);
+    var asyncRequestBody = AsyncRequestBody.fromPublisher(Mono.just(byteBuffer));
     var putObjectRequestBuilder =
         PutObjectRequest.builder()
             .bucket(bucketName)
@@ -215,7 +233,7 @@ public class DocUnitService {
         docUnit.previousDecisions.stream()
             .map(previousDecision -> previousDecision.setDocumentnumber(docUnit.documentnumber))
             .toList();
-    /*Get all id of previous decisions from font-end */
+    /* Get all id of previous decisions from font-end */
     List<Long> incomingIds =
         previousDecisionsList.stream()
             .filter(previousDecision -> previousDecision.id != null)

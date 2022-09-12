@@ -2,14 +2,7 @@ package de.bund.digitalservice.ris.domain;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -20,14 +13,13 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.util.LinkedMultiValueMap;
@@ -49,7 +41,7 @@ import software.amazon.awssdk.services.s3.model.S3Exception;
 class DocUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
-  @Autowired private DocUnitService service;
+  @SpyBean private DocUnitService service;
 
   @MockBean private DocUnitRepository repository;
 
@@ -85,7 +77,7 @@ class DocUnitServiceTest {
   @Test
   void testAttachFileToDocUnit() {
     // given
-    var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
+    var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of("content/type"));
     headerMap.put("X-Filename", List.of("testfile.docx"));
@@ -104,6 +96,7 @@ class DocUnitServiceTest {
     when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(savedDocUnit));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(savedDocUnit));
 
+    doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
 
@@ -118,7 +111,7 @@ class DocUnitServiceTest {
           .consumeNextWith(
               docUnit -> {
                 assertNotNull(docUnit);
-                assertEquals(ResponseEntity.status(HttpStatus.CREATED).body(savedDocUnit), docUnit);
+                assertEquals(savedDocUnit, docUnit);
               })
           .verifyComplete();
 
@@ -168,21 +161,16 @@ class DocUnitServiceTest {
   @Test
   void testGenerateNewDocUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     // given
-    var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
+    var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
 
+    doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenThrow(SdkException.create("exception", null));
 
     // when and then
     StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
-        .consumeNextWith(
-            responseEntity -> {
-              assertNotNull(responseEntity);
-              assertNotNull(responseEntity.getBody());
-              assertEquals(DocUnit.EMPTY, responseEntity.getBody());
-              assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-            })
-        .verifyComplete();
+        .expectErrorMatches(ex -> ex instanceof SdkException)
+        .verify();
 
     verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
     verify(repository, times(0)).save(any(DocUnit.class));
@@ -191,8 +179,9 @@ class DocUnitServiceTest {
   @Test
   void testGenerateNewDocUnitAndAttachFile_withExceptionFromRepository() {
     // given
-    var byteBufferFlux = Flux.just(ByteBuffer.wrap(new byte[] {}));
+    var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
 
+    doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnit.class));
@@ -200,14 +189,8 @@ class DocUnitServiceTest {
 
     // when and then
     StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
-        .consumeNextWith(
-            responseEntity -> {
-              assertNotNull(responseEntity);
-              assertNotNull(responseEntity.getBody());
-              assertEquals(DocUnit.EMPTY, responseEntity.getBody());
-              assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
-            })
-        .verifyComplete();
+        .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
+        .verify();
 
     verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
     verify(repository).save(any(DocUnit.class));

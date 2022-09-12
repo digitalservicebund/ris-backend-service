@@ -46,10 +46,14 @@ public class DocUnitController {
   @PutMapping(value = "/{uuid}/file")
   public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
       @PathVariable UUID uuid,
-      @RequestBody Flux<ByteBuffer> byteBufferFlux,
+      @RequestBody ByteBuffer byteBufferFlux,
       @RequestHeader HttpHeaders httpHeaders) {
 
-    return service.attachFileToDocUnit(uuid, byteBufferFlux, httpHeaders);
+    return service
+        .attachFileToDocUnit(uuid, byteBufferFlux, httpHeaders)
+        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
+        .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex))
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
   }
 
   @DeleteMapping(value = "/{uuid}/file")

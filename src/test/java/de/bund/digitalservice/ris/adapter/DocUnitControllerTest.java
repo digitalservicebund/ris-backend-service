@@ -1,10 +1,9 @@
 package de.bund.digitalservice.ris.adapter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.domain.DocUnit;
@@ -29,7 +28,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -40,7 +38,7 @@ class DocUnitControllerTest {
 
   @MockBean private DocUnitService service;
 
-  @Captor private ArgumentCaptor<Flux<ByteBuffer>> fluxCaptor;
+  @Captor private ArgumentCaptor<ByteBuffer> captor;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
@@ -66,7 +64,8 @@ class DocUnitControllerTest {
   @Test
   void testAttachFileToDocUnit() {
     var headersCaptor = ArgumentCaptor.forClass(HttpHeaders.class);
-
+    when(service.attachFileToDocUnit(eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+        .thenReturn(Mono.empty());
     webClient
         .mutateWith(csrf())
         .put()
@@ -76,9 +75,8 @@ class DocUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service)
-        .attachFileToDocUnit(eq(TEST_UUID), fluxCaptor.capture(), headersCaptor.capture());
-    assertEquals(0, Objects.requireNonNull(fluxCaptor.getValue().blockFirst()).array().length);
+    verify(service).attachFileToDocUnit(eq(TEST_UUID), captor.capture(), headersCaptor.capture());
+    assertEquals(0, Objects.requireNonNull(captor.getValue()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
   }
 

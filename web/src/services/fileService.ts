@@ -7,8 +7,8 @@ export default {
     docUnitUuid: string,
     file: File
   ): Promise<{ docUnit?: DocUnit; status: UploadStatus }> {
-    return await api
-      .put<File, DocUnit>(
+    try {
+      const response = await api.put<File, DocUnit>(
         `docunits/${docUnitUuid}/file`,
         {
           headers: {
@@ -19,20 +19,22 @@ export default {
         },
         file
       )
-      .then((response) => {
-        if (response.status === 201) {
-          return { docUnit: response.data, status: UploadStatus.SUCCESSED }
-        }
+      console.log("response", response)
 
-        return { status: UploadStatus.FAILED }
-      })
-      .catch((error) => {
-        if (error.response.status === 413) {
-          return { status: UploadStatus.FILE_TOO_LARGE }
-        }
-
-        return { status: UploadStatus.FAILED }
-      })
+      if (response.status === 201) {
+        return { docUnit: response.data, status: UploadStatus.SUCCESSED }
+      }
+      return { status: UploadStatus.FAILED }
+    } catch (error: any) {
+      console.log("landed in catch", error)
+      if (error.response.status === 413) {
+        return { status: UploadStatus.FILE_TOO_LARGE }
+      }
+      if (error.response.status === 415) {
+        return { status: UploadStatus.WRONG_FILE_FORMAT }
+      }
+      return { status: UploadStatus.FAILED }
+    }
   },
   async getDocxFileAsHtml(fileName: string) {
     try {
