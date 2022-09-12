@@ -111,7 +111,7 @@ watch(
     flex-wrap: wrap;
 
     &__field {
-      min-width: 25rem;
+      min-width: 15rem;
     }
   }
 }
