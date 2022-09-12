@@ -15,6 +15,7 @@
         <template #removeButton="{ onClick }">
           <TextButton
             label="Entfernen"
+            aria-label="Entscheidung Entfernen"
             button-type="ghost"
             class="previous-decisions__body__remove-button"
             @click="onClick"
@@ -24,6 +25,7 @@
         <template #addButton="{ onClick }">
           <TextButton
             label="weitere Entscheidung hinzufügen"
+            aria-label="weitere Entscheidung hinzufügen"
             class="previous-decisions__body__add-button"
             @click="onClick"
           />
@@ -65,7 +67,7 @@ const values = computed({
     if (props.modelValue?.length) {
       return props.modelValue
     } else {
-      return [defaultModel]
+      return [{ ...defaultModel }]
     }
   },
   set: (newValues) => {
