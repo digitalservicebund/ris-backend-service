@@ -1,11 +1,5 @@
 import axios from "axios"
 
-type Response<T> = {
-  status: number
-  statusText: string
-  data: T
-}
-
 type RequestOptions = {
   headers?: {
     Accept?: string
@@ -18,36 +12,45 @@ interface HttpClient {
   get<TResponse>(
     url: string,
     config?: RequestOptions
-  ): Promise<Response<TResponse>>
+  ): Promise<ServiceResponse<TResponse>>
+
   post<TRequest, TResponse>(
     url: string,
     config?: RequestOptions,
     data?: TRequest
-  ): Promise<Response<TResponse>>
+  ): Promise<ServiceResponse<TResponse>>
+
   put<TRequest, TResponse>(
     url: string,
     config?: RequestOptions,
     data?: TRequest
-  ): Promise<Response<TResponse>>
+  ): Promise<ServiceResponse<TResponse>>
+
   delete<TResponse>(
     url: string,
     config?: RequestOptions
-  ): Promise<Response<TResponse>>
+  ): Promise<ServiceResponse<TResponse>>
 }
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST ?? ""
-const baseHttp = <T>(
+const baseHttp = async <T>(
   url: string,
   method: string,
   options?: RequestOptions,
   data?: T
 ) => {
-  return axios({
+  const response = await axios({
     method: method,
     url: `${backendHost}/api/v1/${url}`,
+    validateStatus: () => true,
     data,
     ...options,
   })
+  return {
+    status: response.status,
+    statusText: response.statusText,
+    data: response?.data,
+  }
 }
 
 const httpClient: HttpClient = {
@@ -60,9 +63,21 @@ const httpClient: HttpClient = {
   async put<T>(url: string, options: RequestOptions, data: T) {
     return baseHttp(url, "put", { ...options }, data)
   },
-  delete(url: string, options: RequestOptions) {
+  async delete(url: string, options: RequestOptions) {
     return baseHttp(url, "delete", { ...options })
   },
+}
+
+type ErrorResponse = {
+  title: string
+  description?: string
+}
+
+export type ServiceResponse<T> = {
+  status: number
+  // statusText: string
+  data: T
+  error?: ErrorResponse
 }
 
 export default httpClient

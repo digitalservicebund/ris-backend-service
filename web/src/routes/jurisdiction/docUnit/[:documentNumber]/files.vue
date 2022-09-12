@@ -8,12 +8,14 @@ import fileService from "@/services/fileService"
 
 const props = defineProps<{ documentNumber: string }>()
 const docUnit = ref(
-  await docUnitService.getByDocumentNumber(props.documentNumber)
+  (await docUnitService.getByDocumentNumber(props.documentNumber)).data
 )
 
 const handleDeleteFile = async () => {
   await fileService.deleteFile(docUnit.value.uuid)
-  docUnit.value = await docUnitService.getByDocumentNumber(props.documentNumber)
+  docUnit.value = (
+    await docUnitService.getByDocumentNumber(props.documentNumber)
+  ).data
 }
 </script>
 

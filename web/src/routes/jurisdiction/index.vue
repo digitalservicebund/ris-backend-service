@@ -7,10 +7,11 @@ import DocUnit from "@/domain/docUnit"
 import docUnitService from "@/services/docUnitService"
 
 const router = useRouter()
-const docUnits = ref(await docUnitService.getAll())
+
+const docUnits = ref((await docUnitService.getAll()).data)
 
 const handleDelete = async (docUnit: DocUnit) => {
-  const status = await docUnitService.delete(docUnit.uuid)
+  const status = (await docUnitService.delete(docUnit.uuid)).status
   if (status === 200) {
     docUnits.value = docUnits.value.filter((item) => item != docUnit)
   }

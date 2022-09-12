@@ -10,7 +10,7 @@ const props = defineProps<{
   documentNumber: string
 }>()
 const docUnit = ref(
-  await docUnitService.getByDocumentNumber(props.documentNumber)
+  (await docUnitService.getByDocumentNumber(props.documentNumber)).data
 )
 const loadDone = ref(false)
 const lastPublishedXmlMail = ref<XmlMail>()

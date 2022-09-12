@@ -6,7 +6,7 @@ import docUnitService from "@/services/docUnitService"
 const router = useRouter()
 
 onBeforeMount(async () => {
-  const newDocUnit = await docUnitService.createNew("KO", "RE")
+  const newDocUnit = (await docUnitService.createNew("KO", "RE")).data
   await router.replace({
     name: "jurisdiction-docUnit-:documentNumber-files",
     params: { documentNumber: newDocUnit.documentnumber },

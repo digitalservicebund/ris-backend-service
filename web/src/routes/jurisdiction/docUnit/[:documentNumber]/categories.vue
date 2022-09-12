@@ -15,8 +15,9 @@ import fileService from "@/services/fileService"
 const props = defineProps<{
   documentNumber: string
 }>()
+
 const docUnit = ref(
-  await docUnitService.getByDocumentNumber(props.documentNumber)
+  (await docUnitService.getByDocumentNumber(props.documentNumber)).data
 )
 
 const handleUpdateValueDocUnitTexts = async (
@@ -33,7 +34,7 @@ const handleUpdateValueDocUnitTexts = async (
 
 const handleUpdateDocUnit = async () => {
   updateStatus.value = UpdateStatus.ON_UPDATE
-  const status = await docUnitService.update(docUnit.value)
+  const status = (await docUnitService.update(docUnit.value)).status
   setTimeout(() => {
     hasDataChange.value = false
     lastUpdatedDocUnit.value = JSON.stringify(docUnit.value)

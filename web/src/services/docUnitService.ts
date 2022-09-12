@@ -1,71 +1,89 @@
 import DocUnit from "../domain/docUnit"
-import api from "./api"
-import { UpdateStatus } from "@/enum/enumUpdateStatus"
+import httpClient, { ServiceResponse } from "./httpClient"
 
-export default {
-  async getAll(): Promise<DocUnit[]> {
-    try {
-      const response = await api.get<DocUnit[]>("docunits")
-      return response.data
-    } catch (error) {
-      throw new Error(`Cloud not load all docUnits: ${error}`)
+interface DocUnitService {
+  getAll(): Promise<ServiceResponse<DocUnit[]>>
+  getByDocumentNumber(documentNumber: string): Promise<ServiceResponse<DocUnit>>
+  createNew(
+    docCenter: string,
+    docType: string
+  ): Promise<ServiceResponse<DocUnit>>
+  update(docUnit: DocUnit): Promise<ServiceResponse<unknown>>
+  delete(docUnitUuid: string): Promise<ServiceResponse<unknown>>
+}
+
+const service: DocUnitService = {
+  async getAll() {
+    const response = await httpClient.get<DocUnit[]>("docunits")
+    if (response.status >= 300) {
+      response.error = {
+        title: "Dokumentationseinheiten konnten nicht geladen werden.",
+      }
     }
+    return response
   },
 
-  async getByDocumentNumber(documentNumber: string): Promise<DocUnit> {
-    try {
-      const response = await api.get<DocUnit>(`docunits/${documentNumber}`)
-      return new DocUnit(response.data.uuid, response.data)
-    } catch (error) {
-      throw new Error(`Could not load docUnit by documentNumber: ${error}`)
+  async getByDocumentNumber(documentNumber: string) {
+    const response = await httpClient.get<DocUnit>(`docunits/${documentNumber}`)
+    if (response.status >= 300) {
+      response.error = {
+        title: "Dokumentationseinheit konnten nicht geladen werden.",
+      }
     }
+    response.data = new DocUnit(response.data.uuid, { ...response.data })
+    return response
   },
 
-  async createNew(docCenter: string, docType: string): Promise<DocUnit> {
-    try {
-      const response = await api.post<Partial<DocUnit>, DocUnit>(
-        "docunits",
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
+  async createNew(docCenter: string, docType: string) {
+    const response = await httpClient.post<Partial<DocUnit>, DocUnit>(
+      "docunits",
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-        JSON.stringify({
-          documentationCenterAbbreviation: docCenter,
-          documentType: docType,
-        }) as Partial<DocUnit>
-      )
-      return new DocUnit(response.data.uuid, response.data)
-    } catch (error) {
-      throw new Error(`Could not create new docUnit: ${error}`)
+      },
+      JSON.stringify({
+        documentationCenterAbbreviation: docCenter,
+        documentType: docType,
+      }) as Partial<DocUnit>
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: "Dokumentationseinheit konnten nicht erstellt werden.",
+      }
     }
+    return response
   },
 
-  async update(docUnit: DocUnit): Promise<number> {
-    try {
-      const response = await api.put(
-        `docunits/${docUnit.uuid}/docx`,
-        {
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
+  async update(docUnit: DocUnit) {
+    const response = await httpClient.put(
+      `docunits/${docUnit.uuid}/docx`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
         },
-        JSON.stringify(docUnit)
-      )
-      return response.status
-    } catch (error) {
-      return UpdateStatus.ERROR
+      },
+      JSON.stringify(docUnit)
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: "Neue Dokumentationseinheit konnten nicht erstellt werden",
+      }
     }
+    return response
   },
 
-  async delete(docUnitUuid: string): Promise<number> {
-    try {
-      const response = await api.delete(`docunits/${docUnitUuid}`)
-      return response.status
-    } catch (error) {
-      throw new Error("Could not delete docUnit")
+  async delete(docUnitUuid: string) {
+    const response = await httpClient.delete(`docunits/${docUnitUuid}`)
+    if (response.status >= 300) {
+      response.error = {
+        title: "Dokumentationseinheit konnte nicht gelöscht werden",
+      }
     }
+    return response
   },
 }
+
+export default service

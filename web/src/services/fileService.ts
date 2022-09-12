@@ -1,4 +1,4 @@
-import api from "./api"
+import httpClient from "./httpClient"
 import DocUnit from "@/domain/docUnit"
 import { UploadStatus } from "@/domain/uploadStatus"
 
@@ -8,7 +8,7 @@ export default {
     file: File
   ): Promise<{ docUnit?: DocUnit; status: UploadStatus }> {
     try {
-      const response = await api.put<File, DocUnit>(
+      const response = await httpClient.put<File, DocUnit>(
         `docunits/${docUnitUuid}/file`,
         {
           headers: {
@@ -38,7 +38,7 @@ export default {
   },
   async getDocxFileAsHtml(fileName: string) {
     try {
-      const response = await api.get<{ content: string }>(
+      const response = await httpClient.get<{ content: string }>(
         `docunitdocx/${fileName}`
       )
       return response.data.content
@@ -48,14 +48,14 @@ export default {
   },
   async deleteFile(docUnitUuid: string) {
     try {
-      await api.delete(`docunits/${docUnitUuid}/file`)
+      await httpClient.delete(`docunits/${docUnitUuid}/file`)
     } catch (error) {
       throw new Error(`Could not delete file: ${error}`)
     }
   },
   async getAllDocxFiles() {
     try {
-      const response = await api.get("docunitdocx")
+      const response = await httpClient.get("docunitdocx")
       return response.data
     } catch (error) {
       throw new Error(`Could not get all docx files: ${error}`)
