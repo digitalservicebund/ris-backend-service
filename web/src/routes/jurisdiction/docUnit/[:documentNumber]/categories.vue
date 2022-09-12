@@ -4,6 +4,7 @@ import { useRoute, useRouter } from "vue-router"
 import { useScrollToHash } from "../../../../composables/useScrollToHash"
 import DocUnitDetail from "./index.vue"
 import DocUnitCoreData from "@/components/DocUnitCoreData.vue"
+import DocUnitPreviousDecisions from "@/components/DocUnitPreviousDecisions.vue"
 import DocUnitTexts from "@/components/DocUnitTexts.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { CoreData, Texts } from "@/domain/docUnit"
@@ -66,6 +67,11 @@ const coreData = computed({
       docUnit.value[key as keyof CoreData] = value
     }
   },
+})
+
+const previousDecisions = computed({
+  get: () => docUnit.value.previousDecisions,
+  set: (newValue) => (docUnit.value.previousDecisions = newValue),
 })
 
 const { hash: routeHash } = toRefs(route)
@@ -156,6 +162,9 @@ onUnmounted(() => {
           :update-status="updateStatus"
           @update-doc-unit="handleUpdateDocUnit"
         />
+
+        <DocUnitPreviousDecisions v-model="previousDecisions" />
+
         <DocUnitTexts
           id="texts"
           :texts="docUnit.texts"
@@ -173,3 +182,9 @@ onUnmounted(() => {
     </v-row>
   </DocUnitDetail>
 </template>
+
+<style>
+#previousDecisions {
+  padding: 2rem 1.1rem;
+}
+</style>

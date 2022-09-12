@@ -24,6 +24,13 @@ export type Texts = {
   entscheidungsgruende?: string
 }
 
+export type PreviousDecision = {
+  gerichtstyp?: string
+  gerichtsort?: string
+  datum?: string
+  aktenzeichen?: string
+}
+
 export default class DocUnit implements CoreData, Texts {
   readonly uuid: string
   readonly id?: string
@@ -57,6 +64,8 @@ export default class DocUnit implements CoreData, Texts {
   public gruende?: string
   public tatbestand?: string
   public entscheidungsgruende?: string
+
+  public previousDecisions?: PreviousDecision[]
 
   constructor(uuid: string, data: Partial<DocUnit> = {}) {
     this.uuid = String(uuid)
