@@ -27,7 +27,8 @@ describe("Core Data", () => {
     expect(
       (wrapper.find("#docketNumber").element as HTMLInputElement).value
     ).toBe("abc")
-    expect(wrapper.get("button").text()).toBe("Speichern")
+    const buttons = wrapper.findAll("button")
+    expect(buttons[buttons.length - 1].text()).toBe("Speichern")
     expect(wrapper.get(".form").element as HTMLDivElement).toHaveTextContent(
       "* Pflichtfelder zum Veröffentlichen"
     )

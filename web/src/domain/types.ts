@@ -1,6 +1,7 @@
 export enum InputType {
   TEXT = "text",
   FILE = "file",
+  DROPDOWN = "dropdown",
 }
 
 export interface BaseInputAttributes {
@@ -14,8 +15,6 @@ export interface BaseInputField {
   iconName: string
   required?: boolean
   inputAttributes: BaseInputAttributes
-  hasDropdown?: boolean
-  dropdownValues?: string[]
 }
 
 export type TextInputModelType = string
@@ -28,6 +27,18 @@ export interface TextInputField extends BaseInputField {
   inputAttributes: TextInputAttributes
 }
 
+export interface DropdownAttributes extends BaseInputAttributes {
+  placeholder?: string
+  dropdownItems?: string[]
+}
+
+export interface DropdownInputField extends BaseInputField {
+  type: InputType.DROPDOWN
+  inputAttributes: DropdownAttributes
+}
+
+export type BaseInput = BaseInputField
 export type InputField = TextInputField // | ...
 export type InputAttributes = TextInputAttributes // | ...
 export type ModelType = TextInputModelType // | ...
+export type DropDownField = DropdownInputField // | ...

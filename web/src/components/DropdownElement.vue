@@ -1,75 +1,66 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted, ref } from "vue"
+import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { useInputModel } from "@/composables/useInputModel"
 
-const props = defineProps<{
+interface Props {
   id: string
-  value: string
-  dropdownValues: string[] | undefined
-}>()
-const emit = defineEmits<{
-  (e: "updateValue", id: string, textVal: string): void
-}>()
-const forcusedItemIndex = ref(-1)
+  value?: string
+  modelValue?: string
+  ariaLabel: string
+  placeholder?: string
+  dropdownValue: string[] | undefined
+}
+
+interface Emits {
+  (event: "update:modelValue", value: string | undefined): void
+  (event: "input", value: Event): void
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+
+const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
+  props,
+  emit
+)
+
 const isShowDropdown = ref(false)
-const items = ref(!!props.dropdownValues ? props.dropdownValues : [])
+const items = ref(!!props.dropdownValue ? props.dropdownValue : [])
 
-const setTextVal = (value: string) => {
-  emit("updateValue", props.id, value)
-  closeDropdown()
+const toggleDropdown = () => {
+  isShowDropdown.value = !isShowDropdown.value
 }
+
 const filterItems = () => {
-  const filteredItems = items.value.filter((item) => item.includes(props.value))
-  return filteredItems.length > 0 ? filteredItems : items.value
+  const filteredItem = items.value.filter((item) =>
+    item.includes(!!props.modelValue ? props.modelValue : "")
+  )
+  return filteredItem.length > 0 ? filteredItem : items.value
 }
 
-const selectItems = (event: KeyboardEvent) => {
-  const isArrowDownPressed = event.key === "ArrowDown"
-  const isArrowUpPressed = event.key === "ArrowUp"
-  const isTabPressed = event.key === "Tab"
-  if (!isShowDropdown.value) return
-  if (isTabPressed) {
-    closeDropdown()
-    return
-  }
-  if (!isArrowDownPressed && !isArrowUpPressed) return
-  const dropdownItems = document.querySelectorAll(
-    `#${props.id} .dropdown-container__dropdown-item`
-  )
-  forcusedItemIndex.value = isArrowDownPressed
-    ? forcusedItemIndex.value + 1
-    : forcusedItemIndex.value - 1
-  if (forcusedItemIndex.value < 0) forcusedItemIndex.value = 0
-  if (forcusedItemIndex.value > dropdownItems.length - 1)
-    forcusedItemIndex.value = dropdownItems.length - 1
-  if (!!dropdownItems[forcusedItemIndex.value]) {
-    ;(dropdownItems[forcusedItemIndex.value] as HTMLElement).focus()
-  }
-}
-
-const closeDropdownWhenClickOutSide = (event: MouseEvent) => {
-  const dropdown = document.querySelector(
-    `#${props.id} .dropdown-container__open-dropdown`
-  )
+const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
+  const dropdown = document.querySelector(`#${props.id}.dropdown-container`)
+  if (dropdown == null) return
   if (
-    event.target !== dropdown &&
-    (event.target as HTMLElement).parentElement !== dropdown
-  ) {
-    closeDropdown()
-  }
-}
-
-const closeDropdown = () => {
-  forcusedItemIndex.value = -1
+    (event.target as HTMLElement) === dropdown ||
+    event.composedPath().includes(dropdown)
+  )
+    return
   isShowDropdown.value = false
 }
 
-onMounted(async () => {
-  window.addEventListener("keydown", selectItems, false)
-  window.addEventListener("click", closeDropdownWhenClickOutSide)
+watch(
+  () => props.modelValue,
+  () => {
+    if (!isShowDropdown.value) isShowDropdown.value = true
+  }
+)
+
+onMounted(() => {
+  window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
-onUnmounted(() => {
-  window.removeEventListener("keydown", selectItems)
-  window.removeEventListener("click", closeDropdownWhenClickOutSide)
+onBeforeUnmount(() => {
+  window.removeEventListener("click", closeDropDownWhenClickOutSide)
 })
 </script>
 
@@ -77,19 +68,44 @@ onUnmounted(() => {
   <div :id="id" class="dropdown-container" style="width: 100%">
     <div
       class="dropdown-container__open-dropdown"
-      @click="isShowDropdown = true"
-      @keydown.enter="isShowDropdown = true"
+      @keydown.enter="toggleDropdown"
     >
-      <slot></slot>
+      <div class="input-container">
+        <input
+          :id="id"
+          v-model="inputValue"
+          :aria-label="ariaLabel"
+          class="text-input"
+          autocomplete="off"
+          tabindex="0"
+          :placeholder="placeholder"
+          @input="emitInputEvent"
+        />
+        <button
+          class="toggle_dropdown_button"
+          tabindex="0"
+          @click="toggleDropdown"
+          @keydown.enter="toggleDropdown"
+        >
+          <span v-if="!isShowDropdown" class="material-icons icon">
+            expand_more
+          </span>
+          <span v-else class="material-icons icon"> expand_less </span>
+        </button>
+      </div>
     </div>
-    <div v-if="isShowDropdown" class="dropdown-container__dropdown-items">
+    <div
+      v-if="isShowDropdown"
+      tabindex="-1"
+      class="dropdown-container__dropdown-items"
+    >
       <div
         v-for="(item, index) in filterItems()"
         :key="index"
         class="dropdown-container__dropdown-item"
-        tabindex="-1"
-        @click="setTextVal(item)"
-        @keypress.enter="setTextVal(item)"
+        tabindex="0"
+        @click="$emit('update:modelValue', item)"
+        @keypress.enter="$emit('update:modelValue', item)"
       >
         <span> {{ item }}</span>
       </div>
@@ -99,19 +115,51 @@ onUnmounted(() => {
 
 <style lang="scss" scoped>
 .dropdown-container {
+  width: 100%;
+  position: relative;
+  display: inline-block;
+  /** Disable user select text */
+  -webkit-user-select: none; /* Chrome all / Safari all */
+  -moz-user-select: none; /* Firefox all */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Likely future */
+  &__open-dropdown {
+    .input-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: space-between;
+      padding: 17px 24px;
+      border: 2px solid $text-tertiary;
+      &:hover {
+        border: 4px solid $text-tertiary;
+      }
+      &:focus {
+        border: 4px solid $text-tertiary;
+        outline: none;
+      }
+      .text-input {
+        width: 100%;
+        &:focus {
+          outline: none;
+        }
+      }
+      .toggle_dropdown_button {
+        height: 5px;
+      }
+    }
+  }
   &__dropdown-items {
     display: flex;
     flex-direction: column;
     max-height: 300px;
     overflow-y: scroll;
     position: absolute;
-    border: 2px solid $text-tertiary;
+    border: 2px solid #ececec;
     border-top: none;
     z-index: 99;
-    /*position the autocomplete items to be the same width as the container:*/
-    top: 100%;
-    left: 0;
-    right: 0;
+    filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.25));
+    width: 100%;
     /*hide scroll bar */
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     scrollbar-width: none; /* Firefox */
@@ -120,18 +168,18 @@ onUnmounted(() => {
     }
   }
   &__dropdown-item {
-    padding: 10px;
+    padding: 17px 24px;
     cursor: pointer;
     background-color: #fff;
-    border-bottom: 2px solid $text-tertiary;
+    border-bottom: 2px solid #ececec;
     &:last-of-type {
       border-bottom: none;
     }
     &:hover {
-      background-color: #e9e9e9;
+      background-color: #ececec;
     }
     &:focus {
-      background-color: #e9e9e9;
+      background-color: #ececec;
       outline: none;
     }
   }
