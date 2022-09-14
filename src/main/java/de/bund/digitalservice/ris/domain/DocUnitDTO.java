@@ -7,16 +7,18 @@ import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Table;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DocUnit {
-  public static final DocUnit EMPTY = new DocUnit();
+@Table("doc_unit")
+public class DocUnitDTO {
+  public static final DocUnitDTO EMPTY = new DocUnitDTO();
 
-  public static DocUnit createNew(DocUnitCreationInfo docUnitCreationInfo, int documentNumber) {
-    return DocUnit.builder()
+  public static DocUnitDTO createNew(DocUnitCreationInfo docUnitCreationInfo, int documentNumber) {
+    return DocUnitDTO.builder()
         .uuid(UUID.randomUUID())
         .creationtimestamp(Instant.now())
         .documentnumber(
@@ -65,7 +67,7 @@ public class DocUnit {
 
   @Transient List<PreviousDecision> previousDecisions;
 
-  public DocUnit setPreviousDecisions(List<PreviousDecision> previousDecisions) {
+  public DocUnitDTO setPreviousDecisions(List<PreviousDecision> previousDecisions) {
     this.previousDecisions = previousDecisions;
     return this;
   }

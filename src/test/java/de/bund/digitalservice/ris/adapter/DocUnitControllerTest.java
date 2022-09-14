@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
+import de.bund.digitalservice.ris.domain.DocUnitDTO;
 import de.bund.digitalservice.ris.domain.DocUnitService;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.XmlMail;
@@ -47,7 +47,7 @@ class DocUnitControllerTest {
   void testGenerateNewDocUnit() {
     DocUnitCreationInfo docUnitCreationInfo = DocUnitCreationInfo.EMPTY;
     when(service.generateNewDocUnit(DocUnitCreationInfo.EMPTY))
-        .thenReturn(Mono.just(DocUnit.EMPTY));
+        .thenReturn(Mono.just(DocUnitDTO.EMPTY));
 
     webClient
         .mutateWith(csrf())
@@ -172,7 +172,7 @@ class DocUnitControllerTest {
 
   @Test
   void testUpdateByUuid() {
-    DocUnit docUnit = new DocUnit();
+    DocUnitDTO docUnit = new DocUnitDTO();
     docUnit.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())
@@ -188,7 +188,7 @@ class DocUnitControllerTest {
 
   @Test
   void testUpdateByUuid_withInvalidUuid() {
-    DocUnit docUnit = new DocUnit();
+    DocUnitDTO docUnit = new DocUnitDTO();
     docUnit.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())

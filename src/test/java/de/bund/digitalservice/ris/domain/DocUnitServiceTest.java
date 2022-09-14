@@ -57,7 +57,7 @@ class DocUnitServiceTest {
 
   @Test
   void testGenerateNewDocUnit() {
-    when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.save(any(DocUnitDTO.class))).thenReturn(Mono.just(DocUnitDTO.EMPTY));
     when(counterRepository.getDocumentNumberCounterEntry())
         .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
     when(counterRepository.save(any(DocumentNumberCounter.class)))
@@ -69,7 +69,7 @@ class DocUnitServiceTest {
     StepVerifier.create(service.generateNewDocUnit(DocUnitCreationInfo.EMPTY))
         .expectNextCount(1) // That it's a DocUnit is given by the generic type..
         .verifyComplete();
-    verify(repository).save(any(DocUnit.class));
+    verify(repository).save(any(DocUnitDTO.class));
   }
 
   // @Test public void testGenerateNewDocUnit_withException() {}
@@ -83,17 +83,17 @@ class DocUnitServiceTest {
     headerMap.put("X-Filename", List.of("testfile.docx"));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
 
-    var toSave = new DocUnit();
+    var toSave = new DocUnitDTO();
     toSave.setUuid(TEST_UUID);
     toSave.setS3path(TEST_UUID.toString());
     toSave.setFiletype("docx");
     toSave.setFilename("testfile.docx");
 
-    var savedDocUnit = new DocUnit();
+    var savedDocUnit = new DocUnitDTO();
     savedDocUnit.setUuid(TEST_UUID);
     savedDocUnit.setS3path(TEST_UUID.toString());
     savedDocUnit.setFiletype("docx");
-    when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(savedDocUnit));
+    when(repository.save(any(DocUnitDTO.class))).thenReturn(Mono.just(savedDocUnit));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(savedDocUnit));
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
@@ -130,17 +130,17 @@ class DocUnitServiceTest {
 
   @Test
   void testRemoveFileFromDocUnit() {
-    var docUnitBefore = new DocUnit();
+    var docUnitBefore = new DocUnitDTO();
     docUnitBefore.setUuid(TEST_UUID);
     docUnitBefore.setS3path(TEST_UUID.toString());
     docUnitBefore.setFilename("testfile.docx");
 
-    var docUnitAfter = new DocUnit();
+    var docUnitAfter = new DocUnitDTO();
     docUnitAfter.setUuid(TEST_UUID);
 
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnitBefore));
     // is the thenReturn ok? Or am I bypassing the actual functionality-test?
-    when(repository.save(any(DocUnit.class))).thenReturn(Mono.just(docUnitAfter));
+    when(repository.save(any(DocUnitDTO.class))).thenReturn(Mono.just(docUnitAfter));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -153,7 +153,7 @@ class DocUnitServiceTest {
             })
         .verifyComplete();
 
-    ArgumentCaptor<DocUnit> docUnitCaptor = ArgumentCaptor.forClass(DocUnit.class);
+    ArgumentCaptor<DocUnitDTO> docUnitCaptor = ArgumentCaptor.forClass(DocUnitDTO.class);
     verify(repository).save(docUnitCaptor.capture());
     assertEquals(docUnitCaptor.getValue(), docUnitAfter);
   }
@@ -173,7 +173,7 @@ class DocUnitServiceTest {
         .verify();
 
     verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
-    verify(repository, times(0)).save(any(DocUnit.class));
+    verify(repository, times(0)).save(any(DocUnitDTO.class));
   }
 
   @Test
@@ -184,8 +184,8 @@ class DocUnitServiceTest {
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
-    doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnit.class));
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
+    doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnitDTO.class));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
 
     // when and then
     StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
@@ -193,7 +193,7 @@ class DocUnitServiceTest {
         .verify();
 
     verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
-    verify(repository).save(any(DocUnit.class));
+    verify(repository).save(any(DocUnitDTO.class));
   }
 
   @Test
@@ -207,12 +207,13 @@ class DocUnitServiceTest {
 
   @Test
   void testGetByDocumentnumber() {
-    when(repository.findByDocumentnumber("ABCDE2022000001")).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findByDocumentnumber("ABCDE2022000001"))
+        .thenReturn(Mono.just(DocUnitDTO.EMPTY));
     when(previousDecisionRepository.findAllByDocumentnumber("ABCDE2022000001"))
         .thenReturn(Flux.just(new PreviousDecision()));
     StepVerifier.create(service.getByDocumentnumber("ABCDE2022000001"))
         .consumeNextWith(
-            monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnit.class))
+            monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnitDTO.class))
         .verifyComplete();
     verify(repository).findByDocumentnumber("ABCDE2022000001");
   }
@@ -291,7 +292,7 @@ class DocUnitServiceTest {
 
     @Test
     void testGetByDocumentnumberWithPreviousDecisions() {
-      when(repository.findByDocumentnumber(documentNr)).thenReturn(Mono.just(DocUnit.EMPTY));
+      when(repository.findByDocumentnumber(documentNr)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
       when(previousDecisionRepository.findAllByDocumentnumber(documentNr))
           .thenReturn(Flux.fromIterable(previousDecisionsList));
       StepVerifier.create(service.getByDocumentnumber(documentNr))
@@ -319,7 +320,7 @@ class DocUnitServiceTest {
               .filter(
                   previousDecision -> !previousDecisionsIdsToDelete.contains(previousDecision.id))
               .toList();
-      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -357,7 +358,7 @@ class DocUnitServiceTest {
       remainPreviousDecision.add(
           new PreviousDecision(
               null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -404,7 +405,7 @@ class DocUnitServiceTest {
       remainPreviousDecision.get(0).gerichtstyp = "new gerTyp";
       remainPreviousDecision.get(0).datum = "30.01.2022";
       remainPreviousDecision.get(0).aktenzeichen = "new aktenzeichen";
-      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -451,7 +452,7 @@ class DocUnitServiceTest {
       remainPreviousDecision.add(
           new PreviousDecision(
               null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var docUnit = DocUnit.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -491,11 +492,11 @@ class DocUnitServiceTest {
     // I think I shouldn't have to insert a specific DocUnit object here?
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
-    DocUnit docUnit = new DocUnit();
+    DocUnitDTO docUnit = new DocUnitDTO();
     docUnit.setUuid(TEST_UUID);
     // can we also test that the fileUuid from the DocUnit is used? with a captor somehow?
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
-    when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
+    when(repository.delete(any(DocUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -511,11 +512,11 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withFileAttached() {
-    DocUnit docUnit = new DocUnit();
+    DocUnitDTO docUnit = new DocUnitDTO();
     docUnit.setUuid(TEST_UUID);
     docUnit.setS3path(TEST_UUID.toString());
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
-    when(repository.delete(any(DocUnit.class))).thenReturn(Mono.just(mock(Void.class)));
+    when(repository.delete(any(DocUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -533,7 +534,7 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
@@ -549,8 +550,8 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
-    doThrow(new IllegalArgumentException()).when(repository).delete(DocUnit.EMPTY);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
+    doThrow(new IllegalArgumentException()).when(repository).delete(DocUnitDTO.EMPTY);
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -564,7 +565,7 @@ class DocUnitServiceTest {
 
   @Test
   void testUpdateDocUnit() {
-    var docUnit = DocUnit.EMPTY;
+    var docUnit = DocUnitDTO.EMPTY;
     when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
     StepVerifier.create(service.updateDocUnit(docUnit))
         .consumeNextWith(monoResponse -> assertEquals(monoResponse.getBody(), docUnit))
@@ -574,7 +575,7 @@ class DocUnitServiceTest {
 
   @Test
   void testPublishByEmail() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnit.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
     XmlMail xmlMail =
         new XmlMail(
             1L,
@@ -586,9 +587,9 @@ class DocUnitServiceTest {
             "status messages",
             "filename",
             null);
-    when(publishService.publish(DocUnit.EMPTY, RECEIVER_ADDRESS))
+    when(publishService.publish(DocUnitDTO.EMPTY, RECEIVER_ADDRESS))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
-    when(previousDecisionRepository.findAllByDocumentnumber(DocUnit.EMPTY.documentnumber))
+    when(previousDecisionRepository.findAllByDocumentnumber(DocUnitDTO.EMPTY.documentnumber))
         .thenReturn(Flux.just(new PreviousDecision()));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
         .consumeNextWith(
@@ -598,7 +599,7 @@ class DocUnitServiceTest {
                     .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
         .verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService).publish(DocUnit.EMPTY, RECEIVER_ADDRESS);
+    verify(publishService).publish(DocUnitDTO.EMPTY, RECEIVER_ADDRESS);
   }
 
   @Test
@@ -607,12 +608,12 @@ class DocUnitServiceTest {
 
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS)).verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService, never()).publish(DocUnit.EMPTY, RECEIVER_ADDRESS);
+    verify(publishService, never()).publish(DocUnitDTO.EMPTY, RECEIVER_ADDRESS);
   }
 
   @Test
   void testGetLastPublishedXmlMail() {
-    DocUnit documentUnit = new DocUnit();
+    DocUnitDTO documentUnit = new DocUnitDTO();
     documentUnit.setId(123L);
     XmlMail xmlMail =
         new XmlMail(

@@ -4,6 +4,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 public interface XmlExporter {
-  XmlResultObject generateXml(DocUnit documentUnit)
+  XmlResultObject generateXml(DocUnitDTO documentUnit)
       throws ParserConfigurationException, TransformerException;
 }

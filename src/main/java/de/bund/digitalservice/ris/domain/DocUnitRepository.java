@@ -7,11 +7,11 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface DocUnitRepository extends ReactiveSortingRepository<DocUnit, Long> {
+public interface DocUnitRepository extends ReactiveSortingRepository<DocUnitDTO, Long> {
 
   @Query("SELECT * FROM doc_unit WHERE documentnumber = $1")
-  Mono<DocUnit> findByDocumentnumber(String documentnumber);
+  Mono<DocUnitDTO> findByDocumentnumber(String documentnumber);
 
   @Query("SELECT * FROM doc_unit WHERE uuid = $1")
-  Mono<DocUnit> findByUuid(UUID uuid);
+  Mono<DocUnitDTO> findByUuid(UUID uuid);
 }

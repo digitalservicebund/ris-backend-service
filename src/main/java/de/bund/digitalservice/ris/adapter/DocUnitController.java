@@ -34,17 +34,17 @@ public class DocUnitController {
   }
 
   @PostMapping(value = "")
-  public Mono<ResponseEntity<DocUnit>> generateNewDocUnit(
+  public Mono<ResponseEntity<DocUnitDTO>> generateNewDocUnit(
       @RequestBody DocUnitCreationInfo docUnitCreationInfo) {
     return service
         .generateNewDocUnit(docUnitCreationInfo)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnitDTO.EMPTY));
   }
 
   @PutMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocUnit>> attachFileToDocUnit(
+  public Mono<ResponseEntity<DocUnitDTO>> attachFileToDocUnit(
       @PathVariable UUID uuid,
       @RequestBody ByteBuffer byteBufferFlux,
       @RequestHeader HttpHeaders httpHeaders) {
@@ -53,11 +53,11 @@ public class DocUnitController {
         .attachFileToDocUnit(uuid, byteBufferFlux, httpHeaders)
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
         .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnit.EMPTY));
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnitDTO.EMPTY));
   }
 
   @DeleteMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocUnit>> removeFileFromDocUnit(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<DocUnitDTO>> removeFileFromDocUnit(@PathVariable UUID uuid) {
 
     return service.removeFileFromDocUnit(uuid);
   }
@@ -70,10 +70,10 @@ public class DocUnitController {
   }
 
   @GetMapping(value = "/{documentnumber}")
-  public Mono<ResponseEntity<DocUnit>> getByDocumentnumber(
+  public Mono<ResponseEntity<DocUnitDTO>> getByDocumentnumber(
       @NonNull @PathVariable String documentnumber) {
     if (documentnumber.length() != 14) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnitDTO.EMPTY));
     }
     return service.getByDocumentnumber(documentnumber);
   }
@@ -85,10 +85,10 @@ public class DocUnitController {
   }
 
   @PutMapping(value = "/{uuid}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Mono<ResponseEntity<DocUnit>> updateByUuid(
-      @PathVariable UUID uuid, @RequestBody DocUnit docUnit) {
+  public Mono<ResponseEntity<DocUnitDTO>> updateByUuid(
+      @PathVariable UUID uuid, @RequestBody DocUnitDTO docUnit) {
     if (!uuid.equals(docUnit.getUuid())) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnit.EMPTY));
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnitDTO.EMPTY));
     }
     return service.updateDocUnit(docUnit);
   }
