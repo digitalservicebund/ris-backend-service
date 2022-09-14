@@ -47,7 +47,6 @@ test("copy-paste from side panel", async ({ page }) => {
   await originalFileParagraph.evaluate((element) => {
     const originalFile = element.parentElement
     if (originalFile !== null) {
-      console.log("original File ", originalFile.innerHTML)
       const selection = window.getSelection()
       const elementChildsLength = originalFile.childNodes.length
       const startOffset = 0

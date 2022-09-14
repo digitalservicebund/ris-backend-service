@@ -82,8 +82,6 @@ describe("PublicationDocument:", () => {
       global: { plugins: [vuetify] },
     })
 
-    console.log(renderResult.container.textContent)
-
     expect(renderResult.container.textContent).match(
       new RegExp(
         "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen " +

@@ -23,7 +23,6 @@ describe("Core Data", () => {
         plugins: [vuetify],
       },
     })
-    console.log(wrapper.html)
 
     expect(
       (wrapper.find("#aktenzeichen").element as HTMLInputElement).value
