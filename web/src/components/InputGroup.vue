@@ -17,11 +17,27 @@
         :required="field.required"
       >
         <InputElement
+          v-if="!field.hasDropdown"
           :id="field.name"
           v-model="inputValues[field.name]"
           :type="field.type"
           :attributes="field.inputAttributes"
         />
+        <DropdownElement
+          v-else
+          :id="field.name"
+          :value="inputValues[field.name]"
+          :dropdown-values="field.dropdownValues"
+          @update-value="updateValue"
+        >
+          <InputElement
+            :id="field.name"
+            v-model="inputValues[field.name]"
+            :type="field.type"
+            :attributes="field.inputAttributes"
+            autocomplete="off"
+          />
+        </DropdownElement>
       </InputFieldoComponent>
     </div>
   </div>
@@ -29,6 +45,7 @@
 
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
+import DropdownElement from "@/components/DropdownElement.vue"
 import InputElement from "@/components/InputElement.vue"
 import InputFieldoComponent from "@/components/InputField.vue"
 import type { InputField, ModelType } from "@/domain"
@@ -77,6 +94,10 @@ const fieldRows = computed(() => {
 
   return rows
 })
+
+const updateValue = (id: string, value: string) => {
+  inputValues.value[id] = value
+}
 
 // A writable computed value (with getter + setter) is not possible due to the depth
 // of the model that gets split across the inputs.

@@ -2,7 +2,7 @@
   <label :for="id" class="input-field">
     <span class="input-field__label">
       <v-icon v-if="!!iconName" data-testid="icon">{{ iconName }}</v-icon>
-      {{ label }}<span v-if="!!required && required">*</span>
+      {{ label }}<span v-if="!!required">*</span>
     </span>
 
     <slot :id="id" />

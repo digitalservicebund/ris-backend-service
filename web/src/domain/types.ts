@@ -14,6 +14,8 @@ export interface BaseInputField {
   iconName: string
   required?: boolean
   inputAttributes: BaseInputAttributes
+  hasDropdown?: boolean
+  dropdownValues?: string[]
 }
 
 export type TextInputModelType = string

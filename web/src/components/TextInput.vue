@@ -46,7 +46,10 @@ const conditionalClasses = computed(() => ({
 .input {
   width: 100%;
   padding: 17px 24px;
-  outline: 2px solid $text-tertiary;
+  border: 2px solid $text-tertiary;
+  &:focus {
+    outline: none;
+  }
 
   &:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 50px white inset;

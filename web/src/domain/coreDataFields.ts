@@ -1,5 +1,6 @@
 import { InputType } from "./types"
 import type { TextInputField } from "./types"
+import { documentTypes } from "@/data/documentType"
 
 export function defineTextField(
   name: string,
@@ -7,7 +8,9 @@ export function defineTextField(
   iconName: string,
   ariaLabel: string,
   required?: boolean,
-  placeholder?: string
+  placeholder?: string,
+  hasDropdown?: boolean,
+  dropdownValues?: string[]
 ): TextInputField {
   return {
     name,
@@ -16,6 +19,8 @@ export function defineTextField(
     iconName,
     required,
     inputAttributes: { ariaLabel, placeholder },
+    hasDropdown,
+    dropdownValues,
   }
 }
 
@@ -40,7 +45,10 @@ export const coreDataFields: TextInputField[] = [
     "Dokumenttyp",
     "category",
     "Dokumenttyp",
-    true
+    true,
+    undefined,
+    true,
+    documentTypes
   ),
   defineTextField(
     "spruchkoerper",
