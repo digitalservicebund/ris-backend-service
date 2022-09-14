@@ -25,7 +25,7 @@ describe("Core Data", () => {
     })
 
     expect(
-      (wrapper.find("#aktenzeichen").element as HTMLInputElement).value
+      (wrapper.find("#docketNumber").element as HTMLInputElement).value
     ).toBe("abc")
     expect(wrapper.get("button").text()).toBe("Speichern")
     expect(wrapper.get(".form").element as HTMLDivElement).toHaveTextContent(
