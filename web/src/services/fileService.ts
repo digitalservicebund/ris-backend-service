@@ -53,12 +53,4 @@ export default {
       throw new Error(`Could not delete file: ${error}`)
     }
   },
-  async getAllDocxFiles() {
-    try {
-      const response = await httpClient.get("docunitdocx")
-      return response.data
-    } catch (error) {
-      throw new Error(`Could not get all docx files: ${error}`)
-    }
-  },
 }
