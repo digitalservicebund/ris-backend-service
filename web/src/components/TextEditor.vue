@@ -72,6 +72,8 @@ const editor = new Editor({
   editorProps: {
     attributes: {
       tabindex: "0",
+      style:
+        "height: 100%; overflow-y: auto; padding: 0.75rem 1rem; outline: 0",
     },
   },
   content: props.value,
@@ -551,7 +553,7 @@ onBeforeRouteUpdate(async () => {
         <editor-content
           :aria-label="ariaLabel"
           :editor="editor"
-          :class="'ProseMirror__' + props.fieldSize"
+          :class="'editor-content editor-content--' + props.fieldSize"
           @click="closeAllDropdownOnSecondClick()"
         />
       </v-col>
@@ -559,10 +561,17 @@ onBeforeRouteUpdate(async () => {
   </v-container>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 #container {
   position: relative;
   .row-primary {
+    /* 
+     * TODO:
+     * The mass of <v-col>usage is pervert. Will be removed when refactoring the
+     * Vuetify grid usage. Therefore ignore for now.
+     */
+
+    /* eslint-disable-next-line vue-scoped-css/no-unused-selector */
     .v-col {
       flex-grow: 0 !important;
       box-sizing: border-box;
@@ -580,43 +589,29 @@ onBeforeRouteUpdate(async () => {
       }
     }
   }
-  i {
-    color: #004b78;
-  }
 }
-.ProseMirror {
-  // background: #eee;
-  color: #000;
-  padding: 0.75rem 1rem;
-  border-radius: 0.5rem;
-  overflow-y: auto;
-  height: 100%;
 
-  &__small {
+.editor-content {
+  &--small {
     height: 60px;
   }
 
-  &__medium {
+  &--medium {
     height: 120px;
   }
 
-  &__large {
+  &--large {
     height: 320px;
   }
 
-  &__max {
+  &--max {
     height: 640px; // ? TODO
   }
 
-  &__100percent {
+  &--100percent {
     height: 100%;
   }
 }
-
-.ProseMirror-focused {
-  outline: 0;
-}
-
 .editor-btn {
   color: #004b78;
 
@@ -630,17 +625,6 @@ onBeforeRouteUpdate(async () => {
     background-color: $navbar-hover-gray;
   }
 }
-
-.ProseMirror p {
-  margin-bottom: 8pt;
-}
-
-.ProseMirror .clearfix::after {
-  content: "";
-  clear: both;
-  display: table;
-}
-
 .display-group {
   display: flex;
   flex-direction: row;

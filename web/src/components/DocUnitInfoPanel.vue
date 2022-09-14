@@ -32,7 +32,7 @@ defineProps<{ docUnit: DocUnit }>()
   </v-container>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .panel-default {
   background-color: $navbar-hover-gray;
   border-bottom: $gray400 solid 1px;

@@ -93,16 +93,14 @@ onMounted(() => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .save-button-container {
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
   align-items: flex-end;
   column-gap: 10px;
-  button {
-    margin-bottom: 0px;
-  }
+
   .save-status div {
     display: flex;
     flex-direction: row;

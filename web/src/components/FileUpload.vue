@@ -128,7 +128,6 @@ function onFileSelect(event: Event): void {
               <div>
                 <FileInputButton
                   id="file-upload-after-fail"
-                  class="ris-btn"
                   aria-label="Upload File"
                   @input="onFileSelect"
                 >
@@ -157,7 +156,6 @@ function onFileSelect(event: Event): void {
               <div>oder</div>
               <FileInputButton
                 id="file-upload"
-                class="ris-btn"
                 aria-label="Upload File"
                 @input="onFileSelect"
               >
@@ -199,7 +197,7 @@ function onFileSelect(event: Event): void {
   </v-container>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .upload-drop-area {
   border-radius: $border-radius;
   border: $border-style-inactive;
@@ -232,75 +230,5 @@ function onFileSelect(event: Event): void {
 .upload_status {
   font-size: 24px;
   margin: 16px 0px 10px 0;
-}
-
-.button_upload {
-  margin-top: 16px;
-  margin-bottom: 10px;
-}
-
-.ris-btn {
-  font-family: $font-bold;
-  margin-top: 16px;
-  margin-bottom: 10px;
-
-  &.v-btn {
-    text-transform: none;
-    font-size: var(--v-btn-size);
-
-    &--size-default {
-      --v-btn-height: 48px;
-      --v-btn-size: 1rem;
-      padding: rem(13px) rem(24px);
-    }
-
-    &--size-small {
-      --v-btn-height: 40px;
-      --v-btn-size: 1rem;
-      padding: rem(9px) rem(24px);
-    }
-
-    &--size-large,
-    &--size-x-large {
-      --v-btn-height: 64px;
-      --v-btn-size: 1.125rem;
-      padding: rem(19px) rem(24px);
-    }
-
-    &:not(.v-btn--icon) {
-      .v-icon--start {
-        margin-inline-start: 0;
-      }
-
-      .v-icon--end {
-        margin-inline-end: 0;
-      }
-    }
-
-    &:hover {
-      background-color: $blue700;
-
-      .v-btn__overlay {
-        opacity: 0;
-      }
-    }
-
-    &:active {
-      background-color: $blue500;
-
-      .v-btn__overlay {
-        opacity: 0;
-      }
-    }
-
-    &:focus-visible {
-      outline: 2px solid $blue800;
-      outline-offset: 2px;
-
-      .v-btn__overlay {
-        opacity: 0;
-      }
-    }
-  }
 }
 </style>

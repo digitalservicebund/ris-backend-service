@@ -24,7 +24,7 @@ interface Props {
 defineProps<Props>()
 </script>
 
-<style lang="scss" setup>
+<style lang="scss" scoped>
 .input-field {
   display: flex;
   flex-direction: column;

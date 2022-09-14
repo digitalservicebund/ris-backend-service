@@ -97,7 +97,7 @@ onUnmounted(() => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .dropdown-container {
   &__dropdown-items {
     display: flex;

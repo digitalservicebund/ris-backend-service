@@ -1,11 +1,5 @@
 <template>
-  <v-btn
-    :rounded="0"
-    :ripple="false"
-    :flat="true"
-    color="blue800"
-    @click.self="triggerFileInput"
-  >
+  <TextButton class="button" @click.self="triggerFileInput">
     <label :for="props.id" :aria-label="ariaLabel" class="label">
       <slot />
 
@@ -19,11 +13,12 @@
         @change="emitInputEvent"
       />
     </label>
-  </v-btn>
+  </TextButton>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue"
+import TextButton from "@/components/TextButton.vue"
 import { useInputModel } from "@/composables/useInputModel"
 
 interface Props {
@@ -53,6 +48,10 @@ function triggerFileInput() {
 </script>
 
 <style lang="scss" scoped>
+.button {
+  margin-top: 1rem;
+}
+
 .label {
   &:hover {
     cursor: pointer;

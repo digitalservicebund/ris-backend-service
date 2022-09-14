@@ -42,6 +42,7 @@ module.exports = {
         "plugin:import/typescript",
         "plugin:vue/vue3-recommended",
         "plugin:vuejs-accessibility/recommended",
+        "plugin:vue-scoped-css/vue3-recommended",
         "@vue/typescript/recommended",
         "@vue/prettier",
         "@vue/eslint-config-prettier",

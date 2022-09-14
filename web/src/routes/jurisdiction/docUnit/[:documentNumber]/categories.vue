@@ -187,7 +187,7 @@ onUnmounted(() => {
   </DocUnitDetail>
 </template>
 
-<style>
+<style scoped>
 #previousDecisions {
   padding: 2rem 1.1rem;
 }

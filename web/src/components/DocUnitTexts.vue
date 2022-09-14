@@ -62,7 +62,7 @@ const data = computed(() =>
   </form>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .ris-texte-form {
   padding: rem(20px);
   &__textfield {

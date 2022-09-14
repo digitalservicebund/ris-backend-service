@@ -125,7 +125,9 @@ describe("PublicationDocument:", () => {
       global: {
         plugins: [vuetify],
         stubs: {
-          CodeSnippet: true,
+          CodeSnippet: {
+            template: '<div data-testid="code-snippet"/>',
+          },
         },
       },
       props: {
@@ -148,8 +150,12 @@ describe("PublicationDocument:", () => {
           "E-Mail an: receiver address Betreff: mail subjectals"
       )
     )
-    expect(renderResult.html()).match(
-      /<code-snippet-stub xml="xml content" title="xml"><\/code-snippet-stub>/
-    )
+
+    const codeSnippet = renderResult.queryByTestId("code-snippet")
+
+    expect(codeSnippet).toBeInTheDocument()
+    expect(codeSnippet?.title).toBe("xml")
+    expect(codeSnippet).toHaveAttribute("xml")
+    expect(codeSnippet?.getAttribute("xml")).toBe("xml content")
   })
 })

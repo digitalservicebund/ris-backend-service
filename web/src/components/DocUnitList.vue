@@ -100,7 +100,7 @@ const onDelete = () => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .table-header {
   background-color: $gray400;
 }

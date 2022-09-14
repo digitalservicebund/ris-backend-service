@@ -20,7 +20,7 @@ defineProps<{ title: string; description: string }>()
   </v-container>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .error {
   background-color: #f9e5ec;
   border-left: 8px solid #b0243f;

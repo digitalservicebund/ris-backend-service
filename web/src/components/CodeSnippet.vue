@@ -80,7 +80,7 @@ watch(
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .xml-container {
   .xml-container-title {
     font-weight: 700;

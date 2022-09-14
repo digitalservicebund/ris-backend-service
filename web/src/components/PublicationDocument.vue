@@ -67,7 +67,7 @@ function validateEmailAddress(): boolean {
           >
             help
           </span>
-          <p class="publication-text-body" style="margin-left: -8px">
+          <p style="margin-left: -8px">
             Durch Klick auf <em>Veröffentlichen</em> wird die
             Plausibilitätsprüfung ausgelöst.
           </p>
@@ -76,7 +76,7 @@ function validateEmailAddress(): boolean {
           <div class="icon">
             <span class="material-icons"> done </span>
           </div>
-          <p class="publication-text-body">0 Fehler</p>
+          <p>0 Fehler</p>
         </div>
         <div v-if="hasValidationError" class="xml-validation-error-container">
           <div class="text-icon">
@@ -86,7 +86,7 @@ function validateEmailAddress(): boolean {
               </span>
               <span v-else class="material-icons"> keyboard_arrow_down </span>
             </button>
-            <p class="publication-text-body">
+            <p>
               {{ props.publishResult?.statusMessages?.length }} Pflichtfelder
               nicht befüllt
             </p>
@@ -98,7 +98,6 @@ function validateEmailAddress(): boolean {
             <p
               v-for="issue in props.publishResult?.statusMessages"
               :key="issue"
-              class="publication-text-body"
             >
               {{ issue }}
             </p>
@@ -142,21 +141,21 @@ function validateEmailAddress(): boolean {
     </div>
     <div class="flex-col-container publication-infos-container">
       <p class="publication-text-header">Letzte Veröffentlichungen</p>
-      <p v-if="isFirstTimePublication" class="publication-text-body">
+      <p v-if="isFirstTimePublication">
         Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
       </p>
       <div v-else class="flex-col-container email-infos-container">
-        <p class="publication-text-body">
+        <p>
           Letzte Veröffentlichung am
           {{ props.lastPublishedXmlMail?.publishDate }}
         </p>
         <p class="publication-text-label">über</p>
         <div class="receiver-info">
-          <p class="publication-text-body">
+          <p>
             E-Mail an:
             <span>{{ props.lastPublishedXmlMail?.receiverAddress }}</span>
           </p>
-          <p class="publication-text-body">
+          <p>
             Betreff: <span>{{ props.lastPublishedXmlMail?.mailSubject }}</span>
           </p>
         </div>
@@ -171,7 +170,7 @@ function validateEmailAddress(): boolean {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .flex-col-container {
   display: flex;
   flex-direction: column;
@@ -201,14 +200,6 @@ function validateEmailAddress(): boolean {
     font-size: 24px;
     line-height: 30px;
   }
-  .publication-text-body  {
-    font-size: 16px;
-    line-height: 26px;
-  }
-  .publication-text-subline {
-    font-size: 11px;
-    line-height: 16px;
-  }
   .publication-text-label {
     font-style: normal;
     font-weight: 700;
@@ -231,11 +222,6 @@ function validateEmailAddress(): boolean {
       &__in_error {
         border: solid 1px #b0243f;
         max-width: 50vw;
-      }
-      .text-container  {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
       }
       .publication-button-container {
         display: flex;
@@ -277,15 +263,6 @@ function validateEmailAddress(): boolean {
       padding-bottom: 16px;
       row-gap: 16px;
     }
-  }
-  .receiver-email-input {
-    outline: 2px solid $text-tertiary;
-    padding: 17px 24px;
-    width: 100%;
-  }
-  .invalid {
-    color: $error;
-    font-size: 0.75rem;
   }
 }
 </style>

@@ -24,9 +24,9 @@ describe("text editor", async () => {
       global: { plugins: [vuetify, router] },
     })
 
-    expect(container.getElementsByClassName("ProseMirror__small").length).toBe(
-      1
-    )
+    expect(
+      container.getElementsByClassName("editor-content--small").length
+    ).toBe(1)
     expect(
       queryByLabelText("Testzeile Editor Button Leiste")
     ).not.toBeInTheDocument()
@@ -47,9 +47,9 @@ describe("text editor", async () => {
     )
 
     queryByText("Test Value")
-    expect(container.getElementsByClassName("ProseMirror__large").length).toBe(
-      1
-    )
+    expect(
+      container.getElementsByClassName("editor-content--large").length
+    ).toBe(1)
     expect(
       queryByLabelText("test label Editor Button Leiste")
     ).not.toBeInTheDocument()

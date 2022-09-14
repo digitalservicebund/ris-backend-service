@@ -3,6 +3,12 @@
 @import "tools/strip-unit";
 @import "tools/rem-function";
 
+body {
+  font-size: $font-size-root;
+  font-family: $font-main;
+}
+
 a {
   text-decoration: none;
+  color: black;
 }

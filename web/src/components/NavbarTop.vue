@@ -36,7 +36,7 @@ const linkStyling = (componentName: string) => {
   </v-container>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .vertically-centered {
   display: flex;
   align-items: center;

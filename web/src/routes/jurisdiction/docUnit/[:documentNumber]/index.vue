@@ -36,3 +36,9 @@ const handleToggleNavBar = async () => {
     </v-container>
   </v-main>
 </template>
+
+<style lang="scss" scoped>
+.panel_and_main_area {
+  background-color: $white;
+}
+</style>

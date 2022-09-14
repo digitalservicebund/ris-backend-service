@@ -64,7 +64,7 @@ const route = useRoute()
   </v-col>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .odoc-open {
   background-color: $yellow500;
   border-radius: 10px;
@@ -109,12 +109,6 @@ const route = useRoute()
 }
 .odoc-panel {
   position: fixed;
-}
-.odoc-as-overlay {
-  position: fixed;
-  right: 0;
-  z-index: 1;
-  background-color: rgba(255, 255, 255, 0.85);
 }
 .odoc-upload-icon {
   margin-bottom: 15px;

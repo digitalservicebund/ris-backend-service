@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { computed } from "vue"
+
 interface Props {
   label?: string
   icon?: string
@@ -10,46 +12,33 @@ const props = withDefaults(defineProps<Props>(), {
   label: "Speichern",
   icon: undefined,
   ariaLabel: undefined,
-  buttonType: undefined,
+  buttonType: "primary",
 })
 
-const buttonClass = () => {
-  let classes = "ris-btn"
-  switch (props.buttonType) {
-    case "primary": {
-      classes += " btn-primary"
-      break
-    }
-    case "secondary": {
-      classes += " btn-secondary"
-      break
-    }
-    case "ghost": {
-      classes += " btn-ghost"
-      break
-    }
-    default:
-      classes += " btn-primary"
-      break
-  }
-  return classes
-}
+const buttonClasses = computed(() => ({
+  "ris-btn": true,
+  "btn-primary": props.buttonType == "primary",
+  "btn-secondary": props.buttonType == "secondary",
+  "btn-ghost": props.buttonType == "ghost",
+}))
 </script>
 
 <template>
   <v-btn
-    :class="buttonClass()"
+    :class="buttonClasses"
     :rounded="0"
     :ripple="false"
     :flat="true"
     :aria-label="ariaLabel"
   >
-    <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
-    {{ props.label }}
+    <slot>
+      <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
+      {{ props.label }}
+    </slot>
   </v-btn>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .ris-btn {
   font-family: $font-bold;
 

@@ -4,7 +4,7 @@
       <h2>Vorgehende Entscheidungen</h2>
     </template>
 
-    <div class="previous-decisions__body">
+    <div class="previous-decisions">
       <ModelComponentRepeater
         v-model="values"
         :component="InputGroup"
@@ -17,7 +17,7 @@
             label="Entfernen"
             aria-label="Entscheidung Entfernen"
             button-type="ghost"
-            class="previous-decisions__body__remove-button"
+            class="previous-decisions__remove-button"
             @click="onClick"
           />
         </template>
@@ -26,7 +26,7 @@
           <TextButton
             label="weitere Entscheidung hinzufügen"
             aria-label="weitere Entscheidung hinzufügen"
-            class="previous-decisions__body__add-button"
+            class="previous-decisions__add-button"
             @click="onClick"
           />
         </template>
@@ -80,17 +80,15 @@ const values = computed({
 
 <style lang="scss" scoped>
 .previous-decisions {
-  &__body {
-    /* FIXME */
-    padding: 3rem 1rem;
+  /* FIXME */
+  padding: 3rem 1rem;
 
-    &__add-button {
-      margin-top: 3rem;
-    }
+  &__add-button {
+    margin-top: 3rem;
+  }
 
-    &__remove-button {
-      margin: 1rem 0 2rem 0;
-    }
+  &__remove-button {
+    margin: 1rem 0 2rem 0;
   }
 }
 </style>
