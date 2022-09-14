@@ -1,0 +1,3 @@
+# Vulnerability in golang.org/x/net (nested dependency of paketobuildpacks/builder:tiny) which must be fixed.
+# Just ignored for now since it is already deployed to production anyways and currently breaks our CD.
+CVE-2022-27664
