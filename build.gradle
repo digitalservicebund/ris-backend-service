@@ -46,7 +46,7 @@ dependencies {
     exclude group: "io.netty", module: "netty-tcnative-classes"
     because("CVE-2021-43797, not using Tomcat")
   }
-  implementation("org.yaml:snakeyaml:1.31") { because("CVE-2022-25857") }
+  implementation("org.yaml:snakeyaml:1.32") { because("CVE-2022-25857") }
   implementation "ch.qos.logback:logback-classic:1.2.11"
   implementation "ch.qos.logback:logback-core:1.4.0"
   implementation "org.springframework.boot:spring-boot-starter-data-r2dbc:2.7.2"
