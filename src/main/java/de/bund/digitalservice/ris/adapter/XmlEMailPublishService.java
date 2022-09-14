@@ -5,11 +5,11 @@ import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.EmailPublishService;
 import de.bund.digitalservice.ris.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.MailResponse;
+import de.bund.digitalservice.ris.domain.XmlExporter;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
-import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
-import de.bund.digitalservice.ris.domain.export.juris.ResultObject;
+import de.bund.digitalservice.ris.domain.XmlResultObject;
 import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -23,7 +23,7 @@ import reactor.core.publisher.Mono;
 public class XmlEMailPublishService implements EmailPublishService {
   private static final Logger LOGGER = LoggerFactory.getLogger(XmlEMailPublishService.class);
 
-  private final JurisXmlExporter jurisXmlExporter;
+  private final XmlExporter xmlExporter;
 
   private final HttpMailSender mailSender;
 
@@ -33,17 +33,17 @@ public class XmlEMailPublishService implements EmailPublishService {
   private String senderAddress;
 
   public XmlEMailPublishService(
-      JurisXmlExporter jurisXmlExporter, HttpMailSender mailSender, XmlMailRepository repository) {
-    this.jurisXmlExporter = jurisXmlExporter;
+      XmlExporter xmlExporter, HttpMailSender mailSender, XmlMailRepository repository) {
+    this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
   }
 
   @Override
   public Mono<MailResponse> publish(DocUnit documentUnit, String receiverAddress) {
-    ResultObject xml;
+    XmlResultObject xml;
     try {
-      xml = jurisXmlExporter.generateXml(documentUnit);
+      xml = xmlExporter.generateXml(documentUnit);
     } catch (ParserConfigurationException | TransformerException ex) {
       return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
     }
@@ -102,20 +102,12 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   private XmlMail generateXmlMail(
-      Long documentUnitId, String receiverAddress, String mailSubject, ResultObject xml) {
+      Long documentUnitId, String receiverAddress, String mailSubject, XmlResultObject xml) {
 
-    String statusMessages = String.join("|", xml.status().statusMessages());
-    if (xml.status().statusCode().equals("400")) {
+    String statusMessages = String.join("|", xml.statusMessages());
+    if (xml.statusCode().equals("400")) {
       return new XmlMail(
-          null,
-          documentUnitId,
-          null,
-          null,
-          null,
-          xml.status().statusCode(),
-          statusMessages,
-          null,
-          null);
+          null, documentUnitId, null, null, null, xml.statusCode(), statusMessages, null, null);
     }
 
     return new XmlMail(
@@ -124,7 +116,7 @@ public class XmlEMailPublishService implements EmailPublishService {
         receiverAddress,
         mailSubject,
         xml.xml(),
-        xml.status().statusCode(),
+        xml.statusCode(),
         statusMessages,
         xml.fileName(),
         xml.publishDate());

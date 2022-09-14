@@ -3,7 +3,9 @@ package de.bund.digitalservice.ris.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
+import de.bund.digitalservice.ris.adapter.JurisXmlExporterWrapper;
+import de.bund.digitalservice.ris.adapter.MockXmlExporter;
+import de.bund.digitalservice.ris.domain.XmlExporter;
 import de.bund.digitalservice.ris.utils.DocxConverter;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -50,7 +52,13 @@ public class ConverterConfig {
   }
 
   @Bean
-  public JurisXmlExporter jurisXmlExporter() {
-    return new JurisXmlExporter(objectMapper());
+  public XmlExporter jurisXmlExporter() {
+    return new JurisXmlExporterWrapper(objectMapper());
+  }
+
+  // @Bean
+  // use the mock if you don't have access to JurisXmlExporter
+  public XmlExporter mockXmlExporter() {
+    return new MockXmlExporter();
   }
 }

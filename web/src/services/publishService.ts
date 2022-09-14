@@ -27,7 +27,7 @@ export default {
               errorMessage: {
                 title: "Leider ist ein Fehler aufgetreten.",
                 description:
-                  "Die Dokumentationseinheit kann nicht veröffentlich werden.",
+                  "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
               },
             }
           }

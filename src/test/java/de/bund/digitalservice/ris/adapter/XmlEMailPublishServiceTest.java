@@ -11,12 +11,11 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.domain.DocUnit;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.HttpMailSender;
+import de.bund.digitalservice.ris.domain.XmlExporter;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
-import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
-import de.bund.digitalservice.ris.domain.export.juris.ResultObject;
-import de.bund.digitalservice.ris.domain.export.juris.Status;
+import de.bund.digitalservice.ris.domain.XmlResultObject;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -65,8 +64,8 @@ class XmlEMailPublishServiceTest {
           PUBLISH_DATE);
   private static final XmlMailResponse EXPECTED_RESPONSE =
       new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL);
-  private static final ResultObject FORMATTED_XML =
-      new ResultObject("xml", new Status("200", List.of("succeed")), "test.xml", PUBLISH_DATE);
+  private static final XmlResultObject FORMATTED_XML =
+      new XmlResultObject("xml", "200", List.of("succeed"), "test.xml", PUBLISH_DATE);
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String SENDER_ADDRESS = "export@neuris";
 
@@ -74,7 +73,7 @@ class XmlEMailPublishServiceTest {
 
   @Autowired private XmlEMailPublishService service;
 
-  @MockBean private JurisXmlExporter xmlExporter;
+  @MockBean private XmlExporter xmlExporter;
 
   @MockBean private XmlMailRepository repository;
 
@@ -112,8 +111,7 @@ class XmlEMailPublishServiceTest {
   @Test
   void testPublish_withValidationError() throws ParserConfigurationException, TransformerException {
     var xmlWithValidationError =
-        new ResultObject(
-            "xml", new Status("400", List.of("status-message")), "test.xml", PUBLISH_DATE);
+        new XmlResultObject("xml", "400", List.of("status-message"), "test.xml", PUBLISH_DATE);
     var xmlMail = new XmlMail(null, 123L, null, null, null, "400", "status-message", null, null);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
     when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
