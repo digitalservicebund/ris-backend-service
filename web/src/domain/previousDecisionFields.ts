@@ -3,7 +3,7 @@ import type { InputField } from "./types"
 
 export const previousDecisionFields: InputField[] = [
   {
-    name: "gerichtstyp",
+    name: "courtType",
     type: InputType.TEXT,
     label: "Gerichtstyp",
     iconName: "home",
@@ -12,7 +12,7 @@ export const previousDecisionFields: InputField[] = [
     },
   },
   {
-    name: "gerichtsort",
+    name: "courtPlace",
     type: InputType.TEXT,
     label: "Gerichtsort",
     iconName: "location_on",
@@ -21,7 +21,7 @@ export const previousDecisionFields: InputField[] = [
     },
   },
   {
-    name: "datum",
+    name: "date",
     type: InputType.TEXT,
     label: "Datum",
     iconName: "calendar_today",
@@ -30,7 +30,7 @@ export const previousDecisionFields: InputField[] = [
     },
   },
   {
-    name: "aktenzeichen",
+    name: "docketNumber",
     type: InputType.TEXT,
     label: "Aktenzeichen",
     iconName: "grid_3x3",

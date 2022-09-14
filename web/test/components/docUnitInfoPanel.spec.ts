@@ -30,8 +30,8 @@ describe("docUnit InfoPanel", () => {
     const { getAllByText } = render(DocUnitInfoPanel, {
       props: {
         docUnit: new DocUnit("123", {
-          entscheidungsdatum: "bar",
-          gerichtstyp: "baz",
+          decisionDate: "bar",
+          courtType: "baz",
           documentnumber: "qux",
         }),
       },
@@ -45,7 +45,7 @@ describe("docUnit InfoPanel", () => {
 
   it("renders Entscheidungsdatum if given", async () => {
     const { getAllByText } = render(DocUnitInfoPanel, {
-      props: { docUnit: new DocUnit("123", { entscheidungsdatum: "foo" }) },
+      props: { docUnit: new DocUnit("123", { decisionDate: "foo" }) },
       global: { plugins: [vuetify] },
     })
 
@@ -59,7 +59,7 @@ describe("docUnit InfoPanel", () => {
       props: {
         docUnit: new DocUnit("123", {
           docketNumber: "foo",
-          gerichtstyp: "baz",
+          courtType: "baz",
           documentnumber: "qux",
         }),
       },
@@ -73,7 +73,7 @@ describe("docUnit InfoPanel", () => {
 
   it("renders Gerichtstyp if given", async () => {
     const { getAllByText } = render(DocUnitInfoPanel, {
-      props: { docUnit: new DocUnit("123", { gerichtstyp: "foo" }) },
+      props: { docUnit: new DocUnit("123", { courtType: "foo" }) },
       global: { plugins: [vuetify] },
     })
 
@@ -87,7 +87,7 @@ describe("docUnit InfoPanel", () => {
       props: {
         docUnit: new DocUnit("123", {
           docketNumber: "foo",
-          entscheidungsdatum: "bar",
+          decisionDate: "bar",
           documentnumber: "qux",
         }),
       },

@@ -46,27 +46,63 @@ public class DocUnitDTO {
   @Column("aktenzeichen")
   String docketNumber;
 
-  String gerichtstyp;
-  String dokumenttyp;
-  String vorgang;
+  @Column("gerichtstyp")
+  String courtType;
+
+  @Column("dokumenttyp")
+  String category;
+
+  @Column("vorgang")
+  String procedure;
+
+  @Column("ecli")
   String ecli;
-  String spruchkoerper;
-  String entscheidungsdatum;
-  String gerichtssitz;
-  String rechtskraft;
-  String eingangsart;
-  String dokumentationsstelle;
+
+  @Column("spruchkoerper")
+  String appraisalBody;
+
+  @Column("entscheidungsdatum")
+  String decisionDate;
+
+  @Column("gerichtssitz")
+  String courtLocation;
+
+  @Column("rechtskraft")
+  String legalEffect;
+
+  @Column("eingangsart")
+  String receiptType;
+
+  @Column("dokumentationsstelle")
+  String center;
+
+  @Column("region")
   String region;
 
   // - Kurz- & Langtexte
-  String entscheidungsname;
-  String titelzeile;
-  String leitsatz;
-  String orientierungssatz;
+  @Column("entscheidungsname")
+  String decisionName;
+
+  @Column("titelzeile")
+  String headline;
+
+  @Column("leitsatz")
+  String guidingPrinciple;
+
+  @Column("orientierungssatz")
+  String headnote;
+
+  @Column("tenor")
   String tenor;
-  String gruende;
-  String tatbestand;
-  String entscheidungsgruende;
+
+  @Column("gruende")
+  String reasons;
+
+  @Column("tatbestand")
+  String caseFacts;
+
+  @Column("entscheidungsgruende")
+  String decisionReasons;
 
   @Transient List<PreviousDecision> previousDecisions;
 

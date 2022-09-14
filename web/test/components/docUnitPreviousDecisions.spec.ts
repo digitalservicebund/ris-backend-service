@@ -17,16 +17,16 @@ describe("DocUnitPreviousDecisions", async () => {
   it("shows all necessary input fields with their value", () => {
     const modelValue = [
       {
-        gerichtstyp: "type one",
-        gerichtsort: "location one",
-        datum: "date one",
-        aktenzeichen: "identifier one",
+        courtType: "type one",
+        courtPlace: "location one",
+        date: "date one",
+        docketNumber: "identifier one",
       },
       {
-        gerichtstyp: "type two",
-        gerichtsort: "location two",
-        datum: "date two",
-        aktenzeichen: "identifier two",
+        courtType: "type two",
+        courtPlace: "location two",
+        date: "date two",
+        docketNumber: "identifier two",
       },
     ]
     const { queryByDisplayValue } = renderComponent({ modelValue })
@@ -44,10 +44,10 @@ describe("DocUnitPreviousDecisions", async () => {
   it("emits update model value event when user types into input", async () => {
     const modelValue = [
       {
-        gerichtstyp: "ab",
-        gerichtsort: "test location",
-        datum: "test date",
-        aktenzeichen: "test identifier",
+        courtType: "ab",
+        courtPlace: "test location",
+        date: "test date",
+        docketNumber: "test identifier",
       },
     ]
     const { emitted, user, getByDisplayValue } = renderComponent({ modelValue })
@@ -59,10 +59,10 @@ describe("DocUnitPreviousDecisions", async () => {
     expect(emitted()["update:modelValue"][0]).toEqual([
       [
         {
-          gerichtstyp: "abc",
-          gerichtsort: "test location",
-          datum: "test date",
-          aktenzeichen: "test identifier",
+          courtType: "abc",
+          courtPlace: "test location",
+          date: "test date",
+          docketNumber: "test identifier",
         },
       ],
     ])

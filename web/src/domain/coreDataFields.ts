@@ -33,15 +33,15 @@ export const coreDataFields: TextInputField[] = [
     true
   ),
   defineTextField(
-    "entscheidungsdatum",
+    "decisionDate",
     "Entscheidungsdatum",
     "calendar_today",
     "Entscheidungsdatum",
     true
   ),
-  defineTextField("gerichtstyp", "Gerichtstyp", "home", "Gerichtstyp", true),
+  defineTextField("courtType", "Gerichtstyp", "home", "Gerichtstyp", true),
   defineTextField(
-    "dokumenttyp",
+    "category",
     "Dokumenttyp",
     "category",
     "Dokumenttyp",
@@ -51,28 +51,28 @@ export const coreDataFields: TextInputField[] = [
     documentTypes
   ),
   defineTextField(
-    "spruchkoerper",
+    "appraisalBody",
     "Spruchkörper",
     "people_alt",
     "Spruchkörper"
   ),
   defineTextField("ecli", "ECLI", "translate", "ECLI"),
-  defineTextField("vorgang", "Vorgang", "inventory_2", "Vorgang"),
+  defineTextField("procedure", "Vorgang", "inventory_2", "Vorgang"),
   defineTextField(
-    "gerichtssitz",
+    "courtLocation",
     "Gerichtssitz",
     "location_on",
     "Gerichtssitz"
   ),
-  defineTextField("rechtskraft", "Rechtskraft", "gavel", "Rechtskraft"),
+  defineTextField("legalEffect", "Rechtskraft", "gavel", "Rechtskraft"),
   defineTextField(
-    "eingangsart",
+    "receiptType",
     "Eingangsart",
     "markunread_mailbox",
     "Eingangsart"
   ),
   defineTextField(
-    "dokumentationsstelle",
+    "center",
     "Dokumentationsstelle",
     "school",
     "Dokumentationsstelle"

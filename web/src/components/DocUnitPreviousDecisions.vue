@@ -45,10 +45,10 @@ import { previousDecisionFields } from "@/domain"
 import type { PreviousDecision } from "@/domain/docUnit"
 
 const defaultModel: PreviousDecision = {
-  gerichtstyp: "",
-  gerichtsort: "",
-  datum: "",
-  aktenzeichen: "",
+  courtType: "",
+  courtPlace: "",
+  date: "",
+  docketNumber: "",
 }
 
 interface Props {

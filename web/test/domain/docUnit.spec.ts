@@ -11,21 +11,21 @@ describe("DocUnit", () => {
   it("returns core Data as object", () => {
     const docUnit = new DocUnit("foo")
     docUnit.docketNumber = "bar"
-    docUnit.gerichtssitz = "baz"
+    docUnit.courtLocation = "baz"
 
     const coreData: CoreData = docUnit.coreData
     expect(coreData.docketNumber).toBe("bar")
-    expect(coreData.gerichtssitz).toBe("baz")
+    expect(coreData.courtLocation).toBe("baz")
   })
 
   it("returns texts as object", () => {
     const docUnit = new DocUnit("foo")
-    docUnit.gruende = "bar"
-    docUnit.orientierungssatz = "baz"
+    docUnit.reasons = "bar"
+    docUnit.headnote = "baz"
 
     const docUnitTexts: Texts = docUnit.texts
-    expect(docUnitTexts.gruende).toBe("bar")
-    expect(docUnitTexts.orientierungssatz).toBe("baz")
+    expect(docUnitTexts.reasons).toBe("bar")
+    expect(docUnitTexts.headnote).toBe("baz")
   })
 
   it("returns false if no file is attached", () => {

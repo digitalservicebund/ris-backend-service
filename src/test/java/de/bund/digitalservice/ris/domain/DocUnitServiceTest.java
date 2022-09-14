@@ -301,10 +301,10 @@ class DocUnitServiceTest {
                 assertEquals(monoResponse.getBody().previousDecisions.size(), count);
                 PreviousDecision previousDecision = monoResponse.getBody().previousDecisions.get(0);
                 assertEquals(previousDecision.id, 1L);
-                assertEquals(previousDecision.gerichtsort, "gerOrt 1");
-                assertEquals(previousDecision.gerichtstyp, "gerTyp 1");
-                assertEquals(previousDecision.datum, "01.01.2022");
-                assertEquals(previousDecision.aktenzeichen, "aktenzeichen 1");
+                assertEquals(previousDecision.courtPlace, "gerOrt 1");
+                assertEquals(previousDecision.courtType, "gerTyp 1");
+                assertEquals(previousDecision.date, "01.01.2022");
+                assertEquals(previousDecision.docketNumber, "aktenzeichen 1");
                 assertEquals(previousDecision.documentnumber, documentNr);
               })
           .verifyComplete();
@@ -381,17 +381,17 @@ class DocUnitServiceTest {
                 PreviousDecision previousDecision =
                     monoResponse.getBody().previousDecisions.get(previousDecisionsList.size() - 2);
                 assertEquals(previousDecision.id, 6L);
-                assertEquals(previousDecision.gerichtsort, "gerOrt 6");
-                assertEquals(previousDecision.gerichtstyp, "gerTyp 6");
-                assertEquals(previousDecision.datum, "01.01.2022");
-                assertEquals(previousDecision.aktenzeichen, "aktenzeichen 6");
+                assertEquals(previousDecision.courtPlace, "gerOrt 6");
+                assertEquals(previousDecision.courtType, "gerTyp 6");
+                assertEquals(previousDecision.date, "01.01.2022");
+                assertEquals(previousDecision.docketNumber, "aktenzeichen 6");
                 previousDecision =
                     monoResponse.getBody().previousDecisions.get(previousDecisionsList.size() - 1);
                 assertEquals(previousDecision.id, 7L);
-                assertEquals(previousDecision.gerichtsort, "gerOrt 7");
-                assertEquals(previousDecision.gerichtstyp, "gerTyp 7");
-                assertEquals(previousDecision.datum, "01.01.2022");
-                assertEquals(previousDecision.aktenzeichen, "aktenzeichen 7");
+                assertEquals(previousDecision.courtPlace, "gerOrt 7");
+                assertEquals(previousDecision.courtType, "gerTyp 7");
+                assertEquals(previousDecision.date, "01.01.2022");
+                assertEquals(previousDecision.docketNumber, "aktenzeichen 7");
                 assertEquals(monoResponse.getBody(), docUnit);
               })
           .verifyComplete();
@@ -401,10 +401,10 @@ class DocUnitServiceTest {
     @Test
     void testUpdateDocUnitWithPreviousDecisionsUpdate() {
       var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
-      remainPreviousDecision.get(0).gerichtsort = "new gerOrt";
-      remainPreviousDecision.get(0).gerichtstyp = "new gerTyp";
-      remainPreviousDecision.get(0).datum = "30.01.2022";
-      remainPreviousDecision.get(0).aktenzeichen = "new aktenzeichen";
+      remainPreviousDecision.get(0).courtPlace = "new gerOrt";
+      remainPreviousDecision.get(0).courtType = "new gerTyp";
+      remainPreviousDecision.get(0).date = "30.01.2022";
+      remainPreviousDecision.get(0).docketNumber = "new aktenzeichen";
       var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
@@ -442,10 +442,10 @@ class DocUnitServiceTest {
                       previousDecision ->
                           !previousDecisionsIdsToDelete.contains(previousDecision.id))
                   .toList());
-      remainPreviousDecision.get(0).gerichtsort = "new gerOrt";
-      remainPreviousDecision.get(0).gerichtstyp = "new gerTyp";
-      remainPreviousDecision.get(0).datum = "30.01.2022";
-      remainPreviousDecision.get(0).aktenzeichen = "new aktenzeichen";
+      remainPreviousDecision.get(0).courtPlace = "new gerOrt";
+      remainPreviousDecision.get(0).courtType = "new gerTyp";
+      remainPreviousDecision.get(0).date = "30.01.2022";
+      remainPreviousDecision.get(0).docketNumber = "new aktenzeichen";
       remainPreviousDecision.add(
           new PreviousDecision(
               null, "gerTyp 6", "gerOrt 6", "01.01.2022", "aktenzeichen 6", documentNr));
@@ -476,10 +476,10 @@ class DocUnitServiceTest {
                 assertTrue(remainIds.contains(7L));
                 assertFalse(remainIds.contains(2L));
                 assertFalse(remainIds.contains(4L));
-                assertEquals(previousDecision.gerichtsort, "new gerOrt");
-                assertEquals(previousDecision.gerichtstyp, "new gerTyp");
-                assertEquals(previousDecision.datum, "30.01.2022");
-                assertEquals(previousDecision.aktenzeichen, "new aktenzeichen");
+                assertEquals(previousDecision.courtPlace, "new gerOrt");
+                assertEquals(previousDecision.courtType, "new gerTyp");
+                assertEquals(previousDecision.date, "30.01.2022");
+                assertEquals(previousDecision.docketNumber, "new aktenzeichen");
                 assertEquals(monoResponse.getBody(), docUnit);
               })
           .verifyComplete();

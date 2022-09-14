@@ -1,34 +1,34 @@
 export type CoreData = {
   docketNumber?: string
-  gerichtstyp?: string
-  dokumenttyp?: string
-  vorgang?: string
+  courtType?: string
+  category?: string
+  procedure?: string
   ecli?: string
-  spruchkoerper?: string
-  entscheidungsdatum?: string
-  gerichtssitz?: string
-  rechtskraft?: string
-  eingangsart?: string
-  dokumentationsstelle?: string
+  appraisalBody?: string
+  decisionDate?: string
+  courtLocation?: string
+  legalEffect?: string
+  receiptType?: string
+  center?: string
   region?: string
 }
 
 export type Texts = {
-  entscheidungsname?: string
-  titelzeile?: string
-  leitsatz?: string
-  orientierungssatz?: string
+  decisionName?: string
+  headline?: string
+  guidingPrinciple?: string
+  headnote?: string
   tenor?: string
-  gruende?: string
-  tatbestand?: string
-  entscheidungsgruende?: string
+  reasons?: string
+  caseFacts?: string
+  decisionReasons?: string
 }
 
 export type PreviousDecision = {
-  gerichtstyp?: string
-  gerichtsort?: string
-  datum?: string
-  aktenzeichen?: string
+  courtType?: string
+  courtPlace?: string
+  date?: string
+  docketNumber?: string
 }
 
 export default class DocUnit implements CoreData, Texts {
@@ -44,26 +44,26 @@ export default class DocUnit implements CoreData, Texts {
   public originalFileAsHTML?: string
 
   public docketNumber?: string
-  public gerichtstyp?: string
-  public dokumenttyp?: string
-  public vorgang?: string
+  public courtType?: string
+  public category?: string
+  public procedure?: string
   public ecli?: string
-  public spruchkoerper?: string
-  public entscheidungsdatum?: string
-  public gerichtssitz?: string
-  public rechtskraft?: string
-  public eingangsart?: string
-  public dokumentationsstelle?: string
+  public appraisalBody?: string
+  public decisionDate?: string
+  public courtLocation?: string
+  public legalEffect?: string
+  public receiptType?: string
+  public center?: string
   public region?: string
 
-  public entscheidungsname?: string
-  public titelzeile?: string
-  public leitsatz?: string
-  public orientierungssatz?: string
+  public decisionName?: string
+  public headline?: string
+  public guidingPrinciple?: string
+  public headnote?: string
   public tenor?: string
-  public gruende?: string
-  public tatbestand?: string
-  public entscheidungsgruende?: string
+  public reasons?: string
+  public caseFacts?: string
+  public decisionReasons?: string
 
   public previousDecisions?: PreviousDecision[]
 
@@ -79,29 +79,29 @@ export default class DocUnit implements CoreData, Texts {
   get coreData(): CoreData {
     return {
       docketNumber: this.docketNumber,
-      gerichtstyp: this.gerichtstyp,
-      dokumenttyp: this.dokumenttyp,
-      vorgang: this.vorgang,
+      courtType: this.courtType,
+      category: this.category,
+      procedure: this.procedure,
       ecli: this.ecli,
-      spruchkoerper: this.spruchkoerper,
-      entscheidungsdatum: this.entscheidungsdatum,
-      gerichtssitz: this.gerichtssitz,
-      rechtskraft: this.rechtskraft,
-      eingangsart: this.eingangsart,
-      dokumentationsstelle: this.dokumentationsstelle,
+      appraisalBody: this.appraisalBody,
+      decisionDate: this.decisionDate,
+      courtLocation: this.courtLocation,
+      legalEffect: this.legalEffect,
+      receiptType: this.receiptType,
+      center: this.center,
       region: this.region,
     }
   }
   get texts(): Texts {
     return {
-      entscheidungsname: this.entscheidungsname,
-      titelzeile: this.titelzeile,
-      leitsatz: this.leitsatz,
-      orientierungssatz: this.orientierungssatz,
+      decisionName: this.decisionName,
+      headline: this.headline,
+      guidingPrinciple: this.guidingPrinciple,
+      headnote: this.headnote,
       tenor: this.tenor,
-      gruende: this.gruende,
-      tatbestand: this.tatbestand,
-      entscheidungsgruende: this.entscheidungsgruende,
+      reasons: this.reasons,
+      caseFacts: this.caseFacts,
+      decisionReasons: this.decisionReasons,
     }
   }
   get hasFile(): boolean {

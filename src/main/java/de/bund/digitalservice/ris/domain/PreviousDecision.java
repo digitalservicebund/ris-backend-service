@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 
 @Data
 @Builder
@@ -13,10 +14,19 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class PreviousDecision {
   @Id Long id;
-  String gerichtstyp;
-  String gerichtsort;
-  String datum;
-  String aktenzeichen;
+
+  @Column("gerichtstyp")
+  String courtType;
+
+  @Column("gerichtsort")
+  String courtPlace;
+
+  @Column("datum")
+  String date;
+
+  @Column("aktenzeichen")
+  String docketNumber;
+
   @JsonIgnore String documentnumber;
 
   public PreviousDecision setDocumentnumber(String documentnumber) {

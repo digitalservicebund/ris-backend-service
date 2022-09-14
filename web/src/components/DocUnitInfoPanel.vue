@@ -19,13 +19,13 @@ defineProps<{ docUnit: DocUnit }>()
       <v-col class="vert-centered" sm="6" md="3">
         Entscheidungsdatum
         <span class="panel-default__values">
-          {{ docUnit.entscheidungsdatum || " - " }}
+          {{ docUnit.decisionDate || " - " }}
         </span>
       </v-col>
       <v-col class="vert-centered" sm="6" md="3">
         Gerichtstyp
         <span class="panel-default__values">{{
-          docUnit.gerichtstyp || " - "
+          docUnit.courtType || " - "
         }}</span>
       </v-col>
     </v-row>
