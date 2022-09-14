@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.domain;
 import java.time.Instant;
 import java.util.UUID;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Table("doc_unit")
@@ -12,4 +13,4 @@ public record DocumentUnitListEntry(
     String documentnumber,
     Instant creationtimestamp,
     String filename,
-    String aktenzeichen) {}
+    @Column("aktenzeichen") String docketNumber) {}

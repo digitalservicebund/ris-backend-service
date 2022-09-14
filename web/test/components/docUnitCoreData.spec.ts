@@ -11,7 +11,7 @@ describe("Core Data", () => {
 
   test("renders correctly with given docUnitId", async () => {
     const docUnit = new DocUnit("1", {
-      aktenzeichen: "abc",
+      docketNumber: "abc",
       documentnumber: "ABCD2022000001",
     })
     const wrapper = mount(DocUnitCoreData, {

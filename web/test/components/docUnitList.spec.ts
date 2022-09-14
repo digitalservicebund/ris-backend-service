@@ -33,7 +33,7 @@ describe("docUnit list", () => {
   })
 
   test("renders docUnits", async () => {
-    const docUnit = new DocUnit("1", { aktenzeichen: "foo" })
+    const docUnit = new DocUnit("1", { docketNumber: "foo" })
 
     render(DocUnitList, {
       props: {
@@ -51,7 +51,7 @@ describe("docUnit list", () => {
   })
 
   test("delete emits event", async () => {
-    const docUnit = new DocUnit("1", { aktenzeichen: "foo" })
+    const docUnit = new DocUnit("1", { docketNumber: "foo" })
 
     const { emitted } = render(DocUnitList, {
       props: {

@@ -1,5 +1,5 @@
 export type CoreData = {
-  aktenzeichen?: string
+  docketNumber?: string
   gerichtstyp?: string
   dokumenttyp?: string
   vorgang?: string
@@ -43,7 +43,7 @@ export default class DocUnit implements CoreData, Texts {
   public filename?: string
   public originalFileAsHTML?: string
 
-  public aktenzeichen?: string
+  public docketNumber?: string
   public gerichtstyp?: string
   public dokumenttyp?: string
   public vorgang?: string
@@ -78,7 +78,7 @@ export default class DocUnit implements CoreData, Texts {
   }
   get coreData(): CoreData {
     return {
-      aktenzeichen: this.aktenzeichen,
+      docketNumber: this.docketNumber,
       gerichtstyp: this.gerichtstyp,
       dokumenttyp: this.dokumenttyp,
       vorgang: this.vorgang,

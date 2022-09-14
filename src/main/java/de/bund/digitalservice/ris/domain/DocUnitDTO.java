@@ -7,6 +7,7 @@ import java.util.UUID;
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
@@ -42,7 +43,9 @@ public class DocUnitDTO {
 
   // RUBRIKEN
   // - Stammdaten
-  String aktenzeichen;
+  @Column("aktenzeichen")
+  String docketNumber;
+
   String gerichtstyp;
   String dokumenttyp;
   String vorgang;

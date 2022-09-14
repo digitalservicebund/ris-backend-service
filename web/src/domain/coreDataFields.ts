@@ -26,7 +26,7 @@ export function defineTextField(
 
 export const coreDataFields: TextInputField[] = [
   defineTextField(
-    "aktenzeichen",
+    "docketNumber",
     "Aktenzeichen",
     "grid_3x3",
     "Aktenzeichen",
