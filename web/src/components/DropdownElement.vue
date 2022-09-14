@@ -41,7 +41,6 @@ const selectItems = (event: KeyboardEvent) => {
   if (forcusedItemIndex.value < 0) forcusedItemIndex.value = 0
   if (forcusedItemIndex.value > dropdownItems.length - 1)
     forcusedItemIndex.value = dropdownItems.length - 1
-  console.log("focused Index " + forcusedItemIndex.value)
   if (!!dropdownItems[forcusedItemIndex.value]) {
     ;(dropdownItems[forcusedItemIndex.value] as HTMLElement).focus()
   }
