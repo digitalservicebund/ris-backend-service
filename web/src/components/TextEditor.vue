@@ -331,7 +331,7 @@ onBeforeRouteUpdate(async () => {
 
       <v-divider inset vertical></v-divider>
 
-      <v-col style="color: #004b78; font-weight: bold">Heading</v-col>
+      <v-col class="editor-btn editor-btn--bold">Heading</v-col>
 
       <v-divider inset vertical></v-divider>
 
@@ -627,6 +627,10 @@ onBeforeRouteUpdate(async () => {
   &__active {
     color: $white;
     background-color: $navbar-hover-gray;
+  }
+
+  &--bold {
+    font-weight: bold;
   }
 }
 

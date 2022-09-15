@@ -47,7 +47,10 @@ module.exports = {
         "@vue/prettier",
         "@vue/eslint-config-prettier",
       ],
-      rules: { ...moduleImportRules },
+      rules: {
+        ...moduleImportRules,
+        "vue/no-static-inline-styles": "error",
+      },
     }, // ...and avoid linting TypeScript files with ES rules for JavaScript config files!
     {
       files: ["**/*.js"],

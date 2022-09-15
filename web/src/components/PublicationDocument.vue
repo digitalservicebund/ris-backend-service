@@ -62,12 +62,11 @@ function validateEmailAddress(): boolean {
 
         <div v-if="!publishResult" class="text-icon">
           <span
-            class="material-icons material-symbols-outlined"
-            style="color: white; background-color: black; border-radius: 50%"
+            class="material-icons material-symbols-outlined text-icon--outlined"
           >
             help
           </span>
-          <p style="margin-left: -8px">
+          <p class="help-text">
             Durch Klick auf <em>Veröffentlichen</em> wird die
             Plausibilitätsprüfung ausgelöst.
           </p>
@@ -267,6 +266,16 @@ function validateEmailAddress(): boolean {
     justify-content: flex-start;
     align-items: center;
     column-gap: 12px;
+
+    &--outlined {
+      color: white;
+      background-color: black;
+      border-radius: 50%;
+    }
+  }
+
+  .help-text {
+    margin-left: -8px;
   }
 
   .xml-validation-error-container {

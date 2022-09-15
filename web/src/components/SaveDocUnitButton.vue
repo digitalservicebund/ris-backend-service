@@ -78,8 +78,8 @@ onMounted(() => {
         <p class="status-text">Daten werden gespeichert</p>
       </div>
       <div v-if="hasUpdateError">
-        <div class="icon">
-          <span class="material-icons" style="color: red"> error_outline </span>
+        <div class="icon icon--error">
+          <span class="material-icons"> error_outline </span>
         </div>
         <p class="error-text">Fehler beim Speichern</p>
       </div>
@@ -113,6 +113,10 @@ onMounted(() => {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
+
+      &--error {
+        color: red;
+      }
     }
 
     p {
