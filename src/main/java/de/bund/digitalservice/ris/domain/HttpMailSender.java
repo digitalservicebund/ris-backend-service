@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.domain;
 
 public interface HttpMailSender {
-  public void sendMail(
+  void sendMail(
       String senderAddress,
       String receiverAddress,
       String subject,

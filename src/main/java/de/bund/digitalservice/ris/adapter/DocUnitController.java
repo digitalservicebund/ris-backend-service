@@ -1,6 +1,10 @@
 package de.bund.digitalservice.ris.adapter;
 
-import de.bund.digitalservice.ris.domain.*;
+import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
+import de.bund.digitalservice.ris.domain.DocUnitDTO;
+import de.bund.digitalservice.ris.domain.DocUnitService;
+import de.bund.digitalservice.ris.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.domain.MailResponse;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.UUID;

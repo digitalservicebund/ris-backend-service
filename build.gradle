@@ -49,7 +49,7 @@ dependencies {
   implementation("org.yaml:snakeyaml:1.32") { because("CVE-2022-25857") }
   implementation "ch.qos.logback:logback-classic:1.2.11"
   implementation "ch.qos.logback:logback-core:1.4.0"
-  implementation "org.springframework.boot:spring-boot-starter-data-r2dbc:2.7.2"
+  implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
   implementation "io.r2dbc:r2dbc-postgresql:0.8.12.RELEASE"
   implementation "io.r2dbc:r2dbc-spi:1.0.0.RELEASE"
   implementation "io.r2dbc:r2dbc-pool:0.9.1.RELEASE"
@@ -61,12 +61,7 @@ dependencies {
   implementation "software.amazon.awssdk:s3"
   implementation "org.springdoc:springdoc-openapi-webflux-ui:1.6.9"
 
-  implementation "org.docx4j:docx4j-JAXB-MOXy:11.4.7"
-  implementation "org.docx4j:docx4j-JAXB-ReferenceImpl:11.4.7"
-  // will be added in docx4j 11.4.8
-  implementation "jakarta.mail:jakarta.mail-api:2.1.0"
-  implementation "jakarta.activation:jakarta.activation-api:2.1.0"
-  // docx4j version needs jaxb 3.0.1
+  implementation "org.docx4j:docx4j-JAXB-MOXy:11.4.8"
   implementation("jakarta.xml.bind:jakarta.xml.bind-api") { version { strictly "3.0.1" } }
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
@@ -76,7 +71,6 @@ dependencies {
   //  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3"
   //  implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 
-  implementation "org.springframework.boot:spring-boot-starter-actuator:2.7.3"
   implementation "io.micrometer:micrometer-registry-prometheus:1.9.3"
   implementation "io.sentry:sentry-spring-boot-starter:6.4.1"
 
@@ -146,6 +140,13 @@ spotless {
   java {
     removeUnusedImports()
     googleJavaFormat()
+    custom "Refuse wildcard imports", {
+      // Wildcard imports can't be resolved by spotless itself.
+      // This will require the developer themselves to adhere to best practices.
+      if (it =~ /\nimport .*\*;/) {
+        throw new AssertionError("Do not use wildcard imports. \"spotlessApply\" cannot resolve this issue.")
+      }
+    }
   }
   groovyGradle {
     greclipse("4.6.3").configFile("greclipse.properties")
@@ -196,7 +197,9 @@ bootBuildImage {
   }
 }
 
-import com.github.jk1.license.filter.*
+
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+
 licenseReport {
   // If there's a new dependency with a yet unknown license causing this task to fail
   // the license(s) will be listed in build/reports/dependency-license/dependencies-without-allowed-license.json
