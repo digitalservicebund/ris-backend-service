@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createVuetify } from "vuetify/lib/framework.mjs"
-import SaveDocUnitButton from "@/components/SaveDocUnitButton.vue"
+import SaveDocUnitButton from "@/components/SaveDocumentUnitButton.vue"
 
 describe("SaveDocUnitButton", () => {
   const vuetify = createVuetify({ components, directives })

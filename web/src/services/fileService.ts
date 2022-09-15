@@ -6,7 +6,7 @@ export default {
   async uploadFile(
     docUnitUuid: string,
     file: File
-  ): Promise<{ docUnit?: DocumentUnit; status: UploadStatus }> {
+  ): Promise<{ documentUnit?: DocumentUnit; status: UploadStatus }> {
     try {
       const response = await httpClient.put<File, DocumentUnit>(
         `docunits/${docUnitUuid}/file`,
@@ -22,7 +22,7 @@ export default {
       console.log("response", response)
 
       if (response.status === 201) {
-        return { docUnit: response.data, status: UploadStatus.SUCCESSED }
+        return { documentUnit: response.data, status: UploadStatus.SUCCESSED }
       }
       return { status: UploadStatus.FAILED }
     } catch (error: any) {

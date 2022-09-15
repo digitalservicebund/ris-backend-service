@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router"
 import DocUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import DocUnitTexts from "@/components/DocumentUnitTexts.vue"
-import DocUnitWrapper from "@/components/DocumentUnitWrapper.vue"
+import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
@@ -13,9 +13,9 @@ import docUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{
-  docUnit: DocumentUnit
+  documentUnit: DocumentUnit
 }>()
-const updatedDocUnit = computed(() => props.docUnit)
+const updatedDocUnit = computed(() => props.documentUnit)
 
 const handleUpdateValueDocUnitTexts = async (
   updatedValue: [keyof CoreData | keyof Texts, string]
@@ -34,7 +34,7 @@ const handleUpdateDocUnit = async () => {
   const status = (await docUnitService.update(updatedDocUnit.value)).status
   setTimeout(() => {
     hasDataChange.value = false
-    lastUpdatedDocUnit.value = JSON.stringify(props.docUnit)
+    lastUpdatedDocUnit.value = JSON.stringify(props.documentUnit)
     updateStatus.value = status
     if (updateStatus.value !== UpdateStatus.SUCCEED) return
   }, 1000)
@@ -44,7 +44,7 @@ const route = useRoute()
 
 const isOnline = ref(navigator.onLine)
 const updateStatus = ref(UpdateStatus.BEFORE_UPDATE)
-const lastUpdatedDocUnit = ref(JSON.stringify(props.docUnit))
+const lastUpdatedDocUnit = ref(JSON.stringify(props.documentUnit))
 const fileAsHTML = ref("")
 const automaticUpload = ref()
 const hasDataChange = ref(false)
@@ -59,7 +59,7 @@ const handleToggleFilePanel = async () => {
 }
 
 const coreData = computed({
-  get: () => props.docUnit.coreData,
+  get: () => props.documentUnit.coreData,
   set: (newValues) => {
     for (const [key, value] of Object.entries(newValues)) {
       updatedDocUnit.value[key as keyof CoreData] = value
@@ -68,7 +68,7 @@ const coreData = computed({
 })
 
 const previousDecisions = computed({
-  get: () => props.docUnit.previousDecisions,
+  get: () => props.documentUnit.previousDecisions,
   set: (newValue) => (updatedDocUnit.value.previousDecisions = newValue),
 })
 
@@ -87,8 +87,8 @@ const handleScroll = () => {
 
 const getOrignalDocUnit = async () => {
   if (fileAsHTML.value.length > 0) return
-  fileAsHTML.value = props.docUnit.s3path
-    ? await fileService.getDocxFileAsHtml(props.docUnit.s3path)
+  fileAsHTML.value = props.documentUnit.s3path
+    ? await fileService.getDocxFileAsHtml(props.documentUnit.s3path)
     : ""
 }
 
@@ -113,7 +113,7 @@ const handleUpdateDocUnitWithShortCut = (event: KeyboardEvent) => {
 const autoUpdate = () => {
   automaticUpload.value = setInterval(() => {
     hasDataChange.value =
-      JSON.stringify(props.docUnit) !== lastUpdatedDocUnit.value
+      JSON.stringify(props.documentUnit) !== lastUpdatedDocUnit.value
     if (
       isOnline.value &&
       hasDataChange.value &&
@@ -121,7 +121,7 @@ const autoUpdate = () => {
     ) {
       handleUpdateDocUnit()
     }
-    lastUpdatedDocUnit.value = JSON.stringify(props.docUnit)
+    lastUpdatedDocUnit.value = JSON.stringify(props.documentUnit)
     /** Offline mode */
     if (isOnline.value && !navigator.onLine) {
       isOnline.value = false
@@ -151,7 +151,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <DocUnitWrapper :doc-unit="docUnit">
+  <DocumentUnitWrapper :document-unit="documentUnit">
     <v-row>
       <v-col :cols="showDocPanel ? 7 : 9">
         <DocUnitCoreData
@@ -168,7 +168,7 @@ onUnmounted(() => {
 
         <DocUnitTexts
           id="texts"
-          :texts="docUnit.texts"
+          :texts="documentUnit.texts"
           :update-status="updateStatus"
           @update-value="handleUpdateValueDocUnitTexts"
           @update-doc-unit="handleUpdateDocUnit"
@@ -176,12 +176,12 @@ onUnmounted(() => {
       </v-col>
       <OriginalFileSidePanel
         :open="showDocPanel"
-        :has-file="docUnit.hasFile"
+        :has-file="documentUnit.hasFile"
         :file="fileAsHTML"
         @toggle-panel="handleToggleFilePanel"
       />
     </v-row>
-  </DocUnitWrapper>
+  </DocumentUnitWrapper>
 </template>
 
 <style scoped>

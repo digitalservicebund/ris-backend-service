@@ -2,7 +2,7 @@
 import { computed } from "vue"
 import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
-import SaveDocUnitButton from "./SaveDocUnitButton.vue"
+import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
 import { coreDataFields } from "@/domain"
 
 interface Props {
@@ -37,7 +37,7 @@ const values = computed({
         * Pflichtfelder zum Veröffentlichen
       </span>
 
-      <SaveDocUnitButton
+      <SaveDocumentUnitButton
         class="form__save-button"
         aria-label="Stammdaten Speichern Button"
         :update-status="updateStatus"

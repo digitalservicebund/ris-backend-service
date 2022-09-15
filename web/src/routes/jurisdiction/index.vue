@@ -1,19 +1,21 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import DocUnitList from "@/components/DocumentUnitList.vue"
+import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import TextButton from "@/components/TextButton.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import docUnitService from "@/services/documentUnitService"
+import documentUnitService from "@/services/documentUnitService"
 
 const router = useRouter()
 
-const docUnits = ref((await docUnitService.getAll()).data)
+const documentUnits = ref((await documentUnitService.getAll()).data)
 
-const handleDelete = async (docUnit: DocumentUnit) => {
-  const status = (await docUnitService.delete(docUnit.uuid)).status
+const handleDelete = async (documentUnit: DocumentUnit) => {
+  const status = (await documentUnitService.delete(documentUnit.uuid)).status
   if (status === 200) {
-    docUnits.value = docUnits.value.filter((item) => item != docUnit)
+    documentUnits.value = documentUnits.value.filter(
+      (item) => item != documentUnit
+    )
   }
 }
 </script>
@@ -37,7 +39,10 @@ const handleDelete = async (docUnit: DocumentUnit) => {
       </v-row>
       <v-row class="text-center">
         <v-col class="mb-4">
-          <DocUnitList :doc-units="docUnits" @delete-doc-unit="handleDelete" />
+          <DocumentUnitList
+            :document-units="documentUnits"
+            @delete-doc-unit="handleDelete"
+          />
         </v-col>
       </v-row>
     </v-container>

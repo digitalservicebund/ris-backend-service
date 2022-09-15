@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { Texts } from "../domain/documentUnit"
-import SaveDocUnitButton from "./SaveDocUnitButton.vue"
+import SaveDocUnitButton from "./SaveDocumentUnitButton.vue"
 import TextEditor from "./TextEditor.vue"
 import { texts } from "@/domain"
 import { FieldSize } from "@/domain/FieldSize"

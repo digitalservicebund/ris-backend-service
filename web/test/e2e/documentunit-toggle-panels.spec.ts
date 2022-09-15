@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import { navigateToCategories } from "./e2e-utils"
-import { testWithDocUnit as test } from "./fixtures"
+import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("test the different layout options", () => {
   test("ensure default layout", async ({ page, documentNumber }) => {

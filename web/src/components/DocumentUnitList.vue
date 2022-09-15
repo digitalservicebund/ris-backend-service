@@ -4,7 +4,7 @@ import { ref } from "vue"
 import DocumentUnit from "../domain/documentUnit"
 import PopupModal from "./PopupModal.vue"
 
-defineProps<{ docUnits: DocumentUnit[] }>()
+defineProps<{ documentUnits: DocumentUnit[] }>()
 const emit = defineEmits<{
   (e: "deleteDocUnit", docUnit: DocumentUnit): void
 }>()
@@ -53,7 +53,7 @@ const onDelete = () => {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <v-table v-if="docUnits.length" class="doc-unit-list-table">
+    <v-table v-if="documentUnits.length" class="doc-unit-list-table">
       <thead>
         <tr class="table-header">
           <th class="text-center" scope="col">Dok.-Nummer</th>
@@ -64,7 +64,7 @@ const onDelete = () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="docUnit in docUnits" :key="docUnit.id">
+        <tr v-for="docUnit in documentUnits" :key="docUnit.id">
           <td>
             <router-link
               class="doc-unit-list-active-link"

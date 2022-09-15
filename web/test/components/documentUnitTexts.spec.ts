@@ -3,14 +3,14 @@ import { render } from "@testing-library/vue"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import DocUnitTexts from "@/components/DocumentUnitTexts.vue"
+import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("Texts", () => {
   const vuetify = createVuetify({ components, directives })
 
   test("renders all text fields with labels", async () => {
-    const { getByText } = render(DocUnitTexts, {
+    const { getByText } = render(DocumentUnitTexts, {
       global: { plugins: [vuetify] },
       props: {
         texts: new DocumentUnit("foo").texts,
@@ -30,7 +30,7 @@ describe("Texts", () => {
 
   test("emits update DocUnit event", async () => {
     const user = userEvent.setup()
-    const { getByLabelText, emitted } = render(DocUnitTexts, {
+    const { getByLabelText, emitted } = render(DocumentUnitTexts, {
       global: { plugins: [vuetify] },
       props: {
         texts: new DocumentUnit("foo").texts,

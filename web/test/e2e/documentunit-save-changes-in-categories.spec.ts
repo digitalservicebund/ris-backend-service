@@ -1,7 +1,7 @@
 import { expect, Page } from "@playwright/test"
 import { generateString } from "../test-helper/dataGenerators"
 import { navigateToCategories } from "./e2e-utils"
-import { testWithDocUnit as test } from "./fixtures"
+import { testWithDocumentUnit as test } from "./fixtures"
 
 async function clickSaveButton(page: Page): Promise<void> {
   await page.locator("[aria-label='Stammdaten Speichern Button']").click()

@@ -6,13 +6,13 @@ const props = defineProps<{
   documentNumber: string
 }>()
 
-const { data: docUnit, error } = await docUnitService.getByDocumentNumber(
+const { data: documentUnit, error } = await docUnitService.getByDocumentNumber(
   props.documentNumber
 )
 </script>
 
 <template>
-  <DocUnitCategories v-if="docUnit" :doc-unit="docUnit" />
+  <DocUnitCategories v-if="documentUnit" :document-unit="documentUnit" />
   <div v-else>
     <h2>{{ error?.title }}</h2>
     <p>{{ error?.description }}</p>

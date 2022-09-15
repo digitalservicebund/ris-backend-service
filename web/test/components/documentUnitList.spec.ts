@@ -6,7 +6,7 @@ import * as directives from "vuetify/directives"
 import DocUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
-describe("docUnit list", () => {
+describe("documentUnit list", () => {
   const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
@@ -22,7 +22,7 @@ describe("docUnit list", () => {
   test("renders fallback if no docUnits found", async () => {
     render(DocUnitList, {
       props: {
-        docUnits: [],
+        documentUnits: [],
       },
       global: {
         plugins: [vuetify, router],
@@ -37,7 +37,7 @@ describe("docUnit list", () => {
 
     render(DocUnitList, {
       props: {
-        docUnits: [docUnit],
+        documentUnits: [docUnit],
       },
       global: {
         plugins: [vuetify, router],
@@ -55,7 +55,7 @@ describe("docUnit list", () => {
 
     const { emitted } = render(DocUnitList, {
       props: {
-        docUnits: [docUnit],
+        documentUnits: [docUnit],
       },
       global: {
         plugins: [vuetify, router],

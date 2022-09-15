@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import { navigateToCategories, navigateToFiles } from "./e2e-utils"
-import { testWithDocUnit as test } from "./fixtures"
+import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("test the scrolling behavior with hashes", () => {
   test("scroll to container with hash on same route", async ({

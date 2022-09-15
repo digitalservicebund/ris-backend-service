@@ -41,7 +41,7 @@ describe("FileUpload", () => {
   test("upload docx file", async () => {
     vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
       Promise.resolve({
-        docUnit: new DocumentUnit("1"),
+        documentUnit: new DocumentUnit("1"),
         status: UploadStatus.SUCCESSED,
       })
     )

@@ -41,8 +41,8 @@ const upload = async (file: File) => {
   status.value.uploadStatus = UploadStatus.UPLOADING
   const response = await fileService.uploadFile(props.docUnitUuid, file)
   status.value.uploadStatus = response.status
-  if (response.status == UploadStatus.SUCCESSED && !!response.docUnit) {
-    emits("updateDocUnit", response.docUnit)
+  if (response.status == UploadStatus.SUCCESSED && !!response.documentUnit) {
+    emits("updateDocUnit", response.documentUnit)
   }
 }
 

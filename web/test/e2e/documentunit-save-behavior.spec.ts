@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import { navigateToCategories } from "./e2e-utils"
-import { testWithDocUnit as test } from "./fixtures"
+import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("autosave on documentation units", () => {
   test("test save button status change", async ({ page, documentNumber }) => {
@@ -21,7 +21,10 @@ test.describe("autosave on documentation units", () => {
     ).toBeVisible()
   })
 
-  test("test could not update docunit", async ({ page, documentNumber }) => {
+  test("test could not update documentUnit", async ({
+    page,
+    documentNumber,
+  }) => {
     await page.route("**/api/v1/docunits/*/docx", async (route) => {
       route.fulfill({
         status: 400,
@@ -47,7 +50,7 @@ test.describe("autosave on documentation units", () => {
     ).toBeVisible()
   })
 
-  test("test automatic save docunit", async ({ page, editorField }) => {
+  test("test automatic save documentUnit", async ({ page, editorField }) => {
     test.setTimeout(50 * 1000) // autosave is supposed to happen every 30s
     await editorField.click()
     await editorField.type("this is a change")

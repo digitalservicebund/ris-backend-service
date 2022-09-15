@@ -1,13 +1,13 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import DocUnitFiles from "@/components/DocumentUnitFiles.vue"
-import docUnitService from "@/services/documentUnitService"
+import DocumentUnitFiles from "@/components/DocumentUnitFiles.vue"
+import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{ documentNumber: string }>()
 
-const { data: docUnit, error } = await (async () => {
-  const response = await docUnitService.getByDocumentNumber(
+const { data: documentUnit, error } = await (async () => {
+  const response = await documentUnitService.getByDocumentNumber(
     props.documentNumber
   )
   return {
@@ -17,19 +17,19 @@ const { data: docUnit, error } = await (async () => {
 })()
 
 const handleDeleteFile = async () => {
-  await fileService.deleteFile(docUnit.value.uuid)
-  docUnit.value = (
-    await docUnitService.getByDocumentNumber(props.documentNumber)
+  await fileService.deleteFile(documentUnit.value.uuid)
+  documentUnit.value = (
+    await documentUnitService.getByDocumentNumber(props.documentNumber)
   ).data
 }
 </script>
 
 <template>
-  <DocUnitFiles
-    v-if="docUnit"
-    :doc-unit="docUnit"
+  <DocumentUnitFiles
+    v-if="documentUnit"
+    :document-unit="documentUnit"
     @delete-file="handleDeleteFile"
-    @update-doc-unit="Object.assign(docUnit, $event)"
+    @update-doc-unit="Object.assign(documentUnit, $event)"
   />
   <div v-else>
     <h2>{{ error?.title }}</h2>

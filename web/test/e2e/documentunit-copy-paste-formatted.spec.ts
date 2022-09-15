@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import { navigateToFiles, uploadTestfile } from "./e2e-utils"
-import { testWithDocUnit as test } from "./fixtures"
+import { testWithDocumentUnit as test } from "./fixtures"
 
 test.skip(
   ({ browserName }) => browserName !== "chromium",

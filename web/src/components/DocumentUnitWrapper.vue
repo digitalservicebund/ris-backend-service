@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import DocUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
-defineProps<{ docUnit: DocumentUnit }>()
+defineProps<{ documentUnit: DocumentUnit }>()
 const router = useRouter()
 const route = useRoute()
 
@@ -24,12 +24,12 @@ const handleToggleNavBar = async () => {
     <v-container fluid>
       <v-row>
         <NavbarSide
-          :document-number="String(docUnit.documentnumber)"
+          :document-number="String(documentUnit.documentnumber)"
           :visible="showNavBar"
           @toggle-navbar="handleToggleNavBar"
         />
         <v-col :cols="showNavBar ? 10 : 11" class="panel-and-main-area">
-          <DocUnitInfoPanel :doc-unit="docUnit" />
+          <DocumentUnitInfoPanel :document-unit="documentUnit" />
           <slot></slot>
         </v-col>
       </v-row>

@@ -7,7 +7,7 @@ type MyFixtures = {
   editorField: Locator
 }
 
-export const testWithDocUnit = test.extend<MyFixtures>({
+export const testWithDocumentUnit = test.extend<MyFixtures>({
   documentNumber: async ({ request }, use) => {
     const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
     const response = await request.post(`${backendHost}/api/v1/docunits`, {

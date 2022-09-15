@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import DocUnitWrapper from "@/components/DocumentUnitWrapper.vue"
+import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import XmlMail from "@/domain/xmlMail"
-import docUnitService from "@/services/documentUnitService"
+import documentUnitService from "@/services/documentUnitService"
 import publishService from "@/services/publishService"
 
 const props = defineProps<{
   documentNumber: string
 }>()
-const docUnit = ref(
-  (await docUnitService.getByDocumentNumber(props.documentNumber)).data
+const documentUnit = ref(
+  (await documentUnitService.getByDocumentNumber(props.documentNumber)).data
 )
 const loadDone = ref(false)
 const lastPublishedXmlMail = ref<XmlMail>()
@@ -19,7 +19,7 @@ const errorMessage = ref<{ title: string; description: string }>()
 
 const publishADocument = async (email: string) => {
   const response = await publishService.publishADocument(
-    docUnit.value.uuid,
+    documentUnit.value.uuid,
     email
   )
 
@@ -56,7 +56,9 @@ const formatDate = (date?: string): string => {
 }
 
 onMounted(async () => {
-  const response = await publishService.getLastPublishedXML(docUnit.value.uuid)
+  const response = await publishService.getLastPublishedXML(
+    documentUnit.value.uuid
+  )
   if (!!response.errorMessage) {
     loadDone.value = true
     return
@@ -82,7 +84,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocUnitWrapper :doc-unit="docUnit">
+  <DocumentUnitWrapper :document-unit="documentUnit">
     <PublicationDocument
       v-if="loadDone"
       :publish-result="publishResult"
@@ -93,7 +95,7 @@ onMounted(async () => {
     <div v-else class="spinner">
       <h2>Überprüfung der Daten ...</h2>
     </div>
-  </DocUnitWrapper>
+  </DocumentUnitWrapper>
 </template>
 
 <style lang="scss" scoped>

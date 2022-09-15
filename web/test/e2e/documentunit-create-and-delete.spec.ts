@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { testWithDocUnit } from "./fixtures"
+import { testWithDocumentUnit } from "./fixtures"
 
 test.describe("create a doc unit and delete it again", () => {
   const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
@@ -47,7 +47,7 @@ test.describe("create a doc unit and delete it again", () => {
     ).not.toBeVisible()
   })
 
-  testWithDocUnit(
+  testWithDocumentUnit(
     "cancel delete doc unit",
     async ({ page, documentNumber }) => {
       await page.goto("/")
