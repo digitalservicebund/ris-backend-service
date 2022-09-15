@@ -81,6 +81,32 @@ describe("Dropdown Element", () => {
     expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
   })
 
+  it("Text should be selected when click", async () => {
+    const { container } = render(DropdownInput, {
+      global: { plugins: [vuetify] },
+      props: {
+        id: "dropdown-test",
+        modelValue: "testItem1",
+        ariaLabel: "",
+        dropdownItems: DROPDOWN_ITEMS,
+      },
+    })
+    const inputField = container.querySelector("input") as HTMLInputElement
+    expect(inputField).toHaveValue("testItem1")
+    await user.click(inputField)
+    if (
+      inputField.selectionStart !== null &&
+      inputField.selectionEnd !== null
+    ) {
+      expect(
+        inputField.value.slice(
+          inputField.selectionStart,
+          inputField.selectionEnd
+        )
+      ).toEqual("testItem1")
+    }
+  })
+
   it("Dropdown items should be show all items if not matched", async () => {
     const { container } = render(DropdownInput, {
       global: { plugins: [vuetify] },

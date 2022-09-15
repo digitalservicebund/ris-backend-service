@@ -60,6 +60,13 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
   isShowDropdown.value = false
 }
 
+const selectAllText = () => {
+  const inputField = document.querySelector(
+    `input#${props.id}`
+  ) as HTMLInputElement
+  if (!!props.modelValue) inputField.select()
+}
+
 const closeDropdown = () => {
   isShowDropdown.value = false
 }
@@ -88,6 +95,7 @@ onBeforeUnmount(() => {
           tabindex="0"
           :placeholder="placeholder"
           @input="onTextChange"
+          @click="selectAllText"
         />
         <button
           class="toggle-dropdown-button"
