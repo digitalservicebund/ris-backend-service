@@ -182,14 +182,8 @@ onBeforeUnmount(() => {
     left: 0;
     right: 0;
     max-height: 300px;
-
-    /* hide scroll bar but still scroll */
     overflow-y: scroll;
-    -ms-overflow-style: none; /* Internet Explorer 10+ */
-    scrollbar-width: none; /* Firefox */
-    &::-webkit-scrollbar {
-      display: none; /* Chrome */
-    }
+    scrollbar-width: none;
   }
 
   &__dropdown-item {
