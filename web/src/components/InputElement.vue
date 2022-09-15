@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import { computed } from "vue"
-import DropdownElement from "@/components/DropdownElement.vue"
+import DropdownInput from "@/components/DropdownInput.vue"
 import FileInputButton from "@/components/FileInputButton.vue"
 import TextInput from "@/components/TextInput.vue"
 import { InputType } from "@/domain"
@@ -34,7 +34,7 @@ const component = computed(() => {
     case "file":
       return FileInputButton
     case "dropdown":
-      return DropdownElement
+      return DropdownInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }

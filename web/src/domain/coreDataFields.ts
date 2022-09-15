@@ -1,5 +1,5 @@
 import { InputType } from "./types"
-import type { TextInputField, BaseInputField, DropDownField } from "./types"
+import type { InputField, InputAttributes } from "./types"
 import { documentTypes } from "@/data/documentType"
 
 export function defineTextField(
@@ -10,31 +10,32 @@ export function defineTextField(
   type: InputType,
   required?: boolean,
   placeholder?: string,
-  dropdownValue?: string[]
-): BaseInputField {
+  dropdownItems?: string[]
+): InputField {
+  let inputFieldType: InputType
+  let inputFieldAttributes: InputAttributes
   switch (type) {
-    case InputType.DROPDOWN:
-      return {
-        name,
-        type: InputType.DROPDOWN,
-        label,
-        iconName,
-        required,
-        inputAttributes: { ariaLabel, placeholder, dropdownValue },
-      } as DropDownField
-    default:
-      return {
-        name,
-        type: InputType.TEXT,
-        label,
-        iconName,
-        required,
-        inputAttributes: { ariaLabel, placeholder },
-      } as TextInputField
+    case InputType.DROPDOWN: {
+      inputFieldType = InputType.DROPDOWN
+      inputFieldAttributes = { ariaLabel, placeholder, dropdownItems }
+      break
+    }
+    default: {
+      inputFieldType = InputType.TEXT
+      inputFieldAttributes = { ariaLabel, placeholder }
+    }
+  }
+  return {
+    name,
+    type: inputFieldType,
+    label,
+    iconName,
+    required,
+    inputAttributes: inputFieldAttributes,
   }
 }
 
-export const coreDataFields: BaseInputField[] = [
+export const coreDataFields: InputField[] = [
   defineTextField(
     "docketNumber",
     "Aktenzeichen",

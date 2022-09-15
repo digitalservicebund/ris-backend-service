@@ -8,7 +8,7 @@ interface Props {
   modelValue?: string
   ariaLabel: string
   placeholder?: string
-  dropdownValue: string[] | undefined
+  dropdownItems: string[] | undefined
 }
 
 interface Emits {
@@ -25,7 +25,7 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 )
 
 const isShowDropdown = ref(false)
-const items = ref(!!props.dropdownValue ? props.dropdownValue : [])
+const items = ref(!!props.dropdownItems ? props.dropdownItems : [])
 
 const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
@@ -132,11 +132,14 @@ onBeforeUnmount(() => {
       padding: 17px 24px;
       border: 2px solid $text-tertiary;
       &:hover {
-        border: 4px solid $text-tertiary;
+        outline: 4px solid $text-tertiary;
+        border: none;
+        margin-bottom: 4px;
       }
       &:focus {
-        border: 4px solid $text-tertiary;
-        outline: none;
+        outline: 4px solid $text-tertiary;
+        border: none;
+        margin-bottom: 4px;
       }
       .text-input {
         width: 100%;
@@ -152,15 +155,18 @@ onBeforeUnmount(() => {
   &__dropdown-items {
     display: flex;
     flex-direction: column;
-    max-height: 300px;
-    overflow-y: scroll;
-    position: absolute;
     border: 2px solid #ececec;
     border-top: none;
-    z-index: 99;
     filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.25));
-    width: 100%;
-    /*hide scroll bar */
+    /**Always show on top after textbox and width equal to textbox */
+    position: absolute;
+    z-index: 99;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: 300px;
+    /*hide scroll bar but still scroll */
+    overflow-y: scroll;
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     scrollbar-width: none; /* Firefox */
     &::-webkit-scrollbar {

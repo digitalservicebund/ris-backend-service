@@ -3,19 +3,19 @@ import { render } from "@testing-library/vue"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createVuetify } from "vuetify/lib/framework.mjs"
-import DropdownElement from "@/components/DropdownElement.vue"
+import DropdownInput from "@/components/DropdownInput.vue"
 
 describe("Dropdown Element", () => {
   const vuetify = createVuetify({ components, directives })
   const user = userEvent.setup()
   it("Dropdown is closed", () => {
-    const { queryByDisplayValue } = render(DropdownElement, {
+    const { queryByDisplayValue } = render(DropdownInput, {
       global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "",
         ariaLabel: "",
-        dropdownValue: ["testItem1", "testItem2", "testItem3"],
+        dropdownItems: ["testItem1", "testItem2", "testItem3"],
       },
     })
     const item1 = queryByDisplayValue("testItem1")
@@ -27,13 +27,13 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown is opened", async () => {
-    const { container } = render(DropdownElement, {
+    const { container } = render(DropdownInput, {
       global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "",
         ariaLabel: "",
-        dropdownValue: ["testItem1", "testItem2", "testItem3"],
+        dropdownItems: ["testItem1", "testItem2", "testItem3"],
       },
     })
     const openDropdownContainer = container.querySelector(
@@ -53,13 +53,13 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should be filted", async () => {
-    const { container } = render(DropdownElement, {
+    const { container } = render(DropdownInput, {
       global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "testItem1",
         ariaLabel: "",
-        dropdownValue: ["testItem1", "testItem2", "testItem3"],
+        dropdownItems: ["testItem1", "testItem2", "testItem3"],
       },
     })
     const openDropdownContainer = container.querySelector(
@@ -76,13 +76,13 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should be show all items if not matched", async () => {
-    const { container } = render(DropdownElement, {
+    const { container } = render(DropdownInput, {
       global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "testItem4",
         ariaLabel: "",
-        dropdownValue: ["testItem1", "testItem2", "testItem3"],
+        dropdownItems: ["testItem1", "testItem2", "testItem3"],
       },
     })
     const openDropdownContainer = container.querySelector(

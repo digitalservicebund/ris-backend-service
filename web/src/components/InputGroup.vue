@@ -31,12 +31,12 @@
 import { computed, ref, watch } from "vue"
 import InputElement from "@/components/InputElement.vue"
 import InputFieldoComponent from "@/components/InputField.vue"
-import type { InputField, ModelType, BaseInput } from "@/domain"
+import type { InputField, ModelType } from "@/domain"
 
 type InputValues = { [fieldId: string]: ModelType }
 
 interface Props {
-  fields: BaseInput[] | InputField[]
+  fields: InputField[]
   modelValue: InputValues
   columnCount?: number
 }
