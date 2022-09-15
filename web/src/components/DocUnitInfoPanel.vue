@@ -33,6 +33,8 @@ defineProps<{ docUnit: DocUnit }>()
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .panel-default {
   background-color: $navbar-hover-gray;
   border-bottom: $gray400 solid 1px;

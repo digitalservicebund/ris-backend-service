@@ -39,6 +39,8 @@ const buttonClasses = computed(() => ({
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .ris-btn {
   font-family: $font-bold;
 
@@ -50,22 +52,7 @@ const buttonClasses = computed(() => ({
       --v-btn-height: 48px;
       --v-btn-size: 1rem;
 
-      padding: rem(13px) rem(24px);
-    }
-
-    &--size-small {
-      --v-btn-height: 40px;
-      --v-btn-size: 1rem;
-
-      padding: rem(9px) rem(24px);
-    }
-
-    &--size-large,
-    &--size-x-large {
-      --v-btn-height: 64px;
-      --v-btn-size: 1.125rem;
-
-      padding: rem(19px) rem(24px);
+      padding: 1rem 1.5rem;
     }
 
     /*

@@ -25,6 +25,8 @@ defineProps<Props>()
 </script>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .input-field {
   display: flex;
   flex-direction: column;

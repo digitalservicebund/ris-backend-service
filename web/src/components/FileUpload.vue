@@ -198,6 +198,8 @@ function onFileSelect(event: Event): void {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .upload-drop-area {
   border-radius: $border-radius;
   border: $border-style-inactive;

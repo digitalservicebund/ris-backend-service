@@ -101,6 +101,8 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .fileviewer-info-panel {
   background-color: $white;
 }

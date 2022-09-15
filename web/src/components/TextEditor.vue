@@ -562,6 +562,8 @@ onBeforeRouteUpdate(async () => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 #container {
   position: relative;
 

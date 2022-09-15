@@ -38,6 +38,8 @@ const handleToggleNavBar = async () => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .panel-and-main-area {
   background-color: $white;
 }

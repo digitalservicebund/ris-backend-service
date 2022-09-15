@@ -81,6 +81,8 @@ watch(
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .xml-container {
   .xml-container-title {
     font-weight: 700;

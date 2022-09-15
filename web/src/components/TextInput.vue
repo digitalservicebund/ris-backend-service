@@ -43,6 +43,8 @@ const conditionalClasses = computed(() => ({
 </script>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .input {
   width: 100%;
   padding: 17px 24px;

@@ -101,6 +101,8 @@ const onDelete = () => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .table-header {
   background-color: $gray400;
 }

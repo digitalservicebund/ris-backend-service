@@ -63,11 +63,13 @@ const data = computed(() =>
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .ris-texte-form {
-  padding: rem(20px);
+  padding: 3rem 1rem;
 
   &__textfield {
-    padding: rem(20px);
+    padding: 1rem;
   }
 
   &__input {

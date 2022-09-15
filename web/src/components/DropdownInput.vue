@@ -114,6 +114,8 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .dropdown-container {
   width: 100%;
   position: relative;

@@ -27,7 +27,7 @@ const values = computed({
 <template>
   <div v-if="!modelValue">Loading...</div>
 
-  <div v-else>
+  <div v-else class="core-data">
     <h2 id="coreData">Stammdaten</h2>
 
     <div class="form">
@@ -48,8 +48,12 @@ const values = computed({
 </template>
 
 <style lang="scss" scoped>
+.core-data {
+  padding: 3rem 1rem;
+}
+
 .form {
-  padding: 2rem;
+  padding: 1rem;
 
   &__save-button {
     margin-top: 2rem;

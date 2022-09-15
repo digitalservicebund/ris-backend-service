@@ -65,6 +65,8 @@ const route = useRoute()
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .odoc-open {
   background-color: $yellow500;
   border-radius: 10px;

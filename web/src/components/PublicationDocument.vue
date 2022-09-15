@@ -170,6 +170,8 @@ function validateEmailAddress(): boolean {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .flex-col-container {
   display: flex;
   flex-direction: column;

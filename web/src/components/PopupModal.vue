@@ -76,6 +76,8 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+@import "@/styles/variables";
+
 .popup-modal-wrapper {
   position: fixed;
   top: 0;
