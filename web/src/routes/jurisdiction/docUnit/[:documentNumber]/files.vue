@@ -1,15 +1,20 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
-import FileUpload from "@/components/FileUpload.vue"
-import FileViewer from "@/components/FileViewer.vue"
+import DocUnitFiles from "@/components/DocUnitFiles.vue"
 import docUnitService from "@/services/docUnitService"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{ documentNumber: string }>()
-const docUnit = ref(
-  (await docUnitService.getByDocumentNumber(props.documentNumber)).data
-)
+
+const { data: docUnit, error } = await (async () => {
+  const response = await docUnitService.getByDocumentNumber(
+    props.documentNumber
+  )
+  return {
+    data: ref(response.data),
+    error: response.error,
+  }
+})()
 
 const handleDeleteFile = async () => {
   await fileService.deleteFile(docUnit.value.uuid)
@@ -20,24 +25,14 @@ const handleDeleteFile = async () => {
 </script>
 
 <template>
-  <DocUnitWrapper :doc-unit="docUnit">
-    <v-container>
-      <v-row>
-        <v-col><h2>Dokumente</h2></v-col>
-      </v-row>
-    </v-container>
-    <FileViewer
-      v-if="docUnit.hasFile"
-      :s3-path="(docUnit.s3path as string)"
-      :file-name="docUnit.filename"
-      :upload-time-stamp="docUnit.fileuploadtimestamp"
-      :file-type="docUnit.filetype"
-      @delete-file="handleDeleteFile"
-    />
-    <FileUpload
-      v-else
-      :doc-unit-uuid="docUnit.uuid"
-      @update-doc-unit="Object.assign(docUnit, $event)"
-    />
-  </DocUnitWrapper>
+  <DocUnitFiles
+    v-if="docUnit"
+    :doc-unit="docUnit"
+    @delete-file="handleDeleteFile"
+    @update-doc-unit="Object.assign(docUnit, $event)"
+  />
+  <div v-else>
+    <h2>{{ error?.title }}</h2>
+    <p>{{ error?.description }}</p>
+  </div>
 </template>
