@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import DocUnitDetail from "./index.vue"
+import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import XmlMail from "@/domain/xmlMail"
 import docUnitService from "@/services/docUnitService"
@@ -82,7 +82,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocUnitDetail :doc-unit="docUnit">
+  <DocUnitWrapper :doc-unit="docUnit">
     <PublicationDocument
       v-if="loadDone"
       :publish-result="publishResult"
@@ -93,7 +93,7 @@ onMounted(async () => {
     <div v-else class="spinner">
       <h2>Überprüfung der Daten ...</h2>
     </div>
-  </DocUnitDetail>
+  </DocUnitWrapper>
 </template>
 
 <style lang="scss" scoped>
