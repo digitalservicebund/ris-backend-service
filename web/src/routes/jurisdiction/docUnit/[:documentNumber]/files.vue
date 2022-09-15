@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import DocUnitDetail from "./index.vue"
+import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FileViewer from "@/components/FileViewer.vue"
 import docUnitService from "@/services/docUnitService"
@@ -20,7 +20,7 @@ const handleDeleteFile = async () => {
 </script>
 
 <template>
-  <DocUnitDetail :doc-unit="docUnit">
+  <DocUnitWrapper :doc-unit="docUnit">
     <v-container>
       <v-row>
         <v-col><h2>Dokumente</h2></v-col>
@@ -39,5 +39,5 @@ const handleDeleteFile = async () => {
       :doc-unit-uuid="docUnit.uuid"
       @update-doc-unit="Object.assign(docUnit, $event)"
     />
-  </DocUnitDetail>
+  </DocUnitWrapper>
 </template>
