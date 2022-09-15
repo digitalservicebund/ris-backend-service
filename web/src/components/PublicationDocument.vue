@@ -55,7 +55,7 @@ function validateEmailAddress(): boolean {
       <div
         class="publication-check-infos-container"
         :class="{
-          'publication-check-infos-container__in_error': hasValidationError,
+          'publication-check-infos-container__in-error': hasValidationError,
         }"
       >
         <p class="publication-text-header">Plausibilitätsprüfung</p>
@@ -228,7 +228,7 @@ function validateEmailAddress(): boolean {
       background-color: $white;
       width: 100%;
 
-      &__in_error {
+      &__in-error {
         border: solid 1px #b0243f;
         max-width: 50vw;
       }

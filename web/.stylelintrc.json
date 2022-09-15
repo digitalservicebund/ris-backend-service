@@ -1,12 +1,19 @@
 {
-  "plugins": ["stylelint-scss"],
+  "plugins": [
+    "stylelint-scss",
+    "@namics/stylelint-bem"
+  ],
   "extends": [
     "stylelint-config-standard-scss",
     "stylelint-config-prettier-scss",
     "stylelint-config-recommended-vue"
   ],
   "rules": {
-    "property-no-vendor-prefix": null
+    "property-no-vendor-prefix": null,
+    "plugin/stylelint-bem-namics": {
+      "patternPrefixes": [],
+      "helperPrefixes": []
+    }
   },
   "reportNeedlessDisables": true
 }
