@@ -30,7 +30,7 @@ export const previousDecisionFields: InputField[] = [
     },
   },
   {
-    name: "docketNumber",
+    name: "fileNumber",
     type: InputType.TEXT,
     label: "Aktenzeichen",
     iconName: "grid_3x3",

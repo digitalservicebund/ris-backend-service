@@ -11,7 +11,7 @@ describe("Core Data", () => {
 
   test("renders correctly with given docUnitId", async () => {
     const docUnit = new DocUnit("1", {
-      docketNumber: "abc",
+      fileNumber: "abc",
       documentnumber: "ABCD2022000001",
     })
     const wrapper = mount(DocUnitCoreData, {
@@ -25,7 +25,7 @@ describe("Core Data", () => {
     })
 
     expect(
-      (wrapper.find("#docketNumber").element as HTMLInputElement).value
+      (wrapper.find("#fileNumber").element as HTMLInputElement).value
     ).toBe("abc")
     const buttons = wrapper.findAll("button")
     expect(buttons[buttons.length - 1].text()).toBe("Speichern")

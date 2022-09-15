@@ -15,7 +15,7 @@ public class DocumentUnit {
   public DocumentUnit(DocUnitDTO docUnitDTO) {
     this.coreData =
         new CoreData(
-            docUnitDTO.getDocketNumber(),
+            docUnitDTO.getFileNumber(),
             docUnitDTO.getCourtType(),
             docUnitDTO.getCategory(),
             docUnitDTO.getProcedure(),
@@ -24,7 +24,7 @@ public class DocumentUnit {
             docUnitDTO.getDecisionDate(),
             docUnitDTO.getCourtLocation(),
             docUnitDTO.getLegalEffect(),
-            docUnitDTO.getReceiptType(),
+            docUnitDTO.getInputType(),
             docUnitDTO.getCenter(),
             docUnitDTO.getRegion());
     this.categories =

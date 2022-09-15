@@ -20,13 +20,13 @@ describe("DocUnitPreviousDecisions", async () => {
         courtType: "type one",
         courtPlace: "location one",
         date: "date one",
-        docketNumber: "identifier one",
+        fileNumber: "identifier one",
       },
       {
         courtType: "type two",
         courtPlace: "location two",
         date: "date two",
-        docketNumber: "identifier two",
+        fileNumber: "identifier two",
       },
     ]
     const { queryByDisplayValue } = renderComponent({ modelValue })
@@ -47,7 +47,7 @@ describe("DocUnitPreviousDecisions", async () => {
         courtType: "ab",
         courtPlace: "test location",
         date: "test date",
-        docketNumber: "test identifier",
+        fileNumber: "test identifier",
       },
     ]
     const { emitted, user, getByDisplayValue } = renderComponent({ modelValue })
@@ -62,7 +62,7 @@ describe("DocUnitPreviousDecisions", async () => {
           courtType: "abc",
           courtPlace: "test location",
           date: "test date",
-          docketNumber: "test identifier",
+          fileNumber: "test identifier",
         },
       ],
     ])

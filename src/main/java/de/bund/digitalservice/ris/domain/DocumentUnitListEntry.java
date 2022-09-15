@@ -13,4 +13,4 @@ public record DocumentUnitListEntry(
     String documentnumber,
     Instant creationtimestamp,
     String filename,
-    @Column("aktenzeichen") String docketNumber) {}
+    @Column("aktenzeichen") String fileNumber) {}

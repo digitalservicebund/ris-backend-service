@@ -37,7 +37,7 @@ export function defineTextField(
 
 export const coreDataFields: InputField[] = [
   defineTextField(
-    "docketNumber",
+    "fileNumber",
     "Aktenzeichen",
     "grid_3x3",
     "Aktenzeichen",
@@ -100,7 +100,7 @@ export const coreDataFields: InputField[] = [
     InputType.TEXT
   ),
   defineTextField(
-    "receiptType",
+    "inputType",
     "Eingangsart",
     "markunread_mailbox",
     "Eingangsart",

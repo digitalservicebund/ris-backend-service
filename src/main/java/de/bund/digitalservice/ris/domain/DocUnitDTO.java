@@ -47,7 +47,7 @@ public class DocUnitDTO {
   // RUBRIKEN
   // - Stammdaten
   @Column("aktenzeichen")
-  String docketNumber;
+  String fileNumber;
 
   @Column("gerichtstyp")
   String courtType;
@@ -74,7 +74,7 @@ public class DocUnitDTO {
   String legalEffect;
 
   @Column("eingangsart")
-  String receiptType;
+  String inputType;
 
   @Column("dokumentationsstelle")
   String center;

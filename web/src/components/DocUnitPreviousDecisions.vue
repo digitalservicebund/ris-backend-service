@@ -48,7 +48,7 @@ const defaultModel: PreviousDecision = {
   courtType: "",
   courtPlace: "",
   date: "",
-  docketNumber: "",
+  fileNumber: "",
 }
 
 interface Props {

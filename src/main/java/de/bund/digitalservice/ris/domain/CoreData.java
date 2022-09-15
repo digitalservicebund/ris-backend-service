@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.domain;
 
 public record CoreData(
-    String docketNumber,
+    String fileNumber,
     String courtType,
     String category,
     String procedure,
@@ -10,6 +10,6 @@ public record CoreData(
     String decisionDate,
     String courtLocation,
     String legalEffect,
-    String receiptType,
+    String inputType,
     String center,
     String region) {}

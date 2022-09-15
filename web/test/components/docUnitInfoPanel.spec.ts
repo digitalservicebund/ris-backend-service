@@ -17,7 +17,7 @@ describe("docUnit InfoPanel", () => {
 
   it("renders aktenzeichen if given", async () => {
     const { getAllByText } = render(DocUnitInfoPanel, {
-      props: { docUnit: new DocUnit("123", { docketNumber: "foo" }) },
+      props: { docUnit: new DocUnit("123", { fileNumber: "foo" }) },
       global: { plugins: [vuetify] },
     })
 
@@ -58,7 +58,7 @@ describe("docUnit InfoPanel", () => {
     const { getAllByText } = render(DocUnitInfoPanel, {
       props: {
         docUnit: new DocUnit("123", {
-          docketNumber: "foo",
+          fileNumber: "foo",
           courtType: "baz",
           documentnumber: "qux",
         }),
@@ -86,7 +86,7 @@ describe("docUnit InfoPanel", () => {
     const { getAllByText } = render(DocUnitInfoPanel, {
       props: {
         docUnit: new DocUnit("123", {
-          docketNumber: "foo",
+          fileNumber: "foo",
           decisionDate: "bar",
           documentnumber: "qux",
         }),

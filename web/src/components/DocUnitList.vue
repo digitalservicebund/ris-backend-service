@@ -79,7 +79,7 @@ const onDelete = () => {
             </router-link>
           </td>
           <td>{{ dayjs(docUnit.creationtimestamp).format("DD.MM.YYYY") }}</td>
-          <td>{{ docUnit.docketNumber ? docUnit.docketNumber : "-" }}</td>
+          <td>{{ docUnit.fileNumber ? docUnit.fileNumber : "-" }}</td>
           <td>
             {{ docUnit.filename ? docUnit.filename : "-" }}
           </td>

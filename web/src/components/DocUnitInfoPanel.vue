@@ -13,7 +13,7 @@ defineProps<{ docUnit: DocUnit }>()
       <v-col class="vert-centered" sm="6" md="3">
         Aktenzeichen
         <span class="panel-default__values">
-          {{ docUnit.docketNumber || " - " }}</span
+          {{ docUnit.fileNumber || " - " }}</span
         >
       </v-col>
       <v-col class="vert-centered" sm="6" md="3">

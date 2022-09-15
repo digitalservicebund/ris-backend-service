@@ -10,11 +10,11 @@ describe("DocUnit", () => {
 
   it("returns core Data as object", () => {
     const docUnit = new DocUnit("foo")
-    docUnit.docketNumber = "bar"
+    docUnit.fileNumber = "bar"
     docUnit.courtLocation = "baz"
 
     const coreData: CoreData = docUnit.coreData
-    expect(coreData.docketNumber).toBe("bar")
+    expect(coreData.fileNumber).toBe("bar")
     expect(coreData.courtLocation).toBe("baz")
   })
 

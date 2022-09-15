@@ -25,7 +25,7 @@ public class PreviousDecision {
   String date;
 
   @Column("aktenzeichen")
-  String docketNumber;
+  String fileNumber;
 
   @JsonIgnore String documentnumber;
 

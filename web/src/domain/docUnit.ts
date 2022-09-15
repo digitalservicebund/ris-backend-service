@@ -1,5 +1,5 @@
 export type CoreData = {
-  docketNumber?: string
+  fileNumber?: string
   courtType?: string
   category?: string
   procedure?: string
@@ -8,7 +8,7 @@ export type CoreData = {
   decisionDate?: string
   courtLocation?: string
   legalEffect?: string
-  receiptType?: string
+  inputType?: string
   center?: string
   region?: string
 }
@@ -28,7 +28,7 @@ export type PreviousDecision = {
   courtType?: string
   courtPlace?: string
   date?: string
-  docketNumber?: string
+  fileNumber?: string
 }
 
 export default class DocUnit implements CoreData, Texts {
@@ -43,7 +43,7 @@ export default class DocUnit implements CoreData, Texts {
   public filename?: string
   public originalFileAsHTML?: string
 
-  public docketNumber?: string
+  public fileNumber?: string
   public courtType?: string
   public category?: string
   public procedure?: string
@@ -52,7 +52,7 @@ export default class DocUnit implements CoreData, Texts {
   public decisionDate?: string
   public courtLocation?: string
   public legalEffect?: string
-  public receiptType?: string
+  public inputType?: string
   public center?: string
   public region?: string
 
@@ -78,7 +78,7 @@ export default class DocUnit implements CoreData, Texts {
   }
   get coreData(): CoreData {
     return {
-      docketNumber: this.docketNumber,
+      fileNumber: this.fileNumber,
       courtType: this.courtType,
       category: this.category,
       procedure: this.procedure,
@@ -87,7 +87,7 @@ export default class DocUnit implements CoreData, Texts {
       decisionDate: this.decisionDate,
       courtLocation: this.courtLocation,
       legalEffect: this.legalEffect,
-      receiptType: this.receiptType,
+      inputType: this.inputType,
       center: this.center,
       region: this.region,
     }
