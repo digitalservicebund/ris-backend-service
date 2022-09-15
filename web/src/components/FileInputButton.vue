@@ -1,21 +1,3 @@
-<template>
-  <TextButton class="button" @click.self="triggerFileInput">
-    <label :for="props.id" :aria-label="ariaLabel" class="label">
-      <slot />
-
-      <input
-        :id="props.id"
-        v-bind="inputValue"
-        ref="fileInput"
-        hidden="true"
-        type="file"
-        tabindex="-1"
-        @change="emitInputEvent"
-      />
-    </label>
-  </TextButton>
-</template>
-
 <script lang="ts" setup>
 import { ref } from "vue"
 import TextButton from "@/components/TextButton.vue"
@@ -46,6 +28,24 @@ function triggerFileInput() {
   fileInput.value?.click()
 }
 </script>
+
+<template>
+  <TextButton class="button" @click.self="triggerFileInput">
+    <label :for="props.id" :aria-label="ariaLabel" class="label">
+      <slot />
+
+      <input
+        :id="props.id"
+        v-bind="inputValue"
+        ref="fileInput"
+        hidden="true"
+        type="file"
+        tabindex="-1"
+        @change="emitInputEvent"
+      />
+    </label>
+  </TextButton>
+</template>
 
 <style lang="scss" scoped>
 .button {

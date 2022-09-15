@@ -1,32 +1,3 @@
-<template>
-  <div class="input-group" :style="gapStyle">
-    <div
-      v-for="(group, index) in fieldRows"
-      :key="index"
-      :style="gapStyle"
-      class="input-group__row"
-    >
-      <InputFieldoComponent
-        v-for="field in group"
-        :id="field.name"
-        :key="field.name"
-        :style="fieldStyle"
-        class="input-group__row__field"
-        :label="field.label"
-        :icon-name="field.iconName"
-        :required="field.required"
-      >
-        <InputElement
-          :id="field.name"
-          v-model="inputValues[field.name]"
-          :type="field.type"
-          :attributes="field.inputAttributes"
-        />
-      </InputFieldoComponent>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import InputElement from "@/components/InputElement.vue"
@@ -98,6 +69,35 @@ watch(
   { deep: true }
 )
 </script>
+
+<template>
+  <div class="input-group" :style="gapStyle">
+    <div
+      v-for="(group, index) in fieldRows"
+      :key="index"
+      :style="gapStyle"
+      class="input-group__row"
+    >
+      <InputFieldoComponent
+        v-for="field in group"
+        :id="field.name"
+        :key="field.name"
+        :style="fieldStyle"
+        class="input-group__row__field"
+        :label="field.label"
+        :icon-name="field.iconName"
+        :required="field.required"
+      >
+        <InputElement
+          :id="field.name"
+          v-model="inputValues[field.name]"
+          :type="field.type"
+          :attributes="field.inputAttributes"
+        />
+      </InputFieldoComponent>
+    </div>
+  </div>
+</template>
 
 <style lang="scss" scoped>
 .input-group {

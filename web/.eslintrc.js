@@ -50,6 +50,12 @@ module.exports = {
       rules: {
         ...moduleImportRules,
         "vue/no-static-inline-styles": "error",
+        "vue/component-tags-order": [
+          "error",
+          {
+            order: ["script", "template", "style"],
+          },
+        ],
       },
     }, // ...and avoid linting TypeScript files with ES rules for JavaScript config files!
     {

@@ -1,29 +1,3 @@
-<template>
-  <div v-for="(_, index) in modelValueList" :key="index">
-    <component
-      :is="component"
-      v-model="modelValueList[index]"
-      v-bind="attributes"
-    />
-
-    <slot
-      v-if="index + 1 < modelValueList.length"
-      name="removeButton"
-      :on-click="() => removeModelEntry(index)"
-    >
-      <button aria-label="Eintrag Entfernen" @click="removeModelEntry(index)">
-        Eintrag Entfernen
-      </button>
-    </slot>
-  </div>
-
-  <slot name="addButton" :on-click="addNewModelEntry">
-    <button aria-label="Eintrag Hinzufügen" @click="addNewModelEntry">
-      Eintrag Hinzufügen
-    </button>
-  </slot>
-</template>
-
 <script lang="ts" setup>
 import { ref, watch, useAttrs } from "vue"
 import type { Component } from "vue"
@@ -69,3 +43,29 @@ watch(
   { deep: true }
 )
 </script>
+
+<template>
+  <div v-for="(_, index) in modelValueList" :key="index">
+    <component
+      :is="component"
+      v-model="modelValueList[index]"
+      v-bind="attributes"
+    />
+
+    <slot
+      v-if="index + 1 < modelValueList.length"
+      name="removeButton"
+      :on-click="() => removeModelEntry(index)"
+    >
+      <button aria-label="Eintrag Entfernen" @click="removeModelEntry(index)">
+        Eintrag Entfernen
+      </button>
+    </slot>
+  </div>
+
+  <slot name="addButton" :on-click="addNewModelEntry">
+    <button aria-label="Eintrag Hinzufügen" @click="addNewModelEntry">
+      Eintrag Hinzufügen
+    </button>
+  </slot>
+</template>

@@ -1,16 +1,3 @@
-<template>
-  <input
-    :id="id"
-    v-model="inputValue"
-    class="input"
-    :class="conditionalClasses"
-    type="text"
-    :placeholder="placeholder"
-    :aria-label="ariaLabel"
-    @input="emitInputEvent"
-  />
-</template>
-
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
@@ -41,6 +28,19 @@ const conditionalClasses = computed(() => ({
   input__error: props.hasError,
 }))
 </script>
+
+<template>
+  <input
+    :id="id"
+    v-model="inputValue"
+    class="input"
+    :class="conditionalClasses"
+    type="text"
+    :placeholder="placeholder"
+    :aria-label="ariaLabel"
+    @input="emitInputEvent"
+  />
+</template>
 
 <style lang="scss" scoped>
 @import "@/styles/variables";

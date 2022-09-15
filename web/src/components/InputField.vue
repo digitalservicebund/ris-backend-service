@@ -1,3 +1,15 @@
+<script lang="ts" setup>
+interface Props {
+  id: string
+  label: string
+  iconName?: string
+  errorMessage?: string
+  required?: boolean
+}
+
+defineProps<Props>()
+</script>
+
 <template>
   <label :for="id" class="input-field">
     <span class="input-field__label">
@@ -11,18 +23,6 @@
     </span>
   </label>
 </template>
-
-<script lang="ts" setup>
-interface Props {
-  id: string
-  label: string
-  iconName?: string
-  errorMessage?: string
-  required?: boolean
-}
-
-defineProps<Props>()
-</script>
 
 <style lang="scss" scoped>
 @import "@/styles/variables";

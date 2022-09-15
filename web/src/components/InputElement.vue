@@ -1,7 +1,3 @@
-<template>
-  <component :is="component" v-bind="attributes" v-model="value" />
-</template>
-
 <script lang="ts" setup>
 import { computed } from "vue"
 import DropdownInput from "@/components/DropdownInput.vue"
@@ -45,3 +41,7 @@ const value = computed({
   set: (newValue) => emit("update:modelValue", newValue),
 })
 </script>
+
+<template>
+  <component :is="component" v-bind="attributes" v-model="value" />
+</template>
