@@ -1,0 +1,12 @@
+@import "@/styles/fonts";
+@import "@/styles/variables";
+
+body {
+  font-size: $font-size-root;
+  font-family: $font-main;
+}
+
+a {
+  text-decoration: none !important;
+  color: $black;
+}
