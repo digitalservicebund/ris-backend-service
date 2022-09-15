@@ -79,7 +79,6 @@ test.describe("upload an original document to a doc unit", () => {
     }, docx)
 
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
-    await expect(page.locator("text=Upload läuft")).toBeVisible()
   })
 
   test("drop non-docx file in upload area", async ({ page }) => {

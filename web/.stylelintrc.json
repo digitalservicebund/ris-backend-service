@@ -1,8 +1,5 @@
 {
-  "plugins": [
-    "stylelint-scss",
-    "@namics/stylelint-bem"
-  ],
+  "plugins": ["stylelint-scss", "@namics/stylelint-bem"],
   "extends": [
     "stylelint-config-standard-scss",
     "stylelint-config-prettier-scss",
