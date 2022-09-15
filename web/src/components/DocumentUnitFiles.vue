@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
+import DocUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FileViewer from "@/components/FileViewer.vue"
 import DocumentUnit from "@/domain/documentUnit"

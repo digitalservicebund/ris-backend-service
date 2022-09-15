@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import DocUnitList from "@/components/DocUnitList.vue"
+import DocUnitList from "@/components/DocumentUnitList.vue"
 import TextButton from "@/components/TextButton.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import docUnitService from "@/services/docUnitService"
+import docUnitService from "@/services/documentUnitService"
 
 const router = useRouter()
 

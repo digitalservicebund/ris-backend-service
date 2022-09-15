@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
 import { createVuetify } from "vuetify"
-import DocUnitPreviousDecisions from "@/components/DocUnitPreviousDecisions.vue"
+import DocUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import type { PreviousDecision } from "@/domain/documentUnit"
 
 function renderComponent(options?: { modelValue?: PreviousDecision[] }) {

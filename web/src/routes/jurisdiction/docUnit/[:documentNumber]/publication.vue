@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
+import DocUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 import XmlMail from "@/domain/xmlMail"
-import docUnitService from "@/services/docUnitService"
+import docUnitService from "@/services/documentUnitService"
 import publishService from "@/services/publishService"
 
 const props = defineProps<{

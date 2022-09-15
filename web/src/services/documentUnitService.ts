@@ -1,7 +1,7 @@
 import DocumentUnit from "../domain/documentUnit"
 import httpClient, { ServiceResponse } from "./httpClient"
 
-interface DocUnitService {
+interface DocumentUnitService {
   getAll(): Promise<ServiceResponse<DocumentUnit[]>>
   getByDocumentNumber(
     documentNumber: string
@@ -14,7 +14,7 @@ interface DocUnitService {
   delete(docUnitUuid: string): Promise<ServiceResponse<unknown>>
 }
 
-const service: DocUnitService = {
+const service: DocumentUnitService = {
   async getAll() {
     const response = await httpClient.get<DocumentUnit[]>("docunits")
     if (response.status >= 300) {

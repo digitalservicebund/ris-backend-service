@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import DocUnitInfoPanel from "@/components/DocUnitInfoPanel.vue"
+import DocUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import DocumentUnit from "@/domain/documentUnit"
 

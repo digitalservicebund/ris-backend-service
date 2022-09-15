@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import DocUnitFiles from "@/components/DocUnitFiles.vue"
-import docUnitService from "@/services/docUnitService"
+import DocUnitFiles from "@/components/DocumentUnitFiles.vue"
+import docUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{ documentNumber: string }>()

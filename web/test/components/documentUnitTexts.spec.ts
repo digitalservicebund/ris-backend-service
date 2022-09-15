@@ -3,7 +3,7 @@ import { render } from "@testing-library/vue"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import DocUnitTexts from "@/components/DocUnitTexts.vue"
+import DocUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("Texts", () => {

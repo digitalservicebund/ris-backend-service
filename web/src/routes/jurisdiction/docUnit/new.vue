@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onBeforeMount } from "vue"
 import { useRouter } from "vue-router"
-import docUnitService from "@/services/docUnitService"
+import docUnitService from "@/services/documentUnitService"
 
 const router = useRouter()
 

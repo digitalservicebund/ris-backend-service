@@ -1,4 +1,4 @@
-import service from "@/services/docUnitService"
+import service from "@/services/documentUnitService"
 import { ServiceResponse } from "@/services/httpClient"
 
 describe("docUnitService", () => {

@@ -2,8 +2,8 @@ import { mount } from "@vue/test-utils"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import DocUnitCoreData from "../../src/components/DocUnitCoreData.vue"
 import DocumentUnit from "../../src/domain/documentUnit"
+import DocUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 
 // vitest run --testNamePattern CoreData
 describe("Core Data", () => {

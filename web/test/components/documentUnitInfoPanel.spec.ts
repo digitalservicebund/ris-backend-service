@@ -1,6 +1,6 @@
 import { render } from "@testing-library/vue"
 import { createVuetify } from "vuetify"
-import DocUnitInfoPanel from "@/components/DocUnitInfoPanel.vue"
+import DocUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("docUnit InfoPanel", () => {

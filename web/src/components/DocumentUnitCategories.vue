@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, toRefs } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import DocUnitCoreData from "@/components/DocUnitCoreData.vue"
-import DocUnitPreviousDecisions from "@/components/DocUnitPreviousDecisions.vue"
-import DocUnitTexts from "@/components/DocUnitTexts.vue"
-import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
+import DocUnitCoreData from "@/components/DocumentUnitCoreData.vue"
+import DocUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
+import DocUnitTexts from "@/components/DocumentUnitTexts.vue"
+import DocUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
-import docUnitService from "@/services/docUnitService"
+import docUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{
