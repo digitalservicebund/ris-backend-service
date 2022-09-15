@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import DocUnit from "../domain/docUnit"
+import DocumentUnit from "../domain/documentUnit"
 
-defineProps<{ docUnit: DocUnit }>()
+defineProps<{ docUnit: DocumentUnit }>()
 </script>
 
 <template>

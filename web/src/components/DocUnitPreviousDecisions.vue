@@ -5,7 +5,7 @@ import InputGroup from "@/components/InputGroup.vue"
 import ModelComponentRepeater from "@/components/ModelComponentRepeater.vue"
 import TextButton from "@/components/TextButton.vue"
 import { previousDecisionFields } from "@/domain"
-import type { PreviousDecision } from "@/domain/docUnit"
+import type { PreviousDecision } from "@/domain/documentUnit"
 
 const defaultModel: PreviousDecision = {
   courtType: "",

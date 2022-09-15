@@ -7,13 +7,13 @@ import DocUnitTexts from "@/components/DocUnitTexts.vue"
 import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import DocUnit, { CoreData, Texts } from "@/domain/docUnit"
+import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import docUnitService from "@/services/docUnitService"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{
-  docUnit: DocUnit
+  docUnit: DocumentUnit
 }>()
 const updatedDocUnit = computed(() => props.docUnit)
 

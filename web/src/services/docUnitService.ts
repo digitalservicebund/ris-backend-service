@@ -1,20 +1,22 @@
-import DocUnit from "../domain/docUnit"
+import DocumentUnit from "../domain/documentUnit"
 import httpClient, { ServiceResponse } from "./httpClient"
 
 interface DocUnitService {
-  getAll(): Promise<ServiceResponse<DocUnit[]>>
-  getByDocumentNumber(documentNumber: string): Promise<ServiceResponse<DocUnit>>
+  getAll(): Promise<ServiceResponse<DocumentUnit[]>>
+  getByDocumentNumber(
+    documentNumber: string
+  ): Promise<ServiceResponse<DocumentUnit>>
   createNew(
     docCenter: string,
     docType: string
-  ): Promise<ServiceResponse<DocUnit>>
-  update(docUnit: DocUnit): Promise<ServiceResponse<unknown>>
+  ): Promise<ServiceResponse<DocumentUnit>>
+  update(docUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(docUnitUuid: string): Promise<ServiceResponse<unknown>>
 }
 
 const service: DocUnitService = {
   async getAll() {
-    const response = await httpClient.get<DocUnit[]>("docunits")
+    const response = await httpClient.get<DocumentUnit[]>("docunits")
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheiten konnten nicht geladen werden.",
@@ -24,18 +26,20 @@ const service: DocUnitService = {
   },
 
   async getByDocumentNumber(documentNumber: string) {
-    const response = await httpClient.get<DocUnit>(`docunits/${documentNumber}`)
+    const response = await httpClient.get<DocumentUnit>(
+      `docunits/${documentNumber}`
+    )
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheit konnten nicht geladen werden.",
       }
     }
-    response.data = new DocUnit(response.data.uuid, { ...response.data })
+    response.data = new DocumentUnit(response.data.uuid, { ...response.data })
     return response
   },
 
   async createNew(docCenter: string, docType: string) {
-    const response = await httpClient.post<Partial<DocUnit>, DocUnit>(
+    const response = await httpClient.post<Partial<DocumentUnit>, DocumentUnit>(
       "docunits",
       {
         headers: {
@@ -46,7 +50,7 @@ const service: DocUnitService = {
       JSON.stringify({
         documentationCenterAbbreviation: docCenter,
         documentType: docType,
-      }) as Partial<DocUnit>
+      }) as Partial<DocumentUnit>
     )
     if (response.status >= 300) {
       response.error = {
@@ -56,7 +60,7 @@ const service: DocUnitService = {
     return response
   },
 
-  async update(docUnit: DocUnit) {
+  async update(docUnit: DocumentUnit) {
     const response = await httpClient.put(
       `docunits/${docUnit.uuid}/docx`,
       {

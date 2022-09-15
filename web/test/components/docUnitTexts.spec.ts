@@ -4,7 +4,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import DocUnitTexts from "@/components/DocUnitTexts.vue"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 
 describe("Texts", () => {
   const vuetify = createVuetify({ components, directives })
@@ -13,7 +13,7 @@ describe("Texts", () => {
     const { getByText } = render(DocUnitTexts, {
       global: { plugins: [vuetify] },
       props: {
-        texts: new DocUnit("foo").texts,
+        texts: new DocumentUnit("foo").texts,
         updateStatus: 0,
       },
     })
@@ -33,7 +33,7 @@ describe("Texts", () => {
     const { getByLabelText, emitted } = render(DocUnitTexts, {
       global: { plugins: [vuetify] },
       props: {
-        texts: new DocUnit("foo").texts,
+        texts: new DocumentUnit("foo").texts,
         updateStatus: 0,
       },
     })

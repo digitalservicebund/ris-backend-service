@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { ref } from "vue"
-import DocUnit from "../domain/docUnit"
+import DocumentUnit from "../domain/documentUnit"
 import PopupModal from "./PopupModal.vue"
 
-defineProps<{ docUnits: DocUnit[] }>()
+defineProps<{ docUnits: DocumentUnit[] }>()
 const emit = defineEmits<{
-  (e: "deleteDocUnit", docUnit: DocUnit): void
+  (e: "deleteDocUnit", docUnit: DocumentUnit): void
 }>()
 
 const showModal = ref(false)
@@ -15,7 +15,7 @@ const modalConfirmText = ref("Löschen")
 const modalHeaderText = "Dokumentationseinheit löschen"
 const modalCancelButtonType = "ghost"
 const modalConfirmButtonType = "secondary"
-const selectedDocUnit = ref(new DocUnit("1"))
+const selectedDocUnit = ref(new DocumentUnit("1"))
 const toggleModal = () => {
   showModal.value = !showModal.value
   if (showModal.value) {
@@ -30,7 +30,7 @@ const toggleModal = () => {
     }
   }
 }
-const setSelectedDocUnit = (docUnit: DocUnit) => {
+const setSelectedDocUnit = (docUnit: DocumentUnit) => {
   selectedDocUnit.value = docUnit
   popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocUnit.value.documentnumber} wirklich dauerhaft löschen?`
   toggleModal()

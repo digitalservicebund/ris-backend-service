@@ -3,14 +3,14 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import DocUnitCoreData from "../../src/components/DocUnitCoreData.vue"
-import DocUnit from "../../src/domain/docUnit"
+import DocumentUnit from "../../src/domain/documentUnit"
 
 // vitest run --testNamePattern CoreData
 describe("Core Data", () => {
   const vuetify = createVuetify({ components, directives })
 
   test("renders correctly with given docUnitId", async () => {
-    const docUnit = new DocUnit("1", {
+    const docUnit = new DocumentUnit("1", {
       fileNumber: "abc",
       documentnumber: "ABCD2022000001",
     })

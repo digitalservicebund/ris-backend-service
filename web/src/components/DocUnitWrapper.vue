@@ -3,9 +3,9 @@ import { ref } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocUnitInfoPanel from "@/components/DocUnitInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 
-defineProps<{ docUnit: DocUnit }>()
+defineProps<{ docUnit: DocumentUnit }>()
 const router = useRouter()
 const route = useRoute()
 

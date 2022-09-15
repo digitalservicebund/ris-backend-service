@@ -2,13 +2,13 @@
 import { ref } from "vue"
 import ErrorModal from "@/components/ErrorModal.vue"
 import FileInputButton from "@/components/FileInputButton.vue"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 import { UploadStatus, UploadErrorStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{ docUnitUuid: string }>()
 const emits = defineEmits<{
-  (e: "updateDocUnit", updatedDocUnit: DocUnit): void
+  (e: "updateDocUnit", updatedDocUnit: DocumentUnit): void
 }>()
 
 interface Status {

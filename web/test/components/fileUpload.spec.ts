@@ -6,7 +6,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import FileUpload from "../../src/components/FileUpload.vue"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 import { UploadStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
 
@@ -41,7 +41,7 @@ describe("FileUpload", () => {
   test("upload docx file", async () => {
     vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
       Promise.resolve({
-        docUnit: new DocUnit("1"),
+        docUnit: new DocumentUnit("1"),
         status: UploadStatus.SUCCESSED,
       })
     )

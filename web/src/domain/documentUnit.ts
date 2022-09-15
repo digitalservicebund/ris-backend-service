@@ -31,7 +31,7 @@ export type PreviousDecision = {
   fileNumber?: string
 }
 
-export default class DocUnit implements CoreData, Texts {
+export default class DocumentUnit implements CoreData, Texts {
   readonly uuid: string
   readonly id?: string
   readonly documentnumber?: string
@@ -67,10 +67,10 @@ export default class DocUnit implements CoreData, Texts {
 
   public previousDecisions?: PreviousDecision[]
 
-  constructor(uuid: string, data: Partial<DocUnit> = {}) {
+  constructor(uuid: string, data: Partial<DocumentUnit> = {}) {
     this.uuid = String(uuid)
 
-    let key: keyof DocUnit
+    let key: keyof DocumentUnit
     for (key in data) {
       if (data[key] === null) delete data[key]
     }

@@ -1,14 +1,14 @@
 import httpClient from "./httpClient"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 import { UploadStatus } from "@/domain/uploadStatus"
 
 export default {
   async uploadFile(
     docUnitUuid: string,
     file: File
-  ): Promise<{ docUnit?: DocUnit; status: UploadStatus }> {
+  ): Promise<{ docUnit?: DocumentUnit; status: UploadStatus }> {
     try {
-      const response = await httpClient.put<File, DocUnit>(
+      const response = await httpClient.put<File, DocumentUnit>(
         `docunits/${docUnitUuid}/file`,
         {
           headers: {

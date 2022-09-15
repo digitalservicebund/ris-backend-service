@@ -3,14 +3,14 @@ import { ref } from "vue"
 import { useRouter } from "vue-router"
 import DocUnitList from "@/components/DocUnitList.vue"
 import TextButton from "@/components/TextButton.vue"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 import docUnitService from "@/services/docUnitService"
 
 const router = useRouter()
 
 const docUnits = ref((await docUnitService.getAll()).data)
 
-const handleDelete = async (docUnit: DocUnit) => {
+const handleDelete = async (docUnit: DocumentUnit) => {
   const status = (await docUnitService.delete(docUnit.uuid)).status
   if (status === 200) {
     docUnits.value = docUnits.value.filter((item) => item != docUnit)

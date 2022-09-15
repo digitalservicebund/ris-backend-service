@@ -1,15 +1,15 @@
 import { describe, it, expect } from "vitest"
-import DocUnit, { CoreData, Texts } from "../../src/domain/docUnit"
+import DocumentUnit, { CoreData, Texts } from "../../src/domain/documentUnit"
 
 describe("DocUnit", () => {
   it("instantiates with uuid", () => {
-    const docUnit = new DocUnit("foo")
+    const docUnit = new DocumentUnit("foo")
     expect(docUnit.uuid).toEqual("foo")
     expect(docUnit.id).toEqual(undefined)
   })
 
   it("returns core Data as object", () => {
-    const docUnit = new DocUnit("foo")
+    const docUnit = new DocumentUnit("foo")
     docUnit.fileNumber = "bar"
     docUnit.courtLocation = "baz"
 
@@ -19,7 +19,7 @@ describe("DocUnit", () => {
   })
 
   it("returns texts as object", () => {
-    const docUnit = new DocUnit("foo")
+    const docUnit = new DocumentUnit("foo")
     docUnit.reasons = "bar"
     docUnit.headnote = "baz"
 
@@ -29,15 +29,15 @@ describe("DocUnit", () => {
   })
 
   it("returns false if no file is attached", () => {
-    const docUnit = new DocUnit("foo")
+    const docUnit = new DocumentUnit("foo")
     expect(docUnit.hasFile).toBeFalsy()
 
-    const docUnit2 = new DocUnit("foo", { s3path: "" })
+    const docUnit2 = new DocumentUnit("foo", { s3path: "" })
     expect(docUnit2.hasFile).toBeFalsy()
   })
 
   it("returns true if file is attached", () => {
-    const docUnit = new DocUnit("foo", { s3path: "foo-path" })
+    const docUnit = new DocumentUnit("foo", { s3path: "foo-path" })
     expect(docUnit.hasFile).toBeTruthy()
   })
 })

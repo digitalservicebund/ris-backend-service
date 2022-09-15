@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import { Texts } from "../domain/docUnit"
+import { Texts } from "../domain/documentUnit"
 import SaveDocUnitButton from "./SaveDocUnitButton.vue"
 import TextEditor from "./TextEditor.vue"
 import { texts } from "@/domain"

@@ -4,7 +4,7 @@ import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import DocUnitList from "../../src/components/DocUnitList.vue"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 
 describe("docUnit list", () => {
   const vuetify = createVuetify({ components, directives })
@@ -33,7 +33,7 @@ describe("docUnit list", () => {
   })
 
   test("renders docUnits", async () => {
-    const docUnit = new DocUnit("1", { fileNumber: "foo" })
+    const docUnit = new DocumentUnit("1", { fileNumber: "foo" })
 
     render(DocUnitList, {
       props: {
@@ -51,7 +51,7 @@ describe("docUnit list", () => {
   })
 
   test("delete emits event", async () => {
-    const docUnit = new DocUnit("1", { fileNumber: "foo" })
+    const docUnit = new DocumentUnit("1", { fileNumber: "foo" })
 
     const { emitted } = render(DocUnitList, {
       props: {

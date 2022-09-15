@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import { CoreData } from "../domain/docUnit"
+import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocUnitButton from "./SaveDocUnitButton.vue"
 import { coreDataFields } from "@/domain"

@@ -2,12 +2,12 @@
 import DocUnitWrapper from "@/components/DocUnitWrapper.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FileViewer from "@/components/FileViewer.vue"
-import DocUnit from "@/domain/docUnit"
+import DocumentUnit from "@/domain/documentUnit"
 
-defineProps<{ docUnit: DocUnit }>()
+defineProps<{ docUnit: DocumentUnit }>()
 
 const emits = defineEmits<{
-  (e: "updateDocUnit", updatedDocUnit: DocUnit): void
+  (e: "updateDocUnit", updatedDocUnit: DocumentUnit): void
   (e: "deleteFile"): void
 }>()
 </script>
