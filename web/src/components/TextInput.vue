@@ -47,6 +47,7 @@ const conditionalClasses = computed(() => ({
   width: 100%;
   padding: 17px 24px;
   border: 2px solid $text-tertiary;
+
   &:focus {
     outline: none;
   }

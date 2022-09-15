@@ -82,7 +82,7 @@ onBeforeUnmount(() => {
           @input="emitInputEvent"
         />
         <button
-          class="toggle_dropdown_button"
+          class="toggle-dropdown-button"
           tabindex="0"
           @click="toggleDropdown"
           @keydown.enter="toggleDropdown"
@@ -118,6 +118,7 @@ onBeforeUnmount(() => {
   width: 100%;
   position: relative;
   display: inline-block;
+
   /** Disable user select text */
   -webkit-user-select: none; /* Chrome all / Safari all */
   -moz-user-select: none; /* Firefox all */
@@ -126,46 +127,53 @@ onBeforeUnmount(() => {
   &__open-dropdown {
     .input-container {
       display: flex;
-      flex-direction: row;
-      flex-wrap: nowrap;
+      flex: row nowrap;
       justify-content: space-between;
       padding: 17px 24px;
       border: 2px solid $text-tertiary;
+
       &:hover {
         outline: 4px solid $text-tertiary;
         border: none;
         margin-bottom: 4px;
       }
+
       &:focus {
         outline: 4px solid $text-tertiary;
         border: none;
         margin-bottom: 4px;
       }
+
       .text-input {
         width: 100%;
+
         &:focus {
           outline: none;
         }
       }
-      .toggle_dropdown_button {
+
+      .toggle-dropdown-button {
         height: 5px;
       }
     }
   }
+
   &__dropdown-items {
     display: flex;
     flex-direction: column;
     border: 2px solid #ececec;
     border-top: none;
-    filter: drop-shadow(0px 1px 3px rgba(0, 0, 0, 0.25));
-    /**Always show on top after textbox and width equal to textbox */
+    filter: drop-shadow(0 1px 3px rgb(0 0 0 / 25%));
+
+    /** Always show on top after textbox and width equal to textbox */
     position: absolute;
     z-index: 99;
     top: 100%;
     left: 0;
     right: 0;
     max-height: 300px;
-    /*hide scroll bar but still scroll */
+
+    /* hide scroll bar but still scroll */
     overflow-y: scroll;
     -ms-overflow-style: none; /* Internet Explorer 10+ */
     scrollbar-width: none; /* Firefox */
@@ -173,17 +181,21 @@ onBeforeUnmount(() => {
       display: none; /* Chrome */
     }
   }
+
   &__dropdown-item {
     padding: 17px 24px;
     cursor: pointer;
     background-color: #fff;
     border-bottom: 2px solid #ececec;
+
     &:last-of-type {
       border-bottom: none;
     }
+
     &:hover {
       background-color: #ececec;
     }
+
     &:focus {
       background-color: #ececec;
       outline: none;

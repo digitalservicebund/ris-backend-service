@@ -8,8 +8,8 @@ $blue300: #dce8ef;
 $blue500: #b3c9d6;
 $blue700: #336f91;
 $blue800: #004b76;
-$white: #ffffff;
-$black: #000000;
+$white: #fff;
+$black: #000;
 $yellow500: #f5e05d;
 $gray100: #f6f7f8;
 $gray400: #dcdee1;
@@ -20,6 +20,7 @@ $button-tertiary-focus: #edf1f4;
 $error: #b0243f;
 $error-background: #f9e5ec;
 
+// Borders
 $border-radius: 10px;
 $border-style-inactive: 3px solid $blue300;
 $border-style-active: 3px solid $blue500 !important;

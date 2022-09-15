@@ -176,6 +176,7 @@ function validateEmailAddress(): boolean {
   flex-direction: column;
   justify-content: flex-start;
 }
+
 .publication-container {
   background-color: #f6f7f8;
   min-height: 100vh;
@@ -183,6 +184,7 @@ function validateEmailAddress(): boolean {
   padding-top: 32px;
   padding-left: 32px;
   padding-bottom: 32px;
+
   .icon {
     width: 15px;
     height: 25px;
@@ -190,16 +192,19 @@ function validateEmailAddress(): boolean {
     align-items: center;
     flex-wrap: wrap;
   }
+
   p {
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.16px;
     color: $black;
   }
+
   .publication-text-header {
     font-size: 24px;
     line-height: 30px;
   }
+
   .publication-text-label {
     font-style: normal;
     font-weight: 700;
@@ -209,8 +214,10 @@ function validateEmailAddress(): boolean {
     letter-spacing: 1px;
     color: #4e596a;
   }
+
   .publication-check-container {
     width: fit-content;
+
     .publication-check-infos-container {
       display: flex;
       flex-direction: column;
@@ -219,10 +226,12 @@ function validateEmailAddress(): boolean {
       padding: 16px 56px 16px 24px;
       background-color: $white;
       width: 100%;
+
       &__in_error {
         border: solid 1px #b0243f;
         max-width: 50vw;
       }
+
       .publication-button-container {
         display: flex;
         flex-direction: row;
@@ -231,9 +240,11 @@ function validateEmailAddress(): boolean {
       }
     }
   }
+
   .publication-infos-container {
     width: fit-content;
     row-gap: 16px;
+
     .email-infos-container {
       row-gap: 24px;
 
@@ -241,6 +252,7 @@ function validateEmailAddress(): boolean {
         p {
           font-weight: 700;
         }
+
         span {
           font-weight: 400;
           margin-left: 5px;
@@ -248,14 +260,15 @@ function validateEmailAddress(): boolean {
       }
     }
   }
+
   .text-icon {
     display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
+    flex: row nowrap;
     justify-content: flex-start;
     align-items: center;
     column-gap: 12px;
   }
+
   .xml-validation-error-container {
     .xml-validation-error-details {
       padding-top: 16px;

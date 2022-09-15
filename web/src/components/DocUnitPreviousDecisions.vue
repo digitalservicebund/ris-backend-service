@@ -88,7 +88,7 @@ const values = computed({
   }
 
   &__remove-button {
-    margin: 1rem 0 2rem 0;
+    margin: 1rem 0 2rem;
   }
 }
 </style>

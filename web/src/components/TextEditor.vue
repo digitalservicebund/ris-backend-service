@@ -564,8 +564,9 @@ onBeforeRouteUpdate(async () => {
 <style lang="scss" scoped>
 #container {
   position: relative;
+
   .row-primary {
-    /* 
+    /*
      * TODO:
      * The mass of <v-col>usage is pervert. Will be removed when refactoring the
      * Vuetify grid usage. Therefore ignore for now.
@@ -575,12 +576,14 @@ onBeforeRouteUpdate(async () => {
     .v-col {
       flex-grow: 0 !important;
       box-sizing: border-box;
+
       .last-icon {
         position: absolute;
         right: 15px;
         margin-top: auto;
         margin-bottom: auto;
       }
+
       .second-last-icon {
         position: absolute;
         right: 50px;
@@ -612,6 +615,7 @@ onBeforeRouteUpdate(async () => {
     height: 100%;
   }
 }
+
 .editor-btn {
   color: #004b78;
 
@@ -625,6 +629,7 @@ onBeforeRouteUpdate(async () => {
     background-color: $navbar-hover-gray;
   }
 }
+
 .display-group {
   display: flex;
   flex-direction: row;
@@ -656,6 +661,7 @@ onBeforeRouteUpdate(async () => {
     z-index: 1;
   }
 }
+
 .row-secondary {
   flex-grow: 0 !important;
 }

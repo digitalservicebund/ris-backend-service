@@ -113,17 +113,17 @@ function onFileSelect(event: Event): void {
           @drop="drop"
         >
           <span v-if="status.inDragError">
-            <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
+            <v-icon class="file-upload" size="50px"> upload_file </v-icon>
             <!-- if still in drag move -->
             <span v-if="status.uploadStatus !== UploadStatus.WRONG_FILE_FORMAT">
-              <div class="upload_status">Datei wird nicht unterstützt.</div>
+              <div class="upload-status">Datei wird nicht unterstützt.</div>
               <div>
                 Versuchen Sie eine .docx-Version dieser Datei hochzuladen.
               </div>
             </span>
             <!-- if file dropped and failed to upload -->
             <span v-else>
-              <div class="upload_status">Datei in diesen Bereich ziehen</div>
+              <div class="upload-status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <div>
                 <FileInputButton
@@ -139,20 +139,20 @@ function onFileSelect(event: Event): void {
           </span>
           <span v-else>
             <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
-              <v-icon class="icon_upload" size="50px"> refresh </v-icon>
-              <div class="upload_status">Upload läuft</div>
+              <v-icon class="icon-upload" size="50px"> refresh </v-icon>
+              <div class="upload-status">Upload läuft</div>
               <div>{{ status.file ? status.file.name : "" }}</div>
             </span>
             <span v-else-if="status.uploadStatus === UploadStatus.SUCCESSED">
-              <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
-              <div class="upload_status">
+              <v-icon class="file-upload" size="50px"> upload_file </v-icon>
+              <div class="upload-status">
                 Die Datei {{ status.file ? status.file.name : "" }} wurde
                 erfolgreich hochgeladen
               </div>
             </span>
             <span v-else>
-              <v-icon class="icon_upload" size="50px"> upload_file </v-icon>
-              <div class="upload_status">Datei in diesen Bereich ziehen</div>
+              <v-icon class="file-upload" size="50px"> upload_file </v-icon>
+              <div class="upload-status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <FileInputButton
                 id="file-upload"
@@ -221,14 +221,14 @@ function onFileSelect(event: Event): void {
   }
 }
 
-.icon_upload {
+.file-upload {
   margin-top: 10px;
   margin-left: -5px;
   color: $blue800;
 }
 
-.upload_status {
+.upload-status {
   font-size: 24px;
-  margin: 16px 0px 10px 0;
+  margin: 16px 0 10px;
 }
 </style>

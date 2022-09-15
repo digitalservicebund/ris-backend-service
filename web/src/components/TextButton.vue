@@ -49,12 +49,14 @@ const buttonClasses = computed(() => ({
     &--size-default {
       --v-btn-height: 48px;
       --v-btn-size: 1rem;
+
       padding: rem(13px) rem(24px);
     }
 
     &--size-small {
       --v-btn-height: 40px;
       --v-btn-size: 1rem;
+
       padding: rem(9px) rem(24px);
     }
 
@@ -62,9 +64,15 @@ const buttonClasses = computed(() => ({
     &--size-x-large {
       --v-btn-height: 64px;
       --v-btn-size: 1.125rem;
+
       padding: rem(19px) rem(24px);
     }
 
+    /*
+     * TODO:
+     * Remove the disable once we established BEM linting.
+     */
+    /* stylelint-disable selector-class-pattern */
     &:not(.v-btn--icon) {
       .v-icon--start {
         margin-inline-start: 0;
@@ -94,8 +102,10 @@ const buttonClasses = computed(() => ({
         opacity: 0;
       }
     }
+    /* stylelint-enable selector-class-pattern */
   }
 }
+
 .btn-primary {
   background-color: $blue800 !important;
   color: $white !important;
@@ -119,6 +129,7 @@ const buttonClasses = computed(() => ({
     }
   }
 }
+
 .btn-secondary {
   background-color: #f5e05d !important;
   color: $blue800 !important;
@@ -139,6 +150,7 @@ const buttonClasses = computed(() => ({
     }
   }
 }
+
 .btn-ghost {
   background: none !important;
   color: $blue800 !important;

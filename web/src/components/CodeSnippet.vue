@@ -89,24 +89,28 @@ watch(
     text-transform: uppercase;
     color: $black;
   }
+
   .code-lines {
     border: solid 1px $white;
     overflow: auto;
     white-space: nowrap;
     width: 60vw;
   }
+
   .code-line {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
     row-gap: 10px;
     box-sizing: border-box;
+
     .line-number {
       background-color: #ebecf0;
       display: flex;
       justify-content: flex-end;
       padding-right: 5px;
-      /* Disable select line number*/
+
+      /* Disable select line number */
       -webkit-touch-callout: none; /* iOS Safari */
       -webkit-user-select: none; /* Safari */
       -khtml-user-select: none; /* Konqueror HTML */
@@ -114,6 +118,7 @@ watch(
       -ms-user-select: none; /* Internet Explorer/Edge */
       user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
     }
+
     .line {
       padding-left: 20px;
     }

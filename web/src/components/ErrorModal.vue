@@ -5,11 +5,11 @@ defineProps<{ title: string; description: string }>()
 <template>
   <v-container class="error">
     <v-row>
-      <v-col class="error_icon">
+      <v-col class="error-icon">
         <v-icon color="#B0243F" size="20px">error</v-icon>
       </v-col>
       <v-col align-self="stretch">
-        <div class="error_title">
+        <div class="error-title">
           {{ title }}
         </div>
         <div>
@@ -27,12 +27,12 @@ defineProps<{ title: string; description: string }>()
   margin-top: 23px;
 }
 
-.error_icon {
+.error-icon {
   max-width: 20px;
   margin-right: 10px;
 }
 
-.error_title {
+.error-title {
   font-size: 16px;
   font-weight: 700;
 }

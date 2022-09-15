@@ -54,6 +54,7 @@ const values = computed({
   &__save-button {
     margin-top: 2rem;
   }
+
   &__require-info {
     display: inline-block;
     margin: 2rem 0;

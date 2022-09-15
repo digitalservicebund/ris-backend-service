@@ -78,9 +78,11 @@ const route = useRoute()
   transform: rotate(-90deg);
   transform-origin: right;
 }
+
 .odoc-open-text {
   margin-left: 30px;
 }
+
 .odoc-open-icon-background {
   background-color: $blue800;
   border-radius: 50%;
@@ -88,11 +90,13 @@ const route = useRoute()
   height: 40px;
   transform: rotate(90deg) translateX(-2px) translateY(-25px);
 }
+
 .odoc-open-icon {
   color: white;
   margin-right: 9px;
   margin-top: 8px;
 }
+
 .odoc-close-icon-background {
   background-color: $blue800;
   color: $white;
@@ -101,21 +105,27 @@ const route = useRoute()
   height: 40px;
   transform: translate(-40px, 10px);
 }
+
 .odoc-editor-header {
   padding: 40px 0 15px 20px; // top right bottom left
 }
+
 .odoc-editor-wrapper {
   border: 1px solid $gray400;
 }
+
 .odoc-panel {
   position: fixed;
 }
+
 .odoc-upload-icon {
   margin-bottom: 15px;
 }
+
 .odoc-upload-note {
   margin-bottom: 15px;
 }
+
 .link-to-upload {
   color: $blue800;
 }

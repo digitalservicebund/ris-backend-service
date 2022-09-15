@@ -165,7 +165,7 @@ onUnmounted(() => {
         />
 
         <DocUnitPreviousDecisions
-          id="previousDecisions"
+          id="previous-decisions"
           v-model="previousDecisions"
         />
 
@@ -188,7 +188,7 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
-#previousDecisions {
+#previous-decisions {
   padding: 2rem 1.1rem;
 }
 </style>

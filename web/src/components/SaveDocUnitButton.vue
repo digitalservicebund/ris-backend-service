@@ -106,6 +106,7 @@ onMounted(() => {
     flex-direction: row;
     justify-items: flex-start;
     align-items: flex-end;
+
     .icon {
       width: 30px;
       height: 25px;
@@ -113,21 +114,25 @@ onMounted(() => {
       align-items: center;
       flex-wrap: wrap;
     }
+
     p {
       font-weight: 400;
       letter-spacing: 0.16px;
     }
+
     .status-text {
       font-size: 14px;
       line-height: 18px;
     }
+
     .error-text {
       font-size: 16px;
       line-height: 22px;
     }
+
     .on-succeed {
       font-size: 16px;
-      animation: textFaded;
+      animation: text-faded;
       animation-delay: 1s;
       animation-duration: 2s;
       animation-timing-function: ease-in;
@@ -135,10 +140,12 @@ onMounted(() => {
       animation-fill-mode: forwards;
     }
   }
-  @keyframes textFaded {
+
+  @keyframes text-faded {
     from {
       font-size: 16px;
     }
+
     to {
       font-size: 14px;
     }

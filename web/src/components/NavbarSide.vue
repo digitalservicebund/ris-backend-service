@@ -41,7 +41,7 @@ const linkStyling = (componentName: string) => {
         <v-divider />
         <v-row><v-col></v-col></v-row>
         <v-row>
-          <v-col class="sidebar_headline">
+          <v-col class="sidebar-headline">
             <router-link
               :class="
                 linkStyling('jurisdiction-docUnit-:documentNumber-categories')
@@ -101,7 +101,7 @@ const linkStyling = (componentName: string) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="sidebar_headline">
+          <v-col class="sidebar-headline">
             <router-link
               :class="linkStyling('jurisdiction-docUnit-:documentNumber-files')"
               :to="{
@@ -119,7 +119,7 @@ const linkStyling = (componentName: string) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="sidebar_headline"> Bearbeitungsstand </v-col>
+          <v-col class="sidebar-headline"> Bearbeitungsstand </v-col>
         </v-row>
         <v-row>
           <v-col>
@@ -132,7 +132,7 @@ const linkStyling = (componentName: string) => {
         <v-row>
           <v-col>
             <router-link
-              class="sidebar_headline public-button"
+              class="sidebar-headline public-button"
               :to="{
                 name: 'jurisdiction-docUnit-:documentNumber-publication',
                 params: { documentNumber: documentNumber },
@@ -160,23 +160,28 @@ const linkStyling = (componentName: string) => {
 </template>
 
 <style lang="scss" scoped>
-.sidebar_headline {
+.sidebar-headline {
   font-weight: bold;
+
   &:hover {
     background-color: $navbar-hover-gray;
     text-decoration: underline;
   }
 }
+
 .sub-rubriken {
   margin-left: 20px;
+
   &:hover {
     background-color: $navbar-hover-gray;
     text-decoration: underline;
   }
 }
+
 .side-navbar-active-link {
   text-decoration: underline;
 }
+
 .sidebar-close-icon-background {
   background-color: $blue800;
   border-radius: 50%;
@@ -185,11 +190,13 @@ const linkStyling = (componentName: string) => {
   float: right;
   transform: translateY(60px);
 }
+
 .sidebar-close-icon {
   color: white;
   margin-left: 8px;
   margin-top: 8px;
 }
+
 .sidebar-open {
   background-color: $yellow500;
   border-radius: 10px;
@@ -203,9 +210,11 @@ const linkStyling = (componentName: string) => {
   transform: rotate(-90deg) translateX(-165px);
   transform-origin: left;
 }
+
 .sidebar-open-text {
   margin-left: 40px;
 }
+
 .sidebar-open-icon-background {
   background-color: $blue800;
   border-radius: 50%;
@@ -213,20 +222,24 @@ const linkStyling = (componentName: string) => {
   height: 40px;
   transform: rotate(90deg) translateX(3px) translateY(-10px);
 }
+
 .sidebar-open-icon {
   color: white;
   margin-left: 9px;
   margin-top: 8px;
 }
+
 .back-button {
   color: $blue800;
   padding-bottom: 49px;
   font-size: small;
+
   &__icon {
     margin-bottom: 4px;
     margin-right: 8px;
   }
 }
+
 .public-button {
   text-decoration: underline;
 }

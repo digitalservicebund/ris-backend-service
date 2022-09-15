@@ -104,10 +104,12 @@ const onDelete = () => {
 .table-header {
   background-color: $gray400;
 }
+
 .doc-unit-list-table td,
 th {
   font-size: medium !important;
 }
+
 .doc-unit-list-active-link {
   text-decoration: underline;
 }

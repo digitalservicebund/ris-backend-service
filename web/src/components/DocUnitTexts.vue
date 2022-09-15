@@ -65,15 +65,18 @@ const data = computed(() =>
 <style lang="scss" scoped>
 .ris-texte-form {
   padding: rem(20px);
+
   &__textfield {
     padding: rem(20px);
   }
+
   &__input {
     width: 100%;
     margin-top: 5px;
     outline: 2px solid $text-tertiary;
     resize: vertical;
   }
+
   &__label {
     padding: 12px 12px 20px 0;
   }

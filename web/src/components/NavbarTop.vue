@@ -41,31 +41,38 @@ const linkStyling = (componentName: string) => {
   display: flex;
   align-items: center;
 }
+
 .topbar-header {
   font-weight: bold;
   line-height: 120%;
   border-right: $gray400 solid 1px;
 }
+
 .topbar-logo-circle {
   color: $blue800;
   float: right;
 }
+
 .topbar-link-box {
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
 }
+
 .topbar-link {
-  padding: 10px 10px 10px 10px;
+  padding: 10px;
+
   &:hover {
     background-color: $yellow500;
     text-decoration: underline;
   }
 }
+
 .topbar-link-active {
   text-decoration: underline !important;
 }
+
 .topbar-user-icon {
   margin-right: 8px;
 }

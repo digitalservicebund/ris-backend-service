@@ -37,7 +37,7 @@ describe("Dropdown Element", () => {
       },
     })
     const openDropdownContainer = container.querySelector(
-      ".toggle_dropdown_button"
+      ".toggle-dropdown-button"
     ) as HTMLElement
     await user.click(openDropdownContainer)
     const dropdownItems = container.querySelectorAll(
@@ -63,7 +63,7 @@ describe("Dropdown Element", () => {
       },
     })
     const openDropdownContainer = container.querySelector(
-      ".toggle_dropdown_button"
+      ".toggle-dropdown-button"
     ) as HTMLElement
 
     await user.click(openDropdownContainer)
@@ -86,7 +86,7 @@ describe("Dropdown Element", () => {
       },
     })
     const openDropdownContainer = container.querySelector(
-      ".toggle_dropdown_button"
+      ".toggle-dropdown-button"
     ) as HTMLElement
 
     await user.click(openDropdownContainer)
