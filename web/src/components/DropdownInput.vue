@@ -60,19 +60,11 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
   isShowDropdown.value = false
 }
 
-const closeDropdownWithKeyboad = (event: KeyboardEvent) => {
-  const isEscPressed = event.key === "Escape"
-  if (!isEscPressed) return
-  if (isShowDropdown.value) isShowDropdown.value = false
-}
-
 onMounted(() => {
   window.addEventListener("click", closeDropDownWhenClickOutSide)
-  window.addEventListener("keydown", closeDropdownWithKeyboad)
 })
 onBeforeUnmount(() => {
   window.removeEventListener("click", closeDropDownWhenClickOutSide)
-  window.removeEventListener("keydown", closeDropdownWithKeyboad)
 })
 </script>
 
