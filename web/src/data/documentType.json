@@ -1,0 +1,56 @@
+{
+  "items": [
+    { "text": "AnU - Anerkenntnisurteil", "value": "AnU" },
+    { "text": "Anh - Anhängiges Verfahren", "value": "Anh" },
+    { "text": "Ant - EuGH-Vorlage", "value": "Ant" },
+    { "text": "Äuß - Äußerung nach § 82 Abs. 4 BVerfGG", "value": "Äuß" },
+    {
+      "text": "BGStA - Bescheid der Generalstaatsanwaltschaft",
+      "value": "BGStA"
+    },
+    { "text": "BStA - Bescheid der Staatsanwaltschaft", "value": "BStA" },
+    { "text": "Bes - Beschluss", "value": "Bes" },
+    { "text": "Buß - Bußgeldbescheid", "value": "Buß" },
+    { "text": "DrB - Dreierausschussbeschluss des BVerfG", "value": "DrB" },
+    {
+      "text": "EVg - Einstellungsverfügung der Staatsanwaltschaft",
+      "value": "EVg"
+    },
+    { "text": "EiA - Einstweilige Anordnung", "value": "EiA" },
+    { "text": "End - Endurteil", "value": "End" },
+    { "text": "Ent - Entscheidung", "value": "Ent" },
+    { "text": "Erg - Ergänzungsurteil", "value": "Erg" },
+    {
+      "text": "GWF - Gegenstandswertfestsetzung im verfassungsgerichtlichen Verfahren",
+      "value": "GWF"
+    },
+    { "text": "GeB - Gerichtsbescheid", "value": "GeB" },
+    { "text": "Gut - Gutachten", "value": "Gut" },
+    {
+      "text": "KaB - Kammerbeschluss des BVerfG, stattgegebene und nicht stattgegebene (ab 1.1.1986 bis Ende 1999)",
+      "value": "KaB"
+    },
+    { "text": "KbN - Nichtannahmebeschluss", "value": "KbN" },
+    { "text": "KbS - Stattgebender Kammerbeschluss", "value": "KbS" },
+    { "text": "KfB - Kostenfestsetzungsbeschluss", "value": "KfB" },
+    { "text": "KoB - Kammerbeschluss ohne Begründung", "value": "KoB" },
+    { "text": "PkH - Prozesskostenhilfebeschluss", "value": "PkH" },
+    { "text": "ReM - Rechtsentscheid in Mietsachen", "value": "ReM" },
+    { "text": "Sch - Schiedsgerichtsentscheidung", "value": "Sch" },
+    { "text": "Ste - Stellungnahme", "value": "Ste" },
+    { "text": "Str - Streitwertbeschluss", "value": "Str" },
+    { "text": "TVU - Teilversäumnisurteil", "value": "TVU" },
+    { "text": "TeB - Teilbeschluss", "value": "TeB" },
+    { "text": "TeU - Teilurteil", "value": "TeU" },
+    { "text": "Urt - Urteil", "value": "Urt" },
+    { "text": "Vfg - Verfügung", "value": "Vfg" },
+    { "text": "Vgl - Vergleich", "value": "Vgl" },
+    { "text": "Vor - Vorlagebeschluss", "value": "Vor" },
+    { "text": "Vorab - Ersuchen um Vorabentscheidung", "value": "Vorab" },
+    { "text": "VsU - Versäumnisurteil", "value": "VsU" },
+    { "text": "VzU - Verzichtsurteil", "value": "VzU" },
+    { "text": "ZVU - Zweites Versäumnisurteil", "value": "ZVU" },
+    { "text": "ZwB - Zwischenbeschluss", "value": "ZwB" },
+    { "text": "ZwU - Zwischenurteil", "value": "ZwU" }
+  ]
+}

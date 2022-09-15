@@ -26,10 +26,13 @@ export interface TextInputField extends BaseInputField {
   type: InputType.TEXT
   inputAttributes: TextInputAttributes
 }
-
+export type DropdownItem = {
+  text: string
+  value: string
+}
 export interface DropdownAttributes extends BaseInputAttributes {
   placeholder?: string
-  dropdownItems?: string[]
+  dropdownItems?: DropdownItem[]
 }
 
 export interface DropdownInputField extends BaseInputField {

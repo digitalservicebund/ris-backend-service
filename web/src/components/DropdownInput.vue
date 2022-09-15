@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { onBeforeUnmount, onMounted, ref } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
+import type { DropdownItem } from "@/domain/types"
 
 interface Props {
   id: string
@@ -8,7 +9,7 @@ interface Props {
   modelValue?: string
   ariaLabel: string
   placeholder?: string
-  dropdownItems: string[] | undefined
+  dropdownItems: DropdownItem[] | undefined
 }
 
 interface Emits {
@@ -19,10 +20,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
-  props,
-  emit
-)
+const { inputValue } = useInputModel<string, Props, Emits>(props, emit)
 
 const isShowDropdown = ref(false)
 const items = ref(!!props.dropdownItems ? props.dropdownItems : [])
@@ -31,9 +29,22 @@ const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
 }
 
+const updateValue = (value: string) => {
+  emit("update:modelValue", value)
+  isShowDropdown.value = false
+}
+
+const onTextChange = () => {
+  const textInput = document.querySelector(
+    `.input-container #${props.id}`
+  ) as HTMLInputElement
+  isShowDropdown.value = true
+  emit("update:modelValue", textInput.value)
+}
+
 const filterItems = () => {
   const filteredItem = items.value.filter((item) =>
-    item.includes(!!props.modelValue ? props.modelValue : "")
+    item.text.includes(!!props.modelValue ? props.modelValue : "")
   )
   return filteredItem.length > 0 ? filteredItem : items.value
 }
@@ -49,18 +60,19 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
   isShowDropdown.value = false
 }
 
-watch(
-  () => props.modelValue,
-  () => {
-    if (!isShowDropdown.value) isShowDropdown.value = true
+const closeDropdownWithKeyboad = (event: KeyboardEvent) => {
+  if (event.key === "Escape") {
+    isShowDropdown.value = false
   }
-)
+}
 
 onMounted(() => {
   window.addEventListener("click", closeDropDownWhenClickOutSide)
+  window.addEventListener("keydown", closeDropdownWithKeyboad)
 })
 onBeforeUnmount(() => {
   window.removeEventListener("click", closeDropDownWhenClickOutSide)
+  window.removeEventListener("keydown", closeDropdownWithKeyboad)
 })
 </script>
 
@@ -73,13 +85,13 @@ onBeforeUnmount(() => {
       <div class="input-container">
         <input
           :id="id"
-          v-model="inputValue"
+          :value="inputValue"
           :aria-label="ariaLabel"
           class="text-input"
           autocomplete="off"
           tabindex="0"
           :placeholder="placeholder"
-          @input="emitInputEvent"
+          @input="onTextChange"
         />
         <button
           class="toggle-dropdown-button"
@@ -104,10 +116,10 @@ onBeforeUnmount(() => {
         :key="index"
         class="dropdown-container__dropdown-item"
         tabindex="0"
-        @click="$emit('update:modelValue', item)"
-        @keypress.enter="$emit('update:modelValue', item)"
+        @click="updateValue(item.value)"
+        @keypress.enter="updateValue(item.value)"
       >
-        <span> {{ item }}</span>
+        <span> {{ item.text }}</span>
       </div>
     </div>
   </div>

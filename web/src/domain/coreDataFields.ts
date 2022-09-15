@@ -1,6 +1,6 @@
 import { InputType } from "./types"
-import type { InputField, InputAttributes } from "./types"
-import { documentTypes } from "@/data/documentType"
+import type { InputField, InputAttributes, DropdownItem } from "./types"
+import documentTypes from "@/data/documentType.json"
 
 export function defineTextField(
   name: string,
@@ -10,7 +10,7 @@ export function defineTextField(
   type: InputType,
   required?: boolean,
   placeholder?: string,
-  dropdownItems?: string[]
+  dropdownItems?: DropdownItem[]
 ): InputField {
   let inputFieldType: InputType
   let inputFieldAttributes: InputAttributes
@@ -68,7 +68,7 @@ export const coreDataFields: InputField[] = [
     InputType.DROPDOWN,
     true,
     "Bitte auswählen",
-    documentTypes
+    documentTypes.items
   ),
   defineTextField(
     "appraisalBody",
