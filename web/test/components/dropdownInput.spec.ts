@@ -47,42 +47,15 @@ describe("Dropdown Element", () => {
       ".toggle-dropdown-button"
     ) as HTMLElement
     await user.click(openDropdownContainer)
-    const dropdownItems = container.querySelectorAll(
+    let dropdownItems = container.querySelectorAll(
       ".dropdown-container__dropdown-item"
     )
     expect(dropdownItems).toHaveLength(3)
-    const item1 = dropdownItems[0]
-    const item2 = dropdownItems[1]
-    const item3 = dropdownItems[2]
-    expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
-    expect(item2).toHaveTextContent(DROPDOWN_ITEMS[1].text)
-    expect(item3).toHaveTextContent(DROPDOWN_ITEMS[2].text)
-  })
-
-  it("Close dropdown", async () => {
-    const { container, queryByDisplayValue } = render(DropdownInput, {
-      global: { plugins: [vuetify] },
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "",
-        dropdownItems: DROPDOWN_ITEMS,
-      },
-    })
-    const openDropdownContainer = container.querySelector(
-      ".toggle-dropdown-button"
-    ) as HTMLElement
-    await user.click(openDropdownContainer)
-    const dropdownItems = container.querySelectorAll(
+    await user.keyboard("{escape}")
+    dropdownItems = container.querySelectorAll(
       ".dropdown-container__dropdown-item"
     )
-    expect(dropdownItems).toHaveLength(3)
-    const item1 = queryByDisplayValue(DROPDOWN_ITEMS[0].text)
-    const item2 = queryByDisplayValue(DROPDOWN_ITEMS[1].text)
-    const item3 = queryByDisplayValue(DROPDOWN_ITEMS[2].text)
-    expect(item1).not.toBeInTheDocument()
-    expect(item2).not.toBeInTheDocument()
-    expect(item3).not.toBeInTheDocument()
+    expect(dropdownItems).toHaveLength(0)
   })
 
   it("Dropdown items should be filted", async () => {

@@ -60,6 +60,10 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
   isShowDropdown.value = false
 }
 
+const closeDropdown = () => {
+  isShowDropdown.value = false
+}
+
 onMounted(() => {
   window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
@@ -69,7 +73,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :id="id" class="dropdown-container">
+  <div :id="id" class="dropdown-container" @keydown.esc="closeDropdown">
     <div
       class="dropdown-container__open-dropdown"
       @keydown.enter="toggleDropdown"
