@@ -8,7 +8,7 @@ const router = useRouter()
 onBeforeMount(async () => {
   const newDocumentUnit = (await documentUnitService.createNew("KO", "RE")).data
   await router.replace({
-    name: "jurisdiction-docUnit-:documentNumber-files",
+    name: "jurisdiction-documentUnit-:documentNumber-files",
     params: { documentNumber: newDocumentUnit.documentnumber },
   })
 })

@@ -13,7 +13,7 @@ describe("originalFile SidePanel", () => {
     routes: [
       {
         path: "",
-        name: "jurisdiction-docUnit-:documentNumber-files",
+        name: "jurisdiction-documentUnit-:documentNumber-files",
         component: {},
       },
     ],

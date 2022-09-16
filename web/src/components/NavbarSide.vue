@@ -44,10 +44,12 @@ const linkStyling = (componentName: string) => {
           <v-col class="sidebar-headline">
             <router-link
               :class="
-                linkStyling('jurisdiction-docUnit-:documentNumber-categories')
+                linkStyling(
+                  'jurisdiction-documentUnit-:documentNumber-categories'
+                )
               "
               :to="{
-                name: 'jurisdiction-docUnit-:documentNumber-categories',
+                name: 'jurisdiction-documentUnit-:documentNumber-categories',
                 params: { documentNumber: documentNumber },
                 query: route.query,
               }"
@@ -60,7 +62,7 @@ const linkStyling = (componentName: string) => {
           <v-col class="sub-rubriken">
             <router-link
               :to="{
-                name: 'jurisdiction-docUnit-:documentNumber-categories',
+                name: 'jurisdiction-documentUnit-:documentNumber-categories',
                 params: { documentNumber: documentNumber },
                 query: route.query,
                 hash: '#coreData',
@@ -73,7 +75,7 @@ const linkStyling = (componentName: string) => {
           <v-col class="sub-rubriken">
             <router-link
               :to="{
-                name: 'jurisdiction-docUnit-:documentNumber-categories',
+                name: 'jurisdiction-documentUnit-:documentNumber-categories',
                 params: { documentNumber: documentNumber },
                 query: route.query,
                 hash: '#previousDecisions',
@@ -86,7 +88,7 @@ const linkStyling = (componentName: string) => {
           <v-col class="sub-rubriken">
             <router-link
               :to="{
-                name: 'jurisdiction-docUnit-:documentNumber-categories',
+                name: 'jurisdiction-documentUnit-:documentNumber-categories',
                 params: { documentNumber: documentNumber },
                 query: route.query,
                 hash: '#texts',
@@ -103,9 +105,11 @@ const linkStyling = (componentName: string) => {
         <v-row>
           <v-col class="sidebar-headline">
             <router-link
-              :class="linkStyling('jurisdiction-docUnit-:documentNumber-files')"
+              :class="
+                linkStyling('jurisdiction-documentUnit-:documentNumber-files')
+              "
               :to="{
-                name: 'jurisdiction-docUnit-:documentNumber-files',
+                name: 'jurisdiction-documentUnit-:documentNumber-files',
                 params: { documentNumber: documentNumber },
                 query: route.query,
               }"
@@ -134,7 +138,7 @@ const linkStyling = (componentName: string) => {
             <router-link
               class="sidebar-headline public-button"
               :to="{
-                name: 'jurisdiction-docUnit-:documentNumber-publication',
+                name: 'jurisdiction-documentUnit-:documentNumber-publication',
                 params: { documentNumber: documentNumber },
               }"
               >Veröffentlichen</router-link

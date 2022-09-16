@@ -26,7 +26,7 @@ describe("file viewer", async () => {
     routes: [
       {
         path: "",
-        name: "jurisdiction-docUnit-:documentNumber-files",
+        name: "jurisdiction-documentUnit-:documentNumber-files",
         component: {},
       },
     ],

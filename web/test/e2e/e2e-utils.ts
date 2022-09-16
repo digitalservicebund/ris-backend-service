@@ -5,12 +5,12 @@ export const navigateToCategories = async (
   page: Page,
   documentNumber: string
 ) => {
-  await page.goto(`/jurisdiction/docunit/${documentNumber}/categories`)
+  await page.goto(`/jurisdiction/documentunit/${documentNumber}/categories`)
   await expect(page.locator("text=Spruchkörper")).toBeVisible()
 }
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
-  await page.goto(`/jurisdiction/docunit/${documentNumber}/files`)
+  await page.goto(`/jurisdiction/documentunit/${documentNumber}/files`)
   await expect(page.locator("h2:has-text('Dokumente')")).toBeVisible()
 }
 

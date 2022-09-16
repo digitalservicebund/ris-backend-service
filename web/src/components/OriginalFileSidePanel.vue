@@ -42,7 +42,7 @@ const route = useRoute()
         <router-link
           class="link-to-upload"
           :to="{
-            name: 'jurisdiction-docUnit-:documentNumber-files',
+            name: 'jurisdiction-documentUnit-:documentNumber-files',
             params: { documentNumber: $route.params.documentNumber },
             query: route.query,
           }"

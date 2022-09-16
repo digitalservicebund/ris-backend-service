@@ -30,7 +30,7 @@ const handleDelete = async (documentUnit: DocumentUnit) => {
         <v-col>
           <TextButton
             label="Neue Dokumentationseinheit"
-            @click="router.push({ name: 'jurisdiction-docUnit-new' })"
+            @click="router.push({ name: 'jurisdiction-documentUnit-new' })"
           />
         </v-col>
       </v-row>

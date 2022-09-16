@@ -11,7 +11,7 @@ test.beforeEach(async ({ page, documentNumber }) => {
   await navigateToFiles(page, documentNumber)
   await page.goto("/")
   await page
-    .locator(`a[href*="/jurisdiction/docunit/${documentNumber}/files"]`)
+    .locator(`a[href*="/jurisdiction/documentunit/${documentNumber}/files"]`)
     .click()
 })
 

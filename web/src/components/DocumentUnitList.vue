@@ -53,7 +53,7 @@ const onDelete = () => {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <v-table v-if="documentUnits.length" class="doc-unit-list-table">
+    <v-table v-if="documentUnits.length" class="document-unit-list-table">
       <thead>
         <tr class="table-header">
           <th class="text-center" scope="col">Dok.-Nummer</th>
@@ -67,11 +67,11 @@ const onDelete = () => {
         <tr v-for="documentUnit in documentUnits" :key="documentUnit.id">
           <td>
             <router-link
-              class="doc-unit-list-active-link"
+              class="document-unit-list-active-link"
               :to="{
                 name: documentUnit.s3path
-                  ? 'jurisdiction-docUnit-:documentNumber-categories'
-                  : 'jurisdiction-docUnit-:documentNumber-files',
+                  ? 'jurisdiction-documentUnit-:documentNumber-categories'
+                  : 'jurisdiction-documentUnit-:documentNumber-files',
                 params: { documentNumber: documentUnit.documentnumber },
               }"
             >
@@ -112,12 +112,12 @@ const onDelete = () => {
   background-color: $gray400;
 }
 
-.doc-unit-list-table td,
+.document-unit-list-table td,
 th {
   font-size: medium !important;
 }
 
-.doc-unit-list-active-link {
+.document-unit-list-active-link {
   text-decoration: underline;
 }
 </style>

@@ -11,7 +11,7 @@ test.describe("test the scrolling behavior with hashes", () => {
     const coreDataHeadline = "#coreData h2"
     const textsHeadline = "#texts h2"
     const textsNavItem = page.locator(
-      `a[href*="/jurisdiction/docunit/${documentNumber}/categories#texts"]`
+      `a[href*="/jurisdiction/documentunit/${documentNumber}/categories#texts"]`
     )
 
     await expect(page).toHaveInsideViewport(coreDataHeadline)
@@ -32,10 +32,10 @@ test.describe("test the scrolling behavior with hashes", () => {
     const coreDataHeadline = "#coreData h2"
     const textsHeadline = "#texts h2"
     const coreDataNavItem = page.locator(
-      `a[href*="/jurisdiction/docunit/${documentNumber}/categories#coreData"]`
+      `a[href*="/jurisdiction/documentunit/${documentNumber}/categories#coreData"]`
     )
     const textsNavItem = page.locator(
-      `a[href*="/jurisdiction/docunit/${documentNumber}/categories#texts"]`
+      `a[href*="/jurisdiction/documentunit/${documentNumber}/categories#texts"]`
     )
 
     await textsNavItem.click()
