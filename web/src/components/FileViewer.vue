@@ -45,7 +45,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <v-container class="fileviewer-info-panel">
+    <v-container class="bg-white">
       <PopupModal
         v-if="showModal"
         :cancel-button-type="modalCancelButtonType"
@@ -58,29 +58,29 @@ onMounted(async () => {
       <v-row>
         <v-col md="2" sm="3">
           Hochgeladen am
-          <div class="fileviewer-info-panel-value">
+          <div class="fileviewer-info-panel-value text-gray-900">
             {{ dayjs(uploadTimeStamp).format("DD.MM.YYYY") || " - " }}
           </div>
         </v-col>
         <v-col md="2" sm="3">
           Format
-          <div class="fileviewer-info-panel-value">
+          <div class="fileviewer-info-panel-value text-gray-900">
             {{ fileType || " - " }}
           </div>
         </v-col>
         <v-col md="2" sm="3">
           Von
-          <div class="fileviewer-info-panel-value">USER NAME</div>
+          <div class="fileviewer-info-panel-value text-gray-900">USER NAME</div>
         </v-col>
         <v-col sm="6">
           Dateiname
-          <div class="fileviewer-info-panel-value">
+          <div class="fileviewer-info-panel-value text-gray-900">
             {{ fileName || " - " }}
           </div>
         </v-col>
         <v-col cols="4" />
       </v-row>
-      <v-row class="fileviewer-info-panel">
+      <v-row class="bg-white">
         <v-col cols="12">
           <TextButton
             icon="delete"
@@ -101,14 +101,7 @@ onMounted(async () => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
-.fileviewer-info-panel {
-  background-color: $white;
-}
-
 .fileviewer-info-panel-value {
-  color: $gray900;
   font-weight: bold;
 }
 </style>

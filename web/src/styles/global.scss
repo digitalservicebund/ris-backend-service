@@ -1,4 +1,3 @@
-@import "@/styles/variables";
 @import "@/styles/font_styles";
 @tailwind base;
 @tailwind components;
@@ -23,6 +22,7 @@ body {
 }
 
 a {
-  color: $black;
+  @apply text-black;
+
   text-decoration: none !important;
 }

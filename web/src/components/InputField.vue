@@ -25,8 +25,6 @@ defineProps<Props>()
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .input-field {
   display: flex;
   flex-direction: column;
@@ -39,8 +37,8 @@ defineProps<Props>()
 
   &__error {
     display: flex;
-    color: $error;
     gap: 0.3rem;
+    @apply text-red-800;
   }
 }
 </style>

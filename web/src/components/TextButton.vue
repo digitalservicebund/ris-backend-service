@@ -39,10 +39,8 @@ const buttonClasses = computed(() => ({
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .ris-btn {
-  font-family: $font-bold;
+  @apply bg-blue-800 font-bold;
 
   &.v-btn {
     font-size: var(--v-btn-size);
@@ -94,70 +92,59 @@ const buttonClasses = computed(() => ({
 }
 
 .btn-primary {
-  background-color: $blue800 !important;
-  color: $white !important;
+  @apply bg-blue-800 text-white;
 
   &.v-btn {
     &:hover {
-      background-color: $blue700 !important;
+      @apply bg-blue-800;
     }
 
     &:active {
-      background-color: $blue500 !important;
+      @apply bg-blue-500;
     }
 
     &:focus-visible {
-      outline: 2px solid $blue800;
+      @apply border-2 border-solid border-blue-800;
     }
 
     &:disabled {
-      background-color: #dcdee1 !important;
-      color: #4e596a !important;
+      @apply bg-gray-400 text-gray-900;
     }
   }
 }
 
 .btn-secondary {
-  border: solid 2px $blue800;
-  background-color: #f5e05d !important;
-  color: $blue800 !important;
+  @apply border-solid border-2 border-blue-800 text-blue-800 bg-yellow-500;
 
   &.v-btn {
     &:hover {
-      background-color: #e5ce5c !important;
+      @apply bg-yellow-700;
     }
 
     &:active {
-      background-color: #f7e67d !important;
+      @apply bg-yellow-400;
     }
 
     &:focus-visible {
-      border: none;
-      outline: 2px solid $blue800;
+      @apply border-solid border-2 border-blue-800;
     }
   }
 }
 
 .btn-ghost {
-  border: 2px solid $white !important;
-  background: none !important;
-  color: $blue800 !important;
-  text-decoration: underline;
+  @apply bg-blue-800 text-white;
 
   &.v-btn {
     &:hover {
-      border: 2px solid #b8bdc3 !important;
-      background-color: $white !important;
+      @apply bg-blue-800;
     }
 
     &:active {
-      border: none;
-      background-color: $white !important;
+      @apply border-none bg-white;
     }
 
     &:focus-visible {
-      border: 2px solid #b8bdc3 !important;
-      outline: 2px solid $blue800;
+      @apply border-2 border-solid border-gray-600;
     }
   }
 }

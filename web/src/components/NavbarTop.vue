@@ -13,15 +13,20 @@ const linkStyling = (componentName: string) => {
   <v-container class="topbar-main" fluid role="navigation" tag="nav">
     <v-row>
       <v-col cols="1">
-        <v-icon class="topbar-logo-circle" size="56px">circle</v-icon>
+        <v-icon class="text-blue-800 topbar-logo-circle" size="56px"
+          >circle</v-icon
+        >
       </v-col>
-      <v-col class="topbar-header vertically-centered" cols="2">
+      <v-col
+        class="border-gray-400 border-r-1 border-solid label-01-bold vertically-centered"
+        cols="2"
+      >
         Rechtsinformationssystem<br />
         des Bundes [Platzhalter]
       </v-col>
       <v-col class="topbar-link-box" cols="2">
         <router-link
-          class="topbar-link"
+          class="hover:bg-yellow-500 topbar-link"
           :class="linkStyling('jurisdiction')"
           :to="{ name: 'jurisdiction' }"
           >Rechtsprechung</router-link
@@ -37,21 +42,17 @@ const linkStyling = (componentName: string) => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .vertically-centered {
   display: flex;
   align-items: center;
 }
 
 .topbar-header {
-  border-right: $gray400 solid 1px;
   font-weight: bold;
   line-height: 120%;
 }
 
 .topbar-logo-circle {
-  color: $blue800;
   float: right;
 }
 
@@ -66,7 +67,6 @@ const linkStyling = (componentName: string) => {
   padding: 10px;
 
   &:hover {
-    background-color: $yellow500;
     text-decoration: underline;
   }
 }

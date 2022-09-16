@@ -19,7 +19,7 @@ const linkStyling = (componentName: string) => {
       <div
         id="sidebar-close-button"
         aria-label="Navigation schließen"
-        class="sidebar-close-icon-background"
+        class="bg-blue-800 sidebar-close-icon-background"
         @click="$emit('toggleNavbar')"
         @keydown.m="$emit('toggleNavbar')"
       >
@@ -29,10 +29,12 @@ const linkStyling = (componentName: string) => {
         <v-row>
           <v-col class="back-button">
             <span>
-              <v-icon class="back-button__icon" size="22px">
+              <v-icon class="back-button__icon text-blue-800" size="22px">
                 arrow_back
               </v-icon>
-              <router-link class="back-button" :to="{ name: 'jurisdiction' }"
+              <router-link
+                class="back-button text-blue-800"
+                :to="{ name: 'jurisdiction' }"
                 >ZURÜCK</router-link
               >
             </span>
@@ -41,7 +43,7 @@ const linkStyling = (componentName: string) => {
         <v-divider />
         <v-row><v-col></v-col></v-row>
         <v-row>
-          <v-col class="sidebar-headline">
+          <v-col class="hover:bg-blue-200 sidebar-headline">
             <router-link
               :class="
                 linkStyling(
@@ -59,7 +61,7 @@ const linkStyling = (componentName: string) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="sub-rubriken">
+          <v-col class="hover:bg-blue-200 sub-rubriken">
             <router-link
               :to="{
                 name: 'jurisdiction-documentUnit-:documentNumber-categories',
@@ -72,7 +74,7 @@ const linkStyling = (componentName: string) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="sub-rubriken">
+          <v-col class="hover:bg-blue-200 sub-rubriken">
             <router-link
               :to="{
                 name: 'jurisdiction-documentUnit-:documentNumber-categories',
@@ -85,7 +87,7 @@ const linkStyling = (componentName: string) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="sub-rubriken">
+          <v-col class="hover:bg-blue-200 sub-rubriken">
             <router-link
               :to="{
                 name: 'jurisdiction-documentUnit-:documentNumber-categories',
@@ -103,7 +105,7 @@ const linkStyling = (componentName: string) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="sidebar-headline">
+          <v-col class="hover:bg-blue-200 sidebar-headline">
             <router-link
               :class="
                 linkStyling('jurisdiction-documentUnit-:documentNumber-files')
@@ -123,7 +125,9 @@ const linkStyling = (componentName: string) => {
           </v-col>
         </v-row>
         <v-row>
-          <v-col class="sidebar-headline"> Bearbeitungsstand </v-col>
+          <v-col class="hover:bg-blue-200 sidebar-headline">
+            Bearbeitungsstand
+          </v-col>
         </v-row>
         <v-row>
           <v-col>
@@ -134,7 +138,7 @@ const linkStyling = (componentName: string) => {
           <v-col> </v-col>
         </v-row>
         <v-row>
-          <v-col>
+          <v-col class="hover:bg-blue-200">
             <router-link
               class="public-button sidebar-headline"
               :to="{
@@ -151,12 +155,12 @@ const linkStyling = (componentName: string) => {
       v-else
       id="sidebar-open-button"
       aria-label="Navigation öffnen"
-      class="sidebar-open"
+      class="bg-yellow-500 border-3 border-blue-800 border-solid sidebar-open"
       @click="$emit('toggleNavbar')"
       @keydown.c="$emit('toggleNavbar')"
     >
       <div class="sidebar-open-text">Menü</div>
-      <div class="sidebar-open-icon-background">
+      <div class="bg-blue-800 sidebar-open-icon-background">
         <v-icon class="sidebar-open-icon"> arrow_forward_ios </v-icon>
       </div>
     </div>
@@ -164,13 +168,10 @@ const linkStyling = (componentName: string) => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .sidebar-headline {
   font-weight: bold;
 
   &:hover {
-    background-color: $navbar-hover-gray;
     text-decoration: underline;
   }
 }
@@ -179,7 +180,6 @@ const linkStyling = (componentName: string) => {
   margin-left: 20px;
 
   &:hover {
-    background-color: $navbar-hover-gray;
     text-decoration: underline;
   }
 }
@@ -191,7 +191,6 @@ const linkStyling = (componentName: string) => {
 .sidebar-close-icon-background {
   width: 40px;
   height: 40px;
-  background-color: $blue800;
   border-radius: 50%;
   float: right;
   transform: translateY(60px);
@@ -209,9 +208,7 @@ const linkStyling = (componentName: string) => {
   height: 65px;
   align-items: center; // align vertical
   justify-content: center; // align horizontal
-  border: 3px solid $blue800;
   margin-left: 6px;
-  background-color: $yellow500;
   border-radius: 10px;
   transform: rotate(-90deg) translateX(-165px);
   transform-origin: left;
@@ -224,7 +221,6 @@ const linkStyling = (componentName: string) => {
 .sidebar-open-icon-background {
   min-width: 40px;
   height: 40px;
-  background-color: $blue800;
   border-radius: 50%;
   transform: rotate(90deg) translateX(3px) translateY(-10px);
 }
@@ -237,7 +233,6 @@ const linkStyling = (componentName: string) => {
 
 .back-button {
   padding-bottom: 49px;
-  color: $blue800;
   font-size: small;
 
   &__icon {

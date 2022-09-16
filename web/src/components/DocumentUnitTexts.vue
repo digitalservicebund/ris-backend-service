@@ -64,8 +64,6 @@ const data = computed(() =>
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .ris-texte-form {
   padding: 3rem 1rem;
 
@@ -76,8 +74,8 @@ const data = computed(() =>
   &__input {
     width: 100%;
     margin-top: 5px;
-    outline: 2px solid $text-tertiary;
     resize: vertical;
+    @apply outline-2 outline outline-blue-900;
   }
 
   &__label {

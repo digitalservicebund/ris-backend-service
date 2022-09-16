@@ -31,6 +31,7 @@ module.exports = {
       },
       red: {
         200: "#f9e5ec",
+        800: "#b0243f",
       },
       yellow: {
         300: "#f9ec9e",
@@ -123,6 +124,16 @@ module.exports = {
       288: "18rem",
       320: "20rem",
       384: "24rem",
+    },
+    extend: {
+      borderWidth: {
+        1: "1px",
+        3: "3px",
+      },
+      boxShadow: {
+        error: "inset 0 0 0 50px bg-red-200",
+        white: "inset 0 0 0 50px bg-white",
+      },
     },
   },
   plugins: [],

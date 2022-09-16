@@ -53,7 +53,7 @@ function validateEmailAddress(): boolean {
     <h2>Veröffentlichen</h2>
     <div class="flex-col-container publication-check-container">
       <div
-        class="publication-check-infos-container"
+        class="bg-white publication-check-infos-container"
         :class="{
           'publication-check-infos-container__in-error': hasValidationError,
         }"
@@ -170,8 +170,6 @@ function validateEmailAddress(): boolean {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .flex-col-container {
   display: flex;
   flex-direction: column;
@@ -195,7 +193,6 @@ function validateEmailAddress(): boolean {
   }
 
   p {
-    color: $black;
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.16px;
@@ -225,7 +222,6 @@ function validateEmailAddress(): boolean {
       flex-direction: column;
       justify-content: flex-start;
       padding: 16px 56px 16px 24px;
-      background-color: $white;
       row-gap: 16px;
 
       &__in-error {

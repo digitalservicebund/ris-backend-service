@@ -28,7 +28,7 @@ const handleToggleNavBar = async () => {
           :visible="showNavBar"
           @toggle-navbar="handleToggleNavBar"
         />
-        <v-col class="panel-and-main-area" :cols="showNavBar ? 10 : 11">
+        <v-col class="bg-white" :cols="showNavBar ? 10 : 11">
           <DocumentUnitInfoPanel :document-unit="documentUnit" />
           <slot></slot>
         </v-col>
@@ -36,11 +36,3 @@ const handleToggleNavBar = async () => {
     </v-container>
   </v-main>
 </template>
-
-<style lang="scss" scoped>
-@import "@/styles/variables";
-
-.panel-and-main-area {
-  background-color: $white;
-}
-</style>

@@ -13,12 +13,12 @@ const route = useRoute()
     <button
       id="odoc-open-element"
       aria-label="Originaldokument öffnen"
-      class="odoc-open"
+      class="bg-yellow-500 border-3 border-blue-800 border-solid odoc-open"
       @click="$emit('togglePanel')"
     >
       <div class="odoc-open-text">Originaldokument</div>
-      <div class="odoc-open-icon-background">
-        <v-icon class="odoc-open-icon"> arrow_back_ios_new </v-icon>
+      <div class="bg-blue-800 odoc-open-icon-background">
+        <v-icon class="odoc-open-icon text-white"> arrow_back_ios_new </v-icon>
       </div>
     </button>
   </v-col>
@@ -27,7 +27,7 @@ const route = useRoute()
       <h3 class="odoc-editor-header">
         <button
           aria-label="Originaldokument schließen"
-          class="odoc-close-icon-background"
+          class="bg-blue-800 odoc-close-icon-background text-white"
           @click="$emit('togglePanel')"
         >
           <v-icon class="odoc-close-icon"> close </v-icon>
@@ -35,12 +35,12 @@ const route = useRoute()
         Originaldokument
       </h3>
       <div v-if="!hasFile">
-        <v-icon class="odoc-upload-icon" size="50px">cloud_upload</v-icon>
+        <v-icon class="mb-4 text-blue-800" size="50px">cloud_upload</v-icon>
         <div class="odoc-upload-note">
           Es wurde noch kein Originaldokument hochgeladen.
         </div>
         <router-link
-          class="link-to-upload"
+          class="text-blue-800"
           :to="{
             name: 'jurisdiction-documentUnit-:documentNumber-files',
             params: { documentNumber: $route.params.documentNumber },
@@ -52,7 +52,7 @@ const route = useRoute()
         </router-link>
       </div>
       <div v-else-if="!file">Dokument wird geladen</div>
-      <div v-else class="odoc-editor-wrapper">
+      <div v-else class="border-1 border-gray-400 border-solid">
         <TextEditor element-id="odoc" field-size="max" :value="file" />
       </div>
     </div>
@@ -60,17 +60,12 @@ const route = useRoute()
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .odoc-open {
   display: flex;
-  width: 200px;
   height: 65px;
   align-items: center; // align vertical
   justify-content: center; // align horizontal
-  border: 3px solid $blue800;
   margin-right: 6px;
-  background-color: $yellow500;
   border-radius: 10px;
   transform: rotate(-90deg);
   transform-origin: right;
@@ -83,23 +78,19 @@ const route = useRoute()
 .odoc-open-icon-background {
   width: 40px;
   height: 40px;
-  background-color: $blue800;
   border-radius: 50%;
-  transform: rotate(90deg) translateX(-2px) translateY(-25px);
+  transform: rotate(90deg) translateX(-25px) translateY(-25px);
 }
 
 .odoc-open-icon {
   margin-top: 8px;
   margin-right: 9px;
-  color: white;
 }
 
 .odoc-close-icon-background {
   width: 40px;
   height: 40px;
-  background-color: $blue800;
   border-radius: 50%;
-  color: $white;
   transform: translate(-40px, 10px);
 }
 
@@ -107,23 +98,11 @@ const route = useRoute()
   padding: 40px 0 15px 20px; // top right bottom left
 }
 
-.odoc-editor-wrapper {
-  border: 1px solid $gray400;
-}
-
 .odoc-panel {
   position: fixed;
 }
 
-.odoc-upload-icon {
-  margin-bottom: 15px;
-}
-
 .odoc-upload-note {
   margin-bottom: 15px;
-}
-
-.link-to-upload {
-  color: $blue800;
 }
 </style>

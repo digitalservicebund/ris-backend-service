@@ -43,41 +43,34 @@ const conditionalClasses = computed(() => ({
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .input {
   width: 100%;
   padding: 17px 24px;
-  border: 2px solid $text-tertiary;
+  @apply border-2 border-solid border-blue-800;
 
   &:focus {
     outline: none;
   }
 
   &:autofill {
-    box-shadow: 0 0 0 50px $white inset;
-    color: inherit;
+    @apply shadow-white text-inherit;
   }
 
   &:autofill:focus {
-    box-shadow: 0 0 0 50px $white inset;
-    color: inherit;
+    @apply shadow-white text-inherit;
   }
 
   &__error {
     width: 100%;
     padding: 17px 24px;
-    background-color: $error-background;
-    outline: 2px solid $error;
+    @apply outline-2 outline outline-red-800 bg-red-200;
 
     &:autofill {
-      box-shadow: 0 0 0 50px $error-background inset;
-      color: inherit;
+      @apply shadow-error text-inherit;
     }
 
     &:autofill:focus {
-      box-shadow: 0 0 0 50px $error-background inset;
-      color: inherit;
+      @apply shadow-error text-inherit;
     }
   }
 }

@@ -101,7 +101,7 @@ function onFileSelect(event: Event): void {
       <v-col md="8" sm="12">
         <v-container
           id="upload-drop-area"
-          class="upload-drop-area"
+          class="border-3 border-blue-300 border-solid hover:border-3 hover:border-blue-500 hover:border-solid rounded-lg upload-drop-area"
           :class="{
             'upload-drop-area__in-drag': status.inDrag,
             'upload-drop-area__in-drag-error':
@@ -113,7 +113,9 @@ function onFileSelect(event: Event): void {
           @drop="drop"
         >
           <span v-if="status.inDragError">
-            <v-icon class="file-upload" size="50px"> upload_file </v-icon>
+            <v-icon class="file-upload text-blue-800" size="50px">
+              upload_file
+            </v-icon>
             <!-- if still in drag move -->
             <span v-if="status.uploadStatus !== UploadStatus.WRONG_FILE_FORMAT">
               <div class="upload-status">Datei wird nicht unterstützt.</div>
@@ -144,14 +146,18 @@ function onFileSelect(event: Event): void {
               <div>{{ status.file ? status.file.name : "" }}</div>
             </span>
             <span v-else-if="status.uploadStatus === UploadStatus.SUCCESSED">
-              <v-icon class="file-upload" size="50px"> upload_file </v-icon>
+              <v-icon class="file-upload text-blue-800" size="50px">
+                upload_file
+              </v-icon>
               <div class="upload-status">
                 Die Datei {{ status.file ? status.file.name : "" }} wurde
                 erfolgreich hochgeladen
               </div>
             </span>
             <span v-else>
-              <v-icon class="file-upload" size="50px"> upload_file </v-icon>
+              <v-icon class="file-upload text-blue-800" size="50px">
+                upload_file
+              </v-icon>
               <div class="upload-status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <FileInputButton
@@ -198,35 +204,25 @@ function onFileSelect(event: Event): void {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .upload-drop-area {
   padding: 44px;
-  border: $border-style-inactive;
-  background: $white;
-  border-radius: $border-radius;
-
-  &:hover {
-    border: $border-style-active;
-  }
 
   &__in-drag-error {
-    border: $border-style-error;
+    @apply border-3 border-solid border-red-200;
 
     &:hover {
-      border: $border-style-error;
+      @apply border-3 border-solid border-red-200;
     }
   }
 
   &__in-drag {
-    border: $border-style-active;
+    @apply border-3 border-solid border-blue-500;
   }
 }
 
 .file-upload {
   margin-top: 10px;
   margin-left: -5px;
-  color: $blue800;
 }
 
 .upload-status {

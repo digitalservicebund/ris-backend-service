@@ -11,7 +11,7 @@ export const navigateToCategories = async (
 
 export const navigateToFiles = async (page: Page, documentNumber: string) => {
   await page.goto(`/jurisdiction/documentunit/${documentNumber}/files`)
-  await expect(page.locator("h2:has-text('Dokumente')")).toBeVisible()
+  await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible()
 }
 
 export const uploadTestfile = async (page: Page, filename: string) => {

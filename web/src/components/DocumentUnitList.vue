@@ -55,7 +55,7 @@ const onDelete = () => {
     />
     <v-table v-if="documentUnits.length" class="document-unit-list-table">
       <thead>
-        <tr class="table-header">
+        <tr class="bg-gray-400">
           <th class="text-center" scope="col">Dok.-Nummer</th>
           <th class="text-center" scope="col">Angelegt am</th>
           <th class="text-center" scope="col">Aktenzeichen</th>
@@ -106,12 +106,6 @@ const onDelete = () => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
-.table-header {
-  background-color: $gray400;
-}
-
 .document-unit-list-table td,
 th {
   font-size: medium !important;

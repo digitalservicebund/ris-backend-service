@@ -130,8 +130,6 @@ onBeforeUnmount(() => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .dropdown-container {
   position: relative;
   display: inline-block;
@@ -139,23 +137,23 @@ onBeforeUnmount(() => {
   user-select: none;
 
   &__open-dropdown {
+    @apply border-2 border-solid border-blue-900;
     .input-container {
       display: flex;
       flex: row nowrap;
       justify-content: space-between;
       padding: 17px 24px;
-      border: 2px solid $text-tertiary;
 
       &:hover {
+        @apply hover:outline-4 hover:outline hover:outline-blue-900;
         border: none;
         margin-bottom: 4px;
-        outline: 4px solid $text-tertiary;
       }
 
       &:focus {
+        @apply focus:outline-4 focus:outline focus:outline-blue-900;
         border: none;
         margin-bottom: 4px;
-        outline: 4px solid $text-tertiary;
       }
 
       .text-input {

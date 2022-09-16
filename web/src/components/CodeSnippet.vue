@@ -62,8 +62,8 @@ watch(
 
 <template>
   <div class="xml-container">
-    <p class="xml-container-title">{{ title }}</p>
-    <div class="code-lines">
+    <p class="text-color-black xml-container-title">{{ title }}</p>
+    <div class="border-1 border-solid border-white code-lines">
       <div v-for="(line, index) in codeLines" :key="index" class="code-line">
         <code
           class="line-number"
@@ -81,11 +81,8 @@ watch(
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .xml-container {
   .xml-container-title {
-    color: $black;
     font-size: 16px;
     font-weight: 700;
     line-height: 26px;
@@ -95,7 +92,6 @@ watch(
   .code-lines {
     overflow: auto;
     width: 60vw;
-    border: solid 1px $white;
     white-space: nowrap;
   }
 

@@ -54,11 +54,11 @@ onMounted(() => {
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >
-    <div class="modal-container">
-      <div class="modal-text-title">
+    <div class="bg-white border-2 border-blue-800 border-solid modal-container">
+      <div class="modal-text-title text-black">
         {{ headerText }}
       </div>
-      <div class="modal-text-content">{{ contentText }}</div>
+      <div class="modal-text-content text-black">{{ contentText }}</div>
       <div class="modal-buttons-container">
         <TextButton
           :button-type="cancelButtonType"
@@ -76,8 +76,6 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 .popup-modal-wrapper {
   position: fixed;
   z-index: 999;
@@ -98,12 +96,9 @@ onMounted(() => {
     flex-direction: column;
     align-items: flex-start;
     padding: 40px;
-    border: 2px solid $blue800;
-    background: $white;
     gap: 16px;
 
     .modal-text-title {
-      color: $black;
       font-size: 18px;
       font-weight: 700;
       letter-spacing: 0.16px;
@@ -111,7 +106,6 @@ onMounted(() => {
     }
 
     .modal-text-content {
-      color: $black;
       font-size: 14px;
       font-style: normal;
       font-weight: 400;

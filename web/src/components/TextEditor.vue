@@ -300,7 +300,7 @@ onBeforeRouteUpdate(async () => {
     >
       <v-col v-for="(btn, index) in editorBtnsGroup1" :key="index">
         <v-icon
-          class="editor-btn"
+          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
@@ -312,7 +312,7 @@ onBeforeRouteUpdate(async () => {
 
       <v-col v-for="(btn, index) in editorBtnsGroup2" :key="index">
         <v-icon
-          class="editor-btn"
+          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
@@ -322,21 +322,33 @@ onBeforeRouteUpdate(async () => {
 
       <v-divider inset vertical></v-divider>
 
-      <v-col class="editor-btn editor-btn--bold">Heading</v-col>
+      <v-col
+        class="active:bg-blue-200 editor-btn editor-btn--bold hover:bg-blue-200 text-blue-900"
+        >Heading</v-col
+      >
 
       <v-divider inset vertical></v-divider>
 
       <v-col v-show="!lg" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
-            <v-icon @click="toggleShowTextAlignModal" @mousedown.prevent=""
+            <v-icon
+              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+              @click="toggleShowTextAlignModal"
+              @mousedown.prevent=""
               >format_align_left</v-icon
             >
-            <v-icon @click="toggleShowTextAlignModal" @mousedown.prevent=""
+            <v-icon
+              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+              @click="toggleShowTextAlignModal"
+              @mousedown.prevent=""
               >arrow_drop_down</v-icon
             >
           </div>
-          <div v-if="showMoreTextAlign" class="dropdown-content">
+          <div
+            v-if="showMoreTextAlign"
+            class="bg-white border-1 border-blue-800 border-solid dropdown-content"
+          >
             <v-col class="display-group pa-0">
               <v-col
                 v-for="(btn, index) in editorBtnsGroup3"
@@ -344,7 +356,7 @@ onBeforeRouteUpdate(async () => {
                 class="dropdown-content-items"
               >
                 <v-icon
-                  class="editor-btn"
+                  class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
                   :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
                   @click="editor.chain().focus().setTextAlign(btn.type).run()"
                   @mousedown.prevent=""
@@ -358,7 +370,7 @@ onBeforeRouteUpdate(async () => {
       <v-col v-show="lg" class="display-group pa-0">
         <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
           <v-icon
-            class="editor-btn"
+            class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
             :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
             @click="editor.chain().focus().setTextAlign(btn.type).run()"
             @mousedown.prevent=""
@@ -371,7 +383,7 @@ onBeforeRouteUpdate(async () => {
 
       <v-col v-for="(btn, index) in editorBtnsGroup4" v-show="!sm" :key="index">
         <v-icon
-          class="editor-btn"
+          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
@@ -384,14 +396,23 @@ onBeforeRouteUpdate(async () => {
       <v-col v-show="md" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
-            <v-icon @click="toggleShowListStylesModal" @mousedown.prevent=""
+            <v-icon
+              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+              @click="toggleShowListStylesModal"
+              @mousedown.prevent=""
               >format_list_bulleted</v-icon
             >
-            <v-icon @click="toggleShowListStylesModal" @mousedown.prevent=""
+            <v-icon
+              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+              @click="toggleShowListStylesModal"
+              @mousedown.prevent=""
               >arrow_drop_down</v-icon
             >
           </div>
-          <div v-if="showListStyles" class="dropdown-content">
+          <div
+            v-if="showListStyles"
+            class="bg-white border-1 border-blue-800 border-solid dropdown-content"
+          >
             <v-col class="display-group pa-0">
               <v-col
                 v-for="(btn, index) in editorBtnsGroup5"
@@ -399,7 +420,7 @@ onBeforeRouteUpdate(async () => {
                 class="dropdown-content-items"
               >
                 <v-icon
-                  class="editor-btn"
+                  class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
                   :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
                   @click="editor.chain().focus().toggleMark(btn.type).run()"
                   @mousedown.prevent=""
@@ -413,7 +434,7 @@ onBeforeRouteUpdate(async () => {
 
       <v-col v-for="(btn, index) in editorBtnsGroup5" v-show="lg" :key="index">
         <v-icon
-          class="editor-btn"
+          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
@@ -425,21 +446,36 @@ onBeforeRouteUpdate(async () => {
       <v-col v-show="md" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
-            <v-icon @click="toggleShowImageAlignmentModal" @mousedown.prevent=""
+            <v-icon
+              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+              @click="toggleShowImageAlignmentModal"
+              @mousedown.prevent=""
               >vertical_split</v-icon
             >
-            <v-icon @click="toggleShowImageAlignmentModal" @mousedown.prevent=""
+            <v-icon
+              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+              @click="toggleShowImageAlignmentModal"
+              @mousedown.prevent=""
               >arrow_drop_down</v-icon
             >
           </div>
-          <div v-if="showImageAlignment" class="dropdown-content">
+          <div
+            v-if="showImageAlignment"
+            class="bg-white border-1 border-blue-800 border-solid dropdown-content"
+          >
             <div class="dropdown-content-items">
               <v-col class="display-group pa-0">
                 <v-col>
-                  <v-icon>vertical_split</v-icon>
+                  <v-icon
+                    class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+                    >vertical_split</v-icon
+                  >
                 </v-col>
                 <v-col>
-                  <v-icon class="mirrored">vertical_split</v-icon>
+                  <v-icon
+                    class="active:bg-blue-200 hover:bg-blue-200 mirrored text-blue-900"
+                    >vertical_split</v-icon
+                  >
                 </v-col>
               </v-col>
             </div>
@@ -451,30 +487,46 @@ onBeforeRouteUpdate(async () => {
 
       <v-col v-show="lg" class="display-group pa-0">
         <v-col>
-          <v-icon>vertical_split</v-icon>
+          <v-icon class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+            >vertical_split</v-icon
+          >
         </v-col>
         <v-col>
-          <v-icon class="mirrored">vertical_split</v-icon>
+          <v-icon
+            class="active:bg-blue-200 hover:bg-blue-200 mirrored text-blue-900"
+            >vertical_split</v-icon
+          >
         </v-col>
         <v-divider inset vertical></v-divider>
       </v-col>
 
       <v-divider v-show="md" inset vertical></v-divider>
       <v-col v-show="md">
-        <v-icon>table_chart</v-icon>
+        <v-icon class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+          >table_chart</v-icon
+        >
       </v-col>
 
       <v-col v-show="sm">
-        <v-icon @click="toggleShowMore" @mousedown.prevent=""
+        <v-icon
+          class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+          @click="toggleShowMore"
+          @mousedown.prevent=""
           >more_horiz</v-icon
         >
       </v-col>
 
       <v-col>
-        <v-icon :class="{ 'second-last-icon': isLastItemFlexEnd }">123</v-icon>
+        <v-icon
+          class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+          :class="{ 'second-last-icon': isLastItemFlexEnd }"
+          >123</v-icon
+        >
       </v-col>
       <v-col>
-        <v-icon :class="{ 'last-icon': isLastItemFlexEnd }"
+        <v-icon
+          class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+          :class="{ 'last-icon': isLastItemFlexEnd }"
           >open_in_full</v-icon
         >
       </v-col>
@@ -493,7 +545,7 @@ onBeforeRouteUpdate(async () => {
         class="row-secondary"
       >
         <v-icon
-          class="editor-btn"
+          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
@@ -505,10 +557,10 @@ onBeforeRouteUpdate(async () => {
       <v-col
         v-for="(btn, index) in editorBtnsGroup5"
         :key="index"
-        class="row-secondary"
+        class="active:bg-blue-200 hover:bg-blue-200 row-secondary text-blue-900"
       >
         <v-icon
-          class="editor-btn"
+          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
           :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
           @click="editor.chain().focus().toggleMark(btn.type).run()"
           @mousedown.prevent=""
@@ -519,10 +571,15 @@ onBeforeRouteUpdate(async () => {
       <v-divider inset vertical></v-divider>
 
       <v-col class="row-secondary">
-        <v-icon>vertical_split</v-icon>
+        <v-icon class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
+          >vertical_split</v-icon
+        >
       </v-col>
       <v-col class="row-secondary">
-        <v-icon class="mirrored">vertical_split</v-icon>
+        <v-icon
+          class="active:bg-blue-200 hover:bg-blue-200 mirrored text-blue-900"
+          >vertical_split</v-icon
+        >
       </v-col>
 
       <v-divider inset vertical></v-divider>
@@ -549,8 +606,6 @@ onBeforeRouteUpdate(async () => {
 </template>
 
 <style lang="scss" scoped>
-@import "@/styles/variables";
-
 #container {
   position: relative;
 
@@ -606,18 +661,6 @@ onBeforeRouteUpdate(async () => {
 }
 
 .editor-btn {
-  color: #004b78;
-
-  &:hover {
-    background-color: $button-tertiary-focus;
-    color: $text-tertiary;
-  }
-
-  &__active {
-    background-color: $navbar-hover-gray;
-    color: $white;
-  }
-
   &--bold {
     font-weight: bold;
   }
@@ -650,8 +693,6 @@ onBeforeRouteUpdate(async () => {
     right: 0;
     display: flex;
     flex-direction: row;
-    border: 1px solid #004b76;
-    background: $white;
   }
 }
 
