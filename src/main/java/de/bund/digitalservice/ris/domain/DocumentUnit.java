@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.domain;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 public record DocumentUnit(
@@ -13,7 +14,8 @@ public record DocumentUnit(
     String filetype,
     String filename,
     CoreData coreData,
+    List<PreviousDecision> previousDecisions,
     Texts texts) {
   public static final DocumentUnit EMPTY =
-      new DocumentUnit(null, null, null, null, null, null, null, null, null, null);
+      new DocumentUnit(null, null, null, null, null, null, null, null, null, null, null);
 }

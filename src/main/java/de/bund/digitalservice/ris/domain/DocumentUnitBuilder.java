@@ -42,6 +42,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),
             documentUnitDTO.getRegion()),
+        documentUnitDTO.getPreviousDecisions(),
         new Texts(
             documentUnitDTO.getDecisionName(),
             documentUnitDTO.getHeadline(),
@@ -50,7 +51,6 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getTenor(),
             documentUnitDTO.getReasons(),
             documentUnitDTO.getCaseFacts(),
-            documentUnitDTO.getDecisionReasons(),
-            documentUnitDTO.getPreviousDecisions()));
+            documentUnitDTO.getDecisionReasons()));
   }
 }

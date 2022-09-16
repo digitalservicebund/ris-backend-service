@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.domain;
 
-import java.util.List;
-
 public record Texts(
     String decisionName,
     String headline,
@@ -10,5 +8,4 @@ public record Texts(
     String tenor,
     String reasons,
     String caseFacts,
-    String decisionReasons,
-    List<PreviousDecision> previousDecisions) {}
+    String decisionReasons) {}
