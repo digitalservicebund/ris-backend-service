@@ -138,6 +138,7 @@ onBeforeUnmount(() => {
 
   &__open-dropdown {
     @apply border-2 border-solid border-blue-900;
+
     .input-container {
       display: flex;
       flex: row nowrap;
@@ -146,12 +147,14 @@ onBeforeUnmount(() => {
 
       &:hover {
         @apply hover:outline-4 hover:outline hover:outline-blue-900;
+
         border: none;
         margin-bottom: 4px;
       }
 
       &:focus {
         @apply focus:outline-4 focus:outline focus:outline-blue-900;
+
         border: none;
         margin-bottom: 4px;
       }
