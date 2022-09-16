@@ -46,7 +46,7 @@ watch(
 
 <template>
   <div v-for="(_, index) in modelValueList" :key="index">
-    <component
+    <Component
       :is="component"
       v-model="modelValueList[index]"
       v-bind="attributes"

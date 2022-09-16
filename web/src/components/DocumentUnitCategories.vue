@@ -175,14 +175,14 @@ onUnmounted(() => {
           id="texts"
           :texts="documentUnit.texts"
           :update-status="updateStatus"
-          @update-value="handleUpdateValueDocumentUnitTexts"
           @update-document-unit="handleUpdateDocumentUnit"
+          @update-value="handleUpdateValueDocumentUnitTexts"
         />
       </v-col>
       <OriginalFileSidePanel
-        :open="showDocPanel"
-        :has-file="documentUnit.hasFile"
         :file="fileAsHTML"
+        :has-file="documentUnit.hasFile"
+        :open="showDocPanel"
         @toggle-panel="handleToggleFilePanel"
       />
     </v-row>

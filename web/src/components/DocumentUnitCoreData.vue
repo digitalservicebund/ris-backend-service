@@ -31,15 +31,15 @@ const values = computed({
     <h2 id="coreData">Stammdaten</h2>
 
     <div class="form">
-      <InputGroup v-model="values" :fields="coreDataFields" :column-count="2" />
+      <InputGroup v-model="values" :column-count="2" :fields="coreDataFields" />
 
       <span class="form__require-info">
         * Pflichtfelder zum Veröffentlichen
       </span>
 
       <SaveDocumentUnitButton
-        class="form__save-button"
         aria-label="Stammdaten Speichern Button"
+        class="form__save-button"
         :update-status="updateStatus"
         @update-document-unit="emit('updateDocumentUnit')"
       />

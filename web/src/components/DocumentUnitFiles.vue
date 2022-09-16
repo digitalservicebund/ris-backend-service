@@ -21,10 +21,10 @@ const emits = defineEmits<{
     </v-container>
     <FileViewer
       v-if="documentUnit.hasFile"
-      :s3-path="(documentUnit.s3path as string)"
       :file-name="documentUnit.filename"
-      :upload-time-stamp="documentUnit.fileuploadtimestamp"
       :file-type="documentUnit.filetype"
+      :s3-path="(documentUnit.s3path as string)"
+      :upload-time-stamp="documentUnit.fileuploadtimestamp"
       @delete-file="emits('deleteFile')"
     />
     <FileUpload

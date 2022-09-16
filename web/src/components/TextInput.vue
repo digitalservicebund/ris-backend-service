@@ -33,11 +33,11 @@ const conditionalClasses = computed(() => ({
   <input
     :id="id"
     v-model="inputValue"
+    :aria-label="ariaLabel"
     class="input"
     :class="conditionalClasses"
-    type="text"
     :placeholder="placeholder"
-    :aria-label="ariaLabel"
+    type="text"
     @input="emitInputEvent"
   />
 </template>

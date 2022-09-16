@@ -62,7 +62,7 @@ watch(
 
 <template>
   <div class="xml-container">
-    <p class="xml-container-title">{{ props.title }}</p>
+    <p class="xml-container-title">{{ title }}</p>
     <div class="code-lines">
       <div v-for="(line, index) in codeLines" :key="index" class="code-line">
         <code

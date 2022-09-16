@@ -75,24 +75,24 @@ watch(
     <div
       v-for="(group, index) in fieldRows"
       :key="index"
-      :style="gapStyle"
       class="input-group__row"
+      :style="gapStyle"
     >
       <InputFieldoComponent
         v-for="field in group"
         :id="field.name"
         :key="field.name"
-        :style="fieldStyle"
         class="input-group__row__field"
-        :label="field.label"
         :icon-name="field.iconName"
+        :label="field.label"
         :required="field.required"
+        :style="fieldStyle"
       >
         <InputElement
           :id="field.name"
           v-model="inputValues[field.name]"
-          :type="field.type"
           :attributes="field.inputAttributes"
+          :type="field.type"
         />
       </InputFieldoComponent>
     </div>

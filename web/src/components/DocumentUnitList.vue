@@ -45,11 +45,11 @@ const onDelete = () => {
   <div>
     <PopupModal
       v-if="showModal"
-      :content-text="popupModalText"
-      :confirm-text="modalConfirmText"
-      :header-text="modalHeaderText"
       :cancel-button-type="modalCancelButtonType"
       :confirm-button-type="modalConfirmButtonType"
+      :confirm-text="modalConfirmText"
+      :content-text="popupModalText"
+      :header-text="modalHeaderText"
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />

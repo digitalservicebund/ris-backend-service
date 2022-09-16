@@ -39,7 +39,6 @@ describe("text editor", async () => {
         props: {
           value: "Test Value",
           fieldSize: "large",
-          editable: false,
           ariaLabel: "test label",
         },
         global: { plugins: [vuetify, router] },
@@ -58,7 +57,7 @@ describe("text editor", async () => {
 
   test("show buttons on focus", async () => {
     const { getByLabelText } = render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "test label" },
+      props: { value: "Test Value", ariaLabel: "test label", editable: true },
       global: { plugins: [vuetify, router] },
     })
     await screen.findByText("Test Value")

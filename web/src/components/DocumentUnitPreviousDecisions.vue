@@ -7,6 +7,10 @@ import TextButton from "@/components/TextButton.vue"
 import { previousDecisionFields } from "@/domain"
 import type { PreviousDecision } from "@/domain/documentUnit"
 
+const props = defineProps<Props>()
+
+const emit = defineEmits<Emits>()
+
 const defaultModel: PreviousDecision = {
   courtType: "",
   courtPlace: "",
@@ -21,9 +25,6 @@ interface Props {
 interface Emits {
   (event: "update:modelValue", value: PreviousDecision[]): void
 }
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
 
 const values = computed({
   get: () => {
@@ -50,26 +51,26 @@ const values = computed({
     <div class="previous-decisions">
       <ModelComponentRepeater
         v-model="values"
+        :column-count="2"
         :component="InputGroup"
         :default-value="defaultModel"
         :fields="previousDecisionFields"
-        :column-count="2"
       >
         <template #removeButton="{ onClick }">
           <TextButton
-            label="Entfernen"
             aria-label="Entscheidung Entfernen"
             button-type="ghost"
             class="previous-decisions__remove-button"
+            label="Entfernen"
             @click="onClick"
           />
         </template>
 
         <template #addButton="{ onClick }">
           <TextButton
-            label="weitere Entscheidung hinzufügen"
             aria-label="weitere Entscheidung hinzufügen"
             class="previous-decisions__add-button"
+            label="weitere Entscheidung hinzufügen"
             @click="onClick"
           />
         </template>

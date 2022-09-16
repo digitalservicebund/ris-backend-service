@@ -92,7 +92,7 @@ function validateEmailAddress(): boolean {
           </div>
           <div
             v-show="showIssuesDetails"
-            class="xml-validation-error-details flex-col-container"
+            class="flex-col-container xml-validation-error-details"
           >
             <p
               v-for="issue in props.publishResult?.statusMessages"
@@ -106,10 +106,10 @@ function validateEmailAddress(): boolean {
           <InputField
             id="receiverAddress"
             key="receiverAddress"
-            label="Empfänger-E-Mail-Adresse:"
             :error-message="
               emailAddressInvalid ? 'E-Mail-Adresse ungültig' : undefined
             "
+            label="Empfänger-E-Mail-Adresse:"
           >
             <TextInput
               id="receiverAddress"
@@ -122,19 +122,19 @@ function validateEmailAddress(): boolean {
         <div class="publication-button-container">
           <div class="publication-button">
             <TextButton
-              label="Dokumentationseinheit veröffentlichen"
               aria-label="Dokumentationseinheit veröffentlichen"
               button-type="primary"
               icon="campaign"
-              @click="publishDocumentUnit()"
+              label="Dokumentationseinheit veröffentlichen"
+              @click="publishDocumentUnit"
             />
           </div>
         </div>
       </div>
       <ErrorModal
-        v-if="!!props.errorMessage"
-        :title="props.errorMessage?.title"
-        :description="props.errorMessage?.description"
+        v-if="!!errorMessage"
+        :description="errorMessage?.description"
+        :title="errorMessage?.title"
       >
       </ErrorModal>
     </div>
@@ -143,7 +143,7 @@ function validateEmailAddress(): boolean {
       <p v-if="isFirstTimePublication">
         Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
       </p>
-      <div v-else class="flex-col-container email-infos-container">
+      <div v-else class="email-infos-container flex-col-container">
         <p>
           Letzte Veröffentlichung am
           {{ props.lastPublishedXmlMail?.publishDate }}
@@ -161,8 +161,8 @@ function validateEmailAddress(): boolean {
         <p class="publication-text-label">als</p>
         <CodeSnippet
           v-if="!!props.lastPublishedXmlMail?.xml"
-          :xml="props.lastPublishedXmlMail.xml"
           title="xml"
+          :xml="props.lastPublishedXmlMail.xml"
         />
       </div>
     </div>

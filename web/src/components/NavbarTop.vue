@@ -10,7 +10,7 @@ const linkStyling = (componentName: string) => {
 </script>
 
 <template>
-  <v-container fluid class="topbar-main" role="navigation" tag="nav">
+  <v-container class="topbar-main" fluid role="navigation" tag="nav">
     <v-row>
       <v-col cols="1">
         <v-icon class="topbar-logo-circle" size="56px">circle</v-icon>
@@ -19,16 +19,16 @@ const linkStyling = (componentName: string) => {
         Rechtsinformationssystem<br />
         des Bundes [Platzhalter]
       </v-col>
-      <v-col cols="2" class="topbar-link-box">
+      <v-col class="topbar-link-box" cols="2">
         <router-link
-          :class="linkStyling('jurisdiction')"
           class="topbar-link"
+          :class="linkStyling('jurisdiction')"
           :to="{ name: 'jurisdiction' }"
           >Rechtsprechung</router-link
         >
       </v-col>
       <v-col cols="5"></v-col>
-      <v-col cols="2" class="vertically-centered">
+      <v-col class="vertically-centered" cols="2">
         <v-icon class="topbar-user-icon"> perm_identity </v-icon>
         User Name
       </v-col>

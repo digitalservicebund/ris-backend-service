@@ -25,15 +25,15 @@ const buttonClasses = computed(() => ({
 
 <template>
   <v-btn
-    :class="buttonClasses"
-    :rounded="0"
-    :ripple="false"
-    :flat="true"
     :aria-label="ariaLabel"
+    :class="buttonClasses"
+    flat
+    :ripple="false"
+    :rounded="0"
   >
     <slot>
-      <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
-      {{ props.label }}
+      <v-icon v-if="icon"> {{ icon }} </v-icon>
+      {{ label }}
     </slot>
   </v-btn>
 </template>

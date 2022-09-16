@@ -31,16 +31,16 @@ function triggerFileInput() {
 
 <template>
   <TextButton class="button" @click.self="triggerFileInput">
-    <label :for="props.id" :aria-label="ariaLabel" class="label">
+    <label :aria-label="ariaLabel" class="label" :for="id">
       <slot />
 
       <input
-        :id="props.id"
+        :id="id"
         v-bind="inputValue"
         ref="fileInput"
         hidden="true"
-        type="file"
         tabindex="-1"
+        type="file"
         @change="emitInputEvent"
       />
     </label>

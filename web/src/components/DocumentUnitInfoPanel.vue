@@ -5,24 +5,24 @@ defineProps<{ documentUnit: DocumentUnit }>()
 </script>
 
 <template>
-  <v-container fluid class="panel-default">
+  <v-container class="panel-default" fluid>
     <v-row class="doc-info-row">
-      <v-col class="vert-centered panel-id" sm="6" md="3">
+      <v-col class="panel-id vert-centered" md="3" sm="6">
         {{ documentUnit.documentnumber || " - " }}
       </v-col>
-      <v-col class="vert-centered" sm="6" md="3">
+      <v-col class="vert-centered" md="3" sm="6">
         Aktenzeichen
         <span class="panel-default__values">
           {{ documentUnit.fileNumber || " - " }}</span
         >
       </v-col>
-      <v-col class="vert-centered" sm="6" md="3">
+      <v-col class="vert-centered" md="3" sm="6">
         Entscheidungsdatum
         <span class="panel-default__values">
           {{ documentUnit.decisionDate || " - " }}
         </span>
       </v-col>
-      <v-col class="vert-centered" sm="6" md="3">
+      <v-col class="vert-centered" md="3" sm="6">
         Gerichtstyp
         <span class="panel-default__values">{{
           documentUnit.courtType || " - "

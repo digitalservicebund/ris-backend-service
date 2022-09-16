@@ -48,27 +48,27 @@ onMounted(async () => {
     <v-container class="fileviewer-info-panel">
       <PopupModal
         v-if="showModal"
-        :content-text="popupModalText"
-        :confirm-text="confirmText"
         :cancel-button-type="modalCancelButtonType"
         :confirm-button-type="modalConfirmButtonType"
+        :confirm-text="confirmText"
+        :content-text="popupModalText"
         @close-modal="toggleModal"
         @confirm-action="toggleModal(), $emit('deleteFile')"
       />
       <v-row>
-        <v-col sm="3" md="2">
+        <v-col md="2" sm="3">
           Hochgeladen am
           <div class="fileviewer-info-panel-value">
             {{ dayjs(uploadTimeStamp).format("DD.MM.YYYY") || " - " }}
           </div>
         </v-col>
-        <v-col sm="3" md="2">
+        <v-col md="2" sm="3">
           Format
           <div class="fileviewer-info-panel-value">
             {{ fileType || " - " }}
           </div>
         </v-col>
-        <v-col sm="3" md="2">
+        <v-col md="2" sm="3">
           Von
           <div class="fileviewer-info-panel-value">USER NAME</div>
         </v-col>
@@ -93,7 +93,7 @@ onMounted(async () => {
     <v-container>
       <v-row>
         <v-col cols="12">
-          <TextEditor :value="fileAsHtml" field-size="max" :editable="false" />
+          <TextEditor field-size="max" :value="fileAsHtml" />
         </v-col>
       </v-row>
     </v-container>

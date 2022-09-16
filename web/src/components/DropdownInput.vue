@@ -5,7 +5,7 @@ import type { DropdownItem } from "@/domain/types"
 
 interface Props {
   id: string
-  value?: string
+  value?: string // @public
   modelValue?: string
   ariaLabel: string
   placeholder?: string
@@ -88,14 +88,14 @@ onBeforeUnmount(() => {
       <div class="input-container">
         <input
           :id="id"
-          :value="inputValue"
           :aria-label="ariaLabel"
-          class="text-input"
           autocomplete="off"
-          tabindex="0"
+          class="text-input"
           :placeholder="placeholder"
-          @input="onTextChange"
+          tabindex="0"
+          :value="inputValue"
           @click="selectAllText"
+          @input="onTextChange"
         />
         <button
           class="toggle-dropdown-button"
@@ -103,17 +103,17 @@ onBeforeUnmount(() => {
           @click="toggleDropdown"
           @keydown.enter="toggleDropdown"
         >
-          <span v-if="!isShowDropdown" class="material-icons icon">
+          <span v-if="!isShowDropdown" class="icon material-icons">
             expand_more
           </span>
-          <span v-else class="material-icons icon"> expand_less </span>
+          <span v-else class="icon material-icons"> expand_less </span>
         </button>
       </div>
     </div>
     <div
       v-if="isShowDropdown"
-      tabindex="-1"
       class="dropdown-container__dropdown-items"
+      tabindex="-1"
     >
       <div
         v-for="(item, index) in filterItems()"

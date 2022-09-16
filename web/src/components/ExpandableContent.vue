@@ -41,8 +41,8 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 <template>
   <div class="expandable-content">
     <button
-      class="expandable-content__header"
       aria-label="Toggle Content Visibility"
+      class="expandable-content__header"
       @click="toggleContentVisibility"
     >
       <slot name="header">

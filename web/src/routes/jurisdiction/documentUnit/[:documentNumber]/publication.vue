@@ -87,9 +87,9 @@ onMounted(async () => {
   <DocumentUnitWrapper :document-unit="documentUnit">
     <PublicationDocument
       v-if="loadDone"
-      :publish-result="publishResult"
-      :last-published-xml-mail="lastPublishedXmlMail"
       :error-message="errorMessage"
+      :last-published-xml-mail="lastPublishedXmlMail"
+      :publish-result="publishResult"
       @publish-a-document="publishADocument($event)"
     />
     <div v-else class="spinner">

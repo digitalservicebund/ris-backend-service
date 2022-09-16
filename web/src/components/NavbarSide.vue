@@ -18,8 +18,8 @@ const linkStyling = (componentName: string) => {
     <span v-if="visible">
       <div
         id="sidebar-close-button"
-        class="sidebar-close-icon-background"
         aria-label="Navigation schließen"
+        class="sidebar-close-icon-background"
         @click="$emit('toggleNavbar')"
         @keydown.m="$emit('toggleNavbar')"
       >
@@ -136,7 +136,7 @@ const linkStyling = (componentName: string) => {
         <v-row>
           <v-col>
             <router-link
-              class="sidebar-headline public-button"
+              class="public-button sidebar-headline"
               :to="{
                 name: 'jurisdiction-documentUnit-:documentNumber-publication',
                 params: { documentNumber: documentNumber },
@@ -150,8 +150,8 @@ const linkStyling = (componentName: string) => {
     <div
       v-else
       id="sidebar-open-button"
-      class="sidebar-open"
       aria-label="Navigation öffnen"
+      class="sidebar-open"
       @click="$emit('toggleNavbar')"
       @keydown.c="$emit('toggleNavbar')"
     >

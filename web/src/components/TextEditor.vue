@@ -31,27 +31,18 @@ import { CustomParagraph } from "../editor/paragraph"
 import { TableStyle } from "../editor/tableStyle"
 import { FieldSize } from "@/domain/FieldSize"
 
-const props = defineProps({
-  value: {
-    type: String,
-    required: false,
-    default: undefined,
-  },
-  fieldSize: {
-    type: String,
-    required: false,
-    default: "small" as FieldSize,
-  },
-  editable: {
-    type: Boolean,
-    required: false,
-    default: true,
-  },
-  ariaLabel: {
-    type: String,
-    required: false,
-    default: null,
-  },
+interface Props {
+  value?: string
+  fieldSize?: FieldSize
+  editable?: boolean
+  ariaLabel?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  value: undefined,
+  fieldSize: "small",
+  editable: false,
+  ariaLabel: "",
 })
 
 const emit = defineEmits<{
@@ -338,10 +329,10 @@ onBeforeRouteUpdate(async () => {
       <v-col v-show="!lg" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
-            <v-icon @click="toggleShowTextAlignModal()" @mousedown.prevent=""
+            <v-icon @click="toggleShowTextAlignModal" @mousedown.prevent=""
               >format_align_left</v-icon
             >
-            <v-icon @click="toggleShowTextAlignModal()" @mousedown.prevent=""
+            <v-icon @click="toggleShowTextAlignModal" @mousedown.prevent=""
               >arrow_drop_down</v-icon
             >
           </div>
@@ -393,10 +384,10 @@ onBeforeRouteUpdate(async () => {
       <v-col v-show="md" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
-            <v-icon @click="toggleShowListStylesModal()" @mousedown.prevent=""
+            <v-icon @click="toggleShowListStylesModal" @mousedown.prevent=""
               >format_list_bulleted</v-icon
             >
-            <v-icon @click="toggleShowListStylesModal()" @mousedown.prevent=""
+            <v-icon @click="toggleShowListStylesModal" @mousedown.prevent=""
               >arrow_drop_down</v-icon
             >
           </div>
@@ -434,14 +425,10 @@ onBeforeRouteUpdate(async () => {
       <v-col v-show="md" class="display-group">
         <div class="dropdown-container">
           <div class="dropdown-icons">
-            <v-icon
-              @click="toggleShowImageAlignmentModal()"
-              @mousedown.prevent=""
+            <v-icon @click="toggleShowImageAlignmentModal" @mousedown.prevent=""
               >vertical_split</v-icon
             >
-            <v-icon
-              @click="toggleShowImageAlignmentModal()"
-              @mousedown.prevent=""
+            <v-icon @click="toggleShowImageAlignmentModal" @mousedown.prevent=""
               >arrow_drop_down</v-icon
             >
           </div>
@@ -478,7 +465,7 @@ onBeforeRouteUpdate(async () => {
       </v-col>
 
       <v-col v-show="sm">
-        <v-icon @click="toggleShowMore()" @mousedown.prevent=""
+        <v-icon @click="toggleShowMore" @mousedown.prevent=""
           >more_horiz</v-icon
         >
       </v-col>
@@ -493,13 +480,13 @@ onBeforeRouteUpdate(async () => {
       </v-col>
     </v-row>
     <!-- Small layout second row on showMore button click-->
-    <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
+    <v-row v-if="showMoreOptions() && showButtons()" v-show="sm">
       <v-col>
         <v-divider class="horizontal-divider"></v-divider>
       </v-col>
     </v-row>
 
-    <v-row v-show="sm" v-if="showMoreOptions() && showButtons()">
+    <v-row v-if="showMoreOptions() && showButtons()" v-show="sm">
       <v-col
         v-for="(btn, index) in editorBtnsGroup4"
         :key="index"
@@ -550,11 +537,11 @@ onBeforeRouteUpdate(async () => {
     <v-divider v-if="showButtons()" class="horizontal-divider"></v-divider>
     <v-row>
       <v-col cols="12">
-        <editor-content
+        <EditorContent
           :aria-label="ariaLabel"
+          :class="'editor-content editor-content--' + fieldSize"
           :editor="editor"
-          :class="'editor-content editor-content--' + props.fieldSize"
-          @click="closeAllDropdownOnSecondClick()"
+          @click="closeAllDropdownOnSecondClick"
         />
       </v-col>
     </v-row>

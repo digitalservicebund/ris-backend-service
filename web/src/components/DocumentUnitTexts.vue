@@ -26,7 +26,7 @@ const data = computed(() =>
 </script>
 
 <template>
-  <form novalidate class="ris-texte-form">
+  <form class="ris-texte-form" novalidate>
     <v-row>
       <v-col><h2>Kurz- & Langtexte</h2></v-col>
     </v-row>
@@ -41,10 +41,11 @@ const data = computed(() =>
             {{ item.label }}
             <div>
               <TextEditor
-                :value="item.value"
-                class="ris-texte-form__input"
                 :aria-label="item.aria"
+                class="ris-texte-form__input"
+                editable
                 :field-size="item.fieldSize"
+                :value="item.value"
                 @update-value="emit('updateValue', [item.id, $event])"
               />
             </div>

@@ -9,11 +9,11 @@ const route = useRoute()
 </script>
 
 <template>
-  <v-col v-if="!open" cols="3" align="right">
+  <v-col v-if="!open" align="right" cols="3">
     <button
       id="odoc-open-element"
-      class="odoc-open"
       aria-label="Originaldokument öffnen"
+      class="odoc-open"
       @click="$emit('togglePanel')"
     >
       <div class="odoc-open-text">Originaldokument</div>
@@ -26,8 +26,8 @@ const route = useRoute()
     <div id="odoc-panel-element" class="odoc-panel">
       <h3 class="odoc-editor-header">
         <button
-          class="odoc-close-icon-background"
           aria-label="Originaldokument schließen"
+          class="odoc-close-icon-background"
           @click="$emit('togglePanel')"
         >
           <v-icon class="odoc-close-icon"> close </v-icon>
@@ -35,7 +35,7 @@ const route = useRoute()
         Originaldokument
       </h3>
       <div v-if="!hasFile">
-        <v-icon size="50px" class="odoc-upload-icon">cloud_upload</v-icon>
+        <v-icon class="odoc-upload-icon" size="50px">cloud_upload</v-icon>
         <div class="odoc-upload-note">
           Es wurde noch kein Originaldokument hochgeladen.
         </div>
@@ -53,12 +53,7 @@ const route = useRoute()
       </div>
       <div v-else-if="!file">Dokument wird geladen</div>
       <div v-else class="odoc-editor-wrapper">
-        <TextEditor
-          :value="file"
-          field-size="max"
-          :editable="false"
-          element-id="odoc"
-        />
+        <TextEditor element-id="odoc" field-size="max" :value="file" />
       </div>
     </div>
   </v-col>

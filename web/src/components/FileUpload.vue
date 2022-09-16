@@ -108,8 +108,8 @@ function onFileSelect(event: Event): void {
               status.inDragError ||
               UploadErrorStatus.includes(status.uploadStatus),
           }"
-          @dragover="dragover"
           @dragleave="dragleave"
+          @dragover="dragover"
           @drop="drop"
         >
           <span v-if="status.inDragError">
@@ -170,8 +170,8 @@ function onFileSelect(event: Event): void {
     <v-row v-if="status.uploadStatus === UploadStatus.WRONG_FILE_FORMAT">
       <v-col md="8" sm="12">
         <ErrorModal
-          title="Das ausgewählte Dateiformat ist nicht korrekt."
           description="Versuchen Sie eine .docx-Version dieser Datei hochzuladen."
+          title="Das ausgewählte Dateiformat ist nicht korrekt."
         >
         </ErrorModal>
       </v-col>
@@ -179,8 +179,8 @@ function onFileSelect(event: Event): void {
     <v-row v-if="status.uploadStatus === UploadStatus.FILE_TOO_LARGE">
       <v-col md="8" sm="12">
         <ErrorModal
-          title="Die Datei darf max. 20 MB groß sein."
           description="Bitte laden Sie eine kleinere Datei hoch."
+          title="Die Datei darf max. 20 MB groß sein."
         >
         </ErrorModal>
       </v-col>
@@ -188,8 +188,8 @@ function onFileSelect(event: Event): void {
     <v-row v-if="status.uploadStatus === UploadStatus.FAILED">
       <v-col md="8" sm="12">
         <ErrorModal
-          title="Leider ist ein Fehler aufgetreten."
           description="Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+          title="Leider ist ein Fehler aufgetreten."
         >
         </ErrorModal>
       </v-col>

@@ -2,7 +2,7 @@
 import { onMounted } from "vue"
 import TextButton from "./TextButton.vue"
 
-const props = defineProps<{
+defineProps<{
   headerText?: string
   contentText: string
   confirmText: string
@@ -49,25 +49,25 @@ onMounted(() => {
 <template>
   <div
     class="popup-modal-wrapper"
-    tabindex="0"
     role="dialog"
+    tabindex="0"
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >
     <div class="modal-container">
       <div class="modal-text-title">
-        {{ props.headerText }}
+        {{ headerText }}
       </div>
-      <div class="modal-text-content">{{ props.contentText }}</div>
+      <div class="modal-text-content">{{ contentText }}</div>
       <div class="modal-buttons-container">
         <TextButton
+          :button-type="cancelButtonType"
           label="Abbrechen"
-          :button-type="props.cancelButtonType"
           @click="$emit('closeModal')"
         />
         <TextButton
-          :label="props.confirmText"
-          :button-type="props.confirmButtonType"
+          :button-type="confirmButtonType"
+          :label="confirmText"
           @click="$emit('confirmAction')"
         />
       </div>

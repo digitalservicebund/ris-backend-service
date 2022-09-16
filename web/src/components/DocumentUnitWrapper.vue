@@ -28,7 +28,7 @@ const handleToggleNavBar = async () => {
           :visible="showNavBar"
           @toggle-navbar="handleToggleNavBar"
         />
-        <v-col :cols="showNavBar ? 10 : 11" class="panel-and-main-area">
+        <v-col class="panel-and-main-area" :cols="showNavBar ? 10 : 11">
           <DocumentUnitInfoPanel :document-unit="documentUnit" />
           <slot></slot>
         </v-col>

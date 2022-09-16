@@ -11,7 +11,7 @@ defineProps<Props>()
 </script>
 
 <template>
-  <label :for="id" class="input-field">
+  <label class="input-field" :for="id">
     <span class="input-field__label">
       <v-icon v-if="!!iconName" data-testid="icon">{{ iconName }}</v-icon>
       {{ label }}<span v-if="!!required">*</span>
