@@ -1,0 +1,70 @@
+.heading-01-regular {
+  @apply font-regular  text-64 leading-68;
+}
+
+.heading-02-regular {
+  @apply font-regular text-30 leading-36;
+}
+
+.heading-03-regular {
+  @apply font-regular text-24 leading-30;
+}
+
+.heading-03-bold {
+  @apply font-bold text-24 leading-30;
+}
+
+.subheading {
+  @apply font-regular text-18 leading-26;
+}
+
+.label-01-reg {
+  @apply font-regular text-18 leading-24;
+}
+
+.label-01-bold {
+  @apply font-bold text-18 leading-24;
+}
+
+.label-02-reg {
+  // TODO: in figma with leading-26
+  @apply font-regular text-16 leading-22;
+}
+
+.label-02-bold {
+  @apply font-bold text-16 leading-22;
+}
+
+.label-03-reg {
+  @apply font-regular text-14 leading-18;
+}
+
+.label-03-bold {
+  @apply font-bold text-14 leading-18;
+}
+
+.label-section {
+  @apply font-bold text-10 leading-16;
+}
+
+.body-01-reg {
+  @apply font-regular text-16 leading-26;
+}
+
+.body-02-reg {
+  @apply font-regular text-14 leading-22;
+}
+
+.link-01-bold {
+  @apply font-bold text-16 leading-26 text-blue-700;
+}
+
+.link-02-bold {
+  // TODO: in figma text-14 leading-22
+  @apply font-bold text-18 leading-24 text-blue-700;
+}
+
+.link-03-bold {
+  // TODO: in figma text-18 leading-24
+  @apply font-bold text-14 leading-22 text-blue-700;
+}

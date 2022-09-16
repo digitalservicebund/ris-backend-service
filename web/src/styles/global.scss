@@ -1,4 +1,8 @@
 @import "@/styles/variables";
+@import "@/styles/font_styles";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @font-face {
   font-family: BundesSansWeb;
@@ -15,8 +19,7 @@
 }
 
 body {
-  font-size: $font-size-root;
-  font-family: $font-main;
+  @apply text-18 font-normal font-regular leading-default text-black;
 }
 
 a {
