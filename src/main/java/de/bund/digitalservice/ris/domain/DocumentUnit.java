@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record DocumentUnit(
+    Long id,
     UUID uuid,
     String documentnumber,
     Instant creationtimestamp,
@@ -14,5 +15,5 @@ public record DocumentUnit(
     CoreData coreData,
     Texts texts) {
   public static final DocumentUnit EMPTY =
-      new DocumentUnit(null, null, null, null, null, null, null, null, null);
+      new DocumentUnit(null, null, null, null, null, null, null, null, null, null);
 }

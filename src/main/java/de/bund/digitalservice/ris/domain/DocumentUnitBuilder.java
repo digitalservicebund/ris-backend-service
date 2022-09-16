@@ -21,6 +21,7 @@ public class DocumentUnitBuilder {
     }
 
     return new DocumentUnit(
+        documentUnitDTO.getId(),
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
         documentUnitDTO.getCreationtimestamp(),
