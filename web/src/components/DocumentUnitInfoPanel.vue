@@ -14,7 +14,7 @@ const entries = computed(() => [
     value: props.documentUnit.decisionDate,
   },
   {
-    label: "Gerichtstype",
+    label: "Gerichtstyp",
     value: props.documentUnit.courtType,
   },
 ])

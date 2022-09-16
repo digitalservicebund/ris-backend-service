@@ -43,7 +43,7 @@ const values = computed({
 </script>
 
 <template>
-  <ExpandableContent>
+  <ExpandableContent class="p-16">
     <template #header>
       <h2>Vorgehende Entscheidungen</h2>
     </template>
@@ -60,7 +60,7 @@ const values = computed({
           <TextButton
             aria-label="Entscheidung Entfernen"
             button-type="ghost"
-            class="previous-decisions__remove-button"
+            class="mb-32 mt-16"
             label="Entfernen"
             @click="onClick"
           />
@@ -69,7 +69,7 @@ const values = computed({
         <template #addButton="{ onClick }">
           <TextButton
             aria-label="weitere Entscheidung hinzufügen"
-            class="previous-decisions__add-button"
+            class="mt-48"
             label="weitere Entscheidung hinzufügen"
             @click="onClick"
           />
@@ -78,18 +78,3 @@ const values = computed({
     </div>
   </ExpandableContent>
 </template>
-
-<style lang="scss" scoped>
-.previous-decisions {
-  /* FIXME */
-  padding: 3rem 1rem;
-
-  &__add-button {
-    margin-top: 3rem;
-  }
-
-  &__remove-button {
-    margin: 1rem 0 2rem;
-  }
-}
-</style>
