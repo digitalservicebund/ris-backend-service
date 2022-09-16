@@ -34,7 +34,7 @@ public class DocumentUnitBuilder {
             docUnitDTO.getInputType(),
             docUnitDTO.getCenter(),
             docUnitDTO.getRegion()),
-        new Categories(
+        new Texts(
             docUnitDTO.getDecisionName(),
             docUnitDTO.getHeadline(),
             docUnitDTO.getGuidingPrinciple(),

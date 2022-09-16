@@ -17,6 +17,6 @@ class DocumentUnitBuilderTest {
     DocumentUnit documentUnit = DocumentUnitBuilder.newInstance().setDocUnitDTO(docUnitDTO).build();
 
     assertThat(documentUnit.coreData().fileNumber()).isEqualTo("fileNumber123");
-    assertThat(documentUnit.categories().reasons()).isEqualTo("reasons123");
+    assertThat(documentUnit.texts().reasons()).isEqualTo("reasons123");
   }
 }

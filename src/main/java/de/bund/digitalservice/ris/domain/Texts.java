@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.domain;
 
 import java.util.List;
 
-public record Categories(
+public record Texts(
     String decisionName,
     String headline,
     String guidingPrinciple,
