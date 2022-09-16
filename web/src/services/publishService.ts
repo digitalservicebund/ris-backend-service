@@ -11,7 +11,7 @@ export default {
   }> {
     return httpClient
       .put<string, XmlMail>(
-        `docunits/${documentUnitUuid}/publish`,
+        `documentunits/${documentUnitUuid}/publish`,
         {
           headers: { "Content-Type": "text/plain" },
         },
@@ -55,7 +55,7 @@ export default {
     errorMessage?: { title: string; description: string }
   }> {
     return httpClient
-      .get<XmlMail>(`docunits/${documentUnitUuid}/publish`)
+      .get<XmlMail>(`documentunits/${documentUnitUuid}/publish`)
       .then((response) => {
         if (response.status === 200) {
           return {

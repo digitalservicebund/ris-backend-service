@@ -25,7 +25,7 @@ test.describe("autosave on documentation units", () => {
     page,
     documentNumber,
   }) => {
-    await page.route("**/api/v1/docunits/*/docx", async (route) => {
+    await page.route("**/api/v1/documentunits/*/docx", async (route) => {
       route.fulfill({
         status: 400,
         contentType: "text/plain",

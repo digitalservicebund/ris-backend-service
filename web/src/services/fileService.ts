@@ -9,7 +9,7 @@ export default {
   ): Promise<{ documentUnit?: DocumentUnit; status: UploadStatus }> {
     try {
       const response = await httpClient.put<File, DocumentUnit>(
-        `docunits/${documentUnitUuid}/file`,
+        `documentunits/${documentUnitUuid}/file`,
         {
           headers: {
             "Content-Type":
@@ -39,7 +39,7 @@ export default {
   async getDocxFileAsHtml(fileName: string) {
     try {
       const response = await httpClient.get<{ content: string }>(
-        `docunitdocx/${fileName}`
+        `documentunitdocx/${fileName}`
       )
       return response.data.content
     } catch (error) {
@@ -48,7 +48,7 @@ export default {
   },
   async deleteFile(documentUnitUuid: string) {
     try {
-      await httpClient.delete(`docunits/${documentUnitUuid}/file`)
+      await httpClient.delete(`documentunits/${documentUnitUuid}/file`)
     } catch (error) {
       throw new Error(`Could not delete file: ${error}`)
     }

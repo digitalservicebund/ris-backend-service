@@ -23,7 +23,13 @@ class DocUnitDocxControllerTest {
 
   @Test
   void testGet() {
-    webClient.mutateWith(csrf()).get().uri("/api/v1/docunitdocx").exchange().expectStatus().isOk();
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/documentunitdocx")
+        .exchange()
+        .expectStatus()
+        .isOk();
 
     verify(service).getDocxFiles();
   }
@@ -33,7 +39,7 @@ class DocUnitDocxControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/docunitdocx/123")
+        .uri("/api/v1/documentunitdocx/123")
         .exchange()
         .expectStatus()
         .isOk();

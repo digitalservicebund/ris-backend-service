@@ -16,7 +16,7 @@ interface DocumentUnitService {
 
 const service: DocumentUnitService = {
   async getAll() {
-    const response = await httpClient.get<DocumentUnit[]>("docunits")
+    const response = await httpClient.get<DocumentUnit[]>("documentunits")
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheiten konnten nicht geladen werden.",
@@ -27,7 +27,7 @@ const service: DocumentUnitService = {
 
   async getByDocumentNumber(documentNumber: string) {
     const response = await httpClient.get<DocumentUnit>(
-      `docunits/${documentNumber}`
+      `documentunits/${documentNumber}`
     )
     if (response.status >= 300) {
       response.error = {
@@ -40,7 +40,7 @@ const service: DocumentUnitService = {
 
   async createNew(docCenter: string, docType: string) {
     const response = await httpClient.post<Partial<DocumentUnit>, DocumentUnit>(
-      "docunits",
+      "documentunits",
       {
         headers: {
           Accept: "application/json",
@@ -62,7 +62,7 @@ const service: DocumentUnitService = {
 
   async update(documentUnit: DocumentUnit) {
     const response = await httpClient.put(
-      `docunits/${documentUnit.uuid}/docx`,
+      `documentunits/${documentUnit.uuid}/docx`,
       {
         headers: {
           Accept: "application/json",
@@ -80,7 +80,9 @@ const service: DocumentUnitService = {
   },
 
   async delete(documentUnitUuid: string) {
-    const response = await httpClient.delete(`docunits/${documentUnitUuid}`)
+    const response = await httpClient.delete(
+      `documentunits/${documentUnitUuid}`
+    )
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheit konnte nicht gelöscht werden",

@@ -54,7 +54,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .post()
-        .uri("/api/v1/docunits")
+        .uri("/api/v1/documentunits")
         .bodyValue(docUnitCreationInfo)
         .exchange()
         .expectStatus()
@@ -71,7 +71,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + TEST_UUID + "/file")
+        .uri("/api/v1/documentunits/" + TEST_UUID + "/file")
         .body(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
@@ -87,7 +87,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/abc/file")
+        .uri("/api/v1/documentunits/abc/file")
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -98,7 +98,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/" + TEST_UUID + "/file")
+        .uri("/api/v1/documentunits/" + TEST_UUID + "/file")
         .exchange()
         .expectStatus()
         .isOk();
@@ -111,7 +111,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/abc/file")
+        .uri("/api/v1/documentunits/abc/file")
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -119,7 +119,13 @@ class DocUnitControllerTest {
 
   @Test
   void testGetAll() {
-    webClient.mutateWith(csrf()).get().uri("/api/v1/docunits/").exchange().expectStatus().isOk();
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/documentunits/")
+        .exchange()
+        .expectStatus()
+        .isOk();
 
     verify(service).getAll();
   }
@@ -129,7 +135,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/docunits/ABCD2022000001")
+        .uri("/api/v1/documentunits/ABCD2022000001")
         .exchange()
         .expectStatus()
         .isOk();
@@ -142,7 +148,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/docunits/abc")
+        .uri("/api/v1/documentunits/abc")
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -153,7 +159,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/" + TEST_UUID)
+        .uri("/api/v1/documentunits/" + TEST_UUID)
         .exchange()
         .expectStatus()
         .isOk();
@@ -166,7 +172,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .delete()
-        .uri("/api/v1/docunits/abc")
+        .uri("/api/v1/documentunits/abc")
         .exchange()
         .expectStatus()
         .is4xxClientError();
@@ -179,7 +185,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + TEST_UUID + "/docx")
+        .uri("/api/v1/documentunits/" + TEST_UUID + "/docx")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(docUnit)
         .exchange()
@@ -195,7 +201,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/abc/docx")
+        .uri("/api/v1/documentunits/abc/docx")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(docUnit)
         .exchange()
@@ -224,7 +230,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
+        .uri("/api/v1/documentunits/" + TEST_UUID + "/publish")
         .bodyValue(RECEIVER_ADDRESS)
         .exchange()
         .expectHeader()
@@ -258,7 +264,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
+        .uri("/api/v1/documentunits/" + TEST_UUID + "/publish")
         .bodyValue(RECEIVER_ADDRESS)
         .exchange()
         .expectStatus()
@@ -288,7 +294,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
+        .uri("/api/v1/documentunits/" + TEST_UUID + "/publish")
         .exchange()
         .expectStatus()
         .isOk()
@@ -318,7 +324,7 @@ class DocUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/docunits/" + TEST_UUID + "/publish")
+        .uri("/api/v1/documentunits/" + TEST_UUID + "/publish")
         .exchange()
         .expectStatus()
         .is5xxServerError();

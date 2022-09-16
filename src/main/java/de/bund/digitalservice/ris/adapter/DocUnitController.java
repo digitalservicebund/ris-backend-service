@@ -28,7 +28,7 @@ import reactor.core.publisher.Mono;
 import reactor.util.retry.Retry;
 
 @RestController
-@RequestMapping("api/v1/docunits")
+@RequestMapping("api/v1/documentunits")
 @Slf4j
 public class DocUnitController {
   private final DocUnitService service;

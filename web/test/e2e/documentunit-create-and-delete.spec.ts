@@ -15,19 +15,19 @@ test.describe("create a doc unit and delete it again", () => {
     const documentNumber = (/jurisdiction\/documentunit\/(.*)\/files/g.exec(
       page.url()
     ) || [])[1]
-    const response = await request.get(`${backendHost}/api/v1/docunits`)
+    const response = await request.get(`${backendHost}/api/v1/documentunits`)
     const units = await response.json()
     await Promise.all(
       units
         .filter((unit) => unit.documentnumber === documentNumber)
         .map((unit) =>
-          request.delete(`${backendHost}/api/v1/docunits/${unit.uuid}`)
+          request.delete(`${backendHost}/api/v1/documentunits/${unit.uuid}`)
         )
     )
   })
 
   test("delete doc unit", async ({ page, request }) => {
-    const response = await request.post(`${backendHost}/api/v1/docunits`, {
+    const response = await request.post(`${backendHost}/api/v1/documentunits`, {
       data: { documentationCenterAbbreviation: "foo", documentType: "X" },
     })
     const { documentnumber: documentNumber } = await response.json()
