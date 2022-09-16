@@ -54,16 +54,14 @@ const conditionalClasses = computed(() => ({
     outline: none;
   }
 
-  &:-webkit-autofill {
-    -webkit-box-shadow: 0 0 0 50px white inset;
-    box-shadow: 0 0 0 50px white inset;
-    -webkit-text-fill-color: $black;
+  &:autofill {
+    box-shadow: 0 0 0 50px $white inset;
+    color: inherit;
   }
 
-  &:-webkit-autofill:focus {
-    -webkit-box-shadow: 0 0 0 50px white inset;
-    box-shadow: 0 0 0 50px white inset;
-    -webkit-text-fill-color: $black;
+  &:autofill:focus {
+    box-shadow: 0 0 0 50px $white inset;
+    color: inherit;
   }
 
   &__error {
@@ -72,16 +70,14 @@ const conditionalClasses = computed(() => ({
     padding: 17px 24px;
     width: 100%;
 
-    &:-webkit-autofill {
-      -webkit-box-shadow: 0 0 0 50px $error-background inset;
+    &:autofill {
       box-shadow: 0 0 0 50px $error-background inset;
-      -webkit-text-fill-color: $black;
+      color: inherit;
     }
 
-    &:-webkit-autofill:focus {
-      -webkit-box-shadow: 0 0 0 50px $error-background inset;
+    &:autofill:focus {
       box-shadow: 0 0 0 50px $error-background inset;
-      -webkit-text-fill-color: $black;
+      color: inherit;
     }
   }
 }

@@ -140,7 +140,6 @@ onMounted(() => {
       animation-delay: 1s;
       animation-duration: 2s;
       animation-timing-function: ease-in;
-      -webkit-animation-fill-mode: forwards;
       animation-fill-mode: forwards;
     }
   }

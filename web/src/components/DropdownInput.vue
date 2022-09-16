@@ -136,12 +136,8 @@ onBeforeUnmount(() => {
   width: 100%;
   position: relative;
   display: inline-block;
+  user-select: none;
 
-  /** Disable user select text */
-  -webkit-user-select: none; /* Chrome all / Safari all */
-  -moz-user-select: none; /* Firefox all */
-  -ms-user-select: none; /* IE 10+ */
-  user-select: none; /* Likely future */
   &__open-dropdown {
     .input-container {
       display: flex;

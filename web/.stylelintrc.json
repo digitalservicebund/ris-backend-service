@@ -6,7 +6,6 @@
     "stylelint-config-recommended-vue"
   ],
   "rules": {
-    "property-no-vendor-prefix": null,
     "plugin/stylelint-bem-namics": {
       "patternPrefixes": [],
       "helperPrefixes": []
