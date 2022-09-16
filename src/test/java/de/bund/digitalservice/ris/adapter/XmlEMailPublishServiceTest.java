@@ -8,6 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.domain.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.HttpMailSender;
@@ -69,7 +70,7 @@ class XmlEMailPublishServiceTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String SENDER_ADDRESS = "export@neuris";
 
-  private DocumentUnitDTO documentUnit;
+  private DocumentUnitDTO documentUnitDTO;
 
   @Autowired private XmlEMailPublishService service;
 
@@ -81,18 +82,20 @@ class XmlEMailPublishServiceTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    documentUnit = new DocumentUnitDTO();
-    documentUnit.setId(123L);
-    documentUnit.setUuid(TEST_UUID);
-    documentUnit.setDocumentnumber("test-document-number");
-    when(xmlExporter.generateXml(documentUnit)).thenReturn(FORMATTED_XML);
+    documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setId(123L);
+    documentUnitDTO.setUuid(TEST_UUID);
+    documentUnitDTO.setDocumentnumber("test-document-number");
+    when(xmlExporter.generateXml(
+            DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+        .thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(Mono.just(SAVED_XML_MAIL));
   }
 
   @Test
   void testPublish() {
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+    StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))
         .consumeNextWith(
             response ->
                 assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
@@ -114,9 +117,11 @@ class XmlEMailPublishServiceTest {
         new XmlResultObject("xml", "400", List.of("status-message"), "test.xml", PUBLISH_DATE);
     var xmlMail = new XmlMail(null, 123L, null, null, null, "400", "status-message", null, null);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
-    when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
+    when(xmlExporter.generateXml(
+            DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+        .thenReturn(xmlWithValidationError);
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+    StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))
         .consumeNextWith(
             response -> assertThat(response).usingRecursiveComparison().isEqualTo(expected))
         .verifyComplete();
@@ -129,9 +134,11 @@ class XmlEMailPublishServiceTest {
   @Test
   void testPublish_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
-    when(xmlExporter.generateXml(documentUnit)).thenThrow(ParserConfigurationException.class);
+    when(xmlExporter.generateXml(
+            DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+        .thenThrow(ParserConfigurationException.class);
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+    StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException
@@ -145,9 +152,9 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testPublish_withoutDocumentNumber() {
-    documentUnit.setDocumentnumber(null);
+    documentUnitDTO.setDocumentnumber(null);
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+    StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException
@@ -163,7 +170,7 @@ class XmlEMailPublishServiceTest {
   void testPublish_withExceptionBySaving() {
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenThrow(IllegalArgumentException.class);
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+    StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))
         .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
         .verify();
 
@@ -174,7 +181,7 @@ class XmlEMailPublishServiceTest {
   @Test
   void testPublish_withoutToReceiverAddressSet() {
 
-    StepVerifier.create(service.publish(documentUnit, null))
+    StepVerifier.create(service.publish(documentUnitDTO, null))
         .expectErrorMatches(
             ex ->
                 ex instanceof DocumentUnitPublishException
@@ -192,7 +199,7 @@ class XmlEMailPublishServiceTest {
         .when(mailSender)
         .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml");
 
-    StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
+    StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))
         .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
         .verify();
 

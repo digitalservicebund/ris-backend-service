@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.adapter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
+import de.bund.digitalservice.ris.domain.DocumentUnit;
 import de.bund.digitalservice.ris.domain.XmlExporter;
 import de.bund.digitalservice.ris.domain.XmlResultObject;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
@@ -17,7 +17,7 @@ public class JurisXmlExporterWrapper implements XmlExporter {
   }
 
   @Override
-  public XmlResultObject generateXml(DocumentUnitDTO documentUnit)
+  public XmlResultObject generateXml(DocumentUnit documentUnit)
       throws ParserConfigurationException, TransformerException {
     ResultObject resultObject = jurisXmlExporter.generateXml(documentUnit);
     return new XmlResultObject(

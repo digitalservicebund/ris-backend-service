@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.adapter;
 
+import de.bund.digitalservice.ris.domain.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.EmailPublishService;
@@ -40,21 +41,24 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public Mono<MailResponse> publish(DocumentUnitDTO documentUnit, String receiverAddress) {
+  public Mono<MailResponse> publish(DocumentUnitDTO documentUnitDTO, String receiverAddress) {
     XmlResultObject xml;
     try {
-      xml = xmlExporter.generateXml(documentUnit);
+      xml =
+          xmlExporter.generateXml(
+              DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build());
     } catch (ParserConfigurationException | TransformerException ex) {
       return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
     }
 
-    return generateMailSubject(documentUnit)
+    return generateMailSubject(documentUnitDTO)
         .map(
-            mailSubject -> generateXmlMail(documentUnit.getId(), receiverAddress, mailSubject, xml))
+            mailSubject ->
+                generateXmlMail(documentUnitDTO.getId(), receiverAddress, mailSubject, xml))
         .doOnNext(this::generateAndSendMail)
         .flatMap(this::savePublishInformation)
         .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex))
-        .map(xmlMail -> new XmlMailResponse(documentUnit.getUuid(), xmlMail));
+        .map(xmlMail -> new XmlMailResponse(documentUnitDTO.getUuid(), xmlMail));
   }
 
   @Override
