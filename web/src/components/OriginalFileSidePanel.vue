@@ -63,15 +63,15 @@ const route = useRoute()
 @import "@/styles/variables";
 
 .odoc-open {
-  background-color: $yellow500;
-  border-radius: 10px;
-  border: 3px solid $blue800;
+  display: flex;
   width: 200px;
   height: 65px;
-  display: flex;
-  justify-content: center; // align horizontal
   align-items: center; // align vertical
+  justify-content: center; // align horizontal
+  border: 3px solid $blue800;
   margin-right: 6px;
+  background-color: $yellow500;
+  border-radius: 10px;
   transform: rotate(-90deg);
   transform-origin: right;
 }
@@ -81,25 +81,25 @@ const route = useRoute()
 }
 
 .odoc-open-icon-background {
-  background-color: $blue800;
-  border-radius: 50%;
   width: 40px;
   height: 40px;
+  background-color: $blue800;
+  border-radius: 50%;
   transform: rotate(90deg) translateX(-2px) translateY(-25px);
 }
 
 .odoc-open-icon {
-  color: white;
-  margin-right: 9px;
   margin-top: 8px;
+  margin-right: 9px;
+  color: white;
 }
 
 .odoc-close-icon-background {
-  background-color: $blue800;
-  color: $white;
-  border-radius: 50%;
   width: 40px;
   height: 40px;
+  background-color: $blue800;
+  border-radius: 50%;
+  color: $white;
   transform: translate(-40px, 10px);
 }
 

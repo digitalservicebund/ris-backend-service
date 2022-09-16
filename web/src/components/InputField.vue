@@ -39,8 +39,8 @@ defineProps<Props>()
 
   &__error {
     display: flex;
-    gap: 0.3rem;
     color: $error;
+    gap: 0.3rem;
   }
 }
 </style>

@@ -201,10 +201,10 @@ function onFileSelect(event: Event): void {
 @import "@/styles/variables";
 
 .upload-drop-area {
-  border-radius: $border-radius;
+  padding: 44px;
   border: $border-style-inactive;
   background: $white;
-  padding: 44px;
+  border-radius: $border-radius;
 
   &:hover {
     border: $border-style-active;
@@ -230,7 +230,7 @@ function onFileSelect(event: Event): void {
 }
 
 .upload-status {
-  font-size: 24px;
   margin: 16px 0 10px;
+  font-size: 24px;
 }
 </style>

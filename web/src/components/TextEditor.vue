@@ -563,8 +563,8 @@ onBeforeRouteUpdate(async () => {
 
     /* eslint-disable-next-line vue-scoped-css/no-unused-selector */
     .v-col {
-      flex-grow: 0 !important;
       box-sizing: border-box;
+      flex-grow: 0 !important;
 
       .last-icon {
         position: absolute;
@@ -609,13 +609,13 @@ onBeforeRouteUpdate(async () => {
   color: #004b78;
 
   &:hover {
-    color: $text-tertiary;
     background-color: $button-tertiary-focus;
+    color: $text-tertiary;
   }
 
   &__active {
-    color: $white;
     background-color: $navbar-hover-gray;
+    color: $white;
   }
 
   &--bold {
@@ -633,25 +633,25 @@ onBeforeRouteUpdate(async () => {
 }
 
 .horizontal-divider {
-  border-color: #004b78;
   border-width: 1px;
-  margin-left: -16px;
+  border-color: #004b78;
   margin-right: -16px;
+  margin-left: -16px;
 }
 
 .dropdown-container {
-  width: max-content;
   position: relative;
   display: inline-block;
+  width: max-content;
 
   .dropdown-content {
+    position: absolute;
+    z-index: 1;
+    right: 0;
     display: flex;
     flex-direction: row;
-    background: $white;
     border: 1px solid #004b76;
-    position: absolute;
-    right: 0;
-    z-index: 1;
+    background: $white;
   }
 }
 

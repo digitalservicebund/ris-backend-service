@@ -36,8 +36,8 @@ defineProps<{ documentUnit: DocumentUnit }>()
 @import "@/styles/variables";
 
 .panel-default {
-  background-color: $navbar-hover-gray;
   border-bottom: $gray400 solid 1px;
+  background-color: $navbar-hover-gray;
 
   &__values {
     padding-left: 6px;

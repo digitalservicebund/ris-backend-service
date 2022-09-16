@@ -133,9 +133,9 @@ onBeforeUnmount(() => {
 @import "@/styles/variables";
 
 .dropdown-container {
-  width: 100%;
   position: relative;
   display: inline-block;
+  width: 100%;
   user-select: none;
 
   &__open-dropdown {
@@ -147,15 +147,15 @@ onBeforeUnmount(() => {
       border: 2px solid $text-tertiary;
 
       &:hover {
-        outline: 4px solid $text-tertiary;
         border: none;
         margin-bottom: 4px;
+        outline: 4px solid $text-tertiary;
       }
 
       &:focus {
-        outline: 4px solid $text-tertiary;
         border: none;
         margin-bottom: 4px;
+        outline: 4px solid $text-tertiary;
       }
 
       .text-input {
@@ -173,28 +173,27 @@ onBeforeUnmount(() => {
   }
 
   &__dropdown-items {
-    display: flex;
-    flex-direction: column;
-    border: 2px solid #ececec;
-    border-top: none;
-    filter: drop-shadow(0 1px 3px rgb(0 0 0 / 25%));
-
     /** Always show on top after textbox and width equal to textbox */
     position: absolute;
     z-index: 99;
     top: 100%;
-    left: 0;
     right: 0;
+    left: 0;
+    display: flex;
     max-height: 300px;
+    flex-direction: column;
+    border: 2px solid #ececec;
+    border-top: none;
+    filter: drop-shadow(0 1px 3px rgb(0 0 0 / 25%));
     overflow-y: scroll;
     scrollbar-width: none;
   }
 
   &__dropdown-item {
     padding: 17px 24px;
-    cursor: pointer;
-    background-color: #fff;
     border-bottom: 2px solid #ececec;
+    background-color: #fff;
+    cursor: pointer;
 
     &:last-of-type {
       border-bottom: none;

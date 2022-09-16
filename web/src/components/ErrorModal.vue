@@ -22,9 +22,9 @@ defineProps<{ title: string; description: string }>()
 
 <style lang="scss" scoped>
 .error {
-  background-color: #f9e5ec;
   border-left: 8px solid #b0243f;
   margin-top: 23px;
+  background-color: #f9e5ec;
 }
 
 .error-icon {

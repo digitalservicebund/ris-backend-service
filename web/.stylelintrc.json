@@ -3,7 +3,8 @@
   "extends": [
     "stylelint-config-standard-scss",
     "stylelint-config-prettier-scss",
-    "stylelint-config-recommended-vue"
+    "stylelint-config-recommended-vue",
+    "stylelint-config-idiomatic-order"
   ],
   "rules": {
     "plugin/stylelint-bem-namics": {

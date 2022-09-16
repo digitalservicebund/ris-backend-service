@@ -97,22 +97,22 @@ onMounted(() => {
 .save-button-container {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   align-items: flex-end;
+  justify-content: flex-start;
   column-gap: 10px;
 
   .save-status div {
     display: flex;
     flex-direction: row;
-    justify-items: flex-start;
     align-items: flex-end;
+    justify-items: flex-start;
 
     .icon {
+      display: flex;
       width: 30px;
       height: 25px;
-      display: flex;
-      align-items: center;
       flex-wrap: wrap;
+      align-items: center;
 
       &--error {
         color: red;
@@ -135,12 +135,12 @@ onMounted(() => {
     }
 
     .on-succeed {
-      font-size: 16px;
       animation: text-faded;
       animation-delay: 1s;
       animation-duration: 2s;
-      animation-timing-function: ease-in;
       animation-fill-mode: forwards;
+      animation-timing-function: ease-in;
+      font-size: 16px;
     }
   }
 

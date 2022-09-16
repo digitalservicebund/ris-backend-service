@@ -85,32 +85,32 @@ watch(
 
 .xml-container {
   .xml-container-title {
-    font-weight: 700;
+    color: $black;
     font-size: 16px;
+    font-weight: 700;
     line-height: 26px;
     text-transform: uppercase;
-    color: $black;
   }
 
   .code-lines {
-    border: solid 1px $white;
     overflow: auto;
-    white-space: nowrap;
     width: 60vw;
+    border: solid 1px $white;
+    white-space: nowrap;
   }
 
   .code-line {
     display: flex;
+    box-sizing: border-box;
     flex-direction: row;
     justify-content: flex-start;
     row-gap: 10px;
-    box-sizing: border-box;
 
     .line-number {
-      background-color: #ebecf0;
       display: flex;
       justify-content: flex-end;
       padding-right: 5px;
+      background-color: #ebecf0;
       user-select: none;
     }
 

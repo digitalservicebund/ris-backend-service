@@ -101,13 +101,13 @@ watch(
 
 <style lang="scss" scoped>
 .input-group {
-  width: 100%;
   display: flex;
+  width: 100%;
   flex-direction: column;
 
   &__row {
-    width: 100%;
     display: flex;
+    width: 100%;
     flex-wrap: wrap;
 
     &__field {

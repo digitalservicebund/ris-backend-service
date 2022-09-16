@@ -45,8 +45,8 @@ const buttonClasses = computed(() => ({
   font-family: $font-bold;
 
   &.v-btn {
-    text-transform: none;
     font-size: var(--v-btn-size);
+    text-transform: none;
 
     &--size-default {
       --v-btn-height: 48px;
@@ -118,9 +118,9 @@ const buttonClasses = computed(() => ({
 }
 
 .btn-secondary {
+  border: solid 2px $blue800;
   background-color: #f5e05d !important;
   color: $blue800 !important;
-  border: solid 2px $blue800;
 
   &.v-btn {
     &:hover {
@@ -132,32 +132,32 @@ const buttonClasses = computed(() => ({
     }
 
     &:focus-visible {
-      outline: 2px solid $blue800;
       border: none;
+      outline: 2px solid $blue800;
     }
   }
 }
 
 .btn-ghost {
+  border: 2px solid $white !important;
   background: none !important;
   color: $blue800 !important;
-  border: 2px solid $white !important;
   text-decoration: underline;
 
   &.v-btn {
     &:hover {
-      background-color: $white !important;
       border: 2px solid #b8bdc3 !important;
+      background-color: $white !important;
     }
 
     &:active {
-      background-color: $white !important;
       border: none;
+      background-color: $white !important;
     }
 
     &:focus-visible {
-      outline: 2px solid $blue800;
       border: 2px solid #b8bdc3 !important;
+      outline: 2px solid $blue800;
     }
   }
 }

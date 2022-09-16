@@ -65,10 +65,10 @@ const conditionalClasses = computed(() => ({
   }
 
   &__error {
-    outline: 2px solid $error;
-    background-color: $error-background;
-    padding: 17px 24px;
     width: 100%;
+    padding: 17px 24px;
+    background-color: $error-background;
+    outline: 2px solid $error;
 
     &:autofill {
       box-shadow: 0 0 0 50px $error-background inset;

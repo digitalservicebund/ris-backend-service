@@ -45,9 +45,9 @@ const linkStyling = (componentName: string) => {
 }
 
 .topbar-header {
+  border-right: $gray400 solid 1px;
   font-weight: bold;
   line-height: 120%;
-  border-right: $gray400 solid 1px;
 }
 
 .topbar-logo-circle {

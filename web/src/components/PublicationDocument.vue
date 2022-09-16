@@ -179,26 +179,26 @@ function validateEmailAddress(): boolean {
 }
 
 .publication-container {
-  background-color: #f6f7f8;
   min-height: 100vh;
-  row-gap: 32px;
   padding-top: 32px;
-  padding-left: 32px;
   padding-bottom: 32px;
+  padding-left: 32px;
+  background-color: #f6f7f8;
+  row-gap: 32px;
 
   .icon {
+    display: flex;
     width: 15px;
     height: 25px;
-    display: flex;
-    align-items: center;
     flex-wrap: wrap;
+    align-items: center;
   }
 
   p {
+    color: $black;
     font-style: normal;
     font-weight: 400;
     letter-spacing: 0.16px;
-    color: $black;
   }
 
   .publication-text-header {
@@ -207,13 +207,13 @@ function validateEmailAddress(): boolean {
   }
 
   .publication-text-label {
+    color: #4e596a;
+    font-size: 11px;
     font-style: normal;
     font-weight: 700;
-    font-size: 11px;
+    letter-spacing: 1px;
     line-height: 16px;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #4e596a;
   }
 
   .publication-check-container {
@@ -221,23 +221,23 @@ function validateEmailAddress(): boolean {
 
     .publication-check-infos-container {
       display: flex;
+      width: 100%;
       flex-direction: column;
       justify-content: flex-start;
-      row-gap: 16px;
       padding: 16px 56px 16px 24px;
       background-color: $white;
-      width: 100%;
+      row-gap: 16px;
 
       &__in-error {
-        border: solid 1px #b0243f;
         max-width: 50vw;
+        border: solid 1px #b0243f;
       }
 
       .publication-button-container {
         display: flex;
         flex-direction: row;
-        column-gap: 32px;
         justify-content: space-between;
+        column-gap: 32px;
       }
     }
   }
@@ -255,8 +255,8 @@ function validateEmailAddress(): boolean {
         }
 
         span {
-          font-weight: 400;
           margin-left: 5px;
+          font-weight: 400;
         }
       }
     }
@@ -265,14 +265,14 @@ function validateEmailAddress(): boolean {
   .text-icon {
     display: flex;
     flex: row nowrap;
-    justify-content: flex-start;
     align-items: center;
+    justify-content: flex-start;
     column-gap: 12px;
 
     &--outlined {
-      color: white;
       background-color: black;
       border-radius: 50%;
+      color: white;
     }
   }
 
@@ -283,8 +283,8 @@ function validateEmailAddress(): boolean {
   .xml-validation-error-container {
     .xml-validation-error-details {
       padding-top: 16px;
-      padding-left: 27px;
       padding-bottom: 16px;
+      padding-left: 27px;
       row-gap: 16px;
     }
   }

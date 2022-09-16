@@ -66,9 +66,9 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 
   &__header {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
     width: 100%;
+    align-items: center;
+    justify-content: space-between;
   }
 }
 </style>

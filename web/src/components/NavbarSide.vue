@@ -189,30 +189,30 @@ const linkStyling = (componentName: string) => {
 }
 
 .sidebar-close-icon-background {
-  background-color: $blue800;
-  border-radius: 50%;
   width: 40px;
   height: 40px;
+  background-color: $blue800;
+  border-radius: 50%;
   float: right;
   transform: translateY(60px);
 }
 
 .sidebar-close-icon {
-  color: white;
-  margin-left: 8px;
   margin-top: 8px;
+  margin-left: 8px;
+  color: white;
 }
 
 .sidebar-open {
-  background-color: $yellow500;
-  border-radius: 10px;
-  border: 3px solid $blue800;
+  display: flex;
   width: 100px;
   height: 65px;
-  display: flex;
-  justify-content: center; // align horizontal
   align-items: center; // align vertical
+  justify-content: center; // align horizontal
+  border: 3px solid $blue800;
   margin-left: 6px;
+  background-color: $yellow500;
+  border-radius: 10px;
   transform: rotate(-90deg) translateX(-165px);
   transform-origin: left;
 }
@@ -222,27 +222,27 @@ const linkStyling = (componentName: string) => {
 }
 
 .sidebar-open-icon-background {
-  background-color: $blue800;
-  border-radius: 50%;
   min-width: 40px;
   height: 40px;
+  background-color: $blue800;
+  border-radius: 50%;
   transform: rotate(90deg) translateX(3px) translateY(-10px);
 }
 
 .sidebar-open-icon {
-  color: white;
-  margin-left: 9px;
   margin-top: 8px;
+  margin-left: 9px;
+  color: white;
 }
 
 .back-button {
-  color: $blue800;
   padding-bottom: 49px;
+  color: $blue800;
   font-size: small;
 
   &__icon {
-    margin-bottom: 4px;
     margin-right: 8px;
+    margin-bottom: 4px;
   }
 }
 

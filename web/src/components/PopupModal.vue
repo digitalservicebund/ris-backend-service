@@ -80,43 +80,43 @@ onMounted(() => {
 
 .popup-modal-wrapper {
   position: fixed;
+  z-index: 999;
   top: 0;
   left: 0;
+  display: flex;
   width: 100vw;
   height: 100%;
-  background-color: rgb(111 119 133 / 60%);
-  z-index: 999;
-  display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  background-color: rgb(111 119 133 / 60%);
 
   .modal-container {
-    background: $white;
-    min-height: 222px;
-    max-width: 442px;
-    box-sizing: border-box;
-    border: 2px solid $blue800;
-    padding: 40px;
     display: flex;
+    max-width: 442px;
+    min-height: 222px;
+    box-sizing: border-box;
     flex-direction: column;
     align-items: flex-start;
+    padding: 40px;
+    border: 2px solid $blue800;
+    background: $white;
     gap: 16px;
 
     .modal-text-title {
-      font-weight: 700;
-      font-size: 18px;
-      line-height: 26px;
-      letter-spacing: 0.16px;
       color: $black;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: 0.16px;
+      line-height: 26px;
     }
 
     .modal-text-content {
+      color: $black;
+      font-size: 14px;
       font-style: normal;
       font-weight: 400;
-      font-size: 14px;
-      line-height: 18px;
       letter-spacing: 0.16px;
-      color: $black;
+      line-height: 18px;
       text-align: left;
     }
 
