@@ -18,7 +18,7 @@ const route = useRoute()
     >
       <div class="odoc-open-text">Originaldokument</div>
       <div class="odoc-open-icon-background">
-        <v-icon class="odoc-open-icon"> arrow_back_ios_new </v-icon>
+        <span class="odoc-open-icon material-icons"> arrow_back_ios_new </span>
       </div>
     </button>
   </v-col>
@@ -30,7 +30,7 @@ const route = useRoute()
           aria-label="Originaldokument schließen"
           @click="$emit('togglePanel')"
         >
-          <v-icon class="odoc-close-icon"> close </v-icon>
+          <span class="odoc-close-icon material-icons"> close </span>
         </button>
         Originaldokument
       </h3>

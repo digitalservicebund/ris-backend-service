@@ -49,7 +49,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
         <span>{{ header }}</span>
       </slot>
 
-      <v-icon>{{ iconName }}</v-icon>
+      <span class="material-icons icon">{{ iconName }}</span>
     </button>
 
     <v-expand-transition>
@@ -69,6 +69,10 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
     justify-content: space-between;
     align-items: center;
     width: 100%;
+  }
+
+  .icon {
+    cursor: pointer;
   }
 }
 </style>

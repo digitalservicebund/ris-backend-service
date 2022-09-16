@@ -32,7 +32,7 @@ const buttonClasses = computed(() => ({
     :aria-label="ariaLabel"
   >
     <slot>
-      <v-icon v-if="props.icon"> {{ props.icon }} </v-icon>
+      <span v-if="props.icon" class="material-icons"> {{ props.icon }} </span>
       {{ props.label }}
     </slot>
   </v-btn>

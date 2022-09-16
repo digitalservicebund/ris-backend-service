@@ -23,16 +23,16 @@ const linkStyling = (componentName: string) => {
         @click="$emit('toggleNavbar')"
         @keydown.m="$emit('toggleNavbar')"
       >
-        <v-icon class="sidebar-close-icon"> close </v-icon>
+        <span class="sidebar-close-icon material-icons"> close </span>
       </div>
       <v-container fluid>
         <v-row>
           <v-col class="back-button">
             <span>
-              <v-icon class="back-button__icon" size="22px">
-                arrow_back
-              </v-icon>
-              <router-link class="back-button" :to="{ name: 'jurisdiction' }"
+              <span class="back-button__icon material-icons"> arrow_back </span>
+              <router-link
+                class="back-button__link"
+                :to="{ name: 'jurisdiction' }"
                 >ZURÜCK</router-link
               >
             </span>
@@ -157,7 +157,9 @@ const linkStyling = (componentName: string) => {
     >
       <div class="sidebar-open-text">Menü</div>
       <div class="sidebar-open-icon-background">
-        <v-icon class="sidebar-open-icon"> arrow_forward_ios </v-icon>
+        <span class="sidebar-open-icon material-icons">
+          arrow_forward_ios
+        </span>
       </div>
     </div>
   </v-col>
@@ -236,13 +238,19 @@ const linkStyling = (componentName: string) => {
 }
 
 .back-button {
-  color: $blue800;
   padding-bottom: 49px;
-  font-size: small;
 
   &__icon {
-    margin-bottom: 4px;
+    color: $blue800;
     margin-right: 8px;
+    position: relative;
+    top: 4px;
+    font-size: 22px;
+  }
+
+  &__link {
+    color: $blue800;
+    font-size: small;
   }
 }
 
