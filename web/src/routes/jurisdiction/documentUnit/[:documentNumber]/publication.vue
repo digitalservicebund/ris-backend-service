@@ -101,9 +101,9 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .spinner {
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
   height: 50vh;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 </style>
