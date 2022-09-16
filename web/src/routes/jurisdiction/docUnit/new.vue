@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onBeforeMount } from "vue"
 import { useRouter } from "vue-router"
-import docUnitService from "@/services/documentUnitService"
+import documentUnitService from "@/services/documentUnitService"
 
 const router = useRouter()
 
 onBeforeMount(async () => {
-  const newDocUnit = (await docUnitService.createNew("KO", "RE")).data
+  const newDocumentUnit = (await documentUnitService.createNew("KO", "RE")).data
   await router.replace({
     name: "jurisdiction-docUnit-:documentNumber-files",
-    params: { documentNumber: newDocUnit.documentnumber },
+    params: { documentNumber: newDocumentUnit.documentnumber },
   })
 })
 </script>

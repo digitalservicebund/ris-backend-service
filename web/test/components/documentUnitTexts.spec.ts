@@ -28,7 +28,7 @@ describe("Texts", () => {
     getByText("Entscheidungsgründe")
   })
 
-  test("emits update DocUnit event", async () => {
+  test("emits update DocumentUnit event", async () => {
     const user = userEvent.setup()
     const { getByLabelText, emitted } = render(DocumentUnitTexts, {
       global: { plugins: [vuetify] },
@@ -39,15 +39,15 @@ describe("Texts", () => {
     })
 
     await user.click(getByLabelText("Kurz- und Langtexte Speichern Button"))
-    expect(emitted().updateDocUnit).toBeTruthy()
+    expect(emitted().updateDocumentUnit).toBeTruthy()
   })
 
   test.todo("change in value emits updateValue event", async () => {
     // const user = userEvent.setup()
-    // const { getByText, getByLabelText, emitted } = render(DocUnitTexts, {
+    // const { getByText, getByLabelText, emitted } = render(DocumentUnitTexts, {
     //   global: { plugins: [vuetify] },
     //   props: {
-    //     texts: new DocUnit("foo", { titelzeile: "foo Titelzeile" }).texts,
+    //     texts: new DocumentUnit("foo", { titelzeile: "foo Titelzeile" }).texts,
     //     updateStatus: 0,
     //   },
     // })
@@ -57,6 +57,6 @@ describe("Texts", () => {
     //   "titelzeile" as keyof Texts,
     //   "new titel",
     // ])
-    // expect(emitted().updateDocUnit).toBeFalsy()
+    // expect(emitted().updateDocumentUnit).toBeFalsy()
   })
 })

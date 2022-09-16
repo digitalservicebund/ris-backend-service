@@ -2,12 +2,12 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import { createVuetify } from "vuetify/lib/framework.mjs"
-import SaveDocUnitButton from "@/components/SaveDocumentUnitButton.vue"
+import SaveDocumentUnitButton from "@/components/SaveDocumentUnitButton.vue"
 
-describe("SaveDocUnitButton", () => {
+describe("SaveDocumentUnitButton", () => {
   const vuetify = createVuetify({ components, directives })
   it("renders frist time", async () => {
-    const { emitted } = render(SaveDocUnitButton, {
+    const { emitted } = render(SaveDocumentUnitButton, {
       global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",
@@ -19,10 +19,10 @@ describe("SaveDocUnitButton", () => {
     expect(saveButton.textContent?.replace(/\s/g, "")).toEqual("Speichern")
     expect(saveButton).toHaveAttribute("aria-label", "Foo")
     await fireEvent.click(saveButton)
-    expect(emitted().updateDocUnit).toBeTruthy()
+    expect(emitted().updateDocumentUnit).toBeTruthy()
   })
   it("renders with on update status", async () => {
-    const { getByText } = await render(SaveDocUnitButton, {
+    const { getByText } = await render(SaveDocumentUnitButton, {
       global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",
@@ -32,7 +32,7 @@ describe("SaveDocUnitButton", () => {
     getByText("Daten werden gespeichert")
   })
   it("renders with has update error status", async () => {
-    const { getByText } = await render(SaveDocUnitButton, {
+    const { getByText } = await render(SaveDocumentUnitButton, {
       global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",
@@ -42,7 +42,7 @@ describe("SaveDocUnitButton", () => {
     getByText("Fehler beim Speichern")
   })
   it("renders with update succeed status", async () => {
-    const { getByText } = await render(SaveDocUnitButton, {
+    const { getByText } = await render(SaveDocumentUnitButton, {
       global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",

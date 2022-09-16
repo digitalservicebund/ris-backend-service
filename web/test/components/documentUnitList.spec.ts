@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import { createVuetify } from "vuetify"
 import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
-import DocUnitList from "@/components/DocumentUnitList.vue"
+import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("documentUnit list", () => {
@@ -19,8 +19,8 @@ describe("documentUnit list", () => {
     ],
   })
 
-  test("renders fallback if no docUnits found", async () => {
-    render(DocUnitList, {
+  test("renders fallback if no documentUnits found", async () => {
+    render(DocumentUnitList, {
       props: {
         documentUnits: [],
       },
@@ -32,12 +32,12 @@ describe("documentUnit list", () => {
     await screen.findByText("Keine Dokumentationseinheiten gefunden")
   })
 
-  test("renders docUnits", async () => {
-    const docUnit = new DocumentUnit("1", { fileNumber: "foo" })
+  test("renders documentUnits", async () => {
+    const documentUnit = new DocumentUnit("1", { fileNumber: "foo" })
 
-    render(DocUnitList, {
+    render(DocumentUnitList, {
       props: {
-        documentUnits: [docUnit],
+        documentUnits: [documentUnit],
       },
       global: {
         plugins: [vuetify, router],
@@ -51,11 +51,11 @@ describe("documentUnit list", () => {
   })
 
   test("delete emits event", async () => {
-    const docUnit = new DocumentUnit("1", { fileNumber: "foo" })
+    const documentUnit = new DocumentUnit("1", { fileNumber: "foo" })
 
-    const { emitted } = render(DocUnitList, {
+    const { emitted } = render(DocumentUnitList, {
       props: {
-        documentUnits: [docUnit],
+        documentUnits: [documentUnit],
       },
       global: {
         plugins: [vuetify, router],
@@ -68,6 +68,6 @@ describe("documentUnit list", () => {
     const confirmButton = screen.getByRole("button", { name: "Löschen" })
     expect(confirmButton).toBeInTheDocument()
     await fireEvent.click(confirmButton)
-    expect(emitted().deleteDocUnit).toBeTruthy()
+    expect(emitted().deleteDocumentUnit).toBeTruthy()
   })
 })

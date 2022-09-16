@@ -6,7 +6,7 @@ import PopupModal from "./PopupModal.vue"
 
 defineProps<{ documentUnits: DocumentUnit[] }>()
 const emit = defineEmits<{
-  (e: "deleteDocUnit", docUnit: DocumentUnit): void
+  (e: "deleteDocumentUnit", documentUnit: DocumentUnit): void
 }>()
 
 const showModal = ref(false)
@@ -15,7 +15,7 @@ const modalConfirmText = ref("Löschen")
 const modalHeaderText = "Dokumentationseinheit löschen"
 const modalCancelButtonType = "ghost"
 const modalConfirmButtonType = "secondary"
-const selectedDocUnit = ref(new DocumentUnit("1"))
+const selectedDocumentUnit = ref(new DocumentUnit("1"))
 const toggleModal = () => {
   showModal.value = !showModal.value
   if (showModal.value) {
@@ -30,13 +30,13 @@ const toggleModal = () => {
     }
   }
 }
-const setSelectedDocUnit = (docUnit: DocumentUnit) => {
-  selectedDocUnit.value = docUnit
-  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocUnit.value.documentnumber} wirklich dauerhaft löschen?`
+const setSelectedDocumentUnit = (documentUnit: DocumentUnit) => {
+  selectedDocumentUnit.value = documentUnit
+  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnit.value.documentnumber} wirklich dauerhaft löschen?`
   toggleModal()
 }
 const onDelete = () => {
-  emit("deleteDocUnit", selectedDocUnit.value)
+  emit("deleteDocumentUnit", selectedDocumentUnit.value)
   toggleModal()
 }
 </script>
@@ -64,30 +64,35 @@ const onDelete = () => {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="docUnit in documentUnits" :key="docUnit.id">
+        <tr v-for="documentUnit in documentUnits" :key="documentUnit.id">
           <td>
             <router-link
               class="doc-unit-list-active-link"
               :to="{
-                name: docUnit.s3path
+                name: documentUnit.s3path
                   ? 'jurisdiction-docUnit-:documentNumber-categories'
                   : 'jurisdiction-docUnit-:documentNumber-files',
-                params: { documentNumber: docUnit.documentnumber },
+                params: { documentNumber: documentUnit.documentnumber },
               }"
             >
-              {{ docUnit.documentnumber }}
+              {{ documentUnit.documentnumber }}
             </router-link>
           </td>
-          <td>{{ dayjs(docUnit.creationtimestamp).format("DD.MM.YYYY") }}</td>
-          <td>{{ docUnit.fileNumber ? docUnit.fileNumber : "-" }}</td>
           <td>
-            {{ docUnit.filename ? docUnit.filename : "-" }}
+            {{ dayjs(documentUnit.creationtimestamp).format("DD.MM.YYYY") }}
+          </td>
+          <td>{{ documentUnit.fileNumber ? documentUnit.fileNumber : "-" }}</td>
+          <td>
+            {{ documentUnit.filename ? documentUnit.filename : "-" }}
           </td>
           <td>
-            <span tabindex="0" @keyup.enter="setSelectedDocUnit(docUnit)">
+            <span
+              tabindex="0"
+              @keyup.enter="setSelectedDocumentUnit(documentUnit)"
+            >
               <v-icon
                 aria-label="Dokumentationseinheit löschen"
-                @click="setSelectedDocUnit(docUnit)"
+                @click="setSelectedDocumentUnit(documentUnit)"
               >
                 delete
               </v-icon>

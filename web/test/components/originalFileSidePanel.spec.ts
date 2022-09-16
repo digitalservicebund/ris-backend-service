@@ -46,7 +46,7 @@ describe("originalFile SidePanel", () => {
     getByText("Dokument wird geladen")
   })
 
-  test("links to file upload if docUnit has no file", async () => {
+  test("links to file upload if documentUnit has no file", async () => {
     const { getByText } = render(OriginalFileSidePanel, {
       props: {
         open: true,

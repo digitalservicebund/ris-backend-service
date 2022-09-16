@@ -4,12 +4,12 @@ import { UploadStatus } from "@/domain/uploadStatus"
 
 export default {
   async uploadFile(
-    docUnitUuid: string,
+    documentUnitUuid: string,
     file: File
   ): Promise<{ documentUnit?: DocumentUnit; status: UploadStatus }> {
     try {
       const response = await httpClient.put<File, DocumentUnit>(
-        `docunits/${docUnitUuid}/file`,
+        `docunits/${documentUnitUuid}/file`,
         {
           headers: {
             "Content-Type":
@@ -46,9 +46,9 @@ export default {
       throw new Error(`Could not get docx: ${error}`)
     }
   },
-  async deleteFile(docUnitUuid: string) {
+  async deleteFile(documentUnitUuid: string) {
     try {
-      await httpClient.delete(`docunits/${docUnitUuid}/file`)
+      await httpClient.delete(`docunits/${documentUnitUuid}/file`)
     } catch (error) {
       throw new Error(`Could not delete file: ${error}`)
     }

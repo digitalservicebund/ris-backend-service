@@ -28,7 +28,7 @@ describe("FileUpload", () => {
   test("renders file upload with default props", async () => {
     const { getByText } = render(FileUpload, {
       props: {
-        docUnitUuid: "1",
+        documentUnitUuid: "1",
       },
       global: { plugins: [vuetify, router] },
     })
@@ -48,7 +48,7 @@ describe("FileUpload", () => {
 
     const { getByText, getByLabelText, emitted } = render(FileUpload, {
       props: {
-        docUnitUuid: "1",
+        documentUnitUuid: "1",
       },
       global: { plugins: [vuetify, router] },
     })
@@ -73,13 +73,13 @@ describe("FileUpload", () => {
     getByText("Die Datei sample.docx wurde erfolgreich hochgeladen", {
       exact: false,
     })
-    expect(emitted().updateDocUnit).toBeTruthy()
+    expect(emitted().updateDocumentUnit).toBeTruthy()
   })
 
   test("upload fails if file has no docx format", async () => {
     const { getByText, getByLabelText, emitted } = render(FileUpload, {
       props: {
-        docUnitUuid: "1",
+        documentUnitUuid: "1",
       },
       global: { plugins: [vuetify, router] },
     })
@@ -97,7 +97,7 @@ describe("FileUpload", () => {
 
     await waitFor(() => fireEvent.update(inputEl))
 
-    expect(emitted().updateDocUnit).not.toBeTruthy()
+    expect(emitted().updateDocumentUnit).not.toBeTruthy()
     getByText("Datei in diesen Bereich ziehen", { exact: false })
   })
 
@@ -108,7 +108,7 @@ describe("FileUpload", () => {
 
     const { getByText, getByLabelText } = render(FileUpload, {
       props: {
-        docUnitUuid: "1",
+        documentUnitUuid: "1",
       },
       global: { plugins: [vuetify, router] },
     })
@@ -139,7 +139,7 @@ describe("FileUpload", () => {
 
     const { getByText, getByLabelText } = render(FileUpload, {
       props: {
-        docUnitUuid: "1",
+        documentUnitUuid: "1",
       },
       global: { plugins: [vuetify, router] },
     })

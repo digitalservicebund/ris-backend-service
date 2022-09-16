@@ -41,7 +41,7 @@ const handleDelete = async (documentUnit: DocumentUnit) => {
         <v-col class="mb-4">
           <DocumentUnitList
             :document-units="documentUnits"
-            @delete-doc-unit="handleDelete"
+            @delete-document-unit="handleDelete"
           />
         </v-col>
       </v-row>

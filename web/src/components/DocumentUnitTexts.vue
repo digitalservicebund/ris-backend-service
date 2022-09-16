@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { Texts } from "../domain/documentUnit"
-import SaveDocUnitButton from "./SaveDocumentUnitButton.vue"
+import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
 import TextEditor from "./TextEditor.vue"
 import { texts } from "@/domain"
 import { FieldSize } from "@/domain/FieldSize"
@@ -9,7 +9,7 @@ import { FieldSize } from "@/domain/FieldSize"
 const props = defineProps<{ texts: Texts; updateStatus: number }>()
 const emit = defineEmits<{
   (e: "updateValue", updatedValue: [keyof Texts, string]): Promise<void>
-  (e: "updateDocUnit"): Promise<void>
+  (e: "updateDocumentUnit"): Promise<void>
 }>()
 const data = computed(() =>
   texts.map((item) => {
@@ -51,10 +51,10 @@ const data = computed(() =>
           </span>
         </div>
         <div class="ris-texte-form__textfield">
-          <SaveDocUnitButton
+          <SaveDocumentUnitButton
             aria-label="Kurz- und Langtexte Speichern Button"
             :update-status="updateStatus"
-            @update-doc-unit="emit('updateDocUnit')"
+            @update-document-unit="emit('updateDocumentUnit')"
           />
         </div>
       </v-col>

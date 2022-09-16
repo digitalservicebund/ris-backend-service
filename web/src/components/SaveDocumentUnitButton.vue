@@ -8,7 +8,7 @@ const props = defineProps<{
   updateStatus: number
 }>()
 const emit = defineEmits<{
-  (e: "updateDocUnit"): void
+  (e: "updateDocumentUnit"): void
 }>()
 const isFristTimeLoad = ref(false)
 const onUpload = ref(false)
@@ -53,8 +53,8 @@ const setStatus = () => {
   }
 }
 
-const handleUpdateDocUnit = () => {
-  emit("updateDocUnit")
+const handleUpdateDocumentUnit = () => {
+  emit("updateDocumentUnit")
 }
 watch(
   () => props.updateStatus,
@@ -69,7 +69,7 @@ onMounted(() => {
 
 <template>
   <div class="save-button-container">
-    <TextButton :aria-label="ariaLabel" @click="handleUpdateDocUnit" />
+    <TextButton :aria-label="ariaLabel" @click="handleUpdateDocumentUnit" />
     <div v-if="!isFristTimeLoad" class="save-status">
       <div v-if="onUpload">
         <div class="icon">

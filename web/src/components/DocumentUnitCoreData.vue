@@ -11,7 +11,7 @@ interface Props {
 }
 
 interface Emits {
-  (event: "updateDocUnit"): void
+  (event: "updateDocumentUnit"): void
   (event: "update:modelValue", value: CoreData): void
 }
 
@@ -41,7 +41,7 @@ const values = computed({
         class="form__save-button"
         aria-label="Stammdaten Speichern Button"
         :update-status="updateStatus"
-        @update-doc-unit="emit('updateDocUnit')"
+        @update-document-unit="emit('updateDocumentUnit')"
       />
     </div>
   </div>

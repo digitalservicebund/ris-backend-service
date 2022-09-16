@@ -1,19 +1,19 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
 import { createVuetify } from "vuetify"
-import DocUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
+import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import type { PreviousDecision } from "@/domain/documentUnit"
 
 function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
   const vuetify = createVuetify()
   const global = { plugins: [vuetify] }
   const props = { modelValue: options?.modelValue }
-  const renderResult = render(DocUnitPreviousDecisions, { global, props })
+  const renderResult = render(DocumentUnitPreviousDecisions, { global, props })
   const user = userEvent.setup()
   return { user, ...renderResult }
 }
 
-describe("DocUnitPreviousDecisions", async () => {
+describe("DocumentUnitPreviousDecisions", async () => {
   it("shows all necessary input fields with their value", () => {
     const modelValue = [
       {

@@ -29,7 +29,7 @@ const handleDeleteFile = async () => {
     v-if="documentUnit"
     :document-unit="documentUnit"
     @delete-file="handleDeleteFile"
-    @update-doc-unit="Object.assign(documentUnit, $event)"
+    @update-document-unit="Object.assign(documentUnit, $event)"
   />
   <div v-else>
     <h2>{{ error?.title }}</h2>

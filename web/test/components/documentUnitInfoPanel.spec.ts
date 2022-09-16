@@ -1,13 +1,13 @@
 import { render } from "@testing-library/vue"
 import { createVuetify } from "vuetify"
-import DocUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("documentUnit InfoPanel", () => {
   const vuetify = createVuetify()
 
   it("renders documentNumber if given", async () => {
-    const { getAllByText } = render(DocUnitInfoPanel, {
+    const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("123", { documentnumber: "foo" }),
       },
@@ -18,7 +18,7 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders aktenzeichen if given", async () => {
-    const { getAllByText } = render(DocUnitInfoPanel, {
+    const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: { documentUnit: new DocumentUnit("123", { fileNumber: "foo" }) },
       global: { plugins: [vuetify] },
     })
@@ -29,7 +29,7 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders placeholder for aktenzeichen if not given", async () => {
-    const { getAllByText } = render(DocUnitInfoPanel, {
+    const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("123", {
           decisionDate: "bar",
@@ -46,7 +46,7 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders Entscheidungsdatum if given", async () => {
-    const { getAllByText } = render(DocUnitInfoPanel, {
+    const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: { documentUnit: new DocumentUnit("123", { decisionDate: "foo" }) },
       global: { plugins: [vuetify] },
     })
@@ -57,7 +57,7 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders placeholder for Entscheidungsdatum if not given", async () => {
-    const { getAllByText } = render(DocUnitInfoPanel, {
+    const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("123", {
           fileNumber: "foo",
@@ -74,7 +74,7 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders Gerichtstyp if given", async () => {
-    const { getAllByText } = render(DocUnitInfoPanel, {
+    const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: { documentUnit: new DocumentUnit("123", { courtType: "foo" }) },
       global: { plugins: [vuetify] },
     })
@@ -85,7 +85,7 @@ describe("documentUnit InfoPanel", () => {
   })
 
   it("renders placeholder for Gerichtstyp if not given", async () => {
-    const { getAllByText } = render(DocUnitInfoPanel, {
+    const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("123", {
           fileNumber: "foo",

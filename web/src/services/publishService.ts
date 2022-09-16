@@ -3,7 +3,7 @@ import XmlMail from "@/domain/xmlMail"
 
 export default {
   async publishADocument(
-    docUnitUuid: string,
+    documentUnitUuid: string,
     receiverEmail: string
   ): Promise<{
     xmlMail?: XmlMail
@@ -11,7 +11,7 @@ export default {
   }> {
     return httpClient
       .put<string, XmlMail>(
-        `docunits/${docUnitUuid}/publish`,
+        `docunits/${documentUnitUuid}/publish`,
         {
           headers: { "Content-Type": "text/plain" },
         },
@@ -50,12 +50,12 @@ export default {
         }
       })
   },
-  async getLastPublishedXML(docUnitUuid: string): Promise<{
+  async getLastPublishedXML(documentUnitUuid: string): Promise<{
     xmlMail?: XmlMail
     errorMessage?: { title: string; description: string }
   }> {
     return httpClient
-      .get<XmlMail>(`docunits/${docUnitUuid}/publish`)
+      .get<XmlMail>(`docunits/${documentUnitUuid}/publish`)
       .then((response) => {
         if (response.status === 200) {
           return {

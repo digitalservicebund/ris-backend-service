@@ -7,7 +7,7 @@ import DocumentUnit from "@/domain/documentUnit"
 defineProps<{ documentUnit: DocumentUnit }>()
 
 const emits = defineEmits<{
-  (e: "updateDocUnit", updatedDocUnit: DocumentUnit): void
+  (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit): void
   (e: "deleteFile"): void
 }>()
 </script>
@@ -29,8 +29,8 @@ const emits = defineEmits<{
     />
     <FileUpload
       v-else
-      :doc-unit-uuid="documentUnit.uuid"
-      @update-doc-unit="emits('updateDocUnit', $event)"
+      :document-unit-uuid="documentUnit.uuid"
+      @update-document-unit="emits('updateDocumentUnit', $event)"
     />
   </DocumentUnitWrapper>
 </template>

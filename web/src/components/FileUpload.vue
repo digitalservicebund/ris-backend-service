@@ -6,9 +6,9 @@ import DocumentUnit from "@/domain/documentUnit"
 import { UploadStatus, UploadErrorStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
 
-const props = defineProps<{ docUnitUuid: string }>()
+const props = defineProps<{ documentUnitUuid: string }>()
 const emits = defineEmits<{
-  (e: "updateDocUnit", updatedDocUnit: DocumentUnit): void
+  (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit): void
 }>()
 
 interface Status {
@@ -39,10 +39,10 @@ const upload = async (file: File) => {
   }
   status.value.file = file
   status.value.uploadStatus = UploadStatus.UPLOADING
-  const response = await fileService.uploadFile(props.docUnitUuid, file)
+  const response = await fileService.uploadFile(props.documentUnitUuid, file)
   status.value.uploadStatus = response.status
   if (response.status == UploadStatus.SUCCESSED && !!response.documentUnit) {
-    emits("updateDocUnit", response.documentUnit)
+    emits("updateDocumentUnit", response.documentUnit)
   }
 }
 

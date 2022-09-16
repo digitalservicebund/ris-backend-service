@@ -10,8 +10,8 @@ interface DocumentUnitService {
     docCenter: string,
     docType: string
   ): Promise<ServiceResponse<DocumentUnit>>
-  update(docUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
-  delete(docUnitUuid: string): Promise<ServiceResponse<unknown>>
+  update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
+  delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
 }
 
 const service: DocumentUnitService = {
@@ -60,16 +60,16 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async update(docUnit: DocumentUnit) {
+  async update(documentUnit: DocumentUnit) {
     const response = await httpClient.put(
-      `docunits/${docUnit.uuid}/docx`,
+      `docunits/${documentUnit.uuid}/docx`,
       {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       },
-      JSON.stringify(docUnit)
+      JSON.stringify(documentUnit)
     )
     if (response.status >= 300) {
       response.error = {
@@ -79,8 +79,8 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async delete(docUnitUuid: string) {
-    const response = await httpClient.delete(`docunits/${docUnitUuid}`)
+  async delete(documentUnitUuid: string) {
+    const response = await httpClient.delete(`docunits/${documentUnitUuid}`)
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheit konnte nicht gelöscht werden",
