@@ -1,57 +1,36 @@
 <script lang="ts" setup>
+import { computed } from "vue"
 import DocumentUnit from "../domain/documentUnit"
 
-defineProps<{ documentUnit: DocumentUnit }>()
+const props = defineProps<{ documentUnit: DocumentUnit }>()
+
+const entries = computed(() => [
+  {
+    label: "Aktenzeichen",
+    value: props.documentUnit.fileNumber,
+  },
+  {
+    label: "Entscheidungsdatum",
+    value: props.documentUnit.decisionDate,
+  },
+  {
+    label: "Gerichtstype",
+    value: props.documentUnit.courtType,
+  },
+])
 </script>
 
 <template>
-  <v-container class="panel-default" fluid>
-    <v-row class="doc-info-row">
-      <v-col class="panel-id vert-centered" md="3" sm="6">
-        {{ documentUnit.documentnumber || " - " }}
-      </v-col>
-      <v-col class="vert-centered" md="3" sm="6">
-        Aktenzeichen
-        <span class="panel-default__values">
-          {{ documentUnit.fileNumber || " - " }}</span
-        >
-      </v-col>
-      <v-col class="vert-centered" md="3" sm="6">
-        Entscheidungsdatum
-        <span class="panel-default__values">
-          {{ documentUnit.decisionDate || " - " }}
-        </span>
-      </v-col>
-      <v-col class="vert-centered" md="3" sm="6">
-        Gerichtstyp
-        <span class="panel-default__values">{{
-          documentUnit.courtType || " - "
-        }}</span>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div
+    class="bg-blue-200 border-b border-gray-400 border-solid flex items-center p-12"
+  >
+    <div class="grow text-30">
+      {{ documentUnit.documentnumber || " - " }}
+    </div>
+
+    <div v-for="entry in entries" :key="entry.label" class="grow">
+      {{ entry.label }}
+      <span class="font-bold ml-2">{{ entry.value ?? "-" }}</span>
+    </div>
+  </div>
 </template>
-
-<style lang="scss" scoped>
-@import "@/styles/variables";
-
-.panel-default {
-  border-bottom: $gray400 solid 1px;
-  background-color: $navbar-hover-gray;
-
-  &__values {
-    padding-left: 6px;
-    font-weight: bold;
-  }
-}
-
-.panel-id {
-  color: $black;
-  font-size: x-large;
-}
-
-.vert-centered {
-  display: flex;
-  align-items: center;
-}
-</style>

@@ -14,11 +14,8 @@ const emits = defineEmits<{
 
 <template>
   <DocumentUnitWrapper :document-unit="documentUnit">
-    <v-container>
-      <v-row>
-        <v-col><h2>Dokumente</h2></v-col>
-      </v-row>
-    </v-container>
+    <h1>Dokumente</h1>
+
     <FileViewer
       v-if="documentUnit.hasFile"
       :file-name="documentUnit.filename"
@@ -27,6 +24,7 @@ const emits = defineEmits<{
       :upload-time-stamp="documentUnit.fileuploadtimestamp"
       @delete-file="emits('deleteFile')"
     />
+
     <FileUpload
       v-else
       :document-unit-uuid="documentUnit.uuid"
