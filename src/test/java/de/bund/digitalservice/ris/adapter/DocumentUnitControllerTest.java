@@ -8,10 +8,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
-import de.bund.digitalservice.ris.domain.DocUnitDTO;
-import de.bund.digitalservice.ris.domain.DocUnitService;
+import de.bund.digitalservice.ris.domain.DocumentUnitCreationInfo;
+import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
+import de.bund.digitalservice.ris.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.domain.XmlMail;
 import de.bund.digitalservice.ris.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
@@ -33,12 +33,12 @@ import org.springframework.web.reactive.function.BodyInserters;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = DocUnitController.class)
+@WebFluxTest(controllers = DocumentUnitController.class)
 @WithMockUser
-class DocUnitControllerTest {
+class DocumentUnitControllerTest {
   @Autowired private WebTestClient webClient;
 
-  @MockBean private DocUnitService service;
+  @MockBean private DocumentUnitService service;
 
   @Captor private ArgumentCaptor<ByteBuffer> captor;
 
@@ -47,20 +47,20 @@ class DocUnitControllerTest {
 
   @Test
   void testGenerateNewDocUnit() {
-    DocUnitCreationInfo docUnitCreationInfo = DocUnitCreationInfo.EMPTY;
-    when(service.generateNewDocUnit(DocUnitCreationInfo.EMPTY))
-        .thenReturn(Mono.just(DocUnitDTO.EMPTY));
+    DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
+    when(service.generateNewDocUnit(DocumentUnitCreationInfo.EMPTY))
+        .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
 
     webClient
         .mutateWith(csrf())
         .post()
         .uri("/api/v1/documentunits")
-        .bodyValue(docUnitCreationInfo)
+        .bodyValue(documentUnitCreationInfo)
         .exchange()
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocUnit(DocUnitCreationInfo.EMPTY);
+    verify(service, times(1)).generateNewDocUnit(DocumentUnitCreationInfo.EMPTY);
   }
 
   @Test
@@ -180,7 +180,7 @@ class DocUnitControllerTest {
 
   @Test
   void testUpdateByUuid() {
-    DocUnitDTO docUnit = new DocUnitDTO();
+    DocumentUnitDTO docUnit = new DocumentUnitDTO();
     docUnit.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())
@@ -196,7 +196,7 @@ class DocUnitControllerTest {
 
   @Test
   void testUpdateByUuid_withInvalidUuid() {
-    DocUnitDTO docUnit = new DocUnitDTO();
+    DocumentUnitDTO docUnit = new DocumentUnitDTO();
     docUnit.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())

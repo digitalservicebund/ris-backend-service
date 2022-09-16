@@ -8,7 +8,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.domain.DocUnitDTO;
+import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.HttpMailSender;
 import de.bund.digitalservice.ris.domain.XmlExporter;
@@ -69,7 +69,7 @@ class XmlEMailPublishServiceTest {
   private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String SENDER_ADDRESS = "export@neuris";
 
-  private DocUnitDTO documentUnit;
+  private DocumentUnitDTO documentUnit;
 
   @Autowired private XmlEMailPublishService service;
 
@@ -81,7 +81,7 @@ class XmlEMailPublishServiceTest {
 
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
-    documentUnit = new DocUnitDTO();
+    documentUnit = new DocumentUnitDTO();
     documentUnit.setId(123L);
     documentUnit.setUuid(TEST_UUID);
     documentUnit.setDocumentnumber("test-document-number");

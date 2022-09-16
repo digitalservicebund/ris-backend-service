@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.adapter;
 
-import de.bund.digitalservice.ris.domain.DocUnitCreationInfo;
-import de.bund.digitalservice.ris.domain.DocUnitDTO;
-import de.bund.digitalservice.ris.domain.DocUnitService;
+import de.bund.digitalservice.ris.domain.DocumentUnitCreationInfo;
+import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.domain.MailResponse;
 import java.nio.ByteBuffer;
 import java.time.Duration;
@@ -30,25 +30,25 @@ import reactor.util.retry.Retry;
 @RestController
 @RequestMapping("api/v1/documentunits")
 @Slf4j
-public class DocUnitController {
-  private final DocUnitService service;
+public class DocumentUnitController {
+  private final DocumentUnitService service;
 
-  public DocUnitController(DocUnitService service) {
+  public DocumentUnitController(DocumentUnitService service) {
     this.service = service;
   }
 
   @PostMapping(value = "")
-  public Mono<ResponseEntity<DocUnitDTO>> generateNewDocUnit(
-      @RequestBody DocUnitCreationInfo docUnitCreationInfo) {
+  public Mono<ResponseEntity<DocumentUnitDTO>> generateNewDocUnit(
+      @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
     return service
-        .generateNewDocUnit(docUnitCreationInfo)
+        .generateNewDocUnit(documentUnitCreationInfo)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnitDTO.EMPTY));
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
   }
 
   @PutMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocUnitDTO>> attachFileToDocUnit(
+  public Mono<ResponseEntity<DocumentUnitDTO>> attachFileToDocUnit(
       @PathVariable UUID uuid,
       @RequestBody ByteBuffer byteBufferFlux,
       @RequestHeader HttpHeaders httpHeaders) {
@@ -57,11 +57,11 @@ public class DocUnitController {
         .attachFileToDocUnit(uuid, byteBufferFlux, httpHeaders)
         .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
         .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnitDTO.EMPTY));
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
   }
 
   @DeleteMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocUnitDTO>> removeFileFromDocUnit(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<DocumentUnitDTO>> removeFileFromDocUnit(@PathVariable UUID uuid) {
 
     return service.removeFileFromDocUnit(uuid);
   }
@@ -74,10 +74,10 @@ public class DocUnitController {
   }
 
   @GetMapping(value = "/{documentnumber}")
-  public Mono<ResponseEntity<DocUnitDTO>> getByDocumentnumber(
+  public Mono<ResponseEntity<DocumentUnitDTO>> getByDocumentnumber(
       @NonNull @PathVariable String documentnumber) {
     if (documentnumber.length() != 14) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnitDTO.EMPTY));
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnitDTO.EMPTY));
     }
     return service.getByDocumentnumber(documentnumber);
   }
@@ -89,10 +89,10 @@ public class DocUnitController {
   }
 
   @PutMapping(value = "/{uuid}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Mono<ResponseEntity<DocUnitDTO>> updateByUuid(
-      @PathVariable UUID uuid, @RequestBody DocUnitDTO docUnit) {
+  public Mono<ResponseEntity<DocumentUnitDTO>> updateByUuid(
+      @PathVariable UUID uuid, @RequestBody DocumentUnitDTO docUnit) {
     if (!uuid.equals(docUnit.getUuid())) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocUnitDTO.EMPTY));
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnitDTO.EMPTY));
     }
     return service.updateDocUnit(docUnit);
   }

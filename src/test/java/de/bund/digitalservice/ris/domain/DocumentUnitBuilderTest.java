@@ -11,10 +11,11 @@ class DocumentUnitBuilderTest {
 
   @Test
   void shouldConvertCorrectly() {
-    DocUnitDTO docUnitDTO = new DocUnitDTO();
-    docUnitDTO.setFileNumber("fileNumber123");
-    docUnitDTO.reasons = "reasons123";
-    DocumentUnit documentUnit = DocumentUnitBuilder.newInstance().setDocUnitDTO(docUnitDTO).build();
+    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setFileNumber("fileNumber123");
+    documentUnitDTO.reasons = "reasons123";
+    DocumentUnit documentUnit =
+        DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build();
 
     assertThat(documentUnit.coreData().fileNumber()).isEqualTo("fileNumber123");
     assertThat(documentUnit.texts().reasons()).isEqualTo("reasons123");

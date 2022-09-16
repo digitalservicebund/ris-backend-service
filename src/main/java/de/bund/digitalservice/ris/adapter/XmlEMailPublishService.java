@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.adapter;
 
-import de.bund.digitalservice.ris.domain.DocUnitDTO;
+import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.domain.EmailPublishService;
 import de.bund.digitalservice.ris.domain.HttpMailSender;
@@ -40,7 +40,7 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public Mono<MailResponse> publish(DocUnitDTO documentUnit, String receiverAddress) {
+  public Mono<MailResponse> publish(DocumentUnitDTO documentUnit, String receiverAddress) {
     XmlResultObject xml;
     try {
       xml = xmlExporter.generateXml(documentUnit);
@@ -64,7 +64,7 @@ public class XmlEMailPublishService implements EmailPublishService {
         .map(xmlMail -> new XmlMailResponse(documentUnitUuid, xmlMail));
   }
 
-  private Mono<String> generateMailSubject(DocUnitDTO documentUnit) {
+  private Mono<String> generateMailSubject(DocumentUnitDTO documentUnit) {
     if (documentUnit.getDocumentnumber() == null) {
       return Mono.error(
           new DocumentUnitPublishException("No document number has set in the document unit."));

@@ -33,8 +33,8 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 
 @Service
 @Slf4j
-public class DocUnitService {
-  private final DocUnitRepository repository;
+public class DocumentUnitService {
+  private final DocumentUnitRepository repository;
   private final DocumentUnitListEntryRepository listEntryRepository;
   private final DocumentNumberCounterRepository counterRepository;
   private final PreviousDecisionRepository previousDecisionRepository;
@@ -44,8 +44,8 @@ public class DocUnitService {
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
-  public DocUnitService(
-      DocUnitRepository repository,
+  public DocumentUnitService(
+      DocumentUnitRepository repository,
       DocumentUnitListEntryRepository listEntryRepository,
       DocumentNumberCounterRepository counterRepository,
       PreviousDecisionRepository previousDecisionRepository,
@@ -59,7 +59,8 @@ public class DocUnitService {
     this.previousDecisionRepository = previousDecisionRepository;
   }
 
-  public Mono<DocUnitDTO> generateNewDocUnit(DocUnitCreationInfo docUnitCreationInfo) {
+  public Mono<DocumentUnitDTO> generateNewDocUnit(
+      DocumentUnitCreationInfo documentUnitCreationInfo) {
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
     return counterRepository
         .getDocumentNumberCounterEntry()
@@ -77,12 +78,12 @@ public class DocUnitService {
         .flatMap(
             updatedDocumentNumberCounter ->
                 repository.save(
-                    DocUnitDTO.createNew(
-                        docUnitCreationInfo, updatedDocumentNumberCounter.nextnumber - 1)))
+                    DocumentUnitDTO.createNew(
+                        documentUnitCreationInfo, updatedDocumentNumberCounter.nextnumber - 1)))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
-  public Mono<DocUnitDTO> attachFileToDocUnit(
+  public Mono<DocumentUnitDTO> attachFileToDocUnit(
       UUID docUnitId, ByteBuffer byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
     checkDocx(byteBufferFlux);
@@ -107,7 +108,7 @@ public class DocUnitService {
         .flatMap(repository::save);
   }
 
-  public Mono<ResponseEntity<DocUnitDTO>> removeFileFromDocUnit(UUID docUnitId) {
+  public Mono<ResponseEntity<DocumentUnitDTO>> removeFileFromDocUnit(UUID docUnitId) {
     return repository
         .findByUuid(docUnitId)
         .flatMap(
@@ -128,7 +129,7 @@ public class DocUnitService {
         .flatMap(repository::save)
         .map(docUnit -> ResponseEntity.status(HttpStatus.OK).body(docUnit))
         .doOnError(ex -> log.error("Couldn't remove the file from the DocUnit", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnitDTO.EMPTY));
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
   }
 
   void checkDocx(ByteBuffer byteBufferFlux) {
@@ -190,7 +191,7 @@ public class DocUnitService {
         ResponseEntity.ok(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber")))));
   }
 
-  public Mono<ResponseEntity<DocUnitDTO>> getByDocumentnumber(String documentnumber) {
+  public Mono<ResponseEntity<DocumentUnitDTO>> getByDocumentnumber(String documentnumber) {
     return repository
         .findByDocumentnumber(documentnumber)
         .flatMap(
@@ -224,13 +225,13 @@ public class DocUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body("Couldn't delete the DocUnit"));
   }
 
-  public Mono<ResponseEntity<DocUnitDTO>> updateDocUnit(DocUnitDTO docUnit) {
+  public Mono<ResponseEntity<DocumentUnitDTO>> updateDocUnit(DocumentUnitDTO docUnit) {
     if (docUnit.previousDecisions == null)
       return repository
           .save(docUnit)
           .map(ResponseEntity::ok)
           .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
-          .onErrorReturn(ResponseEntity.internalServerError().body(DocUnitDTO.EMPTY));
+          .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
 
     /* Passing foreign key to object */
     List<PreviousDecision> previousDecisionsList =
@@ -272,7 +273,7 @@ public class DocUnitService {
         .then(repository.save(docUnit))
         .map(ResponseEntity::ok)
         .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocUnitDTO.EMPTY));
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
   }
 
   private List<Long> getDeletedPreviousDecisionIds(

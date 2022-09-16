@@ -3,8 +3,8 @@ package de.bund.digitalservice.ris.domain;
 import lombok.Data;
 
 @Data
-public class DocUnitCreationInfo {
-  public static final DocUnitCreationInfo EMPTY = new DocUnitCreationInfo();
+public class DocumentUnitCreationInfo {
+  public static final DocumentUnitCreationInfo EMPTY = new DocumentUnitCreationInfo();
 
   String documentationCenterAbbreviation;
   String documentType;

@@ -13,11 +13,11 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/documentunitdocx")
-public class DocUnitDocxController {
+public class DocumentUnitDocxController {
 
   private final DocxConverterService service;
 
-  public DocUnitDocxController(DocxConverterService service) {
+  public DocumentUnitDocxController(DocxConverterService service) {
     this.service = service;
   }
 

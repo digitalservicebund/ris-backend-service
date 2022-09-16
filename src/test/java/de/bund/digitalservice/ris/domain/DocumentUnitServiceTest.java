@@ -51,14 +51,14 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @ExtendWith(SpringExtension.class)
-@Import(DocUnitService.class)
+@Import(DocumentUnitService.class)
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
-class DocUnitServiceTest {
+class DocumentUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
-  @SpyBean private DocUnitService service;
+  @SpyBean private DocumentUnitService service;
 
-  @MockBean private DocUnitRepository repository;
+  @MockBean private DocumentUnitRepository repository;
 
   @MockBean private DocumentUnitListEntryRepository listEntryRepository;
 
@@ -72,7 +72,7 @@ class DocUnitServiceTest {
 
   @Test
   void testGenerateNewDocUnit() {
-    when(repository.save(any(DocUnitDTO.class))).thenReturn(Mono.just(DocUnitDTO.EMPTY));
+    when(repository.save(any(DocumentUnitDTO.class))).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
     when(counterRepository.getDocumentNumberCounterEntry())
         .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
     when(counterRepository.save(any(DocumentNumberCounter.class)))
@@ -81,10 +81,10 @@ class DocUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    StepVerifier.create(service.generateNewDocUnit(DocUnitCreationInfo.EMPTY))
+    StepVerifier.create(service.generateNewDocUnit(DocumentUnitCreationInfo.EMPTY))
         .expectNextCount(1) // That it's a DocUnit is given by the generic type..
         .verifyComplete();
-    verify(repository).save(any(DocUnitDTO.class));
+    verify(repository).save(any(DocumentUnitDTO.class));
   }
 
   // @Test public void testGenerateNewDocUnit_withException() {}
@@ -98,17 +98,17 @@ class DocUnitServiceTest {
     headerMap.put("X-Filename", List.of("testfile.docx"));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
 
-    var toSave = new DocUnitDTO();
+    var toSave = new DocumentUnitDTO();
     toSave.setUuid(TEST_UUID);
     toSave.setS3path(TEST_UUID.toString());
     toSave.setFiletype("docx");
     toSave.setFilename("testfile.docx");
 
-    var savedDocUnit = new DocUnitDTO();
+    var savedDocUnit = new DocumentUnitDTO();
     savedDocUnit.setUuid(TEST_UUID);
     savedDocUnit.setS3path(TEST_UUID.toString());
     savedDocUnit.setFiletype("docx");
-    when(repository.save(any(DocUnitDTO.class))).thenReturn(Mono.just(savedDocUnit));
+    when(repository.save(any(DocumentUnitDTO.class))).thenReturn(Mono.just(savedDocUnit));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(savedDocUnit));
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
@@ -145,17 +145,17 @@ class DocUnitServiceTest {
 
   @Test
   void testRemoveFileFromDocUnit() {
-    var docUnitBefore = new DocUnitDTO();
+    var docUnitBefore = new DocumentUnitDTO();
     docUnitBefore.setUuid(TEST_UUID);
     docUnitBefore.setS3path(TEST_UUID.toString());
     docUnitBefore.setFilename("testfile.docx");
 
-    var docUnitAfter = new DocUnitDTO();
+    var docUnitAfter = new DocumentUnitDTO();
     docUnitAfter.setUuid(TEST_UUID);
 
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnitBefore));
     // is the thenReturn ok? Or am I bypassing the actual functionality-test?
-    when(repository.save(any(DocUnitDTO.class))).thenReturn(Mono.just(docUnitAfter));
+    when(repository.save(any(DocumentUnitDTO.class))).thenReturn(Mono.just(docUnitAfter));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -168,7 +168,7 @@ class DocUnitServiceTest {
             })
         .verifyComplete();
 
-    ArgumentCaptor<DocUnitDTO> docUnitCaptor = ArgumentCaptor.forClass(DocUnitDTO.class);
+    ArgumentCaptor<DocumentUnitDTO> docUnitCaptor = ArgumentCaptor.forClass(DocumentUnitDTO.class);
     verify(repository).save(docUnitCaptor.capture());
     assertEquals(docUnitCaptor.getValue(), docUnitAfter);
   }
@@ -188,7 +188,7 @@ class DocUnitServiceTest {
         .verify();
 
     verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
-    verify(repository, times(0)).save(any(DocUnitDTO.class));
+    verify(repository, times(0)).save(any(DocumentUnitDTO.class));
   }
 
   @Test
@@ -199,8 +199,8 @@ class DocUnitServiceTest {
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenReturn(CompletableFuture.completedFuture(PutObjectResponse.builder().build()));
-    doThrow(new IllegalArgumentException()).when(repository).save(any(DocUnitDTO.class));
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
+    doThrow(new IllegalArgumentException()).when(repository).save(any(DocumentUnitDTO.class));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
 
     // when and then
     StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
@@ -208,7 +208,7 @@ class DocUnitServiceTest {
         .verify();
 
     verify(s3AsyncClient).putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class));
-    verify(repository).save(any(DocUnitDTO.class));
+    verify(repository).save(any(DocumentUnitDTO.class));
   }
 
   @Test
@@ -223,12 +223,12 @@ class DocUnitServiceTest {
   @Test
   void testGetByDocumentnumber() {
     when(repository.findByDocumentnumber("ABCDE2022000001"))
-        .thenReturn(Mono.just(DocUnitDTO.EMPTY));
+        .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
     when(previousDecisionRepository.findAllByDocumentnumber("ABCDE2022000001"))
         .thenReturn(Flux.just(new PreviousDecision()));
     StepVerifier.create(service.getByDocumentnumber("ABCDE2022000001"))
         .consumeNextWith(
-            monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocUnitDTO.class))
+            monoResponse -> assertEquals(monoResponse.getBody().getClass(), DocumentUnitDTO.class))
         .verifyComplete();
     verify(repository).findByDocumentnumber("ABCDE2022000001");
   }
@@ -307,7 +307,8 @@ class DocUnitServiceTest {
 
     @Test
     void testGetByDocumentnumberWithPreviousDecisions() {
-      when(repository.findByDocumentnumber(documentNr)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
+      when(repository.findByDocumentnumber(documentNr))
+          .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
       when(previousDecisionRepository.findAllByDocumentnumber(documentNr))
           .thenReturn(Flux.fromIterable(previousDecisionsList));
       StepVerifier.create(service.getByDocumentnumber(documentNr))
@@ -335,7 +336,7 @@ class DocUnitServiceTest {
               .filter(
                   previousDecision -> !previousDecisionsIdsToDelete.contains(previousDecision.id))
               .toList();
-      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -373,7 +374,7 @@ class DocUnitServiceTest {
       remainPreviousDecision.add(
           new PreviousDecision(
               null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -420,7 +421,7 @@ class DocUnitServiceTest {
       remainPreviousDecision.get(0).courtType = "new gerTyp";
       remainPreviousDecision.get(0).date = "30.01.2022";
       remainPreviousDecision.get(0).fileNumber = "new aktenzeichen";
-      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -467,7 +468,7 @@ class DocUnitServiceTest {
       remainPreviousDecision.add(
           new PreviousDecision(
               null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var docUnit = DocUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -507,11 +508,11 @@ class DocUnitServiceTest {
     // I think I shouldn't have to insert a specific DocUnit object here?
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
-    DocUnitDTO docUnit = new DocUnitDTO();
+    DocumentUnitDTO docUnit = new DocumentUnitDTO();
     docUnit.setUuid(TEST_UUID);
     // can we also test that the fileUuid from the DocUnit is used? with a captor somehow?
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
-    when(repository.delete(any(DocUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
+    when(repository.delete(any(DocumentUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -527,11 +528,11 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withFileAttached() {
-    DocUnitDTO docUnit = new DocUnitDTO();
+    DocumentUnitDTO docUnit = new DocumentUnitDTO();
     docUnit.setUuid(TEST_UUID);
     docUnit.setS3path(TEST_UUID.toString());
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
-    when(repository.delete(any(DocUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
+    when(repository.delete(any(DocumentUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
@@ -549,7 +550,7 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
@@ -565,8 +566,8 @@ class DocUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
-    doThrow(new IllegalArgumentException()).when(repository).delete(DocUnitDTO.EMPTY);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
+    doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnitDTO.EMPTY);
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
         .consumeNextWith(
@@ -580,7 +581,7 @@ class DocUnitServiceTest {
 
   @Test
   void testUpdateDocUnit() {
-    var docUnit = DocUnitDTO.EMPTY;
+    var docUnit = DocumentUnitDTO.EMPTY;
     when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
     StepVerifier.create(service.updateDocUnit(docUnit))
         .consumeNextWith(monoResponse -> assertEquals(monoResponse.getBody(), docUnit))
@@ -590,7 +591,7 @@ class DocUnitServiceTest {
 
   @Test
   void testPublishByEmail() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocUnitDTO.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
     XmlMail xmlMail =
         new XmlMail(
             1L,
@@ -602,9 +603,9 @@ class DocUnitServiceTest {
             "status messages",
             "filename",
             null);
-    when(publishService.publish(DocUnitDTO.EMPTY, RECEIVER_ADDRESS))
+    when(publishService.publish(DocumentUnitDTO.EMPTY, RECEIVER_ADDRESS))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
-    when(previousDecisionRepository.findAllByDocumentnumber(DocUnitDTO.EMPTY.documentnumber))
+    when(previousDecisionRepository.findAllByDocumentnumber(DocumentUnitDTO.EMPTY.documentnumber))
         .thenReturn(Flux.just(new PreviousDecision()));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
         .consumeNextWith(
@@ -614,7 +615,7 @@ class DocUnitServiceTest {
                     .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
         .verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService).publish(DocUnitDTO.EMPTY, RECEIVER_ADDRESS);
+    verify(publishService).publish(DocumentUnitDTO.EMPTY, RECEIVER_ADDRESS);
   }
 
   @Test
@@ -623,12 +624,12 @@ class DocUnitServiceTest {
 
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS)).verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService, never()).publish(DocUnitDTO.EMPTY, RECEIVER_ADDRESS);
+    verify(publishService, never()).publish(DocumentUnitDTO.EMPTY, RECEIVER_ADDRESS);
   }
 
   @Test
   void testGetLastPublishedXmlMail() {
-    DocUnitDTO documentUnit = new DocUnitDTO();
+    DocumentUnitDTO documentUnit = new DocumentUnitDTO();
     documentUnit.setId(123L);
     XmlMail xmlMail =
         new XmlMail(

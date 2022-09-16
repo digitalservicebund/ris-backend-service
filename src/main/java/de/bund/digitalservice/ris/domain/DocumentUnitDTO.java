@@ -18,16 +18,17 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("doc_unit")
-public class DocUnitDTO {
-  public static final DocUnitDTO EMPTY = new DocUnitDTO();
+public class DocumentUnitDTO {
+  public static final DocumentUnitDTO EMPTY = new DocumentUnitDTO();
 
-  public static DocUnitDTO createNew(DocUnitCreationInfo docUnitCreationInfo, int documentNumber) {
-    return DocUnitDTO.builder()
+  public static DocumentUnitDTO createNew(
+      DocumentUnitCreationInfo documentUnitCreationInfo, int documentNumber) {
+    return DocumentUnitDTO.builder()
         .uuid(UUID.randomUUID())
         .creationtimestamp(Instant.now())
         .documentnumber(
-            docUnitCreationInfo.getDocumentationCenterAbbreviation()
-                + docUnitCreationInfo.getDocumentType()
+            documentUnitCreationInfo.getDocumentationCenterAbbreviation()
+                + documentUnitCreationInfo.getDocumentType()
                 + Calendar.getInstance().get(Calendar.YEAR)
                 + String.format("%06d", documentNumber))
         .build();
@@ -109,7 +110,7 @@ public class DocUnitDTO {
 
   @Transient List<PreviousDecision> previousDecisions;
 
-  public DocUnitDTO setPreviousDecisions(List<PreviousDecision> previousDecisions) {
+  public DocumentUnitDTO setPreviousDecisions(List<PreviousDecision> previousDecisions) {
     this.previousDecisions = previousDecisions;
     return this;
   }

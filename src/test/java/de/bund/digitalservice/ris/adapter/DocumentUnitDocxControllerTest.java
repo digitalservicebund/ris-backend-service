@@ -14,9 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = DocUnitDocxController.class)
+@WebFluxTest(controllers = DocumentUnitDocxController.class)
 @WithMockUser
-class DocUnitDocxControllerTest {
+class DocumentUnitDocxControllerTest {
   @Autowired private WebTestClient webClient;
 
   @MockBean private DocxConverterService service;

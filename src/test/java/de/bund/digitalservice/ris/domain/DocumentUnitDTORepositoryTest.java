@@ -8,8 +8,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
 @DataR2dbcTest
-class DocUnitRepositoryTest {
-  @Autowired DocUnitRepository docUnitRepo;
+class DocumentUnitDTORepositoryTest {
+  @Autowired DocumentUnitRepository docUnitRepo;
 
   @Autowired DatabaseClient client;
 }
