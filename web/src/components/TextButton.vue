@@ -132,11 +132,11 @@ const buttonClasses = computed(() => ({
 }
 
 .btn-ghost {
-  @apply bg-blue-800 text-white;
+  @apply bg-none border-2 border-solid border-white bg-white text-blue-800 underline;
 
   &.v-btn {
     &:hover {
-      @apply bg-blue-800;
+      @apply border-2 border-solid border-blue-800 bg-white;
     }
 
     &:active {
@@ -144,7 +144,7 @@ const buttonClasses = computed(() => ({
     }
 
     &:focus-visible {
-      @apply border-2 border-solid border-gray-600;
+      @apply border-2 border-solid border-blue-800 bg-white;
     }
   }
 }
