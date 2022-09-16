@@ -21,6 +21,13 @@ public class DocumentUnitBuilder {
     }
 
     return new DocumentUnit(
+        documentUnitDTO.getUuid(),
+        documentUnitDTO.getDocumentnumber(),
+        documentUnitDTO.getCreationtimestamp(),
+        documentUnitDTO.getFileuploadtimestamp(),
+        documentUnitDTO.getS3path(),
+        documentUnitDTO.getFiletype(),
+        documentUnitDTO.getFilename(),
         new CoreData(
             documentUnitDTO.getFileNumber(),
             documentUnitDTO.getCourtType(),
