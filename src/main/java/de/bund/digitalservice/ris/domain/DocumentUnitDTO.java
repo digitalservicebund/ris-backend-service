@@ -34,6 +34,40 @@ public class DocumentUnitDTO {
         .build();
   }
 
+  public static DocumentUnitDTO buildFromDocumentUnit(DocumentUnit documentUnit) {
+    return DocumentUnitDTO.builder()
+        .id(documentUnit.id())
+        .uuid(documentUnit.uuid())
+        .documentnumber(documentUnit.documentnumber())
+        .creationtimestamp(documentUnit.creationtimestamp())
+        .fileuploadtimestamp(documentUnit.fileuploadtimestamp())
+        .s3path(documentUnit.s3path())
+        .filetype(documentUnit.filetype())
+        .filename(documentUnit.filename())
+        .fileNumber(documentUnit.coreData().fileNumber())
+        .courtType(documentUnit.coreData().courtType())
+        .category(documentUnit.coreData().category())
+        .procedure(documentUnit.coreData().procedure())
+        .ecli(documentUnit.coreData().ecli())
+        .appraisalBody(documentUnit.coreData().appraisalBody())
+        .decisionDate(documentUnit.coreData().decisionDate())
+        .courtLocation(documentUnit.coreData().courtLocation())
+        .legalEffect(documentUnit.coreData().legalEffect())
+        .inputType(documentUnit.coreData().inputType())
+        .center(documentUnit.coreData().center())
+        .region(documentUnit.coreData().region())
+        .previousDecisions(documentUnit.previousDecisions())
+        .decisionName(documentUnit.texts().decisionName())
+        .headline(documentUnit.texts().headline())
+        .guidingPrinciple(documentUnit.texts().guidingPrinciple())
+        .headnote(documentUnit.texts().headnote())
+        .tenor(documentUnit.texts().tenor())
+        .reasons(documentUnit.texts().reasons())
+        .caseFacts(documentUnit.texts().caseFacts())
+        .decisionReasons(documentUnit.texts().decisionReasons())
+        .build();
+  }
+
   @Id Long id;
   UUID uuid;
   String documentnumber;
