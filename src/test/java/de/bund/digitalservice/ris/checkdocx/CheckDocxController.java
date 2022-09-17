@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.checkdocx;
 
 import de.bund.digitalservice.ris.domain.DocxConverterService;
-import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.ErrorElement;
 import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.utils.DocxConverter;
@@ -51,7 +51,7 @@ public class CheckDocxController {
   private final List<IView> views = new ArrayList<>();
 
   private Map<String, String> filePaths = new HashMap<>();
-  private List<DocUnitDocx> contentList = new ArrayList<>();
+  private List<DocumentUnitDocx> contentList = new ArrayList<>();
   private boolean errorsOnly;
   private File selectedFile;
   private Object selectedElement;
@@ -95,7 +95,7 @@ public class CheckDocxController {
     return filePaths.keySet();
   }
 
-  public List<DocUnitDocx> getConvertedFileContent() {
+  public List<DocumentUnitDocx> getConvertedFileContent() {
     if (errorsOnly) {
       return contentList.stream()
           .filter(

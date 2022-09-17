@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.utils;
 
-import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.domain.docx.ErrorElement;
 import jakarta.xml.bind.JAXBElement;
@@ -27,7 +27,7 @@ public class DocxConverter {
     this.listNumberingDefinitions = listNumberingDefinitions;
   }
 
-  public DocUnitDocx convert(Object part) {
+  public DocumentUnitDocx convert(Object part) {
     if (part instanceof P p) {
       return convertP(p);
     } else if (part instanceof JAXBElement<?> element && element.getDeclaredType() == Tbl.class) {
@@ -37,9 +37,9 @@ public class DocxConverter {
     return new ErrorElement(part.getClass().getName());
   }
 
-  private DocUnitDocx convertP(P part) {
+  private DocumentUnitDocx convertP(P part) {
     var builder =
-        DocUnitDocxBuilder.newInstance()
+        DocumentUnitDocxBuilder.newInstance()
             .useStyles(styles)
             .useImages(images)
             .useListNumberingDefinitions(listNumberingDefinitions)
@@ -48,9 +48,9 @@ public class DocxConverter {
     return builder.build();
   }
 
-  private DocUnitDocx convertTbl(Tbl part) {
+  private DocumentUnitDocx convertTbl(Tbl part) {
     var builder =
-        DocUnitDocxBuilder.newInstance().useStyles(styles).useImages(images).setTable(part);
+        DocumentUnitDocxBuilder.newInstance().useStyles(styles).useImages(images).setTable(part);
 
     return builder.build();
   }

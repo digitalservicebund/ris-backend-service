@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TableRowElement implements DocUnitDocx {
+public class TableRowElement implements DocumentUnitDocx {
   public final List<TableCellElement> cells;
 
   public TableRowElement(List<TableCellElement> cells) {

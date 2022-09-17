@@ -59,14 +59,14 @@ public class DocumentUnitService {
     this.previousDecisionRepository = previousDecisionRepository;
   }
 
-  public Mono<DocumentUnitDTO> generateNewDocUnit(
+  public Mono<DocumentUnitDTO> generateNewDocumentUnit(
       DocumentUnitCreationInfo documentUnitCreationInfo) {
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
     return counterRepository
         .getDocumentNumberCounterEntry()
         .flatMap(
             outdatedDocumentNumberCounter -> {
-              // this is the switch happening when the first new DocUnit in a new year gets
+              // this is the switch happening when the first new DocumentUnit in a new year gets
               // created
               if (outdatedDocumentNumberCounter.currentyear != currentYear) {
                 outdatedDocumentNumberCounter.currentyear = currentYear;
@@ -83,8 +83,8 @@ public class DocumentUnitService {
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
-  public Mono<DocumentUnitDTO> attachFileToDocUnit(
-      UUID docUnitId, ByteBuffer byteBufferFlux, HttpHeaders httpHeaders) {
+  public Mono<DocumentUnitDTO> attachFileToDocumentUnit(
+      UUID documentUnitId, ByteBuffer byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
     checkDocx(byteBufferFlux);
     return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
@@ -92,46 +92,50 @@ public class DocumentUnitService {
         .flatMap(
             putObjectResponse ->
                 repository
-                    .findByUuid(docUnitId)
+                    .findByUuid(documentUnitId)
                     .map(
-                        docUnit -> {
-                          docUnit.setFileuploadtimestamp(Instant.now());
-                          docUnit.setS3path(fileUuid);
-                          docUnit.setFiletype("docx");
-                          docUnit.setFilename(
+                        documentUnitDTO -> {
+                          documentUnitDTO.setFileuploadtimestamp(Instant.now());
+                          documentUnitDTO.setS3path(fileUuid);
+                          documentUnitDTO.setFiletype("docx");
+                          documentUnitDTO.setFilename(
                               httpHeaders.containsKey("X-Filename")
                                   ? httpHeaders.getFirst("X-Filename")
                                   : "Kein Dateiname gefunden");
-                          return docUnit;
+                          return documentUnitDTO;
                         }))
-        .doOnNext(docUnit -> log.debug("save doc unit"))
+        .doOnNext(documentUnitDTO -> log.debug("save documentUnitDTO"))
         .flatMap(repository::save);
   }
 
-  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocUnit(UUID docUnitId) {
+  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocumentUnit(UUID documentUnitId) {
     return repository
-        .findByUuid(docUnitId)
+        .findByUuid(documentUnitId)
         .flatMap(
-            docUnit -> {
-              var fileUuid = docUnit.getS3path();
+            documentUnitDTO -> {
+              var fileUuid = documentUnitDTO.getS3path();
               return deleteObjectFromBucket(fileUuid)
                   .doOnNext(
                       deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
                   .map(
                       deleteObjectResponse -> {
-                        docUnit.setS3path(null);
-                        docUnit.setFilename(null);
-                        docUnit.setFileuploadtimestamp(null);
-                        return docUnit;
+                        documentUnitDTO.setS3path(null);
+                        documentUnitDTO.setFilename(null);
+                        documentUnitDTO.setFileuploadtimestamp(null);
+                        return documentUnitDTO;
                       });
             })
-        .doOnNext(docUnit -> log.debug("removed file from DocUnit {}", docUnitId))
+        .doOnNext(
+            documentUnitDTO -> log.debug("removed file from DocumentUnitDTO {}", documentUnitId))
         .flatMap(repository::save)
         .map(
             documentUnitDTO ->
                 ResponseEntity.status(HttpStatus.OK)
-                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
-        .doOnError(ex -> log.error("Couldn't remove the file from the DocUnit", ex))
+                    .body(
+                        DocumentUnitBuilder.newInstance()
+                            .setDocumentUnitDTO(documentUnitDTO)
+                            .build()))
+        .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex))
         .onErrorReturn(
             ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
   }
@@ -209,30 +213,31 @@ public class DocumentUnitService {
         .map(
             documentUnitDTO ->
                 ResponseEntity.ok(
-                    DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()));
+                    DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build()));
   }
 
-  public Mono<ResponseEntity<String>> deleteByUuid(UUID docUnitId) {
+  public Mono<ResponseEntity<String>> deleteByUuid(UUID documentUnitId) {
     return repository
-        .findByUuid(docUnitId)
+        .findByUuid(documentUnitId)
         .flatMap(
-            docUnit -> {
-              if (docUnit.hasFileAttached()) {
-                var fileUuid = docUnit.getS3path();
+            documentUnitDTO -> {
+              if (documentUnitDTO.hasFileAttached()) {
+                var fileUuid = documentUnitDTO.getS3path();
                 return deleteObjectFromBucket(fileUuid)
                     .doOnNext(
                         deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
-                    .flatMap(deleteObjectResponse -> repository.delete(docUnit));
+                    .flatMap(deleteObjectResponse -> repository.delete(documentUnitDTO));
               }
-              return repository.delete(docUnit);
+              return repository.delete(documentUnitDTO);
             })
-        .doOnNext(v -> log.debug("deleted doc unit"))
+        .doOnNext(v -> log.debug("deleted DocumentUnitDTO"))
         .map(v -> ResponseEntity.status(HttpStatus.OK).body("done"))
-        .doOnError(ex -> log.error("Couldn't delete the DocUnit", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body("Couldn't delete the DocUnit"));
+        .doOnError(ex -> log.error("Couldn't delete the DocumentUnit", ex))
+        .onErrorReturn(
+            ResponseEntity.internalServerError().body("Couldn't delete the DocumentUnit"));
   }
 
-  public Mono<ResponseEntity<DocumentUnit>> updateDocUnit(DocumentUnit documentUnit) {
+  public Mono<ResponseEntity<DocumentUnit>> updateDocumentUnit(DocumentUnit documentUnit) {
     DocumentUnitDTO documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
     if (documentUnitDTO.previousDecisions == null)
       return repository
@@ -240,8 +245,8 @@ public class DocumentUnitService {
           .map(
               duDTO ->
                   ResponseEntity.status(HttpStatus.OK)
-                      .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(duDTO).build()))
-          .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
+                      .body(DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build()))
+          .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex))
           .onErrorReturn(
               ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
 
@@ -288,8 +293,8 @@ public class DocumentUnitService {
         .map(
             duDTO ->
                 ResponseEntity.status(HttpStatus.OK)
-                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(duDTO).build()))
-        .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
+                    .body(DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build()))
+        .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex))
         .onErrorReturn(
             ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
   }

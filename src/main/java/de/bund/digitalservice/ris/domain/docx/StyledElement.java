@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class StyledElement implements DocUnitDocx {
+public abstract class StyledElement implements DocumentUnitDocx {
   private final List<Style> styles = new ArrayList<>();
 
   public void addStyle(String property, String value) {

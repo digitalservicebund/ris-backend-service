@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.domain.docx;
 
 import org.springframework.beans.factory.annotation.Value;
 
-public class ErrorElement implements DocUnitDocx {
+public class ErrorElement implements DocumentUnitDocx {
   @Value("${error.nodes.active}")
   private boolean active;
 

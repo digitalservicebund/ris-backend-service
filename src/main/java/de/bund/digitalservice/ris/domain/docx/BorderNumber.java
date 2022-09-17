@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BorderNumber implements DocUnitDocx {
+public class BorderNumber implements DocumentUnitDocx {
   private final StringBuilder number = new StringBuilder();
   private final List<ParagraphElement> paragraphElements = new ArrayList<>();
 

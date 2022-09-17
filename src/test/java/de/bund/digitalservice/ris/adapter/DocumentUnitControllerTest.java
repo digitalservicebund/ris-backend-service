@@ -48,9 +48,9 @@ class DocumentUnitControllerTest {
   private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
 
   @Test
-  void testGenerateNewDocUnit() {
+  void testGenerateNewDocumentUnit() {
     DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
-    when(service.generateNewDocUnit(DocumentUnitCreationInfo.EMPTY))
+    when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
         .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
 
     webClient
@@ -62,13 +62,14 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocUnit(DocumentUnitCreationInfo.EMPTY);
+    verify(service, times(1)).generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY);
   }
 
   @Test
-  void testAttachFileToDocUnit() {
+  void testAttachFileToDocumentUnit() {
     var headersCaptor = ArgumentCaptor.forClass(HttpHeaders.class);
-    when(service.attachFileToDocUnit(eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
+    when(service.attachFileToDocumentUnit(
+            eq(TEST_UUID), any(ByteBuffer.class), any(HttpHeaders.class)))
         .thenReturn(Mono.empty());
     webClient
         .mutateWith(csrf())
@@ -79,13 +80,14 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).attachFileToDocUnit(eq(TEST_UUID), captor.capture(), headersCaptor.capture());
+    verify(service)
+        .attachFileToDocumentUnit(eq(TEST_UUID), captor.capture(), headersCaptor.capture());
     assertEquals(0, Objects.requireNonNull(captor.getValue()).array().length);
     assertEquals(0, headersCaptor.getValue().getContentLength());
   }
 
   @Test
-  void testAttachFileToDocUnit_withInvalidUuid() {
+  void testAttachFileToDocumentUnit_withInvalidUuid() {
     webClient
         .mutateWith(csrf())
         .put()
@@ -96,7 +98,7 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testRemoveFileFromDocUnit() {
+  void testRemoveFileFromDocumentUnit() {
     webClient
         .mutateWith(csrf())
         .delete()
@@ -105,11 +107,11 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).removeFileFromDocUnit(TEST_UUID);
+    verify(service, times(1)).removeFileFromDocumentUnit(TEST_UUID);
   }
 
   @Test
-  void testRemoveFileFromDocUnit_withInvalidUuid() {
+  void testRemoveFileFromDocumentUnit_withInvalidUuid() {
     webClient
         .mutateWith(csrf())
         .delete()
@@ -182,9 +184,10 @@ class DocumentUnitControllerTest {
 
   @Test
   void testUpdateByUuid() {
-    DocumentUnitDTO docUnit = new DocumentUnitDTO();
-    docUnit.setUuid(TEST_UUID);
-    DocumentUnit documentUnit = DocumentUnitBuilder.newInstance().setDocUnitDTO(docUnit).build();
+    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setUuid(TEST_UUID);
+    DocumentUnit documentUnit =
+        DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();
     webClient
         .mutateWith(csrf())
         .put()
@@ -194,19 +197,19 @@ class DocumentUnitControllerTest {
         .exchange()
         .expectStatus()
         .isOk();
-    verify(service).updateDocUnit(documentUnit);
+    verify(service).updateDocumentUnit(documentUnit);
   }
 
   @Test
   void testUpdateByUuid_withInvalidUuid() {
-    DocumentUnitDTO docUnit = new DocumentUnitDTO();
-    docUnit.setUuid(TEST_UUID);
+    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())
         .put()
         .uri("/api/v1/documentunits/abc/docx")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
-        .bodyValue(docUnit)
+        .bodyValue(documentUnitDTO)
         .exchange()
         .expectStatus()
         .is4xxClientError();

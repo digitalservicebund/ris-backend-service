@@ -16,7 +16,7 @@ class DocumentUnitBuilderTest {
     documentUnitDTO.setFileNumber("fileNumber123");
     documentUnitDTO.reasons = "reasons123";
     DocumentUnit documentUnit =
-        DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build();
+        DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();
 
     assertThat(documentUnit.filename()).isEqualTo("doc.docx");
     assertThat(documentUnit.coreData().fileNumber()).isEqualTo("fileNumber123");

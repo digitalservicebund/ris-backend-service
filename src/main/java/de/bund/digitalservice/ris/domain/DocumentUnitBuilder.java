@@ -10,7 +10,7 @@ public class DocumentUnitBuilder {
     return new DocumentUnitBuilder();
   }
 
-  public DocumentUnitBuilder setDocUnitDTO(DocumentUnitDTO documentUnitDTO) {
+  public DocumentUnitBuilder setDocumentUnitDTO(DocumentUnitDTO documentUnitDTO) {
     this.documentUnitDTO = documentUnitDTO;
     return this;
   }

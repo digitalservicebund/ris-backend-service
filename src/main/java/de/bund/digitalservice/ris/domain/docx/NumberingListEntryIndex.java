@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.domain.docx;
 
+import de.bund.digitalservice.ris.domain.docx.NumberingList.DocumentUnitNumberingListNumberFormat;
 import org.docx4j.wml.JcEnumeration;
 
 public record NumberingListEntryIndex(
@@ -11,7 +12,7 @@ public record NumberingListEntryIndex(
     String fontSize,
     boolean lvlPicBullet,
     boolean isLgl,
-    NumberingList.DocUnitNumberingListNumberFormat numberFormat,
+    DocumentUnitNumberingListNumberFormat numberFormat,
     String iLvl,
     JcEnumeration lvlJc,
     String suff) {}

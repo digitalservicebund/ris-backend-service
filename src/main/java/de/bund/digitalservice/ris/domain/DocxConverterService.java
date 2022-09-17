@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.domain;
 
 import de.bund.digitalservice.ris.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.domain.docx.NumberingList;
@@ -135,7 +135,7 @@ public class DocxConverterService {
     CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
-    List<DocUnitDocx> packedList = new ArrayList<>();
+    List<DocumentUnitDocx> packedList = new ArrayList<>();
     BorderNumber[] lastBorderNumber = {null};
     NumberingList[] lastNumberingList = {null};
     boolean[] isCreateNewList = {false};
@@ -143,8 +143,8 @@ public class DocxConverterService {
     return Mono.fromFuture(futureResponse)
         .map(response -> getDocumentParagraphs(response.asInputStream()))
         .map(
-            docUnitDocxList -> {
-              docUnitDocxList.forEach(
+            documentUnitDocxList -> {
+              documentUnitDocxList.forEach(
                   element -> {
                     if (packBorderNumberElements(element, packedList, lastBorderNumber)) {
                       isCreateNewList[0] = true;
@@ -163,10 +163,10 @@ public class DocxConverterService {
                 packedList.add(lastNumberingList[0]);
               }
               String content = null;
-              if (!docUnitDocxList.isEmpty()) {
+              if (!documentUnitDocxList.isEmpty()) {
                 content =
                     packedList.stream()
-                        .map(DocUnitDocx::toHtmlString)
+                        .map(DocumentUnitDocx::toHtmlString)
                         .collect(Collectors.joining());
               }
 
@@ -174,7 +174,7 @@ public class DocxConverterService {
             });
   }
 
-  public List<DocUnitDocx> getDocumentParagraphs(InputStream inputStream) {
+  public List<DocumentUnitDocx> getDocumentParagraphs(InputStream inputStream) {
     if (inputStream == null) {
       return Collections.emptyList();
     }
@@ -197,7 +197,9 @@ public class DocxConverterService {
   }
 
   private boolean packBorderNumberElements(
-      DocUnitDocx element, List<DocUnitDocx> packedList, BorderNumber[] lastBorderNumber) {
+      DocumentUnitDocx element,
+      List<DocumentUnitDocx> packedList,
+      BorderNumber[] lastBorderNumber) {
     if (lastBorderNumber[0] == null && !(element instanceof BorderNumber)) {
       return false;
     }
@@ -223,8 +225,8 @@ public class DocxConverterService {
   }
 
   private boolean packNumberingListEntries(
-      DocUnitDocx element,
-      List<DocUnitDocx> packedList,
+      DocumentUnitDocx element,
+      List<DocumentUnitDocx> packedList,
       NumberingList[] lastNumberingList,
       boolean isCreateNewList) {
     if (lastNumberingList[0] == null && !(element instanceof NumberingListEntry)) {

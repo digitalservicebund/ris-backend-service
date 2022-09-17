@@ -87,7 +87,7 @@ class XmlEMailPublishServiceTest {
     documentUnitDTO.setUuid(TEST_UUID);
     documentUnitDTO.setDocumentnumber("test-document-number");
     when(xmlExporter.generateXml(
-            DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+            DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build()))
         .thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(Mono.just(SAVED_XML_MAIL));
@@ -118,7 +118,7 @@ class XmlEMailPublishServiceTest {
     var xmlMail = new XmlMail(null, 123L, null, null, null, "400", "status-message", null, null);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
     when(xmlExporter.generateXml(
-            DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+            DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build()))
         .thenReturn(xmlWithValidationError);
 
     StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))
@@ -135,7 +135,7 @@ class XmlEMailPublishServiceTest {
   void testPublish_withExceptionFromXmlExporter()
       throws ParserConfigurationException, TransformerException {
     when(xmlExporter.generateXml(
-            DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+            DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build()))
         .thenThrow(ParserConfigurationException.class);
 
     StepVerifier.create(service.publish(documentUnitDTO, RECEIVER_ADDRESS))

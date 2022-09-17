@@ -72,7 +72,7 @@ class DocumentUnitServiceTest {
   @MockBean private EmailPublishService publishService;
 
   @Test
-  void testGenerateNewDocUnit() {
+  void testGenerateNewDocumentUnit() {
     when(repository.save(any(DocumentUnitDTO.class))).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
     when(counterRepository.getDocumentNumberCounterEntry())
         .thenReturn(Mono.just(DocumentNumberCounter.buildInitial()));
@@ -82,16 +82,16 @@ class DocumentUnitServiceTest {
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    StepVerifier.create(service.generateNewDocUnit(DocumentUnitCreationInfo.EMPTY))
-        .expectNextCount(1) // That it's a DocUnit is given by the generic type..
+    StepVerifier.create(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
+        .expectNextCount(1) // That it's a DocumentUnit is given by the generic type..
         .verifyComplete();
     verify(repository).save(any(DocumentUnitDTO.class));
   }
 
-  // @Test public void testGenerateNewDocUnit_withException() {}
+  // @Test public void testGenerateNewDocumentUnit_withException() {}
 
   @Test
-  void testAttachFileToDocUnit() {
+  void testAttachFileToDocumentUnit() {
     // given
     var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
     var headerMap = new LinkedMultiValueMap<String, String>();
@@ -105,12 +105,12 @@ class DocumentUnitServiceTest {
     toSave.setFiletype("docx");
     toSave.setFilename("testfile.docx");
 
-    var savedDocUnit = new DocumentUnitDTO();
-    savedDocUnit.setUuid(TEST_UUID);
-    savedDocUnit.setS3path(TEST_UUID.toString());
-    savedDocUnit.setFiletype("docx");
-    when(repository.save(any(DocumentUnitDTO.class))).thenReturn(Mono.just(savedDocUnit));
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(savedDocUnit));
+    var savedDocumentUnit = new DocumentUnitDTO();
+    savedDocumentUnit.setUuid(TEST_UUID);
+    savedDocumentUnit.setS3path(TEST_UUID.toString());
+    savedDocumentUnit.setFiletype("docx");
+    when(repository.save(any(DocumentUnitDTO.class))).thenReturn(Mono.just(savedDocumentUnit));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(savedDocumentUnit));
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
@@ -123,11 +123,11 @@ class DocumentUnitServiceTest {
       mockedUUIDStatic.when(UUID::randomUUID).thenReturn(TEST_UUID);
 
       // when and then
-      StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, httpHeaders))
+      StepVerifier.create(service.attachFileToDocumentUnit(TEST_UUID, byteBufferFlux, httpHeaders))
           .consumeNextWith(
-              docUnit -> {
-                assertNotNull(docUnit);
-                assertEquals(savedDocUnit, docUnit);
+              documentUnitDTO -> {
+                assertNotNull(documentUnitDTO);
+                assertEquals(savedDocumentUnit, documentUnitDTO);
               })
           .verifyComplete();
 
@@ -139,13 +139,13 @@ class DocumentUnitServiceTest {
       StepVerifier.create(asyncRequestBodyCaptor.getValue())
           .expectNext(ByteBuffer.wrap(new byte[] {}))
           .verifyComplete();
-      toSave.setFileuploadtimestamp(savedDocUnit.getFileuploadtimestamp());
+      toSave.setFileuploadtimestamp(savedDocumentUnit.getFileuploadtimestamp());
       verify(repository).save(toSave);
     }
   }
 
   @Test
-  void testRemoveFileFromDocUnit() {
+  void testRemoveFileFromDocumentUnit() {
     var documentUnitDTOBefore = new DocumentUnitDTO();
     documentUnitDTOBefore.setUuid(TEST_UUID);
     documentUnitDTOBefore.setS3path(TEST_UUID.toString());
@@ -160,24 +160,27 @@ class DocumentUnitServiceTest {
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
 
-    StepVerifier.create(service.removeFileFromDocUnit(TEST_UUID))
+    StepVerifier.create(service.removeFileFromDocumentUnit(TEST_UUID))
         .consumeNextWith(
             documentUnitResponseEntity -> {
               assertNotNull(documentUnitResponseEntity);
               assertEquals(HttpStatus.OK, documentUnitResponseEntity.getStatusCode());
               assertEquals(
-                  DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTOAfter).build(),
+                  DocumentUnitBuilder.newInstance()
+                      .setDocumentUnitDTO(documentUnitDTOAfter)
+                      .build(),
                   documentUnitResponseEntity.getBody());
             })
         .verifyComplete();
 
-    ArgumentCaptor<DocumentUnitDTO> docUnitCaptor = ArgumentCaptor.forClass(DocumentUnitDTO.class);
-    verify(repository).save(docUnitCaptor.capture());
-    assertEquals(docUnitCaptor.getValue(), documentUnitDTOAfter);
+    ArgumentCaptor<DocumentUnitDTO> documentUnitDTOCaptor =
+        ArgumentCaptor.forClass(DocumentUnitDTO.class);
+    verify(repository).save(documentUnitDTOCaptor.capture());
+    assertEquals(documentUnitDTOCaptor.getValue(), documentUnitDTOAfter);
   }
 
   @Test
-  void testGenerateNewDocUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
+  void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     // given
     var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
 
@@ -186,7 +189,8 @@ class DocumentUnitServiceTest {
         .thenThrow(SdkException.create("exception", null));
 
     // when and then
-    StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(
+            service.attachFileToDocumentUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
         .expectErrorMatches(ex -> ex instanceof SdkException)
         .verify();
 
@@ -195,7 +199,7 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testGenerateNewDocUnitAndAttachFile_withExceptionFromRepository() {
+  void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromRepository() {
     // given
     var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
 
@@ -206,7 +210,8 @@ class DocumentUnitServiceTest {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
 
     // when and then
-    StepVerifier.create(service.attachFileToDocUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(
+            service.attachFileToDocumentUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
         .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
         .verify();
 
@@ -238,8 +243,8 @@ class DocumentUnitServiceTest {
   }
 
   @Nested
-  @DisplayName("Test Update DocUnit With PreviousDecisions")
-  class TestUpdateDocUnitWithPreviousDecisions {
+  @DisplayName("Test Update DocumentUnit With PreviousDecisions")
+  class TestUpdateDocumentUnitWithPreviousDecisions {
     private List<PreviousDecision> previousDecisionsList;
     private List<String> previousDecisionsIdsToDelete;
     private Long count;
@@ -336,7 +341,7 @@ class DocumentUnitServiceTest {
     @Disabled(
         "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
             + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
-    void testUpdateDocUnitWithPreviousDecisionsDelete() {
+    void testUpdateDocumentUnitWithPreviousDecisionsDelete() {
       previousDecisionsIdsToDelete.add("2");
       previousDecisionsIdsToDelete.add("4");
       var remainPreviousDecision =
@@ -344,7 +349,7 @@ class DocumentUnitServiceTest {
               .filter(
                   previousDecision -> !previousDecisionsIdsToDelete.contains(previousDecision.id))
               .toList();
-      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -355,10 +360,10 @@ class DocumentUnitServiceTest {
           .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
-      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+      when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
 
       // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocUnit(null))
+      StepVerifier.create(service.updateDocumentUnit(null))
           .consumeNextWith(
               monoResponse -> {
                 assertEquals(previousDecisionsList.size(), 3);
@@ -368,17 +373,17 @@ class DocumentUnitServiceTest {
                 assertTrue(remainIds.contains(5L));
                 assertFalse(remainIds.contains(2L));
                 assertFalse(remainIds.contains(4L));
-                assertEquals(monoResponse.getBody(), docUnit);
+                assertEquals(monoResponse.getBody(), documentUnitDTO);
               })
           .verifyComplete();
-      verify(repository).save(docUnit);
+      verify(repository).save(documentUnitDTO);
     }
 
     @Test
     @Disabled(
         "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
             + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
-    void testUpdateDocUnitWithPreviousDecisionsInsert() {
+    void testUpdateDocumentUnitWithPreviousDecisionsInsert() {
       var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
       remainPreviousDecision.add(
           new PreviousDecision(
@@ -386,7 +391,7 @@ class DocumentUnitServiceTest {
       remainPreviousDecision.add(
           new PreviousDecision(
               null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -397,10 +402,10 @@ class DocumentUnitServiceTest {
           .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
-      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+      when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
 
       // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocUnit(null))
+      StepVerifier.create(service.updateDocumentUnit(null))
           .consumeNextWith(
               monoResponse -> {
                 assertEquals(previousDecisionsList.size(), 7);
@@ -427,23 +432,23 @@ class DocumentUnitServiceTest {
                 assertEquals(previousDecision.courtType, "gerTyp 7");
                 assertEquals(previousDecision.date, "01.01.2022");
                 assertEquals(previousDecision.fileNumber, "aktenzeichen 7");
-                assertEquals(monoResponse.getBody(), docUnit);
+                assertEquals(monoResponse.getBody(), documentUnitDTO);
               })
           .verifyComplete();
-      verify(repository).save(docUnit);
+      verify(repository).save(documentUnitDTO);
     }
 
     @Test
     @Disabled(
         "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
             + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
-    void testUpdateDocUnitWithPreviousDecisionsUpdate() {
+    void testUpdateDocumentUnitWithPreviousDecisionsUpdate() {
       var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
       remainPreviousDecision.get(0).courtPlace = "new gerOrt";
       remainPreviousDecision.get(0).courtType = "new gerTyp";
       remainPreviousDecision.get(0).date = "30.01.2022";
       remainPreviousDecision.get(0).fileNumber = "new aktenzeichen";
-      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -454,10 +459,10 @@ class DocumentUnitServiceTest {
           .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
-      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+      when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
 
       // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocUnit(null))
+      StepVerifier.create(service.updateDocumentUnit(null))
           .consumeNextWith(
               monoResponse -> {
                 assertEquals(
@@ -465,17 +470,17 @@ class DocumentUnitServiceTest {
                     previousDecisionsList.size());
                 assertTrue(
                     monoResponse.getBody().previousDecisions().containsAll(previousDecisionsList));
-                assertEquals(monoResponse.getBody(), docUnit);
+                assertEquals(monoResponse.getBody(), documentUnitDTO);
               })
           .verifyComplete();
-      verify(repository).save(docUnit);
+      verify(repository).save(documentUnitDTO);
     }
 
     @Test
     @Disabled(
         "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
             + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
-    void testUpdateDocUnitWithPreviousDecisionsInsertUpdateDelete() {
+    void testUpdateDocumentUnitWithPreviousDecisionsInsertUpdateDelete() {
       previousDecisionsIdsToDelete.add("2");
       previousDecisionsIdsToDelete.add("4");
       List<PreviousDecision> remainPreviousDecision =
@@ -495,7 +500,7 @@ class DocumentUnitServiceTest {
       remainPreviousDecision.add(
           new PreviousDecision(
               null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var docUnit = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -506,10 +511,10 @@ class DocumentUnitServiceTest {
           .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
-      when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
+      when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
 
       // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocUnit(null))
+      StepVerifier.create(service.updateDocumentUnit(null))
           .consumeNextWith(
               monoResponse -> {
                 assertEquals(previousDecisionsList.size(), 5);
@@ -525,22 +530,22 @@ class DocumentUnitServiceTest {
                 assertEquals(previousDecision.courtType, "new gerTyp");
                 assertEquals(previousDecision.date, "30.01.2022");
                 assertEquals(previousDecision.fileNumber, "new aktenzeichen");
-                assertEquals(monoResponse.getBody(), docUnit);
+                assertEquals(monoResponse.getBody(), documentUnitDTO);
               })
           .verifyComplete();
-      verify(repository).save(docUnit);
+      verify(repository).save(documentUnitDTO);
     }
   }
 
   @Test
   void testDeleteByUuid_withoutFileAttached() {
-    // I think I shouldn't have to insert a specific DocUnit object here?
+    // I think I shouldn't have to insert a specific DocumentUnit object here?
     // But if I don't, the test by itself succeeds, but fails if all tests in this class run
     // something flaky with the repository mock? Investigate this later
-    DocumentUnitDTO docUnit = new DocumentUnitDTO();
-    docUnit.setUuid(TEST_UUID);
-    // can we also test that the fileUuid from the DocUnit is used? with a captor somehow?
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
+    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setUuid(TEST_UUID);
+    // can we also test that the fileUuid from the DocumentUnit is used? with a captor somehow?
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnitDTO));
     when(repository.delete(any(DocumentUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID))
@@ -557,10 +562,10 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withFileAttached() {
-    DocumentUnitDTO docUnit = new DocumentUnitDTO();
-    docUnit.setUuid(TEST_UUID);
-    docUnit.setS3path(TEST_UUID.toString());
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(docUnit));
+    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setUuid(TEST_UUID);
+    documentUnitDTO.setS3path(TEST_UUID.toString());
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnitDTO));
     when(repository.delete(any(DocumentUnitDTO.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenReturn(buildEmptyDeleteObjectResponse());
@@ -588,7 +593,7 @@ class DocumentUnitServiceTest {
             stringResponseEntity -> {
               assertNotNull(stringResponseEntity);
               assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, stringResponseEntity.getStatusCode());
-              assertEquals("Couldn't delete the DocUnit", stringResponseEntity.getBody());
+              assertEquals("Couldn't delete the DocumentUnit", stringResponseEntity.getBody());
             })
         .verifyComplete();
   }
@@ -603,18 +608,18 @@ class DocumentUnitServiceTest {
             stringResponseEntity -> {
               assertNotNull(stringResponseEntity);
               assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, stringResponseEntity.getStatusCode());
-              assertEquals("Couldn't delete the DocUnit", stringResponseEntity.getBody());
+              assertEquals("Couldn't delete the DocumentUnit", stringResponseEntity.getBody());
             })
         .verifyComplete();
   }
 
   @Test
-  void testUpdateDocUnit() {
+  void testUpdateDocumentUnit() {
     var documentUnitDTO = DocumentUnitDTO.EMPTY;
     when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
     DocumentUnit documentUnit =
-        DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build();
-    StepVerifier.create(service.updateDocUnit(documentUnit))
+        DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();
+    StepVerifier.create(service.updateDocumentUnit(documentUnit))
         .consumeNextWith(
             documentUnitResponseEntity ->
                 assertEquals(documentUnitResponseEntity.getBody(), documentUnit))

@@ -28,7 +28,7 @@ class APIJourneyTest {
   private String stagingUser;
 
   @Test
-  void docUnitCreationAPITest() {
+  void documentUnitCreationAPITest() {
     WebTestClient.bindToServer()
         .baseUrl(stagingUrl)
         .build()
@@ -46,9 +46,9 @@ class APIJourneyTest {
   }
 
   @Test
-  void docUnitFileUploadAPITest() {
+  void documentUnitFileUploadAPITest() {
     // Create documentation unit
-    DocUnitResponse response =
+    DocumentUnitResponse response =
         WebTestClient.bindToServer()
             .baseUrl(stagingUrl)
             .build()
@@ -58,7 +58,7 @@ class APIJourneyTest {
             .contentType(MediaType.APPLICATION_JSON)
             .bodyValue("{\"documentationCenterAbbreviation\":\"foo\",\"documentType\":\"X\"}")
             .exchange()
-            .returnResult(DocUnitResponse.class)
+            .returnResult(DocumentUnitResponse.class)
             .getResponseBody()
             .blockFirst();
 
@@ -79,5 +79,5 @@ class APIJourneyTest {
         .isCreated();
   }
 
-  static record DocUnitResponse(UUID uuid) {}
+  static record DocumentUnitResponse(UUID uuid) {}
 }

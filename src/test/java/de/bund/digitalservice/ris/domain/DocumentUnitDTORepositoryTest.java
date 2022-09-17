@@ -9,7 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 @ExtendWith(SpringExtension.class)
 @DataR2dbcTest
 class DocumentUnitDTORepositoryTest {
-  @Autowired DocumentUnitRepository docUnitRepo;
+  @Autowired DocumentUnitRepository documentUnitRepository;
 
   @Autowired DatabaseClient client;
 }

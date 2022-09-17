@@ -39,44 +39,50 @@ public class DocumentUnitController {
   }
 
   @PostMapping(value = "")
-  public Mono<ResponseEntity<DocumentUnit>> generateNewDocUnit(
+  public Mono<ResponseEntity<DocumentUnit>> generateNewDocumentUnit(
       @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
     return service
-        .generateNewDocUnit(documentUnitCreationInfo)
+        .generateNewDocumentUnit(documentUnitCreationInfo)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .map(
             documentUnitDTO ->
                 ResponseEntity.status(HttpStatus.CREATED)
-                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+                    .body(
+                        DocumentUnitBuilder.newInstance()
+                            .setDocumentUnitDTO(documentUnitDTO)
+                            .build()))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.EMPTY));
   }
 
   @PutMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocumentUnit>> attachFileToDocUnit(
+  public Mono<ResponseEntity<DocumentUnit>> attachFileToDocumentUnit(
       @PathVariable UUID uuid,
       @RequestBody ByteBuffer byteBufferFlux,
       @RequestHeader HttpHeaders httpHeaders) {
 
     return service
-        .attachFileToDocUnit(uuid, byteBufferFlux, httpHeaders)
+        .attachFileToDocumentUnit(uuid, byteBufferFlux, httpHeaders)
         .map(
             documentUnitDTO ->
                 ResponseEntity.status(HttpStatus.CREATED)
-                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+                    .body(
+                        DocumentUnitBuilder.newInstance()
+                            .setDocumentUnitDTO(documentUnitDTO)
+                            .build()))
         .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex))
         .onErrorReturn(
             ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
   }
 
   @DeleteMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocUnit(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocumentUnit(@PathVariable UUID uuid) {
 
-    return service.removeFileFromDocUnit(uuid);
+    return service.removeFileFromDocumentUnit(uuid);
   }
 
   @GetMapping(value = "")
   public Mono<ResponseEntity<Flux<DocumentUnitListEntry>>> getAll() {
-    log.info("All DocUnits were requested");
+    log.info("All DocumentUnits were requested");
 
     return service.getAll();
   }
@@ -103,7 +109,7 @@ public class DocumentUnitController {
       return Mono.just(
           ResponseEntity.unprocessableEntity().body(DocumentUnitBuilder.newInstance().build()));
     }
-    return service.updateDocUnit(documentUnit);
+    return service.updateDocumentUnit(documentUnit);
   }
 
   @PutMapping(

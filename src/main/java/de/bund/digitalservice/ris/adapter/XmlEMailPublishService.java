@@ -46,7 +46,7 @@ public class XmlEMailPublishService implements EmailPublishService {
     try {
       xml =
           xmlExporter.generateXml(
-              DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build());
+              DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
     } catch (ParserConfigurationException | TransformerException ex) {
       return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
     }

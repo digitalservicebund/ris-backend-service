@@ -8,13 +8,13 @@ import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class NumberingList implements DocUnitDocx {
+public class NumberingList implements DocumentUnitDocx {
 
   private final List<NumberingListEntry> entries = new ArrayList<>();
   private static final Logger LOGGER = LoggerFactory.getLogger(NumberingList.class);
 
   public NumberingList() {
-    /*Create new instance of docUnitNumberList*/
+    /*Create new instance of documentUnitNumberList*/
   }
 
   public void addNumberingListEntry(NumberingListEntry entry) {
@@ -26,7 +26,7 @@ public class NumberingList implements DocUnitDocx {
     StringBuilder sb = new StringBuilder();
     LinkedList<String> closeTags = new LinkedList<>();
     int[] cLvl = {-1};
-    List<DocUnitNumberingListNumberFormat> currentNumberFormat = new ArrayList<>();
+    List<DocumentUnitNumberingListNumberFormat> currentNumberFormat = new ArrayList<>();
     HashMap<Integer, Index> lvlTextIndex = new HashMap<>();
 
     entries.forEach(
@@ -89,7 +89,7 @@ public class NumberingList implements DocUnitDocx {
     return sb.toString();
   }
 
-  public enum DocUnitNumberingListNumberFormat {
+  public enum DocumentUnitNumberingListNumberFormat {
     DECIMAL,
     BULLET,
     UPPER_ROMAN,
@@ -99,7 +99,7 @@ public class NumberingList implements DocUnitDocx {
   }
 
   private String getOpenListTag(NumberingListEntryIndex numberingListEntryIndex) {
-    DocUnitNumberingListNumberFormat listNumberFormat = numberingListEntryIndex.numberFormat();
+    DocumentUnitNumberingListNumberFormat listNumberFormat = numberingListEntryIndex.numberFormat();
     String listStyle = getListType(listNumberFormat, numberingListEntryIndex);
     final String numOpenTagFormat = "<ol style=\"%s\">";
     final String bulletOpenTagFormat = "<ul style=\"%s\">";
@@ -109,19 +109,19 @@ public class NumberingList implements DocUnitDocx {
     };
   }
 
-  private String getCloseListTag(DocUnitNumberingListNumberFormat listNumberFormat) {
-    return listNumberFormat == DocUnitNumberingListNumberFormat.BULLET ? "</ul>" : "</ol>";
+  private String getCloseListTag(DocumentUnitNumberingListNumberFormat listNumberFormat) {
+    return listNumberFormat == DocumentUnitNumberingListNumberFormat.BULLET ? "</ul>" : "</ol>";
   }
 
   private boolean shouldCreateNewList(
       int cLvl,
       int nLvl,
-      List<DocUnitNumberingListNumberFormat> cNumberFormat,
-      DocUnitNumberingListNumberFormat nNumberFormat) {
+      List<DocumentUnitNumberingListNumberFormat> cNumberFormat,
+      DocumentUnitNumberingListNumberFormat nNumberFormat) {
     if (cNumberFormat.isEmpty() || nNumberFormat.equals(cNumberFormat.get(0))) return false;
     if (nLvl != 0) return false;
     if (cLvl == 0) return true;
-    return nNumberFormat.equals(DocUnitNumberingListNumberFormat.BULLET);
+    return nNumberFormat.equals(DocumentUnitNumberingListNumberFormat.BULLET);
   }
 
   private String getPStyle(NumberingListEntryIndex numberingListEntryIndex) {
@@ -140,7 +140,7 @@ public class NumberingList implements DocUnitDocx {
   }
 
   private String getListType(
-      DocUnitNumberingListNumberFormat numberFormat,
+      DocumentUnitNumberingListNumberFormat numberFormat,
       NumberingListEntryIndex numberingListEntryIndex) {
     if (numberingListEntryIndex.lvlPicBullet()) {
       LOGGER.error("Unsupported picture bullet, use default bullet for list");
@@ -196,8 +196,8 @@ public class NumberingList implements DocUnitDocx {
   }
 
   private String getNumericIndex(
-      int number, DocUnitNumberingListNumberFormat docUnitNumberingListNumberFormat) {
-    return switch (docUnitNumberingListNumberFormat) {
+      int number, DocumentUnitNumberingListNumberFormat documentUnitNumberingListNumberFormat) {
+    return switch (documentUnitNumberingListNumberFormat) {
       case UPPER_LETTER -> intToLatin(number).toUpperCase();
       case LOWER_LETTER -> intToLatin(number).toLowerCase();
       case UPPER_ROMAN -> intToRoman(number + 1).toUpperCase();
@@ -230,13 +230,13 @@ public class NumberingList implements DocUnitDocx {
       boolean resetLvlText,
       int currentLvl,
       NumberingListEntryIndex numberingListEntryIndex) {
-    DocUnitNumberingListNumberFormat numberFormat = numberingListEntryIndex.numberFormat();
+    DocumentUnitNumberingListNumberFormat numberFormat = numberingListEntryIndex.numberFormat();
     final String listIndexFormat =
         "<p style=\"%s\"><span style=\"%s\">%s</span><span>%s</span></p>";
     String indexJc = getIndexJc(numberingListEntryIndex);
     String pStyle = getPStyle(numberingListEntryIndex);
     String suff = getSuff(numberingListEntryIndex);
-    if (numberFormat.equals(DocUnitNumberingListNumberFormat.BULLET)) {
+    if (numberFormat.equals(DocumentUnitNumberingListNumberFormat.BULLET)) {
       String bulletHexCode = getBulletHexCode(numberingListEntryIndex.fontStyle());
       return String.format(listIndexFormat, indexJc, pStyle, bulletHexCode, suff);
     }

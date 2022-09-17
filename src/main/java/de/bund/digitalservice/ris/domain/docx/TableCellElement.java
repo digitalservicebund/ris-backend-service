@@ -3,11 +3,11 @@ package de.bund.digitalservice.ris.domain.docx;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TableCellElement extends BlockElement implements DocUnitDocx {
-  public final List<DocUnitDocx> paragraphElements;
+public class TableCellElement extends BlockElement implements DocumentUnitDocx {
+  public final List<DocumentUnitDocx> paragraphElements;
   public Integer columnSpan;
 
-  public TableCellElement(List<DocUnitDocx> paragraphElements) {
+  public TableCellElement(List<DocumentUnitDocx> paragraphElements) {
     this.paragraphElements = paragraphElements;
     addStyle("min-width", "5px");
     addStyle("padding", "5px");
@@ -28,7 +28,9 @@ public class TableCellElement extends BlockElement implements DocUnitDocx {
         + columnSpanToHtmlString()
         + super.getStyleString()
         + ">"
-        + paragraphElements.stream().map(DocUnitDocx::toHtmlString).collect(Collectors.joining())
+        + paragraphElements.stream()
+            .map(DocumentUnitDocx::toHtmlString)
+            .collect(Collectors.joining())
         + "</td>";
   }
 }

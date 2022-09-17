@@ -108,21 +108,21 @@ _clean_staging() {
   [ -z ${STAGING_USER+x} ] && _user "Staging user? " && read -r STAGING_USER
   [ -z ${STAGING_PASSWORD+x} ] && _user "Staging password? " && read -r STAGING_PASSWORD
 
-  endpoint="https://${STAGING_URL#"https://"}/api/v1/docunits/"
+  endpoint="https://${STAGING_URL#"https://"}/api/v1/documentunits/"
   regex="\"uuid\":\"[a-z0-9-]\{36\}\""
 
-  docUnits=$(curl -s "$endpoint" -u "$STAGING_USER":"$STAGING_PASSWORD" \
+  documentunits=$(curl -s "$endpoint" -u "$STAGING_USER":"$STAGING_PASSWORD" \
     | grep -o "$regex" \
     | sed "s/\"uuid\":\"//g" \
     | sed "s/\"//g")
 
   n_deleted=0
-  for docUnit in $docUnits; do
-    curl -X DELETE "$endpoint""$docUnit" -u "$STAGING_USER":"$STAGING_PASSWORD"
+  for documentUnit in $documentunits; do
+    curl -X DELETE "$endpoint""$documentUnit" -u "$STAGING_USER":"$STAGING_PASSWORD"
     n_deleted=$((n_deleted + 1))
   done
 
-  _info "$n_deleted docUnits deleted."
+  _info "$n_deleted documentunits deleted."
 }
 
 _help() {
@@ -132,7 +132,7 @@ _help() {
   echo "init                  Set up repository for development"
   echo "gradle-env            Provide shell env for Java build tooling; usage: \`eval \"\$(./run.sh gradle-env)\"\`"
   echo "dev                   Start full-stack development environment"
-  echo "clean-staging         Deletes all existing docUnits on staging"
+  echo "clean-staging         Deletes all existing documentunits on staging"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
 }

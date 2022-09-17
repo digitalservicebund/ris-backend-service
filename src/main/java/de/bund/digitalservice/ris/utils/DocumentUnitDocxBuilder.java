@@ -4,12 +4,12 @@ import de.bund.digitalservice.ris.domain.docx.AnchorImageElement;
 import de.bund.digitalservice.ris.domain.docx.BlockElement;
 import de.bund.digitalservice.ris.domain.docx.Border;
 import de.bund.digitalservice.ris.domain.docx.BorderNumber;
-import de.bund.digitalservice.ris.domain.docx.DocUnitDocx;
+import de.bund.digitalservice.ris.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.domain.docx.ErrorElement;
 import de.bund.digitalservice.ris.domain.docx.ErrorRunElement;
 import de.bund.digitalservice.ris.domain.docx.InlineImageElement;
-import de.bund.digitalservice.ris.domain.docx.NumberingList.DocUnitNumberingListNumberFormat;
+import de.bund.digitalservice.ris.domain.docx.NumberingList.DocumentUnitNumberingListNumberFormat;
 import de.bund.digitalservice.ris.domain.docx.NumberingListEntry;
 import de.bund.digitalservice.ris.domain.docx.NumberingListEntryIndex;
 import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
@@ -66,8 +66,8 @@ import org.docx4j.wml.UnderlineEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DocUnitDocxBuilder {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DocUnitDocxBuilder.class);
+public class DocumentUnitDocxBuilder {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocumentUnitDocxBuilder.class);
 
   P paragraph;
   Tbl table;
@@ -75,44 +75,44 @@ public class DocUnitDocxBuilder {
   private Map<String, DocxImagePart> images = new HashMap<>();
   private Map<String, ListNumberingDefinition> listNumberingDefinitions;
 
-  private DocUnitDocxBuilder() {}
+  private DocumentUnitDocxBuilder() {}
 
-  public static DocUnitDocxBuilder newInstance() {
-    return new DocUnitDocxBuilder();
+  public static DocumentUnitDocxBuilder newInstance() {
+    return new DocumentUnitDocxBuilder();
   }
 
-  public DocUnitDocxBuilder useStyles(Map<String, Style> styles) {
+  public DocumentUnitDocxBuilder useStyles(Map<String, Style> styles) {
     this.styles = styles;
 
     return this;
   }
 
-  public DocUnitDocxBuilder useImages(Map<String, DocxImagePart> images) {
+  public DocumentUnitDocxBuilder useImages(Map<String, DocxImagePart> images) {
     this.images = images;
 
     return this;
   }
 
-  public DocUnitDocxBuilder useListNumberingDefinitions(
+  public DocumentUnitDocxBuilder useListNumberingDefinitions(
       Map<String, ListNumberingDefinition> listNumberingDefinitions) {
     this.listNumberingDefinitions = listNumberingDefinitions;
 
     return this;
   }
 
-  public DocUnitDocxBuilder setParagraph(P paragraph) {
+  public DocumentUnitDocxBuilder setParagraph(P paragraph) {
     this.paragraph = paragraph;
 
     return this;
   }
 
-  public DocUnitDocxBuilder setTable(Tbl table) {
+  public DocumentUnitDocxBuilder setTable(Tbl table) {
     this.table = table;
 
     return this;
   }
 
-  public DocUnitDocx build() {
+  public DocumentUnitDocx build() {
     if (isTable()) {
       return convertToTable();
     }
@@ -216,7 +216,7 @@ public class DocUnitDocxBuilder {
             "",
             false,
             false,
-            DocUnitNumberingListNumberFormat.BULLET,
+            DocumentUnitNumberingListNumberFormat.BULLET,
             iLvl,
             JcEnumeration.RIGHT,
             "tab");
@@ -237,19 +237,19 @@ public class DocUnitDocxBuilder {
   }
 
   private NumberingListEntryIndex setNumberingListEntryIndex(ListLevel listLevel, String iLvl) {
-    DocUnitNumberingListNumberFormat numberFormat;
+    DocumentUnitNumberingListNumberFormat numberFormat;
     switch (listLevel.getNumFmt()) {
-      case BULLET -> numberFormat = DocUnitNumberingListNumberFormat.BULLET;
-      case DECIMAL -> numberFormat = DocUnitNumberingListNumberFormat.DECIMAL;
-      case UPPER_LETTER -> numberFormat = DocUnitNumberingListNumberFormat.UPPER_LETTER;
-      case LOWER_LETTER -> numberFormat = DocUnitNumberingListNumberFormat.LOWER_LETTER;
-      case UPPER_ROMAN -> numberFormat = DocUnitNumberingListNumberFormat.UPPER_ROMAN;
-      case LOWER_ROMAN -> numberFormat = DocUnitNumberingListNumberFormat.LOWER_ROMAN;
+      case BULLET -> numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
+      case DECIMAL -> numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
+      case UPPER_LETTER -> numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_LETTER;
+      case LOWER_LETTER -> numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_LETTER;
+      case UPPER_ROMAN -> numberFormat = DocumentUnitNumberingListNumberFormat.UPPER_ROMAN;
+      case LOWER_ROMAN -> numberFormat = DocumentUnitNumberingListNumberFormat.LOWER_ROMAN;
       default -> {
         LOGGER.error(
             "not implemented number format ({}) in list. use default bullet list",
             listLevel.getNumFmt());
-        numberFormat = DocUnitNumberingListNumberFormat.BULLET;
+        numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
       }
     }
     String restartNummerAfterBreak = "";
@@ -305,7 +305,7 @@ public class DocUnitDocxBuilder {
     return paragraph != null;
   }
 
-  private DocUnitDocx convertToParagraphElement(P paragraph) {
+  private DocumentUnitDocx convertToParagraphElement(P paragraph) {
     if (paragraph == null) {
       return null;
     }
@@ -806,7 +806,7 @@ public class DocUnitDocxBuilder {
     return "#" + ctShd.getFill();
   }
 
-  private DocUnitDocx convertToTable() {
+  private DocumentUnitDocx convertToTable() {
     var tableElement = new TableElement(parseTable(table));
     addTableStyle(tableElement, table.getTblPr());
 
@@ -874,7 +874,7 @@ public class DocUnitDocxBuilder {
   }
 
   private TableCellElement parseTc(Tc tc) {
-    List<DocUnitDocx> paragraphElements = new ArrayList<>();
+    List<DocumentUnitDocx> paragraphElements = new ArrayList<>();
     tc.getContent()
         .forEach(
             element -> {

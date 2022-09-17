@@ -9,9 +9,9 @@ env:
   STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
 
 jobs:
-  remove-all-docunits:
+  remove-all-documentunits:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Run script to remove doc units
+      - name: Run script to remove documentunits
         run: ./run.sh clean-staging
