@@ -1,7 +1,8 @@
 package de.bund.digitalservice.ris.adapter;
 
+import de.bund.digitalservice.ris.domain.DocumentUnit;
+import de.bund.digitalservice.ris.domain.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.domain.DocumentUnitCreationInfo;
-import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.domain.MailResponse;
@@ -38,30 +39,37 @@ public class DocumentUnitController {
   }
 
   @PostMapping(value = "")
-  public Mono<ResponseEntity<DocumentUnitDTO>> generateNewDocUnit(
+  public Mono<ResponseEntity<DocumentUnit>> generateNewDocUnit(
       @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
     return service
         .generateNewDocUnit(documentUnitCreationInfo)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
-        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
+        .map(
+            documentUnitDTO ->
+                ResponseEntity.status(HttpStatus.CREATED)
+                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
+        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.EMPTY));
   }
 
   @PutMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocumentUnitDTO>> attachFileToDocUnit(
+  public Mono<ResponseEntity<DocumentUnit>> attachFileToDocUnit(
       @PathVariable UUID uuid,
       @RequestBody ByteBuffer byteBufferFlux,
       @RequestHeader HttpHeaders httpHeaders) {
 
     return service
         .attachFileToDocUnit(uuid, byteBufferFlux, httpHeaders)
-        .map(docUnit -> ResponseEntity.status(HttpStatus.CREATED).body(docUnit))
+        .map(
+            documentUnitDTO ->
+                ResponseEntity.status(HttpStatus.CREATED)
+                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
         .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
+        .onErrorReturn(
+            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
   }
 
   @DeleteMapping(value = "/{uuid}/file")
-  public Mono<ResponseEntity<DocumentUnitDTO>> removeFileFromDocUnit(@PathVariable UUID uuid) {
+  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocUnit(@PathVariable UUID uuid) {
 
     return service.removeFileFromDocUnit(uuid);
   }
@@ -74,10 +82,10 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "/{documentnumber}")
-  public Mono<ResponseEntity<DocumentUnitDTO>> getByDocumentnumber(
+  public Mono<ResponseEntity<DocumentUnit>> getByDocumentnumber(
       @NonNull @PathVariable String documentnumber) {
     if (documentnumber.length() != 14) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnitDTO.EMPTY));
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.EMPTY));
     }
     return service.getByDocumentnumber(documentnumber);
   }
@@ -89,12 +97,13 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/{uuid}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Mono<ResponseEntity<DocumentUnitDTO>> updateByUuid(
-      @PathVariable UUID uuid, @RequestBody DocumentUnitDTO docUnit) {
-    if (!uuid.equals(docUnit.getUuid())) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnitDTO.EMPTY));
+  public Mono<ResponseEntity<DocumentUnit>> updateByUuid(
+      @PathVariable UUID uuid, @RequestBody DocumentUnit documentUnit) {
+    if (!uuid.equals(documentUnit.uuid())) {
+      return Mono.just(
+          ResponseEntity.unprocessableEntity().body(DocumentUnitBuilder.newInstance().build()));
     }
-    return service.updateDocUnit(docUnit);
+    return service.updateDocUnit(documentUnit);
   }
 
   @PutMapping(

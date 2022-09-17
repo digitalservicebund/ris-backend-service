@@ -81,7 +81,13 @@ const onDelete = () => {
           <td>
             {{ dayjs(documentUnit.creationtimestamp).format("DD.MM.YYYY") }}
           </td>
-          <td>{{ documentUnit.fileNumber ? documentUnit.fileNumber : "-" }}</td>
+          <td>
+            {{
+              documentUnit.coreData && documentUnit.coreData.fileNumber
+                ? documentUnit.coreData.fileNumber
+                : "-"
+            }}
+          </td>
           <td>
             {{ documentUnit.filename ? documentUnit.filename : "-" }}
           </td>

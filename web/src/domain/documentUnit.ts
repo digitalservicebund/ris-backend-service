@@ -31,7 +31,7 @@ export type PreviousDecision = {
   fileNumber?: string
 }
 
-export default class DocumentUnit implements CoreData, Texts {
+export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
   readonly documentnumber?: string
@@ -43,66 +43,29 @@ export default class DocumentUnit implements CoreData, Texts {
   public filename?: string
   public originalFileAsHTML?: string
 
-  public fileNumber?: string
-  public courtType?: string
-  public category?: string
-  public procedure?: string
-  public ecli?: string
-  public appraisalBody?: string
-  public decisionDate?: string
-  public courtLocation?: string
-  public legalEffect?: string
-  public inputType?: string
-  public center?: string
-  public region?: string
-
-  public decisionName?: string
-  public headline?: string
-  public guidingPrinciple?: string
-  public headnote?: string
-  public tenor?: string
-  public reasons?: string
-  public caseFacts?: string
-  public decisionReasons?: string
-
+  public coreData: CoreData = {}
+  public texts: Texts = {}
   public previousDecisions?: PreviousDecision[]
 
   constructor(uuid: string, data: Partial<DocumentUnit> = {}) {
     this.uuid = String(uuid)
 
-    let key: keyof DocumentUnit
-    for (key in data) {
-      if (data[key] === null) delete data[key]
+    let rootField: keyof DocumentUnit
+    for (rootField in data) {
+      if (data[rootField] === null) delete data[rootField]
     }
+    let coreDataField: keyof CoreData
+    for (coreDataField in data.coreData) {
+      if (data.coreData && data.coreData[coreDataField] === null)
+        delete data.coreData[coreDataField]
+    }
+    let textsField: keyof Texts
+    for (textsField in data.texts) {
+      if (data.texts && data.texts[textsField] === null)
+        delete data.texts[textsField]
+    }
+
     Object.assign(this, data)
-  }
-  get coreData(): CoreData {
-    return {
-      fileNumber: this.fileNumber,
-      courtType: this.courtType,
-      category: this.category,
-      procedure: this.procedure,
-      ecli: this.ecli,
-      appraisalBody: this.appraisalBody,
-      decisionDate: this.decisionDate,
-      courtLocation: this.courtLocation,
-      legalEffect: this.legalEffect,
-      inputType: this.inputType,
-      center: this.center,
-      region: this.region,
-    }
-  }
-  get texts(): Texts {
-    return {
-      decisionName: this.decisionName,
-      headline: this.headline,
-      guidingPrinciple: this.guidingPrinciple,
-      headnote: this.headnote,
-      tenor: this.tenor,
-      reasons: this.reasons,
-      caseFacts: this.caseFacts,
-      decisionReasons: this.decisionReasons,
-    }
   }
   get hasFile(): boolean {
     return !!this.s3path

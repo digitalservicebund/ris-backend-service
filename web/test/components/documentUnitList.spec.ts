@@ -33,7 +33,11 @@ describe("documentUnit list", () => {
   })
 
   test("renders documentUnits", async () => {
-    const documentUnit = new DocumentUnit("1", { fileNumber: "foo" })
+    const documentUnit = new DocumentUnit("1", {
+      coreData: {
+        fileNumber: "foo",
+      },
+    })
 
     render(DocumentUnitList, {
       props: {
@@ -51,7 +55,11 @@ describe("documentUnit list", () => {
   })
 
   test("delete emits event", async () => {
-    const documentUnit = new DocumentUnit("1", { fileNumber: "foo" })
+    const documentUnit = new DocumentUnit("1", {
+      coreData: {
+        fileNumber: "foo",
+      },
+    })
 
     const { emitted } = render(DocumentUnitList, {
       props: {

@@ -10,8 +10,8 @@ describe("DocumentUnit", () => {
 
   it("returns core Data as object", () => {
     const documentUnit = new DocumentUnit("foo")
-    documentUnit.fileNumber = "bar"
-    documentUnit.courtLocation = "baz"
+    documentUnit.coreData.fileNumber = "bar"
+    documentUnit.coreData.courtLocation = "baz"
 
     const coreData: CoreData = documentUnit.coreData
     expect(coreData.fileNumber).toBe("bar")
@@ -20,8 +20,8 @@ describe("DocumentUnit", () => {
 
   it("returns texts as object", () => {
     const documentUnit = new DocumentUnit("foo")
-    documentUnit.reasons = "bar"
-    documentUnit.headnote = "baz"
+    documentUnit.texts.reasons = "bar"
+    documentUnit.texts.headnote = "baz"
 
     const documentUnitTexts: Texts = documentUnit.texts
     expect(documentUnitTexts.reasons).toBe("bar")

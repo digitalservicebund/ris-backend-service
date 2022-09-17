@@ -7,15 +7,15 @@ const props = defineProps<{ documentUnit: DocumentUnit }>()
 const entries = computed(() => [
   {
     label: "Aktenzeichen",
-    value: props.documentUnit.fileNumber,
+    value: props.documentUnit.coreData.fileNumber,
   },
   {
     label: "Entscheidungsdatum",
-    value: props.documentUnit.decisionDate,
+    value: props.documentUnit.coreData.decisionDate,
   },
   {
     label: "Gerichtstyp",
-    value: props.documentUnit.courtType,
+    value: props.documentUnit.coreData.courtType,
   },
 ])
 </script>

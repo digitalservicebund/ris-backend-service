@@ -15,7 +15,13 @@ describe("documentUnit InfoPanel", () => {
 
   it("renders aktenzeichen if given", async () => {
     const { getAllByText } = render(DocumentUnitInfoPanel, {
-      props: { documentUnit: new DocumentUnit("123", { fileNumber: "foo" }) },
+      props: {
+        documentUnit: new DocumentUnit("123", {
+          coreData: {
+            fileNumber: "foo",
+          },
+        }),
+      },
     })
 
     getAllByText((_content, node) => {
@@ -27,10 +33,12 @@ describe("documentUnit InfoPanel", () => {
     const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("123", {
-          decisionDate: "bar",
-          courtType: "baz",
+          coreData: {
+            decisionDate: "bar",
+            courtType: "baz",
+            fileNumber: undefined,
+          },
           documentnumber: "qux",
-          fileNumber: undefined,
         }),
       },
     })
@@ -42,7 +50,13 @@ describe("documentUnit InfoPanel", () => {
 
   it("renders Entscheidungsdatum if given", async () => {
     const { getAllByText } = render(DocumentUnitInfoPanel, {
-      props: { documentUnit: new DocumentUnit("123", { decisionDate: "foo" }) },
+      props: {
+        documentUnit: new DocumentUnit("123", {
+          coreData: {
+            decisionDate: "foo",
+          },
+        }),
+      },
     })
 
     getAllByText((_content, node) => {
@@ -54,8 +68,10 @@ describe("documentUnit InfoPanel", () => {
     const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("123", {
-          fileNumber: "foo",
-          courtType: "baz",
+          coreData: {
+            fileNumber: "foo",
+            courtType: "baz",
+          },
           documentnumber: "qux",
         }),
       },
@@ -68,9 +84,14 @@ describe("documentUnit InfoPanel", () => {
 
   it("renders Gerichtstyp if given", async () => {
     const { getAllByText } = render(DocumentUnitInfoPanel, {
-      props: { documentUnit: new DocumentUnit("123", { courtType: "foo" }) },
+      props: {
+        documentUnit: new DocumentUnit("123", {
+          coreData: {
+            courtType: "foo",
+          },
+        }),
+      },
     })
-
     getAllByText((_content, node) => {
       return !!node?.textContent?.match(/Gerichtstyp foo/)
     })
@@ -80,8 +101,10 @@ describe("documentUnit InfoPanel", () => {
     const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
         documentUnit: new DocumentUnit("123", {
-          fileNumber: "foo",
-          decisionDate: "bar",
+          coreData: {
+            fileNumber: "foo",
+            decisionDate: "bar",
+          },
           documentnumber: "qux",
         }),
       },

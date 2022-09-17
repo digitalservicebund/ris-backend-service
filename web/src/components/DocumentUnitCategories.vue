@@ -18,14 +18,14 @@ const props = defineProps<{
 const updatedDocumentUnit = computed(() => props.documentUnit)
 
 const handleUpdateValueDocumentUnitTexts = async (
-  updatedValue: [keyof CoreData | keyof Texts, string]
+  updatedValue: [keyof Texts, string]
 ) => {
   const divElem = document.createElement("div")
   divElem.innerHTML = updatedValue[1]
   const hasImgElem = divElem.getElementsByTagName("img").length > 0
   const hasTable = divElem.getElementsByTagName("table").length > 0
   const hasInnerText = divElem.innerText.length > 0
-  updatedDocumentUnit.value[updatedValue[0]] =
+  updatedDocumentUnit.value.texts[updatedValue[0]] =
     hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
 }
 
@@ -63,7 +63,7 @@ const coreData = computed({
   get: () => props.documentUnit.coreData,
   set: (newValues) => {
     for (const [key, value] of Object.entries(newValues)) {
-      updatedDocumentUnit.value[key as keyof CoreData] = value
+      updatedDocumentUnit.value.coreData[key as keyof CoreData] = value
     }
   },
 })

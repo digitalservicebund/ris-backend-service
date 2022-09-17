@@ -8,6 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import de.bund.digitalservice.ris.domain.DocumentUnit;
+import de.bund.digitalservice.ris.domain.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.domain.DocumentUnitPublishException;
@@ -182,16 +184,17 @@ class DocumentUnitControllerTest {
   void testUpdateByUuid() {
     DocumentUnitDTO docUnit = new DocumentUnitDTO();
     docUnit.setUuid(TEST_UUID);
+    DocumentUnit documentUnit = DocumentUnitBuilder.newInstance().setDocUnitDTO(docUnit).build();
     webClient
         .mutateWith(csrf())
         .put()
         .uri("/api/v1/documentunits/" + TEST_UUID + "/docx")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
-        .bodyValue(docUnit)
+        .bodyValue(documentUnit)
         .exchange()
         .expectStatus()
         .isOk();
-    verify(service).updateDocUnit(docUnit);
+    verify(service).updateDocUnit(documentUnit);
   }
 
   @Test

@@ -11,7 +11,9 @@ describe("Core Data", () => {
 
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
-      fileNumber: "abc",
+      coreData: {
+        fileNumber: "abc",
+      },
       documentnumber: "ABCD2022000001",
     })
     const wrapper = mount(DocumentUnitCoreData, {

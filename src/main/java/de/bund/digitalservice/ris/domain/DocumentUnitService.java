@@ -108,7 +108,7 @@ public class DocumentUnitService {
         .flatMap(repository::save);
   }
 
-  public Mono<ResponseEntity<DocumentUnitDTO>> removeFileFromDocUnit(UUID docUnitId) {
+  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocUnit(UUID docUnitId) {
     return repository
         .findByUuid(docUnitId)
         .flatMap(
@@ -127,9 +127,13 @@ public class DocumentUnitService {
             })
         .doOnNext(docUnit -> log.debug("removed file from DocUnit {}", docUnitId))
         .flatMap(repository::save)
-        .map(docUnit -> ResponseEntity.status(HttpStatus.OK).body(docUnit))
+        .map(
+            documentUnitDTO ->
+                ResponseEntity.status(HttpStatus.OK)
+                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()))
         .doOnError(ex -> log.error("Couldn't remove the file from the DocUnit", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
+        .onErrorReturn(
+            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
   }
 
   void checkDocx(ByteBuffer byteBufferFlux) {
@@ -191,18 +195,21 @@ public class DocumentUnitService {
         ResponseEntity.ok(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber")))));
   }
 
-  public Mono<ResponseEntity<DocumentUnitDTO>> getByDocumentnumber(String documentnumber) {
+  public Mono<ResponseEntity<DocumentUnit>> getByDocumentnumber(String documentnumber) {
     return repository
         .findByDocumentnumber(documentnumber)
         .flatMap(
-            docUnit ->
+            documentUnitDTO ->
                 previousDecisionRepository
                     .findAllByDocumentnumber(documentnumber)
                     .collectList()
                     .flatMap(
                         previousDecisions ->
-                            Mono.just(docUnit.setPreviousDecisions(previousDecisions))))
-        .map(ResponseEntity::ok);
+                            Mono.just(documentUnitDTO.setPreviousDecisions(previousDecisions))))
+        .map(
+            documentUnitDTO ->
+                ResponseEntity.ok(
+                    DocumentUnitBuilder.newInstance().setDocUnitDTO(documentUnitDTO).build()));
   }
 
   public Mono<ResponseEntity<String>> deleteByUuid(UUID docUnitId) {
@@ -225,18 +232,25 @@ public class DocumentUnitService {
         .onErrorReturn(ResponseEntity.internalServerError().body("Couldn't delete the DocUnit"));
   }
 
-  public Mono<ResponseEntity<DocumentUnitDTO>> updateDocUnit(DocumentUnitDTO docUnit) {
-    if (docUnit.previousDecisions == null)
+  public Mono<ResponseEntity<DocumentUnit>> updateDocUnit(DocumentUnit documentUnit) {
+    DocumentUnitDTO documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
+    if (documentUnitDTO.previousDecisions == null)
       return repository
-          .save(docUnit)
-          .map(ResponseEntity::ok)
+          .save(documentUnitDTO)
+          .map(
+              duDTO ->
+                  ResponseEntity.status(HttpStatus.OK)
+                      .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(duDTO).build()))
           .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
-          .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
+          .onErrorReturn(
+              ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
 
     /* Passing foreign key to object */
     List<PreviousDecision> previousDecisionsList =
-        docUnit.previousDecisions.stream()
-            .map(previousDecision -> previousDecision.setDocumentnumber(docUnit.documentnumber))
+        documentUnitDTO.previousDecisions.stream()
+            .map(
+                previousDecision ->
+                    previousDecision.setDocumentnumber(documentUnitDTO.documentnumber))
             .toList();
     /* Get all id of previous decisions from font-end */
     List<Long> incomingIds =
@@ -250,7 +264,7 @@ public class DocumentUnitService {
         .flatMap(
             previousDecisions ->
                 previousDecisionRepository
-                    .getAllIdsByDocumentnumber(docUnit.documentnumber)
+                    .getAllIdsByDocumentnumber(documentUnitDTO.documentnumber)
                     .collectList()
                     .flatMap(
                         inDatabaseIds -> {
@@ -270,10 +284,14 @@ public class DocumentUnitService {
                                   previousDecisionRepository.deleteAllById(
                                       deletedIndexes.stream().map(String::valueOf).toList()));
                         }))
-        .then(repository.save(docUnit))
-        .map(ResponseEntity::ok)
+        .then(repository.save(documentUnitDTO))
+        .map(
+            duDTO ->
+                ResponseEntity.status(HttpStatus.OK)
+                    .body(DocumentUnitBuilder.newInstance().setDocUnitDTO(duDTO).build()))
         .doOnError(ex -> log.error("Couldn't update the DocUnit", ex))
-        .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnitDTO.EMPTY));
+        .onErrorReturn(
+            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
   }
 
   private List<Long> getDeletedPreviousDecisionIds(
