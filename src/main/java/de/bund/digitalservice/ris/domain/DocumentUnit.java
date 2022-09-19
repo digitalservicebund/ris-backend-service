@@ -7,7 +7,7 @@ import java.util.UUID;
 public record DocumentUnit(
     Long id,
     UUID uuid,
-    String documentnumber,
+    String documentNumber,
     Instant creationtimestamp,
     Instant fileuploadtimestamp,
     String s3path,

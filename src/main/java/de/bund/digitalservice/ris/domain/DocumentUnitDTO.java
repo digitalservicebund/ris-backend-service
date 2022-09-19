@@ -38,7 +38,7 @@ public class DocumentUnitDTO {
     return DocumentUnitDTO.builder()
         .id(documentUnit.id())
         .uuid(documentUnit.uuid())
-        .documentnumber(documentUnit.documentnumber())
+        .documentnumber(documentUnit.documentNumber())
         .creationtimestamp(documentUnit.creationtimestamp())
         .fileuploadtimestamp(documentUnit.fileuploadtimestamp())
         .s3path(documentUnit.s3path())
