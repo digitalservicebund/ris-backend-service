@@ -18,7 +18,9 @@ const route = useRoute()
     >
       <div class="odoc-open-text">Originaldokument</div>
       <div class="bg-blue-800 odoc-open-icon-background">
-        <v-icon class="odoc-open-icon text-white"> arrow_back_ios_new </v-icon>
+        <span class="material-icons odoc-open-icon text-white">
+          arrow_back_ios_new
+        </span>
       </div>
     </button>
   </v-col>
@@ -30,26 +32,29 @@ const route = useRoute()
           class="bg-blue-800 odoc-close-icon-background text-white"
           @click="$emit('togglePanel')"
         >
-          <v-icon class="odoc-close-icon"> close </v-icon>
+          <span class="material-icons odoc-close-icon"> close </span>
         </button>
         Originaldokument
       </h3>
       <div v-if="!hasFile">
-        <v-icon class="mb-4 text-blue-800" size="50px">cloud_upload</v-icon>
+        <span class="material-icons mb-4 odoc-upload-icon text-blue-800"
+          >cloud_upload</span
+        >
         <div class="odoc-upload-note">
           Es wurde noch kein Originaldokument hochgeladen.
         </div>
-        <router-link
-          class="text-blue-800"
-          :to="{
-            name: 'jurisdiction-documentUnit-:documentNumber-files',
-            params: { documentNumber: $route.params.documentNumber },
-            query: route.query,
-          }"
-        >
-          <v-icon> arrow_forward </v-icon>
-          Zum Upload
-        </router-link>
+        <span class="flex gap-x-4">
+          <span class="material-icons text-blue-800"> arrow_forward </span>
+          <router-link
+            class="text-blue-800"
+            :to="{
+              name: 'jurisdiction-documentUnit-:documentNumber-files',
+              params: { documentNumber: $route.params.documentNumber },
+              query: route.query,
+            }"
+            >Zum Upload</router-link
+          >
+        </span>
       </div>
       <div v-else-if="!file">Dokument wird geladen</div>
       <div v-else class="border-1 border-gray-400 border-solid">
@@ -104,5 +109,9 @@ const route = useRoute()
 
 .odoc-upload-note {
   margin-bottom: 15px;
+}
+
+.odoc-upload-icon {
+  font-size: 50px;
 }
 </style>

@@ -13,8 +13,8 @@ const linkStyling = (componentName: string) => {
   <v-container class="topbar-main" fluid role="navigation" tag="nav">
     <v-row>
       <v-col cols="1">
-        <v-icon class="text-blue-800 topbar-logo-circle" size="56px"
-          >circle</v-icon
+        <span class="material-icons text-blue-800 topbar-logo-circle"
+          >circle</span
         >
       </v-col>
       <v-col
@@ -34,7 +34,7 @@ const linkStyling = (componentName: string) => {
       </v-col>
       <v-col cols="5"></v-col>
       <v-col class="vertically-centered" cols="2">
-        <v-icon class="topbar-user-icon"> perm_identity </v-icon>
+        <span class="material-icons topbar-user-icon"> perm_identity </span>
         User Name
       </v-col>
     </v-row>
@@ -54,6 +54,7 @@ const linkStyling = (componentName: string) => {
 
 .topbar-logo-circle {
   float: right;
+  font-size: 56px;
 }
 
 .topbar-link-box {

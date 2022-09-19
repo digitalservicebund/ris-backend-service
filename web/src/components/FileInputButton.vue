@@ -1,3 +1,4 @@
+when(repository.save(docUnit)).thenReturn(Mono.just(docUnit));
 <script lang="ts" setup>
 import { ref } from "vue"
 import TextButton from "@/components/TextButton.vue"
@@ -53,6 +54,11 @@ function triggerFileInput() {
 }
 
 .label {
+  display: flex;
+  flex-flow: row nowrap;
+  align-items: center;
+  justify-content: center;
+
   &:hover {
     cursor: pointer;
   }

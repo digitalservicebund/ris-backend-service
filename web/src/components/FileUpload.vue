@@ -113,9 +113,9 @@ function onFileSelect(event: Event): void {
           @drop="drop"
         >
           <span v-if="status.inDragError">
-            <v-icon class="file-upload text-blue-800" size="50px">
+            <span class="file-upload material-icons text-blue-800">
               upload_file
-            </v-icon>
+            </span>
             <!-- if still in drag move -->
             <span v-if="status.uploadStatus !== UploadStatus.WRONG_FILE_FORMAT">
               <div class="upload-status">Datei wird nicht unterstützt.</div>
@@ -133,7 +133,7 @@ function onFileSelect(event: Event): void {
                   aria-label="Upload File"
                   @input="onFileSelect"
                 >
-                  <v-icon>search</v-icon>
+                  <span class="material-icons">search</span>
                   Festplatte durchsuchen
                 </FileInputButton>
               </div>
@@ -141,23 +141,23 @@ function onFileSelect(event: Event): void {
           </span>
           <span v-else>
             <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
-              <v-icon class="icon-upload" size="50px"> refresh </v-icon>
+              <span class="file-upload material-icons"> refresh </span>
               <div class="upload-status">Upload läuft</div>
               <div>{{ status.file ? status.file.name : "" }}</div>
             </span>
             <span v-else-if="status.uploadStatus === UploadStatus.SUCCESSED">
-              <v-icon class="file-upload text-blue-800" size="50px">
+              <span class="file-upload material-icons text-blue-800">
                 upload_file
-              </v-icon>
+              </span>
               <div class="upload-status">
                 Die Datei {{ status.file ? status.file.name : "" }} wurde
                 erfolgreich hochgeladen
               </div>
             </span>
             <span v-else>
-              <v-icon class="file-upload text-blue-800" size="50px">
+              <span class="file-upload material-icons text-blue-800">
                 upload_file
-              </v-icon>
+              </span>
               <div class="upload-status">Datei in diesen Bereich ziehen</div>
               <div>oder</div>
               <FileInputButton
@@ -165,7 +165,7 @@ function onFileSelect(event: Event): void {
                 aria-label="Upload File"
                 @input="onFileSelect"
               >
-                <v-icon>search</v-icon>
+                <span class="material-icons">search</span>
                 Festplatte durchsuchen
               </FileInputButton>
             </span>

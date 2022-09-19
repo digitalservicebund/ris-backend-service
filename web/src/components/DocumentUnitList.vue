@@ -93,15 +93,13 @@ const onDelete = () => {
           </td>
           <td>
             <span
+              aria-label="Dokumentationseinheit löschen"
+              class="icon material-icons"
               tabindex="0"
+              @click="setSelectedDocumentUnit(documentUnit)"
               @keyup.enter="setSelectedDocumentUnit(documentUnit)"
             >
-              <v-icon
-                aria-label="Dokumentationseinheit löschen"
-                @click="setSelectedDocumentUnit(documentUnit)"
-              >
-                delete
-              </v-icon>
+              delete
             </span>
           </td>
         </tr>
@@ -119,5 +117,9 @@ th {
 
 .document-unit-list-active-link {
   text-decoration: underline;
+}
+
+.icon {
+  cursor: pointer;
 }
 </style>

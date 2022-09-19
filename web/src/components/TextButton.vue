@@ -32,7 +32,7 @@ const buttonClasses = computed(() => ({
     :rounded="0"
   >
     <slot>
-      <v-icon v-if="icon"> {{ icon }} </v-icon>
+      <span v-if="icon" class="material-icons"> {{ icon }} </span>
       {{ label }}
     </slot>
   </v-btn>
