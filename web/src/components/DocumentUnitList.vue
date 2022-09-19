@@ -32,7 +32,7 @@ const toggleModal = () => {
 }
 const setSelectedDocumentUnit = (documentUnit: DocumentUnit) => {
   selectedDocumentUnit.value = documentUnit
-  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnit.value.documentnumber} wirklich dauerhaft löschen?`
+  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnit.value.documentNumber} wirklich dauerhaft löschen?`
   toggleModal()
 }
 const onDelete = () => {
@@ -72,10 +72,10 @@ const onDelete = () => {
                 name: documentUnit.s3path
                   ? 'jurisdiction-documentUnit-:documentNumber-categories'
                   : 'jurisdiction-documentUnit-:documentNumber-files',
-                params: { documentNumber: documentUnit.documentnumber },
+                params: { documentNumber: documentUnit.documentNumber },
               }"
             >
-              {{ documentUnit.documentnumber }}
+              {{ documentUnit.documentNumber }}
             </router-link>
           </td>
           <td>

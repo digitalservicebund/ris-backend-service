@@ -14,7 +14,7 @@ describe("Core Data", () => {
       coreData: {
         fileNumber: "abc",
       },
-      documentnumber: "ABCD2022000001",
+      documentNumber: "ABCD2022000001",
     })
     const wrapper = mount(DocumentUnitCoreData, {
       props: {

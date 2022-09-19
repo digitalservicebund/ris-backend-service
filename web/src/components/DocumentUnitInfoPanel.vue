@@ -25,7 +25,7 @@ const entries = computed(() => [
     class="bg-blue-200 border-b border-gray-400 border-solid flex items-center p-12"
   >
     <div class="grow text-30">
-      {{ documentUnit.documentnumber || " - " }}
+      {{ documentUnit.documentNumber || " - " }}
     </div>
 
     <div v-for="entry in entries" :key="entry.label" class="grow">

@@ -6,7 +6,7 @@ describe("documentUnit InfoPanel", () => {
   it("renders documentNumber if given", async () => {
     const { getAllByText } = render(DocumentUnitInfoPanel, {
       props: {
-        documentUnit: new DocumentUnit("123", { documentnumber: "foo" }),
+        documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
       },
     })
 
@@ -38,7 +38,7 @@ describe("documentUnit InfoPanel", () => {
             courtType: "baz",
             fileNumber: undefined,
           },
-          documentnumber: "qux",
+          documentNumber: "qux",
         }),
       },
     })
@@ -72,7 +72,7 @@ describe("documentUnit InfoPanel", () => {
             fileNumber: "foo",
             courtType: "baz",
           },
-          documentnumber: "qux",
+          documentNumber: "qux",
         }),
       },
     })
@@ -105,7 +105,7 @@ describe("documentUnit InfoPanel", () => {
             fileNumber: "foo",
             decisionDate: "bar",
           },
-          documentnumber: "qux",
+          documentNumber: "qux",
         }),
       },
     })

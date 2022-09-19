@@ -34,7 +34,7 @@ export type PreviousDecision = {
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string
-  readonly documentnumber?: string
+  readonly documentNumber?: string
   readonly creationtimestamp?: string
 
   public fileuploadtimestamp?: string

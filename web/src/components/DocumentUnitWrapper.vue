@@ -24,7 +24,7 @@ const handleToggleNavBar = async () => {
     <v-container fluid>
       <v-row>
         <NavbarSide
-          :document-number="String(documentUnit.documentnumber)"
+          :document-number="String(documentUnit.documentNumber)"
           :visible="showNavBar"
           @toggle-navbar="handleToggleNavBar"
         />

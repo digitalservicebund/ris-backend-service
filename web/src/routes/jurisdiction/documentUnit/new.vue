@@ -9,7 +9,7 @@ onBeforeMount(async () => {
   const newDocumentUnit = (await documentUnitService.createNew("KO", "RE")).data
   await router.replace({
     name: "jurisdiction-documentUnit-:documentNumber-files",
-    params: { documentNumber: newDocumentUnit.documentnumber },
+    params: { documentNumber: newDocumentUnit.documentNumber },
   })
 })
 </script>
