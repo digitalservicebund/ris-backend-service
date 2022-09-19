@@ -55,6 +55,7 @@ describe("FileUpload", () => {
 
     const inputEl = getByLabelText("Festplatte durchsuchen", {
       selector: "input",
+      exact: false,
     })
 
     const file = new File(["test"], "sample.docx", {
@@ -117,6 +118,7 @@ describe("FileUpload", () => {
 
     const inputEl = getByLabelText("Festplatte durchsuchen", {
       selector: "input",
+      exact: false,
     })
 
     Object.defineProperty(inputEl, "files", {
@@ -148,6 +150,7 @@ describe("FileUpload", () => {
 
     const inputEl = getByLabelText("Festplatte durchsuchen", {
       selector: "input",
+      exact: false,
     })
 
     Object.defineProperty(inputEl, "files", {

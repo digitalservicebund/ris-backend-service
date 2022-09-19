@@ -29,7 +29,7 @@ describe("InputField", () => {
   it("shows input with given label", () => {
     const { queryByLabelText } = renderComponent({ label: "test label" })
 
-    const input = queryByLabelText("test label")
+    const input = queryByLabelText("test label", { exact: false })
 
     expect(input).toBeInTheDocument()
   })
@@ -40,8 +40,7 @@ describe("InputField", () => {
       required: true,
     })
 
-    const input = queryByLabelText("test label*")
-
+    const input = queryByLabelText("test label*", { exact: false })
     expect(input).toBeInTheDocument()
   })
 
@@ -62,16 +61,13 @@ describe("InputField", () => {
   })
 
   it("injects given input element into slot", () => {
-    const { queryByLabelText } = renderComponent({
+    const { container } = renderComponent({
       slot: "<template v-slot='slotProps'><input v-bind='slotProps' type='radio' /></template>",
       id: "test-identifier",
       label: "test label",
     })
 
-    const input: HTMLInputElement | null = queryByLabelText("test label", {
-      selector: "input",
-    })
-
+    const input = container.getElementsByTagName("input")[0] as HTMLInputElement
     expect(input).toBeInTheDocument()
     expect(input?.type).toBe("radio")
   })

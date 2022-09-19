@@ -67,12 +67,14 @@ describe("ExpandableContent", () => {
       defaultSlot: "test content",
     })
     const header = getByRole("button")
-    const content = getByText("test content")
+    let content = getByText("test content")
 
     expect(content).not.toBeVisible()
     await user.click(header)
+    content = getByText("test content")
     expect(content).toBeVisible()
     await user.click(header)
+    content = getByText("test content")
     expect(content).not.toBeVisible()
   })
 

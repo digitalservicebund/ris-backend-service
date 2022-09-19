@@ -29,7 +29,7 @@ const route = useRoute()
       <h3 class="odoc-editor-header">
         <button
           aria-label="Originaldokument schließen"
-          class="bg-blue-800 odoc-close-icon-background text-white"
+          class="bg-blue-800 flex items-center justify-center odoc-close-icon-background text-white"
           @click="$emit('togglePanel')"
         >
           <span class="material-icons odoc-close-icon"> close </span>

@@ -223,6 +223,7 @@ function onFileSelect(event: Event): void {
 .file-upload {
   margin-top: 10px;
   margin-left: -5px;
+  font-size: 50px;
 }
 
 .upload-status {
