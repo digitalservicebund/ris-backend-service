@@ -16,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -254,12 +255,12 @@ class DocumentUnitServiceTest {
       return previousDecisionsList.stream().map(previousDecision -> previousDecision.id).toList();
     }
 
-    private Mono<Void> deleteByIds(List<String> ids) {
+    private List<String> deleteByIds(List<String> ids) {
       previousDecisionsList.removeAll(
           previousDecisionsList.stream()
               .filter(previousDecision -> ids.contains(String.valueOf(previousDecision.id)))
               .toList());
-      return null;
+      return ids;
     }
 
     private List<PreviousDecision> saveAll(List<PreviousDecision> pDecisionsList) {
@@ -356,8 +357,8 @@ class DocumentUnitServiceTest {
                   previousDecisionsList.stream()
                       .map(previousDecision -> previousDecision.id)
                       .toList()));
-      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
-          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
+          .thenReturn(Mono.empty());
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
       when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
@@ -398,8 +399,8 @@ class DocumentUnitServiceTest {
                   previousDecisionsList.stream()
                       .map(previousDecision -> previousDecision.id)
                       .toList()));
-      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
-          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
+          .thenReturn(Mono.empty());
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
       when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
@@ -439,30 +440,42 @@ class DocumentUnitServiceTest {
     }
 
     @Test
-    @Disabled(
-        "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
-            + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
     void testUpdateDocumentUnitWithPreviousDecisionsUpdate() {
       var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
       remainPreviousDecision.get(0).courtPlace = "new gerOrt";
       remainPreviousDecision.get(0).courtType = "new gerTyp";
       remainPreviousDecision.get(0).date = "30.01.2022";
       remainPreviousDecision.get(0).fileNumber = "new aktenzeichen";
-      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
+      CoreData coreData = new CoreData("", "", "", "", "", "", "", "", "", "", "", "");
+      Texts texts = new Texts("", "", "", "", "", "", "", "");
+      DocumentUnit documentUnit =
+          new DocumentUnit(
+              99L,
+              UUID.randomUUID(),
+              documentNr,
+              Instant.now(),
+              Instant.now(),
+              "",
+              "",
+              "",
+              coreData,
+              remainPreviousDecision,
+              texts);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
                   previousDecisionsList.stream()
                       .map(previousDecision -> previousDecision.id)
                       .toList()));
-      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
-          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
+          .thenReturn(Mono.empty());
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
+      var documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
       when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
 
       // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocumentUnit(null))
+      StepVerifier.create(service.updateDocumentUnit(documentUnit))
           .consumeNextWith(
               monoResponse -> {
                 assertEquals(
@@ -470,7 +483,6 @@ class DocumentUnitServiceTest {
                     previousDecisionsList.size());
                 assertTrue(
                     monoResponse.getBody().previousDecisions().containsAll(previousDecisionsList));
-                // assertEquals(monoResponse.getBody(), documentUnitDTO); TODO reactivate
               })
           .verifyComplete();
       verify(repository).save(documentUnitDTO);
@@ -507,8 +519,8 @@ class DocumentUnitServiceTest {
                   previousDecisionsList.stream()
                       .map(previousDecision -> previousDecision.id)
                       .toList()));
-      when(previousDecisionRepository.deleteAllById(previousDecisionsIdsToDelete))
-          .thenReturn(deleteByIds(previousDecisionsIdsToDelete));
+      when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
+          .thenReturn(Mono.empty());
       when(previousDecisionRepository.saveAll(remainPreviousDecision))
           .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
       when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
@@ -614,16 +626,24 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  @Disabled(
-      "This test fails not when run alone, but when all tests are run. "
-          + "The issue seems to be, that there are no previousDecisions. This needs to be "
-          + "investigated and fixed once the other previousDecisions tests are getting fixed - "
-          + "or when the previousDecision logic is being rewritten.")
   void testUpdateDocumentUnit() {
-    var documentUnitDTO = DocumentUnitDTO.EMPTY;
-    when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
+    CoreData coreData = new CoreData("", "", "", "", "", "", "", "", "", "", "", "");
+    Texts texts = new Texts("", "", "", "", "", "", "", "");
     DocumentUnit documentUnit =
-        DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();
+        new DocumentUnit(
+            99L,
+            UUID.randomUUID(),
+            "ABCDE2022000001",
+            Instant.now(),
+            Instant.now(),
+            "",
+            "",
+            "",
+            coreData,
+            null,
+            texts);
+    var documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
+    when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
     StepVerifier.create(service.updateDocumentUnit(documentUnit))
         .consumeNextWith(
             documentUnitResponseEntity ->
