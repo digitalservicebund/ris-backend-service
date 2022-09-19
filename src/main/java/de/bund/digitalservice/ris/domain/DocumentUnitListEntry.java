@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public record DocumentUnitListEntry(
     @Id Long id,
     UUID uuid,
-    String documentnumber,
+    @Column("documentnumber") String documentNumber,
     Instant creationtimestamp,
     String filename,
     @Column("aktenzeichen") String fileNumber) {}

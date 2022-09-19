@@ -30,7 +30,7 @@ test.describe("create a doc unit and delete it again", () => {
     const response = await request.post(`${backendHost}/api/v1/documentunits`, {
       data: { documentationCenterAbbreviation: "foo", documentType: "X" },
     })
-    const { documentnumber: documentNumber } = await response.json()
+    const { documentNumber } = await response.json()
     await page.goto("/")
     await expect(
       page.locator(

@@ -13,7 +13,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
     const response = await request.post(`${backendHost}/api/v1/documentunits`, {
       data: { documentationCenterAbbreviation: "foo", documentType: "X" },
     })
-    const { uuid, documentnumber: documentNumber } = await response.json()
+    const { uuid, documentNumber } = await response.json()
 
     await use(documentNumber)
 
