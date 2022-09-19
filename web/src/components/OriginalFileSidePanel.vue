@@ -35,7 +35,7 @@ const route = useRoute()
         Originaldokument
       </h3>
       <div v-if="!hasFile">
-        <v-icon size="50px" class="odoc-upload-icon">cloud_upload</v-icon>
+        <span class="odoc-upload-icon material-icons">cloud_upload</span>
         <div class="odoc-upload-note">
           Es wurde noch kein Originaldokument hochgeladen.
         </div>
@@ -47,7 +47,9 @@ const route = useRoute()
             query: route.query,
           }"
         >
-          <v-icon> arrow_forward </v-icon>
+          <span class="material-icons link-to-upload__icon">
+            arrow_forward
+          </span>
           Zum Upload
         </router-link>
       </div>
@@ -122,6 +124,7 @@ const route = useRoute()
 
 .odoc-upload-icon {
   margin-bottom: 15px;
+  font-size: 50px;
 }
 
 .odoc-upload-note {
@@ -130,5 +133,7 @@ const route = useRoute()
 
 .link-to-upload {
   color: $blue800;
+  display: flex;
+  flex-flow: row nowrap;
 }
 </style>
