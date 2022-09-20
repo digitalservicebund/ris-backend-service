@@ -41,7 +41,6 @@ export default class DocumentUnit {
   public s3path?: string
   public filetype?: string
   public filename?: string
-  public originalFileAsHTML?: string
 
   public coreData: CoreData = {}
   public texts: Texts = {}
