@@ -268,7 +268,7 @@ class DocumentUnitServiceTest {
               "",
               "",
               coreData,
-              previousDecisionsListInDB,
+              inputPreviousDecisionFromFE,
               texts);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
