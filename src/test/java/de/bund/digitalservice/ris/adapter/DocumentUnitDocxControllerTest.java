@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.adapter;
 
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.domain.DocxConverterService;
@@ -12,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
 @WebFluxTest(controllers = DocumentUnitDocxController.class)
@@ -23,6 +25,8 @@ class DocumentUnitDocxControllerTest {
 
   @Test
   void testGet() {
+    when(service.getDocxFiles()).thenReturn(Mono.empty());
+
     webClient
         .mutateWith(csrf())
         .get()

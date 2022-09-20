@@ -23,7 +23,7 @@ public class DocumentUnitDocxController {
 
   @GetMapping
   public Mono<ResponseEntity<List<String>>> get() {
-    return service.getDocxFiles();
+    return service.getDocxFiles().map(ResponseEntity::ok);
   }
 
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)

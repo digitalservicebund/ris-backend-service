@@ -49,7 +49,6 @@ import org.freehep.graphicsio.emf.EMFRenderer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
@@ -116,17 +115,13 @@ public class DocxConverterService {
     return originalText;
   }
 
-  public Mono<ResponseEntity<List<String>>> getDocxFiles() {
+  public Mono<List<String>> getDocxFiles() {
     ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucketName).build();
 
     CompletableFuture<ListObjectsV2Response> futureResponse = client.listObjectsV2(request);
 
     return Mono.fromFuture(futureResponse)
-        .map(
-            response -> {
-              List<String> keys = response.contents().stream().map(S3Object::key).toList();
-              return ResponseEntity.ok(keys);
-            });
+        .map(response -> response.contents().stream().map(S3Object::key).toList());
   }
 
   public Mono<Docx2Html> getHtml(String fileName) {

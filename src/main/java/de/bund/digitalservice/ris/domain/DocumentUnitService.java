@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.domain;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -19,11 +20,11 @@ import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.retry.Retry;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
@@ -59,7 +60,7 @@ public class DocumentUnitService {
     this.previousDecisionRepository = previousDecisionRepository;
   }
 
-  public Mono<DocumentUnitDTO> generateNewDocumentUnit(
+  public Mono<DocumentUnit> generateNewDocumentUnit(
       DocumentUnitCreationInfo documentUnitCreationInfo) {
     int currentYear = Calendar.getInstance().get(Calendar.YEAR);
     return counterRepository
@@ -80,10 +81,14 @@ public class DocumentUnitService {
                 repository.save(
                     DocumentUnitDTO.createNew(
                         documentUnitCreationInfo, updatedDocumentNumberCounter.nextnumber - 1)))
+        .map(
+            documentUnitDTO ->
+                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build())
+        .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
-  public Mono<DocumentUnitDTO> attachFileToDocumentUnit(
+  public Mono<DocumentUnit> attachFileToDocumentUnit(
       UUID documentUnitId, ByteBuffer byteBufferFlux, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
     checkDocx(byteBufferFlux);
@@ -105,10 +110,14 @@ public class DocumentUnitService {
                           return documentUnitDTO;
                         }))
         .doOnNext(documentUnitDTO -> log.debug("save documentUnitDTO"))
-        .flatMap(repository::save);
+        .flatMap(repository::save)
+        .map(
+            documentUnitDTO ->
+                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build())
+        .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex));
   }
 
-  public Mono<ResponseEntity<DocumentUnit>> removeFileFromDocumentUnit(UUID documentUnitId) {
+  public Mono<DocumentUnit> removeFileFromDocumentUnit(UUID documentUnitId) {
     return repository
         .findByUuid(documentUnitId)
         .flatMap(
@@ -130,14 +139,8 @@ public class DocumentUnitService {
         .flatMap(repository::save)
         .map(
             documentUnitDTO ->
-                ResponseEntity.status(HttpStatus.OK)
-                    .body(
-                        DocumentUnitBuilder.newInstance()
-                            .setDocumentUnitDTO(documentUnitDTO)
-                            .build()))
-        .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex))
-        .onErrorReturn(
-            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
+                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build())
+        .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex));
   }
 
   void checkDocx(ByteBuffer byteBufferFlux) {
@@ -194,12 +197,11 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Mono<ResponseEntity<Flux<DocumentUnitListEntry>>> getAll() {
-    return Mono.just(
-        ResponseEntity.ok(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber")))));
+  public Mono<Flux<DocumentUnitListEntry>> getAll() {
+    return Mono.just(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber"))));
   }
 
-  public Mono<ResponseEntity<DocumentUnit>> getByDocumentnumber(String documentnumber) {
+  public Mono<DocumentUnit> getByDocumentnumber(String documentnumber) {
     return repository
         .findByDocumentnumber(documentnumber)
         .flatMap(
@@ -212,11 +214,10 @@ public class DocumentUnitService {
                             Mono.just(documentUnitDTO.setPreviousDecisions(previousDecisions))))
         .map(
             documentUnitDTO ->
-                ResponseEntity.ok(
-                    DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build()));
+                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 
-  public Mono<ResponseEntity<String>> deleteByUuid(UUID documentUnitId) {
+  public Mono<String> deleteByUuid(UUID documentUnitId) {
     return repository
         .findByUuid(documentUnitId)
         .flatMap(
@@ -231,24 +232,17 @@ public class DocumentUnitService {
               return repository.delete(documentUnitDTO);
             })
         .doOnNext(v -> log.debug("deleted DocumentUnitDTO"))
-        .map(v -> ResponseEntity.status(HttpStatus.OK).body("done"))
-        .doOnError(ex -> log.error("Couldn't delete the DocumentUnit", ex))
-        .onErrorReturn(
-            ResponseEntity.internalServerError().body("Couldn't delete the DocumentUnit"));
+        .map(v -> "done")
+        .doOnError(ex -> log.error("Couldn't delete the DocumentUnit", ex));
   }
 
-  public Mono<ResponseEntity<DocumentUnit>> updateDocumentUnit(DocumentUnit documentUnit) {
+  public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
     DocumentUnitDTO documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
     if (documentUnitDTO.previousDecisions == null)
       return repository
           .save(documentUnitDTO)
-          .map(
-              duDTO ->
-                  ResponseEntity.status(HttpStatus.OK)
-                      .body(DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build()))
-          .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex))
-          .onErrorReturn(
-              ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
+          .map(duDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build())
+          .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
 
     /* Passing foreign key to object */
     List<PreviousDecision> previousDecisionsList =
@@ -290,13 +284,8 @@ public class DocumentUnitService {
                                       deletedIndexes.stream().map(String::valueOf).toList()));
                         }))
         .then(repository.save(documentUnitDTO))
-        .map(
-            duDTO ->
-                ResponseEntity.status(HttpStatus.OK)
-                    .body(DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build()))
-        .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex))
-        .onErrorReturn(
-            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
+        .map(duDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build())
+        .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
   }
 
   private List<Long> getDeletedPreviousDecisionIds(

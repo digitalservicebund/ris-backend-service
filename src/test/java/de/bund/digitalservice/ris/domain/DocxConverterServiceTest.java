@@ -32,7 +32,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -64,7 +63,6 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.test.StepVerifier;
 import software.amazon.awssdk.core.ResponseBytes;
@@ -119,11 +117,10 @@ class DocxConverterServiceTest {
 
     StepVerifier.create(service.getDocxFiles())
         .consumeNextWith(
-            responseEntity -> {
-              assertNotNull(responseEntity);
-              assertEquals(1, Objects.requireNonNull(responseEntity.getBody()).size());
-              assertEquals("test.docx", responseEntity.getBody().get(0));
-              assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+            stringList -> {
+              assertNotNull(stringList);
+              assertEquals(1, stringList.size());
+              assertEquals("test.docx", stringList.get(0));
             })
         .verifyComplete();
   }

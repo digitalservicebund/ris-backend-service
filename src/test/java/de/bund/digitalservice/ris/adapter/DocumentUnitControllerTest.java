@@ -51,7 +51,7 @@ class DocumentUnitControllerTest {
   void testGenerateNewDocumentUnit() {
     DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
     when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
-        .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
+        .thenReturn(Mono.just(DocumentUnitBuilder.newInstance().build()));
 
     webClient
         .mutateWith(csrf())
@@ -99,6 +99,8 @@ class DocumentUnitControllerTest {
 
   @Test
   void testRemoveFileFromDocumentUnit() {
+    when(service.removeFileFromDocumentUnit(TEST_UUID)).thenReturn(Mono.empty());
+
     webClient
         .mutateWith(csrf())
         .delete()
@@ -123,6 +125,8 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetAll() {
+    when(service.getAll()).thenReturn(Mono.empty());
+
     webClient
         .mutateWith(csrf())
         .get()
@@ -136,6 +140,8 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetByDocumentnumber() {
+    when(service.getByDocumentnumber("ABCD2022000001")).thenReturn(Mono.empty());
+
     webClient
         .mutateWith(csrf())
         .get()
@@ -160,6 +166,8 @@ class DocumentUnitControllerTest {
 
   @Test
   void testDeleteByUuid() {
+    when(service.deleteByUuid(TEST_UUID)).thenReturn(Mono.empty());
+
     webClient
         .mutateWith(csrf())
         .delete()
@@ -188,6 +196,7 @@ class DocumentUnitControllerTest {
     documentUnitDTO.setUuid(TEST_UUID);
     DocumentUnit documentUnit =
         DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();
+    when(service.updateDocumentUnit(documentUnit)).thenReturn(Mono.empty());
     webClient
         .mutateWith(csrf())
         .put()
