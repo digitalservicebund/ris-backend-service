@@ -1,5 +1,9 @@
 package de.bund.digitalservice.ris.domain;
 
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
 public class DocumentUnitBuilder {
 
   private DocumentUnitDTO documentUnitDTO;
@@ -12,6 +16,36 @@ public class DocumentUnitBuilder {
 
   public DocumentUnitBuilder setDocumentUnitDTO(DocumentUnitDTO documentUnitDTO) {
     this.documentUnitDTO = documentUnitDTO;
+    return this;
+  }
+
+  public DocumentUnitBuilder setId(Long id) {
+    this.documentUnitDTO.setId(id);
+    return this;
+  }
+
+  public DocumentUnitBuilder setUUID(UUID uuid) {
+    this.documentUnitDTO.setUuid(uuid);
+    return this;
+  }
+
+  public DocumentUnitBuilder setDocumentNumber(String documentNumber) {
+    this.documentUnitDTO.setDocumentnumber(documentNumber);
+    return this;
+  }
+
+  public DocumentUnitBuilder setCreationtimestamp(Instant instant) {
+    this.documentUnitDTO.setCreationtimestamp(instant);
+    return this;
+  }
+
+  public DocumentUnitBuilder setFileuploadtimestamp(Instant instant) {
+    this.documentUnitDTO.setFileuploadtimestamp(instant);
+    return this;
+  }
+
+  public DocumentUnitBuilder setPreviousDecisions(List<PreviousDecision> previousDecisions) {
+    this.documentUnitDTO.setPreviousDecisions(previousDecisions);
     return this;
   }
 

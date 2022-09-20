@@ -250,29 +250,23 @@ class DocumentUnitServiceTest {
   class TestUpdateDocumentUnitWithPreviousDecisions {
     private List<PreviousDecision> previousDecisionsListInDB;
     private List<String> previousDecisionsIdsToDelete;
-
     private List<PreviousDecision> inputPreviousDecisionFromFE;
     private Long count;
     private final String documentNr = "ABCDE2022000001";
-    private final CoreData coreData = new CoreData("", "", "", "", "", "", "", "", "", "", "", "");
-    private final Texts texts = new Texts("", "", "", "", "", "", "", "");
 
     private record DocumentUnitObj(DocumentUnit documentUnit, DocumentUnitDTO documentUnitDTO) {}
 
     private DocumentUnitObj setUpMockDBQueries() {
       DocumentUnit documentUnit =
-          new DocumentUnit(
-              99L,
-              UUID.randomUUID(),
-              documentNr,
-              Instant.now(),
-              Instant.now(),
-              "",
-              "",
-              "",
-              coreData,
-              inputPreviousDecisionFromFE,
-              texts);
+          DocumentUnitBuilder.newInstance()
+              .setDocumentUnitDTO(DocumentUnitDTO.EMPTY)
+              .setId(99L)
+              .setUUID(UUID.randomUUID())
+              .setDocumentNumber(documentNr)
+              .setPreviousDecisions(inputPreviousDecisionFromFE)
+              .setCreationtimestamp(Instant.now())
+              .setFileuploadtimestamp(Instant.now())
+              .build();
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
@@ -411,6 +405,7 @@ class DocumentUnitServiceTest {
                 assertTrue(remainIds.contains(5L));
                 assertFalse(remainIds.contains(2L));
                 assertFalse(remainIds.contains(4L));
+                assertEquals(documentUnit, documentUnitObj.documentUnit());
               })
           .verifyComplete();
       verify(repository).save(documentUnitObj.documentUnitDTO());
@@ -439,6 +434,7 @@ class DocumentUnitServiceTest {
                 List<Long> remainIds = getRemainsIds();
                 assertTrue(remainIds.contains(6L));
                 assertTrue(remainIds.contains(7L));
+                assertEquals(documentUnit, documentUnitObj.documentUnit());
               })
           .verifyComplete();
       verify(repository).save(documentUnitObj.documentUnitDTO());
@@ -467,6 +463,7 @@ class DocumentUnitServiceTest {
                     new PreviousDecision(
                         1L, "new gerTyp", "new gerOrt", "30.01.2022", "new fileNumber", documentNr),
                     documentUnit.previousDecisions().get(0));
+                assertEquals(documentUnit, documentUnitObj.documentUnit());
               })
           .verifyComplete();
       verify(repository).save(documentUnitObj.documentUnitDTO());
@@ -518,6 +515,7 @@ class DocumentUnitServiceTest {
                     new PreviousDecision(
                         1L, "new gerTyp", "new gerOrt", "30.01.2022", "new fileNumber", documentNr),
                     documentUnit.previousDecisions().get(0));
+                assertEquals(documentUnit, documentUnitObj.documentUnit());
               })
           .verifyComplete();
       verify(repository).save(documentUnitObj.documentUnitDTO());
@@ -590,21 +588,16 @@ class DocumentUnitServiceTest {
 
   @Test
   void testUpdateDocumentUnit() {
-    CoreData coreData = new CoreData("", "", "", "", "", "", "", "", "", "", "", "");
-    Texts texts = new Texts("", "", "", "", "", "", "", "");
     DocumentUnit documentUnit =
-        new DocumentUnit(
-            99L,
-            UUID.randomUUID(),
-            "ABCDE2022000001",
-            Instant.now(),
-            Instant.now(),
-            "",
-            "",
-            "",
-            coreData,
-            null,
-            texts);
+        DocumentUnitBuilder.newInstance()
+            .setDocumentUnitDTO(DocumentUnitDTO.EMPTY)
+            .setId(99L)
+            .setUUID(UUID.randomUUID())
+            .setDocumentNumber("ABCDE2022000001")
+            .setCreationtimestamp(Instant.now())
+            .setFileuploadtimestamp(Instant.now())
+            .setPreviousDecisions(null)
+            .build();
     var documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
     when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
     StepVerifier.create(service.updateDocumentUnit(documentUnit))
