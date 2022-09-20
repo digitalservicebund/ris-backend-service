@@ -28,7 +28,7 @@ const data = computed(() =>
 <template>
   <form class="ris-texte-form" novalidate>
     <v-row>
-      <v-col><h2>Kurz- & Langtexte</h2></v-col>
+      <v-col><h1 class="heading-03-bold">Kurz- & Langtexte</h1></v-col>
     </v-row>
     <v-row>
       <v-col>

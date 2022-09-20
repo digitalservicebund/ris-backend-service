@@ -45,7 +45,7 @@ const values = computed({
 <template>
   <ExpandableContent class="p-16">
     <template #header>
-      <h2>Vorgehende Entscheidungen</h2>
+      <h1 class="heading-03-bold">Vorgehende Entscheidungen</h1>
     </template>
 
     <div class="previous-decisions">

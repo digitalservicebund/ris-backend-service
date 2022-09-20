@@ -156,36 +156,38 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="documentUnit">
-    <v-row>
-      <v-col :cols="showDocPanel ? 7 : 9">
-        <DocumentUnitCoreData
-          id="coreData"
-          v-model="coreData"
-          :update-status="updateStatus"
-          @update-document-unit="handleUpdateDocumentUnit"
-        />
+  <DocumentUnitWrapper v-slot="{ classes }" :document-unit="documentUnit">
+    <div :class="classes">
+      <v-row>
+        <v-col :cols="showDocPanel ? 7 : 9">
+          <DocumentUnitCoreData
+            id="coreData"
+            v-model="coreData"
+            :update-status="updateStatus"
+            @update-document-unit="handleUpdateDocumentUnit"
+          />
 
-        <DocumentUnitPreviousDecisions
-          id="previous-decisions"
-          v-model="previousDecisions"
-        />
+          <DocumentUnitPreviousDecisions
+            id="previous-decisions"
+            v-model="previousDecisions"
+          />
 
-        <DocumentUnitTexts
-          id="texts"
-          :texts="documentUnit.texts"
-          :update-status="updateStatus"
-          @update-document-unit="handleUpdateDocumentUnit"
-          @update-value="handleUpdateValueDocumentUnitTexts"
+          <DocumentUnitTexts
+            id="texts"
+            :texts="documentUnit.texts"
+            :update-status="updateStatus"
+            @update-document-unit="handleUpdateDocumentUnit"
+            @update-value="handleUpdateValueDocumentUnitTexts"
+          />
+        </v-col>
+        <OriginalFileSidePanel
+          :file="fileAsHTML"
+          :has-file="documentUnit.hasFile"
+          :open="showDocPanel"
+          @toggle-panel="handleToggleFilePanel"
         />
-      </v-col>
-      <OriginalFileSidePanel
-        :file="fileAsHTML"
-        :has-file="documentUnit.hasFile"
-        :open="showDocPanel"
-        @toggle-panel="handleToggleFilePanel"
-      />
-    </v-row>
+      </v-row>
+    </div>
   </DocumentUnitWrapper>
 </template>
 

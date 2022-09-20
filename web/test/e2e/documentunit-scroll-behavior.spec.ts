@@ -8,8 +8,8 @@ test.describe("test the scrolling behavior with hashes", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const coreDataHeadline = "#coreData h2"
-    const textsHeadline = "#texts h2"
+    const coreDataHeadline = "#coreData h1"
+    const textsHeadline = "#texts h1"
     const textsNavItem = page.locator(
       `a[href*="/jurisdiction/documentunit/${documentNumber}/categories#texts"]`
     )
@@ -29,8 +29,8 @@ test.describe("test the scrolling behavior with hashes", () => {
   }) => {
     await navigateToFiles(page, documentNumber)
 
-    const coreDataHeadline = "#coreData h2"
-    const textsHeadline = "#texts h2"
+    const coreDataHeadline = "#coreData h1"
+    const textsHeadline = "#texts h1"
     const coreDataNavItem = page.locator(
       `a[href*="/jurisdiction/documentunit/${documentNumber}/categories#coreData"]`
     )

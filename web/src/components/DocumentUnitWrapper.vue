@@ -20,19 +20,19 @@ const handleToggleNavBar = async () => {
 </script>
 
 <template>
-  <v-main role="main">
-    <v-container fluid>
-      <v-row>
-        <NavbarSide
-          :document-number="String(documentUnit.documentNumber)"
-          :visible="showNavBar"
-          @toggle-navbar="handleToggleNavBar"
-        />
-        <v-col class="bg-white" :cols="showNavBar ? 10 : 11">
-          <DocumentUnitInfoPanel :document-unit="documentUnit" />
-          <slot></slot>
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-main>
+  <div class="flex grow w-screen" role="main">
+    <NavbarSide
+      :document-number="String(documentUnit.documentNumber)"
+      :visible="showNavBar"
+      @toggle-navbar="handleToggleNavBar"
+    />
+
+    <div class="bg-gray-100 grow">
+      <DocumentUnitInfoPanel :document-unit="documentUnit" />
+
+      <div class="flex flex-col items-start">
+        <slot :classes="['p-32 w-full']" />
+      </div>
+    </div>
+  </div>
 </template>
