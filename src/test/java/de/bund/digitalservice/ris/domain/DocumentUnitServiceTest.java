@@ -574,6 +574,8 @@ class DocumentUnitServiceTest {
         .thenThrow(SdkException.create("exception", null));
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
+
+    verify(repository).findByUuid(TEST_UUID);
   }
 
   @Test
@@ -582,6 +584,8 @@ class DocumentUnitServiceTest {
     doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnitDTO.EMPTY);
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
+
+    verify(repository).findByUuid(TEST_UUID);
   }
 
   @Test
