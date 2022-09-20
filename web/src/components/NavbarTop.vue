@@ -1,82 +1,32 @@
 <script lang="ts" setup>
-import { useRouter } from "vue-router"
+import { useRoute } from "vue-router"
 
-const router = useRouter()
-const linkStyling = (componentName: string) => {
-  return router.currentRoute.value.path.includes(componentName.toLowerCase())
-    ? "topbar-link-active"
-    : ""
-}
+const route = useRoute()
 </script>
 
 <template>
-  <v-container class="topbar-main" fluid role="navigation" tag="nav">
-    <v-row>
-      <v-col cols="1">
-        <span class="material-icons text-blue-800 topbar-logo-circle"
-          >circle</span
-        >
-      </v-col>
-      <v-col
-        class="border-gray-400 border-r-1 border-solid label-01-bold vertically-centered"
-        cols="2"
+  <div class="flex items-center justify-between p-24" role="navigation">
+    <div class="flex gap-44 items-center">
+      <div class="flex items-center">
+        <div class="bg-yellow-500 h-56 rounded-full w-56" />
+
+        <span class="font-bold leading-20 mx-4 text-16">
+          Rechtsinformationssystem<br />
+          des Bundes [Platzhalter]
+        </span>
+      </div>
+
+      <router-link
+        class="hover:bg-yellow-500 hover:underline p-8"
+        :class="{ underline: route.path.includes('jurisdiction') }"
+        :to="{ name: 'jurisdiction' }"
+        >Rechtsprechung</router-link
       >
-        Rechtsinformationssystem<br />
-        des Bundes [Platzhalter]
-      </v-col>
-      <v-col class="topbar-link-box" cols="2">
-        <router-link
-          class="hover:bg-yellow-500 topbar-link"
-          :class="linkStyling('jurisdiction')"
-          :to="{ name: 'jurisdiction' }"
-          >Rechtsprechung</router-link
-        >
-      </v-col>
-      <v-col cols="5"></v-col>
-      <v-col class="vertically-centered" cols="2">
-        <span class="material-icons topbar-user-icon"> perm_identity </span>
-        User Name
-      </v-col>
-    </v-row>
-  </v-container>
+    </div>
+
+    <div class="flex font-bold gap-8 items-center">
+      <v-icon class="topbar-user-icon"> perm_identity </v-icon>
+      User Name
+    </div>
+  </div>
 </template>
-
-<style lang="scss" scoped>
-.vertically-centered {
-  display: flex;
-  align-items: center;
-}
-
-.topbar-header {
-  font-weight: bold;
-  line-height: 120%;
-}
-
-.topbar-logo-circle {
-  float: right;
-  font-size: 56px;
-}
-
-.topbar-link-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
-.topbar-link {
-  padding: 10px;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.topbar-link-active {
-  text-decoration: underline !important;
-}
-
-.topbar-user-icon {
-  margin-right: 8px;
-}
-</style>
