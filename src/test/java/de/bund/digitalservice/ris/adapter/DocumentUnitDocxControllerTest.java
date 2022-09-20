@@ -40,6 +40,8 @@ class DocumentUnitDocxControllerTest {
 
   @Test
   void testHtml() {
+    when(service.getHtml("123")).thenReturn(Mono.empty());
+
     webClient
         .mutateWith(csrf())
         .get()
