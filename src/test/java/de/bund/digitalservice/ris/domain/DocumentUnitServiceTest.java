@@ -23,7 +23,6 @@ import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -246,208 +245,18 @@ class DocumentUnitServiceTest {
   @Nested
   @DisplayName("Test Update DocumentUnit With PreviousDecisions")
   class TestUpdateDocumentUnitWithPreviousDecisions {
-    private List<PreviousDecision> previousDecisionsList;
+    private List<PreviousDecision> previousDecisionsListInDB;
     private List<String> previousDecisionsIdsToDelete;
+
+    private List<PreviousDecision> inputPreviousDecisionFromFE;
     private Long count;
     private final String documentNr = "ABCDE2022000001";
+    private final CoreData coreData = new CoreData("", "", "", "", "", "", "", "", "", "", "", "");
+    private final Texts texts = new Texts("", "", "", "", "", "", "", "");
 
-    private List<Long> getRemainsIds() {
-      return previousDecisionsList.stream().map(previousDecision -> previousDecision.id).toList();
-    }
+    private record DocumentUnitObj(DocumentUnit documentUnit, DocumentUnitDTO documentUnitDTO) {}
 
-    private List<String> deleteByIds(List<String> ids) {
-      previousDecisionsList.removeAll(
-          previousDecisionsList.stream()
-              .filter(previousDecision -> ids.contains(String.valueOf(previousDecision.id)))
-              .toList());
-      return ids;
-    }
-
-    private List<PreviousDecision> saveAll(List<PreviousDecision> pDecisionsList) {
-      List<PreviousDecision> pDecisionToInsert =
-          pDecisionsList.stream()
-              .filter(previousDecision -> previousDecision.id == null)
-              .map(
-                  previousDecision -> {
-                    previousDecision.id = Long.valueOf(++count);
-                    return previousDecision;
-                  })
-              .toList();
-      pDecisionToInsert.forEach(previousDecision -> previousDecisionsList.add(previousDecision));
-      List<PreviousDecision> pDecisionToUpdate =
-          pDecisionsList.stream().filter(previousDecision -> previousDecision.id != null).toList();
-      pDecisionToUpdate.forEach(
-          decisionToUpdate -> {
-            previousDecisionsList =
-                new ArrayList<>(
-                    previousDecisionsList.stream()
-                        .map(
-                            pd -> {
-                              if (pd.id == decisionToUpdate.id) {
-                                return decisionToUpdate;
-                              }
-                              return pd;
-                            })
-                        .toList());
-          });
-      return pDecisionsList;
-    }
-
-    @BeforeEach
-    void setUp() {
-      previousDecisionsIdsToDelete = new ArrayList<>();
-      previousDecisionsList = new ArrayList<>();
-      previousDecisionsList.add(
-          new PreviousDecision(
-              1L, "gerTyp 1", "gerOrt 1", "01.01.2022", "aktenzeichen 1", "ABCDE2022000001"));
-      previousDecisionsList.add(
-          new PreviousDecision(
-              2L, "gerTyp 2", "gerOrt 2", "01.02.2022", "aktenzeichen 2", "ABCDE2022000001"));
-      previousDecisionsList.add(
-          new PreviousDecision(
-              3L, "gerTyp 3", "gerOrt 3", "01.03.2022", "aktenzeichen 3", "ABCDE2022000001"));
-      previousDecisionsList.add(
-          new PreviousDecision(
-              4L, "gerTyp 4", "gerOrt 4", "01.04.2022", "aktenzeichen 4", "ABCDE2022000001"));
-      previousDecisionsList.add(
-          new PreviousDecision(
-              5L, "gerTyp 5", "gerOrt 5", "01.05.2022", "aktenzeichen 5", "ABCDE2022000001"));
-      count = Long.valueOf(previousDecisionsList.size());
-    }
-
-    @Test
-    void testGetByDocumentnumberWithPreviousDecisions() {
-      when(repository.findByDocumentnumber(documentNr))
-          .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
-      when(previousDecisionRepository.findAllByDocumentnumber(documentNr))
-          .thenReturn(Flux.fromIterable(previousDecisionsList));
-      StepVerifier.create(service.getByDocumentnumber(documentNr))
-          .consumeNextWith(
-              monoResponse -> {
-                assertEquals(monoResponse.getBody().previousDecisions().size(), count);
-                PreviousDecision previousDecision =
-                    monoResponse.getBody().previousDecisions().get(0);
-                assertEquals(previousDecision.id, 1L);
-                assertEquals(previousDecision.courtPlace, "gerOrt 1");
-                assertEquals(previousDecision.courtType, "gerTyp 1");
-                assertEquals(previousDecision.date, "01.01.2022");
-                assertEquals(previousDecision.fileNumber, "aktenzeichen 1");
-                assertEquals(previousDecision.documentnumber, documentNr);
-              })
-          .verifyComplete();
-      verify(repository).findByDocumentnumber("ABCDE2022000001");
-    }
-
-    @Test
-    @Disabled(
-        "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
-            + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
-    void testUpdateDocumentUnitWithPreviousDecisionsDelete() {
-      previousDecisionsIdsToDelete.add("2");
-      previousDecisionsIdsToDelete.add("4");
-      var remainPreviousDecision =
-          previousDecisionsList.stream()
-              .filter(
-                  previousDecision -> !previousDecisionsIdsToDelete.contains(previousDecision.id))
-              .toList();
-      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
-      when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
-          .thenReturn(
-              Flux.fromIterable(
-                  previousDecisionsList.stream()
-                      .map(previousDecision -> previousDecision.id)
-                      .toList()));
-      when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
-          .thenReturn(Mono.empty());
-      when(previousDecisionRepository.saveAll(remainPreviousDecision))
-          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
-      when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
-
-      // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocumentUnit(null))
-          .consumeNextWith(
-              monoResponse -> {
-                assertEquals(previousDecisionsList.size(), 3);
-                List<Long> remainIds = getRemainsIds();
-                assertTrue(remainIds.contains(1L));
-                assertTrue(remainIds.contains(3L));
-                assertTrue(remainIds.contains(5L));
-                assertFalse(remainIds.contains(2L));
-                assertFalse(remainIds.contains(4L));
-                // assertEquals(monoResponse.getBody(), documentUnitDTO); TODO reactivate
-              })
-          .verifyComplete();
-      verify(repository).save(documentUnitDTO);
-    }
-
-    @Test
-    @Disabled(
-        "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
-            + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
-    void testUpdateDocumentUnitWithPreviousDecisionsInsert() {
-      var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
-      remainPreviousDecision.add(
-          new PreviousDecision(
-              null, "gerTyp 6", "gerOrt 6", "01.01.2022", "aktenzeichen 6", documentNr));
-      remainPreviousDecision.add(
-          new PreviousDecision(
-              null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
-      when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
-          .thenReturn(
-              Flux.fromIterable(
-                  previousDecisionsList.stream()
-                      .map(previousDecision -> previousDecision.id)
-                      .toList()));
-      when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
-          .thenReturn(Mono.empty());
-      when(previousDecisionRepository.saveAll(remainPreviousDecision))
-          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
-      when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
-
-      // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocumentUnit(null))
-          .consumeNextWith(
-              monoResponse -> {
-                assertEquals(previousDecisionsList.size(), 7);
-                List<Long> remainIds = getRemainsIds();
-                assertTrue(remainIds.contains(6L));
-                assertTrue(remainIds.contains(7L));
-                PreviousDecision previousDecision =
-                    monoResponse
-                        .getBody()
-                        .previousDecisions()
-                        .get(previousDecisionsList.size() - 2);
-                assertEquals(previousDecision.id, 6L);
-                assertEquals(previousDecision.courtPlace, "gerOrt 6");
-                assertEquals(previousDecision.courtType, "gerTyp 6");
-                assertEquals(previousDecision.date, "01.01.2022");
-                assertEquals(previousDecision.fileNumber, "aktenzeichen 6");
-                previousDecision =
-                    monoResponse
-                        .getBody()
-                        .previousDecisions()
-                        .get(previousDecisionsList.size() - 1);
-                assertEquals(previousDecision.id, 7L);
-                assertEquals(previousDecision.courtPlace, "gerOrt 7");
-                assertEquals(previousDecision.courtType, "gerTyp 7");
-                assertEquals(previousDecision.date, "01.01.2022");
-                assertEquals(previousDecision.fileNumber, "aktenzeichen 7");
-                // assertEquals(monoResponse.getBody(), documentUnitDTO); TODO reactivate
-              })
-          .verifyComplete();
-      verify(repository).save(documentUnitDTO);
-    }
-
-    @Test
-    void testUpdateDocumentUnitWithPreviousDecisionsUpdate() {
-      var remainPreviousDecision = new ArrayList<>(previousDecisionsList);
-      remainPreviousDecision.get(0).courtPlace = "new gerOrt";
-      remainPreviousDecision.get(0).courtType = "new gerTyp";
-      remainPreviousDecision.get(0).date = "30.01.2022";
-      remainPreviousDecision.get(0).fileNumber = "new aktenzeichen";
-      CoreData coreData = new CoreData("", "", "", "", "", "", "", "", "", "", "", "");
-      Texts texts = new Texts("", "", "", "", "", "", "", "");
+    private DocumentUnitObj setUpMockDBQueries() {
       DocumentUnit documentUnit =
           new DocumentUnit(
               99L,
@@ -459,93 +268,273 @@ class DocumentUnitServiceTest {
               "",
               "",
               coreData,
-              remainPreviousDecision,
+              previousDecisionsListInDB,
               texts);
       when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
           .thenReturn(
               Flux.fromIterable(
-                  previousDecisionsList.stream()
+                  previousDecisionsListInDB.stream()
                       .map(previousDecision -> previousDecision.id)
                       .toList()));
       when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
           .thenReturn(Mono.empty());
-      when(previousDecisionRepository.saveAll(remainPreviousDecision))
-          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
+      when(previousDecisionRepository.saveAll(inputPreviousDecisionFromFE))
+          .thenReturn(Flux.fromIterable(saveAll()));
       var documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
       when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
+      return new DocumentUnitObj(documentUnit, documentUnitDTO);
+    }
 
-      // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocumentUnit(documentUnit))
-          .consumeNextWith(
-              monoResponse -> {
-                assertEquals(
-                    monoResponse.getBody().previousDecisions().size(),
-                    previousDecisionsList.size());
-                assertTrue(
-                    monoResponse.getBody().previousDecisions().containsAll(previousDecisionsList));
-              })
-          .verifyComplete();
-      verify(repository).save(documentUnitDTO);
+    private List<Long> getRemainsIds() {
+      return previousDecisionsListInDB.stream()
+          .map(previousDecision -> previousDecision.id)
+          .toList();
+    }
+
+    private List<String> deleteByIds(List<String> ids) {
+      previousDecisionsListInDB.removeAll(
+          previousDecisionsListInDB.stream()
+              .filter(previousDecision -> ids.contains(String.valueOf(previousDecision.id)))
+              .toList());
+      return ids;
+    }
+
+    private List<PreviousDecision> saveAll() {
+      List<PreviousDecision> pDecisionToInsert =
+          inputPreviousDecisionFromFE.stream()
+              .filter(previousDecision -> previousDecision.id == null)
+              .map(
+                  previousDecision -> {
+                    previousDecision.id = Long.valueOf(++count);
+                    return previousDecision;
+                  })
+              .toList();
+      if (pDecisionToInsert.size() > 0) {
+        pDecisionToInsert.forEach(
+            previousDecision -> previousDecisionsListInDB.add(previousDecision));
+      }
+      List<PreviousDecision> pDecisionToUpdate =
+          inputPreviousDecisionFromFE.stream()
+              .filter(previousDecision -> previousDecision.id != null)
+              .toList();
+      if (pDecisionToUpdate.size() > 0) {
+        pDecisionToUpdate.forEach(
+            decisionToUpdate -> {
+              previousDecisionsListInDB =
+                  new ArrayList<>(
+                      previousDecisionsListInDB.stream()
+                          .map(
+                              pd -> {
+                                if (pd.id == decisionToUpdate.id) {
+                                  return decisionToUpdate;
+                                }
+                                return pd;
+                              })
+                          .toList());
+            });
+      }
+      return previousDecisionsListInDB;
+    }
+
+    @BeforeEach
+    void setUp() {
+      previousDecisionsIdsToDelete = new ArrayList<>();
+      previousDecisionsListInDB = new ArrayList<>();
+      previousDecisionsListInDB.add(
+          new PreviousDecision(
+              1L, "gerTyp 1", "gerOrt 1", "01.01.2022", "aktenzeichen 1", "ABCDE2022000001"));
+      previousDecisionsListInDB.add(
+          new PreviousDecision(
+              2L, "gerTyp 2", "gerOrt 2", "01.02.2022", "aktenzeichen 2", "ABCDE2022000001"));
+      previousDecisionsListInDB.add(
+          new PreviousDecision(
+              3L, "gerTyp 3", "gerOrt 3", "01.03.2022", "aktenzeichen 3", "ABCDE2022000001"));
+      previousDecisionsListInDB.add(
+          new PreviousDecision(
+              4L, "gerTyp 4", "gerOrt 4", "01.04.2022", "aktenzeichen 4", "ABCDE2022000001"));
+      previousDecisionsListInDB.add(
+          new PreviousDecision(
+              5L, "gerTyp 5", "gerOrt 5", "01.05.2022", "aktenzeichen 5", "ABCDE2022000001"));
+      count = Long.valueOf(previousDecisionsListInDB.size());
     }
 
     @Test
-    @Disabled(
-        "Doesn't work anymore upon introducing DocumentUnit vs. DocumentUnitDTO, but didn't really work beforehand either:"
-            + " there was a 'silent' error in the StepVerifier-section that didn't break the test because of the way previousDecision gets injected")
+    void testGetByDocumentnumberWithPreviousDecisions() {
+      when(repository.findByDocumentnumber(documentNr))
+          .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
+      when(previousDecisionRepository.findAllByDocumentnumber(documentNr))
+          .thenReturn(Flux.fromIterable(previousDecisionsListInDB));
+      StepVerifier.create(service.getByDocumentnumber(documentNr))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(monoResponse.getBody().previousDecisions().size(), count);
+                PreviousDecision previousDecision =
+                    monoResponse.getBody().previousDecisions().get(0);
+                assertEquals(1L, previousDecision.id);
+                assertEquals("gerOrt 1", previousDecision.courtPlace);
+                assertEquals("gerTyp 1", previousDecision.courtType);
+                assertEquals("01.01.2022", previousDecision.date);
+                assertEquals("aktenzeichen 1", previousDecision.fileNumber);
+                assertEquals(documentNr, previousDecision.documentnumber);
+              })
+          .verifyComplete();
+      verify(repository).findByDocumentnumber("ABCDE2022000001");
+    }
+
+    @Test
+    void testUpdateDocumentUnitWithPreviousDecisionsDelete() {
+      previousDecisionsIdsToDelete.add("2");
+      previousDecisionsIdsToDelete.add("4");
+      inputPreviousDecisionFromFE =
+          previousDecisionsListInDB.stream()
+              .filter(
+                  previousDecision ->
+                      !previousDecisionsIdsToDelete.contains(previousDecision.id.toString()))
+              .toList();
+      DocumentUnitObj documentUnitObj = setUpMockDBQueries();
+
+      StepVerifier.create(service.updateDocumentUnit(documentUnitObj.documentUnit()))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(inputPreviousDecisionFromFE.size(), previousDecisionsListInDB.size());
+                assertEquals(
+                    inputPreviousDecisionFromFE.size(),
+                    monoResponse.getBody().previousDecisions().size());
+                assertTrue(
+                    monoResponse
+                        .getBody()
+                        .previousDecisions()
+                        .containsAll(inputPreviousDecisionFromFE));
+                assertTrue(previousDecisionsListInDB.containsAll(inputPreviousDecisionFromFE));
+                assertEquals(3, previousDecisionsListInDB.size());
+                List<Long> remainIds = getRemainsIds();
+                assertTrue(remainIds.contains(1L));
+                assertTrue(remainIds.contains(3L));
+                assertTrue(remainIds.contains(5L));
+                assertFalse(remainIds.contains(2L));
+                assertFalse(remainIds.contains(4L));
+              })
+          .verifyComplete();
+      verify(repository).save(documentUnitObj.documentUnitDTO());
+    }
+
+    @Test
+    void testUpdateDocumentUnitWithPreviousDecisionsInsert() {
+      inputPreviousDecisionFromFE = new ArrayList<>(previousDecisionsListInDB);
+      inputPreviousDecisionFromFE.add(
+          new PreviousDecision(
+              null, "gerTyp 6", "gerOrt 6", "01.01.2022", "aktenzeichen 6", documentNr));
+      inputPreviousDecisionFromFE.add(
+          new PreviousDecision(
+              null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
+      DocumentUnitObj documentUnitObj = setUpMockDBQueries();
+
+      StepVerifier.create(service.updateDocumentUnit(documentUnitObj.documentUnit()))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(inputPreviousDecisionFromFE.size(), previousDecisionsListInDB.size());
+                assertEquals(
+                    inputPreviousDecisionFromFE.size(),
+                    monoResponse.getBody().previousDecisions().size());
+                assertTrue(
+                    monoResponse
+                        .getBody()
+                        .previousDecisions()
+                        .containsAll(inputPreviousDecisionFromFE));
+                assertTrue(previousDecisionsListInDB.containsAll(inputPreviousDecisionFromFE));
+                List<Long> remainIds = getRemainsIds();
+                assertTrue(remainIds.contains(6L));
+                assertTrue(remainIds.contains(7L));
+              })
+          .verifyComplete();
+      verify(repository).save(documentUnitObj.documentUnitDTO());
+    }
+
+    @Test
+    void testUpdateDocumentUnitWithPreviousDecisionsUpdate() {
+      inputPreviousDecisionFromFE = new ArrayList<>(previousDecisionsListInDB);
+      inputPreviousDecisionFromFE.get(0).courtPlace = "new gerOrt";
+      inputPreviousDecisionFromFE.get(0).courtType = "new gerTyp";
+      inputPreviousDecisionFromFE.get(0).date = "30.01.2022";
+      inputPreviousDecisionFromFE.get(0).fileNumber = "new fileNumber";
+
+      DocumentUnitObj documentUnitObj = setUpMockDBQueries();
+
+      StepVerifier.create(service.updateDocumentUnit(documentUnitObj.documentUnit()))
+          .consumeNextWith(
+              monoResponse -> {
+                assertEquals(inputPreviousDecisionFromFE.size(), previousDecisionsListInDB.size());
+                assertEquals(
+                    inputPreviousDecisionFromFE.size(),
+                    monoResponse.getBody().previousDecisions().size());
+                assertTrue(
+                    monoResponse
+                        .getBody()
+                        .previousDecisions()
+                        .containsAll(inputPreviousDecisionFromFE));
+                assertTrue(previousDecisionsListInDB.containsAll(inputPreviousDecisionFromFE));
+                assertEquals(
+                    new PreviousDecision(
+                        1L, "new gerTyp", "new gerOrt", "30.01.2022", "new fileNumber", documentNr),
+                    monoResponse.getBody().previousDecisions().get(0));
+              })
+          .verifyComplete();
+      verify(repository).save(documentUnitObj.documentUnitDTO());
+    }
+
+    @Test
     void testUpdateDocumentUnitWithPreviousDecisionsInsertUpdateDelete() {
       previousDecisionsIdsToDelete.add("2");
       previousDecisionsIdsToDelete.add("4");
-      List<PreviousDecision> remainPreviousDecision =
+      inputPreviousDecisionFromFE =
           new ArrayList<>(
-              previousDecisionsList.stream()
+              previousDecisionsListInDB.stream()
                   .filter(
                       previousDecision ->
-                          !previousDecisionsIdsToDelete.contains(previousDecision.id))
+                          !previousDecisionsIdsToDelete.contains(previousDecision.id.toString()))
                   .toList());
-      remainPreviousDecision.get(0).courtPlace = "new gerOrt";
-      remainPreviousDecision.get(0).courtType = "new gerTyp";
-      remainPreviousDecision.get(0).date = "30.01.2022";
-      remainPreviousDecision.get(0).fileNumber = "new aktenzeichen";
-      remainPreviousDecision.add(
+      inputPreviousDecisionFromFE.get(0).courtPlace = "new gerOrt";
+      inputPreviousDecisionFromFE.get(0).courtType = "new gerTyp";
+      inputPreviousDecisionFromFE.get(0).date = "30.01.2022";
+      inputPreviousDecisionFromFE.get(0).fileNumber = "new fileNumber";
+      inputPreviousDecisionFromFE.add(
           new PreviousDecision(
               null, "gerTyp 6", "gerOrt 6", "01.01.2022", "aktenzeichen 6", documentNr));
-      remainPreviousDecision.add(
+      inputPreviousDecisionFromFE.add(
           new PreviousDecision(
               null, "gerTyp 7", "gerOrt 7", "01.01.2022", "aktenzeichen 7", documentNr));
-      var documentUnitDTO = DocumentUnitDTO.EMPTY.setPreviousDecisions(remainPreviousDecision);
-      when(previousDecisionRepository.getAllIdsByDocumentnumber(documentNr))
-          .thenReturn(
-              Flux.fromIterable(
-                  previousDecisionsList.stream()
-                      .map(previousDecision -> previousDecision.id)
-                      .toList()));
-      when(previousDecisionRepository.deleteAllById(deleteByIds(previousDecisionsIdsToDelete)))
-          .thenReturn(Mono.empty());
-      when(previousDecisionRepository.saveAll(remainPreviousDecision))
-          .thenReturn(Flux.fromIterable(saveAll(remainPreviousDecision)));
-      when(repository.save(documentUnitDTO)).thenReturn(Mono.just(documentUnitDTO));
 
-      // TODO replace null when fixing the test
-      StepVerifier.create(service.updateDocumentUnit(null))
+      DocumentUnitObj documentUnitObj = setUpMockDBQueries();
+
+      StepVerifier.create(service.updateDocumentUnit(documentUnitObj.documentUnit()))
           .consumeNextWith(
               monoResponse -> {
-                assertEquals(previousDecisionsList.size(), 5);
-                PreviousDecision previousDecision =
-                    monoResponse.getBody().previousDecisions().get(0);
-                assertEquals(previousDecision.id, 1L);
+                assertEquals(inputPreviousDecisionFromFE.size(), previousDecisionsListInDB.size());
+                assertEquals(
+                    inputPreviousDecisionFromFE.size(),
+                    monoResponse.getBody().previousDecisions().size());
+                assertTrue(
+                    monoResponse
+                        .getBody()
+                        .previousDecisions()
+                        .containsAll(inputPreviousDecisionFromFE));
+                assertTrue(previousDecisionsListInDB.containsAll(inputPreviousDecisionFromFE));
+                assertEquals(5, previousDecisionsListInDB.size());
                 List<Long> remainIds = getRemainsIds();
+                assertTrue(remainIds.contains(1L));
+                assertTrue(remainIds.contains(3L));
+                assertTrue(remainIds.contains(5L));
                 assertTrue(remainIds.contains(6L));
                 assertTrue(remainIds.contains(7L));
                 assertFalse(remainIds.contains(2L));
                 assertFalse(remainIds.contains(4L));
-                assertEquals(previousDecision.courtPlace, "new gerOrt");
-                assertEquals(previousDecision.courtType, "new gerTyp");
-                assertEquals(previousDecision.date, "30.01.2022");
-                assertEquals(previousDecision.fileNumber, "new aktenzeichen");
-                // assertEquals(monoResponse.getBody(), documentUnitDTO); TODO reactivate
+                assertEquals(
+                    new PreviousDecision(
+                        1L, "new gerTyp", "new gerOrt", "30.01.2022", "new fileNumber", documentNr),
+                    monoResponse.getBody().previousDecisions().get(0));
               })
           .verifyComplete();
-      verify(repository).save(documentUnitDTO);
+      verify(repository).save(documentUnitObj.documentUnitDTO());
     }
   }
 
