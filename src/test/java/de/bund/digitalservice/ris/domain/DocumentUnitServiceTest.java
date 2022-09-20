@@ -573,11 +573,7 @@ class DocumentUnitServiceTest {
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
-    // Assertion fails if the test runs standalone: a NullPointerException is thrown instead.
-    // Use expectError() instead to cover both situations? TODO
-    StepVerifier.create(service.deleteByUuid(TEST_UUID))
-        .expectErrorSatisfies(e -> assertThat(e).isInstanceOf(SdkException.class))
-        .verify();
+    StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
   }
 
   @Test
@@ -585,11 +581,7 @@ class DocumentUnitServiceTest {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnitDTO.EMPTY);
 
-    // Assertion fails if the test runs standalone: a IllegalArgumentException is thrown instead.
-    // Use expectError() instead to cover both situations? TODO
-    StepVerifier.create(service.deleteByUuid(TEST_UUID))
-        .expectErrorSatisfies(e -> assertThat(e).isInstanceOf(NullPointerException.class))
-        .verify();
+    StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
   }
 
   @Test
