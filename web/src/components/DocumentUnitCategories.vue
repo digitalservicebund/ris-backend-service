@@ -109,8 +109,8 @@ const handleUpdateDocumentUnitWithShortCut = (event: KeyboardEvent) => {
   }
 }
 
-/** Time interval to automatic update documentUnit every 30sec */
-/** Only update documentUnit when there is any change after 30sec and last update is done */
+/** Time interval to automatic update documentUnit every 10sec */
+/** Only update documentUnit when there is any change after 10sec and last update is done */
 const autoUpdate = () => {
   automaticUpload.value = setInterval(() => {
     hasDataChange.value =
@@ -131,7 +131,7 @@ const autoUpdate = () => {
       isOnline.value = true
       handleUpdateDocumentUnit()
     }
-  }, 30000)
+  }, 10000)
 }
 /** Clear time Interval */
 const removeAutoUpdate = () => {

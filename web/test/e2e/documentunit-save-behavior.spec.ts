@@ -51,17 +51,17 @@ test.describe("autosave on documentation units", () => {
   })
 
   test("test automatic save documentUnit", async ({ page, editorField }) => {
-    test.setTimeout(50 * 1000) // autosave is supposed to happen every 30s
+    test.setTimeout(30 * 1000) // autosave is supposed to happen every 10s
     await editorField.click()
     await editorField.type("this is a change")
     await page.keyboard.down("Tab")
 
     await expect(
       page.locator("text=Daten werden gespeichert").nth(0)
-    ).toBeVisible({ timeout: 31 * 1000 }) // autosave is supposed to happen every 30s
+    ).toBeVisible({ timeout: 11 * 1000 }) // autosave is supposed to happen every 10s
     await expect(
       page.locator("text=Daten werden gespeichert").nth(1)
-    ).toBeVisible({ timeout: 31 * 1000 }) // autosave is supposed to happen every 30s
+    ).toBeVisible({ timeout: 11 * 1000 }) // autosave is supposed to happen every 10s
 
     await expect(
       page.locator("text=Zuletzt gespeichert um").nth(0)
