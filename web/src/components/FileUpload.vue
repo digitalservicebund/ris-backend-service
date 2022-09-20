@@ -90,117 +90,101 @@ function onFileSelect(event: Event): void {
 </script>
 
 <template>
-  <v-container>
-    <v-row>
-      <v-col md="8" sm="12">
-        Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
-        Originaldokumentes aus
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col md="8" sm="12">
-        <v-container
-          id="upload-drop-area"
-          class="border-3 border-blue-300 border-solid hover:border-3 hover:border-blue-500 hover:border-solid rounded-lg upload-drop-area"
-          :class="{
-            'upload-drop-area__in-drag': status.inDrag,
-            'upload-drop-area__in-drag-error':
-              status.inDragError ||
-              UploadErrorStatus.includes(status.uploadStatus),
-          }"
-          @dragleave="dragleave"
-          @dragover="dragover"
-          @drop="drop"
-        >
-          <span v-if="status.inDragError">
-            <span class="file-upload material-icons text-blue-800">
-              upload_file
-            </span>
-            <!-- if still in drag move -->
-            <span v-if="status.uploadStatus !== UploadStatus.WRONG_FILE_FORMAT">
-              <div class="upload-status">Datei wird nicht unterstützt.</div>
-              <div>
-                Versuchen Sie eine .docx-Version dieser Datei hochzuladen.
-              </div>
-            </span>
-            <!-- if file dropped and failed to upload -->
-            <span v-else>
-              <div class="upload-status">Datei in diesen Bereich ziehen</div>
-              <div>oder</div>
-              <div>
-                <FileInputButton
-                  id="file-upload-after-fail"
-                  aria-label="Upload File"
-                  @input="onFileSelect"
-                >
-                  <span class="material-icons">search</span>
-                  Festplatte durchsuchen
-                </FileInputButton>
-              </div>
-            </span>
+  <div class="flex flex-col items-start">
+    <div class="mb-14">
+      Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
+      Originaldokumentes aus
+    </div>
+
+    <div
+      id="upload-drop-area"
+      class="bg-white border-3 border-blue-300 border-solid hover:border-3 hover:border-blue-500 hover:border-solid rounded-lg upload-drop-area w-[40rem]"
+      :class="{
+        'upload-drop-area__in-drag': status.inDrag,
+        'upload-drop-area__in-drag-error':
+          status.inDragError || UploadErrorStatus.includes(status.uploadStatus),
+      }"
+      @dragleave="dragleave"
+      @dragover="dragover"
+      @drop="drop"
+    >
+      <span v-if="status.inDragError">
+        <span class="file-upload material-icons text-blue-800">
+          upload_file
+        </span>
+        <!-- if still in drag move -->
+        <span v-if="status.uploadStatus !== UploadStatus.WRONG_FILE_FORMAT">
+          <div class="upload-status">Datei wird nicht unterstützt.</div>
+          <div>Versuchen Sie eine .docx-Version dieser Datei hochzuladen.</div>
+        </span>
+        <!-- if file dropped and failed to upload -->
+        <span v-else>
+          <div class="upload-status">Datei in diesen Bereich ziehen</div>
+          <div>oder</div>
+          <div>
+            <FileInputButton
+              id="file-upload-after-fail"
+              aria-label="Upload File"
+              @input="onFileSelect"
+            >
+              <span class="material-icons">search</span>
+              Festplatte durchsuchen
+            </FileInputButton>
+          </div>
+        </span>
+      </span>
+      <span v-else>
+        <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
+          <span class="file-upload material-icons"> refresh </span>
+          <div class="upload-status">Upload läuft</div>
+          <div>{{ status.file ? status.file.name : "" }}</div>
+        </span>
+        <span v-else-if="status.uploadStatus === UploadStatus.SUCCESSED">
+          <span class="file-upload material-icons text-blue-800">
+            upload_file
           </span>
-          <span v-else>
-            <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
-              <span class="file-upload material-icons"> refresh </span>
-              <div class="upload-status">Upload läuft</div>
-              <div>{{ status.file ? status.file.name : "" }}</div>
-            </span>
-            <span v-else-if="status.uploadStatus === UploadStatus.SUCCESSED">
-              <span class="file-upload material-icons text-blue-800">
-                upload_file
-              </span>
-              <div class="upload-status">
-                Die Datei {{ status.file ? status.file.name : "" }} wurde
-                erfolgreich hochgeladen
-              </div>
-            </span>
-            <span v-else>
-              <span class="file-upload material-icons text-blue-800">
-                upload_file
-              </span>
-              <div class="upload-status">Datei in diesen Bereich ziehen</div>
-              <div>oder</div>
-              <FileInputButton
-                id="file-upload"
-                aria-label="Upload File"
-                @input="onFileSelect"
-              >
-                <span class="material-icons">search</span>
-                Festplatte durchsuchen
-              </FileInputButton>
-            </span>
+          <div class="upload-status">
+            Die Datei {{ status.file ? status.file.name : "" }} wurde
+            erfolgreich hochgeladen
+          </div>
+        </span>
+        <span v-else>
+          <span class="file-upload material-icons text-blue-800">
+            upload_file
           </span>
-        </v-container>
-      </v-col>
-    </v-row>
-    <v-row v-if="status.uploadStatus === UploadStatus.WRONG_FILE_FORMAT">
-      <v-col md="8" sm="12">
-        <ErrorModal
-          description="Versuchen Sie eine .docx-Version dieser Datei hochzuladen."
-          title="Das ausgewählte Dateiformat ist nicht korrekt."
-        >
-        </ErrorModal>
-      </v-col>
-    </v-row>
-    <v-row v-if="status.uploadStatus === UploadStatus.FILE_TOO_LARGE">
-      <v-col md="8" sm="12">
-        <ErrorModal
-          description="Bitte laden Sie eine kleinere Datei hoch."
-          title="Die Datei darf max. 20 MB groß sein."
-        >
-        </ErrorModal>
-      </v-col>
-    </v-row>
-    <v-row v-if="status.uploadStatus === UploadStatus.FAILED">
-      <v-col md="8" sm="12">
-        <ErrorModal
-          description="Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
-          title="Leider ist ein Fehler aufgetreten."
-        >
-        </ErrorModal>
-      </v-col>
-    </v-row>
-  </v-container>
+          <div class="upload-status">Datei in diesen Bereich ziehen</div>
+          <div>oder</div>
+          <FileInputButton
+            id="file-upload"
+            aria-label="Upload File"
+            @input="onFileSelect"
+          >
+            <span class="material-icons">search</span>
+            Festplatte durchsuchen
+          </FileInputButton>
+        </span>
+      </span>
+    </div>
+
+    <div v-if="status.uploadStatus === UploadStatus.WRONG_FILE_FORMAT">
+      <ErrorModal
+        description="Versuchen Sie eine .docx-Version dieser Datei hochzuladen."
+        title="Das ausgewählte Dateiformat ist nicht korrekt."
+      />
+    </div>
+    <div v-if="status.uploadStatus === UploadStatus.FILE_TOO_LARGE">
+      <ErrorModal
+        description="Bitte laden Sie eine kleinere Datei hoch."
+        title="Die Datei darf max. 20 MB groß sein."
+      />
+    </div>
+    <div v-if="status.uploadStatus === UploadStatus.FAILED">
+      <ErrorModal
+        description="Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
+        title="Leider ist ein Fehler aufgetreten."
+      />
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

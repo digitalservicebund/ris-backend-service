@@ -27,11 +27,11 @@ const handleToggleNavBar = async () => {
       @toggle-navbar="handleToggleNavBar"
     />
 
-    <div class="bg-gray-100 grow">
+    <div class="bg-gray-100 flex flex-col w-full">
       <DocumentUnitInfoPanel :document-unit="documentUnit" />
 
-      <div class="flex flex-col items-start">
-        <slot :classes="['p-32 w-full']" />
+      <div class="flex flex-col grow items-start">
+        <slot :classes="['p-32 w-full grow']" />
       </div>
     </div>
   </div>

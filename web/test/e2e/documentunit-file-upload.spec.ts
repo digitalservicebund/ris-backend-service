@@ -11,9 +11,7 @@ test.describe("upload an original document to a doc unit", () => {
   test("upload docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
-    await page.waitForSelector(
-      ".fileviewer-info-panel-value >> text=sample.docx"
-    )
+    await page.waitForSelector("text=sample.docx")
     await page.waitForSelector("text=Die ist ein Test")
   })
 

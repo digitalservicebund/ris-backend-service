@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { onMounted, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import PopupModal from "./PopupModal.vue"
 import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"
@@ -16,12 +16,31 @@ const props = defineProps<{
 defineEmits<{ (e: "deleteFile"): void }>()
 
 const showModal = ref(false)
-const popupModalText = ref(
-  ` Möchten Sie die ausgewählte Datei ${props.fileName} wirklich löschen?`
+const fileAsHtml = ref("Dokument wird geladen.")
+
+const popupModalText = computed(
+  () => `Möchten Sie die ausgewählte Datei ${props.fileName} wirklich löschen?`
 )
-const confirmText = ref("Löschen")
-const modalCancelButtonType = "ghost"
-const modalConfirmButtonType = "secondary"
+
+const fileInfos = computed(() => [
+  {
+    label: "Hochgeladen am",
+    value: dayjs(props.uploadTimeStamp).format("DD.MM.YYYY"),
+  },
+  {
+    label: "Format",
+    value: props.fileType,
+  },
+  {
+    label: "Von",
+    value: "USER NAME",
+  },
+  {
+    label: "Dateiname",
+    value: props.fileName,
+  },
+])
+
 const toggleModal = () => {
   showModal.value = !showModal.value
   if (showModal.value) {
@@ -37,71 +56,34 @@ const toggleModal = () => {
   }
 }
 
-const fileAsHtml = ref("Dokument wird geladen.")
 onMounted(async () => {
   fileAsHtml.value = await fileService.getDocxFileAsHtml(props.s3Path)
 })
 </script>
 
 <template>
-  <div>
-    <v-container class="bg-white">
-      <PopupModal
-        v-if="showModal"
-        :cancel-button-type="modalCancelButtonType"
-        :confirm-button-type="modalConfirmButtonType"
-        :confirm-text="confirmText"
-        :content-text="popupModalText"
-        @close-modal="toggleModal"
-        @confirm-action="toggleModal(), $emit('deleteFile')"
-      />
-      <v-row>
-        <v-col md="2" sm="3">
-          Hochgeladen am
-          <div class="fileviewer-info-panel-value text-gray-900">
-            {{ dayjs(uploadTimeStamp).format("DD.MM.YYYY") || " - " }}
-          </div>
-        </v-col>
-        <v-col md="2" sm="3">
-          Format
-          <div class="fileviewer-info-panel-value text-gray-900">
-            {{ fileType || " - " }}
-          </div>
-        </v-col>
-        <v-col md="2" sm="3">
-          Von
-          <div class="fileviewer-info-panel-value text-gray-900">USER NAME</div>
-        </v-col>
-        <v-col sm="6">
-          Dateiname
-          <div class="fileviewer-info-panel-value text-gray-900">
-            {{ fileName || " - " }}
-          </div>
-        </v-col>
-        <v-col cols="4" />
-      </v-row>
-      <v-row class="bg-white">
-        <v-col cols="12">
-          <TextButton
-            icon="delete"
-            label="Datei löschen"
-            @click="toggleModal"
-          />
-        </v-col>
-      </v-row>
-    </v-container>
-    <v-container>
-      <v-row>
-        <v-col cols="12">
-          <TextEditor field-size="max" :value="fileAsHtml" />
-        </v-col>
-      </v-row>
-    </v-container>
+  <div class="flex flex-col gap-32 grow">
+    <div class="bg-white flex flex-col gap-32 items-start px-32 py-24">
+      <div class="flex w-full">
+        <div v-for="entry in fileInfos" :key="entry.label" class="grow">
+          <div>{{ entry.label }}</div>
+          <div class="font-bold text-gray-900">{{ entry.value ?? " - " }}</div>
+        </div>
+      </div>
+
+      <TextButton icon="delete" label="Datei löschen" @click="toggleModal" />
+    </div>
+
+    <TextEditor class="bg-white grow" field-size="max" :value="fileAsHtml" />
+
+    <PopupModal
+      v-if="showModal"
+      cancel-button-type="ghost"
+      confirm-button-type="secondary"
+      confirm-text="Löschen"
+      :content-text="popupModalText"
+      @close-modal="toggleModal"
+      @confirm-action="toggleModal(), $emit('deleteFile')"
+    />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.fileviewer-info-panel-value {
-  font-weight: bold;
-}
-</style>

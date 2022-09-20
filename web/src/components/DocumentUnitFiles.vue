@@ -14,7 +14,7 @@ const emits = defineEmits<{
 
 <template>
   <DocumentUnitWrapper v-slot="{ classes }" :document-unit="documentUnit">
-    <div :class="classes">
+    <div class="flex flex-col" :class="classes">
       <h1 class="heading-03-bold mb-8">Dokumente</h1>
 
       <FileViewer
