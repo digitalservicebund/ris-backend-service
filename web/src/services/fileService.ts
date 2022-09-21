@@ -27,10 +27,10 @@ export default {
       return { status: UploadStatus.FAILED }
     } catch (error: any) {
       console.log("landed in catch", error)
-      if (error.response.status === 413) {
+      if (error.response && error.response.status === 413) {
         return { status: UploadStatus.FILE_TOO_LARGE }
       }
-      if (error.response.status === 415) {
+      if (error.response && error.response.status === 415) {
         return { status: UploadStatus.WRONG_FILE_FORMAT }
       }
       return { status: UploadStatus.FAILED }
