@@ -133,7 +133,7 @@ const buttonClasses = computed(() => ({
 }
 
 .btn-ghost {
-  @apply bg-none border-2 border-solid border-white bg-white text-blue-800 underline;
+  @apply border-2 border-solid border-transparent bg-transparent text-blue-800 underline;
 
   &.v-btn {
     &:hover {
