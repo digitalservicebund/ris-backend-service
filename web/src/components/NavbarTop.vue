@@ -25,7 +25,7 @@ const route = useRoute()
     </div>
 
     <div class="flex font-bold gap-8 items-center">
-      <v-icon class="topbar-user-icon"> perm_identity </v-icon>
+      <span class="material-icons"> perm_identity </span>
       User Name
     </div>
   </div>

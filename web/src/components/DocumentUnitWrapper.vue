@@ -20,7 +20,7 @@ const handleToggleNavBar = async () => {
 </script>
 
 <template>
-  <div class="flex grow w-screen" role="main">
+  <div class="flex grow w-screen">
     <NavbarSide
       :document-number="String(documentUnit.documentNumber)"
       :visible="showNavBar"

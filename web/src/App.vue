@@ -3,10 +3,11 @@ import Navbar from "./components/NavbarTop.vue"
 </script>
 
 <template>
-  <v-app>
+  <div class="flex flex-col min-h-screen">
     <Navbar />
+
     <Suspense>
-      <router-view />
+      <router-view class="grow" role="main" />
     </Suspense>
-  </v-app>
+  </div>
 </template>

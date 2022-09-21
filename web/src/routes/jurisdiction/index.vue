@@ -21,30 +21,20 @@ const handleDelete = async (documentUnit: DocumentUnit) => {
 </script>
 
 <template>
-  <v-main role="main">
-    <v-container fluid>
-      <v-row>
-        <v-col class="rechtsprechung-header"><h1>Rechtsprechung</h1></v-col>
-      </v-row>
-      <v-row class="text-right">
-        <v-col>
-          <TextButton
-            label="Neue Dokumentationseinheit"
-            @click="router.push({ name: 'jurisdiction-documentUnit-new' })"
-          />
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col> </v-col>
-      </v-row>
-      <v-row class="text-center">
-        <v-col class="mb-4">
-          <DocumentUnitList
-            :document-units="documentUnits"
-            @delete-document-unit="handleDelete"
-          />
-        </v-col>
-      </v-row>
-    </v-container>
-  </v-main>
+  <div class="flex flex-col gap-16 p-16">
+    <div class="flex justify-between">
+      <h1 class="heading-02-regular">Übersicht Rechtsprechung</h1>
+
+      <TextButton
+        label="Neue Dokumentationseinheit"
+        @click="router.push({ name: 'jurisdiction-documentUnit-new' })"
+      />
+    </div>
+
+    <DocumentUnitList
+      class="grow"
+      :document-units="documentUnits"
+      @delete-document-unit="handleDelete"
+    />
+  </div>
 </template>
