@@ -27,7 +27,6 @@
 }
 
 .label-02-reg {
-  // TODO: in figma with leading-26
   @apply font-regular text-16 leading-22;
 }
 
@@ -60,11 +59,9 @@
 }
 
 .link-02-bold {
-  // TODO: in figma text-14 leading-22
-  @apply font-bold text-18 leading-24 text-blue-700;
+  @apply font-bold text-14 leading-22 text-blue-700;
 }
 
 .link-03-bold {
-  // TODO: in figma text-18 leading-24
-  @apply font-bold text-14 leading-22 text-blue-700;
+  @apply font-bold text-18 leading-24 text-blue-700;
 }
