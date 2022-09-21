@@ -1,5 +1,29 @@
 <script lang="ts" setup>
-import TextButton from "@/components/TextButton.vue"
+import { ref } from "vue"
+import KitchensinkHeader from "@/kitchensink/components/KitchensinkHeader.vue"
+import type { NormComponent } from "@/kitchensink/types/types"
+
+const components = ref<NormComponent[]>([
+  { name: "Text Button", view: "IndexView" },
+  { name: "Text Editor", view: "IndexView" },
+  { name: "Text Input", view: "IndexView" },
+  { name: "Save Document Unit Button", view: "IndexView" },
+  { name: "Publication Document", view: "IndexView" },
+  { name: "Popup Modal", view: "IndexView" },
+  { name: "Original File Side Panel", view: "IndexView" },
+  { name: "Navbar Top", view: "IndexView" },
+  { name: "Navbar Side", view: "IndexView" },
+  { name: "Input Group", view: "IndexView" },
+  { name: "Input Field", view: "IndexView" },
+  { name: "Input Element", view: "IndexView" },
+  { name: "File Viewer", view: "IndexView" },
+  { name: "File Upload", view: "IndexView" },
+  { name: "File Input Button", view: "IndexView" },
+  { name: "Expandable Content", view: "IndexView" },
+  { name: "Error Modal", view: "IndexView" },
+  { name: "Dropdown Input", view: "IndexView" },
+  { name: "Code Snippet", view: "IndexView" },
+])
 </script>
 
 <template>
@@ -7,30 +31,10 @@ import TextButton from "@/components/TextButton.vue"
     id="kitchensink"
     class="absolute bg-white box-border h-full left-0 overflow-y-scroll top-0 w-full"
   >
-    <!-- Header -->
-    <div
-      class="border-b-4 flex flex-nowrap flex-row items-center justify-center w-full"
-    >
-      <div class="flex flex-col flex-nowrap gap-y-10 justify-start py-10 w-2/3">
-        <!-- Title -->
-        <h1 class="font-bold text-64">Kitchensink</h1>
-        <!-- Navbar -->
-        <div
-          class="flex flex-nowrap flex-row gap-x-8 justify-start navbar overflow-x-scroll overflow-y-hidden"
-        >
-          <TextButton button-type="tertiary" label="Index" />
-          <TextButton button-type="tertiary" label="Buttons" />
-          <TextButton button-type="tertiary" label="Form" />
-          <TextButton button-type="tertiary" label="Spinner" />
-          <TextButton button-type="tertiary" label="Help" />
-          <TextButton button-type="tertiary" label="Icons" />
-          <TextButton button-type="tertiary" label="Email Status" />
-        </div>
-      </div>
-    </div>
+    <KitchensinkHeader :components="components" />
     <!-- Container -->
     <div
-      class="border-b-4 flex flex-nowrap flex-row items-center justify-center overflow-hidden relative w-full"
+      class="border-b-4 flex flex-nowrap flex-row items-center justify-center overflow-y-hidden relative w-full"
     >
       <div
         class="flex flex-col flex-nowrap gap-y-10 justify-start py-10 text-justify w-2/3"
@@ -215,7 +219,7 @@ import TextButton from "@/components/TextButton.vue"
 </template>
 
 <style lang="scss" scoped>
-* {
+#kitchensink {
   scrollbar-width: none;
 }
 </style>
