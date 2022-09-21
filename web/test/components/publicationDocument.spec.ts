@@ -113,7 +113,7 @@ describe("PublicationDocument:", () => {
       new RegExp(
         "VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt " +
           "error message 1error message 2 Empfänger-E-Mail-Adresse:campaign Dokumentationseinheit " +
-          "veröffentlichenerrorerror message titleerror message descriptionLetzte " +
+          "veröffentlichenerrorerror message title error message descriptionLetzte " +
           "Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
       )
     )

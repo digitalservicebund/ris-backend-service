@@ -131,12 +131,8 @@ function validateEmailAddress(): boolean {
           </div>
         </div>
       </div>
-      <ErrorModal
-        v-if="!!errorMessage"
-        :description="errorMessage?.description"
-        :title="errorMessage?.title"
-      >
-      </ErrorModal>
+
+      <ErrorModal v-if="errorMessage" class="mt-8" v-bind="errorMessage" />
     </div>
     <div class="flex-col-container publication-infos-container">
       <p class="publication-text-header">Letzte Veröffentlichungen</p>

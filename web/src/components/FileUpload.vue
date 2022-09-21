@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import ErrorModal from "@/components/ErrorModal.vue"
 import FileInputButton from "@/components/FileInputButton.vue"
 import DocumentUnit from "@/domain/documentUnit"
@@ -87,10 +87,34 @@ function onFileSelect(event: Event): void {
     upload(files[0])
   }
 }
+
+const error = computed(() => {
+  switch (status.value.uploadStatus) {
+    case UploadStatus.WRONG_FILE_FORMAT:
+      return {
+        description:
+          "Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
+        title: "Das ausgewählte Dateiformat ist nicht korrekt.",
+      }
+    case UploadStatus.FILE_TOO_LARGE:
+      return {
+        description: "Bitte laden Sie eine kleinere Datei hoch.",
+        title: "Die Datei darf max. 20 MB groß sein.",
+      }
+    case UploadStatus.FAILED:
+      return {
+        description:
+          "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+        title: "Leider ist ein Fehler aufgetreten.",
+      }
+    default:
+      return undefined
+  }
+})
 </script>
 
 <template>
-  <div class="flex flex-col items-start">
+  <div class="flex flex-col items-start w-[40rem]">
     <div class="mb-14">
       Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
       Originaldokumentes aus
@@ -98,7 +122,7 @@ function onFileSelect(event: Event): void {
 
     <div
       id="upload-drop-area"
-      class="bg-white border-3 border-blue-300 border-solid hover:border-3 hover:border-blue-500 hover:border-solid rounded-lg upload-drop-area w-[40rem]"
+      class="bg-white border-3 border-blue-300 border-solid hover:border-3 hover:border-blue-500 hover:border-solid rounded-lg upload-drop-area w-full"
       :class="{
         'upload-drop-area__in-drag': status.inDrag,
         'upload-drop-area__in-drag-error':
@@ -166,24 +190,7 @@ function onFileSelect(event: Event): void {
       </span>
     </div>
 
-    <div v-if="status.uploadStatus === UploadStatus.WRONG_FILE_FORMAT">
-      <ErrorModal
-        description="Versuchen Sie eine .docx-Version dieser Datei hochzuladen."
-        title="Das ausgewählte Dateiformat ist nicht korrekt."
-      />
-    </div>
-    <div v-if="status.uploadStatus === UploadStatus.FILE_TOO_LARGE">
-      <ErrorModal
-        description="Bitte laden Sie eine kleinere Datei hoch."
-        title="Die Datei darf max. 20 MB groß sein."
-      />
-    </div>
-    <div v-if="status.uploadStatus === UploadStatus.FAILED">
-      <ErrorModal
-        description="Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut."
-        title="Leider ist ein Fehler aufgetreten."
-      />
-    </div>
+    <ErrorModal v-if="error" v-bind="error" class="mt-8" />
   </div>
 </template>
 
