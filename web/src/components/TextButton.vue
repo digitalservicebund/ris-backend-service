@@ -20,6 +20,7 @@ const buttonClasses = computed(() => ({
   "btn-primary": props.buttonType == "primary",
   "btn-secondary": props.buttonType == "secondary",
   "btn-ghost": props.buttonType == "ghost",
+  "btn-tertiary": props.buttonType == "tertiary",
 }))
 </script>
 
@@ -145,6 +146,24 @@ const buttonClasses = computed(() => ({
 
     &:focus-visible {
       @apply border-2 border-solid border-blue-800 bg-white;
+    }
+  }
+}
+
+.btn-tertiary {
+  @apply border-solid border-2 border-blue-800 text-blue-800 bg-white;
+
+  &.v-btn {
+    &:hover {
+      @apply bg-blue-200;
+    }
+
+    &:active {
+      @apply border-none bg-blue-200;
+    }
+
+    &:focus-visible {
+      @apply border-solid border-2 border-blue-800 bg-blue-200;
     }
   }
 }

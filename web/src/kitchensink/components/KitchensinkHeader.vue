@@ -1,0 +1,50 @@
+<script lang="ts" setup>
+import TextButton from "@/components/TextButton.vue"
+import type { NormComponent } from "@/kitchensink/types/types"
+
+const props = defineProps<{
+  components: NormComponent[]
+  selectedComponent: NormComponent
+}>()
+
+defineEmits<{
+  (e: "setSelectedComponent", component: NormComponent): void
+}>()
+
+const isSelectedComponent = (component: NormComponent) => {
+  return component.name === props.selectedComponent.name
+}
+</script>
+
+<template>
+  <!-- Header -->
+  <div
+    class="border-b-4 flex flex-nowrap flex-row items-center justify-center w-full"
+  >
+    <div
+      class="flex flex-col flex-nowrap gap-y-10 justify-start overflow-hidden py-10 relative w-2/3"
+    >
+      <!-- Title -->
+      <h1 class="font-bold text-64">Kitchensink</h1>
+      <!-- Navbar -->
+      <div
+        class="flex flex-nowrap flex-row gap-x-20 justify-start navbar overflow-x-scroll overflow-y-hidden"
+      >
+        <TextButton
+          v-for="(component, index) in components"
+          :key="index"
+          button-type="tertiary"
+          :class="{ 'bg-blue800': isSelectedComponent(component) }"
+          :label="component.name"
+          @click="$emit('setSelectedComponent', component)"
+        />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.navbar {
+  scrollbar-width: none;
+}
+</style>
