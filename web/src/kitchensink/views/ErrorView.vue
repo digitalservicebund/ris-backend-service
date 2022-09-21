@@ -4,7 +4,7 @@ import ErrorModal from "@/components/ErrorModal.vue"
 
 <template>
   <ErrorModal
-    description="Vesuchen Sie diese Seite später erneut !"
-    title="Diese Seite wird gerade eingebaut."
+    description="Diese Seite wird gerade eingebaut. Vesuchen Sie diese Seite später erneut !"
+    title="Es ist ein Fehler aufgetreten"
   ></ErrorModal>
 </template>
