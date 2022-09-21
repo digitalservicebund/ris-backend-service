@@ -14,7 +14,7 @@ export default {
           headers: {
             "Content-Type":
               "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-            "X-Filename": file.name,
+            "X-Filename": file.name.normalize(),
           },
         },
         file
