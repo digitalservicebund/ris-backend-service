@@ -11,7 +11,6 @@ import { aliases, md } from "vuetify/iconsets/md"
 export const risLightTheme = {
   dark: false,
   colors: {
-    white: "#FFFFFF",
     black: "#000000",
     blue800: "#004B76",
     blue700: "#336F91",
