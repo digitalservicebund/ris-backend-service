@@ -73,7 +73,7 @@ onMounted(async () => {
       lastPublishedXmlMail.value.publishDate
     )
     lastPublishedXmlMail.value.xml = lastPublishedXmlMail.value.xml
-      ? lastPublishedXmlMail.value.xml.replace(/[ \t]{2,}/g, "")
+      ? lastPublishedXmlMail.value.xml
       : ""
   }
 

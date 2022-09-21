@@ -6,48 +6,9 @@ const props = defineProps<{
   xml: string
 }>()
 
-type CodeLine = {
-  text: string
-  marginLeft: number
-}
-const codeLineMarginLeftUnitInPx = 20
-const marginLeft = ref(0)
-const caculateLineMarginLeft = (line: string): number => {
-  const isXMLTag = line.includes("<?xml")
-  const isDocTypeTag = line.includes("<!DOCTYPE")
-  const isCloseTag = line.startsWith("</")
-  const isOpenTag = !isCloseTag && !line.includes("</")
-  const hasBothTags =
-    (!isCloseTag && line.includes("</")) ||
-    (line.startsWith("<") && line.endsWith("/>"))
-  let ml = 0
-  if (isXMLTag || isDocTypeTag) {
-    marginLeft.value = -1
-    return 0
-  }
-  if (hasBothTags) {
-    return (marginLeft.value + 1) * codeLineMarginLeftUnitInPx
-  }
-  if (isOpenTag) {
-    marginLeft.value += 1
-    ml = marginLeft.value * codeLineMarginLeftUnitInPx
-  }
-  if (isCloseTag) {
-    ml = marginLeft.value * codeLineMarginLeftUnitInPx
-    marginLeft.value -= 1
-  }
-  return ml
-}
-
-const getCodeLines = (): CodeLine[] => {
+const getCodeLines = (): string[] => {
   if (props.xml.includes("<?xml")) {
-    return props.xml
-      .split("\n")
-      .filter((line) => line.length > 0)
-      .map((line) => {
-        const ml = caculateLineMarginLeft(line)
-        return { text: line, marginLeft: ml }
-      })
+    return props.xml.split("\n").filter((line) => line.length > 0)
   }
   return []
 }
@@ -72,8 +33,8 @@ watch(
           }"
           ><span>{{ index + 1 }}</span></code
         >
-        <code class="line" :style="{ 'margin-left': `${line.marginLeft}px` }"
-          ><span>{{ line.text }}</span></code
+        <code class="line"
+          ><span>{{ line }}</span></code
         >
       </div>
     </div>
@@ -112,6 +73,7 @@ watch(
 
     .line {
       padding-left: 20px;
+      white-space: pre;
     }
   }
 }

@@ -107,6 +107,9 @@ const editor = new Editor({
   onFocus: () => (hasFocus.value = true),
   onBlur: () => (hasFocus.value = false),
   editable: props.editable,
+  parseOptions: {
+    preserveWhitespace: "full",
+  },
 })
 
 const onResize = () => {
