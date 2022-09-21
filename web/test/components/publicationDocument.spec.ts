@@ -29,7 +29,7 @@ describe("PublicationDocument:", () => {
       expect(renderResult.container.textContent).match(
         new RegExp(
           "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen wird " +
-            "die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse:campaign " +
+            "die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: campaign " +
             "Dokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am " +
             "01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1" +
             '<\\?xml version="1.0"\\?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>'
@@ -85,7 +85,7 @@ describe("PublicationDocument:", () => {
     expect(renderResult.container.textContent).match(
       new RegExp(
         "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen " +
-          "wird die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse:campaign Dokumentationseinheit " +
+          "wird die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: campaign Dokumentationseinheit " +
           "veröffentlichenLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
       )
     )
@@ -112,7 +112,7 @@ describe("PublicationDocument:", () => {
     expect(renderResult.container.textContent).match(
       new RegExp(
         "VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt " +
-          "error message 1error message 2 Empfänger-E-Mail-Adresse:campaign Dokumentationseinheit " +
+          "error message 1error message 2 Empfänger-E-Mail-Adresse: campaign Dokumentationseinheit " +
           "veröffentlichenerrorerror message title error message descriptionLetzte " +
           "Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
       )
@@ -143,7 +143,7 @@ describe("PublicationDocument:", () => {
     expect(renderResult.container.textContent).match(
       new RegExp(
         "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen wird die " +
-          "Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse:campaign Dokumentationseinheit " +
+          "Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: campaign Dokumentationseinheit " +
           "veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über " +
           "E-Mail an: receiver address Betreff: mail subjectals"
       )

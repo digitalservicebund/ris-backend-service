@@ -11,36 +11,17 @@ defineProps<Props>()
 </script>
 
 <template>
-  <label class="input-field" :for="id">
-    <span class="input-field__label">
-      <span v-if="!!iconName" class="material-icons" data-testid="icon">{{
-        iconName
-      }}</span>
-      {{ label }}<span v-if="!!required">*</span>
-    </span>
+  <div class="flex flex-col">
+    <label class="flex gap-4 items-center label-02-regular mb-2" :for="id">
+      <span class="material-icons">{{ iconName }}</span>
+      {{ label }}
+      <span v-if="!!required">*</span>
+    </label>
 
     <slot :id="id" />
-    <span v-if="!!errorMessage" class="input-field__error">
+
+    <div class="h-16 text-16 text-red-800">
       {{ errorMessage }}
-    </span>
-  </label>
+    </div>
+  </div>
 </template>
-
-<style lang="scss" scoped>
-.input-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-
-  &__label {
-    display: flex;
-    gap: 0.3rem;
-  }
-
-  &__error {
-    display: flex;
-    gap: 0.3rem;
-    @apply text-red-800;
-  }
-}
-</style>

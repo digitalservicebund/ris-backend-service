@@ -40,14 +40,14 @@ describe("InputField", () => {
       required: true,
     })
 
-    const input = queryByLabelText("test label*", { exact: false })
+    const input = queryByLabelText("test label *", { exact: false })
     expect(input).toBeInTheDocument()
   })
 
   it("shows input with given icon", () => {
-    const { queryByTestId } = renderComponent({ iconName: "test-icon" })
+    const { queryByText } = renderComponent({ iconName: "test-icon" })
 
-    const icon = queryByTestId("icon")
+    const icon = queryByText("test-icon")
 
     expect(icon).toBeInTheDocument()
   })
