@@ -1,17 +1,17 @@
 <script lang="ts" setup>
 import TextButton from "@/components/TextButton.vue"
-import type { NormComponent } from "@/kitchensink/types/types"
+import type { risComponent } from "@/kitchensink/types/types"
 
 const props = defineProps<{
-  components: NormComponent[]
-  selectedComponent: NormComponent
+  components: risComponent[]
+  selectedComponent: risComponent
 }>()
 
 defineEmits<{
-  (e: "setSelectedComponent", component: NormComponent): void
+  (e: "setSelectedComponent", component: risComponent): void
 }>()
 
-const isSelectedComponent = (component: NormComponent) => {
+const isSelectedComponent = (component: risComponent) => {
   return component.name === props.selectedComponent.name
 }
 </script>

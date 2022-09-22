@@ -1,4 +1,4 @@
-export type NormComponent = {
+export type risComponent = {
   name: string
   view: string
 }
