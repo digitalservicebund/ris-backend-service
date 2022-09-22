@@ -22,7 +22,7 @@ const entries = computed(() => [
 
 <template>
   <div
-    class="bg-blue-200 border-b border-gray-400 border-solid flex items-center p-12"
+    class="bg-blue-200 border-b border-gray-400 border-solid flex h-80 items-center px-8"
   >
     <div class="grow text-30">
       {{ documentUnit.documentNumber || " - " }}

@@ -6,202 +6,121 @@ defineEmits<{ (e: "toggleNavbar"): void }>()
 const router = useRouter()
 const route = useRoute()
 
-const linkStyling = (componentName: string) => {
-  return router.currentRoute.value.name === componentName
-    ? "side-navbar-active-link"
-    : ""
-}
+const linkStyling = (componentName: string) => ({
+  underline: router.currentRoute.value.name === componentName,
+})
 </script>
 
 <template>
-  <v-col :cols="visible ? 2 : 1">
-    <span v-if="visible">
-      <div
-        id="sidebar-close-button"
-        aria-label="Navigation schließen"
-        class="bg-blue-800 sidebar-close-icon-background"
-        @click="$emit('toggleNavbar')"
-        @keydown.m="$emit('toggleNavbar')"
-      >
-        <span class="material-icons sidebar-close-icon"> close </span>
-      </div>
-      <v-container fluid>
-        <v-row>
-          <v-col class="back-button">
-            <span class="flex">
-              <span class="back-button__icon material-icons text-blue-800">
-                arrow_back
-              </span>
-              <router-link
-                class="back-button__link text-blue-800"
-                :to="{ name: 'jurisdiction' }"
-                >ZURÜCK</router-link
-              >
-            </span>
-          </v-col>
-        </v-row>
-        <v-divider />
-        <v-row><v-col></v-col></v-row>
-        <v-row>
-          <v-col class="hover:bg-blue-200 sidebar-headline">
-            <router-link
-              :class="
-                linkStyling(
-                  'jurisdiction-documentUnit-:documentNumber-categories'
-                )
-              "
-              :to="{
-                name: 'jurisdiction-documentUnit-:documentNumber-categories',
-                params: { documentNumber: documentNumber },
-                query: route.query,
-              }"
-            >
-              Rubriken
-            </router-link>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="hover:bg-blue-200 sub-rubriken">
-            <router-link
-              :to="{
-                name: 'jurisdiction-documentUnit-:documentNumber-categories',
-                params: { documentNumber: documentNumber },
-                query: route.query,
-                hash: '#coreData',
-              }"
-              >Stammdaten</router-link
-            >
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="hover:bg-blue-200 sub-rubriken">
-            <router-link
-              :to="{
-                name: 'jurisdiction-documentUnit-:documentNumber-categories',
-                params: { documentNumber: documentNumber },
-                query: route.query,
-                hash: '#previousDecisions',
-              }"
-              >Rechtszug</router-link
-            >
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="hover:bg-blue-200 sub-rubriken">
-            <router-link
-              :to="{
-                name: 'jurisdiction-documentUnit-:documentNumber-categories',
-                params: { documentNumber: documentNumber },
-                query: route.query,
-                hash: '#texts',
-              }"
-              >Kurz- & Langtexte</router-link
-            >
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-divider />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="hover:bg-blue-200 sidebar-headline">
-            <router-link
-              :class="
-                linkStyling('jurisdiction-documentUnit-:documentNumber-files')
-              "
-              :to="{
-                name: 'jurisdiction-documentUnit-:documentNumber-files',
-                params: { documentNumber: documentNumber },
-                query: route.query,
-              }"
-              >Dokumente</router-link
-            >
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-divider />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="hover:bg-blue-200 sidebar-headline">
-            Bearbeitungsstand
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col>
-            <v-divider />
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col> </v-col>
-        </v-row>
-        <v-row>
-          <v-col class="hover:bg-blue-200">
-            <router-link
-              class="public-button sidebar-headline"
-              :to="{
-                name: 'jurisdiction-documentUnit-:documentNumber-publication',
-                params: { documentNumber: documentNumber },
-              }"
-              >Veröffentlichen</router-link
-            >
-          </v-col>
-        </v-row>
-      </v-container>
-    </span>
+  <div v-if="visible" class="flex flex-col w-240">
     <div
-      v-else
-      id="sidebar-open-button"
-      aria-label="Navigation öffnen"
-      class="bg-yellow-500 border-3 border-blue-800 border-solid sidebar-open"
-      @click="$emit('toggleNavbar')"
-      @keydown.c="$emit('toggleNavbar')"
+      class="border-gray-400 border-solid border-y flex h-80 items-center justify-between pl-3"
     >
-      <div class="sidebar-open-text">Menü</div>
-      <div class="bg-blue-800 sidebar-open-icon-background">
-        <span class="material-icons sidebar-open-icon">
-          arrow_forward_ios
-        </span>
-      </div>
+      <router-link
+        class="flex gap-2 items-center link-01-bold"
+        :to="{ name: 'jurisdiction' }"
+      >
+        <span class="material-icons">arrow_back</span>
+        <span>ZURÜCK</span>
+      </router-link>
+
+      <button
+        aria-label="Navigation schließen"
+        class="-mr-20 bg-blue-800 rounded-full text-white z-10"
+        @click="$emit('toggleNavbar')"
+      >
+        <span class="material-icons p-8">close</span>
+      </button>
     </div>
-  </v-col>
+
+    <div class="flex flex-col">
+      <router-link
+        class="font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+        :class="
+          linkStyling('jurisdiction-documentUnit-:documentNumber-categories')
+        "
+        :to="{
+          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+        }"
+      >
+        Rubriken
+      </router-link>
+
+      <router-link
+        class="hover:bg-blue-200 hover:underline pl-5 py-1"
+        :to="{
+          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+          hash: '#coreData',
+        }"
+        >Stammdaten</router-link
+      >
+      <router-link
+        class="hover:bg-blue-200 hover:underline pl-5 py-1"
+        :to="{
+          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+          hash: '#previousDecisions',
+        }"
+        >Rechtszug</router-link
+      >
+      <router-link
+        class="hover:bg-blue-200 hover:underline pl-5 py-1"
+        :to="{
+          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+          hash: '#texts',
+        }"
+        >Kurz- & Langtexte</router-link
+      >
+      <router-link
+        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+        :class="linkStyling('jurisdiction-documentUnit-:documentNumber-files')"
+        :to="{
+          name: 'jurisdiction-documentUnit-:documentNumber-files',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+        }"
+        >Dokumente</router-link
+      >
+      <div
+        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+      >
+        Bearbeitungsstand
+      </div>
+
+      <router-link
+        class="font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+        :to="{
+          name: 'jurisdiction-documentUnit-:documentNumber-publication',
+          params: { documentNumber: documentNumber },
+        }"
+        >Veröffentlichen</router-link
+      >
+    </div>
+  </div>
+
+  <button
+    v-else
+    aria-label="Navigation öffnen"
+    class="bg-yellow-500 border-3 border-blue-800 border-solid sidebar-open"
+    @click="$emit('toggleNavbar')"
+  >
+    <div class="sidebar-open-text">Menü</div>
+    <div class="bg-blue-800 sidebar-open-icon-background">
+      <span class="material-icons sidebar-open-icon"> arrow_forward_ios </span>
+    </div>
+  </button>
 </template>
 
 <style lang="scss" scoped>
-.sidebar-headline {
-  font-weight: bold;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-.sub-rubriken {
-  margin-left: 20px;
-
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
 .side-navbar-active-link {
   text-decoration: underline;
-}
-
-.sidebar-close-icon-background {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  float: right;
-  transform: translateY(60px);
-}
-
-.sidebar-close-icon {
-  margin-top: 8px;
-  margin-left: 8px;
-  color: white;
 }
 
 .sidebar-open {
@@ -231,19 +150,5 @@ const linkStyling = (componentName: string) => {
   margin-top: 8px;
   margin-left: 9px;
   color: white;
-}
-
-.back-button {
-  padding-bottom: 49px;
-
-  &__icon {
-    position: relative;
-    margin-right: 8px;
-    margin-bottom: 4px;
-  }
-}
-
-.public-button {
-  text-decoration: underline;
 }
 </style>
