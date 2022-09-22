@@ -86,4 +86,51 @@ describe("text editor", async () => {
       queryByLabelText("test label Editor Button Leiste")
     ).not.toBeInTheDocument()
   })
+
+  /*
+   * The purpose of this test is to ensure that all expected buttons are
+   * rendered. Having this test helps us to ensure that we do not accidentally
+   * remove any of them.
+   * Unfortunately is the logic of the button bar very complex and dependents on
+   * the current width of the editor element. Thereby it is very hard, or rather
+   * impossible to test this end-to-end as it depends on the surrounding layout.
+   * Thereby this is rather an integration test, as the button list is
+   * a configuration of the component. The logic of the button bar and how it
+   * collapses for certain widths, is a logic for itself that gets tested
+   * separetly.
+   * The test should be continuosly improved to very that all buttons exist.
+   */
+  it("shows all necessary editor buttons", async () => {
+    const { getByLabelText, findByText, container } = render(TextEditor, {
+      props: { value: "Test Value", ariaLabel: "test label", editable: true },
+      global: { plugins: [vuetify, router] },
+    })
+    await findByText("Test Value")
+    const editorField = getByLabelText("test label Editor Feld")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
+
+    function expectIconToExist(iconName: string) {
+      expect(container.innerHTML).match(
+        new RegExp(`<i.*class=".*${iconName}.*"`)
+      )
+    }
+
+    expectIconToExist("undo")
+    expectIconToExist("redo")
+    expectIconToExist("bold")
+    expectIconToExist("italic")
+    expectIconToExist("underline")
+    expectIconToExist("strike")
+    expectIconToExist("format_align_left")
+    expectIconToExist("format_align_center")
+    expectIconToExist("format_align_right")
+    expectIconToExist("format_align_justify")
+    expectIconToExist("superscript")
+    expectIconToExist("subscript")
+    expectIconToExist("format_list_numbered")
+    expectIconToExist("format_list_bulleted")
+  })
 })
