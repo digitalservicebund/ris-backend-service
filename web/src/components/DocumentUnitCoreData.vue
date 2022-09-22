@@ -27,41 +27,18 @@ const values = computed({
 <template>
   <div v-if="!modelValue">Loading...</div>
 
-  <div v-else class="core-data">
-    <h1 id="coreData" class="heading-03-bold">Stammdaten</h1>
+  <div v-else>
+    <h1 class="heading-02-regular mb-6">Stammdaten</h1>
 
-    <div class="form">
-      <InputGroup v-model="values" :column-count="2" :fields="coreDataFields" />
+    <InputGroup v-model="values" :column-count="2" :fields="coreDataFields" />
 
-      <span class="form__require-info">
-        * Pflichtfelder zum Veröffentlichen
-      </span>
+    <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
 
-      <SaveDocumentUnitButton
-        aria-label="Stammdaten Speichern Button"
-        class="form__save-button"
-        :update-status="updateStatus"
-        @update-document-unit="emit('updateDocumentUnit')"
-      />
-    </div>
+    <SaveDocumentUnitButton
+      aria-label="Stammdaten Speichern Button"
+      class="mt-8"
+      :update-status="updateStatus"
+      @update-document-unit="emit('updateDocumentUnit')"
+    />
   </div>
 </template>
-
-<style lang="scss" scoped>
-.core-data {
-  padding: 3rem 1rem;
-}
-
-.form {
-  padding: 1rem;
-
-  &__save-button {
-    margin-top: 2rem;
-  }
-
-  &__require-info {
-    display: inline-block;
-    margin: 2rem 0;
-  }
-}
-</style>

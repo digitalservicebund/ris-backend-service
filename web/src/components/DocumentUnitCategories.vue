@@ -168,9 +168,9 @@ onUnmounted(() => {
           />
 
           <DocumentUnitPreviousDecisions
-            id="previous-decisions"
+            id="previousDecisions"
             v-model="previousDecisions"
-          />
+            class="my-16"
 
           <DocumentUnitTexts
             id="texts"

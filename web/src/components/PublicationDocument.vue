@@ -50,7 +50,7 @@ function validateEmailAddress(): boolean {
 
 <template>
   <div class="flex-col-container publication-container">
-    <h1 class="heading-03-bold">Veröffentlichen</h1>
+    <h1 class="heading-02-regular">Veröffentlichen</h1>
     <div class="flex-col-container publication-check-container">
       <div
         class="bg-white publication-check-infos-container"

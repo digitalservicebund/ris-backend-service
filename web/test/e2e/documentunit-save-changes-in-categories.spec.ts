@@ -11,7 +11,7 @@ async function clickSaveButton(page: Page): Promise<void> {
 }
 
 async function togglePreviousDecisionsSection(page: Page): Promise<void> {
-  await page.locator("id=previous-decisions").click()
+  await page.locator("text=Vorgehende Entscheidungen").click()
 }
 
 async function fillPreviousDecisionInputs(

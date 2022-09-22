@@ -43,38 +43,36 @@ const values = computed({
 </script>
 
 <template>
-  <ExpandableContent class="p-16">
+  <ExpandableContent>
     <template #header>
-      <h1 class="heading-03-bold">Vorgehende Entscheidungen</h1>
+      <h1 class="heading-02-regular mb-6">Vorgehende Entscheidungen</h1>
     </template>
 
-    <div class="previous-decisions">
-      <ModelComponentRepeater
-        v-model="values"
-        :column-count="2"
-        :component="InputGroup"
-        :default-value="defaultModel"
-        :fields="previousDecisionFields"
-      >
-        <template #removeButton="{ onClick }">
-          <TextButton
-            aria-label="Entscheidung Entfernen"
-            button-type="ghost"
-            class="mb-32 mt-16"
-            label="Entfernen"
-            @click="onClick"
-          />
-        </template>
+    <ModelComponentRepeater
+      v-model="values"
+      :column-count="2"
+      :component="InputGroup"
+      :default-value="defaultModel"
+      :fields="previousDecisionFields"
+    >
+      <template #removeButton="{ onClick }">
+        <TextButton
+          aria-label="Entscheidung Entfernen"
+          button-type="ghost"
+          class="mb-44 mt-6"
+          label="Entfernen"
+          @click="onClick"
+        />
+      </template>
 
-        <template #addButton="{ onClick }">
-          <TextButton
-            aria-label="weitere Entscheidung hinzufügen"
-            class="mt-48"
-            label="weitere Entscheidung hinzufügen"
-            @click="onClick"
-          />
-        </template>
-      </ModelComponentRepeater>
-    </div>
+      <template #addButton="{ onClick }">
+        <TextButton
+          aria-label="weitere Entscheidung hinzufügen"
+          class="mt-44"
+          label="weitere Entscheidung hinzufügen"
+          @click="onClick"
+        />
+      </template>
+    </ModelComponentRepeater>
   </ExpandableContent>
 </template>

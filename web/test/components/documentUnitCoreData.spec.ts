@@ -31,9 +31,7 @@ describe("Core Data", () => {
     ).toBe("abc")
     const buttons = wrapper.findAll("button")
     expect(buttons[buttons.length - 1].text()).toBe("Speichern")
-    expect(wrapper.get(".form").element as HTMLDivElement).toHaveTextContent(
-      "* Pflichtfelder zum Veröffentlichen"
-    )
+    expect(wrapper.text()).toContain("* Pflichtfelder zum Veröffentlichen")
     // what else? TODO
   })
 })

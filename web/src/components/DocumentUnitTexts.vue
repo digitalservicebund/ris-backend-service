@@ -26,60 +26,31 @@ const data = computed(() =>
 </script>
 
 <template>
-  <form class="ris-texte-form" novalidate>
-    <v-row>
-      <v-col><h1 class="heading-03-bold">Kurz- & Langtexte</h1></v-col>
-    </v-row>
-    <v-row>
-      <v-col>
-        <div
-          v-for="item in data"
-          :key="item.id"
-          class="ris-texte-form__textfield"
-        >
-          <span class="ris-texte-form__label">
-            {{ item.label }}
-            <div>
-              <TextEditor
-                :aria-label="item.aria"
-                class="ris-texte-form__input"
-                editable
-                :field-size="item.fieldSize"
-                :value="item.value"
-                @update-value="emit('updateValue', [item.id, $event])"
-              />
-            </div>
-          </span>
-        </div>
-        <div class="ris-texte-form__textfield">
-          <SaveDocumentUnitButton
-            aria-label="Kurz- und Langtexte Speichern Button"
-            :update-status="updateStatus"
-            @update-document-unit="emit('updateDocumentUnit')"
-          />
-        </div>
-      </v-col>
-    </v-row>
-  </form>
+  <div>
+    <h1 class="heading-02-regular mb-6">Kurz- & Langtexte</h1>
+
+    <div class="flex flex-col gap-36">
+      <div v-for="item in data" :key="item.id" class="">
+        <label class="label-02-regular mb-2" :for="item.id">{{
+          item.label
+        }}</label>
+
+        <TextEditor
+          :id="item.id"
+          :aria-label="item.aria"
+          class="outline outline-2 outline-blue-900"
+          editable
+          :field-size="item.fieldSize"
+          :value="item.value"
+          @update-value="emit('updateValue', [item.id, $event])"
+        />
+      </div>
+
+      <SaveDocumentUnitButton
+        aria-label="Kurz- und Langtexte Speichern Button"
+        :update-status="updateStatus"
+        @update-document-unit="emit('updateDocumentUnit')"
+      />
+    </div>
+  </div>
 </template>
-
-<style lang="scss" scoped>
-.ris-texte-form {
-  padding: 3rem 1rem;
-
-  &__textfield {
-    padding: 1rem;
-  }
-
-  &__input {
-    width: 100%;
-    margin-top: 5px;
-    resize: vertical;
-    @apply outline-2 outline outline-blue-900;
-  }
-
-  &__label {
-    padding: 12px 12px 20px 0;
-  }
-}
-</style>
