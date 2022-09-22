@@ -34,7 +34,7 @@ const conditionalClasses = computed(() => ({
     :id="id"
     v-model="inputValue"
     :aria-label="ariaLabel"
-    class="input"
+    class="bg-white input"
     :class="conditionalClasses"
     :placeholder="placeholder"
     type="text"

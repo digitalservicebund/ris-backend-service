@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
       class="dropdown-container__open-dropdown"
       @keydown.enter="toggleDropdown"
     >
-      <div class="input-container">
+      <div class="bg-white input-container">
         <input
           :id="id"
           :aria-label="ariaLabel"
@@ -147,16 +147,10 @@ onBeforeUnmount(() => {
 
       &:hover {
         @apply hover:outline-4 hover:outline hover:outline-blue-900;
-
-        border: none;
-        margin-bottom: 4px;
       }
 
       &:focus {
         @apply focus:outline-4 focus:outline focus:outline-blue-900;
-
-        border: none;
-        margin-bottom: 4px;
       }
 
       .text-input {
