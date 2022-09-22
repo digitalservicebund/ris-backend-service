@@ -6,62 +6,61 @@ defineProps<{ open: boolean; hasFile: boolean; file?: string }>()
 defineEmits<{ (e: "togglePanel"): void }>()
 
 const route = useRoute()
+
+const uploadFileRoute = {
+  name: "jurisdiction-documentUnit-:documentNumber-files",
+  params: { documentNumber: route.params.documentNumber },
+  query: route.query,
+}
 </script>
 
 <template>
-  <v-col v-if="!open" align="right" cols="3">
-    <button
-      id="odoc-open-element"
-      aria-label="Originaldokument öffnen"
-      class="bg-yellow-500 border-3 border-blue-800 border-solid odoc-open"
-      @click="$emit('togglePanel')"
-    >
-      <div class="odoc-open-text">Originaldokument</div>
-      <div class="bg-blue-800 odoc-open-icon-background">
-        <span class="material-icons odoc-open-icon text-white">
-          arrow_back_ios_new
-        </span>
-      </div>
-    </button>
-  </v-col>
-  <v-col v-else cols="5">
-    <div id="odoc-panel-element" class="odoc-panel">
-      <h3 class="odoc-editor-header">
-        <button
-          aria-label="Originaldokument schließen"
-          class="bg-blue-800 flex items-center justify-center odoc-close-icon-background text-white"
-          @click="$emit('togglePanel')"
-        >
-          <span class="material-icons odoc-close-icon"> close </span>
-        </button>
-        Originaldokument
-      </h3>
-      <div v-if="!hasFile">
-        <span class="material-icons mb-4 odoc-upload-icon text-blue-800"
-          >cloud_upload</span
-        >
-        <div class="odoc-upload-note">
-          Es wurde noch kein Originaldokument hochgeladen.
-        </div>
-        <span class="flex gap-x-4">
-          <span class="material-icons text-blue-800"> arrow_forward </span>
-          <router-link
-            class="text-blue-800"
-            :to="{
-              name: 'jurisdiction-documentUnit-:documentNumber-files',
-              params: { documentNumber: $route.params.documentNumber },
-              query: route.query,
-            }"
-            >Zum Upload</router-link
-          >
-        </span>
-      </div>
-      <div v-else-if="!file">Dokument wird geladen</div>
-      <div v-else class="border-1 border-gray-400 border-solid">
-        <TextEditor element-id="odoc" field-size="max" :value="file" />
-      </div>
+  <button
+    v-if="!open"
+    id="odoc-open-element"
+    aria-label="Originaldokument öffnen"
+    class="bg-yellow-500 border-3 border-blue-800 border-solid odoc-open"
+    @click="$emit('togglePanel')"
+  >
+    <div class="odoc-open-text">Originaldokument</div>
+    <div class="bg-blue-800 odoc-open-icon-background">
+      <span class="material-icons odoc-open-icon"> arrow_back_ios_new </span>
     </div>
-  </v-col>
+  </button>
+
+  <div v-if="open" v-bind="$attrs" class="basis-1/3! flex flex-col gap-56">
+    <div class="flex items-center">
+      <h2 class="grow heading-02-regular">Originaldokument</h2>
+
+      <button
+        aria-label="Originaldokument schließen"
+        class="bg-blue-800 rounded-full text-white"
+        @click="$emit('togglePanel')"
+      >
+        <span class="material-icons p-8"> close </span>
+      </button>
+    </div>
+
+    <div v-if="!hasFile" class="flex flex-col gap-24">
+      <span class="material-icons odoc-upload-icon">cloud_upload</span>
+
+      Es wurde noch kein Originaldokument hochgeladen.
+
+      <router-link
+        class="flex gap-2 items-center link-01-bold"
+        :to="uploadFileRoute"
+      >
+        <span class="material-icons">arrow_forward</span>
+        <span>Zum Upload</span>
+      </router-link>
+    </div>
+
+    <div v-else-if="!file">Dokument wird geladen</div>
+
+    <div v-else class="border-1 border-gray-400 border-solid">
+      <TextEditor element-id="odoc" field-size="max" :value="file" />
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -70,7 +69,7 @@ const route = useRoute()
   height: 65px;
   align-items: center; // align vertical
   justify-content: center; // align horizontal
-  margin-right: 6px;
+  margin-right: 40px;
   border-radius: 10px;
   transform: rotate(-90deg);
   transform-origin: right;
@@ -84,7 +83,8 @@ const route = useRoute()
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  transform: rotate(90deg) translateX(-25px) translateY(-25px);
+  color: white;
+  transform: rotate(90deg) translateY(-25px);
 }
 
 .odoc-open-icon {
@@ -92,26 +92,8 @@ const route = useRoute()
   margin-right: 9px;
 }
 
-.odoc-close-icon-background {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  transform: translate(-40px, 10px);
-}
-
-.odoc-editor-header {
-  padding: 40px 0 15px 20px; // top right bottom left
-}
-
-.odoc-panel {
-  position: fixed;
-}
-
-.odoc-upload-note {
-  margin-bottom: 15px;
-}
-
 .odoc-upload-icon {
   font-size: 50px;
+  @apply text-blue-800;
 }
 </style>

@@ -157,42 +157,38 @@ onUnmounted(() => {
 
 <template>
   <DocumentUnitWrapper v-slot="{ classes }" :document-unit="documentUnit">
-    <div :class="classes">
-      <v-row>
-        <v-col :cols="showDocPanel ? 7 : 9">
-          <DocumentUnitCoreData
-            id="coreData"
-            v-model="coreData"
-            :update-status="updateStatus"
-            @update-document-unit="handleUpdateDocumentUnit"
-          />
-
-          <DocumentUnitPreviousDecisions
-            id="previousDecisions"
-            v-model="previousDecisions"
-            class="my-16"
-
-          <DocumentUnitTexts
-            id="texts"
-            :texts="documentUnit.texts"
-            :update-status="updateStatus"
-            @update-document-unit="handleUpdateDocumentUnit"
-            @update-value="handleUpdateValueDocumentUnitTexts"
-          />
-        </v-col>
-        <OriginalFileSidePanel
-          :file="fileAsHTML"
-          :has-file="documentUnit.hasFile"
-          :open="showDocPanel"
-          @toggle-panel="handleToggleFilePanel"
+    <div class="flex w-full">
+      <div :class="classes">
+        <DocumentUnitCoreData
+          id="coreData"
+          v-model="coreData"
+          :update-status="updateStatus"
+          @update-document-unit="handleUpdateDocumentUnit"
         />
-      </v-row>
+
+        <DocumentUnitPreviousDecisions
+          id="previousDecisions"
+          v-model="previousDecisions"
+          class="my-16"
+        />
+
+        <DocumentUnitTexts
+          id="texts"
+          :texts="documentUnit.texts"
+          :update-status="updateStatus"
+          @update-document-unit="handleUpdateDocumentUnit"
+          @update-value="handleUpdateValueDocumentUnitTexts"
+        />
+      </div>
+
+      <OriginalFileSidePanel
+        class="bg-white"
+        :class="classes"
+        :file="fileAsHTML"
+        :has-file="documentUnit.hasFile"
+        :open="showDocPanel"
+        @toggle-panel="handleToggleFilePanel"
+      />
     </div>
   </DocumentUnitWrapper>
 </template>
-
-<style scoped>
-#previous-decisions {
-  padding: 2rem 1.1rem;
-}
-</style>
