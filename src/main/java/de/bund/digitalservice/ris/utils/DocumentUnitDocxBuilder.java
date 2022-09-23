@@ -198,7 +198,7 @@ public class DocumentUnitDocxBuilder {
     }
 
     NumPr numPr = paragraph.getPPr().getNumPr();
-    String numId = null;
+    String numId;
     String iLvl = null;
 
     ListNumberingDefinition listNumberingDefinition = null;
@@ -545,10 +545,10 @@ public class DocumentUnitDocxBuilder {
       return null;
     }
 
-    if (positionH.getAlign() == STAlignH.LEFT
+    if ((positionH != null && positionH.getAlign() == STAlignH.LEFT)
         || (wrapSquare != null && wrapSquare.getWrapText() == STWrapText.LEFT)) {
       return "left";
-    } else if (positionH.getAlign() == STAlignH.RIGHT
+    } else if ((positionH != null && positionH.getAlign() == STAlignH.RIGHT)
         || (wrapSquare != null && wrapSquare.getWrapText() == STWrapText.RIGHT)) {
       return "right";
     } else {
