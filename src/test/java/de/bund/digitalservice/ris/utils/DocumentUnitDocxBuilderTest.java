@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.utils;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -1269,6 +1270,72 @@ class DocumentUnitDocxBuilderTest {
 
     var htmlString = numberingListEntry.toHtmlString();
     assertEquals("<p>test text</p>", htmlString);
+  }
+
+  @Test
+  void testBuild_hasTheRightSorting() {
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildTextRunElement("test"))
+            .addRunElement(TestDocxBuilder.buildAnchorImageElement())
+            .addRunElement(TestDocxBuilder.buildTextRunElement("test 2"))
+            .addRunElement(TestDocxBuilder.buildInlineImageElement())
+            .addRunElement(TestDocxBuilder.buildTextRunElement("test 3"))
+            .build();
+
+    var result =
+        DocumentUnitDocxBuilder.newInstance()
+            .setParagraph(paragraph)
+            .useImages(TestDocxBuilder.getImageMap())
+            .build();
+
+    assertThat(result).isInstanceOf(ParagraphElement.class);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertThat(paragraphElement.getRunElements()).hasSize(5);
+    assertThat(paragraphElement.getRunElements().get(0)).isInstanceOf(AnchorImageElement.class);
+    assertThat(paragraphElement.getRunElements().get(1))
+        .hasFieldOrPropertyWithValue("text", "test");
+    assertThat(paragraphElement.getRunElements().get(2))
+        .hasFieldOrPropertyWithValue("text", "test 2");
+    assertThat(paragraphElement.getRunElements().get(3)).isInstanceOf(InlineImageElement.class);
+    assertThat(paragraphElement.getRunElements().get(4))
+        .hasFieldOrPropertyWithValue("text", "test 3");
+  }
+
+  @Test
+  void testBuild_withVmlShape() {
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildVmlImage())
+            .build();
+
+    var result =
+        DocumentUnitDocxBuilder.newInstance()
+            .setParagraph(paragraph)
+            .useImages(TestDocxBuilder.getImageMap())
+            .build();
+
+    assertThat(result).isInstanceOf(ParagraphElement.class);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertThat(paragraphElement.getRunElements()).hasSize(1);
+    assertThat(paragraphElement.getRunElements().get(0)).isInstanceOf(AnchorImageElement.class);
+    AnchorImageElement imageElement = (AnchorImageElement) paragraphElement.getRunElements().get(0);
+    assertThat(imageElement.getBase64Representation()).isEqualTo("dm1s");
+    assertThat(imageElement.getContentType()).isEqualTo("vml-content-type");
+  }
+
+  @Test
+  void testBuild_withUnknownRunElement_shouldHaveAnErrorRunElement() {
+    R runElement = new R();
+    runElement.getContent().add(new JAXBElement<>(new QName("error run"), String.class, "error"));
+    P paragraph = TestDocxBuilder.newParagraphBuilder().addRunElement(runElement).build();
+
+    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+
+    assertThat(result).isInstanceOf(ParagraphElement.class);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertThat(paragraphElement.getRunElements()).hasSize(1);
+    assertThat(paragraphElement.getRunElements().get(0)).isInstanceOf(ErrorRunElement.class);
   }
 
   @Test

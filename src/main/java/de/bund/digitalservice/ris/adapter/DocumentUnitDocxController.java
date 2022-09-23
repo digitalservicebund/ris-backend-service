@@ -28,6 +28,9 @@ public class DocumentUnitDocxController {
 
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<Docx2Html>> html(@PathVariable String id) {
-    return service.getHtml(id).map(ResponseEntity::ok);
+    return service
+        .getHtml(id)
+        .map(ResponseEntity::ok)
+        .onErrorReturn(ResponseEntity.internalServerError().build());
   }
 }

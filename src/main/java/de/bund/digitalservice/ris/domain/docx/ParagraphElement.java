@@ -5,7 +5,7 @@ import java.util.List;
 
 public class ParagraphElement extends TextElement {
   private boolean clearfix;
-  private final List<RunElement> runElements = new ArrayList<>();
+  private List<RunElement> runElements = new ArrayList<>();
 
   public void setAlignment(String alignment) {
     addStyle("text-align", alignment);
@@ -21,6 +21,10 @@ public class ParagraphElement extends TextElement {
 
   public List<RunElement> getRunElements() {
     return runElements;
+  }
+
+  public void setRunElements(List<RunElement> runElements) {
+    this.runElements = runElements;
   }
 
   @Override

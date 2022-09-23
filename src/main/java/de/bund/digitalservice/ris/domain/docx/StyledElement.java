@@ -12,6 +12,11 @@ public abstract class StyledElement implements DocumentUnitDocx {
     styles.add(new Style(property, value));
   }
 
+  public void addStyle(Style newStyle) {
+    styles.removeIf(style -> style.property().equals(newStyle.property()));
+    styles.add(newStyle);
+  }
+
   public Boolean hasStyle() {
     return !styles.isEmpty();
   }
@@ -22,11 +27,5 @@ public abstract class StyledElement implements DocumentUnitDocx {
     return " style=\""
         + styles.stream().map(Style::toString).collect(Collectors.joining("; "))
         + ";\"";
-  }
-}
-
-record Style(String property, String value) {
-  public String toString() {
-    return property + ": " + value;
   }
 }

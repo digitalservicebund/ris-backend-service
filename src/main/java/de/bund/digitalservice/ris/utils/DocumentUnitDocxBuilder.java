@@ -36,11 +36,15 @@ import org.docx4j.dml.CTPositiveSize2D;
 import org.docx4j.dml.GraphicData;
 import org.docx4j.dml.wordprocessingDrawing.Anchor;
 import org.docx4j.dml.wordprocessingDrawing.CTPosH;
+import org.docx4j.dml.wordprocessingDrawing.CTWrapSquare;
 import org.docx4j.dml.wordprocessingDrawing.Inline;
 import org.docx4j.dml.wordprocessingDrawing.STAlignH;
+import org.docx4j.dml.wordprocessingDrawing.STWrapText;
 import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
+import org.docx4j.vml.CTImageData;
+import org.docx4j.vml.CTShape;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.CTShd;
 import org.docx4j.wml.Drawing;
@@ -50,6 +54,7 @@ import org.docx4j.wml.Lvl;
 import org.docx4j.wml.P;
 import org.docx4j.wml.PPr;
 import org.docx4j.wml.PPrBase.NumPr;
+import org.docx4j.wml.Pict;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.RPrAbstract;
@@ -327,7 +332,33 @@ public class DocumentUnitDocxBuilder {
         .map(R.class::cast)
         .forEach(run -> parseRunElement(run, paragraphElement));
 
+    sortParagraphElements(paragraphElement);
+
     return paragraphElement;
+  }
+
+  private void sortParagraphElements(ParagraphElement paragraphElement) {
+    List<RunElement> sortedList =
+        paragraphElement.getRunElements().stream()
+            .sorted(
+                (o1, o2) -> {
+                  if (o1.getClass().equals(o2.getClass())) {
+                    return 0;
+                  }
+
+                  if (o1 instanceof AnchorImageElement && !(o2 instanceof AnchorImageElement)) {
+                    return -1;
+                  }
+
+                  if (!(o1 instanceof AnchorImageElement) && o2 instanceof AnchorImageElement) {
+                    return 1;
+                  }
+
+                  return 0;
+                })
+            .toList();
+
+    paragraphElement.setRunElements(sortedList);
   }
 
   private void parseRunElement(R run, ParagraphElement paragraphElement) {
@@ -350,6 +381,8 @@ public class DocumentUnitDocxBuilder {
         paragraphElement.addRunElement(imageElement);
       } else if (declaredType == R.Tab.class) {
         paragraphElement.addRunElement(new RunTabElement());
+      } else if (declaredType == Pict.class) {
+        parsePict(paragraphElement, (Pict) jaxbElement.getValue());
       } else {
         LOGGER.error("unknown run element: {}", declaredType.getName());
         paragraphElement.addRunElement(new ErrorRunElement(declaredType.getName()));
@@ -385,6 +418,47 @@ public class DocumentUnitDocxBuilder {
     }
   }
 
+  private void parsePict(ParagraphElement parent, Pict pict) {
+    pict.getAnyAndAny()
+        .forEach(
+            child -> {
+              if (child instanceof JAXBElement<?> jaxbElement) {
+                LOGGER.error(
+                    "unknown jaxb child '{}' in pict element: {}",
+                    jaxbElement.getName(),
+                    jaxbElement.getValue());
+              } else if (child instanceof CTShape shape) {
+                parseCTShape(parent, shape);
+              } else {
+                LOGGER.info("unknown child in pict element: {}", child);
+              }
+            });
+  }
+
+  private void parseCTShape(ParagraphElement parent, CTShape shape) {
+    shape
+        .getEGShapeElements()
+        .forEach(
+            jaxbElement -> {
+              if (jaxbElement.getValue() instanceof CTImageData imageData) {
+                parseCTImageData(parent, imageData, shape.getStyle());
+              } else {
+                LOGGER.info(
+                    "unknown shape child '{}': {}", jaxbElement.getName(), jaxbElement.getValue());
+              }
+            });
+  }
+
+  private void parseCTImageData(ParagraphElement parent, CTImageData imageData, String style) {
+    DocxImagePart image = images.get(imageData.getId());
+    AnchorImageElement imageElement = new AnchorImageElement();
+    imageElement.setContentType(image.contentType());
+    var base64 = Base64.getEncoder().encodeToString(image.bytes());
+    imageElement.setBase64Representation(base64);
+    StyleConverter.getListFromString(style).forEach(imageElement::addStyle);
+    parent.addRunElement(imageElement);
+  }
+
   private RunElement parseAnchorImageElement(ParagraphElement parent, Anchor anchor) {
     if (anchor == null
         || anchor.getGraphic() == null
@@ -398,7 +472,7 @@ public class DocumentUnitDocxBuilder {
     if (runElement instanceof AnchorImageElement imageElement) {
       imageElement.setAlternateText(parseImageAlternateText(anchor.getDocPr()));
       imageElement.setSize(parseImageSize(anchor.getExtent()));
-      String floating = parseFloating(anchor.getPositionH());
+      String floating = parseFloating(anchor);
       if (floating != null) {
         if (floating.equals("error")) {
           return new ErrorRunElement(
@@ -463,14 +537,19 @@ public class DocumentUnitDocxBuilder {
     return !alternateText.isBlank() ? alternateText : null;
   }
 
-  private String parseFloating(CTPosH positionH) {
-    if (positionH == null || positionH.getAlign() == null) {
+  private String parseFloating(Anchor anchor) {
+    CTPosH positionH = anchor.getPositionH();
+    CTWrapSquare wrapSquare = anchor.getWrapSquare();
+
+    if ((positionH == null || positionH.getAlign() == null) && (wrapSquare == null)) {
       return null;
     }
 
-    if (positionH.getAlign() == STAlignH.LEFT) {
+    if (positionH.getAlign() == STAlignH.LEFT
+        || (wrapSquare != null && wrapSquare.getWrapText() == STWrapText.LEFT)) {
       return "left";
-    } else if (positionH.getAlign() == STAlignH.RIGHT) {
+    } else if (positionH.getAlign() == STAlignH.RIGHT
+        || (wrapSquare != null && wrapSquare.getWrapText() == STWrapText.RIGHT)) {
       return "right";
     } else {
       return "error";
