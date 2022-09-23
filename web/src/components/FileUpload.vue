@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import ErrorModal from "@/components/ErrorModal.vue"
 import FileInputButton from "@/components/FileInputButton.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import { UploadStatus, UploadErrorStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
@@ -190,7 +190,7 @@ const error = computed(() => {
       </span>
     </div>
 
-    <ErrorModal v-if="error" v-bind="error" class="mt-8" />
+    <InfoModal v-if="error" v-bind="error" class="mt-8" />
   </div>
 </template>
 

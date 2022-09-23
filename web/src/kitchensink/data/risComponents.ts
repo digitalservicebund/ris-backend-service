@@ -11,5 +11,5 @@ export const risComponents: risComponent[] = [
   { name: "Navbar", view: "NavbarView" },
   { name: "File Viewer", view: "FileViewerView" },
   { name: "File Upload", view: "FileUploadView" },
-  { name: "Error Modal", view: "ErrorModalView" },
+  { name: "InfoModal", view: "InfoModalView" },
 ]

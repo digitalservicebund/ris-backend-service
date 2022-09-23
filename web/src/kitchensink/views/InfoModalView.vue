@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import ErrorModal from "@/components/ErrorModal.vue"
+import InfoModal from "@/components/InfoModal.vue"
 </script>
 
 <template>
-  <ErrorModal
+  <InfoModal
     description="The messages are shown here."
     title="The messages title is shown here"
-  ></ErrorModal>
+  ></InfoModal>
 </template>

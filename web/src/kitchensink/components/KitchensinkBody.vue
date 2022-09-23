@@ -3,11 +3,11 @@ import { computed } from "vue"
 import type { risComponent } from "@/kitchensink/types/types"
 import ButtonView from "@/kitchensink/views/ButtonView.vue"
 import CodeSnippetView from "@/kitchensink/views/CodeSnippetView.vue"
-import ErrorModalView from "@/kitchensink/views/ErrorModalView.vue"
 import ErrorView from "@/kitchensink/views/ErrorView.vue"
 import ExpandableContentView from "@/kitchensink/views/ExpandableContentView.vue"
 import FileUploadView from "@/kitchensink/views/FileUploadView.vue"
 import FileViewerView from "@/kitchensink/views/FileViewerView.vue"
+import InfoModalView from "@/kitchensink/views/InfoModalView.vue"
 import InputView from "@/kitchensink/views/InputView.vue"
 import NavbarView from "@/kitchensink/views/NavbarView.vue"
 import OriginalFileSidePanelView from "@/kitchensink/views/OriginalFileSidePanelView.vue"
@@ -24,8 +24,8 @@ const component = computed(() => {
       return ButtonView
     case "CodeSnippetView":
       return CodeSnippetView
-    case "ErrorModalView":
-      return ErrorModalView
+    case "InfoModalView":
+      return InfoModalView
     case "ExpandableContentView":
       return ExpandableContentView
     case "FileUploadView":

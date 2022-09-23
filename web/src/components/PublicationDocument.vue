@@ -4,13 +4,15 @@ import InputField from "./InputField.vue"
 import TextButton from "./TextButton.vue"
 import TextInput from "./TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
-import ErrorModal from "@/components/ErrorModal.vue"
+import InfoModal from "@/components/InfoModal.vue"
 import XmlMail from "@/domain/xmlMail"
+import { InfoStatus } from "@/enum/enumInfoStatus"
 
 const props = defineProps<{
   publishResult?: XmlMail
   lastPublishedXmlMail?: XmlMail
   errorMessage?: { title: string; description: string }
+  succeedMessage?: { title: string; description: string }
 }>()
 
 const emits = defineEmits<{
@@ -132,7 +134,13 @@ function validateEmailAddress(): boolean {
         </div>
       </div>
 
-      <ErrorModal v-if="errorMessage" class="mt-8" v-bind="errorMessage" />
+      <InfoModal v-if="errorMessage" class="mt-8" v-bind="errorMessage" />
+      <InfoModal
+        v-if="succeedMessage"
+        class="mt-8"
+        v-bind="succeedMessage"
+        :status="InfoStatus.SUCCEED"
+      />
     </div>
     <div class="flex-col-container publication-infos-container">
       <p class="publication-text-header">Letzte Veröffentlichungen</p>

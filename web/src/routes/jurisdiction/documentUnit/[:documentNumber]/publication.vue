@@ -16,6 +16,7 @@ const loadDone = ref(false)
 const lastPublishedXmlMail = ref<XmlMail>()
 const publishResult = ref<XmlMail>()
 const errorMessage = ref<{ title: string; description: string }>()
+const succeedMessage = ref<{ title: string; description: string }>()
 
 const publishADocument = async (email: string) => {
   const response = await publishService.publishADocument(
@@ -34,9 +35,12 @@ const publishADocument = async (email: string) => {
       lastPublishedXmlMail.value.xml = lastPublishedXmlMail.value.xml
         ? lastPublishedXmlMail.value.xml.replace(/[ \t]{2,}/g, "")
         : ""
+      succeedMessage.value = {
+        title: "Email wurde erfolgreich versendet",
+        description: "",
+      }
     }
   }
-
   errorMessage.value = response.errorMessage
 }
 
@@ -78,7 +82,6 @@ onMounted(async () => {
   }
 
   errorMessage.value = response.errorMessage
-
   loadDone.value = true
 })
 </script>
@@ -91,6 +94,7 @@ onMounted(async () => {
         :error-message="errorMessage"
         :last-published-xml-mail="lastPublishedXmlMail"
         :publish-result="publishResult"
+        :succeed-message="succeedMessage"
         @publish-a-document="publishADocument($event)"
       />
 

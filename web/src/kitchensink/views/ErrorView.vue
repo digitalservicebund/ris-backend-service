@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import ErrorModal from "@/components/ErrorModal.vue"
+import InfoModal from "@/components/InfoModal.vue"
 </script>
 
 <template>
-  <ErrorModal
+  <InfoModal
     description="Diese Seite wird gerade eingebaut. Vesuchen Sie diese Seite später erneut !"
     title="Es ist ein Fehler aufgetreten"
-  ></ErrorModal>
+  ></InfoModal>
 </template>
