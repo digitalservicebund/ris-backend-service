@@ -6,7 +6,9 @@ import { risComponents } from "@/kitchensink/data/risComponents"
 import type { risComponent } from "@/kitchensink/types/types"
 
 const components = ref(risComponents)
-const selectedComponent = ref({ name: "Index", view: "IndexView" })
+const selectedComponent = ref(
+  !!risComponents ? risComponents[0] : { name: "Error", view: "ErrorView" }
+)
 const setSelectedComponent = (component: risComponent) => {
   selectedComponent.value = component
 }
