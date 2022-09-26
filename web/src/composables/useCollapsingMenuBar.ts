@@ -29,6 +29,7 @@ export interface MenuButton {
   isLast?: boolean
   isActive?: boolean
   isSecondRow?: boolean
+  callback?: () => void
 }
 
 export function useCollapsingMenuBar(
@@ -50,7 +51,6 @@ export function useCollapsingMenuBar(
           ariaLabel: "more",
           isCollapsable: false,
           childButtons: secondRow,
-          callback: "showMore",
         }
         buttonList = flatButtonList.filter(
           (button) => !secondRow.includes(button)

@@ -50,7 +50,7 @@ interface MenuButton {
   isActive?: boolean
   isSecondRow?: boolean
   isCollapsable?: boolean
-  callback?: string
+  callback?: () => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -107,11 +107,10 @@ const editor = new Editor({
       inline: true,
     }),
     History.configure({
-      depth: 10,
+      depth: 100,
     }),
   ],
   onUpdate: () => {
-    // outgoing changes
     emit("updateValue", editor.getHTML())
   },
   onFocus: () => (hasFocus.value = true),
@@ -129,7 +128,7 @@ const buttons = computed(() => [
     ariaLabel: "undo",
     group: "arrow",
     isCollapsable: false,
-    callback: "undo",
+    callback: () => editor.chain().focus().undo().run(),
   },
   {
     type: "redo",
@@ -137,7 +136,7 @@ const buttons = computed(() => [
     ariaLabel: "redo",
     group: "arrow",
     isCollapsable: false,
-    callback: "redo",
+    callback: () => editor.chain().focus().redo().run(),
   },
   {
     type: "bold",
@@ -145,7 +144,7 @@ const buttons = computed(() => [
     ariaLabel: "bold",
     group: "format",
     isCollapsable: false,
-    callback: "toggle",
+    callback: () => editor.chain().focus().toggleMark("bold").run(),
   },
   {
     type: "italic",
@@ -153,7 +152,7 @@ const buttons = computed(() => [
     ariaLabel: "italic",
     group: "format",
     isCollapsable: false,
-    callback: "toggle",
+    callback: () => editor.chain().focus().toggleMark("italic").run(),
   },
   {
     type: "underline",
@@ -161,7 +160,7 @@ const buttons = computed(() => [
     ariaLabel: "underline",
     group: "format",
     isCollapsable: false,
-    callback: "toggle",
+    callback: () => editor.chain().focus().toggleMark("underline").run(),
   },
   {
     type: "strike",
@@ -169,7 +168,7 @@ const buttons = computed(() => [
     ariaLabel: "strike",
     group: "format",
     isCollapsable: false,
-    callback: "toggle",
+    callback: () => editor.chain().focus().toggleMark("strike").run(),
   },
   {
     type: "left",
@@ -178,7 +177,7 @@ const buttons = computed(() => [
     group: "alignment",
     isCollapsable: true,
     isSecondRow: true,
-    callback: "textAlign",
+    callback: () => editor.chain().focus().setTextAlign("left").run(),
   },
   {
     type: "center",
@@ -187,7 +186,7 @@ const buttons = computed(() => [
     group: "alignment",
     isCollapsable: true,
     isSecondRow: true,
-    callback: "textAlign",
+    callback: () => editor.chain().focus().setTextAlign("center").run(),
   },
   {
     type: "right",
@@ -196,7 +195,7 @@ const buttons = computed(() => [
     group: "alignment",
     isCollapsable: true,
     isSecondRow: true,
-    callback: "textAlign",
+    callback: () => editor.chain().focus().setTextAlign("right").run(),
   },
   {
     type: "justify",
@@ -205,7 +204,7 @@ const buttons = computed(() => [
     group: "alignment",
     isCollapsable: true,
     isSecondRow: true,
-    callback: "textAlign",
+    callback: () => editor.chain().focus().setTextAlign("justify").run(),
   },
   {
     type: "superscript",
@@ -214,7 +213,7 @@ const buttons = computed(() => [
     group: "vertical-alignment",
     isCollapsable: false,
     isSecondRow: true,
-    callback: "toggle",
+    callback: () => editor.chain().focus().toggleMark("superscript").run(),
   },
   {
     type: "subscript",
@@ -223,7 +222,7 @@ const buttons = computed(() => [
     group: "vertical-alignment",
     isCollapsable: false,
     isSecondRow: true,
-    callback: "toggle",
+    callback: () => editor.chain().focus().toggleMark("subscript").run(),
   },
   {
     type: "numbered-list",
@@ -271,13 +270,11 @@ const fixButtons = [
     type: "",
     icon: "123",
     ariaLabel: "margins",
-    callback: "toggle",
   },
   {
     type: "",
     icon: "open_in_full",
     ariaLabel: "fullview",
-    callback: "toggle",
   },
 ]
 
@@ -306,17 +303,8 @@ function onResize() {
 }
 
 function handleButtonClick(button: MenuButton) {
-  if (button.callback === "toggle") {
-    editor.chain().focus().toggleMark(button.type).run()
-  } else if (button.callback === "textAlign") {
-    editor.chain().focus().setTextAlign(button.type).run()
-  } else if (button.callback === "showMore") {
-    showSecondRow.value = !showSecondRow.value
-  } else if (button.callback === "undo") {
-    editor.chain().focus().undo().run()
-  } else if (button.callback === "redo") {
-    editor.chain().focus().redo().run()
-  }
+  if (button.type == "more") showSecondRow.value = !showSecondRow.value
+  if (button.callback) button.callback()
 }
 
 watch(

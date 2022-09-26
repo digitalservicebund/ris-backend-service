@@ -10,7 +10,7 @@ interface MenuButton {
   isActive?: boolean
   isSecondRow?: boolean
   isCollapsable?: boolean
-  callback?: string
+  callback?: () => void
 }
 const props = defineProps<MenuButton>()
 const emits = defineEmits<{
