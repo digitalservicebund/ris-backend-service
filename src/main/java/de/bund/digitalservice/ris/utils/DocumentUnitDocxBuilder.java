@@ -47,6 +47,7 @@ import org.docx4j.vml.CTImageData;
 import org.docx4j.vml.CTShape;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.CTShd;
+import org.docx4j.wml.CTTblPrBase;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
@@ -63,7 +64,7 @@ import org.docx4j.wml.STShd;
 import org.docx4j.wml.STVerticalAlignRun;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
-import org.docx4j.wml.TblPr;
+import org.docx4j.wml.TblBorders;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
 import org.docx4j.wml.Tr;
@@ -842,9 +843,21 @@ public class DocumentUnitDocxBuilder {
     return table != null;
   }
 
-  private void addTableStyle(TableElement tableElement, TblPr tblPr) {
-    if (tblPr == null) return;
+  private void addTableStyle(TableElement tableElement) {
+    if (table.getTblPr() == null) {
+      return;
+    }
 
+    if (table.getTblPr().getTblStyle() != null) {
+      var tblStyleKey = table.getTblPr().getTblStyle().getVal();
+      Style style = styles.get(tblStyleKey);
+      addTableStyle(tableElement, style.getTblPr());
+    }
+
+    addTableStyle(tableElement, table.getTblPr());
+  }
+
+  private void addTableStyle(TableElement tableElement, CTTblPrBase tblPr) {
     if (tblPr.getTblBorders() != null) {
       var topBorder = tblPr.getTblBorders().getTop();
       tableElement.setTopBorder(parseCtBorder(topBorder));
@@ -859,7 +872,9 @@ public class DocumentUnitDocxBuilder {
       tableElement.setLeftBorder(parseCtBorder(leftBorder));
     }
 
-    if (tblPr.getShd() != null) tableElement.setBackgroundColor(parseCTShd(tblPr.getShd()));
+    if (tblPr.getShd() != null) {
+      tableElement.setBackgroundColor(parseCTShd(tblPr.getShd()));
+    }
   }
 
   private Border parseCtBorder(CTBorder border) {
@@ -869,12 +884,16 @@ public class DocumentUnitDocxBuilder {
     if (color != null) {
       color = color.equals("auto") ? "000" : color;
       color = "#" + color.toLowerCase();
+    } else {
+      color = "#000";
     }
 
-    var width =
-        border.getSz() != null ? DocxUnitConverter.convertPointToPixel(border.getSz()) : null;
+    var width = border.getSz() != null ? DocxUnitConverter.convertPointToPixel(border.getSz()) : 0;
 
-    if (!border.getVal().equals(STBorder.SINGLE)) LOGGER.error("unsupported table border style");
+    if (border.getVal() != null && !border.getVal().equals(STBorder.SINGLE)) {
+      LOGGER.error("unsupported table border style");
+    }
+
     var type = "solid";
 
     return new Border(color, width, type);
@@ -887,7 +906,7 @@ public class DocumentUnitDocxBuilder {
 
   private DocumentUnitDocx convertToTable() {
     var tableElement = new TableElement(parseTable(table));
-    addTableStyle(tableElement, table.getTblPr());
+    addTableStyle(tableElement);
 
     return tableElement;
   }
@@ -931,25 +950,47 @@ public class DocumentUnitDocxBuilder {
               }
             });
 
-    if (!cells.isEmpty() && table.getTblPr().getTblBorders() != null) {
-      var verticalCtBorder = table.getTblPr().getTblBorders().getInsideV();
-      var horizontalCtBorder = table.getTblPr().getTblBorders().getInsideH();
-
-      var verticalBorder = parseCtBorder(verticalCtBorder);
-      var horizontalBorder = parseCtBorder(horizontalCtBorder);
-
-      cells.forEach(
-          cell -> {
-            cell.setTopBorder(horizontalBorder);
-            cell.setRightBorder(verticalBorder);
-            cell.setBottomBorder(horizontalBorder);
-            cell.setLeftBorder(verticalBorder);
-          });
-      cells.get(0).setLeftBorder(null);
-      cells.get(cells.size() - 1).setRightBorder(null);
-    }
+    addBordersToCells(cells);
 
     return new TableRowElement(cells);
+  }
+
+  private void addBordersToCells(List<TableCellElement> cells) {
+    if (cells.isEmpty() || table.getTblPr() == null) {
+      return;
+    }
+
+    if (table.getTblPr().getTblStyle() != null) {
+      String tableStyleKey = table.getTblPr().getTblStyle().getVal();
+      Style style = styles.get(tableStyleKey);
+      if (style.getTblPr() != null) {
+        addBordersToCells(cells, style.getTblPr().getTblBorders());
+      }
+    }
+
+    addBordersToCells(cells, table.getTblPr().getTblBorders());
+  }
+
+  private void addBordersToCells(List<TableCellElement> cells, TblBorders tblBorders) {
+    if (tblBorders == null) {
+      return;
+    }
+
+    var verticalCtBorder = tblBorders.getInsideV();
+    var horizontalCtBorder = tblBorders.getInsideH();
+
+    var verticalBorder = parseCtBorder(verticalCtBorder);
+    var horizontalBorder = parseCtBorder(horizontalCtBorder);
+
+    cells.forEach(
+        cell -> {
+          cell.setTopBorder(horizontalBorder);
+          cell.setRightBorder(verticalBorder);
+          cell.setBottomBorder(horizontalBorder);
+          cell.setLeftBorder(verticalBorder);
+        });
+    cells.get(0).setLeftBorder(null);
+    cells.get(cells.size() - 1).setRightBorder(null);
   }
 
   private TableCellElement parseTc(Tc tc) {

@@ -25,6 +25,8 @@ fileignoreconfig:
     checksum: 409affd3818f16f55c7189a6bc65c550658089f234f53e06faffdd0369af1953
   - filename: src/main/java/de/bund/digitalservice/ris/adapter/SendInBlueHttpMailSender.java
     checksum: e55e8b56f9da19f328b040d588d555cec3fdcd91afd20c8f30f3f72a9f5458a7
+  - filename: src/main/java/de/bund/digitalservice/ris/utils/DocumentUnitDocxBuilder.java
+    checksum: ed80cd8ee6efb20354dbfc93045a682c825d730d35c4e3510c8be0b29b1e2235
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
