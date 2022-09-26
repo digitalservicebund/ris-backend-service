@@ -57,7 +57,6 @@ export function useCollapsingMenuBar(
           (button) => !secondRow.includes(button)
         )
         buttonList.push(moreButton)
-        console.log(buttonList)
         return buttonList
       }
 
