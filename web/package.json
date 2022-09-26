@@ -57,7 +57,7 @@
     "@namics/stylelint-bem": "^7.0.0",
     "@playwright-testing-library/test": "^4.3.0",
     "@playwright/test": "^1.25.0",
-    "@testing-library/dom": "^8.17.1",
+    "@testing-library/dom": "^8.18.1",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/user-event": "^14.4.2",
     "@testing-library/vue": "^6.6.0",
