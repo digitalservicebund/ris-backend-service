@@ -21,7 +21,8 @@ function flattenList(array: MenuButton[]) {
 
 export interface MenuButton {
   type: string
-  icon: string
+  icon?: string
+  text?: string
   ariaLabel: string
   group?: string
   childButtons?: MenuButton[]
@@ -56,6 +57,7 @@ export function useCollapsingMenuBar(
           (button) => !secondRow.includes(button)
         )
         buttonList.push(moreButton)
+        console.log(buttonList)
         return buttonList
       }
 

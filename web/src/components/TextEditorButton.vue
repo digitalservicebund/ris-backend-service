@@ -1,25 +1,26 @@
 <script lang="ts" setup>
 import { onMounted, onUnmounted, ref } from "vue"
 
-interface TextEditorButton {
+interface MenuButton {
   type: string
-  icon: string
+  icon?: string
+  text?: string
   ariaLabel: string
-  childButtons?: TextEditorButton[]
+  childButtons?: MenuButton[]
   isLast?: boolean
   isActive?: boolean
   isSecondRow?: boolean
   isCollapsable?: boolean
   callback?: string
 }
-const props = defineProps<TextEditorButton>()
+const props = defineProps<MenuButton>()
 const emits = defineEmits<{
-  (e: "toggle", value: TextEditorButton): void
+  (e: "toggle", value: MenuButton): void
 }>()
 
 const showDropdown = ref(false)
 
-function onClickToggle(button: TextEditorButton) {
+function onClickToggle(button: MenuButton) {
   if (!button.childButtons || button.type === "more") emits("toggle", button)
   else if (button.type === "menu") showDropdown.value = !showDropdown.value
 }
@@ -45,7 +46,7 @@ onUnmounted(() => {
 <template>
   <div
     :aria-label="ariaLabel"
-    class="cursor-pointer editor-button flex flex-row-reverse hover:bg-blue-200 text-blue-900"
+    class="cursor-pointer editor-button flex flex-row-reverse hover:bg-blue-200 items-center text-blue-900"
     :class="{
       'bg-blue-200': isActive && !childButtons,
       'border-r-1 border-gray-400 border-solid': isLast,
@@ -56,9 +57,13 @@ onUnmounted(() => {
   >
     <span
       :id="type"
-      class="leading-default material-icons px-2"
-      :class="{ dropdown: type == 'menu' }"
-      >{{ icon }}</span
+      class="leading-default px-2"
+      :class="{
+        dropdown: type == 'menu',
+        'material-icons': icon,
+        'label-02-bold': text,
+      }"
+      >{{ icon ? icon : text }}</span
     >
     <div
       v-if="showDropdown"
@@ -86,5 +91,9 @@ onUnmounted(() => {
 .dropdown::after {
   content: "arrow_drop_down";
   font-family: "Material Icons", sans-serif;
+}
+
+.material-symbols-outlined {
+  font-variation-settings: "FILL" 0, "wght" 400, "GRAD" 0, "opsz" 48;
 }
 </style>

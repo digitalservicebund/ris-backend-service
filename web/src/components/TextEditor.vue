@@ -41,11 +41,12 @@ interface Props {
   ariaLabel?: string
 }
 
-interface Button {
+interface MenuButton {
   type: string
-  icon: string
+  icon?: string
+  text?: string
   ariaLabel: string
-  childButtons?: Button[]
+  childButtons?: MenuButton[]
   isLast?: boolean
   isActive?: boolean
   isSecondRow?: boolean
@@ -171,7 +172,14 @@ const buttons = computed(() => [
     isCollapsable: false,
     callback: "toggle",
   },
-
+  {
+    type: "heading",
+    text: "Heading",
+    ariaLabel: "heading 1",
+    group: "heading",
+    isCollapsable: true,
+    callback: "heading",
+  },
   {
     type: "left",
     icon: "format_align_left",
@@ -288,7 +296,7 @@ const editorButtons = computed(() =>
     isActive: editor.isActive(button.type),
   }))
 )
-const buttonSize = 47 //px
+const buttonSize = 48 //px
 const containerWidth = ref()
 const maxButtonEntries = computed(() =>
   Math.floor((containerWidth.value - 100) / buttonSize)
@@ -306,7 +314,7 @@ function onResize() {
   containerWidth.value = container.value.getBoundingClientRect().width
 }
 
-function handleButtonClick(button: Button) {
+function handleButtonClick(button: MenuButton) {
   if (button.callback === "toggle") {
     editor.chain().focus().toggleMark(button.type).run()
   } else if (button.callback === "textAlign") {
@@ -412,7 +420,9 @@ onBeforeRouteUpdate(async () => {
         class="flex flex-row flex-wrap pa-1"
       >
         <TextEditorButton
-          v-for="(button, index) in collapsedButtons[6].childButtons"
+          v-for="(button, index) in collapsedButtons[
+            collapsedButtons.length - 1
+          ].childButtons"
           :key="index"
           v-bind="button"
           @toggle="handleButtonClick"
