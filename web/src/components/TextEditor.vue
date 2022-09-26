@@ -281,7 +281,10 @@ const fixButtons = [
 const editorButtons = computed(() =>
   buttons.value.map((button) => ({
     ...button,
-    isActive: editor.isActive(button.type),
+    isActive:
+      button.group == "alignment"
+        ? editor.isActive({ textAlign: button.type })
+        : editor.isActive(button.type),
   }))
 )
 const buttonSize = 48 //px
