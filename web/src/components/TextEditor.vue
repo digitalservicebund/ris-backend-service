@@ -323,7 +323,6 @@ watch(
 
 const showButtons = () => {
   const showButtons = props.editable && hasFocus.value
-  // const showButtons = props.editable
   return showButtons
 }
 

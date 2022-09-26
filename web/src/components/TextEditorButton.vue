@@ -62,7 +62,7 @@ onUnmounted(() => {
     >
     <div
       v-if="showDropdown"
-      class="absolute bg-white border-1 border-blue-800 border-solid flex flex-row mt-36 pa-1 z-50"
+      class="absolute bg-white border-1 border-blue-800 border-solid flex flex-row mt-80 pa-1 z-50"
     >
       <div
         v-for="(childButton, index) in childButtons"
