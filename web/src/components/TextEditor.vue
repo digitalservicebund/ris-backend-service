@@ -43,8 +43,7 @@ interface Props {
 
 interface MenuButton {
   type: string
-  icon?: string
-  text?: string
+  icon: string
   ariaLabel: string
   childButtons?: MenuButton[]
   isLast?: boolean
@@ -171,14 +170,6 @@ const buttons = computed(() => [
     group: "format",
     isCollapsable: false,
     callback: "toggle",
-  },
-  {
-    type: "heading",
-    text: "Heading",
-    ariaLabel: "heading 1",
-    group: "heading",
-    isCollapsable: true,
-    callback: "heading",
   },
   {
     type: "left",

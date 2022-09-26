@@ -21,8 +21,7 @@ function flattenList(array: MenuButton[]) {
 
 export interface MenuButton {
   type: string
-  icon?: string
-  text?: string
+  icon: string
   ariaLabel: string
   group?: string
   childButtons?: MenuButton[]

@@ -3,8 +3,7 @@ import { onMounted, onUnmounted, ref } from "vue"
 
 interface MenuButton {
   type: string
-  icon?: string
-  text?: string
+  icon: string
   ariaLabel: string
   childButtons?: MenuButton[]
   isLast?: boolean
@@ -58,12 +57,8 @@ onUnmounted(() => {
     <span
       :id="type"
       class="leading-default px-2"
-      :class="{
-        dropdown: type == 'menu',
-        'material-icons': icon,
-        'label-02-bold': text,
-      }"
-      >{{ icon ? icon : text }}</span
+      :class="{ dropdown: type == 'menu', 'material-icons': icon }"
+      >{{ icon }}</span
     >
     <div
       v-if="showDropdown"
