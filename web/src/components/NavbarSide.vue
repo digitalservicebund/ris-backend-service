@@ -129,8 +129,8 @@ const linkStyling = (componentName: string) => ({
   height: 65px;
   align-items: center; // align vertical
   justify-content: center; // align horizontal
-  margin-left: 6px;
   border-radius: 10px;
+  margin-left: 6px;
   transform: rotate(-90deg) translateX(-165px);
   transform-origin: left;
 }

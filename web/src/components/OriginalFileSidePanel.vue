@@ -69,8 +69,8 @@ const uploadFileRoute = {
   height: 65px;
   align-items: center; // align vertical
   justify-content: center; // align horizontal
-  margin-right: 40px;
   border-radius: 10px;
+  margin-right: 40px;
   transform: rotate(-90deg);
   transform-origin: right;
 }
