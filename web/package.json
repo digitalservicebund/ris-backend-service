@@ -90,7 +90,7 @@
     "postcss-import": "^15.0.0",
     "postcss-scrollbar": "^0.5.1",
     "prettier": "^2.7.0",
-    "sass": "^1.54.0",
+    "sass": "^1.55.0",
     "sass-loader": "^13.0.0",
     "stylelint": "^14.11.0",
     "stylelint-config-idiomatic-order": "^8.1.0",
