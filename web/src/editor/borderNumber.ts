@@ -22,11 +22,7 @@ export const BorderNumberNumber = Node.create({
     return [{ tag: "number" }]
   },
   renderHTML() {
-    return [
-      "number",
-      { style: "padding-top: 10px; padding-left: 10px; min-width: 40px;" },
-      0,
-    ]
+    return ["number", { style: "padding-left: 10px; min-width: 40px;" }, 0]
   },
 })
 
