@@ -84,7 +84,7 @@ describe("text editor button", async () => {
   test("toggles dropdown menu when user clicks on button with child buttons", async () => {
     const user = userEvent.setup()
 
-    const { emitted, getByLabelText } = render(TextEditorButton, {
+    const { getByLabelText, getByText } = render(TextEditorButton, {
       props: {
         type: "menu",
         icon: "test icon",
@@ -103,13 +103,12 @@ describe("text editor button", async () => {
         ],
       },
     })
-    const button = getByLabelText("menu")
+    const button = getByText("test icon")
     expect(button).toBeInTheDocument()
-    await fireEvent.click(button)
     await user.click(button)
-    expect(emitted().toggle).not.toBeTruthy()
-    // expect(getByLabelText("test child 1 aria")).toBeInTheDocument()
-    // expect(getByLabelText("test child 2 aria")).toBeInTheDocument()
+
+    expect(getByLabelText("test child 1 aria")).toBeInTheDocument()
+    expect(getByLabelText("test child 2 aria")).toBeInTheDocument()
   })
 
   test("if more button clicked, don't show childButtons but emit event", async () => {
