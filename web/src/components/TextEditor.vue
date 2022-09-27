@@ -5,8 +5,6 @@ import { Document } from "@tiptap/extension-document"
 import { History } from "@tiptap/extension-history"
 import { Italic } from "@tiptap/extension-italic"
 import { Strike } from "@tiptap/extension-strike"
-import { Subscript } from "@tiptap/extension-subscript"
-import { Superscript } from "@tiptap/extension-superscript"
 import { Table } from "@tiptap/extension-table"
 import { TableCell } from "@tiptap/extension-table-cell"
 import { TableHeader } from "@tiptap/extension-table-header"
@@ -29,6 +27,7 @@ import { CustomImage } from "../editor/image"
 import { CustomListItem } from "../editor/listItem"
 import { CustomOrderedList } from "../editor/orderedList"
 import { CustomParagraph } from "../editor/paragraph"
+import { CustomSuperscript, CustomSubscript } from "../editor/scriptText"
 import { TableStyle } from "../editor/tableStyle"
 import TextEditorButton from "@/components/TextEditorButton.vue"
 import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
@@ -91,8 +90,8 @@ const editor = new Editor({
     CustomOrderedList,
     Underline,
     Strike,
-    Subscript,
-    Superscript,
+    CustomSubscript,
+    CustomSuperscript,
     Table,
     TableCell,
     TableHeader,
