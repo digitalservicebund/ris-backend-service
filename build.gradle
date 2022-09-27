@@ -2,7 +2,7 @@ plugins {
   id "org.springframework.boot" version "2.7.0"
   id "io.spring.dependency-management" version "1.0.11.RELEASE"
   id "java"
-  id "com.diffplug.spotless" version "6.10.0"
+  id "com.diffplug.spotless" version "6.11.0"
   id "jacoco"
   id "org.sonarqube" version "3.4.0.2513"
   id "com.github.jk1.dependency-license-report" version "2.1"
@@ -46,7 +46,7 @@ dependencies {
     exclude group: "io.netty", module: "netty-tcnative-classes"
     because("CVE-2021-43797, not using Tomcat")
   }
-  implementation("org.yaml:snakeyaml:1.32") { because("CVE-2022-25857") }
+  implementation("org.yaml:snakeyaml:1.33") { because("CVE-2022-25857") }
   implementation "ch.qos.logback:logback-classic:1.2.11"
   implementation "ch.qos.logback:logback-core:1.4.0"
   implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"

@@ -363,7 +363,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6
+        uses: sigstore/cosign-installer@ced07f21fb1da67979f539bbc6304c16c0677e76
         with:
           cosign-release: "v1.11.0"
       - name: Sign the published backend Docker image
@@ -423,7 +423,7 @@ jobs:
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6
+        uses: sigstore/cosign-installer@ced07f21fb1da67979f539bbc6304c16c0677e76
         with:
           cosign-release: "v1.11.0"
       - name: Sign the published frontend Docker image
@@ -461,7 +461,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
       - name: Deploy new backend image
-        uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
+        uses: digitalservicebund/github-actions/argocd-deploy@df6e19d8472c90dd612a8c9497fd22d501e710c0
         with:
           environment: staging
           version: ${{ needs.build-and-push-backend-image.outputs.version }}
@@ -472,7 +472,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Deploy new frontend image
-        uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
+        uses: digitalservicebund/github-actions/argocd-deploy@df6e19d8472c90dd612a8c9497fd22d501e710c0
         with:
           environment: staging
           version: ${{ needs.build-and-push-frontend-image.outputs.version }}
@@ -601,7 +601,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@dd7445e5bf72abb072c0994c4838c6235e046df4
       - name: Deploy new backend image
-        uses: digitalservicebund/github-actions/argocd-deploy@772b9e0c8e9c63de4b6c891398247a98469e4c38
+        uses: digitalservicebund/github-actions/argocd-deploy@df6e19d8472c90dd612a8c9497fd22d501e710c0
         with:
           environment: production
           version: ${{ needs.build-and-push-backend-image.outputs.version }}
@@ -612,7 +612,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Deploy new frontend image
-        uses: digitalservicebund/github-actions/argocd-deploy@6dacdbcf1e74ea3f93099eb2e961219def896712
+        uses: digitalservicebund/github-actions/argocd-deploy@df6e19d8472c90dd612a8c9497fd22d501e710c0
         with:
           environment: production
           version: ${{ needs.build-and-push-frontend-image.outputs.version }}

@@ -2,11 +2,11 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 74ba195913d9c3b397a7367b031aa6def08d3f02b824038039bf75626e61aa38
+    checksum: 778b8938d17c3c477eb8922cf8cc0253fdfbae9a804057d0ba4a974a02fdae0b
   - filename: run.sh
     checksum: 9bdbe5db9639a5d8d7f5f4bde81c2c5acb6af0ccd619e55a59c32dcb08d1a4de
   - filename: .github/workflows/pipeline.yml
-    checksum: 4269bd92d98cd94f55efca8ae17b414f2fddcb243211c3a6cd512dd298b8820f
+    checksum: 8c32d8a4d20c0ea20bd3fbc50e0b9a66f38c0804af23af854c8ae9914fe24ddb
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
@@ -25,6 +25,8 @@ fileignoreconfig:
     checksum: 409affd3818f16f55c7189a6bc65c550658089f234f53e06faffdd0369af1953
   - filename: src/main/java/de/bund/digitalservice/ris/adapter/SendInBlueHttpMailSender.java
     checksum: e55e8b56f9da19f328b040d588d555cec3fdcd91afd20c8f30f3f72a9f5458a7
+  - filename: src/main/java/de/bund/digitalservice/ris/utils/DocumentUnitDocxBuilder.java
+    checksum: ed80cd8ee6efb20354dbfc93045a682c825d730d35c4e3510c8be0b29b1e2235
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql

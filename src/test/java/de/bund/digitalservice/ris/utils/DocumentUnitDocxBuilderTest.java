@@ -27,6 +27,7 @@ import java.awt.Dimension;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import org.docx4j.dml.CTBlip;
 import org.docx4j.dml.CTBlipFillProperties;
@@ -45,6 +46,8 @@ import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.wml.BooleanDefaultTrue;
 import org.docx4j.wml.CTBorder;
 import org.docx4j.wml.CTShd;
+import org.docx4j.wml.CTTblPrBase;
+import org.docx4j.wml.CTTblPrBase.TblStyle;
 import org.docx4j.wml.CTVerticalAlignRun;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.HpsMeasure;
@@ -63,6 +66,7 @@ import org.docx4j.wml.RPr;
 import org.docx4j.wml.STBorder;
 import org.docx4j.wml.STShd;
 import org.docx4j.wml.STVerticalAlignRun;
+import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 import org.docx4j.wml.TblPr;
@@ -1336,6 +1340,69 @@ class DocumentUnitDocxBuilderTest {
     ParagraphElement paragraphElement = (ParagraphElement) result;
     assertThat(paragraphElement.getRunElements()).hasSize(1);
     assertThat(paragraphElement.getRunElements().get(0)).isInstanceOf(ErrorRunElement.class);
+  }
+
+  @Test
+  void testBuild_withExternalTableStyle() {
+    Tbl table = generateTable(List.of(List.of("table cell")));
+    TblPr tblPr = new TblPr();
+    TblStyle tblStyle = new TblStyle();
+    tblStyle.setVal("external-style");
+    tblPr.setTblStyle(tblStyle);
+    table.setTblPr(tblPr);
+    Map<String, Style> styles = new HashMap<>();
+    Style style = new Style();
+    CTTblPrBase externalTblPr = new CTTblPrBase();
+    TblBorders externalTblBorder = new TblBorders();
+    CTBorder externalLeftBorder = new CTBorder();
+    externalLeftBorder.setSz(new BigInteger("24"));
+    externalLeftBorder.setVal(STBorder.SINGLE);
+    externalTblBorder.setLeft(externalLeftBorder);
+    externalTblPr.setTblBorders(externalTblBorder);
+    style.setTblPr(externalTblPr);
+    styles.put("external-style", style);
+
+    var result = DocumentUnitDocxBuilder.newInstance().setTable(table).useStyles(styles).build();
+
+    assertThat(result).isInstanceOf(TableElement.class);
+    TableElement tableElement = (TableElement) result;
+    assertThat(tableElement.getStyleString())
+        .isEqualTo(" style=\"border-collapse: collapse; border-left: 3px solid #000;\"");
+  }
+
+  @Test
+  void testBuild_withExternalAndInternalTableStyle() {
+    Tbl table = generateTable(List.of(List.of("table cell")));
+    TblPr tblPr = new TblPr();
+    TblStyle tblStyle = new TblStyle();
+    tblStyle.setVal("external-style");
+    tblPr.setTblStyle(tblStyle);
+    table.setTblPr(tblPr);
+    Map<String, Style> styles = new HashMap<>();
+    Style style = new Style();
+    CTTblPrBase externalTblPr = new CTTblPrBase();
+    TblBorders externalTblBorder = new TblBorders();
+    CTBorder externalLeftBorder = new CTBorder();
+    externalLeftBorder.setSz(new BigInteger("24"));
+    externalLeftBorder.setVal(STBorder.SINGLE);
+    externalTblBorder.setLeft(externalLeftBorder);
+    externalTblPr.setTblBorders(externalTblBorder);
+    style.setTblPr(externalTblPr);
+    styles.put("external-style", style);
+    TblBorders internalTblBorder = new TblBorders();
+    CTBorder internalLeftBorder = new CTBorder();
+    internalLeftBorder.setSz(new BigInteger("48"));
+    internalLeftBorder.setVal(STBorder.SINGLE);
+    internalLeftBorder.setColor("F00");
+    internalTblBorder.setLeft(internalLeftBorder);
+    tblPr.setTblBorders(internalTblBorder);
+
+    var result = DocumentUnitDocxBuilder.newInstance().setTable(table).useStyles(styles).build();
+
+    assertThat(result).isInstanceOf(TableElement.class);
+    TableElement tableElement = (TableElement) result;
+    assertThat(tableElement.getStyleString())
+        .isEqualTo(" style=\"border-collapse: collapse; border-left: 6px solid #f00;\"");
   }
 
   @Test
