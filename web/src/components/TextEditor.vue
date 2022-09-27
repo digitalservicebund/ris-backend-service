@@ -2,6 +2,7 @@
 import { Bold } from "@tiptap/extension-bold"
 import { Color } from "@tiptap/extension-color"
 import { Document } from "@tiptap/extension-document"
+import { History } from "@tiptap/extension-history"
 import { Italic } from "@tiptap/extension-italic"
 import { Strike } from "@tiptap/extension-strike"
 import { Subscript } from "@tiptap/extension-subscript"
@@ -15,7 +16,7 @@ import { TextAlign } from "@tiptap/extension-text-align"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
-import { watch, ref, onMounted } from "vue"
+import { computed, watch, ref, onMounted } from "vue"
 import { onBeforeRouteUpdate } from "vue-router"
 import {
   BorderNumber,
@@ -29,6 +30,8 @@ import { CustomListItem } from "../editor/listItem"
 import { CustomOrderedList } from "../editor/orderedList"
 import { CustomParagraph } from "../editor/paragraph"
 import { TableStyle } from "../editor/tableStyle"
+import TextEditorButton from "@/components/TextEditorButton.vue"
+import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
 import { FieldSize } from "@/domain/FieldSize"
 
 interface Props {
@@ -36,6 +39,18 @@ interface Props {
   fieldSize?: FieldSize
   editable?: boolean
   ariaLabel?: string
+}
+
+interface MenuButton {
+  type: string
+  icon: string
+  ariaLabel: string
+  childButtons?: MenuButton[]
+  isLast?: boolean
+  isActive?: boolean
+  isSecondRow?: boolean
+  isCollapsable?: boolean
+  callback?: () => void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -50,14 +65,6 @@ const emit = defineEmits<{
 }>()
 
 const hasFocus = ref(false)
-const showMore = ref(false)
-const showMoreTextAlign = ref(false)
-const showImageAlignment = ref(false)
-const showListStyles = ref(false)
-const sm = ref(false)
-const md = ref(false)
-const lg = ref(false)
-const isLastItemFlexEnd = ref(false)
 
 const editor = new Editor({
   editorProps: {
@@ -99,9 +106,11 @@ const editor = new Editor({
       allowBase64: true,
       inline: true,
     }),
+    History.configure({
+      depth: 100,
+    }),
   ],
   onUpdate: () => {
-    // outgoing changes
     emit("updateValue", editor.getHTML())
   },
   onFocus: () => (hasFocus.value = true),
@@ -112,60 +121,193 @@ const editor = new Editor({
   },
 })
 
-const onResize = () => {
-  let containerWidth
-  const containerElement = document.getElementById("container")
-  if (containerElement)
-    containerWidth = containerElement.getBoundingClientRect().width
-  calculateBreakpoints(containerWidth)
+const buttons = computed(() => [
+  {
+    type: "undo",
+    icon: "undo",
+    ariaLabel: "undo",
+    group: "arrow",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().undo().run(),
+  },
+  {
+    type: "redo",
+    icon: "redo",
+    ariaLabel: "redo",
+    group: "arrow",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().redo().run(),
+  },
+  {
+    type: "bold",
+    icon: "format_bold",
+    ariaLabel: "bold",
+    group: "format",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleMark("bold").run(),
+  },
+  {
+    type: "italic",
+    icon: "format_italic",
+    ariaLabel: "italic",
+    group: "format",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleMark("italic").run(),
+  },
+  {
+    type: "underline",
+    icon: "format_underlined",
+    ariaLabel: "underline",
+    group: "format",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleMark("underline").run(),
+  },
+  {
+    type: "strike",
+    icon: "strikethrough_s",
+    ariaLabel: "strike",
+    group: "format",
+    isCollapsable: false,
+    callback: () => editor.chain().focus().toggleMark("strike").run(),
+  },
+  {
+    type: "left",
+    icon: "format_align_left",
+    ariaLabel: "left",
+    group: "alignment",
+    isCollapsable: true,
+    isSecondRow: true,
+    callback: () => editor.chain().focus().setTextAlign("left").run(),
+  },
+  {
+    type: "center",
+    icon: "format_align_center",
+    ariaLabel: "center",
+    group: "alignment",
+    isCollapsable: true,
+    isSecondRow: true,
+    callback: () => editor.chain().focus().setTextAlign("center").run(),
+  },
+  {
+    type: "right",
+    icon: "format_align_right",
+    ariaLabel: "right",
+    group: "alignment",
+    isCollapsable: true,
+    isSecondRow: true,
+    callback: () => editor.chain().focus().setTextAlign("right").run(),
+  },
+  {
+    type: "justify",
+    icon: "format_align_justify",
+    ariaLabel: "justify",
+    group: "alignment",
+    isCollapsable: true,
+    isSecondRow: true,
+    callback: () => editor.chain().focus().setTextAlign("justify").run(),
+  },
+  {
+    type: "superscript",
+    icon: "superscript",
+    ariaLabel: "superscript",
+    group: "vertical-alignment",
+    isCollapsable: false,
+    isSecondRow: true,
+    callback: () => editor.chain().focus().toggleMark("superscript").run(),
+  },
+  {
+    type: "subscript",
+    icon: "subscript",
+    ariaLabel: "subscript",
+    group: "vertical-alignment",
+    isCollapsable: false,
+    isSecondRow: true,
+    callback: () => editor.chain().focus().toggleMark("subscript").run(),
+  },
+  {
+    type: "numbered-list",
+    icon: "format_list_numbered",
+    ariaLabel: "numbered-list",
+    group: "list",
+    isCollapsable: true,
+    isSecondRow: true,
+  },
+  {
+    type: "bullet-list",
+    icon: "format_list_bulleted",
+    ariaLabel: "bullet-list",
+    group: "list",
+    isCollapsable: true,
+    isSecondRow: true,
+  },
+  {
+    type: "vertical_split",
+    icon: "vertical_split",
+    ariaLabel: "vertical_split",
+    group: "split",
+    isCollapsable: true,
+    isSecondRow: true,
+  },
+  {
+    type: "vertical_split",
+    icon: "vertical_split",
+    ariaLabel: "vertical_split",
+    group: "split",
+    isCollapsable: true,
+    isSecondRow: true,
+  },
+  {
+    type: "table",
+    icon: "table_chart",
+    ariaLabel: "table",
+    isCollapsable: false,
+    isSecondRow: true,
+  },
+])
+
+const fixButtons = [
+  {
+    type: "",
+    icon: "123",
+    ariaLabel: "margins",
+  },
+  {
+    type: "",
+    icon: "open_in_full",
+    ariaLabel: "fullview",
+  },
+]
+
+const editorButtons = computed(() =>
+  buttons.value.map((button) => ({
+    ...button,
+    isActive:
+      button.group == "alignment"
+        ? editor.isActive({ textAlign: button.type })
+        : editor.isActive(button.type),
+  }))
+)
+const buttonSize = 48 //px
+const containerWidth = ref()
+const maxButtonEntries = computed(() =>
+  Math.floor((containerWidth.value - 100) / buttonSize)
+)
+const { collapsedButtons } = useCollapsingMenuBar(
+  editorButtons,
+  maxButtonEntries
+)
+const showSecondRow = ref(false)
+
+const container = ref()
+
+function onResize() {
+  showSecondRow.value = false
+  containerWidth.value = container.value.getBoundingClientRect().width
 }
 
-const calculateBreakpoints = (containerWidth: number | undefined) => {
-  if (containerWidth) {
-    if (containerWidth < 830) {
-      sm.value = true
-      md.value = false
-      lg.value = false
-    } else if (containerWidth >= 830 && containerWidth < 950) {
-      sm.value = false
-      md.value = true
-      lg.value = false
-    } else {
-      sm.value = false
-      md.value = false
-      lg.value = true
-    }
-    isLastItemFlexEnd.value = containerWidth > 570 ? true : false
-  }
-}
-const isClickOnEditor = ref(false)
-const closeAllDropdown = () => {
-  showListStyles.value = false
-  showImageAlignment.value = false
-  showMoreTextAlign.value = false
-}
-const closeAllDropdownOnSecondClick = () => {
-  isClickOnEditor.value = !isClickOnEditor.value
-  if (!isClickOnEditor.value) closeAllDropdown()
-}
-const toggleShowMore = () => {
-  closeAllDropdown()
-  showMore.value = !showMore.value
-}
-const toggleShowTextAlignModal = () => {
-  showMoreTextAlign.value = !showMoreTextAlign.value
-  showListStyles.value = false
-  showImageAlignment.value = false
-}
-const toggleShowImageAlignmentModal = () => {
-  showImageAlignment.value = !showImageAlignment.value
-  showListStyles.value = false
-  showMoreTextAlign.value = false
-}
-const toggleShowListStylesModal = () => {
-  showListStyles.value = !showListStyles.value
-  showImageAlignment.value = false
-  showMoreTextAlign.value = false
+function handleButtonClick(button: MenuButton) {
+  if (button.type == "more") showSecondRow.value = !showSecondRow.value
+  if (button.callback) button.callback()
 }
 
 watch(
@@ -180,79 +322,10 @@ watch(
 )
 
 const showButtons = () => {
-  const isShowButtons = props.editable && hasFocus.value
-  // const isShowButtons = props.editable
-
-  if (!isShowButtons) {
-    showListStyles.value = false
-    showImageAlignment.value = false
-    showMoreTextAlign.value = false
-  }
-  return isShowButtons
+  const showButtons = props.editable && hasFocus.value
+  return showButtons
 }
 
-const showMoreOptions = () => {
-  return showMore.value
-}
-
-interface EditorBtn {
-  type: string
-  icon: string
-}
-
-const editorBtnsGroup1: EditorBtn[] = [
-  ["undo", "undo"],
-  ["redo", "redo"],
-].map((button) => {
-  return {
-    type: button[0],
-    icon: button[1],
-  }
-})
-
-const editorBtnsGroup2: EditorBtn[] = [
-  ["bold", "format_bold"],
-  ["italic", "format_italic"],
-  ["underline", "format_underlined"],
-  ["strike", "strikethrough_s"],
-].map((button) => {
-  return {
-    type: button[0],
-    icon: button[1],
-  }
-})
-
-const editorBtnsGroup3: EditorBtn[] = [
-  ["left", "format_align_left"],
-  ["center", "format_align_center"],
-  ["right", "format_align_right"],
-  ["justify", "format_align_justify"],
-].map((button) => {
-  return {
-    type: button[0],
-    icon: button[1],
-  }
-})
-
-const editorBtnsGroup4: EditorBtn[] = [
-  ["superscript", "superscript"],
-  ["subscript", "subscript"],
-].map((button) => {
-  return {
-    type: button[0],
-    icon: button[1],
-  }
-})
-
-const editorBtnsGroup5: EditorBtn[] = [
-  ["numbered-list", "format_list_numbered"],
-  ["bullet-list", "format_list_bulleted"],
-].map((button) => {
-  return {
-    type: button[0],
-    icon: button[1],
-  }
-})
 const ariaLabel = props.ariaLabel ? props.ariaLabel + " Editor Feld" : null
 const alignText = [
   { style: "text-align: right", align: "right" },
@@ -285,421 +358,65 @@ onMounted(() => {
   }
 })
 
-// same as beforeRouteUpdate option with no access to `this`
 onBeforeRouteUpdate(async () => {
-  // only fetch the user if the id changed as maybe only the query or the hash changed
   onResize()
 })
 </script>
 
 <template>
-  <v-container id="container" v-resize="onResize" fluid>
-    <v-row
-      v-if="showButtons()"
-      :aria-label="
-        props.ariaLabel ? props.ariaLabel + ' Editor Button Leiste' : null
-      "
-      class="row-primary"
-    >
-      <v-col v-for="(btn, index) in editorBtnsGroup1" :key="index">
-        <v-icon
-          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
-
-      <v-divider inset vertical></v-divider>
-
-      <v-col v-for="(btn, index) in editorBtnsGroup2" :key="index">
-        <v-icon
-          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
-
-      <v-divider inset vertical></v-divider>
-
-      <v-col
-        class="active:bg-blue-200 editor-btn editor-btn--bold hover:bg-blue-200 text-blue-900"
-        >Heading</v-col
+  <div
+    id="container"
+    ref="container"
+    v-resize="onResize"
+    class="bg-white"
+    fluid
+  >
+    <div v-if="showButtons()">
+      <div
+        :aria-label="props.ariaLabel + ' Editor Button Leiste'"
+        class="flex flex-row flex-wrap justify-between pa-1"
       >
-
-      <v-divider inset vertical></v-divider>
-
-      <v-col v-show="!lg" class="display-group">
-        <div class="dropdown-container">
-          <div class="dropdown-icons">
-            <v-icon
-              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-              @click="toggleShowTextAlignModal"
-              @mousedown.prevent=""
-              >format_align_left</v-icon
-            >
-            <v-icon
-              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-              @click="toggleShowTextAlignModal"
-              @mousedown.prevent=""
-              >arrow_drop_down</v-icon
-            >
-          </div>
-          <div
-            v-if="showMoreTextAlign"
-            class="bg-white border-1 border-blue-800 border-solid dropdown-content"
-          >
-            <v-col class="display-group pa-0">
-              <v-col
-                v-for="(btn, index) in editorBtnsGroup3"
-                :key="index"
-                class="dropdown-content-items"
-              >
-                <v-icon
-                  class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-                  :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-                  @click="editor.chain().focus().setTextAlign(btn.type).run()"
-                  @mousedown.prevent=""
-                  >{{ btn.icon }}
-                </v-icon>
-              </v-col>
-            </v-col>
-          </div>
+        <div class="flex flex-row">
+          <TextEditorButton
+            v-for="(button, index) in collapsedButtons"
+            :key="index"
+            v-bind="button"
+            @toggle="handleButtonClick"
+          />
         </div>
-      </v-col>
-      <v-col v-show="lg" class="display-group pa-0">
-        <v-col v-for="(btn, index) in editorBtnsGroup3" :key="index">
-          <v-icon
-            class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-            :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-            @click="editor.chain().focus().setTextAlign(btn.type).run()"
-            @mousedown.prevent=""
-            >{{ btn.icon }}</v-icon
-          >
-        </v-col>
-      </v-col>
-
-      <v-divider inset vertical></v-divider>
-
-      <v-col v-for="(btn, index) in editorBtnsGroup4" v-show="!sm" :key="index">
-        <v-icon
-          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
-
-      <v-divider v-show="!sm" inset vertical></v-divider>
-
-      <v-col v-show="md" class="display-group">
-        <div class="dropdown-container">
-          <div class="dropdown-icons">
-            <v-icon
-              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-              @click="toggleShowListStylesModal"
-              @mousedown.prevent=""
-              >format_list_bulleted</v-icon
-            >
-            <v-icon
-              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-              @click="toggleShowListStylesModal"
-              @mousedown.prevent=""
-              >arrow_drop_down</v-icon
-            >
-          </div>
-          <div
-            v-if="showListStyles"
-            class="bg-white border-1 border-blue-800 border-solid dropdown-content"
-          >
-            <v-col class="display-group pa-0">
-              <v-col
-                v-for="(btn, index) in editorBtnsGroup5"
-                :key="index"
-                class="dropdown-content-items"
-              >
-                <v-icon
-                  class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-                  :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-                  @click="editor.chain().focus().toggleMark(btn.type).run()"
-                  @mousedown.prevent=""
-                  >{{ btn.icon }}
-                </v-icon>
-              </v-col>
-            </v-col>
-          </div>
+        <div class="flex flex-row">
+          <TextEditorButton
+            v-for="(button, index) in fixButtons"
+            :key="index"
+            v-bind="button"
+            @toggle="handleButtonClick"
+          />
         </div>
-      </v-col>
-
-      <v-col v-for="(btn, index) in editorBtnsGroup5" v-show="lg" :key="index">
-        <v-icon
-          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
-
-      <v-divider inset vertical></v-divider>
-      <v-col v-show="md" class="display-group">
-        <div class="dropdown-container">
-          <div class="dropdown-icons">
-            <v-icon
-              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-              @click="toggleShowImageAlignmentModal"
-              @mousedown.prevent=""
-              >vertical_split</v-icon
-            >
-            <v-icon
-              class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-              @click="toggleShowImageAlignmentModal"
-              @mousedown.prevent=""
-              >arrow_drop_down</v-icon
-            >
-          </div>
-          <div
-            v-if="showImageAlignment"
-            class="bg-white border-1 border-blue-800 border-solid dropdown-content"
-          >
-            <div class="dropdown-content-items">
-              <v-col class="display-group pa-0">
-                <v-col>
-                  <v-icon
-                    class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-                    >vertical_split</v-icon
-                  >
-                </v-col>
-                <v-col>
-                  <v-icon
-                    class="active:bg-blue-200 hover:bg-blue-200 mirrored text-blue-900"
-                    >vertical_split</v-icon
-                  >
-                </v-col>
-              </v-col>
-            </div>
-          </div>
-        </div>
-      </v-col>
-
-      <v-divider v-show="lg" inset vertical></v-divider>
-
-      <v-col v-show="lg" class="display-group pa-0">
-        <v-col>
-          <v-icon class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-            >vertical_split</v-icon
-          >
-        </v-col>
-        <v-col>
-          <v-icon
-            class="active:bg-blue-200 hover:bg-blue-200 mirrored text-blue-900"
-            >vertical_split</v-icon
-          >
-        </v-col>
-        <v-divider inset vertical></v-divider>
-      </v-col>
-
-      <v-divider v-show="md" inset vertical></v-divider>
-      <v-col v-show="md">
-        <v-icon class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-          >table_chart</v-icon
-        >
-      </v-col>
-
-      <v-col v-show="sm">
-        <v-icon
-          class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-          @click="toggleShowMore"
-          @mousedown.prevent=""
-          >more_horiz</v-icon
-        >
-      </v-col>
-
-      <v-col>
-        <v-icon
-          class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-          :class="{ 'second-last-icon': isLastItemFlexEnd }"
-          >123</v-icon
-        >
-      </v-col>
-      <v-col>
-        <v-icon
-          class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-          :class="{ 'last-icon': isLastItemFlexEnd }"
-          >open_in_full</v-icon
-        >
-      </v-col>
-    </v-row>
-    <!-- Small layout second row on showMore button click-->
-    <v-row v-if="showMoreOptions() && showButtons()" v-show="sm">
-      <v-col>
-        <v-divider class="horizontal-divider"></v-divider>
-      </v-col>
-    </v-row>
-
-    <v-row v-if="showMoreOptions() && showButtons()" v-show="sm">
-      <v-col
-        v-for="(btn, index) in editorBtnsGroup4"
-        :key="index"
-        class="row-secondary"
+      </div>
+      <hr />
+    </div>
+    <div v-if="showButtons() && showSecondRow">
+      <div
+        :aria-label="ariaLabel + ' Editor Button Leiste'"
+        class="flex flex-row flex-wrap pa-1"
       >
-        <v-icon
-          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
-      <v-divider inset vertical></v-divider>
-
-      <v-col
-        v-for="(btn, index) in editorBtnsGroup5"
-        :key="index"
-        class="active:bg-blue-200 hover:bg-blue-200 row-secondary text-blue-900"
-      >
-        <v-icon
-          class="active:bg-blue-200 editor-btn hover:bg-blue-200 text-blue-900"
-          :class="{ 'editor-btn__active': editor.isActive(btn.type) }"
-          @click="editor.chain().focus().toggleMark(btn.type).run()"
-          @mousedown.prevent=""
-          >{{ btn.icon }}</v-icon
-        >
-      </v-col>
-
-      <v-divider inset vertical></v-divider>
-
-      <v-col class="row-secondary">
-        <v-icon class="active:bg-blue-200 hover:bg-blue-200 text-blue-900"
-          >vertical_split</v-icon
-        >
-      </v-col>
-      <v-col class="row-secondary">
-        <v-icon
-          class="active:bg-blue-200 hover:bg-blue-200 mirrored text-blue-900"
-          >vertical_split</v-icon
-        >
-      </v-col>
-
-      <v-divider inset vertical></v-divider>
-      <v-col class="row-secondary">
-        <v-icon>table_chart</v-icon>
-      </v-col>
-    </v-row>
-
-    <v-row v-if="showButtons()">
-      <v-col></v-col>
-    </v-row>
-    <v-divider v-if="showButtons()" class="horizontal-divider"></v-divider>
-    <v-row>
-      <v-col cols="12">
-        <EditorContent
-          :aria-label="ariaLabel"
-          :class="'editor-content editor-content--' + fieldSize"
-          :editor="editor"
-          @click="closeAllDropdownOnSecondClick"
+        <TextEditorButton
+          v-for="(button, index) in collapsedButtons[
+            collapsedButtons.length - 1
+          ].childButtons"
+          :key="index"
+          v-bind="button"
+          @toggle="handleButtonClick"
         />
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+      <hr />
+    </div>
+    <div>
+      <EditorContent
+        :aria-label="ariaLabel"
+        :class="'editor-content editor-content--' + fieldSize"
+        :editor="editor"
+      />
+    </div>
+  </div>
 </template>
-
-<style lang="scss" scoped>
-#container {
-  position: relative;
-
-  .row-primary {
-    /*
-     * TODO:
-     * The mass of <v-col>usage is pervert. Will be removed when refactoring the
-     * Vuetify grid usage. Therefore ignore for now.
-     */
-
-    /* eslint-disable-next-line vue-scoped-css/no-unused-selector */
-    .v-col {
-      box-sizing: border-box;
-      flex-grow: 0 !important;
-
-      .last-icon {
-        position: absolute;
-        right: 15px;
-        margin-top: auto;
-        margin-bottom: auto;
-      }
-
-      .second-last-icon {
-        position: absolute;
-        right: 50px;
-        margin-top: auto;
-        margin-bottom: auto;
-      }
-    }
-  }
-}
-
-.editor-content {
-  &--small {
-    height: 60px;
-  }
-
-  &--medium {
-    height: 120px;
-  }
-
-  &--large {
-    height: 320px;
-  }
-
-  &--max {
-    height: 640px; // ? TODO
-  }
-
-  &--100percent {
-    height: 100%;
-  }
-}
-
-.editor-btn {
-  &--bold {
-    font-weight: bold;
-  }
-}
-
-.display-group {
-  display: flex;
-  flex-direction: row;
-}
-
-.mirrored {
-  transform: scaleX(-1);
-}
-
-.horizontal-divider {
-  border-width: 1px;
-  border-color: #004b78;
-  margin-right: -16px;
-  margin-left: -16px;
-}
-
-.dropdown-container {
-  position: relative;
-  display: inline-block;
-  width: max-content;
-
-  .dropdown-content {
-    position: absolute;
-    z-index: 1;
-    right: 0;
-    display: flex;
-    flex-direction: row;
-  }
-}
-
-.row-secondary {
-  flex-grow: 0 !important;
-}
-</style>

@@ -100,8 +100,8 @@ describe("text editor", async () => {
    * separetly.
    * The test should be continuosly improved to very that all buttons exist.
    */
-  it("shows all necessary editor buttons", async () => {
-    const { getByLabelText, findByText, container } = render(TextEditor, {
+  it("shows all necessary editor buttons in small view", async () => {
+    const { getByLabelText, findByText, getByText } = render(TextEditor, {
       props: { value: "Test Value", ariaLabel: "test label", editable: true },
       global: { plugins: [vuetify, router] },
     })
@@ -112,25 +112,41 @@ describe("text editor", async () => {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
-    function expectIconToExist(iconName: string) {
-      expect(container.innerHTML).match(
-        new RegExp(`<i.*class=".*${iconName}.*"`)
-      )
+    expect(getByText("undo")).toBeInTheDocument()
+    expect(getByText("redo")).toBeInTheDocument()
+    expect(getByText("format_bold")).toBeInTheDocument()
+    expect(getByText("format_italic")).toBeInTheDocument()
+    expect(getByText("format_underlined")).toBeInTheDocument()
+    expect(getByText("strikethrough_s")).toBeInTheDocument()
+    expect(getByText("more_horiz")).toBeInTheDocument()
+  })
+
+  it("click on more button shows second row", async () => {
+    const { getAllByText, getByLabelText, findByText, getByText } = render(
+      TextEditor,
+      {
+        props: { value: "Test Value", ariaLabel: "test label", editable: true },
+        global: { plugins: [vuetify, router] },
+      }
+    )
+    await findByText("Test Value")
+    const editorField = getByLabelText("test label Editor Feld")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
     }
 
-    expectIconToExist("undo")
-    expectIconToExist("redo")
-    expectIconToExist("bold")
-    expectIconToExist("italic")
-    expectIconToExist("underline")
-    expectIconToExist("strike")
-    expectIconToExist("format_align_left")
-    expectIconToExist("format_align_center")
-    expectIconToExist("format_align_right")
-    expectIconToExist("format_align_justify")
-    expectIconToExist("superscript")
-    expectIconToExist("subscript")
-    expectIconToExist("format_list_numbered")
-    expectIconToExist("format_list_bulleted")
+    await fireEvent.click(getByText("more_horiz"))
+
+    expect(getByText("format_align_left")).toBeInTheDocument()
+    expect(getByText("format_align_center")).toBeInTheDocument()
+    expect(getByText("format_align_right")).toBeInTheDocument()
+    expect(getByText("format_align_justify")).toBeInTheDocument()
+    expect(getByText("superscript")).toBeInTheDocument()
+    expect(getByText("subscript")).toBeInTheDocument()
+    expect(getByText("format_list_numbered")).toBeInTheDocument()
+    expect(getByText("format_list_bulleted")).toBeInTheDocument()
+    expect(getAllByText("vertical_split")).toHaveLength(2)
+    expect(getByText("table_chart")).toBeInTheDocument()
   })
 })
