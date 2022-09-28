@@ -148,7 +148,7 @@ public class DocumentUnitService {
     ZipEntry entry;
     try {
       while ((entry = zip.getNextEntry()) != null) {
-        if (entry.getName().equals("word/document.xml")) {
+        if (entry.getName().startsWith("word/document") && entry.getName().endsWith(".xml")) {
           return;
         }
       }
