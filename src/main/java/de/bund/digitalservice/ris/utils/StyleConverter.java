@@ -37,6 +37,6 @@ public class StyleConverter {
       return null;
     }
 
-    return new Style(parts[0].trim(), parts[1].trim());
+    return new Style(parts[0].trim(), Collections.singletonList(parts[1].trim()));
   }
 }

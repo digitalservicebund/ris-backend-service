@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.domain.docx.Border;
 import de.bund.digitalservice.ris.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
-import de.bund.digitalservice.ris.domain.docx.ErrorElement;
 import de.bund.digitalservice.ris.domain.docx.ErrorRunElement;
 import de.bund.digitalservice.ris.domain.docx.InlineImageElement;
 import de.bund.digitalservice.ris.domain.docx.NumberingList.DocumentUnitNumberingListNumberFormat;
@@ -324,10 +323,6 @@ public class DocumentUnitDocxBuilder {
       paragraphElement.setAlignment(alignment);
     }
 
-    if (!addParagraphStyle(paragraphElement, pPr)) {
-      return new ErrorElement("Font size of paragraph is to high.");
-    }
-
     paragraph.getContent().stream()
         .filter(R.class::isInstance)
         .map(R.class::cast)
@@ -629,160 +624,29 @@ public class DocumentUnitDocxBuilder {
     return null;
   }
 
-  private boolean addParagraphStyle(TextElement textElement, PPr pPr) {
-    if (pPr == null) {
-      return true;
-    }
+  private boolean addStyle(TextElement textElement, RPrAbstract rPr) {
+    if (rPr != null) {
+      _addStyle(textElement, rPr);
+    } else {
+      if (paragraph.getPPr().getPStyle() != null) {
+        var style = styles.get(paragraph.getPPr().getPStyle().getVal());
 
-    RPrAbstract styleRPr = null;
-    var pStyle = pPr.getPStyle();
-    if (pStyle != null && pStyle.getVal() != null) {
-      var style = styles.get(pStyle.getVal());
-      if (style != null) {
-        styleRPr = style.getRPr();
+        if (style != null) {
+          if (style.getRPr() != null) {
+            _addStyle(textElement, style.getRPr());
+          } else if (style.getPPr().getRPr() != null) {
+            _addStyle(textElement, style.getPPr().getRPr());
+          }
+        }
+      }
+      if (paragraph.getPPr().getRPr() != null) {
+        _addStyle(textElement, paragraph.getPPr().getRPr());
       }
     }
-
-    textElement.setBold(isBold(styleRPr, pPr.getRPr()));
-    textElement.setItalic(isItalic(styleRPr, pPr.getRPr()));
-    textElement.setStrike(isStrike(styleRPr, pPr.getRPr()));
-    textElement.setVertAlign(getVertAlign(styleRPr, pPr.getRPr()));
-
-    var size = getSize(styleRPr, pPr.getRPr());
-    if (size != null) {
-      if (size.compareTo(new BigInteger(String.valueOf(Integer.MAX_VALUE))) > 0) {
-        return false;
-      }
-      textElement.setSize(size.intValue());
-    }
-
-    var underline = getUnderline(styleRPr, pPr.getRPr());
-    if (underline != null) {
-      textElement.setUnderline(underline);
-    }
-
     return true;
   }
 
-  private boolean isBold(RPrAbstract styleRPr, RPrAbstract rPr) {
-    if (styleRPr == null && rPr == null) {
-      return false;
-    }
-
-    boolean bold = false;
-    if (styleRPr != null && styleRPr.getB() != null) {
-      bold = styleRPr.getB().isVal();
-    }
-
-    if (rPr != null && rPr.getB() != null && rPr.getB().isVal()) {
-      bold = rPr.getB().isVal();
-    }
-
-    return bold;
-  }
-
-  private boolean isItalic(RPrAbstract styleRPr, RPrAbstract rPr) {
-    if (styleRPr == null && rPr == null) {
-      return false;
-    }
-
-    boolean italic = false;
-    if (styleRPr != null && styleRPr.getI() != null) {
-      italic = styleRPr.getI().isVal();
-    }
-
-    if (rPr != null && rPr.getI() != null && rPr.getI().isVal()) {
-      italic = rPr.getI().isVal();
-    }
-
-    return italic;
-  }
-
-  private VerticalAlign getVertAlign(RPrAbstract styleRPr, RPrAbstract rPr) {
-
-    if (styleRPr == null && rPr == null) {
-      return null;
-    }
-
-    STVerticalAlignRun vertAlign = null;
-    if (styleRPr != null
-        && styleRPr.getVertAlign() != null
-        && styleRPr.getVertAlign().getVal() != null) {
-      vertAlign = styleRPr.getVertAlign().getVal();
-    }
-
-    if (rPr != null && rPr.getVertAlign() != null && rPr.getVertAlign().getVal() != null) {
-      vertAlign = rPr.getVertAlign().getVal();
-    }
-
-    if (vertAlign != null && vertAlign != STVerticalAlignRun.BASELINE) {
-      if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
-        return VerticalAlign.SUBSCRIPT;
-      } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
-        return VerticalAlign.SUPERSCRIPT;
-      } else {
-        LOGGER.error("Unknown vertical align value: {}", vertAlign);
-      }
-    }
-    return null;
-  }
-
-  private BigInteger getSize(RPrAbstract styleRPr, RPrAbstract rPr) {
-    if (styleRPr == null && rPr == null) {
-      return null;
-    }
-
-    BigInteger size = null;
-    if (styleRPr != null && styleRPr.getSz() != null && styleRPr.getSz().getVal() != null) {
-      size = styleRPr.getSz().getVal();
-    }
-
-    if (rPr != null && rPr.getSz() != null && rPr.getSz().getVal() != null) {
-      size = rPr.getSz().getVal();
-    }
-
-    return size;
-  }
-
-  private String getUnderline(RPrAbstract styleRPr, RPrAbstract rPr) {
-    if (styleRPr == null && rPr == null) {
-      return null;
-    }
-
-    UnderlineEnumeration underline = null;
-    if (styleRPr != null && styleRPr.getU() != null && styleRPr.getU().getVal() != null) {
-      underline = styleRPr.getU().getVal();
-    }
-
-    if (rPr != null && rPr.getU() != null && rPr.getU().getVal() != null) {
-      underline = rPr.getU().getVal();
-    }
-
-    if (underline == UnderlineEnumeration.SINGLE) {
-      return "single";
-    }
-
-    return null;
-  }
-
-  private boolean isStrike(RPrAbstract styleRPr, RPrAbstract rPr) {
-    if (styleRPr == null && rPr == null) {
-      return false;
-    }
-
-    boolean strike = false;
-    if (styleRPr != null && styleRPr.getStrike() != null) {
-      strike = styleRPr.getStrike().isVal();
-    }
-
-    if (rPr != null && rPr.getStrike() != null) {
-      strike = rPr.getStrike().isVal();
-    }
-
-    return strike;
-  }
-
-  private boolean addStyle(TextElement textElement, RPrAbstract rPr) {
+  private boolean _addStyle(TextElement textElement, RPrAbstract rPr) {
     if (rPr == null) {
       return true;
     }

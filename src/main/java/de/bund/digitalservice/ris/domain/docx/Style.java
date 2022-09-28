@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-public record Style(String property, String value) {
+import java.util.List;
+
+public record Style(String property, List<String> value) {
   public String toString() {
-    return property + ": " + value;
+    return property + ": " + String.join(", ", value);
   }
 }
