@@ -326,35 +326,9 @@ const showButtons = () => {
 }
 
 const ariaLabel = props.ariaLabel ? props.ariaLabel + " Editor Feld" : null
-const alignText = [
-  { style: "text-align: right", align: "right" },
-  { style: "text-align: left", align: "left" },
-  { style: "text-align: center", align: "center" },
-  { style: "text-align: justify", align: "justify" },
-]
+
 onMounted(() => {
   onResize()
-  const editorContainer = document.querySelector(`[aria-label="${ariaLabel}"]`)
-  if (editorContainer) {
-    editorContainer.addEventListener("paste", (e) => {
-      const clipboardCoppiedData =
-        (e as ClipboardEvent).clipboardData?.getData("text/html") ?? ""
-      if (clipboardCoppiedData) {
-        const parser = new DOMParser()
-        const pastedContent = parser.parseFromString(
-          clipboardCoppiedData,
-          "text/html"
-        ).body.innerHTML
-        const applyStyle = alignText.filter((alignTextElement) =>
-          pastedContent.includes(alignTextElement.style)
-        )
-        if (applyStyle.length === 1) {
-          editor.chain().focus().setTextAlign(applyStyle[0].align).run()
-          emit("updateValue", editor.getHTML())
-        }
-      }
-    })
-  }
 })
 
 onBeforeRouteUpdate(async () => {
