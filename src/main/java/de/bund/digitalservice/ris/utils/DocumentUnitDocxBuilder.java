@@ -628,7 +628,9 @@ public class DocumentUnitDocxBuilder {
     if (rPr != null) {
       _addStyle(textElement, rPr);
     } else {
-      if (paragraph.getPPr().getPStyle() != null) {
+      if (paragraph != null
+          && paragraph.getPPr() != null
+          && paragraph.getPPr().getPStyle() != null) {
         var style = styles.get(paragraph.getPPr().getPStyle().getVal());
 
         if (style != null) {
@@ -639,7 +641,7 @@ public class DocumentUnitDocxBuilder {
           }
         }
       }
-      if (paragraph.getPPr().getRPr() != null) {
+      if (paragraph.getPPr() != null && paragraph.getPPr().getRPr() != null) {
         _addStyle(textElement, paragraph.getPPr().getRPr());
       }
     }

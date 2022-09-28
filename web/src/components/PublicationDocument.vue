@@ -267,8 +267,8 @@ function validateEmailAddress(): boolean {
     column-gap: 12px;
 
     &--outlined {
-      border-radius: 50%;
       background-color: black;
+      border-radius: 50%;
       color: white;
     }
   }

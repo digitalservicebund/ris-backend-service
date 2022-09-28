@@ -17,7 +17,7 @@ public abstract class StyledElement implements DocumentUnitDocx {
     if (property.equals("text-decoration") && !values.contains(value)) {
       values.add(value);
     } else {
-      if (values.isEmpty()){
+      if (values.isEmpty()) {
         values.add(value);
       } else {
         values.set(0, value);
@@ -34,8 +34,7 @@ public abstract class StyledElement implements DocumentUnitDocx {
   }
 
   public String getStyleString() {
-    if (styles.isEmpty())
-      return "";
+    if (styles.isEmpty()) return "";
 
     return " style=\""
         + styles.entrySet().stream()
