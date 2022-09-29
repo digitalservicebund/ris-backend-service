@@ -23,7 +23,6 @@ import de.bund.digitalservice.ris.domain.docx.VerticalAlign;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -624,8 +623,10 @@ public class DocumentUnitDocxBuilder {
 
   private boolean addStyle(TextElement textElement, RPrAbstract rPr) {
     if (rPr != null) {
+      // run element style
       _addStyle(textElement, rPr);
     } else {
+      // external paragraph style
       if (paragraph != null
           && paragraph.getPPr() != null
           && paragraph.getPPr().getPStyle() != null) {
@@ -639,6 +640,7 @@ public class DocumentUnitDocxBuilder {
           }
         }
       }
+      // internal paragraph style
       if (paragraph != null && paragraph.getPPr() != null && paragraph.getPPr().getRPr() != null) {
         _addStyle(textElement, paragraph.getPPr().getRPr());
       }
@@ -680,9 +682,6 @@ public class DocumentUnitDocxBuilder {
     }
 
     if (rPr.getSz() != null) {
-      if (rPr.getSz().getVal().compareTo(new BigInteger(String.valueOf(Integer.MAX_VALUE))) > 0) {
-        return false;
-      }
       textElement.setSize(rPr.getSz().getVal().intValue());
     }
 

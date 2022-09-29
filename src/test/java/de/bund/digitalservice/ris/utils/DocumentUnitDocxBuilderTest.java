@@ -781,74 +781,6 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphMultipleTextDecoration() {
-
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    BooleanDefaultTrue strike = new BooleanDefaultTrue();
-    strike.setVal(true);
-    rPr.setStrike(strike);
-    U underline = new U();
-    underline.setVal(UnderlineEnumeration.SINGLE);
-    rPr.setU(underline);
-    pPr.setRPr(rPr);
-
-    P paragraph =
-        TestDocxBuilder.newParagraphBuilder()
-            .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
-            .buildWithParagraphStyles(pPr);
-
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(
-        ((RunTextElement) runElement)
-            .getStyleString()
-            .contains("text-decoration: line-through underline"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals(
-        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunMultipleTextDecoration() {
-
-    RPr rPr = new RPr();
-    BooleanDefaultTrue strike = new BooleanDefaultTrue();
-    strike.setVal(true);
-    rPr.setStrike(strike);
-    U underline = new U();
-    underline.setVal(UnderlineEnumeration.SINGLE);
-    rPr.setU(underline);
-
-    P paragraph =
-        TestDocxBuilder.newParagraphBuilder()
-            .addRunElement(TestDocxBuilder.buildTextRunElementWithStyles("text", rPr))
-            .build();
-
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    var runTextElement = (RunTextElement) runElement;
-    assertEquals("text", runTextElement.getText());
-    assertTrue(runTextElement.getStyleString().contains("text-decoration: line-through underline"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals(
-        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
-  }
-
-  @Test
   void testBuild_withTextAndParagraphSubscript() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
@@ -977,24 +909,118 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
+  void testBuild_withMultipleTextDecorationParagraphStyles() {
+
+    PPr pPr = new PPr();
+    ParaRPr rPr = new ParaRPr();
+    BooleanDefaultTrue strike = new BooleanDefaultTrue();
+    strike.setVal(true);
+    rPr.setStrike(strike);
+    U underline = new U();
+    underline.setVal(UnderlineEnumeration.SINGLE);
+    rPr.setU(underline);
+    pPr.setRPr(rPr);
+
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
+            .buildWithParagraphStyles(pPr);
+
+    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
+    assertTrue(
+        ((RunTextElement) runElement)
+            .getStyleString()
+            .contains("text-decoration: line-through underline"));
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withMultipleTextDecorationRunElementStyles() {
+
+    RPr rPr = new RPr();
+    BooleanDefaultTrue strike = new BooleanDefaultTrue();
+    strike.setVal(true);
+    rPr.setStrike(strike);
+    U underline = new U();
+    underline.setVal(UnderlineEnumeration.SINGLE);
+    rPr.setU(underline);
+
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildTextRunElementWithStyles("text", rPr))
+            .build();
+
+    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
+    assertEquals("text", runTextElement.getText());
+    assertTrue(runTextElement.getStyleString().contains("text-decoration: line-through underline"));
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
+  }
+
+  @Test
+  void testBuild_WithRunElementStylesAndParagraphStyles() {
+
+    RPr rPr = new RPr();
+    BooleanDefaultTrue strike = new BooleanDefaultTrue();
+    strike.setVal(true);
+    rPr.setStrike(strike);
+
+    PPr pPr = new PPr();
+    ParaRPr pararPr = new ParaRPr();
+    U underline = new U();
+    underline.setVal(UnderlineEnumeration.SINGLE);
+    rPr.setU(underline);
+    pPr.setRPr(pararPr);
+
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildTextRunElementWithStyles("text", rPr))
+            .buildWithParagraphStyles(pPr);
+
+    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
+    assertEquals("text", runTextElement.getText());
+    assertTrue(runTextElement.getStyleString().contains("text-decoration: line-through underline"));
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
+  }
+
+  @Test
   void testBuild_withMultipleTextBlocks() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    R run = new R();
-    Text text = new Text();
-    text.setValue("run text 1");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildTextRunElement("run text 1"))
+            .addRunElement(TestDocxBuilder.buildTextRunElement("run text 2"))
+            .build();
 
-    R run2 = new R();
-    Text text2 = new Text();
-    text2.setValue("run text 2");
-    JAXBElement<Text> element2 = new JAXBElement<>(new QName("text"), Text.class, text2);
-    run2.getContent().add(element2);
-    paragraph.getContent().add(run2);
-
-    var result = builder.setParagraph(paragraph).build();
+    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
 
     assertTrue(result instanceof ParagraphElement);
     ParagraphElement paragraphElement = (ParagraphElement) result;
