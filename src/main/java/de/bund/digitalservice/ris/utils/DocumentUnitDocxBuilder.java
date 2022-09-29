@@ -635,7 +635,7 @@ public class DocumentUnitDocxBuilder {
         if (style != null) {
           if (style.getRPr() != null) {
             _addStyle(textElement, style.getRPr());
-          } else if (style.getPPr().getRPr() != null) {
+          } else if (style.getPPr() != null && style.getPPr().getRPr() != null) {
             _addStyle(textElement, style.getPPr().getRPr());
           }
         }

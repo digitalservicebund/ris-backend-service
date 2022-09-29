@@ -40,16 +40,6 @@ public class TestDocxBuilder {
     return runElement;
   }
 
-  public static R buildTextRunElementWithStyles(String text, RPr rPr) {
-    R runElement = new R();
-    runElement.setRPr(rPr);
-    Text textElement = new Text();
-    textElement.setValue(text);
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, textElement);
-    runElement.getContent().add(element);
-    return runElement;
-  }
-
   public static R buildAnchorImageElement() {
     R runElement = new R();
     Drawing drawing = new Drawing();
@@ -127,21 +117,32 @@ public class TestDocxBuilder {
 
   public static class ParagraphBuilder {
     private final List<R> runElements = new ArrayList<>();
+    private PPr paragraphStyle;
+    private RPr runElementStyle;
+
+    public ParagraphBuilder setParagraphStyle(PPr pPr) {
+      paragraphStyle = pPr;
+      return this;
+    }
+
+    public ParagraphBuilder setRunElementStyle(RPr rPr) {
+      runElementStyle = rPr;
+      return this;
+    }
 
     public ParagraphBuilder addRunElement(R runElement) {
+      if (runElementStyle != null) {
+        runElement.setRPr(runElementStyle);
+      }
       runElements.add(runElement);
       return this;
     }
 
-    public P buildWithParagraphStyles(PPr pPr) {
-      P paragraph = new P();
-      paragraph.setPPr(pPr);
-      runElements.forEach(runElement -> paragraph.getContent().add(runElement));
-      return paragraph;
-    }
-
     public P build() {
       P paragraph = new P();
+      if (paragraphStyle != null) {
+        paragraph.setPPr(paragraphStyle);
+      }
       runElements.forEach(runElement -> paragraph.getContent().add(runElement));
       return paragraph;
     }
