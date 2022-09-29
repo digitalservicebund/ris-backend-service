@@ -26,7 +26,7 @@ fileignoreconfig:
   - filename: src/main/java/de/bund/digitalservice/ris/adapter/SendInBlueHttpMailSender.java
     checksum: e55e8b56f9da19f328b040d588d555cec3fdcd91afd20c8f30f3f72a9f5458a7
   - filename: src/main/java/de/bund/digitalservice/ris/utils/DocumentUnitDocxBuilder.java
-    checksum: ed80cd8ee6efb20354dbfc93045a682c825d730d35c4e3510c8be0b29b1e2235
+    checksum: 84d28b1f6783b2cd9d39928426d8625e926fda62dc88f7aa1e02c72bc8636db4
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
@@ -47,6 +47,8 @@ fileignoreconfig:
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: fee4409465a171ae90dbe84d8efe12db4c584b5ffecdfe374c5a9770909ca4dd
+  - filename: src/main/java/de/bund/digitalservice/ris/domain/docx/StyledElement.java
+    checksum: 5083ffadc8195d0d5ec0d136fe85726616c1370f7540c81b5757bd3f11d9754d
 scopeconfig:
   - scope: node
 allowed_patterns:

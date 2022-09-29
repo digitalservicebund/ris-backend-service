@@ -19,6 +19,7 @@ import org.docx4j.vml.CTImageData;
 import org.docx4j.vml.CTShape;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.P;
+import org.docx4j.wml.PPr;
 import org.docx4j.wml.Pict;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
