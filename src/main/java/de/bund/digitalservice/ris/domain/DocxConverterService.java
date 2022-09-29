@@ -130,16 +130,12 @@ public class DocxConverterService {
     CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
-    List<DocumentUnitDocx> packedList = new ArrayList<>();
-    List<DocumentUnitDocx> mergedList = new ArrayList<>();
-    BorderNumber[] lastBorderNumber = {null};
-    NumberingList[] lastNumberingList = {null};
-    boolean[] isCreateNewList = {false};
-
     return Mono.fromFuture(futureResponse)
         .map(response -> getDocumentParagraphs(response.asInputStream()))
         .map(
             documentUnitDocxList -> {
+              List<DocumentUnitDocx> packedList = new ArrayList<>();
+              List<DocumentUnitDocx> mergedList = new ArrayList<>();
 
               // first run through:
               //  - pack consecutive NumberingListEntry's into one NumberingList element per block,
@@ -147,22 +143,27 @@ public class DocxConverterService {
               //  - identify last BorderNumber
 
               BorderNumber finalBorderNumber = null;
+              NumberingList currentNumberingList = null;
 
               for (DocumentUnitDocx element : documentUnitDocxList) {
-                if (packNumberingListEntries(
-                    element, mergedList, lastNumberingList, isCreateNewList[0])) {
-                  isCreateNewList[0] = false;
-                  continue;
+                if (element instanceof NumberingListEntry numberingListEntry) {
+                  if (currentNumberingList == null) {
+                    currentNumberingList = new NumberingList();
+                  }
+                  currentNumberingList.addNumberingListEntry(numberingListEntry);
+                } else {
+                  if (currentNumberingList != null) {
+                    mergedList.add(currentNumberingList);
+                  }
+                  currentNumberingList = null;
+                  mergedList.add(element);
                 }
-                isCreateNewList[0] = true;
-                mergedList.add(element);
                 if (element instanceof BorderNumber borderNumber) {
                   finalBorderNumber = borderNumber;
                 }
               }
-
-              if (lastNumberingList[0] != null) {
-                mergedList.add(lastNumberingList[0]);
+              if (currentNumberingList != null) {
+                mergedList.add(currentNumberingList);
               }
 
               // second run through:
@@ -237,36 +238,6 @@ public class DocxConverterService {
         .map(converter::convert)
         .filter(Objects::nonNull)
         .toList();
-  }
-
-  private boolean packNumberingListEntries(
-      DocumentUnitDocx element,
-      List<DocumentUnitDocx> collectingList,
-      NumberingList[] lastNumberingList,
-      boolean isCreateNewList) {
-    if (lastNumberingList[0] == null && !(element instanceof NumberingListEntry)) {
-      return false;
-    }
-
-    boolean packed = false;
-    NumberingList last = lastNumberingList[0];
-    if (element instanceof NumberingListEntry numberingListEntry) {
-      if (last == null || isCreateNewList) {
-        if (last != null) {
-          collectingList.add(last);
-        }
-        lastNumberingList[0] = new NumberingList();
-        lastNumberingList[0].addNumberingListEntry(numberingListEntry);
-      } else {
-        last.addNumberingListEntry(numberingListEntry);
-      }
-      packed = true;
-    } else {
-      collectingList.add(lastNumberingList[0]);
-      lastNumberingList[0] = null;
-    }
-
-    return packed;
   }
 
   private Map<String, ListNumberingDefinition> readNumbering(WordprocessingMLPackage mlPackage) {
