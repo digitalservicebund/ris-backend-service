@@ -131,6 +131,7 @@ public class DocxConverterService {
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
     List<DocumentUnitDocx> packedList = new ArrayList<>();
+    List<DocumentUnitDocx> mergedList = new ArrayList<>();
     BorderNumber[] lastBorderNumber = {null};
     NumberingList[] lastNumberingList = {null};
     boolean[] isCreateNewList = {false};
@@ -139,24 +140,71 @@ public class DocxConverterService {
         .map(response -> getDocumentParagraphs(response.asInputStream()))
         .map(
             documentUnitDocxList -> {
-              documentUnitDocxList.forEach(
-                  element -> {
-                    if (packBorderNumberElements(element, packedList, lastBorderNumber)) {
-                      isCreateNewList[0] = true;
-                      return;
-                    }
 
-                    if (packNumberingListEntries(
-                        element, packedList, lastNumberingList, isCreateNewList[0])) {
-                      isCreateNewList[0] = false;
-                      return;
-                    }
-                    isCreateNewList[0] = true;
-                    packedList.add(element);
-                  });
-              if (lastNumberingList[0] != null) {
-                packedList.add(lastNumberingList[0]);
+              // first run through:
+              //  - pack consecutive NumberingListEntry's into one NumberingList element per block,
+              //    build a new list --> mergedList
+              //  - identify last BorderNumber
+
+              BorderNumber finalBorderNumber = null;
+
+              for (DocumentUnitDocx element : documentUnitDocxList) {
+                if (packNumberingListEntries(
+                    element, mergedList, lastNumberingList, isCreateNewList[0])) {
+                  isCreateNewList[0] = false;
+                  continue;
+                }
+                isCreateNewList[0] = true;
+                mergedList.add(element);
+                if (element instanceof BorderNumber borderNumber) {
+                  finalBorderNumber = borderNumber;
+                }
               }
+
+              if (lastNumberingList[0] != null) {
+                mergedList.add(lastNumberingList[0]);
+              }
+
+              // second run through:
+              //  - All elements between BorderNumber's get attached to the BorderNumber on top.
+              //    Two conditions can break this rule: a paragraph that is centered or if it's the
+              //    last BorderNumber in the document.
+              //  - If no BorderNumber is active as current parent, the element goes into the
+              //    packedList without a parent.
+
+              BorderNumber currentBorderNumber = null;
+
+              for (DocumentUnitDocx element : mergedList) {
+                // if we encounter a BorderNumber, this is the new parent of all following elements
+                // until a new BorderNumber or a BorderNumber-block-breaking condition comes along
+                if (element instanceof BorderNumber borderNumber) {
+                  currentBorderNumber = borderNumber;
+                  packedList.add(element);
+                  continue;
+                }
+                // BorderNumber-block-breaking condition 1: centered paragraphs
+                if (element instanceof ParagraphElement paragraphElement
+                    && paragraphElement.getStyleString().contains("text-align: center;")) {
+                  currentBorderNumber = null;
+                }
+                // BorderNumber-block-breaking condition 2: the final BorderNumber of the whole
+                // document (as scanned for above) only gets one child attached (otherwise
+                // the whole rest of the document would get absorbed into the final BorderNumber)
+                if (currentBorderNumber != null
+                    && currentBorderNumber == finalBorderNumber
+                    && currentBorderNumber.getChildrenSize() >= 1) {
+                  currentBorderNumber = null;
+                }
+                if (currentBorderNumber == null) {
+                  // not within a BorderNumber-block --> add whatever it is straight to the list
+                  packedList.add(element);
+                } else {
+                  // in a BorderNumber-block and no breaking condition was encountered
+                  // --> add this element as child of the current BorderNumber
+                  currentBorderNumber.addChild(element);
+                }
+              }
+
               String content = null;
               if (!documentUnitDocxList.isEmpty()) {
                 content =
@@ -191,37 +239,9 @@ public class DocxConverterService {
         .toList();
   }
 
-  private boolean packBorderNumberElements(
-      DocumentUnitDocx element,
-      List<DocumentUnitDocx> packedList,
-      BorderNumber[] lastBorderNumber) {
-    if (lastBorderNumber[0] == null && !(element instanceof BorderNumber)) {
-      return false;
-    }
-
-    BorderNumber last = lastBorderNumber[0];
-    boolean packed = false;
-    if (element instanceof BorderNumber borderNumber) {
-      lastBorderNumber[0] = borderNumber;
-      if (last != null) {
-        packedList.add(last);
-      }
-      packed = true;
-    } else if (element instanceof ParagraphElement paragraphElement) {
-      lastBorderNumber[0] = null;
-      last.addParagraphElement(paragraphElement);
-      packedList.add(last);
-      packed = true;
-    } else {
-      lastBorderNumber[0] = null;
-    }
-
-    return packed;
-  }
-
   private boolean packNumberingListEntries(
       DocumentUnitDocx element,
-      List<DocumentUnitDocx> packedList,
+      List<DocumentUnitDocx> collectingList,
       NumberingList[] lastNumberingList,
       boolean isCreateNewList) {
     if (lastNumberingList[0] == null && !(element instanceof NumberingListEntry)) {
@@ -233,7 +253,7 @@ public class DocxConverterService {
     if (element instanceof NumberingListEntry numberingListEntry) {
       if (last == null || isCreateNewList) {
         if (last != null) {
-          packedList.add(last);
+          collectingList.add(last);
         }
         lastNumberingList[0] = new NumberingList();
         lastNumberingList[0].addNumberingListEntry(numberingListEntry);
@@ -242,7 +262,7 @@ public class DocxConverterService {
       }
       packed = true;
     } else {
-      packedList.add(lastNumberingList[0]);
+      collectingList.add(lastNumberingList[0]);
       lastNumberingList[0] = null;
     }
 
