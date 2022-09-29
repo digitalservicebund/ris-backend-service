@@ -53,73 +53,63 @@ const onDelete = () => {
       @close-modal="toggleModal"
       @confirm-action="onDelete"
     />
-    <v-table v-if="documentUnits.length" class="document-unit-list-table">
-      <thead>
-        <tr class="bg-gray-400">
-          <th class="text-center" scope="col">Dok.-Nummer</th>
-          <th class="text-center" scope="col">Angelegt am</th>
-          <th class="text-center" scope="col">Aktenzeichen</th>
-          <th class="text-center" scope="col">Dokumente</th>
-          <th class="text-center" scope="col">Löschen</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="documentUnit in documentUnits" :key="documentUnit.id">
-          <td>
-            <router-link
-              class="document-unit-list-active-link"
-              :to="{
-                name: documentUnit.s3path
-                  ? 'jurisdiction-documentUnit-:documentNumber-categories'
-                  : 'jurisdiction-documentUnit-:documentNumber-files',
-                params: { documentNumber: documentUnit.documentNumber },
-              }"
-            >
-              {{ documentUnit.documentNumber }}
-            </router-link>
-          </td>
-          <td>
-            {{ dayjs(documentUnit.creationtimestamp).format("DD.MM.YYYY") }}
-          </td>
-          <td>
-            {{
-              documentUnit.coreData && documentUnit.coreData.fileNumber
-                ? documentUnit.coreData.fileNumber
-                : "-"
-            }}
-          </td>
-          <td>
-            {{ documentUnit.filename ? documentUnit.filename : "-" }}
-          </td>
-          <td>
-            <span
-              aria-label="Dokumentationseinheit löschen"
-              class="icon material-icons"
-              tabindex="0"
-              @click="setSelectedDocumentUnit(documentUnit)"
-              @keyup.enter="setSelectedDocumentUnit(documentUnit)"
-            >
-              delete
-            </span>
-          </td>
-        </tr>
-      </tbody>
-    </v-table>
+    <div
+      v-if="documentUnits.length"
+      class="border-collapse document-unit-list-table table w-full"
+    >
+      <div
+        class="bg-gray-400 font-bold leading-[3] table-row text-18 text-center"
+      >
+        <div class="table-cell">Dok.-Nummer</div>
+        <div class="table-cell">Angelegt am</div>
+        <div class="table-cell">Aktenzeichen</div>
+        <div class="table-cell">Dokumente</div>
+        <div class="table-cell">Löschen</div>
+      </div>
+      <div
+        v-for="documentUnit in documentUnits"
+        :key="documentUnit.id"
+        class="border-b-2 border-b-gray-100 hover:bg-gray-100 leading-[3] table-row text-18"
+      >
+        <div class="px-[16px] py-0 table-cell">
+          <router-link
+            class="underline"
+            :to="{
+              name: documentUnit.s3path
+                ? 'jurisdiction-documentUnit-:documentNumber-categories'
+                : 'jurisdiction-documentUnit-:documentNumber-files',
+              params: { documentNumber: documentUnit.documentNumber },
+            }"
+          >
+            {{ documentUnit.documentNumber }}
+          </router-link>
+        </div>
+        <div class="px-[16px] py-0 table-cell">
+          {{ dayjs(documentUnit.creationtimestamp).format("DD.MM.YYYY") }}
+        </div>
+        <div class="px-[16px] py-0 table-cell">
+          {{
+            documentUnit.coreData && documentUnit.coreData.fileNumber
+              ? documentUnit.coreData.fileNumber
+              : "-"
+          }}
+        </div>
+        <div class="px-16 py-0 table-cell">
+          {{ documentUnit.filename ? documentUnit.filename : "-" }}
+        </div>
+        <div class="table-cell text-center">
+          <span
+            aria-label="Dokumentationseinheit löschen"
+            class="cursor-pointer material-icons"
+            tabindex="0"
+            @click="setSelectedDocumentUnit(documentUnit)"
+            @keyup.enter="setSelectedDocumentUnit(documentUnit)"
+          >
+            delete
+          </span>
+        </div>
+      </div>
+    </div>
     <span v-else>Keine Dokumentationseinheiten gefunden</span>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.document-unit-list-table td,
-th {
-  font-size: medium !important;
-}
-
-.document-unit-list-active-link {
-  text-decoration: underline;
-}
-
-.icon {
-  cursor: pointer;
-}
-</style>

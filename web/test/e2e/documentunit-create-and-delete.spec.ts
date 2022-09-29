@@ -38,7 +38,7 @@ test.describe("create a doc unit and delete it again", () => {
       )
     ).toBeVisible()
     await page
-      .locator("tr", {
+      .locator(".table-row", {
         hasText: documentNumber,
       })
       .locator("[aria-label='Dokumentationseinheit löschen']")
@@ -61,7 +61,7 @@ test.describe("create a doc unit and delete it again", () => {
         )
       ).toBeVisible()
       await page
-        .locator("tr", {
+        .locator(".table-row", {
           hasText: documentNumber,
         })
         .locator("[aria-label='Dokumentationseinheit löschen']")
