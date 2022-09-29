@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
 import de.bund.digitalservice.ris.domain.docx.Style;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +42,8 @@ class StyleConverterTest {
 
     assertThat(styleList)
         .extracting("property", "value")
-        .containsExactly(tuple("style-name", "style-value"));
+        .containsExactly(
+            tuple("style-name", new ArrayList<>(Collections.singleton("style-value"))));
   }
 
   @Test
@@ -50,7 +53,8 @@ class StyleConverterTest {
 
     assertThat(styleList)
         .extracting("property", "value")
-        .containsExactly(tuple("style-name", "style-value"));
+        .containsExactly(
+            tuple("style-name", new ArrayList<>(Collections.singleton("style-value"))));
   }
 
   @Test
@@ -63,9 +67,9 @@ class StyleConverterTest {
     assertThat(styleList)
         .extracting("property", "value")
         .containsExactly(
-            tuple("style-name", "style-value"),
-            tuple("style-name2", "style-value2"),
-            tuple("style-name3", "style-value3"));
+            tuple("style-name", new ArrayList<>(Collections.singleton("style-value"))),
+            tuple("style-name2", new ArrayList<>(Collections.singleton("style-value2"))),
+            tuple("style-name3", new ArrayList<>(Collections.singleton("style-value3"))));
   }
 
   @Test
@@ -78,9 +82,9 @@ class StyleConverterTest {
     assertThat(styleList)
         .extracting("property", "value")
         .containsExactly(
-            tuple("style-name", "style-value"),
-            tuple("style-name2", "style-value2"),
-            tuple("style-name3", "style-value3"));
+            tuple("style-name", new ArrayList<>(Collections.singleton("style-value"))),
+            tuple("style-name2", new ArrayList<>(Collections.singleton("style-value2"))),
+            tuple("style-name3", new ArrayList<>(Collections.singleton("style-value3"))));
   }
 
   @Test
@@ -93,6 +97,7 @@ class StyleConverterTest {
     assertThat(styleList)
         .extracting("property", "value")
         .containsExactly(
-            tuple("style-name2", "style-value2"), tuple("style-name3", "style-value3"));
+            tuple("style-name2", new ArrayList<>(Collections.singleton("style-value2"))),
+            tuple("style-name3", new ArrayList<>(Collections.singleton("style-value3"))));
   }
 }

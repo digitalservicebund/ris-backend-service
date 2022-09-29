@@ -641,7 +641,7 @@ public class DocumentUnitDocxBuilder {
           }
         }
       }
-      if (paragraph.getPPr() != null && paragraph.getPPr().getRPr() != null) {
+      if (paragraph != null && paragraph.getPPr() != null && paragraph.getPPr().getRPr() != null) {
         _addStyle(textElement, paragraph.getPPr().getRPr());
       }
     }

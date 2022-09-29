@@ -245,12 +245,12 @@ class DocumentUnitDocxBuilderTest {
     assertTrue(result.contains("colspan=\"2\""));
 
     // cell should take insideV from table
-    assertTrue(
+    assertThat(
         result.contains(
             "<td style=\"min-width: 5px; padding: 5px; border-top: 1px solid #ghijkl; border-right: 6px solid #000; border-left: 6px solid #000;\">"));
 
     // insideV from table should not overwrite cell's border
-    assertTrue(
+    assertThat(
         result.contains(
             "<td colspan=\"2\" style=\"min-width: 5px; padding: 5px; background-color: #111222; border-top: 1px solid #mnopqr; border-right: 3px solid #foo; border-left: 6px solid #000;\"><p>foo</p></td>"));
   }
@@ -474,10 +474,10 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStyleString().contains("font-size: 24pt"));
+    assertTrue(((RunTextElement) runElement).getStyleString().contains("font-size: 24pt"));
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"font-size: 24pt;\">text</p>", htmlString);
+    assertEquals("<p><span style=\"font-size: 24pt;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -552,10 +552,10 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStyleString().contains("font-weight: bold"));
+    assertTrue(((RunTextElement) runElement).getStyleString().contains("font-weight: bold"));
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"font-weight: bold;\">text</p>", htmlString);
+    assertEquals("<p><span style=\"font-weight: bold;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -615,10 +615,10 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStyleString().contains("font-style: italic"));
+    assertTrue(((RunTextElement) runElement).getStyleString().contains("font-style: italic"));
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"font-style: italic;\">text</p>", htmlString);
+    assertEquals("<p><span style=\"font-style: italic;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -678,10 +678,11 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStyleString().contains("text-decoration: line-through"));
+    assertTrue(
+        ((RunTextElement) runElement).getStyleString().contains("text-decoration: line-through"));
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"text-decoration: line-through;\">text</p>", htmlString);
+    assertEquals("<p><span style=\"text-decoration: line-through;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -741,10 +742,11 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStyleString().contains("text-decoration: underline"));
+    assertTrue(
+        ((RunTextElement) runElement).getStyleString().contains("text-decoration: underline"));
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"text-decoration: underline;\">text</p>", htmlString);
+    assertEquals("<p><span style=\"text-decoration: underline;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -779,6 +781,74 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
+  void testBuild_withTextAndParagraphMultipleTextDecoration() {
+
+    PPr pPr = new PPr();
+    ParaRPr rPr = new ParaRPr();
+    BooleanDefaultTrue strike = new BooleanDefaultTrue();
+    strike.setVal(true);
+    rPr.setStrike(strike);
+    U underline = new U();
+    underline.setVal(UnderlineEnumeration.SINGLE);
+    rPr.setU(underline);
+    pPr.setRPr(rPr);
+
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
+            .buildWithParagraphStyles(pPr);
+
+    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    assertEquals("text", ((RunTextElement) runElement).getText());
+    assertTrue(
+        ((RunTextElement) runElement)
+            .getStyleString()
+            .contains("text-decoration: line-through underline"));
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
+  }
+
+  @Test
+  void testBuild_withTextAndRunMultipleTextDecoration() {
+
+    RPr rPr = new RPr();
+    BooleanDefaultTrue strike = new BooleanDefaultTrue();
+    strike.setVal(true);
+    rPr.setStrike(strike);
+    U underline = new U();
+    underline.setVal(UnderlineEnumeration.SINGLE);
+    rPr.setU(underline);
+
+    P paragraph =
+        TestDocxBuilder.newParagraphBuilder()
+            .addRunElement(TestDocxBuilder.buildTextRunElementWithStyles("text", rPr))
+            .build();
+
+    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    ParagraphElement paragraphElement = (ParagraphElement) result;
+    assertEquals(1, paragraphElement.getRunElements().size());
+    var runElement = paragraphElement.getRunElements().get(0);
+    assertEquals(RunTextElement.class, runElement.getClass());
+    var runTextElement = (RunTextElement) runElement;
+    assertEquals("text", runTextElement.getText());
+    assertTrue(runTextElement.getStyleString().contains("text-decoration: line-through underline"));
+
+    var htmlString = paragraphElement.toHtmlString();
+    assertEquals(
+        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
+  }
+
+  @Test
   void testBuild_withTextAndParagraphSubscript() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
@@ -804,10 +874,10 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStyleString().contains("vertical-align: sub"));
+    assertTrue(((RunTextElement) runElement).getStyleString().contains("vertical-align: sub"));
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"vertical-align: sub;\">text</p>", htmlString);
+    assertEquals("<p><span style=\"vertical-align: sub;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -868,10 +938,10 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(paragraphElement.getStyleString().contains("vertical-align: super"));
+    assertTrue(((RunTextElement) runElement).getStyleString().contains("vertical-align: super"));
 
     var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p style=\"vertical-align: super;\">text</p>", htmlString);
+    assertEquals("<p><span style=\"vertical-align: super;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -1367,7 +1437,7 @@ class DocumentUnitDocxBuilderTest {
     assertThat(result).isInstanceOf(TableElement.class);
     TableElement tableElement = (TableElement) result;
     assertThat(tableElement.getStyleString())
-        .isEqualTo(" style=\"border-collapse: collapse; border-left: 3px solid #000;\"");
+        .isEqualTo(" style=\"border-left: 3px solid #000;border-collapse: collapse;\"");
   }
 
   @Test
@@ -1402,7 +1472,7 @@ class DocumentUnitDocxBuilderTest {
     assertThat(result).isInstanceOf(TableElement.class);
     TableElement tableElement = (TableElement) result;
     assertThat(tableElement.getStyleString())
-        .isEqualTo(" style=\"border-collapse: collapse; border-left: 6px solid #f00;\"");
+        .isEqualTo(" style=\"border-left: 6px solid #f00;border-collapse: collapse;\"");
   }
 
   @Test

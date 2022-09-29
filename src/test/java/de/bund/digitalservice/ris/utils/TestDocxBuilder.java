@@ -21,6 +21,7 @@ import org.docx4j.wml.Drawing;
 import org.docx4j.wml.P;
 import org.docx4j.wml.Pict;
 import org.docx4j.wml.R;
+import org.docx4j.wml.RPr;
 import org.docx4j.wml.Text;
 
 public class TestDocxBuilder {
@@ -31,6 +32,16 @@ public class TestDocxBuilder {
 
   public static R buildTextRunElement(String text) {
     R runElement = new R();
+    Text textElement = new Text();
+    textElement.setValue(text);
+    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, textElement);
+    runElement.getContent().add(element);
+    return runElement;
+  }
+
+  public static R buildTextRunElementWithStyles(String text, RPr rPr) {
+    R runElement = new R();
+    runElement.setRPr(rPr);
     Text textElement = new Text();
     textElement.setValue(text);
     JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, textElement);
@@ -119,6 +130,13 @@ public class TestDocxBuilder {
     public ParagraphBuilder addRunElement(R runElement) {
       runElements.add(runElement);
       return this;
+    }
+
+    public P buildWithParagraphStyles(PPr pPr) {
+      P paragraph = new P();
+      paragraph.setPPr(pPr);
+      runElements.forEach(runElement -> paragraph.getContent().add(runElement));
+      return paragraph;
     }
 
     public P build() {
