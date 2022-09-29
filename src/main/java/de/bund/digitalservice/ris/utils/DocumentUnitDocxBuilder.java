@@ -390,9 +390,7 @@ public class DocumentUnitDocxBuilder {
     RunTextElement runTextElement = new RunTextElement();
 
     runTextElement.setText(text);
-    if (!addStyle(runTextElement, rPr)) {
-      return new ErrorRunElement("Size of the font to high!");
-    }
+    addStyle(runTextElement, rPr);
 
     return runTextElement;
   }
