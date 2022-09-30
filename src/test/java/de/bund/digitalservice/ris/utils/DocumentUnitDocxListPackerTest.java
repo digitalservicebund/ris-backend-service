@@ -80,6 +80,7 @@ class DocumentUnitDocxListPackerTest {
     assertThat(borderNumberBlock.getChildren().get(0)).isInstanceOf(ParagraphElement.class);
     assertThat(borderNumberBlock.getChildren().get(0).toHtmlString())
         .isEqualTo("<p>paragraph1 text</p>");
+    assertThat(packedList.get(1)).isInstanceOf(ParagraphElement.class);
     ParagraphElement paragraphElement = (ParagraphElement) packedList.get(1);
     assertThat(paragraphElement.toHtmlString()).isEqualTo("<p>paragraph2 text</p>");
   }
@@ -136,6 +137,7 @@ class DocumentUnitDocxListPackerTest {
         .isEqualTo("<p>paragraph text</p>");
     assertThat(borderNumberBlock1.getChildren().get(1)).isInstanceOf(NumberingList.class);
     NumberingList numberingList = (NumberingList) borderNumberBlock1.getChildren().get(1);
+    assertThat(numberingList.getEntries()).hasSize(2);
     assertThat(numberingList.getEntries().get(0).toHtmlString()).isEqualTo("<p>entry 1</p>");
     assertThat(numberingList.getEntries().get(1).toHtmlString()).isEqualTo("<p>entry 2</p>");
   }
