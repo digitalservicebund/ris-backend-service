@@ -42,4 +42,8 @@ public class BorderNumber implements DocumentUnitDocx {
   public int getChildrenSize() {
     return children.size();
   }
+
+  public List<DocumentUnitDocx> getChildren() {
+    return children;
+  }
 }

@@ -23,6 +23,10 @@ public class NumberingList implements DocumentUnitDocx {
     entries.add(entry);
   }
 
+  public List<NumberingListEntry> getEntries() {
+    return entries;
+  }
+
   @Override
   public String toHtmlString() {
     StringBuilder sb = new StringBuilder();
