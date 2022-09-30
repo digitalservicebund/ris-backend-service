@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public class NumberingList implements DocumentUnitDocx {
 
+  // this should be a list containing either NumberingListEntry's or NumberingList's
+  // so that a tree structure that can recursively be traversed TODO
   private final List<NumberingListEntry> entries = new ArrayList<>();
   private static final Logger LOGGER = LoggerFactory.getLogger(NumberingList.class);
 
