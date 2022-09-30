@@ -623,10 +623,8 @@ public class DocumentUnitDocxBuilder {
 
   private boolean addStyle(TextElement textElement, RPrAbstract rPr) {
     if (rPr != null) {
-      // run element style
       _addStyle(textElement, rPr);
     } else {
-      // external paragraph style
       if (paragraph != null
           && paragraph.getPPr() != null
           && paragraph.getPPr().getPStyle() != null) {
@@ -635,14 +633,8 @@ public class DocumentUnitDocxBuilder {
         if (style != null) {
           if (style.getRPr() != null) {
             _addStyle(textElement, style.getRPr());
-          } else if (style.getPPr() != null && style.getPPr().getRPr() != null) {
-            _addStyle(textElement, style.getPPr().getRPr());
           }
         }
-      }
-      // internal paragraph style
-      if (paragraph != null && paragraph.getPPr() != null && paragraph.getPPr().getRPr() != null) {
-        _addStyle(textElement, paragraph.getPPr().getRPr());
       }
     }
     return true;

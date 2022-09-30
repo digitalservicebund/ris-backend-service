@@ -60,7 +60,6 @@ import org.docx4j.wml.PPrBase;
 import org.docx4j.wml.PPrBase.NumPr;
 import org.docx4j.wml.PPrBase.NumPr.Ilvl;
 import org.docx4j.wml.PPrBase.NumPr.NumId;
-import org.docx4j.wml.ParaRPr;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.STBorder;
@@ -449,39 +448,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphSize() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    HpsMeasure size = new HpsMeasure();
-    size.setVal(new BigInteger("48"));
-    rPr.setSz(size);
-    pPr.setRPr(rPr);
-    paragraph.setPPr(pPr);
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(((RunTextElement) runElement).getStyleString().contains("font-size: 24pt"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"font-size: 24pt;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunSize() {
+  void testBuild_withTextAndSize() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
@@ -527,39 +494,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphWeight() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    BooleanDefaultTrue bold = new BooleanDefaultTrue();
-    bold.setVal(true);
-    rPr.setB(bold);
-    pPr.setRPr(rPr);
-    paragraph.setPPr(pPr);
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(((RunTextElement) runElement).getStyleString().contains("font-weight: bold"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"font-weight: bold;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunWeight() {
+  void testBuild_withTextAndWeight() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
@@ -590,39 +525,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphItalic() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    BooleanDefaultTrue italic = new BooleanDefaultTrue();
-    italic.setVal(true);
-    rPr.setI(italic);
-    pPr.setRPr(rPr);
-    paragraph.setPPr(pPr);
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(((RunTextElement) runElement).getStyleString().contains("font-style: italic"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"font-style: italic;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunItalic() {
+  void testBuild_withTextAndItalic() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
@@ -653,40 +556,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphStrike() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    BooleanDefaultTrue strike = new BooleanDefaultTrue();
-    strike.setVal(true);
-    rPr.setStrike(strike);
-    pPr.setRPr(rPr);
-    paragraph.setPPr(pPr);
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(
-        ((RunTextElement) runElement).getStyleString().contains("text-decoration: line-through"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"text-decoration: line-through;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunStrike() {
+  void testBuild_withTextAndStrike() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
@@ -717,40 +587,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphUnderline() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    U underline = new U();
-    underline.setVal(UnderlineEnumeration.SINGLE);
-    rPr.setU(underline);
-    pPr.setRPr(rPr);
-    paragraph.setPPr(pPr);
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(
-        ((RunTextElement) runElement).getStyleString().contains("text-decoration: underline"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"text-decoration: underline;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunUnderline() {
+  void testBuild_withTextAndUnderline() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
     RPr rPr = new RPr();
@@ -781,39 +618,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphSubscript() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    CTVerticalAlignRun vertAlign = new CTVerticalAlignRun();
-    vertAlign.setVal(STVerticalAlignRun.SUBSCRIPT);
-    rPr.setVertAlign(vertAlign);
-    pPr.setRPr(rPr);
-    paragraph.setPPr(pPr);
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(((RunTextElement) runElement).getStyleString().contains("vertical-align: sub"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"vertical-align: sub;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunSubscript() {
+  void testBuild_withTextAndSubscript() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
@@ -845,39 +650,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_withTextAndParagraphSuperscript() {
-    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
-    P paragraph = new P();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    CTVerticalAlignRun vertAlign = new CTVerticalAlignRun();
-    vertAlign.setVal(STVerticalAlignRun.SUPERSCRIPT);
-    rPr.setVertAlign(vertAlign);
-    pPr.setRPr(rPr);
-    paragraph.setPPr(pPr);
-    R run = new R();
-    Text text = new Text();
-    text.setValue("text");
-    JAXBElement<Text> element = new JAXBElement<>(new QName("text"), Text.class, text);
-    run.getContent().add(element);
-    paragraph.getContent().add(run);
-
-    var result = builder.setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(((RunTextElement) runElement).getStyleString().contains("vertical-align: super"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"vertical-align: super;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withTextAndRunSuperscript() {
+  void testBuild_withTextAndSuperscript() {
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     P paragraph = new P();
 
@@ -911,20 +684,18 @@ class DocumentUnitDocxBuilderTest {
   @Test
   void testBuild_withMultipleTextDecoration() {
 
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
+    RPr rPr = new RPr();
     BooleanDefaultTrue strike = new BooleanDefaultTrue();
     strike.setVal(true);
     rPr.setStrike(strike);
     U underline = new U();
     underline.setVal(UnderlineEnumeration.SINGLE);
     rPr.setU(underline);
-    pPr.setRPr(rPr);
 
     P paragraph =
         TestDocxBuilder.newParagraphBuilder()
+            .setRunElementStyle(rPr)
             .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
-            .setParagraphStyle(pPr)
             .build();
 
     var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
@@ -935,45 +706,10 @@ class DocumentUnitDocxBuilderTest {
     var runElement = paragraphElement.getRunElements().get(0);
     assertEquals(RunTextElement.class, runElement.getClass());
     assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(
-        ((RunTextElement) runElement)
-            .getStyleString()
-            .contains("text-decoration: line-through underline"));
 
     var htmlString = paragraphElement.toHtmlString();
     assertEquals(
         "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withParagraphStyles() {
-
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-    BooleanDefaultTrue strike = new BooleanDefaultTrue();
-    strike.setVal(true);
-    rPr.setStrike(strike);
-    pPr.setRPr(rPr);
-
-    P paragraph =
-        TestDocxBuilder.newParagraphBuilder()
-            .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
-            .setParagraphStyle(pPr)
-            .build();
-
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    assertEquals("text", ((RunTextElement) runElement).getText());
-    assertTrue(
-        ((RunTextElement) runElement).getStyleString().contains("text-decoration: line-through"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"text-decoration: line-through;\">text</span></p>", htmlString);
   }
 
   @Test
@@ -1006,84 +742,7 @@ class DocumentUnitDocxBuilderTest {
   }
 
   @Test
-  void testBuild_WithParagraphStylesAndRunElementStyles() {
-
-    RPr rPr = new RPr();
-    BooleanDefaultTrue strike = new BooleanDefaultTrue();
-    strike.setVal(true);
-    rPr.setStrike(strike);
-
-    PPr pPr = new PPr();
-    ParaRPr pararPr = new ParaRPr();
-    U underline = new U();
-    underline.setVal(UnderlineEnumeration.SINGLE);
-    rPr.setU(underline);
-    pPr.setRPr(pararPr);
-
-    P paragraph =
-        TestDocxBuilder.newParagraphBuilder()
-            .setRunElementStyle(rPr)
-            .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
-            .setParagraphStyle(pPr)
-            .build();
-
-    var result = DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    var runTextElement = (RunTextElement) runElement;
-    assertEquals("text", runTextElement.getText());
-    assertTrue(runTextElement.getStyleString().contains("text-decoration: line-through underline"));
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals(
-        "<p><span style=\"text-decoration: line-through underline;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withExternalPPRStyles() {
-    Map<String, Style> styles = new HashMap<>();
-    Style style = new Style();
-    PPr pPr = new PPr();
-    ParaRPr rPr = new ParaRPr();
-
-    U underline = new U();
-    underline.setVal(UnderlineEnumeration.SINGLE);
-    rPr.setU(underline);
-
-    pPr.setRPr(rPr);
-    PPrBase.PStyle pStyle = new PPrBase.PStyle();
-    pStyle.setVal("external");
-    pPr.setPStyle(pStyle);
-    style.setPPr(pPr);
-    styles.put("external", style);
-
-    P paragraph =
-        TestDocxBuilder.newParagraphBuilder()
-            .addRunElement(TestDocxBuilder.buildTextRunElement("text"))
-            .setParagraphStyle(pPr)
-            .build();
-
-    var result =
-        DocumentUnitDocxBuilder.newInstance().setParagraph(paragraph).useStyles(styles).build();
-
-    assertTrue(result instanceof ParagraphElement);
-    ParagraphElement paragraphElement = (ParagraphElement) result;
-    assertEquals(1, paragraphElement.getRunElements().size());
-    var runElement = paragraphElement.getRunElements().get(0);
-    assertEquals(RunTextElement.class, runElement.getClass());
-    var runTextElement = (RunTextElement) runElement;
-    assertEquals("text", runTextElement.getText());
-
-    var htmlString = paragraphElement.toHtmlString();
-    assertEquals("<p><span style=\"text-decoration: underline;\">text</span></p>", htmlString);
-  }
-
-  @Test
-  void testBuild_withExternalRPRStyles() {
+  void testBuild_withExternalStyles() {
     Map<String, Style> styles = new HashMap<>();
     Style style = new Style();
 
