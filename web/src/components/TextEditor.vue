@@ -105,7 +105,7 @@ const editor = new Editor({
       allowBase64: true,
       inline: true,
       HTMLAttributes: {
-        class: "inline align-bottom",
+        class: "inline align-baseline",
       },
     }),
     History.configure({
