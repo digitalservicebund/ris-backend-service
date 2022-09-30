@@ -33,8 +33,7 @@ const isSelectedComponent = (component: risComponent) => {
         <TextButton
           v-for="(component, index) in components"
           :key="index"
-          button-type="tertiary"
-          :class="{ 'bg-blue800': isSelectedComponent(component) }"
+          :button-type="isSelectedComponent(component) ? 'primary' : 'tertiary'"
           :label="component.name"
           @click="$emit('setSelectedComponent', component)"
         />
