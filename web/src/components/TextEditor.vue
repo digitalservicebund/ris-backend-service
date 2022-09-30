@@ -104,6 +104,9 @@ const editor = new Editor({
     CustomImage.configure({
       allowBase64: true,
       inline: true,
+      HTMLAttributes: {
+        class: "inline align-bottom",
+      },
     }),
     History.configure({
       depth: 100,
