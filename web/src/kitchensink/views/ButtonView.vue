@@ -11,7 +11,7 @@ const updateStatus = ref(UpdateStatus)
 <template>
   <div class="flex flex-col gap-y-20 items-start">
     <h1 class="font-bold text-32">Text Button</h1>
-    <div class="flex flex-row flex-wrap gap-x-5 gap-y-20 items-start w-full">
+    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
       <div class="min-w-[30%]">
         <TextButton button-type="primary" label="Button Primary" />
       </div>
@@ -26,7 +26,7 @@ const updateStatus = ref(UpdateStatus)
         <TextButton button-type="primary" icon="close" label="" />
       </div>
     </div>
-    <div class="flex flex-row flex-wrap gap-x-5 gap-y-20 items-start w-full">
+    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
       <div class="min-w-[30%]">
         <TextButton button-type="secondary" label="Button Secondary" />
       </div>
@@ -41,7 +41,7 @@ const updateStatus = ref(UpdateStatus)
         <TextButton button-type="secondary" icon="close" label="" />
       </div>
     </div>
-    <div class="flex flex-row flex-wrap gap-x-5 gap-y-20 items-start w-full">
+    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
       <div class="min-w-[30%]">
         <TextButton button-type="tertiary" label="Button Tertiary" />
       </div>
@@ -56,7 +56,7 @@ const updateStatus = ref(UpdateStatus)
         <TextButton button-type="tertiary" icon="close" label="" />
       </div>
     </div>
-    <div class="flex flex-row flex-wrap gap-x-5 gap-y-20 items-start w-full">
+    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
       <div class="min-w-[30%]">
         <TextButton button-type="ghost" label="Button Ghost" />
       </div>
