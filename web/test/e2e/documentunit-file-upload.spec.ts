@@ -8,11 +8,20 @@ test.describe("upload an original document to a doc unit", () => {
     await navigateToFiles(page, documentNumber)
   })
 
-  test("upload docx file per file chooser", async ({ page }) => {
+  test("upload and delete docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
     await page.waitForSelector("text=sample.docx")
     await page.waitForSelector("text=Die ist ein Test")
+
+    // delete file
+    await page.locator("text=Datei löschen").click()
+    await page.locator("[role='dialog'] >> button:has-text('Löschen')").click()
+    await expect(
+      page.locator(
+        "text=Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus"
+      )
+    ).toBeVisible()
   })
 
   test("upload non-docx file per file chooser", async ({ page }) => {
