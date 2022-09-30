@@ -5,16 +5,22 @@ import java.util.stream.Collectors;
 
 public class TableCellElement extends BlockElement implements DocumentUnitDocx {
   public final List<DocumentUnitDocx> paragraphElements;
+  private final Integer usedStyles;
   public Integer columnSpan;
 
-  public TableCellElement(List<DocumentUnitDocx> paragraphElements) {
+  public TableCellElement(List<DocumentUnitDocx> paragraphElements, Integer usedStyles) {
     this.paragraphElements = paragraphElements;
+    this.usedStyles = usedStyles;
     addStyle("min-width", "5px");
     addStyle("padding", "5px");
   }
 
   public void setColumnSpan(Integer columnSpan) {
     this.columnSpan = columnSpan;
+  }
+
+  public Integer getUsedStyles() {
+    return usedStyles;
   }
 
   private String columnSpanToHtmlString() {

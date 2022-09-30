@@ -28,30 +28,28 @@ public class DocxConverter {
   }
 
   public DocumentUnitDocx convert(Object part) {
+    DocxBuilder builder;
     if (part instanceof P p) {
-      return convertP(p);
+      builder = convertP(p);
     } else if (part instanceof JAXBElement<?> element && element.getDeclaredType() == Tbl.class) {
-      return convertTbl((Tbl) element.getValue());
+      builder = convertTbl((Tbl) element.getValue());
+    } else {
+      return new ErrorElement(part.getClass().getName());
     }
 
-    return new ErrorElement(part.getClass().getName());
-  }
-
-  private DocumentUnitDocx convertP(P part) {
-    var builder =
-        DocumentUnitDocxBuilder.newInstance()
-            .useStyles(styles)
-            .useImages(images)
-            .useListNumberingDefinitions(listNumberingDefinitions)
-            .setParagraph(part);
+    builder
+        .useStyles(styles)
+        .useImages(images)
+        .useListNumberingDefinitions(listNumberingDefinitions);
 
     return builder.build();
   }
 
-  private DocumentUnitDocx convertTbl(Tbl part) {
-    var builder =
-        DocumentUnitDocxBuilder.newInstance().useStyles(styles).useImages(images).setTable(part);
+  private DocxBuilder convertP(P part) {
+    return DocumentUnitDocxBuilder.newInstance().setParagraph(part);
+  }
 
-    return builder.build();
+  private DocxBuilder convertTbl(Tbl part) {
+    return DocxTableBuilder.newInstance().setTable(part);
   }
 }

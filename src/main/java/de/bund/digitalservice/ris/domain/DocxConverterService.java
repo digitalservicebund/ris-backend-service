@@ -140,7 +140,8 @@ public class DocxConverterService {
                         .collect(Collectors.joining());
               }
               return new Docx2Html(content);
-            });
+            })
+        .doOnError(ex -> LOGGER.error("Couldn't convert docx", ex));
   }
 
   public List<DocumentUnitDocx> getDocumentParagraphs(InputStream inputStream) {

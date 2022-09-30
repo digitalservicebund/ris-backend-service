@@ -1,7 +1,15 @@
 package de.bund.digitalservice.ris.domain.docx;
 
-public record Border(String color, Integer width, String type) {
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
+public record Border(String color, float width, String type) {
   public String toString() {
-    return width + "px " + type + " " + color;
+    return new DecimalFormat("0.##", DecimalFormatSymbols.getInstance(Locale.ENGLISH)).format(width)
+        + "px "
+        + type
+        + " "
+        + color;
   }
 }

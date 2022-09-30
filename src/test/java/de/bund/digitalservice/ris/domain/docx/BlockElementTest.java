@@ -89,6 +89,6 @@ class BlockElementTest {
   private BlockElement generateConcreteBlockElement() {
     var someElements = new ArrayList<DocumentUnitDocx>();
     someElements.add(new NumberingList());
-    return new TableCellElement(someElements);
+    return new TableCellElement(someElements, null);
   }
 }

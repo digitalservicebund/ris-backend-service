@@ -30,7 +30,9 @@ public class DocxUnitConverter {
     return (int) (emu / 9525); // 914400 / 96
   }
 
-  public static int convertPointToPixel(BigInteger point) {
-    return Math.max(point.intValue() / 8, 1);
+  public static float convertPointToPixel(BigInteger point) {
+    float pixel = Math.max(point.floatValue() / 8.0f, 0.25f);
+    pixel = Math.min(pixel, 12.0f);
+    return pixel;
   }
 }

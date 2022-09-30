@@ -14,15 +14,15 @@ public abstract class TextElement extends StyledElement implements DocumentUnitD
     DECIMAL_FORMATTER.setMaximumFractionDigits(2);
   }
 
-  public void setBold(Boolean bold) {
+  public void setBold(boolean bold) {
     if (bold) addStyle("font-weight", "bold");
   }
 
-  public void setItalic(Boolean italic) {
+  public void setItalic(boolean italic) {
     if (italic) addStyle("font-style", "italic");
   }
 
-  public void setStrike(Boolean strike) {
+  public void setStrike(boolean strike) {
     if (strike) addStyle("text-decoration", "line-through");
   }
 
@@ -35,10 +35,22 @@ public abstract class TextElement extends StyledElement implements DocumentUnitD
   }
 
   public void setVertAlign(VerticalAlign vertAlign) {
+    if (vertAlign == null) {
+      return;
+    }
+
     if (vertAlign == VerticalAlign.SUBSCRIPT) {
       addStyle("vertical-align", "sub");
     } else if (vertAlign == VerticalAlign.SUPERSCRIPT) {
       addStyle("vertical-align", "super");
     }
+  }
+
+  public void setColor(String color) {
+    if (color == null) {
+      return;
+    }
+
+    addStyle("color", "#" + color.toLowerCase());
   }
 }

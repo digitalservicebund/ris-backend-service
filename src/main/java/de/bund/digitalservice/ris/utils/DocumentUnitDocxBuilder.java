@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.utils;
 
 import de.bund.digitalservice.ris.domain.docx.AnchorImageElement;
-import de.bund.digitalservice.ris.domain.docx.BlockElement;
-import de.bund.digitalservice.ris.domain.docx.Border;
 import de.bund.digitalservice.ris.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
@@ -15,19 +13,13 @@ import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.RunElement;
 import de.bund.digitalservice.ris.domain.docx.RunTabElement;
 import de.bund.digitalservice.ris.domain.docx.RunTextElement;
-import de.bund.digitalservice.ris.domain.docx.TableCellElement;
-import de.bund.digitalservice.ris.domain.docx.TableElement;
-import de.bund.digitalservice.ris.domain.docx.TableRowElement;
 import de.bund.digitalservice.ris.domain.docx.TextElement;
 import de.bund.digitalservice.ris.domain.docx.VerticalAlign;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import org.docx4j.dml.CTNonVisualDrawingProps;
 import org.docx4j.dml.CTPositiveSize2D;
@@ -43,9 +35,6 @@ import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.vml.CTImageData;
 import org.docx4j.vml.CTShape;
-import org.docx4j.wml.CTBorder;
-import org.docx4j.wml.CTShd;
-import org.docx4j.wml.CTTblPrBase;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.Jc;
 import org.docx4j.wml.JcEnumeration;
@@ -57,51 +46,22 @@ import org.docx4j.wml.Pict;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.RPrAbstract;
-import org.docx4j.wml.STBorder;
-import org.docx4j.wml.STShd;
 import org.docx4j.wml.STVerticalAlignRun;
 import org.docx4j.wml.Style;
-import org.docx4j.wml.Tbl;
-import org.docx4j.wml.TblBorders;
-import org.docx4j.wml.Tc;
 import org.docx4j.wml.Text;
-import org.docx4j.wml.Tr;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DocumentUnitDocxBuilder {
+public class DocumentUnitDocxBuilder extends DocxBuilder {
   private static final Logger LOGGER = LoggerFactory.getLogger(DocumentUnitDocxBuilder.class);
 
   P paragraph;
-  Tbl table;
-  private Map<String, Style> styles = new HashMap<>();
-  private Map<String, DocxImagePart> images = new HashMap<>();
-  private Map<String, ListNumberingDefinition> listNumberingDefinitions;
 
   private DocumentUnitDocxBuilder() {}
 
   public static DocumentUnitDocxBuilder newInstance() {
     return new DocumentUnitDocxBuilder();
-  }
-
-  public DocumentUnitDocxBuilder useStyles(Map<String, Style> styles) {
-    this.styles = styles;
-
-    return this;
-  }
-
-  public DocumentUnitDocxBuilder useImages(Map<String, DocxImagePart> images) {
-    this.images = images;
-
-    return this;
-  }
-
-  public DocumentUnitDocxBuilder useListNumberingDefinitions(
-      Map<String, ListNumberingDefinition> listNumberingDefinitions) {
-    this.listNumberingDefinitions = listNumberingDefinitions;
-
-    return this;
   }
 
   public DocumentUnitDocxBuilder setParagraph(P paragraph) {
@@ -110,17 +70,7 @@ public class DocumentUnitDocxBuilder {
     return this;
   }
 
-  public DocumentUnitDocxBuilder setTable(Tbl table) {
-    this.table = table;
-
-    return this;
-  }
-
   public DocumentUnitDocx build() {
-    if (isTable()) {
-      return convertToTable();
-    }
-
     if (isBorderNumber()) {
       return convertToBorderNumber();
     } else if (isNumberingList()) {
@@ -692,190 +642,5 @@ public class DocumentUnitDocxBuilder {
         .map(el -> (Text) el.getValue())
         .map(Text::getValue)
         .collect(Collectors.joining());
-  }
-
-  private boolean isTable() {
-    return table != null;
-  }
-
-  private void addTableStyle(TableElement tableElement) {
-    if (table.getTblPr() == null) {
-      return;
-    }
-
-    if (table.getTblPr().getTblStyle() != null) {
-      var tblStyleKey = table.getTblPr().getTblStyle().getVal();
-      Style style = styles.get(tblStyleKey);
-      addTableStyle(tableElement, style.getTblPr());
-    }
-
-    addTableStyle(tableElement, table.getTblPr());
-  }
-
-  private void addTableStyle(TableElement tableElement, CTTblPrBase tblPr) {
-    if (tblPr.getTblBorders() != null) {
-      var topBorder = tblPr.getTblBorders().getTop();
-      tableElement.setTopBorder(parseCtBorder(topBorder));
-
-      var rightBorder = tblPr.getTblBorders().getRight();
-      tableElement.setRightBorder(parseCtBorder(rightBorder));
-
-      var bottomBorder = tblPr.getTblBorders().getBottom();
-      tableElement.setBottomBorder(parseCtBorder(bottomBorder));
-
-      var leftBorder = tblPr.getTblBorders().getLeft();
-      tableElement.setLeftBorder(parseCtBorder(leftBorder));
-    }
-
-    if (tblPr.getShd() != null) {
-      tableElement.setBackgroundColor(parseCTShd(tblPr.getShd()));
-    }
-  }
-
-  private Border parseCtBorder(CTBorder border) {
-    if (border == null) return null;
-
-    var color = border.getColor();
-    if (color != null) {
-      color = color.equals("auto") ? "000" : color;
-      color = "#" + color.toLowerCase();
-    } else {
-      color = "#000";
-    }
-
-    var width = border.getSz() != null ? DocxUnitConverter.convertPointToPixel(border.getSz()) : 0;
-
-    if (border.getVal() != null && !border.getVal().equals(STBorder.SINGLE)) {
-      LOGGER.error("unsupported table border style");
-    }
-
-    var type = "solid";
-
-    return new Border(color, width, type);
-  }
-
-  private String parseCTShd(CTShd ctShd) {
-    if (!ctShd.getVal().equals(STShd.CLEAR)) LOGGER.error("unsupported shading value (STShd)");
-    return "#" + ctShd.getFill();
-  }
-
-  private DocumentUnitDocx convertToTable() {
-    var tableElement = new TableElement(parseTable(table));
-    addTableStyle(tableElement);
-
-    return tableElement;
-  }
-
-  private List<TableRowElement> parseTable(Tbl table) {
-    List<TableRowElement> rows = new ArrayList<>();
-
-    table
-        .getContent()
-        .forEach(
-            element -> {
-              if (element instanceof Tr tr) {
-                rows.add(parseTr(tr));
-              } else {
-                LOGGER.error("unknown table element: {}", element.getClass());
-              }
-            });
-
-    if (!rows.isEmpty()) {
-      rows.get(0).cells.forEach(BlockElement::removeTopBorder);
-      rows.get(rows.size() - 1).cells.forEach(BlockElement::removeBottomBorder);
-    }
-
-    return rows;
-  }
-
-  private TableRowElement parseTr(Tr tr) {
-    List<TableCellElement> cells = new ArrayList<>();
-
-    tr.getContent()
-        .forEach(
-            element -> {
-              if (element instanceof JAXBElement<?> jaxbElement) {
-                if (jaxbElement.getDeclaredType() == Tc.class) {
-                  cells.add(parseTc((Tc) jaxbElement.getValue()));
-                } else {
-                  LOGGER.error("unknown tr element: {}", jaxbElement.getDeclaredType());
-                }
-              } else {
-                LOGGER.error("unknown tr element: {}", element.getClass());
-              }
-            });
-
-    addBordersToCells(cells);
-
-    return new TableRowElement(cells);
-  }
-
-  private void addBordersToCells(List<TableCellElement> cells) {
-    if (cells.isEmpty() || table.getTblPr() == null) {
-      return;
-    }
-
-    if (table.getTblPr().getTblStyle() != null) {
-      String tableStyleKey = table.getTblPr().getTblStyle().getVal();
-      Style style = styles.get(tableStyleKey);
-      if (style.getTblPr() != null) {
-        addBordersToCells(cells, style.getTblPr().getTblBorders());
-      }
-    }
-
-    addBordersToCells(cells, table.getTblPr().getTblBorders());
-  }
-
-  private void addBordersToCells(List<TableCellElement> cells, TblBorders tblBorders) {
-    if (tblBorders == null) {
-      return;
-    }
-
-    var verticalCtBorder = tblBorders.getInsideV();
-    var horizontalCtBorder = tblBorders.getInsideH();
-
-    var verticalBorder = parseCtBorder(verticalCtBorder);
-    var horizontalBorder = parseCtBorder(horizontalCtBorder);
-
-    cells.forEach(
-        cell -> {
-          cell.setTopBorder(horizontalBorder);
-          cell.setRightBorder(verticalBorder);
-          cell.setBottomBorder(horizontalBorder);
-          cell.setLeftBorder(verticalBorder);
-        });
-    cells.get(0).setLeftBorder(null);
-    cells.get(cells.size() - 1).setRightBorder(null);
-  }
-
-  private TableCellElement parseTc(Tc tc) {
-    List<DocumentUnitDocx> paragraphElements = new ArrayList<>();
-    tc.getContent()
-        .forEach(
-            element -> {
-              if (element instanceof P p) {
-                paragraphElements.add(convertToParagraphElement(p));
-              } else {
-                LOGGER.error("unknown tr element");
-              }
-            });
-
-    var cell = new TableCellElement(paragraphElements);
-
-    var tcPr = tc.getTcPr();
-    if (tcPr != null) {
-      if (tcPr.getTcBorders() != null) {
-        var tcBorders = tcPr.getTcBorders();
-        cell.setInitialBorders(
-            parseCtBorder(tcBorders.getTop()),
-            parseCtBorder(tcBorders.getRight()),
-            parseCtBorder(tcBorders.getBottom()),
-            parseCtBorder(tcBorders.getLeft()));
-      }
-      if (tcPr.getGridSpan() != null) cell.setColumnSpan(tcPr.getGridSpan().getVal().intValue());
-      if (tcPr.getShd() != null) cell.setBackgroundColor(parseCTShd(tcPr.getShd()));
-    }
-
-    return cell;
   }
 }

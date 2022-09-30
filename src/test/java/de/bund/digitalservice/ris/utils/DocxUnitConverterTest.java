@@ -24,6 +24,6 @@ class DocxUnitConverterTest {
   void testConvertPointToPixel() {
     assertThat(DocxUnitConverter.convertPointToPixel(BigInteger.valueOf(48))).isEqualTo(6);
 
-    assertThat(DocxUnitConverter.convertPointToPixel(BigInteger.valueOf(2))).isEqualTo(1);
+    assertThat(DocxUnitConverter.convertPointToPixel(BigInteger.valueOf(2))).isEqualTo(0.25f);
   }
 }

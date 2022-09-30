@@ -27,6 +27,10 @@ fileignoreconfig:
     checksum: e55e8b56f9da19f328b040d588d555cec3fdcd91afd20c8f30f3f72a9f5458a7
   - filename: src/main/java/de/bund/digitalservice/ris/utils/DocumentUnitDocxBuilder.java
     checksum: ad60ac05f2963dbe2999e739549b74e9c61849364767fe504cd92a49e10ce4de
+  - filename: src/main/java/de/bund/digitalservice/ris/utils/DocxTableBuilder.java
+    checksum: 5e7e109c4182e907f1160e9d2ac1ffc3e547396a8eb23c967a3bb1a041e19402
+  - filename: src/main/java/de/bund/digitalservice/ris/domain/docx/StyledElement.java
+    checksum: 3196c69fd30d4e1834c840e38b5f9fba4173c0ce928486f64c479b42107cfadd
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
@@ -47,8 +51,6 @@ fileignoreconfig:
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: fee4409465a171ae90dbe84d8efe12db4c584b5ffecdfe374c5a9770909ca4dd
-  - filename: src/main/java/de/bund/digitalservice/ris/domain/docx/StyledElement.java
-    checksum: 5083ffadc8195d0d5ec0d136fe85726616c1370f7540c81b5757bd3f11d9754d
 scopeconfig:
   - scope: node
 allowed_patterns:
