@@ -25,7 +25,7 @@ const buttonClasses = computed(() => ({
 </script>
 
 <template>
-  <v-btn
+  <button
     :aria-label="ariaLabel"
     :class="buttonClasses"
     flat
@@ -36,135 +36,89 @@ const buttonClasses = computed(() => ({
       <span v-if="icon" class="material-icons"> {{ icon }} </span>
       {{ label }}
     </slot>
-  </v-btn>
+  </button>
 </template>
 
 <style lang="scss" scoped>
 .ris-btn {
-  @apply bg-blue-800 font-bold;
+  @apply align-middle bg-blue-800 font-bold inline-flex items-center 
+  justify-center max-w-full min-w-[64px] h-[48px] 
+  no-underline overflow-hidden outline-none shrink-0 select-none
+  relative tracking-widest no-underline normal-case 
+  indent-[0.1em] px-[1rem] py-[1.5rem] whitespace-nowrap;
 
-  &.v-btn {
-    font-size: var(--v-btn-size);
-    text-transform: none;
+  line-height: normal;
 
-    &--size-default {
-      --v-btn-height: 48px;
-      --v-btn-size: 1rem;
-
-      padding: 1rem 1.5rem;
-    }
-
-    /*
-     * TODO:
-     * Remove the disable once we established BEM linting.
-     */
-    /* stylelint-disable selector-class-pattern */
-    &:not(.v-btn--icon) {
-      .v-icon--start {
-        margin-inline-start: 0;
-      }
-
-      .v-icon--end {
-        margin-inline-end: 0;
-      }
-    }
-
-    &:hover {
-      .v-btn__overlay {
-        opacity: 0;
-      }
-    }
-
-    &:active {
-      .v-btn__overlay {
-        opacity: 0;
-      }
-    }
-
-    &:focus-visible {
-      outline-offset: 2px;
-
-      .v-btn__overlay {
-        opacity: 0;
-      }
-    }
-    /* stylelint-enable selector-class-pattern */
+  &:focus-visible {
+    outline-offset: 2px;
   }
 }
 
 .btn-primary {
   @apply bg-blue-800 text-white;
 
-  &.v-btn {
-    &:hover {
-      @apply bg-blue-800;
-    }
+  &:hover {
+    @apply bg-blue-800;
+  }
 
-    &:active {
-      @apply bg-blue-500;
-    }
+  &:active {
+    @apply bg-blue-500;
+  }
 
-    &:focus-visible {
-      @apply border-2 border-solid border-blue-800;
-    }
+  &:focus-visible {
+    @apply border-2 border-solid border-blue-800;
+  }
 
-    &:disabled {
-      @apply bg-gray-400 text-gray-900;
-    }
+  &:disabled {
+    @apply bg-gray-400 text-gray-900;
   }
 }
 
 .btn-secondary {
   @apply border-solid border-2 border-blue-800 text-blue-800 bg-yellow-500;
 
-  &.v-btn {
-    &:hover {
-      @apply bg-yellow-700;
-    }
+  &:hover {
+    @apply bg-yellow-700;
+  }
 
-    &:active {
-      @apply bg-yellow-400;
-    }
+  &:active {
+    @apply bg-yellow-400;
+  }
 
-    &:focus-visible {
-      @apply border-solid border-2 border-blue-800;
-    }
+  &:focus-visible {
+    @apply border-solid border-2 border-blue-800;
   }
 }
 
 .btn-ghost {
   @apply border-2 border-solid border-transparent bg-transparent text-blue-800 underline;
 
-  &.v-btn {
-    &:hover {
-      @apply border-2 border-solid border-blue-800 bg-white;
-    }
+  &:hover {
+    @apply border-2 border-solid border-blue-800 bg-white;
+  }
 
-    &:active {
-      @apply border-none bg-white;
-    }
+  &:active {
+    @apply border-white bg-white;
+  }
 
-    &:focus-visible {
-      @apply border-2 border-solid border-blue-800 bg-white;
-    }
+  &:focus-visible {
+    @apply border-2 border-solid border-blue-800 bg-white;
   }
 }
 
 .btn-tertiary {
   @apply border-solid border-2 border-blue-800 text-blue-800 bg-white;
 
-  &.v-btn {
-    &:hover {
-      @apply bg-blue-200;
-    }
+  &:hover {
+    @apply bg-blue-200;
+  }
 
-    &:active {
-      @apply border-none bg-blue-200;
-    }
+  &:active {
+    @apply border-blue-200 bg-blue-200;
+  }
 
-    &:focus-visible {
-      @apply border-solid border-2 border-blue-800 bg-blue-200;
-    }
+  &:focus-visible {
+    @apply border-solid border-2 border-blue-800 bg-blue-200;
   }
 }
 </style>
