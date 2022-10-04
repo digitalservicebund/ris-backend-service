@@ -1,35 +1,28 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import DocumentUnitFiles from "@/components/DocumentUnitFiles.vue"
+import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
-import fileService from "@/services/fileService"
 
 const props = defineProps<{ documentNumber: string }>()
 
-const { data: documentUnit, error } = await (async () => {
+async function loadDocumentUnit() {
   const response = await documentUnitService.getByDocumentNumber(
     props.documentNumber
   )
   return {
-    data: ref(response.data),
+    documentUnit: ref(response.data),
     error: response.error,
   }
-})()
-
-const handleDeleteFile = async () => {
-  await fileService.deleteFile(documentUnit.value.uuid)
-  documentUnit.value = (
-    await documentUnitService.getByDocumentNumber(props.documentNumber)
-  ).data
 }
+const { documentUnit, error } = await loadDocumentUnit()
 </script>
 
 <template>
   <DocumentUnitFiles
     v-if="documentUnit"
     :document-unit="documentUnit"
-    @delete-file="handleDeleteFile"
-    @update-document-unit="Object.assign(documentUnit, $event)"
+    @update-document-unit="Object.assign(documentUnit as DocumentUnit, $event)"
   />
   <div v-else>
     <h2>{{ error?.title }}</h2>

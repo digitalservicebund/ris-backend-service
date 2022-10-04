@@ -10,12 +10,14 @@ const router = useRouter()
 
 const documentUnits = ref((await documentUnitService.getAll()).data)
 
-const handleDelete = async (documentUnit: DocumentUnit) => {
-  const status = (await documentUnitService.delete(documentUnit.uuid)).status
-  if (status === 200) {
-    documentUnits.value = documentUnits.value.filter(
-      (item) => item != documentUnit
-    )
+async function handleDelete(documentUnit: DocumentUnit) {
+  if (documentUnits.value) {
+    const status = (await documentUnitService.delete(documentUnit.uuid)).status
+    if (status === 200) {
+      documentUnits.value = documentUnits.value.filter(
+        (item) => item != documentUnit
+      )
+    }
   }
 }
 </script>
@@ -32,6 +34,7 @@ const handleDelete = async (documentUnit: DocumentUnit) => {
     </div>
 
     <DocumentUnitList
+      v-if="documentUnits"
       class="grow"
       :document-units="documentUnits"
       @delete-document-unit="handleDelete"

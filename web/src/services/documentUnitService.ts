@@ -29,12 +29,13 @@ const service: DocumentUnitService = {
     const response = await httpClient.get<DocumentUnit>(
       `documentunits/${documentNumber}`
     )
-    if (response.status >= 300) {
+    if (response.status >= 300 || response.error) {
       response.error = {
         title: "Dokumentationseinheit konnten nicht geladen werden.",
       }
+    } else {
+      response.data = new DocumentUnit(response.data.uuid, { ...response.data })
     }
-    response.data = new DocumentUnit(response.data.uuid, { ...response.data })
     return response
   },
 

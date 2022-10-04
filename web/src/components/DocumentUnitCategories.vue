@@ -88,9 +88,12 @@ const handleScroll = () => {
 
 const getOriginalDocumentUnit = async () => {
   if (fileAsHTML.value.length > 0) return
-  fileAsHTML.value = props.documentUnit.s3path
-    ? await fileService.getDocxFileAsHtml(props.documentUnit.s3path)
-    : ""
+  if (props.documentUnit.s3path) {
+    const htmlResponse = await fileService.getDocxFileAsHtml(
+      props.documentUnit.s3path
+    )
+    if (htmlResponse.error === undefined) fileAsHTML.value = htmlResponse.data
+  }
 }
 
 /** Overwrite ctrl + S to update documentUnit */

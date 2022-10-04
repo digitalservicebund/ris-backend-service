@@ -6,11 +6,12 @@ import documentUnitService from "@/services/documentUnitService"
 const router = useRouter()
 
 onBeforeMount(async () => {
-  const newDocumentUnit = (await documentUnitService.createNew("KO", "RE")).data
-  await router.replace({
-    name: "jurisdiction-documentUnit-:documentNumber-files",
-    params: { documentNumber: newDocumentUnit.documentNumber },
-  })
+  const createResponse = await documentUnitService.createNew("KO", "RE")
+  if (createResponse.data)
+    await router.replace({
+      name: "jurisdiction-documentUnit-:documentNumber-files",
+      params: { documentNumber: createResponse.data.documentNumber },
+    })
 })
 </script>
 
