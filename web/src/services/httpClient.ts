@@ -77,16 +77,22 @@ const httpClient: HttpClient = {
   },
 }
 
-type ErrorResponse = {
+export type ResponseError = {
   title: string
   description?: string
 }
 
 export type ServiceResponse<T> = {
   status: number
-  // statusText: string
-  data: T
-  error?: ErrorResponse
-}
+} & (
+  | {
+      data: T
+      error?: never
+    }
+  | {
+      data?: never
+      error: ResponseError
+    }
+)
 
 export default httpClient
