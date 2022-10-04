@@ -7,11 +7,12 @@ import CodeSnippet from "@/components/CodeSnippet.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import XmlMail from "@/domain/xmlMail"
 import { InfoStatus } from "@/enum/enumInfoStatus"
+import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
   publishResult?: XmlMail
   lastPublishedXmlMail?: XmlMail
-  errorMessage?: { title: string; description: string }
+  errorMessage?: ResponseError
   succeedMessage?: { title: string; description: string }
 }>()
 

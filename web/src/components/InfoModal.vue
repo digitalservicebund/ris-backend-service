@@ -5,10 +5,11 @@ import { InfoStatus } from "@/enum/enumInfoStatus"
 const props = withDefaults(
   defineProps<{
     title: string
-    description: string
+    description?: string
     status?: InfoStatus
   }>(),
   {
+    description: "",
     status: InfoStatus.ERROR,
   }
 )
