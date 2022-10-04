@@ -8,10 +8,34 @@ import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class DocumentUnitDocxListPacker {
+public class DocumentUnitDocxListUtils {
+  private static final Logger LOGGER = LoggerFactory.getLogger(DocumentUnitDocxListUtils.class);
 
-  private DocumentUnitDocxListPacker() {}
+  private DocumentUnitDocxListUtils() {}
+
+  public static void postprocessBorderNumbers(List<DocumentUnitDocx> documentUnitDocxList) {
+    Integer numIdOfCurrentBorderNumberBlock = null;
+    int borderNumberCounter = 1;
+
+    for (DocumentUnitDocx documentUnitDocx : documentUnitDocxList) {
+      if (documentUnitDocx instanceof BorderNumber borderNumber
+          && borderNumber.getNumber().isEmpty()) {
+        borderNumber.addNumberText(String.valueOf(borderNumberCounter++));
+        if (numIdOfCurrentBorderNumberBlock != null
+            && !borderNumber.getNumId().equals(numIdOfCurrentBorderNumberBlock)) {
+          LOGGER.error(
+              "Unexpected case of a new numId. Are there more than one border number blocks "
+                  + "in this document? Then we need to support this case. Until then "
+                  + "every border number block after the first one will not start at 1. Instead"
+                  + "it is a continuous counting up across the whole document. ");
+        }
+        numIdOfCurrentBorderNumberBlock = borderNumber.getNumId();
+      }
+    }
+  }
 
   public static List<DocumentUnitDocx> packList(List<DocumentUnitDocx> documentUnitDocxList) {
     if (documentUnitDocxList == null) {

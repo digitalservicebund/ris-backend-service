@@ -16,13 +16,13 @@ import java.util.List;
 import org.docx4j.wml.JcEnumeration;
 import org.junit.jupiter.api.Test;
 
-class DocumentUnitDocxListPackerTest {
+class DocumentUnitDocxListUtilsTest {
 
   @Test
   void testPackList_withEmptyList_shouldReturnEmptyList() {
     List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListPacker.packList(documentUnitDocxList);
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
 
     assertThat(packedList).isEmpty();
   }
@@ -30,7 +30,7 @@ class DocumentUnitDocxListPackerTest {
   @Test
   void testPackList_withNull_shouldReturnEmptyList() {
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListPacker.packList(null);
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(null);
 
     assertThat(packedList).isEmpty();
   }
@@ -40,7 +40,7 @@ class DocumentUnitDocxListPackerTest {
     List<DocumentUnitDocx> documentUnitDocxList = new ArrayList<>();
     documentUnitDocxList.add(createParagraphWithTextElement("paragraph text"));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListPacker.packList(documentUnitDocxList);
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
 
     assertThat(packedList).hasSize(1);
     assertThat(packedList.get(0)).isInstanceOf(ParagraphElement.class);
@@ -53,7 +53,7 @@ class DocumentUnitDocxListPackerTest {
     documentUnitDocxList.add(createNumberingListEntry("entry 1", false, 0));
     documentUnitDocxList.add(createNumberingListEntry("entry 2", false, 0));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListPacker.packList(documentUnitDocxList);
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
 
     assertThat(packedList).hasSize(1);
     assertThat(packedList.get(0)).isInstanceOf(NumberingList.class);
@@ -71,7 +71,7 @@ class DocumentUnitDocxListPackerTest {
     documentUnitDocxList.add(createParagraphWithTextElement("paragraph1 text"));
     documentUnitDocxList.add(createParagraphWithTextElement("paragraph2 text"));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListPacker.packList(documentUnitDocxList);
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
 
     assertThat(packedList).hasSize(2);
     assertThat(packedList.get(0)).isInstanceOf(BorderNumber.class);
@@ -95,7 +95,7 @@ class DocumentUnitDocxListPackerTest {
     // just so that the first Randnummer is not the final one in the document:
     documentUnitDocxList.add(createBorderNumber(2));
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListPacker.packList(documentUnitDocxList);
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
 
     assertThat(packedList).hasSize(4);
     assertThat(packedList.get(0)).isInstanceOf(BorderNumber.class);
@@ -124,7 +124,7 @@ class DocumentUnitDocxListPackerTest {
     documentUnitDocxList.add(createNumberingListEntry("entry 2", false, 0));
     documentUnitDocxList.add(createBorderNumber(2)); // <-- final one in the document
 
-    List<DocumentUnitDocx> packedList = DocumentUnitDocxListPacker.packList(documentUnitDocxList);
+    List<DocumentUnitDocx> packedList = DocumentUnitDocxListUtils.packList(documentUnitDocxList);
 
     assertThat(packedList).hasSize(2);
     assertThat(packedList.get(0)).isInstanceOf(BorderNumber.class);
