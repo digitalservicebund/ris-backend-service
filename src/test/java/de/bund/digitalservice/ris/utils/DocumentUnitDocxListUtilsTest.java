@@ -38,10 +38,10 @@ class DocumentUnitDocxListUtilsTest {
   }
 
   @Test
-  void testPostprocessBorderNumbers_withTwoBorderlessBorderNumbers_shouldAssignNumbers() {
+  void testPostprocessBorderNumbers_withTwoNumberlessBorderNumbers_shouldAssignNumbers() {
     List<DocumentUnitDocx> list = new ArrayList<>();
-    list.add(createEmptyBorderNumberWithNumId(7));
-    list.add(createEmptyBorderNumberWithNumId(7));
+    list.add(createNumberlessBorderNumberWithNumId(7));
+    list.add(createNumberlessBorderNumberWithNumId(7));
 
     DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
 
@@ -57,11 +57,11 @@ class DocumentUnitDocxListUtilsTest {
   }
 
   @Test
-  void testPostprocessBorderNumbers_withBorderlessBorderNumbersButDifferentNumIds_shouldLogError(
+  void testPostprocessBorderNumbers_withNumberlessBorderNumbersButDifferentNumIds_shouldLogError(
       CapturedOutput output) {
     List<DocumentUnitDocx> list = new ArrayList<>();
-    list.add(createEmptyBorderNumberWithNumId(7));
-    list.add(createEmptyBorderNumberWithNumId(8));
+    list.add(createNumberlessBorderNumberWithNumId(7));
+    list.add(createNumberlessBorderNumberWithNumId(8));
 
     DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
 
@@ -218,7 +218,7 @@ class DocumentUnitDocxListUtilsTest {
     return paragraph;
   }
 
-  private BorderNumber createEmptyBorderNumberWithNumId(int numId) {
+  private BorderNumber createNumberlessBorderNumberWithNumId(int numId) {
     BorderNumber borderNumber = new BorderNumber();
     borderNumber.setNumId(numId);
     return borderNumber;
