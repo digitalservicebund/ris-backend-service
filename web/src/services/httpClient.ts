@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios, { AxiosError } from "axios"
 
 type RequestOptions = {
   headers?: {
@@ -33,23 +33,32 @@ interface HttpClient {
 }
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST ?? ""
-const baseHttp = async <T>(
+async function baseHttp<T>(
   url: string,
   method: string,
   options?: RequestOptions,
   data?: T
-) => {
-  const response = await axios({
-    method: method,
-    url: `${backendHost}/api/v1/${url}`,
-    validateStatus: () => true,
-    data,
-    ...options,
-  })
-  return {
-    status: response.status,
-    statusText: response.statusText,
-    data: response?.data,
+) {
+  try {
+    const response = await axios({
+      method: method,
+      url: `${backendHost}/api/v1/${url}`,
+      validateStatus: () => true,
+      data,
+      ...options,
+    })
+    return {
+      status: response.status,
+      data: response.data.content ? response.data.content : response.data,
+    }
+  } catch (error) {
+    return {
+      status: Number((error as AxiosError).code) || 500,
+      error: {
+        title: (error as AxiosError).status || "Network Error",
+        description: String((error as AxiosError).cause),
+      },
+    }
   }
 }
 
