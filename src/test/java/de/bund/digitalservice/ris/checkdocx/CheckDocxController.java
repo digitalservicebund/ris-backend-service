@@ -84,7 +84,7 @@ public class CheckDocxController {
     String filePath = filePaths.get(fileName);
     try {
       selectedFile = new File(filePath);
-      contentList = service.getDocumentParagraphs(new FileInputStream(selectedFile));
+      contentList = service.parseAsDocumentUnitDocxList(new FileInputStream(selectedFile));
       notifyAllViews(NotificationType.SELECT_FILE);
     } catch (FileNotFoundException e) {
       throw new RuntimeException(e);

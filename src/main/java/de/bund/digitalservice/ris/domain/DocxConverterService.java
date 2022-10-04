@@ -128,7 +128,7 @@ public class DocxConverterService {
         client.getObject(request, AsyncResponseTransformer.toBytes());
 
     return Mono.fromFuture(futureResponse)
-        .map(response -> getDocumentParagraphs(response.asInputStream()))
+        .map(response -> parseAsDocumentUnitDocxList(response.asInputStream()))
         .map(
             documentUnitDocxList -> {
               List<DocumentUnitDocx> packedList =
@@ -145,7 +145,7 @@ public class DocxConverterService {
         .doOnError(ex -> LOGGER.error("Couldn't convert docx", ex));
   }
 
-  public List<DocumentUnitDocx> getDocumentParagraphs(InputStream inputStream) {
+  public List<DocumentUnitDocx> parseAsDocumentUnitDocxList(InputStream inputStream) {
     if (inputStream == null) {
       return Collections.emptyList();
     }
