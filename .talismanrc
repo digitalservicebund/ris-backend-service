@@ -28,7 +28,7 @@ fileignoreconfig:
   - filename: src/main/java/de/bund/digitalservice/ris/utils/DocumentUnitDocxBuilder.java
     checksum: ad60ac05f2963dbe2999e739549b74e9c61849364767fe504cd92a49e10ce4de
   - filename: src/main/java/de/bund/digitalservice/ris/utils/DocxTableBuilder.java
-    checksum: 5e7e109c4182e907f1160e9d2ac1ffc3e547396a8eb23c967a3bb1a041e19402
+    checksum: 6a927b2c29cef29ae6aa058d3c18f86d51bf7c1b1b2d2a5c9b2dc651731a4d57
   - filename: src/main/java/de/bund/digitalservice/ris/domain/docx/StyledElement.java
     checksum: 3196c69fd30d4e1834c840e38b5f9fba4173c0ce928486f64c479b42107cfadd
   - filename: src/main/resources/bootstrap.properties
