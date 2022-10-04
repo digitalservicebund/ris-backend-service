@@ -62,6 +62,8 @@ dependencies {
   implementation "org.springdoc:springdoc-openapi-webflux-ui:1.6.9"
 
   implementation "org.docx4j:docx4j-JAXB-MOXy:11.4.8"
+  implementation "com.sun.mail:jakarta.mail:2.0.1"
+  implementation "com.sun.activation:jakarta.activation:2.0.1"
   implementation("jakarta.xml.bind:jakarta.xml.bind-api") { version { strictly "3.0.1" } }
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
