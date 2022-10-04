@@ -6,6 +6,7 @@ import java.util.List;
 public class BorderNumber implements DocumentUnitDocx {
   private final StringBuilder number = new StringBuilder();
   private List<DocumentUnitDocx> children = new ArrayList<>();
+  private Integer numId = null;
 
   public String getNumber() {
     return number.toString();
@@ -45,5 +46,13 @@ public class BorderNumber implements DocumentUnitDocx {
 
   public List<DocumentUnitDocx> getChildren() {
     return children;
+  }
+
+  public void setNumId(int numId) {
+    this.numId = numId;
+  }
+
+  public Integer getNumId() {
+    return numId;
   }
 }

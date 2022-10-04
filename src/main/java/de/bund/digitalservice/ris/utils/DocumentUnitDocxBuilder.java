@@ -109,10 +109,11 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private boolean isBorderNumber() {
-    var isText = isText();
+    PPr ppr = paragraph.getPPr();
 
-    if (isText && paragraph.getPPr() != null && paragraph.getPPr().getPStyle() != null) {
-      return paragraph.getPPr().getPStyle().getVal().equals("RandNummer");
+    if (isText() && ppr != null && ppr.getPStyle() != null) {
+      return List.of("RandNummer", "ListParagraph", "Listenabsatz")
+          .contains(ppr.getPStyle().getVal());
     }
 
     return false;
@@ -126,6 +127,10 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
         .map(R.class::cast)
         .forEach(r -> borderNumber.addNumberText(parseTextFromRun(r)));
 
+    PPr ppr = paragraph.getPPr();
+    if (ppr != null && ppr.getNumPr() != null && ppr.getNumPr().getNumId() != null) {
+      borderNumber.setNumId(paragraph.getPPr().getNumPr().getNumId().getVal().intValue());
+    }
     return borderNumber;
   }
 

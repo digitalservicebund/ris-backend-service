@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.domain;
 
+import de.bund.digitalservice.ris.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.domain.docx.DocxImagePart;
@@ -160,10 +161,31 @@ public class DocxConverterService {
     converter.setImages(readImages(mlPackage));
     converter.setNumbering(readNumbering(mlPackage));
 
-    return mlPackage.getMainDocumentPart().getContent().stream()
-        .map(converter::convert)
-        .filter(Objects::nonNull)
-        .toList();
+    List<DocumentUnitDocx> documentUnitDocxList =
+        mlPackage.getMainDocumentPart().getContent().stream()
+            .map(converter::convert)
+            .filter(Objects::nonNull)
+            .toList();
+
+    Integer numIdOfCurrentBorderNumberBlock = null;
+    int borderNumberCounter = 1;
+
+    for (DocumentUnitDocx documentUnitDocx : documentUnitDocxList) {
+      if (documentUnitDocx instanceof BorderNumber borderNumber
+          && borderNumber.getNumber().isEmpty()) {
+        borderNumber.addNumberText(String.valueOf(borderNumberCounter++));
+        if (numIdOfCurrentBorderNumberBlock != null
+            && !borderNumber.getNumId().equals(numIdOfCurrentBorderNumberBlock)) {
+          LOGGER.error(
+              "Unexpected case of a new numId. Are there more than one border number blocks "
+                  + "in this document? Then we need to support this case. Until then "
+                  + "every border number block after the first one will not start at 1. Instead"
+                  + "it is a continuous counting up across the whole document. ");
+        }
+        numIdOfCurrentBorderNumberBlock = borderNumber.getNumId();
+      }
+    }
+    return documentUnitDocxList;
   }
 
   private Map<String, ListNumberingDefinition> readNumbering(WordprocessingMLPackage mlPackage) {
