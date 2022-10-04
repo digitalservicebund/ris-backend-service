@@ -7,7 +7,6 @@ import * as components from "vuetify/components"
 import * as directives from "vuetify/directives"
 import FileUpload from "../../src/components/FileUpload.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import { UploadStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
 
 describe("FileUpload", () => {
@@ -39,10 +38,10 @@ describe("FileUpload", () => {
   })
 
   test("upload docx file", async () => {
-    vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
+    vi.spyOn(fileService, "upload").mockImplementation(() =>
       Promise.resolve({
-        documentUnit: new DocumentUnit("1"),
-        status: UploadStatus.SUCCESSED,
+        status: 201,
+        data: new DocumentUnit("1"),
       })
     )
 
@@ -103,8 +102,14 @@ describe("FileUpload", () => {
   })
 
   test("upload fails because the file is too large", async () => {
-    vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
-      Promise.resolve({ status: UploadStatus.FILE_TOO_LARGE })
+    vi.spyOn(fileService, "upload").mockImplementation(() =>
+      Promise.resolve({
+        status: 413,
+        error: {
+          title: "Die Datei darf max. 20 MB groß sein.",
+          description: "Bitte laden Sie eine kleinere Datei hoch.",
+        },
+      })
     )
 
     const { getByText, getByLabelText } = render(FileUpload, {
@@ -134,9 +139,16 @@ describe("FileUpload", () => {
     getByText("Bitte laden Sie eine kleinere Datei hoch.", { exact: false })
   })
 
-  test("upload fails due to unknown error while sending via service", async () => {
-    vi.spyOn(fileService, "uploadFile").mockImplementation(() =>
-      Promise.resolve({ status: UploadStatus.FAILED })
+  test.skip("upload fails due to unknown error while sending via service", async () => {
+    vi.spyOn(fileService, "upload").mockImplementation(() =>
+      Promise.resolve({
+        status: 500,
+        error: {
+          title: "Leider ist ein Fehler aufgetreten.",
+          description:
+            "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+        },
+      })
     )
 
     const { getByText, getByLabelText } = render(FileUpload, {

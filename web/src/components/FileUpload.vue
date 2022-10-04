@@ -1,15 +1,30 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { ref } from "vue"
 import FileInputButton from "@/components/FileInputButton.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import { UploadStatus, UploadErrorStatus } from "@/domain/uploadStatus"
 import fileService from "@/services/fileService"
+import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{ documentUnitUuid: string }>()
 const emits = defineEmits<{
   (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit): void
 }>()
+
+enum UploadStatus {
+  UNKNOWN,
+  UPLOADING,
+  SUCCESSED,
+  FAILED,
+  FILE_TOO_LARGE,
+  WRONG_FILE_FORMAT,
+}
+
+const UploadErrorStatus: UploadStatus[] = [
+  UploadStatus.FAILED,
+  UploadStatus.FILE_TOO_LARGE,
+  UploadStatus.WRONG_FILE_FORMAT,
+]
 
 interface Status {
   file: File | null
@@ -26,33 +41,37 @@ const emptyStatus: Status = {
 }
 
 const status = ref(emptyStatus)
+const error = ref<ResponseError>()
 
-const reset = () => {
+function reset() {
   status.value = emptyStatus
 }
 
-const upload = async (file: File) => {
-  const extension = file.name?.split(".").pop()
-  if (!extension || extension.toLowerCase() !== "docx") {
-    status.value.uploadStatus = UploadStatus.WRONG_FILE_FORMAT
-    return
-  }
+async function upload(file: File) {
   status.value.file = file
   status.value.uploadStatus = UploadStatus.UPLOADING
-  const response = await fileService.uploadFile(props.documentUnitUuid, file)
-  status.value.uploadStatus = response.status
-  if (response.status == UploadStatus.SUCCESSED && !!response.documentUnit) {
-    emits("updateDocumentUnit", response.documentUnit)
+  const response = await fileService.upload(props.documentUnitUuid, file)
+  if (response.status === 201 && response.data) {
+    status.value.uploadStatus = UploadStatus.SUCCESSED
+    emits("updateDocumentUnit", response.data)
+  } else {
+    status.value.uploadStatus =
+      response.status === 413
+        ? UploadStatus.FILE_TOO_LARGE
+        : response.status === 415
+        ? UploadStatus.WRONG_FILE_FORMAT
+        : UploadStatus.FAILED
   }
+  error.value = response.error
 }
 
-const dragover = (e: DragEvent) => {
+function dragover(e: DragEvent) {
   e.preventDefault()
   status.value.inDragError = checkForInDragError(e)
   status.value.inDrag = true
 }
 
-const checkForInDragError = (e: DragEvent): string => {
+function checkForInDragError(e: DragEvent): string {
   if (!e.dataTransfer) return ""
   const items = e.dataTransfer.items
   if (items.length > 1) return "Nur eine Datei auf einmal ist möglich"
@@ -66,12 +85,12 @@ const checkForInDragError = (e: DragEvent): string => {
   return ""
 }
 
-const dragleave = () => {
+function dragleave() {
   status.value.inDragError = ""
   status.value.inDrag = false
 }
 
-const drop = (e: DragEvent) => {
+function drop(e: DragEvent) {
   e.preventDefault()
   reset()
   if (e.dataTransfer) {
@@ -79,7 +98,7 @@ const drop = (e: DragEvent) => {
   }
 }
 
-function onFileSelect(event: Event): void {
+function onFileSelect(event: Event) {
   const files = (event.target as HTMLInputElement).files
 
   if (files) {
@@ -87,30 +106,6 @@ function onFileSelect(event: Event): void {
     upload(files[0])
   }
 }
-
-const error = computed(() => {
-  switch (status.value.uploadStatus) {
-    case UploadStatus.WRONG_FILE_FORMAT:
-      return {
-        description:
-          "Versuchen Sie eine .docx-Version dieser Datei hochzuladen.",
-        title: "Das ausgewählte Dateiformat ist nicht korrekt.",
-      }
-    case UploadStatus.FILE_TOO_LARGE:
-      return {
-        description: "Bitte laden Sie eine kleinere Datei hoch.",
-        title: "Die Datei darf max. 20 MB groß sein.",
-      }
-    case UploadStatus.FAILED:
-      return {
-        description:
-          "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
-        title: "Leider ist ein Fehler aufgetreten.",
-      }
-    default:
-      return undefined
-  }
-})
 </script>
 
 <template>

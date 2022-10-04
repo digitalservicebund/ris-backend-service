@@ -16,7 +16,6 @@ const props = defineProps<{
 defineEmits<{ (e: "deleteFile"): void }>()
 
 const showModal = ref(false)
-const fileAsHtml = ref("Dokument wird geladen.")
 
 const popupModalText = computed(
   () => `Möchten Sie die ausgewählte Datei ${props.fileName} wirklich löschen?`
@@ -56,8 +55,14 @@ const toggleModal = () => {
   }
 }
 
+const fileAsHtml = ref("Dokument wird geladen.")
 onMounted(async () => {
-  fileAsHtml.value = await fileService.getDocxFileAsHtml(props.s3Path)
+  const fileResponse = await fileService.getDocxFileAsHtml(props.s3Path)
+  if (fileResponse.error) {
+    console.error(fileResponse.error)
+  } else {
+    fileAsHtml.value = fileResponse.data
+  }
 })
 </script>
 
