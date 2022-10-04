@@ -15,8 +15,67 @@ import java.util.ArrayList;
 import java.util.List;
 import org.docx4j.wml.JcEnumeration;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.boot.test.system.CapturedOutput;
+import org.springframework.boot.test.system.OutputCaptureExtension;
 
+@ExtendWith(OutputCaptureExtension.class)
 class DocumentUnitDocxListUtilsTest {
+
+  @Test
+  void testPostprocessBorderNumbers_withEmptyList_shouldDoNothing() {
+    List<DocumentUnitDocx> list = new ArrayList<>();
+
+    DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
+
+    assertThat(list).isEmpty();
+  }
+
+  @Test
+  void testPostprocessBorderNumbers_withNull_shouldDoNothing() {
+
+    DocumentUnitDocxListUtils.postprocessBorderNumbers(null);
+  }
+
+  @Test
+  void testPostprocessBorderNumbers_withTwoBorderlessBorderNumbers_shouldAssignNumbers() {
+    List<DocumentUnitDocx> list = new ArrayList<>();
+    list.add(createEmptyBorderNumberWithNumId(7));
+    list.add(createEmptyBorderNumberWithNumId(7));
+
+    DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
+
+    assertThat(list).hasSize(2);
+    assertThat(list.get(0)).isInstanceOf(BorderNumber.class);
+    BorderNumber borderNumber0 = (BorderNumber) list.get(0);
+    assertThat(borderNumber0.getNumber()).isEqualTo("1");
+    assertThat(borderNumber0.getNumId()).isEqualTo(7);
+    assertThat(list.get(0)).isInstanceOf(BorderNumber.class);
+    BorderNumber borderNumber1 = (BorderNumber) list.get(1);
+    assertThat(borderNumber1.getNumber()).isEqualTo("2");
+    assertThat(borderNumber1.getNumId()).isEqualTo(7);
+  }
+
+  @Test
+  void testPostprocessBorderNumbers_withBorderlessBorderNumbersButDifferentNumIds_shouldLogError(
+      CapturedOutput output) {
+    List<DocumentUnitDocx> list = new ArrayList<>();
+    list.add(createEmptyBorderNumberWithNumId(7));
+    list.add(createEmptyBorderNumberWithNumId(8));
+
+    DocumentUnitDocxListUtils.postprocessBorderNumbers(list);
+
+    assertThat(list).hasSize(2);
+    assertThat(list.get(0)).isInstanceOf(BorderNumber.class);
+    BorderNumber borderNumber0 = (BorderNumber) list.get(0);
+    assertThat(borderNumber0.getNumber()).isEqualTo("1");
+    assertThat(borderNumber0.getNumId()).isEqualTo(7);
+    assertThat(list.get(0)).isInstanceOf(BorderNumber.class);
+    BorderNumber borderNumber1 = (BorderNumber) list.get(1);
+    assertThat(borderNumber1.getNumber()).isEqualTo("2");
+    assertThat(borderNumber1.getNumId()).isEqualTo(8);
+    assertThat(output).contains("Unexpected case of a new numId");
+  }
 
   @Test
   void testPackList_withEmptyList_shouldReturnEmptyList() {
@@ -157,6 +216,12 @@ class DocumentUnitDocxListUtilsTest {
     textElement.setText(text);
     paragraph.setRunElements(List.of(textElement));
     return paragraph;
+  }
+
+  private BorderNumber createEmptyBorderNumberWithNumId(int numId) {
+    BorderNumber borderNumber = new BorderNumber();
+    borderNumber.setNumId(numId);
+    return borderNumber;
   }
 
   private BorderNumber createBorderNumber(int number) {

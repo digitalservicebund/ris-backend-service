@@ -17,6 +17,9 @@ public class DocumentUnitDocxListUtils {
   private DocumentUnitDocxListUtils() {}
 
   public static void postprocessBorderNumbers(List<DocumentUnitDocx> documentUnitDocxList) {
+    if (documentUnitDocxList == null) {
+      return;
+    }
     Integer numIdOfCurrentBorderNumberBlock = null;
     int borderNumberCounter = 1;
 
