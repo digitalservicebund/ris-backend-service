@@ -70,7 +70,7 @@
     "@vitest/coverage-c8": "^0.23.1",
     "@vue/eslint-config-prettier": "^7.0.0",
     "@vue/eslint-config-typescript": "^11.0.0",
-    "@vue/test-utils": "^2.0.0",
+    "@vue/test-utils": "^2.1.0",
     "@vuetify/vite-plugin": "^1.0.0-alpha.0",
     "autoprefixer": "^10.4.11",
     "axe-playwright": "^1.1.11",
