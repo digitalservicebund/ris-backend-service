@@ -113,6 +113,10 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private boolean isBorderNumber() {
+    if (paragraph == null) {
+      return false;
+    }
+
     PPr ppr = paragraph.getPPr();
 
     if (isText() && ppr != null && ppr.getPStyle() != null) {
