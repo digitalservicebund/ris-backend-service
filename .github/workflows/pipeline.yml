@@ -574,15 +574,6 @@ jobs:
       mode: a11y
     secrets: inherit
 
-  deploy-staging-verify-a11y-firefox:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
-    uses: ./.github/workflows/playwright-test.yml
-    with:
-      browser: firefox
-      mode: a11y
-    secrets: inherit
-
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -595,7 +586,6 @@ jobs:
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
       - deploy-staging-verify-a11y-chrome
-      - deploy-staging-verify-a11y-firefox
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
