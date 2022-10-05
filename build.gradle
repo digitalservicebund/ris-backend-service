@@ -61,6 +61,10 @@ dependencies {
   implementation "software.amazon.awssdk:s3"
   implementation "org.springdoc:springdoc-openapi-webflux-ui:1.6.9"
 
+  // CVE-2022-42004
+  implementation "com.fasterxml.jackson:jackson-bom:2.13.4"
+  implementation "com.fasterxml.jackson.core:jackson-databind:2.13.4"
+
   implementation "org.docx4j:docx4j-JAXB-MOXy:11.4.8"
   implementation "com.sun.mail:jakarta.mail:2.0.1"
   implementation "com.sun.activation:jakarta.activation:2.0.1"
