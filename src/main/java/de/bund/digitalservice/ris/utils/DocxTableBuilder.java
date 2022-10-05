@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.domain.docx.RunTextElement;
 import de.bund.digitalservice.ris.domain.docx.TableCellElement;
 import de.bund.digitalservice.ris.domain.docx.TableElement;
 import de.bund.digitalservice.ris.domain.docx.TableRowElement;
-import de.bund.digitalservice.ris.domain.docx.VerticalAlign;
 import jakarta.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -24,16 +23,13 @@ import org.docx4j.wml.CTTblLook;
 import org.docx4j.wml.CTTblPrBase;
 import org.docx4j.wml.CTTblStylePr;
 import org.docx4j.wml.P;
-import org.docx4j.wml.RPr;
 import org.docx4j.wml.STTblStyleOverrideType;
-import org.docx4j.wml.STVerticalAlignRun;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 import org.docx4j.wml.TblBorders;
 import org.docx4j.wml.Tc;
 import org.docx4j.wml.TcPr;
 import org.docx4j.wml.Tr;
-import org.docx4j.wml.UnderlineEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,8 +51,8 @@ public class DocxTableBuilder extends DocxBuilder {
 
   public DocumentUnitDocx build() {
     var tableElement = new TableElement(parseTable(table));
-    addTableProperties(tableElement);
     addTableStyleProperties(tableElement);
+    addTableProperties(tableElement);
 
     return tableElement;
   }
@@ -147,7 +143,7 @@ public class DocxTableBuilder extends DocxBuilder {
                             .filter(RunTextElement.class::isInstance)
                             .forEach(
                                 runElement ->
-                                    addRunElementStyles(
+                                    RunElementStyleAdapter.addStyles(
                                         (RunTextElement) runElement, style.getRPr()));
                       }
                     });
@@ -330,7 +326,8 @@ public class DocxTableBuilder extends DocxBuilder {
                 .filter(RunTextElement.class::isInstance)
                 .forEach(
                     runElement ->
-                        addRunElementStyles((RunTextElement) runElement, tblStylePr.getRPr()));
+                        RunElementStyleAdapter.addStyles(
+                            (RunTextElement) runElement, tblStylePr.getRPr()));
           }
         });
   }
@@ -362,56 +359,6 @@ public class DocxTableBuilder extends DocxBuilder {
       case SW_CELL -> (1 & usedStyles) != 0;
       case WHOLE_TABLE -> true;
     };
-  }
-
-  private void addRunElementStyles(RunTextElement textElement, RPr rPr) {
-    if (rPr == null) {
-      return;
-    }
-
-    if (rPr.getB() != null && rPr.getB().isVal()) {
-      textElement.setBold(rPr.getB().isVal());
-    }
-
-    if (rPr.getI() != null && rPr.getI().isVal()) {
-      textElement.setItalic(rPr.getI().isVal());
-    }
-
-    if (rPr.getStrike() != null && rPr.getStrike().isVal()) {
-      textElement.setStrike(rPr.getStrike().isVal());
-    }
-
-    if (rPr.getVertAlign() != null && rPr.getVertAlign().getVal() != null) {
-      textElement.setVertAlign(convertVertAlign(rPr.getVertAlign().getVal()));
-    }
-
-    // check this again. don't find the reason why the font-size of the
-    // external table style don't override the old one
-    if (rPr.getSz() != null && !textElement.containsStyle("font-size")) {
-      textElement.setSize(rPr.getSz().getVal().intValue());
-    }
-
-    if (rPr.getU() != null && rPr.getU().getVal() == UnderlineEnumeration.SINGLE) {
-      textElement.setUnderline("single");
-    }
-
-    if (rPr.getColor() != null) {
-      textElement.setColor(rPr.getColor().getVal());
-    }
-  }
-
-  private VerticalAlign convertVertAlign(STVerticalAlignRun verticalAlignRun) {
-    if (verticalAlignRun == null) {
-      return null;
-    }
-
-    if (verticalAlignRun == STVerticalAlignRun.SUBSCRIPT) {
-      return VerticalAlign.SUBSCRIPT;
-    } else if (verticalAlignRun == STVerticalAlignRun.SUPERSCRIPT) {
-      return VerticalAlign.SUPERSCRIPT;
-    }
-
-    return null;
   }
 
   private void addTableProperties(TableElement tableElement) {

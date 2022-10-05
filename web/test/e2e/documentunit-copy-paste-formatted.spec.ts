@@ -42,10 +42,11 @@ test("copy-paste from side panel", async ({ page }) => {
   await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
   const originalFileParagraph = page.locator(`text=${leftAlignText}`)
+  await expect(originalFileParagraph).toBeVisible()
 
   // Selected all text from sidepanel
   await originalFileParagraph.evaluate((element) => {
-    const originalFile = element.parentElement
+    const originalFile = element.parentElement.parentElement
     if (originalFile !== null) {
       const selection = window.getSelection()
       const elementChildsLength = originalFile.childNodes.length

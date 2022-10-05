@@ -13,8 +13,6 @@ import de.bund.digitalservice.ris.domain.docx.ParagraphElement;
 import de.bund.digitalservice.ris.domain.docx.RunElement;
 import de.bund.digitalservice.ris.domain.docx.RunTabElement;
 import de.bund.digitalservice.ris.domain.docx.RunTextElement;
-import de.bund.digitalservice.ris.domain.docx.TextElement;
-import de.bund.digitalservice.ris.domain.docx.VerticalAlign;
 import jakarta.xml.bind.JAXBElement;
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
@@ -46,10 +44,8 @@ import org.docx4j.wml.Pict;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.RPrAbstract;
-import org.docx4j.wml.STVerticalAlignRun;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Text;
-import org.docx4j.wml.UnderlineEnumeration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -580,9 +576,9 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     return null;
   }
 
-  private boolean addStyle(TextElement textElement, RPrAbstract rPr) {
+  private void addStyle(RunTextElement textElement, RPrAbstract rPr) {
     if (rPr != null) {
-      _addStyle(textElement, rPr);
+      RunElementStyleAdapter.addStyles(textElement, rPr);
     } else {
       if (paragraph != null
           && paragraph.getPPr() != null
@@ -591,56 +587,11 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
 
         if (style != null) {
           if (style.getRPr() != null) {
-            _addStyle(textElement, style.getRPr());
+            RunElementStyleAdapter.addStyles(textElement, style.getRPr());
           }
         }
       }
     }
-    return true;
-  }
-
-  private boolean _addStyle(TextElement textElement, RPrAbstract rPr) {
-    if (rPr == null) {
-      return true;
-    }
-
-    if (rPr.getB() != null && rPr.getB().isVal()) {
-      textElement.setBold(rPr.getB().isVal());
-    }
-
-    if (rPr.getI() != null && rPr.getI().isVal()) {
-      textElement.setItalic(rPr.getI().isVal());
-    }
-
-    if (rPr.getStrike() != null && rPr.getStrike().isVal()) {
-      textElement.setStrike(rPr.getStrike().isVal());
-    }
-
-    if (rPr.getVertAlign() != null) {
-      STVerticalAlignRun vertAlign = rPr.getVertAlign().getVal();
-      VerticalAlign convertedVertAlign = null;
-      if (vertAlign != null && vertAlign != STVerticalAlignRun.BASELINE) {
-        if (vertAlign == STVerticalAlignRun.SUBSCRIPT) {
-          convertedVertAlign = VerticalAlign.SUBSCRIPT;
-        } else if (vertAlign == STVerticalAlignRun.SUPERSCRIPT) {
-          convertedVertAlign = VerticalAlign.SUPERSCRIPT;
-        } else {
-          LOGGER.error("Unknown vertical align value: {}", vertAlign);
-        }
-      }
-
-      textElement.setVertAlign(convertedVertAlign);
-    }
-
-    if (rPr.getSz() != null) {
-      textElement.setSize(rPr.getSz().getVal().intValue());
-    }
-
-    if (rPr.getU() != null && rPr.getU().getVal() == UnderlineEnumeration.SINGLE) {
-      textElement.setUnderline("single");
-    }
-
-    return true;
   }
 
   private String parseTextFromRun(R r) {
