@@ -15,8 +15,8 @@
     "dev": "vite",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write --ignore-unknown .",
-    "lint:check": "eslint --ext .js,.ts,.vue --ignore-path .gitignore . && stylelint ./src/**/*.{vue,scss}",
-    "lint:fix": "eslint --ext .js,.ts,.vue --ignore-path .gitignore --fix . && stylelint --fix ./src/**/*.{vue,scss}",
+    "lint:check": "eslint --max-warnings=0 --ext .js,.ts,.vue --ignore-path .gitignore . && stylelint ./src/**/*.{vue,scss}",
+    "lint:fix": "eslint --max-warnings=0 --ext .js,.ts,.vue --ignore-path .gitignore --fix . && stylelint --fix ./src/**/*.{vue,scss}",
     "style:check": "vue-tsc && npm run format:check && npm run lint:check",
     "style:fix": "npm run format:fix && npm run lint:fix",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''"
