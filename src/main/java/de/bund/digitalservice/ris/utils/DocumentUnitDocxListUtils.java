@@ -28,6 +28,7 @@ public class DocumentUnitDocxListUtils {
           && borderNumber.getNumber().isEmpty()) {
         borderNumber.addNumberText(String.valueOf(borderNumberCounter++));
         if (numIdOfCurrentBorderNumberBlock != null
+            && borderNumber.getNumId() != null
             && !borderNumber.getNumId().equals(numIdOfCurrentBorderNumberBlock)) {
           LOGGER.error(
               "Unexpected case of a new numId. Are there more than one border number blocks "
