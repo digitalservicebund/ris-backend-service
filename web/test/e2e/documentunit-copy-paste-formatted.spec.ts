@@ -20,8 +20,8 @@ test("copy-paste from side panel", async ({ page }) => {
   const rightAlignText = "I am right aligned"
   const centerAlignText = "I am centered"
   const justifyAlignText = "I am justify aligned"
-  const leftAlignTextWithStyle = `<p>${leftAlignText}</p>`
-  const rightAlignTextWithStyle = `<p style="text-align: right">${rightAlignText}</p>`
+  const leftAlignTextWithStyle = `<p><span style="color: rgb(0, 0, 0)">${leftAlignText}</span></p>`
+  const rightAlignTextWithStyle = `<p style="text-align: right"><span style="color: rgb(0, 0, 0)">${rightAlignText}</span></p>`
   const centerAlignTextWithStyle = `<p style="text-align: center">${centerAlignText}</p>`
   const justifyAlignTextWithStyle = `<p style="text-align: justify">${justifyAlignText}</p>`
 
