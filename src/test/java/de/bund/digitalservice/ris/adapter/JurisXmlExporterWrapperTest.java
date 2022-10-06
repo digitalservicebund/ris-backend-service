@@ -11,8 +11,6 @@ import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -62,7 +60,7 @@ public class JurisXmlExporterWrapperTest {
   @Mock private Instant mockInstant;
 
   @BeforeEach
-  void setUp() throws ParserConfigurationException, TransformerException {
+  void setUp() {
     objectMapper = new ObjectMapper();
     documentUnit =
         DocumentUnit.builder()

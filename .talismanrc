@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 8318ab7d45a0281092b93d09ffd63d1baf21d2afba8a4b27e1b0d8b588292c88
+    checksum: 433fc79d024e49fd3fbbbae3f8d89292b3103e9c66f829a6c9bcc857c0dd33a2
   - filename: run.sh
     checksum: 9bdbe5db9639a5d8d7f5f4bde81c2c5acb6af0ccd619e55a59c32dcb08d1a4de
   - filename: .github/workflows/pipeline.yml
@@ -51,6 +51,8 @@ fileignoreconfig:
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: fee4409465a171ae90dbe84d8efe12db4c584b5ffecdfe374c5a9770909ca4dd
+  - filename: src/test/java/de/bund/digitalservice/ris/adapter/JurisXmlExporterWrapperTest.java
+    checksum: 1d128c9e70c4865df8e37aa4df71388df969030cb98af987d419a0a67269108c
 scopeconfig:
   - scope: node
 allowed_patterns:
