@@ -27,4 +27,10 @@ public class JurisXmlExporterWrapper implements XmlExporter {
         resultObject.fileName(),
         resultObject.publishDate());
   }
+
+  @Override
+  public String generateEncryptedXMLString(DocumentUnit documentUnit) throws Exception {
+    String resultObject = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
+    return resultObject;
+  }
 }

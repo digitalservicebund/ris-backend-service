@@ -15,4 +15,11 @@ public class MockXmlExporter implements XmlExporter {
       throws ParserConfigurationException, TransformerException {
     return new XmlResultObject("xml", "200", Collections.emptyList(), "test.xml", Instant.now());
   }
+
+  @Override
+  public String generateEncryptedXMLString(DocumentUnit documentUnit)
+      throws ParserConfigurationException, TransformerException {
+    String resultObject = "";
+    return resultObject;
+  }
 }
