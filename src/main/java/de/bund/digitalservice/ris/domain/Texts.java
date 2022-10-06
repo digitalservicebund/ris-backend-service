@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.domain;
 
+import lombok.Builder;
+
+@Builder
 public record Texts(
     String decisionName,
     String headline,
