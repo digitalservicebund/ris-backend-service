@@ -69,10 +69,10 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   public DocumentUnitDocx build() {
     if (isBorderNumber()) {
       return convertToBorderNumber();
-    } else if (isNumberingList()) {
-      return convertToNumberingList();
+    } else if (isNumberingListEntry()) {
+      return convertToNumberingListEntry();
     } else if (isParagraph()) {
-      return convertToParagraphElement(paragraph);
+      return convertToParagraph(paragraph);
     }
 
     return null;
@@ -138,7 +138,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     return borderNumber;
   }
 
-  private boolean isNumberingList() {
+  private boolean isNumberingListEntry() {
     if (!isParagraph() || paragraph.getPPr() == null) {
       return false;
     }
@@ -146,8 +146,8 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     return paragraph.getPPr().getNumPr() != null;
   }
 
-  private NumberingListEntry convertToNumberingList() {
-    if (!isNumberingList()) {
+  private NumberingListEntry convertToNumberingListEntry() {
+    if (!isNumberingListEntry()) {
       return null;
     }
 
@@ -192,7 +192,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
       }
     }
 
-    return new NumberingListEntry(convertToParagraphElement(paragraph), numberingListEntryIndex);
+    return new NumberingListEntry(convertToParagraph(paragraph), numberingListEntryIndex);
   }
 
   private NumberingListEntryIndex setNumberingListEntryIndex(ListLevel listLevel, String iLvl) {
@@ -264,7 +264,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     return paragraph != null;
   }
 
-  private DocumentUnitDocx convertToParagraphElement(P paragraph) {
+  private DocumentUnitDocx convertToParagraph(P paragraph) {
     if (paragraph == null) {
       return null;
     }
