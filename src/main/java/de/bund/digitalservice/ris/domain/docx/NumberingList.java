@@ -96,6 +96,7 @@ public class NumberingList implements DocumentUnitDocx {
   }
 
   public enum DocumentUnitNumberingListNumberFormat {
+    NONE,
     DECIMAL,
     BULLET,
     UPPER_ROMAN,
@@ -107,12 +108,11 @@ public class NumberingList implements DocumentUnitDocx {
   private String getOpenListTag(NumberingListEntryIndex numberingListEntryIndex) {
     DocumentUnitNumberingListNumberFormat listNumberFormat = numberingListEntryIndex.numberFormat();
     String listStyle = getListType(listNumberFormat, numberingListEntryIndex);
-    final String numOpenTagFormat = "<ol style=\"%s\">";
-    final String bulletOpenTagFormat = "<ul style=\"%s\">";
-    return switch (listNumberFormat) {
-      case BULLET -> String.format(bulletOpenTagFormat, listStyle);
-      default -> String.format(numOpenTagFormat, listStyle);
-    };
+    if (listNumberFormat == DocumentUnitNumberingListNumberFormat.BULLET) {
+      return listStyle == null ? "<ul>" : String.format("<ul style=\"%s\">", listStyle);
+    } else {
+      return listStyle == null ? "<ol>" : String.format("<ol style=\"%s\">", listStyle);
+    }
   }
 
   private String getCloseListTag(DocumentUnitNumberingListNumberFormat listNumberFormat) {
@@ -162,6 +162,7 @@ public class NumberingList implements DocumentUnitDocx {
     if (!lvlText.isBlank() && docxIndexMatchPattern.matcher(lvlText).find())
       return "list-style-type:none;display:table;";
     return switch (numberFormat) {
+      case NONE -> null;
       case DECIMAL -> "list-style-type:decimal;";
       case UPPER_LETTER -> "list-style-type:lower-latin;";
       case LOWER_LETTER -> "list-style-type:upper-latin;";
@@ -242,6 +243,9 @@ public class NumberingList implements DocumentUnitDocx {
     String indexJc = getIndexJc(numberingListEntryIndex);
     String pStyle = getPStyle(numberingListEntryIndex);
     String suff = getSuff(numberingListEntryIndex);
+    if (numberFormat.equals(DocumentUnitNumberingListNumberFormat.NONE)) {
+      return String.format(listIndexFormat, indexJc, pStyle, "", suff);
+    }
     if (numberFormat.equals(DocumentUnitNumberingListNumberFormat.BULLET)) {
       String bulletHexCode = getBulletHexCode(numberingListEntryIndex.fontStyle());
       return String.format(listIndexFormat, indexJc, pStyle, bulletHexCode, suff);

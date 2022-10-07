@@ -152,7 +152,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     }
 
     NumPr numPr = paragraph.getPPr().getNumPr();
-    String numId;
+    String numId = null;
     String iLvl = null;
 
     ListNumberingDefinition listNumberingDefinition = null;
@@ -165,20 +165,17 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
       iLvl = numPr.getIlvl().getVal().toString();
     }
 
+    // Unless we find a counter example, we treat the presence of a numPr element with numId 0
+    // as a list entry that brings its own numbering symbol inside the paragraph part --> we don't
+    // add any own numbering symbols
+    DocumentUnitNumberingListNumberFormat numberFormat =
+        numId != null && numId.equals("0")
+            ? DocumentUnitNumberingListNumberFormat.NONE
+            : DocumentUnitNumberingListNumberFormat.BULLET;
+
     NumberingListEntryIndex numberingListEntryIndex =
         new NumberingListEntryIndex(
-            "",
-            "1",
-            "",
-            "",
-            "",
-            "",
-            false,
-            false,
-            DocumentUnitNumberingListNumberFormat.BULLET,
-            iLvl,
-            JcEnumeration.RIGHT,
-            "tab");
+            "", "1", "", "", "", "", false, false, numberFormat, iLvl, JcEnumeration.RIGHT, "tab");
     if (listNumberingDefinition != null) {
       AbstractListNumberingDefinition abstractListDefinition =
           listNumberingDefinition.getAbstractListDefinition();
