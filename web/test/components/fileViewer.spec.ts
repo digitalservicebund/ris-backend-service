@@ -1,8 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import FileViewer from "../../src/components/FileViewer.vue"
 
 const S3PATH = "47a77c3f-a05d-4362-97ea-d54a35236a67"
@@ -13,6 +10,7 @@ const LABEL_TEXTES = ["Hochgeladen am", "Format", "Von", "Dateiname"]
 const DELETE_BTN_TEXT = "Datei löschen"
 const DEFAULT_EDITOR_TEXT = "Loading data ...."
 describe("file viewer", async () => {
+  global.ResizeObserver = require("resize-observer-polyfill")
   vi.mock("@/services/fileService", () => {
     return {
       default: {
@@ -20,7 +18,6 @@ describe("file viewer", async () => {
       },
     }
   })
-  const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -40,7 +37,7 @@ describe("file viewer", async () => {
         fileType: FILE_TYPE,
         uploadTimeStamp: getUploadTimeStampToUpload(),
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     LABEL_TEXTES.forEach((labelText) => getByText(labelText))
@@ -62,7 +59,7 @@ describe("file viewer", async () => {
         fileType: FILE_TYPE,
         uploadTimeStamp: getUploadTimeStampToUpload(),
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     await fireEvent.click(screen.getByText(DELETE_BTN_TEXT, { exact: false }))

@@ -1,17 +1,13 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("Texts", () => {
-  const vuetify = createVuetify({ components, directives })
+  global.ResizeObserver = require("resize-observer-polyfill")
 
   test("renders all text fields with labels", async () => {
     const { getByText } = render(DocumentUnitTexts, {
-      global: { plugins: [vuetify] },
       props: {
         texts: new DocumentUnit("foo").texts,
         updateStatus: 0,
@@ -31,7 +27,6 @@ describe("Texts", () => {
   test("emits update DocumentUnit event", async () => {
     const user = userEvent.setup()
     const { getByLabelText, emitted } = render(DocumentUnitTexts, {
-      global: { plugins: [vuetify] },
       props: {
         texts: new DocumentUnit("foo").texts,
         updateStatus: 0,

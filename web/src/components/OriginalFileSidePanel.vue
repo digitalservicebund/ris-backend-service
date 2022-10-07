@@ -15,7 +15,9 @@ const uploadFileRoute = {
 </script>
 
 <script lang="ts">
-// As this component does not have a root node, Vue throws a warning that Extraneous non-props attributes (class) were passed to component but could not be automatically inherited. This disables attribute inheritance to avoid the warning. An alternative could be to wrap the component with another root div.
+// As this component does not have a root node, Vue throws a warning that Extraneous non-props attributes (class)
+// were passed to component but could not be automatically inherited. This disables attribute inheritance to avoid
+// the warning. An alternative could be to wrap the component with another root div.
 export default {
   inheritAttrs: false,
 }

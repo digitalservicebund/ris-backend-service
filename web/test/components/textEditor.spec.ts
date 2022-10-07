@@ -1,12 +1,9 @@
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import TextEditor from "../../src/components/TextEditor.vue"
 
 describe("text editor", async () => {
-  const vuetify = createVuetify({ components, directives })
+  global.ResizeObserver = require("resize-observer-polyfill")
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -21,7 +18,7 @@ describe("text editor", async () => {
   test("renders text editor with default props", async () => {
     const { queryByLabelText, container } = render(TextEditor, {
       props: {},
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     expect(
@@ -41,7 +38,7 @@ describe("text editor", async () => {
           fieldSize: "large",
           ariaLabel: "test label",
         },
-        global: { plugins: [vuetify, router] },
+        global: { plugins: [router] },
       }
     )
 
@@ -58,7 +55,7 @@ describe("text editor", async () => {
   test("show buttons on focus", async () => {
     const { getByLabelText } = render(TextEditor, {
       props: { value: "Test Value", ariaLabel: "test label", editable: true },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
     await screen.findByText("Test Value")
     const editorField = getByLabelText("test label Editor Feld")
@@ -74,7 +71,7 @@ describe("text editor", async () => {
   test("hide buttons on blur", async () => {
     const { getByLabelText, queryByLabelText } = render(TextEditor, {
       props: { value: "Test Value", ariaLabel: "test label" },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     await screen.findByText("Test Value")
@@ -100,11 +97,16 @@ describe("text editor", async () => {
    * separetly.
    * The test should be continuosly improved to very that all buttons exist.
    */
-  it("shows all necessary editor buttons in small view", async () => {
-    const { getByLabelText, findByText, getByText } = render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "test label", editable: true },
-      global: { plugins: [vuetify, router] },
-    })
+  it("shows all necessary editor buttons", async () => {
+    window.innerWidth = 500
+    global.innerWidth = 500
+    const { getByLabelText, getAllByText, findByText, getByText } = render(
+      TextEditor,
+      {
+        props: { value: "Test Value", ariaLabel: "test label", editable: true },
+        global: { plugins: [router] },
+      }
+    )
     await findByText("Test Value")
     const editorField = getByLabelText("test label Editor Feld")
 
@@ -118,26 +120,6 @@ describe("text editor", async () => {
     expect(getByText("format_italic")).toBeInTheDocument()
     expect(getByText("format_underlined")).toBeInTheDocument()
     expect(getByText("strikethrough_s")).toBeInTheDocument()
-    expect(getByText("more_horiz")).toBeInTheDocument()
-  })
-
-  it("click on more button shows second row", async () => {
-    const { getAllByText, getByLabelText, findByText, getByText } = render(
-      TextEditor,
-      {
-        props: { value: "Test Value", ariaLabel: "test label", editable: true },
-        global: { plugins: [vuetify, router] },
-      }
-    )
-    await findByText("Test Value")
-    const editorField = getByLabelText("test label Editor Feld")
-
-    if (editorField.firstElementChild !== null) {
-      await fireEvent.focus(editorField.firstElementChild)
-    }
-
-    await fireEvent.click(getByText("more_horiz"))
-
     expect(getByText("format_align_left")).toBeInTheDocument()
     expect(getByText("format_align_center")).toBeInTheDocument()
     expect(getByText("format_align_right")).toBeInTheDocument()
@@ -148,5 +130,7 @@ describe("text editor", async () => {
     expect(getByText("format_list_bulleted")).toBeInTheDocument()
     expect(getAllByText("vertical_split")).toHaveLength(2)
     expect(getByText("table_chart")).toBeInTheDocument()
+    expect(getByText("123")).toBeInTheDocument()
+    expect(getByText("open_in_full")).toBeInTheDocument()
   })
 })

@@ -15,7 +15,6 @@ import { TextStyle } from "@tiptap/extension-text-style"
 import { Underline } from "@tiptap/extension-underline"
 import { EditorContent, Editor } from "@tiptap/vue-3"
 import { computed, watch, ref, onMounted } from "vue"
-import { onBeforeRouteUpdate } from "vue-router"
 import {
   BorderNumber,
   BorderNumberContent,
@@ -302,11 +301,6 @@ const showSecondRow = ref(false)
 
 const container = ref()
 
-function onResize() {
-  showSecondRow.value = false
-  containerWidth.value = container.value.getBoundingClientRect().width
-}
-
 function handleButtonClick(button: MenuButton) {
   if (button.type == "more") showSecondRow.value = !showSecondRow.value
   if (button.callback) button.callback()
@@ -331,22 +325,20 @@ const showButtons = () => {
 const ariaLabel = props.ariaLabel ? props.ariaLabel + " Editor Feld" : null
 
 onMounted(() => {
-  onResize()
+  const editorContainer = document.querySelector(".editor")
+  if (editorContainer != null) resizeObserver.observe(editorContainer)
 })
 
-onBeforeRouteUpdate(async () => {
-  onResize()
+const resizeObserver = new ResizeObserver((entries) => {
+  showSecondRow.value = false
+  for (const entry of entries) {
+    containerWidth.value = entry.contentRect.width
+  }
 })
 </script>
 
 <template>
-  <div
-    id="container"
-    ref="container"
-    v-resize="onResize"
-    class="bg-white"
-    fluid
-  >
+  <div ref="container" class="bg-white editor" fluid>
     <div v-if="showButtons()">
       <div
         :aria-label="props.ariaLabel + ' Editor Button Leiste'"
