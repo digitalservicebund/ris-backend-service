@@ -55,9 +55,6 @@ const component = computed(() => {
     <div
       class="flex flex-col flex-nowrap gap-y-10 justify-start py-10 text-justify w-2/3"
     >
-      <!-- Title -->
-      <h1 class="font-bold text-32">{{ selectedComponent.name }}</h1>
-      <!-- Content -->
       <div class="content-container flex flex-col">
         <component :is="component" />
       </div>

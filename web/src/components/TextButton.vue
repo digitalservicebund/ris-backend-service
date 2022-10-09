@@ -22,6 +22,10 @@ const buttonClasses = computed(() => ({
   "btn-ghost": props.buttonType == "ghost",
   "btn-tertiary": props.buttonType == "tertiary",
 }))
+
+const labels = computed(() => ({
+  "label-ghost": props.buttonType == "ghost",
+}))
 </script>
 
 <template>
@@ -33,8 +37,8 @@ const buttonClasses = computed(() => ({
     :rounded="0"
   >
     <slot>
-      <span v-if="icon" class="material-icons"> {{ icon }} </span>
-      {{ label }}
+      <span v-if="icon" class="material-icons pr-2"> {{ icon }} </span>
+      <span class="label-01-bold" :class="labels">{{ label }} </span>
     </slot>
   </button>
 </template>
@@ -42,10 +46,10 @@ const buttonClasses = computed(() => ({
 <style lang="scss" scoped>
 .ris-btn {
   @apply align-middle bg-blue-800 font-bold inline-flex items-center 
-  justify-center max-w-full min-w-[64px] h-[48px] 
+  justify-center max-w-full
   no-underline overflow-hidden outline-none shrink-0 select-none
   relative tracking-widest no-underline normal-case 
-  indent-[0.1em] px-[1rem] py-[1.5rem] whitespace-nowrap;
+  indent-[0.1em] px-[1.5rem] py-[1.188rem] whitespace-nowrap;
 
   line-height: normal;
 
@@ -91,7 +95,7 @@ const buttonClasses = computed(() => ({
 }
 
 .btn-ghost {
-  @apply border-2 border-solid border-transparent bg-transparent text-blue-800 underline;
+  @apply border-2 border-solid border-transparent bg-transparent text-blue-800;
 
   &:hover {
     @apply border-2 border-solid border-blue-800 bg-white;
@@ -104,6 +108,10 @@ const buttonClasses = computed(() => ({
   &:focus-visible {
     @apply border-2 border-solid border-blue-800 bg-white;
   }
+}
+
+.label-ghost {
+  @apply underline;
 }
 
 .btn-tertiary {
