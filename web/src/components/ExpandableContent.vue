@@ -59,13 +59,18 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
     </transition>
   </div>
 </template>
+
+<!-- Transitions are difficult to handle with dynamic heights. To use the max-height as 
+  transition parameter is a known workaround for this issue, the max-height doesn't have 
+  an effect on the actual height, but is just used to get the transition effect. -->
+
 <style lang="scss" scoped>
 .expand-enter-from {
   max-height: 0;
 }
 
 .expand-enter-to {
-  max-height: 600px;
+  max-height: 1000px;
 }
 
 .expand-enter-active {
@@ -74,7 +79,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 }
 
 .expand-leave-from {
-  max-height: 600px;
+  max-height: 1000px;
 }
 
 .expand-leave-to {
