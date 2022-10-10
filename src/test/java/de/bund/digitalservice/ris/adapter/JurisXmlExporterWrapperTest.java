@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 public class JurisXmlExporterWrapperTest {
@@ -32,6 +33,7 @@ public class JurisXmlExporterWrapperTest {
   }
 
   @Test
+  @Tag("IntegrationTest")
   void test_validDocumentUnit_shouldReturnEncryptedXMLString() throws Exception {
     this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
 
@@ -73,6 +75,7 @@ public class JurisXmlExporterWrapperTest {
   }
 
   @Test
+  @Tag("IntegrationTest")
   void test_invalidDocumentUnitMissingMandatoryFields_shouldReturnEmptyString() throws Exception {
     this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
 
@@ -99,6 +102,7 @@ public class JurisXmlExporterWrapperTest {
   // documentUnit. The test documentUnit needs to be updated accordingly to be
   // in sync with the model.
   @Test
+  @Tag("IntegrationTest")
   public void testDocumentUnitIsSyncedWithModel()
       throws NoSuchFieldException, SecurityException, IllegalArgumentException,
           IllegalAccessException {
