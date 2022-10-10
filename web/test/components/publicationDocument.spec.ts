@@ -1,17 +1,12 @@
 import { render, RenderResult, fireEvent } from "@testing-library/vue"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-import { createVuetify } from "vuetify/lib/framework.mjs"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 
 describe("PublicationDocument:", () => {
-  const vuetify = createVuetify({ components, directives })
   let renderResult: RenderResult
 
   describe("with earlier published document unit", () => {
     beforeEach(() => {
       renderResult = render(PublicationDocument, {
-        global: { plugins: [vuetify] },
         props: {
           lastPublishedXmlMail: {
             xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
@@ -28,10 +23,7 @@ describe("PublicationDocument:", () => {
     it("render text", async () => {
       expect(renderResult.container.textContent).match(
         new RegExp(
-          "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen wird " +
-            "die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: campaign " +
-            "Dokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am " +
-            "01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1" +
+          "VeröffentlichenPlausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1" +
             '<\\?xml version="1.0"\\?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>'
         )
       )
@@ -78,22 +70,17 @@ describe("PublicationDocument:", () => {
   })
 
   it("without earlier published document unit", async () => {
-    renderResult = render(PublicationDocument, {
-      global: { plugins: [vuetify] },
-    })
+    renderResult = render(PublicationDocument)
 
     expect(renderResult.container.textContent).match(
       new RegExp(
-        "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen " +
-          "wird die Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: campaign Dokumentationseinheit " +
-          "veröffentlichenLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
+        "VeröffentlichenPlausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
       )
     )
   })
 
   it("with error message", async () => {
     renderResult = render(PublicationDocument, {
-      global: { plugins: [vuetify] },
       props: {
         publishResult: {
           xml: "xml",
@@ -111,10 +98,7 @@ describe("PublicationDocument:", () => {
     })
     expect(renderResult.container.textContent).match(
       new RegExp(
-        "VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt " +
-          "error message 1error message 2 Empfänger-E-Mail-Adresse: campaign Dokumentationseinheit " +
-          "veröffentlichenerrorerror message title error message descriptionLetzte " +
-          "Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
+        "VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt error message 1error message 2 Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenerrorerror message title error message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht"
       )
     )
   })
@@ -122,7 +106,6 @@ describe("PublicationDocument:", () => {
   it("with stubbing", () => {
     renderResult = render(PublicationDocument, {
       global: {
-        plugins: [vuetify],
         stubs: {
           CodeSnippet: {
             template: '<div data-testid="code-snippet"/>',
@@ -142,10 +125,7 @@ describe("PublicationDocument:", () => {
     })
     expect(renderResult.container.textContent).match(
       new RegExp(
-        "VeröffentlichenPlausibilitätsprüfung help\\s{2}Durch Klick auf Veröffentlichen wird die " +
-          "Plausibilitätsprüfung ausgelöst.\\s{2}Empfänger-E-Mail-Adresse: campaign Dokumentationseinheit " +
-          "veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über " +
-          "E-Mail an: receiver address Betreff: mail subjectals"
+        "VeröffentlichenPlausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectals"
       )
     )
 

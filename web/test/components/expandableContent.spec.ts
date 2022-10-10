@@ -22,6 +22,7 @@ function renderComponent(options?: {
 }
 
 describe("ExpandableContent", () => {
+  global.ResizeObserver = require("resize-observer-polyfill")
   it("displays given header property as regular text", () => {
     const { queryByText } = renderComponent({ header: "test header" })
     const header = queryByText("test header")

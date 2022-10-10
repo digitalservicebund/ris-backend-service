@@ -14,6 +14,7 @@ function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
 }
 
 describe("DocumentUnitPreviousDecisions", async () => {
+  global.ResizeObserver = require("resize-observer-polyfill")
   it("shows all necessary input fields with their value", () => {
     const modelValue = [
       {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue"
+import { computed, ref, watch, onMounted } from "vue"
 
 interface Props {
   header?: string
@@ -25,8 +25,6 @@ const iconName = computed(() =>
 )
 function toggleContentVisibility(): void {
   isExpanded.value = !isExpanded.value
-  containerHeight.value =
-    expandableContainer.value.getBoundingClientRect().height
 }
 watch(
   () => props.isExpanded,
@@ -34,6 +32,17 @@ watch(
   { immediate: true }
 )
 watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
+
+onMounted(() => {
+  const expandableContainer = document.querySelector(".expandable")
+  if (expandableContainer != null) resizeObserver.observe(expandableContainer)
+})
+
+const resizeObserver = new ResizeObserver((entries) => {
+  for (const entry of entries) {
+    containerHeight.value = entry.contentRect.width
+  }
+})
 </script>
 <template>
   <div class="expandable-content">
@@ -49,6 +58,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
     </button>
     <transition
       ref="expandableContainer"
+      class="expandable"
       :class="{ expanded: isExpanded }"
       name="expand"
       :style="{ height: containerHeight.valueOf + 'px' }"
