@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.domain.DocumentUnit;
 import de.bund.digitalservice.ris.domain.PreviousDecision;
 import de.bund.digitalservice.ris.domain.Texts;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -92,10 +93,11 @@ public class JurisXmlExporterWrapperTest {
     assertEquals("", encryptedXml);
   }
 
-  // In order to be in sync with the model, all possible fields are set in this test
-  // documentUnit and checked for null fields. Everytime a new field is added to the
-  // data model this test will fail, as it is not set in the test documentUnit. The
-  // test documentUnit needs to be updated accordingly to be in sync with the model.
+  // In order to be in sync with the model, all possible fields are set in this
+  // test documentUnit and checked for null fields. Everytime a new field is
+  // added to the data model this test will fail, as it is not set in the test
+  // documentUnit. The test documentUnit needs to be updated accordingly to be
+  // in sync with the model.
   @Test
   public void testDocumentUnitIsSyncedWithModel()
       throws NoSuchFieldException, SecurityException, IllegalArgumentException,
@@ -130,10 +132,12 @@ public class JurisXmlExporterWrapperTest {
     List<PreviousDecision> previousDecisions =
         List.of(
             PreviousDecision.builder()
+                .id(99L)
                 .courtType("courtType")
                 .courtPlace("courtPlace")
                 .date("date")
                 .fileNumber("fileNumber")
+                .documentnumber(documentNr)
                 .build());
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -151,5 +155,18 @@ public class JurisXmlExporterWrapperTest {
             .build();
 
     assertThat(documentUnit).hasNoNullFieldsOrProperties();
+
+    for (Field field : documentUnit.getClass().getDeclaredFields()) {
+      if (field.getType().equals(CoreData.class) || field.getType().equals(Texts.class))
+        assertThat(field).hasNoNullFieldsOrProperties();
+      if (field.getType().equals(List.class)) {
+        field.setAccessible(true);
+        List<PreviousDecision> previousDecisionsList =
+            (List<PreviousDecision>) field.get(documentUnit);
+        for (PreviousDecision previousDecision : previousDecisionsList) {
+          assertThat(previousDecision).hasNoNullFieldsOrProperties();
+        }
+      }
+    }
   }
 }
