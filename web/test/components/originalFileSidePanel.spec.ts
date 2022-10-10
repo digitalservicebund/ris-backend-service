@@ -1,13 +1,9 @@
 import { render } from "@testing-library/vue"
 import { describe, test } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 
 describe("originalFile SidePanel", () => {
-  const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -26,7 +22,7 @@ describe("originalFile SidePanel", () => {
         hasFile: true,
         file: "<p>Foo</p>",
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
     getByText("Originaldokument")
     expect(queryByText("Dokument wird geladen")).not.toBeInTheDocument()
@@ -41,7 +37,7 @@ describe("originalFile SidePanel", () => {
         open: true,
         hasFile: true,
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
     getByText("Dokument wird geladen")
   })
@@ -52,7 +48,7 @@ describe("originalFile SidePanel", () => {
         open: true,
         hasFile: false,
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
     getByText("Es wurde noch kein Originaldokument hochgeladen.")
     getByText("Zum Upload")

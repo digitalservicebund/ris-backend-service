@@ -31,7 +31,7 @@ const handleToggleNavBar = async () => {
       <DocumentUnitInfoPanel :document-unit="documentUnit" />
 
       <div class="flex flex-col grow items-start">
-        <slot :classes="['p-32 w-full grow']" />
+        <slot :classes="['p-[2rem] w-full grow']" />
       </div>
     </div>
   </div>

@@ -98,8 +98,6 @@ describe("text editor", async () => {
    * The test should be continuosly improved to very that all buttons exist.
    */
   it("shows all necessary editor buttons", async () => {
-    window.innerWidth = 500
-    global.innerWidth = 500
     const { getByLabelText, getAllByText, findByText, getByText } = render(
       TextEditor,
       {

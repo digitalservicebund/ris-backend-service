@@ -1,8 +1,5 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-import { createVuetify } from "vuetify/lib/framework.mjs"
 import DropdownInput from "@/components/DropdownInput.vue"
 import type { DropdownItem } from "@/domain/types"
 
@@ -13,11 +10,9 @@ const DROPDOWN_ITEMS: DropdownItem[] = [
 ]
 
 describe("Dropdown Element", () => {
-  const vuetify = createVuetify({ components, directives })
   const user = userEvent.setup()
   it("Dropdown is closed", () => {
     const { queryByDisplayValue } = render(DropdownInput, {
-      global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "",
@@ -35,7 +30,6 @@ describe("Dropdown Element", () => {
 
   it("Dropdown is opened", async () => {
     const { container } = render(DropdownInput, {
-      global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "",
@@ -60,7 +54,6 @@ describe("Dropdown Element", () => {
 
   it("Dropdown items should be filted", async () => {
     const { container } = render(DropdownInput, {
-      global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "testItem1",
@@ -83,7 +76,6 @@ describe("Dropdown Element", () => {
 
   it("Text should be selected when click", async () => {
     const { container } = render(DropdownInput, {
-      global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "testItem1",
@@ -109,7 +101,6 @@ describe("Dropdown Element", () => {
 
   it("Dropdown items should be show all items if not matched", async () => {
     const { container } = render(DropdownInput, {
-      global: { plugins: [vuetify] },
       props: {
         id: "dropdown-test",
         modelValue: "testItem4",

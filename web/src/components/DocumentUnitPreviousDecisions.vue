@@ -45,7 +45,7 @@ const values = computed({
 <template>
   <ExpandableContent>
     <template #header>
-      <h1 class="heading-02-regular mb-6">Vorgehende Entscheidungen</h1>
+      <h1 class="heading-02-regular mb-[1rem]">Vorgehende Entscheidungen</h1>
     </template>
 
     <ModelComponentRepeater

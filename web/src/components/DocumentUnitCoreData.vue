@@ -27,8 +27,8 @@ const values = computed({
 <template>
   <div v-if="!modelValue">Loading...</div>
 
-  <div v-else>
-    <h1 class="heading-02-regular mb-6">Stammdaten</h1>
+  <div v-else class="mb-[4rem]">
+    <h1 class="heading-02-regular mb-[1rem]">Stammdaten</h1>
 
     <InputGroup v-model="values" :column-count="2" :fields="coreDataFields" />
 

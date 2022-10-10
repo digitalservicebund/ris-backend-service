@@ -26,8 +26,8 @@ const data = computed(() =>
 </script>
 
 <template>
-  <div>
-    <h1 class="heading-02-regular mb-6">Kurz- & Langtexte</h1>
+  <div class="mb-[4rem]">
+    <h1 class="heading-02-regular mb-[1rem]">Kurz- & Langtexte</h1>
 
     <div class="flex flex-col gap-36">
       <div v-for="item in data" :key="item.id" class="">

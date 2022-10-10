@@ -1,19 +1,14 @@
 import { fireEvent, render, RenderResult, waitFor } from "@testing-library/vue"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import FileInputButton from "@/components/FileInputButton.vue"
 
 function renderComponent(options?: { slot?: string }): RenderResult {
-  const vuetify = createVuetify({ components, directives })
-  const global = { plugins: [vuetify] }
   const slots = { default: options?.slot ?? "" }
   const props = {
     id: "identifier",
     ariaLabel: "aria-label",
   }
 
-  return render(FileInputButton, { global, slots, props })
+  return render(FileInputButton, { slots, props })
 }
 
 describe("FileInputButton", () => {

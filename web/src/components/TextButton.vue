@@ -45,7 +45,7 @@ const labels = computed(() => ({
 
 <style lang="scss" scoped>
 .ris-btn {
-  @apply align-middle bg-blue-800 font-bold inline-flex items-center 
+  @apply align-middle bg-blue-800 inline-flex items-center 
   justify-center max-w-full
   no-underline overflow-hidden outline-none shrink-0 select-none
   relative tracking-widest no-underline normal-case 

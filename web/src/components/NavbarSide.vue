@@ -17,7 +17,7 @@ const linkStyling = (componentName: string) => ({
       class="border-gray-400 border-solid border-y flex h-80 items-center justify-between pl-3"
     >
       <router-link
-        class="flex gap-2 items-center link-01-bold"
+        class="flex gap-12 items-center link-01-bold px-[1.3rem] py-[0.44rem] text-blue-800"
         :to="{ name: 'jurisdiction' }"
       >
         <span class="material-icons">arrow_back</span>
@@ -35,7 +35,7 @@ const linkStyling = (componentName: string) => ({
 
     <div class="flex flex-col">
       <router-link
-        class="font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+        class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
         :class="
           linkStyling('jurisdiction-documentUnit-:documentNumber-categories')
         "
@@ -49,7 +49,7 @@ const linkStyling = (componentName: string) => ({
       </router-link>
 
       <router-link
-        class="hover:bg-blue-200 hover:underline pl-5 py-1"
+        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
         :to="{
           name: 'jurisdiction-documentUnit-:documentNumber-categories',
           params: { documentNumber: documentNumber },
@@ -59,7 +59,7 @@ const linkStyling = (componentName: string) => ({
         >Stammdaten</router-link
       >
       <router-link
-        class="hover:bg-blue-200 hover:underline pl-5 py-1"
+        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
         :to="{
           name: 'jurisdiction-documentUnit-:documentNumber-categories',
           params: { documentNumber: documentNumber },
@@ -69,7 +69,7 @@ const linkStyling = (componentName: string) => ({
         >Rechtszug</router-link
       >
       <router-link
-        class="hover:bg-blue-200 hover:underline pl-5 py-1"
+        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
         :to="{
           name: 'jurisdiction-documentUnit-:documentNumber-categories',
           params: { documentNumber: documentNumber },
@@ -79,7 +79,7 @@ const linkStyling = (componentName: string) => ({
         >Kurz- & Langtexte</router-link
       >
       <router-link
-        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
         :class="linkStyling('jurisdiction-documentUnit-:documentNumber-files')"
         :to="{
           name: 'jurisdiction-documentUnit-:documentNumber-files',
@@ -89,13 +89,13 @@ const linkStyling = (componentName: string) => ({
         >Dokumente</router-link
       >
       <div
-        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
       >
         Bearbeitungsstand
       </div>
 
       <router-link
-        class="font-bold hover:bg-blue-200 hover:underline pl-3 py-4"
+        class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
         :to="{
           name: 'jurisdiction-documentUnit-:documentNumber-publication',
           params: { documentNumber: documentNumber },

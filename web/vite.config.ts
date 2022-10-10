@@ -1,6 +1,5 @@
 import path from "path"
 import vue from "@vitejs/plugin-vue"
-import vuetify from "@vuetify/vite-plugin"
 import { defineConfig } from "vite"
 import Pages from "vite-plugin-pages"
 
@@ -11,19 +10,12 @@ export default defineConfig({
   },
   plugins: [
     vue(),
-    // https://github.com/vuetifyjs/vuetify-loader/tree/next/packages/vite-plugin
-    vuetify({
-      autoImport: true,
-    }),
     Pages({
       dirs: "src/routes",
     }),
   ],
   test: {
-    setupFiles: ["vuetify.config.ts", "test/setup.ts"],
-    deps: {
-      inline: ["vuetify"],
-    },
+    setupFiles: ["test/setup.ts"],
     globals: true,
     environment: "jsdom",
     include: ["test/**/*.ts"],

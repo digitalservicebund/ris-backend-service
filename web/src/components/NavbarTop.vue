@@ -10,7 +10,7 @@ const route = useRoute()
       <div class="flex items-center">
         <div class="bg-yellow-500 h-56 rounded-full w-56" />
 
-        <span class="font-bold leading-20 mx-4 text-16">
+        <span class="font-bold leading-20 px-[1.333rem] text-16">
           Rechtsinformationssystem<br />
           des Bundes [Platzhalter]
         </span>

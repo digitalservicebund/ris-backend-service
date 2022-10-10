@@ -1,6 +1,5 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import { createVuetify } from "vuetify"
 import InputGroup from "@/components/InputGroup.vue"
 import type { InputField } from "@/domain"
 import { generateTextInputField } from "~/test-helper/dataGenerators"
@@ -9,13 +8,11 @@ function renderComponent(options?: {
   fields?: InputField[]
   modelValue?: Record<string, string>
 }) {
-  const vuetify = createVuetify()
-  const global = { plugins: [vuetify] }
   const props = {
     fields: options?.fields ?? [],
     modelValue: options?.modelValue ?? {},
   }
-  const renderResult = render(InputGroup, { global, props })
+  const renderResult = render(InputGroup, { props })
   const user = userEvent.setup()
   return { user, ...renderResult }
 }

@@ -1,14 +1,9 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-import { createVuetify } from "vuetify/lib/framework.mjs"
 import SaveDocumentUnitButton from "@/components/SaveDocumentUnitButton.vue"
 
 describe("SaveDocumentUnitButton", () => {
-  const vuetify = createVuetify({ components, directives })
   it("renders frist time", async () => {
     const { emitted } = render(SaveDocumentUnitButton, {
-      global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",
         updateStatus: 0,
@@ -23,7 +18,6 @@ describe("SaveDocumentUnitButton", () => {
   })
   it("renders with on update status", async () => {
     const { getByText } = await render(SaveDocumentUnitButton, {
-      global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",
         updateStatus: 1,
@@ -33,7 +27,6 @@ describe("SaveDocumentUnitButton", () => {
   })
   it("renders with has update error status", async () => {
     const { getByText } = await render(SaveDocumentUnitButton, {
-      global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",
         updateStatus: 400,
@@ -43,7 +36,6 @@ describe("SaveDocumentUnitButton", () => {
   })
   it("renders with update succeed status", async () => {
     const { getByText } = await render(SaveDocumentUnitButton, {
-      global: { plugins: [vuetify] },
       props: {
         ariaLabel: "Foo",
         updateStatus: 200,

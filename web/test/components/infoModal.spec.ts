@@ -1,7 +1,4 @@
 import { render } from "@testing-library/vue"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
-import { createVuetify } from "vuetify/lib/framework.mjs"
 import InfoModal from "@/components/InfoModal.vue"
 import { InfoStatus } from "@/enum/enumInfoStatus"
 
@@ -10,10 +7,7 @@ describe("InfoModal", () => {
   const ERROR_ICON_TEXT = "error"
   const ICON_CLASS_NAME = "material-icons"
   test("renders infomodal: error", () => {
-    const vuetify = createVuetify({ components, directives })
-
     const { getByText, container } = render(InfoModal, {
-      global: { plugins: [vuetify] },
       props: {
         title: "foo",
         description: "bar",
@@ -27,10 +21,7 @@ describe("InfoModal", () => {
   })
 
   test("renders infomodal: succeed", () => {
-    const vuetify = createVuetify({ components, directives })
-
     const { getByText, container } = render(InfoModal, {
-      global: { plugins: [vuetify] },
       props: {
         title: "foo",
         description: "bar",

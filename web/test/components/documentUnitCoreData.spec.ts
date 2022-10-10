@@ -1,14 +1,9 @@
 import { mount } from "@vue/test-utils"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import DocumentUnit from "../../src/domain/documentUnit"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 
 // vitest run --testNamePattern CoreData
 describe("Core Data", () => {
-  const vuetify = createVuetify({ components, directives })
-
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {
@@ -20,9 +15,6 @@ describe("Core Data", () => {
       props: {
         modelValue: documentUnit.coreData,
         updateStatus: 0,
-      },
-      global: {
-        plugins: [vuetify],
       },
     })
 

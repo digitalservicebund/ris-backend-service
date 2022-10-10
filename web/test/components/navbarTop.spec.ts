@@ -1,8 +1,5 @@
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import NavbarTop from "../../src/components/NavbarTop.vue"
 
 const HEADER_TEXT_SUB_TEXT = "Rechtsinformationssystem"
@@ -11,7 +8,6 @@ const NAVBAR_TOP_LINK_TEXT = "Rechtsprechung"
 const NAVBAR_TOP_LINK_URL = "/"
 
 describe("navbar top", () => {
-  const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -26,7 +22,7 @@ describe("navbar top", () => {
   test("navbar top should be rendered without error", async () => {
     render(NavbarTop, {
       props: {},
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     const header_text = screen

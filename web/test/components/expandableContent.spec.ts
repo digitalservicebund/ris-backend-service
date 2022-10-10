@@ -1,6 +1,5 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import { createVuetify } from "vuetify"
 import ExpandableContentnt from "@/components/ExpandableContent.vue"
 
 function renderComponent(options?: {
@@ -9,14 +8,12 @@ function renderComponent(options?: {
   defaultSlot?: string
   headerSlot?: string
 }) {
-  const vuetify = createVuetify()
-  const global = { plugins: [vuetify] }
   const slots = {
     default: options?.defaultSlot ?? "",
     header: options?.headerSlot ?? "",
   }
   const props = { header: options?.header, isExpanded: options?.isExpanded }
-  const renderResult = render(ExpandableContentnt, { global, slots, props })
+  const renderResult = render(ExpandableContentnt, { slots, props })
   const user = userEvent.setup()
   return { user, ...renderResult }
 }

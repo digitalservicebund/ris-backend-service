@@ -1,19 +1,11 @@
 import userEvent from "@testing-library/user-event"
 import { render, fireEvent } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import TextEditorButton from "../../src/components/TextEditorButton.vue"
 
 describe("text editor button", async () => {
-  const vuetify = createVuetify({ components, directives })
-
   it("renders with mandatory props", () => {
     const wrapper = mount(TextEditorButton, {
-      global: {
-        plugins: [vuetify],
-      },
       props: {
         type: "test type",
         icon: "test icon",
@@ -28,9 +20,6 @@ describe("text editor button", async () => {
 
   test("renders with child components", async () => {
     const wrapper = mount(TextEditorButton, {
-      global: {
-        plugins: [vuetify],
-      },
       props: {
         type: "test type",
         icon: "test icon",

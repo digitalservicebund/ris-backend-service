@@ -40,7 +40,6 @@ describe("Texts", () => {
   test.todo("change in value emits updateValue event", async () => {
     // const user = userEvent.setup()
     // const { getByText, getByLabelText, emitted } = render(DocumentUnitTexts, {
-    //   global: { plugins: [vuetify] },
     //   props: {
     //     texts: new DocumentUnit("foo", { titelzeile: "foo Titelzeile" }).texts,
     //     updateStatus: 0,

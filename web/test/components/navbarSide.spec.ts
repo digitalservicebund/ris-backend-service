@@ -1,15 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import NavbarSide from "../../src/components/NavbarSide.vue"
 
 const OPEN_SIDEBAR_BTN_TEXT = "Menü"
 
 describe("navbar side", async () => {
   const DOCUMENT_NR = "KORE2022000003"
-  const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -38,7 +34,7 @@ describe("navbar side", async () => {
   test("navbar side is closed", async () => {
     const { emitted } = render(NavbarSide, {
       props: { documentNumber: DOCUMENT_NR, visible: false },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
     const openSidebarBtn = screen.getByText(OPEN_SIDEBAR_BTN_TEXT)
     expect(openSidebarBtn).toBeInTheDocument()
@@ -50,7 +46,7 @@ describe("navbar side", async () => {
     const { getByText } = render(NavbarSide, {
       props: { documentNumber: DOCUMENT_NR, visible: true },
       global: {
-        plugins: [vuetify, router],
+        plugins: [router],
       },
     })
     getByText("Rubriken", { exact: false })

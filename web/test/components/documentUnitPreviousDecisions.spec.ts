@@ -1,14 +1,11 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import { createVuetify } from "vuetify"
 import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import type { PreviousDecision } from "@/domain/documentUnit"
 
 function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
-  const vuetify = createVuetify()
-  const global = { plugins: [vuetify] }
   const props = { modelValue: options?.modelValue }
-  const renderResult = render(DocumentUnitPreviousDecisions, { global, props })
+  const renderResult = render(DocumentUnitPreviousDecisions, { props })
   const user = userEvent.setup()
   return { user, ...renderResult }
 }

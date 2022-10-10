@@ -1,31 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
-import { createRouter, createWebHistory } from "vue-router"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
 describe("documentUnit list", () => {
-  const vuetify = createVuetify({ components, directives })
-  const router = createRouter({
-    history: createWebHistory(),
-    routes: [
-      {
-        path: "",
-        name: "jurisdiction-documentUnit-:documentNumber-files",
-        component: {},
-      },
-    ],
-  })
-
   test("renders fallback if no documentUnits found", async () => {
     render(DocumentUnitList, {
       props: {
         documentUnits: [],
-      },
-      global: {
-        plugins: [vuetify, router],
       },
     })
 
@@ -42,9 +23,6 @@ describe("documentUnit list", () => {
     render(DocumentUnitList, {
       props: {
         documentUnits: [documentUnit],
-      },
-      global: {
-        plugins: [vuetify, router],
       },
     })
 
@@ -64,9 +42,6 @@ describe("documentUnit list", () => {
     const { emitted } = render(DocumentUnitList, {
       props: {
         documentUnits: [documentUnit],
-      },
-      global: {
-        plugins: [vuetify, router],
       },
     })
 

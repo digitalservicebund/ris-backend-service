@@ -2,9 +2,6 @@ import { fireEvent, render, waitFor } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, test } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
-import { createVuetify } from "vuetify"
-import * as components from "vuetify/components"
-import * as directives from "vuetify/directives"
 import FileUpload from "../../src/components/FileUpload.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import fileService from "@/services/fileService"
@@ -12,7 +9,6 @@ import fileService from "@/services/fileService"
 describe("FileUpload", () => {
   vi.mock("@/services/fileService")
 
-  const vuetify = createVuetify({ components, directives })
   const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -29,7 +25,7 @@ describe("FileUpload", () => {
       props: {
         documentUnitUuid: "1",
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     getByText(
@@ -49,7 +45,7 @@ describe("FileUpload", () => {
       props: {
         documentUnitUuid: "1",
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     const inputEl = getByLabelText("Festplatte durchsuchen", {
@@ -81,7 +77,7 @@ describe("FileUpload", () => {
       props: {
         documentUnitUuid: "1",
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     const inputEl = getByLabelText("Upload File")
@@ -116,7 +112,7 @@ describe("FileUpload", () => {
       props: {
         documentUnitUuid: "1",
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     const file = new File(["test"], "sample.docx")
@@ -155,7 +151,7 @@ describe("FileUpload", () => {
       props: {
         documentUnitUuid: "1",
       },
-      global: { plugins: [vuetify, router] },
+      global: { plugins: [router] },
     })
 
     const file = new File(["test"], "sample.docx")

@@ -45,7 +45,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 })
 </script>
 <template>
-  <div class="expandable-content">
+  <div class="expandable-content mb-[4rem]">
     <button
       aria-label="Toggle Content Visibility"
       class="expandable-content__header"

@@ -29,7 +29,7 @@ const emit = defineEmits<Emits>()
  * After all, a grid layout might be the more powerful solution, but the flow
  * was not yet working and is more important.
  */
-const gapSize = "3rem"
+const gapSize = "2rem"
 const gapStyle = { gap: gapSize }
 const fieldStyle = computed(() => ({
   width: `calc((100% - ${gapSize} * ${props.columnCount - 1}) / ${

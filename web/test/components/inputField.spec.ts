@@ -1,5 +1,4 @@
 import { render } from "@testing-library/vue"
-import { createVuetify } from "vuetify"
 import InputField from "@/components/InputField.vue"
 
 function renderComponent(options?: {
@@ -11,8 +10,6 @@ function renderComponent(options?: {
   required?: true
 }) {
   const id = options?.id ?? "identifier"
-  const vuetify = createVuetify()
-  const global = { plugins: [vuetify] }
   const slots = { default: options?.slot ?? `<input id="${id}" />` }
   const props = {
     id,
@@ -22,7 +19,7 @@ function renderComponent(options?: {
     errorMessage: options?.errorMessage,
   }
 
-  return render(InputField, { global, slots, props })
+  return render(InputField, { slots, props })
 }
 
 describe("InputField", () => {
