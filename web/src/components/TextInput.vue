@@ -63,7 +63,7 @@ const conditionalClasses = computed(() => ({
   &__error {
     width: 100%;
     padding: 17px 24px;
-    @apply outline-2 outline outline-red-800 bg-red-200;
+    @apply border-red-800 bg-red-200;
 
     &:autofill {
       @apply shadow-error text-inherit;

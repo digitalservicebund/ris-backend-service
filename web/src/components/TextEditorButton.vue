@@ -56,7 +56,7 @@ onUnmounted(() => {
   >
     <span
       :id="type"
-      class="leading-default px-2"
+      class="leading-default px-[0.5rem]"
       :class="{ dropdown: type == 'menu', 'material-icons': icon }"
       >{{ icon }}</span
     >

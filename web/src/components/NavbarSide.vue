@@ -12,7 +12,7 @@ const linkStyling = (componentName: string) => ({
 </script>
 
 <template>
-  <div v-if="visible" class="flex flex-col w-240">
+  <div v-if="visible" class="flex flex-col w-[24rem]">
     <div
       class="border-gray-400 border-solid border-y flex h-80 items-center justify-between pl-3"
     >

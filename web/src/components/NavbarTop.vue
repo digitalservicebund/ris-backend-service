@@ -5,7 +5,10 @@ const route = useRoute()
 </script>
 
 <template>
-  <div class="flex items-center justify-between p-24" role="navigation">
+  <div
+    class="flex items-center justify-between px-[1.3rem] py-24"
+    role="navigation"
+  >
     <div class="flex gap-44 items-center">
       <div class="flex items-center">
         <div class="bg-yellow-500 h-56 rounded-full w-56" />
