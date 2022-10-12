@@ -1,6 +1,7 @@
 import { InputType } from "./types"
 import type { InputField, InputAttributes, DropdownItem } from "./types"
 import documentTypes from "@/data/documentType.json"
+import legalEffectTypes from "@/data/legalEffectTypes.json"
 
 export function defineTextField(
   name: string,
@@ -17,11 +18,6 @@ export function defineTextField(
   switch (type) {
     case InputType.DROPDOWN: {
       inputFieldType = InputType.DROPDOWN
-      inputFieldAttributes = { ariaLabel, placeholder, dropdownItems }
-      break
-    }
-    case InputType.DATE: {
-      inputFieldType = InputType.DATE
       inputFieldAttributes = { ariaLabel, placeholder, dropdownItems }
       break
     }
@@ -54,7 +50,7 @@ export const coreDataFields: InputField[] = [
     "Entscheidungsdatum",
     "calendar_today",
     "Entscheidungsdatum",
-    InputType.DATE,
+    InputType.TEXT,
     true
   ),
   defineTextField(
@@ -102,7 +98,10 @@ export const coreDataFields: InputField[] = [
     "Rechtskraft",
     "gavel",
     "Rechtskraft",
-    InputType.TEXT
+    InputType.DROPDOWN,
+    true,
+    "Ja",
+    legalEffectTypes.items
   ),
   defineTextField(
     "inputType",
