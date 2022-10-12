@@ -9,39 +9,40 @@ interface Props {
   ariaLabel: string
   placeholder?: string
   hasError?: boolean
+  isInFuture?: boolean
 }
 
 interface Emits {
   (event: "update:modelValue", value: string | undefined): void
-  (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const inputValue = ref<string>()
-const hasError = ref(false)
 
 watch(props, () => (inputValue.value = props.modelValue ?? props.value), {
   immediate: true,
 })
 
-function emitInputEvent(event: Event): void {
-  hasError.value = false
-  emit("input", event)
-}
+watch(inputValue, (value) => {
+  if (!hasError.value) emit("update:modelValue", value)
+})
 
-function handleBlur(): void {
-  if (inputValue.value && !isInFuture(inputValue.value)) {
-    emit("update:modelValue", inputValue.value)
-  } else hasError.value = true
-}
+const isInFuture = computed(() => {
+  if (inputValue.value) {
+    const date = new Date(inputValue.value)
+    const today = new Date()
+    return date > today
+  } else return true
+})
 
-function isInFuture(value: string) {
-  const date = new Date(value)
-  const today = new Date()
-  console.log(date > today)
-  return date > today
-}
+const hasError = computed(
+  () =>
+    props.hasError ||
+    props.isInFuture ||
+    isInFuture.value ||
+    inputValue.value == ""
+)
 
 const conditionalClasses = computed(() => ({
   input__error: props.hasError || hasError.value,
@@ -57,8 +58,6 @@ const conditionalClasses = computed(() => ({
     :class="conditionalClasses"
     :placeholder="placeholder"
     type="date"
-    @blur="handleBlur"
-    @input="emitInputEvent"
   />
 </template>
 
