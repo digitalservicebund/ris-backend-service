@@ -31,11 +31,9 @@ function emitInputEvent(event: Event): void {
 }
 
 function handleBlur(): void {
-  if (inputValue.value) {
-    if (inputValue.value != "" && !isInFuture(inputValue.value))
-      emit("update:modelValue", inputValue.value)
-    else hasError.value = true
-  }
+  if (inputValue.value && !isInFuture(inputValue.value)) {
+    emit("update:modelValue", inputValue.value)
+  } else hasError.value = true
 }
 
 function isInFuture(value: string) {
