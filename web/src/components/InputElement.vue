@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import FileInputButton from "@/components/FileInputButton.vue"
 import TextInput from "@/components/TextInput.vue"
@@ -31,6 +32,8 @@ const component = computed(() => {
       return FileInputButton
     case "dropdown":
       return DropdownInput
+    case "date":
+      return DateInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }

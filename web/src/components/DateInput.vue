@@ -1,45 +1,53 @@
 <script lang="ts" setup>
 import { placeholder } from "@babel/types"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 
 interface Props {
   id: string
-  value?: Date
-  modelValue?: Date
+  value?: string
+  modelValue?: string
   ariaLabel: string
   placeholder?: string
   hasError?: boolean
 }
 
 interface Emits {
-  (event: "update:modelValue", value: Date | undefined): void
+  (event: "update:modelValue", value: string | undefined): void
   (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const inputValue = ref<Date>()
+const inputValue = ref<string>()
+const hasError = ref(false)
 
 watch(props, () => (inputValue.value = props.modelValue ?? props.value), {
   immediate: true,
 })
 
-watch(inputValue, () => {
-  emit("update:modelValue", inputValue.value)
-})
-
 function emitInputEvent(event: Event): void {
+  hasError.value = false
   emit("input", event)
 }
 
-const conditionalClasses = computed(() => ({
-  input__error: props.hasError,
-}))
+function handleBlur(): void {
+  if (inputValue.value) {
+    if (inputValue.value != "" && !isInFuture(inputValue.value))
+      emit("update:modelValue", inputValue.value)
+    else hasError.value = true
+  }
+}
 
-onMounted(() => {
-  inputValue.value = new Date()
-  console.log(props.modelValue, props.value)
-})
+function isInFuture(value: string) {
+  const date = new Date(value)
+  const today = new Date()
+  console.log(date > today)
+  return date > today
+}
+
+const conditionalClasses = computed(() => ({
+  input__error: props.hasError || hasError.value,
+}))
 </script>
 
 <template>
@@ -51,6 +59,7 @@ onMounted(() => {
     :class="conditionalClasses"
     :placeholder="placeholder"
     type="date"
+    @blur="handleBlur"
     @input="emitInputEvent"
   />
 </template>
