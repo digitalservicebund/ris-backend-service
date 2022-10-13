@@ -11,7 +11,9 @@ export function defineTextField(
   type: InputType,
   required?: boolean,
   placeholder?: string,
-  dropdownItems?: DropdownItem[]
+  dropdownItems?: DropdownItem[],
+  hasError?: boolean,
+  isInPast?: boolean
 ): InputField {
   let inputFieldType: InputType
   let inputFieldAttributes: InputAttributes
@@ -19,6 +21,11 @@ export function defineTextField(
     case InputType.DROPDOWN: {
       inputFieldType = InputType.DROPDOWN
       inputFieldAttributes = { ariaLabel, placeholder, dropdownItems }
+      break
+    }
+    case InputType.DATE: {
+      inputFieldType = InputType.DATE
+      inputFieldAttributes = { ariaLabel, hasError, isInPast }
       break
     }
     default: {
@@ -50,7 +57,7 @@ export const coreDataFields: InputField[] = [
     "Entscheidungsdatum",
     "calendar_today",
     "Entscheidungsdatum",
-    InputType.TEXT,
+    InputType.DATE,
     true
   ),
   defineTextField(

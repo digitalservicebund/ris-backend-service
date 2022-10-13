@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { placeholder } from "@babel/types"
 import { computed, ref, watch } from "vue"
 
 interface Props {
@@ -7,9 +6,8 @@ interface Props {
   value?: string
   modelValue?: string
   ariaLabel: string
-  placeholder?: string
   hasError?: boolean
-  isInFuture?: boolean
+  isInPast?: boolean
 }
 
 interface Emits {
@@ -28,19 +26,19 @@ watch(inputValue, (value) => {
   if (!hasError.value) emit("update:modelValue", value)
 })
 
-const isInFuture = computed(() => {
+const isInPast = computed(() => {
   if (inputValue.value) {
     const date = new Date(inputValue.value)
     const today = new Date()
-    return date > today
+    return date < today
   } else return true
 })
 
 const hasError = computed(
   () =>
     props.hasError ||
-    props.isInFuture ||
-    isInFuture.value ||
+    props.isInPast ||
+    !isInPast.value ||
     inputValue.value == ""
 )
 
@@ -56,7 +54,6 @@ const conditionalClasses = computed(() => ({
     :aria-label="ariaLabel"
     class="bg-white input"
     :class="conditionalClasses"
-    :placeholder="placeholder"
     type="date"
   />
 </template>

@@ -32,7 +32,8 @@ export interface TextInputField extends BaseInputField {
 export type DateInputModelType = string
 
 export interface DateInputAttributes extends BaseInputAttributes {
-  placeholder?: string
+  hasError?: boolean
+  isInPast?: boolean
 }
 
 export interface DateInputField extends BaseInputField {
