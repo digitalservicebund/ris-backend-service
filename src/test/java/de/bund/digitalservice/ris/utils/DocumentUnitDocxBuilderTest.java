@@ -54,6 +54,7 @@ import org.docx4j.wml.PPrBase;
 import org.docx4j.wml.PPrBase.NumPr;
 import org.docx4j.wml.PPrBase.NumPr.Ilvl;
 import org.docx4j.wml.PPrBase.NumPr.NumId;
+import org.docx4j.wml.PPrBase.Spacing;
 import org.docx4j.wml.R;
 import org.docx4j.wml.RPr;
 import org.docx4j.wml.STVerticalAlignRun;
@@ -108,6 +109,58 @@ class DocumentUnitDocxBuilderTest {
 
     var htmlString = borderNumberElement.toHtmlString();
     assertEquals("<border-number><number>1</number></border-number>", htmlString);
+  }
+
+  @Test
+  void testBuild_withBorderNumberThatHasNoBorderNumberTemplateStyle_shouldSucceed() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    BooleanDefaultTrue keepNext = new BooleanDefaultTrue();
+    keepNext.setVal(true);
+    pPr.setKeepNext(keepNext); // indicator 1
+    Spacing spacing = new Spacing();
+    spacing.setLine(BigInteger.valueOf(240L)); // indicator 2
+    pPr.setSpacing(spacing);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("1"); // indicator 3: just one integer
+    run.getContent().add(new JAXBElement<>(new QName("text"), Text.class, text));
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof BorderNumber);
+    var borderNumberElement = (BorderNumber) result;
+    assertEquals("1", borderNumberElement.getNumber());
+    assertEquals(
+        "<border-number><number>1</number></border-number>", borderNumberElement.toHtmlString());
+  }
+
+  @Test
+  void testBuild_withBorderNumberThatHasNoBorderNumberTemplateStyle_wrongTextShouldFail() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    BooleanDefaultTrue keepNext = new BooleanDefaultTrue();
+    keepNext.setVal(true);
+    pPr.setKeepNext(keepNext);
+    Spacing spacing = new Spacing();
+    spacing.setLine(BigInteger.valueOf(240L));
+    pPr.setSpacing(spacing);
+    paragraph.setPPr(pPr);
+    R run = new R();
+    Text text = new Text();
+    text.setValue("1."); // can't be parsed as integer
+    run.getContent().add(new JAXBElement<>(new QName("text"), Text.class, text));
+    paragraph.getContent().add(run);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof ParagraphElement);
+    var paragraphElement = (ParagraphElement) result;
+    assertEquals("<p>1.</p>", paragraphElement.toHtmlString());
   }
 
   @Test
