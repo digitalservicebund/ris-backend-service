@@ -109,18 +109,45 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
   }
 
   private boolean isBorderNumber() {
-    if (paragraph == null) {
+    if (paragraph == null || !isText()) {
       return false;
     }
 
     PPr ppr = paragraph.getPPr();
-
-    if (isText() && ppr != null && ppr.getPStyle() != null) {
-      return List.of("RandNummer", "ListParagraph", "Listenabsatz")
-          .contains(ppr.getPStyle().getVal());
+    if (ppr == null) {
+      return false;
     }
 
-    return false;
+    if (ppr.getPStyle() != null
+        && List.of("RandNummer", "ListParagraph", "Listenabsatz")
+            .contains(ppr.getPStyle().getVal())) {
+      return true;
+    }
+
+    // Found in some BGH documents: the border numbers have no dedicated style element in
+    // document.xml. So we decided to combine 3 characteristics that hopefully match these kind
+    // of border numbers in all cases
+    // --> keepNext exists (=true), line in spacing to be 240 and the text to be only one integer
+    return ppr.getKeepNext() != null
+        && ppr.getKeepNext().isVal()
+        && ppr.getSpacing() != null
+        && ppr.getSpacing().getLine() != null
+        && ppr.getSpacing().getLine().intValue() == 240
+        && contentIsOnlyInteger();
+  }
+
+  private boolean contentIsOnlyInteger() {
+    StringBuilder content = new StringBuilder();
+    paragraph.getContent().stream()
+        .filter(R.class::isInstance)
+        .map(R.class::cast)
+        .forEach(r -> content.append(parseTextFromRun(r)));
+    try {
+      Integer.parseInt(content.toString());
+      return true;
+    } catch (NumberFormatException e) {
+      return false;
+    }
   }
 
   private BorderNumber convertToBorderNumber() {
