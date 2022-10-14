@@ -34,7 +34,7 @@ describe("documentUnit InfoPanel", () => {
       props: {
         documentUnit: new DocumentUnit("123", {
           coreData: {
-            decisionDate: "bar",
+            decisionDate: "2024-01-31",
             courtType: "baz",
             fileNumber: undefined,
           },
@@ -53,14 +53,14 @@ describe("documentUnit InfoPanel", () => {
       props: {
         documentUnit: new DocumentUnit("123", {
           coreData: {
-            decisionDate: "foo",
+            decisionDate: "2024-01-31",
           },
         }),
       },
     })
 
     getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Entscheidungsdatum foo/)
+      return !!node?.textContent?.match(/Entscheidungsdatum 31.01.2024/)
     })
   })
 
@@ -103,7 +103,7 @@ describe("documentUnit InfoPanel", () => {
         documentUnit: new DocumentUnit("123", {
           coreData: {
             fileNumber: "foo",
-            decisionDate: "bar",
+            decisionDate: "2024-01-31",
           },
           documentNumber: "qux",
         }),

@@ -12,7 +12,9 @@ const entries = computed(() => [
   },
   {
     label: "Entscheidungsdatum",
-    value: dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
+    value: props.documentUnit.coreData.decisionDate
+      ? dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY")
+      : null,
   },
   {
     label: "Gerichtstyp",
