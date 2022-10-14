@@ -59,6 +59,7 @@ describe("Dropdown Element", () => {
         modelValue: "testItem1",
         ariaLabel: "",
         dropdownItems: DROPDOWN_ITEMS,
+        isCombobox: true,
       },
     })
     const openDropdownContainer = container.querySelector(

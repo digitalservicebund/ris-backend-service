@@ -47,6 +47,7 @@ export function defineDropdownField(
   ariaLabel: string,
   required?: boolean,
   placeholder?: string,
+  isCombobox?: boolean,
   dropdownItems?: DropdownItem[]
 ): InputField {
   return {
@@ -55,7 +56,7 @@ export function defineDropdownField(
     label,
     iconName,
     required,
-    inputAttributes: { ariaLabel, placeholder, dropdownItems },
+    inputAttributes: { ariaLabel, placeholder, dropdownItems, isCombobox },
   }
 }
 
@@ -83,6 +84,7 @@ export const coreDataFields: InputField[] = [
     "Dokumenttyp",
     true,
     "Bitte auswählen",
+    true,
     documentTypes.items
   ),
   defineTextField(
@@ -106,6 +108,7 @@ export const coreDataFields: InputField[] = [
     "Rechtskraft",
     true,
     "Ja",
+    false,
     legalEffectTypes.items
   ),
   defineTextField(

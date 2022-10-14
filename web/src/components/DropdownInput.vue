@@ -10,6 +10,7 @@ interface Props {
   ariaLabel: string
   placeholder?: string
   dropdownItems: DropdownItem[] | undefined
+  isCombobox?: boolean
 }
 
 interface Emits {
@@ -92,6 +93,7 @@ onBeforeUnmount(() => {
           autocomplete="off"
           class="text-input"
           :placeholder="placeholder"
+          :readonly="!props.isCombobox"
           tabindex="0"
           :value="inputValue"
           @click="selectAllText"
@@ -116,7 +118,7 @@ onBeforeUnmount(() => {
       tabindex="-1"
     >
       <div
-        v-for="(item, index) in filterItems()"
+        v-for="(item, index) in isCombobox ? filterItems() : items"
         :key="index"
         class="dropdown-container__dropdown-item"
         tabindex="0"
