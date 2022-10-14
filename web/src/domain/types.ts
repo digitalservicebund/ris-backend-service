@@ -7,6 +7,7 @@ export enum InputType {
 
 export interface BaseInputAttributes {
   ariaLabel: string
+  hasError?: boolean
 }
 
 export interface BaseInputField {
@@ -32,7 +33,6 @@ export interface TextInputField extends BaseInputField {
 export type DateInputModelType = string
 
 export interface DateInputAttributes extends BaseInputAttributes {
-  hasError?: boolean
   isInPast?: boolean
 }
 

@@ -1,5 +1,5 @@
 import { InputType } from "./types"
-import type { InputField, InputAttributes, DropdownItem } from "./types"
+import type { InputField, DropdownItem } from "./types"
 import documentTypes from "@/data/documentType.json"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 
@@ -8,38 +8,54 @@ export function defineTextField(
   label: string,
   iconName: string,
   ariaLabel: string,
-  type: InputType,
   required?: boolean,
-  placeholder?: string,
-  dropdownItems?: DropdownItem[],
-  hasError?: boolean,
-  isInPast?: boolean
+  placeholder?: string
 ): InputField {
-  let inputFieldType: InputType
-  let inputFieldAttributes: InputAttributes
-  switch (type) {
-    case InputType.DROPDOWN: {
-      inputFieldType = InputType.DROPDOWN
-      inputFieldAttributes = { ariaLabel, placeholder, dropdownItems }
-      break
-    }
-    case InputType.DATE: {
-      inputFieldType = InputType.DATE
-      inputFieldAttributes = { ariaLabel, hasError, isInPast }
-      break
-    }
-    default: {
-      inputFieldType = InputType.TEXT
-      inputFieldAttributes = { ariaLabel, placeholder }
-    }
-  }
   return {
     name,
-    type: inputFieldType,
+    type: InputType.TEXT,
     label,
     iconName,
     required,
-    inputAttributes: inputFieldAttributes,
+    inputAttributes: { ariaLabel, placeholder },
+  }
+}
+
+export function defineDateField(
+  name: string,
+  label: string,
+  iconName: string,
+  ariaLabel: string,
+  required?: boolean,
+  hasError?: boolean,
+  isInPast?: boolean
+): InputField {
+  return {
+    name,
+    type: InputType.DATE,
+    label,
+    iconName,
+    required,
+    inputAttributes: { ariaLabel, hasError, isInPast },
+  }
+}
+
+export function defineDropdownField(
+  name: string,
+  label: string,
+  iconName: string,
+  ariaLabel: string,
+  required?: boolean,
+  placeholder?: string,
+  dropdownItems?: DropdownItem[]
+): InputField {
+  return {
+    name,
+    type: InputType.DROPDOWN,
+    label,
+    iconName,
+    required,
+    inputAttributes: { ariaLabel, placeholder, dropdownItems },
   }
 }
 
@@ -49,31 +65,22 @@ export const coreDataFields: InputField[] = [
     "Aktenzeichen",
     "grid_3x3",
     "Aktenzeichen",
-    InputType.TEXT,
     true
   ),
-  defineTextField(
+  defineDateField(
     "decisionDate",
     "Entscheidungsdatum",
     "calendar_today",
     "Entscheidungsdatum",
-    InputType.DATE,
-    true
+    true,
+    undefined
   ),
-  defineTextField(
-    "courtType",
-    "Gerichtstyp",
-    "home",
-    "Gerichtstyp",
-    InputType.TEXT,
-    true
-  ),
-  defineTextField(
+  defineTextField("courtType", "Gerichtstyp", "home", "Gerichtstyp", true),
+  defineDropdownField(
     "category",
     "Dokumenttyp",
     "category",
     "Dokumenttyp",
-    InputType.DROPDOWN,
     true,
     "Bitte auswählen",
     documentTypes.items
@@ -82,30 +89,21 @@ export const coreDataFields: InputField[] = [
     "appraisalBody",
     "Spruchkörper",
     "people_alt",
-    "Spruchkörper",
-    InputType.TEXT
+    "Spruchkörper"
   ),
-  defineTextField("ecli", "ECLI", "translate", "ECLI", InputType.TEXT),
-  defineTextField(
-    "procedure",
-    "Vorgang",
-    "inventory_2",
-    "Vorgang",
-    InputType.TEXT
-  ),
+  defineTextField("ecli", "ECLI", "translate", "ECLI"),
+  defineTextField("procedure", "Vorgang", "inventory_2", "Vorgang"),
   defineTextField(
     "courtLocation",
     "Gerichtssitz",
     "location_on",
-    "Gerichtssitz",
-    InputType.TEXT
+    "Gerichtssitz"
   ),
-  defineTextField(
+  defineDropdownField(
     "legalEffect",
     "Rechtskraft",
     "gavel",
     "Rechtskraft",
-    InputType.DROPDOWN,
     true,
     "Ja",
     legalEffectTypes.items
@@ -114,15 +112,13 @@ export const coreDataFields: InputField[] = [
     "inputType",
     "Eingangsart",
     "markunread_mailbox",
-    "Eingangsart",
-    InputType.TEXT
+    "Eingangsart"
   ),
   defineTextField(
     "center",
     "Dokumentationsstelle",
     "school",
-    "Dokumentationsstelle",
-    InputType.TEXT
+    "Dokumentationsstelle"
   ),
-  defineTextField("region", "Region", "map", "Region", InputType.TEXT),
+  defineTextField("region", "Region", "map", "Region"),
 ]

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { computed } from "vue"
 import DocumentUnit from "../domain/documentUnit"
 
@@ -11,7 +12,7 @@ const entries = computed(() => [
   },
   {
     label: "Entscheidungsdatum",
-    value: props.documentUnit.coreData.decisionDate,
+    value: dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY"),
   },
   {
     label: "Gerichtstyp",
