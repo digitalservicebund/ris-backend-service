@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.domain.docx;
 public class RunTabElement extends TextElement implements RunElement {
   @Override
   public String toHtmlString() {
-    return "<span>&emsp;</span>";
+    return "&nbsp;&nbsp;&nbsp;&nbsp;";
   }
 
   @Override
