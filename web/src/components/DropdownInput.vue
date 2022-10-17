@@ -11,6 +11,7 @@ interface Props {
   placeholder?: string
   dropdownItems: DropdownItem[] | undefined
   isCombobox?: boolean
+  preselectedValue?: string
 }
 
 interface Emits {
@@ -73,6 +74,7 @@ const closeDropdown = () => {
 }
 
 onMounted(() => {
+  if (props.preselectedValue) inputValue.value = props.preselectedValue
   window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
 onBeforeUnmount(() => {

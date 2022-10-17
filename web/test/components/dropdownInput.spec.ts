@@ -52,7 +52,7 @@ describe("Dropdown Element", () => {
     expect(dropdownItems).toHaveLength(0)
   })
 
-  it("Dropdown items should be filted", async () => {
+  it("Dropdown items should be filtered", async () => {
     const { container } = render(DropdownInput, {
       props: {
         id: "dropdown-test",
@@ -73,6 +73,32 @@ describe("Dropdown Element", () => {
     expect(dropdownItems).toHaveLength(1)
     const item1 = dropdownItems[0]
     expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
+  })
+
+  it("Dropdown items shouldn't be filtered if no combobox", async () => {
+    const { container } = render(DropdownInput, {
+      props: {
+        id: "dropdown-test",
+        modelValue: "testItem1",
+        ariaLabel: "",
+        dropdownItems: DROPDOWN_ITEMS,
+      },
+    })
+    const openDropdownContainer = container.querySelector(
+      ".toggle-dropdown-button"
+    ) as HTMLElement
+
+    await user.click(openDropdownContainer)
+    const dropdownItems = container.querySelectorAll(
+      ".dropdown-container__dropdown-item"
+    )
+    expect(dropdownItems).toHaveLength(3)
+    const item1 = dropdownItems[0]
+    const item2 = dropdownItems[1]
+    const item3 = dropdownItems[2]
+    expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
+    expect(item2).toHaveTextContent(DROPDOWN_ITEMS[1].text)
+    expect(item3).toHaveTextContent(DROPDOWN_ITEMS[2].text)
   })
 
   it("Text should be selected when click", async () => {
@@ -100,7 +126,7 @@ describe("Dropdown Element", () => {
     }
   })
 
-  it("Dropdown items should be show all items if not matched", async () => {
+  it("Dropdown items should show all items if not matched", async () => {
     const { container } = render(DropdownInput, {
       props: {
         id: "dropdown-test",
@@ -124,5 +150,18 @@ describe("Dropdown Element", () => {
     expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
     expect(item2).toHaveTextContent(DROPDOWN_ITEMS[1].text)
     expect(item3).toHaveTextContent(DROPDOWN_ITEMS[2].text)
+  })
+
+  it("Dropdown renders with preselectes item", async () => {
+    const { queryByDisplayValue } = render(DropdownInput, {
+      props: {
+        id: "dropdown-test",
+        modelValue: "testItem4",
+        ariaLabel: "",
+        dropdownItems: DROPDOWN_ITEMS,
+        preselectedValue: "test",
+      },
+    })
+    expect(queryByDisplayValue("test")).not.toBeInTheDocument()
   })
 })

@@ -48,7 +48,8 @@ export function defineDropdownField(
   required?: boolean,
   placeholder?: string,
   isCombobox?: boolean,
-  dropdownItems?: DropdownItem[]
+  dropdownItems?: DropdownItem[],
+  preselectedValue?: string
 ): InputField {
   return {
     name,
@@ -56,7 +57,13 @@ export function defineDropdownField(
     label,
     iconName,
     required,
-    inputAttributes: { ariaLabel, placeholder, dropdownItems, isCombobox },
+    inputAttributes: {
+      ariaLabel,
+      placeholder,
+      dropdownItems,
+      isCombobox,
+      preselectedValue,
+    },
   }
 }
 
@@ -109,7 +116,8 @@ export const coreDataFields: InputField[] = [
     true,
     "Ja",
     false,
-    legalEffectTypes.items
+    legalEffectTypes.items,
+    "Ja"
   ),
   defineTextField(
     "inputType",

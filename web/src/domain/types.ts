@@ -49,6 +49,7 @@ export interface DropdownAttributes extends BaseInputAttributes {
   isCombobox?: boolean
   placeholder?: string
   dropdownItems?: DropdownItem[]
+  preselectedValue?: string
 }
 
 export interface DropdownInputField extends BaseInputField {
