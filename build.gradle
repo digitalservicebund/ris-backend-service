@@ -78,7 +78,7 @@ dependencies {
   //  implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 
   implementation "io.micrometer:micrometer-registry-prometheus:1.9.3"
-  implementation "io.sentry:sentry-spring-boot-starter:6.4.1"
+  implementation "io.sentry:sentry-spring-boot-starter:6.5.0"
   implementation "org.springframework.boot:spring-boot-starter-validation"
 
   compileOnly "org.projectlombok:lombok"
