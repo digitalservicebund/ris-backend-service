@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.domain;
 
+import de.bund.digitalservice.ris.domain.validator.LookupTableConstraint;
 import lombok.Builder;
 
 @Builder
@@ -12,7 +13,7 @@ public record CoreData(
     String appraisalBody,
     String decisionDate,
     String courtLocation,
-    String legalEffect,
+    @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,
     String inputType,
     String center,
     String region) {}

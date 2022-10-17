@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.domain.MailResponse;
 import java.nio.ByteBuffer;
 import java.util.UUID;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -97,7 +98,7 @@ public class DocumentUnitController {
 
   @PutMapping(value = "/{uuid}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<DocumentUnit>> updateByUuid(
-      @PathVariable UUID uuid, @RequestBody DocumentUnit documentUnit) {
+      @PathVariable UUID uuid, @Valid @RequestBody DocumentUnit documentUnit) {
     if (!uuid.equals(documentUnit.uuid())) {
       return Mono.just(
           ResponseEntity.unprocessableEntity().body(DocumentUnitBuilder.newInstance().build()));

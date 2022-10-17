@@ -193,6 +193,7 @@ class DocumentUnitControllerTest {
   @Test
   void testUpdateByUuid() {
     DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
+    documentUnitDTO.setDocumentnumber("ABCD2022000001");
     documentUnitDTO.setUuid(TEST_UUID);
     DocumentUnit documentUnit =
         DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();
