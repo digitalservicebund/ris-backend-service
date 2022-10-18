@@ -50,7 +50,10 @@ public class DocumentUnitDTO {
         .procedure(documentUnit.coreData().procedure())
         .ecli(documentUnit.coreData().ecli())
         .appraisalBody(documentUnit.coreData().appraisalBody())
-        .decisionDate(documentUnit.coreData().decisionDate())
+        .decisionDate(
+            documentUnit.coreData().decisionDate() != null
+                ? documentUnit.coreData().decisionDate().toString()
+                : null)
         .courtLocation(documentUnit.coreData().courtLocation())
         .legalEffect(documentUnit.coreData().legalEffect())
         .inputType(documentUnit.coreData().inputType())
