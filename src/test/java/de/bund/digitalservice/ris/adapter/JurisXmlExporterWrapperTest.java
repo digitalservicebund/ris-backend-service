@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.bund.digitalservice.ris.domain.CoreData;
 import de.bund.digitalservice.ris.domain.DocumentUnit;
@@ -30,47 +31,50 @@ public class JurisXmlExporterWrapperTest {
   void setUp() {
     objectMapper = new ObjectMapper();
     objectMapper.registerModule(new JavaTimeModule());
+    objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
   }
 
-  // @Test
-  // @Tag("IntegrationTest")
-  // void test_validDocumentUnit_shouldReturnEncryptedXMLString() throws Exception
-  // {
-  // this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
+  @Test
+  @Tag("IntegrationTest")
+  void test_validDocumentUnit_shouldReturnEncryptedXMLString() throws Exception {
+    this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
 
-  // CoreData coreData = CoreData.builder()
-  // .fileNumber("fileNumber")
-  // .courtType("courtType")
-  // .category("category")
-  // .ecli("ecli")
-  // .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
-  // .build();
+    CoreData coreData =
+        CoreData.builder()
+            .fileNumber("fileNumber")
+            .courtType("courtType")
+            .category("category")
+            .ecli("ecli")
+            .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
+            .build();
 
-  // Texts texts = Texts.builder().decisionName("decisionName").build();
+    Texts texts = Texts.builder().decisionName("decisionName").build();
 
-  // List<PreviousDecision> previousDecisions = List.of(
-  // PreviousDecision.builder()
-  // .courtType("courtType")
-  // .courtPlace("courtPlace")
-  // .date("date")
-  // .fileNumber("fileNumber")
-  // .build());
+    List<PreviousDecision> previousDecisions =
+        List.of(
+            PreviousDecision.builder()
+                .courtType("courtType")
+                .courtPlace("courtPlace")
+                .date("date")
+                .fileNumber("fileNumber")
+                .build());
 
-  // DocumentUnit documentUnit = DocumentUnit.builder()
-  // .id(99L)
-  // .uuid(TEST_UUID)
-  // .documentNumber(documentNr)
-  // .coreData(coreData)
-  // .previousDecisions(previousDecisions)
-  // .texts(texts)
-  // .build();
+    DocumentUnit documentUnit =
+        DocumentUnit.builder()
+            .id(99L)
+            .uuid(TEST_UUID)
+            .documentNumber(documentNr)
+            .coreData(coreData)
+            .previousDecisions(previousDecisions)
+            .texts(texts)
+            .build();
 
-  // encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
+    encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
 
-  // assertEquals(
-  // "hoj9Xi74aXi9dPWMdaJm3noJt/m8BEO8DAYMRnMGQvpxxtnuRDwB+x8bVG6O0BTpTokyk+hWClr6pwQ5Bm5Xj7n5CUPU7L1LxgQOake4IDvKIaJibbD8SPkVIHgo1Pm0P//idUMCKXkp66tix1uuktvT8MDDNuw/lxSC+QT4xLjb03l66TQJxPwKlA30WiJwQ/gz53ieE7bPwHfqSWxfwC6Fvr69ik646jsSsJUMCSvZmTQsAXjxN/nnCJbBeDUmVmkVS2e9HEdz+IEFBc/oLpal7N7UjAVhbAuj0W2XHVTJWsjLHN9oKELe14AO64Sw3RAz2JEKNKc3rvoyTb/kqhbJdWjdg8uFJG+YvJjQ3lf2BI7qpGRWDO1pDtOc3oddne4yMlZbJXXcR6CCTuUR1VoV2vULTk09FpW0FCxzPtB2Gj0v7lcc5rbn/t2A9I+emFGuWeBoYR0ELqFtLqJHbUnUjVpq01TLkSO+L8x7+xA9vdkNUe+8ATp/g3Qe0hHsQNuWp6C/SRMlMkGW4E5AKgAuDxfhPNu5EeZZN8F7VJ11kfY5L+kQDzBazGHBsx/LaRXSYNU3Nn2J1VW/EApfbWQcwcVgD2EnO08IXD9jf41xVvlSH6bpQtGZ4/95rrfdnOt5ZC2peAmCRbOP0rXYszr5aLAp6JQSvposcCNhjJwAKEBD4UdrXqG4jXgt9oo7IibCyeP9n9u9P9figKMKeeG9l3sa1AZsRQD0L3PNwX+Gi8F09mDnBXJxEO+rhDV0c5JGd0tpwPzI0jZZTbL9DK1EZUdJs842KvswLkcXPcWMHinWLJNms2NhbrBnHobTbJWyqp/oR/DmKKS8mcFYmezonOlwt/QP8kKmjX9KKmcGEaPeUrTky8p/PbcZ+o1ViZKoD0waTRytBWcGeg4t9NYwp7ahEZ5CEYrAwEdkImDS7zOORRKDiDOv16+Gj1QzQEW7U9QJZqB/se+UDvgF7f5zyc+IzRkWk3u2rtbGRSRlTRoNl1XfVMsL57eX4swmO6TAzQ7KmSsnPcjXU+SiMUFb8lwYAeb12mWlZVWDfTU=",
-  // encryptedXml);
-  // }
+    assertEquals(
+        "hoj9Xi74aXi9dPWMdaJm3noJt/m8BEO8DAYMRnMGQvpxxtnuRDwB+x8bVG6O0BTpTokyk+hWClr6pwQ5Bm5Xj7n5CUPU7L1LxgQOake4IDvKIaJibbD8SPkVIHgo1Pm0P//idUMCKXkp66tix1uuktvT8MDDNuw/lxSC+QT4xLjb03l66TQJxPwKlA30WiJwQ/gz53ieE7bPwHfqSWxfwC6Fvr69ik646jsSsJUMCSvZmTQsAXjxN/nnCJbBeDUmRpoRcv4ndk9JUpq8p3kpChhNAs/Njk8f6UBrg9XUxjPFsrV1O7chj2MmekyVWt5re/lNwjRFd5t7fWTpFirBK1aZUHuQOrHbanOR5ML7mIsjyB38ds4T+D0uG86XzmEelUPrYBzigqkdGIYzAp4n5cV7dz8vt+2u5HFUI+qWb81+IKDHUpbeln+gaxZ24PovZUruxkiJUWNTM82yYoKdAZHvV/DO6Vny5IF/2aT/2jdcFS0gSMzDvN8Gz1+VMomHt+Xluw+xQJniMGR+bfhm3ma+fcn5dAFjm4GSaZL6HlwZSUbUPJiDjbZfgFtIx8Vs8N9gYq6e7hwMi5X7VFawuqFV9fXyVx5bDwxz5njT/RlstdIKiZ7GBBjE38OMWJ7ufmyMuTCzj/cB1IJdWJ1IRuXn3JoTsoU99PxE55uz/TUSWXE121RvVNcQZvEDb++oKU05Oks3fnfdgf88mM1nHBf8BD7rEfRvWasmBIDNEz/Kv5OpWZwLde2TyUeZjQfloxdf9PbPTlTb8Jm4BPhPJkFNXi4q80CHJUZsbKRFY1tO2HgDkGHY55nPGqyAvw/ggxYy0oyIVmGa+dzdzj+CHaJIO7intDUDbKFrQ7GZuVWDfr7O4x2wtOOjLDMaBm6g+g8hD6qsx881GDS4rYIt4U1JtpS85i5xCsgDSBJbID/c8jbeRiPJy2fL6271A1mvgI2MksBW+pSddycjoE/JNsJma0G2I7viADuHOj5kJUOwDXTYj7wCiIeAx2Ic7TBwLqxcA6HA5xi42gy6Gf4UctaeDmHmipsQm0fBSQUNSO0=",
+        encryptedXml);
+  }
 
   @Test
   @Tag("IntegrationTest")

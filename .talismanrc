@@ -52,7 +52,7 @@ fileignoreconfig:
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: fee4409465a171ae90dbe84d8efe12db4c584b5ffecdfe374c5a9770909ca4dd
   - filename: src/test/java/de/bund/digitalservice/ris/adapter/JurisXmlExporterWrapperTest.java
-    checksum: 901b3c4ebf974636ee6365bc4aa1ad70172b41852308780de1b2cce8594d85f3
+    checksum: 908dd8e8456bad5c8c3aa0e0e41cf82cc61e1ec5494acc267111864a01ce7afc
 scopeconfig:
   - scope: node
 allowed_patterns:
