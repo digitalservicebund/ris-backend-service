@@ -70,7 +70,9 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getProcedure(),
             documentUnitDTO.getEcli(),
             documentUnitDTO.getAppraisalBody(),
-            documentUnitDTO.getDecisionDate(),
+            documentUnitDTO.getDecisionDate() != null
+                ? Instant.parse(documentUnitDTO.getDecisionDate())
+                : null,
             documentUnitDTO.getCourtLocation(),
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),
