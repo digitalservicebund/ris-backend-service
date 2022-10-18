@@ -114,10 +114,10 @@ export const coreDataFields: InputField[] = [
     "gavel",
     "Rechtskraft",
     true,
-    "Ja",
+    "",
     false,
     legalEffectTypes.items,
-    "Ja"
+    legalEffectTypes.items[0].value
   ),
   defineTextField(
     "inputType",
