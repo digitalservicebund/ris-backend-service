@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.domain;
 
 import de.bund.digitalservice.ris.domain.validator.LookupTableConstraint;
-import java.time.Instant;
-import javax.validation.constraints.PastOrPresent;
 import lombok.Builder;
 
 @Builder
@@ -13,7 +11,7 @@ public record CoreData(
     String procedure,
     String ecli,
     String appraisalBody,
-    @PastOrPresent Instant decisionDate,
+    String decisionDate,
     String courtLocation,
     @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,
     String inputType,

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 
 interface Props {
   id: string
@@ -19,19 +18,12 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const inputValue = ref<string>()
 
-watch(
-  props,
-  () =>
-    (inputValue.value = props.modelValue
-      ? dayjs(props.modelValue).format("YYYY-MM-DD")
-      : props.value),
-  {
-    immediate: true,
-  }
-)
+watch(props, () => (inputValue.value = props.modelValue ?? props.value), {
+  immediate: true,
+})
 
-onMounted(() => {
-  console.log(props.modelValue)
+watch(inputValue, (value) => {
+  if (!hasError.value) emit("update:modelValue", value)
 })
 
 const isInPast = computed(() => {
@@ -53,11 +45,6 @@ const hasError = computed(
 const conditionalClasses = computed(() => ({
   input__error: props.hasError || hasError.value,
 }))
-
-function handleOnBlur() {
-  if (!hasError.value)
-    emit("update:modelValue", dayjs(inputValue.value).toISOString())
-}
 </script>
 
 <template>
@@ -68,7 +55,6 @@ function handleOnBlur() {
     class="bg-white input"
     :class="conditionalClasses"
     type="date"
-    @blur="handleOnBlur"
   />
 </template>
 
