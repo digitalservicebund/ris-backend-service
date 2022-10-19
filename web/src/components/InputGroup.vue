@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import InputElement from "@/components/InputElement.vue"
-import InputFieldoComponent from "@/components/InputField.vue"
+import InputFieldComponent from "@/components/InputField.vue"
 import type { InputField, ModelType } from "@/domain"
 
 type InputValues = { [fieldId: string]: ModelType }
@@ -78,7 +78,7 @@ watch(
       class="input-group__row"
       :style="gapStyle"
     >
-      <InputFieldoComponent
+      <InputFieldComponent
         v-for="field in group"
         :id="field.name"
         :key="field.name"
@@ -94,7 +94,7 @@ watch(
           :attributes="field.inputAttributes"
           :type="field.type"
         />
-      </InputFieldoComponent>
+      </InputFieldComponent>
     </div>
   </div>
 </template>
