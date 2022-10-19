@@ -76,14 +76,14 @@ const previousDecisions = computed({
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
 
-const originalOdocPanelYPos = 169
+const fixedPanelPosition = ref(false)
 
-const handleScroll = () => {
+function onScroll() {
   const element = document.getElementById("odoc-panel-element")
   if (!element) return
-  const pos = originalOdocPanelYPos - window.scrollY
-  const threshold = -40
-  element.style.top = (pos < threshold ? threshold : pos) + "px"
+  element.getBoundingClientRect().top <= 0
+    ? (fixedPanelPosition.value = true)
+    : (fixedPanelPosition.value = false)
 }
 
 const getOriginalDocumentUnit = async () => {
@@ -142,7 +142,7 @@ const removeAutoUpdate = () => {
 }
 
 onMounted(async () => {
-  window.addEventListener("scroll", handleScroll)
+  window.addEventListener("scroll", onScroll)
   window.addEventListener(
     "keydown",
     handleUpdateDocumentUnitWithShortCut,
@@ -152,7 +152,7 @@ onMounted(async () => {
   getOriginalDocumentUnit()
 })
 onUnmounted(() => {
-  window.removeEventListener("scroll", handleScroll)
+  window.removeEventListener("scroll", onScroll)
   window.removeEventListener("keydown", handleUpdateDocumentUnitWithShortCut)
   removeAutoUpdate()
 })
@@ -185,9 +185,11 @@ onUnmounted(() => {
       </div>
 
       <OriginalFileSidePanel
+        id="odoc-panel-element"
         class="bg-white"
         :class="classes"
         :file="fileAsHTML"
+        :fixed-panel-position="fixedPanelPosition"
         :has-file="documentUnit.hasFile"
         :open="showDocPanel"
         @toggle-panel="handleToggleFilePanel"

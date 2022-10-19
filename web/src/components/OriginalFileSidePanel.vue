@@ -2,7 +2,12 @@
 import { useRoute } from "vue-router"
 import TextEditor from "@/components/TextEditor.vue"
 
-defineProps<{ open: boolean; hasFile: boolean; file?: string }>()
+defineProps<{
+  open: boolean
+  hasFile: boolean
+  file?: string
+  fixedPanelPosition?: boolean
+}>()
 defineEmits<{ (e: "togglePanel"): void }>()
 
 const route = useRoute()
@@ -37,37 +42,46 @@ export default {
     </div>
   </button>
 
-  <div v-if="open" v-bind="$attrs" class="basis-1/3! flex flex-col gap-56">
-    <div class="flex items-center">
-      <h2 class="grow heading-02-regular">Originaldokument</h2>
+  <div v-if="open" v-bind="$attrs">
+    <div
+      class="basis-1/3! flex flex-col gap-56"
+      :class="{ sticky: fixedPanelPosition }"
+    >
+      <div class="flex items-center">
+        <h2 class="grow heading-02-regular">Originaldokument</h2>
 
-      <button
-        aria-label="Originaldokument schließen"
-        class="bg-blue-800 rounded-full text-white"
-        @click="$emit('togglePanel')"
+        <button
+          aria-label="Originaldokument schließen"
+          class="bg-blue-800 rounded-full text-white"
+          @click="$emit('togglePanel')"
+        >
+          <span class="material-icons p-8"> close </span>
+        </button>
+      </div>
+
+      <div v-if="!hasFile" class="flex flex-col gap-24">
+        <span class="material-icons odoc-upload-icon">cloud_upload</span>
+
+        Es wurde noch kein Originaldokument hochgeladen.
+
+        <router-link
+          class="flex gap-2 items-center link-01-bold"
+          :to="uploadFileRoute"
+        >
+          <span class="material-icons">arrow_forward</span>
+          <span>Zum Upload</span>
+        </router-link>
+      </div>
+
+      <div v-else-if="!file">Dokument wird geladen</div>
+
+      <div
+        v-else
+        class="border-1 border-gray-400 border-solid overflow-scroll"
+        :class="{ 'editor-height': fixedPanelPosition }"
       >
-        <span class="material-icons p-8"> close </span>
-      </button>
-    </div>
-
-    <div v-if="!hasFile" class="flex flex-col gap-24">
-      <span class="material-icons odoc-upload-icon">cloud_upload</span>
-
-      Es wurde noch kein Originaldokument hochgeladen.
-
-      <router-link
-        class="flex gap-2 items-center link-01-bold"
-        :to="uploadFileRoute"
-      >
-        <span class="material-icons">arrow_forward</span>
-        <span>Zum Upload</span>
-      </router-link>
-    </div>
-
-    <div v-else-if="!file">Dokument wird geladen</div>
-
-    <div v-else class="border-1 border-gray-400 border-solid">
-      <TextEditor element-id="odoc" field-size="max" :value="file" />
+        <TextEditor element-id="odoc" field-size="max" :value="file" />
+      </div>
     </div>
   </div>
 </template>
@@ -104,5 +118,15 @@ export default {
 .odoc-upload-icon {
   font-size: 50px;
   @apply text-blue-800;
+}
+
+.sticky {
+  @apply fixed top-0 pt-[2rem] pr-[2rem];
+
+  overflow: scroll;
+}
+
+.editor-height {
+  height: calc(100vh - 150px);
 }
 </style>
