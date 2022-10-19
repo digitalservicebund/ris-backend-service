@@ -55,7 +55,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Dokumentationseinheit konnten nicht erstellt werden.",
+        title: "Neue Dokumentationseinheit konnte nicht erstellt werden.",
       }
     }
     return response
@@ -74,7 +74,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Neue Dokumentationseinheit konnten nicht erstellt werden",
+        title: "Dokumentationseinheit konnte nicht aktualisiert werden.",
       }
     }
     return response
@@ -86,7 +86,7 @@ const service: DocumentUnitService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: "Dokumentationseinheit konnte nicht gelöscht werden",
+        title: "Dokumentationseinheit konnte nicht gelöscht werden.",
       }
     }
     return response
