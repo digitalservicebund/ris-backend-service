@@ -3,7 +3,7 @@ import { computed } from "vue"
 import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
-import { coreDataFields } from "@/domain"
+import { coreDataFields, prefilledDataFields, moreCategories } from "@/domain"
 import { ValidationError } from "@/services/httpClient"
 
 interface Props {
@@ -38,11 +38,22 @@ const values = computed({
       :fields="coreDataFields"
       :validation-errors="props.validationErrors"
     />
-
+    <InputGroup
+      v-model="values"
+      :column-count="2"
+      :fields="prefilledDataFields"
+      :validation-errors="props.validationErrors"
+    />
+    <InputGroup
+      v-model="values"
+      :column-count="2"
+      :fields="moreCategories"
+      :validation-errors="props.validationErrors"
+    />
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
 
     <SaveDocumentUnitButton
-      aria-label="Stammdaten Speichern Button"
+      ariaLabel="Stammdaten Speichern Button"
       class="mt-8"
       :update-status="updateStatus"
       @update-document-unit="emit('updateDocumentUnit')"

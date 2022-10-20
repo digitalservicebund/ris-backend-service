@@ -21,11 +21,8 @@ describe("PublicationDocument:", () => {
     })
 
     it("render text", async () => {
-      expect(renderResult.container.textContent).match(
-        new RegExp(
-          "VeröffentlichenPlausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1" +
-            '<\\?xml version="1.0"\\?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>'
-        )
+      expect(renderResult.container).toHaveTextContent(
+        `VeröffentlichenPlausibilitätsprüfung help Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst. Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`
       )
     })
 
@@ -71,11 +68,8 @@ describe("PublicationDocument:", () => {
 
   it("without earlier published document unit", async () => {
     renderResult = render(PublicationDocument)
-
-    expect(renderResult.container.textContent).match(
-      new RegExp(
-        "VeröffentlichenPlausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht "
-      )
+    expect(renderResult.container).toHaveTextContent(
+      `VeröffentlichenPlausibilitätsprüfung help Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst. Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`
     )
   })
 
@@ -96,10 +90,8 @@ describe("PublicationDocument:", () => {
         },
       },
     })
-    expect(renderResult.container.textContent).match(
-      new RegExp(
-        "VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt error message 1error message 2 Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenerrorerror message title error message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht"
-      )
+    expect(renderResult.container).toHaveTextContent(
+      `VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt error message 1error message 2Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenerrorerror message title error message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`
     )
   })
 
@@ -123,10 +115,8 @@ describe("PublicationDocument:", () => {
         },
       },
     })
-    expect(renderResult.container.textContent).match(
-      new RegExp(
-        "VeröffentlichenPlausibilitätsprüfung help  Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst.  Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectals"
-      )
+    expect(renderResult.container).toHaveTextContent(
+      `VeröffentlichenPlausibilitätsprüfung help Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst. Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectals`
     )
 
     const codeSnippet = renderResult.queryByTestId("code-snippet")

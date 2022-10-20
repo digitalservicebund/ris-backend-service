@@ -16,7 +16,6 @@ export interface BaseInputField {
   name: string
   type: InputType
   label: string
-  iconName: string
   required?: boolean
   inputAttributes: BaseInputAttributes
 }

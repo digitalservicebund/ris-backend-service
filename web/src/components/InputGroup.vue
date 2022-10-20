@@ -74,7 +74,7 @@ watch(
 </script>
 
 <template>
-  <div class="input-group" :style="gapStyle">
+  <div class="input-group pb-[2rem]" :style="gapStyle">
     <div
       v-for="(group, index) in fieldRows"
       :key="index"
@@ -86,7 +86,6 @@ watch(
         :id="field.name"
         :key="field.name"
         class="input-group__row__field"
-        :icon-name="field.iconName"
         :label="field.label"
         :required="field.required"
         :style="fieldStyle"

@@ -7,7 +7,6 @@ import { ValidationError } from "@/services/httpClient"
 export function defineTextField(
   name: string,
   label: string,
-  iconName: string,
   ariaLabel: string,
   required?: boolean,
   placeholder?: string,
@@ -17,7 +16,6 @@ export function defineTextField(
     name,
     type: InputType.TEXT,
     label,
-    iconName,
     required,
     inputAttributes: { ariaLabel, placeholder, validationError },
   }
@@ -26,7 +24,6 @@ export function defineTextField(
 export function defineDateField(
   name: string,
   label: string,
-  iconName: string,
   ariaLabel: string,
   required?: boolean,
   validationError?: ValidationError
@@ -35,7 +32,6 @@ export function defineDateField(
     name,
     type: InputType.DATE,
     label,
-    iconName,
     required,
     inputAttributes: { ariaLabel, validationError },
   }
@@ -44,7 +40,6 @@ export function defineDateField(
 export function defineDropdownField(
   name: string,
   label: string,
-  iconName: string,
   ariaLabel: string,
   required?: boolean,
   placeholder?: string,
@@ -57,7 +52,6 @@ export function defineDropdownField(
     name,
     type: InputType.DROPDOWN,
     label,
-    iconName,
     required,
     inputAttributes: {
       ariaLabel,
@@ -71,50 +65,31 @@ export function defineDropdownField(
 }
 
 export const coreDataFields: InputField[] = [
-  defineTextField(
-    "fileNumber",
-    "Aktenzeichen",
-    "grid_3x3",
-    "Aktenzeichen",
-    true
-  ),
+  defineTextField("courtType", "Gerichtstyp", "Gerichtstyp", true),
+  defineTextField("courtLocation", "Gerichtssitz", "Gerichtssitz"),
+  defineTextField("fileNumber", "Aktenzeichen", "Aktenzeichen", true),
   defineDateField(
     "decisionDate",
     "Entscheidungsdatum",
-    "calendar_today",
     "Entscheidungsdatum",
     true,
     undefined
   ),
-  defineTextField("courtType", "Gerichtstyp", "home", "Gerichtstyp", true),
+  defineTextField("appraisalBody", "Spruchkörper", "Spruchkörper"),
   defineDropdownField(
     "category",
     "Dokumenttyp",
-    "category",
     "Dokumenttyp",
     true,
     "Bitte auswählen",
     true,
     documentTypes.items
   ),
-  defineTextField(
-    "appraisalBody",
-    "Spruchkörper",
-    "people_alt",
-    "Spruchkörper"
-  ),
-  defineTextField("ecli", "ECLI", "translate", "ECLI"),
-  defineTextField("procedure", "Vorgang", "inventory_2", "Vorgang"),
-  defineTextField(
-    "courtLocation",
-    "Gerichtssitz",
-    "location_on",
-    "Gerichtssitz"
-  ),
+  defineTextField("ecli", "ECLI", "ECLI"),
+  defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(
     "legalEffect",
     "Rechtskraft",
-    "gavel",
     "Rechtskraft",
     true,
     "",
@@ -122,17 +97,23 @@ export const coreDataFields: InputField[] = [
     legalEffectTypes.items,
     legalEffectTypes.items[0].value
   ),
-  defineTextField(
-    "inputType",
-    "Eingangsart",
-    "markunread_mailbox",
-    "Eingangsart"
+]
+
+export const prefilledDataFields: InputField[] = [
+  defineTextField("center", "Dokumentationsstelle", "Dokumentationsstelle"),
+  defineTextField("region", "Region", "Region"),
+  defineTextField("type", "Dokumentart", "Dokumentart"),
+  defineTextField("judicature", "Gerichtbarkeit", "Gerichtbarkeit"),
+]
+
+export const moreCategories: InputField[] = [
+  defineDropdownField(
+    "moreCategories",
+    "Weitere Rubrik",
+    "Weitere Rubrik",
+    false,
+    "Bitte auswählen",
+    false,
+    legalEffectTypes.items
   ),
-  defineTextField(
-    "center",
-    "Dokumentationsstelle",
-    "school",
-    "Dokumentationsstelle"
-  ),
-  defineTextField("region", "Region", "map", "Region"),
 ]

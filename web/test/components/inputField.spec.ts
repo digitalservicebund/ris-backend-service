@@ -4,7 +4,6 @@ import InputField from "@/components/InputField.vue"
 function renderComponent(options?: {
   id?: string
   label?: string
-  iconName?: string
   slot?: string
   errorMessage?: string
   required?: true
@@ -14,7 +13,6 @@ function renderComponent(options?: {
   const props = {
     id,
     label: options?.label ?? "label",
-    iconName: options?.iconName ?? "icon-name",
     required: options?.required ?? options?.required,
     errorMessage: options?.errorMessage,
   }
@@ -39,14 +37,6 @@ describe("InputField", () => {
 
     const input = queryByLabelText("test label *", { exact: false })
     expect(input).toBeInTheDocument()
-  })
-
-  it("shows input with given icon", () => {
-    const { queryByText } = renderComponent({ iconName: "test-icon" })
-
-    const icon = queryByText("test-icon")
-
-    expect(icon).toBeInTheDocument()
   })
 
   it("shows input with given error message", () => {
