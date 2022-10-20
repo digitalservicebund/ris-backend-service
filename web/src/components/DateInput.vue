@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 
 interface Props {
   id: string
@@ -29,10 +29,6 @@ watch(
     immediate: true,
   }
 )
-
-onMounted(() => {
-  console.log(props.modelValue)
-})
 
 const isInPast = computed(() => {
   if (inputValue.value) {
