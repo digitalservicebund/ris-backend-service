@@ -1,0 +1,128 @@
+{
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0-rtm.5.json",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "fullName": "Trivy Vulnerability Scanner",
+          "informationUri": "https://github.com/aquasecurity/trivy",
+          "name": "Trivy",
+          "rules": [
+            {
+              "id": "CVE-2022-40303",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "CVE-2022-40303"
+              },
+              "fullDescription": {
+                "text": "No description is available for this CVE."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2022-40303",
+              "help": {
+                "text": "Vulnerability CVE-2022-40303\nSeverity: HIGH\nPackage: libxml2\nFixed Version: 2.9.14-r2\nLink: [CVE-2022-40303](https://avd.aquasec.com/nvd/cve-2022-40303)\nNo description is available for this CVE.",
+                "markdown": "**Vulnerability CVE-2022-40303**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|HIGH|libxml2|2.9.14-r2|[CVE-2022-40303](https://avd.aquasec.com/nvd/cve-2022-40303)|\n\nNo description is available for this CVE."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "8.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "HIGH"
+                ]
+              }
+            },
+            {
+              "id": "CVE-2022-40304",
+              "name": "OsPackageVulnerability",
+              "shortDescription": {
+                "text": "CVE-2022-40304"
+              },
+              "fullDescription": {
+                "text": "No description is available for this CVE."
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "helpUri": "https://avd.aquasec.com/nvd/cve-2022-40304",
+              "help": {
+                "text": "Vulnerability CVE-2022-40304\nSeverity: HIGH\nPackage: libxml2\nFixed Version: 2.9.14-r2\nLink: [CVE-2022-40304](https://avd.aquasec.com/nvd/cve-2022-40304)\nNo description is available for this CVE.",
+                "markdown": "**Vulnerability CVE-2022-40304**\n| Severity | Package | Fixed Version | Link |\n| --- | --- | --- | --- |\n|HIGH|libxml2|2.9.14-r2|[CVE-2022-40304](https://avd.aquasec.com/nvd/cve-2022-40304)|\n\nNo description is available for this CVE."
+              },
+              "properties": {
+                "precision": "very-high",
+                "security-severity": "8.0",
+                "tags": [
+                  "vulnerability",
+                  "security",
+                  "HIGH"
+                ]
+              }
+            }
+          ],
+          "version": "0.29.2"
+        }
+      },
+      "results": [
+        {
+          "ruleId": "CVE-2022-40303",
+          "ruleIndex": 0,
+          "level": "error",
+          "message": {
+            "text": "Package: libxml2\nInstalled Version: 2.9.14-r1\nVulnerability CVE-2022-40303\nSeverity: HIGH\nFixed Version: 2.9.14-r2\nLink: [CVE-2022-40303](https://avd.aquasec.com/nvd/cve-2022-40303)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "digitalservicebund/ris-backend-service/frontend",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "CVE-2022-40304",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "Package: libxml2\nInstalled Version: 2.9.14-r1\nVulnerability CVE-2022-40304\nSeverity: HIGH\nFixed Version: 2.9.14-r2\nLink: [CVE-2022-40304](https://avd.aquasec.com/nvd/cve-2022-40304)"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "digitalservicebund/ris-backend-service/frontend",
+                  "uriBaseId": "ROOTPATH"
+                },
+                "region": {
+                  "startLine": 1,
+                  "startColumn": 1,
+                  "endLine": 1,
+                  "endColumn": 1
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits",
+      "originalUriBaseIds": {
+        "ROOTPATH": {
+          "uri": "file:///"
+        }
+      }
+    }
+  ]
+}
