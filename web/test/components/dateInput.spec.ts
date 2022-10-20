@@ -74,6 +74,7 @@ describe("DateInput", () => {
     await fireEvent.update(input)
     await nextTick()
 
+    expect(input.className).toContain("input__error")
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
   })
 
@@ -88,6 +89,7 @@ describe("DateInput", () => {
     await fireEvent.update(input)
     await nextTick()
 
+    expect(input.className).toContain("input__error")
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
   })
 
