@@ -2,12 +2,14 @@ import userEvent from "@testing-library/user-event"
 import { fireEvent, render } from "@testing-library/vue"
 import { nextTick } from "vue"
 import DateInput from "@/components/DateInput.vue"
+import { ValidationError } from "@/services/httpClient"
 
 function renderComponent(options?: {
   ariaLabel?: string
   value?: string
   modelValue?: string
   placeholder?: string
+  validationError?: ValidationError
 }) {
   const user = userEvent.setup()
   const props = {
@@ -16,9 +18,15 @@ function renderComponent(options?: {
     modelValue: options?.modelValue,
     ariaLabel: options?.ariaLabel ?? "aria-label",
     placeholder: options?.placeholder,
+    validationError: options?.validationError,
   }
   const renderResult = render(DateInput, { props })
   return { user, props, ...renderResult }
+}
+
+const mockValidationError: ValidationError = {
+  defaultMessage: "wrong date",
+  field: "coreData.decisionDate",
 }
 
 describe("DateInput", () => {
@@ -91,6 +99,22 @@ describe("DateInput", () => {
 
     expect(input.className).toContain("input__error")
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
+  })
+
+  it("show validation error coming from the backend", async () => {
+    const { container } = renderComponent({
+      validationError: mockValidationError,
+    })
+    const input = container.querySelector("input") as HTMLInputElement
+
+    // The date is valid, so the backend validation error is "artificially" added here
+    // to trigger the error. Invalid dates would be also caught by the component directly,
+    // so we couldn't test if the backend mechanism works.
+    fireEvent.input(input, { target: { value: "2020-05-12" } })
+    fireEvent.blur(input)
+    await nextTick()
+
+    expect(input.className).toContain("input__error")
   })
 
   it("does not allow letters", async () => {
