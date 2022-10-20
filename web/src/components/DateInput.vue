@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed, ref, watch } from "vue"
+import { ValidationError } from "@/services/httpClient"
 
 interface Props {
   id: string
   value?: string
   modelValue?: string
   ariaLabel: string
-  hasError?: boolean
-  isInPast?: boolean
+  validationError?: ValidationError
 }
 
 interface Emits {
@@ -39,15 +39,11 @@ const isInPast = computed(() => {
 })
 
 const hasError = computed(
-  () =>
-    props.hasError ||
-    props.isInPast ||
-    !isInPast.value ||
-    inputValue.value == ""
+  () => props.validationError || !isInPast.value || inputValue.value == ""
 )
 
 const conditionalClasses = computed(() => ({
-  input__error: props.hasError || hasError.value,
+  input__error: props.validationError || hasError.value,
 }))
 
 function handleOnBlur() {

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
+import { ValidationError } from "@/services/httpClient"
 
 interface Props {
   id: string
@@ -8,7 +9,7 @@ interface Props {
   modelValue?: string
   ariaLabel: string
   placeholder?: string
-  hasError?: boolean
+  validationError?: ValidationError
 }
 
 interface Emits {
@@ -25,7 +26,7 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 )
 
 const conditionalClasses = computed(() => ({
-  input__error: props.hasError,
+  input__error: props.validationError,
 }))
 </script>
 

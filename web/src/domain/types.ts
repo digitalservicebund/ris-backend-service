@@ -1,3 +1,5 @@
+import { ValidationError } from "@/services/httpClient"
+
 export enum InputType {
   TEXT = "text",
   FILE = "file",
@@ -7,7 +9,7 @@ export enum InputType {
 
 export interface BaseInputAttributes {
   ariaLabel: string
-  hasError?: boolean
+  validationError?: ValidationError
 }
 
 export interface BaseInputField {
@@ -32,13 +34,9 @@ export interface TextInputField extends BaseInputField {
 
 export type DateInputModelType = string
 
-export interface DateInputAttributes extends BaseInputAttributes {
-  isInPast?: boolean
-}
-
 export interface DateInputField extends BaseInputField {
   type: InputType.DATE
-  inputAttributes: DateInputAttributes
+  inputAttributes: BaseInputAttributes
 }
 
 export type DropdownItem = {
@@ -58,8 +56,5 @@ export interface DropdownInputField extends BaseInputField {
 }
 
 export type InputField = TextInputField | DropdownInputField | DateInputField
-export type InputAttributes =
-  | TextInputAttributes
-  | DropdownAttributes
-  | DateInputAttributes
+export type InputAttributes = TextInputAttributes | DropdownAttributes
 export type ModelType = TextInputModelType | DateInputModelType

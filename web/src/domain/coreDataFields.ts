@@ -2,6 +2,7 @@ import { InputType } from "./types"
 import type { InputField, DropdownItem } from "./types"
 import documentTypes from "@/data/documentType.json"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
+import { ValidationError } from "@/services/httpClient"
 
 export function defineTextField(
   name: string,
@@ -9,7 +10,8 @@ export function defineTextField(
   iconName: string,
   ariaLabel: string,
   required?: boolean,
-  placeholder?: string
+  placeholder?: string,
+  validationError?: ValidationError
 ): InputField {
   return {
     name,
@@ -17,7 +19,7 @@ export function defineTextField(
     label,
     iconName,
     required,
-    inputAttributes: { ariaLabel, placeholder },
+    inputAttributes: { ariaLabel, placeholder, validationError },
   }
 }
 
@@ -27,8 +29,7 @@ export function defineDateField(
   iconName: string,
   ariaLabel: string,
   required?: boolean,
-  hasError?: boolean,
-  isInPast?: boolean
+  validationError?: ValidationError
 ): InputField {
   return {
     name,
@@ -36,7 +37,7 @@ export function defineDateField(
     label,
     iconName,
     required,
-    inputAttributes: { ariaLabel, hasError, isInPast },
+    inputAttributes: { ariaLabel, validationError },
   }
 }
 
@@ -49,7 +50,8 @@ export function defineDropdownField(
   placeholder?: string,
   isCombobox?: boolean,
   dropdownItems?: DropdownItem[],
-  preselectedValue?: string
+  preselectedValue?: string,
+  validationError?: ValidationError
 ): InputField {
   return {
     name,
@@ -63,6 +65,7 @@ export function defineDropdownField(
       dropdownItems,
       isCombobox,
       preselectedValue,
+      validationError,
     },
   }
 }

@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue"
 import InputElement from "@/components/InputElement.vue"
 import InputFieldComponent from "@/components/InputField.vue"
 import type { InputField, ModelType } from "@/domain"
+import { ValidationError } from "@/services/httpClient"
 
 type InputValues = { [fieldId: string]: ModelType }
 
@@ -10,6 +11,7 @@ interface Props {
   fields: InputField[]
   modelValue: InputValues
   columnCount?: number
+  validationErrors?: ValidationError[]
 }
 
 interface Emits {
@@ -18,6 +20,7 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   columnCount: 1,
+  validationErrors: undefined,
 })
 const emit = defineEmits<Emits>()
 
@@ -93,6 +96,12 @@ watch(
           v-model="inputValues[field.name]"
           :attributes="field.inputAttributes"
           :type="field.type"
+          :validation-error="
+            props.validationErrors &&
+            props.validationErrors.find(
+              (err) => err.field.split('\.')[1] === field.name
+            )
+          "
         />
       </InputFieldComponent>
     </div>

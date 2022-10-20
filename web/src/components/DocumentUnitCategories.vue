@@ -11,6 +11,7 @@ import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
+import { ValidationError } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
@@ -31,12 +32,16 @@ const handleUpdateValueDocumentUnitTexts = async (
 
 const handleUpdateDocumentUnit = async () => {
   updateStatus.value = UpdateStatus.ON_UPDATE
-  const status = (await documentUnitService.update(updatedDocumentUnit.value))
-    .status
+  const response = await documentUnitService.update(updatedDocumentUnit.value)
+  if (response.error && response.error.validationErrors) {
+    validationErrors.value = response.error.validationErrors
+  } else {
+    validationErrors.value = []
+  }
   setTimeout(() => {
     hasDataChange.value = false
     lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit)
-    updateStatus.value = status
+    updateStatus.value = response.status
     if (updateStatus.value !== UpdateStatus.SUCCEED) return
   }, 1000)
 }
@@ -44,6 +49,7 @@ const router = useRouter()
 const route = useRoute()
 
 const isOnline = ref(navigator.onLine)
+const validationErrors = ref<ValidationError[]>([])
 const updateStatus = ref(UpdateStatus.BEFORE_UPDATE)
 const lastUpdatedDocumentUnit = ref(JSON.stringify(props.documentUnit))
 const fileAsHTML = ref("")
@@ -166,15 +172,22 @@ onUnmounted(() => {
           id="coreData"
           v-model="coreData"
           :update-status="updateStatus"
+          :validation-errors="
+            validationErrors.filter(
+              (err) => err.field.split('\.')[0] === 'coreData'
+            )
+          "
           @update-document-unit="handleUpdateDocumentUnit"
         />
 
+        <!-- TODO add validationErrors -->
         <DocumentUnitPreviousDecisions
           id="previousDecisions"
           v-model="previousDecisions"
           class="my-16"
         />
 
+        <!-- TODO add validationErrors -->
         <DocumentUnitTexts
           id="texts"
           :texts="documentUnit.texts"

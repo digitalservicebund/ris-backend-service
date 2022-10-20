@@ -1,5 +1,8 @@
 import DocumentUnit from "../domain/documentUnit"
-import httpClient, { ServiceResponse } from "./httpClient"
+import httpClient, {
+  ServiceResponse,
+  FailedValidationServerResponse,
+} from "./httpClient"
 
 interface DocumentUnitService {
   getAll(): Promise<ServiceResponse<DocumentUnit[]>>
@@ -75,6 +78,15 @@ const service: DocumentUnitService = {
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheit konnte nicht aktualisiert werden.",
+      }
+      // good enough condition to detect validation errors (@Valid)?
+      if (
+        response.status == 400 &&
+        JSON.stringify(response.data).includes("Validation failed")
+      ) {
+        response.error.validationErrors = (
+          response.data as FailedValidationServerResponse
+        ).errors
       }
     }
     return response

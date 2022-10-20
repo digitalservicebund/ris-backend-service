@@ -4,10 +4,12 @@ import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
 import { coreDataFields } from "@/domain"
+import { ValidationError } from "@/services/httpClient"
 
 interface Props {
   modelValue?: CoreData
   updateStatus: number
+  validationErrors?: ValidationError[]
 }
 
 interface Emits {
@@ -30,7 +32,12 @@ const values = computed({
   <div v-else class="mb-[4rem]">
     <h1 class="heading-02-regular mb-[1rem]">Stammdaten</h1>
 
-    <InputGroup v-model="values" :column-count="2" :fields="coreDataFields" />
+    <InputGroup
+      v-model="values"
+      :column-count="2"
+      :fields="coreDataFields"
+      :validation-errors="props.validationErrors"
+    />
 
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
 

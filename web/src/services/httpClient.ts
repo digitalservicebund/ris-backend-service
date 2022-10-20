@@ -77,9 +77,19 @@ const httpClient: HttpClient = {
   },
 }
 
+export type ValidationError = {
+  defaultMessage: string
+  field: string
+}
+
+export type FailedValidationServerResponse = {
+  errors: ValidationError[]
+}
+
 export type ResponseError = {
   title: string
   description?: string
+  validationErrors?: ValidationError[]
 }
 
 export type ServiceResponse<T> = {

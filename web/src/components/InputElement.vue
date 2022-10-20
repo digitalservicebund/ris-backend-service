@@ -6,11 +6,13 @@ import FileInputButton from "@/components/FileInputButton.vue"
 import TextInput from "@/components/TextInput.vue"
 import { InputType } from "@/domain"
 import type { InputAttributes, ModelType } from "@/domain"
+import { ValidationError } from "@/services/httpClient"
 
 interface Props {
   type?: InputType
   modelValue?: ModelType
   attributes: InputAttributes
+  validationError?: ValidationError
 }
 
 interface Emits {
@@ -20,6 +22,7 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   type: InputType.TEXT,
   modelValue: undefined,
+  validationError: undefined,
 })
 
 const emit = defineEmits<Emits>()
@@ -46,5 +49,10 @@ const value = computed({
 </script>
 
 <template>
-  <component :is="component" v-bind="attributes" v-model="value" />
+  <component
+    :is="component"
+    v-model="value"
+    v-bind="attributes"
+    :validation-error="validationError"
+  />
 </template>
