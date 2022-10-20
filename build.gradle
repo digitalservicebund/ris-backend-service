@@ -14,10 +14,7 @@ group = "de.bund.digitalservice"
 version = "0.0.1-SNAPSHOT"
 sourceCompatibility = "17"
 
-configurations {
-  compileOnly { extendsFrom annotationProcessor }
-  all*.exclude module : "logback-classic"
-}
+configurations { compileOnly { extendsFrom annotationProcessor } }
 
 repositories {
   mavenCentral()
@@ -50,7 +47,7 @@ dependencies {
     because("CVE-2021-43797, not using Tomcat")
   }
   implementation("org.yaml:snakeyaml:1.33") { because("CVE-2022-25857") }
-  implementation "ch.qos.logback:logback-classic:1.4.4"
+  implementation "ch.qos.logback:logback-classic:1.2.11"
   implementation "ch.qos.logback:logback-core:1.4.0"
   implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
   implementation "io.r2dbc:r2dbc-postgresql:0.8.12.RELEASE"
