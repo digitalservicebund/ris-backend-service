@@ -14,7 +14,10 @@ group = "de.bund.digitalservice"
 version = "0.0.1-SNAPSHOT"
 sourceCompatibility = "17"
 
-configurations { compileOnly { extendsFrom annotationProcessor } }
+configurations {
+  compileOnly { extendsFrom annotationProcessor }
+  all*.exclude module : "logback-classic"
+}
 
 repositories {
   mavenCentral()
