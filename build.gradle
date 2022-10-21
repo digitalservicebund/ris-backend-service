@@ -98,6 +98,10 @@ dependencies {
   testImplementation "org.testcontainers:testcontainers:1.17.3"
   testImplementation "org.testcontainers:junit-jupiter:1.17.3"
   testImplementation "org.testcontainers:postgresql:1.17.3"
+
+  // this is to force transitive dependencies to use 1.0.24 instead of
+  // 1.0.23 as that is affected by CVE-2022-31684
+  implementation "io.projectreactor.netty:reactor-netty-http:1.0.24"
 }
 
 jar { // We have no need for the plain archive, thus skip creation for build speedup!
