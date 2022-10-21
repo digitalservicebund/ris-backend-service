@@ -32,13 +32,15 @@ interface HttpClient {
   ): Promise<ServiceResponse<TResponse>>
 }
 
-const backendHost = process.env.IS_LOCAL ?? "http://localhost:8080"
+const backendHost =
+  process.env.IS_LOCAL != undefined ? "" : "http://localhost:8080"
 async function baseHttp<T>(
   url: string,
   method: string,
   options?: RequestOptions,
   data?: T
 ) {
+  console.log(process.env.IS_LOCAL, `${backendHost}/api/v1/${url}`)
   try {
     const response = await axios({
       method: method,
