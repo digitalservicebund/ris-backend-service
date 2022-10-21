@@ -53,7 +53,7 @@ const values = computed({
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
 
     <SaveDocumentUnitButton
-      ariaLabel="Stammdaten Speichern Button"
+      aria-label="Stammdaten Speichern Button"
       class="mt-8"
       :update-status="updateStatus"
       @update-document-unit="emit('updateDocumentUnit')"

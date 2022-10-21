@@ -10,14 +10,15 @@ export function defineTextField(
   ariaLabel: string,
   required?: boolean,
   placeholder?: string,
-  validationError?: ValidationError
+  validationError?: ValidationError,
+  readOnly?: boolean
 ): InputField {
   return {
     name,
     type: InputType.TEXT,
     label,
     required,
-    inputAttributes: { ariaLabel, placeholder, validationError },
+    inputAttributes: { ariaLabel, placeholder, validationError, readOnly },
   }
 }
 
@@ -100,10 +101,42 @@ export const coreDataFields: InputField[] = [
 ]
 
 export const prefilledDataFields: InputField[] = [
-  defineTextField("center", "Dokumentationsstelle", "Dokumentationsstelle"),
-  defineTextField("region", "Region", "Region"),
-  defineTextField("type", "Dokumentart", "Dokumentart"),
-  defineTextField("judicature", "Gerichtbarkeit", "Gerichtbarkeit"),
+  defineTextField(
+    "center",
+    "Dokumentationsstelle",
+    "Dokumentationsstelle",
+    false,
+    "",
+    { defaultMessage: "", field: "" },
+    true
+  ),
+  defineTextField(
+    "region",
+    "Region",
+    "Region",
+    false,
+    "",
+    { defaultMessage: "", field: "" },
+    true
+  ),
+  defineTextField(
+    "type",
+    "Dokumentart",
+    "Dokumentart",
+    false,
+    "",
+    { defaultMessage: "", field: "" },
+    true
+  ),
+  defineTextField(
+    "judicature",
+    "Gerichtbarkeit",
+    "Gerichtbarkeit",
+    false,
+    "",
+    { defaultMessage: "", field: "" },
+    true
+  ),
 ]
 
 export const moreCategories: InputField[] = [
@@ -114,6 +147,6 @@ export const moreCategories: InputField[] = [
     false,
     "Bitte auswählen",
     false,
-    legalEffectTypes.items
+    []
   ),
 ]

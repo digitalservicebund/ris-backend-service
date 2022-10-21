@@ -24,6 +24,7 @@ export type TextInputModelType = string
 
 export interface TextInputAttributes extends BaseInputAttributes {
   placeholder?: string
+  readOnly?: boolean
 }
 
 export interface TextInputField extends BaseInputField {

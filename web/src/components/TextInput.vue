@@ -10,6 +10,7 @@ interface Props {
   ariaLabel: string
   placeholder?: string
   validationError?: ValidationError
+  readOnly?: boolean
 }
 
 interface Emits {
@@ -27,6 +28,7 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 
 const conditionalClasses = computed(() => ({
   input__error: props.validationError,
+  input__readonly: props.readOnly,
 }))
 </script>
 
@@ -38,6 +40,7 @@ const conditionalClasses = computed(() => ({
     class="bg-white input"
     :class="conditionalClasses"
     :placeholder="placeholder"
+    :readonly="$props.readOnly"
     type="text"
     @input="emitInputEvent"
   />
@@ -62,8 +65,6 @@ const conditionalClasses = computed(() => ({
   }
 
   &__error {
-    width: 100%;
-    padding: 17px 24px;
     @apply border-red-800 bg-red-200;
 
     &:autofill {
@@ -73,6 +74,10 @@ const conditionalClasses = computed(() => ({
     &:autofill:focus {
       @apply shadow-error text-inherit;
     }
+  }
+
+  &__readonly {
+    @apply border-none bg-white;
   }
 }
 </style>

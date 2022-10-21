@@ -8,11 +8,17 @@ import { InputType } from "@/domain"
 import type { InputAttributes } from "@/domain"
 import type { DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
+import { ValidationError } from "@/services/httpClient"
 
 const items: DropdownItem[] = dropdownItems.items
 const modelValue1 = ref("")
 const modelValue2 = ref("")
 const hasError = ref(true)
+const isReadonly = ref(true)
+const mockValidationError: ValidationError = {
+  defaultMessage: "wrong date",
+  field: "coreData.decisionDate",
+}
 const updateValue1 = (textValue: string | undefined) => {
   if (!!textValue) modelValue1.value = textValue
 }
@@ -59,8 +65,18 @@ const dropdownInputAttribute: InputAttributes = {
       <TextInput
         id="textInputError"
         aria-label="text input"
+        :validation-error="mockValidationError"
+        value="wrong value"
+      />
+    </div>
+    <span class="text-20">Text input is readonly</span>
+    <div>
+      <TextInput
+        id="textInputReadonly"
+        aria-label="text input"
         :has-error="hasError"
-        placeholder="this is text input has error"
+        placeholder="this is text input readonly"
+        :read-only="isReadonly"
         value=""
       />
     </div>
