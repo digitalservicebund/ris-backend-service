@@ -33,8 +33,7 @@ interface HttpClient {
   ): Promise<ServiceResponse<TResponse>>
 }
 
-const backendHost =
-  process.env.IS_LOCAL != undefined ? "" : "http://localhost:8080"
+const backendHost = import.meta.env.VITE_BACKEND_HOST ?? ""
 async function baseHttp<T>(
   url: string,
   method: string,

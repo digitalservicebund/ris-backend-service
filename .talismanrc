@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: run.sh
     checksum: 9bdbe5db9639a5d8d7f5f4bde81c2c5acb6af0ccd619e55a59c32dcb08d1a4de
   - filename: .github/workflows/pipeline.yml
-    checksum: 2991eaf49f5d917b286ff381fc6b9a20c1e9ec27f9fe3b1ce586eedebf098c62
+    checksum: 2f87b78065cd672918ad7d20dd2bc0578709a805e97b868e6eeab0a02ef60a64
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
@@ -38,7 +38,7 @@ fileignoreconfig:
   - filename: src/main/resources/data.sql
     checksum: a84facaeaf6f5eaa5fb46a77e8e097fdb50ef193eb56aaed51307cc88350f09f
   - filename: web/src/env.d.ts
-    checksum: 1220113e6945dc7bab0feb3a8c4d8eba7d29ed65def7dee66d8bb0409db6fbe5
+    checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/playwright.config.ts
     checksum: 8747a15221fcf538724f39052484ff36d5f43171ffe133bd2ecaacc888ccded2
   - filename: web/sonar-project.properties
