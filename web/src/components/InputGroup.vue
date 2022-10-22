@@ -3,7 +3,7 @@ import { computed, ref, watch } from "vue"
 import InputElement from "@/components/InputElement.vue"
 import InputFieldComponent from "@/components/InputField.vue"
 import type { InputField, ModelType } from "@/domain"
-import { ValidationError } from "@/services/httpClient"
+import { ValidationError } from "@/domain"
 
 type InputValues = { [fieldId: string]: ModelType }
 

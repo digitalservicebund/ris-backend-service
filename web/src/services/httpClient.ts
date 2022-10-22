@@ -1,4 +1,5 @@
 import axios, { AxiosError } from "axios"
+import { ValidationError } from "@/domain"
 
 type RequestOptions = {
   headers?: {
@@ -77,11 +78,6 @@ const httpClient: HttpClient = {
   async delete(url: string, options: RequestOptions) {
     return baseHttp(url, "delete", { ...options })
   },
-}
-
-export type ValidationError = {
-  defaultMessage: string
-  field: string
 }
 
 export type FailedValidationServerResponse = {

@@ -3,8 +3,12 @@ import { computed } from "vue"
 import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
-import { coreDataFields, prefilledDataFields, moreCategories } from "@/domain"
-import { ValidationError } from "@/services/httpClient"
+import {
+  coreDataFields,
+  prefilledDataFields,
+  moreCategories,
+  ValidationError,
+} from "@/domain"
 
 interface Props {
   modelValue?: CoreData

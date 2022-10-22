@@ -4,9 +4,8 @@ import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import FileInputButton from "@/components/FileInputButton.vue"
 import TextInput from "@/components/TextInput.vue"
-import { InputType } from "@/domain"
 import type { InputAttributes, ModelType } from "@/domain"
-import { ValidationError } from "@/services/httpClient"
+import { InputType, ValidationError } from "@/domain"
 
 interface Props {
   type?: InputType

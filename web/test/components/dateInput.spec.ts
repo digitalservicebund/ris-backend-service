@@ -2,7 +2,7 @@ import userEvent from "@testing-library/user-event"
 import { fireEvent, render } from "@testing-library/vue"
 import { nextTick } from "vue"
 import DateInput from "@/components/DateInput.vue"
-import { ValidationError } from "@/services/httpClient"
+import { ValidationError } from "@/domain"
 
 function renderComponent(options?: {
   ariaLabel?: string

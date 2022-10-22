@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed, ref, watch } from "vue"
-import { ValidationError } from "@/services/httpClient"
+import { ValidationError } from "@/domain"
 
 interface Props {
   id: string

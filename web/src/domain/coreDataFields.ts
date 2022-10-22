@@ -1,8 +1,7 @@
-import { InputType } from "./types"
+import { InputType, ValidationError } from "./types"
 import type { InputField, DropdownItem } from "./types"
 import documentTypes from "@/data/documentType.json"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
-import { ValidationError } from "@/services/httpClient"
 
 export function defineTextField(
   name: string,

@@ -7,11 +7,11 @@ import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
+import { ValidationError } from "@/domain"
 import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
-import { ValidationError } from "@/services/httpClient"
 
 const props = defineProps<{
   documentUnit: DocumentUnit

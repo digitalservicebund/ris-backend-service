@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
-import { ValidationError } from "@/services/httpClient"
+import { ValidationError } from "@/domain"
 
 interface Props {
   id: string

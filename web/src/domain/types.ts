@@ -1,5 +1,3 @@
-import { ValidationError } from "@/services/httpClient"
-
 export enum InputType {
   TEXT = "text",
   FILE = "file",
@@ -58,3 +56,8 @@ export interface DropdownInputField extends BaseInputField {
 export type InputField = TextInputField | DropdownInputField | DateInputField
 export type InputAttributes = TextInputAttributes | DropdownAttributes
 export type ModelType = TextInputModelType | DateInputModelType
+
+export type ValidationError = {
+  defaultMessage: string
+  field: string
+}

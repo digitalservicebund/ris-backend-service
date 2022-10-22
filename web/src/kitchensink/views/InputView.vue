@@ -4,11 +4,10 @@ import DropdownInput from "@/components/DropdownInput.vue"
 import InputElement from "@/components/InputElement.vue"
 import InputField from "@/components/InputField.vue"
 import TextInput from "@/components/TextInput.vue"
-import { InputType } from "@/domain"
 import type { InputAttributes } from "@/domain"
+import { InputType, ValidationError } from "@/domain"
 import type { DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
-import { ValidationError } from "@/services/httpClient"
 
 const items: DropdownItem[] = dropdownItems.items
 const modelValue1 = ref("")
