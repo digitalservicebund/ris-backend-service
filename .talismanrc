@@ -17,19 +17,19 @@ fileignoreconfig:
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: src/test/resources/application.properties
     checksum: 3b330b6390ddb0c4ed3ce344ace2e4a8afc48d3bb4bef4f66f6465f4f2632254
-  - filename: src/test/java/de/bund/digitalservice/ris/HealthEndpointIntegrationTest.java
+  - filename: src/test/java/de/bund/digitalservice/ris/caselaw/HealthEndpointIntegrationTest.java
     checksum: 84e3e4e6d3ef71f16220dbda3808b6e0943a5c43029a167fa9d89be70fa6db5a
-  - filename: src/test/java/de/bund/digitalservice/ris/SecurityIntegrationTest.java
+  - filename: src/test/java/de/bund/digitalservice/ris/caselaw/SecurityIntegrationTest.java
     checksum: 25c731cc32d2496e7299ac1a75e487d9a7d47085a4f0fda90ad063931027a383
-  - filename: src/main/java/de/bund/digitalservice/ris/config/MailConfig.java
+  - filename: src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
     checksum: 409affd3818f16f55c7189a6bc65c550658089f234f53e06faffdd0369af1953
-  - filename: src/main/java/de/bund/digitalservice/ris/adapter/SendInBlueHttpMailSender.java
+  - filename: src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: e55e8b56f9da19f328b040d588d555cec3fdcd91afd20c8f30f3f72a9f5458a7
-  - filename: src/main/java/de/bund/digitalservice/ris/utils/DocumentUnitDocxBuilder.java
+  - filename: src/main/java/de/bund/digitalservice/ris/caselaw/utils/DocumentUnitDocxBuilder.java
     checksum: ad60ac05f2963dbe2999e739549b74e9c61849364767fe504cd92a49e10ce4de
-  - filename: src/main/java/de/bund/digitalservice/ris/utils/DocxTableBuilder.java
+  - filename: src/main/java/de/bund/digitalservice/ris/caselaw/utils/DocxTableBuilder.java
     checksum: 6a927b2c29cef29ae6aa058d3c18f86d51bf7c1b1b2d2a5c9b2dc651731a4d57
-  - filename: src/main/java/de/bund/digitalservice/ris/domain/docx/StyledElement.java
+  - filename: src/main/java/de/bund/digitalservice/ris/caselaw/domain/docx/StyledElement.java
     checksum: 3196c69fd30d4e1834c840e38b5f9fba4173c0ce928486f64c479b42107cfadd
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
@@ -51,7 +51,7 @@ fileignoreconfig:
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: 05c271c75eb3d7bfbe25ee895109248fcdd8cc224750690a8db211b028d070d0
-  - filename: src/test/java/de/bund/digitalservice/ris/adapter/JurisXmlExporterWrapperTest.java
+  - filename: src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: 908dd8e8456bad5c8c3aa0e0e41cf82cc61e1ec5494acc267111864a01ce7afc
 scopeconfig:
   - scope: node
