@@ -40,7 +40,6 @@ async function baseHttp<T>(
   options?: RequestOptions,
   data?: T
 ) {
-  console.log(process.env.IS_LOCAL, `${backendHost}/api/v1/${url}`)
   try {
     const response = await axios({
       method: method,

@@ -80,10 +80,10 @@ public class DocumentUnitController {
   @GetMapping(value = "/{documentnumber}")
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentnumber(
       @NonNull @PathVariable String documentnumber) {
-    if (documentnumber.length() != 14) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.EMPTY));
+    if (documentnumber.length() == 13 || documentnumber.length() == 14) {
+      return service.getByDocumentnumber(documentnumber).map(ResponseEntity::ok);
     }
-    return service.getByDocumentnumber(documentnumber).map(ResponseEntity::ok);
+    return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.EMPTY));
   }
 
   @DeleteMapping(value = "/{uuid}")

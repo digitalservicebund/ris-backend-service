@@ -8,7 +8,7 @@ test.describe("create a doc unit and delete it again", () => {
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
     await page.waitForSelector("text=Festplatte durchsuchen")
     await expect(page).toHaveURL(
-      /\/jurisdiction\/documentunit\/[A-Z0-9]{14}\/files$/
+      /\/jurisdiction\/documentunit\/[A-Z0-9]{13}\/files$/
     )
 
     // Given the earlier expectation we can assume that the regex will match...

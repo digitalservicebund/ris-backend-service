@@ -30,7 +30,7 @@ public class DocumentUnitDTO {
             documentUnitCreationInfo.getDocumentationCenterAbbreviation()
                 + documentUnitCreationInfo.getDocumentType()
                 + Calendar.getInstance().get(Calendar.YEAR)
-                + String.format("%06d", documentNumber))
+                + String.format("%05d", documentNumber))
         .build();
   }
 

@@ -140,17 +140,17 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetByDocumentnumber() {
-    when(service.getByDocumentnumber("ABCD2022000001")).thenReturn(Mono.empty());
+    when(service.getByDocumentnumber("ABCD202200001")).thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/documentunits/ABCD2022000001")
+        .uri("/api/v1/documentunits/ABCD202200001")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).getByDocumentnumber("ABCD2022000001");
+    verify(service).getByDocumentnumber("ABCD202200001");
   }
 
   @Test
@@ -193,7 +193,7 @@ class DocumentUnitControllerTest {
   @Test
   void testUpdateByUuid() {
     DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
-    documentUnitDTO.setDocumentnumber("ABCD2022000001");
+    documentUnitDTO.setDocumentnumber("ABCD202200001");
     documentUnitDTO.setUuid(TEST_UUID);
     DocumentUnit documentUnit =
         DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();

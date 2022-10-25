@@ -235,14 +235,14 @@ class DocumentUnitServiceTest {
 
   @Test
   void testGetByDocumentnumber() {
-    when(repository.findByDocumentnumber("ABCDE2022000001"))
+    when(repository.findByDocumentnumber("ABCDE20220001"))
         .thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
-    when(previousDecisionRepository.findAllByDocumentnumber("ABCDE2022000001"))
+    when(previousDecisionRepository.findAllByDocumentnumber("ABCDE20220001"))
         .thenReturn(Flux.just(new PreviousDecision()));
-    StepVerifier.create(service.getByDocumentnumber("ABCDE2022000001"))
+    StepVerifier.create(service.getByDocumentnumber("ABCDE20220001"))
         .consumeNextWith(documentUnit -> assertEquals(documentUnit.getClass(), DocumentUnit.class))
         .verifyComplete();
-    verify(repository).findByDocumentnumber("ABCDE2022000001");
+    verify(repository).findByDocumentnumber("ABCDE20220001");
   }
 
   @Nested
@@ -252,7 +252,7 @@ class DocumentUnitServiceTest {
     private List<String> previousDecisionsIdsToDelete;
     private List<PreviousDecision> inputPreviousDecisionFromFE;
     private Long count;
-    private final String documentNr = "ABCDE2022000001";
+    private final String documentNr = "ABCDE20220001";
 
     private record DocumentUnitObj(DocumentUnit documentUnit, DocumentUnitDTO documentUnitDTO) {}
 
@@ -339,19 +339,19 @@ class DocumentUnitServiceTest {
       previousDecisionsListInDB = new ArrayList<>();
       previousDecisionsListInDB.add(
           new PreviousDecision(
-              1L, "gerTyp 1", "gerOrt 1", "01.01.2022", "aktenzeichen 1", "ABCDE2022000001"));
+              1L, "gerTyp 1", "gerOrt 1", "01.01.2022", "aktenzeichen 1", "ABCDE20220001"));
       previousDecisionsListInDB.add(
           new PreviousDecision(
-              2L, "gerTyp 2", "gerOrt 2", "01.02.2022", "aktenzeichen 2", "ABCDE2022000001"));
+              2L, "gerTyp 2", "gerOrt 2", "01.02.2022", "aktenzeichen 2", "ABCDE20220001"));
       previousDecisionsListInDB.add(
           new PreviousDecision(
-              3L, "gerTyp 3", "gerOrt 3", "01.03.2022", "aktenzeichen 3", "ABCDE2022000001"));
+              3L, "gerTyp 3", "gerOrt 3", "01.03.2022", "aktenzeichen 3", "ABCDE20220001"));
       previousDecisionsListInDB.add(
           new PreviousDecision(
-              4L, "gerTyp 4", "gerOrt 4", "01.04.2022", "aktenzeichen 4", "ABCDE2022000001"));
+              4L, "gerTyp 4", "gerOrt 4", "01.04.2022", "aktenzeichen 4", "ABCDE20220001"));
       previousDecisionsListInDB.add(
           new PreviousDecision(
-              5L, "gerTyp 5", "gerOrt 5", "01.05.2022", "aktenzeichen 5", "ABCDE2022000001"));
+              5L, "gerTyp 5", "gerOrt 5", "01.05.2022", "aktenzeichen 5", "ABCDE20220001"));
       count = Long.valueOf(previousDecisionsListInDB.size());
     }
 
@@ -374,7 +374,7 @@ class DocumentUnitServiceTest {
                 assertEquals(documentNr, previousDecision.documentnumber);
               })
           .verifyComplete();
-      verify(repository).findByDocumentnumber("ABCDE2022000001");
+      verify(repository).findByDocumentnumber("ABCDE20220001");
     }
 
     @Test
@@ -593,7 +593,7 @@ class DocumentUnitServiceTest {
             .setDocumentUnitDTO(DocumentUnitDTO.EMPTY)
             .setId(99L)
             .setUUID(UUID.randomUUID())
-            .setDocumentNumber("ABCDE2022000001")
+            .setDocumentNumber("ABCDE20220001")
             .setCreationtimestamp(Instant.now())
             .setFileuploadtimestamp(Instant.now())
             .setPreviousDecisions(null)
