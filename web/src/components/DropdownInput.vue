@@ -31,12 +31,17 @@ const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
 }
 
+const clearSelection = () => {
+  emit("update:modelValue", "")
+}
+
 const updateValue = (value: string) => {
   emit("update:modelValue", value)
   isShowDropdown.value = false
 }
 
 const onTextChange = () => {
+  emit("update:modelValue", "")
   const textInput = document.querySelector(
     `.input-container #${props.id}`
   ) as HTMLInputElement
@@ -48,7 +53,10 @@ const filterItems = () => {
   const filteredItem = items.value.filter((item) =>
     item.text.includes(!!props.modelValue ? props.modelValue : "")
   )
-  return filteredItem.length > 0 ? filteredItem : items.value
+
+  return filteredItem.length > 0
+    ? filteredItem
+    : [{ text: "Kein passender Eintrag", value: "" }]
 }
 
 const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
@@ -102,7 +110,17 @@ onBeforeUnmount(() => {
           @input="onTextChange"
         />
         <button
-          class="toggle-dropdown-button"
+          class="input-close-icon"
+          tabindex="0"
+          @click="clearSelection"
+          @keydown.enter="clearSelection"
+        >
+          <span class="icon material-icons pr-[1.5rem] text-blue-800">
+            close
+          </span>
+        </button>
+        <button
+          class="input-expand-icon"
           tabindex="0"
           @click="toggleDropdown"
           @keydown.enter="toggleDropdown"
@@ -165,7 +183,8 @@ onBeforeUnmount(() => {
         }
       }
 
-      .toggle-dropdown-button {
+      .input-close-icon,
+      .input-expand-icon {
         height: 5px;
       }
     }

@@ -38,7 +38,7 @@ describe("Dropdown Element", () => {
       },
     })
     const openDropdownContainer = container.querySelector(
-      ".toggle-dropdown-button"
+      ".input-expand-icon"
     ) as HTMLElement
     await user.click(openDropdownContainer)
     let dropdownItems = container.querySelectorAll(
@@ -63,7 +63,7 @@ describe("Dropdown Element", () => {
       },
     })
     const openDropdownContainer = container.querySelector(
-      ".toggle-dropdown-button"
+      ".input-expand-icon"
     ) as HTMLElement
 
     await user.click(openDropdownContainer)
@@ -85,7 +85,7 @@ describe("Dropdown Element", () => {
       },
     })
     const openDropdownContainer = container.querySelector(
-      ".toggle-dropdown-button"
+      ".input-expand-icon"
     ) as HTMLElement
 
     await user.click(openDropdownContainer)
@@ -126,30 +126,25 @@ describe("Dropdown Element", () => {
     }
   })
 
-  it("Dropdown items should show all items if not matched", async () => {
+  it("Dropdown items should show message if no items matched", async () => {
     const { container } = render(DropdownInput, {
       props: {
         id: "dropdown-test",
         modelValue: "testItem4",
         ariaLabel: "",
         dropdownItems: DROPDOWN_ITEMS,
+        isCombobox: true,
       },
     })
     const openDropdownContainer = container.querySelector(
-      ".toggle-dropdown-button"
+      ".input-expand-icon"
     ) as HTMLElement
 
     await user.click(openDropdownContainer)
     const dropdownItems = container.querySelectorAll(
       ".dropdown-container__dropdown-item"
     )
-    expect(dropdownItems).toHaveLength(3)
-    const item1 = dropdownItems[0]
-    const item2 = dropdownItems[1]
-    const item3 = dropdownItems[2]
-    expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
-    expect(item2).toHaveTextContent(DROPDOWN_ITEMS[1].text)
-    expect(item3).toHaveTextContent(DROPDOWN_ITEMS[2].text)
+    expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
   })
 
   it("Dropdown renders with preselectes item", async () => {
