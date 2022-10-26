@@ -133,6 +133,8 @@ module.exports = {
       boxShadow: {
         error: "inset 0 0 0 50px bg-red-200",
         white: "inset 0 0 0 50px bg-white",
+        focus: "inset 0 0 0 2px bg-blue-900",
+        hover: "inset 0 0 0 2px bg-blue-900",
       },
     },
   },

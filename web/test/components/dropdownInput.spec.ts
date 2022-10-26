@@ -53,26 +53,26 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should be filtered", async () => {
-    const { container } = render(DropdownInput, {
+    const user = userEvent.setup()
+    const { container, getByLabelText } = render(DropdownInput, {
       props: {
         id: "dropdown-test",
-        modelValue: "testItem1",
-        ariaLabel: "",
+        modelValue: "",
+        ariaLabel: "test label",
         dropdownItems: DROPDOWN_ITEMS,
         isCombobox: true,
       },
     })
-    const openDropdownContainer = container.querySelector(
-      ".input-expand-icon"
-    ) as HTMLElement
 
-    await user.click(openDropdownContainer)
+    const input = getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "testItem2")
+
     const dropdownItems = container.querySelectorAll(
       ".dropdown-container__dropdown-item"
     )
+
     expect(dropdownItems).toHaveLength(1)
-    const item1 = dropdownItems[0]
-    expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
+    expect(dropdownItems[0]).toHaveTextContent("testItem2")
   })
 
   it("Dropdown items shouldn't be filtered if no combobox", async () => {
@@ -127,23 +127,24 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should show message if no items matched", async () => {
-    const { container } = render(DropdownInput, {
+    const user = userEvent.setup()
+    const { container, getByLabelText } = render(DropdownInput, {
       props: {
         id: "dropdown-test",
-        modelValue: "testItem4",
-        ariaLabel: "",
+        modelValue: "",
+        ariaLabel: "test label",
         dropdownItems: DROPDOWN_ITEMS,
         isCombobox: true,
       },
     })
-    const openDropdownContainer = container.querySelector(
-      ".input-expand-icon"
-    ) as HTMLElement
 
-    await user.click(openDropdownContainer)
+    const input = getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "testItem10")
+
     const dropdownItems = container.querySelectorAll(
       ".dropdown-container__dropdown-item"
     )
+    expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
   })
 
