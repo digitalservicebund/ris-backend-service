@@ -1,0 +1,124 @@
+openapi: 3.0.0
+info:
+  version: 0.0.1
+  title: NeuRIS Normen Service API
+  description: Interface for the normen service of the legal information system
+  license:
+    name: MIT
+    url: https://mit-license.org
+
+servers:
+  - url: https://ris.prod.ds4g.net/api/norms
+    description: Public production server
+  - url: http://localhost:3000
+    description: Local development server
+
+paths:
+  /norms:
+    get:
+      summary: Get a list of all available norms
+      operationId: getAllNorms
+      responses:
+        "200":
+          description: Successful response with list of allnorms
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Norm"
+
+        "400":
+          description: ""
+
+    post:
+      summary: Create new norm
+      operationId: createNorm
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NormWithoutGuid"
+      responses:
+        "201":
+          description: Norm got successfully created
+          headers:
+            Location:
+              description: URI reference for the new norm
+              schema:
+                type: string
+        "400":
+          description: Invalid norm
+
+  /norms/{guid}:
+    get:
+      summary: Obtain a single norm by its Guid
+      operationId: getNormByGuid
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/Guid"
+      responses:
+        "200":
+          description: Norm was found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Norm"
+        "404":
+          description: No norm found for this Guid
+
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+
+  schemas:
+    Guid:
+      description: The globally unique identifier of the norm (format in UUID)
+      type: string
+      format: uuid
+
+    NormWithoutGuid:
+      type: object
+      required:
+        - longTitle
+        - firstParagraph
+      properties:
+        longTitle:
+          type: string
+        firstParagraph:
+          type: string
+      example:
+        longTitle: "Geschäftsordnung des Deutschen Bundestages"
+        firstParagraph: >
+          Der Beschluss des Bundestags vom 24. November 2015 (BGBl. 2016 I S. 118),
+          zuletzt geändert durch Beschluss des Plenums vom 3. Dezember 2019 (BGBl.
+          2020 I S. 112), wird im Folgenden geändert.
+
+    Norm:
+      allOf:
+        - $ref: "#/components/schemas/NormWithoutGuid"
+        - type: object
+          required:
+            - guid
+          properties:
+            guid:
+              $ref: "#/components/schemas/Guid"
+      example:
+        guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
+        longTitle: "Geschäftsordnung des Deutschen Bundestages"
+        firstParagraph: >
+          Der Beschluss des Bundestags vom 24. November 2015 (BGBl. 2016 I S. 118),
+          zuletzt geändert durch Beschluss des Plenums vom 3. Dezember 2019 (BGBl.
+          2020 I S. 112), wird im Folgenden geändert.
+
+security:
+  - BasicAuth: []
