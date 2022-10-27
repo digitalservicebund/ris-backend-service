@@ -50,11 +50,11 @@ public class DocumentUnitController {
   @PutMapping(value = "/{uuid}/file")
   public Mono<ResponseEntity<DocumentUnit>> attachFileToDocumentUnit(
       @PathVariable UUID uuid,
-      @RequestBody ByteBuffer byteBufferFlux,
+      @RequestBody ByteBuffer byteBuffer,
       @RequestHeader HttpHeaders httpHeaders) {
 
     return service
-        .attachFileToDocumentUnit(uuid, byteBufferFlux, httpHeaders)
+        .attachFileToDocumentUnit(uuid, byteBuffer, httpHeaders)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(
             ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
