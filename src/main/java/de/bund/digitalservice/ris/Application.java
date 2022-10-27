@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw;
+package de.bund.digitalservice.ris;
 
 import io.sentry.Sentry;
 import java.util.Date;
@@ -8,7 +8,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class Application {
 
-  @Generated
   public static void main(String[] args) {
     SpringApplication.run(Application.class, args);
     try {
