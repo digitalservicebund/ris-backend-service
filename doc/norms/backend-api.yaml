@@ -8,6 +8,9 @@ info:
     url: https://mit-license.org
 
 servers:
+  # Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/VICTORDELCAMPO_1/neu-ris_normen_service_api_new/0.0.1
   - url: https://ris.prod.ds4g.net/api/norms
     description: Public production server
   - url: http://localhost:3000
@@ -86,39 +89,128 @@ components:
       type: string
       format: uuid
 
+    ParagraphWithoutGuid:
+      type: object
+      required:
+        - marker
+        - text
+      properties:
+        marker:
+          type: string
+        text:
+          type: string
+      example:
+        marker: "(1)"
+        text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+
+    ArticleWithoutGuid:
+      type: object
+      required:
+        - marker
+        - paragraphs
+      properties:
+        marker:
+          type: string
+        title:
+          type: string
+        paragraphs:
+          type: array
+          items:
+            $ref: "#/components/schemas/ParagraphWithoutGuid"
+      example:
+        marker: "§ 1"
+        title: "Allgemeiner Anwendungsbereich"
+        paragraphs:
+          - marker: "(1)"
+            text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+
     NormWithoutGuid:
       type: object
       required:
         - longTitle
-        - firstParagraph
+        - articles
       properties:
         longTitle:
           type: string
-        firstParagraph:
-          type: string
+        articles:
+          type: array
+          items:
+            $ref: "#/components/schemas/ArticleWithoutGuid"
       example:
-        longTitle: "Geschäftsordnung des Deutschen Bundestages"
-        firstParagraph: >
-          Der Beschluss des Bundestags vom 24. November 2015 (BGBl. 2016 I S. 118),
-          zuletzt geändert durch Beschluss des Plenums vom 3. Dezember 2019 (BGBl.
-          2020 I S. 112), wird im Folgenden geändert.
+        longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
+        articles:
+          - marker: "§ 1"
+            title: "Allgemeiner Anwendungsbereich"
+            paragraphs:
+              - marker: "(1)"
+                text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
 
-    Norm:
+    Paragraph:
       allOf:
-        - $ref: "#/components/schemas/NormWithoutGuid"
+        - $ref: "#/components/schemas/ParagraphWithoutGuid"
         - type: object
           required:
             - guid
           properties:
             guid:
               $ref: "#/components/schemas/Guid"
+          example:
+            guid: "eb6f27c7-79ef-4b25-8aef-b8726f6ed26f"
+            marker: "(1)"
+            text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+
+    Article:
+      type: object
+      required:
+        - guid
+        - marker
+        - paragraphs
+      properties:
+        guid:
+          $ref: "#/components/schemas/Guid"
+        title:
+          type: string
+        marker:
+          type: string
+        paragraphs:
+          type: array
+          items:
+            $ref: "#/components/schemas/Paragraph"
+      example:
+        guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
+        marker: "§ 1"
+        title: "Allgemeiner Anwendungsbereich"
+        paragraphs:
+          - guid: "eb6f27c7-79ef-4b25-8aef-b8726f6ed26f"
+            marker: "(1)"
+            text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+
+    Norm:
+      type: object
+      required:
+        - guid
+        - longTitle
+        - articles
+      properties:
+        guid:
+          $ref: "#/components/schemas/Guid"
+        longTitle:
+          type: string
+        articles:
+          type: array
+          items:
+            $ref: "#/components/schemas/Article"
       example:
         guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
-        longTitle: "Geschäftsordnung des Deutschen Bundestages"
-        firstParagraph: >
-          Der Beschluss des Bundestags vom 24. November 2015 (BGBl. 2016 I S. 118),
-          zuletzt geändert durch Beschluss des Plenums vom 3. Dezember 2019 (BGBl.
-          2020 I S. 112), wird im Folgenden geändert.
+        longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
+        articles:
+          - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
+            marker: "§ 1"
+            title: "Allgemeiner Anwendungsbereich"
+            paragraphs:
+              - guid: "eb6f27c7-79ef-4b25-8aef-b8726f6ed26f"
+                marker: "(1)"
+                text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
 
 security:
   - BasicAuth: []
