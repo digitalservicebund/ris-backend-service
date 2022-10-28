@@ -12,30 +12,8 @@ pre-commit:
       tags: style frontend
       run: cd web && npm run style:check
     secrets-audit:
-      # NOTE: there's one caveat with this hook! When pushing, it will only correctly scan the range of
-      # outgoing commits when pushing to a matching branch on the remote (e.g. `git push`) - pushing to a
-      # different ref on the remote like `git push origin master:foreign` does not work..
-      #
-      # For this to work the following issue will need to be fixed (in short: Lefthook does not pass on stdin
-      # to the hook script, whereas pre-push is one of the few hooks which retrieves information from there):
-      # https://github.com/evilmartians/lefthook/issues/1471
-      #
-      # The hook configuration would then turn into:
-      #
-      # pre-push:
-      #   scripts:
-      #     secrets-audit:
-      #       runner: sh
-      #
-      # with a file .lefthook/pre-push/secrets-audit looking something like:
-      #
-      # while read -r local_ref local_sha remote_ref remote_sha; do
-      #   echo "$local_ref $local_sha $remote_ref $remote_sha" | talisman --githook pre-push
-      # done
-      #
-      # exit 0
       tags: security audit
-      run: currentbranch=$(git rev-parse --abbrev-ref HEAD); echo "refs/heads/$currentbranch HEAD refs/heads/$currentbranch $(git log -1 origin/$currentbranch --format='%H')" | talisman --githook pre-push
+      run: talisman --githook pre-commit
 pre-push:
   parallel: true
   commands:
