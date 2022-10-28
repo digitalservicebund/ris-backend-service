@@ -75,11 +75,12 @@ dependencies {
   implementation("jakarta.xml.bind:jakarta.xml.bind-api") { version { strictly "3.0.1" } }
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
-  // package served by private repo, requires authentication
+  // package served by private repo, requires authentication:
   implementation "de.bund.digitalservice:neuris-juris-xml-export:0.3.6"
-  // for local development (both):
-  //  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.13.3"
-  //  implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
+  // for local development:
+  // implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
+
+  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.0-rc1"
 
   implementation "io.micrometer:micrometer-registry-prometheus:1.9.3"
   implementation "io.sentry:sentry-spring-boot-starter:6.5.0"

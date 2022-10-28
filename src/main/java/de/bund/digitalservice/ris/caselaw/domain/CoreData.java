@@ -9,7 +9,7 @@ import lombok.Builder;
 public record CoreData(
     String fileNumber,
     String courtType,
-    String category,
+    String category, // DocumentType TODO
     String procedure,
     String ecli,
     String appraisalBody,
