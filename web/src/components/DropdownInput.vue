@@ -124,6 +124,7 @@ onBeforeUnmount(() => {
           @input="onTextChange"
         />
         <button
+          v-if="isCombobox"
           class="input-close-icon"
           tabindex="0"
           @click="clearSelection"
