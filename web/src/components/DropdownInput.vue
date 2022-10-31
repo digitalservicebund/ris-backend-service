@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import type { DropdownItem } from "@/domain/types"
+import lookupTableService from "@/services/lookupTableService"
 
 interface Props {
   id: string
@@ -25,7 +26,8 @@ const emit = defineEmits<Emits>()
 const { inputValue } = useInputModel<string, Props, Emits>(props, emit)
 
 const isShowDropdown = ref(false)
-const items = ref(!!props.dropdownItems ? props.dropdownItems : [])
+const fetchedItems = ref<DropdownItem[]>([])
+const items = ref(!!props.dropdownItems ? props.dropdownItems : fetchedItems)
 const itemRefs = ref([])
 const filter = ref<string>()
 
@@ -95,9 +97,20 @@ const closeDropdown = () => {
   isShowDropdown.value = false
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (props.preselectedValue) inputValue.value = props.preselectedValue
   window.addEventListener("click", closeDropDownWhenClickOutSide)
+  if (props.id === "category") {
+    const documentTypes = await lookupTableService.getAllDocumentTypes()
+    if (documentTypes.data) {
+      fetchedItems.value = documentTypes.data.map((item) => {
+        return {
+          text: item.jurisShortcut + " - " + item.label,
+          value: item.label,
+        }
+      })
+    }
+  }
 })
 onBeforeUnmount(() => {
   window.removeEventListener("click", closeDropDownWhenClickOutSide)

@@ -1,6 +1,5 @@
 import { InputType, ValidationError } from "./types"
 import type { InputField, DropdownItem } from "./types"
-import documentTypes from "@/data/documentType.json"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 
 export function defineTextField(
@@ -83,7 +82,7 @@ export const coreDataFields: InputField[] = [
     true,
     "Bitte auswählen",
     true,
-    documentTypes.items
+    undefined
   ),
   defineTextField("ecli", "ECLI", "ECLI"),
   defineTextField("procedure", "Vorgang", "Vorgang"),
