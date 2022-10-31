@@ -26,6 +26,7 @@ const { inputValue } = useInputModel<string, Props, Emits>(props, emit)
 
 const isShowDropdown = ref(false)
 const items = ref(!!props.dropdownItems ? props.dropdownItems : [])
+const itemRefs = ref([])
 const filter = ref<string>()
 
 const toggleDropdown = () => {
@@ -40,6 +41,16 @@ const updateValue = (value: string) => {
   emit("update:modelValue", value)
   filter.value = ""
   isShowDropdown.value = false
+}
+
+const keyup = (index: number) => {
+  const prev = itemRefs.value[index - 1] as HTMLElement
+  if (prev) prev.focus()
+}
+
+const keydown = (index: number) => {
+  const next = itemRefs.value[index + 1] as HTMLElement
+  if (next) next.focus()
 }
 
 const onTextChange = () => {
@@ -146,10 +157,13 @@ onBeforeUnmount(() => {
       <div
         v-for="(item, index) in isCombobox ? filterItems() : items"
         :key="index"
+        ref="itemRefs"
         class="dropdown-container__dropdown-item"
         tabindex="0"
         @click="updateValue(item.value)"
         @keypress.enter="updateValue(item.value)"
+        @keyup.down="keydown(index)"
+        @keyup.up="keyup(index)"
       >
         <span> {{ item.text }}</span>
       </div>
