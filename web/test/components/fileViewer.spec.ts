@@ -72,16 +72,18 @@ describe("file viewer", async () => {
 
 // @return "19.07.2019"
 function getUploadTimeStampToCheck(): string {
-  const today = new Date()
+  /*const today = new Date()
   return `${("0" + today.getDate()).slice(-2)}.${("0" + today.getMonth()).slice(
     -2
-  )}.${today.getFullYear()}`
+  )}.${today.getFullYear()}`*/
+  return "19.07.2019"
 }
 
 // @return "2019-07-19"
 function getUploadTimeStampToUpload(): string {
-  const today = new Date()
+  /*const today = new Date()
   return `${today.getFullYear()}-${("0" + today.getMonth()).slice(
     -2
-  )}-${today.getDate()}`
+  )}-${today.getDate()}`*/
+  return "2019-07-19"
 }
