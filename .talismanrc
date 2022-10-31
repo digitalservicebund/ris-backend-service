@@ -34,7 +34,7 @@ fileignoreconfig:
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
-    checksum: 9062856601f8b523c335f63788089c1614ace283ee61c8615cf86622220fb059
+    checksum: f6d5eb39ac7a46fefc6ce6fa6439b496dfa6110d739387ba36d3fa66250d793b
   - filename: src/main/resources/data.sql
     checksum: a84facaeaf6f5eaa5fb46a77e8e097fdb50ef193eb56aaed51307cc88350f09f
   - filename: web/src/env.d.ts
