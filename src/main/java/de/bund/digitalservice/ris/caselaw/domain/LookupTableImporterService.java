@@ -32,6 +32,8 @@ public class LookupTableImporterService {
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
     }
 
+    repository.deleteAll().subscribe();
+
     documentTypesXML
         .getList()
         .forEach(
