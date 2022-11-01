@@ -30,7 +30,7 @@ class DocumentUnitDocxControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/documentunitdocx")
+        .uri("/api/v1/caselaw/documentunitdocx")
         .exchange()
         .expectStatus()
         .isOk();
@@ -45,7 +45,7 @@ class DocumentUnitDocxControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/documentunitdocx/123")
+        .uri("/api/v1/caselaw/documentunitdocx/123")
         .exchange()
         .expectStatus()
         .isOk();

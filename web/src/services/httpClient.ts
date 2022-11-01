@@ -43,7 +43,7 @@ async function baseHttp<T>(
   try {
     const response = await axios({
       method: method,
-      url: `${backendHost}/api/v1/${url}`,
+      url: `${backendHost}/api/v1/caselaw/${url}`,
       validateStatus: () => true,
       data,
       ...options,

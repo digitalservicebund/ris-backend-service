@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 @RestController
-@RequestMapping("api/v1/lookuptable")
+@RequestMapping("api/v1/caselaw/lookuptable")
 @Slf4j
 public class LookupTableController {
 

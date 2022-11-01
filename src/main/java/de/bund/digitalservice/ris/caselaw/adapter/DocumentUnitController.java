@@ -28,7 +28,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("api/v1/documentunits")
+@RequestMapping("api/v1/caselaw/documentunits")
 @Slf4j
 public class DocumentUnitController {
   private final DocumentUnitService service;
