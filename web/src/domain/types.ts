@@ -37,6 +37,10 @@ export interface DateInputField extends BaseInputField {
   inputAttributes: BaseInputAttributes
 }
 
+export enum LookupTableEndpoint {
+  documentTypes = "lookuptable/documentTypes",
+}
+
 export type DropdownItem = {
   text: string
   value: string
@@ -44,7 +48,7 @@ export type DropdownItem = {
 export interface DropdownAttributes extends BaseInputAttributes {
   isCombobox?: boolean
   placeholder?: string
-  dropdownItems?: DropdownItem[]
+  dropdownItems?: DropdownItem[] | LookupTableEndpoint
   preselectedValue?: string
 }
 

@@ -2,6 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import type { DropdownItem } from "@/domain/types"
+import { LookupTableEndpoint } from "@/domain/types"
 import lookupTableService from "@/services/lookupTableService"
 
 interface Props {
@@ -10,7 +11,7 @@ interface Props {
   modelValue?: string
   ariaLabel: string
   placeholder?: string
-  dropdownItems: DropdownItem[] | undefined
+  dropdownItems: DropdownItem[] | LookupTableEndpoint
   isCombobox?: boolean
   preselectedValue?: string
 }
@@ -26,26 +27,25 @@ const emit = defineEmits<Emits>()
 const { inputValue } = useInputModel<string, Props, Emits>(props, emit)
 
 const isShowDropdown = ref(false)
-const items = ref(!!props.dropdownItems ? props.dropdownItems : [])
+const items = ref(
+  !!props.dropdownItems && Array.isArray(props.dropdownItems)
+    ? props.dropdownItems
+    : []
+)
 const itemRefs = ref([])
 const filter = ref<string>()
 
 const toggleDropdown = () => {
+  // if it's the first time opening the dropdown and an endpoint is defined
+  // --> fetch items from the backend
   if (
-    props.id === "category" &&
+    !Array.isArray(props.dropdownItems) &&
     !isShowDropdown.value &&
     items.value.length == 0
   ) {
-    lookupTableService.getAllDocumentTypes().then((response) => {
-      if (response.data) {
-        items.value = response.data.map((item) => {
-          return {
-            text: item.jurisShortcut + " - " + item.label,
-            value: item.label,
-          }
-        })
-      }
-    })
+    lookupTableService
+      .getAll(props.dropdownItems)
+      .then((response) => (items.value = response))
   }
   isShowDropdown.value = !isShowDropdown.value
 }

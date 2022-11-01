@@ -1,21 +1,21 @@
-import httpClient, { ServiceResponse } from "./httpClient"
+import httpClient from "./httpClient"
+import { DropdownItem, LookupTableEndpoint } from "@/domain"
 import { DocumentType } from "@/domain/lookupTables"
 
 interface LookupTableService {
-  getAllDocumentTypes(): Promise<ServiceResponse<DocumentType[]>>
+  getAll(endpoint: LookupTableEndpoint): Promise<DropdownItem[]>
 }
 
 const service: LookupTableService = {
-  async getAllDocumentTypes() {
-    const response = await httpClient.get<DocumentType[]>(
-      "lookuptable/documentTypes"
-    )
-    if (response.status >= 300) {
-      response.error = {
-        title: "Dokumenttypen konnten nicht geladen werden.",
-      }
+  async getAll(endpoint: LookupTableEndpoint) {
+    const response = await httpClient.get<DocumentType[]>(endpoint)
+    if (response.status >= 300 || !response.data) {
+      return []
     }
-    return response
+    return response.data.map((item) => ({
+      text: item.jurisShortcut + " - " + item.label,
+      value: item.label,
+    }))
   },
 }
 
