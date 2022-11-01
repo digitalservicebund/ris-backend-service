@@ -12,6 +12,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("lookuptable_documenttype")
 public class DocumentTypeDTO {
+  public static final DocumentTypeDTO EMPTY = new DocumentTypeDTO();
   long id;
   String changeDateMail;
   String changeDateClient;

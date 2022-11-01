@@ -54,6 +54,6 @@ public class LookupTableImporterService {
                             .build())
                     .subscribe());
 
-    return Mono.just("Successfully imported the lookup table");
+    return Mono.just("Successfully imported the document type lookup table");
   }
 }
