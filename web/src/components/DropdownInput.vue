@@ -26,12 +26,27 @@ const emit = defineEmits<Emits>()
 const { inputValue } = useInputModel<string, Props, Emits>(props, emit)
 
 const isShowDropdown = ref(false)
-const fetchedItems = ref<DropdownItem[]>([])
-const items = ref(!!props.dropdownItems ? props.dropdownItems : fetchedItems)
+const items = ref(!!props.dropdownItems ? props.dropdownItems : [])
 const itemRefs = ref([])
 const filter = ref<string>()
 
 const toggleDropdown = () => {
+  if (
+    props.id === "category" &&
+    !isShowDropdown.value &&
+    items.value.length == 0
+  ) {
+    lookupTableService.getAllDocumentTypes().then((response) => {
+      if (response.data) {
+        items.value = response.data.map((item) => {
+          return {
+            text: item.jurisShortcut + " - " + item.label,
+            value: item.label,
+          }
+        })
+      }
+    })
+  }
   isShowDropdown.value = !isShowDropdown.value
 }
 
@@ -97,21 +112,11 @@ const closeDropdown = () => {
   isShowDropdown.value = false
 }
 
-onMounted(async () => {
+onMounted(() => {
   if (props.preselectedValue) inputValue.value = props.preselectedValue
   window.addEventListener("click", closeDropDownWhenClickOutSide)
-  if (props.id === "category") {
-    const documentTypes = await lookupTableService.getAllDocumentTypes()
-    if (documentTypes.data) {
-      fetchedItems.value = documentTypes.data.map((item) => {
-        return {
-          text: item.jurisShortcut + " - " + item.label,
-          value: item.label,
-        }
-      })
-    }
-  }
 })
+
 onBeforeUnmount(() => {
   window.removeEventListener("click", closeDropDownWhenClickOutSide)
 })
