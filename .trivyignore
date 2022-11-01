@@ -1,0 +1,4 @@
+# TODO: Remove from ignore list
+# As our image does not and will never run curl commands, this vulnerability does not affect us and will be ignored. We will be using a distroless base image in the future, to avoid these kinds of vulnerabilites.
+CVE-2022-42915
+CVE-2022-42915
