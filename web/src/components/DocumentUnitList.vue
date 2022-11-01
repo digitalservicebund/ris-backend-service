@@ -76,8 +76,8 @@ const onDelete = () => {
             class="underline"
             :to="{
               name: documentUnit.s3path
-                ? 'jurisdiction-documentUnit-:documentNumber-categories'
-                : 'jurisdiction-documentUnit-:documentNumber-files',
+                ? 'caselaw-documentUnit-:documentNumber-categories'
+                : 'caselaw-documentUnit-:documentNumber-files',
               params: { documentNumber: documentUnit.documentNumber },
             }"
           >

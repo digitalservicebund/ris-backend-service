@@ -8,11 +8,11 @@ test.describe("create a doc unit and delete it again", () => {
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
     await page.waitForSelector("text=Festplatte durchsuchen")
     await expect(page).toHaveURL(
-      /\/jurisdiction\/documentunit\/[A-Z0-9]{13}\/files$/
+      /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/
     )
 
     // Given the earlier expectation we can assume that the regex will match...
-    const documentNumber = (/jurisdiction\/documentunit\/(.*)\/files/g.exec(
+    const documentNumber = (/caselaw\/documentunit\/(.*)\/files/g.exec(
       page.url()
     ) || [])[1]
     const response = await request.get(`${backendHost}/api/v1/documentunits`)
@@ -33,9 +33,7 @@ test.describe("create a doc unit and delete it again", () => {
     const { documentNumber } = await response.json()
     await page.goto("/")
     await expect(
-      page.locator(
-        `a[href*="/jurisdiction/documentunit/${documentNumber}/files"]`
-      )
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
     ).toBeVisible()
     await page
       .locator(".table-row", {
@@ -45,9 +43,7 @@ test.describe("create a doc unit and delete it again", () => {
       .click()
     await page.locator('button:has-text("Löschen")').click()
     await expect(
-      page.locator(
-        `a[href*="/jurisdiction/documentunit/${documentNumber}/files"]`
-      )
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
     ).not.toBeVisible()
   })
 
@@ -56,9 +52,7 @@ test.describe("create a doc unit and delete it again", () => {
     async ({ page, documentNumber }) => {
       await page.goto("/")
       await expect(
-        page.locator(
-          `a[href*="/jurisdiction/documentunit/${documentNumber}/files"]`
-        )
+        page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
       ).toBeVisible()
       await page
         .locator(".table-row", {
@@ -68,9 +62,7 @@ test.describe("create a doc unit and delete it again", () => {
         .click()
       await page.locator('button:has-text("Abbrechen")').click()
       await expect(
-        page.locator(
-          `a[href*="/jurisdiction/documentunit/${documentNumber}/files"]`
-        )
+        page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
       ).toBeVisible()
     }
   )

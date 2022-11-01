@@ -13,7 +13,7 @@ describe("navbar top", () => {
     routes: [
       {
         path: "",
-        name: "jurisdiction",
+        name: "caselaw",
         component: {},
       },
     ],

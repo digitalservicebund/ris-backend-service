@@ -29,7 +29,7 @@ async function handleDelete(documentUnit: DocumentUnit) {
 
       <TextButton
         label="Neue Dokumentationseinheit"
-        @click="router.push({ name: 'jurisdiction-documentUnit-new' })"
+        @click="router.push({ name: 'caselaw-documentUnit-new' })"
       />
     </div>
 

@@ -9,7 +9,7 @@ describe("text editor", async () => {
     routes: [
       {
         path: "",
-        name: "jurisdiction-documentUnit-:documentNumber-categories#coreData",
+        name: "caselaw-documentUnit-:documentNumber-categories#coreData",
         component: {},
       },
     ],

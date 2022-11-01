@@ -10,23 +10,23 @@ describe("navbar side", async () => {
     history: createWebHistory(),
     routes: [
       {
-        path: "/jurisdiction",
-        name: "jurisdiction",
+        path: "/caselaw",
+        name: "caselaw",
         component: {},
       },
       {
-        path: `/jurisdiction/documentunit/${DOCUMENT_NR}/files`,
-        name: "jurisdiction-documentUnit-:documentNumber-files",
+        path: `/caselaw/documentunit/${DOCUMENT_NR}/files`,
+        name: "caselaw-documentUnit-:documentNumber-files",
         component: {},
       },
       {
-        path: `/jurisdiction/documentunit/${DOCUMENT_NR}/categories`,
-        name: "jurisdiction-documentUnit-:documentNumber-categories",
+        path: `/caselaw/documentunit/${DOCUMENT_NR}/categories`,
+        name: "caselaw-documentUnit-:documentNumber-categories",
         component: {},
       },
       {
-        path: `/jurisdiction/documentunit/${DOCUMENT_NR}/publication`,
-        name: "jurisdiction-documentUnit-:documentNumber-publication",
+        path: `/caselaw/documentunit/${DOCUMENT_NR}/publication`,
+        name: "caselaw-documentUnit-:documentNumber-publication",
         component: {},
       },
     ],
@@ -58,18 +58,18 @@ describe("navbar side", async () => {
     getByText("Veröffentlichen", { exact: false })
     expect(
       screen.getByText("Rubriken").closest("a")?.getAttribute("href")
-    ).toEqual(`/jurisdiction/documentunit/${DOCUMENT_NR}/categories`)
+    ).toEqual(`/caselaw/documentunit/${DOCUMENT_NR}/categories`)
     expect(
       screen.getByText("Stammdaten").closest("a")?.getAttribute("href")
-    ).toEqual(`/jurisdiction/documentunit/${DOCUMENT_NR}/categories#coreData`)
+    ).toEqual(`/caselaw/documentunit/${DOCUMENT_NR}/categories#coreData`)
     expect(
       screen.getByText("Kurz- & Langtexte").closest("a")?.getAttribute("href")
-    ).toEqual(`/jurisdiction/documentunit/${DOCUMENT_NR}/categories#texts`)
+    ).toEqual(`/caselaw/documentunit/${DOCUMENT_NR}/categories#texts`)
     expect(
       screen.getByText("Dokumente").closest("a")?.getAttribute("href")
-    ).toEqual(`/jurisdiction/documentunit/${DOCUMENT_NR}/files`)
+    ).toEqual(`/caselaw/documentunit/${DOCUMENT_NR}/files`)
     expect(
       screen.getByText("Veröffentlichen").closest("a")?.getAttribute("href")
-    ).toEqual(`/jurisdiction/documentunit/${DOCUMENT_NR}/publication`)
+    ).toEqual(`/caselaw/documentunit/${DOCUMENT_NR}/publication`)
   })
 })

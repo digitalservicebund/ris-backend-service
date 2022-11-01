@@ -18,7 +18,7 @@ const linkStyling = (componentName: string) => ({
     >
       <router-link
         class="flex gap-12 items-center link-01-bold px-[1.3rem] py-[0.44rem] text-blue-800"
-        :to="{ name: 'jurisdiction' }"
+        :to="{ name: 'caselaw' }"
       >
         <span class="material-icons">arrow_back</span>
         <span>ZURÜCK</span>
@@ -36,11 +36,9 @@ const linkStyling = (componentName: string) => ({
     <div class="flex flex-col">
       <router-link
         class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-        :class="
-          linkStyling('jurisdiction-documentUnit-:documentNumber-categories')
-        "
+        :class="linkStyling('caselaw-documentUnit-:documentNumber-categories')"
         :to="{
-          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          name: 'caselaw-documentUnit-:documentNumber-categories',
           params: { documentNumber: documentNumber },
           query: route.query,
         }"
@@ -51,7 +49,7 @@ const linkStyling = (componentName: string) => ({
       <router-link
         class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
         :to="{
-          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          name: 'caselaw-documentUnit-:documentNumber-categories',
           params: { documentNumber: documentNumber },
           query: route.query,
           hash: '#coreData',
@@ -61,7 +59,7 @@ const linkStyling = (componentName: string) => ({
       <router-link
         class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
         :to="{
-          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          name: 'caselaw-documentUnit-:documentNumber-categories',
           params: { documentNumber: documentNumber },
           query: route.query,
           hash: '#previousDecisions',
@@ -71,7 +69,7 @@ const linkStyling = (componentName: string) => ({
       <router-link
         class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
         :to="{
-          name: 'jurisdiction-documentUnit-:documentNumber-categories',
+          name: 'caselaw-documentUnit-:documentNumber-categories',
           params: { documentNumber: documentNumber },
           query: route.query,
           hash: '#texts',
@@ -80,9 +78,9 @@ const linkStyling = (componentName: string) => ({
       >
       <router-link
         class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-        :class="linkStyling('jurisdiction-documentUnit-:documentNumber-files')"
+        :class="linkStyling('caselaw-documentUnit-:documentNumber-files')"
         :to="{
-          name: 'jurisdiction-documentUnit-:documentNumber-files',
+          name: 'caselaw-documentUnit-:documentNumber-files',
           params: { documentNumber: documentNumber },
           query: route.query,
         }"
@@ -97,7 +95,7 @@ const linkStyling = (componentName: string) => ({
       <router-link
         class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
         :to="{
-          name: 'jurisdiction-documentUnit-:documentNumber-publication',
+          name: 'caselaw-documentUnit-:documentNumber-publication',
           params: { documentNumber: documentNumber },
         }"
         >Veröffentlichen</router-link
