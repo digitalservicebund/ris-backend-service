@@ -16,13 +16,13 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class LookupTableImporterService {
 
-  private final DocumentTypeRepository repository;
+  private final DocumentTypeRepository documentTypeRepository;
 
-  public LookupTableImporterService(DocumentTypeRepository repository) {
-    this.repository = repository;
+  public LookupTableImporterService(DocumentTypeRepository documentTypeRepository) {
+    this.documentTypeRepository = documentTypeRepository;
   }
 
-  public Mono<String> importLookupTable(ByteBuffer byteBuffer) {
+  public Mono<String> importDocumentTypeLookupTable(ByteBuffer byteBuffer) {
     XmlMapper mapper = new XmlMapper();
     DocumentTypesXML documentTypesXML;
     try {
@@ -32,13 +32,13 @@ public class LookupTableImporterService {
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
     }
 
-    repository.deleteAll().subscribe();
+    documentTypeRepository.deleteAll().subscribe();
 
     documentTypesXML
         .getList()
         .forEach(
             documentTypeXML ->
-                repository
+                documentTypeRepository
                     .save(
                         DocumentTypeDTO.builder()
                             .id(documentTypeXML.getId())

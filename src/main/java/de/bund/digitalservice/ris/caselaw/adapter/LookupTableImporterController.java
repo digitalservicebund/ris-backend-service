@@ -24,11 +24,13 @@ public class LookupTableImporterController {
 
   // in Postman go to "Body", select "raw" and "XML" and paste the XML-contents
   @PutMapping(value = "doktyp")
-  public Mono<ResponseEntity<String>> importLookupTable(@RequestBody ByteBuffer byteBuffer) {
+  public Mono<ResponseEntity<String>> importDocumentTypeLookupTable(
+      @RequestBody ByteBuffer byteBuffer) {
     return service
-        .importLookupTable(byteBuffer)
+        .importDocumentTypeLookupTable(byteBuffer)
         .map(resultString -> ResponseEntity.status(HttpStatus.OK).body(resultString))
         .onErrorReturn(
-            ResponseEntity.internalServerError().body("Could not import the lookup table"));
+            ResponseEntity.internalServerError()
+                .body("Could not import the document type lookup table"));
   }
 }
