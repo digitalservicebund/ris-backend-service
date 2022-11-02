@@ -33,4 +33,13 @@ public class LookupTableImporterController {
             ResponseEntity.internalServerError()
                 .body("Could not import the document type lookup table"));
   }
+
+  @PutMapping(value = "gerichtdata")
+  public Mono<ResponseEntity<String>> importCourtLookupTable(@RequestBody ByteBuffer byteBuffer) {
+    return service
+        .importCourtLookupTable(byteBuffer)
+        .map(resultString -> ResponseEntity.status(HttpStatus.OK).body(resultString))
+        .onErrorReturn(
+            ResponseEntity.internalServerError().body("Could not import the court lookup table"));
+  }
 }

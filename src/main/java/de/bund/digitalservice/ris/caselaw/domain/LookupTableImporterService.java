@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypesXML;
@@ -53,6 +54,23 @@ public class LookupTableImporterService {
                             .superlabel2(documentTypeXML.getSuperlabel2())
                             .build())
                     .subscribe());
+
+    return Mono.just("Successfully imported the document type lookup table");
+  }
+
+  public Mono<String> importCourtLookupTable(ByteBuffer byteBuffer) {
+    XmlMapper mapper = new XmlMapper();
+    CourtsXML courtsXML;
+    try {
+      courtsXML = mapper.readValue(byteBuffer.array(), CourtsXML.class);
+    } catch (IOException e) {
+      throw new ResponseStatusException(
+          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
+    }
+
+    System.out.println(courtsXML);
+
+    // TODO
 
     return Mono.just("Successfully imported the document type lookup table");
   }
