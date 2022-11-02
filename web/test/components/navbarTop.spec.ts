@@ -16,6 +16,11 @@ describe("navbar top", () => {
         name: "jurisdiction",
         component: {},
       },
+      {
+        path: "",
+        name: "norms",
+        component: {},
+      },
     ],
   })
 
