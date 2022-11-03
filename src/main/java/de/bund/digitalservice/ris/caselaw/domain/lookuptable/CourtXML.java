@@ -77,43 +77,43 @@ public class CourtXML {
   @JsonProperty(value = "internet")
   String internet;
 
-  @JsonProperty(value = "istzweigstellezu")
+  @JsonProperty(value = "istzweigstellezu") // Zweigstelle des Gerichts
   String isbranchofficeto;
 
-  @JsonProperty(value = "fruehname")
-  String fruehname; // TODO
+  @JsonProperty(value = "fruehname") // frühe Bezeichnung des Gerichts
+  String earlycourtname;
 
-  @JsonProperty(value = "spaetname")
-  String spaetname; // TODO
+  @JsonProperty(value = "spaetname") // späte Bezeichnung des Gerichts
+  String latecourtname;
 
-  @JsonProperty(value = "offizname")
-  String offizname; // TODO
+  @JsonProperty(value = "offizname") // aktuelle offizielle Bezeichnung des Gerichts
+  String currentofficialcourtname;
 
-  @JsonProperty(value = "tradname")
-  String tradname; // TODO
+  @JsonProperty(value = "tradname") // traditionelle Bezeichnung des Gerichts
+  String traditionalcourtname;
 
-  @JsonProperty(value = "bestzweigstelle")
-  String bestzweigstelle; // TODO
+  @JsonProperty(value = "bestzweigstelle") // bestehende Zweigstelle?
+  String existingbranchoffice;
 
-  @JsonProperty(value = "aufgehzweigstelle")
-  String aufgehzweigstelle; // TODO
+  @JsonProperty(value = "aufgehzweigstelle") // aufgegebene Zweigstelle?
+  String abandonedbranchoffice;
 
   @JsonProperty(value = "ansprechpartner")
   String contactperson;
 
   @JsonProperty(value = "liefertlrs")
-  String deliverslrs;
+  String deliverslrs; // TODO
 
   @JsonProperty(value = "bemerkung")
   String remark;
 
-  @JsonProperty(value = "zusatz")
+  @JsonProperty(value = "zusatz") // allgemeine Zusatzangaben
   String additional;
 
-  @JsonProperty(value = "bestehdatum")
+  @JsonProperty(value = "bestehdatum") // seit wann das Gericht besteht
   String existencedate;
 
-  @JsonProperty(value = "aufhebdatum")
+  @JsonProperty(value = "aufhebdatum") // Aufhebedatum
   String cancellationdate;
 
   @JacksonXmlElementWrapper(useWrapping = false)
