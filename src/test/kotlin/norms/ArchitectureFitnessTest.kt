@@ -57,6 +57,7 @@ class ArchitectureFitnessTest {
                 DOMAIN_PACKAGE,
                 APPLICATION_PACKAGE,
                 "reactor.core..",
+                "org.springframework.stereotype..",
                 "kotlin..",
                 "java..",
                 "org.jetbrains.annotations.."
