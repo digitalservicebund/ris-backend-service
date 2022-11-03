@@ -1,5 +1,6 @@
 import { InputType, LookupTableEndpoint, ValidationError } from "./types"
 import type { InputField, DropdownItem } from "./types"
+import courts from "@/data/courts.json"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 
 export function defineTextField(
@@ -64,8 +65,15 @@ export function defineDropdownField(
 }
 
 export const coreDataFields: InputField[] = [
-  defineTextField("courtType", "Gerichtstyp", "Gerichtstyp", true),
-  defineTextField("courtLocation", "Gerichtssitz", "Gerichtssitz"),
+  defineDropdownField(
+    "courts",
+    "Gericht",
+    "Gericht",
+    true,
+    "Gerichtstyp Gerichtsort",
+    true,
+    courts.items
+  ),
   defineTextField("fileNumber", "Aktenzeichen", "Aktenzeichen", true),
   defineDateField(
     "decisionDate",
