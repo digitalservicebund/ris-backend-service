@@ -4,6 +4,6 @@ COPY . .
 RUN npm install && npx vite build
 
 FROM cgr.dev/chainguard/nginx:1.22.1
-EXPOSE 80
+EXPOSE 8081
 COPY --from=builder /usr/src/app/dist /var/lib/nginx/html
 COPY nginx.conf /etc/nginx/
