@@ -108,7 +108,7 @@ _clean_staging() {
   [ -z ${STAGING_USER+x} ] && _user "Staging user? " && read -r STAGING_USER
   [ -z ${STAGING_PASSWORD+x} ] && _user "Staging password? " && read -r STAGING_PASSWORD
 
-  endpoint="https://${STAGING_URL#"https://"}/api/v1/documentunits/"
+  endpoint="https://${STAGING_URL#"https://"}/api/v1/caselaw/documentunits/"
   regex="\"uuid\":\"[a-z0-9-]\{36\}\""
 
   documentunits=$(curl -s "$endpoint" -u "$STAGING_USER":"$STAGING_PASSWORD" \

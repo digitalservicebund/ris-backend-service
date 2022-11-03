@@ -9,7 +9,7 @@ describe("originalFile SidePanel", () => {
     routes: [
       {
         path: "",
-        name: "jurisdiction-documentUnit-:documentNumber-files",
+        name: "caselaw-documentUnit-:documentNumber-files",
         component: {},
       },
     ],

@@ -2,11 +2,11 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 3e348319815137cce32a2fc7ee18529dd942ffa603b1b90120ab09ef91387e19
+    checksum: 8d4b7a970aa5197b89a2be76c2da07dccc183933270ca11bbbd2597e05de17db
   - filename: run.sh
-    checksum: 9bdbe5db9639a5d8d7f5f4bde81c2c5acb6af0ccd619e55a59c32dcb08d1a4de
+    checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
-    checksum: 2f87b78065cd672918ad7d20dd2bc0578709a805e97b868e6eeab0a02ef60a64
+    checksum: 7330d8b0b61fe34d64b03297d96dfcdcd02a006419e8866a0dbc251a9e221069
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
@@ -34,7 +34,7 @@ fileignoreconfig:
   - filename: src/main/resources/bootstrap.properties
     checksum: a9234b883d57c5c99abb02a061f973f1323cb132ab2601dca58b6df1fdf43cbc
   - filename: src/main/resources/schema.sql
-    checksum: 9062856601f8b523c335f63788089c1614ace283ee61c8615cf86622220fb059
+    checksum: 2b0590d7a385b10736b61d2e85b1ffd702fb459492b870766d6722c2a4f66285
   - filename: src/main/resources/data.sql
     checksum: a84facaeaf6f5eaa5fb46a77e8e097fdb50ef193eb56aaed51307cc88350f09f
   - filename: web/src/env.d.ts

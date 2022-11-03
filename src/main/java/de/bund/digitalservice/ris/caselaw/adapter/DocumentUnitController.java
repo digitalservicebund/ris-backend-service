@@ -28,7 +28,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("api/v1/documentunits")
+@RequestMapping("api/v1/caselaw/documentunits")
 @Slf4j
 public class DocumentUnitController {
   private final DocumentUnitService service;
@@ -50,11 +50,11 @@ public class DocumentUnitController {
   @PutMapping(value = "/{uuid}/file")
   public Mono<ResponseEntity<DocumentUnit>> attachFileToDocumentUnit(
       @PathVariable UUID uuid,
-      @RequestBody ByteBuffer byteBufferFlux,
+      @RequestBody ByteBuffer byteBuffer,
       @RequestHeader HttpHeaders httpHeaders) {
 
     return service
-        .attachFileToDocumentUnit(uuid, byteBufferFlux, httpHeaders)
+        .attachFileToDocumentUnit(uuid, byteBuffer, httpHeaders)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(
             ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
@@ -80,10 +80,10 @@ public class DocumentUnitController {
   @GetMapping(value = "/{documentnumber}")
   public Mono<ResponseEntity<DocumentUnit>> getByDocumentnumber(
       @NonNull @PathVariable String documentnumber) {
-    if (documentnumber.length() == 13 || documentnumber.length() == 14) {
-      return service.getByDocumentnumber(documentnumber).map(ResponseEntity::ok);
+    if (documentnumber.length() != 13 && documentnumber.length() != 14) {
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.EMPTY));
     }
-    return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.EMPTY));
+    return service.getByDocumentnumber(documentnumber).map(ResponseEntity::ok);
   }
 
   @DeleteMapping(value = "/{uuid}")

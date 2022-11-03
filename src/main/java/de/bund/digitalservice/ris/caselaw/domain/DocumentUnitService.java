@@ -89,10 +89,10 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> attachFileToDocumentUnit(
-      UUID documentUnitId, ByteBuffer byteBufferFlux, HttpHeaders httpHeaders) {
+      UUID documentUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
-    checkDocx(byteBufferFlux);
-    return putObjectIntoBucket(fileUuid, byteBufferFlux, httpHeaders)
+    checkDocx(byteBuffer);
+    return putObjectIntoBucket(fileUuid, byteBuffer, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
         .flatMap(
             putObjectResponse ->
@@ -143,8 +143,8 @@ public class DocumentUnitService {
         .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex));
   }
 
-  void checkDocx(ByteBuffer byteBufferFlux) {
-    var zip = new ZipInputStream(new ByteArrayInputStream(byteBufferFlux.array()));
+  void checkDocx(ByteBuffer byteBuffer) {
+    var zip = new ZipInputStream(new ByteArrayInputStream(byteBuffer.array()));
     ZipEntry entry;
     try {
       while ((entry = zip.getNextEntry()) != null) {

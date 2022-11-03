@@ -91,7 +91,7 @@ public class DocumentUnitDTO {
   String courtType;
 
   @Column("dokumenttyp")
-  String category;
+  String category; // <-- long id of entry in DocumentType table TODO
 
   @Column("vorgang")
   String procedure;

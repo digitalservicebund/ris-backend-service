@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("api/v1/documentunitdocx")
+@RequestMapping("api/v1/caselaw/documentunitdocx")
 public class DocumentUnitDocxController {
 
   private final DocxConverterService service;

@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,43 +14,28 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 
 @ExtendWith(SpringExtension.class)
-@WebFluxTest(controllers = DocumentUnitDocxController.class)
+@WebFluxTest(controllers = LookupTableController.class)
 @WithMockUser
-class DocumentUnitDocxControllerTest {
+class LookupTableControllerTest {
   @Autowired private WebTestClient webClient;
 
-  @MockBean private DocxConverterService service;
+  @MockBean private LookupTableService service;
 
   @Test
-  void testGet() {
-    when(service.getDocxFiles()).thenReturn(Mono.empty());
+  void testGetDocumentTypes() {
+    when(service.getDocumentTypes()).thenReturn(Flux.empty());
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunitdocx")
+        .uri("/api/v1/caselaw/lookuptable/documentTypes")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).getDocxFiles();
-  }
-
-  @Test
-  void testHtml() {
-    when(service.getHtml("123")).thenReturn(Mono.empty());
-
-    webClient
-        .mutateWith(csrf())
-        .get()
-        .uri("/api/v1/caselaw/documentunitdocx/123")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service).getHtml("123");
+    verify(service, times(1)).getDocumentTypes();
   }
 }

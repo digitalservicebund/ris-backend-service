@@ -92,7 +92,7 @@ class DocumentUnitServiceTest {
   @Test
   void testAttachFileToDocumentUnit() {
     // given
-    var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
+    var byteBuffer = ByteBuffer.wrap(new byte[] {});
     var headerMap = new LinkedMultiValueMap<String, String>();
     headerMap.put("Content-Type", List.of("content/type"));
     headerMap.put("X-Filename", List.of("testfile.docx"));
@@ -122,7 +122,7 @@ class DocumentUnitServiceTest {
       mockedUUIDStatic.when(UUID::randomUUID).thenReturn(TEST_UUID);
 
       // when and then
-      StepVerifier.create(service.attachFileToDocumentUnit(TEST_UUID, byteBufferFlux, httpHeaders))
+      StepVerifier.create(service.attachFileToDocumentUnit(TEST_UUID, byteBuffer, httpHeaders))
           .consumeNextWith(
               documentUnit -> {
                 assertNotNull(documentUnit);
@@ -184,15 +184,14 @@ class DocumentUnitServiceTest {
   @Test
   void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromBucket() throws S3Exception {
     // given
-    var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
+    var byteBuffer = ByteBuffer.wrap(new byte[] {});
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
         .thenThrow(SdkException.create("exception", null));
 
     // when and then
-    StepVerifier.create(
-            service.attachFileToDocumentUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocumentUnit(TEST_UUID, byteBuffer, HttpHeaders.EMPTY))
         .expectErrorMatches(ex -> ex instanceof SdkException)
         .verify();
 
@@ -203,7 +202,7 @@ class DocumentUnitServiceTest {
   @Test
   void testGenerateNewDocumentUnitAndAttachFile_withExceptionFromRepository() {
     // given
-    var byteBufferFlux = ByteBuffer.wrap(new byte[] {});
+    var byteBuffer = ByteBuffer.wrap(new byte[] {});
 
     doNothing().when(service).checkDocx(any(ByteBuffer.class));
     when(s3AsyncClient.putObject(any(PutObjectRequest.class), any(AsyncRequestBody.class)))
@@ -212,8 +211,7 @@ class DocumentUnitServiceTest {
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnitDTO.EMPTY));
 
     // when and then
-    StepVerifier.create(
-            service.attachFileToDocumentUnit(TEST_UUID, byteBufferFlux, HttpHeaders.EMPTY))
+    StepVerifier.create(service.attachFileToDocumentUnit(TEST_UUID, byteBuffer, HttpHeaders.EMPTY))
         .expectErrorMatches(ex -> ex instanceof IllegalArgumentException)
         .verify();
 

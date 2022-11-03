@@ -25,13 +25,16 @@ test.describe("autosave on documentation units", () => {
     page,
     documentNumber,
   }) => {
-    await page.route("**/api/v1/documentunits/*/docx", async (route) => {
-      route.fulfill({
-        status: 400,
-        contentType: "text/plain",
-        body: "Not Found!",
-      })
-    })
+    await page.route(
+      "**/api/v1/caselaw/documentunits/*/docx",
+      async (route) => {
+        route.fulfill({
+          status: 400,
+          contentType: "text/plain",
+          body: "Not Found!",
+        })
+      }
+    )
     navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()

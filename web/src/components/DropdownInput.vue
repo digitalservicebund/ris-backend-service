@@ -2,6 +2,8 @@
 import { onBeforeUnmount, onMounted, ref } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import type { DropdownItem } from "@/domain/types"
+import { LookupTableEndpoint } from "@/domain/types"
+import lookupTableService from "@/services/lookupTableService"
 
 interface Props {
   id: string
@@ -9,7 +11,7 @@ interface Props {
   modelValue?: string
   ariaLabel: string
   placeholder?: string
-  dropdownItems: DropdownItem[] | undefined
+  dropdownItems: DropdownItem[] | LookupTableEndpoint
   isCombobox?: boolean
   preselectedValue?: string
 }
@@ -25,10 +27,26 @@ const emit = defineEmits<Emits>()
 const { inputValue } = useInputModel<string, Props, Emits>(props, emit)
 
 const isShowDropdown = ref(false)
-const items = ref(!!props.dropdownItems ? props.dropdownItems : [])
+const items = ref(
+  !!props.dropdownItems && Array.isArray(props.dropdownItems)
+    ? props.dropdownItems
+    : []
+)
+const itemRefs = ref([])
 const filter = ref<string>()
 
 const toggleDropdown = () => {
+  // if it's the first time opening the dropdown and an endpoint is defined
+  // --> fetch items from the backend
+  if (
+    !Array.isArray(props.dropdownItems) &&
+    !isShowDropdown.value &&
+    items.value.length == 0
+  ) {
+    lookupTableService
+      .getAll(props.dropdownItems)
+      .then((response) => (items.value = response))
+  }
   isShowDropdown.value = !isShowDropdown.value
 }
 
@@ -40,6 +58,16 @@ const updateValue = (value: string) => {
   emit("update:modelValue", value)
   filter.value = ""
   isShowDropdown.value = false
+}
+
+const keyup = (index: number) => {
+  const prev = itemRefs.value[index - 1] as HTMLElement
+  if (prev) prev.focus()
+}
+
+const keydown = (index: number) => {
+  const next = itemRefs.value[index + 1] as HTMLElement
+  if (next) next.focus()
 }
 
 const onTextChange = () => {
@@ -88,6 +116,7 @@ onMounted(() => {
   if (props.preselectedValue) inputValue.value = props.preselectedValue
   window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
+
 onBeforeUnmount(() => {
   window.removeEventListener("click", closeDropDownWhenClickOutSide)
 })
@@ -113,6 +142,7 @@ onBeforeUnmount(() => {
           @input="onTextChange"
         />
         <button
+          v-if="isCombobox"
           class="input-close-icon"
           tabindex="0"
           @click="clearSelection"
@@ -146,10 +176,13 @@ onBeforeUnmount(() => {
       <div
         v-for="(item, index) in isCombobox ? filterItems() : items"
         :key="index"
+        ref="itemRefs"
         class="dropdown-container__dropdown-item"
         tabindex="0"
         @click="updateValue(item.value)"
         @keypress.enter="updateValue(item.value)"
+        @keyup.down="keydown(index)"
+        @keyup.up="keyup(index)"
       >
         <span> {{ item.text }}</span>
       </div>

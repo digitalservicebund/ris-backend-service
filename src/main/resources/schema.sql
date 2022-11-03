@@ -68,3 +68,18 @@ CREATE TABLE
     documentnumber VARCHAR(14),
     CONSTRAINT fk_legal_procession_documentnumber FOREIGN KEY (documentnumber) REFERENCES doc_unit (documentnumber) ON DELETE CASCADE
   );
+
+CREATE TABLE
+  IF NOT EXISTS lookuptable_documenttype (
+    id BIGSERIAL NOT NULL PRIMARY KEY,
+    change_date_mail VARCHAR(255),
+    change_date_client VARCHAR(255),
+    change_indicator CHAR(1),
+    version VARCHAR(255),
+    juris_shortcut VARCHAR(255),
+    document_type CHAR(1),
+    multiple VARCHAR(255),
+    label VARCHAR(255),
+    superlabel1 VARCHAR(255),
+    superlabel2 VARCHAR(255)
+  );

@@ -13,7 +13,7 @@ defineEmits<{ (e: "togglePanel"): void }>()
 const route = useRoute()
 
 const uploadFileRoute = {
-  name: "jurisdiction-documentUnit-:documentNumber-files",
+  name: "caselaw-documentUnit-:documentNumber-files",
   params: { documentNumber: route.params.documentNumber },
   query: route.query,
 }

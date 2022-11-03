@@ -1,6 +1,5 @@
-import { InputType, ValidationError } from "./types"
+import { InputType, LookupTableEndpoint, ValidationError } from "./types"
 import type { InputField, DropdownItem } from "./types"
-import documentTypes from "@/data/documentType.json"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 
 export function defineTextField(
@@ -44,7 +43,7 @@ export function defineDropdownField(
   required?: boolean,
   placeholder?: string,
   isCombobox?: boolean,
-  dropdownItems?: DropdownItem[],
+  dropdownItems?: DropdownItem[] | LookupTableEndpoint,
   preselectedValue?: string,
   validationError?: ValidationError
 ): InputField {
@@ -83,7 +82,7 @@ export const coreDataFields: InputField[] = [
     true,
     "Bitte auswählen",
     true,
-    documentTypes.items
+    LookupTableEndpoint.documentTypes
   ),
   defineTextField("ecli", "ECLI", "ECLI"),
   defineTextField("procedure", "Vorgang", "Vorgang"),

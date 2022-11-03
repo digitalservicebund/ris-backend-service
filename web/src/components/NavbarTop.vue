@@ -21,8 +21,8 @@ const route = useRoute()
 
       <router-link
         class="hover:bg-yellow-500 hover:underline p-8"
-        :class="{ underline: route.path.includes('jurisdiction') }"
-        :to="{ name: 'jurisdiction' }"
+        :class="{ underline: route.path.includes('caselaw') }"
+        :to="{ name: 'caselaw' }"
         >Rechtsprechung</router-link
       >
       <router-link

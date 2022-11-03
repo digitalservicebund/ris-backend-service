@@ -75,6 +75,75 @@ describe("Dropdown Element", () => {
     expect(dropdownItems[0]).toHaveTextContent("testItem2")
   })
 
+  it("Dropdown items should not be filtered after selection", async () => {
+    const user = userEvent.setup()
+    const { container, getByLabelText } = render(DropdownInput, {
+      props: {
+        id: "dropdown-test",
+        modelValue: "",
+        ariaLabel: "test label",
+        dropdownItems: DROPDOWN_ITEMS,
+        isCombobox: true,
+      },
+    })
+
+    const input = getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "testItem2")
+
+    const dropdownItems = container.querySelectorAll(
+      ".dropdown-container__dropdown-item"
+    )
+
+    expect(dropdownItems).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("testItem2")
+
+    await user.click(dropdownItems[0])
+
+    const openDropdownContainer = container.querySelector(
+      ".input-expand-icon"
+    ) as HTMLElement
+
+    await user.click(openDropdownContainer)
+
+    expect(
+      container.querySelectorAll(".dropdown-container__dropdown-item")
+    ).toHaveLength(3)
+  })
+
+  it("Dropdown items should stay filtered after typing without selection", async () => {
+    const user = userEvent.setup()
+    const { container, getByLabelText } = render(DropdownInput, {
+      props: {
+        id: "dropdown-test",
+        modelValue: "",
+        ariaLabel: "test label",
+        dropdownItems: DROPDOWN_ITEMS,
+        isCombobox: true,
+      },
+    })
+
+    const input = getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "testItem2")
+
+    const dropdownItems = container.querySelectorAll(
+      ".dropdown-container__dropdown-item"
+    )
+
+    expect(dropdownItems).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("testItem2")
+
+    const openDropdownContainer = container.querySelector(
+      ".input-expand-icon"
+    ) as HTMLElement
+
+    await user.click(openDropdownContainer)
+    await user.click(openDropdownContainer)
+
+    expect(
+      container.querySelectorAll(".dropdown-container__dropdown-item")
+    ).toHaveLength(1)
+  })
+
   it("Dropdown items shouldn't be filtered if no combobox", async () => {
     const { container } = render(DropdownInput, {
       props: {
