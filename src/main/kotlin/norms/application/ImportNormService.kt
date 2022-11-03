@@ -6,10 +6,10 @@ import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.Guid
-import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 
-@Component
+// TODO: Enable once all adapters are available
+// @Component
 class ImportNormService(private val saveNormPort: SaveNormOutputPort) : ImportNormUseCase {
     override fun importNorm(command: ImportNormUseCase.Command): Mono<Guid> {
         val guid = Guid.generateNew()
