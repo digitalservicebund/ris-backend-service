@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeRepository;
 import java.nio.ByteBuffer;
@@ -24,6 +25,8 @@ class LookupTableImporterServiceTest {
   @SpyBean private LookupTableImporterService service;
 
   @MockBean private DocumentTypeRepository documentTypeRepository;
+
+  @MockBean private CourtRepository courtRepository;
 
   @Test
   void testImportDocumentTypeLookupTable() {

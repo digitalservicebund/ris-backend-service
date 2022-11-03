@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeRepository;
@@ -18,9 +20,12 @@ import reactor.core.publisher.Mono;
 public class LookupTableImporterService {
 
   private final DocumentTypeRepository documentTypeRepository;
+  private final CourtRepository courtRepository;
 
-  public LookupTableImporterService(DocumentTypeRepository documentTypeRepository) {
+  public LookupTableImporterService(
+      DocumentTypeRepository documentTypeRepository, CourtRepository courtRepository) {
     this.documentTypeRepository = documentTypeRepository;
+    this.courtRepository = courtRepository;
   }
 
   public Mono<String> importDocumentTypeLookupTable(ByteBuffer byteBuffer) {
@@ -68,9 +73,51 @@ public class LookupTableImporterService {
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
     }
 
-    System.out.println(courtsXML);
-
-    // TODO
+    courtsXML
+        .getList()
+        .forEach(
+            courtXML ->
+                courtRepository
+                    .save(
+                        CourtDTO.builder()
+                            .id(courtXML.getId())
+                            .changeDateMail(courtXML.getChangeDateMail())
+                            .changeDateClient(courtXML.getChangeDateClient())
+                            .changeIndicator(courtXML.getChangeIndicator())
+                            .version(courtXML.getVersion())
+                            .courtType(courtXML.getCourtType())
+                            .courtLocation(courtXML.getCourtLocation())
+                            .field(courtXML.getField())
+                            .superiorcourt(courtXML.getSuperiorcourt())
+                            .foreignCountry(courtXML.getForeignCountry())
+                            .region(courtXML.getRegion())
+                            .federalState(courtXML.getFederalState())
+                            .belongsto(courtXML.getBelongsto())
+                            .street(courtXML.getStreet())
+                            .zipcode(courtXML.getZipcode())
+                            .maillocation(courtXML.getMaillocation())
+                            .phone(courtXML.getPhone())
+                            .fax(courtXML.getFax())
+                            .postofficebox(courtXML.getPostofficebox())
+                            .postofficeboxzipcode(courtXML.getPostofficeboxzipcode())
+                            .postofficeboxlocation(courtXML.getPostofficeboxlocation())
+                            .email(courtXML.getEmail())
+                            .internet(courtXML.getInternet())
+                            .isbranchofficeto(courtXML.getIsbranchofficeto())
+                            .earlycourtname(courtXML.getEarlycourtname())
+                            .latecourtname(courtXML.getLatecourtname())
+                            .currentofficialcourtname(courtXML.getCurrentofficialcourtname())
+                            .traditionalcourtname(courtXML.getTraditionalcourtname())
+                            .existingbranchoffice(courtXML.getExistingbranchoffice())
+                            .abandonedbranchoffice(courtXML.getAbandonedbranchoffice())
+                            .contactperson(courtXML.getContactperson())
+                            .deliverslrs(courtXML.getDeliverslrs())
+                            .remark(courtXML.getRemark())
+                            .additional(courtXML.getAdditional())
+                            .existencedate(courtXML.getExistencedate())
+                            .cancellationdate(courtXML.getCancellationdate())
+                            .build())
+                    .subscribe());
 
     return Mono.just("Successfully imported the document type lookup table");
   }
