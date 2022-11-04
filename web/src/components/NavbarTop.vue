@@ -25,6 +25,12 @@ const route = useRoute()
         :to="{ name: 'caselaw' }"
         >Rechtsprechung</router-link
       >
+      <router-link
+        class="hover:bg-yellow-500 hover:underline p-8"
+        :class="{ underline: route.path.includes('norms') }"
+        :to="{ name: 'norms' }"
+        >Normen</router-link
+      >
     </div>
 
     <div class="flex font-bold gap-8 items-center">
