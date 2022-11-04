@@ -203,7 +203,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Build frontend image
         run: docker build --file web/Dockerfile.prod --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./web
-      - name: Run Trivy vulnerability scanner
+      - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
@@ -213,7 +213,24 @@ jobs:
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH"
           exit-code: "1" # Fail the build!
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: Upload Trivy image scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
+        with:
+          sarif_file: "trivy-results.sarif"
+      - name: Run Trivy vulnerability file scanner
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
+        with:
+          scan-type: "fs"
+          scan-ref: "./web"
+          skip-dirs: "node_modules" # See https://github.com/aquasecurity/trivy/issues/1283
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
+      - name: Upload Trivy file scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
