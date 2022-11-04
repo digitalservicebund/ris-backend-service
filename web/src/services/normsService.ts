@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import Norm from "@/domain/Norm"
+import { Norm } from "@/domain/Norm"
 
 export async function getAllNorms(): Promise<ServiceResponse<Norm[]>> {
   const { data, status, error } = await httpClient.get<{ data: Norm[] }>(

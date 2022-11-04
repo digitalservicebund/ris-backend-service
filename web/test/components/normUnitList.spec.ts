@@ -1,18 +1,8 @@
 import { render, screen } from "@testing-library/vue"
 import NormsList from "@/components/NormsList.vue"
-import Norm from "@/domain/Norm"
+import { Norm } from "@/domain/Norm"
 
 describe("norms list", () => {
-  test("renders fallback text if no norms are found", async () => {
-    render(NormsList, {
-      props: {
-        norms: [],
-      },
-    })
-
-    await screen.findByText("Keine Dokumentationseinheiten gefunden")
-  })
-
   test("renders list of norms", async () => {
     const longTitle = "test"
     const guid = "123"

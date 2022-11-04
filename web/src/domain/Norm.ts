@@ -11,7 +11,7 @@ export type Paragraph = {
   text: string
 }
 
-export default class Norm {
+export class Norm {
   readonly longTitle: string
   readonly guid: string
   readonly articles: Article[]

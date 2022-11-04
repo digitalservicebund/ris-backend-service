@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import Norms from "../domain/Norm"
+import { Norm } from "../domain/Norm"
 
-defineProps<{ norms: Norms[] }>()
+defineProps<{ norms: Norm[] }>()
 </script>
 <template>
   <div v-if="norms.length" class="p-40 w-[50rem]">
@@ -19,5 +19,4 @@ defineProps<{ norms: Norms[] }>()
       </div>
     </div>
   </div>
-  <span v-else>Keine Dokumentationseinheiten gefunden</span>
 </template>

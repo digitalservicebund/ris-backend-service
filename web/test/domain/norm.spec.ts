@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import Norm, { Article, Paragraph } from "../../src/domain/Norm"
+import { Norm, Article, Paragraph } from "../../src/domain/Norm"
 
 describe("Norm", () => {
   it("instantiates with a guid and longTitle", () => {
