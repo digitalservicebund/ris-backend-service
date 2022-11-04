@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.lookuptable;
+package de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -8,8 +8,8 @@ import lombok.Data;
 
 @Data
 @JacksonXmlRootElement(localName = "juris-table")
-public class CourtsXML {
+public class DocumentTypesXML {
   @JacksonXmlElementWrapper(useWrapping = false)
-  @JsonProperty(value = "juris-gericht")
-  List<CourtXML> list;
+  @JsonProperty(value = "juris-doktyp")
+  List<DocumentTypeXML> list;
 }

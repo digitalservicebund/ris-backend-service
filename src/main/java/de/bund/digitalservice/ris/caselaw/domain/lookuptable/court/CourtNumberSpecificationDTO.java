@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.lookuptable;
+package de.bund.digitalservice.ris.caselaw.domain.lookuptable.court;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

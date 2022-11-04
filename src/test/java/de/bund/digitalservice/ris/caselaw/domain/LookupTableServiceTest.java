@@ -4,9 +4,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;

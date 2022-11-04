@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.CourtsXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypesXML;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;

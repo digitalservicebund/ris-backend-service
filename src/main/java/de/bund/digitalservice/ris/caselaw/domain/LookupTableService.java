@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
