@@ -19,7 +19,8 @@ type ModalAttribute = {
   textColorClass: string
   icon: string
 }
-const staticContainerClass = "border-l-8 flex gap-8 px-4 py-4 w-full"
+const staticContainerClass =
+  "border-l-[0.125rem] flex gap-[0.625rem] px-[1.25rem] py-[1.125rem] w-full"
 const staticIconClass = "material-icons pt-1"
 const modalAttribute = computed((): ModalAttribute => {
   switch (props.status) {
@@ -54,8 +55,8 @@ const modalAttribute = computed((): ModalAttribute => {
     }}</span>
 
     <div class="flex flex-col">
-      <span class="font-bold">{{ title }}</span>
-      {{ description }}
+      <span class="label-02-bold">{{ title }}</span>
+      <span class="body-01-reg">{{ description }}</span>
     </div>
   </div>
 </template>
