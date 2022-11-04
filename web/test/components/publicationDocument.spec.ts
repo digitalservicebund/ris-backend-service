@@ -91,7 +91,7 @@ describe("PublicationDocument:", () => {
       },
     })
     expect(renderResult.container).toHaveTextContent(
-      `VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt error message 1error message 2Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenerrorerror message title error message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`
+      `VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt error message 1error message 2Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenerrorerror message titleerror message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`
     )
   })
 
