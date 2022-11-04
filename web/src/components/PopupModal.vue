@@ -48,18 +48,20 @@ onMounted(() => {
 
 <template>
   <div
-    class="popup-modal-wrapper"
+    class="bg-background fixed flex h-full items-center justify-center left-0 popup-modal-wrapper top-0 w-screen z-999"
     role="dialog"
     tabindex="0"
     @click.self="$emit('closeModal')"
     @keydown.esc="$emit('closeModal')"
   >
-    <div class="bg-white border-2 border-blue-800 border-solid modal-container">
-      <div class="modal-text-title text-black">
+    <div
+      class="bg-white border-2 border-blue-800 border-solid box-border flex flex-col gap-[1rem] items-start modal-container px-[3.5rem] py-[2.5rem]"
+    >
+      <div class="label-01-bold text-black">
         {{ headerText }}
       </div>
-      <div class="modal-text-content text-black">{{ contentText }}</div>
-      <div class="modal-buttons-container">
+      <div class="label-03-reg text-black">{{ contentText }}</div>
+      <div class="flex flex-row gap-[1rem] modal-buttons-container">
         <TextButton
           :button-type="cancelButtonType"
           label="Abbrechen"
@@ -74,53 +76,3 @@ onMounted(() => {
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.popup-modal-wrapper {
-  position: fixed;
-  z-index: 999;
-  top: 0;
-  left: 0;
-  display: flex;
-  width: 100vw;
-  height: 100%;
-  align-items: center;
-  justify-content: center;
-  background-color: rgb(111 119 133 / 60%);
-
-  .modal-container {
-    display: flex;
-    max-width: 442px;
-    min-height: 222px;
-    box-sizing: border-box;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 40px;
-    gap: 16px;
-
-    .modal-text-title {
-      font-size: 18px;
-      font-weight: 700;
-      letter-spacing: 0.16px;
-      line-height: 26px;
-    }
-
-    .modal-text-content {
-      font-size: 14px;
-      font-style: normal;
-      font-weight: 400;
-      letter-spacing: 0.16px;
-      line-height: 18px;
-      text-align: left;
-    }
-
-    .modal-buttons-container {
-      display: flex;
-      min-width: 70%;
-      flex-direction: row;
-      justify-content: space-between;
-      column-gap: 16px;
-    }
-  }
-}
-</style>

@@ -40,6 +40,7 @@ module.exports = {
         700: "#e5ce5c",
         900: "#c3a91e",
       },
+      background: "rgba(184, 189, 195, 0.5)",
     },
     fontFamily: {
       regular: [
