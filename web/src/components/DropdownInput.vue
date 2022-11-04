@@ -36,8 +36,11 @@ const itemRefs = ref([])
 const filter = ref<string>()
 
 const toggleDropdown = () => {
-  // if it's the first time opening the dropdown and an endpoint is defined
-  // --> fetch items from the backend
+  checkIfItemsNeedToBeFetched()
+  isShowDropdown.value = !isShowDropdown.value
+}
+
+const checkIfItemsNeedToBeFetched = () => {
   if (
     !Array.isArray(props.dropdownItems) &&
     !isShowDropdown.value &&
@@ -47,11 +50,11 @@ const toggleDropdown = () => {
       .getAll(props.dropdownItems)
       .then((response) => (items.value = response))
   }
-  isShowDropdown.value = !isShowDropdown.value
 }
 
 const clearSelection = () => {
   emit("update:modelValue", "")
+  filter.value = ""
 }
 
 const updateValue = (value: string) => {
@@ -71,6 +74,7 @@ const keydown = (index: number) => {
 }
 
 const onTextChange = () => {
+  checkIfItemsNeedToBeFetched()
   emit("update:modelValue", "")
   const textInput = document.querySelector(
     `.input-container #${props.id}`
