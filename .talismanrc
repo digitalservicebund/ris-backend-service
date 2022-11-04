@@ -10,7 +10,7 @@ fileignoreconfig:
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
-    checksum: b64bd8828aaf7af38386b867544abfef3e91f59c265ab5097c3130d06b825b0b
+    checksum: 70b6588a4dfb14ff82f2d8faeab0f8a116bd28e24f4ff088f2d660bc47f00a98
   - filename: .github/workflows/playwright-test.yml
     checksum: 0e56d8ddd29e07178752835665b2baa771bfe75de14e164be70989093593943e
   - filename: .github/workflows/playwright.yml
