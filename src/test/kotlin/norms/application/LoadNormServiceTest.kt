@@ -12,28 +12,28 @@ import reactor.test.StepVerifier
 
 // TODO: Improve by using behavior driven testing concept with documentation.
 class LoadNormServiceTest {
-  @Test
-  fun `can load norm by GUID if output adapter finds one`() {
-    val port = mockk<GetNormByGuidOutputPort>()
-    val service = LoadNormService(port)
-    val guid = Guid.generateNew()
-    val query = LoadNormUseCase.Query(guid)
-    val norm = Norm(guid, "title")
+    @Test
+    fun `can load norm by GUID if output adapter finds one`() {
+        val port = mockk<GetNormByGuidOutputPort>()
+        val service = LoadNormService(port)
+        val guid = Guid.generateNew()
+        val query = LoadNormUseCase.Query(guid)
+        val norm = Norm(guid, "title")
 
-    every { port.getNormByGuid(guid) } returns Mono.just(norm)
+        every { port.getNormByGuid(guid) } returns Mono.just(norm)
 
-    StepVerifier.create(service.loadNorm(query)).expectNext(norm).verifyComplete()
-  }
+        StepVerifier.create(service.loadNorm(query)).expectNext(norm).verifyComplete()
+    }
 
-  @Test
-  fun `loads nothing if output adapter does not find a norm for a given GUID`() {
-    val port = mockk<GetNormByGuidOutputPort>()
-    val service = LoadNormService(port)
-    val guid = Guid.generateNew()
-    val query = LoadNormUseCase.Query(guid)
+    @Test
+    fun `loads nothing if output adapter does not find a norm for a given GUID`() {
+        val port = mockk<GetNormByGuidOutputPort>()
+        val service = LoadNormService(port)
+        val guid = Guid.generateNew()
+        val query = LoadNormUseCase.Query(guid)
 
-    every { port.getNormByGuid(guid) } returns Mono.empty()
+        every { port.getNormByGuid(guid) } returns Mono.empty()
 
-    StepVerifier.create(service.loadNorm(query)).expectNextCount(0).verifyComplete()
-  }
+        StepVerifier.create(service.loadNorm(query)).expectNextCount(0).verifyComplete()
+    }
 }
