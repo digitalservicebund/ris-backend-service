@@ -62,7 +62,8 @@ class ImportNormServiceTest {
 
         val savedNorms = mutableListOf<Norm>()
         verify(exactly = 3) { port.saveNorm(capture(savedNorms)) }
-        assertTrue(savedNorms.toSet().size == savedNorms.size)
+        val usedGuids = savedNorms.map { it.guid }
+        assertTrue(usedGuids.toSet().size == usedGuids.size)
     }
 
     @Test
