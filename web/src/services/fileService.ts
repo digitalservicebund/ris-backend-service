@@ -25,7 +25,7 @@ const service: fileService = {
     }
 
     const response = await httpClient.put<File, DocumentUnit>(
-      `documentunits/${documentUnitUuid}/file`,
+      `caselaw/documentunits/${documentUnitUuid}/file`,
       {
         headers: {
           "Content-Type":
@@ -60,7 +60,7 @@ const service: fileService = {
 
   async delete(documentUnitUuid: string) {
     const response = await httpClient.delete(
-      `documentunits/${documentUnitUuid}/file`
+      `caselaw/documentunits/${documentUnitUuid}/file`
     )
     response.error =
       response.status >= 300
@@ -72,7 +72,7 @@ const service: fileService = {
 
   async getDocxFileAsHtml(fileName: string) {
     const response = await httpClient.get<string>(
-      `documentunitdocx/${fileName}`
+      `caselaw/documentunitdocx/${fileName}`
     )
     response.error =
       response.status >= 300

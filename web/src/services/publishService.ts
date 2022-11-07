@@ -14,7 +14,7 @@ interface publishService {
 const service: publishService = {
   async publishDocument(documentUnitUuid: string, receiverEmail: string) {
     const response = await httpClient.put<string, XmlMail>(
-      `documentunits/${documentUnitUuid}/publish`,
+      `caselaw/documentunits/${documentUnitUuid}/publish`,
       {
         headers: { "Content-Type": "text/plain" },
       },
@@ -38,7 +38,7 @@ const service: publishService = {
 
   async getLastPublishedXML(documentUnitUuid: string) {
     const response = await httpClient.get<XmlMail>(
-      `documentunits/${documentUnitUuid}/publish`
+      `caselaw/documentunits/${documentUnitUuid}/publish`
     )
 
     response.error =

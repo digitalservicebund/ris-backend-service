@@ -19,7 +19,9 @@ interface DocumentUnitService {
 
 const service: DocumentUnitService = {
   async getAll() {
-    const response = await httpClient.get<DocumentUnit[]>("documentunits")
+    const response = await httpClient.get<DocumentUnit[]>(
+      "caselaw/documentunits"
+    )
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheiten konnten nicht geladen werden.",
@@ -30,7 +32,7 @@ const service: DocumentUnitService = {
 
   async getByDocumentNumber(documentNumber: string) {
     const response = await httpClient.get<DocumentUnit>(
-      `documentunits/${documentNumber}`
+      `caselaw/documentunits/${documentNumber}`
     )
     if (response.status >= 300 || response.error) {
       response.error = {
@@ -44,7 +46,7 @@ const service: DocumentUnitService = {
 
   async createNew(docCenter: string, docType: string) {
     const response = await httpClient.post<Partial<DocumentUnit>, DocumentUnit>(
-      "documentunits",
+      "caselaw/documentunits",
       {
         headers: {
           Accept: "application/json",
@@ -66,7 +68,7 @@ const service: DocumentUnitService = {
 
   async update(documentUnit: DocumentUnit) {
     const response = await httpClient.put(
-      `documentunits/${documentUnit.uuid}/docx`,
+      `caselaw/documentunits/${documentUnit.uuid}/docx`,
       {
         headers: {
           Accept: "application/json",
@@ -94,7 +96,7 @@ const service: DocumentUnitService = {
 
   async delete(documentUnitUuid: string) {
     const response = await httpClient.delete(
-      `documentunits/${documentUnitUuid}`
+      `caselaw/documentunits/${documentUnitUuid}`
     )
     if (response.status >= 300) {
       response.error = {

@@ -18,7 +18,7 @@ watch(() => props.normGuid, loadNormByGuid, { immediate: true })
       </h1>
       <div v-for="article in norm.articles" :key="article.guid">
         <h2 class="heading-04-regular mb-16">
-          {{ article.marker }}{{ article.title }}
+          {{ article.marker }} {{ article.title }}
         </h2>
         <div v-for="paragraph in article.paragraphs" :key="paragraph.guid">
           <p>{{ paragraph.marker }} {{ paragraph.text }}</p>

@@ -8,7 +8,7 @@ interface LookupTableService {
 
 const service: LookupTableService = {
   async getAll(endpoint: LookupTableEndpoint) {
-    const response = await httpClient.get<DocumentType[]>(endpoint)
+    const response = await httpClient.get<DocumentType[]>(`caselaw/${endpoint}`)
     if (response.status >= 300 || !response.data) {
       return []
     }
