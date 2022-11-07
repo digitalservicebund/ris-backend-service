@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
-import de.bund.digitalservice.ris.norms.domain.value.Guid
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
@@ -18,6 +17,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
+import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [ImportNormController::class])
@@ -43,7 +43,7 @@ class ImportNormControllerTest {
         }
     """
 
-        every { importNormService.importNorm(any()) } returns Mono.just(Guid.generateNew())
+        every { importNormService.importNorm(any()) } returns Mono.just(UUID.randomUUID())
 
         webClient
             .mutateWith(csrf())
@@ -67,7 +67,7 @@ class ImportNormControllerTest {
 
     @Test
     fun `it responds with created status when norm was imported`() {
-        every { importNormService.importNorm(any()) } returns Mono.just(Guid.generateNew())
+        every { importNormService.importNorm(any()) } returns Mono.just(UUID.randomUUID())
 
         webClient
             .mutateWith(csrf())
@@ -83,7 +83,7 @@ class ImportNormControllerTest {
     @Test
     fun `it uses the new GUID from the service an creates a location header for the imported norm`() {
         every { importNormService.importNorm(any()) } returns
-            Mono.just(Guid.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
+            Mono.just(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
 
         webClient
             .mutateWith(csrf())

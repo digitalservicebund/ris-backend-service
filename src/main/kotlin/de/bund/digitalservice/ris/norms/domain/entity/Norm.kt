@@ -1,5 +1,5 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
-import de.bund.digitalservice.ris.norms.domain.value.Guid
+import java.util.UUID
 
-data class Norm(val guid: Guid, val longTitle: String, val articles: List<Article> = listOf())
+data class Norm(val guid: UUID, val longTitle: String, val articles: List<Article> = listOf())

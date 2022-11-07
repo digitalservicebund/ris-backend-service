@@ -5,13 +5,13 @@ import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.value.Guid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
+import java.util.UUID
 
 @RestController
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
@@ -32,7 +32,7 @@ class QueryNormsController(
 
     @GetMapping(path = ["/{guid}"])
     fun getNormByGuid(@PathVariable guid: String): Mono<ResponseEntity<NormResponseSchema>> {
-        val query = LoadNormUseCase.Query(Guid.fromString(guid))
+        val query = LoadNormUseCase.Query(UUID.fromString(guid))
 
         return loadNormService
             .loadNorm(query)

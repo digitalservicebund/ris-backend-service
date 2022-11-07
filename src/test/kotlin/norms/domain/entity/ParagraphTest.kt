@@ -1,13 +1,13 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
-import de.bund.digitalservice.ris.norms.domain.value.Guid
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class ParagraphTest {
     @Test
     fun `can create a simple paragraph instance`() {
-        val guid = Guid.generateNew()
+        val guid = UUID.randomUUID()
         val paragraph = Paragraph(guid, "marker", "text")
 
         assertTrue(paragraph.guid == guid)

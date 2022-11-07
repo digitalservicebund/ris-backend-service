@@ -2,11 +2,12 @@ package de.bund.digitalservice.ris.norms.domain.value
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.util.UUID
 
 class GuidTest {
     @Test
     fun `can generate a valid GUID`() {
-        val guid = Guid.generateNew()
+        val guid = UUID.randomUUID()
 
         assertThat(guid).isNotNull()
         assertThat(guid.toString().length).isEqualTo(36)
@@ -15,8 +16,8 @@ class GuidTest {
 
     @Test
     fun `can create instance from former generated identifer`() {
-        val firstGuid = Guid.generateNew()
-        val secondGuid = Guid.fromString(firstGuid.toString())
+        val firstGuid = UUID.randomUUID()
+        val secondGuid = UUID.fromString(firstGuid.toString())
 
         assertThat(secondGuid).isEqualTo(firstGuid)
     }
