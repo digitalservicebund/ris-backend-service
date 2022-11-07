@@ -14,7 +14,7 @@ const linkStyling = (componentName: string) => ({
 <template>
   <div v-if="visible" class="flex flex-col w-[24rem]">
     <div
-      class="border-gray-400 border-solid border-y flex h-80 items-center justify-between pl-3"
+      class="border-b border-gray-400 border-solid flex h-80 items-center justify-between pl-3"
     >
       <router-link
         class="flex gap-12 items-center link-01-bold px-[1.3rem] py-[0.44rem] text-blue-800"

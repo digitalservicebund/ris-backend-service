@@ -2,8 +2,8 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarTop from "../../src/components/NavbarTop.vue"
 
-const HEADER_TEXT_SUB_TEXT = "Rechtsinformationssystem"
-const HEADER_TEXT = " Rechtsinformationssystem des Bundes [Platzhalter] "
+const HEADER_TEXT_SUB_TEXT = "Rechtsinformationen"
+const HEADER_TEXT = " Rechtsinformationen des Bundes "
 const NAVBAR_TOP_LINK_TEXT = "Rechtsprechung"
 const NAVBAR_TOP_LINK_URL = "/"
 

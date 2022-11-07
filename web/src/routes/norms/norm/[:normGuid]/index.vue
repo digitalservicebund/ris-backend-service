@@ -11,7 +11,7 @@ async function loadNormByGuid() {
 watch(() => props.normGuid, loadNormByGuid, { immediate: true })
 </script>
 <template>
-  <div class="flex flex-col gap-16">
+  <div class="bg-gray-100 flex flex-col gap-16">
     <div v-if="norm" class="max-w-screen-lg p-96 pt-[3.5rem]">
       <h1 class="heading-02-regular mb-44">
         {{ norm.longTitle }}
