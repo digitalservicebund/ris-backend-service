@@ -13,6 +13,6 @@ const norms = ref((await getAllNorms()).data)
       class="grow max-w-screen-lg"
       :norms="norms"
     />
-    <span v-else class="pl-96 pt-[3.5rem]">Keine Normen gefunden</span>
+    <span v-else class="pl-64 pt-[3.5rem]">Keine Normen gefunden</span>
   </div>
 </template>

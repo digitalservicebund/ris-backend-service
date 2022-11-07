@@ -4,7 +4,7 @@ import { Norm } from "../domain/Norm"
 defineProps<{ norms: Norm[] }>()
 </script>
 <template>
-  <div v-if="norms.length" class="pl-96 pt-[3.5rem]">
+  <div v-if="norms.length" class="pl-64 pt-[3.5rem]">
     <div v-for="norm in norms" :key="norm.guid">
       <div class="mb-24">
         <router-link

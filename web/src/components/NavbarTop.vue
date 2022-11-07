@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 import { useRoute } from "vue-router"
+import Logo from "../assets/neuRIS-logo.svg"
 
 const route = useRoute()
 </script>
 
 <template>
   <div
-    class="border-gray-400 border-y flex items-center justify-between px-[1.3rem] py-24"
+    class="border-gray-400 border-y flex items-center justify-between px-16 py-24"
     role="navigation"
   >
     <div class="flex gap-44 items-center">
       <div class="flex items-center">
-        <div class="bg-yellow-500 h-56 rounded-full w-56" />
-
-        <span class="leading-20 px-[1.333rem] text-16">
+        <img alt="Neuris Logo" :src="Logo" />
+        <span class="leading-20 px-[1rem] text-16">
           <span class="font-bold"> Rechtsinformationen</span><br />
           des Bundes
         </span>
