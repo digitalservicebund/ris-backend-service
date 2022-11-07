@@ -11,16 +11,20 @@ async function loadNormByGuid() {
 watch(() => props.normGuid, loadNormByGuid, { immediate: true })
 </script>
 <template>
-  <div class="flex flex-col gap-16 p-16">
-    <div v-if="norm" class="max-w-screen-lg p-40">
+  <div class="flex flex-col gap-16">
+    <div v-if="norm" class="max-w-screen-lg p-96 pt-[3.5rem]">
       <h1 class="heading-02-regular mb-44">
         {{ norm.longTitle }}
       </h1>
       <div v-for="article in norm.articles" :key="article.guid">
-        <h2 class="heading-04-regular mb-16">
+        <h2 class="heading-04-regular mb-24">
           {{ article.marker }} {{ article.title }}
         </h2>
-        <div v-for="paragraph in article.paragraphs" :key="paragraph.guid">
+        <div
+          v-for="paragraph in article.paragraphs"
+          :key="paragraph.guid"
+          class="mb-24"
+        >
           <p>{{ paragraph.marker }} {{ paragraph.text }}</p>
         </div>
       </div>
