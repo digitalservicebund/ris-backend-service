@@ -7,8 +7,8 @@ const norms = ref((await getAllNorms()).data)
 </script>
 
 <template>
-  <div class="flex flex-col gap-16">
+  <div class="flex flex-col gap-16 max-w-screen-lg">
     <NormsList v-if="norms && norms.length !== 0" class="grow" :norms="norms" />
-    <span v-else>Keine Normen gefunden</span>
+    <span v-else class="pl-96 pt-[3.5rem]">Keine Normen gefunden</span>
   </div>
 </template>
