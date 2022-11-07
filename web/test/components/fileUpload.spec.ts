@@ -41,14 +41,14 @@ describe("FileUpload", () => {
       })
     )
 
-    const { getByText, getByLabelText, emitted } = render(FileUpload, {
+    const { getByLabelText, emitted } = render(FileUpload, {
       props: {
         documentUnitUuid: "1",
       },
       global: { plugins: [router] },
     })
 
-    const inputEl = getByLabelText("Festplatte durchsuchen", {
+    const inputEl = getByLabelText("oder Datei auswählen", {
       selector: "input",
       exact: false,
     })
@@ -66,9 +66,6 @@ describe("FileUpload", () => {
 
     await flushPromises()
 
-    getByText("Die Datei sample.docx wurde erfolgreich hochgeladen", {
-      exact: false,
-    })
     expect(emitted().updateDocumentUnit).toBeTruthy()
   })
 
@@ -117,7 +114,7 @@ describe("FileUpload", () => {
 
     const file = new File(["test"], "sample.docx")
 
-    const inputEl = getByLabelText("Festplatte durchsuchen", {
+    const inputEl = getByLabelText("oder Datei auswählen", {
       selector: "input",
       exact: false,
     })
@@ -156,7 +153,7 @@ describe("FileUpload", () => {
 
     const file = new File(["test"], "sample.docx")
 
-    const inputEl = getByLabelText("Festplatte durchsuchen", {
+    const inputEl = getByLabelText("oder Datei auswählen", {
       selector: "input",
       exact: false,
     })

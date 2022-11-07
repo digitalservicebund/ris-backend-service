@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import FileInputButton from "@/components/FileInputButton.vue"
+import FileInput from "@/components/FileInput.vue"
 import InfoModal from "@/components/InfoModal.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import fileService from "@/services/fileService"
@@ -19,12 +19,6 @@ enum UploadStatus {
   FILE_TOO_LARGE,
   WRONG_FILE_FORMAT,
 }
-
-const UploadErrorStatus: UploadStatus[] = [
-  UploadStatus.FAILED,
-  UploadStatus.FILE_TOO_LARGE,
-  UploadStatus.WRONG_FILE_FORMAT,
-]
 
 interface Status {
   file: File | null
@@ -67,26 +61,10 @@ async function upload(file: File) {
 
 function dragover(e: DragEvent) {
   e.preventDefault()
-  status.value.inDragError = checkForInDragError(e)
   status.value.inDrag = true
 }
 
-function checkForInDragError(e: DragEvent): string {
-  if (!e.dataTransfer) return ""
-  const items = e.dataTransfer.items
-  if (items.length > 1) return "Nur eine Datei auf einmal ist möglich"
-  if (items[0].kind !== "file") return "Dies scheint keine Datei zu sein"
-  if (
-    items[0].type &&
-    items[0].type !==
-      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  )
-    return "Aktuell werden nur DOCX Dateien unterstützt"
-  return ""
-}
-
 function dragleave() {
-  status.value.inDragError = ""
   status.value.inDrag = false
 }
 
@@ -117,71 +95,34 @@ function onFileSelect(event: Event) {
 
     <div
       id="upload-drop-area"
-      class="bg-white border-3 border-blue-300 border-solid hover:border-3 hover:border-blue-500 hover:border-solid rounded-lg upload-drop-area w-full"
+      class="bg-white border-3 border-blue-300 border-dashed flex flex-col hover:border-3 items-center p-[3.125rem] rounded-lg text-center upload-drop-area w-full"
       :class="{
         'upload-drop-area__in-drag': status.inDrag,
-        'upload-drop-area__in-drag-error':
-          status.inDragError || UploadErrorStatus.includes(status.uploadStatus),
       }"
       @dragleave="dragleave"
       @dragover="dragover"
       @drop="drop"
     >
-      <span v-if="status.inDragError">
-        <span class="file-upload material-icons text-blue-800">
-          upload_file
-        </span>
-        <!-- if still in drag move -->
-        <span v-if="status.uploadStatus !== UploadStatus.WRONG_FILE_FORMAT">
-          <div class="upload-status">Datei wird nicht unterstützt.</div>
-          <div>Versuchen Sie eine .docx-Version dieser Datei hochzuladen.</div>
-        </span>
-        <!-- if file dropped and failed to upload -->
-        <span v-else>
-          <div class="upload-status">Datei in diesen Bereich ziehen</div>
-          <div>oder</div>
-          <div>
-            <FileInputButton
-              id="file-upload-after-fail"
-              aria-label="Upload File"
-              @input="onFileSelect"
-            >
-              <span class="material-icons">search</span>
-              Festplatte durchsuchen
-            </FileInputButton>
-          </div>
-        </span>
+      <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
+        <span class="material-icons text-72 text-blue-800"> refresh </span>
+        <div class="heading-03-regular mt-[0.5rem]">Upload läuft</div>
+        <div>{{ status.file ? status.file.name : "" }}</div>
       </span>
       <span v-else>
-        <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
-          <span class="file-upload material-icons"> refresh </span>
-          <div class="upload-status">Upload läuft</div>
-          <div>{{ status.file ? status.file.name : "" }}</div>
-        </span>
-        <span v-else-if="status.uploadStatus === UploadStatus.SUCCESSED">
-          <span class="file-upload material-icons text-blue-800">
-            upload_file
-          </span>
-          <div class="upload-status">
-            Die Datei {{ status.file ? status.file.name : "" }} wurde
-            erfolgreich hochgeladen
-          </div>
-        </span>
-        <span v-else>
-          <span class="file-upload material-icons text-blue-800">
-            upload_file
-          </span>
-          <div class="upload-status">Datei in diesen Bereich ziehen</div>
-          <div>oder</div>
-          <FileInputButton
-            id="file-upload"
-            aria-label="Upload File"
-            @input="onFileSelect"
+        <span class="material-icons text-72 text-blue-800"> upload_file </span>
+
+        <div class="heading-03-regular mt-[0.5rem]">
+          Datei in diesen Bereich ziehen
+        </div>
+        <FileInput
+          id="file-upload"
+          aria-label="Upload File"
+          @input="onFileSelect"
+        >
+          <span class="hover:underline link-03-bold mt-[0.438rem]"
+            >oder Datei auswählen</span
           >
-            <span class="material-icons">search</span>
-            Festplatte durchsuchen
-          </FileInputButton>
-        </span>
+        </FileInput>
       </span>
     </div>
 
@@ -191,29 +132,16 @@ function onFileSelect(event: Event) {
 
 <style lang="scss" scoped>
 .upload-drop-area {
-  padding: 44px;
-
   &__in-drag-error {
-    @apply border-3 border-solid border-red-200;
+    @apply border-3 border-dashed border-red-200;
 
     &:hover {
-      @apply border-3 border-solid border-red-200;
+      @apply border-3 border-dashed border-red-800;
     }
   }
 
   &__in-drag {
-    @apply border-3 border-solid border-blue-500;
+    @apply border-3 border-dashed border-blue-500;
   }
-}
-
-.file-upload {
-  margin-top: 10px;
-  margin-left: -5px;
-  font-size: 50px;
-}
-
-.upload-status {
-  margin: 16px 0 10px;
-  font-size: 24px;
 }
 </style>

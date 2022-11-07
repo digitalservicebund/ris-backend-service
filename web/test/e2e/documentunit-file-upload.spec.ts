@@ -51,26 +51,6 @@ test.describe("upload an original document to a doc unit", () => {
     ).toBeVisible()
   })
 
-  test("drag over non-docx file in upload area", async ({ page }) => {
-    const png = await fs.promises.readFile(
-      "./test/e2e/testfiles/sample.png",
-      "utf-8"
-    )
-    const dataTransfer = await page.evaluateHandle((png) => {
-      const data = new DataTransfer()
-      const file = new File([`${png}`], "sample.png", {
-        type: "image/png",
-      })
-      data.items.add(file)
-      return data
-    }, png)
-
-    await page.dispatchEvent(".upload-drop-area", "dragover", { dataTransfer })
-    await expect(
-      page.locator("text=Datei wird nicht unterstützt.")
-    ).toBeVisible()
-  })
-
   test("drop docx file in upload area", async ({ page }) => {
     const docx = await fs.promises.readFile(
       "./test/e2e/testfiles/sample.docx",

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import FileInputButton from "@/components/FileInputButton.vue"
 import SaveDocumentUnitButton from "@/components/SaveDocumentUnitButton.vue"
 import TextButton from "@/components/TextButton.vue"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
@@ -95,13 +94,6 @@ const updateStatus = ref(UpdateStatus)
         aria-label="Save Document Unit"
         :update-status="updateStatus.SUCCEED"
       />
-    </div>
-    <div class="flex flex-col gap-y-20 items-start">
-      <h2 class="heading-02-regular">File Upload Button</h2>
-      <FileInputButton id="file-upload-after-fail" aria-label="Upload File">
-        <span class="material-icons">search</span>
-        Festplatte durchsuchen
-      </FileInputButton>
     </div>
   </div>
 </template>

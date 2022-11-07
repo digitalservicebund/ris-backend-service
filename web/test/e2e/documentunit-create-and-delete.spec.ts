@@ -6,7 +6,7 @@ test.describe("create a doc unit and delete it again", () => {
   test("create new doc unit", async ({ page, request }) => {
     await page.goto("/")
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
-    await page.waitForSelector("text=Festplatte durchsuchen")
+    await page.waitForSelector("text=oder Datei auswählen")
     await expect(page).toHaveURL(
       /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/
     )

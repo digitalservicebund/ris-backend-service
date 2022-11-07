@@ -1,5 +1,5 @@
 import { fireEvent, render, RenderResult, waitFor } from "@testing-library/vue"
-import FileInputButton from "@/components/FileInputButton.vue"
+import FileInputButton from "@/components/FileInput.vue"
 
 function renderComponent(options?: { slot?: string }): RenderResult {
   const slots = { default: options?.slot ?? "" }
@@ -17,7 +17,7 @@ describe("FileInputButton", () => {
       slot: "<span>Select File</span>",
     })
 
-    const button = getByRole("button")
+    const button = getByRole("link")
 
     expect(button.innerHTML).toContain("<span>Select File</span>")
   })
@@ -37,7 +37,7 @@ describe("FileInputButton", () => {
     const { getByRole, getByLabelText } = renderComponent({
       slot: "Select File",
     })
-    const button = getByRole("button")
+    const button = getByRole("link")
     const input = getByLabelText("Select File")
     input.onclick = vi.fn()
 

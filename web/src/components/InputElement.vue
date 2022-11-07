@@ -2,7 +2,7 @@
 import { computed } from "vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
-import FileInputButton from "@/components/FileInputButton.vue"
+import FileInput from "@/components/FileInput.vue"
 import TextInput from "@/components/TextInput.vue"
 import type { InputAttributes, ModelType } from "@/domain"
 import { InputType, ValidationError } from "@/domain"
@@ -31,7 +31,7 @@ const component = computed(() => {
     case "text":
       return TextInput
     case "file":
-      return FileInputButton
+      return FileInput
     case "dropdown":
       return DropdownInput
     case "date":

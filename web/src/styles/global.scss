@@ -20,6 +20,9 @@
 
 body {
   @apply text-18 font-normal font-regular leading-default text-black;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 a {

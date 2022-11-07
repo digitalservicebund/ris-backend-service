@@ -17,7 +17,7 @@ export const navigateToFiles = async (page: Page, documentNumber: string) => {
 export const uploadTestfile = async (page: Page, filename: string) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
-    page.locator("text=Festplatte durchsuchen").click(),
+    page.locator("text=oder Datei auswählen").click(),
   ])
   await fileChooser.setFiles("./test/e2e/testfiles/" + filename)
   await expect(page.locator("text=Upload läuft")).not.toBeVisible()
