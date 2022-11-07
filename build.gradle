@@ -87,7 +87,7 @@ dependencies {
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.0-rc1"
 
   implementation "io.micrometer:micrometer-registry-prometheus:1.9.3"
-  implementation "io.sentry:sentry-spring-boot-starter:6.5.0"
+  implementation "io.sentry:sentry-spring-boot-starter:6.7.0"
   implementation "org.springframework.boot:spring-boot-starter-validation"
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
