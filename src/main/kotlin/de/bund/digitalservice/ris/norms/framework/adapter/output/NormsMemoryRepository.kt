@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.framework.output
+package de.bund.digitalservice.ris.norms.framework.adapter.output
 
 import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort

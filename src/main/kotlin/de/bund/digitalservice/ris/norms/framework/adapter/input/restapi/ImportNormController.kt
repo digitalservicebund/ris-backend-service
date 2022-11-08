@@ -18,8 +18,8 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
 
         return importNormService
             .importNorm(command)
-            .map({ guid -> URI("${ApiConfiguration.API_BASE_PATH}/$guid") })
-            .map({ uri -> ResponseEntity.created(uri).build<Void>() })
+            .map { guid -> URI("${ApiConfiguration.API_BASE_PATH}/$guid") }
+            .map { uri -> ResponseEntity.created(uri).build<Void>() }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
 
