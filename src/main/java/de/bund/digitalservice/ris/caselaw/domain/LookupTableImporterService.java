@@ -73,6 +73,8 @@ public class LookupTableImporterService {
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
     }
 
+    courtRepository.deleteAll().subscribe();
+
     courtsXML
         .getList()
         .forEach(
@@ -81,17 +83,17 @@ public class LookupTableImporterService {
                     .save(
                         CourtDTO.builder()
                             .id(courtXML.getId())
-                            .changeDateMail(courtXML.getChangeDateMail())
-                            .changeDateClient(courtXML.getChangeDateClient())
-                            .changeIndicator(courtXML.getChangeIndicator())
+                            .changedatemail(courtXML.getChangeDateMail())
+                            .changedateclient(courtXML.getChangeDateClient())
+                            .changeindicator(courtXML.getChangeIndicator())
                             .version(courtXML.getVersion())
-                            .courtType(courtXML.getCourtType())
-                            .courtLocation(courtXML.getCourtLocation())
+                            .courttype(courtXML.getCourtType())
+                            .courtlocation(courtXML.getCourtLocation())
                             .field(courtXML.getField())
                             .superiorcourt(courtXML.getSuperiorcourt())
-                            .foreignCountry(courtXML.getForeignCountry())
+                            .foreigncountry(courtXML.getForeignCountry())
                             .region(courtXML.getRegion())
-                            .federalState(courtXML.getFederalState())
+                            .federalstate(courtXML.getFederalState())
                             .belongsto(courtXML.getBelongsto())
                             .street(courtXML.getStreet())
                             .zipcode(courtXML.getZipcode())

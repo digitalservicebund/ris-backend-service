@@ -14,17 +14,17 @@ import org.springframework.data.relational.core.mapping.Table;
 public class CourtDTO {
   public static final CourtDTO EMPTY = new CourtDTO();
   long id;
-  String changeDateMail;
-  String changeDateClient;
-  char changeIndicator;
+  String changedatemail;
+  String changedateclient;
+  char changeindicator;
   String version;
-  String courtType;
-  String courtLocation;
+  String courttype;
+  String courtlocation;
   String field;
   String superiorcourt;
-  String foreignCountry;
+  String foreigncountry;
   String region;
-  String federalState;
+  String federalstate;
   String belongsto;
   String street;
   String zipcode;
@@ -44,7 +44,7 @@ public class CourtDTO {
   String existingbranchoffice;
   String abandonedbranchoffice;
   String contactperson;
-  String deliverslrs; // TODO
+  String deliverslrs;
   String remark;
   String additional;
   String existencedate;
