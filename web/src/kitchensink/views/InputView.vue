@@ -5,7 +5,7 @@ import InputElement from "@/components/InputElement.vue"
 import InputField from "@/components/InputField.vue"
 import TextInput from "@/components/TextInput.vue"
 import type { InputAttributes } from "@/domain"
-import { InputType, ValidationError } from "@/domain"
+import { InputType, ValidationError, defineTextField } from "@/domain"
 import type { DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 
@@ -38,19 +38,16 @@ const dropdownInputAttribute: InputAttributes = {
 <template>
   <div class="flex flex-col gap-y-20 h-auto w-1/2">
     <h1 class="font-bold text-24">Text Input</h1>
-    <span class="text-20">Text input without value</span>
     <div>
       <TextInput id="textInputEmpty" aria-label="text input" value="" />
     </div>
-    <span class="text-20">Text input has value</span>
     <div>
       <TextInput
         id="textInputWithValue"
         aria-label="text input"
-        value="This is text input value"
+        value="this is a text input with a value"
       />
     </div>
-    <span class="text-20">Text input has placeholder</span>
     <div>
       <TextInput
         id="textInputPlaceholder"
@@ -59,7 +56,6 @@ const dropdownInputAttribute: InputAttributes = {
         value=""
       />
     </div>
-    <span class="text-20">Text input has error</span>
     <div>
       <TextInput
         id="textInputError"
@@ -68,7 +64,6 @@ const dropdownInputAttribute: InputAttributes = {
         value="wrong value"
       />
     </div>
-    <span class="text-20">Text input is readonly</span>
     <div>
       <TextInput
         id="textInputReadonly"
@@ -77,6 +72,21 @@ const dropdownInputAttribute: InputAttributes = {
         placeholder="this is text input readonly"
         :read-only="isReadonly"
         value=""
+      />
+    </div>
+    <div>
+      <TextInput
+        id="textInputWithValue"
+        aria-label="text input"
+        :sub-field="
+          defineTextField(
+            'testField',
+            'Divergent Subfield',
+            'Divergent Subfield',
+            true
+          )
+        "
+        value="this input has a subcategory"
       />
     </div>
 
@@ -95,12 +105,6 @@ const dropdownInputAttribute: InputAttributes = {
     <h1 class="font-bold text-24">Input Element</h1>
     <span class="text-20">Type="Textfield"</span>
     <InputElement :attributes="textInputAttribute" :type="InputType.TEXT" />
-    <span class="text-20">Type="FileInput"</span>
-    <InputElement
-      :attributes="textInputAttribute"
-      class="w-[150px]"
-      :type="InputType.FILE"
-    />
     <span class="text-20">Type="Dropdown"</span>
     <div class="pb-4">
       <InputElement

@@ -10,14 +10,21 @@ export function defineTextField(
   required?: boolean,
   placeholder?: string,
   validationError?: ValidationError,
-  readOnly?: boolean
+  readOnly?: boolean,
+  subField?: InputField
 ): InputField {
   return {
     name,
     type: InputType.TEXT,
     label,
     required,
-    inputAttributes: { ariaLabel, placeholder, validationError, readOnly },
+    inputAttributes: {
+      ariaLabel,
+      placeholder,
+      validationError,
+      readOnly,
+      subField,
+    },
   }
 }
 
@@ -76,7 +83,21 @@ export const coreDataFields: InputField[] = [
   //   true,
   //   courts.items
   // ),
-  defineTextField("fileNumber", "Aktenzeichen", "Aktenzeichen", true),
+  defineTextField(
+    "fileNumber",
+    "Aktenzeichen",
+    "Aktenzeichen",
+    true,
+    "",
+    undefined,
+    false,
+    defineTextField(
+      "divergentFileNumber",
+      "Abweichendes Aktenzeichen",
+      "Abweichendes Aktenzeichen",
+      true
+    )
+  ),
   defineDateField(
     "decisionDate",
     "Entscheidungsdatum",

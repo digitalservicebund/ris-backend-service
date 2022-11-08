@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, onMounted } from "vue"
+import SubCategory from "@/components/SubCategory.vue"
 import { useInputModel } from "@/composables/useInputModel"
-import { ValidationError } from "@/domain"
+import { InputField, ValidationError } from "@/domain"
 
 interface Props {
   id: string
@@ -11,6 +12,7 @@ interface Props {
   placeholder?: string
   validationError?: ValidationError
   readOnly?: boolean
+  subField?: InputField
 }
 
 interface Emits {
@@ -30,6 +32,10 @@ const conditionalClasses = computed(() => ({
   input__error: props.validationError,
   input__readonly: props.readOnly,
 }))
+
+onMounted(() => {
+  console.log(props)
+})
 </script>
 
 <template>
@@ -44,12 +50,31 @@ const conditionalClasses = computed(() => ({
     type="text"
     @input="emitInputEvent"
   />
+  <SubCategory v-if="props.subField">
+    <div class="mt-[2.625rem]">
+      <label
+        class="flex gap-4 items-center label-03-regular mb-2 text-gray-900"
+        :for="id"
+      >
+        {{ subField?.label }}
+      </label>
+      <input
+        :id="subField?.name"
+        v-model="inputValue"
+        :aria-label="subField?.inputAttributes.ariaLabel"
+        class="bg-white input"
+        :class="conditionalClasses"
+        type="text"
+      />
+    </div>
+  </SubCategory>
 </template>
 
 <style lang="scss" scoped>
 .input {
   width: 100%;
-  padding: 17px 24px;
+  max-height: 4rem;
+  padding: 1.063rem 1.5rem;
   @apply border-2 border-solid border-blue-800;
 
   &:focus {
@@ -78,6 +103,47 @@ const conditionalClasses = computed(() => ({
 
   &__readonly {
     @apply border-none bg-white;
+  }
+}
+
+.expand-enter-from {
+  max-height: 0;
+}
+
+.expand-enter-to {
+  max-height: 1000px;
+}
+
+.expand-enter-active {
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+}
+
+.expand-leave-from {
+  max-height: 1000px;
+}
+
+.expand-leave-to {
+  max-height: 0;
+}
+
+.expand-leave-active {
+  overflow: hidden;
+  transition: all 0.5s ease-in-out;
+}
+
+.expandable-content {
+  width: 100%;
+
+  &__header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .icon {
+    cursor: pointer;
   }
 }
 </style>

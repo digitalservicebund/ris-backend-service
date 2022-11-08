@@ -4,6 +4,7 @@ import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 
 // vitest run --testNamePattern CoreData
 describe("Core Data", () => {
+  global.ResizeObserver = require("resize-observer-polyfill")
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {
