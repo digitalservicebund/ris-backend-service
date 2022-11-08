@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -10,14 +12,17 @@ import reactor.core.publisher.Flux;
 @Slf4j
 public class LookupTableService {
 
-  private final DocumentTypeRepository repository;
+  private final DocumentTypeRepository documentTypeRepository;
+  private final CourtRepository courtRepository;
 
-  public LookupTableService(DocumentTypeRepository repository) {
-    this.repository = repository;
+  public LookupTableService(
+      DocumentTypeRepository documentTypeRepository, CourtRepository courtRepository) {
+    this.documentTypeRepository = documentTypeRepository;
+    this.courtRepository = courtRepository;
   }
 
   public Flux<DocumentType> getDocumentTypes() {
-    return repository
+    return documentTypeRepository
         .findAll()
         .map(
             documentTypeDTO ->
@@ -25,5 +30,11 @@ public class LookupTableService {
                     documentTypeDTO.getId(),
                     documentTypeDTO.getJurisShortcut(),
                     documentTypeDTO.getLabel()));
+  }
+
+  public Flux<Court> getCourts() {
+    return courtRepository
+        .findAll()
+        .map(courtDTO -> new Court(courtDTO.getCourttype(), courtDTO.getCourtlocation()));
   }
 }
