@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.domain.lookuptable.court;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -50,6 +49,4 @@ public class CourtDTO {
   String additional;
   String existencedate;
   String cancellationdate;
-  List<CourtSynonymDTO> synonyms;
-  List<CourtAppraisalBodyDTO> appraisalbodies;
 }

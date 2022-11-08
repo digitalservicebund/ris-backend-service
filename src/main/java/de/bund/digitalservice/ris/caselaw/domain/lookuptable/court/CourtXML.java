@@ -1,12 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.domain.lookuptable.court;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
-import java.util.List;
 import lombok.Data;
 
 @Data
+@JsonIgnoreProperties(value = {"synonym", "spruchkoerper"})
 public class CourtXML {
   @JacksonXmlProperty(isAttribute = true)
   long id;
@@ -115,12 +115,4 @@ public class CourtXML {
 
   @JsonProperty(value = "aufhebdatum") // Aufhebedatum
   String cancellationdate;
-
-  @JacksonXmlElementWrapper(useWrapping = false)
-  @JsonProperty(value = "synonym")
-  List<CourtSynonymXML> synonyms;
-
-  @JacksonXmlElementWrapper(useWrapping = false)
-  @JsonProperty(value = "spruchkoerper")
-  List<CourtAppraisalBodyXML> appraisalbodies;
 }
