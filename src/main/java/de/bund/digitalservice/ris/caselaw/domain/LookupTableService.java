@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -32,7 +33,12 @@ public class LookupTableService {
                     documentTypeDTO.getLabel()));
   }
 
-  public Flux<Court> getCourts() {
+  public Flux<Court> getCourts(Optional<String> searchStr) {
+    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
+      return courtRepository
+          .findBySearchStr(searchStr.get())
+          .map(courtDTO -> new Court(courtDTO.getCourttype(), courtDTO.getCourtlocation()));
+    }
     return courtRepository
         .findAll()
         .map(courtDTO -> new Court(courtDTO.getCourttype(), courtDTO.getCourtlocation()));
