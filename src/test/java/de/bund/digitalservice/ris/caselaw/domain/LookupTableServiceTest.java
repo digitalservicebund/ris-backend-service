@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
@@ -23,6 +24,7 @@ class LookupTableServiceTest {
   @SpyBean private LookupTableService service;
 
   @MockBean private DocumentTypeRepository documentTypeRepository;
+  @MockBean private CourtRepository courtRepository;
 
   @Test
   void testGetDocumentTypes() {
