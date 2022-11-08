@@ -60,7 +60,6 @@ onMounted(() => {
       </label>
       <input
         :id="subField?.name"
-        v-model="inputValue"
         :aria-label="subField?.inputAttributes.ariaLabel"
         class="bg-white input"
         :class="conditionalClasses"
