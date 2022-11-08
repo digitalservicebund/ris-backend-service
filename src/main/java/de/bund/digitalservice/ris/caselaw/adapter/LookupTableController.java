@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,12 +20,8 @@ public class LookupTableController {
   }
 
   @GetMapping(value = "documentTypes")
+  // pass search query @param TODO
   public Flux<DocumentType> getDocumentTypes() {
     return service.getDocumentTypes();
-  }
-
-  @GetMapping(value = "courts")
-  public Flux<Court> getCourts() {
-    return service.getCourts();
   }
 }
