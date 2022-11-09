@@ -46,7 +46,7 @@ fileignoreconfig:
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/playwright.config.ts
-    checksum: 8747a15221fcf538724f39052484ff36d5f43171ffe133bd2ecaacc888ccded2
+    checksum: beb96d2152ae186fe622a43cba45cfb6c39c626fd22c315b39b7a1a08aff6688
   - filename: web/sonar-project.properties
     checksum: 8fa8db24e8b523d44c8b624854e3c478ff22f6b102ecc68c0a764b083bea1383
   - filename: .github/workflows/clean-staging.yml
