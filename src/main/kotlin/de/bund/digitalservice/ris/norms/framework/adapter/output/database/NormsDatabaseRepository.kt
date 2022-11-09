@@ -20,7 +20,8 @@ class NormsDatabaseRepository(
 ) : GetAllNormsOutputPort, GetNormByGuidOutputPort, SaveNormOutputPort {
 
     override fun getNormByGuid(guid: UUID): Mono<Norm> {
-        normsRepository.findById(guid).map { println(it) }
+        val norm: Mono<NormDto> = normsRepository.findById(guid)
+        // TODO flatMap and call articlesRepo and paragraphRepo
         return Mono.empty()
     }
 
