@@ -1,5 +1,5 @@
 import { devices, PlaywrightTestConfig, expect, Page } from "@playwright/test"
-import { isInViewport } from "./test/e2e/e2e-utils"
+import { isInViewport } from "./test/e2e/shared/e2e-utils"
 
 const config: PlaywrightTestConfig = {
   testDir: "./test/e2e",
