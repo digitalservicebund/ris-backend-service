@@ -29,7 +29,7 @@ async function handleDeleteFile() {
 <template>
   <DocumentUnitWrapper v-slot="{ classes }" :document-unit="documentUnit">
     <div class="flex flex-col" :class="classes">
-      <h1 class="heading-02-regular mb-6">Dokumente</h1>
+      <h1 class="heading-02-regular mb-[1rem]">Dokumente</h1>
 
       <FileViewer
         v-if="documentUnit.hasFile"

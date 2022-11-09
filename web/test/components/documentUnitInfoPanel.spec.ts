@@ -25,7 +25,10 @@ describe("documentUnit InfoPanel", () => {
     })
 
     getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Aktenzeichen foo/)
+      return !!node?.textContent?.match(/Aktenzeichen/)
+    })
+    getAllByText((_content, node) => {
+      return !!node?.textContent?.match(/foo/)
     })
   })
 
@@ -44,7 +47,10 @@ describe("documentUnit InfoPanel", () => {
     })
 
     getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Aktenzeichen -/)
+      return !!node?.textContent?.match(/Aktenzeichen/)
+    })
+    getAllByText((_content, node) => {
+      return !!node?.textContent?.match(/-/)
     })
   })
 
@@ -60,7 +66,11 @@ describe("documentUnit InfoPanel", () => {
     })
 
     getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Entscheidungsdatum 31.01.2024/)
+      return !!node?.textContent?.match(/Entscheidungsdatum/)
+    })
+
+    getAllByText((_content, node) => {
+      return !!node?.textContent?.match(/31.01.2024/)
     })
   })
 
@@ -93,7 +103,11 @@ describe("documentUnit InfoPanel", () => {
       },
     })
     getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Gerichtstyp foo/)
+      return !!node?.textContent?.match(/Gerichtstyp/)
+    })
+
+    getAllByText((_content, node) => {
+      return !!node?.textContent?.match(/foo/)
     })
   })
 

@@ -33,19 +33,6 @@ describe("FileInputButton", () => {
     expect(input.hidden).toBe(true)
   })
 
-  it("clicking the button triggers the file input", () => {
-    const { getByRole, getByLabelText } = renderComponent({
-      slot: "Select File",
-    })
-    const button = getByRole("link")
-    const input = getByLabelText("Select File")
-    input.onclick = vi.fn()
-
-    button.click()
-
-    expect(input.onclick).toHaveBeenCalledOnce()
-  })
-
   it("emits input event when user uploads files", async () => {
     const { emitted, getByLabelText } = renderComponent({ slot: "Select File" })
     const input: HTMLInputElement = getByLabelText("Select File", {

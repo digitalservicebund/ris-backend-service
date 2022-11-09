@@ -4,6 +4,7 @@ import { computed, onMounted, ref } from "vue"
 import PopupModal from "./PopupModal.vue"
 import TextButton from "./TextButton.vue"
 import TextEditor from "./TextEditor.vue"
+import PropertyInfo from "@/components/PropertyInfo.vue"
 import fileService from "@/services/fileService"
 
 const props = defineProps<{
@@ -68,11 +69,13 @@ onMounted(async () => {
 
 <template>
   <div class="flex flex-col gap-32 grow">
-    <div class="bg-white flex flex-col gap-32 items-start px-32 py-24">
-      <div class="flex w-full">
+    <div class="bg-white flex flex-col items-start px-[2rem] py-[1.5rem]">
+      <div class="flex pb-[1rem] w-full">
         <div v-for="entry in fileInfos" :key="entry.label" class="grow">
-          <div>{{ entry.label }}</div>
-          <div class="font-bold text-gray-900">{{ entry.value ?? " - " }}</div>
+          <PropertyInfo
+            :label="entry.label"
+            :value="entry.value"
+          ></PropertyInfo>
         </div>
       </div>
 

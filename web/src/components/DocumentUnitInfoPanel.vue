@@ -2,6 +2,7 @@
 import dayjs from "dayjs"
 import { computed } from "vue"
 import DocumentUnit from "../domain/documentUnit"
+import PropertyInfo from "@/components/PropertyInfo.vue"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
 
@@ -32,8 +33,11 @@ const entries = computed(() => [
     </div>
 
     <div v-for="entry in entries" :key="entry.label" class="grow">
-      {{ entry.label }}
-      <span class="font-bold ml-2">{{ entry.value ?? "-" }}</span>
+      <PropertyInfo
+        direction="row"
+        :label="entry.label"
+        :value="entry.value"
+      ></PropertyInfo>
     </div>
   </div>
 </template>
