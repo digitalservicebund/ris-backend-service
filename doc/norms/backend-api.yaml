@@ -77,6 +77,33 @@ paths:
         "404":
           description: No norm found for this Guid
 
+    patch:
+      summary: Edit the frame data of a norm
+      operationId: editNormFrame
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/Guid"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - longTitle
+              properties:
+                longTitle:
+                  type: string
+      responses:
+        "204":
+          description: Norm was updated
+
+        "400":
+          description: ""
+
 components:
   securitySchemes:
     BasicAuth:
