@@ -38,8 +38,17 @@
   @apply font-regular text-14 leading-18;
 }
 
+// TODO: text-14 is too small in the context of 18px body base size, needs adjustment
+// .label-03-bold {
+//   @apply font-bold text-14 leading-18;
+// }
+
 .label-03-bold {
-  @apply font-bold text-14 leading-18;
+  @apply font-bold text-18 leading-24;
+}
+
+.label-03-caps {
+  @apply uppercase text-14 leading-24;
 }
 
 .label-section {

@@ -22,19 +22,10 @@ const { inputValue, emitInputEvent } = useInputModel<FileList, Props, Emits>(
   props,
   emit
 )
-
-function triggerFileInput() {
-  fileInput.value?.click()
-}
 </script>
 
 <template>
-  <span
-    role="link"
-    tabIndex="0"
-    @click="triggerFileInput"
-    @keydown="triggerFileInput"
-  >
+  <span role="link" tabIndex="0">
     <label :aria-label="ariaLabel" class="label" :for="id">
       <slot />
 
@@ -42,6 +33,7 @@ function triggerFileInput() {
         :id="id"
         v-bind="inputValue"
         ref="fileInput"
+        class=""
         hidden="true"
         tabindex="-1"
         type="file"

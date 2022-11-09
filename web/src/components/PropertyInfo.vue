@@ -1,0 +1,23 @@
+<script lang="ts" setup>
+import { computed } from "vue"
+
+interface Props {
+  label: string
+  value: string | null | undefined
+  direction?: string | undefined
+}
+
+const props = defineProps<Props>()
+
+const classes = computed(() => ({
+  "flex-row": props.direction == "row",
+  "flex-col": props.direction == "column",
+}))
+</script>
+
+<template>
+  <div class="flex items-baseline" :class="classes">
+    <div class="label-03-caps pr-[0.4rem]">{{ label }}</div>
+    <div class="label-03-bold">{{ value ?? " - " }}</div>
+  </div>
+</template>
