@@ -50,7 +50,7 @@ fileignoreconfig:
   - filename: web/sonar-project.properties
     checksum: 8fa8db24e8b523d44c8b624854e3c478ff22f6b102ecc68c0a764b083bea1383
   - filename: .github/workflows/clean-staging.yml
-    checksum: e4a2c0d406aad64b92e849622603e7998cee94528d789927e862c8a7c08d43e5
+    checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: web/.env.development
     checksum: 131da0ec785871a9d38af7866c14edc7fa4af46bd1030c5eaef8a3b2ea6302fb
   - filename: web/src/env.d.ts
