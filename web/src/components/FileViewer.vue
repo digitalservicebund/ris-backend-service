@@ -73,6 +73,7 @@ onMounted(async () => {
       <div class="flex pb-[1rem] w-full">
         <div v-for="entry in fileInfos" :key="entry.label" class="grow">
           <PropertyInfo
+            direction="column"
             :label="entry.label"
             :value="entry.value"
           ></PropertyInfo>
