@@ -42,6 +42,17 @@ The application depends on a Java package from a private GitHub package reposito
 eval "$(./run.sh gradle-env)"
 ```
 
+### Flyway
+
+The application uses Flyway for maintaining and versioning database migrations. In order to create a change in the database, you should create a new sql file on the directory `src\main\resources\db\migration`.
+
+The file should be named in the following format: `Vx.x__teamname_create_table_xyz.sql` where `x.x` is your migration version (make sure to pull first from the repository and see what is the latest version otherwise migrations wouldn't work properly).
+The `teamname` can be replaced with: whether `caselaw` or `norms` and is normally followed by a descriptive name for the migration.
+
+Flyway automatically detects new files and run migrations accordingly on sprint boot start.
+
+The configuration is made to use `localhost` as a database host. However, if you're running from the container, you may need to use `db` instead to be recognized by the application (no need to take care of that as in the docker compose file profiles are defined and in those profiles the config is overwritten)
+
 ### Full-stack
 
 ```bash
