@@ -41,6 +41,8 @@ fileignoreconfig:
     checksum: 59d76a8206d825e846b246668a6321f6efafe83b4195a7bc05a31f94eabebbbc
   - filename: src/main/resources/db/migration/V0.4__caselaw_add_courtlookuptable.sql
     checksum: 85d86e3c159e742249182f8ee136ff36b4aa5c2024e5ca5d84cc47b1924db94e
+  - filename: src/main/resources/db/migration/V0.5__norms_update_id.sql
+    checksum: d1efb2f738e2ce9a172e80dd10f9a571d5e5702ed642abe71d0d05ef420f1641
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/playwright.config.ts
