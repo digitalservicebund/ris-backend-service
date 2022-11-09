@@ -10,7 +10,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Pa
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.util.*
+import java.util.UUID
 
 @Component
 class NormsDatabaseRepository(
@@ -20,9 +20,22 @@ class NormsDatabaseRepository(
 ) : GetAllNormsOutputPort, GetNormByGuidOutputPort, SaveNormOutputPort {
 
     override fun getNormByGuid(guid: UUID): Mono<Norm> {
-        val norm: Mono<NormDto> = normsRepository.findById(guid)
-        // TODO flatMap and call articlesRepo and paragraphRepo
-        return Mono.empty()
+        return normsRepository
+            .findByGuid(guid)
+            .flatMap { normDto: NormDto ->
+                articlesRepository
+                    .findByNorm(normDto.id)
+                    .flatMap { articleDto: ArticleDto ->
+                        paragraphsRepository
+                            .findByArticle(articleDto.id)
+                            .collectList()
+                            .flatMap { paragraphs: List<ParagraphDto> -> Mono.just(articleDto.setParagraphs(paragraphs)) }
+                    }
+                    .collectList()
+                    .flatMap { articles: List<ArticleDto> -> Mono.just(normDto.setArticles(articles)) }
+            }
+            // TODO convert ArticleDTO and ParagraphDTO to Article and Paragraph
+            .map { normDto: NormDto -> Norm(normDto.guid, normDto.longTitle, listOf()) }
     }
 
     override fun getAllNorms(): Flux<Norm> {

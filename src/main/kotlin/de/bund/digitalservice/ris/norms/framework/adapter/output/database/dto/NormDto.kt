@@ -12,4 +12,12 @@ data class NormDto(
     val guid: UUID,
     @Column("long_title")
     val longTitle: String
-)
+) {
+    @Transient
+    var articles: List<ArticleDto>? = null
+
+    fun setArticles(articles: List<ArticleDto>): NormDto {
+        this.articles = articles
+        return this
+    }
+}

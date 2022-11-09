@@ -14,4 +14,12 @@ data class ArticleDto(
     val marker: String,
     @Column("norm_id")
     val norm: Int
-)
+) {
+    @Transient
+    var paragraphs: List<ParagraphDto>? = null
+
+    fun setParagraphs(paragraphs: List<ParagraphDto>): ArticleDto {
+        this.paragraphs = paragraphs
+        return this
+    }
+}
