@@ -33,7 +33,7 @@ test.describe("upload an original document to a doc unit", () => {
 
   test("drag over docx file in upload area", async ({ page }) => {
     const docx = await fs.promises.readFile(
-      "./test/e2e/testfiles/sample.docx",
+      "./test/e2e/caselaw/testfiles/sample.docx",
       "utf-8"
     )
     const dataTransfer = await page.evaluateHandle((docx) => {
@@ -53,7 +53,7 @@ test.describe("upload an original document to a doc unit", () => {
 
   test("drop docx file in upload area", async ({ page }) => {
     const docx = await fs.promises.readFile(
-      "./test/e2e/testfiles/sample.docx",
+      "./test/e2e/caselaw/testfiles/sample.docx",
       "utf-8"
     )
     const dataTransfer = await page.evaluateHandle((docx) => {
@@ -70,7 +70,7 @@ test.describe("upload an original document to a doc unit", () => {
 
   test("drop non-docx file in upload area", async ({ page }) => {
     const png = await fs.promises.readFile(
-      "./test/e2e/testfiles/sample.png",
+      "./test/e2e/caselaw/testfiles/sample.png",
       "utf-8"
     )
     const dataTransfer = await page.evaluateHandle((png) => {

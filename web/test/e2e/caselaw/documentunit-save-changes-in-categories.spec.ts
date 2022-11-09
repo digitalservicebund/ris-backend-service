@@ -1,5 +1,5 @@
 import { expect, Page } from "@playwright/test"
-import { generateString } from "../test-helper/dataGenerators"
+import { generateString } from "../../test-helper/dataGenerators"
 import { navigateToCategories } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
