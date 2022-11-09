@@ -37,10 +37,20 @@ public class LookupTableService {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       return courtRepository
           .findBySearchStr(searchStr.get())
-          .map(courtDTO -> new Court(courtDTO.getCourttype(), courtDTO.getCourtlocation()));
+          .map(
+              courtDTO ->
+                  new Court(
+                      courtDTO.getCourttype(),
+                      courtDTO.getCourtlocation(),
+                      courtDTO.getCourttype() + " " + courtDTO.getCourtlocation()));
     }
     return courtRepository
         .findAll()
-        .map(courtDTO -> new Court(courtDTO.getCourttype(), courtDTO.getCourtlocation()));
+        .map(
+            courtDTO ->
+                new Court(
+                    courtDTO.getCourttype(),
+                    courtDTO.getCourtlocation(),
+                    courtDTO.getCourttype() + " " + courtDTO.getCourtlocation()));
   }
 }
