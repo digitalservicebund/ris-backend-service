@@ -4,6 +4,7 @@ import { createRouter, createWebHistory } from "vue-router"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 
 describe("originalFile SidePanel", () => {
+  global.ResizeObserver = require("resize-observer-polyfill")
   const router = createRouter({
     history: createWebHistory(),
     routes: [

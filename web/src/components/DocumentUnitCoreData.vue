@@ -30,7 +30,7 @@ const values = computed({
 })
 
 const containerWidth = ref()
-const columnCount = computed(() => (containerWidth.value < 500 ? 1 : 2))
+const columnCount = computed(() => (containerWidth.value < 600 ? 1 : 2))
 
 onMounted(() => {
   const editorContainer = document.querySelector(".core-data")
@@ -48,7 +48,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   <div v-if="!modelValue">Loading...</div>
 
   <div v-else class="mb-[4rem]">
-    <h1 class="heading-02-regular mb-[1rem] core-data">Stammdaten</h1>
+    <h1 class="core-data heading-02-regular mb-[1rem]">Stammdaten</h1>
 
     <InputGroup
       v-model="values"
@@ -71,7 +71,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
 
     <SaveDocumentUnitButton
-      ariaLabel="Stammdaten Speichern Button"
+      aria-label="Stammdaten Speichern Button"
       class="mt-8"
       :update-status="updateStatus"
       @update-document-unit="emit('updateDocumentUnit')"
