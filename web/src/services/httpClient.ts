@@ -34,6 +34,7 @@ interface HttpClient {
 }
 
 const backendHost = import.meta.env.VITE_BACKEND_HOST ?? ""
+
 async function baseHttp<T>(
   url: string,
   method: string,
@@ -41,7 +42,7 @@ async function baseHttp<T>(
   data?: T
 ) {
   try {
-    const response = await axios({
+    const response = await axiosInstance.request({
       method: method,
       url: `${backendHost}/api/v1/${url}`,
       validateStatus: () => true,
@@ -101,4 +102,5 @@ export type ServiceResponse<T> = {
     }
 )
 
+export const axiosInstance = axios.create()
 export default httpClient

@@ -75,6 +75,7 @@
     "@vue/test-utils": "^2.1.0",
     "autoprefixer": "^10.4.11",
     "axe-playwright": "^1.1.11",
+    "axios-mock-adapter": "^1.21.2",
     "babel-loader": "^8.2.5",
     "eslint": "^8.24.0",
     "eslint-plugin-import": "^2.26.0",
