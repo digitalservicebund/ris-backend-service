@@ -61,7 +61,7 @@ dependencies {
 
   implementation "com.sendinblue:sib-api-v3-sdk:6.0.0"
 
-  implementation platform("software.amazon.awssdk:bom:2.17.191")
+  implementation platform("software.amazon.awssdk:bom:2.18.15")
   implementation "software.amazon.awssdk:netty-nio-client"
   implementation "software.amazon.awssdk:s3"
   implementation "org.springdoc:springdoc-openapi-webflux-ui:1.6.9"
