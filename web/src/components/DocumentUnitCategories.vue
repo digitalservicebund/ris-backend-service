@@ -87,7 +87,7 @@ const fixedPanelPosition = ref(false)
 function onScroll() {
   const element = document.getElementById("odoc-panel-element")
   if (!element) return
-  element.getBoundingClientRect().top <= 0
+  element.getBoundingClientRect().top <= 0 && showDocPanel.value === true
     ? (fixedPanelPosition.value = true)
     : (fixedPanelPosition.value = false)
 }
@@ -197,16 +197,27 @@ onUnmounted(() => {
         />
       </div>
 
-      <OriginalFileSidePanel
-        id="odoc-panel-element"
-        class="bg-white"
-        :class="classes"
-        :file="fileAsHTML"
-        :fixed-panel-position="fixedPanelPosition"
-        :has-file="documentUnit.hasFile"
-        :open="showDocPanel"
-        @toggle-panel="handleToggleFilePanel"
-      />
+      <div
+        class="bg-white border-gray-400 border-l-1 border-solid"
+        :class="{ full: showDocPanel }"
+      >
+        <OriginalFileSidePanel
+          id="odoc-panel-element"
+          class="bg-white"
+          :class="classes"
+          :file="fileAsHTML"
+          :fixed-panel-position="fixedPanelPosition"
+          :has-file="documentUnit.hasFile"
+          :open="showDocPanel"
+          @toggle-panel="handleToggleFilePanel"
+        />
+      </div>
     </div>
   </DocumentUnitWrapper>
 </template>
+
+<style lang="scss" scoped>
+.full {
+  @apply w-full grow;
+}
+</style>

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted } from "vue"
+import { computed } from "vue"
 import SubCategory from "@/components/SubCategory.vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { InputField, ValidationError } from "@/domain"
@@ -32,10 +32,6 @@ const conditionalClasses = computed(() => ({
   input__error: props.validationError,
   input__readonly: props.readOnly,
 }))
-
-onMounted(() => {
-  console.log(props)
-})
 </script>
 
 <template>

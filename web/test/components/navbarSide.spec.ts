@@ -2,8 +2,6 @@ import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarSide from "../../src/components/NavbarSide.vue"
 
-const OPEN_SIDEBAR_BTN_TEXT = "Menü"
-
 describe("navbar side", async () => {
   const DOCUMENT_NR = "KORE2022000003"
   const router = createRouter({
@@ -32,13 +30,13 @@ describe("navbar side", async () => {
     ],
   })
   test("navbar side is closed", async () => {
-    const { emitted } = render(NavbarSide, {
+    const { emitted, getByRole, getByLabelText } = render(NavbarSide, {
       props: { documentNumber: DOCUMENT_NR, visible: false },
       global: { plugins: [router] },
     })
-    const openSidebarBtn = screen.getByText(OPEN_SIDEBAR_BTN_TEXT)
+    const openSidebarBtn = getByLabelText("Open Side Content")
     expect(openSidebarBtn).toBeInTheDocument()
-    await fireEvent.click(openSidebarBtn)
+    await fireEvent.click(getByRole("button"))
     expect(emitted().toggleNavbar).toBeTruthy()
   })
 
