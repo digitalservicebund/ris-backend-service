@@ -13,5 +13,5 @@ data class ParagraphDto(
     val marker: String,
     val text: String,
     @Column("article_id")
-    val article: Int
+    val articleId: Int
 )
