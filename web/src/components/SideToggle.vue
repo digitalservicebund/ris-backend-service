@@ -3,8 +3,8 @@ import { computed, ref, watch } from "vue"
 
 interface Props {
   isExpanded?: boolean
-  fromSide: string
-  label: string
+  openingDirection?: OpeningDirection
+  label?: string
 }
 
 interface Emits {
@@ -14,24 +14,35 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   isExpanded: false,
-  fromSide: "left",
-  ariaLabel: "side toggle",
+  openingDirection: OpeningDirection.RIGHT,
+  label: "side toggle",
 })
 
 const emit = defineEmits<Emits>()
 const isExpanded = ref(false)
-const closeIconName =
-  props.fromSide === "left" ? "chevron_left" : "chevron_right"
-const openIconName =
-  props.fromSide === "left" ? "chevron_right" : "chevron_left"
+
+const closeIconNames = {
+  [OpeningDirection.LEFT]: "chevron_right",
+  [OpeningDirection.RIGHT]: "chevron_left",
+}
+
+const openIconNames = {
+  [OpeningDirection.RIGHT]: "chevron_right",
+  [OpeningDirection.LEFT]: "chevron_left",
+}
+
 const iconName = computed(() =>
-  isExpanded.value ? closeIconName : openIconName
+  isExpanded.value
+    ? closeIconNames[props.openingDirection]
+    : openIconNames[props.openingDirection]
 )
 const postFix = computed(() => (isExpanded.value ? "schließen" : "öffnen"))
 const label = computed(() => props.label + " " + postFix.value)
 const classes = computed(() => ({
-  "toggle-right": props.fromSide == "left",
-  "toggle-left": props.fromSide == "right",
+  "right-0": props.openingDirection == OpeningDirection.RIGHT,
+  "left-0": props.openingDirection == OpeningDirection.LEFT,
+  "-mr-12": props.openingDirection == OpeningDirection.RIGHT,
+  "-ml-12": props.openingDirection == OpeningDirection.LEFT,
 }))
 
 function toggleContentVisibility(): void {
@@ -48,11 +59,18 @@ watch(
 watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 </script>
 
+<script lang="ts">
+export enum OpeningDirection {
+  LEFT = "left",
+  RIGHT = "right",
+}
+</script>
+
 <template>
   <div class="bg-white pr-[1.25rem] relative">
     <button
       :aria-label="label"
-      class="absolute align-center flex mt-[1.625rem] w-full"
+      class="absolute flex items-center top-24"
       :class="classes"
       @click="toggleContentVisibility"
     >
@@ -66,13 +84,3 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.toggle-left {
-  @apply justify-start -ml-[0.75rem] mr-[0.75rem];
-}
-
-.toggle-right {
-  @apply justify-end -mr-[0.75rem] ml-[0.75rem];
-}
-</style>
