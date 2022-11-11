@@ -33,7 +33,7 @@ watch(navigationIsOpen, () =>
 
 <template>
   <div class="flex grow w-screen">
-    <SideToggle v-model:is-expanded="navigationIsOpen" aria-label="Navigation">
+    <SideToggle v-model:is-expanded="navigationIsOpen" label="Navigation">
       <NavbarSide
         class="border-gray-400 border-r-1 border-solid"
         :document-number="documentUnit.documentNumber"

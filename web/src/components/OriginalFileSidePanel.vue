@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRoute } from "vue-router"
-import SideToggle from "@/components/SideToggle.vue"
+import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import TextEditor from "@/components/TextEditor.vue"
 
 defineProps<{
@@ -31,9 +31,9 @@ export default {
 
 <template>
   <SideToggle
-    from-side="right"
     :is-expanded="open"
     label="Originaldokument"
+    :opening-direction="OpeningDirection.LEFT"
     @toggle="$emit('togglePanel')"
   >
     <div v-bind="$attrs">
