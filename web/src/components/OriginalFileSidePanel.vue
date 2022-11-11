@@ -1,23 +1,34 @@
 <script setup lang="ts">
+import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
 import TextEditor from "@/components/TextEditor.vue"
 
-defineProps<{
-  open: boolean
+const props = defineProps<{
+  open?: boolean
   hasFile: boolean
   file?: string
   fixedPanelPosition?: boolean
 }>()
-defineEmits<{ (e: "togglePanel"): void }>()
 
+const emit = defineEmits<{ (e: "update:open", value: boolean): void }>()
+
+const open = ref(false)
+
+watch(
+  () => props.open,
+  () => (open.value = props.open ?? false),
+  { immediate: true }
+)
+
+watch(open, () => emit("update:open", open.value))
 const route = useRoute()
 
-const uploadFileRoute = {
+const uploadFileRoute = computed(() => ({
   name: "caselaw-documentUnit-:documentNumber-files",
   params: { documentNumber: route.params.documentNumber },
   query: route.query,
-}
+}))
 </script>
 
 <script lang="ts">
@@ -31,10 +42,9 @@ export default {
 
 <template>
   <SideToggle
-    :is-expanded="open"
+    v-model:is-expanded="open"
     label="Originaldokument"
     :opening-direction="OpeningDirection.LEFT"
-    @toggle="$emit('togglePanel')"
   >
     <div v-bind="$attrs">
       <div

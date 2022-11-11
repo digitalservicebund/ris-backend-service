@@ -48,7 +48,6 @@ test.describe("test the different layout options", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Originaldokument öffnen']").click()
-    await expect(page).toHaveURL(/showDocPanel=true/)
 
     await page.locator("[aria-label='Navigation schließen']").click()
     await expect(page).toHaveURL(/showNavBar=false/)
