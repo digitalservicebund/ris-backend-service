@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import SubCategory from "@/components/SubCategory.vue"
+import SubField from "@/components/SubField.vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { InputField, ValidationError } from "@/domain"
 
@@ -46,23 +46,23 @@ const conditionalClasses = computed(() => ({
     type="text"
     @input="emitInputEvent"
   />
-  <SubCategory v-if="props.subField">
+  <SubField v-if="subField">
     <div class="mt-[2.625rem]">
       <label
         class="flex gap-4 items-center label-03-regular mb-2 text-gray-900"
         :for="id"
       >
-        {{ subField?.label }}
+        {{ subField.label }}
       </label>
       <input
-        :id="subField?.name"
-        :aria-label="subField?.inputAttributes.ariaLabel"
+        :id="subField.name"
+        :aria-label="subField.inputAttributes.ariaLabel"
         class="bg-white input"
         :class="conditionalClasses"
         type="text"
       />
     </div>
-  </SubCategory>
+  </SubField>
 </template>
 
 <style lang="scss" scoped>

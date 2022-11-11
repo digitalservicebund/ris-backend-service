@@ -31,9 +31,9 @@ export default {
 
 <template>
   <SideToggle
-    aria-label="Originaldokument"
     from-side="right"
     :is-expanded="open"
+    label="Originaldokument"
     @toggle="$emit('togglePanel')"
   >
     <div v-bind="$attrs">

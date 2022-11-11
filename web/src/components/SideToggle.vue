@@ -4,7 +4,7 @@ import { computed, ref, watch } from "vue"
 interface Props {
   isExpanded?: boolean
   fromSide: string
-  ariaLabel: string
+  label: string
 }
 
 interface Emits {
@@ -23,7 +23,7 @@ const iconName = computed(() =>
   isExpanded.value ? closeIconName : openIconName
 )
 const postFix = computed(() => (isExpanded.value ? "schließen" : "öffnen"))
-const ariaLabel = computed(() => props.ariaLabel + " " + postFix.value)
+const label = computed(() => props.label + " " + postFix.value)
 const classes = computed(() => ({
   "toggle-right": props.fromSide == "left",
   "toggle-left": props.fromSide == "right",
@@ -46,7 +46,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 <template>
   <div class="bg-white pr-[1.25rem] relative">
     <button
-      :aria-label="ariaLabel"
+      :aria-label="label"
       class="absolute align-center flex mt-[1.625rem] w-full"
       :class="classes"
       @click="toggleContentVisibility"
