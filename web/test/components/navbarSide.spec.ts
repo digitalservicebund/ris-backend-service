@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarSide from "../../src/components/NavbarSide.vue"
 
@@ -29,24 +29,15 @@ describe("navbar side", async () => {
       },
     ],
   })
-  test("navbar side is closed", async () => {
-    const { emitted, getByRole, getByLabelText } = render(NavbarSide, {
-      props: { documentNumber: DOCUMENT_NR, visible: false },
-      global: { plugins: [router] },
-    })
-    const openSidebarBtn = getByLabelText("Navigation öffnen")
-    expect(openSidebarBtn).toBeInTheDocument()
-    await fireEvent.click(getByRole("button"))
-    expect(emitted().toggleNavbar).toBeTruthy()
-  })
 
-  test("navbar side is opened", async () => {
+  it("shows all relevant navigation items", async () => {
     const { getByText } = render(NavbarSide, {
-      props: { documentNumber: DOCUMENT_NR, visible: true },
+      props: { documentNumber: DOCUMENT_NR },
       global: {
         plugins: [router],
       },
     })
+
     getByText("Rubriken", { exact: false })
     getByText("Stammdaten", { exact: false })
     getByText("Kurz- & Langtexte", { exact: false })
