@@ -12,6 +12,7 @@ import InputView from "@/kitchensink/views/InputView.vue"
 import NavbarView from "@/kitchensink/views/NavbarView.vue"
 import OriginalFileSidePanelView from "@/kitchensink/views/OriginalFileSidePanelView.vue"
 import PopupModalView from "@/kitchensink/views/PopupModalView.vue"
+import SideToggleView from "@/kitchensink/views/SideToggleView.vue"
 import TextEditorView from "@/kitchensink/views/TextEditorView.vue"
 
 const props = defineProps<{
@@ -42,6 +43,8 @@ const component = computed(() => {
       return PopupModalView
     case "TextEditorView":
       return TextEditorView
+    case "SideToggleView":
+      return SideToggleView
     default:
       return ErrorView
   }

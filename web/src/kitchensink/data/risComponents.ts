@@ -12,4 +12,5 @@ export const risComponents: risComponent[] = [
   { name: "File Viewer", view: "FileViewerView" },
   { name: "File Upload", view: "FileUploadView" },
   { name: "InfoModal", view: "InfoModalView" },
+  { name: "SideToggle", view: "SideToggleView" },
 ]

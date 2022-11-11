@@ -44,17 +44,15 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 </script>
 
 <template>
-  <div
-    class="bg-white border-gray-400 border-r-1 border-solid pr-[1.25rem] relative"
-  >
+  <div class="bg-white pr-[1.25rem] relative">
     <button
       :aria-label="ariaLabel"
-      class="absolute h-[1.5rem] mt-[1.625rem] w-[1.5rem]"
+      class="absolute align-center flex mt-[1.625rem] w-full"
       :class="classes"
       @click="toggleContentVisibility"
     >
       <span
-        class="bg-white border-1 border-gray-400 border-solid material-icons rounded-full text-gray-900 w-icon"
+        class="bg-white border-1 border-gray-400 border-solid material-icons rounded-full text-22 text-gray-900 w-icon"
         >{{ iconName }}</span
       >
     </button>
@@ -66,20 +64,10 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 
 <style lang="scss" scoped>
 .toggle-left {
-  @apply -ml-[0.75rem] mr-[0.75rem];
-
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: flex-start;
+  @apply justify-start -ml-[0.75rem] mr-[0.75rem];
 }
 
 .toggle-right {
-  @apply -mr-[0.75rem] ml-[0.75rem];
-
-  display: flex;
-  width: 100%;
-  align-items: center;
-  justify-content: flex-end;
+  @apply justify-end -mr-[0.75rem] ml-[0.75rem];
 }
 </style>
