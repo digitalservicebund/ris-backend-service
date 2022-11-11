@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { useRouter, useRoute } from "vue-router"
-import SideToggle from "@/components/SideToggle.vue"
 
-defineProps<{ documentNumber: string; visible: boolean }>()
-defineEmits<{ (e: "toggleNavbar"): void }>()
+defineProps<{ documentNumber?: string }>()
+
 const router = useRouter()
 const route = useRoute()
 
@@ -13,97 +12,88 @@ const linkStyling = (componentName: string) => ({
 </script>
 
 <template>
-  <SideToggle
-    from-side="left"
-    :is-expanded="visible"
-    label="Navigation"
-    @toggle="$emit('toggleNavbar')"
-  >
-    <div v-if="visible" class="flex flex-col w-[24rem]">
-      <div
-        class="border-b border-gray-400 border-solid flex h-80 items-center justify-between pl-3"
+  <div class="flex flex-col w-[24rem]">
+    <div
+      class="border-b border-gray-400 border-solid flex h-80 items-center justify-between pl-3"
+    >
+      <router-link
+        class="flex gap-12 items-center link-01-bold px-[1.3rem] py-[0.44rem] text-blue-800"
+        :to="{ name: 'caselaw' }"
       >
-        <router-link
-          class="flex gap-12 items-center link-01-bold px-[1.3rem] py-[0.44rem] text-blue-800"
-          :to="{ name: 'caselaw' }"
-        >
-          <span class="material-icons">arrow_back</span>
-          <span>ZURÜCK</span>
-        </router-link>
-      </div>
-
-      <div class="flex flex-col">
-        <router-link
-          class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-          :class="
-            linkStyling('caselaw-documentUnit-:documentNumber-categories')
-          "
-          :to="{
-            name: 'caselaw-documentUnit-:documentNumber-categories',
-            params: { documentNumber: documentNumber },
-            query: route.query,
-          }"
-        >
-          Rubriken
-        </router-link>
-
-        <router-link
-          class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
-          :to="{
-            name: 'caselaw-documentUnit-:documentNumber-categories',
-            params: { documentNumber: documentNumber },
-            query: route.query,
-            hash: '#coreData',
-          }"
-          >Stammdaten</router-link
-        >
-        <router-link
-          class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
-          :to="{
-            name: 'caselaw-documentUnit-:documentNumber-categories',
-            params: { documentNumber: documentNumber },
-            query: route.query,
-            hash: '#previousDecisions',
-          }"
-          >Rechtszug</router-link
-        >
-        <router-link
-          class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
-          :to="{
-            name: 'caselaw-documentUnit-:documentNumber-categories',
-            params: { documentNumber: documentNumber },
-            query: route.query,
-            hash: '#texts',
-          }"
-          >Kurz- & Langtexte</router-link
-        >
-        <router-link
-          class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-          :class="linkStyling('caselaw-documentUnit-:documentNumber-files')"
-          :to="{
-            name: 'caselaw-documentUnit-:documentNumber-files',
-            params: { documentNumber: documentNumber },
-            query: route.query,
-          }"
-          >Dokumente</router-link
-        >
-        <div
-          class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-        >
-          Bearbeitungsstand
-        </div>
-
-        <router-link
-          class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-          :to="{
-            name: 'caselaw-documentUnit-:documentNumber-publication',
-            params: { documentNumber: documentNumber },
-          }"
-          >Veröffentlichen</router-link
-        >
-      </div>
+        <span class="material-icons">arrow_back</span>
+        <span>ZURÜCK</span>
+      </router-link>
     </div>
-  </SideToggle>
+
+    <div class="flex flex-col">
+      <router-link
+        class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
+        :class="linkStyling('caselaw-documentUnit-:documentNumber-categories')"
+        :to="{
+          name: 'caselaw-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+        }"
+      >
+        Rubriken
+      </router-link>
+
+      <router-link
+        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
+        :to="{
+          name: 'caselaw-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+          hash: '#coreData',
+        }"
+        >Stammdaten</router-link
+      >
+      <router-link
+        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
+        :to="{
+          name: 'caselaw-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+          hash: '#previousDecisions',
+        }"
+        >Rechtszug</router-link
+      >
+      <router-link
+        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
+        :to="{
+          name: 'caselaw-documentUnit-:documentNumber-categories',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+          hash: '#texts',
+        }"
+        >Kurz- & Langtexte</router-link
+      >
+      <router-link
+        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
+        :class="linkStyling('caselaw-documentUnit-:documentNumber-files')"
+        :to="{
+          name: 'caselaw-documentUnit-:documentNumber-files',
+          params: { documentNumber: documentNumber },
+          query: route.query,
+        }"
+        >Dokumente</router-link
+      >
+      <div
+        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
+      >
+        Bearbeitungsstand
+      </div>
+
+      <router-link
+        class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
+        :to="{
+          name: 'caselaw-documentUnit-:documentNumber-publication',
+          params: { documentNumber: documentNumber },
+        }"
+        >Veröffentlichen</router-link
+      >
+    </div>
+  </div>
 </template>
 
 <style lang="scss" scoped>

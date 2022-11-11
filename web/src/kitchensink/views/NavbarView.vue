@@ -1,12 +1,6 @@
 <script lang="ts" setup>
-import { ref } from "vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import Navbar from "@/components/NavbarTop.vue"
-
-const showNavBar = ref(false)
-const handleToggleNavBar = () => {
-  showNavBar.value = !showNavBar.value
-}
 </script>
 
 <template>
@@ -17,11 +11,7 @@ const handleToggleNavBar = () => {
     </div>
     <h1 class="font-bold text-32">Navbar Side</h1>
     <div class="min-h-[200px] pb-4">
-      <NavbarSide
-        document-number="AABB20220051"
-        :visible="showNavBar"
-        @toggle-navbar="handleToggleNavBar"
-      />
+      <NavbarSide document-number="AABB20220051" />
     </div>
   </div>
 </template>

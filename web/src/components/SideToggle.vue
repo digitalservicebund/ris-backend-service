@@ -12,7 +12,12 @@ interface Emits {
   (event: "toggle"): void
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  isExpanded: false,
+  fromSide: "left",
+  ariaLabel: "side toggle",
+})
+
 const emit = defineEmits<Emits>()
 const isExpanded = ref(false)
 const closeIconName =
