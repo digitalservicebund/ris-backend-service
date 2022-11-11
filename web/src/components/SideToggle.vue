@@ -4,6 +4,7 @@ import { computed, ref, watch } from "vue"
 interface Props {
   isExpanded?: boolean
   fromSide: string
+  ariaLabel: string
 }
 
 interface Emits {
@@ -21,6 +22,8 @@ const openIconName =
 const iconName = computed(() =>
   isExpanded.value ? closeIconName : openIconName
 )
+const postFix = computed(() => (isExpanded.value ? "schließen" : "öffnen"))
+const ariaLabel = computed(() => props.ariaLabel + " " + postFix.value)
 const classes = computed(() => ({
   "toggle-right": props.fromSide == "left",
   "toggle-left": props.fromSide == "right",
@@ -41,10 +44,12 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 </script>
 
 <template>
-  <div class="bg-white border-gray-400 border-r-1 border-solid z-50">
+  <div
+    class="bg-white border-gray-400 border-r-1 border-solid pr-[1.25rem] relative"
+  >
     <button
-      :aria-label="isExpanded ? 'Close Side Content' : 'Open Side Content'"
-      class="-mb-[3.125rem] expandable-content__header h-[1.5rem] mt-[1.625rem] w-[1.5rem]"
+      :aria-label="ariaLabel"
+      class="absolute h-[1.5rem] mt-[1.625rem] w-[1.5rem]"
       :class="classes"
       @click="toggleContentVisibility"
     >
@@ -53,7 +58,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
         >{{ iconName }}</span
       >
     </button>
-    <div v-show="isExpanded">
+    <div v-show="isExpanded" class="-mr-[1.25rem]">
       <slot />
     </div>
   </div>

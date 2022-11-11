@@ -14,6 +14,7 @@ const linkStyling = (componentName: string) => ({
 
 <template>
   <SideToggle
+    aria-label="Navigation"
     from-side="left"
     :is-expanded="visible"
     @toggle="$emit('toggleNavbar')"

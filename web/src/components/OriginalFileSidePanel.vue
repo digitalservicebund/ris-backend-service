@@ -31,6 +31,7 @@ export default {
 
 <template>
   <SideToggle
+    aria-label="Originaldokument"
     from-side="right"
     :is-expanded="open"
     @toggle="$emit('togglePanel')"

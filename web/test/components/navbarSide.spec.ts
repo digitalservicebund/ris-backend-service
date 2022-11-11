@@ -34,7 +34,7 @@ describe("navbar side", async () => {
       props: { documentNumber: DOCUMENT_NR, visible: false },
       global: { plugins: [router] },
     })
-    const openSidebarBtn = getByLabelText("Open Side Content")
+    const openSidebarBtn = getByLabelText("Navigation öffnen")
     expect(openSidebarBtn).toBeInTheDocument()
     await fireEvent.click(getByRole("button"))
     expect(emitted().toggleNavbar).toBeTruthy()
