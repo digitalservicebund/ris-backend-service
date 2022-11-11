@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, toRefs } from "vue"
+import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
@@ -7,6 +7,7 @@ import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
+import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import { ValidationError } from "@/domain"
 import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
@@ -55,15 +56,22 @@ const lastUpdatedDocumentUnit = ref(JSON.stringify(props.documentUnit))
 const fileAsHTML = ref("")
 const automaticUpload = ref()
 const hasDataChange = ref(false)
-const showDocPanel = ref(useRoute().query.showDocPanel === "true")
-const handleToggleFilePanel = async () => {
-  showDocPanel.value = !showDocPanel.value
-  getOriginalDocumentUnit()
-  await router.push({
-    ...route,
-    query: { ...route.query, showDocPanel: String(showDocPanel.value) },
-  })
-}
+const showDocPanel = useToggleStateInRouteQuery(
+  "showDocPanel",
+  route,
+  router.replace,
+  false
+)
+
+watch(
+  showDocPanel,
+  () => {
+    if (showDocPanel.value && fileAsHTML.value.length == 0) {
+      getOriginalDocumentUnit()
+    }
+  },
+  { immediate: true }
+)
 
 const coreData = computed({
   get: () => props.documentUnit.coreData,
@@ -92,7 +100,7 @@ function onScroll() {
     : (fixedPanelPosition.value = false)
 }
 
-const getOriginalDocumentUnit = async () => {
+async function getOriginalDocumentUnit() {
   if (fileAsHTML.value.length > 0) return
   if (props.documentUnit.s3path) {
     const htmlResponse = await fileService.getDocxFileAsHtml(
@@ -203,13 +211,12 @@ onUnmounted(() => {
       >
         <OriginalFileSidePanel
           id="odoc-panel-element"
+          v-model:open="showDocPanel"
           class="bg-white"
           :class="classes"
           :file="fileAsHTML"
           :fixed-panel-position="fixedPanelPosition"
           :has-file="documentUnit.hasFile"
-          :open="showDocPanel"
-          @toggle-panel="handleToggleFilePanel"
         />
       </div>
     </div>

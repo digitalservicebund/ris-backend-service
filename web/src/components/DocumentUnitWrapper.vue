@@ -1,33 +1,19 @@
 <script setup lang="ts">
-import { ref, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
+import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
 
 defineProps<{ documentUnit: DocumentUnit }>()
 
-const navigationIsOpen = ref(true)
 const route = useRoute()
-
-watch(
-  () => route.query.showNavBar,
-  (showNavBar) => {
-    if (showNavBar) {
-      navigationIsOpen.value = route.query.showNavBar === "true"
-    }
-  },
-  { immediate: true }
-)
-
 const router = useRouter()
-
-watch(navigationIsOpen, () =>
-  router.replace({
-    ...route,
-    query: { ...route.query, showNavBar: navigationIsOpen.value.toString() },
-  })
+const navigationIsOpen = useToggleStateInRouteQuery(
+  "showNavBar",
+  route,
+  router.replace
 )
 </script>
 
