@@ -25,7 +25,7 @@ interface NormsMapper {
     }
 
     fun articlesToDto(articles: List<Article>, normId: Int): List<ArticleDto> {
-        return articles.map { ArticleDto(0, it.guid, it.marker, it.title, normId) }
+        return articles.map { ArticleDto(0, it.guid, it.title, it.marker, normId) }
     }
 
     fun paragraphsToDto(paragraphs: List<Paragraph>, articleId: Int): List<ParagraphDto> {
