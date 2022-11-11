@@ -3,8 +3,8 @@ import { computed } from "vue"
 
 interface Props {
   label: string
-  value: string | null | undefined
-  direction?: string | undefined
+  value?: string
+  direction?: string
 }
 
 const props = defineProps<Props>()

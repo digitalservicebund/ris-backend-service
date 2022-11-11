@@ -8,7 +8,7 @@ const visible = ref(false)
 <template>
   <div class="flex flex-row gap-[3rem] h-[10rem] justify-between w-full">
     <div class="flex h-[10rem]">
-      <SideToggle aria-label="Inhalt" from-side="left" :is-expanded="visible"
+      <SideToggle from-side="left" :is-expanded="visible" label="Inhalt"
         ><div class="flex w-full">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem
           iusto autem quasi saepe fuga quis dolores dolor ipsum eligendi dolore
@@ -18,10 +18,7 @@ const visible = ref(false)
       </SideToggle>
     </div>
     <div class="flex h-[10rem]">
-      <SideToggle
-        aria-label="Inhalt rechts"
-        from-side="right"
-        :is-expanded="visible"
+      <SideToggle from-side="right" :is-expanded="visible" label="Inhalt rechts"
         ><div class="flex w-full">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptatem
           iusto autem quasi saepe fuga quis dolores dolor ipsum eligendi dolore
