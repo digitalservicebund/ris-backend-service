@@ -4,7 +4,7 @@ import InfoModal from "@/components/InfoModal.vue"
 
 <template>
   <InfoModal
-    description="Diese Seite wird gerade eingebaut. Vesuchen Sie diese Seite später erneut !"
+    description="Diese Seite wird gerade eingebaut. Vesuchen Sie es später erneut!"
     title="Es ist ein Fehler aufgetreten"
   ></InfoModal>
 </template>
