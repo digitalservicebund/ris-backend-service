@@ -9,7 +9,6 @@ testWithImportedNorm("Check display of norm", async ({ page, createdGuid }) => {
   const locatorA = page.locator(`a[href*="/norms/norm/${createdGuid}"]`)
   await expect(locatorA).toBeVisible()
   await locatorA.click()
-  await expect(locatorA).not.toBeVisible()
 
   await expect(page).toHaveURL(`/norms/norm/${createdGuid}`)
   await expect(page.getByText(normCleanCars.longTitle)).toBeVisible()
