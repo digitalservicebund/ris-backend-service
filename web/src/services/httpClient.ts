@@ -27,6 +27,12 @@ interface HttpClient {
     data?: TRequest
   ): Promise<ServiceResponse<TResponse>>
 
+  patch<TRequest, TResponse>(
+    url: string,
+    config?: RequestOptions,
+    data?: TRequest
+  ): Promise<ServiceResponse<TResponse>>
+
   delete<TResponse>(
     url: string,
     config?: RequestOptions
@@ -73,6 +79,9 @@ const httpClient: HttpClient = {
   },
   async put<T>(url: string, options: RequestOptions, data: T) {
     return baseHttp(url, "put", { ...options }, data)
+  },
+  async patch<T>(url: string, options: RequestOptions, data: T) {
+    return baseHttp(url, "patch", { ...options }, data)
   },
   async delete(url: string, options: RequestOptions) {
     return baseHttp(url, "delete", { ...options })

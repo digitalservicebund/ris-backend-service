@@ -1,5 +1,9 @@
 import httpClient from "@/services/httpClient"
-import { getAllNorms, getNormByGuid } from "@/services/normsService"
+import {
+  editNormFrame,
+  getAllNorms,
+  getNormByGuid,
+} from "@/services/normsService"
 
 vi.mock("@/services/httpClient")
 
@@ -105,6 +109,49 @@ describe("normsService", () => {
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht geladen werden."
+      )
+    })
+  })
+
+  describe("edit norm frame", () => {
+    it("sends command to the backend with the correct parameters", async () => {
+      const httpClientPatch = vi
+        .mocked(httpClient)
+        .patch.mockResolvedValueOnce({ status: 204, data: "" })
+
+      await editNormFrame("fake-guid", "new title")
+
+      expect(httpClientPatch).toHaveBeenCalledOnce()
+      expect(httpClientPatch).toHaveBeenLastCalledWith(
+        "norms/fake-guid",
+        undefined,
+        { longTitle: "new title" }
+      )
+    })
+
+    it("responds with correct error message if server response status is above 300", async () => {
+      vi.mocked(httpClient).patch.mockResolvedValueOnce({
+        status: 300,
+        data: "",
+      })
+
+      const response = await editNormFrame("fake-guid", "new title")
+
+      expect(response.error?.title).toBe(
+        "Dokumentationseinheit konnte nicht bearbeitet werden."
+      )
+    })
+
+    it("responds with correct error message if connection failed", async () => {
+      vi.mocked(httpClient).patch.mockResolvedValueOnce({
+        status: 500,
+        error: { title: "error" },
+      })
+
+      const response = await editNormFrame("fake-guid", "new title")
+
+      expect(response.error?.title).toBe(
+        "Dokumentationseinheit konnte nicht bearbeitet werden."
       )
     })
   })
