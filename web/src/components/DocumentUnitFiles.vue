@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { defineEmits } from "vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FileViewer from "@/components/FileViewer.vue"
