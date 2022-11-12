@@ -1,132 +1,61 @@
 <script lang="ts" setup>
-import { useRouter, useRoute } from "vue-router"
+import type { RouteLocationRaw } from "vue-router"
 
-defineProps<{ documentNumber?: string }>()
+interface Props {
+  menuItems: MenuItem[]
+  goBackLabel: string
+  goBackRoute: RouteLocationRaw
+}
 
-const router = useRouter()
-const route = useRoute()
+defineProps<Props>()
+</script>
 
-const linkStyling = (componentName: string) => ({
-  underline: router.currentRoute.value.name === componentName,
-})
+<script lang="ts">
+export interface ChildMenuItem {
+  name: string
+  route: RouteLocationRaw
+  isDisabled?: boolean
+}
+
+export interface MenuItem extends ChildMenuItem {
+  children?: ChildMenuItem[]
+}
 </script>
 
 <template>
-  <div class="flex flex-col w-[24rem]">
+  <div class="px-14 w-[24rem]">
+    <router-link
+      class="flex gap-12 h-80 items-center link-01-bold text-blue-800"
+      :to="goBackRoute"
+    >
+      <span class="material-icons">arrow_back</span>
+      <span>{{ goBackLabel }}</span>
+    </router-link>
+
     <div
-      class="border-b border-gray-400 border-solid flex h-80 items-center justify-between pl-3"
+      v-for="menuItem in menuItems"
+      :key="menuItem.name"
+      class="border-gray-400 border-t-2"
     >
       <router-link
-        class="flex gap-12 items-center link-01-bold px-[1.3rem] py-[0.44rem] text-blue-800"
-        :to="{ name: 'caselaw' }"
+        active-class="bg-blue-200"
+        class="block hover:bg-blue-200 hover:underline label-02-bold my-10 px-8 py-12"
+        :class="{ disabled: menuItem.isDisabled, 'mb-0': menuItem.children }"
+        exact-path
+        :to="menuItem.route"
       >
-        <span class="material-icons">arrow_back</span>
-        <span>ZURÜCK</span>
-      </router-link>
-    </div>
-
-    <div class="flex flex-col">
-      <router-link
-        class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-        :class="linkStyling('caselaw-documentUnit-:documentNumber-categories')"
-        :to="{
-          name: 'caselaw-documentUnit-:documentNumber-categories',
-          params: { documentNumber: documentNumber },
-          query: route.query,
-        }"
-      >
-        Rubriken
+        {{ menuItem.name }}
       </router-link>
 
       <router-link
-        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
-        :to="{
-          name: 'caselaw-documentUnit-:documentNumber-categories',
-          params: { documentNumber: documentNumber },
-          query: route.query,
-          hash: '#coreData',
-        }"
-        >Stammdaten</router-link
+        v-for="(childMenuItem, index) in menuItem.children"
+        :key="childMenuItem.name"
+        class="block hover:bg-blue-200 hover:underline label-02-reg p-10 pl-16"
+        :class="{ 'mb-24': index + 1 == menuItem.children?.length }"
+        :to="childMenuItem.route"
       >
-      <router-link
-        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
-        :to="{
-          name: 'caselaw-documentUnit-:documentNumber-categories',
-          params: { documentNumber: documentNumber },
-          query: route.query,
-          hash: '#previousDecisions',
-        }"
-        >Rechtszug</router-link
-      >
-      <router-link
-        class="hover:bg-blue-200 hover:underline px-[2.667rem] py-[0.33rem]"
-        :to="{
-          name: 'caselaw-documentUnit-:documentNumber-categories',
-          params: { documentNumber: documentNumber },
-          query: route.query,
-          hash: '#texts',
-        }"
-        >Kurz- & Langtexte</router-link
-      >
-      <router-link
-        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-        :class="linkStyling('caselaw-documentUnit-:documentNumber-files')"
-        :to="{
-          name: 'caselaw-documentUnit-:documentNumber-files',
-          params: { documentNumber: documentNumber },
-          query: route.query,
-        }"
-        >Dokumente</router-link
-      >
-      <div
-        class="border-b border-gray-400 font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-      >
-        Bearbeitungsstand
-      </div>
-
-      <router-link
-        class="font-bold hover:bg-blue-200 hover:underline px-[1.3rem] py-[0.44rem]"
-        :to="{
-          name: 'caselaw-documentUnit-:documentNumber-publication',
-          params: { documentNumber: documentNumber },
-        }"
-        >Veröffentlichen</router-link
-      >
+        {{ childMenuItem.name }}
+      </router-link>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.side-navbar-active-link {
-  text-decoration: underline;
-}
-
-.sidebar-open {
-  display: flex;
-  width: 100px;
-  height: 65px;
-  align-items: center; // align vertical
-  justify-content: center; // align horizontal
-  border-radius: 10px;
-  margin-left: 6px;
-  transform: rotate(-90deg) translateX(-165px);
-  transform-origin: left;
-}
-
-.sidebar-open-text {
-  margin-left: 40px;
-}
-
-.sidebar-open-icon-background {
-  min-width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  transform: rotate(90deg) translateX(3px) translateY(-10px);
-}
-
-.sidebar-open-icon {
-  margin-top: 8px;
-  margin-left: 9px;
-  color: white;
-}
-</style>
