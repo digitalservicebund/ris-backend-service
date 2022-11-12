@@ -39,3 +39,28 @@ export async function getNormByGuid(
     }
   }
 }
+
+export async function editNormFrame(
+  guid: string,
+  longTitle: string
+): Promise<ServiceResponse<void>> {
+  const { status, error } = await httpClient.patch<{ longTitle: string }, void>(
+    `norms/${guid}`,
+    undefined,
+    { longTitle }
+  )
+
+  if (status >= 300 || error) {
+    return {
+      status: status,
+      error: {
+        title: "Dokumentationseinheit konnte nicht bearbeitet werden.",
+      },
+    }
+  } else {
+    return {
+      status,
+      data: undefined,
+    }
+  }
+}
