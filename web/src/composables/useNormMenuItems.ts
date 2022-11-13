@@ -23,7 +23,7 @@ export function useNormMenuItems(
       name: "RAHMEN",
       route: {
         ...baseRoute,
-        name: "norms-norm-:normGuid",
+        name: "norms-norm-:normGuid-frame",
       },
       isDisabled: true,
       children: [
@@ -31,24 +31,22 @@ export function useNormMenuItems(
           name: "Normgeber",
           route: {
             ...baseRoute,
-            name: "norms-norm-:normGuid-edit",
-            hash: "#normgeber",
+            name: "norms-norm-:normGuid-frame",
+            hash: "#headlines",
           },
         },
         {
           name: "Mitwirkende Organe",
           route: {
             ...baseRoute,
-            name: "norms-norm-:normGuid-edit",
-            hash: "#mitwirkendeOrgane",
+            name: "norms-norm-:normGuid-frame",
           },
         },
         {
           name: "Sachgebiet",
           route: {
             ...baseRoute,
-            name: "norms-norm-:normGuid-edit",
-            hash: "#sachgebiet",
+            name: "norms-norm-:normGuid-frame",
           },
         },
       ],
