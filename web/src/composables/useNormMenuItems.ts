@@ -23,7 +23,7 @@ export function useNormMenuItems(
       name: "RAHMEN",
       route: {
         ...baseRoute,
-        name: "norms-norm-:normGuid-edit",
+        name: "norms-norm-:normGuid",
       },
       isDisabled: true,
       children: [
