@@ -39,7 +39,7 @@ watch(() => props.normGuid, loadNormByGuid, { immediate: true })
       />
     </SideToggle>
 
-    <div class="bg-gray-100 p-64 w-full">
+    <div class="bg-gray-100 border-gray-400 border-l-1 p-48 w-full">
       <router-view :norm="norm" />
     </div>
   </div>
