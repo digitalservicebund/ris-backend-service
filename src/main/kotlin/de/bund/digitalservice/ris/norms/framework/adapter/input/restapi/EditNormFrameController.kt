@@ -23,7 +23,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         return editNormFrameService
             .editNormFrame(command)
-            .map({ ResponseEntity.noContent().build<Void>() })
+            .map { ResponseEntity.noContent().build<Void>() }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
 

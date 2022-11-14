@@ -77,7 +77,7 @@ class ImportNormServiceTest {
         every { port.saveNorm(capture(savedNorm)) } returns Mono.just(true)
 
         StepVerifier.create(service.importNorm(command))
-            .expectNextMatches({ it == savedNorm.captured.guid })
+            .expectNextMatches { it == savedNorm.captured.guid }
             .verifyComplete()
     }
 }

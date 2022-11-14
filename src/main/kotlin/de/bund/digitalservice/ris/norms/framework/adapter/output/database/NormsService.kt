@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
+import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
@@ -15,7 +16,7 @@ import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.util.UUID
+import java.util.*
 
 @Component
 @Primary
@@ -23,7 +24,7 @@ class NormsService(
     val normsRepository: NormsRepository,
     val articlesRepository: ArticlesRepository,
     val paragraphsRepository: ParagraphsRepository
-) : NormsMapper, GetAllNormsOutputPort, GetNormByGuidOutputPort, SaveNormOutputPort {
+) : NormsMapper, GetAllNormsOutputPort, GetNormByGuidOutputPort, SaveNormOutputPort, EditNormOutputPort {
 
     override fun getNormByGuid(guid: UUID): Mono<Norm> {
         return normsRepository
@@ -43,6 +44,16 @@ class NormsService(
             .flatMap { normDto ->
                 saveNormArticles(norm, normDto)
                     .then(Mono.just(true))
+            }
+    }
+
+    override fun editNorm(norm: Norm): Mono<Boolean> {
+        return normsRepository
+            .findByGuid(norm.guid)
+            .flatMap { normDto ->
+                normsRepository
+                    .save(normToDto(norm, normDto.id))
+                    .flatMap { Mono.just(true) }
             }
     }
 
