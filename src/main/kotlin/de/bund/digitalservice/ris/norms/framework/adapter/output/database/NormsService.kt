@@ -11,12 +11,14 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Pa
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticlesRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.UUID
 
 @Component
+@Primary
 class NormsService(
     val normsRepository: NormsRepository,
     val articlesRepository: ArticlesRepository,

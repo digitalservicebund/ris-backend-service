@@ -4,11 +4,13 @@ import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutpu
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.util.UUID
 import kotlin.collections.HashMap
 
+@Component
 class NormsMemoryRepository : GetAllNormsOutputPort, GetNormByGuidOutputPort, SaveNormOutputPort {
     private val data = HashMap<UUID, Norm>()
 
