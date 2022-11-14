@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: f8bb25ca865c7ab5d7eb9899946dbaec66a62612ffd817bbaf62cdfde980f2b9
+    checksum: dcf2a83fd0651282094339b81ced21f6763534fbdd88b3e351f469fc157adffa
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
@@ -43,6 +43,8 @@ fileignoreconfig:
     checksum: 85d86e3c159e742249182f8ee136ff36b4aa5c2024e5ca5d84cc47b1924db94e
   - filename: src/main/resources/db/migration/V0.5__norms_update_id.sql
     checksum: d1efb2f738e2ce9a172e80dd10f9a571d5e5702ed642abe71d0d05ef420f1641
+  - filename: src/main/resources/db/migration/V0.6__norms_remove_fk_constraints.sql
+    checksum: 3f5507a5d3a75fd144781d45c7dd35755f3354cebbcca3cc656710f07acfc55f
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/playwright.config.ts
