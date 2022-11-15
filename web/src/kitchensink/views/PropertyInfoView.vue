@@ -2,11 +2,9 @@
 import PropertyInfo from "@/components/PropertyInfo.vue"
 </script>
 
-interface Props { label: string value?: string direction?: string }
-
 <template>
-  <h1 class="mb-10 mt-20">row:</h1>
+  <h2 class="heading-02-regular mb-10 mt-20">row:</h2>
   <PropertyInfo direction="row" label="myLabel" value="value" />
-  <h1 class="mb-10 mt-40">column:</h1>
+  <h2 class="heading-02-regular mb-10 mt-40">column:</h2>
   <PropertyInfo direction="column" label="myLabel" value="value" />
 </template>
