@@ -1,16 +1,21 @@
 export type CoreData = {
   fileNumber?: string
-  courtType?: string
+  court?: Court
   category?: string
   procedure?: string
   ecli?: string
   appraisalBody?: string
   decisionDate?: string
-  courtLocation?: string
   legalEffect?: string
   inputType?: string
   center?: string
   region?: string
+}
+
+export type Court = {
+  type: string
+  location: string
+  label: string
 }
 
 export type Texts = {

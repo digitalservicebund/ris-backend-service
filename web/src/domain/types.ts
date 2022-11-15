@@ -1,3 +1,5 @@
+import { Court } from "@/domain/documentUnit"
+
 export enum InputType {
   TEXT = "text",
   FILE = "file",
@@ -40,12 +42,16 @@ export interface DateInputField extends BaseInputField {
 
 export enum LookupTableEndpoint {
   documentTypes = "lookuptable/documentTypes",
+  courts = "lookuptable/courts",
 }
+
+export type DropdownInputModelType = string | Court
 
 export type DropdownItem = {
   text: string
-  value: string
+  value: DropdownInputModelType
 }
+
 export interface DropdownAttributes extends BaseInputAttributes {
   isCombobox?: boolean
   placeholder?: string
@@ -60,7 +66,10 @@ export interface DropdownInputField extends BaseInputField {
 
 export type InputField = TextInputField | DropdownInputField | DateInputField
 export type InputAttributes = TextInputAttributes | DropdownAttributes
-export type ModelType = TextInputModelType | DateInputModelType
+export type ModelType =
+  | TextInputModelType
+  | DateInputModelType
+  | DropdownInputModelType
 
 export type ValidationError = {
   defaultMessage: string

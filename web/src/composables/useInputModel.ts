@@ -22,7 +22,10 @@ export function useInputModel<
   })
 
   watch(inputValue, () => {
-    emit("update:modelValue", inputValue.value)
+    emit(
+      "update:modelValue",
+      inputValue.value === "" ? undefined : inputValue.value
+    )
   })
 
   function emitInputEvent(event: Event): void {

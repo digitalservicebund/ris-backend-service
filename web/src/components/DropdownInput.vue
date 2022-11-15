@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref } from "vue"
-import { useInputModel } from "@/composables/useInputModel"
+import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { Court } from "@/domain/documentUnit"
 import type { DropdownItem } from "@/domain/types"
-import { LookupTableEndpoint } from "@/domain/types"
+import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
 import lookupTableService from "@/services/lookupTableService"
 
 interface Props {
   id: string
-  value?: string // @public
-  modelValue?: string
+  value?: DropdownInputModelType // TODO do we need this?
+  modelValue?: DropdownInputModelType
   ariaLabel: string
   placeholder?: string
   dropdownItems: DropdownItem[] | LookupTableEndpoint
@@ -17,14 +17,40 @@ interface Props {
 }
 
 interface Emits {
-  (event: "update:modelValue", value: string | undefined): void
+  (event: "update:modelValue", value: DropdownInputModelType | undefined): void
   (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const inputValue = ref<DropdownInputModelType>()
+const inputText = ref<string>()
 
-const { inputValue } = useInputModel<string, Props, Emits>(props, emit)
+watch(
+  props,
+  () => {
+    inputValue.value = props.modelValue ?? props.value
+    checkValue()
+  },
+  {
+    immediate: true,
+  }
+)
+
+watch(inputValue, () => {
+  emit("update:modelValue", inputValue.value)
+  checkValue()
+})
+
+function checkValue() {
+  // TODO better solution to check for court type
+  if (typeof inputValue.value === "object") {
+    const court = inputValue.value as Court
+    inputText.value = court.label
+  } else {
+    inputText.value = inputValue.value as string
+  }
+}
 
 const isShowDropdown = ref(false)
 const items = ref(
@@ -53,11 +79,11 @@ const checkIfItemsNeedToBeFetched = () => {
 }
 
 const clearSelection = () => {
-  emit("update:modelValue", "")
+  emit("update:modelValue", undefined)
   filter.value = ""
 }
 
-const updateValue = (value: string) => {
+const updateValue = (value: DropdownInputModelType) => {
   emit("update:modelValue", value)
   filter.value = ""
   isShowDropdown.value = false
@@ -75,12 +101,15 @@ const keydown = (index: number) => {
 
 const onTextChange = () => {
   checkIfItemsNeedToBeFetched()
-  emit("update:modelValue", "")
+  emit("update:modelValue", undefined)
   const textInput = document.querySelector(
     `.input-container #${props.id}`
   ) as HTMLInputElement
   isShowDropdown.value = true
-  emit("update:modelValue", textInput.value)
+  emit(
+    "update:modelValue",
+    textInput.value === "" ? undefined : textInput.value
+  )
   filter.value = textInput.value
 }
 
@@ -141,7 +170,7 @@ onBeforeUnmount(() => {
           :placeholder="placeholder"
           :readonly="!props.isCombobox"
           tabindex="0"
-          :value="inputValue"
+          :value="inputText"
           @click="selectAllText"
           @input="onTextChange"
         />

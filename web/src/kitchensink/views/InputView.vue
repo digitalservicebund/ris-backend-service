@@ -4,24 +4,28 @@ import DropdownInput from "@/components/DropdownInput.vue"
 import InputElement from "@/components/InputElement.vue"
 import InputField from "@/components/InputField.vue"
 import TextInput from "@/components/TextInput.vue"
-import type { InputAttributes } from "@/domain"
+import type {
+  DropdownInputModelType,
+  InputAttributes,
+  ModelType,
+} from "@/domain"
 import { InputType, ValidationError, defineTextField } from "@/domain"
 import type { DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 
 const items: DropdownItem[] = dropdownItems.items
-const modelValue1 = ref("")
-const modelValue2 = ref("")
+const modelValue1 = ref<DropdownInputModelType>()
+const modelValue2 = ref<ModelType>()
 const hasError = ref(true)
 const isReadonly = ref(true)
 const mockValidationError: ValidationError = {
   defaultMessage: "wrong date",
   field: "coreData.decisionDate",
 }
-const updateValue1 = (textValue: string | undefined) => {
+const updateValue1 = (textValue: DropdownInputModelType | undefined) => {
   if (!!textValue) modelValue1.value = textValue
 }
-const updateValue2 = (textValue: string | undefined) => {
+const updateValue2 = (textValue: ModelType | undefined) => {
   if (!!textValue) modelValue2.value = textValue
 }
 const textInputAttribute: InputAttributes = {

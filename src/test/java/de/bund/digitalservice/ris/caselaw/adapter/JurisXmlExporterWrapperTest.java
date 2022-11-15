@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -42,7 +43,7 @@ public class JurisXmlExporterWrapperTest {
     CoreData coreData =
         CoreData.builder()
             .fileNumber("fileNumber")
-            .courtType("courtType")
+            .court(new Court("courtType", null, null))
             .category("category")
             .ecli("ecli")
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
@@ -111,13 +112,11 @@ public class JurisXmlExporterWrapperTest {
     CoreData coreData =
         CoreData.builder()
             .fileNumber("fileNumber")
-            .courtType("courtType")
             .category("category")
             .procedure("procedure")
             .ecli("ecli")
             .appraisalBody("appraisalBody")
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
-            .courtLocation("courtLocation")
             .legalEffect("legalEffect")
             .inputType("inputType")
             .center("center")

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +55,15 @@ public class DocumentUnitBuilder {
       return DocumentUnit.EMPTY;
     }
 
+    Court court = null;
+    if (documentUnitDTO.getCourtType() != null && documentUnitDTO.getCourtLocation() != null) {
+      court =
+          new Court(
+              documentUnitDTO.getCourtType(),
+              documentUnitDTO.getCourtLocation(),
+              documentUnitDTO.getCourtType() + " " + documentUnitDTO.getCourtLocation());
+    }
+
     return new DocumentUnit(
         documentUnitDTO.getId(),
         documentUnitDTO.getUuid(),
@@ -65,7 +75,7 @@ public class DocumentUnitBuilder {
         documentUnitDTO.getFilename(),
         new CoreData(
             documentUnitDTO.getFileNumber(),
-            documentUnitDTO.getCourtType(),
+            court,
             documentUnitDTO.getCategory(),
             documentUnitDTO.getProcedure(),
             documentUnitDTO.getEcli(),
@@ -73,7 +83,6 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getDecisionDate() != null
                 ? Instant.parse(documentUnitDTO.getDecisionDate())
                 : null,
-            documentUnitDTO.getCourtLocation(),
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),

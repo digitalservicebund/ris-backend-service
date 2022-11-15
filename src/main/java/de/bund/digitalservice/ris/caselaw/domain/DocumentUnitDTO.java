@@ -45,7 +45,8 @@ public class DocumentUnitDTO {
         .filetype(documentUnit.filetype())
         .filename(documentUnit.filename())
         .fileNumber(documentUnit.coreData().fileNumber())
-        .courtType(documentUnit.coreData().courtType())
+        .courtType(
+            documentUnit.coreData().court() == null ? null : documentUnit.coreData().court().type())
         .category(documentUnit.coreData().category())
         .procedure(documentUnit.coreData().procedure())
         .ecli(documentUnit.coreData().ecli())
@@ -54,7 +55,10 @@ public class DocumentUnitDTO {
             documentUnit.coreData().decisionDate() != null
                 ? documentUnit.coreData().decisionDate().toString()
                 : null)
-        .courtLocation(documentUnit.coreData().courtLocation())
+        .courtLocation(
+            documentUnit.coreData().court() == null
+                ? null
+                : documentUnit.coreData().court().location())
         .legalEffect(documentUnit.coreData().legalEffect())
         .inputType(documentUnit.coreData().inputType())
         .center(documentUnit.coreData().center())

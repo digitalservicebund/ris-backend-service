@@ -9,7 +9,7 @@ import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import { ValidationError } from "@/domain"
-import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
+import DocumentUnit, { Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
@@ -75,11 +75,8 @@ watch(
 
 const coreData = computed({
   get: () => props.documentUnit.coreData,
-  set: (newValues) => {
-    for (const [key, value] of Object.entries(newValues)) {
-      updatedDocumentUnit.value.coreData[key as keyof CoreData] = value
-    }
-  },
+  set: (newValues) =>
+    Object.assign(updatedDocumentUnit.value.coreData, newValues),
 })
 
 const previousDecisions = computed({

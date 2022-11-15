@@ -19,7 +19,7 @@ const entries = computed(() => [
   },
   {
     label: "Gerichtstyp",
-    value: props.documentUnit.coreData.courtType,
+    value: props.documentUnit.coreData.court?.type,
   },
 ])
 </script>

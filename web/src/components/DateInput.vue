@@ -49,6 +49,8 @@ const conditionalClasses = computed(() => ({
 function handleOnBlur() {
   if (!hasError.value)
     emit("update:modelValue", dayjs(inputValue.value).toISOString())
+  // TODO support clearing date and sending undefined to backend
+  // empty field should not be an error
 }
 </script>
 

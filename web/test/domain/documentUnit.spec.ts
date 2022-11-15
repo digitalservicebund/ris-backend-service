@@ -11,11 +11,15 @@ describe("DocumentUnit", () => {
   it("returns core Data as object", () => {
     const documentUnit = new DocumentUnit("foo")
     documentUnit.coreData.fileNumber = "bar"
-    documentUnit.coreData.courtLocation = "baz"
+    documentUnit.coreData.court = {
+      type: "baz",
+      location: "baz",
+      label: "baz",
+    }
 
     const coreData: CoreData = documentUnit.coreData
     expect(coreData.fileNumber).toBe("bar")
-    expect(coreData.courtLocation).toBe("baz")
+    expect(coreData.court?.location).toBe("baz")
   })
 
   it("returns texts as object", () => {
