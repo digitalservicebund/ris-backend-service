@@ -46,7 +46,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   <div class="expandable-content">
     <button
       aria-label="Toggle Content Visibility"
-      class="-mt-[2.625rem] expandable-content__header h-[1.25rem] ml-[0.625rem] text-white w-[1.25rem]"
+      class="-mt-[2.625rem] expandable-content__header h-[1.25rem] text-white"
       @click="toggleContentVisibility"
     >
       <span class="bg-blue-800 material-icons rounded-full w-icon">{{
@@ -102,10 +102,16 @@ const resizeObserver = new ResizeObserver((entries) => {
   width: 100%;
 
   &__header {
+    position: relative;
     display: flex;
-    width: 100%;
     align-items: center;
     justify-content: flex-end;
+    margin-left: 100%;
+
+    .w-icon {
+      position: absolute;
+      right: -11px;
+    }
   }
 }
 </style>
