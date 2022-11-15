@@ -22,6 +22,7 @@ export function useSaveToRemote(
 
       if (lastSaveError.value == undefined) {
         lastSavedOn.value = new Date()
+        lastSaveError.value = undefined
       }
     } catch (error) {
       console.error(error)
@@ -33,7 +34,6 @@ export function useSaveToRemote(
 
   const timer = setInterval(triggerSave, autoSaveInterval)
   onUnmounted(() => {
-    console.log("no more!")
     clearInterval(timer)
   })
 
