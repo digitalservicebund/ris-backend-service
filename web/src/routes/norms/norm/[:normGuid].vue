@@ -13,6 +13,10 @@ const props = defineProps<{ normGuid: string }>()
 const route = useRoute()
 const router = useRouter()
 const { normGuid } = toRefs(props)
+const fetchNorm = function () {
+  loadNormByGuid()
+}
+
 const menuItems = useNormMenuItems(normGuid, route)
 const goBackRoute = { name: "norms" }
 const navigationIsOpen = useToggleStateInRouteQuery(
@@ -40,7 +44,7 @@ watch(() => props.normGuid, loadNormByGuid, { immediate: true })
     </SideToggle>
 
     <div class="bg-gray-100 border-gray-400 border-l-1 p-48 w-full">
-      <router-view :norm="norm" />
+      <router-view :norm="norm" @fetch-norm="fetchNorm" />
     </div>
   </div>
 </template>

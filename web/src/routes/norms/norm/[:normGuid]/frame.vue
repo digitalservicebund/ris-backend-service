@@ -12,7 +12,12 @@ interface Props {
   norm: Norm
 }
 
+interface Emits {
+  (event: "fetchNorm"): void
+}
+
 const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
 const frameData = computed({
   get: () => ({
@@ -41,6 +46,7 @@ useScrollToHash(routeHash)
       :service-callback="
         () => editNormFrame(props.norm.guid, frameData.longTitle)
       "
+      @fetch-norm="emit('fetchNorm')"
     />
   </div>
 </template>
