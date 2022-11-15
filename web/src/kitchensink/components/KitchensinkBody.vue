@@ -3,6 +3,7 @@ import { computed } from "vue"
 import type { risComponent } from "@/kitchensink/types/types"
 import ButtonView from "@/kitchensink/views/ButtonView.vue"
 import CodeSnippetView from "@/kitchensink/views/CodeSnippetView.vue"
+import DocumentUnitInfoPanelView from "@/kitchensink/views/DocumentUnitInfoPanelView.vue"
 import ErrorView from "@/kitchensink/views/ErrorView.vue"
 import ExpandableContentView from "@/kitchensink/views/ExpandableContentView.vue"
 import FileUploadView from "@/kitchensink/views/FileUploadView.vue"
@@ -45,6 +46,8 @@ const component = computed(() => {
       return TextEditorView
     case "SideToggleView":
       return SideToggleView
+    case "DocumentUnitInfoPanelView":
+      return DocumentUnitInfoPanelView
     default:
       return ErrorView
   }
