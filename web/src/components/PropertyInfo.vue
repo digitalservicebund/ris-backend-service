@@ -4,7 +4,7 @@ import { computed } from "vue"
 interface Props {
   label: string
   value?: string
-  direction?: string
+  direction?: "row" | "column"
 }
 
 const props = defineProps<Props>()
