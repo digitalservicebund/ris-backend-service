@@ -30,90 +30,35 @@ watch(() => lastSavedOn, handleNormUpdate, { immediate: true })
 </script>
 
 <template>
-  <div class="save-button-container">
+  <div class="flex flex-row items-end justify-start space-x-[10px]">
     <TextButton :aria-label="ariaLabel" @click="triggerSave" />
-    <div class="save-status">
+    <div class="flex flex-row items-end justify-start">
       <div v-if="saveIsInProgress">
-        <div class="icon">
+        <div class="flex flex-wrap h-[25px] items-center w-[30px]">
           <span class="material-icons"> cloud_upload </span>
         </div>
-        <p class="status-text">Daten werden gespeichert</p>
+        <p class="font-normal text-sm tracking-[0.16px]">
+          Daten werden gespeichert
+        </p>
       </div>
       <div v-if="lastSaveError !== undefined && !saveIsInProgress">
-        <div class="icon icon--error">
+        <div class="icon text-red-900">
           <span class="material-icons"> error_outline </span>
         </div>
-        <p class="error-text">Fehler beim Speichern</p>
+        <p class="font-normal text-base tracking-[0.16px]">
+          Fehler beim Speichern
+        </p>
       </div>
       <div v-if="lastSavedOn !== undefined && !saveIsInProgress">
-        <p class="status-text">
+        <p class="font-normal text-sm tracking-[0.16px]">
           Zuletzt gespeichert um
-          <span class="on-succeed">{{ getCurrentTime(lastSavedOn) }}</span> Uhr
+          <span
+            class="delay-1000 duration-2000 ease-in scale-87 text-base transition"
+            >{{ getCurrentTime(lastSavedOn) }}</span
+          >
+          Uhr
         </p>
       </div>
     </div>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.save-button-container {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-end;
-  justify-content: flex-start;
-  column-gap: 10px;
-
-  .save-status div {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-items: flex-start;
-
-    .icon {
-      display: flex;
-      width: 30px;
-      height: 25px;
-      flex-wrap: wrap;
-      align-items: center;
-
-      &--error {
-        color: red;
-      }
-    }
-
-    p {
-      font-weight: 400;
-      letter-spacing: 0.16px;
-    }
-
-    .status-text {
-      font-size: 14px;
-      line-height: 18px;
-    }
-
-    .error-text {
-      font-size: 16px;
-      line-height: 22px;
-    }
-
-    .on-succeed {
-      animation: text-faded;
-      animation-delay: 1s;
-      animation-duration: 2s;
-      animation-fill-mode: forwards;
-      animation-timing-function: ease-in;
-      font-size: 16px;
-    }
-  }
-
-  @keyframes text-faded {
-    from {
-      font-size: 16px;
-    }
-
-    to {
-      font-size: 14px;
-    }
-  }
-}
-</style>
