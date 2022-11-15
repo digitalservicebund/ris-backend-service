@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtReposito
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -32,7 +33,7 @@ class LookupTableServiceTest {
     documentTypeDTO.setId(3L);
     when(documentTypeRepository.findAll()).thenReturn(Flux.just(documentTypeDTO));
 
-    StepVerifier.create(service.getDocumentTypes())
+    StepVerifier.create(service.getDocumentTypes(Optional.empty()))
         .consumeNextWith(
             documentType -> {
               assertThat(documentType).isInstanceOf(DocumentType.class);

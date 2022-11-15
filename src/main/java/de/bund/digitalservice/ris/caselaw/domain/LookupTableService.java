@@ -22,7 +22,17 @@ public class LookupTableService {
     this.courtRepository = courtRepository;
   }
 
-  public Flux<DocumentType> getDocumentTypes() {
+  public Flux<DocumentType> getDocumentTypes(Optional<String> searchStr) {
+    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
+      return documentTypeRepository
+          .findBySearchStr(searchStr.get())
+          .map(
+              documentTypeDTO ->
+                  new DocumentType(
+                      documentTypeDTO.getId(),
+                      documentTypeDTO.getJurisShortcut(),
+                      documentTypeDTO.getLabel()));
+    }
     return documentTypeRepository
         .findAll()
         .map(

@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ class LookupTableControllerTest {
 
   @Test
   void testGetDocumentTypes() {
-    when(service.getDocumentTypes()).thenReturn(Flux.empty());
+    when(service.getDocumentTypes(Optional.empty())).thenReturn(Flux.empty());
 
     webClient
         .mutateWith(csrf())
@@ -36,6 +37,6 @@ class LookupTableControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getDocumentTypes();
+    verify(service, times(1)).getDocumentTypes(Optional.empty());
   }
 }
