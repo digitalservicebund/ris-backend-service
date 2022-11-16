@@ -7,6 +7,9 @@ type RequestOptions = {
     "Content-Type"?: string
     "X-Filename"?: string
   }
+  params?: {
+    [key: string]: string
+  }
 }
 
 interface HttpClient {

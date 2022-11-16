@@ -73,7 +73,7 @@ const checkIfItemsNeedToBeFetched = () => {
     items.value.length == 0
   ) {
     lookupTableService
-      .getAll(props.dropdownItems)
+      .fetch(props.dropdownItems)
       .then((response) => (items.value = response))
   }
 }

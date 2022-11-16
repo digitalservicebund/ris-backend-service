@@ -4,15 +4,21 @@ import { Court } from "@/domain/documentUnit"
 import { DocumentType } from "@/domain/lookupTables"
 
 interface LookupTableService {
-  getAll(endpoint: LookupTableEndpoint): Promise<DropdownItem[]>
+  fetch(
+    endpoint: LookupTableEndpoint,
+    searchStr?: string
+  ): Promise<DropdownItem[]>
 }
 
 const service: LookupTableService = {
-  async getAll(endpoint: LookupTableEndpoint) {
+  async fetch(endpoint: LookupTableEndpoint, searchStr?: string) {
     let response
     switch (endpoint) {
       case LookupTableEndpoint.documentTypes: {
-        response = await httpClient.get<DocumentType[]>(`caselaw/${endpoint}`)
+        response = await httpClient.get<DocumentType[]>(
+          `caselaw/${endpoint}`,
+          searchStr ? { params: { searchStr } } : undefined
+        )
         if (response.status >= 300 || !response.data) {
           return []
         }
@@ -22,7 +28,10 @@ const service: LookupTableService = {
         }))
       }
       case LookupTableEndpoint.courts: {
-        response = await httpClient.get<Court[]>(`caselaw/${endpoint}`)
+        response = await httpClient.get<Court[]>(
+          `caselaw/${endpoint}`,
+          searchStr ? { params: { searchStr } } : undefined
+        )
         if (response.status >= 300 || !response.data) {
           return []
         }
