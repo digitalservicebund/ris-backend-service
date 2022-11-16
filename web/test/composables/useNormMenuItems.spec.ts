@@ -33,7 +33,7 @@ describe("useCaseLawMenuItems", () => {
     )
 
     const topLebelNames = menuItems.value.map((item) => item.name)
-    expect(topLebelNames).toContain("Normkomplex")
+    expect(topLebelNames).toContain("Normenkomplex")
     expect(topLebelNames).toContain("Rahmen")
     expect(topLebelNames).toContain("Bestand")
     expect(topLebelNames).toContain("Abgabe")

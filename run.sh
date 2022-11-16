@@ -88,7 +88,7 @@ _dev() {
   fi
   docker build ./web -f web/Dockerfile -t neuris/frontend --no-cache
   eval "$(_gradle_env)"
-  docker compose up
+  docker-compose up
 }
 
 _commit_message_template() {
