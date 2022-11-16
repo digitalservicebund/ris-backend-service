@@ -2,19 +2,25 @@ import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
 import ExpandableContentnt from "@/components/ExpandableContent.vue"
 
-function renderComponent(options?: {
+function renderComponent({
+  header,
+  isExpanded,
+  defaultSlot = "",
+  headerSlot = "",
+}: {
   header?: string
   isExpanded?: boolean
   defaultSlot?: string
   headerSlot?: string
-}) {
+} = {}) {
   const slots = {
-    default: options?.defaultSlot ?? "",
-    header: options?.headerSlot ?? "",
+    default: defaultSlot,
+    header: headerSlot,
   }
-  const props = { header: options?.header, isExpanded: options?.isExpanded }
+  const props = { header, isExpanded }
   const renderResult = render(ExpandableContentnt, { slots, props })
   const user = userEvent.setup()
+
   return { user, ...renderResult }
 }
 
