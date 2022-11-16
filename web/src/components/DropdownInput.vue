@@ -11,6 +11,8 @@ interface Props {
   modelValue?: DropdownInputModelType
   ariaLabel: string
   placeholder?: string
+  // first is for static dropdowns with the items all present in the FE
+  // second is for dynamic fetching from BE based on the search input
   dropdownItems: DropdownItem[] | LookupTableEndpoint
   isCombobox?: boolean
   preselectedValue?: string
@@ -269,6 +271,7 @@ onBeforeUnmount(() => {
   &__dropdown-items {
     /** Always show on top after textbox and width equal to textbox */
     position: absolute;
+    z-index: 1;
     top: 100%;
     right: 0;
     left: 0;
