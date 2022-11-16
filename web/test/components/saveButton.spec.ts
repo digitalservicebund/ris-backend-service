@@ -7,7 +7,7 @@ import { ResponseError } from "@/services/httpClient"
 vi.mock("@/composables/useSaveToRemote")
 
 describe("SaveButton", () => {
-  it("data is being saved", async () => {
+  it("renders with info message that data is being saved", async () => {
     vi.mocked(useSaveToRemote).mockReturnValue({
       saveIsInProgress: ref(true),
       triggerSave: vi.fn(),
@@ -18,7 +18,7 @@ describe("SaveButton", () => {
     expect(getByText("Daten werden gespeichert")).toBeVisible()
   })
 
-  it("data was saved", async () => {
+  it("renders with info message that data was last saved on a specific time", async () => {
     vi.mocked(useSaveToRemote).mockReturnValue({
       saveIsInProgress: ref(false),
       triggerSave: vi.fn(),
@@ -29,7 +29,7 @@ describe("SaveButton", () => {
     expect(getByText("Zuletzt gespeichert um", { exact: false })).toBeVisible()
   })
 
-  it("error when saving", async () => {
+  it("renders with info message that there was an error when saving data", async () => {
     vi.mocked(useSaveToRemote).mockReturnValue({
       saveIsInProgress: ref(false),
       triggerSave: vi.fn(),

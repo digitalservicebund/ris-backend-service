@@ -1,14 +1,11 @@
 import { expect } from "@playwright/test"
 
+import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import normCleanCars from "./testdata/norm_clean_cars.json"
 
 testWithImportedNorm("Check display of norm", async ({ page, createdGuid }) => {
-  await page.goto("/norms")
-  await expect(page.getByText(normCleanCars.longTitle).first()).toBeVisible()
-  const locatorA = page.locator(`a[href*="/norms/norm/${createdGuid}"]`)
-  await expect(locatorA).toBeVisible()
-  await locatorA.click()
+  await openNorm(page, normCleanCars.longTitle, createdGuid)
 
   await expect(page).toHaveURL(`/norms/norm/${createdGuid}`)
   await expect(page.getByText(normCleanCars.longTitle)).toBeVisible()
