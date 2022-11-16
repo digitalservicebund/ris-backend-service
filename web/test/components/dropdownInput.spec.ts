@@ -1,7 +1,10 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
 import DropdownInput from "@/components/DropdownInput.vue"
+import { Court } from "@/domain/documentUnit"
 import type { DropdownItem } from "@/domain/types"
+import { LookupTableEndpoint } from "@/domain/types"
+import lookupTableService from "@/services/lookupTableService"
 
 const DROPDOWN_ITEMS: DropdownItem[] = [
   { text: "testItem1", value: "t1" },
@@ -217,7 +220,7 @@ describe("Dropdown Element", () => {
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
   })
 
-  it("Dropdown renders with preselectes item", async () => {
+  it("Dropdown renders with preselected item", async () => {
     const { queryByDisplayValue } = render(DropdownInput, {
       props: {
         id: "dropdown-test",
@@ -228,5 +231,127 @@ describe("Dropdown Element", () => {
       },
     })
     expect(queryByDisplayValue("test")).not.toBeInTheDocument()
+  })
+
+  it("Dropdown uses endpoint to fetch all DocumentType items", async () => {
+    const user = userEvent.setup()
+    const dropdownItems: DropdownItem[] = [
+      {
+        text: "AO - Anordnung",
+        value: "Anordnung", // <-- string
+      },
+    ]
+    const fetchSpy = vi
+      .spyOn(lookupTableService, "fetch")
+      .mockImplementation(() => Promise.resolve(dropdownItems))
+
+    const { container } = render(DropdownInput, {
+      props: {
+        id: "dropdown-test",
+        modelValue: "",
+        ariaLabel: "",
+        dropdownItems: LookupTableEndpoint.documentTypes,
+        isCombobox: true,
+      },
+    })
+
+    const openDropdownContainer = container.querySelector(
+      ".input-expand-icon"
+    ) as HTMLElement
+    await user.click(openDropdownContainer)
+
+    const dropdownItemElements = container.querySelectorAll(
+      ".dropdown-container__dropdown-item"
+    )
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(fetchSpy).toHaveBeenCalledWith(
+      LookupTableEndpoint.documentTypes,
+      undefined
+    )
+    expect(dropdownItemElements).toHaveLength(1)
+    expect(dropdownItemElements[0]).toHaveTextContent("AO - Anordnung")
+  })
+
+  it("Dropdown uses endpoint to fetch all Court items", async () => {
+    const user = userEvent.setup()
+    const court: Court = {
+      type: "BGH",
+      location: "Karlsruhe",
+      label: "BGH Karlsruhe",
+    }
+    const dropdownItems: DropdownItem[] = [
+      {
+        text: "BGH Karlsruhe",
+        value: court, // <-- Court
+      },
+    ]
+    const fetchSpy = vi
+      .spyOn(lookupTableService, "fetch")
+      .mockImplementation(() => Promise.resolve(dropdownItems))
+
+    const { container } = render(DropdownInput, {
+      props: {
+        id: "dropdown-test",
+        modelValue: "",
+        ariaLabel: "",
+        dropdownItems: LookupTableEndpoint.courts,
+        isCombobox: true,
+      },
+    })
+
+    const openDropdownContainer = container.querySelector(
+      ".input-expand-icon"
+    ) as HTMLElement
+    await user.click(openDropdownContainer)
+
+    const dropdownItemElements = container.querySelectorAll(
+      ".dropdown-container__dropdown-item"
+    )
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(fetchSpy).toHaveBeenCalledWith(LookupTableEndpoint.courts, undefined)
+    expect(dropdownItemElements).toHaveLength(1)
+    expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
+  })
+
+  it("Dropdown uses endpoint to fetch Court items based on search string", async () => {
+    const user = userEvent.setup()
+    const court: Court = {
+      type: "BGH",
+      location: "Karlsruhe",
+      label: "BGH Karlsruhe",
+    }
+    const dropdownItems: DropdownItem[] = [
+      {
+        text: "BGH Karlsruhe",
+        value: court,
+      },
+    ]
+    const fetchSpy = vi
+      .spyOn(lookupTableService, "fetch")
+      .mockImplementation(() => Promise.resolve(dropdownItems))
+
+    const { container, getByLabelText } = render(DropdownInput, {
+      props: {
+        id: "dropdown-test",
+        modelValue: "",
+        ariaLabel: "test label",
+        dropdownItems: LookupTableEndpoint.courts,
+        isCombobox: true,
+      },
+    })
+
+    const input = getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "bgh")
+
+    const dropdownItemElements = container.querySelectorAll(
+      ".dropdown-container__dropdown-item"
+    )
+
+    expect(fetchSpy).toHaveBeenCalledTimes(3)
+    // TODO checking for "b", "bg", "bgh" as the three arguments does not work though
+    expect(dropdownItemElements).toHaveLength(1)
+    expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
   })
 })
