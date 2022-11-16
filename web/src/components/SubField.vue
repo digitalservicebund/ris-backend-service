@@ -3,23 +3,23 @@ import { computed, ref, watch, onMounted } from "vue"
 
 interface Props {
   isExpanded?: boolean
-  openIconName?: string
-  closeIconName?: string
+  iconExpanding?: string
+  iconClosing?: string
 }
 interface Emits {
   (event: "update:isExpanded", value: boolean): void
 }
 const props = withDefaults(defineProps<Props>(), {
   isExpanded: false,
-  openIconName: "add",
-  closeIconName: "horizontal_rule",
+  iconExpanding: "add",
+  iconClosing: "horizontal_rule",
 })
 const emit = defineEmits<Emits>()
 const expandableContainer = ref()
 const containerHeight = ref(0)
 const isExpanded = ref(false)
 const iconName = computed(() =>
-  isExpanded.value ? props.closeIconName : props.openIconName
+  isExpanded.value ? props.iconClosing : props.iconExpanding
 )
 function toggleContentVisibility(): void {
   isExpanded.value = !isExpanded.value
@@ -45,7 +45,9 @@ const resizeObserver = new ResizeObserver((entries) => {
 <template>
   <div class="expandable-content">
     <button
-      aria-label="Toggle Content Visibility"
+      :aria-label="
+        isExpanded ? 'Abweichendes Feld schließen' : 'Abweichendes Feld öffnen'
+      "
       class="-mt-[2.625rem] expandable-content__header h-[1.25rem] text-white"
       @click="toggleContentVisibility"
     >
