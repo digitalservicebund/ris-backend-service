@@ -1,7 +1,7 @@
 export type CoreData = {
   fileNumber?: string
   court?: Court
-  category?: string
+  category?: string // TODO should this be DocumentType from lookupTables.ts?
   procedure?: string
   ecli?: string
   appraisalBody?: string

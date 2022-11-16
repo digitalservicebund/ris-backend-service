@@ -3,6 +3,7 @@ import { DropdownItem, LookupTableEndpoint } from "@/domain"
 import { Court } from "@/domain/documentUnit"
 import { DocumentType } from "@/domain/lookupTables"
 
+// TODO this should be wrapped in a ServiceResponse
 interface LookupTableService {
   fetch(
     endpoint: LookupTableEndpoint,
