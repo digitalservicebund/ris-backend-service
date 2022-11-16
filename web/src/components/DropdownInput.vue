@@ -54,7 +54,7 @@ function checkValue() {
 
 const isShowDropdown = ref(false)
 const items = ref(
-  !!props.dropdownItems && Array.isArray(props.dropdownItems)
+  !!props.dropdownItems && props.dropdownItems instanceof Array
     ? props.dropdownItems
     : []
 )
@@ -71,7 +71,7 @@ const toggleDropdown = () => {
 
 const useEndpoint = (): boolean => {
   // TODO is there a better way to check this?
-  return !Array.isArray(props.dropdownItems)
+  return !(props.dropdownItems instanceof Array)
 }
 
 const clearSelection = () => {

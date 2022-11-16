@@ -12,7 +12,7 @@ function flattenList(array: MenuButton[]) {
   let result: MenuButton[] = []
   array.forEach(function (a) {
     if (a.type !== "menu") result.push(a)
-    if (Array.isArray(a.childButtons)) {
+    if (a.childButtons instanceof Array) {
       result = result.concat(flattenList(a.childButtons))
     }
   })
