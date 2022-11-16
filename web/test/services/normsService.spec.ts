@@ -31,7 +31,6 @@ describe("normsService", () => {
       })
 
       const response = await getAllNorms()
-      console.log(response)
 
       expect(response.data).toEqual(["fake-norm"])
     })

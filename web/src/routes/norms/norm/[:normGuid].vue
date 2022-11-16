@@ -44,7 +44,8 @@ watch(() => props.normGuid, loadNormByGuid, { immediate: true })
     </SideToggle>
 
     <div class="bg-gray-100 border-gray-400 border-l-1 p-48 w-full">
-      <router-view :norm="norm" @fetch-norm="fetchNorm" />
+      <router-view v-if="norm" :norm="norm" @fetch-norm="fetchNorm" />
+      <span v-else>Lade Norm...</span>
     </div>
   </div>
 </template>
