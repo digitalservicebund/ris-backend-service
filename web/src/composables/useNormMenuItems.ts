@@ -13,7 +13,7 @@ export function useNormMenuItems(
 
   return computed(() => [
     {
-      name: "Normkomplex",
+      name: "Normenkomplex",
       route: {
         ...baseRoute,
         name: "norms-norm-:normGuid",
