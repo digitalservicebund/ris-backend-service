@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
+import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
@@ -14,6 +15,20 @@ function renderComponent(
   return render(DocumentUnitList, {
     props: {
       documentUnits: documentUnits,
+    },
+    global: {
+      plugins: [
+        createRouter({
+          history: createWebHistory(),
+          routes: [
+            {
+              path: "",
+              name: "caselaw-documentUnit-:documentNumber-files",
+              component: {},
+            },
+          ],
+        }),
+      ],
     },
   })
 }
