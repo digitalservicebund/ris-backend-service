@@ -58,32 +58,29 @@ const items = ref(
     ? props.dropdownItems
     : []
 )
+const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
 const itemRefs = ref([])
 const filter = ref<string>()
 
 const toggleDropdown = () => {
-  checkIfItemsNeedToBeFetched()
   isShowDropdown.value = !isShowDropdown.value
+  if (isShowDropdown.value) {
+    updateCurrentItems()
+  }
 }
 
-const checkIfItemsNeedToBeFetched = () => {
-  if (
-    !Array.isArray(props.dropdownItems) &&
-    !isShowDropdown.value &&
-    items.value.length == 0
-  ) {
-    lookupTableService
-      .fetch(props.dropdownItems)
-      .then((response) => (items.value = response))
-  }
+const useEndpoint = (): boolean => {
+  // TODO is there a better way to check this?
+  return !Array.isArray(props.dropdownItems)
 }
 
 const clearSelection = () => {
   emit("update:modelValue", undefined)
   filter.value = ""
+  updateCurrentItems()
 }
 
-const updateValue = (value: DropdownInputModelType) => {
+const setChosenItem = (value: DropdownInputModelType) => {
   emit("update:modelValue", value)
   filter.value = ""
   isShowDropdown.value = false
@@ -100,7 +97,6 @@ const keydown = (index: number) => {
 }
 
 const onTextChange = () => {
-  checkIfItemsNeedToBeFetched()
   emit("update:modelValue", undefined)
   const textInput = document.querySelector(
     `.input-container #${props.id}`
@@ -111,16 +107,29 @@ const onTextChange = () => {
     textInput.value === "" ? undefined : textInput.value
   )
   filter.value = textInput.value
+  updateCurrentItems()
 }
 
-const filterItems = () => {
-  const filteredItem = items.value.filter((item) =>
-    item.text.includes(!!filter.value ? filter.value : "")
-  )
+const updateCurrentItems = () => {
+  if (useEndpoint()) {
+    lookupTableService
+      .fetch(props.dropdownItems as LookupTableEndpoint, filter.value)
+      .then((dropdownItems: DropdownItem[]) => {
+        currentItems.value = dropdownItems
+        insertItemIfEmpty()
+      })
+  } else {
+    currentItems.value = items.value.filter((item) =>
+      item.text.includes(!!filter.value ? filter.value : "")
+    )
+    insertItemIfEmpty()
+  }
+}
 
-  return filteredItem.length > 0
-    ? filteredItem
-    : [{ text: "Kein passender Eintrag", value: "" }]
+const insertItemIfEmpty = () => {
+  if (currentItems.value.length === 0) {
+    currentItems.value = [{ text: "Kein passender Eintrag", value: "" }]
+  }
 }
 
 const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
@@ -207,13 +216,13 @@ onBeforeUnmount(() => {
       tabindex="-1"
     >
       <div
-        v-for="(item, index) in isCombobox ? filterItems() : items"
+        v-for="(item, index) in currentItems"
         :key="index"
         ref="itemRefs"
         class="dropdown-container__dropdown-item"
         tabindex="0"
-        @click="updateValue(item.value)"
-        @keypress.enter="updateValue(item.value)"
+        @click="setChosenItem(item.value)"
+        @keypress.enter="setChosenItem(item.value)"
         @keyup.down="keydown(index)"
         @keyup.up="keyup(index)"
       >
