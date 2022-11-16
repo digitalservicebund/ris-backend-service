@@ -39,4 +39,19 @@ class LookupTableControllerTest {
 
     verify(service, times(1)).getDocumentTypes(Optional.empty());
   }
+
+  @Test
+  void testGetCourts() {
+    when(service.getCourts(Optional.empty())).thenReturn(Flux.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/lookuptable/courts")
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).getCourts(Optional.empty());
+  }
 }

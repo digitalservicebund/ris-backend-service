@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
@@ -42,5 +44,22 @@ class LookupTableServiceTest {
         .verifyComplete();
 
     verify(documentTypeRepository).findAll();
+  }
+
+  @Test
+  void testGetCourts() {
+    CourtDTO courtDTO = CourtDTO.EMPTY;
+    courtDTO.setCourttype("BGH");
+    when(courtRepository.findAll()).thenReturn(Flux.just(courtDTO));
+
+    StepVerifier.create(service.getCourts(Optional.empty()))
+        .consumeNextWith(
+            court -> {
+              assertThat(court).isInstanceOf(Court.class);
+              assertThat(court.type()).isEqualTo("BGH");
+            })
+        .verifyComplete();
+
+    verify(courtRepository).findAll();
   }
 }

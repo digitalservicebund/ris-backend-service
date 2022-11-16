@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
@@ -56,5 +57,34 @@ class LookupTableImporterServiceTest {
 
     verify(documentTypeRepository).save(any(DocumentTypeDTO.class));
     verify(documentTypeRepository).deleteAll();
+  }
+
+  @Test
+  void testImportCourtLookupTable() {
+    when(courtRepository.save(any(CourtDTO.class))).thenReturn(Mono.just(CourtDTO.EMPTY));
+    when(courtRepository.deleteAll()).thenReturn(Mono.empty());
+
+    String courtXml =
+        """
+            <?xml version="1.0"?>
+            <juris-table>
+                <juris-gericht id="1" version="1.0">
+                    <gertyp>type123</gertyp>
+                    <gerort>location123</gerort>
+                    <spruchkoerper>
+                        <name>Staatsanwaltschaft</name>
+                    </spruchkoerper>
+                </juris-gericht>
+            </juris-table>
+            """;
+    ByteBuffer byteBuffer = ByteBuffer.wrap(courtXml.getBytes());
+
+    StepVerifier.create(service.importCourtLookupTable(byteBuffer))
+        .consumeNextWith(
+            courtDTO -> assertEquals("Successfully imported the court lookup table", courtDTO))
+        .verifyComplete();
+
+    verify(courtRepository).save(any(CourtDTO.class));
+    verify(courtRepository).deleteAll();
   }
 }

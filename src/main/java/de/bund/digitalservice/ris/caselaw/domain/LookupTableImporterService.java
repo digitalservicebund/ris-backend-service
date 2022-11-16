@@ -121,6 +121,6 @@ public class LookupTableImporterService {
                             .build())
                     .subscribe());
 
-    return Mono.just("Successfully imported the document type lookup table");
+    return Mono.just("Successfully imported the court lookup table");
   }
 }

@@ -42,4 +42,20 @@ class LookupTableImporterControllerTest {
 
     verify(service, times(1)).importDocumentTypeLookupTable(any(ByteBuffer.class));
   }
+
+  @Test
+  void testImportCourtLookupTable() {
+    when(service.importCourtLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/lookuptableimporter/gerichtdata")
+        .bodyValue(BodyInserters.fromValue(new byte[] {}))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).importCourtLookupTable(any(ByteBuffer.class));
+  }
 }
