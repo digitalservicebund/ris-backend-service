@@ -53,7 +53,10 @@ test.describe("autosave on documentation units", () => {
     ).toBeVisible()
   })
 
-  test("test automatic save documentUnit", async ({ page, editorField }) => {
+  test.skip("test automatic save documentUnit", async ({
+    page,
+    editorField,
+  }) => {
     test.setTimeout(30 * 1000) // autosave is supposed to happen every 10s
     await editorField.click()
     await editorField.type("this is a change")
