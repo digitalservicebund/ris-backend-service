@@ -36,15 +36,12 @@ classDiagram
     +List~Paragraph~ paragraphs
   }
 
-
   class Paragraph {
     +UUID guid
     +String marker
     +String text
   }
 
-
   Norm "1" --> "*" Article
   Article "1" --> "*" Paragraph
-
 ```

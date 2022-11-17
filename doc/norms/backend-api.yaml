@@ -23,7 +23,7 @@ paths:
       operationId: getAllNorms
       responses:
         "200":
-          description: Successful response with list of allnorms
+          description: Successful response with list of all norms
           content:
             application/json:
               schema:
@@ -116,6 +116,11 @@ components:
       type: string
       format: uuid
 
+    Date:
+      description: The date format in XML files
+      type: string
+      pattern: '^[1-2]\d{3}-[0-1]\d-[0-3]\d$'
+
     ParagraphWithoutGuid:
       type: object
       required:
@@ -159,12 +164,75 @@ components:
       properties:
         longTitle:
           type: string
+        officialShortTitle:
+          type: string
+        officialAbbreviation:
+          type: string
+        referenceNumber:
+          type: string
+        publicationDate:
+          $ref: "#/components/schemas/Date"
+        announcementDate:
+          $ref: "#/components/schemas/Date"
+        citationDate:
+          $ref: "#/components/schemas/Date"
+        frameKeywords:
+          type: string
+        authorEntity:
+          type: string
+        authorDecidingBody:
+          type: string
+        authorIsResolutionMajority:
+          type: boolean
+        leadJurisdiction:
+          type: string
+        leadUnit:
+          type: string
+        participationType:
+          type: string
+        participationInstitution:
+          type: string
+        documentTypeName:
+          type: string
+        documentNormCategory:
+          type: string
+        documentTemplateName:
+          type: string
+        subjectFna:
+          type: string
+        subjectPreviousFna:
+          type: string
+        subjectGesta:
+          type: string
+        subjectBgb3:
+          type: string
         articles:
           type: array
           items:
             $ref: "#/components/schemas/ArticleWithoutGuid"
       example:
         longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
+        officialShortTitle: "Notenwechsel vom 25. September 1990 zum NATO-Truppenstatut"
+        officialAbbreviation: "2. KostRMoG"
+        referenceNumber: "1 BvR 2011/94"
+        publicationDate: "2022-03-30"
+        announcementDate: "2012-03-30"
+        citationDate: "2002-03-30"
+        frameKeywords: "BGBl I 2009, Nr 027"
+        authorEntity: "DEU"
+        authorDecidingBody: "BMinI"
+        authorIsResolutionMajority: true
+        leadJurisdiction: "BMELV"
+        leadUnit: "BMELV 335"
+        participationType: "EZ"
+        participationInstitution: "BR"
+        documentTypeName: "RV"
+        documentNormCategory: "NS"
+        documentTemplateName: "ASD"
+        subjectFna: "6/32"
+        subjectPreviousFna: "6/31"
+        subjectGesta: "Sample Text"
+        subjectBgb3: "Sample Text"
         articles:
           - marker: "§ 1"
             title: "Allgemeiner Anwendungsbereich"
@@ -213,31 +281,16 @@ components:
             text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
 
     Norm:
-      type: object
-      required:
-        - guid
-        - longTitle
-        - articles
-      properties:
-        guid:
-          $ref: "#/components/schemas/Guid"
-        longTitle:
-          type: string
-        articles:
-          type: array
-          items:
-            $ref: "#/components/schemas/Article"
-      example:
-        guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
-        longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
-        articles:
-          - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
-            marker: "§ 1"
-            title: "Allgemeiner Anwendungsbereich"
-            paragraphs:
-              - guid: "eb6f27c7-79ef-4b25-8aef-b8726f6ed26f"
-                marker: "(1)"
-                text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+      allOf:
+        - $ref: "#/components/schemas/NormWithoutGuid"
+        - type: object
+          required:
+            - guid
+          properties:
+            guid:
+              $ref: "#/components/schemas/Guid"
+          example:
+            guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
 
 security:
   - BasicAuth: []
