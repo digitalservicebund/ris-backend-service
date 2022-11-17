@@ -250,7 +250,7 @@ describe("Dropdown Element", () => {
         id: "dropdown-test",
         modelValue: "",
         ariaLabel: "",
-        dropdownItems: LookupTableEndpoint.documentTypes,
+        endpoint: LookupTableEndpoint.documentTypes,
         isCombobox: true,
       },
     })
@@ -295,7 +295,7 @@ describe("Dropdown Element", () => {
         id: "dropdown-test",
         modelValue: "",
         ariaLabel: "",
-        dropdownItems: LookupTableEndpoint.courts,
+        endpoint: LookupTableEndpoint.courts,
         isCombobox: true,
       },
     })
@@ -337,7 +337,7 @@ describe("Dropdown Element", () => {
         id: "dropdown-test",
         modelValue: "",
         ariaLabel: "test label",
-        dropdownItems: LookupTableEndpoint.courts,
+        endpoint: LookupTableEndpoint.courts,
         isCombobox: true,
       },
     })

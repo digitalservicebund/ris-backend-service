@@ -55,7 +55,8 @@ export type DropdownItem = {
 export interface DropdownAttributes extends BaseInputAttributes {
   isCombobox?: boolean
   placeholder?: string
-  dropdownItems?: DropdownItem[] | LookupTableEndpoint
+  dropdownItems?: DropdownItem[]
+  endpoint?: LookupTableEndpoint
   preselectedValue?: string
 }
 

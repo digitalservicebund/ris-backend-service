@@ -50,7 +50,8 @@ export function defineDropdownField(
   required?: boolean,
   placeholder?: string,
   isCombobox?: boolean,
-  dropdownItems?: DropdownItem[] | LookupTableEndpoint,
+  dropdownItems?: DropdownItem[],
+  endpoint?: LookupTableEndpoint,
   preselectedValue?: string,
   validationError?: ValidationError
 ): InputField {
@@ -63,6 +64,7 @@ export function defineDropdownField(
       ariaLabel,
       placeholder,
       dropdownItems,
+      endpoint,
       isCombobox,
       preselectedValue,
       validationError,
@@ -80,6 +82,7 @@ export const coreDataFields: InputField[] = [
     true,
     "Gerichtstyp Gerichtsort",
     true,
+    [],
     LookupTableEndpoint.courts
   ),
   defineTextField(
@@ -112,6 +115,7 @@ export const coreDataFields: InputField[] = [
     true,
     "Bitte auswählen",
     true,
+    [],
     LookupTableEndpoint.documentTypes
   ),
   defineTextField("ecli", "ECLI", "ECLI"),
@@ -124,6 +128,7 @@ export const coreDataFields: InputField[] = [
     "",
     false,
     legalEffectTypes.items,
+    undefined,
     legalEffectTypes.items[0].value
   ),
 ]

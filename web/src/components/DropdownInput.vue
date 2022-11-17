@@ -11,9 +11,8 @@ interface Props {
   modelValue?: DropdownInputModelType
   ariaLabel: string
   placeholder?: string
-  // first is for static dropdowns with the items all present in the FE
-  // second is for dynamic fetching from BE based on the search input
-  dropdownItems: DropdownItem[] | LookupTableEndpoint
+  dropdownItems?: DropdownItem[]
+  endpoint?: LookupTableEndpoint
   isCombobox?: boolean
   preselectedValue?: string
 }
@@ -55,11 +54,7 @@ function checkValue() {
 }
 
 const isShowDropdown = ref(false)
-const items = ref(
-  !!props.dropdownItems && props.dropdownItems instanceof Array
-    ? props.dropdownItems
-    : []
-)
+const items = ref(props.dropdownItems ?? [])
 const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
 const itemRefs = ref([])
 const filter = ref<string>()
@@ -69,11 +64,6 @@ const toggleDropdown = () => {
   if (isShowDropdown.value) {
     updateCurrentItems()
   }
-}
-
-const useEndpoint = (): boolean => {
-  // TODO is there a better way to check this?
-  return !(props.dropdownItems instanceof Array)
 }
 
 const clearSelection = () => {
@@ -105,9 +95,9 @@ const onTextChange = () => {
 }
 
 const updateCurrentItems = () => {
-  if (useEndpoint()) {
+  if (!!props.endpoint) {
     lookupTableService
-      .fetch(props.dropdownItems as LookupTableEndpoint, filter.value)
+      .fetch(props.endpoint, filter.value)
       .then((dropdownItems: DropdownItem[]) => {
         currentItems.value = dropdownItems
         insertItemIfEmpty()
