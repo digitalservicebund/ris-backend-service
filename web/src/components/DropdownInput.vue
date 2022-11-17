@@ -99,16 +99,8 @@ const keydown = (index: number) => {
 }
 
 const onTextChange = () => {
-  emit("update:modelValue", undefined)
-  const textInput = document.querySelector(
-    `.input-container #${props.id}`
-  ) as HTMLInputElement
   isShowDropdown.value = true
-  emit(
-    "update:modelValue",
-    textInput.value === "" ? undefined : textInput.value
-  )
-  filter.value = textInput.value
+  filter.value = inputText.value
   updateCurrentItems()
 }
 
@@ -175,13 +167,13 @@ onBeforeUnmount(() => {
       <div class="bg-white input-container">
         <input
           :id="id"
+          v-model="inputText"
           :aria-label="ariaLabel"
           autocomplete="off"
           class="text-input"
           :placeholder="placeholder"
           :readonly="!props.isCombobox"
           tabindex="0"
-          :value="inputText"
           @click="selectAllText"
           @input="onTextChange"
         />
