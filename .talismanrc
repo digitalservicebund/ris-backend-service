@@ -67,6 +67,9 @@ fileignoreconfig:
     checksum: f45b8f8a6400570594ebf82a067d0780799a65e78ef509807a0442d0f5b7478f
   - filename: src/test/kotlin/norms/domain/entity/NormTest.kt
     checksum: f08238ee8a16a4ac5a029f38d2a21c9a6f1911171a071ac4ae3b19d98c2a09a0
+  - filename: doc/norms/backend-api.yaml
+    checksum: 318f4c05c3174e7a3385324229c6a44fdd7ece44215cf3d944846f76b0cec8cb
+
 scopeconfig:
   - scope: node
 allowed_patterns:
