@@ -64,7 +64,7 @@ fileignoreconfig:
   - filename: web/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
-    checksum: 2c5d8246c4d773802c3fd1edfac8ddc79e4e490f7267eb189c4c71beb7c5005b
+    checksum: f45b8f8a6400570594ebf82a067d0780799a65e78ef509807a0442d0f5b7478f
 scopeconfig:
   - scope: node
 allowed_patterns:
