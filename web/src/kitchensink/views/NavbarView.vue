@@ -1,33 +1,31 @@
 <script lang="ts" setup>
-import { useRoute } from "vue-router"
-import NavbarSide, { MenuItem } from "@/components/NavbarSide.vue"
+import NavbarSide, { LevelOneMenuItem } from "@/components/NavbarSide.vue"
 import Navbar from "@/components/NavbarTop.vue"
 
-const route = useRoute()
 const goBackRoute = { name: "kitchensink" }
-const menuItems: MenuItem[] = [
+const menuItems: LevelOneMenuItem[] = [
   {
-    name: "Top Item",
-    route,
+    label: "Top Item",
+    route: "/kitchensink",
     children: [
       {
-        name: "Child Item",
-        route: { path: "foo" },
+        label: "Child Item",
+        route: { path: "/kitchensink", hash: "#navbarTop" },
       },
       {
-        name: "Another Child",
-        route: { path: "bar" },
+        label: "Child Item",
+        route: { path: "/kitchensink", hash: "#navbarSide" },
       },
     ],
   },
   {
-    name: "Disabled Item",
-    route: { path: "baz" },
+    label: "Disabled Item",
+    route: "/caselaw",
     isDisabled: true,
   },
   {
-    name: "Last Item",
-    route: { path: "baz" },
+    label: "Last Item",
+    route: "/norms",
   },
 ]
 </script>

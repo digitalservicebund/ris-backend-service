@@ -13,14 +13,14 @@ export function useNormMenuItems(
 
   return computed(() => [
     {
-      name: "Normenkomplex",
+      label: "Normenkomplex",
       route: {
         ...baseRoute,
         name: "norms-norm-:normGuid",
       },
     },
     {
-      name: "Rahmen",
+      label: "Rahmen",
       route: {
         ...baseRoute,
         name: "norms-norm-:normGuid-frame",
@@ -28,7 +28,7 @@ export function useNormMenuItems(
       isDisabled: true,
       children: [
         {
-          name: "Normgeber",
+          label: "Normgeber",
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
@@ -36,23 +36,25 @@ export function useNormMenuItems(
           },
         },
         {
-          name: "Mitwirkende Organe",
+          label: "Mitwirkende Organe",
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
+            hash: "#organs",
           },
         },
         {
-          name: "Sachgebiet",
+          label: "Sachgebiet",
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
+            hash: "#subject",
           },
         },
       ],
     },
     {
-      name: "Bestand",
+      label: "Bestand",
       route: {
         ...baseRoute,
         name: "norms",
@@ -60,7 +62,7 @@ export function useNormMenuItems(
       isDisabled: true,
     },
     {
-      name: "Abgabe",
+      label: "Abgabe",
       route: {
         ...baseRoute,
         name: "norms",

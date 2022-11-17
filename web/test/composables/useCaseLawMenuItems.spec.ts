@@ -32,7 +32,7 @@ describe("useCaseLawMenuItems", () => {
       {} as unknown as RouteLocationNormalizedLoaded
     )
 
-    const topLebelNames = menuItems.value.map((item) => item.name)
+    const topLebelNames = menuItems.value.map((item) => item.label)
     expect(topLebelNames).toContain("Rubriken")
     expect(topLebelNames).toContain("Dokumente")
     expect(topLebelNames).toContain("Bearbeitungsstand")

@@ -13,14 +13,14 @@ export function useCaseLawMenuItems(
 
   return computed(() => [
     {
-      name: "Rubriken",
+      label: "Rubriken",
       route: {
         ...baseRoute,
         name: "caselaw-documentUnit-:documentNumber-categories",
       },
       children: [
         {
-          name: "Stammdaten",
+          label: "Stammdaten",
           route: {
             ...baseRoute,
             name: "caselaw-documentUnit-:documentNumber-categories",
@@ -28,7 +28,7 @@ export function useCaseLawMenuItems(
           },
         },
         {
-          name: "Rechtszug",
+          label: "Rechtszug",
           route: {
             ...baseRoute,
             name: "caselaw-documentUnit-:documentNumber-categories",
@@ -36,7 +36,7 @@ export function useCaseLawMenuItems(
           },
         },
         {
-          name: "Kurz- & Langtexte",
+          label: "Kurz- & Langtexte",
           route: {
             ...baseRoute,
             name: "caselaw-documentUnit-:documentNumber-categories",
@@ -46,14 +46,14 @@ export function useCaseLawMenuItems(
       ],
     },
     {
-      name: "Dokumente",
+      label: "Dokumente",
       route: {
         ...baseRoute,
         name: "caselaw-documentUnit-:documentNumber-files",
       },
     },
     {
-      name: "Bearbeitungsstand",
+      label: "Bearbeitungsstand",
       route: {
         ...baseRoute,
         name: "caselaw",
@@ -61,7 +61,7 @@ export function useCaseLawMenuItems(
       isDisabled: true,
     },
     {
-      name: "Veröffentlichen",
+      label: "Veröffentlichen",
       route: {
         ...baseRoute,
         name: "caselaw-documentUnit-:documentNumber-publication",

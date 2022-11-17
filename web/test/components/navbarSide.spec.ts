@@ -19,8 +19,8 @@ describe("NavbarSide", () => {
 
   it("shows a router link for each configured menu item", () => {
     const menuItems = [
-      { name: "first item", route: "/first-route" },
-      { name: "second item", route: "/second-route" },
+      { label: "first item", route: "/first-route" },
+      { label: "second item", route: "/second-route" },
     ]
 
     const { queryByText } = renderComponent({ menuItems })
@@ -34,32 +34,32 @@ describe("NavbarSide", () => {
     expect(secondItem?.getAttribute("href")).toBe("/second-route")
   })
 
-  it("allows to render parent item with child entries", () => {
+  it("allows to render level one item with level two items as children", () => {
     const menuItems = [
       {
-        name: "parent item",
-        route: "/parent",
+        label: "level one",
+        route: "/",
         children: [
-          { name: "first child", route: "/first-child" },
-          { name: "second child", route: "/second-child" },
+          { label: "first level two", route: "/first-level-two" },
+          { label: "second level two", route: "/second-level-two" },
         ],
       },
     ]
 
     const { queryByText } = renderComponent({ menuItems })
-    const firstChild = queryByText("first child")?.closest("a")
-    const secondChild = queryByText("second child")?.closest("a")
+    const firstLevelTwo = queryByText("first level two")?.closest("a")
+    const secondLevelTwo = queryByText("second level two")?.closest("a")
 
-    expect(firstChild).toBeVisible()
-    expect(firstChild?.getAttribute("href")).toBe("/first-child")
+    expect(firstLevelTwo).toBeVisible()
+    expect(firstLevelTwo?.getAttribute("href")).toBe("/first-level-two")
 
-    expect(secondChild).toBeVisible()
-    expect(secondChild?.getAttribute("href")).toBe("/second-child")
+    expect(secondLevelTwo).toBeVisible()
+    expect(secondLevelTwo?.getAttribute("href")).toBe("/second-level-two")
   })
 
   it("allows to disable a menu item", () => {
     const menuItems = [
-      { name: "disabled item", route: "/route", isDisabled: true },
+      { label: "disabled item", route: "/route", isDisabled: true },
     ]
 
     const { queryByText } = renderComponent({ menuItems })
@@ -70,7 +70,7 @@ describe("NavbarSide", () => {
 })
 
 interface MenuItem {
-  name: string
+  label: string
   route: RouteLocationRaw
   children?: MenuItem[]
   isDisabled?: boolean
@@ -98,7 +98,7 @@ function buildRouter(
   menuItems: MenuItem[]
 ): Router {
   const routes = []
-  routes.push(generateRouterRoute({ name: "root", path: "/" }))
+  routes.push(generateRouterRoute({ path: "/" }))
   routes.push(generateRouterRoute(goBackRoute))
 
   for (const item of menuItems) {

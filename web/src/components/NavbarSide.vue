@@ -2,7 +2,7 @@
 import type { RouteLocationRaw } from "vue-router"
 
 interface Props {
-  menuItems: MenuItem[]
+  menuItems: LevelOneMenuItem[]
   goBackLabel: string
   goBackRoute: RouteLocationRaw
 }
@@ -11,14 +11,17 @@ defineProps<Props>()
 </script>
 
 <script lang="ts">
-export interface ChildMenuItem {
-  name: string
+export interface LevelOneMenuItem {
+  label: string
   route: RouteLocationRaw
   isDisabled?: boolean
+  children?: LevelTwoMenuItem[]
 }
 
-export interface MenuItem extends ChildMenuItem {
-  children?: ChildMenuItem[]
+export interface LevelTwoMenuItem {
+  label: string
+  route: RouteLocationRaw
+  isDisabled?: boolean
 }
 </script>
 
@@ -33,28 +36,31 @@ export interface MenuItem extends ChildMenuItem {
     </router-link>
 
     <div
-      v-for="menuItem in menuItems"
-      :key="menuItem.name"
+      v-for="levelOneItem in menuItems"
+      :key="levelOneItem.label"
       class="border-gray-400 border-t-2"
     >
       <router-link
         active-class="bg-blue-200"
         class="block hover:bg-blue-200 hover:underline label-02-bold my-10 px-8 py-12"
-        :class="{ disabled: menuItem.isDisabled, 'mb-0': menuItem.children }"
+        :class="{
+          disabled: levelOneItem.isDisabled,
+          'mb-0': levelOneItem.children,
+        }"
         exact-path
-        :to="menuItem.route"
+        :to="levelOneItem.route"
       >
-        {{ menuItem.name }}
+        {{ levelOneItem.label }}
       </router-link>
 
       <router-link
-        v-for="(childMenuItem, index) in menuItem.children"
-        :key="childMenuItem.name"
+        v-for="(levelTwoItem, index) in levelOneItem.children"
+        :key="levelTwoItem.label"
         class="block hover:bg-blue-200 hover:underline label-02-reg p-10 pl-16"
-        :class="{ 'mb-24': index + 1 == menuItem.children?.length }"
-        :to="childMenuItem.route"
+        :class="{ 'mb-24': index + 1 == levelOneItem.children?.length }"
+        :to="levelTwoItem.route"
       >
-        {{ childMenuItem.name }}
+        {{ levelTwoItem.label }}
       </router-link>
     </div>
   </div>
