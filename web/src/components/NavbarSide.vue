@@ -42,7 +42,7 @@ export interface LevelTwoMenuItem {
     >
       <router-link
         active-class="bg-blue-200"
-        class="block hover:bg-blue-200 hover:underline label-02-bold my-10 px-8 py-12"
+        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold my-10 px-8 py-12"
         :class="{
           disabled: levelOneItem.isDisabled,
           'mb-0': levelOneItem.children,
@@ -56,7 +56,7 @@ export interface LevelTwoMenuItem {
       <router-link
         v-for="(levelTwoItem, index) in levelOneItem.children"
         :key="levelTwoItem.label"
-        class="block hover:bg-blue-200 hover:underline label-02-reg p-10 pl-16"
+        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg p-10 pl-16"
         :class="{ 'mb-24': index + 1 == levelOneItem.children?.length }"
         :to="levelTwoItem.route"
       >
