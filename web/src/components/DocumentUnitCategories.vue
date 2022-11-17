@@ -49,12 +49,12 @@ const handleUpdateDocumentUnit = async () => {
 const router = useRouter()
 const route = useRoute()
 
-const isOnline = ref(navigator.onLine)
+// const isOnline = ref(navigator.onLine)
 const validationErrors = ref<ValidationError[]>([])
 const updateStatus = ref(UpdateStatus.BEFORE_UPDATE)
 const lastUpdatedDocumentUnit = ref(JSON.stringify(props.documentUnit))
 const fileAsHTML = ref("")
-const automaticUpload = ref()
+// const automaticUpload = ref()
 const hasDataChange = ref(false)
 const showDocPanel = useToggleStateInRouteQuery(
   "showDocPanel",
@@ -122,9 +122,9 @@ const handleUpdateDocumentUnitWithShortCut = (event: KeyboardEvent) => {
     event.preventDefault()
   }
 }
-
-/** Time interval to automatic update documentUnit every 10sec */
-/** Only update documentUnit when there is any change after 10sec and last update is done */
+/*
+// Time interval to automatic update documentUnit every 10sec
+// Only update documentUnit when there is any change after 10sec and last update is done
 const autoUpdate = () => {
   automaticUpload.value = setInterval(() => {
     hasDataChange.value =
@@ -137,7 +137,7 @@ const autoUpdate = () => {
       handleUpdateDocumentUnit()
     }
     lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit)
-    /** Offline mode */
+    // Offline mode
     if (isOnline.value && !navigator.onLine) {
       isOnline.value = false
     }
@@ -147,11 +147,11 @@ const autoUpdate = () => {
     }
   }, 10000)
 }
-/** Clear time Interval */
+// Clear time Interval
 const removeAutoUpdate = () => {
   clearInterval(automaticUpload.value)
 }
-
+*/
 onMounted(async () => {
   window.addEventListener("scroll", onScroll)
   window.addEventListener(
@@ -159,13 +159,13 @@ onMounted(async () => {
     handleUpdateDocumentUnitWithShortCut,
     false
   )
-  autoUpdate()
+  // autoUpdate()
   getOriginalDocumentUnit()
 })
 onUnmounted(() => {
   window.removeEventListener("scroll", onScroll)
   window.removeEventListener("keydown", handleUpdateDocumentUnitWithShortCut)
-  removeAutoUpdate()
+  // removeAutoUpdate()
 })
 </script>
 
