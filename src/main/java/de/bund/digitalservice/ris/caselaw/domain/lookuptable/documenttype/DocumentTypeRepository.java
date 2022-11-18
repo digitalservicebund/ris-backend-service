@@ -9,6 +9,6 @@ import reactor.core.publisher.Flux;
 public interface DocumentTypeRepository extends ReactiveSortingRepository<DocumentTypeDTO, Long> {
 
   @Query(
-      "SELECT * FROM lookuptable_documenttype WHERE UPPER(juris_shortcut) LIKE UPPER('%'||:searchStr||'%') OR UPPER(label) LIKE UPPER('%'||:searchStr||'%')")
+      "SELECT * FROM lookuptable_documenttype WHERE UPPER(CONCAT(juris_shortcut, ' ', label)) LIKE UPPER('%'||:searchStr||'%')")
   Flux<DocumentTypeDTO> findBySearchStr(String searchStr);
 }

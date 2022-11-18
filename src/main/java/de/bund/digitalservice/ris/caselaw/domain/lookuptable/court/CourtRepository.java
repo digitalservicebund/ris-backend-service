@@ -9,6 +9,6 @@ import reactor.core.publisher.Flux;
 public interface CourtRepository extends ReactiveSortingRepository<CourtDTO, Long> {
 
   @Query(
-      "SELECT * FROM lookuptable_court WHERE UPPER(courttype) LIKE UPPER('%'||:searchStr||'%') OR UPPER(courtlocation) LIKE UPPER('%'||:searchStr||'%')")
+      "SELECT * FROM lookuptable_court WHERE UPPER(CONCAT(courttype, ' ', courtlocation)) LIKE UPPER('%'||:searchStr||'%')")
   Flux<CourtDTO> findBySearchStr(String searchStr);
 }
