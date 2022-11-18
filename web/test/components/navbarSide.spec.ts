@@ -213,7 +213,7 @@ function buildRouter(
 
 function generateRouterRoute(routeLocation: RouteLocationRaw): RouteRecordRaw {
   if (typeof routeLocation === "string") {
-    const routeAsUrl = new URL(routeLocation, "http://fake.com")
+    const routeAsUrl = new URL(routeLocation, "https://fake.com")
     return { path: routeAsUrl.pathname, component: {} }
   } else {
     const path =

@@ -106,7 +106,7 @@ type ParsedLocation = { path?: string; name?: string; hash?: string }
 
 function parseRouteLocation(route: RouteLocationRaw): ParsedLocation {
   if (typeof route === "string") {
-    const routeAsUrl = new URL(route, "http://fake.necessary")
+    const routeAsUrl = new URL(route, "https://fake.necessary")
     return { path: routeAsUrl.pathname, hash: routeAsUrl.hash }
   } else {
     return {
