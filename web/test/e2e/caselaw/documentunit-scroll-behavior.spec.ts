@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, navigateToFiles } from "./e2e-utils"
+import { navigateToCategories } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("test the scrolling behavior with hashes", () => {
@@ -27,7 +27,7 @@ test.describe("test the scrolling behavior with hashes", () => {
     page,
     documentNumber,
   }) => {
-    await navigateToFiles(page, documentNumber)
+    await navigateToCategories(page, documentNumber)
 
     const coreDataHeadline = "#coreData h1"
     const textsHeadline = "#texts h1"

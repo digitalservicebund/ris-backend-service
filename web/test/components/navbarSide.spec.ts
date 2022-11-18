@@ -162,6 +162,88 @@ describe("NavbarSide", () => {
       expect(getByText("second level two")).not.toHaveClass("bg-blue-200")
     })
   })
+
+  describe("expansion of level one items", () => {
+    it("hides all level two items per default", async () => {
+      const menuItems = [
+        {
+          label: "first level one",
+          route: "/not-matching",
+          children: [{ label: "first level two", route: "/not-matching" }],
+        },
+        {
+          label: "second level one",
+          route: "/not-matching",
+          children: [{ label: "second level two", route: "/not-matching" }],
+        },
+      ]
+
+      const { queryByText } = await renderComponent({ menuItems })
+
+      expect(queryByText("first level one")).toBeVisible()
+      expect(queryByText("first level two")).not.toBeVisible()
+      expect(queryByText("second level one")).toBeVisible()
+      expect(queryByText("second level two")).not.toBeVisible()
+    })
+
+    it("shows all level two items of an active level one item", async () => {
+      const menuItems = [
+        {
+          label: "first level one",
+          route: "/matching",
+          children: [
+            { label: "first level two", route: "/not-matching" },
+            { label: "second level two", route: "/not-matching" },
+          ],
+        },
+        {
+          label: "second level one",
+          route: "/not-matching",
+          children: [{ label: "third level two", route: "/not-matching" }],
+        },
+      ]
+
+      const { queryByText } = await renderComponent({
+        menuItems,
+        activeRoute: "/matching",
+      })
+
+      expect(queryByText("first level one")).toBeVisible()
+      expect(queryByText("first level two")).toBeVisible()
+      expect(queryByText("second level two")).toBeVisible()
+      expect(queryByText("second level one")).toBeVisible()
+      expect(queryByText("third level two")).not.toBeVisible()
+    })
+
+    it("shows all siblings of an active level two item", async () => {
+      const menuItems = [
+        {
+          label: "first level one",
+          route: "/not-matching",
+          children: [
+            { label: "first level two", route: "/matching" },
+            { label: "second level two", route: "/not-matching" },
+          ],
+        },
+        {
+          label: "second level one",
+          route: "/not-matching",
+          children: [{ label: "third level two", route: "/not-matching" }],
+        },
+      ]
+
+      const { queryByText } = await renderComponent({
+        menuItems,
+        activeRoute: "/matching",
+      })
+
+      expect(queryByText("first level one")).toBeVisible()
+      expect(queryByText("first level two")).toBeVisible()
+      expect(queryByText("second level two")).toBeVisible()
+      expect(queryByText("second level one")).toBeVisible()
+      expect(queryByText("third level two")).not.toBeVisible()
+    })
+  })
 })
 
 interface MenuItem {

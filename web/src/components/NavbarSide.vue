@@ -16,6 +16,7 @@ const enhencedMenuItems = computed(() =>
   props.menuItems.map((levelOneItem) => ({
     ...levelOneItem,
     classes: getClassesForLevelOne(levelOneItem),
+    isExpanded: checkIfLevelOneItemIsExpanded(levelOneItem),
     children: levelOneItem.children?.map((levelTwoItem) => ({
       ...levelTwoItem,
       classes: getClassesForLevelTwo(levelTwoItem, levelOneItem),
@@ -51,6 +52,17 @@ function getClassesForLevelTwo(
     "mb-24": isLastSibling,
     "bg-blue-200": isActive,
   }
+}
+
+function checkIfLevelOneItemIsExpanded(
+  levelOneItem: LevelOneMenuItem
+): boolean {
+  const activeChilds = levelOneItem.children?.filter((item) => {
+    return checkIfMenuItemIsActive(item)
+  })
+  const anyChildIsActive = (activeChilds?.length ?? 0) > 0
+  const isActiveItself = routesAreMatching(levelOneItem.route, activeRoute)
+  return anyChildIsActive || isActiveItself
 }
 
 function checkIfMenuItemIsActive(
@@ -156,15 +168,17 @@ export interface LevelTwoMenuItem {
         {{ levelOneItem.label }}
       </router-link>
 
-      <router-link
-        v-for="levelTwoItem in levelOneItem.children"
-        :key="levelTwoItem.label"
-        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg p-10 pl-16"
-        :class="levelTwoItem.classes"
-        :to="levelTwoItem.route"
-      >
-        {{ levelTwoItem.label }}
-      </router-link>
+      <div v-show="levelOneItem.isExpanded">
+        <router-link
+          v-for="levelTwoItem in levelOneItem.children"
+          :key="levelTwoItem.label"
+          class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg p-10 pl-16"
+          :class="levelTwoItem.classes"
+          :to="levelTwoItem.route"
+        >
+          {{ levelTwoItem.label }}
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
