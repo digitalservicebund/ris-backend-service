@@ -58,21 +58,13 @@ const inputValues = ref<InputValues>({})
 
 watch(
   () => props.modelValue,
-  () => {
-    console.log("InputGroup.watch-modelValue", Date.now(), props.modelValue)
-    inputValues.value = props.modelValue
-  },
+  () => (inputValues.value = props.modelValue),
   { immediate: true, deep: true }
 )
 
-watch(
-  inputValues,
-  () => {
-    console.log("InputGroup.watch-inputValues", Date.now(), inputValues.value)
-    emit("update:modelValue", inputValues.value)
-  },
-  { deep: true }
-)
+watch(inputValues, () => emit("update:modelValue", inputValues.value), {
+  deep: true,
+})
 </script>
 
 <template>

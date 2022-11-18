@@ -25,18 +25,8 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const values = computed({
-  get: () => {
-    console.log("DocumentUnitCoreData.values.computed.get", Date.now(), values)
-    return props.modelValue ?? {}
-  },
-  set: (newValues) => {
-    console.log(
-      "DocumentUnitCoreData.values.computed.set",
-      Date.now(),
-      newValues
-    )
-    emit("update:modelValue", newValues)
-  },
+  get: () => props.modelValue ?? {},
+  set: (newValues) => emit("update:modelValue", newValues),
 })
 
 const containerWidth = ref()
