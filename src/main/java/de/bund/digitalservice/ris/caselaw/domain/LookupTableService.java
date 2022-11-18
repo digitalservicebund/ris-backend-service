@@ -25,7 +25,7 @@ public class LookupTableService {
   public Flux<DocumentType> getDocumentTypes(Optional<String> searchStr) {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       return documentTypeRepository
-          .findBySearchStr(searchStr.get())
+          .findBySearchStr(searchStr.get().trim())
           .map(
               documentTypeDTO ->
                   new DocumentType(
@@ -46,7 +46,7 @@ public class LookupTableService {
   public Flux<Court> getCourts(Optional<String> searchStr) {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       return courtRepository
-          .findBySearchStr(searchStr.get())
+          .findBySearchStr(searchStr.get().trim())
           .map(
               courtDTO ->
                   new Court(
