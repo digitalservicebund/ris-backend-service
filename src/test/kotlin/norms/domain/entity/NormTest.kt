@@ -16,9 +16,9 @@ class NormTest {
         assertTrue(norm.guid == guid)
         assertTrue(norm.longTitle == "long title")
         assertTrue(norm.articles == listOf(article))
-        assertTrue(norm.officialShortTitle == "")
-        assertTrue(norm.officialAbbreviation == "")
-        assertTrue(norm.frameKeywords == "")
+        assertTrue(norm.officialShortTitle == null)
+        assertTrue(norm.officialAbbreviation == null)
+        assertTrue(norm.frameKeywords == null)
     }
 
     @Test
