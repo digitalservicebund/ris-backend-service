@@ -5,17 +5,11 @@ import Navbar from "@/components/NavbarTop.vue"
 const goBackRoute = { name: "kitchensink" }
 const menuItems: LevelOneMenuItem[] = [
   {
-    label: "Top Item",
+    label: "Kitchensink",
     route: "/kitchensink",
     children: [
-      {
-        label: "Child Item",
-        route: { path: "/kitchensink", hash: "#navbarTop" },
-      },
-      {
-        label: "Child Item",
-        route: { path: "/kitchensink", hash: "#navbarSide" },
-      },
+      { label: "Navbar Top", route: "/kitchensink#navbarTop" },
+      { label: "Navbar Side", route: "/kitchensink#navbarSide" },
     ],
   },
   {
@@ -25,7 +19,11 @@ const menuItems: LevelOneMenuItem[] = [
   },
   {
     label: "Last Item",
-    route: "/norms",
+    route: "/kitchensink#nothing",
+    children: [
+      { label: "Foo", route: "/kitchensink#foo" },
+      { label: "Bar", route: "/kitchensink#bar" },
+    ],
   },
 ]
 </script>
