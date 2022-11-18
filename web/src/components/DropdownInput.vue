@@ -105,7 +105,7 @@ const updateCurrentItems = () => {
     lookupTableService
       .fetch(props.endpoint, filter.value)
       .then((dropdownItems: DropdownItem[]) => {
-        currentItems.value = dropdownItems.slice(0, 50)
+        currentItems.value = dropdownItems
         insertItemIfEmpty()
       })
   } else {
