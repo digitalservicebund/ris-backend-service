@@ -32,6 +32,7 @@ const handleUpdateValueDocumentUnitTexts = async (
 }
 
 const handleUpdateDocumentUnit = async () => {
+  console.log("DocumentUnitCategories.handleUpdateDocumentUnit", Date.now())
   updateStatus.value = UpdateStatus.ON_UPDATE
   const response = await documentUnitService.update(updatedDocumentUnit.value)
   if (response.error && response.error.validationErrors) {
@@ -74,9 +75,22 @@ watch(
 )
 
 const coreData = computed({
-  get: () => props.documentUnit.coreData,
-  set: (newValues) =>
-    Object.assign(updatedDocumentUnit.value.coreData, newValues),
+  get: () => {
+    console.log(
+      "DocumentUnitCategories.coreData.computed.get",
+      Date.now(),
+      coreData
+    )
+    return props.documentUnit.coreData
+  },
+  set: (newValues) => {
+    console.log(
+      "DocumentUnitCategories.coreData.computed.set",
+      Date.now(),
+      coreData
+    )
+    Object.assign(updatedDocumentUnit.value.coreData, newValues)
+  },
 })
 
 const previousDecisions = computed({

@@ -42,8 +42,24 @@ const component = computed(() => {
 })
 
 const value = computed({
-  get: () => props.modelValue,
-  set: (newValue) => emit("update:modelValue", newValue),
+  get: () => {
+    console.log(
+      "InputElement.value.computed.get",
+      Date.now(),
+      value,
+      props.attributes.ariaLabel
+    )
+    return props.modelValue
+  },
+  set: (newValue) => {
+    console.log(
+      "InputElement.value.computed.set",
+      Date.now(),
+      newValue,
+      props.attributes.ariaLabel
+    )
+    emit("update:modelValue", newValue)
+  },
 })
 </script>
 

@@ -30,6 +30,12 @@ const inputText = ref<string>()
 watch(
   props,
   () => {
+    console.log(
+      "DropdownInput.watch-modelValue.get",
+      Date.now(),
+      props.modelValue,
+      props.ariaLabel
+    )
     inputValue.value = props.modelValue ?? props.value
     checkValue()
   },
@@ -39,6 +45,12 @@ watch(
 )
 
 watch(inputValue, () => {
+  console.log(
+    "DropdownInput.watch-inputValue",
+    Date.now(),
+    inputValue.value,
+    props.ariaLabel
+  )
   emit("update:modelValue", inputValue.value)
   checkValue()
 })
@@ -73,6 +85,7 @@ const clearSelection = () => {
 }
 
 const setChosenItem = (value: DropdownInputModelType) => {
+  console.log("DropdownInput.setChosenItem", Date.now(), value, props.ariaLabel)
   emit("update:modelValue", value)
   filter.value = ""
   isShowDropdown.value = false
