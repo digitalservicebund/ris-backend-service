@@ -71,6 +71,8 @@ fileignoreconfig:
     checksum: 4b7b9269ab5bafd2cc7c26fc277991892af621139c1418fe065a302f9b2695c1
   - filename: doc/norms/backend-api.yaml
     checksum: 318f4c05c3174e7a3385324229c6a44fdd7ece44215cf3d944846f76b0cec8cb
+  - filename: web/test/components/navbarSide.spec.ts
+    checksum: d84c4cb9da786eec1b403974797526dfadf90372c8957e0f37abbfe5e934c669
 
 scopeconfig:
   - scope: node
