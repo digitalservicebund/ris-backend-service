@@ -72,6 +72,7 @@ const itemRefs = ref([])
 const filter = ref<string>()
 
 const toggleDropdown = () => {
+  console.log("DropdownInput.toggleDropdown")
   isShowDropdown.value = !isShowDropdown.value
   if (isShowDropdown.value) {
     updateCurrentItems()
@@ -79,6 +80,7 @@ const toggleDropdown = () => {
 }
 
 const clearSelection = () => {
+  console.log("DropdownInput.clearSelection")
   emit("update:modelValue", undefined)
   filter.value = ""
   updateCurrentItems()
@@ -86,28 +88,32 @@ const clearSelection = () => {
 
 const setChosenItem = (value: DropdownInputModelType) => {
   console.log("DropdownInput.setChosenItem", Date.now(), value, props.ariaLabel)
+  isShowDropdown.value = false
   emit("update:modelValue", value)
   filter.value = ""
-  isShowDropdown.value = false
 }
 
 const keyup = (index: number) => {
+  console.log("DropdownInput.keyup")
   const prev = itemRefs.value[index - 1] as HTMLElement
   if (prev) prev.focus()
 }
 
 const keydown = (index: number) => {
+  console.log("DropdownInput.keydown")
   const next = itemRefs.value[index + 1] as HTMLElement
   if (next) next.focus()
 }
 
 const onTextChange = () => {
+  console.log("DropdownInput.onTextChange")
   isShowDropdown.value = true
   filter.value = inputText.value
   updateCurrentItems()
 }
 
 const updateCurrentItems = () => {
+  console.log("DropdownInput.updateCurrentItems")
   if (!!props.endpoint) {
     lookupTableService
       .fetch(props.endpoint, filter.value)
@@ -124,12 +130,14 @@ const updateCurrentItems = () => {
 }
 
 const insertItemIfEmpty = () => {
+  console.log("DropdownInput.insertItemIfEmpty")
   if (currentItems.value.length === 0) {
     currentItems.value = [{ text: "Kein passender Eintrag", value: "" }]
   }
 }
 
 const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
+  console.log("DropdownInput.closeDropDownWhenClickOutSide")
   const dropdown = document.querySelector(`#${props.id}.dropdown-container`)
   if (dropdown == null) return
   if (
@@ -141,6 +149,7 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
 }
 
 const selectAllText = () => {
+  console.log("DropdownInput.selectAllText")
   const inputField = document.querySelector(
     `input#${props.id}`
   ) as HTMLInputElement
@@ -148,15 +157,18 @@ const selectAllText = () => {
 }
 
 const closeDropdown = () => {
+  console.log("DropdownInput.closeDropdown")
   isShowDropdown.value = false
 }
 
 onMounted(() => {
+  console.log("DropdownInput.onMounted", props.preselectedValue)
   if (props.preselectedValue) inputValue.value = props.preselectedValue
   window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
 
 onBeforeUnmount(() => {
+  console.log("DropdownInput.onBeforeUnmount")
   window.removeEventListener("click", closeDropDownWhenClickOutSide)
 })
 </script>
