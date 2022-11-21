@@ -15,41 +15,22 @@ const activeRoute = useRoute()
 const enhencedMenuItems = computed(() =>
   props.menuItems.map((levelOneItem) => ({
     ...levelOneItem,
-    classes: getClassesForLevelOne(levelOneItem),
+    classes: getClassesForMenuItem(levelOneItem),
     isExpanded: checkIfLevelOneItemIsExpanded(levelOneItem),
     children: levelOneItem.children?.map((levelTwoItem) => ({
       ...levelTwoItem,
-      classes: getClassesForLevelTwo(levelTwoItem, levelOneItem),
+      classes: getClassesForMenuItem(levelTwoItem),
     })),
   }))
 )
 
-function getClassesForLevelOne(
-  levelOneItem: LevelOneMenuItem
+function getClassesForMenuItem(
+  menuItem: LevelOneMenuItem | LevelTwoMenuItem
 ): Record<string, boolean> {
-  const { isDisabled, children } = levelOneItem
-  const hasChildren = (children?.length ?? 0) > 0
-  const isActive = checkIfMenuItemIsActive(levelOneItem)
+  const { isDisabled } = menuItem
+  const isActive = checkIfMenuItemIsActive(menuItem)
   return {
     disabled: isDisabled ?? false,
-    "mb-0": hasChildren,
-    "bg-blue-200": isActive,
-  }
-}
-
-function getClassesForLevelTwo(
-  levelTwoItem: LevelTwoMenuItem,
-  levelOneItem: LevelOneMenuItem
-): Record<string, boolean> {
-  const { isDisabled } = levelTwoItem
-  const siblings = levelOneItem.children ?? []
-  const lastSibling = siblings[siblings.length - 1]
-  const isLastSibling = siblings.length > 0 && levelTwoItem == lastSibling
-  const isActive = checkIfMenuItemIsActive(levelTwoItem)
-
-  return {
-    disabled: isDisabled ?? false,
-    "mb-24": isLastSibling,
     "bg-blue-200": isActive,
   }
 }
@@ -155,13 +136,11 @@ export interface LevelTwoMenuItem {
       <span>{{ goBackLabel }}</span>
     </router-link>
 
-    <div
-      v-for="levelOneItem in enhencedMenuItems"
-      :key="levelOneItem.label"
-      class="border-gray-400 border-t-2"
-    >
+    <hr class="border border-gray-400 mb-10" />
+
+    <div v-for="levelOneItem in enhencedMenuItems" :key="levelOneItem.label">
       <router-link
-        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold my-10 px-8 py-12"
+        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold px-8 py-12"
         :class="levelOneItem.classes"
         :to="levelOneItem.route"
       >
@@ -172,13 +151,15 @@ export interface LevelTwoMenuItem {
         <router-link
           v-for="levelTwoItem in levelOneItem.children"
           :key="levelTwoItem.label"
-          class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg p-10 pl-16"
+          class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg p-12 pl-24"
           :class="levelTwoItem.classes"
           :to="levelTwoItem.route"
         >
           {{ levelTwoItem.label }}
         </router-link>
       </div>
+
+      <hr class="border border-gray-400 my-10" />
     </div>
   </div>
 </template>
