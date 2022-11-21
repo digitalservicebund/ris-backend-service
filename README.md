@@ -76,6 +76,19 @@ If you use IntelliJ: the run configuration _Application_ should be created autom
 
 See `web/README.md`
 
+### Lookup tables
+
+Some dropdown menus in the frontend get populated via calls to the backend which query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables. 
+
+These are the endpoints and the respective XML files (find those in our wiki) that need to be uploaded to them:
+
+| Endpoint  | XML file |
+| ------------- | ------------- |
+| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/doktyp` | `doktyp.xml` |
+| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/gerichtdata` | `gerichtdata_gesamt.xml` |
+
+In both cases you need to do a `PUT` call: in *Postman* go to *Body*, set it to *raw*, change from *Text* to *XML* on the blue dropdown to the right and paste the entire XML content in.
+
 ## Tests
 
 The project has distinct unit and integration test sets.
