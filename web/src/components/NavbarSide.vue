@@ -127,20 +127,22 @@ export interface LevelTwoMenuItem {
 </script>
 
 <template>
-  <div class="px-14 w-[24rem]">
+  <div class="w-[16rem]">
     <router-link
-      class="flex gap-12 h-80 items-center link-01-bold text-blue-800"
+      class="flex gap-12 h-80 items-center link-01-bold px-14 text-blue-800"
       :to="goBackRoute"
     >
       <span class="material-icons">arrow_back</span>
       <span>{{ goBackLabel }}</span>
     </router-link>
 
-    <hr class="border border-gray-400 mb-10" />
-
-    <div v-for="levelOneItem in enhencedMenuItems" :key="levelOneItem.label">
+    <div
+      v-for="levelOneItem in enhencedMenuItems"
+      :key="levelOneItem.label"
+      class="border-gray-400 border-t-1"
+    >
       <router-link
-        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold px-8 py-12"
+        class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold pl-[1rem] py-[1.25rem]"
         :class="levelOneItem.classes"
         :to="levelOneItem.route"
       >
@@ -151,7 +153,7 @@ export interface LevelTwoMenuItem {
         <router-link
           v-for="levelTwoItem in levelOneItem.children"
           :key="levelTwoItem.label"
-          class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg p-12 pl-24"
+          class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg pl-[2rem] py-[1rem]"
           :class="levelTwoItem.classes"
           :to="levelTwoItem.route"
         >

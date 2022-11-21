@@ -37,7 +37,7 @@ const menuItems: LevelOneMenuItem[] = [
     <h1 class="font-bold text-32">Navbar Side</h1>
     <div class="min-h-[200px] pb-4">
       <NavbarSide
-        go-back-label="ZURÜCK"
+        go-back-label="Zurück"
         :go-back-route="goBackRoute"
         :menu-items="menuItems"
       />

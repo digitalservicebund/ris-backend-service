@@ -25,10 +25,13 @@ const documentUnit = ref<DocumentUnit>(props.documentUnit)
 
 <template>
   <div class="flex grow w-screen">
-    <SideToggle v-model:is-expanded="navigationIsOpen" label="Navigation">
+    <SideToggle
+      v-model:is-expanded="navigationIsOpen"
+      class="border-gray-400 border-r-1 border-solid"
+      label="Navigation"
+    >
       <NavbarSide
-        class="border-gray-400 border-r-1 border-solid"
-        go-back-label="ZURÜCK"
+        go-back-label="Zurück"
         :go-back-route="goBackRoute"
         :menu-items="menuItems"
       />
