@@ -1,44 +1,44 @@
 ALTER TABLE
   norms
 ADD
-  officialShortTitle VARCHAR(255),
+  officialShortTitle VARCHAR(255) NULL,
 ADD
-  officialAbbreviation VARCHAR(255),
+  officialAbbreviation VARCHAR(255) NULL,
 ADD
-  referenceNumber VARCHAR(255),
+  referenceNumber VARCHAR(255) NULL,
 ADD
-  publicationDate DATE,
+  publicationDate DATE NULL,
 ADD
-  announcementDate DATE,
+  announcementDate DATE NULL,
 ADD
-  citationDate DATE,
+  citationDate DATE NULL,
 ADD
-  frameKeywords VARCHAR(255),
+  frameKeywords VARCHAR(255) NULL,
 ADD
-  authorEntity VARCHAR(255),
+  authorEntity VARCHAR(255) NULL,
 ADD
-  authorDecidingBody VARCHAR(255),
+  authorDecidingBody VARCHAR(255) NULL,
 ADD
-  authorIsResolutionMajority BOOLEAN,
+  authorIsResolutionMajority BOOLEAN DEFAULT FALSE,
 ADD
-  leadJurisdiction VARCHAR(255),
+  leadJurisdiction VARCHAR(255) NULL,
 ADD
-  leadUnit VARCHAR(255),
+  leadUnit VARCHAR(255) NULL,
 ADD
-  participationType VARCHAR(255),
+  participationType VARCHAR(255) NULL,
 ADD
-  participationInstitution VARCHAR(255),
+  participationInstitution VARCHAR(255) NULL,
 ADD
-  documentTypeName VARCHAR(255),
+  documentTypeName VARCHAR(255) NULL,
 ADD
-  documentNormCategory VARCHAR(255),
+  documentNormCategory VARCHAR(255) NULL,
 ADD
-  documentTemplateName VARCHAR(255),
+  documentTemplateName VARCHAR(255) NULL,
 ADD
-  subjectFna VARCHAR(255),
+  subjectFna VARCHAR(255) NULL,
 ADD
-  subjectPreviousFna VARCHAR(255),
+  subjectPreviousFna VARCHAR(255) NULL,
 ADD
-  subjectGesta VARCHAR(255),
+  subjectGesta VARCHAR(255) NULL,
 ADD
-  subjectBgb3 VARCHAR(255);
+  subjectBgb3 VARCHAR(255) NULL;
