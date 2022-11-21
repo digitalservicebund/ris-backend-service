@@ -70,7 +70,7 @@ export enum OpeningDirection {
   <div class="bg-white pr-[1.25rem] relative">
     <button
       :aria-label="label"
-      class="absolute flex items-center top-24"
+      class="absolute flex items-center top-28"
       :class="classes"
       @click="toggleContentVisibility"
     >
