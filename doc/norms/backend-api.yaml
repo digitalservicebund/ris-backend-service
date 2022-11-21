@@ -20,10 +20,10 @@ paths:
   /norms:
     get:
       summary: Get a list of all available norms
-      operationId: listNorms
+      operationId: getAllNorms
       responses:
         "200":
-          description: Successful response with list of basic data for each norm
+          description: Successful response with list of all norms
           content:
             application/json:
               schema:
@@ -32,19 +32,7 @@ paths:
                   data:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        guid:
-                          $ref: "#/components/schemas/Guid"
-                        longTitle:
-                          type: string
-                example:
-                  data:
-                    - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
-                      longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
-                    - guid: "eb6f27c7-79ef-4b25-8aef-b8726f6ed26f"
-                      longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
-
+                      $ref: "#/components/schemas/Norm"
         "400":
           description: ""
 
