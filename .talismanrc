@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
-    checksum: 66bed125d35800a2abfa8d0e81ff5b37fb5da49429372800a883cc4adb2e99db
+    checksum: cf83e9ea913733c5d1486963648d3dc9df39cd77e3d2eae3562fc8483042ba14
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
@@ -47,6 +47,8 @@ fileignoreconfig:
     checksum: 22dfc4b5b151e9994c79bf2bad4c5eefe242495a0d76091c66abd8901f1b0c51
   - filename: src/main/resources/db/migration/V0.7__norms_update_norms_table.sql
     checksum: e6361f67288a38af664dc0069707427306208c3909a998fd66dc6d28cf8a5fe4
+  - filename: src/main/resources/db/migration/V0.8__norms_update_norms_table2.sql
+    checksum: 3b82c552aba99f3574c666aedf13a8b0cd5875ff3106e666e26533787f4c2698
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/playwright.config.ts
