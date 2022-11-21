@@ -36,7 +36,7 @@ function renderComponent(
 }
 
 describe("documentUnit list", () => {
-  test("renders fallback if no documentUnits found", async () => {
+  test("renders fallback if no documentUnitsListEntries found", async () => {
     renderComponent([])
 
     await screen.findByText("Keine Dokumentationseinheiten gefunden")

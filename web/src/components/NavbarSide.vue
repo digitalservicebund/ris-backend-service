@@ -129,7 +129,7 @@ export interface LevelTwoMenuItem {
 <template>
   <div class="w-[16rem]">
     <router-link
-      class="border-gray-400 border-b-1 flex gap-12 h-80 items-center link-01-bold px-14 text-blue-800"
+      class="border-b-1 border-gray-400 flex gap-12 h-80 items-center link-01-bold px-14 text-blue-800"
       :to="goBackRoute"
     >
       <span class="material-icons">arrow_back</span>
@@ -139,7 +139,7 @@ export interface LevelTwoMenuItem {
     <div
       v-for="levelOneItem in enhencedMenuItems"
       :key="levelOneItem.label"
-      class="border-gray-400 border-b-1"
+      class="border-b-1 border-gray-400"
     >
       <router-link
         class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold pl-[1rem] py-[1.25rem]"
