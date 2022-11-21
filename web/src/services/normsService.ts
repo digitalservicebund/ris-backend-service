@@ -1,8 +1,10 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Norm } from "@/domain/Norm"
 
-export async function getAllNorms(): Promise<ServiceResponse<Norm[]>> {
-  const { data, status, error } = await httpClient.get<{ data: Norm[] }>(
+type NormList = { longTitle: string; guid: string }[]
+
+export async function getAllNorms(): Promise<ServiceResponse<NormList>> {
+  const { data, status, error } = await httpClient.get<{ data: NormList }>(
     "norms"
   )
 

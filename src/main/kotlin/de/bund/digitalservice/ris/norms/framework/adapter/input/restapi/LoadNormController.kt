@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
-import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
@@ -15,20 +14,7 @@ import java.util.UUID
 
 @RestController
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
-class QueryNormsController(
-    private val listNormsService: ListNormsUseCase,
-    private val loadNormService: LoadNormUseCase
-) {
-
-    @GetMapping
-    fun getAllNorms(): Mono<ResponseEntity<PaginatedNormListResponseSchema>> =
-        listNormsService
-            .listNorms()
-            .map({ norm -> NormResponseSchema.from(norm) })
-            .collectList()
-            .map({ normDataList -> PaginatedNormListResponseSchema(normDataList) })
-            .map({ paginationData -> ResponseEntity.ok(paginationData) })
-            .onErrorReturn(ResponseEntity.internalServerError().build())
+class LoadNormController(private val loadNormService: LoadNormUseCase) {
 
     @GetMapping(path = ["/{guid}"])
     fun getNormByGuid(@PathVariable guid: String): Mono<ResponseEntity<NormResponseSchema>> {
@@ -41,8 +27,6 @@ class QueryNormsController(
             .defaultIfEmpty(ResponseEntity.notFound().build<NormResponseSchema>())
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
-
-    data class PaginatedNormListResponseSchema(val data: List<NormResponseSchema>)
 
     data class NormResponseSchema
     private constructor(

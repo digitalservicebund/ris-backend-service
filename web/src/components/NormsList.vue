@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-import { Norm } from "../domain/Norm"
+interface Norm {
+  longTitle: string
+  guid: string
+}
 
 defineProps<{ norms: Norm[] }>()
 </script>
