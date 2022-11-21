@@ -1,20 +1,22 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnitListEntry } from "@/domain/documentUnit"
 
 function renderComponent(
-  documentUnits: DocumentUnit[] = [
-    new DocumentUnit("1", {
-      coreData: {
-        fileNumber: "foo",
-      },
-    }),
+  documentUnitListEntries: DocumentUnitListEntry[] = [
+    {
+      id: "id",
+      uuid: "1",
+      documentNumber: "123",
+      creationtimestamp: "today",
+      fileNumber: "foo",
+    },
   ]
 ) {
   return render(DocumentUnitList, {
     props: {
-      documentUnits: documentUnits,
+      documentUnitListEntries: documentUnitListEntries,
     },
     global: {
       plugins: [

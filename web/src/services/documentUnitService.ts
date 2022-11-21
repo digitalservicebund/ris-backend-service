@@ -1,11 +1,11 @@
-import DocumentUnit from "../domain/documentUnit"
+import DocumentUnit, { DocumentUnitListEntry } from "../domain/documentUnit"
 import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
 } from "./httpClient"
 
 interface DocumentUnitService {
-  getAll(): Promise<ServiceResponse<DocumentUnit[]>>
+  getAllListEntries(): Promise<ServiceResponse<DocumentUnitListEntry[]>>
   getByDocumentNumber(
     documentNumber: string
   ): Promise<ServiceResponse<DocumentUnit>>
@@ -18,8 +18,8 @@ interface DocumentUnitService {
 }
 
 const service: DocumentUnitService = {
-  async getAll() {
-    const response = await httpClient.get<DocumentUnit[]>(
+  async getAllListEntries() {
+    const response = await httpClient.get<DocumentUnitListEntry[]>(
       "caselaw/documentunits"
     )
     if (response.status >= 300) {

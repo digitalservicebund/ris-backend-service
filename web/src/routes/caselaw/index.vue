@@ -3,19 +3,23 @@ import { ref } from "vue"
 import { useRouter } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import TextButton from "@/components/TextButton.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnitListEntry } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 
 const router = useRouter()
 
-const documentUnits = ref((await documentUnitService.getAll()).data)
+const documentUnitListEntries = ref(
+  (await documentUnitService.getAllListEntries()).data
+)
 
-async function handleDelete(documentUnit: DocumentUnit) {
-  if (documentUnits.value) {
-    const status = (await documentUnitService.delete(documentUnit.uuid)).status
+async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
+  if (documentUnitListEntries.value) {
+    const status = (
+      await documentUnitService.delete(documentUnitListEntry.uuid)
+    ).status
     if (status === 200) {
-      documentUnits.value = documentUnits.value.filter(
-        (item) => item != documentUnit
+      documentUnitListEntries.value = documentUnitListEntries.value.filter(
+        (item) => item != documentUnitListEntry
       )
     }
   }
@@ -34,9 +38,9 @@ async function handleDelete(documentUnit: DocumentUnit) {
     </div>
 
     <DocumentUnitList
-      v-if="documentUnits"
+      v-if="documentUnitListEntries"
       class="grow"
-      :document-units="documentUnits"
+      :document-unit-list-entries="documentUnitListEntries"
       @delete-document-unit="handleDelete"
     />
   </div>

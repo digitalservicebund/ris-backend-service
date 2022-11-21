@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { ref } from "vue"
-import DocumentUnit from "../domain/documentUnit"
+import { DocumentUnitListEntry } from "../domain/documentUnit"
 import PopupModal from "./PopupModal.vue"
 
-defineProps<{ documentUnits: DocumentUnit[] }>()
+defineProps<{ documentUnitListEntries: DocumentUnitListEntry[] }>()
 const emit = defineEmits<{
-  (e: "deleteDocumentUnit", documentUnit: DocumentUnit): void
+  (e: "deleteDocumentUnit", documentUnitListEntry: DocumentUnitListEntry): void
 }>()
 
 const showModal = ref(false)
@@ -15,7 +15,7 @@ const modalConfirmText = ref("Löschen")
 const modalHeaderText = "Dokumentationseinheit löschen"
 const modalCancelButtonType = "ghost"
 const modalConfirmButtonType = "secondary"
-const selectedDocumentUnit = ref(new DocumentUnit("1"))
+const selectedDocumentUnitListEntry = ref<DocumentUnitListEntry>()
 const toggleModal = () => {
   showModal.value = !showModal.value
   if (showModal.value) {
@@ -30,14 +30,19 @@ const toggleModal = () => {
     }
   }
 }
-const setSelectedDocumentUnit = (documentUnit: DocumentUnit) => {
-  selectedDocumentUnit.value = documentUnit
-  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnit.value.documentNumber} wirklich dauerhaft löschen?`
+const setSelectedDocumentUnitListEntry = (
+  documentUnitListEntry: DocumentUnitListEntry
+) => {
+  selectedDocumentUnitListEntry.value = documentUnitListEntry
+  console.log(documentUnitListEntry)
+  popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry.value.documentNumber} wirklich dauerhaft löschen?`
   toggleModal()
 }
 const onDelete = () => {
-  emit("deleteDocumentUnit", selectedDocumentUnit.value)
-  toggleModal()
+  if (selectedDocumentUnitListEntry.value) {
+    emit("deleteDocumentUnit", selectedDocumentUnitListEntry.value)
+    toggleModal()
+  }
 }
 </script>
 
@@ -54,7 +59,7 @@ const onDelete = () => {
       @confirm-action="onDelete"
     />
     <div
-      v-if="documentUnits.length"
+      v-if="documentUnitListEntries.length"
       class="border-collapse document-unit-list-table table w-full"
     >
       <div
@@ -67,43 +72,51 @@ const onDelete = () => {
         <div class="table-cell">Löschen</div>
       </div>
       <div
-        v-for="documentUnit in documentUnits"
-        :key="documentUnit.id"
+        v-for="documentUnitListEntry in documentUnitListEntries"
+        :key="documentUnitListEntry.id"
         class="border-b-2 border-b-gray-100 hover:bg-gray-100 leading-[3] table-row text-18"
       >
         <div class="px-[16px] py-0 table-cell">
           <router-link
             class="underline"
             :to="{
-              name: documentUnit.s3path
+              name: documentUnitListEntry.filename
                 ? 'caselaw-documentUnit-:documentNumber-categories'
                 : 'caselaw-documentUnit-:documentNumber-files',
-              params: { documentNumber: documentUnit.documentNumber },
+              params: { documentNumber: documentUnitListEntry.documentNumber },
             }"
           >
-            {{ documentUnit.documentNumber }}
+            {{ documentUnitListEntry.documentNumber }}
           </router-link>
         </div>
         <div class="px-[16px] py-0 table-cell">
-          {{ dayjs(documentUnit.creationtimestamp).format("DD.MM.YYYY") }}
+          {{
+            dayjs(documentUnitListEntry.creationtimestamp).format("DD.MM.YYYY")
+          }}
         </div>
         <div class="px-[16px] py-0 table-cell">
           {{
-            documentUnit.coreData && documentUnit.coreData.fileNumber
-              ? documentUnit.coreData.fileNumber
+            documentUnitListEntry && documentUnitListEntry.fileNumber
+              ? documentUnitListEntry.fileNumber
               : "-"
           }}
         </div>
         <div class="px-16 py-0 table-cell">
-          {{ documentUnit.filename ? documentUnit.filename : "-" }}
+          {{
+            documentUnitListEntry.filename
+              ? documentUnitListEntry.filename
+              : "-"
+          }}
         </div>
         <div class="table-cell text-center">
           <span
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer material-icons"
             tabindex="0"
-            @click="setSelectedDocumentUnit(documentUnit)"
-            @keyup.enter="setSelectedDocumentUnit(documentUnit)"
+            @click="setSelectedDocumentUnitListEntry(documentUnitListEntry)"
+            @keyup.enter="
+              setSelectedDocumentUnitListEntry(documentUnitListEntry)
+            "
           >
             delete
           </span>

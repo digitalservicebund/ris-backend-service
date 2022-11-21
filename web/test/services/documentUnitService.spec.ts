@@ -15,7 +15,7 @@ describe("documentUnitService", () => {
   })
 
   it("appends correct error message if status 500", async () => {
-    const result = await service.getAll()
+    const result = await service.getAllListEntries()
     expect(result.error?.title).toEqual(
       "Dokumentationseinheiten konnten nicht geladen werden."
     )
