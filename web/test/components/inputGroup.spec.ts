@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { fireEvent, render } from "@testing-library/vue"
 import InputGroup from "@/components/InputGroup.vue"
 import type { InputField } from "@/domain"
 import { generateTextInputField } from "~/test-helper/dataGenerators"
@@ -72,35 +72,33 @@ describe("InputFieldGroup", () => {
     expect(input).toHaveValue("")
   })
 
-  it("emits a model update event when user types into input", async () => {
+  it("emits update model value event when input value changes", async () => {
     const fields = [generateTextInputField({ name: "foo" })]
     const modelValue = { foo: "ab" }
-    const { emitted, user, getByRole } = renderComponent({
+    const { emitted, getByRole } = renderComponent({
       fields,
       modelValue,
     })
 
     const input = getByRole("textbox")
-    await user.type(input, "c")
+    await fireEvent.change(input, { target: { value: "abc" } })
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([[{ foo: "abc" }]])
   })
 
-  it("emits a model update event also for inputs without mode value entry", async () => {
+  it("emits a model update event also for inputs without model value entry", async () => {
     const fields = [generateTextInputField({ name: "foo" })]
     const modelValue = {}
-    const { emitted, user, getByRole } = renderComponent({
+    const { emitted, getByRole } = renderComponent({
       fields,
       modelValue,
     })
 
     const input = getByRole("textbox")
-    await user.type(input, "a")
+    await fireEvent.change(input, { target: { value: "a" } })
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([[{ foo: "a" }]])
   })
-
-  // TODO: How to test column count property? (maybe snapshot tests)
 })

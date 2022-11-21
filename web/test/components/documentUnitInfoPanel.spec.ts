@@ -115,7 +115,7 @@ describe("documentUnit InfoPanel", () => {
       },
     })
     getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Gerichtstyp/)
+      return !!node?.textContent?.match(/Gericht/)
     })
 
     getAllByText((_content, node) => {
@@ -137,7 +137,7 @@ describe("documentUnit InfoPanel", () => {
     })
 
     getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Gerichtstyp -/)
+      return !!node?.textContent?.match(/Gericht -/)
     })
   })
 })

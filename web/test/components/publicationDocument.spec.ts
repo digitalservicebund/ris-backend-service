@@ -54,7 +54,10 @@ describe("PublicationDocument:", () => {
         const inputReceiverAddress = renderResult.getByLabelText(
           "Empfängeradresse E-Mail"
         )
-        await fireEvent.update(inputReceiverAddress, "test.email@test.com")
+
+        await fireEvent.change(inputReceiverAddress, {
+          target: { value: "test.email@test.com" },
+        })
 
         const publishButton = renderResult.getByRole("button", {
           name: "Dokumentationseinheit veröffentlichen",

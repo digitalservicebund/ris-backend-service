@@ -57,7 +57,7 @@ function handleOnBlur() {
 <template>
   <input
     :id="id"
-    v-model="inputValue"
+    v-model.lazy="inputValue"
     :aria-label="ariaLabel"
     class="bg-white input"
     :class="conditionalClasses"

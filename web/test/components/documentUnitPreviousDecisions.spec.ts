@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { fireEvent, render } from "@testing-library/vue"
 import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import type { PreviousDecision } from "@/domain/documentUnit"
 
@@ -39,7 +39,7 @@ describe("DocumentUnitPreviousDecisions", async () => {
     expect(queryByDisplayValue("identifier two")).toBeInTheDocument()
   })
 
-  it("emits update model value event when user types into input", async () => {
+  it("emits update model value event when input value changes", async () => {
     const modelValue = [
       {
         courtType: "ab",
@@ -48,10 +48,9 @@ describe("DocumentUnitPreviousDecisions", async () => {
         fileNumber: "test identifier",
       },
     ]
-    const { emitted, user, getByDisplayValue } = renderComponent({ modelValue })
+    const { emitted, getByDisplayValue } = renderComponent({ modelValue })
     const input = getByDisplayValue("ab")
-
-    await user.type(input, "c")
+    await fireEvent.change(input, { target: { value: "abc" } })
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"][0]).toEqual([

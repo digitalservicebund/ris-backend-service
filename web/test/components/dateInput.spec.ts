@@ -58,12 +58,12 @@ describe("DateInput", () => {
     expect(input).toHaveValue("2020-05-12")
   })
 
-  it("emits model update event when user types into input", async () => {
+  it("emits model update event when input changes", async () => {
     const { container, emitted } = renderComponent({
       value: "2022-02-03",
     })
     const input = container.querySelector("input") as HTMLInputElement
-    fireEvent.input(input, { target: { value: "2020-05-12" } })
+    fireEvent.change(input, { target: { value: "2020-05-12" } })
     fireEvent.blur(input)
     await nextTick()
 
@@ -79,7 +79,7 @@ describe("DateInput", () => {
       value: "2024-02-10",
     })
 
-    await fireEvent.update(input)
+    await fireEvent.change(input)
     await nextTick()
 
     expect(input.className).toContain("input__error")
@@ -94,7 +94,7 @@ describe("DateInput", () => {
       value: "2020-02-31",
     })
 
-    await fireEvent.update(input)
+    await fireEvent.change(input)
     await nextTick()
 
     expect(input.className).toContain("input__error")
@@ -125,7 +125,7 @@ describe("DateInput", () => {
       value: "20HA-02-31",
     })
 
-    await fireEvent.update(input)
+    await fireEvent.change(input)
     await nextTick()
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
