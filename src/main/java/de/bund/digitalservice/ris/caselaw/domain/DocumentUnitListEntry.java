@@ -11,6 +11,6 @@ public record DocumentUnitListEntry(
     @Id Long id,
     UUID uuid,
     @Column("documentnumber") String documentNumber,
-    Instant creationtimestamp,
-    String filename,
+    @Column("creationtimestamp") Instant creationTimestamp,
+    @Column("filename") String fileName,
     @Column("aktenzeichen") String fileNumber) {}

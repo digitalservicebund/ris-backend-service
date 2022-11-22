@@ -79,7 +79,7 @@ const onDelete = () => {
           <router-link
             class="underline"
             :to="{
-              name: documentUnitListEntry.filename
+              name: documentUnitListEntry.fileName
                 ? 'caselaw-documentUnit-:documentNumber-categories'
                 : 'caselaw-documentUnit-:documentNumber-files',
               params: { documentNumber: documentUnitListEntry.documentNumber },
@@ -90,7 +90,7 @@ const onDelete = () => {
         </div>
         <div class="px-[16px] py-0 table-cell">
           {{
-            dayjs(documentUnitListEntry.creationtimestamp).format("DD.MM.YYYY")
+            dayjs(documentUnitListEntry.creationTimestamp).format("DD.MM.YYYY")
           }}
         </div>
         <div class="px-[16px] py-0 table-cell">
@@ -102,8 +102,8 @@ const onDelete = () => {
         </div>
         <div class="px-16 py-0 table-cell">
           {{
-            documentUnitListEntry.filename
-              ? documentUnitListEntry.filename
+            documentUnitListEntry.fileName
+              ? documentUnitListEntry.fileName
               : "-"
           }}
         </div>

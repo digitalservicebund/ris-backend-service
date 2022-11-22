@@ -14,8 +14,8 @@ function renderComponent(
             id: "id",
             uuid: "1",
             documentNumber: "123",
-            creationtimestamp: "2022-02-10",
-            filename: "",
+            creationTimestamp: "2022-02-10",
+            fileName: "",
             fileNumber: "",
             ...options,
           },
@@ -66,7 +66,7 @@ describe("documentUnit list", () => {
   test("renders documentUnits with file number and file name", async () => {
     renderComponent({
       fileNumber: "foo",
-      filename: "test.docx",
+      fileName: "test.docx",
     })
 
     await screen.findByText("123")
