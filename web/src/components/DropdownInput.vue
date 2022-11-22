@@ -68,6 +68,7 @@ const toggleDropdown = () => {
 const clearSelection = () => {
   emit("update:modelValue", undefined)
   filter.value = ""
+  inputText.value = ""
   updateCurrentItems()
 }
 
@@ -157,7 +158,7 @@ onBeforeUnmount(() => {
           @input="onTextChange"
         />
         <button
-          v-if="isCombobox"
+          v-if="isCombobox && inputText"
           class="input-close-icon"
           tabindex="0"
           @click="clearSelection"
