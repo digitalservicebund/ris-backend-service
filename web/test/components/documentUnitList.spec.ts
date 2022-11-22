@@ -54,7 +54,7 @@ describe("documentUnit list", () => {
   })
 
   test("renders documentUnits", async () => {
-    renderComponent({ documentNumber: "foo" })
+    renderComponent()
 
     await screen.findByText("123")
     await screen.findByText("10.02.2022")
@@ -64,16 +64,11 @@ describe("documentUnit list", () => {
   })
 
   test("renders documentUnits with file number and file name", async () => {
-    renderComponent([
-      {
-        id: "id1",
-        uuid: "1",
-        documentNumber: "123",
-        creationtimestamp: "2022-02-10",
-        fileNumber: "foo",
-        filename: "test.docx",
-      },
-    ])
+    renderComponent({
+      fileNumber: "foo",
+      filename: "test.docx",
+    })
+
     await screen.findByText("123")
     await screen.findByText("10.02.2022")
     await screen.findByText("foo")
@@ -84,14 +79,7 @@ describe("documentUnit list", () => {
   })
 
   test("renders placeholder for missing file number and file name", async () => {
-    renderComponent([
-      {
-        id: "id2",
-        uuid: "2",
-        documentNumber: "123",
-        creationtimestamp: "2022-02-10",
-      },
-    ])
+    renderComponent()
 
     const items = await screen.findAllByText(/-/)
     expect(items).toHaveLength(2)
