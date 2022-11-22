@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
+import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -26,9 +27,34 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
     class NormRequestSchema {
         lateinit var longTitle: String
         var articles: List<ArticleRequestSchema> = listOf()
+        var officialShortTitle: String? = null
+        var officialAbbreviation: String? = null
+        var referenceNumber: String? = null
+        var publicationDate: String? = null
+        var announcementDate: String? = null
+        var citationDate: String? = null
+        var frameKeywords: String? = null
+        var authorEntity: String? = null
+        var authorDecidingBody: String? = null
+        var authorIsResolutionMajority: Boolean? = null
+        var leadJurisdiction: String? = null
+        var leadUnit: String? = null
+        var participationType: String? = null
+        var participationInstitution: String? = null
+        var documentTypeName: String? = null
+        var documentNormCategory: String? = null
+        var documentTemplateName: String? = null
+        var subjectFna: String? = null
+        var subjectPreviousFna: String? = null
+        var subjectGesta: String? = null
+        var subjectBgb3: String? = null
 
         fun toUseCaseData(): ImportNormUseCase.NormData {
-            return ImportNormUseCase.NormData(longTitle, articles.map { it.toUseCaseData() })
+            return ImportNormUseCase.NormData(
+                longTitle, articles.map { it.toUseCaseData() }, officialShortTitle, officialAbbreviation,
+                referenceNumber, publicationDate, announcementDate, citationDate, frameKeywords, authorEntity, authorDecidingBody,
+                authorIsResolutionMajority, leadJurisdiction, leadUnit, participationType, participationInstitution, documentTypeName, documentNormCategory, documentTemplateName, subjectFna, subjectPreviousFna, subjectGesta, subjectBgb3
+            )
         }
     }
 

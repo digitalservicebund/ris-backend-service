@@ -31,16 +31,40 @@ class ImportNormControllerTest {
     fun `it correctly maps the data to the command to call the import norm service`() {
         val importJson =
             """
-        {
-          "longTitle": "long title",
-          "articles": [
-            {
-            "title": "title",
-            "marker": "marker",
-            "paragraphs": [{ "marker": "marker", "text": "text" }]
-            }
-          ]
-        }
+{
+	"longTitle": "long title",
+	"articles": [
+		{
+			"marker": "§ 1",
+			"title": "article title",
+			"paragraphs": [
+				{
+					"marker": "(1)",
+					"text": "paragraph text 1"
+				},
+				{
+					"marker": "(2)",
+					"text": "paragraph text 2"
+				}
+			]
+		}
+	],
+	"officialShortTitle": "official short title",
+	"officialAbbreviation": "official abbreviation",
+	"referenceNumber": null,
+	"announcementDate": "2021-06-14",
+	"citationDate": "2021-06-09",
+	"frameKeywords": "frame keywords",
+	"authorEntity": "DEU",
+	"authorDecidingBody": "BT",
+	"authorIsResolutionMajority": true,
+	"leadJurisdiction": "BMVI",
+	"leadUnit": "G 22",
+	"participationType": null,
+	"participationInstitution": null,
+	"subjectFna": "FNA 703-12",
+	"subjectGesta": "GESTA J040"
+}
     """
 
         every { importNormService.importNorm(any()) } returns Mono.just(UUID.randomUUID())
@@ -58,11 +82,28 @@ class ImportNormControllerTest {
 
         assertTrue(command.captured.data.longTitle == "long title")
         assertTrue(command.captured.data.articles.size == 1)
-        assertTrue(command.captured.data.articles[0].title == "title")
-        assertTrue(command.captured.data.articles[0].marker == "marker")
-        assertTrue(command.captured.data.articles[0].paragraphs.size == 1)
-        assertTrue(command.captured.data.articles[0].paragraphs[0].marker == "marker")
-        assertTrue(command.captured.data.articles[0].paragraphs[0].text == "text")
+        assertTrue(command.captured.data.articles[0].title == "article title")
+        assertTrue(command.captured.data.articles[0].marker == "§ 1")
+        assertTrue(command.captured.data.articles[0].paragraphs.size == 2)
+        assertTrue(command.captured.data.articles[0].paragraphs[0].marker == "(1)")
+        assertTrue(command.captured.data.articles[0].paragraphs[0].text == "paragraph text 1")
+        assertTrue(command.captured.data.articles[0].paragraphs[1].marker == "(2)")
+        assertTrue(command.captured.data.articles[0].paragraphs[1].text == "paragraph text 2")
+        assertTrue(command.captured.data.officialShortTitle == "official short title")
+        assertTrue(command.captured.data.officialAbbreviation == "official abbreviation")
+        assertTrue(command.captured.data.referenceNumber == null)
+        assertTrue(command.captured.data.announcementDate == "2021-06-14")
+        assertTrue(command.captured.data.citationDate == "2021-06-09")
+        assertTrue(command.captured.data.frameKeywords == "frame keywords")
+        assertTrue(command.captured.data.authorEntity == "DEU")
+        assertTrue(command.captured.data.authorDecidingBody == "BT")
+        assertTrue(command.captured.data.authorIsResolutionMajority == true)
+        assertTrue(command.captured.data.leadJurisdiction == "BMVI")
+        assertTrue(command.captured.data.leadUnit == "G 22")
+        assertTrue(command.captured.data.participationType == null)
+        assertTrue(command.captured.data.participationInstitution == null)
+        assertTrue(command.captured.data.subjectFna == "FNA 703-12")
+        assertTrue(command.captured.data.subjectGesta == "GESTA J040")
     }
 
     @Test

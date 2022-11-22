@@ -21,7 +21,20 @@ interface NormsMapper {
     }
 
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
-        return NormDto(id, norm.guid, norm.longTitle)
+        return NormDto(
+            id, norm.guid, norm.longTitle, officialShortTitle = norm.officialShortTitle,
+            officialAbbreviation = norm.officialAbbreviation, referenceNumber = norm.referenceNumber,
+            publicationDate = norm.publicationDate,
+            announcementDate = norm.announcementDate,
+            citationDate = norm.citationDate,
+            frameKeywords = norm.frameKeywords, authorEntity = norm.authorEntity,
+            authorDecidingBody = norm.authorDecidingBody, authorIsResolutionMajority = norm.authorIsResolutionMajority,
+            leadJurisdiction = norm.leadJurisdiction,
+            leadUnit = norm.leadUnit, participationType = norm.participationType, participationInstitution = norm.participationInstitution,
+            documentTypeName = norm.documentTypeName, documentNormCategory = norm.documentNormCategory, documentTemplateName = norm.documentTemplateName,
+            subjectFna = norm.subjectFna, subjectPreviousFna = norm.subjectPreviousFna, subjectGesta = norm.subjectGesta,
+            subjectBgb3 = norm.subjectBgb3
+        )
     }
 
     fun articlesToDto(articles: List<Article>, normId: Int, id: Int = 0): List<ArticleDto> {

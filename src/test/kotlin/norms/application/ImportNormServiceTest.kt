@@ -11,11 +11,12 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import java.time.LocalDate
 
 // TODO: Improve by using behavior driven testing concept with documentation.
 class ImportNormServiceTest {
     @Test
-    fun `it saves norm to output port with data from command`() {
+    fun `it saves norm to output port with data from command without optional fields`() {
         val port = mockk<SaveNormOutputPort>()
         val service = ImportNormService(port)
         val paragraph = ImportNormUseCase.ParagraphData("marker", "text")
@@ -38,6 +39,85 @@ class ImportNormServiceTest {
                     assertTrue(it.articles[0].paragraphs.size == 1)
                     assertTrue(it.articles[0].paragraphs[0].marker == "marker")
                     assertTrue(it.articles[0].paragraphs[0].text == "text")
+                    assertTrue(it.officialShortTitle == null)
+                    assertTrue(it.officialAbbreviation == null)
+                    assertTrue(it.referenceNumber == null)
+                    assertTrue(it.publicationDate == null)
+                    assertTrue(it.announcementDate == null)
+                    assertTrue(it.citationDate == null)
+                    assertTrue(it.frameKeywords == null)
+                    assertTrue(it.authorEntity == null)
+                    assertTrue(it.authorDecidingBody == null)
+                    assertTrue(it.authorIsResolutionMajority == null)
+                    assertTrue(it.leadJurisdiction == null)
+                    assertTrue(it.leadUnit == null)
+                    assertTrue(it.participationType == null)
+                    assertTrue(it.participationInstitution == null)
+                    assertTrue(it.documentTypeName == null)
+                    assertTrue(it.documentNormCategory == null)
+                    assertTrue(it.documentTemplateName == null)
+                    assertTrue(it.subjectFna == null)
+                    assertTrue(it.subjectPreviousFna == null)
+                    assertTrue(it.subjectGesta == null)
+                    assertTrue(it.subjectBgb3 == null)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun `it saves norm to output port with data from command including optional fields`() {
+        val port = mockk<SaveNormOutputPort>()
+        val service = ImportNormService(port)
+        val paragraph = ImportNormUseCase.ParagraphData("marker", "text")
+        val article = ImportNormUseCase.ArticleData("title", "marker", listOf(paragraph))
+        val norm = ImportNormUseCase.NormData(
+            "long title", listOf(article), "official short title", "official abbreviation",
+            "reference number", "2020-10-27", "2020-10-28", "2020-10-29",
+            "frame keywords", "author entity", "author deciding body",
+            true, "lead jurisdiction", "lead unit", "participation type",
+            "participation institution", "document type name", "document norm category",
+            "document template name", "subject fna", "subject previous fna",
+            "subject gesta", "subject bgb3"
+        )
+        val command = ImportNormUseCase.Command(norm)
+
+        every { port.saveNorm(any()) } returns Mono.just(true)
+
+        service.importNorm(command)
+
+        verify(exactly = 1) { port.saveNorm(any()) }
+        verify {
+            port.saveNorm(
+                withArg {
+                    assertTrue(it.longTitle == "long title")
+                    assertTrue(it.articles.size == 1)
+                    assertTrue(it.articles[0].title == "title")
+                    assertTrue(it.articles[0].marker == "marker")
+                    assertTrue(it.articles[0].paragraphs.size == 1)
+                    assertTrue(it.articles[0].paragraphs[0].marker == "marker")
+                    assertTrue(it.articles[0].paragraphs[0].text == "text")
+                    assertTrue(it.officialShortTitle == "official short title")
+                    assertTrue(it.officialAbbreviation == "official abbreviation")
+                    assertTrue(it.referenceNumber == "reference number")
+                    assertTrue(it.publicationDate == LocalDate.parse("2020-10-27"))
+                    assertTrue(it.announcementDate == LocalDate.parse("2020-10-28"))
+                    assertTrue(it.citationDate == LocalDate.parse("2020-10-29"))
+                    assertTrue(it.frameKeywords == "frame keywords")
+                    assertTrue(it.authorEntity == "author entity")
+                    assertTrue(it.authorDecidingBody == "author deciding body")
+                    assertTrue(it.authorIsResolutionMajority == true)
+                    assertTrue(it.leadJurisdiction == "lead jurisdiction")
+                    assertTrue(it.leadUnit == "lead unit")
+                    assertTrue(it.participationType == "participation type")
+                    assertTrue(it.participationInstitution == "participation institution")
+                    assertTrue(it.documentTypeName == "document type name")
+                    assertTrue(it.documentNormCategory == "document norm category")
+                    assertTrue(it.documentTemplateName == "document template name")
+                    assertTrue(it.subjectFna == "subject fna")
+                    assertTrue(it.subjectPreviousFna == "subject previous fna")
+                    assertTrue(it.subjectGesta == "subject gesta")
+                    assertTrue(it.subjectBgb3 == "subject bgb3")
                 }
             )
         }

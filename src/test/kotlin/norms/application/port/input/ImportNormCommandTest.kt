@@ -76,9 +76,25 @@ class ImportNormCommandTest {
     }
 
     @Test
-    fun `can create command with norm data`() {
+    fun `can create command with norm data without the optional fields`() {
         val command = ImportNormUseCase.Command(validNorm)
 
         assertTrue(command.data == validNorm)
+    }
+
+    @Test
+    fun `can create command with optional fields`() {
+        val normData = ImportNormUseCase.NormData(
+            "long title", listOf(validArticle), "official short title", "official abbreviation",
+            "reference number", "2020-10-27", "2020-10-28", "2020-10-29",
+            "frame keywords", "author entity", "author deciding body",
+            true, "lead jurisdiction", "lead unit", "participation type",
+            "participation institution", "document type name", "document norm category",
+            "document template name", "subject fna", "subject previous fna",
+            "subject gesta", "subject bgb3"
+        )
+        val command = ImportNormUseCase.Command(normData)
+
+        assertTrue(command.data == normData)
     }
 }
