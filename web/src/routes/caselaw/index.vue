@@ -3,7 +3,7 @@ import { ref } from "vue"
 import { useRouter } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import TextButton from "@/components/TextButton.vue"
-import { DocumentUnitListEntry } from "@/domain/documentUnit"
+import { DocumentUnitListEntry } from "@/domain/DocumentUnitListEntry"
 import documentUnitService from "@/services/documentUnitService"
 
 const router = useRouter()

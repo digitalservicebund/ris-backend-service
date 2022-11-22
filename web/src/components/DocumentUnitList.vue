@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { ref } from "vue"
-import { DocumentUnitListEntry } from "../domain/documentUnit"
+import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
 import PopupModal from "./PopupModal.vue"
 
 defineProps<{ documentUnitListEntries: DocumentUnitListEntry[] }>()
@@ -34,7 +34,6 @@ const setSelectedDocumentUnitListEntry = (
   documentUnitListEntry: DocumentUnitListEntry
 ) => {
   selectedDocumentUnitListEntry.value = documentUnitListEntry
-  console.log(documentUnitListEntry)
   popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry.value.documentNumber} wirklich dauerhaft löschen?`
   toggleModal()
 }
@@ -65,7 +64,7 @@ const onDelete = () => {
       <div
         class="bg-gray-400 font-bold leading-[3] table-row text-18 text-center"
       >
-        <div class="table-cell">Dok.-Nummer</div>
+        <div class="table-cell">Dokumentnummer</div>
         <div class="table-cell">Angelegt am</div>
         <div class="table-cell">Aktenzeichen</div>
         <div class="table-cell">Dokumente</div>

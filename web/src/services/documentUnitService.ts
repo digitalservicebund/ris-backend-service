@@ -1,4 +1,5 @@
-import DocumentUnit, { DocumentUnitListEntry } from "../domain/documentUnit"
+import DocumentUnit from "../domain/documentUnit"
+import { DocumentUnitListEntry } from "../domain/DocumentUnitListEntry"
 import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,

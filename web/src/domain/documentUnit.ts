@@ -75,12 +75,3 @@ export default class DocumentUnit {
     return !!this.s3path
   }
 }
-
-export type DocumentUnitListEntry = {
-  id: string
-  uuid: string
-  documentNumber: string
-  creationtimestamp: string
-  filename?: string
-  fileNumber?: string
-}
