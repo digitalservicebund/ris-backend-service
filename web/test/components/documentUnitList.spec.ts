@@ -4,19 +4,25 @@ import DocumentUnitList from "@/components/DocumentUnitList.vue"
 import { DocumentUnitListEntry } from "@/domain/documentUnit"
 
 function renderComponent(
-  documentUnitListEntries: DocumentUnitListEntry[] = [
-    {
-      id: "id",
-      uuid: "1",
-      documentNumber: "123",
-      creationtimestamp: "today",
-      fileNumber: "foo",
-    },
-  ]
+  options?: Partial<DocumentUnitListEntry> | DocumentUnitListEntry[]
 ) {
+  const documentUnitListEntries: DocumentUnitListEntry[] =
+    options instanceof Array
+      ? options
+      : [
+          {
+            id: "id",
+            uuid: "1",
+            documentNumber: "123",
+            creationtimestamp: "2022-02-10",
+            filename: "",
+            fileNumber: "",
+            ...options,
+          },
+        ]
   return render(DocumentUnitList, {
     props: {
-      documentUnitListEntries: documentUnitListEntries,
+      documentUnitListEntries,
     },
     global: {
       plugins: [
@@ -43,7 +49,7 @@ describe("documentUnit list", () => {
   })
 
   test("renders documentUnits", async () => {
-    renderComponent()
+    renderComponent({ documentNumber: "foo" })
 
     await screen.findByText("foo")
     expect(
@@ -52,7 +58,7 @@ describe("documentUnit list", () => {
   })
 
   test("delete emits event", async () => {
-    const { emitted } = renderComponent()
+    const { emitted } = renderComponent({ id: "123" })
 
     await fireEvent.click(
       screen.getByLabelText("Dokumentationseinheit löschen")
