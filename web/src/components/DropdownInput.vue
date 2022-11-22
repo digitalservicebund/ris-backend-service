@@ -57,6 +57,8 @@ const isShowDropdown = ref(false)
 const items = ref(props.dropdownItems ?? [])
 const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
 const filter = ref<string>()
+const dropdownContainerRef = ref<HTMLElement>()
+const focusedItemIndex = ref<number>(0)
 
 const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
@@ -76,6 +78,22 @@ const setChosenItem = (value: DropdownInputModelType) => {
   isShowDropdown.value = false
   emit("update:modelValue", value)
   filter.value = ""
+}
+
+const keyup = () => {
+  focusedItemIndex.value -= 1
+  const prev = dropdownContainerRef.value?.childNodes[
+    focusedItemIndex.value
+  ] as HTMLElement
+  if (prev) prev.focus()
+}
+
+const keydown = () => {
+  focusedItemIndex.value += 1
+  const next = dropdownContainerRef.value?.childNodes[
+    focusedItemIndex.value
+  ] as HTMLElement
+  if (next) next.focus()
 }
 
 const onTextChange = () => {
@@ -186,6 +204,7 @@ onBeforeUnmount(() => {
     </div>
     <div
       v-if="isShowDropdown"
+      ref="dropdownContainerRef"
       class="dropdown-container__dropdown-items"
       tabindex="-1"
     >
@@ -196,6 +215,8 @@ onBeforeUnmount(() => {
         tabindex="0"
         @click="setChosenItem(item.value)"
         @keypress.enter="setChosenItem(item.value)"
+        @keyup.down="keydown"
+        @keyup.up="keyup"
       >
         <span> {{ item.text }}</span>
       </div>
