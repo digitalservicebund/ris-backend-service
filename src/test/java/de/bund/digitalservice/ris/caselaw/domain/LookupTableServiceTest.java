@@ -33,7 +33,8 @@ class LookupTableServiceTest {
   void testGetDocumentTypes() {
     DocumentTypeDTO documentTypeDTO = DocumentTypeDTO.EMPTY;
     documentTypeDTO.setId(3L);
-    when(documentTypeRepository.findAll()).thenReturn(Flux.just(documentTypeDTO));
+    when(documentTypeRepository.findAllByOrderByJurisShortcutAscLabelAsc())
+        .thenReturn(Flux.just(documentTypeDTO));
 
     StepVerifier.create(service.getDocumentTypes(Optional.empty()))
         .consumeNextWith(
@@ -43,14 +44,15 @@ class LookupTableServiceTest {
             })
         .verifyComplete();
 
-    verify(documentTypeRepository).findAll();
+    verify(documentTypeRepository).findAllByOrderByJurisShortcutAscLabelAsc();
   }
 
   @Test
   void testGetCourts() {
     CourtDTO courtDTO = CourtDTO.EMPTY;
     courtDTO.setCourttype("BGH");
-    when(courtRepository.findAll()).thenReturn(Flux.just(courtDTO));
+    when(courtRepository.findAllByOrderByCourttypeAscCourtlocationAsc())
+        .thenReturn(Flux.just(courtDTO));
 
     StepVerifier.create(service.getCourts(Optional.empty()))
         .consumeNextWith(
@@ -60,6 +62,6 @@ class LookupTableServiceTest {
             })
         .verifyComplete();
 
-    verify(courtRepository).findAll();
+    verify(courtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();
   }
 }

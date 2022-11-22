@@ -34,7 +34,7 @@ public class LookupTableService {
                       documentTypeDTO.getLabel()));
     }
     return documentTypeRepository
-        .findAll()
+        .findAllByOrderByJurisShortcutAscLabelAsc()
         .map(
             documentTypeDTO ->
                 new DocumentType(
@@ -55,7 +55,7 @@ public class LookupTableService {
                       courtDTO.getCourttype() + " " + courtDTO.getCourtlocation()));
     }
     return courtRepository
-        .findAll()
+        .findAllByOrderByCourttypeAscCourtlocationAsc()
         .map(
             courtDTO ->
                 new Court(
