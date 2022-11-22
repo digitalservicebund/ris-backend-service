@@ -16,7 +16,6 @@ import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 const items: DropdownItem[] = dropdownItems.items
 const modelValue1 = ref<DropdownInputModelType>()
 const modelValue2 = ref<ModelType>()
-const hasError = ref(true)
 const isReadonly = ref(true)
 const mockValidationError: ValidationError = {
   defaultMessage: "wrong date",
@@ -72,7 +71,6 @@ const dropdownInputAttribute: InputAttributes = {
       <TextInput
         id="textInputReadonly"
         aria-label="text input"
-        :has-error="hasError"
         placeholder="this is text input readonly"
         :read-only="isReadonly"
         value=""

@@ -118,7 +118,6 @@ function validateEmailAddress(): boolean {
               id="receiverAddress"
               v-model="receiverAddress"
               aria-label="Empfängeradresse E-Mail"
-              :has-error="emailAddressInvalid"
             />
           </InputField>
         </div>
