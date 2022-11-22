@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch } from "vue"
+import { onUnmounted, watch } from "vue"
 import TextButton from "./TextButton.vue"
 import { useSaveToRemote } from "@/composables/useSaveToRemote"
 import { ServiceResponse } from "@/services/httpClient"
@@ -19,7 +19,7 @@ const getCurrentTime = (dateSaved: Date) => {
   return `${fullHour}:${fullMinute}`
 }
 
-const { saveIsInProgress, triggerSave, lastSaveError, lastSavedOn } =
+const { saveIsInProgress, triggerSave, lastSaveError, lastSavedOn, timer } =
   useSaveToRemote(props.serviceCallback, 10000)
 
 const handleNormUpdate = () => {
@@ -27,6 +27,10 @@ const handleNormUpdate = () => {
 }
 
 watch(() => lastSavedOn, handleNormUpdate, { immediate: true })
+
+onUnmounted(() => {
+  clearInterval(timer)
+})
 </script>
 
 <template>

@@ -13,6 +13,7 @@ describe("SaveButton", () => {
       triggerSave: vi.fn(),
       lastSaveError: ref<ResponseError | undefined>(undefined),
       lastSavedOn: ref<Date | undefined>(undefined),
+      timer: setInterval(() => vi.fn()),
     })
     const getByText = await renderAndClick()
     expect(getByText("Daten werden gespeichert")).toBeVisible()
@@ -24,6 +25,7 @@ describe("SaveButton", () => {
       triggerSave: vi.fn(),
       lastSaveError: ref<ResponseError | undefined>(undefined),
       lastSavedOn: ref<Date | undefined>(new Date()),
+      timer: setInterval(() => vi.fn()),
     })
     const getByText = await renderAndClick()
     expect(getByText("Zuletzt gespeichert um", { exact: false })).toBeVisible()
@@ -37,6 +39,7 @@ describe("SaveButton", () => {
         title: "test",
       } as ResponseError),
       lastSavedOn: ref<Date | undefined>(new Date()),
+      timer: setInterval(() => vi.fn()),
     })
     const getByText = await renderAndClick()
     expect(getByText("Fehler beim Speichern")).toBeVisible()

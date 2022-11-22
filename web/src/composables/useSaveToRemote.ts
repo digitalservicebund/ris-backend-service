@@ -1,4 +1,4 @@
-import { onUnmounted, ref } from "vue"
+import { ref } from "vue"
 import { ServiceResponse, ResponseError } from "@/services/httpClient"
 
 export function useSaveToRemote(
@@ -25,22 +25,18 @@ export function useSaveToRemote(
         lastSaveError.value = undefined
       }
     } catch (error) {
-      console.error(error)
       lastSaveError.value = { title: "Verbindung fehlgeschlagen" }
     } finally {
       saveIsInProgress.value = false
     }
   }
-
   const timer = setInterval(triggerSave, autoSaveInterval)
-  onUnmounted(() => {
-    clearInterval(timer)
-  })
 
   return {
     saveIsInProgress,
     triggerSave,
     lastSaveError,
     lastSavedOn,
+    timer,
   }
 }
