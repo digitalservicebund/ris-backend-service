@@ -51,6 +51,17 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await page.reload()
     expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("abc")
+
+    await page.goto("/")
+    await expect(
+      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+    ).toBeVisible()
+    await page.locator(".table-row", {
+      hasText: documentNumber,
+    })
+    await page.locator(".table-row", {
+      hasText: "abc",
+    })
   })
 
   test("test previous decision data change", async ({
