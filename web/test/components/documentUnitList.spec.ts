@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import { DocumentUnitListEntry } from "@/domain/documentUnit"
+import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
 
 function renderComponent(
   options?: Partial<DocumentUnitListEntry> | DocumentUnitListEntry[]
@@ -34,6 +34,11 @@ function renderComponent(
               name: "caselaw-documentUnit-:documentNumber-files",
               component: {},
             },
+            {
+              path: "",
+              name: "caselaw-documentUnit-:documentNumber-categories",
+              component: {},
+            },
           ],
         }),
       ],
@@ -51,7 +56,45 @@ describe("documentUnit list", () => {
   test("renders documentUnits", async () => {
     renderComponent({ documentNumber: "foo" })
 
+    await screen.findByText("123")
+    await screen.findByText("10.02.2022")
+    expect(
+      screen.queryByText("Keine Dokumentationseinheiten gefunden")
+    ).not.toBeInTheDocument()
+  })
+
+  test("renders documentUnits with file number and file name", async () => {
+    renderComponent([
+      {
+        id: "id1",
+        uuid: "1",
+        documentNumber: "123",
+        creationtimestamp: "2022-02-10",
+        fileNumber: "foo",
+        filename: "test.docx",
+      },
+    ])
+    await screen.findByText("123")
+    await screen.findByText("10.02.2022")
     await screen.findByText("foo")
+    await screen.findByText("test.docx")
+    expect(
+      screen.queryByText("Keine Dokumentationseinheiten gefunden")
+    ).not.toBeInTheDocument()
+  })
+
+  test("renders placeholder for missing file number and file name", async () => {
+    renderComponent([
+      {
+        id: "id2",
+        uuid: "2",
+        documentNumber: "123",
+        creationtimestamp: "2022-02-10",
+      },
+    ])
+
+    const items = await screen.findAllByText(/-/)
+    expect(items).toHaveLength(2)
     expect(
       screen.queryByText("Keine Dokumentationseinheiten gefunden")
     ).not.toBeInTheDocument()
