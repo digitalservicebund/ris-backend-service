@@ -20,7 +20,7 @@ paths:
   /norms:
     get:
       summary: Get a list of all available norms
-      operationId: getAllNorms
+      operationId: listNorms
       responses:
         "200":
           description: Successful response with list of all norms
@@ -32,7 +32,18 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/Norm"
+                      type: object
+                      properties:
+                        guid:
+                          $ref: "#/components/schemas/Guid"
+                        longTitle:
+                          type: string
+                example:
+                  data:
+                    - guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
+                      longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
+                    - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
+                      longTitle: "Übereinkommen über das umweltgerechte Recycling von Schiffen"
         "400":
           description: ""
 
@@ -59,7 +70,7 @@ paths:
   /norms/{guid}:
     get:
       summary: Obtain a single norm by its Guid
-      operationId: getNormByGuid
+      operationId: loadNorm
       parameters:
         - name: guid
           in: path
