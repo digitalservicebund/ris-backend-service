@@ -84,11 +84,15 @@ fileignoreconfig:
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/ImportNormController.kt
     checksum: 2d7001046c8a92a29e6e5b72e1f8ed769316d02d11c031dd29efdfb3672c748d
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/NormsMapper.kt
-    checksum: d3ed4b4d0eb2d4408c2692cbad77da6a79e4970b5ad2f3881ae0f2413ac9fa5e
+    checksum: 7f0745e5e0aa25bce1f489bee94746add432d2d227c0faf0e3afa3053ef88609
   - filename: src/test/kotlin/norms/application/ImportNormServiceTest.kt
     checksum: 3981c011c7514a1cf59029c96829810b1b50adf89d79f77234adc3deb8486ac5
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/ImportNormControllerTest.kt
     checksum: 79561285e32e656c74689de329a06468ff0153c34f58d0d9d64989ca09963519
+  - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/LoadNormController.kt
+    checksum: 9baad1f844acc8ced8e4448afdbb4414711b9a90f65014bc57a9e2897ad8d5e1
+  - filename: src/test/kotlin/norms/framework/adapter/input/restapi/LoadNormControllerTest.kt
+    checksum: 968b2c4074b6ba7de8669b503bfe996686b118424eec80a4e4ddb9e3f9c051cb
 
 scopeconfig:
   - scope: node
