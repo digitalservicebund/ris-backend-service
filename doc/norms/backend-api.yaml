@@ -292,55 +292,35 @@ components:
 
     Paragraph:
       allOf:
-        - $ref: "#/components/schemas/ParagraphWithoutGuid"
         - type: object
-          required:
-            - guid
           properties:
             guid:
               $ref: "#/components/schemas/Guid"
-          example:
-            guid: "eb6f27c7-79ef-4b25-8aef-b8726f6ed26f"
-            marker: "(1)"
-            text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+        - $ref: "#/components/schemas/ParagraphWithoutGuid"
 
     Article:
-      type: object
-      required:
-        - guid
-        - marker
-        - paragraphs
-      properties:
-        guid:
-          $ref: "#/components/schemas/Guid"
-        title:
-          type: string
-        marker:
-          type: string
-        paragraphs:
-          type: array
-          items:
-            $ref: "#/components/schemas/Paragraph"
-      example:
-        guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
-        marker: "§ 1"
-        title: "Allgemeiner Anwendungsbereich"
-        paragraphs:
-          - guid: "eb6f27c7-79ef-4b25-8aef-b8726f6ed26f"
-            marker: "(1)"
-            text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+      allOf:
+        - type: object
+          properties:
+            guid:
+              $ref: "#/components/schemas/Guid"
+            paragraphs:
+              type: array
+              items:
+                $ref: "#/components/schemas/Paragraph"
+        - $ref: "#/components/schemas/ArticleWithoutGuid"
 
     Norm:
       allOf:
-        - $ref: "#/components/schemas/NormWithoutGuid"
         - type: object
-          required:
-            - guid
           properties:
             guid:
               $ref: "#/components/schemas/Guid"
-          example:
-            guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
+            articles:
+              type: array
+              items:
+                $ref: "#/components/schemas/Article"
+        - $ref: "#/components/schemas/NormWithoutGuid"
 
 security:
   - BasicAuth: []
