@@ -1,12 +1,12 @@
 import { LookupTableEndpoint } from "@/domain"
 import { Court } from "@/domain/documentUnit"
 import { DocumentType } from "@/domain/lookupTables"
+import service from "@/services/dropdownItemService"
 import httpClient from "@/services/httpClient"
-import service from "@/services/lookupTableService"
 
 vi.mock("@/services/httpClient")
 
-describe("lookupTableService", () => {
+describe("dropdownItemService", () => {
   beforeEach(() => {
     vi.resetAllMocks()
   })

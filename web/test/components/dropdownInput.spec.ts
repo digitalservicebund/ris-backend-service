@@ -4,7 +4,7 @@ import DropdownInput from "@/components/DropdownInput.vue"
 import { Court } from "@/domain/documentUnit"
 import type { DropdownItem } from "@/domain/types"
 import { LookupTableEndpoint } from "@/domain/types"
-import lookupTableService from "@/services/lookupTableService"
+import dropdownInputService from "@/services/dropdownItemService"
 
 const DROPDOWN_ITEMS: DropdownItem[] = [
   { text: "testItem1", value: "t1" },
@@ -242,7 +242,7 @@ describe("Dropdown Element", () => {
       },
     ]
     const fetchSpy = vi
-      .spyOn(lookupTableService, "fetch")
+      .spyOn(dropdownInputService, "fetch")
       .mockImplementation(() => Promise.resolve(dropdownItems))
 
     const { container } = render(DropdownInput, {
@@ -287,7 +287,7 @@ describe("Dropdown Element", () => {
       },
     ]
     const fetchSpy = vi
-      .spyOn(lookupTableService, "fetch")
+      .spyOn(dropdownInputService, "fetch")
       .mockImplementation(() => Promise.resolve(dropdownItems))
 
     const { container } = render(DropdownInput, {
@@ -329,7 +329,7 @@ describe("Dropdown Element", () => {
       },
     ]
     const fetchSpy = vi
-      .spyOn(lookupTableService, "fetch")
+      .spyOn(dropdownInputService, "fetch")
       .mockImplementation(() => Promise.resolve(dropdownItems))
 
     const { container, getByLabelText } = render(DropdownInput, {

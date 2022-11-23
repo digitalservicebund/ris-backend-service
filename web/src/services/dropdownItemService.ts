@@ -4,14 +4,14 @@ import { Court } from "@/domain/documentUnit"
 import { DocumentType } from "@/domain/lookupTables"
 
 // TODO this should be wrapped in a ServiceResponse
-interface LookupTableService {
+interface DropdownItemService {
   fetch(
     endpoint: LookupTableEndpoint,
     searchStr?: string
   ): Promise<DropdownItem[]>
 }
 
-const service: LookupTableService = {
+const service: DropdownItemService = {
   async fetch(endpoint: LookupTableEndpoint, searchStr?: string) {
     let response
     switch (endpoint) {

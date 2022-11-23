@@ -3,7 +3,7 @@ import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { Court } from "@/domain/documentUnit"
 import type { DropdownItem } from "@/domain/types"
 import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
-import lookupTableService from "@/services/lookupTableService"
+import dropdownItemService from "@/services/dropdownItemService"
 
 interface Props {
   id: string
@@ -31,7 +31,7 @@ watch(
   props,
   () => {
     inputValue.value = props.modelValue ?? props.value
-    checkValue()
+    checkInputValueType()
   },
   {
     immediate: true,
@@ -40,10 +40,10 @@ watch(
 
 watch(inputValue, () => {
   emit("update:modelValue", inputValue.value)
-  checkValue()
+  checkInputValueType()
 })
 
-function checkValue() {
+function checkInputValueType() {
   // TODO better solution to check for court type
   if (typeof inputValue.value === "object") {
     const court = inputValue.value as Court
@@ -104,7 +104,7 @@ const onTextChange = () => {
 
 const updateCurrentItems = () => {
   if (!!props.endpoint) {
-    lookupTableService
+    dropdownItemService
       .fetch(props.endpoint, filter.value)
       .then((dropdownItems: DropdownItem[]) => {
         currentItems.value = dropdownItems
