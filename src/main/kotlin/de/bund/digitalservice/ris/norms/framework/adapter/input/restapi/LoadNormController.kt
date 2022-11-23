@@ -75,7 +75,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     data class ArticleResponseSchema
     private constructor(
         val guid: String,
-        val title: String,
+        var title: String? = null,
         val marker: String,
         val paragraphs: List<ParagraphResponseSchema>
     ) {
@@ -93,7 +93,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     }
 
     data class ParagraphResponseSchema
-    private constructor(val guid: String, val marker: String, val text: String) {
+    private constructor(val guid: String, var marker: String? = null, val text: String) {
         companion object {
             fun from(paragraph: Paragraph): ParagraphResponseSchema {
                 return ParagraphResponseSchema(paragraph.guid.toString(), paragraph.marker, paragraph.text)

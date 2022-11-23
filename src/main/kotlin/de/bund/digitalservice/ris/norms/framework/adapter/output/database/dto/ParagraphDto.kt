@@ -10,7 +10,7 @@ data class ParagraphDto(
     @Id
     val id: Int,
     val guid: UUID,
-    val marker: String,
+    var marker: String? = null,
     val text: String,
     @Column("article_id")
     val articleId: Int

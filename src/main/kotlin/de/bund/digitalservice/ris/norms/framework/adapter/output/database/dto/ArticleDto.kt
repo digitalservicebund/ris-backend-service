@@ -10,7 +10,7 @@ data class ArticleDto(
     @Id
     val id: Int,
     val guid: UUID,
-    val title: String,
+    var title: String? = null,
     val marker: String,
     @Column("norm_id")
     val normId: Int

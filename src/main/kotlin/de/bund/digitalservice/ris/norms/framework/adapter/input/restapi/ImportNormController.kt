@@ -59,7 +59,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
     }
 
     class ArticleRequestSchema {
-        lateinit var title: String
+        var title: String? = null
         lateinit var marker: String
         var paragraphs: List<ParagraphRequestSchema> = listOf()
 
@@ -69,7 +69,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
     }
 
     class ParagraphRequestSchema {
-        lateinit var marker: String
+        var marker: String? = null
         lateinit var text: String
 
         fun toUseCaseData(): ImportNormUseCase.ParagraphData {

@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.application.port.input
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 
 class ImportNormCommandTest {
     private val validParagraph = ImportNormUseCase.ParagraphData("maker", "text")
@@ -11,9 +12,8 @@ class ImportNormCommandTest {
     private val validNorm = ImportNormUseCase.NormData("long title", listOf(validArticle))
 
     @Test
-    fun `it requires paragraphs to have a non empty marker`() {
-        assertThrows(
-            IllegalArgumentException::class.java,
+    fun `it does not require paragraphs to have a non empty marker`() {
+        assertDoesNotThrow(
             { ImportNormUseCase.ParagraphData(marker = "", "text") }
         )
     }
@@ -35,9 +35,8 @@ class ImportNormCommandTest {
     }
 
     @Test
-    fun `it requires articles to have a non empty title`() {
-        assertThrows(
-            IllegalArgumentException::class.java,
+    fun `it does not require articles to have a non empty title`() {
+        assertDoesNotThrow(
             { ImportNormUseCase.ArticleData(title = "", "marker", listOf()) }
         )
     }

@@ -39,19 +39,17 @@ interface ImportNormUseCase {
     }
 
     data class ArticleData(
-        val title: String,
+        val title: String? = null,
         val marker: String,
         val paragraphs: List<ParagraphData>
     ) {
         init {
-            require(title.isNotBlank())
             require(marker.isNotBlank())
         }
     }
 
-    data class ParagraphData(val marker: String, val text: String) {
+    data class ParagraphData(val marker: String? = null, val text: String) {
         init {
-            require(marker.isNotBlank())
             require(text.isNotBlank())
         }
     }
