@@ -1,13 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import java.nio.ByteBuffer;
 import org.junit.jupiter.api.Test;
@@ -31,8 +28,6 @@ class LookupTableImporterServiceTest {
 
   @Test
   void testImportDocumentTypeLookupTable() {
-    when(documentTypeRepository.save(any(DocumentTypeDTO.class)))
-        .thenReturn(Mono.just(DocumentTypeDTO.EMPTY));
     when(documentTypeRepository.deleteAll()).thenReturn(Mono.empty());
 
     String doctypeXml =
@@ -55,13 +50,11 @@ class LookupTableImporterServiceTest {
                     "Successfully imported the document type lookup table", documentTypeDTO))
         .verifyComplete();
 
-    verify(documentTypeRepository).save(any(DocumentTypeDTO.class));
     verify(documentTypeRepository).deleteAll();
   }
 
   @Test
   void testImportCourtLookupTable() {
-    when(courtRepository.save(any(CourtDTO.class))).thenReturn(Mono.just(CourtDTO.EMPTY));
     when(courtRepository.deleteAll()).thenReturn(Mono.empty());
 
     String courtXml =
@@ -84,7 +77,6 @@ class LookupTableImporterServiceTest {
             courtDTO -> assertEquals("Successfully imported the court lookup table", courtDTO))
         .verifyComplete();
 
-    verify(courtRepository).save(any(CourtDTO.class));
     verify(courtRepository).deleteAll();
   }
 }
