@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/vue"
+import { createRouter, createWebHistory } from "vue-router"
 import NormsList from "@/components/NormsList.vue"
 import { Norm } from "@/domain/Norm"
 
@@ -20,6 +21,20 @@ describe("norms list", () => {
     render(NormsList, {
       props: {
         norms: [norm],
+      },
+      global: {
+        plugins: [
+          createRouter({
+            history: createWebHistory(),
+            routes: [
+              {
+                path: "",
+                name: "norms-norm-:normGuid",
+                component: {},
+              },
+            ],
+          }),
+        ],
       },
     })
 
