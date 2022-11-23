@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { fireEvent, render } from "@testing-library/vue"
+import { render } from "@testing-library/vue"
 import InputGroup from "@/components/InputGroup.vue"
 import type { InputField } from "@/domain"
 import { generateTextInputField } from "~/test-helper/dataGenerators"
@@ -75,13 +75,14 @@ describe("InputFieldGroup", () => {
   it("emits update model value event when input value changes", async () => {
     const fields = [generateTextInputField({ name: "foo" })]
     const modelValue = { foo: "ab" }
-    const { emitted, getByRole } = renderComponent({
+    const { emitted, user, getByRole } = renderComponent({
       fields,
       modelValue,
     })
 
     const input = getByRole("textbox")
-    await fireEvent.change(input, { target: { value: "abc" } })
+    await user.type(input, "c")
+    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([[{ foo: "abc" }]])
@@ -90,13 +91,14 @@ describe("InputFieldGroup", () => {
   it("emits a model update event also for inputs without model value entry", async () => {
     const fields = [generateTextInputField({ name: "foo" })]
     const modelValue = {}
-    const { emitted, getByRole } = renderComponent({
+    const { emitted, user, getByRole } = renderComponent({
       fields,
       modelValue,
     })
 
     const input = getByRole("textbox")
-    await fireEvent.change(input, { target: { value: "a" } })
+    await user.type(input, "a")
+    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([[{ foo: "a" }]])

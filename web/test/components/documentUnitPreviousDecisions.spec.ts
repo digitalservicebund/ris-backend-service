@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { fireEvent, render } from "@testing-library/vue"
+import { render } from "@testing-library/vue"
 import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import type { PreviousDecision } from "@/domain/documentUnit"
 
@@ -48,9 +48,10 @@ describe("DocumentUnitPreviousDecisions", async () => {
         fileNumber: "test identifier",
       },
     ]
-    const { emitted, getByDisplayValue } = renderComponent({ modelValue })
+    const { emitted, user, getByDisplayValue } = renderComponent({ modelValue })
     const input = getByDisplayValue("ab")
-    await fireEvent.change(input, { target: { value: "abc" } })
+    await user.type(input, "c")
+    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"][0]).toEqual([

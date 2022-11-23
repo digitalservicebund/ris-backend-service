@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { fireEvent, render } from "@testing-library/vue"
+import { render } from "@testing-library/vue"
 import TextInput from "@/components/TextInput.vue"
 
 function renderComponent(options?: {
@@ -68,9 +68,10 @@ describe("TextInput", () => {
   })
 
   it("emits model update event when user types into input", async () => {
-    const { emitted, getByRole } = renderComponent()
+    const { emitted, user, getByRole } = renderComponent()
     const input: HTMLInputElement = getByRole("textbox")
-    await fireEvent.change(input, { target: { value: "ab" } })
+    await user.type(input, "ab")
+    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toEqual([["ab"]])
   })

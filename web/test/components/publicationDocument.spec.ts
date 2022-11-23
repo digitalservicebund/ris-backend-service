@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event"
 import { render, RenderResult, fireEvent } from "@testing-library/vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 
@@ -55,9 +56,8 @@ describe("PublicationDocument:", () => {
           "Empfängeradresse E-Mail"
         )
 
-        await fireEvent.change(inputReceiverAddress, {
-          target: { value: "test.email@test.com" },
-        })
+        await userEvent.type(inputReceiverAddress, "test.email@test.com")
+        await userEvent.tab()
 
         const publishButton = renderResult.getByRole("button", {
           name: "Dokumentationseinheit veröffentlichen",
