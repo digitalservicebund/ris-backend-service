@@ -91,10 +91,50 @@ paths:
           application/json:
             schema:
               type: object
-              required:
-                - longTitle
               properties:
                 longTitle:
+                  type: string
+                officialShortTitle:
+                  type: string
+                officialAbbreviation:
+                  type: string
+                referenceNumber:
+                  type: string
+                publicationDate:
+                  $ref: "#/components/schemas/Date"
+                announcementDate:
+                  $ref: "#/components/schemas/Date"
+                citationDate:
+                  $ref: "#/components/schemas/Date"
+                frameKeywords:
+                  type: string
+                authorEntity:
+                  type: string
+                authorDecidingBody:
+                  type: string
+                authorIsResolutionMajority:
+                  type: boolean
+                leadJurisdiction:
+                  type: string
+                leadUnit:
+                  type: string
+                participationType:
+                  type: string
+                participationInstitution:
+                  type: string
+                documentTypeName:
+                  type: string
+                documentNormCategory:
+                  type: string
+                documentTemplateName:
+                  type: string
+                subjectFna:
+                  type: string
+                subjectPreviousFna:
+                  type: string
+                subjectGesta:
+                  type: string
+                subjectBgb3:
                   type: string
       responses:
         "204":
