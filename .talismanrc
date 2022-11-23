@@ -80,9 +80,9 @@ fileignoreconfig:
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt
     checksum: 6940bc0211cc70dc03eccaad0986864b1b4ba4da9369d057587a741bc82ade5d
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
-    checksum: 476d4d72f0db68b4358ad4370643f48d33e1aac3cbd56f89adcf98bd676fb8a0
+    checksum: 211614f7a1ca89c4893a4a73625f91dd685dafe7fd7eb5c992d9d33f26c28d7f
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/ImportNormController.kt
-    checksum: 2d7001046c8a92a29e6e5b72e1f8ed769316d02d11c031dd29efdfb3672c748d
+    checksum: 2a5ec0038398864d88d6212bc7ddd88228a027978930b3dfaffeb787d45f84de
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/NormsMapper.kt
     checksum: 7f0745e5e0aa25bce1f489bee94746add432d2d227c0faf0e3afa3053ef88609
   - filename: src/test/kotlin/norms/application/ImportNormServiceTest.kt
@@ -90,7 +90,7 @@ fileignoreconfig:
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/ImportNormControllerTest.kt
     checksum: 79561285e32e656c74689de329a06468ff0153c34f58d0d9d64989ca09963519
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/LoadNormController.kt
-    checksum: 9baad1f844acc8ced8e4448afdbb4414711b9a90f65014bc57a9e2897ad8d5e1
+    checksum: d3c96ab476f3d218fafb10b1505a79f7bc5af30ca16601ac2276291f503a53ed
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 968b2c4074b6ba7de8669b503bfe996686b118424eec80a4e4ddb9e3f9c051cb
 
