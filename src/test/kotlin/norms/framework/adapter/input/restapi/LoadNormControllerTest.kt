@@ -18,15 +18,18 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import java.util.UUID
+import java.time.LocalDate
+import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [LoadNormController::class])
 @WithMockUser
 class LoadNormControllerTest {
-    @Autowired lateinit var webClient: WebTestClient
+    @Autowired
+    lateinit var webClient: WebTestClient
 
-    @MockkBean lateinit var loadNormService: LoadNormUseCase
+    @MockkBean
+    lateinit var loadNormService: LoadNormUseCase
 
     @Test
     fun `it calls the load norm service with the correct query to get a norm by GUID`() {
@@ -67,7 +70,15 @@ class LoadNormControllerTest {
         val articleGuid = UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359")
         val article = Article(articleGuid, "title", "marker", listOf(paragraph))
         val normGuid = UUID.fromString("72631e54-78a4-11d0-bcf7-00aa00b7b32a")
-        val norm = Norm(normGuid, "long title", listOf(article))
+        val norm = Norm(
+            normGuid, "long title", listOf(article), "official short title", "official abbreviation",
+            null, LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
+            "frame keywords", "author entity", "author deciding body",
+            true, "lead jurisdiction", "lead unit", "participation type",
+            "participation institution", "document type name", "document norm category",
+            "document template name", "subject fna", "subject previous fna",
+            "subject gesta", "subject bgb3"
+        )
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -95,7 +106,28 @@ class LoadNormControllerTest {
                 }
               ]
             }
-          ]
+          ],
+          "officialShortTitle": "official short title",
+          "officialAbbreviation": "official abbreviation",
+          "referenceNumber": null,
+          "publicationDate": "2020-10-27",
+          "announcementDate": "2020-10-28",
+          "citationDate": "2020-10-29",
+          "frameKeywords": "frame keywords",
+          "authorEntity": "author entity",
+          "authorDecidingBody": "author deciding body",
+          "authorIsResolutionMajority": true,
+          "leadJurisdiction": "lead jurisdiction",
+          "leadUnit": "lead unit",
+          "participationType": "participation type",
+          "participationInstitution": "participation institution",
+          "documentTypeName": "document type name",
+          "documentNormCategory": "document norm category",
+          "documentTemplateName": "document template name",
+          "subjectFna": "subject fna",
+          "subjectPreviousFna": "subject previous fna",
+          "subjectGesta": "subject gesta",
+          "subjectBgb3": "subject bgb3"
         }
         """,
                 true

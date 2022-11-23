@@ -9,7 +9,14 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Pa
 
 interface NormsMapper {
     fun normToEntity(normDto: NormDto, articles: List<Article>): Norm {
-        return Norm(normDto.guid, normDto.longTitle, articles)
+        return Norm(
+            normDto.guid, normDto.longTitle, articles, normDto.officialShortTitle, normDto.officialAbbreviation,
+            normDto.referenceNumber, normDto.publicationDate, normDto.announcementDate, normDto.citationDate,
+            normDto.frameKeywords, normDto.authorEntity, normDto.authorDecidingBody, normDto.authorIsResolutionMajority,
+            normDto.leadJurisdiction, normDto.leadUnit, normDto.participationType, normDto.participationInstitution,
+            normDto.documentTypeName, normDto.documentNormCategory, normDto.documentTemplateName,
+            normDto.subjectFna, normDto.subjectPreviousFna, normDto.subjectGesta, normDto.subjectBgb3
+        )
     }
 
     fun paragraphToEntity(paragraphDto: ParagraphDto): Paragraph {

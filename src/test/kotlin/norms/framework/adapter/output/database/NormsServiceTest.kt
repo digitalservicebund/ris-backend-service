@@ -19,6 +19,7 @@ import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
 import java.time.Duration
+import java.time.LocalDate
 import java.util.*
 
 @DataR2dbcTest
@@ -27,7 +28,15 @@ import java.util.*
 class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     companion object {
-        private val NORM: Norm = Norm(UUID.randomUUID(), "Norm title")
+        private val NORM: Norm = Norm(
+            UUID.randomUUID(), "Norm title", listOf(), "official short title", "official abbreviation",
+            null, LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
+            "frame keywords", "author entity", "author deciding body",
+            true, "lead jurisdiction", "lead unit", "participation type",
+            "participation institution", "document type name", "document norm category",
+            "document template name", "subject fna", "subject previous fna",
+            "subject gesta", "subject bgb3"
+        )
         private val ARTICLE1: Article = Article(UUID.randomUUID(), "Article1 title", "§ 1")
         private val ARTICLE2: Article = Article(UUID.randomUUID(), "Article2 title", "§ 2")
         private val PARAGRAPH1: Paragraph = Paragraph(UUID.randomUUID(), "(1)", "Text1")
