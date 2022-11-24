@@ -243,7 +243,9 @@ describe("Dropdown Element", () => {
     ]
     const fetchSpy = vi
       .spyOn(dropdownInputService, "fetch")
-      .mockImplementation(() => Promise.resolve(dropdownItems))
+      .mockImplementation(() =>
+        Promise.resolve({ status: 200, data: dropdownItems })
+      )
 
     const { container } = render(DropdownInput, {
       props: {
@@ -288,7 +290,9 @@ describe("Dropdown Element", () => {
     ]
     const fetchSpy = vi
       .spyOn(dropdownInputService, "fetch")
-      .mockImplementation(() => Promise.resolve(dropdownItems))
+      .mockImplementation(() =>
+        Promise.resolve({ status: 200, data: dropdownItems })
+      )
 
     const { container } = render(DropdownInput, {
       props: {
@@ -330,7 +334,9 @@ describe("Dropdown Element", () => {
     ]
     const fetchSpy = vi
       .spyOn(dropdownInputService, "fetch")
-      .mockImplementation(() => Promise.resolve(dropdownItems))
+      .mockImplementation(() =>
+        Promise.resolve({ status: 200, data: dropdownItems })
+      )
 
     const { container, getByLabelText } = render(DropdownInput, {
       props: {

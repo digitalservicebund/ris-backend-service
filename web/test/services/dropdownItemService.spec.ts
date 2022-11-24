@@ -1,7 +1,7 @@
 import { LookupTableEndpoint } from "@/domain"
 import { Court } from "@/domain/documentUnit"
-import { DocumentType } from "@/domain/lookupTables"
-import service from "@/services/dropdownItemService"
+import { DropdownItem } from "@/domain/types"
+import service, { DocumentType } from "@/services/dropdownItemService"
 import httpClient from "@/services/httpClient"
 
 vi.mock("@/services/httpClient")
@@ -22,7 +22,8 @@ describe("dropdownItemService", () => {
       .mocked(httpClient)
       .get.mockResolvedValueOnce({ status: 200, data: [doctype] })
 
-    const result = await service.fetch(LookupTableEndpoint.documentTypes)
+    const result = (await service.fetch(LookupTableEndpoint.documentTypes))
+      .data as DropdownItem[]
 
     expect(httpClientGet).toHaveBeenCalledOnce()
     expect(result[0].text).toEqual("AO - Anordnung")
@@ -40,7 +41,8 @@ describe("dropdownItemService", () => {
       .mocked(httpClient)
       .get.mockResolvedValueOnce({ status: 200, data: [court] })
 
-    const result = await service.fetch(LookupTableEndpoint.courts)
+    const result = (await service.fetch(LookupTableEndpoint.courts))
+      .data as DropdownItem[]
 
     expect(httpClientGet).toHaveBeenCalledOnce()
     expect(result[0].text).toEqual("BGH Karlsruhe")

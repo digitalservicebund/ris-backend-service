@@ -102,19 +102,21 @@ const onTextChange = () => {
   updateCurrentItems()
 }
 
-const updateCurrentItems = () => {
-  if (!!props.endpoint) {
-    dropdownItemService
-      .fetch(props.endpoint, filter.value)
-      .then((dropdownItems: DropdownItem[]) => {
-        currentItems.value = dropdownItems
-        insertItemIfEmpty()
-      })
-  } else {
+const updateCurrentItems = async () => {
+  if (!props.endpoint) {
     currentItems.value = items.value.filter((item) =>
       item.text.includes(!!filter.value ? filter.value : "")
     )
     insertItemIfEmpty()
+    return
+  }
+
+  const response = await dropdownItemService.fetch(props.endpoint, filter.value)
+  if (response.data) {
+    currentItems.value = response.data
+    insertItemIfEmpty()
+  } else {
+    console.error(response.error)
   }
 }
 

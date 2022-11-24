@@ -1,51 +1,63 @@
-import httpClient from "./httpClient"
+import httpClient, { ServiceResponse } from "./httpClient"
 import { DropdownItem, LookupTableEndpoint } from "@/domain"
 import { Court } from "@/domain/documentUnit"
-import { DocumentType } from "@/domain/lookupTables"
 
-// TODO this should be wrapped in a ServiceResponse
+function createDropdownItems(
+  responseData: DropdownType,
+  endpoint: LookupTableEndpoint
+): DropdownItem[] {
+  switch (endpoint) {
+    case LookupTableEndpoint.documentTypes: {
+      return (responseData as DocumentType[]).map((item) => ({
+        text: item.jurisShortcut + " - " + item.label,
+        value: item.label,
+      }))
+    }
+    case LookupTableEndpoint.courts: {
+      return (responseData as Court[]).map((item) => ({
+        text: item.label,
+        value: item,
+      }))
+    }
+  }
+}
+
 interface DropdownItemService {
   fetch(
     endpoint: LookupTableEndpoint,
     searchStr?: string
-  ): Promise<DropdownItem[]>
+  ): Promise<ServiceResponse<DropdownItem[]>>
 }
 
 const service: DropdownItemService = {
   async fetch(endpoint: LookupTableEndpoint, searchStr?: string) {
-    let response
-    switch (endpoint) {
-      case LookupTableEndpoint.documentTypes: {
-        response = await httpClient.get<DocumentType[]>(
-          `caselaw/${endpoint}`,
-          searchStr ? { params: { searchStr } } : undefined
-        )
-        if (response.status >= 300 || !response.data) {
-          return []
-        }
-        return response.data.map((item) => ({
-          text: item.jurisShortcut + " - " + item.label,
-          value: item.label,
-        }))
+    const response = await httpClient.get<DropdownType>(
+      `caselaw/${endpoint}`,
+      searchStr ? { params: { searchStr } } : undefined
+    )
+    if (response.data) {
+      return {
+        status: response.status,
+        data: createDropdownItems(response.data, endpoint),
       }
-      case LookupTableEndpoint.courts: {
-        response = await httpClient.get<Court[]>(
-          `caselaw/${endpoint}`,
-          searchStr ? { params: { searchStr } } : undefined
-        )
-        if (response.status >= 300 || !response.data) {
-          return []
-        }
-        return response.data.map((item) => ({
-          text: item.label,
-          value: item,
-        }))
-      }
-      default: {
-        return []
+    } else {
+      return {
+        status: response.status,
+        error: {
+          title: "Serverfehler.",
+          description: "Dropdown Items konnten nicht geladen werden.",
+        },
       }
     }
   },
 }
+
+export type DocumentType = {
+  id: number
+  jurisShortcut: string
+  label: string
+}
+
+export type DropdownType = DocumentType[] | Court[]
 
 export default service
