@@ -1,17 +1,17 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.UUID;
-import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveSortingRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Mono;
 
-@Repository
-public interface DocumentUnitRepository extends ReactiveSortingRepository<DocumentUnitDTO, Long> {
+@NoRepositoryBean
+public interface DocumentUnitRepository {
 
-  @Query("SELECT * FROM doc_unit WHERE documentnumber = $1")
   Mono<DocumentUnitDTO> findByDocumentnumber(String documentnumber);
 
-  @Query("SELECT * FROM doc_unit WHERE uuid = $1")
   Mono<DocumentUnitDTO> findByUuid(UUID uuid);
+
+  Mono<DocumentUnitDTO> save(DocumentUnitDTO documentUnitDTO);
+
+  Mono<Void> delete(DocumentUnitDTO documentUnitDTO);
 }
