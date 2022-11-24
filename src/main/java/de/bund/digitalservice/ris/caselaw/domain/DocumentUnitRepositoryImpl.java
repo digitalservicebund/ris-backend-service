@@ -50,9 +50,7 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
         .save(documentUnitDTO)
         .flatMap(
             duDTO ->
-                fileNumberRepository
-                    .deleteAllByDocumentUnitId(duDTO.getId())
-                    .flatMap(v -> Mono.just(duDTO)))
+                fileNumberRepository.deleteAllByDocumentUnitId(duDTO.getId()).thenReturn(duDTO))
         .flatMap(
             duDTO ->
                 fileNumberRepository
