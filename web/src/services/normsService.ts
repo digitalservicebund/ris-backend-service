@@ -3,6 +3,31 @@ import { Norm } from "@/domain/Norm"
 
 type NormList = { longTitle: string; guid: string }[]
 
+type frameDataType = {
+  longTitle: string
+  officialShortTitle?: string
+  officialAbbreviation?: string
+  referenceNumber?: string
+  publicationDate?: string
+  announcementDate?: string
+  citationDate?: string
+  frameKeywords?: string
+  authorEntity?: string
+  authorDecidingBody?: string
+  authorIsResolutionMajority?: boolean
+  leadJurisdiction?: string
+  leadUnit?: string
+  participationType?: string
+  participationInstitution?: string
+  documentTypeName?: string
+  documentNormCategory?: string
+  documentTemplateName?: string
+  subjectFna?: string
+  subjectPreviousFna?: string
+  subjectGesta?: string
+  subjectBgb3?: string
+}
+
 export async function getAllNorms(): Promise<ServiceResponse<NormList>> {
   const { data, status, error } = await httpClient.get<{ data: NormList }>(
     "norms"
@@ -44,12 +69,18 @@ export async function getNormByGuid(
 
 export async function editNormFrame(
   guid: string,
-  longTitle: string
+  frameData: frameDataType
 ): Promise<ServiceResponse<void>> {
-  const { status, error } = await httpClient.patch<{ longTitle: string }, void>(
+  console.log(JSON.stringify(frameData))
+  const { status, error } = await httpClient.put(
     `norms/${guid}`,
-    undefined,
-    { longTitle }
+    {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    },
+    frameData
   )
 
   if (status >= 300 || error) {

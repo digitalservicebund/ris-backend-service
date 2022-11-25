@@ -11,7 +11,32 @@ describe("Norm", () => {
         paragraphs: [{ guid: "123", marker: "(1)", text: "text" }],
       },
     ]
-    const norm = new Norm("longtitle", "123", articleMock)
+    const norm = new Norm(
+      "longtitle",
+      "123",
+      articleMock,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      false,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    )
     expect(norm.longTitle).toEqual("longtitle")
     expect(norm.guid).toEqual("123")
   })
@@ -25,7 +50,32 @@ describe("Norm", () => {
         paragraphs: [{ guid: "123", marker: "(1)", text: "text" }],
       },
     ]
-    const norm = new Norm("longtitle", "123", articleMock)
+    const norm = new Norm(
+      "longtitle",
+      "123",
+      articleMock,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      false,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    )
 
     norm.articles[0].guid = "123"
     norm.articles[0].title = "articleTitle"
@@ -46,7 +96,32 @@ describe("Norm", () => {
         paragraphs: [{ guid: "123", marker: "(1)", text: "text" }],
       },
     ]
-    const norm = new Norm("longtitle", "123", articleMock)
+    const norm = new Norm(
+      "longtitle",
+      "123",
+      articleMock,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      false,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    )
 
     norm.articles[0].paragraphs[0].guid = "123"
     norm.articles[0].paragraphs[0].marker = "(1)"

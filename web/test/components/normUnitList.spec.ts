@@ -16,7 +16,32 @@ describe("norms list", () => {
       },
     ]
 
-    const norm = new Norm(longTitle, guid, articleMock)
+    const norm = new Norm(
+      longTitle,
+      guid,
+      articleMock,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      false,
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    )
 
     render(NormsList, {
       props: {

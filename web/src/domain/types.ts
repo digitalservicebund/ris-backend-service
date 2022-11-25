@@ -22,6 +22,8 @@ export interface BaseInputField {
 
 export type TextInputModelType = string
 
+export type BooleanModelType = boolean
+
 export interface TextInputAttributes extends BaseInputAttributes {
   placeholder?: string
   readOnly?: boolean
@@ -71,6 +73,7 @@ export type ModelType =
   | TextInputModelType
   | DateInputModelType
   | DropdownInputModelType
+  | BooleanModelType
 
 export type ValidationError = {
   defaultMessage: string

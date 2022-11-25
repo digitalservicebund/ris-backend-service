@@ -22,6 +22,27 @@ const emit = defineEmits<Emits>()
 const frameData = computed({
   get: () => ({
     longTitle: props.norm.longTitle,
+    officialShortTitle: props.norm.officialShortTitle,
+    officialAbbreviation: props.norm.officialAbbreviation,
+    referenceNumber: props.norm.referenceNumber,
+    publicationDate: props.norm.publicationDate,
+    announcementDate: props.norm.announcementDate,
+    citationDate: props.norm.citationDate,
+    frameKeywords: props.norm.frameKeywords,
+    authorEntity: props.norm.authorEntity,
+    authorDecidingBody: props.norm.authorDecidingBody,
+    authorIsResolutionMajority: props.norm.authorIsResolutionMajority,
+    leadJurisdiction: props.norm.leadJurisdiction,
+    leadUnit: props.norm.leadUnit,
+    participationType: props.norm.participationType,
+    participationInstitution: props.norm.participationInstitution,
+    documentTypeName: props.norm.documentTypeName,
+    documentNormCategory: props.norm.documentNormCategory,
+    documentTemplateName: props.norm.documentTemplateName,
+    subjectFna: props.norm.subjectFna,
+    subjectPreviousFna: props.norm.subjectPreviousFna,
+    subjectGesta: props.norm.subjectGesta,
+    subjectBgb3: props.norm.subjectBgb3,
   }),
   set: (data) => console.log(data),
 })
@@ -43,9 +64,7 @@ useScrollToHash(routeHash)
     <SaveButton
       aria-label="Rahmendaten Speichern Button"
       class="mt-8"
-      :service-callback="
-        () => editNormFrame(props.norm.guid, frameData.longTitle)
-      "
+      :service-callback="() => editNormFrame(props.norm.guid, frameData)"
       @fetch-norm="emit('fetchNorm')"
     />
   </div>

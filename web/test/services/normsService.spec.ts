@@ -114,27 +114,101 @@ describe("normsService", () => {
 
   describe("edit norm frame", () => {
     it("sends command to the backend with the correct parameters", async () => {
-      const httpClientPatch = vi
+      const httpClientPut = vi
         .mocked(httpClient)
-        .patch.mockResolvedValueOnce({ status: 204, data: "" })
+        .put.mockResolvedValueOnce({ status: 204, data: "" })
 
-      await editNormFrame("fake-guid", "new title")
+      await editNormFrame("fake-guid", {
+        longTitle: "new title",
+        officialShortTitle: undefined,
+        officialAbbreviation: undefined,
+        referenceNumber: undefined,
+        publicationDate: undefined,
+        announcementDate: undefined,
+        citationDate: undefined,
+        frameKeywords: undefined,
+        authorEntity: undefined,
+        authorDecidingBody: undefined,
+        authorIsResolutionMajority: undefined,
+        leadJurisdiction: undefined,
+        leadUnit: undefined,
+        participationType: undefined,
+        participationInstitution: undefined,
+        documentTypeName: undefined,
+        documentNormCategory: undefined,
+        documentTemplateName: undefined,
+        subjectFna: undefined,
+        subjectPreviousFna: undefined,
+        subjectGesta: undefined,
+        subjectBgb3: undefined,
+      })
 
-      expect(httpClientPatch).toHaveBeenCalledOnce()
-      expect(httpClientPatch).toHaveBeenLastCalledWith(
+      expect(httpClientPut).toHaveBeenCalledOnce()
+      expect(httpClientPut).toHaveBeenLastCalledWith(
         "norms/fake-guid",
-        undefined,
-        { longTitle: "new title" }
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        },
+        {
+          longTitle: "new title",
+          officialShortTitle: undefined,
+          officialAbbreviation: undefined,
+          referenceNumber: undefined,
+          publicationDate: undefined,
+          announcementDate: undefined,
+          citationDate: undefined,
+          frameKeywords: undefined,
+          authorEntity: undefined,
+          authorDecidingBody: undefined,
+          authorIsResolutionMajority: undefined,
+          leadJurisdiction: undefined,
+          leadUnit: undefined,
+          participationType: undefined,
+          participationInstitution: undefined,
+          documentTypeName: undefined,
+          documentNormCategory: undefined,
+          documentTemplateName: undefined,
+          subjectFna: undefined,
+          subjectPreviousFna: undefined,
+          subjectGesta: undefined,
+          subjectBgb3: undefined,
+        }
       )
     })
 
     it("responds with correct error message if server response status is above 300", async () => {
-      vi.mocked(httpClient).patch.mockResolvedValueOnce({
+      vi.mocked(httpClient).put.mockResolvedValueOnce({
         status: 300,
         data: "",
       })
 
-      const response = await editNormFrame("fake-guid", "new title")
+      const response = await editNormFrame("fake-guid", {
+        longTitle: "new title",
+        officialShortTitle: undefined,
+        officialAbbreviation: undefined,
+        referenceNumber: undefined,
+        publicationDate: undefined,
+        announcementDate: undefined,
+        citationDate: undefined,
+        frameKeywords: undefined,
+        authorEntity: undefined,
+        authorDecidingBody: undefined,
+        authorIsResolutionMajority: undefined,
+        leadJurisdiction: undefined,
+        leadUnit: undefined,
+        participationType: undefined,
+        participationInstitution: undefined,
+        documentTypeName: undefined,
+        documentNormCategory: undefined,
+        documentTemplateName: undefined,
+        subjectFna: undefined,
+        subjectPreviousFna: undefined,
+        subjectGesta: undefined,
+        subjectBgb3: undefined,
+      })
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden."
@@ -142,13 +216,35 @@ describe("normsService", () => {
     })
 
     it("responds with correct error message if connection failed", async () => {
-      vi.mocked(httpClient).patch.mockResolvedValueOnce({
+      vi.mocked(httpClient).put.mockResolvedValueOnce({
         status: 500,
         error: { title: "error" },
       })
 
-      const response = await editNormFrame("fake-guid", "new title")
-
+      const response = await editNormFrame("fake-guid", {
+        longTitle: "new title",
+        officialShortTitle: undefined,
+        officialAbbreviation: undefined,
+        referenceNumber: undefined,
+        publicationDate: undefined,
+        announcementDate: undefined,
+        citationDate: undefined,
+        frameKeywords: undefined,
+        authorEntity: undefined,
+        authorDecidingBody: undefined,
+        authorIsResolutionMajority: undefined,
+        leadJurisdiction: undefined,
+        leadUnit: undefined,
+        participationType: undefined,
+        participationInstitution: undefined,
+        documentTypeName: undefined,
+        documentNormCategory: undefined,
+        documentTemplateName: undefined,
+        subjectFna: undefined,
+        subjectPreviousFna: undefined,
+        subjectGesta: undefined,
+        subjectBgb3: undefined,
+      })
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden."
       )
