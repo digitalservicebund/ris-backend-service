@@ -127,7 +127,7 @@ export interface LevelTwoMenuItem {
 </script>
 
 <template>
-  <div class="w-[16rem]">
+  <nav class="w-[16rem]">
     <router-link
       class="border-b-1 border-gray-400 flex gap-12 h-80 items-center link-01-bold px-14 text-blue-800"
       :to="goBackRoute"
@@ -161,5 +161,5 @@ export interface LevelTwoMenuItem {
         </router-link>
       </div>
     </div>
-  </div>
+  </nav>
 </template>
