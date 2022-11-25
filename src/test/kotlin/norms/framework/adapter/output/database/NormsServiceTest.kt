@@ -127,6 +127,30 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .verifyComplete()
     }
 
+    @Test
+    fun `save norm and edit norm`() {
+        normsService.saveNorm(NORM)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(NORM.guid)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        val updatedNorm = NORM.copy(longTitle = "new title")
+        normsService.editNorm(updatedNorm)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(NORM.guid)
+            .`as`(StepVerifier::create)
+            .assertNext { validateNorm(updatedNorm, it) }
+            .verifyComplete()
+    }
+
     private fun validateNorm(normBeforePersist: Norm, normAfterPersist: Norm) {
         assertThat(normBeforePersist == normAfterPersist, `is`(true))
     }
