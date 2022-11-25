@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
 import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
-import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase.Command
 import decodeGuid
 import decodeLocalDate
 import org.springframework.http.ResponseEntity
