@@ -21,7 +21,7 @@ export class Norm {
   readonly publicationDate: string
   readonly announcementDate: string
   readonly citationDate: string
-  readonly frameWords: string
+  readonly frameKeywords: string
   readonly authorEntity: string
   readonly authorDecidingBody: string
   readonly authorIsResolutionMajority: boolean
@@ -47,7 +47,7 @@ export class Norm {
     publicationDate: string,
     announcementDate: string,
     citationDate: string,
-    frameWords: string,
+    frameKeywords: string,
     authorEntity: string,
     authorDecidingBody: string,
     authorIsResolutionMajority: boolean,
@@ -72,7 +72,7 @@ export class Norm {
       (this.publicationDate = publicationDate),
       (this.announcementDate = announcementDate),
       (this.citationDate = citationDate),
-      (this.frameWords = frameWords),
+      (this.frameKeywords = frameKeywords),
       (this.authorEntity = authorEntity),
       (this.authorDecidingBody = authorDecidingBody),
       (this.authorIsResolutionMajority = authorIsResolutionMajority),

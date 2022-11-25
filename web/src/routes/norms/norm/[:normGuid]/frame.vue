@@ -28,7 +28,7 @@ const frameData = computed({
     publicationDate: props.norm.publicationDate,
     announcementDate: props.norm.announcementDate,
     citationDate: props.norm.citationDate,
-    frameKeywords: props.norm.frameWords,
+    frameKeywords: props.norm.frameKeywords,
     authorEntity: props.norm.authorEntity,
     authorDecidingBody: props.norm.authorDecidingBody,
     authorIsResolutionMajority: props.norm.authorIsResolutionMajority,
