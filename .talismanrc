@@ -93,6 +93,16 @@ fileignoreconfig:
     checksum: d3c96ab476f3d218fafb10b1505a79f7bc5af30ca16601ac2276291f503a53ed
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 968b2c4074b6ba7de8669b503bfe996686b118424eec80a4e4ddb9e3f9c051cb
+  - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
+    checksum: 30f2f5c3a6ba13150348f1e5764799dd39594f42353a2273d405eb020ce8c586
+  - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/EditNormFrameService.kt
+    checksum: a5fbb7fbad9efff390ff0357487547b13b95eb1fdc93bd42fe71f1a31a34c23c
+  - filename: src/test/kotlin/norms/application/EditNormFrameServiceTest.kt
+    checksum: 1fc7788810189695390145f60109c67cb2e097c818f86689fa4bf84035b1b5c1
+  - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/EditNormFrameController.kt
+    checksum: 9985940885fe28631f9fbcaf0532cc13e221e8917cad21afe8a4108613dafb13
+  - filename: src/test/kotlin/norms/framework/adapter/input/restapi/EditNormFrameControllerTest.kt
+    checksum: 8749ca184350ee79bb76ecbf75599dd4f1d7428109c8b75e5056d04eb80d5cbc
 
 scopeconfig:
   - scope: node
