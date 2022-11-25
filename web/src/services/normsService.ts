@@ -28,6 +28,14 @@ type frameDataType = {
   subjectBgb3?: string
 }
 
+function dateStringOrNull(dateString?: string): string | null {
+  if (dateString === undefined || dateString.length == 0) {
+    return null
+  } else {
+    return dateString
+  }
+}
+
 export async function getAllNorms(): Promise<ServiceResponse<NormList>> {
   const { data, status, error } = await httpClient.get<{ data: NormList }>(
     "norms"
@@ -71,7 +79,9 @@ export async function editNormFrame(
   guid: string,
   frameData: frameDataType
 ): Promise<ServiceResponse<void>> {
-  console.log(JSON.stringify(frameData))
+  frameData.publicationDate = dateStringOrNull(frameData.punblicationDate)
+  frameData.announcementDate = dateStringOrNull(frameData.announcementDate)
+  frameData.citationDate = dateStringOrNull(frameData.citationDate)
   const { status, error } = await httpClient.put(
     `norms/${guid}`,
     {
