@@ -10,7 +10,7 @@ info:
 servers:
   # Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/VICTORDELCAMPO_1/neu-ris_normen_service_api_new/0.0.1
+    url: https://virtserver.swaggerhub.com/VICTORDELCAMPO_1/neu-ris_normen_service_api/0.0.1
   - url: https://ris.prod.ds4g.net/api/norms
     description: Public production server
   - url: http://localhost:3000
@@ -87,7 +87,7 @@ paths:
         "404":
           description: No norm found for this Guid
 
-    patch:
+    put:
       summary: Edit the frame data of a norm
       operationId: editNormFrame
       parameters:
@@ -101,52 +101,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                longTitle:
-                  type: string
-                officialShortTitle:
-                  type: string
-                officialAbbreviation:
-                  type: string
-                referenceNumber:
-                  type: string
-                publicationDate:
-                  $ref: "#/components/schemas/Date"
-                announcementDate:
-                  $ref: "#/components/schemas/Date"
-                citationDate:
-                  $ref: "#/components/schemas/Date"
-                frameKeywords:
-                  type: string
-                authorEntity:
-                  type: string
-                authorDecidingBody:
-                  type: string
-                authorIsResolutionMajority:
-                  type: boolean
-                leadJurisdiction:
-                  type: string
-                leadUnit:
-                  type: string
-                participationType:
-                  type: string
-                participationInstitution:
-                  type: string
-                documentTypeName:
-                  type: string
-                documentNormCategory:
-                  type: string
-                documentTemplateName:
-                  type: string
-                subjectFna:
-                  type: string
-                subjectPreviousFna:
-                  type: string
-                subjectGesta:
-                  type: string
-                subjectBgb3:
-                  type: string
+              $ref: "#/components/schemas/MetadataFields"
       responses:
         "204":
           description: Norm was updated
@@ -321,6 +276,79 @@ components:
               items:
                 $ref: "#/components/schemas/Article"
         - $ref: "#/components/schemas/NormWithoutGuid"
+
+    MetadataFields:
+      type: object
+      required:
+        [
+          longTitle,
+          officialShortTitle,
+          officialAbbreviation,
+          referenceNumber,
+          publicationDate,
+          announcementDate,
+          citationDate,
+          frameKeywords,
+          authorEntity,
+          authorDecidingBody,
+          authorIsResolutionMajority,
+          leadJurisdiction,
+          leadUnit,
+          participationType,
+          participationInstitution,
+          documentTypeName,
+          documentNormCategory,
+          documentTemplateName,
+          subjectFna,
+          subjectPreviousFna,
+          subjectGesta,
+          subjectBgb3,
+        ]
+      properties:
+        longTitle:
+          type: string
+        officialShortTitle:
+          type: string
+        officialAbbreviation:
+          type: string
+        referenceNumber:
+          type: string
+        publicationDate:
+          $ref: "#/components/schemas/Date"
+        announcementDate:
+          $ref: "#/components/schemas/Date"
+        citationDate:
+          $ref: "#/components/schemas/Date"
+        frameKeywords:
+          type: string
+        authorEntity:
+          type: string
+        authorDecidingBody:
+          type: string
+        authorIsResolutionMajority:
+          type: boolean
+        leadJurisdiction:
+          type: string
+        leadUnit:
+          type: string
+        participationType:
+          type: string
+        participationInstitution:
+          type: string
+        documentTypeName:
+          type: string
+        documentNormCategory:
+          type: string
+        documentTemplateName:
+          type: string
+        subjectFna:
+          type: string
+        subjectPreviousFna:
+          type: string
+        subjectGesta:
+          type: string
+        subjectBgb3:
+          type: string
 
 security:
   - BasicAuth: []
