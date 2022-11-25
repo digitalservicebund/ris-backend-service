@@ -35,11 +35,11 @@ test.describe("test the different layout options", () => {
     await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Navigation schließen']").click()
     await expect(page).toHaveURL(/showNavBar=false/)
-    await expect(page.locator("text=Veröffentlichen")).not.toBeVisible()
+    await expect(page.locator("text=Zurück")).not.toBeVisible()
 
     await page.locator("[aria-label='Navigation öffnen']").click()
     await expect(page).toHaveURL(/showNavBar=true/)
-    await expect(page.locator("text=Veröffentlichen")).toBeVisible()
+    await expect(page.locator("text=Zurück")).toBeVisible()
   })
 
   test("persist toggle queries for new pages", async ({
