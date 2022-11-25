@@ -51,9 +51,29 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
 
         fun toUseCaseData(): ImportNormUseCase.NormData {
             return ImportNormUseCase.NormData(
-                longTitle, articles.map { it.toUseCaseData() }, officialShortTitle, officialAbbreviation,
-                referenceNumber, publicationDate, announcementDate, citationDate, frameKeywords, authorEntity, authorDecidingBody,
-                authorIsResolutionMajority, leadJurisdiction, leadUnit, participationType, participationInstitution, documentTypeName, documentNormCategory, documentTemplateName, subjectFna, subjectPreviousFna, subjectGesta, subjectBgb3
+                longTitle = longTitle,
+                articles = articles.map { it.toUseCaseData() },
+                officialShortTitle = officialShortTitle,
+                officialAbbreviation = officialAbbreviation,
+                referenceNumber = referenceNumber,
+                publicationDate = publicationDate,
+                announcementDate = announcementDate,
+                citationDate = citationDate,
+                frameKeywords = frameKeywords,
+                authorEntity = authorEntity,
+                authorDecidingBody = authorDecidingBody,
+                authorIsResolutionMajority = authorIsResolutionMajority,
+                leadJurisdiction = leadJurisdiction,
+                leadUnit = leadUnit,
+                participationType = participationType,
+                participationInstitution = participationInstitution,
+                documentTypeName = documentTypeName,
+                documentNormCategory = documentNormCategory,
+                documentTemplateName = documentTemplateName,
+                subjectFna = subjectFna,
+                subjectPreviousFna = subjectPreviousFna,
+                subjectGesta = subjectGesta,
+                subjectBgb3 = subjectBgb3
             )
         }
     }

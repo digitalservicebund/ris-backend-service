@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
+import java.time.LocalDate
 import java.util.UUID
 
 @RestController
@@ -59,14 +60,30 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
             fun from(norm: Norm): NormResponseSchema {
                 val articles = norm.articles.map { ArticleResponseSchema.from(it) }
                 return NormResponseSchema(
-                    norm.guid.toString(), norm.longTitle, articles, norm.officialShortTitle, norm.officialAbbreviation, norm.referenceNumber,
-                    if (norm.publicationDate != null) norm.publicationDate.toString() else null,
-                    if (norm.announcementDate != null) norm.announcementDate.toString() else null,
-                    if (norm.citationDate != null) norm.citationDate.toString() else null,
-                    norm.frameKeywords, norm.authorEntity,
-                    norm.authorDecidingBody, norm.authorIsResolutionMajority, norm.leadJurisdiction, norm.leadUnit, norm.participationType,
-                    norm.participationInstitution, norm.documentTypeName, norm.documentNormCategory, norm.documentTemplateName,
-                    norm.subjectFna, norm.subjectPreviousFna, norm.subjectGesta, norm.subjectBgb3
+                    guid = norm.guid.toString(),
+                    longTitle = norm.longTitle,
+                    articles = articles,
+                    officialShortTitle = norm.officialShortTitle,
+                    officialAbbreviation = norm.officialAbbreviation,
+                    referenceNumber = norm.referenceNumber,
+                    publicationDate = encodeLocalDate(norm.publicationDate),
+                    announcementDate = encodeLocalDate(norm.announcementDate),
+                    citationDate = encodeLocalDate(norm.citationDate),
+                    frameKeywords = norm.frameKeywords,
+                    authorEntity = norm.authorEntity,
+                    authorDecidingBody = norm.authorDecidingBody,
+                    authorIsResolutionMajority = norm.authorIsResolutionMajority,
+                    leadJurisdiction = norm.leadJurisdiction,
+                    leadUnit = norm.leadUnit,
+                    participationType = norm.participationType,
+                    participationInstitution = norm.participationInstitution,
+                    documentTypeName = norm.documentTypeName,
+                    documentNormCategory = norm.documentNormCategory,
+                    documentTemplateName = norm.documentTemplateName,
+                    subjectFna = norm.subjectFna,
+                    subjectPreviousFna = norm.subjectPreviousFna,
+                    subjectGesta = norm.subjectGesta,
+                    subjectBgb3 = norm.subjectBgb3
                 )
             }
         }
@@ -101,3 +118,5 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         }
     }
 }
+
+private fun encodeLocalDate(date: LocalDate?): String? = if (date != null) date.toString() else null

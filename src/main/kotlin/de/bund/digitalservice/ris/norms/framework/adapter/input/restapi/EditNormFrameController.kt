@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
 import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
+import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase.Command
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
@@ -20,13 +21,32 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         @PathVariable guid: String,
         @RequestBody request: EditNormFrameRequestSchema
     ): Mono<ResponseEntity<Void>> {
-        val command = EditNormFrameUseCase.Command(
-            UUID.fromString(guid), request.longTitle, request.officialShortTitle, request.officialAbbreviation,
-            request.referenceNumber, request.publicationDate, request.announcementDate, request.citationDate, request.frameKeywords, request.authorEntity,
-            request.authorDecidingBody, request.authorIsResolutionMajority, request.leadJurisdiction, request.leadUnit, request.participationType,
-            request.participationInstitution, request.documentTypeName, request.documentNormCategory, request.documentTemplateName,
-            request.subjectFna, request.subjectPreviousFna, request.subjectGesta, request.subjectBgb3
-        )
+        val command =
+            EditNormFrameUseCase.Command(
+                guid = UUID.fromString(guid),
+                longTitle = request.longTitle,
+                officialShortTitle = request.officialShortTitle,
+                officialAbbreviation = request.officialAbbreviation,
+                referenceNumber = request.referenceNumber,
+                publicationDate = request.publicationDate,
+                announcementDate = request.announcementDate,
+                citationDate = request.citationDate,
+                frameKeywords = request.frameKeywords,
+                authorEntity = request.authorEntity,
+                authorDecidingBody = request.authorDecidingBody,
+                authorIsResolutionMajority = request.authorIsResolutionMajority,
+                leadJurisdiction = request.leadJurisdiction,
+                leadUnit = request.leadUnit,
+                participationType = request.participationType,
+                participationInstitution = request.participationInstitution,
+                documentTypeName = request.documentTypeName,
+                documentNormCategory = request.documentNormCategory,
+                documentTemplateName = request.documentTemplateName,
+                subjectFna = request.subjectFna,
+                subjectPreviousFna = request.subjectPreviousFna,
+                subjectGesta = request.subjectGesta,
+                subjectBgb3 = request.subjectBgb3
+            )
 
         return editNormFrameService
             .editNormFrame(command)

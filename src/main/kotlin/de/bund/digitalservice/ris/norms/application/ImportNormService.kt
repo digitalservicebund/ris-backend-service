@@ -22,18 +22,30 @@ class ImportNormService(private val saveNormPort: SaveNormOutputPort) : ImportNo
 private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
     val articles = data.articles.map { createArticle(it) }
     return Norm(
-        guid, data.longTitle, articles, data.officialShortTitle,
-        data.officialAbbreviation, data.referenceNumber,
-        if (data.publicationDate != null) LocalDate.parse(data.publicationDate) else null,
-        if (data.announcementDate != null) LocalDate.parse(data.announcementDate) else null,
-        if (data.citationDate != null) LocalDate.parse(data.citationDate) else null,
-        data.frameKeywords, data.authorEntity,
-        data.authorDecidingBody, data.authorIsResolutionMajority,
-        data.leadJurisdiction,
-        data.leadUnit, data.participationType, data.participationInstitution,
-        data.documentTypeName, data.documentNormCategory, data.documentTemplateName,
-        data.subjectFna, data.subjectPreviousFna, data.subjectGesta,
-        data.subjectBgb3
+        guid = guid,
+        longTitle = data.longTitle,
+        articles = articles,
+        officialShortTitle = data.officialShortTitle,
+        officialAbbreviation = data.officialAbbreviation,
+        referenceNumber = data.referenceNumber,
+        publicationDate = decodeLocalDate(data.publicationDate),
+        announcementDate = decodeLocalDate(data.announcementDate),
+        citationDate = decodeLocalDate(data.citationDate),
+        frameKeywords = data.frameKeywords,
+        authorEntity = data.authorEntity,
+        authorDecidingBody = data.authorDecidingBody,
+        authorIsResolutionMajority = data.authorIsResolutionMajority,
+        leadJurisdiction = data.leadJurisdiction,
+        leadUnit = data.leadUnit,
+        participationType = data.participationType,
+        participationInstitution = data.participationInstitution,
+        documentTypeName = data.documentTypeName,
+        documentNormCategory = data.documentNormCategory,
+        documentTemplateName = data.documentTemplateName,
+        subjectFna = data.subjectFna,
+        subjectPreviousFna = data.subjectPreviousFna,
+        subjectGesta = data.subjectGesta,
+        subjectBgb3 = data.subjectBgb3
     )
 }
 
@@ -47,3 +59,6 @@ private fun createParagraph(data: ImportNormUseCase.ParagraphData): Paragraph {
     val guid = UUID.randomUUID()
     return Paragraph(guid, data.marker, data.text)
 }
+
+private fun decodeLocalDate(dateString: String?): LocalDate? =
+    if (dateString != null) LocalDate.parse(dateString) else null
