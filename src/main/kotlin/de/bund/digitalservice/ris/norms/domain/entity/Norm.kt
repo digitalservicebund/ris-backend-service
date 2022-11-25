@@ -28,5 +28,9 @@ data class Norm(
     var subjectFna: String? = null,
     var subjectPreviousFna: String? = null,
     var subjectGesta: String? = null,
-    var subjectBgb3: String? = null
+    var subjectBgb3: String? = null,
+    var unofficialTitle: String? = null,
+    var unofficialShortTitle: String? = null,
+    var unofficialAbbreviation: String? = null,
+    var risAbbreviation: String? = null
 )

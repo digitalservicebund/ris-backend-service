@@ -27,6 +27,10 @@ classDiagram
     String subjectPreviousFna
     String subjectGesta
     String subjectBgb3
+    String unofficialTitle
+    String unofficialShortTitle
+    String unofficialAbbreviation
+    String risAbbreviation
   }
 
   class Article {
