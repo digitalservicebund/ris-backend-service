@@ -138,10 +138,18 @@ const dropdownInputAttribute: InputAttributes = {
       icon-name="location_on"
       label="This input field is a dropdown"
     >
+      <InputElement
+        :attributes="dropdownInputAttribute"
+        :type="InputType.DROPDOWN"
+      />
+    </InputField>
+
+    <h1 class="font-bold text-24">Checkbox Input</h1>
+    <InputField id="inputCheckBox" label="This input field is a checkbox">
       <div class="h-[250px]">
         <InputElement
           :attributes="dropdownInputAttribute"
-          :type="InputType.DROPDOWN"
+          :type="InputType.CHECKBOX"
         />
       </div>
     </InputField>

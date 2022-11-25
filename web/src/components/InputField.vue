@@ -10,7 +10,7 @@ defineProps<Props>()
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col flex-start">
     <label
       class="flex gap-4 items-center label-03-regular mb-2 text-gray-900"
       :for="id"

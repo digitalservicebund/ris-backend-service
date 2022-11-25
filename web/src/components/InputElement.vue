@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import CheckboxInput from "@/components/CheckboxInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import FileInput from "@/components/FileInput.vue"
@@ -28,14 +29,16 @@ const emit = defineEmits<Emits>()
 
 const component = computed(() => {
   switch (props.type) {
-    case "text":
+    case InputType.TEXT:
       return TextInput
-    case "file":
+    case InputType.FILE:
       return FileInput
-    case "dropdown":
+    case InputType.DROPDOWN:
       return DropdownInput
-    case "date":
+    case InputType.DATE:
       return DateInput
+    case InputType.CHECKBOX:
+      return CheckboxInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }

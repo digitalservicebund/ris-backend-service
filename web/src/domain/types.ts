@@ -5,6 +5,7 @@ export enum InputType {
   FILE = "file",
   DROPDOWN = "dropdown",
   DATE = "date",
+  CHECKBOX = "checkbox",
 }
 
 export interface BaseInputAttributes {
@@ -62,18 +63,31 @@ export interface DropdownAttributes extends BaseInputAttributes {
   preselectedValue?: string
 }
 
+export type CheckboxInputModelType = boolean
+
+export interface CheckboxInputField extends BaseInputField {
+  type: InputType.CHECKBOX
+  inputAttributes: BaseInputAttributes
+}
+
 export interface DropdownInputField extends BaseInputField {
   type: InputType.DROPDOWN
   inputAttributes: DropdownAttributes
 }
 
-export type InputField = TextInputField | DropdownInputField | DateInputField
+export type InputField =
+  | TextInputField
+  | DropdownInputField
+  | DateInputField
+  | CheckboxInputField
 export type InputAttributes = TextInputAttributes | DropdownAttributes
+
 export type ModelType =
   | TextInputModelType
   | DateInputModelType
   | DropdownInputModelType
   | BooleanModelType
+  | CheckboxInputModelType
 
 export type ValidationError = {
   defaultMessage: string
