@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase.NormData
+import encodeGuid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -17,9 +18,25 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
         listNormsService
             .listNorms()
             .collectList()
-            .map({ normDataList -> PaginatedNormListResponseSchema(normDataList) })
+            .map({ normDataList -> PaginatedNormListResponseSchema.fromUseCaseData(normDataList) })
             .map({ paginationData -> ResponseEntity.ok(paginationData) })
             .onErrorReturn(ResponseEntity.internalServerError().build())
 
-    data class PaginatedNormListResponseSchema(val data: List<NormData>)
+    data class PaginatedNormListResponseSchema
+    private constructor(val data: List<NormDataResponseSchema>) {
+        companion object {
+            fun fromUseCaseData(data: List<NormData>): PaginatedNormListResponseSchema {
+                val foo = data.map { NormDataResponseSchema.fromUseCaseData(it) }
+                return PaginatedNormListResponseSchema(foo)
+            }
+        }
+    }
+
+    data class NormDataResponseSchema private constructor(val guid: String, val longTitle: String) {
+        companion object {
+            fun fromUseCaseData(data: NormData): NormDataResponseSchema {
+                return NormDataResponseSchema(encodeGuid(data.guid), data.longTitle)
+            }
+        }
+    }
 }

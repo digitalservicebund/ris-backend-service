@@ -17,7 +17,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
-import java.util.*
+import java.time.LocalDate
+import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [EditNormFrameController::class])
@@ -75,8 +76,8 @@ class EditNormFrameControllerTest {
         assertTrue(command.captured.officialAbbreviation == "official abbreviation")
         assertTrue(command.captured.referenceNumber == "reference number")
         assertTrue(command.captured.publicationDate == null)
-        assertTrue(command.captured.announcementDate == "2020-10-21")
-        assertTrue(command.captured.citationDate == "2020-10-22")
+        assertTrue(command.captured.announcementDate == LocalDate.parse("2020-10-21"))
+        assertTrue(command.captured.citationDate == LocalDate.parse("2020-10-22"))
         assertTrue(command.captured.frameKeywords == "frame keywords")
         assertTrue(command.captured.authorEntity == "author entity")
         assertTrue(command.captured.authorDecidingBody == "author deciding body")

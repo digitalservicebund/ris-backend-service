@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -28,9 +27,9 @@ private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
         referenceNumber = data.referenceNumber,
-        publicationDate = decodeLocalDate(data.publicationDate),
-        announcementDate = decodeLocalDate(data.announcementDate),
-        citationDate = decodeLocalDate(data.citationDate),
+        publicationDate = data.publicationDate,
+        announcementDate = data.announcementDate,
+        citationDate = data.citationDate,
         frameKeywords = data.frameKeywords,
         authorEntity = data.authorEntity,
         authorDecidingBody = data.authorDecidingBody,
@@ -59,6 +58,3 @@ private fun createParagraph(data: ImportNormUseCase.ParagraphData): Paragraph {
     val guid = UUID.randomUUID()
     return Paragraph(guid, data.marker, data.text)
 }
-
-private fun decodeLocalDate(dateString: String?): LocalDate? =
-    if (dateString != null) LocalDate.parse(dateString) else null

@@ -1,7 +1,8 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
-import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 import java.util.UUID
 
 class EditNormFrameCommandTest {
@@ -10,29 +11,29 @@ class EditNormFrameCommandTest {
         val guid = UUID.randomUUID()
         val command = EditNormFrameUseCase.Command(guid, "new title")
 
-        assertThat(command.guid).isEqualTo(guid)
-        assertThat(command.longTitle).isEqualTo("new title")
-        assertThat(command.officialShortTitle).isEqualTo(null)
-        assertThat(command.officialAbbreviation).isEqualTo(null)
-        assertThat(command.referenceNumber).isEqualTo(null)
-        assertThat(command.publicationDate).isEqualTo(null)
-        assertThat(command.announcementDate).isEqualTo(null)
-        assertThat(command.citationDate).isEqualTo(null)
-        assertThat(command.frameKeywords).isEqualTo(null)
-        assertThat(command.authorEntity).isEqualTo(null)
-        assertThat(command.authorDecidingBody).isEqualTo(null)
-        assertThat(command.authorIsResolutionMajority).isEqualTo(null)
-        assertThat(command.leadJurisdiction).isEqualTo(null)
-        assertThat(command.leadUnit).isEqualTo(null)
-        assertThat(command.participationType).isEqualTo(null)
-        assertThat(command.participationInstitution).isEqualTo(null)
-        assertThat(command.documentTypeName).isEqualTo(null)
-        assertThat(command.documentNormCategory).isEqualTo(null)
-        assertThat(command.documentTemplateName).isEqualTo(null)
-        assertThat(command.subjectFna).isEqualTo(null)
-        assertThat(command.subjectPreviousFna).isEqualTo(null)
-        assertThat(command.subjectGesta).isEqualTo(null)
-        assertThat(command.subjectBgb3).isEqualTo(null)
+        assertTrue(command.guid == guid)
+        assertTrue(command.longTitle == "new title")
+        assertTrue(command.officialShortTitle == null)
+        assertTrue(command.officialAbbreviation == null)
+        assertTrue(command.referenceNumber == null)
+        assertTrue(command.publicationDate == null)
+        assertTrue(command.announcementDate == null)
+        assertTrue(command.citationDate == null)
+        assertTrue(command.frameKeywords == null)
+        assertTrue(command.authorEntity == null)
+        assertTrue(command.authorDecidingBody == null)
+        assertTrue(command.authorIsResolutionMajority == null)
+        assertTrue(command.leadJurisdiction == null)
+        assertTrue(command.leadUnit == null)
+        assertTrue(command.participationType == null)
+        assertTrue(command.participationInstitution == null)
+        assertTrue(command.documentTypeName == null)
+        assertTrue(command.documentNormCategory == null)
+        assertTrue(command.documentTemplateName == null)
+        assertTrue(command.subjectFna == null)
+        assertTrue(command.subjectPreviousFna == null)
+        assertTrue(command.subjectGesta == null)
+        assertTrue(command.subjectBgb3 == null)
     }
 
     @Test
@@ -40,35 +41,35 @@ class EditNormFrameCommandTest {
         val guid = UUID.randomUUID()
         val command = EditNormFrameUseCase.Command(
             guid, "long title", "official short title", "official abbreviation",
-            "reference number", "2020-10-27", "2020-10-28", "2020-10-29",
+            "reference number", LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
             "frame keywords", "author entity", "author deciding body",
             true, "lead jurisdiction", "lead unit", "participation type",
             "participation institution", "document type name", "document norm category",
             "document template name", "subject fna", "subject previous fna",
             "subject gesta", "subject bgb3"
         )
-        assertThat(command.guid).isEqualTo(guid)
-        assertThat(command.longTitle).isEqualTo("long title")
-        assertThat(command.officialShortTitle).isEqualTo("official short title")
-        assertThat(command.officialAbbreviation).isEqualTo("official abbreviation")
-        assertThat(command.referenceNumber).isEqualTo("reference number")
-        assertThat(command.publicationDate).isEqualTo("2020-10-27")
-        assertThat(command.announcementDate).isEqualTo("2020-10-28")
-        assertThat(command.citationDate).isEqualTo("2020-10-29")
-        assertThat(command.frameKeywords).isEqualTo("frame keywords")
-        assertThat(command.authorEntity).isEqualTo("author entity")
-        assertThat(command.authorDecidingBody).isEqualTo("author deciding body")
-        assertThat(command.authorIsResolutionMajority).isEqualTo(true)
-        assertThat(command.leadJurisdiction).isEqualTo("lead jurisdiction")
-        assertThat(command.leadUnit).isEqualTo("lead unit")
-        assertThat(command.participationType).isEqualTo("participation type")
-        assertThat(command.participationInstitution).isEqualTo("participation institution")
-        assertThat(command.documentTypeName).isEqualTo("document type name")
-        assertThat(command.documentNormCategory).isEqualTo("document norm category")
-        assertThat(command.documentTemplateName).isEqualTo("document template name")
-        assertThat(command.subjectFna).isEqualTo("subject fna")
-        assertThat(command.subjectPreviousFna).isEqualTo("subject previous fna")
-        assertThat(command.subjectGesta).isEqualTo("subject gesta")
-        assertThat(command.subjectBgb3).isEqualTo("subject bgb3")
+        assertTrue(command.guid == guid)
+        assertTrue(command.longTitle == "long title")
+        assertTrue(command.officialShortTitle == "official short title")
+        assertTrue(command.officialAbbreviation == "official abbreviation")
+        assertTrue(command.referenceNumber == "reference number")
+        assertTrue(command.publicationDate == LocalDate.parse("2020-10-27"))
+        assertTrue(command.announcementDate == LocalDate.parse("2020-10-28"))
+        assertTrue(command.citationDate == LocalDate.parse("2020-10-29"))
+        assertTrue(command.frameKeywords == "frame keywords")
+        assertTrue(command.authorEntity == "author entity")
+        assertTrue(command.authorDecidingBody == "author deciding body")
+        assertTrue(command.authorIsResolutionMajority == true)
+        assertTrue(command.leadJurisdiction == "lead jurisdiction")
+        assertTrue(command.leadUnit == "lead unit")
+        assertTrue(command.participationType == "participation type")
+        assertTrue(command.participationInstitution == "participation institution")
+        assertTrue(command.documentTypeName == "document type name")
+        assertTrue(command.documentNormCategory == "document norm category")
+        assertTrue(command.documentTemplateName == "document template name")
+        assertTrue(command.subjectFna == "subject fna")
+        assertTrue(command.subjectPreviousFna == "subject previous fna")
+        assertTrue(command.subjectGesta == "subject gesta")
+        assertTrue(command.subjectBgb3 == "subject bgb3")
     }
 }

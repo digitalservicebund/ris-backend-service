@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase.Command
+import decodeGuid
+import decodeLocalDate
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import java.util.UUID
 
 @RestController
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
@@ -23,14 +24,14 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     ): Mono<ResponseEntity<Void>> {
         val command =
             EditNormFrameUseCase.Command(
-                guid = UUID.fromString(guid),
+                guid = decodeGuid(guid),
                 longTitle = request.longTitle,
                 officialShortTitle = request.officialShortTitle,
                 officialAbbreviation = request.officialAbbreviation,
                 referenceNumber = request.referenceNumber,
-                publicationDate = request.publicationDate,
-                announcementDate = request.announcementDate,
-                citationDate = request.citationDate,
+                publicationDate = decodeLocalDate(request.publicationDate),
+                announcementDate = decodeLocalDate(request.announcementDate),
+                citationDate = decodeLocalDate(request.citationDate),
                 frameKeywords = request.frameKeywords,
                 authorEntity = request.authorEntity,
                 authorDecidingBody = request.authorDecidingBody,

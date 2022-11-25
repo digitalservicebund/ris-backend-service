@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
 import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
+import decodeLocalDate
+import encodeGuid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,7 +21,8 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
 
         return importNormService
             .importNorm(command)
-            .map { guid -> URI("${ApiConfiguration.API_BASE_PATH}/$guid") }
+            .map { guid -> encodeGuid(guid) }
+            .map { encodedGuid -> URI("${ApiConfiguration.API_BASE_PATH}/$encodedGuid") }
             .map { uri -> ResponseEntity.created(uri).build<Void>() }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
@@ -56,9 +59,9 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 officialShortTitle = officialShortTitle,
                 officialAbbreviation = officialAbbreviation,
                 referenceNumber = referenceNumber,
-                publicationDate = publicationDate,
-                announcementDate = announcementDate,
-                citationDate = citationDate,
+                publicationDate = decodeLocalDate(publicationDate),
+                announcementDate = decodeLocalDate(announcementDate),
+                citationDate = decodeLocalDate(citationDate),
                 frameKeywords = frameKeywords,
                 authorEntity = authorEntity,
                 authorDecidingBody = authorDecidingBody,

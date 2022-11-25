@@ -73,7 +73,7 @@ class ImportNormServiceTest {
         val article = ImportNormUseCase.ArticleData("title", "marker", listOf(paragraph))
         val norm = ImportNormUseCase.NormData(
             "long title", listOf(article), "official short title", "official abbreviation",
-            "reference number", "2020-10-27", "2020-10-28", "2020-10-29",
+            "reference number", LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
             "frame keywords", "author entity", "author deciding body",
             true, "lead jurisdiction", "lead unit", "participation type",
             "participation institution", "document type name", "document norm category",

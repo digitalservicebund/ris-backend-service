@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPo
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 
 @Service
 class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
@@ -19,9 +18,9 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
                 officialShortTitle = command.officialShortTitle,
                 officialAbbreviation = command.officialAbbreviation,
                 referenceNumber = command.referenceNumber,
-                publicationDate = decodeDateString(command.publicationDate),
-                announcementDate = decodeDateString(command.announcementDate),
-                citationDate = decodeDateString(command.citationDate),
+                publicationDate = command.publicationDate,
+                announcementDate = command.announcementDate,
+                citationDate = command.citationDate,
                 frameKeywords = command.frameKeywords,
                 authorEntity = command.authorEntity,
                 authorDecidingBody = command.authorDecidingBody,
@@ -41,6 +40,3 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
         )
     }
 }
-
-private fun decodeDateString(dateString: String?): LocalDate? =
-    if (dateString != null) LocalDate.parse(dateString) else null

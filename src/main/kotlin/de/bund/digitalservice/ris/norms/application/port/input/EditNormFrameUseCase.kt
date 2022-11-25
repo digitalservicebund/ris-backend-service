@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
 import reactor.core.publisher.Mono
+import java.time.LocalDate
 import java.util.UUID
 
 interface EditNormFrameUseCase {
@@ -12,9 +13,9 @@ interface EditNormFrameUseCase {
         val officialShortTitle: String? = null,
         val officialAbbreviation: String? = null,
         val referenceNumber: String? = null,
-        val publicationDate: String? = null,
-        val announcementDate: String? = null,
-        val citationDate: String? = null,
+        val publicationDate: LocalDate? = null,
+        val announcementDate: LocalDate? = null,
+        val citationDate: LocalDate? = null,
         val frameKeywords: String? = null,
         val authorEntity: String? = null,
         val authorDecidingBody: String? = null,

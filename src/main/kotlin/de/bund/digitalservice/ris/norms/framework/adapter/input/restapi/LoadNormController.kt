@@ -23,7 +23,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
 
         return loadNormService
             .loadNorm(query)
-            .map({ norm -> NormResponseSchema.from(norm) })
+            .map({ norm -> NormResponseSchema.fromUseCaseData(norm) })
             .map({ normResponseSchema -> ResponseEntity.ok(normResponseSchema) })
             .defaultIfEmpty(ResponseEntity.notFound().build<NormResponseSchema>())
             .onErrorReturn(ResponseEntity.internalServerError().build())
@@ -57,8 +57,8 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var subjectBgb3: String? = null
     ) {
         companion object {
-            fun from(norm: Norm): NormResponseSchema {
-                val articles = norm.articles.map { ArticleResponseSchema.from(it) }
+            fun fromUseCaseData(norm: Norm): NormResponseSchema {
+                val articles = norm.articles.map { ArticleResponseSchema.fromUseCaseData(it) }
                 return NormResponseSchema(
                     guid = norm.guid.toString(),
                     longTitle = norm.longTitle,
@@ -97,8 +97,8 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val paragraphs: List<ParagraphResponseSchema>
     ) {
         companion object {
-            fun from(article: Article): ArticleResponseSchema {
-                val paragraphs = article.paragraphs.map { ParagraphResponseSchema.from(it) }
+            fun fromUseCaseData(article: Article): ArticleResponseSchema {
+                val paragraphs = article.paragraphs.map { ParagraphResponseSchema.fromUseCaseData(it) }
                 return ArticleResponseSchema(
                     article.guid.toString(),
                     article.title,
@@ -112,7 +112,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     data class ParagraphResponseSchema
     private constructor(val guid: String, var marker: String? = null, val text: String) {
         companion object {
-            fun from(paragraph: Paragraph): ParagraphResponseSchema {
+            fun fromUseCaseData(paragraph: Paragraph): ParagraphResponseSchema {
                 return ParagraphResponseSchema(paragraph.guid.toString(), paragraph.marker, paragraph.text)
             }
         }
