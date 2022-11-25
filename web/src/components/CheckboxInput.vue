@@ -28,21 +28,14 @@ const { inputValue, emitInputEvent } = useInputModel<boolean, Props, Emits>(
     :id="id"
     v-model="inputValue"
     :aria-label="ariaLabel"
-    class="input"
+    class="appearance-none border-2 border-blue-800 border-solid focus:outline-none h-40 w-40"
     type="checkbox"
     @input="emitInputEvent"
   />
 </template>
 
 <style lang="scss" scoped>
-.input {
-  height: 2.5rem;
-  width: 40px;
-  appearance: none;
-  @apply border-2 border-solid border-blue-800;
-  &:focus {
-    outline: none;
-  }
+input {
   &:checked {
     appearance: auto;
   }
