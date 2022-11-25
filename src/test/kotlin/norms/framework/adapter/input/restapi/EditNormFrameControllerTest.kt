@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import io.mockk.every
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -24,15 +23,14 @@ import java.util.UUID
 @WebFluxTest(controllers = [EditNormFrameController::class])
 @WithMockUser
 class EditNormFrameControllerTest {
-    @Autowired
-    lateinit var webClient: WebTestClient
+    @Autowired lateinit var webClient: WebTestClient
 
-    @MockkBean
-    lateinit var editNormFrameService: EditNormFrameUseCase
+    @MockkBean lateinit var editNormFrameService: EditNormFrameUseCase
 
     @Test
     fun `it correctly maps the parameter and body to the command calling the service`() {
-        val editJson = """
+        val editJson =
+            """
             {
               "longTitle": "new title",
               "officialShortTitle": "official short title",
@@ -68,31 +66,35 @@ class EditNormFrameControllerTest {
             .body(BodyInserters.fromValue(editJson))
             .exchange()
 
-        var command = slot<EditNormFrameUseCase.Command>()
-        verify(exactly = 1) { editNormFrameService.editNormFrame(capture(command)) }
-        assertTrue(command.captured.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
-        assertTrue(command.captured.longTitle == "new title")
-        assertTrue(command.captured.officialShortTitle == "official short title")
-        assertTrue(command.captured.officialAbbreviation == "official abbreviation")
-        assertTrue(command.captured.referenceNumber == "reference number")
-        assertTrue(command.captured.publicationDate == null)
-        assertTrue(command.captured.announcementDate == LocalDate.parse("2020-10-21"))
-        assertTrue(command.captured.citationDate == LocalDate.parse("2020-10-22"))
-        assertTrue(command.captured.frameKeywords == "frame keywords")
-        assertTrue(command.captured.authorEntity == "author entity")
-        assertTrue(command.captured.authorDecidingBody == "author deciding body")
-        assertTrue(command.captured.authorIsResolutionMajority == true)
-        assertTrue(command.captured.leadJurisdiction == "lead jurisdiction")
-        assertTrue(command.captured.leadUnit == "lead unit")
-        assertTrue(command.captured.participationType == "participation type")
-        assertTrue(command.captured.participationInstitution == "participation institution")
-        assertTrue(command.captured.documentTypeName == "document type name")
-        assertTrue(command.captured.documentNormCategory == "document norm category")
-        assertTrue(command.captured.documentTemplateName == "document template name")
-        assertTrue(command.captured.subjectFna == "subject fna")
-        assertTrue(command.captured.subjectPreviousFna == "subject previous fna")
-        assertTrue(command.captured.subjectGesta == "subject gesta")
-        assertTrue(command.captured.subjectBgb3 == "subject bgb3")
+        verify(exactly = 1) {
+            editNormFrameService.editNormFrame(
+                withArg {
+                    assertTrue(it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
+                    assertTrue(it.properties.longTitle == "new title")
+                    assertTrue(it.properties.officialShortTitle == "official short title")
+                    assertTrue(it.properties.officialAbbreviation == "official abbreviation")
+                    assertTrue(it.properties.referenceNumber == "reference number")
+                    assertTrue(it.properties.publicationDate == null)
+                    assertTrue(it.properties.announcementDate == LocalDate.parse("2020-10-21"))
+                    assertTrue(it.properties.citationDate == LocalDate.parse("2020-10-22"))
+                    assertTrue(it.properties.frameKeywords == "frame keywords")
+                    assertTrue(it.properties.authorEntity == "author entity")
+                    assertTrue(it.properties.authorDecidingBody == "author deciding body")
+                    assertTrue(it.properties.authorIsResolutionMajority == true)
+                    assertTrue(it.properties.leadJurisdiction == "lead jurisdiction")
+                    assertTrue(it.properties.leadUnit == "lead unit")
+                    assertTrue(it.properties.participationType == "participation type")
+                    assertTrue(it.properties.participationInstitution == "participation institution")
+                    assertTrue(it.properties.documentTypeName == "document type name")
+                    assertTrue(it.properties.documentNormCategory == "document norm category")
+                    assertTrue(it.properties.documentTemplateName == "document template name")
+                    assertTrue(it.properties.subjectFna == "subject fna")
+                    assertTrue(it.properties.subjectPreviousFna == "subject previous fna")
+                    assertTrue(it.properties.subjectGesta == "subject gesta")
+                    assertTrue(it.properties.subjectBgb3 == "subject bgb3")
+                }
+            )
+        }
     }
 
     @Test

@@ -9,67 +9,86 @@ class EditNormFrameCommandTest {
     @Test
     fun `can create command with GUID and new long title`() {
         val guid = UUID.randomUUID()
-        val command = EditNormFrameUseCase.Command(guid, "new title")
+        val properties = EditNormFrameUseCase.NormFrameProperties("new title")
+        val command = EditNormFrameUseCase.Command(guid, properties)
 
         assertTrue(command.guid == guid)
-        assertTrue(command.longTitle == "new title")
-        assertTrue(command.officialShortTitle == null)
-        assertTrue(command.officialAbbreviation == null)
-        assertTrue(command.referenceNumber == null)
-        assertTrue(command.publicationDate == null)
-        assertTrue(command.announcementDate == null)
-        assertTrue(command.citationDate == null)
-        assertTrue(command.frameKeywords == null)
-        assertTrue(command.authorEntity == null)
-        assertTrue(command.authorDecidingBody == null)
-        assertTrue(command.authorIsResolutionMajority == null)
-        assertTrue(command.leadJurisdiction == null)
-        assertTrue(command.leadUnit == null)
-        assertTrue(command.participationType == null)
-        assertTrue(command.participationInstitution == null)
-        assertTrue(command.documentTypeName == null)
-        assertTrue(command.documentNormCategory == null)
-        assertTrue(command.documentTemplateName == null)
-        assertTrue(command.subjectFna == null)
-        assertTrue(command.subjectPreviousFna == null)
-        assertTrue(command.subjectGesta == null)
-        assertTrue(command.subjectBgb3 == null)
+        assertTrue(command.properties.longTitle == "new title")
+        assertTrue(command.properties.officialShortTitle == null)
+        assertTrue(command.properties.officialAbbreviation == null)
+        assertTrue(command.properties.referenceNumber == null)
+        assertTrue(command.properties.publicationDate == null)
+        assertTrue(command.properties.announcementDate == null)
+        assertTrue(command.properties.citationDate == null)
+        assertTrue(command.properties.frameKeywords == null)
+        assertTrue(command.properties.authorEntity == null)
+        assertTrue(command.properties.authorDecidingBody == null)
+        assertTrue(command.properties.authorIsResolutionMajority == null)
+        assertTrue(command.properties.leadJurisdiction == null)
+        assertTrue(command.properties.leadUnit == null)
+        assertTrue(command.properties.participationType == null)
+        assertTrue(command.properties.participationInstitution == null)
+        assertTrue(command.properties.documentTypeName == null)
+        assertTrue(command.properties.documentNormCategory == null)
+        assertTrue(command.properties.documentTemplateName == null)
+        assertTrue(command.properties.subjectFna == null)
+        assertTrue(command.properties.subjectPreviousFna == null)
+        assertTrue(command.properties.subjectGesta == null)
+        assertTrue(command.properties.subjectBgb3 == null)
     }
 
     @Test
     fun `can create command with optional fields`() {
         val guid = UUID.randomUUID()
-        val command = EditNormFrameUseCase.Command(
-            guid, "long title", "official short title", "official abbreviation",
-            "reference number", LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "author entity", "author deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
-        )
+        val properties =
+            EditNormFrameUseCase.NormFrameProperties(
+                "long title",
+                "official short title",
+                "official abbreviation",
+                "reference number",
+                LocalDate.parse("2020-10-27"),
+                LocalDate.parse("2020-10-28"),
+                LocalDate.parse("2020-10-29"),
+                "frame keywords",
+                "author entity",
+                "author deciding body",
+                true,
+                "lead jurisdiction",
+                "lead unit",
+                "participation type",
+                "participation institution",
+                "document type name",
+                "document norm category",
+                "document template name",
+                "subject fna",
+                "subject previous fna",
+                "subject gesta",
+                "subject bgb3"
+            )
+        val command = EditNormFrameUseCase.Command(guid, properties)
+
         assertTrue(command.guid == guid)
-        assertTrue(command.longTitle == "long title")
-        assertTrue(command.officialShortTitle == "official short title")
-        assertTrue(command.officialAbbreviation == "official abbreviation")
-        assertTrue(command.referenceNumber == "reference number")
-        assertTrue(command.publicationDate == LocalDate.parse("2020-10-27"))
-        assertTrue(command.announcementDate == LocalDate.parse("2020-10-28"))
-        assertTrue(command.citationDate == LocalDate.parse("2020-10-29"))
-        assertTrue(command.frameKeywords == "frame keywords")
-        assertTrue(command.authorEntity == "author entity")
-        assertTrue(command.authorDecidingBody == "author deciding body")
-        assertTrue(command.authorIsResolutionMajority == true)
-        assertTrue(command.leadJurisdiction == "lead jurisdiction")
-        assertTrue(command.leadUnit == "lead unit")
-        assertTrue(command.participationType == "participation type")
-        assertTrue(command.participationInstitution == "participation institution")
-        assertTrue(command.documentTypeName == "document type name")
-        assertTrue(command.documentNormCategory == "document norm category")
-        assertTrue(command.documentTemplateName == "document template name")
-        assertTrue(command.subjectFna == "subject fna")
-        assertTrue(command.subjectPreviousFna == "subject previous fna")
-        assertTrue(command.subjectGesta == "subject gesta")
-        assertTrue(command.subjectBgb3 == "subject bgb3")
+        assertTrue(command.properties.longTitle == "long title")
+        assertTrue(command.properties.officialShortTitle == "official short title")
+        assertTrue(command.properties.officialAbbreviation == "official abbreviation")
+        assertTrue(command.properties.referenceNumber == "reference number")
+        assertTrue(command.properties.publicationDate == LocalDate.parse("2020-10-27"))
+        assertTrue(command.properties.announcementDate == LocalDate.parse("2020-10-28"))
+        assertTrue(command.properties.citationDate == LocalDate.parse("2020-10-29"))
+        assertTrue(command.properties.frameKeywords == "frame keywords")
+        assertTrue(command.properties.authorEntity == "author entity")
+        assertTrue(command.properties.authorDecidingBody == "author deciding body")
+        assertTrue(command.properties.authorIsResolutionMajority == true)
+        assertTrue(command.properties.leadJurisdiction == "lead jurisdiction")
+        assertTrue(command.properties.leadUnit == "lead unit")
+        assertTrue(command.properties.participationType == "participation type")
+        assertTrue(command.properties.participationInstitution == "participation institution")
+        assertTrue(command.properties.documentTypeName == "document type name")
+        assertTrue(command.properties.documentNormCategory == "document norm category")
+        assertTrue(command.properties.documentTemplateName == "document template name")
+        assertTrue(command.properties.subjectFna == "subject fna")
+        assertTrue(command.properties.subjectPreviousFna == "subject previous fna")
+        assertTrue(command.properties.subjectGesta == "subject gesta")
+        assertTrue(command.properties.subjectBgb3 == "subject bgb3")
     }
 }

@@ -18,7 +18,8 @@ class EditNormFrameServiceTest {
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)
         val guid = UUID.randomUUID()
-        val command = EditNormFrameUseCase.Command(guid, "new title")
+        val properties = EditNormFrameUseCase.NormFrameProperties("new title")
+        val command = EditNormFrameUseCase.Command(guid, properties)
 
         every { editNormOutputPort.editNorm(any()) } returns Mono.just(true)
 
@@ -60,15 +61,32 @@ class EditNormFrameServiceTest {
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)
         val guid = UUID.randomUUID()
-        val command = EditNormFrameUseCase.Command(
-            guid, "long title", "official short title", "official abbreviation",
-            "reference number", LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "author entity", "author deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
-        )
+        val properties =
+            EditNormFrameUseCase.NormFrameProperties(
+                "long title",
+                "official short title",
+                "official abbreviation",
+                "reference number",
+                LocalDate.parse("2020-10-27"),
+                LocalDate.parse("2020-10-28"),
+                LocalDate.parse("2020-10-29"),
+                "frame keywords",
+                "author entity",
+                "author deciding body",
+                true,
+                "lead jurisdiction",
+                "lead unit",
+                "participation type",
+                "participation institution",
+                "document type name",
+                "document norm category",
+                "document template name",
+                "subject fna",
+                "subject previous fna",
+                "subject gesta",
+                "subject bgb3"
+            )
+        val command = EditNormFrameUseCase.Command(guid, properties)
 
         every { editNormOutputPort.editNorm(any()) } returns Mono.just(true)
 

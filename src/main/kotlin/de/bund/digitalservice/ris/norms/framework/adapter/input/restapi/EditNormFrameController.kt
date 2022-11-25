@@ -19,34 +19,10 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     @PutMapping(path = ["/{guid}"])
     fun editNormFrame(
         @PathVariable guid: String,
-        @RequestBody request: EditNormFrameRequestSchema
+        @RequestBody request: NormFramePropertiesRequestSchema
     ): Mono<ResponseEntity<Void>> {
-        val command =
-            EditNormFrameUseCase.Command(
-                guid = decodeGuid(guid),
-                longTitle = request.longTitle,
-                officialShortTitle = request.officialShortTitle,
-                officialAbbreviation = request.officialAbbreviation,
-                referenceNumber = request.referenceNumber,
-                publicationDate = decodeLocalDate(request.publicationDate),
-                announcementDate = decodeLocalDate(request.announcementDate),
-                citationDate = decodeLocalDate(request.citationDate),
-                frameKeywords = request.frameKeywords,
-                authorEntity = request.authorEntity,
-                authorDecidingBody = request.authorDecidingBody,
-                authorIsResolutionMajority = request.authorIsResolutionMajority,
-                leadJurisdiction = request.leadJurisdiction,
-                leadUnit = request.leadUnit,
-                participationType = request.participationType,
-                participationInstitution = request.participationInstitution,
-                documentTypeName = request.documentTypeName,
-                documentNormCategory = request.documentNormCategory,
-                documentTemplateName = request.documentTemplateName,
-                subjectFna = request.subjectFna,
-                subjectPreviousFna = request.subjectPreviousFna,
-                subjectGesta = request.subjectGesta,
-                subjectBgb3 = request.subjectBgb3
-            )
+        val properties = request.toUseCaseData()
+        val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
 
         return editNormFrameService
             .editNormFrame(command)
@@ -54,7 +30,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
 
-    class EditNormFrameRequestSchema {
+    class NormFramePropertiesRequestSchema {
         lateinit var longTitle: String
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
@@ -77,5 +53,32 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var subjectPreviousFna: String? = null
         var subjectGesta: String? = null
         var subjectBgb3: String? = null
+
+        fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
+            return EditNormFrameUseCase.NormFrameProperties(
+                longTitle = this.longTitle,
+                officialShortTitle = this.officialShortTitle,
+                officialAbbreviation = this.officialAbbreviation,
+                referenceNumber = this.referenceNumber,
+                publicationDate = decodeLocalDate(this.publicationDate),
+                announcementDate = decodeLocalDate(this.announcementDate),
+                citationDate = decodeLocalDate(this.citationDate),
+                frameKeywords = this.frameKeywords,
+                authorEntity = this.authorEntity,
+                authorDecidingBody = this.authorDecidingBody,
+                authorIsResolutionMajority = this.authorIsResolutionMajority,
+                leadJurisdiction = this.leadJurisdiction,
+                leadUnit = this.leadUnit,
+                participationType = this.participationType,
+                participationInstitution = this.participationInstitution,
+                documentTypeName = this.documentTypeName,
+                documentNormCategory = this.documentNormCategory,
+                documentTemplateName = this.documentTemplateName,
+                subjectFna = this.subjectFna,
+                subjectPreviousFna = this.subjectPreviousFna,
+                subjectGesta = this.subjectGesta,
+                subjectBgb3 = this.subjectBgb3
+            )
+        }
     }
 }

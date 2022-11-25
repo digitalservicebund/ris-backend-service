@@ -7,8 +7,9 @@ import java.util.UUID
 interface EditNormFrameUseCase {
     fun editNormFrame(command: Command): Mono<Boolean>
 
-    data class Command(
-        val guid: UUID,
+    data class Command(val guid: UUID, val properties: NormFrameProperties)
+
+    data class NormFrameProperties(
         val longTitle: String,
         val officialShortTitle: String? = null,
         val officialAbbreviation: String? = null,
