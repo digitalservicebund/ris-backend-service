@@ -28,9 +28,9 @@ type frameDataType = {
   subjectBgb3?: string
 }
 
-function dateStringOrNull(dateString?: string): string | null {
+function dateStringOrNull(dateString?: string): string | undefined {
   if (dateString === undefined || dateString.length == 0) {
-    return null
+    return undefined
   } else {
     return dateString
   }
