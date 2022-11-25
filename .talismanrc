@@ -68,9 +68,9 @@ fileignoreconfig:
   - filename: web/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
-    checksum: 10b1c97b62b795b15f5984d22f9301858d0576ba6e2a1c5da2177a80b220674e
+    checksum: 03cfffcb67e8e5f06f287c322b04aee3f709c7941d284ea812a9805f6a0191c9
   - filename: src/test/kotlin/norms/domain/entity/NormTest.kt
-    checksum: 4b7b9269ab5bafd2cc7c26fc277991892af621139c1418fe065a302f9b2695c1
+    checksum: bb9ec706036cc4462a04af10dd851c8b366b71ab9d3d2cb614a9eab3002da49e
   - filename: doc/norms/backend-api.yaml
     checksum: 9958c0459654c74faa57b5a47de5aeb4698ba7e3713b313a4864ec3e701e8e46
   - filename: web/test/components/navbarSide.spec.ts
