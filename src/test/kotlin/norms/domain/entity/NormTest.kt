@@ -19,6 +19,8 @@ class NormTest {
         assertTrue(norm.officialShortTitle == null)
         assertTrue(norm.officialAbbreviation == null)
         assertTrue(norm.frameKeywords == null)
+        assertTrue(norm.unofficialTitle == null)
+        assertTrue(norm.risAbbreviation == null)
     }
 
     @Test
@@ -32,7 +34,9 @@ class NormTest {
             listOf(article),
             officialShortTitle = "short title",
             officialAbbreviation = "ABC",
-            frameKeywords = "keywords"
+            frameKeywords = "keywords",
+            unofficialTitle = "unofficial title",
+            risAbbreviation = "ABC"
         )
 
         assertTrue(norm.guid == guid)
@@ -41,6 +45,8 @@ class NormTest {
         assertTrue(norm.officialShortTitle == "short title")
         assertTrue(norm.officialAbbreviation == "ABC")
         assertTrue(norm.frameKeywords == "keywords")
+        assertTrue(norm.unofficialTitle == "unofficial title")
+        assertTrue(norm.risAbbreviation == "ABC")
     }
 
     @Test
@@ -58,7 +64,9 @@ class NormTest {
             publicationDate = publicationDate,
             announcementDate = announcementDate,
             citationDate = citationDate,
-            authorIsResolutionMajority = true
+            authorIsResolutionMajority = true,
+            unofficialTitle = "unofficial title",
+            risAbbreviation = "ABC"
         )
 
         assertTrue(norm.guid == guid)
@@ -68,5 +76,7 @@ class NormTest {
         assertTrue(norm.announcementDate == announcementDate)
         assertTrue(norm.citationDate == citationDate)
         assertTrue(norm.authorIsResolutionMajority == true)
+        assertTrue(norm.unofficialTitle == "unofficial title")
+        assertTrue(norm.risAbbreviation == "ABC")
     }
 }

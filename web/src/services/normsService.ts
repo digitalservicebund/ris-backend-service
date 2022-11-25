@@ -79,7 +79,7 @@ export async function editNormFrame(
   guid: string,
   frameData: frameDataType
 ): Promise<ServiceResponse<void>> {
-  frameData.publicationDate = dateStringOrNull(frameData.punblicationDate)
+  frameData.publicationDate = dateStringOrNull(frameData.publicationDate)
   frameData.announcementDate = dateStringOrNull(frameData.announcementDate)
   frameData.citationDate = dateStringOrNull(frameData.citationDate)
   const { status, error } = await httpClient.put(

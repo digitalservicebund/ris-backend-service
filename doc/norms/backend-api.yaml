@@ -39,11 +39,10 @@ paths:
                         longTitle:
                           type: string
                 example:
-                  data:
-                    - guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
-                      longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
-                    - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
-                      longTitle: "Übereinkommen über das umweltgerechte Recycling von Schiffen"
+                  - guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
+                    longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
+                  - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
+                    longTitle: "Übereinkommen über das umweltgerechte Recycling von Schiffen"
         "400":
           description: ""
 
@@ -105,7 +104,6 @@ paths:
       responses:
         "204":
           description: Norm was updated
-
         "400":
           description: ""
 
@@ -120,25 +118,25 @@ components:
       description: The globally unique identifier of the norm (format in UUID)
       type: string
       format: uuid
+      example: "6a18380f-5c65-4f4d-902d-d49694f25de2"
 
     Date:
       description: The date format in XML files
       type: string
       pattern: '^[1-2]\d{3}-[0-1]\d-[0-3]\d$'
+      example: "2020-10-21"
 
     ParagraphWithoutGuid:
       type: object
       required:
-        - marker
         - text
       properties:
         marker:
           type: string
+          example: "(1)"
         text:
           type: string
-      example:
-        marker: "(1)"
-        text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+          example: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
 
     ArticleWithoutGuid:
       type: object
@@ -148,114 +146,44 @@ components:
       properties:
         marker:
           type: string
+          example: "§ 1"
         title:
           type: string
+          example: "Allgemeiner Anwendungsbereich"
         paragraphs:
           type: array
           items:
             $ref: "#/components/schemas/ParagraphWithoutGuid"
-      example:
-        marker: "§ 1"
-        title: "Allgemeiner Anwendungsbereich"
-        paragraphs:
-          - marker: "(1)"
-            text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
 
     NormWithoutGuid:
-      type: object
-      required:
-        - longTitle
-        - articles
-      properties:
-        longTitle:
-          type: string
-        officialShortTitle:
-          type: string
-        officialAbbreviation:
-          type: string
-        referenceNumber:
-          type: string
-        publicationDate:
-          $ref: "#/components/schemas/Date"
-        announcementDate:
-          $ref: "#/components/schemas/Date"
-        citationDate:
-          $ref: "#/components/schemas/Date"
-        frameKeywords:
-          type: string
-        authorEntity:
-          type: string
-        authorDecidingBody:
-          type: string
-        authorIsResolutionMajority:
-          type: boolean
-        leadJurisdiction:
-          type: string
-        leadUnit:
-          type: string
-        participationType:
-          type: string
-        participationInstitution:
-          type: string
-        documentTypeName:
-          type: string
-        documentNormCategory:
-          type: string
-        documentTemplateName:
-          type: string
-        subjectFna:
-          type: string
-        subjectPreviousFna:
-          type: string
-        subjectGesta:
-          type: string
-        subjectBgb3:
-          type: string
-        articles:
-          type: array
-          items:
-            $ref: "#/components/schemas/ArticleWithoutGuid"
-      example:
-        longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
-        officialShortTitle: "Notenwechsel vom 25. September 1990 zum NATO-Truppenstatut"
-        officialAbbreviation: "2. KostRMoG"
-        referenceNumber: "1 BvR 2011/94"
-        publicationDate: "2022-03-30"
-        announcementDate: "2012-03-30"
-        citationDate: "2002-03-30"
-        frameKeywords: "BGBl I 2009, Nr 027"
-        authorEntity: "DEU"
-        authorDecidingBody: "BMinI"
-        authorIsResolutionMajority: true
-        leadJurisdiction: "BMELV"
-        leadUnit: "BMELV 335"
-        participationType: "EZ"
-        participationInstitution: "BR"
-        documentTypeName: "RV"
-        documentNormCategory: "NS"
-        documentTemplateName: "ASD"
-        subjectFna: "6/32"
-        subjectPreviousFna: "6/31"
-        subjectGesta: "Sample Text"
-        subjectBgb3: "Sample Text"
-        articles:
-          - marker: "§ 1"
-            title: "Allgemeiner Anwendungsbereich"
-            paragraphs:
-              - marker: "(1)"
-                text: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
+      allOf:
+        - $ref: "#/components/schemas/MetadataFields"
+        - type: object
+          required:
+            - longTitle
+            - articles
+          properties:
+            articles:
+              type: array
+              items:
+                $ref: "#/components/schemas/ArticleWithoutGuid"
 
     Paragraph:
       allOf:
+        - $ref: "#/components/schemas/ParagraphWithoutGuid"
         - type: object
+          required:
+            - guid
           properties:
             guid:
               $ref: "#/components/schemas/Guid"
-        - $ref: "#/components/schemas/ParagraphWithoutGuid"
 
     Article:
       allOf:
+        - $ref: "#/components/schemas/ArticleWithoutGuid"
         - type: object
+          required:
+            - guid
           properties:
             guid:
               $ref: "#/components/schemas/Guid"
@@ -263,11 +191,13 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Paragraph"
-        - $ref: "#/components/schemas/ArticleWithoutGuid"
 
     Norm:
       allOf:
+        - $ref: "#/components/schemas/NormWithoutGuid"
         - type: object
+          required:
+            - guid
           properties:
             guid:
               $ref: "#/components/schemas/Guid"
@@ -275,44 +205,22 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/Article"
-        - $ref: "#/components/schemas/NormWithoutGuid"
 
     MetadataFields:
       type: object
-      required:
-        [
-          longTitle,
-          officialShortTitle,
-          officialAbbreviation,
-          referenceNumber,
-          publicationDate,
-          announcementDate,
-          citationDate,
-          frameKeywords,
-          authorEntity,
-          authorDecidingBody,
-          authorIsResolutionMajority,
-          leadJurisdiction,
-          leadUnit,
-          participationType,
-          participationInstitution,
-          documentTypeName,
-          documentNormCategory,
-          documentTemplateName,
-          subjectFna,
-          subjectPreviousFna,
-          subjectGesta,
-          subjectBgb3,
-        ]
       properties:
         longTitle:
           type: string
+          example: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
         officialShortTitle:
           type: string
+          example: "Saubere-Fahrzeuge-Beschaffungs-Gesetz"
         officialAbbreviation:
           type: string
+          example: "SaubFahrzeugBeschG"
         referenceNumber:
           type: string
+          example: "1 BvR 2011/94"
         publicationDate:
           $ref: "#/components/schemas/Date"
         announcementDate:
@@ -321,34 +229,61 @@ components:
           $ref: "#/components/schemas/Date"
         frameKeywords:
           type: string
+          example: "BGBl I 2021, Nr 031;geltendes Bundesrecht;Umsetzung EG-Recht;Umsetzung EURL 2019/1161;Beschaffung;sauber;Straßenfahrzeug"
         authorEntity:
           type: string
+          example: "DEU"
         authorDecidingBody:
           type: string
+          example: "BT"
         authorIsResolutionMajority:
           type: boolean
+          example: true
         leadJurisdiction:
           type: string
+          example: "BMVI"
         leadUnit:
           type: string
+          example: "G 22"
         participationType:
           type: string
+          example: "EZ"
         participationInstitution:
           type: string
+          example: "BR"
         documentTypeName:
           type: string
+          example: "RV"
         documentNormCategory:
           type: string
+          example: "XX"
         documentTemplateName:
           type: string
+          example: "Template"
         subjectFna:
           type: string
+          example: "FNA 703-12"
         subjectPreviousFna:
           type: string
+          example: "FNA 703-11"
         subjectGesta:
           type: string
+          example: "GESTA J040"
         subjectBgb3:
           type: string
+          example: "BGB III 234"
+        unofficialTitle:
+          type: string
+          example: "Nichtamtliche Langüberschrift"
+        unofficialShortTitle:
+          type: string
+          example: "Nichtamtliche Kurzüberschrift"
+        unofficialAbbreviation:
+          type: string
+          example: "Nichtamtliche Buchstabenabkürzung"
+        risAbbreviation:
+          type: string
+          example: "SaubFahrzeugBeschG"
 
 security:
   - BasicAuth: []
