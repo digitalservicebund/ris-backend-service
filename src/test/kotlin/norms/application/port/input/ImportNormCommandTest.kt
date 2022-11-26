@@ -91,7 +91,8 @@ class ImportNormCommandTest {
             true, "lead jurisdiction", "lead unit", "participation type",
             "participation institution", "document type name", "document norm category",
             "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
+            "subject gesta", "subject bgb3", "unofficial title", "unofficial short title",
+            "unofficial abbreviation", "ris abbreviation"
         )
         val command = ImportNormUseCase.Command(normData)
 

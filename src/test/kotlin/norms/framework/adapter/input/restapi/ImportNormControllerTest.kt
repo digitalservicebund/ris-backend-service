@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import io.mockk.every
-import io.mockk.slot
 import io.mockk.verify
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -64,7 +63,11 @@ class ImportNormControllerTest {
 	"participationType": null,
 	"participationInstitution": null,
 	"subjectFna": "FNA 703-12",
-	"subjectGesta": "GESTA J040"
+	"subjectGesta": "GESTA J040",
+  "unofficialTitle": "unofficial title",
+  "unofficialShortTitle": "unofficial short title",
+  "unofficialAbbreviation": "unofficial abbreviation",
+  "risAbbreviation": "ris abbreviation"
 }
     """
 
@@ -78,34 +81,41 @@ class ImportNormControllerTest {
             .body(BodyInserters.fromValue(importJson))
             .exchange()
 
-        val command = slot<ImportNormUseCase.Command>()
-        verify(exactly = 1) { importNormService.importNorm(capture(command)) }
-
-        assertTrue(command.captured.data.longTitle == "long title")
-        assertTrue(command.captured.data.articles.size == 1)
-        assertTrue(command.captured.data.articles[0].title == "article title")
-        assertTrue(command.captured.data.articles[0].marker == "§ 1")
-        assertTrue(command.captured.data.articles[0].paragraphs.size == 2)
-        assertTrue(command.captured.data.articles[0].paragraphs[0].marker == "(1)")
-        assertTrue(command.captured.data.articles[0].paragraphs[0].text == "paragraph text 1")
-        assertTrue(command.captured.data.articles[0].paragraphs[1].marker == "(2)")
-        assertTrue(command.captured.data.articles[0].paragraphs[1].text == "paragraph text 2")
-        assertTrue(command.captured.data.officialShortTitle == "official short title")
-        assertTrue(command.captured.data.officialAbbreviation == "official abbreviation")
-        assertTrue(command.captured.data.referenceNumber == null)
-        assertTrue(command.captured.data.publicationDate == null)
-        assertTrue(command.captured.data.announcementDate == LocalDate.parse("2021-06-14"))
-        assertTrue(command.captured.data.citationDate == LocalDate.parse("2021-06-09"))
-        assertTrue(command.captured.data.frameKeywords == "frame keywords")
-        assertTrue(command.captured.data.authorEntity == "DEU")
-        assertTrue(command.captured.data.authorDecidingBody == "BT")
-        assertTrue(command.captured.data.authorIsResolutionMajority == true)
-        assertTrue(command.captured.data.leadJurisdiction == "BMVI")
-        assertTrue(command.captured.data.leadUnit == "G 22")
-        assertTrue(command.captured.data.participationType == null)
-        assertTrue(command.captured.data.participationInstitution == null)
-        assertTrue(command.captured.data.subjectFna == "FNA 703-12")
-        assertTrue(command.captured.data.subjectGesta == "GESTA J040")
+        verify(exactly = 1) {
+            importNormService.importNorm(
+                withArg {
+                    assertTrue(it.data.longTitle == "long title")
+                    assertTrue(it.data.articles.size == 1)
+                    assertTrue(it.data.articles[0].title == "article title")
+                    assertTrue(it.data.articles[0].marker == "§ 1")
+                    assertTrue(it.data.articles[0].paragraphs.size == 2)
+                    assertTrue(it.data.articles[0].paragraphs[0].marker == "(1)")
+                    assertTrue(it.data.articles[0].paragraphs[0].text == "paragraph text 1")
+                    assertTrue(it.data.articles[0].paragraphs[1].marker == "(2)")
+                    assertTrue(it.data.articles[0].paragraphs[1].text == "paragraph text 2")
+                    assertTrue(it.data.officialShortTitle == "official short title")
+                    assertTrue(it.data.officialAbbreviation == "official abbreviation")
+                    assertTrue(it.data.referenceNumber == null)
+                    assertTrue(it.data.publicationDate == null)
+                    assertTrue(it.data.announcementDate == LocalDate.parse("2021-06-14"))
+                    assertTrue(it.data.citationDate == LocalDate.parse("2021-06-09"))
+                    assertTrue(it.data.frameKeywords == "frame keywords")
+                    assertTrue(it.data.authorEntity == "DEU")
+                    assertTrue(it.data.authorDecidingBody == "BT")
+                    assertTrue(it.data.authorIsResolutionMajority == true)
+                    assertTrue(it.data.leadJurisdiction == "BMVI")
+                    assertTrue(it.data.leadUnit == "G 22")
+                    assertTrue(it.data.participationType == null)
+                    assertTrue(it.data.participationInstitution == null)
+                    assertTrue(it.data.subjectFna == "FNA 703-12")
+                    assertTrue(it.data.subjectGesta == "GESTA J040")
+                    assertTrue(it.data.unofficialTitle == "unofficial title")
+                    assertTrue(it.data.unofficialShortTitle == "unofficial short title")
+                    assertTrue(it.data.unofficialAbbreviation == "unofficial abbreviation")
+                    assertTrue(it.data.risAbbreviation == "ris abbreviation")
+                }
+            )
+        }
     }
 
     @Test

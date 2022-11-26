@@ -32,7 +32,11 @@ interface ImportNormUseCase {
         val subjectFna: String? = null,
         val subjectPreviousFna: String? = null,
         val subjectGesta: String? = null,
-        val subjectBgb3: String? = null
+        val subjectBgb3: String? = null,
+        val unofficialTitle: String? = null,
+        val unofficialShortTitle: String? = null,
+        val unofficialAbbreviation: String? = null,
+        val risAbbreviation: String? = null
     ) {
         init {
             require(longTitle.isNotBlank())

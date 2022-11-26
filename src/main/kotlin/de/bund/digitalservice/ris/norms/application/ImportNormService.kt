@@ -44,7 +44,11 @@ private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
         subjectFna = data.subjectFna,
         subjectPreviousFna = data.subjectPreviousFna,
         subjectGesta = data.subjectGesta,
-        subjectBgb3 = data.subjectBgb3
+        subjectBgb3 = data.subjectBgb3,
+        unofficialTitle = data.unofficialTitle,
+        unofficialShortTitle = data.unofficialShortTitle,
+        unofficialAbbreviation = data.unofficialAbbreviation,
+        risAbbreviation = data.risAbbreviation
     )
 }
 
