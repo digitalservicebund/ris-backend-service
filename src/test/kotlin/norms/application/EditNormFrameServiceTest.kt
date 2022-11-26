@@ -84,7 +84,11 @@ class EditNormFrameServiceTest {
                 "subject fna",
                 "subject previous fna",
                 "subject gesta",
-                "subject bgb3"
+                "subject bgb3",
+                "unofficial title",
+                "unofficial short title",
+                "unofficial abbreviation",
+                "ris abbreviation"
             )
         val command = EditNormFrameUseCase.Command(guid, properties)
 
@@ -117,7 +121,10 @@ class EditNormFrameServiceTest {
                     assertTrue(it.subjectFna == "subject fna")
                     assertTrue(it.subjectPreviousFna == "subject previous fna")
                     assertTrue(it.subjectGesta == "subject gesta")
-                    assertTrue(it.subjectBgb3 == "subject bgb3")
+                    assertTrue(it.unofficialTitle == "unofficial title")
+                    assertTrue(it.unofficialShortTitle == "unofficial short title")
+                    assertTrue(it.unofficialAbbreviation == "unofficial abbreviation")
+                    assertTrue(it.risAbbreviation == "ris abbreviation")
                 }
             )
         }

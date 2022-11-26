@@ -36,7 +36,11 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
                 subjectFna = properties.subjectFna,
                 subjectPreviousFna = properties.subjectPreviousFna,
                 subjectGesta = properties.subjectGesta,
-                subjectBgb3 = properties.subjectBgb3
+                subjectBgb3 = properties.subjectBgb3,
+                unofficialTitle = properties.unofficialTitle,
+                unofficialShortTitle = properties.unofficialShortTitle,
+                unofficialAbbreviation = properties.unofficialAbbreviation,
+                risAbbreviation = properties.risAbbreviation
             )
         )
     }

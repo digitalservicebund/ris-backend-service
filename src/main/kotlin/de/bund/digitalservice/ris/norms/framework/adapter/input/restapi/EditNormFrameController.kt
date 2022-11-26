@@ -53,6 +53,10 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var subjectPreviousFna: String? = null
         var subjectGesta: String? = null
         var subjectBgb3: String? = null
+        var unofficialTitle: String? = null
+        var unofficialShortTitle: String? = null
+        var unofficialAbbreviation: String? = null
+        var risAbbreviation: String? = null
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
             return EditNormFrameUseCase.NormFrameProperties(
@@ -77,7 +81,11 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 subjectFna = this.subjectFna,
                 subjectPreviousFna = this.subjectPreviousFna,
                 subjectGesta = this.subjectGesta,
-                subjectBgb3 = this.subjectBgb3
+                subjectBgb3 = this.subjectBgb3,
+                unofficialTitle = this.unofficialTitle,
+                unofficialShortTitle = this.unofficialShortTitle,
+                unofficialAbbreviation = this.unofficialAbbreviation,
+                risAbbreviation = this.risAbbreviation
             )
         }
     }

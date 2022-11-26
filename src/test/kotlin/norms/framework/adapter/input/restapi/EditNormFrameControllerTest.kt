@@ -53,7 +53,11 @@ class EditNormFrameControllerTest {
               "subjectFna": "subject fna",
               "subjectPreviousFna": "subject previous fna",
               "subjectGesta": "subject gesta",
-              "subjectBgb3": "subject bgb3"
+              "subjectBgb3": "subject bgb3",
+              "unofficialTitle": "unofficial title",
+              "unofficialShortTitle": "unofficial short title",
+              "unofficialAbbreviation": "unofficial abbreviation",
+              "risAbbreviation": "ris abbreviation"
             }
         """
         every { editNormFrameService.editNormFrame(any()) } returns Mono.just(true)
@@ -92,6 +96,10 @@ class EditNormFrameControllerTest {
                     assertTrue(it.properties.subjectPreviousFna == "subject previous fna")
                     assertTrue(it.properties.subjectGesta == "subject gesta")
                     assertTrue(it.properties.subjectBgb3 == "subject bgb3")
+                    assertTrue(it.properties.unofficialTitle == "unofficial title")
+                    assertTrue(it.properties.unofficialShortTitle == "unofficial short title")
+                    assertTrue(it.properties.unofficialAbbreviation == "unofficial abbreviation")
+                    assertTrue(it.properties.risAbbreviation == "ris abbreviation")
                 }
             )
         }
