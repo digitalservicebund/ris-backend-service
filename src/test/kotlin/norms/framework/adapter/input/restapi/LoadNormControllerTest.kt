@@ -77,7 +77,8 @@ class LoadNormControllerTest {
             true, "lead jurisdiction", "lead unit", "participation type",
             "participation institution", "document type name", "document norm category",
             "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
+            "subject gesta", "subject bgb3", "unofficial title", "unofficial short title",
+            "unofficial abbreviation", "ris abbreviation"
         )
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
@@ -127,7 +128,11 @@ class LoadNormControllerTest {
           "subjectFna": "subject fna",
           "subjectPreviousFna": "subject previous fna",
           "subjectGesta": "subject gesta",
-          "subjectBgb3": "subject bgb3"
+          "subjectBgb3": "subject bgb3",
+          "unofficialTitle": "unofficial title",
+          "unofficialShortTitle": "unofficial short title",
+          "unofficialAbbreviation": "unofficial abbreviation",
+          "risAbbreviation": "ris abbreviation"
         }
         """,
                 true

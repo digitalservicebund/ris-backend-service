@@ -55,7 +55,11 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val subjectFna: String?,
         val subjectPreviousFna: String?,
         val subjectGesta: String?,
-        val subjectBgb3: String?
+        val subjectBgb3: String?,
+        val unofficialTitle: String?,
+        val unofficialShortTitle: String?,
+        val unofficialAbbreviation: String?,
+        val risAbbreviation: String?
     ) {
         companion object {
             fun fromUseCaseData(data: Norm): NormResponseSchema {
@@ -84,7 +88,11 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     subjectFna = data.subjectFna,
                     subjectPreviousFna = data.subjectPreviousFna,
                     subjectGesta = data.subjectGesta,
-                    subjectBgb3 = data.subjectBgb3
+                    subjectBgb3 = data.subjectBgb3,
+                    unofficialTitle = data.unofficialTitle,
+                    unofficialShortTitle = data.unofficialShortTitle,
+                    unofficialAbbreviation = data.unofficialAbbreviation,
+                    risAbbreviation = data.risAbbreviation
                 )
             }
         }
