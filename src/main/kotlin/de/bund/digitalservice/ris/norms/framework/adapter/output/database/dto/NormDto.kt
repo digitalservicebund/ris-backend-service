@@ -54,5 +54,13 @@ data class NormDto(
     @Column("subject_gesta")
     var subjectGesta: String? = null,
     @Column("subject_bgb3")
-    var subjectBgb3: String? = null
+    var subjectBgb3: String? = null,
+    @Column("unofficial_title")
+    var unofficialTitle: String? = null,
+    @Column("unofficial_short_title")
+    var unofficialShortTitle: String? = null,
+    @Column("unofficial_abbreviation")
+    var unofficialAbbreviation: String? = null,
+    @Column("ris_abbreviation")
+    var risAbbreviation: String? = null
 )

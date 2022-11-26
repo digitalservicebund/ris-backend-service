@@ -35,7 +35,8 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             true, "lead jurisdiction", "lead unit", "participation type",
             "participation institution", "document type name", "document norm category",
             "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
+            "subject gesta", "subject bgb3", "unofficial title", "unofficial short title",
+            "unofficial abbreviation", "ris abbreviation"
         )
         private val ARTICLE1: Article = Article(UUID.randomUUID(), "Article1 title", "§ 1")
         private val ARTICLE2: Article = Article(UUID.randomUUID(), "Article2 title", "§ 2")

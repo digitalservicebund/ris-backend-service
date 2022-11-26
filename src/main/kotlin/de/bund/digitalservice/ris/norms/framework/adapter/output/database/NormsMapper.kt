@@ -15,7 +15,8 @@ interface NormsMapper {
             normDto.frameKeywords, normDto.authorEntity, normDto.authorDecidingBody, normDto.authorIsResolutionMajority,
             normDto.leadJurisdiction, normDto.leadUnit, normDto.participationType, normDto.participationInstitution,
             normDto.documentTypeName, normDto.documentNormCategory, normDto.documentTemplateName,
-            normDto.subjectFna, normDto.subjectPreviousFna, normDto.subjectGesta, normDto.subjectBgb3
+            normDto.subjectFna, normDto.subjectPreviousFna, normDto.subjectGesta, normDto.subjectBgb3,
+            normDto.unofficialTitle, normDto.unofficialShortTitle, normDto.unofficialAbbreviation, normDto.risAbbreviation
         )
     }
 
@@ -40,7 +41,8 @@ interface NormsMapper {
             leadUnit = norm.leadUnit, participationType = norm.participationType, participationInstitution = norm.participationInstitution,
             documentTypeName = norm.documentTypeName, documentNormCategory = norm.documentNormCategory, documentTemplateName = norm.documentTemplateName,
             subjectFna = norm.subjectFna, subjectPreviousFna = norm.subjectPreviousFna, subjectGesta = norm.subjectGesta,
-            subjectBgb3 = norm.subjectBgb3
+            subjectBgb3 = norm.subjectBgb3, unofficialTitle = norm.unofficialTitle, unofficialShortTitle = norm.unofficialShortTitle,
+            unofficialAbbreviation = norm.unofficialAbbreviation, risAbbreviation = norm.risAbbreviation
         )
     }
 
