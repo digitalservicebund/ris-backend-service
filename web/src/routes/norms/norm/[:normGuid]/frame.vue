@@ -68,14 +68,12 @@ useScrollToHash(routeHash)
       :column-count="2"
       :fields="normCoredataFields"
     />
-
     <h1 id="documentType" class="heading-02-regular mb-[1rem]">Dokumenttyp</h1>
     <InputGroup
       v-model="frameData"
       :column-count="1"
       :fields="normDocumentTypeFields"
     />
-
     <h1 id="headings_abbreviations" class="heading-02-regular mb-[1rem]">
       Überschriften und Abkürzungen
     </h1>
@@ -84,14 +82,12 @@ useScrollToHash(routeHash)
       :column-count="1"
       :fields="normHeadlineFields"
     />
-
     <h1 id="normOriginator" class="heading-02-regular mb-[1rem]">Normgeber</h1>
     <InputGroup
       v-model="frameData"
       :column-count="1"
       :fields="normLegalBodyFields"
     />
-
     <h1 id="leadManagement" class="heading-02-regular mb-[1rem]">
       Federführung
     </h1>
@@ -100,14 +96,12 @@ useScrollToHash(routeHash)
       :column-count="1"
       :fields="normOrganisationalUnitFields"
     />
-
     <h1 id="subjectArea" class="heading-02-regular mb-[1rem]">Sachgebiet</h1>
     <InputGroup
       v-model="frameData"
       :column-count="2"
       :fields="normSubjectFields"
     />
-
     <h1 id="participatingInstitutions" class="heading-02-regular mb-[1rem]">
       Mitwirkende Organe
     </h1>
@@ -124,4 +118,3 @@ useScrollToHash(routeHash)
     />
   </div>
 </template>
-<style scoped></style>
