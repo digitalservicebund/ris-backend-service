@@ -3,11 +3,10 @@ import { Norm } from "@/domain/Norm"
 
 type NormList = { longTitle: string; guid: string }[]
 
-type frameDataType = {
+type FrameData = {
   longTitle: string
   officialShortTitle?: string
   officialAbbreviation?: string
-  risAbbreviation?: string
   referenceNumber?: string
   publicationDate?: string
   announcementDate?: string
@@ -27,13 +26,50 @@ type frameDataType = {
   subjectPreviousFna?: string
   subjectGesta?: string
   subjectBgb3?: string
+  unofficialTitle?: string
+  unofficialShortTitle?: string
+  unofficialAbbreviation?: string
+  risAbbreviation?: string
 }
 
-function dateStringOrNull(dateString?: string): string | undefined {
-  if (dateString === undefined || dateString.length == 0) {
-    return undefined
+function noBlankStringOrNull(data?: string): string | null {
+  if (data === undefined || data.length == 0) {
+    return null
   } else {
-    return dateString
+    return data
+  }
+}
+
+function encodeFrameData(data: FrameData) {
+  return {
+    longTitle: noBlankStringOrNull(data.longTitle),
+    officialShortTitle: noBlankStringOrNull(data.officialShortTitle),
+    officialAbbreviation: noBlankStringOrNull(data.officialAbbreviation),
+    referenceNumber: noBlankStringOrNull(data.referenceNumber),
+    publicationDate: noBlankStringOrNull(data.publicationDate),
+    announcementDate: noBlankStringOrNull(data.announcementDate),
+    citationDate: noBlankStringOrNull(data.citationDate),
+    frameKeywords: noBlankStringOrNull(data.frameKeywords),
+    authorEntity: noBlankStringOrNull(data.authorEntity),
+    authorDecidingBody: noBlankStringOrNull(data.authorDecidingBody),
+    authorIsResolutionMajority: data.authorIsResolutionMajority ?? null,
+    leadJurisdiction: noBlankStringOrNull(data.leadJurisdiction),
+    leadUnit: noBlankStringOrNull(data.leadUnit),
+    participationType: noBlankStringOrNull(data.participationType),
+    participationInstitution: noBlankStringOrNull(
+      data.participationInstitution
+    ),
+    documentTypeName: noBlankStringOrNull(data.documentTypeName),
+    documentNormCategory: noBlankStringOrNull(data.documentNormCategory),
+    documentTemplateName: noBlankStringOrNull(data.documentTemplateName),
+    subjectFna: noBlankStringOrNull(data.subjectFna),
+    subjectPreviousFna: noBlankStringOrNull(data.subjectPreviousFna),
+    subjectGesta: noBlankStringOrNull(data.subjectGesta),
+    subjectBgb3: noBlankStringOrNull(data.subjectBgb3),
+    unofficialTitle: noBlankStringOrNull(data.unofficialTitle),
+    unofficialShortTitle: noBlankStringOrNull(data.unofficialShortTitle),
+    unofficialAbbreviation: noBlankStringOrNull(data.unofficialAbbreviation),
+    risAbbreviation: noBlankStringOrNull(data.risAbbreviation),
   }
 }
 
@@ -78,11 +114,9 @@ export async function getNormByGuid(
 
 export async function editNormFrame(
   guid: string,
-  frameData: frameDataType
+  frameData: FrameData
 ): Promise<ServiceResponse<void>> {
-  frameData.publicationDate = dateStringOrNull(frameData.publicationDate)
-  frameData.announcementDate = dateStringOrNull(frameData.announcementDate)
-  frameData.citationDate = dateStringOrNull(frameData.citationDate)
+  const body = encodeFrameData(frameData)
   const { status, error } = await httpClient.put(
     `norms/${guid}`,
     {
@@ -91,7 +125,7 @@ export async function editNormFrame(
         "Content-Type": "application/json",
       },
     },
-    frameData
+    body
   )
 
   if (status >= 300 || error) {
