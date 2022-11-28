@@ -4,7 +4,7 @@ import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import normCleanCars from "./testdata/norm_clean_cars.json"
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if long title can be edited",
   async ({ page, createdGuid }) => {
     await openNorm(page, normCleanCars.longTitle, createdGuid)
