@@ -1,11 +1,11 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"
 import { computed, toRefs } from "vue"
 import { useRoute } from "vue-router"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import SaveButton from "@/components/SaveButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { Norm } from "@/domain/Norm"
 import { normCoredataFields } from "@/domain/normCoredataFields"
 import { normDocumentTypeFields } from "@/domain/normDocumentTypeFields"
 import { normHeadlineFields } from "@/domain/normHeadlineFields"
@@ -14,51 +14,76 @@ import { normOrganisationalUnitFields } from "@/domain/normOrganisationalUnitFie
 import { normOrgansFields } from "@/domain/normOrgansFields"
 import { normSubjectFields } from "@/domain/normSubjectFields"
 import { unofficialNormHeadlineFields } from "@/domain/unofficialNormHeadlineFields"
-import { editNormFrame } from "@/services/normsService"
-
-interface Props {
-  norm: Norm
-}
-
-interface Emits {
-  (event: "fetchNorm"): void
-}
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-
-const frameData = computed({
-  get: () => ({
-    announcementDate: props.norm.announcementDate ?? "",
-    authorDecidingBody: props.norm.authorDecidingBody ?? "",
-    authorEntity: props.norm.authorEntity ?? "",
-    authorIsResolutionMajority: props.norm.authorIsResolutionMajority ?? false,
-    citationDate: props.norm.citationDate ?? "",
-    documentNormCategory: props.norm.documentNormCategory ?? "",
-    documentTemplateName: props.norm.documentTemplateName ?? "",
-    documentTypeName: props.norm.documentTypeName ?? "",
-    frameKeywords: props.norm.frameKeywords ?? "",
-    leadJurisdiction: props.norm.leadJurisdiction ?? "",
-    leadUnit: props.norm.leadUnit ?? "",
-    longTitle: props.norm.longTitle ?? "",
-    risAbbreviation: props.norm.risAbbreviation ?? "",
-    officialAbbreviation: props.norm.officialAbbreviation ?? "",
-    officialShortTitle: props.norm.officialShortTitle ?? "",
-    participationInstitution: props.norm.participationInstitution ?? "",
-    participationType: props.norm.participationType ?? "",
-    publicationDate: props.norm.publicationDate ?? "",
-    referenceNumber: props.norm.referenceNumber ?? "",
-    subjectBgb3: props.norm.subjectBgb3 ?? "",
-    subjectFna: props.norm.subjectFna ?? "",
-    subjectGesta: props.norm.subjectGesta ?? "",
-    subjectPreviousFna: props.norm.subjectPreviousFna ?? "",
-  }),
-  set: (data) => console.log(data),
-})
+import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const route = useRoute()
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
+
+const store = useLoadedNormStore()
+const { loadedNorm } = storeToRefs(store)
+const frameData = computed({
+  get: () => ({
+    announcementDate: loadedNorm.value?.announcementDate ?? "",
+    authorDecidingBody: loadedNorm.value?.authorDecidingBody ?? "",
+    authorEntity: loadedNorm.value?.authorEntity ?? "",
+    authorIsResolutionMajority:
+      loadedNorm.value?.authorIsResolutionMajority ?? false,
+    citationDate: loadedNorm.value?.citationDate ?? "",
+    documentNormCategory: loadedNorm.value?.documentNormCategory ?? "",
+    documentTemplateName: loadedNorm.value?.documentTemplateName ?? "",
+    documentTypeName: loadedNorm.value?.documentTypeName ?? "",
+    frameKeywords: loadedNorm.value?.frameKeywords ?? "",
+    leadJurisdiction: loadedNorm.value?.leadJurisdiction ?? "",
+    leadUnit: loadedNorm.value?.leadUnit ?? "",
+    longTitle: loadedNorm.value?.longTitle ?? "",
+    officialAbbreviation: loadedNorm.value?.officialAbbreviation ?? "",
+    officialShortTitle: loadedNorm.value?.officialShortTitle ?? "",
+    participationInstitution: loadedNorm.value?.participationInstitution ?? "",
+    participationType: loadedNorm.value?.participationType ?? "",
+    publicationDate: loadedNorm.value?.publicationDate ?? "",
+    referenceNumber: loadedNorm.value?.referenceNumber ?? "",
+    subjectBgb3: loadedNorm.value?.subjectBgb3 ?? "",
+    subjectFna: loadedNorm.value?.subjectFna ?? "",
+    subjectGesta: loadedNorm.value?.subjectGesta ?? "",
+    subjectPreviousFna: loadedNorm.value?.subjectPreviousFna ?? "",
+    unofficialTitle: loadedNorm.value?.unofficialTitle ?? "",
+    unofficialShortTitle: loadedNorm.value?.unofficialShortTitle ?? "",
+    unofficialAbbreviation: loadedNorm.value?.unofficialAbbreviation ?? "",
+    risAbbreviation: loadedNorm.value?.risAbbreviation ?? "",
+  }),
+  set: (data) => {
+    if (loadedNorm.value !== undefined) {
+      loadedNorm.value.announcementDate = data.announcementDate
+      loadedNorm.value.authorDecidingBody = data.authorDecidingBody
+      loadedNorm.value.authorEntity = data.authorEntity
+      loadedNorm.value.authorIsResolutionMajority =
+        data.authorIsResolutionMajority
+      loadedNorm.value.citationDate = data.citationDate
+      loadedNorm.value.documentNormCategory = data.documentNormCategory
+      loadedNorm.value.documentTemplateName = data.documentTemplateName
+      loadedNorm.value.documentTypeName = data.documentTypeName
+      loadedNorm.value.frameKeywords = data.frameKeywords
+      loadedNorm.value.leadJurisdiction = data.leadJurisdiction
+      loadedNorm.value.leadUnit = data.leadUnit
+      loadedNorm.value.longTitle = data.longTitle
+      loadedNorm.value.officialAbbreviation = data.officialAbbreviation
+      loadedNorm.value.officialShortTitle = data.officialShortTitle
+      loadedNorm.value.participationInstitution = data.participationInstitution
+      loadedNorm.value.participationType = data.participationType
+      loadedNorm.value.publicationDate = data.publicationDate
+      loadedNorm.value.referenceNumber = data.referenceNumber
+      loadedNorm.value.subjectBgb3 = data.subjectBgb3
+      loadedNorm.value.subjectFna = data.subjectFna
+      loadedNorm.value.subjectGesta = data.subjectGesta
+      loadedNorm.value.subjectPreviousFna = data.subjectPreviousFna
+      loadedNorm.value.unofficialTitle = data.unofficialTitle
+      loadedNorm.value.unofficialShortTitle = data.unofficialShortTitle
+      loadedNorm.value.unofficialAbbreviation = data.unofficialAbbreviation
+      loadedNorm.value.risAbbreviation = data.risAbbreviation
+    }
+  },
+})
 </script>
 
 <template>
@@ -128,8 +153,7 @@ useScrollToHash(routeHash)
     <SaveButton
       aria-label="Rahmendaten Speichern Button"
       class="mt-8"
-      :service-callback="() => editNormFrame(props.norm.guid, frameData)"
-      @fetch-norm="emit('fetchNorm')"
+      :service-callback="store.update"
     />
   </div>
 </template>

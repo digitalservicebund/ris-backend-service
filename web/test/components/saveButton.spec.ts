@@ -47,7 +47,7 @@ describe("SaveButton", () => {
 })
 
 async function renderAndClick() {
-  const { emitted, getByText } = render(SaveButton, {
+  const { getByText } = render(SaveButton, {
     props: {
       ariaLabel: "Foo",
       serviceCallback: vi.fn(),
@@ -59,6 +59,5 @@ async function renderAndClick() {
   expect(saveButton.textContent?.replace(/\s/g, "")).toEqual("Speichern")
   expect(saveButton).toHaveAttribute("aria-label", "Foo")
   await fireEvent.click(saveButton)
-  expect(emitted().fetchNorm).toBeTruthy()
   return getByText
 }

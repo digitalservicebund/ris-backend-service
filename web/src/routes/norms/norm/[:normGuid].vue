@@ -1,22 +1,18 @@
 <script lang="ts" setup>
-import { toRefs, ref, watch } from "vue"
+import { storeToRefs } from "pinia"
+import { toRefs, watchEffect, onUnmounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import NavbarSide from "@/components/NavbarSide.vue"
 import SideToggle from "@/components/SideToggle.vue"
 import { useNormMenuItems } from "@/composables/useNormMenuItems"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
-import { Norm } from "@/domain/Norm"
-import { getNormByGuid } from "@/services/normsService"
+import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const props = defineProps<{ normGuid: string }>()
 
 const route = useRoute()
 const router = useRouter()
 const { normGuid } = toRefs(props)
-const fetchNorm = function () {
-  loadNormByGuid()
-}
-
 const menuItems = useNormMenuItems(normGuid, route)
 const goBackRoute = { name: "norms" }
 const navigationIsOpen = useToggleStateInRouteQuery(
@@ -24,14 +20,11 @@ const navigationIsOpen = useToggleStateInRouteQuery(
   route,
   router.replace
 )
+const store = useLoadedNormStore()
+const { loadedNorm } = storeToRefs(store)
 
-const norm = ref<Norm | undefined>()
-
-async function loadNormByGuid() {
-  norm.value = (await getNormByGuid(props.normGuid)).data
-}
-
-watch(() => props.normGuid, loadNormByGuid, { immediate: true })
+watchEffect(() => store.load(props.normGuid))
+onUnmounted(() => (loadedNorm.value = undefined))
 </script>
 <template>
   <div class="flex grow w-screen">
@@ -44,7 +37,7 @@ watch(() => props.normGuid, loadNormByGuid, { immediate: true })
     </SideToggle>
 
     <div class="bg-gray-100 border-gray-400 border-l-1 p-48 w-full">
-      <router-view v-if="norm" :norm="norm" @fetch-norm="fetchNorm" />
+      <router-view v-if="loadedNorm" />
       <span v-else>Lade Norm...</span>
     </div>
   </div>

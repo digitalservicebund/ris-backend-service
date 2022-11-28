@@ -1,6 +1,7 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
 import { Norm } from "@/domain/Norm"
+import { ServiceResponse } from "@/services/httpClient"
 import { editNormFrame, getNormByGuid } from "@/services/normsService"
 
 function getFrameDataOfNorm(norm: Norm) {
@@ -39,10 +40,13 @@ export const useLoadedNormStore = defineStore("loaded-norm", () => {
     loadedNorm.value = response.data
   }
 
-  async function update() {
+  async function update(): Promise<ServiceResponse<void>> {
     if (loadedNorm.value) {
       const frameData = getFrameDataOfNorm(loadedNorm.value)
-      editNormFrame(loadedNorm.value.guid, frameData)
+      return editNormFrame(loadedNorm.value.guid, frameData)
+    } else {
+      // TODO: Get rid of this madness after service refactoring.
+      return { status: 200, data: undefined }
     }
   }
 
