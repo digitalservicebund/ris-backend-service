@@ -32,44 +32,51 @@ type FrameData = {
   risAbbreviation?: string
 }
 
-function noBlankStringOrNull(data?: string): string | null {
-  if (data === undefined || data.length == 0) {
-    return null
-  } else {
-    return data
-  }
+function encodeString(data?: string): string | null {
+  return data && data.length > 0 ? data : null
+}
+
+function encodeBoolean(data?: boolean): boolean | null {
+  return data ?? null
+}
+
+// Makes the assumption that we currently get a date string in the following
+// format: `2022-11-14T23:00:00.000Z`. To comply with the expected date format
+// of the API, we only take the first 10 characters.
+//
+// TODO: Improve by working with enriched date type.
+function encodeDate(data?: string): string | null {
+  return data && data.length > 0 ? data.slice(0, 10) : null
 }
 
 function encodeFrameData(data: FrameData) {
   return {
-    longTitle: noBlankStringOrNull(data.longTitle),
-    officialShortTitle: noBlankStringOrNull(data.officialShortTitle),
-    officialAbbreviation: noBlankStringOrNull(data.officialAbbreviation),
-    referenceNumber: noBlankStringOrNull(data.referenceNumber),
-    publicationDate: noBlankStringOrNull(data.publicationDate),
-    announcementDate: noBlankStringOrNull(data.announcementDate),
-    citationDate: noBlankStringOrNull(data.citationDate),
-    frameKeywords: noBlankStringOrNull(data.frameKeywords),
-    authorEntity: noBlankStringOrNull(data.authorEntity),
-    authorDecidingBody: noBlankStringOrNull(data.authorDecidingBody),
-    authorIsResolutionMajority: data.authorIsResolutionMajority ?? null,
-    leadJurisdiction: noBlankStringOrNull(data.leadJurisdiction),
-    leadUnit: noBlankStringOrNull(data.leadUnit),
-    participationType: noBlankStringOrNull(data.participationType),
-    participationInstitution: noBlankStringOrNull(
-      data.participationInstitution
-    ),
-    documentTypeName: noBlankStringOrNull(data.documentTypeName),
-    documentNormCategory: noBlankStringOrNull(data.documentNormCategory),
-    documentTemplateName: noBlankStringOrNull(data.documentTemplateName),
-    subjectFna: noBlankStringOrNull(data.subjectFna),
-    subjectPreviousFna: noBlankStringOrNull(data.subjectPreviousFna),
-    subjectGesta: noBlankStringOrNull(data.subjectGesta),
-    subjectBgb3: noBlankStringOrNull(data.subjectBgb3),
-    unofficialTitle: noBlankStringOrNull(data.unofficialTitle),
-    unofficialShortTitle: noBlankStringOrNull(data.unofficialShortTitle),
-    unofficialAbbreviation: noBlankStringOrNull(data.unofficialAbbreviation),
-    risAbbreviation: noBlankStringOrNull(data.risAbbreviation),
+    longTitle: encodeString(data.longTitle),
+    officialShortTitle: encodeString(data.officialShortTitle),
+    officialAbbreviation: encodeString(data.officialAbbreviation),
+    referenceNumber: encodeString(data.referenceNumber),
+    publicationDate: encodeDate(data.publicationDate),
+    announcementDate: encodeDate(data.announcementDate),
+    citationDate: encodeDate(data.citationDate),
+    frameKeywords: encodeString(data.frameKeywords),
+    authorEntity: encodeString(data.authorEntity),
+    authorDecidingBody: encodeString(data.authorDecidingBody),
+    authorIsResolutionMajority: encodeBoolean(data.authorIsResolutionMajority),
+    leadJurisdiction: encodeString(data.leadJurisdiction),
+    leadUnit: encodeString(data.leadUnit),
+    participationType: encodeString(data.participationType),
+    participationInstitution: encodeString(data.participationInstitution),
+    documentTypeName: encodeString(data.documentTypeName),
+    documentNormCategory: encodeString(data.documentNormCategory),
+    documentTemplateName: encodeString(data.documentTemplateName),
+    subjectFna: encodeString(data.subjectFna),
+    subjectPreviousFna: encodeString(data.subjectPreviousFna),
+    subjectGesta: encodeString(data.subjectGesta),
+    subjectBgb3: encodeString(data.subjectBgb3),
+    unofficialTitle: encodeString(data.unofficialTitle),
+    unofficialShortTitle: encodeString(data.unofficialShortTitle),
+    unofficialAbbreviation: encodeString(data.unofficialAbbreviation),
+    risAbbreviation: encodeString(data.risAbbreviation),
   }
 }
 
