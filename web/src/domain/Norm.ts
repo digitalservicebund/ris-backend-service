@@ -17,6 +17,7 @@ export class Norm {
   readonly articles: Article[]
   readonly officialShortTitle: string
   readonly officialAbbreviation: string
+  readonly risAbbreviation: string
   readonly referenceNumber: string
   readonly publicationDate: string
   readonly announcementDate: string
@@ -36,6 +37,9 @@ export class Norm {
   readonly subjectPreviousFna: string
   readonly subjectGesta: string
   readonly subjectBgb3: string
+  readonly unofficialTitle: string
+  readonly unofficialShortTitle: string
+  readonly unofficialAbbreviation: string
 
   constructor(
     longTitle: string,
@@ -43,6 +47,7 @@ export class Norm {
     articles: Article[],
     officialShortTitle: string,
     officialAbbreviation: string,
+    risAbbreviation: string,
     referenceNumber: string,
     publicationDate: string,
     announcementDate: string,
@@ -61,13 +66,17 @@ export class Norm {
     subjectFna: string,
     subjectPreviousFna: string,
     subjectGesta: string,
-    subjectBgb3: string
+    subjectBgb3: string,
+    unofficialTitle: string,
+    unofficialShortTitle: string,
+    unofficialAbbreviation: string
   ) {
     ;(this.longTitle = longTitle),
       (this.guid = guid),
       (this.articles = articles),
       (this.officialShortTitle = officialShortTitle),
       (this.officialAbbreviation = officialAbbreviation),
+      (this.risAbbreviation = risAbbreviation),
       (this.referenceNumber = referenceNumber),
       (this.publicationDate = publicationDate),
       (this.announcementDate = announcementDate),
@@ -86,6 +95,9 @@ export class Norm {
       (this.subjectFna = subjectFna),
       (this.subjectPreviousFna = subjectPreviousFna),
       (this.subjectGesta = subjectGesta),
-      (this.subjectBgb3 = subjectBgb3)
+      (this.subjectBgb3 = subjectBgb3),
+      (this.unofficialTitle = unofficialTitle),
+      (this.unofficialShortTitle = unofficialShortTitle),
+      (this.unofficialAbbreviation = unofficialAbbreviation)
   }
 }

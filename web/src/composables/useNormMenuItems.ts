@@ -28,19 +28,43 @@ export function useNormMenuItems(
       isDisabled: true,
       children: [
         {
+          label: "Allgemeine Angaben",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#coreData",
+          },
+        },
+        {
+          label: "Dokumenttyp",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#documentType",
+          },
+        },
+        {
+          label: "Überschriften und Abkürzungen",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#headings_abbreviations",
+          },
+        },
+        {
           label: "Normgeber",
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
-            hash: "#headlines",
+            hash: "#normOriginator",
           },
         },
         {
-          label: "Mitwirkende Organe",
+          label: "Federführung",
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
-            hash: "#organs",
+            hash: "#leadManagement",
           },
         },
         {
@@ -48,7 +72,15 @@ export function useNormMenuItems(
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
-            hash: "#subject",
+            hash: "#subjectArea",
+          },
+        },
+        {
+          label: "Mitwirkende Organe",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#participatingInstitutions",
           },
         },
       ],

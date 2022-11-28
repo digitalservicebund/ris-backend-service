@@ -122,6 +122,7 @@ describe("normsService", () => {
         longTitle: "new title",
         officialShortTitle: undefined,
         officialAbbreviation: undefined,
+        risAbbreviation: undefined,
         referenceNumber: undefined,
         publicationDate: undefined,
         announcementDate: undefined,

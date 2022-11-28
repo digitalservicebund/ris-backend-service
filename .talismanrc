@@ -104,11 +104,11 @@ fileignoreconfig:
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/EditNormFrameControllerTest.kt
     checksum: 8749ca184350ee79bb76ecbf75599dd4f1d7428109c8b75e5056d04eb80d5cbc
   - filename: web/src/domain/Norm.ts
-    checksum: 0ed5b2a534ddaffe4efb4b15514193c88263830bf5d0c8cfad6b50edfd97cf26
+    checksum: 767152817b3382f25cb478d3cd7ac3b7da48ca5c19e8d7892a88a91217512538
   - filename: web/test/services/normsService.spec.ts
-    checksum: b547d789a6c0d182581eba01a5f98fa7b69d2e35303f2a9903ee48416b9cf532
+    checksum: ebd2a79f0d4a65719eddb0b3d9f37a8db2db0b0399d87d9fd9f0e2342e8d825d
   - filename: web/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: 8546b6c2f5faff82c61981738db558df9bfb3c09173ef691c4efe67282d5bf77
+    checksum: 6a8e24a3c86c8ceed51b5611129f9920d8d10643c6aee35e44fde0443b9f1a1a
 
 scopeconfig:
   - scope: node
