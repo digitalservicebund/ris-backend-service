@@ -234,15 +234,14 @@ onBeforeUnmount(() => {
   user-select: none;
 
   &__open-dropdown {
-    @apply border-2 border-solid border-blue-900;
-
     .input-container {
-      @apply hover:shadow-hover hover:shadow-blue-900 focus:shadow-focus focus:shadow-blue-900;
+      @apply border-2 border-solid border-blue-800 hover:shadow-hover hover:shadow-blue-800 focus:shadow-focus focus:shadow-blue-800;
 
       display: flex;
+      height: 3.75rem;
       flex: row nowrap;
       justify-content: space-between;
-      padding: 17px 24px;
+      padding: 12px 16px;
 
       .text-input {
         width: 100%;

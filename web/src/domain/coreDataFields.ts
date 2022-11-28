@@ -27,6 +27,27 @@ export function defineTextField(
   }
 }
 
+export function defineMultiTextField(
+  name: string,
+  label: string,
+  ariaLabel: string,
+  required?: boolean,
+  placeholder?: string,
+  subField?: InputField
+): InputField {
+  return {
+    name,
+    type: InputType.CHIP,
+    label,
+    required,
+    inputAttributes: {
+      ariaLabel,
+      placeholder,
+      subField,
+    },
+  }
+}
+
 export function defineDateField(
   name: string,
   label: string,
@@ -73,8 +94,6 @@ export function defineDropdownField(
 }
 
 export const coreDataFields: InputField[] = [
-  // defineTextField("courtType", "Gerichtstyp", "Gerichtstyp", true),
-  // defineTextField("courtLocation", "Gerichtssitz", "Gerichtssitz"),
   defineDropdownField(
     "court",
     "Gericht",
@@ -85,19 +104,18 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.courts
   ),
-  defineTextField(
+  defineMultiTextField(
     "fileNumber",
     "Aktenzeichen",
     "Aktenzeichen",
     true,
     "",
-    undefined,
-    false,
-    defineTextField(
+    defineMultiTextField(
       "divergentFileNumber",
       "Abweichendes Aktenzeichen",
       "Abweichendes Aktenzeichen",
-      true
+      false,
+      ""
     )
   ),
   defineDateField(
@@ -118,7 +136,22 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.documentTypes
   ),
-  defineTextField("ecli", "ECLI", "ECLI"),
+  defineTextField(
+    "ecli",
+    "ECLI",
+    "ECLI",
+    false,
+    "",
+    { defaultMessage: "", field: "" },
+    false,
+    defineMultiTextField(
+      "divergentECLI",
+      "Abweichender ECLI",
+      "Abweichender ECLI",
+      false,
+      ""
+    )
+  ),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(
     "legalEffect",

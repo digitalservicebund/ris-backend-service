@@ -6,11 +6,13 @@ export enum InputType {
   DROPDOWN = "dropdown",
   DATE = "date",
   CHECKBOX = "checkbox",
+  CHIP = "chip",
 }
 
 export interface BaseInputAttributes {
   ariaLabel: string
   validationError?: ValidationError
+  subField?: InputField
 }
 
 export interface BaseInputField {
@@ -28,7 +30,10 @@ export type BooleanModelType = boolean
 export interface TextInputAttributes extends BaseInputAttributes {
   placeholder?: string
   readOnly?: boolean
-  subField?: InputField
+}
+
+export interface ChipInputAttributes extends BaseInputAttributes {
+  placeholder?: string
 }
 
 export interface TextInputField extends BaseInputField {
@@ -36,7 +41,14 @@ export interface TextInputField extends BaseInputField {
   inputAttributes: TextInputAttributes
 }
 
+export interface ChipInputField extends BaseInputField {
+  type: InputType.CHIP
+  inputAttributes: ChipInputAttributes
+}
+
 export type DateInputModelType = string
+
+export type ChipInputModelType = string[]
 
 export interface DateInputField extends BaseInputField {
   type: InputType.DATE
@@ -80,7 +92,12 @@ export type InputField =
   | DropdownInputField
   | DateInputField
   | CheckboxInputField
-export type InputAttributes = TextInputAttributes | DropdownAttributes
+  | ChipInputField
+
+export type InputAttributes =
+  | TextInputAttributes
+  | DropdownAttributes
+  | ChipInputAttributes
 
 export type ModelType =
   | TextInputModelType
@@ -88,6 +105,7 @@ export type ModelType =
   | DropdownInputModelType
   | BooleanModelType
   | CheckboxInputModelType
+  | ChipInputModelType
 
 export type ValidationError = {
   defaultMessage: string

@@ -107,10 +107,15 @@ const dropdownInputAttribute: InputAttributes = {
     </div>
     <h1 class="font-bold text-24">Input Element</h1>
     <span class="text-20">Type="Textfield"</span>
-    <InputElement :attributes="textInputAttribute" :type="InputType.TEXT" />
+    <InputElement
+      id="text"
+      :attributes="textInputAttribute"
+      :type="InputType.TEXT"
+    />
     <span class="text-20">Type="Dropdown"</span>
     <div class="pb-4">
       <InputElement
+        id="dropdown"
         :attributes="dropdownInputAttribute"
         :type="InputType.DROPDOWN"
         :value="modelValue2"
@@ -119,20 +124,32 @@ const dropdownInputAttribute: InputAttributes = {
     </div>
     <h1 class="font-bold text-24">Input Field</h1>
     <InputField id="inputTextBox" label="This input field has only label"
-      ><InputElement :attributes="textInputAttribute" :type="InputType.TEXT" />
+      ><InputElement
+        id="textlabel"
+        :attributes="textInputAttribute"
+        :type="InputType.TEXT"
+      />
     </InputField>
     <InputField
       id="inputTextBox"
       icon-name="location_on"
       label="This input field is not required"
-      ><InputElement :attributes="textInputAttribute" :type="InputType.TEXT" />
+      ><InputElement
+        id="notrequired"
+        :attributes="textInputAttribute"
+        :type="InputType.TEXT"
+      />
     </InputField>
     <InputField
       id="inputTextBox"
       icon-name="location_on"
       label="This input field is required"
       required
-      ><InputElement :attributes="textInputAttribute" :type="InputType.TEXT" />
+      ><InputElement
+        id="required"
+        :attributes="textInputAttribute"
+        :type="InputType.TEXT"
+      />
     </InputField>
     <InputField
       id="inputTextBox"
