@@ -1,43 +1,28 @@
-import { render, screen } from "@testing-library/vue"
-import { createRouter, createWebHistory } from "vue-router"
+import { render } from "@testing-library/vue"
 import NormsList from "@/components/NormsList.vue"
 
+vi.mock("vue-router")
+
 describe("norms list", () => {
-  test("renders list of norms", async () => {
-    const articleMock = [
-      {
-        guid: "123",
-        title: "title",
-        marker: "(1)",
-        paragraphs: [{ guid: "123", marker: "(1)", text: "text" }],
-      },
+  it("shows the title of each norm", async () => {
+    const norms = [
+      { longTitle: "first title", guid: "first guid" },
+      { longTitle: "second title", guid: "second guid" },
     ]
+    const { queryByText } = renderComponent({ norms })
 
-    const norm = { longTitle: "test", guid: "123", articles: articleMock }
+    const firstEntry = queryByText("first title")
+    const secondEntry = queryByText("second title")
 
-    render(NormsList, {
-      props: {
-        norms: [norm],
-      },
-      global: {
-        plugins: [
-          createRouter({
-            history: createWebHistory(),
-            routes: [
-              {
-                path: "",
-                name: "norms-norm-:normGuid",
-                component: {},
-              },
-            ],
-          }),
-        ],
-      },
-    })
-
-    await screen.findByText("test")
-    expect(
-      screen.queryByText("Keine Dokumentationseinheiten gefunden")
-    ).not.toBeInTheDocument()
+    expect(firstEntry).toBeVisible()
+    expect(secondEntry).toBeVisible()
   })
 })
+
+function renderComponent(options?: {
+  norms?: { longTitle: string; guid: string }[]
+}) {
+  const global = { stubs: { routerLink: { template: "<a><slot/></a>" } } }
+  const props = { norms: options?.norms ?? [] }
+  return render(NormsList, { props, global })
+}
