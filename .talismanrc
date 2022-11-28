@@ -64,7 +64,7 @@ fileignoreconfig:
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/test/test-helper/dataGenerators.ts
-    checksum: 05c271c75eb3d7bfbe25ee895109248fcdd8cc224750690a8db211b028d070d0
+    checksum: b74bfe683a8c6d970341e3578d6e7f61704f843e50929aa8d76129b03dfdcf67
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: 5b648fae36a5fa772afe7014b747b838d286250e590ee9ed6307e3f355b0796c
   - filename: web/src/data/courts.json
@@ -111,10 +111,16 @@ fileignoreconfig:
     checksum: 59cc647b2bf27e682795a031aa7460137128cbf014a688f9768aa69c505c6a40
   - filename: web/src/domain/Norm.ts
     checksum: 767152817b3382f25cb478d3cd7ac3b7da48ca5c19e8d7892a88a91217512538
+  - filename: web/src/services/normsService.ts
+    checksum: 279b4055ac9b6986c2fd4b345df94f9dd3173aed9c0b9e1cbb19d4dae1666f3e
   - filename: web/test/services/normsService.spec.ts
-    checksum: ebd2a79f0d4a65719eddb0b3d9f37a8db2db0b0399d87d9fd9f0e2342e8d825d
+    checksum: 279b4055ac9b6986c2fd4b345df94f9dd3173aed9c0b9e1cbb19d4dae1666f3e
   - filename: web/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: 6a8e24a3c86c8ceed51b5611129f9920d8d10643c6aee35e44fde0443b9f1a1a
+    checksum: 90e3328c6e3d36c6c3624bcab7431eed1bf048944eabfc54e46aafb4112123cf
+  - filename: web/src/stores/loadedNorm.ts
+    checksum: c25d81f6085eb2fd075a7f6a4e0d198561c836fb30a2695d7d089b826359704f
+  - filename: web/test/stores/loadedNorm.spec.ts
+    checksum: 4577cac612dcb47ee07bbb7cb801c9711aa20f96d0ad23bd8889837dbcd6436f
 
 scopeconfig:
   - scope: node
