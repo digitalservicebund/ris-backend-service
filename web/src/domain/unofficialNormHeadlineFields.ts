@@ -6,7 +6,7 @@ export const unofficialNormHeadlineFields: InputField[] = [
     type: InputType.TEXT,
     label: "Nichtamtliche Langüberschrift",
     inputAttributes: {
-      ariaLabel: "Amtliche Langüberschrift",
+      ariaLabel: "Nichtamtliche Langüberschrift",
     },
   },
   {
@@ -14,7 +14,7 @@ export const unofficialNormHeadlineFields: InputField[] = [
     type: InputType.TEXT,
     label: "Nichtamtliche Kurzüberschrift",
     inputAttributes: {
-      ariaLabel: "Amtliche Kurzüberschrift",
+      ariaLabel: "Nichtamtliche Kurzüberschrift",
     },
   },
   {
@@ -22,7 +22,7 @@ export const unofficialNormHeadlineFields: InputField[] = [
     type: InputType.TEXT,
     label: "Nichtamtliche Buchstabenabkürzung",
     inputAttributes: {
-      ariaLabel: "Amtliche Buchstabenabkürzung",
+      ariaLabel: "Nichtamtliche Buchstabenabkürzung",
     },
   },
 ]
