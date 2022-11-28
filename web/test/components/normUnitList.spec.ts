@@ -1,12 +1,9 @@
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NormsList from "@/components/NormsList.vue"
-import { Norm } from "@/domain/Norm"
 
 describe("norms list", () => {
   test("renders list of norms", async () => {
-    const longTitle = "test"
-    const guid = "123"
     const articleMock = [
       {
         guid: "123",
@@ -16,36 +13,7 @@ describe("norms list", () => {
       },
     ]
 
-    const norm = new Norm(
-      longTitle,
-      guid,
-      articleMock,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      false,
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      "",
-      ""
-    )
+    const norm = { longTitle: "test", guid: "123", articles: articleMock }
 
     render(NormsList, {
       props: {
