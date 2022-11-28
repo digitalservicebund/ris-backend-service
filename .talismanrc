@@ -121,6 +121,8 @@ fileignoreconfig:
     checksum: c25d81f6085eb2fd075a7f6a4e0d198561c836fb30a2695d7d089b826359704f
   - filename: web/test/stores/loadedNorm.spec.ts
     checksum: 4577cac612dcb47ee07bbb7cb801c9711aa20f96d0ad23bd8889837dbcd6436f
+  - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
+    checksum: 9e2f18f6e3158066ab114e5b396d0862479d7f8e6fc4d903b0d55b54d948e548
 
 scopeconfig:
   - scope: node
