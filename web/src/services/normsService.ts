@@ -7,6 +7,7 @@ type frameDataType = {
   longTitle: string
   officialShortTitle?: string
   officialAbbreviation?: string
+  risAbbreviation?: string
   referenceNumber?: string
   publicationDate?: string
   announcementDate?: string

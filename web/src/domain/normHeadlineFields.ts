@@ -25,4 +25,12 @@ export const normHeadlineFields: InputField[] = [
       ariaLabel: "Amtliche Buchstabenabkürzung",
     },
   },
+  {
+    name: "risAbbreviation",
+    type: InputType.TEXT,
+    label: "RIS-Abkürzung",
+    inputAttributes: {
+      ariaLabel: "RIS-Abkürzung",
+    },
+  },
 ]

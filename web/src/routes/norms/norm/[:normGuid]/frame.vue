@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed, toRefs } from "vue"
 import { useRoute } from "vue-router"
+import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import SaveButton from "@/components/SaveButton.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
@@ -12,6 +13,7 @@ import { normLegalBodyFields } from "@/domain/normLegalBodyFields"
 import { normOrganisationalUnitFields } from "@/domain/normOrganisationalUnitFields"
 import { normOrgansFields } from "@/domain/normOrgansFields"
 import { normSubjectFields } from "@/domain/normSubjectFields"
+import { unofficialNormHeadlineFields } from "@/domain/unofficialNormHeadlineFields"
 import { editNormFrame } from "@/services/normsService"
 
 interface Props {
@@ -39,6 +41,7 @@ const frameData = computed({
     leadJurisdiction: props.norm.leadJurisdiction ?? "",
     leadUnit: props.norm.leadUnit ?? "",
     longTitle: props.norm.longTitle ?? "",
+    risAbbreviation: props.norm.risAbbreviation ?? "",
     officialAbbreviation: props.norm.officialAbbreviation ?? "",
     officialShortTitle: props.norm.officialShortTitle ?? "",
     participationInstitution: props.norm.participationInstitution ?? "",
@@ -82,6 +85,18 @@ useScrollToHash(routeHash)
       :column-count="1"
       :fields="normHeadlineFields"
     />
+    <ExpandableContent>
+      <template #header>
+        <h1 class="link-01-bold mb-[1rem]">
+          Nichtamtliche Überschriften und Abkürzungen
+        </h1>
+      </template>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="unofficialNormHeadlineFields"
+      />
+    </ExpandableContent>
     <h1 id="normOriginator" class="heading-02-regular mb-[1rem]">Normgeber</h1>
     <InputGroup
       v-model="frameData"
