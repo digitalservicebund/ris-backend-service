@@ -51,8 +51,6 @@ fileignoreconfig:
     checksum: 3b82c552aba99f3574c666aedf13a8b0cd5875ff3106e666e26533787f4c2698
   - filename: src/main/resources/db/migration/V0.10__norms_extend_norms_table.sql
     checksum: 1d97d06b3fbd8c3a3696b8139a05129569ab485afa361b86731aac05a9e8b374
-  - filename: src/main/resources/db/migration/V0.11__caselaw_filenumber-as-array.sql
-    checksum: 6a894e2179981c9ed7778cdb752e4de9ad994d9cc673a09189927c4c360331ad
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/playwright.config.ts
