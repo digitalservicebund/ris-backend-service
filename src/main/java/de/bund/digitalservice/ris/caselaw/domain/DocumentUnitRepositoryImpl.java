@@ -16,32 +16,34 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
     this.fileNumberRepository = fileNumberRepository;
   }
 
-  private DocumentUnitDTO injectFileNumbers(DocumentUnitDTO documentUnitDTO) {
-    fileNumberRepository
-        .findAllByDocumentUnitIdAndIsDeviating(documentUnitDTO.getId(), false)
+  private Mono<DocumentUnitDTO> injectFileNumbers(DocumentUnitDTO documentUnitDTO) {
+    return fileNumberRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
         .collectList()
-        .subscribe(
-            fileNumbers ->
-                documentUnitDTO.setFileNumbers(
-                    fileNumbers.stream().map(FileNumberDTO::getFileNumber).toList()));
-    fileNumberRepository
-        .findAllByDocumentUnitIdAndIsDeviating(documentUnitDTO.getId(), true)
-        .collectList()
-        .subscribe(
-            fileNumbers ->
-                documentUnitDTO.setDeviatingFileNumbers(
-                    fileNumbers.stream().map(FileNumberDTO::getFileNumber).toList()));
-    return documentUnitDTO;
+        .flatMap(
+            fileNumbers -> {
+              documentUnitDTO.setFileNumbers(
+                  fileNumbers.stream()
+                      .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
+                      .map(FileNumberDTO::getFileNumber)
+                      .toList());
+              documentUnitDTO.setDeviatingFileNumbers(
+                  fileNumbers.stream()
+                      .filter(FileNumberDTO::getIsDeviating)
+                      .map(FileNumberDTO::getFileNumber)
+                      .toList());
+              return Mono.just(documentUnitDTO);
+            });
   }
 
   @Override
   public Mono<DocumentUnitDTO> findByDocumentnumber(String documentnumber) {
-    return repository.findByDocumentnumber(documentnumber).map(this::injectFileNumbers);
+    return repository.findByDocumentnumber(documentnumber).flatMap(this::injectFileNumbers);
   }
 
   @Override
   public Mono<DocumentUnitDTO> findByUuid(UUID uuid) {
-    return repository.findByUuid(uuid).map(this::injectFileNumbers);
+    return repository.findByUuid(uuid).flatMap(this::injectFileNumbers);
   }
 
   @Override

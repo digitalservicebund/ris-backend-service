@@ -8,6 +8,5 @@ public interface FileNumberRepository extends ReactiveSortingRepository<FileNumb
 
   Mono<Void> deleteAllByDocumentUnitId(Long documentUnitId);
 
-  Flux<FileNumberDTO> findAllByDocumentUnitIdAndIsDeviating(
-      Long documentUnitId, Boolean isDeviating);
+  Flux<FileNumberDTO> findAllByDocumentUnitId(Long documentUnitId);
 }
