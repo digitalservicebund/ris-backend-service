@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import CheckboxInput from "@/components/CheckboxInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import InputElement from "@/components/InputElement.vue"
 import InputField from "@/components/InputField.vue"
@@ -145,13 +146,36 @@ const dropdownInputAttribute: InputAttributes = {
     </InputField>
 
     <h1 class="font-bold text-24">Checkbox Input</h1>
-    <InputField id="inputCheckBox" label="This input field is a checkbox">
-      <div class="h-[250px]">
-        <InputElement
-          :attributes="dropdownInputAttribute"
-          :type="InputType.CHECKBOX"
-        />
-      </div>
-    </InputField>
+
+    Regular Checkbox
+    <CheckboxInput id="regularCheckbox" aria-label="regular checkbox" />
+
+    Checked Checkbox
+    <CheckboxInput id="checkedCheckbox" aria-label="checked checkbox" value />
+
+    Disabled Checkbox
+    <CheckboxInput
+      id="disabedCheckbox"
+      aria-label="disabled checkbox"
+      disabled
+    />
+
+    Disabled and checked Checkbox
+    <CheckboxInput
+      id="disabledAndCheckedCheckbox"
+      aria-label="disabled checkbox"
+      disabled
+      value
+    />
+
+    Invalid Checkbox
+    <CheckboxInput
+      id="invalidCheckbox"
+      aria-label="invalid checkbox"
+      :validation-error="{
+        defaultMessage: 'error message',
+        field: 'invalidCheckbox',
+      }"
+    />
   </div>
 </template>
