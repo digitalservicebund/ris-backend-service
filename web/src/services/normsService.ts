@@ -1,3 +1,4 @@
+import dayjs from "dayjs"
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Norm } from "@/domain/Norm"
 
@@ -46,7 +47,7 @@ function encodeBoolean(data?: boolean): boolean | null {
 //
 // TODO: Improve by working with enriched date type.
 function encodeDate(data?: string): string | null {
-  return data && data.length > 0 ? data.slice(0, 10) : null
+  return data && data.length > 0 ? dayjs(data).format("YYYY-MM-DD") : null
 }
 
 function encodeFrameData(data: FrameData) {

@@ -230,3 +230,35 @@ testWithImportedNorm(
     ).toBeEmpty()
   }
 )
+
+testWithImportedNorm(
+  "Check if switching frame sections affects sections being inside or outside viewport",
+  async ({ page, createdGuid }) => {
+    await openNorm(page, normCleanCars.longTitle, createdGuid)
+
+    const locatorFrameButton = page.locator("a:has-text('Rahmen')")
+    await expect(locatorFrameButton).toBeVisible()
+    await locatorFrameButton.click()
+    await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
+
+    await expect(page).toHaveInsideViewport('h1:text-is("Allgemeine Angaben")')
+    await expect(page).toHaveOutsideViewport('h1:text-is("Mitwirkende Organe")')
+    await expect(page).toHaveOutsideViewport('h1:text-is("Normgeber")')
+
+    const locatorAuthor = page.locator("a:has-text('Normgeber')")
+    await expect(locatorAuthor).toBeVisible()
+    await locatorAuthor.click()
+
+    await expect(page).toHaveInsideViewport('h1:text-is("Normgeber")')
+    await expect(page).toHaveOutsideViewport('h1:text-is("Allgemeine Angaben")')
+    await expect(page).toHaveOutsideViewport('h1:text-is("Mitwirkende Organe")')
+
+    const locatorLead = page.locator("a:has-text('Mitwirkende Organe')")
+    await expect(locatorLead).toBeVisible()
+    await locatorLead.click()
+
+    await expect(page).toHaveInsideViewport('h1:text-is("Mitwirkende Organe")')
+    await expect(page).toHaveOutsideViewport('h1:text-is("Allgemeine Angaben")')
+    await expect(page).toHaveOutsideViewport('h1:text-is("Normgeber")')
+  }
+)

@@ -22,6 +22,20 @@ testWithImportedNorm(
     await expect(locatorInputReferencenumber).toBeEditable()
     await locatorInputReferencenumber.fill("referenceNumber")
 
+    await expect(
+      page.locator('label:text-is("Verkündungsdatum")')
+    ).toBeVisible()
+    const selectorInputAnnouncementDate =
+      'role=textbox[name="Verkündungsdatum"]'
+    expect(await page.inputValue(selectorInputAnnouncementDate)).toBe(
+      normCleanCars.announcementDate
+    )
+    const locatorInputAnnouncementDate = page.locator(
+      selectorInputAnnouncementDate
+    )
+    await expect(locatorInputAnnouncementDate).toBeEditable()
+    await locatorInputAnnouncementDate.fill("2022-11-29")
+
     // Update category Dokumenttyp
     await expect(page.locator('label:text-is("Art der Norm")')).toBeVisible()
     const selectInputNormType = 'role=textbox[name="Art der Norm"]'
@@ -55,6 +69,19 @@ testWithImportedNorm(
     const locatorInputDecidingBody = page.locator(selectorInputDecidingBody)
     await expect(locatorInputDecidingBody).toBeEditable()
     await locatorInputDecidingBody.fill("deciding body")
+
+    await expect(
+      page.locator(
+        'label:text-is("Beschlussfassung mit qualifizierter Mehrheit")'
+      )
+    ).toBeVisible()
+
+    const selectorCheckboxAuthorIsResolutionMajority =
+      'role=checkbox[name="Beschlussfassung mit qualifizierter Mehrheit"]'
+    expect(
+      await page.isChecked(selectorCheckboxAuthorIsResolutionMajority)
+    ).toBeTruthy()
+    await page.uncheck(selectorCheckboxAuthorIsResolutionMajority)
 
     // Update category Federführung
     await expect(page.locator('label:text-is("Ressort")')).toBeVisible()
@@ -102,10 +129,16 @@ testWithImportedNorm(
     expect(await page.inputValue(selectInputReferencenumber)).toBe(
       "referenceNumber"
     )
+    expect(await page.inputValue(selectorInputAnnouncementDate)).toBe(
+      "2022-11-29"
+    )
     expect(await page.inputValue(selectInputNormType)).toBe("norm type")
     expect(await page.inputValue(selectorInputDecidingBody)).toBe(
       "deciding body"
     )
+    expect(
+      await page.isChecked(selectorCheckboxAuthorIsResolutionMajority)
+    ).toBeFalsy()
     expect(await page.inputValue(selectorInputLeadJurisdiction)).toBe(
       "lead jurisdiction"
     )
