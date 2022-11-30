@@ -16,6 +16,7 @@ import PopupModalView from "@/kitchensink/views/PopupModalView.vue"
 import PropertyInfoView from "@/kitchensink/views/PropertyInfoView.vue"
 import SideToggleView from "@/kitchensink/views/SideToggleView.vue"
 import TextEditorView from "@/kitchensink/views/TextEditorView.vue"
+import TupleView from "@/kitchensink/views/TupleView.vue"
 
 const props = defineProps<{
   selectedComponent: risComponent
@@ -37,6 +38,8 @@ const component = computed(() => {
       return FileViewerView
     case "InputView":
       return InputView
+    case "TupleView":
+      return TupleView
     case "NavbarView":
       return NavbarView
     case "OriginalFileSidePanelView":

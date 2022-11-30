@@ -5,11 +5,14 @@ import DocumentUnit from "../domain/documentUnit"
 import PropertyInfo from "@/components/PropertyInfo.vue"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
+const fileNumber = props.documentUnit.coreData.fileNumber
+  ? props.documentUnit.coreData.fileNumber[0]
+  : undefined
 
 const entries = computed(() => [
   {
     label: "Aktenzeichen",
-    value: props.documentUnit.coreData.fileNumber,
+    value: fileNumber,
   },
   {
     label: "Entscheidungsdatum",

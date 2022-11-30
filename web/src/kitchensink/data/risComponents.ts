@@ -1,6 +1,7 @@
 import type { risComponent } from "@/kitchensink/types/types"
 
 export const risComponents: risComponent[] = [
+  { name: "Tuple", view: "TupleView" },
   { name: "Button", view: "ButtonView" },
   { name: "Text Editor", view: "TextEditorView" },
   { name: "Input", view: "InputView" },
