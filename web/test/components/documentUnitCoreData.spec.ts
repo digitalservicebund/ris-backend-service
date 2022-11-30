@@ -8,7 +8,7 @@ describe("Core Data", () => {
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {
-        fileNumbers: ["abc"],
+        fileNumber: "abc",
       },
       documentNumber: "ABCD2022000001",
     })
@@ -20,7 +20,7 @@ describe("Core Data", () => {
     })
 
     expect(
-      (wrapper.find("#fileNumbers").element as HTMLInputElement).value
+      (wrapper.find("#fileNumber").element as HTMLInputElement).value
     ).toBe("abc")
     const buttons = wrapper.findAll("button")
     expect(buttons[buttons.length - 1].text()).toBe("Speichern")

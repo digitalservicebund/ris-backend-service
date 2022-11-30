@@ -69,8 +69,7 @@ function handleOnBlur() {
 <style lang="scss" scoped>
 .input {
   width: 100%;
-  height: 3.75rem;
-  padding: 12px 16px;
+  padding: 17px 24px;
   @apply border-2 border-solid border-blue-800 uppercase;
 
   &:focus {

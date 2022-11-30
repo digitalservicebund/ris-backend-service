@@ -9,7 +9,8 @@ export function defineTextField(
   required?: boolean,
   placeholder?: string,
   validationError?: ValidationError,
-  readOnly?: boolean
+  readOnly?: boolean,
+  subField?: InputField
 ): InputField {
   return {
     name,
@@ -21,25 +22,7 @@ export function defineTextField(
       placeholder,
       validationError,
       readOnly,
-    },
-  }
-}
-
-export function defineMultiTextField(
-  name: string,
-  label: string,
-  ariaLabel: string,
-  required?: boolean,
-  placeholder?: string
-): InputField {
-  return {
-    name,
-    type: InputType.MULTITEXT,
-    label,
-    required,
-    inputAttributes: {
-      ariaLabel,
-      placeholder,
+      subField,
     },
   }
 }
@@ -89,22 +72,9 @@ export function defineDropdownField(
   }
 }
 
-export function defineTupleField(
-  ariaLabel: string,
-  name: string,
-  fields: { parent: InputField; child: InputField }
-): InputField {
-  return {
-    name,
-    type: InputType.TUPLE,
-    inputAttributes: {
-      ariaLabel,
-      fields,
-    },
-  }
-}
-
 export const coreDataFields: InputField[] = [
+  // defineTextField("courtType", "Gerichtstyp", "Gerichtstyp", true),
+  // defineTextField("courtLocation", "Gerichtssitz", "Gerichtssitz"),
   defineDropdownField(
     "court",
     "Gericht",
@@ -115,25 +85,20 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.courts
   ),
-  defineTupleField(
-    "Toggle Abweichendes Aktenzeichen",
-    "fileNumbersAndDeviatingFileNumbers",
-    {
-      parent: defineMultiTextField(
-        "fileNumbers",
-        "Aktenzeichen",
-        "Aktenzeichen Parent",
-        true,
-        ""
-      ),
-      child: defineMultiTextField(
-        "deviatingFileNumbers",
-        "Abweichendes Aktenzeichen",
-        "Aktenzeichen Child",
-        false,
-        ""
-      ),
-    }
+  defineTextField(
+    "fileNumber",
+    "Aktenzeichen",
+    "Aktenzeichen",
+    true,
+    "",
+    undefined,
+    false,
+    defineTextField(
+      "divergentFileNumber",
+      "Abweichendes Aktenzeichen",
+      "Abweichendes Aktenzeichen",
+      true
+    )
   ),
   defineDateField(
     "decisionDate",
@@ -153,22 +118,7 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.documentTypes
   ),
-  defineTextField(
-    "ecli",
-    "ECLI",
-    "ECLI",
-    false,
-    "",
-    { defaultMessage: "", field: "" },
-    false
-    // defineMultiTextField(
-    //   "divergentECLI",
-    //   "Abweichender ECLI",
-    //   "Abweichender ECLI",
-    //   false,
-    //   ""
-    // )
-  ),
+  defineTextField("ecli", "ECLI", "ECLI"),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(
     "legalEffect",

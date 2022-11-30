@@ -40,7 +40,7 @@ describe("SubField", () => {
     expect(emitted()["update:isExpanded"][0]).toEqual([false])
   })
 
-  it("should open on toggle if close", async () => {
+  it("should close on toggle if open", async () => {
     const { emitted, getByText, getByLabelText } = renderComponent({
       isExpanded: false,
     })

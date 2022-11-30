@@ -4,14 +4,11 @@ import CheckboxInput from "@/components/CheckboxInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import FileInput from "@/components/FileInput.vue"
-import MultiTextInput from "@/components/MultiTextInput.vue"
 import TextInput from "@/components/TextInput.vue"
-import TupleInput from "@/components/TupleInput.vue"
 import type { InputAttributes, ModelType } from "@/domain"
 import { InputType, ValidationError } from "@/domain"
 
 interface Props {
-  id: string
   type?: InputType
   modelValue?: ModelType
   attributes: InputAttributes
@@ -42,10 +39,6 @@ const component = computed(() => {
       return DateInput
     case InputType.CHECKBOX:
       return CheckboxInput
-    case InputType.MULTITEXT:
-      return MultiTextInput
-    case InputType.TUPLE:
-      return TupleInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }
@@ -58,13 +51,10 @@ const value = computed({
 </script>
 
 <template>
-  <div>
-    <component
-      :is="component"
-      :id="id"
-      v-model="value"
-      v-bind="attributes"
-      :validation-error="validationError"
-    />
-  </div>
+  <component
+    :is="component"
+    v-model="value"
+    v-bind="attributes"
+    :validation-error="validationError"
+  />
 </template>

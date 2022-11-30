@@ -42,7 +42,6 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
-    await page.keyboard.press("Enter")
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
@@ -51,7 +50,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     ).toBeVisible()
 
     await page.reload()
-    expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("")
+    expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("abc")
 
     await page.goto("/")
     await expect(

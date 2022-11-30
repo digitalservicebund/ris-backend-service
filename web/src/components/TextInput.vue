@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import SubField from "@/components/SubField.vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { InputField, ValidationError } from "@/domain"
 
@@ -45,16 +46,30 @@ const conditionalClasses = computed(() => ({
     type="text"
     @input="emitInputEvent"
   />
+  <SubField v-if="subField">
+    <div class="mt-[2.625rem]">
+      <label
+        class="flex gap-4 items-center label-03-regular mb-2 text-gray-900"
+        :for="id"
+      >
+        {{ subField.label }}
+      </label>
+      <input
+        :id="subField.name"
+        :aria-label="subField.inputAttributes.ariaLabel"
+        class="bg-white input"
+        :class="conditionalClasses"
+        type="text"
+      />
+    </div>
+  </SubField>
 </template>
 
 <style lang="scss" scoped>
 .input {
-  display: flex;
   width: 100%;
-  height: 3.75rem;
-  flex-wrap: wrap;
-  align-content: space-between;
-  padding: 12px 16px;
+  max-height: 4rem;
+  padding: 1.063rem 1.5rem;
   @apply border-2 border-solid border-blue-800;
 
   &:focus {

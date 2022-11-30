@@ -5,12 +5,10 @@ import { InputType } from "@/domain"
 import type { ModelType } from "@/domain"
 
 function renderComponent(options?: {
-  id?: string
   type?: InputType
   modelValue?: ModelType
 }) {
   const props = {
-    id: "test",
     type: options?.type,
     modelValue: options?.modelValue,
     attributes: {

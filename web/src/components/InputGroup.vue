@@ -5,7 +5,7 @@ import InputFieldComponent from "@/components/InputField.vue"
 import type { InputField, ModelType } from "@/domain"
 import { ValidationError } from "@/domain"
 
-type InputValues = { [fieldName: string]: ModelType }
+type InputValues = { [fieldId: string]: ModelType }
 
 interface Props {
   fields: InputField[]
