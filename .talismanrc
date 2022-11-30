@@ -1,6 +1,8 @@
 fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
+  - filename: web/src/routes/norms/norm/[:normGuid]/frame.vue
+    checksum: 79b37f487b61d8d9251c29009f01403e2119fe7b66afe2d8006849b773069a41
   - filename: build.gradle
     checksum: 40fbeb2209d1374aa50b4c52f97857a5c03065699f39082f1e91c08daac55756
   - filename: run.sh

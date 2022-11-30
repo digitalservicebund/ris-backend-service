@@ -55,7 +55,7 @@ testWithImportedNorm(
     await expect(page.locator("a:has-text('Mitwirkende Organe')")).toBeVisible()
 
     // Allgemeine Angaben
-    await expect(page.locator('h1:text-is("Allgemeine Angaben")')).toBeVisible()
+    await expect(page.locator('h2:text-is("Allgemeine Angaben")')).toBeVisible()
     await expect(page.locator('label:text-is("Aktenzeichen")')).toBeVisible()
     await expect(page.locator('role=textbox[name="Aktenzeichen"]')).toBeEmpty()
     await expect(
@@ -84,7 +84,7 @@ testWithImportedNorm(
     ).toBe(normCleanCars.frameKeywords)
 
     // Dokumenttyp
-    await expect(page.locator('h1:text-is("Dokumenttyp")')).toBeVisible()
+    await expect(page.locator('h2:text-is("Dokumenttyp")')).toBeVisible()
     await expect(page.locator('label:text-is("Typbezeichnung")')).toBeVisible()
     await expect(
       page.locator('role=textbox[name="Typbezeichnung"]')
@@ -100,7 +100,7 @@ testWithImportedNorm(
 
     // Überschriften und Abkürzungen
     await expect(
-      page.locator('h1:text-is("Überschriften und Abkürzungen")')
+      page.locator('h2:text-is("Überschriften und Abkürzungen")')
     ).toBeVisible()
     await expect(
       page.locator('label:text-is("Amtliche Langüberschrift")')
@@ -126,7 +126,7 @@ testWithImportedNorm(
     )
     // Hidden fields
     const locatorHiddenh1 = page.locator(
-      'h1:text-is("Nichtamtliche Überschriften und Abkürzungen")'
+      'h2:text-is("Nichtamtliche Überschriften und Abkürzungen")'
     )
     await expect(locatorHiddenh1).toBeVisible()
     await locatorHiddenh1.click()
@@ -150,7 +150,7 @@ testWithImportedNorm(
     ).toBeEmpty()
 
     // Normgeber
-    await expect(page.locator('h1:text-is("Normgeber")')).toBeVisible()
+    await expect(page.locator('h2:text-is("Normgeber")')).toBeVisible()
     await expect(
       page.locator(
         'label:text-is("Staat, Land, Stadt, Landkreis oder juristische Person")'
@@ -179,7 +179,7 @@ testWithImportedNorm(
     ).toBeTruthy()
 
     // Federführung
-    await expect(page.locator('h1:text-is("Federführung")')).toBeVisible()
+    await expect(page.locator('h2:text-is("Federführung")')).toBeVisible()
     await expect(page.locator('label:text-is("Ressort")')).toBeVisible()
     expect(await page.inputValue('role=textbox[name="Ressort"]')).toBe(
       normCleanCars.leadJurisdiction
@@ -192,7 +192,7 @@ testWithImportedNorm(
     ).toBe(normCleanCars.leadUnit)
 
     // Sachgebiet
-    await expect(page.locator('h1:text-is("Sachgebiet")')).toBeVisible()
+    await expect(page.locator('h2:text-is("Sachgebiet")')).toBeVisible()
     await expect(page.locator('label:text-is("FNA-Nummer")')).toBeVisible()
     expect(await page.inputValue('role=textbox[name="FNA-Nummer"]')).toBe(
       normCleanCars.subjectFna
@@ -215,7 +215,7 @@ testWithImportedNorm(
     ).toBeEmpty()
 
     // Mitwirkende Organe
-    await expect(page.locator('h1:text-is("Mitwirkende Organe")')).toBeVisible()
+    await expect(page.locator('h2:text-is("Mitwirkende Organe")')).toBeVisible()
     await expect(
       page.locator('label:text-is("Art der Mitwirkung")')
     ).toBeVisible()
@@ -241,24 +241,24 @@ testWithImportedNorm(
     await locatorFrameButton.click()
     await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
 
-    await expect(page).toHaveInsideViewport('h1:text-is("Allgemeine Angaben")')
-    await expect(page).toHaveOutsideViewport('h1:text-is("Mitwirkende Organe")')
-    await expect(page).toHaveOutsideViewport('h1:text-is("Normgeber")')
+    await expect(page).toHaveInsideViewport('h2:text-is("Allgemeine Angaben")')
+    await expect(page).toHaveOutsideViewport('h2:text-is("Mitwirkende Organe")')
+    await expect(page).toHaveOutsideViewport('h2:text-is("Normgeber")')
 
     const locatorAuthor = page.locator("a:has-text('Normgeber')")
     await expect(locatorAuthor).toBeVisible()
     await locatorAuthor.click()
 
-    await expect(page).toHaveInsideViewport('h1:text-is("Normgeber")')
-    await expect(page).toHaveOutsideViewport('h1:text-is("Allgemeine Angaben")')
-    await expect(page).toHaveOutsideViewport('h1:text-is("Mitwirkende Organe")')
+    await expect(page).toHaveInsideViewport('h2:text-is("Normgeber")')
+    await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
+    await expect(page).toHaveOutsideViewport('h2:text-is("Mitwirkende Organe")')
 
     const locatorLead = page.locator("a:has-text('Mitwirkende Organe')")
     await expect(locatorLead).toBeVisible()
     await locatorLead.click()
 
-    await expect(page).toHaveInsideViewport('h1:text-is("Mitwirkende Organe")')
-    await expect(page).toHaveOutsideViewport('h1:text-is("Allgemeine Angaben")')
-    await expect(page).toHaveOutsideViewport('h1:text-is("Normgeber")')
+    await expect(page).toHaveInsideViewport('h2:text-is("Mitwirkende Organe")')
+    await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
+    await expect(page).toHaveOutsideViewport('h2:text-is("Normgeber")')
   }
 )

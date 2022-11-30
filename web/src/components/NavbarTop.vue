@@ -6,7 +6,7 @@ const route = useRoute()
 </script>
 
 <template>
-  <div
+  <nav
     class="border-gray-400 border-y flex items-center justify-between px-16 py-24"
     role="navigation"
   >
@@ -37,5 +37,5 @@ const route = useRoute()
       <span class="material-icons"> perm_identity </span>
       User Name
     </div>
-  </div>
+  </nav>
 </template>
