@@ -8,7 +8,7 @@ describe("Core Data", () => {
   test("renders correctly with given documentUnitId", async () => {
     const documentUnit = new DocumentUnit("1", {
       coreData: {
-        fileNumber: ["abc"],
+        fileNumbers: ["abc"],
       },
       documentNumber: "ABCD2022000001",
     })
@@ -18,10 +18,10 @@ describe("Core Data", () => {
         updateStatus: 0,
       },
     })
-    //TODO this test, needs to be adjusted when multitext model value is rendered correctly in fileNumber
+
     expect(
-      (wrapper.find("#fileNumber").element as HTMLInputElement).value
-    ).toBe("")
+      (wrapper.find("#fileNumbers").element as HTMLInputElement).value
+    ).toBe("abc")
     const buttons = wrapper.findAll("button")
     expect(buttons[buttons.length - 1].text()).toBe("Speichern")
     expect(wrapper.text()).toContain("* Pflichtfelder zum Veröffentlichen")

@@ -12,29 +12,27 @@ interface Props {
   validationError?: ValidationError
 }
 
-// interface Emits {
-//   (event: "update:modelValue", value: string[] | undefined): void
-// }
+interface Emits {
+  (event: "update:modelValue", value: string[] | undefined): void
+}
 
-defineProps<Props>()
-// const emit = defineEmits<Emits>()
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
-const chips = ref<string[]>([])
-
-// const currentInput = ref<string>(props.modelValue ?? "")
+const chips = ref<string[]>(props.modelValue ?? [])
 const currentInput = ref<string>("")
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
 function saveChip() {
   chips.value.push(currentInput.value)
-  // emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
   currentInput.value = ""
 }
 
 function deleteChip(index: number) {
   chips.value.splice(index, 1)
-  // emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 function resetFocus() {
   focusedItemIndex.value = undefined
@@ -42,7 +40,7 @@ function resetFocus() {
 
 function backspaceDelete() {
   chips.value.splice(chips.value.length - 1)
-  // emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
 function enterDelete() {
@@ -57,7 +55,7 @@ function enterDelete() {
     }
   }
 
-  // emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
 const previous = () => {
