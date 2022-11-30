@@ -14,7 +14,9 @@ test.describe("a11y of norms list page (/norms)", () => {
 test.describe("a11y of a norm complex (/norms/norm/{guid})", () => {
   testWithImportedNorm("norm complex", async ({ page, createdGuid }) => {
     await page.goto(`/norms/norm/${createdGuid}`)
-    await expect(page.locator("text=Zur Übersicht")).toBeVisible()
+    await expect(
+      page.locator("text=Gesetz über die Beschaffung sauberer Straßenfahrzeuge")
+    ).toBeVisible()
     await injectAxe(page)
     await checkA11y(page)
   })
@@ -23,7 +25,9 @@ test.describe("a11y of a norm complex (/norms/norm/{guid})", () => {
 test.describe("a11y of a norm frame data (/norms/norm/{guid}/frame)", () => {
   testWithImportedNorm("norm frame data", async ({ page, createdGuid }) => {
     await page.goto(`/norms/norm/${createdGuid}/frame`)
-    await expect(page.locator("text=Zur Übersicht")).toBeVisible()
+    await expect(
+      page.locator("text=Dokumentation des Rahmenelements")
+    ).toBeVisible()
     await injectAxe(page)
     await checkA11y(page)
   })
