@@ -8,7 +8,7 @@ import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record DocumentUnit(
     Long id,
     UUID uuid,

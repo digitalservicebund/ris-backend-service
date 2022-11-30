@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
@@ -41,24 +40,20 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public Mono<MailResponse> publish(DocumentUnitDTO documentUnitDTO, String receiverAddress) {
+  public Mono<MailResponse> publish(DocumentUnit documentUnit, String receiverAddress) {
     XmlResultObject xml;
     try {
-      xml =
-          xmlExporter.generateXml(
-              DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+      xml = xmlExporter.generateXml(documentUnit);
     } catch (ParserConfigurationException | TransformerException ex) {
       return Mono.error(new DocumentUnitPublishException("Couldn't generate xml.", ex));
     }
 
-    return generateMailSubject(documentUnitDTO)
-        .map(
-            mailSubject ->
-                generateXmlMail(documentUnitDTO.getId(), receiverAddress, mailSubject, xml))
+    return generateMailSubject(documentUnit)
+        .map(mailSubject -> generateXmlMail(documentUnit.id(), receiverAddress, mailSubject, xml))
         .doOnNext(this::generateAndSendMail)
         .flatMap(this::savePublishInformation)
         .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex))
-        .map(xmlMail -> new XmlMailResponse(documentUnitDTO.getUuid(), xmlMail));
+        .map(xmlMail -> new XmlMailResponse(documentUnit.uuid(), xmlMail));
   }
 
   @Override
@@ -68,8 +63,8 @@ public class XmlEMailPublishService implements EmailPublishService {
         .map(xmlMail -> new XmlMailResponse(documentUnitUuid, xmlMail));
   }
 
-  private Mono<String> generateMailSubject(DocumentUnitDTO documentUnit) {
-    if (documentUnit.getDocumentnumber() == null) {
+  private Mono<String> generateMailSubject(DocumentUnit documentUnit) {
+    if (documentUnit.documentNumber() == null) {
       return Mono.error(
           new DocumentUnitPublishException("No document number has set in the document unit."));
     }

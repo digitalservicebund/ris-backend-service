@@ -4,10 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
-import java.time.Instant;
-import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -37,8 +34,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 public class DocumentUnitService {
   private final DocumentUnitRepository repository;
   private final DocumentUnitListEntryRepository listEntryRepository;
-  private final DocumentNumberCounterRepository counterRepository;
-  private final PreviousDecisionRepository previousDecisionRepository;
+  private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
 
@@ -48,72 +44,47 @@ public class DocumentUnitService {
   public DocumentUnitService(
       DocumentUnitRepository repository,
       DocumentUnitListEntryRepository listEntryRepository,
-      DocumentNumberCounterRepository counterRepository,
-      PreviousDecisionRepository previousDecisionRepository,
+      DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService) {
+
     this.repository = repository;
     this.listEntryRepository = listEntryRepository;
-    this.counterRepository = counterRepository;
+    this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
-    this.previousDecisionRepository = previousDecisionRepository;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(
       DocumentUnitCreationInfo documentUnitCreationInfo) {
-    int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-    return counterRepository
-        .getDocumentNumberCounterEntry()
-        .flatMap(
-            outdatedDocumentNumberCounter -> {
-              // this is the switch happening when the first new DocumentUnit in a new year gets
-              // created
-              if (outdatedDocumentNumberCounter.currentyear != currentYear) {
-                outdatedDocumentNumberCounter.currentyear = currentYear;
-                outdatedDocumentNumberCounter.nextnumber = 1;
-              }
-              outdatedDocumentNumberCounter.nextnumber += 1;
-              return counterRepository.save(outdatedDocumentNumberCounter);
-            })
-        .flatMap(
-            updatedDocumentNumberCounter ->
-                repository.save(
-                    DocumentUnitDTO.createNew(
-                        documentUnitCreationInfo, updatedDocumentNumberCounter.nextnumber - 1)))
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build())
+    return documentNumberService
+        .generateNextDocumentNumber(documentUnitCreationInfo)
+        .flatMap(repository::createNewDocumentUnit)
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
   public Mono<DocumentUnit> attachFileToDocumentUnit(
-      UUID documentUnitId, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
+      UUID documentUnitUuid, ByteBuffer byteBuffer, HttpHeaders httpHeaders) {
     var fileUuid = UUID.randomUUID().toString();
+    String fileName =
+        httpHeaders.containsKey("X-Filename")
+            ? httpHeaders.getFirst("X-Filename")
+            : "Kein Dateiname gefunden";
+
     checkDocx(byteBuffer);
+
     return putObjectIntoBucket(fileUuid, byteBuffer, httpHeaders)
         .doOnNext(putObjectResponse -> log.debug("generate doc unit for {}", fileUuid))
+        .flatMap(putObjectResponse -> repository.findByUuid(documentUnitUuid))
+        .doOnNext(
+            documentUnit ->
+                log.debug(
+                    "attach file '{}' to documentUnit: {}",
+                    fileName,
+                    documentUnit.documentNumber()))
         .flatMap(
-            putObjectResponse ->
-                repository
-                    .findByUuid(documentUnitId)
-                    .map(
-                        documentUnitDTO -> {
-                          documentUnitDTO.setFileuploadtimestamp(Instant.now());
-                          documentUnitDTO.setS3path(fileUuid);
-                          documentUnitDTO.setFiletype("docx");
-                          documentUnitDTO.setFilename(
-                              httpHeaders.containsKey("X-Filename")
-                                  ? httpHeaders.getFirst("X-Filename")
-                                  : "Kein Dateiname gefunden");
-                          return documentUnitDTO;
-                        }))
-        .doOnNext(documentUnitDTO -> log.debug("save documentUnitDTO"))
-        .flatMap(repository::save)
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build())
+            documentUnit -> repository.attachFile(documentUnitUuid, fileUuid, "docx", fileName))
         .doOnError(ex -> log.error("Couldn't upload the file to bucket", ex));
   }
 
@@ -121,25 +92,14 @@ public class DocumentUnitService {
     return repository
         .findByUuid(documentUnitId)
         .flatMap(
-            documentUnitDTO -> {
-              var fileUuid = documentUnitDTO.getS3path();
+            documentUnit -> {
+              var fileUuid = documentUnit.s3path();
               return deleteObjectFromBucket(fileUuid)
                   .doOnNext(
-                      deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
-                  .map(
-                      deleteObjectResponse -> {
-                        documentUnitDTO.setS3path(null);
-                        documentUnitDTO.setFilename(null);
-                        documentUnitDTO.setFileuploadtimestamp(null);
-                        return documentUnitDTO;
-                      });
+                      deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid));
             })
-        .doOnNext(
-            documentUnitDTO -> log.debug("removed file from DocumentUnitDTO {}", documentUnitId))
-        .flatMap(repository::save)
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build())
+        .doOnNext(response -> log.debug("removed file from DocumentUnitDTO {}", documentUnitId))
+        .flatMap(response -> repository.removeFile(documentUnitId))
         .doOnError(ex -> log.error("Couldn't remove the file from the DocumentUnit", ex));
   }
 
@@ -201,35 +161,23 @@ public class DocumentUnitService {
     return Mono.just(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber"))));
   }
 
-  public Mono<DocumentUnit> getByDocumentnumber(String documentnumber) {
-    return repository
-        .findByDocumentnumber(documentnumber)
-        .flatMap(
-            documentUnitDTO ->
-                previousDecisionRepository
-                    .findAllByDocumentnumber(documentnumber)
-                    .collectList()
-                    .flatMap(
-                        previousDecisions ->
-                            Mono.just(documentUnitDTO.setPreviousDecisions(previousDecisions))))
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+  public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {
+    return repository.findByDocumentNumber(documentNumber);
   }
 
   public Mono<String> deleteByUuid(UUID documentUnitId) {
     return repository
         .findByUuid(documentUnitId)
         .flatMap(
-            documentUnitDTO -> {
-              if (documentUnitDTO.hasFileAttached()) {
-                var fileUuid = documentUnitDTO.getS3path();
+            documentUnit -> {
+              if (documentUnit.s3path() != null) {
+                var fileUuid = documentUnit.s3path();
                 return deleteObjectFromBucket(fileUuid)
                     .doOnNext(
                         deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
-                    .flatMap(deleteObjectResponse -> repository.delete(documentUnitDTO));
+                    .flatMap(deleteObjectResponse -> repository.delete(documentUnit));
               }
-              return repository.delete(documentUnitDTO);
+              return repository.delete(documentUnit);
             })
         .doOnNext(v -> log.debug("deleted DocumentUnitDTO"))
         .map(v -> "done")
@@ -237,82 +185,21 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {
-    DocumentUnitDTO documentUnitDTO = DocumentUnitDTO.buildFromDocumentUnit(documentUnit);
-    if (documentUnitDTO.previousDecisions == null)
-      return repository
-          .save(documentUnitDTO)
-          .map(duDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build())
-          .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
-
-    /* Passing foreign key to object */
-    List<PreviousDecision> previousDecisionsList =
-        documentUnitDTO.previousDecisions.stream()
-            .map(
-                previousDecision ->
-                    previousDecision.setDocumentnumber(documentUnitDTO.documentnumber))
-            .toList();
-    /* Get all id of previous decisions from font-end */
-    List<Long> incomingIds =
-        previousDecisionsList.stream()
-            .filter(previousDecision -> previousDecision.id != null)
-            .map(previousDecision -> previousDecision.id)
-            .toList();
-    /* Create mono publisher object to loop through */
-    Mono<List<PreviousDecision>> listPreviousDecisionMonoObj = Mono.just(previousDecisionsList);
-    return listPreviousDecisionMonoObj
-        .flatMap(
-            previousDecisions ->
-                previousDecisionRepository
-                    .getAllIdsByDocumentnumber(documentUnitDTO.documentnumber)
-                    .collectList()
-                    .flatMap(
-                        inDatabaseIds -> {
-                          /* Get all id of deleted decisions */
-                          List<Long> deletedIndexes =
-                              getDeletedPreviousDecisionIds(incomingIds, inDatabaseIds);
-                          /* Insert/Update decisions */
-                          return previousDecisionRepository
-                              .saveAll(
-                                  previousDecisions.stream()
-                                      .filter(
-                                          previousDecision ->
-                                              !deletedIndexes.contains(previousDecision.id))
-                                      .toList())
-                              .then(
-                                  /* Delete decisions */
-                                  previousDecisionRepository.deleteAllById(
-                                      deletedIndexes.stream().map(String::valueOf).toList()));
-                        }))
-        .then(repository.save(documentUnitDTO))
-        .map(duDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(duDTO).build())
+    return repository
+        .save(documentUnit)
         .doOnError(ex -> log.error("Couldn't update the DocumentUnit", ex));
-  }
-
-  private List<Long> getDeletedPreviousDecisionIds(
-      List<Long> incomingIds, List<Long> inDatabaseIds) {
-    /* Return all ids in database but not in incoming Id from front end */
-    return inDatabaseIds.stream().filter(index -> !incomingIds.contains(index)).toList();
   }
 
   public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String receiverAddress) {
     return repository
         .findByUuid(documentUnitUuid)
-        .flatMap(
-            documentUnit ->
-                previousDecisionRepository
-                    .findAllByDocumentnumber(documentUnit.documentnumber)
-                    .collectList()
-                    .flatMap(
-                        previousDecisions ->
-                            publishService.publish(
-                                documentUnit.setPreviousDecisions(previousDecisions),
-                                receiverAddress)));
+        .flatMap(documentUnit -> publishService.publish(documentUnit, receiverAddress));
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
     return repository
         .findByUuid(documentUuid)
         .flatMap(
-            documentUnit -> publishService.getLastPublishedXml(documentUnit.getId(), documentUuid));
+            documentUnit -> publishService.getLastPublishedXml(documentUnit.id(), documentUuid));
   }
 }

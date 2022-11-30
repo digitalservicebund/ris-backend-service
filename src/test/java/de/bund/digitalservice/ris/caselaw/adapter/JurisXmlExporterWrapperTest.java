@@ -137,12 +137,10 @@ public class JurisXmlExporterWrapperTest {
     List<PreviousDecision> previousDecisions =
         List.of(
             PreviousDecision.builder()
-                .id(99L)
                 .courtType("courtType")
                 .courtPlace("courtPlace")
                 .date("date")
                 .fileNumber("fileNumber")
-                .documentnumber(documentNr)
                 .build());
     DocumentUnit documentUnit =
         DocumentUnit.builder()

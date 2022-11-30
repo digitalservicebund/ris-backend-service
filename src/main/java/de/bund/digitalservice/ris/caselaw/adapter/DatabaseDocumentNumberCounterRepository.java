@@ -1,11 +1,12 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberCounter;
 import org.springframework.data.repository.Repository;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public interface DocumentNumberCounterRepository
+public interface DatabaseDocumentNumberCounterRepository
     extends Repository<DocumentNumberCounter, Integer> {
 
   Mono<DocumentNumberCounter> save(DocumentNumberCounter entity);

@@ -11,7 +11,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
@@ -140,7 +139,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetByDocumentnumber() {
-    when(service.getByDocumentnumber("ABCD202200001")).thenReturn(Mono.empty());
+    when(service.getByDocumentNumber("ABCD202200001")).thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
@@ -150,7 +149,7 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).getByDocumentnumber("ABCD202200001");
+    verify(service).getByDocumentNumber("ABCD202200001");
   }
 
   @Test
