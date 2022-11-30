@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,12 @@ public class DocumentUnitIntegrationTest {
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private FileNumberRepository fileNumberRepository;
+
+  @BeforeEach
+  void setUp() {
+    repository.deleteAll().block();
+    fileNumberRepository.deleteAll().block();
+  }
 
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {

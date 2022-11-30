@@ -126,7 +126,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 9e2f18f6e3158066ab114e5b396d0862479d7f8e6fc4d903b0d55b54d948e548
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: bd59b5919e26981f339cd485c26c4698d592af28aee820cc991eb33bef9041b7
+    checksum: 498ed59ed0b895f2d86bbb37a70dec87dcd00b40f1c022e08e93b4c59150dc64
 
 scopeconfig:
   - scope: node
