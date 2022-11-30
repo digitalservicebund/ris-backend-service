@@ -5,8 +5,7 @@ import { InputField, ValidationError } from "@/domain"
 interface Props {
   id: string
   value?: string
-  // modelValue?: string[]
-  modelValue?: string
+  modelValue?: string[]
   ariaLabel: string
   placeholder?: string
   subField?: InputField
@@ -17,12 +16,13 @@ interface Props {
 //   (event: "update:modelValue", value: string[] | undefined): void
 // }
 
-const props = defineProps<Props>()
+defineProps<Props>()
 // const emit = defineEmits<Emits>()
 
 const chips = ref<string[]>([])
 
-const currentInput = ref<string>(props.modelValue ?? "")
+// const currentInput = ref<string>(props.modelValue ?? "")
+const currentInput = ref<string>("")
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 

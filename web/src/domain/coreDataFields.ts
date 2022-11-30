@@ -9,8 +9,7 @@ export function defineTextField(
   required?: boolean,
   placeholder?: string,
   validationError?: ValidationError,
-  readOnly?: boolean,
-  subField?: InputField
+  readOnly?: boolean
 ): InputField {
   return {
     name,
@@ -22,7 +21,6 @@ export function defineTextField(
       placeholder,
       validationError,
       readOnly,
-      subField,
     },
   }
 }
@@ -32,18 +30,16 @@ export function defineMultiTextField(
   label: string,
   ariaLabel: string,
   required?: boolean,
-  placeholder?: string,
-  subField?: InputField
+  placeholder?: string
 ): InputField {
   return {
     name,
-    type: InputType.CHIP,
+    type: InputType.MULTITEXT,
     label,
     required,
     inputAttributes: {
       ariaLabel,
       placeholder,
-      subField,
     },
   }
 }
@@ -93,6 +89,21 @@ export function defineDropdownField(
   }
 }
 
+export function defineTupleField(
+  ariaLabel: string,
+  name: string,
+  fields: { parent: InputField; child: InputField }
+): InputField {
+  return {
+    name,
+    type: InputType.TUPLE,
+    inputAttributes: {
+      ariaLabel,
+      fields,
+    },
+  }
+}
+
 export const coreDataFields: InputField[] = [
   defineDropdownField(
     "court",
@@ -104,19 +115,25 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.courts
   ),
-  defineMultiTextField(
-    "fileNumber",
-    "Aktenzeichen",
-    "Aktenzeichen",
-    true,
-    "",
-    defineMultiTextField(
-      "divergentFileNumber",
-      "Abweichendes Aktenzeichen",
-      "Abweichendes Aktenzeichen",
-      false,
-      ""
-    )
+  defineTupleField(
+    "Toggle Abweichendes Aktenzeichen",
+    "fileNumberAndDeviatingFileNumbers",
+    {
+      parent: defineMultiTextField(
+        "fileNumber",
+        "Aktenzeichen",
+        "Aktenzeichen Parent",
+        true,
+        ""
+      ),
+      child: defineMultiTextField(
+        "deviatingFileNumbers",
+        "Abweichendes Aktenzeichen",
+        "Aktenzeichen Child",
+        false,
+        ""
+      ),
+    }
   ),
   defineDateField(
     "decisionDate",
@@ -143,14 +160,14 @@ export const coreDataFields: InputField[] = [
     false,
     "",
     { defaultMessage: "", field: "" },
-    false,
-    defineMultiTextField(
-      "divergentECLI",
-      "Abweichender ECLI",
-      "Abweichender ECLI",
-      false,
-      ""
-    )
+    false
+    // defineMultiTextField(
+    //   "divergentECLI",
+    //   "Abweichender ECLI",
+    //   "Abweichender ECLI",
+    //   false,
+    //   ""
+    // )
   ),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(

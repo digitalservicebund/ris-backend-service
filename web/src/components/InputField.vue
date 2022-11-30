@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 interface Props {
   id: string
-  label: string
+  label?: string
   errorMessage?: string
   required?: boolean
 }
@@ -12,6 +12,7 @@ defineProps<Props>()
 <template>
   <div class="flex flex-col flex-start">
     <label
+      v-if="label"
       class="flex gap-4 items-center label-03-regular mb-2 text-gray-900"
       :for="id"
     >

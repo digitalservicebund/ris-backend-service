@@ -11,7 +11,7 @@ import {
 } from "@/domain"
 
 interface Props {
-  modelValue?: CoreData
+  modelValue: CoreData
   updateStatus: number
   validationErrors?: ValidationError[]
 }
@@ -21,12 +21,40 @@ interface Emits {
   (event: "update:modelValue", value: CoreData): void
 }
 
+type StructuredCoreData = Omit<
+  CoreData,
+  "fileNumber" | "deviatingFileNumber"
+> & {
+  fileNumberAndDeviatingFileNumbers: {
+    parent: string[]
+    child: string[]
+  }
+}
+
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const values = computed({
-  get: () => props.modelValue ?? {},
-  set: (newValues) => emit("update:modelValue", newValues),
+  get: () => {
+    const values = { ...props.modelValue }
+    delete values.fileNumber
+    delete values.deviatingFileNumber
+    Object.assign(values, {
+      fileNumberAndDeviatingFileNumbers: {
+        parent: props.modelValue.fileNumber,
+        child: props.modelValue.deviatingFileNumber,
+      },
+    })
+    return values as StructuredCoreData
+  },
+  set: (newValues) => {
+    const values = { ...newValues }
+    // delete values.fileNumberAndDeviatingFileNumbers
+    // values.fileNumber = newValues.fileNumberAndDeviatingFileNumbers.parent
+    // values.deviatingFileNumber =
+    //   newValues.fileNumberAndDeviatingFileNumbers.child
+    emit("update:modelValue", values)
+  },
 })
 
 const containerWidth = ref()

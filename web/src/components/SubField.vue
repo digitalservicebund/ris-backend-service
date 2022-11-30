@@ -48,7 +48,7 @@ const resizeObserver = new ResizeObserver((entries) => {
       :aria-label="
         isExpanded ? 'Abweichendes Feld schließen' : 'Abweichendes Feld öffnen'
       "
-      class="-mt-[2.5rem] expandable-content__header h-[1.25rem] text-white"
+      class="-mt-[3.5rem] expandable-content__header h-[1.25rem] text-white"
       @click="toggleContentVisibility"
     >
       <span class="bg-blue-800 material-icons rounded-full w-icon">{{

@@ -6,34 +6,30 @@ export enum InputType {
   DROPDOWN = "dropdown",
   DATE = "date",
   CHECKBOX = "checkbox",
-  CHIP = "chip",
+  MULTITEXT = "multitext",
+  TUPLE = "tuple",
 }
 
+//BASE
 export interface BaseInputAttributes {
   ariaLabel: string
   validationError?: ValidationError
-  subField?: InputField
 }
 
 export interface BaseInputField {
   name: string
   type: InputType
-  label: string
+  label?: string
   required?: boolean
   inputAttributes: BaseInputAttributes
 }
 
+//TEXT
 export type TextInputModelType = string
-
-export type BooleanModelType = boolean
 
 export interface TextInputAttributes extends BaseInputAttributes {
   placeholder?: string
   readOnly?: boolean
-}
-
-export interface ChipInputAttributes extends BaseInputAttributes {
-  placeholder?: string
 }
 
 export interface TextInputField extends BaseInputField {
@@ -41,25 +37,48 @@ export interface TextInputField extends BaseInputField {
   inputAttributes: TextInputAttributes
 }
 
-export interface ChipInputField extends BaseInputField {
-  type: InputType.CHIP
-  inputAttributes: ChipInputAttributes
+//MULTITEXT
+export type MultitextInputModelType = string[]
+
+export interface MultitextInputAttributes extends BaseInputAttributes {
+  placeholder?: string
 }
 
-export type DateInputModelType = string
+export interface MultitextInputField extends BaseInputField {
+  type: InputType.MULTITEXT
+  inputAttributes: MultitextInputAttributes
+}
 
-export type ChipInputModelType = string[]
+//TUPLE
+export interface TupleInputModelType {
+  parent: ModelType
+  child: ModelType
+}
 
+export interface TupleInputAttributes extends BaseInputAttributes {
+  fields: { parent: InputField; child: InputField }
+}
+
+export interface TupleInputField extends BaseInputField {
+  type: InputType.TUPLE
+  inputAttributes: TupleInputAttributes
+}
+
+//DATE
 export interface DateInputField extends BaseInputField {
   type: InputType.DATE
   inputAttributes: BaseInputAttributes
 }
 
+export type DateInputModelType = string
+
+//LOOKUP
 export enum LookupTableEndpoint {
   documentTypes = "lookuptable/documentTypes",
   courts = "lookuptable/courts",
 }
 
+//DROPDOWN
 export type DropdownInputModelType = string | Court
 
 export type DropdownItem = {
@@ -75,6 +94,14 @@ export interface DropdownAttributes extends BaseInputAttributes {
   preselectedValue?: string
 }
 
+export interface DropdownInputField extends BaseInputField {
+  type: InputType.DROPDOWN
+  inputAttributes: DropdownAttributes
+}
+
+//CHECKBOX
+export type BooleanModelType = boolean
+
 export type CheckboxInputModelType = boolean
 
 export interface CheckboxInputField extends BaseInputField {
@@ -82,22 +109,19 @@ export interface CheckboxInputField extends BaseInputField {
   inputAttributes: BaseInputAttributes
 }
 
-export interface DropdownInputField extends BaseInputField {
-  type: InputType.DROPDOWN
-  inputAttributes: DropdownAttributes
-}
-
 export type InputField =
   | TextInputField
   | DropdownInputField
   | DateInputField
   | CheckboxInputField
-  | ChipInputField
+  | MultitextInputField
+  | TupleInputField
 
 export type InputAttributes =
   | TextInputAttributes
   | DropdownAttributes
-  | ChipInputAttributes
+  | MultitextInputAttributes
+  | TupleInputAttributes
 
 export type ModelType =
   | TextInputModelType
@@ -105,7 +129,8 @@ export type ModelType =
   | DropdownInputModelType
   | BooleanModelType
   | CheckboxInputModelType
-  | ChipInputModelType
+  | MultitextInputModelType
+  | TupleInputModelType
 
 export type ValidationError = {
   defaultMessage: string

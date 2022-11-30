@@ -157,6 +157,7 @@ const dropdownInputAttribute: InputAttributes = {
       label="This input field is a dropdown"
     >
       <InputElement
+        id="dropdownInput"
         :attributes="dropdownInputAttribute"
         :type="InputType.DROPDOWN"
       />
