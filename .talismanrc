@@ -1,8 +1,6 @@
 fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
-  - filename: web/src/routes/norms/norm/[:normGuid]/frame.vue
-    checksum: 79b37f487b61d8d9251c29009f01403e2119fe7b66afe2d8006849b773069a41
   - filename: build.gradle
     checksum: 40fbeb2209d1374aa50b4c52f97857a5c03065699f39082f1e91c08daac55756
   - filename: run.sh
@@ -120,7 +118,7 @@ fileignoreconfig:
   - filename: web/test/services/normsService.spec.ts
     checksum: b023f40aa4fb5132e3abe24d14ad345bd6e1d59c44009a8c2a3764951b91787d
   - filename: web/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: 90e3328c6e3d36c6c3624bcab7431eed1bf048944eabfc54e46aafb4112123cf
+    checksum: 79b37f487b61d8d9251c29009f01403e2119fe7b66afe2d8006849b773069a41
   - filename: web/src/stores/loadedNorm.ts
     checksum: c25d81f6085eb2fd075a7f6a4e0d198561c836fb30a2695d7d089b826359704f
   - filename: web/test/stores/loadedNorm.spec.ts
