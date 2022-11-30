@@ -28,8 +28,8 @@ public class DocumentUnitDTO {
         .uuid(UUID.randomUUID())
         .creationtimestamp(Instant.now())
         .documentnumber(
-            documentUnitCreationInfo.getDocumentationCenterAbbreviation()
-                + documentUnitCreationInfo.getDocumentType()
+            documentUnitCreationInfo.documentationCenterAbbreviation()
+                + documentUnitCreationInfo.documentType()
                 + Calendar.getInstance().get(Calendar.YEAR)
                 + String.format("%05d", documentNumber))
         .build();
