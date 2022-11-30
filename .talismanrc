@@ -114,9 +114,9 @@ fileignoreconfig:
   - filename: web/src/domain/Norm.ts
     checksum: 767152817b3382f25cb478d3cd7ac3b7da48ca5c19e8d7892a88a91217512538
   - filename: web/src/services/normsService.ts
-    checksum: 2780225651c1d985339def1746b4b4dab2a6c3f6fc2ba08a446059141fd445af
+    checksum: 0296e14302960935baa61851f26e8f867994486a0ecf44d61205d9f539ce8ba1
   - filename: web/test/services/normsService.spec.ts
-    checksum: 279b4055ac9b6986c2fd4b345df94f9dd3173aed9c0b9e1cbb19d4dae1666f3e
+    checksum: b023f40aa4fb5132e3abe24d14ad345bd6e1d59c44009a8c2a3764951b91787d
   - filename: web/src/routes/norms/norm/\[:normGuid\]/frame.vue
     checksum: 90e3328c6e3d36c6c3624bcab7431eed1bf048944eabfc54e46aafb4112123cf
   - filename: web/src/stores/loadedNorm.ts

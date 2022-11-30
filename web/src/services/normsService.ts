@@ -1,9 +1,12 @@
 import dayjs from "dayjs"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Norm } from "@/domain/Norm"
 
 type NormList = { longTitle: string; guid: string }[]
-
+dayjs.extend(utc)
+dayjs.extend(timezone)
 type FrameData = {
   longTitle: string
   officialShortTitle?: string
@@ -47,7 +50,9 @@ function encodeBoolean(data?: boolean): boolean | null {
 //
 // TODO: Improve by working with enriched date type.
 function encodeDate(data?: string): string | null {
-  return data && data.length > 0 ? dayjs(data).format("YYYY-MM-DD") : null
+  return data && data.length > 0
+    ? dayjs(data).tz("Europe/Berlin").format("YYYY-MM-DD")
+    : null
 }
 
 function encodeFrameData(data: FrameData) {
