@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -47,6 +48,7 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
   }
 
   @Override
+  @Transactional
   public Mono<DocumentUnitDTO> save(DocumentUnitDTO documentUnitDTO) {
     return repository
         .save(documentUnitDTO)
@@ -70,7 +72,7 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
                                       .build())
                           .toList())
                   .collectList()
-                  .flatMap(f -> Mono.just(duDTO));
+                  .map(f -> duDTO);
             })
         .flatMap(
             duDTO -> {
@@ -89,7 +91,7 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
                                       .build())
                           .toList())
                   .collectList()
-                  .flatMap(f -> Mono.just(duDTO));
+                  .map(f -> duDTO);
             });
   }
 
