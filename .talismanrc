@@ -133,6 +133,8 @@ fileignoreconfig:
     checksum: aca9d888104b1ac92e712c59ed147a4e9450f1582a493534a1842adc3d9a4880
   - filename: web/src/composables/useTransformTupleData.ts
     checksum: b26f91d6c76014b14d90da40a9d4dd0f0a91bec8a3035fed73f351e1d628d81c
+  - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
+    checksum: 0a6c0e6bd3a9373472a2ed7c0e6b7973be7e4f78715a09b1495d15d2d0d1522f
 
 scopeconfig:
   - scope: node
