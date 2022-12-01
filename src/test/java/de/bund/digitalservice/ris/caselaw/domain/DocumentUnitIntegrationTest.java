@@ -55,6 +55,7 @@ public class DocumentUnitIntegrationTest {
 
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean EmailPublishService publishService;
+  @MockBean DocumentUnitListEntryRepository listEntryRepository;
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;

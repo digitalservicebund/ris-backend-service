@@ -126,7 +126,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 9e2f18f6e3158066ab114e5b396d0862479d7f8e6fc4d903b0d55b54d948e548
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 8a44fe30fd2b4661a597c78c7ac8789d47d511fcd22c0dae2f8cc6c071be166a
+    checksum: 0138c48519cd1d74b18948042317cee9ecfe927486f079ff5525ea5f2f01dc4b
   - filename: web/test/composables/useTransformTupleData.spec.ts
     checksum: d34e3fa625bce09cc2cb6a42601ac8ee6f4ea7e798ee44b55bc8ad9e111e5f0e
   - filename: web/src/components/DocumentUnitCoreData.vue
