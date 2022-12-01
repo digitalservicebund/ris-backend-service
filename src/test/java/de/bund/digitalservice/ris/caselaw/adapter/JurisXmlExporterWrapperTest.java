@@ -17,7 +17,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
@@ -38,13 +37,13 @@ public class JurisXmlExporterWrapperTest {
 
   @Test
   @Tag("IntegrationTest")
-  @Disabled("Will make necessary fileNumbers changes in the exporter asap")
   void test_validDocumentUnit_shouldReturnEncryptedXMLString() throws Exception {
     this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
 
     CoreData coreData =
         CoreData.builder()
-            .fileNumbers(List.of("fileNumber"))
+            .fileNumbers(List.of("fileNumber1", "fileNumber2"))
+            .deviatingFileNumbers(List.of("deviatingFileNumber1", "deviatingFileNumber2"))
             .court(new Court("courtType", null, null))
             .category("category")
             .ecli("ecli")
@@ -75,7 +74,7 @@ public class JurisXmlExporterWrapperTest {
     encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
 
     assertEquals(
-        "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",
+        "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",
         encryptedXml);
   }
 
