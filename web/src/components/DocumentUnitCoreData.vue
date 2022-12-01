@@ -1,8 +1,9 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, toRefs } from "vue"
 import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
+import { useTransformTupleData } from "@/composables/useTransformTupleData"
 import {
   coreDataFields,
   prefilledDataFields,
@@ -21,41 +22,15 @@ interface Emits {
   (event: "update:modelValue", value: CoreData): void
 }
 
-type StructuredCoreData = Omit<
-  CoreData,
-  "fileNumber" | "deviatingFileNumber"
-> & {
-  fileNumberAndDeviatingFileNumbers: {
-    parent: string[]
-    child: string[]
-  }
-}
-
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { modelValue } = toRefs(props)
 
-const values = computed({
-  get: () => {
-    const values = { ...props.modelValue }
-    delete values.fileNumber
-    delete values.deviatingFileNumber
-    Object.assign(values, {
-      fileNumberAndDeviatingFileNumbers: {
-        parent: props.modelValue.fileNumber,
-        child: props.modelValue.deviatingFileNumber,
-      },
-    })
-    return values as StructuredCoreData
-  },
-  set: (newValues) => {
-    const values = { ...newValues }
-    // delete values.fileNumberAndDeviatingFileNumbers
-    // values.fileNumber = newValues.fileNumberAndDeviatingFileNumbers.parent
-    // values.deviatingFileNumber =
-    //   newValues.fileNumberAndDeviatingFileNumbers.child
-    emit("update:modelValue", values)
-  },
-})
+const values = useTransformTupleData(
+  modelValue,
+  [{ parentKey: "fileNumbers", childKey: "deviatingFileNumbers" }],
+  emit
+)
 
 const containerWidth = ref()
 const columnCount = computed(() => (containerWidth.value < 600 ? 1 : 2))
