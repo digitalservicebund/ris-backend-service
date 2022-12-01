@@ -122,14 +122,14 @@ export const coreDataFields: InputField[] = [
       parent: defineMultiTextField(
         "fileNumbers",
         "Aktenzeichen",
-        "Aktenzeichen Parent",
+        "Aktenzeichen",
         true,
         ""
       ),
       child: defineMultiTextField(
         "deviatingFileNumbers",
         "Abweichendes Aktenzeichen",
-        "Aktenzeichen Child",
+        "Abweichendes Aktenzeichen",
         false,
         ""
       ),
