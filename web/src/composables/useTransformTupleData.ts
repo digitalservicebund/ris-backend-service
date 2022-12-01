@@ -9,6 +9,19 @@ function getTupleKey(parentKey: string, childKey: string) {
   return `${parentKey}And${sentenceCaseChildKey}`
 }
 
+function getKeysFromTupleKey(combinedTupleKey: string) {
+  const parentKey = combinedTupleKey.substring(
+    0,
+    combinedTupleKey.indexOf("And")
+  )
+  let childKey = combinedTupleKey.substring(
+    combinedTupleKey.indexOf("And") + 3,
+    combinedTupleKey.length
+  )
+  childKey = childKey.charAt(0).toLowerCase() + childKey.slice(1)
+  return { parentKey, childKey }
+}
+
 //TODO Naming to be done
 function transformToNestedData(
   data: Record<string, ModelType>,
@@ -28,24 +41,25 @@ function transformToNestedData(
   return nestedData
 }
 
-function transformToFlatData(
-  data: Record<string, ModelType>,
-  parentKey: string,
-  childKey: string
-) {
-  const tupleKey = getTupleKey(parentKey, childKey)
-  const tupleValue = data[tupleKey]
-  if (
-    typeof tupleValue === "object" &&
-    "parent" in tupleValue &&
-    "child" in tupleValue
-  ) {
-    const flattenData = { ...data }
-    delete flattenData[tupleKey]
-    flattenData[parentKey] = tupleValue.parent
-    flattenData[childKey] = tupleValue.child
-    return flattenData
-  } else throw new Error(`Can not flatten tuple key: ${tupleKey}`)
+function transformToFlatData(newValues: Record<string, ModelType>) {
+  for (const tupleKey in newValues) {
+    const tupleValue = newValues[tupleKey]
+    if (
+      typeof tupleValue === "object" &&
+      "parent" in tupleValue &&
+      "child" in tupleValue
+    ) {
+      const { parentKey, childKey } = getKeysFromTupleKey(tupleKey)
+
+      const flattenData = { ...newValues }
+      delete flattenData[tupleKey]
+      flattenData[parentKey] = tupleValue.parent
+      flattenData[childKey] = tupleValue.child
+      return flattenData
+      // } else throw new Error(`Can not flatten tuple key: ${tupleKey}`)
+    }
+  }
+  return newValues
 }
 
 interface Emits {
@@ -70,14 +84,7 @@ export function useTransformTupleData<E extends Emits>(
       return nestedData
     },
     set: (newValues) => {
-      let flatData = data.value
-      tuples.map((tuple) => {
-        flatData = transformToFlatData(
-          newValues,
-          tuple.parentKey,
-          tuple.childKey
-        )
-      })
+      const flatData = transformToFlatData(newValues)
       emit("update:modelValue", flatData)
     },
   })
