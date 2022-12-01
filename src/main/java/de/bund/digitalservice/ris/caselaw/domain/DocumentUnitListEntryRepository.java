@@ -1,8 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import org.springframework.data.repository.reactive.ReactiveSortingRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.NoRepositoryBean;
+import reactor.core.publisher.Flux;
 
-@Repository
-public interface DocumentUnitListEntryRepository
-    extends ReactiveSortingRepository<DocumentUnitListEntry, Long> {}
+@NoRepositoryBean
+public interface DocumentUnitListEntryRepository {
+
+  Flux<DocumentUnitListEntry> findAll(Sort sort);
+}

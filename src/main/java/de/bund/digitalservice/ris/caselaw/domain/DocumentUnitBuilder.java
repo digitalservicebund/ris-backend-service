@@ -74,9 +74,8 @@ public class DocumentUnitBuilder {
         documentUnitDTO.getFiletype(),
         documentUnitDTO.getFilename(),
         new CoreData(
-            documentUnitDTO.getFileNumbers() == null || documentUnitDTO.getFileNumbers().isEmpty()
-                ? null
-                : documentUnitDTO.getFileNumbers().get(0),
+            documentUnitDTO.getFileNumbers(),
+            documentUnitDTO.getDeviatingFileNumbers(),
             court,
             documentUnitDTO.getCategory(),
             documentUnitDTO.getProcedure(),

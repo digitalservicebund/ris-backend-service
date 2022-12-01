@@ -68,7 +68,7 @@ fileignoreconfig:
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: b74bfe683a8c6d970341e3578d6e7f61704f843e50929aa8d76129b03dfdcf67
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
-    checksum: 5b648fae36a5fa772afe7014b747b838d286250e590ee9ed6307e3f355b0796c
+    checksum: d657273e0c2eb9bd211a3a30ad98a0d0f889abc56935fb5c12f0c7cf7ecce12c
   - filename: web/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
@@ -126,7 +126,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 9e2f18f6e3158066ab114e5b396d0862479d7f8e6fc4d903b0d55b54d948e548
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 498ed59ed0b895f2d86bbb37a70dec87dcd00b40f1c022e08e93b4c59150dc64
+    checksum: 8a44fe30fd2b4661a597c78c7ac8789d47d511fcd22c0dae2f8cc6c071be166a
   - filename: web/test/composables/useTransformTupleData.spec.ts
     checksum: d34e3fa625bce09cc2cb6a42601ac8ee6f4ea7e798ee44b55bc8ad9e111e5f0e
   - filename: web/src/components/DocumentUnitCoreData.vue

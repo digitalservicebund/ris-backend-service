@@ -109,7 +109,7 @@ public class DocumentUnitIntegrationTest {
             .uuid(dto.getUuid())
             .creationtimestamp(dto.getCreationtimestamp())
             .documentNumber(dto.getDocumentnumber())
-            .coreData(CoreData.builder().fileNumber("AkteX").build())
+            .coreData(CoreData.builder().fileNumbers(List.of("AkteX")).build())
             .texts(Texts.builder().decisionName("decisionName").build())
             .build();
 
@@ -126,7 +126,8 @@ public class DocumentUnitIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
-              assertThat(response.getResponseBody().coreData().fileNumber()).isEqualTo("AkteX");
+              assertThat(response.getResponseBody().coreData().fileNumbers().get(0))
+                  .isEqualTo("AkteX");
             });
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
