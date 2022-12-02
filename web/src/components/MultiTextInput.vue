@@ -40,6 +40,7 @@ function deleteChip(index: number) {
   chips.value.splice(index, 1)
   emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
+
 function resetFocus() {
   focusedItemIndex.value = undefined
 }
@@ -57,9 +58,9 @@ function backspaceDelete() {
 function enterDelete() {
   if (focusedItemIndex.value !== undefined) {
     chips.value.splice(focusedItemIndex.value, 1)
-    //bring focus on secondlast item if last item was deleted
+    // bring focus on second last item if last item was deleted
     if (focusedItemIndex.value === chips.value.length) {
-      previous()
+      focusPrevious()
     }
     if (focusedItemIndex.value === -1) {
       resetFocus()
@@ -69,7 +70,7 @@ function enterDelete() {
   emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
-const previous = () => {
+const focusPrevious = () => {
   focusedItemIndex.value =
     focusedItemIndex.value === undefined || focusedItemIndex.value === 0
       ? chips.value.length - 1
@@ -79,13 +80,13 @@ const previous = () => {
   ] as HTMLElement
   if (prev) prev.focus()
 }
-const next = () => {
+
+const focusNext = () => {
   focusedItemIndex.value =
     focusedItemIndex.value === undefined ||
     focusedItemIndex.value === chips.value.length - 1
       ? 0
       : (focusedItemIndex.value += 1)
-
   const next = containerRef.value?.children[
     focusedItemIndex.value
   ] as HTMLElement
@@ -115,8 +116,8 @@ onMounted(() => {
         class="bg-blue-500 body-01-reg chip"
         tabindex="0"
         @keypress.enter="enterDelete"
-        @keyup.left="previous"
-        @keyup.right="next"
+        @keyup.left="focusPrevious"
+        @keyup.right="focusNext"
       >
         <div class="label-wrapper">{{ chip }}</div>
 
@@ -138,8 +139,8 @@ onMounted(() => {
       type="text"
       @keydown.delete="backspaceDelete"
       @keypress.enter="saveChip"
-      @keyup.left="previous"
-      @keyup.right="next"
+      @keyup.left="focusPrevious"
+      @keyup.right="focusNext"
     />
   </div>
 </template>
