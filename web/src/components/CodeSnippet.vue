@@ -21,6 +21,7 @@ watch(
 )
 </script>
 
+<!-- TODO use tiptap with XML plugin instead of building it ourselves -->
 <template>
   <div class="xml-container">
     <p class="text-color-black xml-container-title">{{ title }}</p>
