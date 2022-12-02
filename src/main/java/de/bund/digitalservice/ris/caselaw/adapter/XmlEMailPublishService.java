@@ -20,6 +20,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
+/** Implementation of the email publish service to publish the document unit as xml. */
 @Service
 public class XmlEMailPublishService implements EmailPublishService {
   private static final Logger LOGGER = LoggerFactory.getLogger(XmlEMailPublishService.class);
@@ -33,6 +34,14 @@ public class XmlEMailPublishService implements EmailPublishService {
   @Value("${mail.exporter.senderAddress:test}")
   private String senderAddress;
 
+  /**
+   * Constructor to get the bean singletons.
+   *
+   * @param xmlExporter get the xml exporter to convert the document unit to xml
+   * @param mailSender get the service to send the generated email
+   * @param repository get the repository in which the published xml information and the generated
+   *     mail subject are saved
+   */
   public XmlEMailPublishService(
       XmlExporter xmlExporter, HttpMailSender mailSender, XmlMailRepository repository) {
     this.xmlExporter = xmlExporter;
@@ -40,6 +49,14 @@ public class XmlEMailPublishService implements EmailPublishService {
     this.repository = repository;
   }
 
+  /**
+   * Publish the xml converted document unit via email.
+   *
+   * @param documentUnitDTO document unit which should be published
+   * @param receiverAddress email address of the receiver of the xml version of the document unit.
+   * @return the mail response object which was saved to the repository. It contains mail subject
+   *     and xml data.
+   */
   @Override
   public Mono<MailResponse> publish(DocumentUnitDTO documentUnitDTO, String receiverAddress) {
     XmlResultObject xml;
@@ -61,6 +78,14 @@ public class XmlEMailPublishService implements EmailPublishService {
         .map(xmlMail -> new XmlMailResponse(documentUnitDTO.getUuid(), xmlMail));
   }
 
+  /**
+   * Get the xml response object of the last published xml for a document unit id. It contains the
+   * mail subject and the xml data.
+   *
+   * @param documentUnitId id of the document unit
+   * @param documentUnitUuid uuid of the document unit
+   * @return xml response object of document unit which was published last
+   */
   @Override
   public Mono<MailResponse> getLastPublishedXml(Long documentUnitId, UUID documentUnitUuid) {
     return repository

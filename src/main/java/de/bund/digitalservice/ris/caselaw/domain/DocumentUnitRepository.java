@@ -4,6 +4,7 @@ import java.util.UUID;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Mono;
 
+/** Definition of the repository for the document units. */
 @NoRepositoryBean
 public interface DocumentUnitRepository {
 

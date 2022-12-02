@@ -8,8 +8,20 @@ import java.util.Collections;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+/**
+ * Mock implementation of the xml exporter. Allow the use of the system without the private library
+ * for converting.
+ */
 public class MockXmlExporter implements XmlExporter {
 
+  /**
+   * Give a XmlResultObject with no real information about the document unit.
+   *
+   * @param documentUnit the document unit
+   * @return a mocked result object
+   * @throws ParserConfigurationException
+   * @throws TransformerException
+   */
   @Override
   public XmlResultObject generateXml(DocumentUnit documentUnit)
       throws ParserConfigurationException, TransformerException {

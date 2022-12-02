@@ -60,6 +60,10 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
+/**
+ * Implementation of the service to get word files (*.docx) from the storage and convert it with the
+ * use of the converter to a xhtml version of the content.
+ */
 @Service
 public class DocxConverterService {
   private static final Logger LOGGER = LoggerFactory.getLogger(DocxConverterService.class);
@@ -71,6 +75,13 @@ public class DocxConverterService {
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
 
+  /**
+   * Contstructor to initialize the needed singletons.
+   *
+   * @param client client for the handling of the file storage
+   * @param documentBuilderFactory xml builder factory for parsing of the docx format
+   * @param converter converter to convert the xml docx to xhtml
+   */
   public DocxConverterService(
       S3AsyncClient client,
       DocumentBuilderFactory documentBuilderFactory,
@@ -80,6 +91,12 @@ public class DocxConverterService {
     this.converter = converter;
   }
 
+  /**
+   * Get the unformatted text content of the docx file
+   *
+   * @param mlPackage representation of the docx object from the library
+   * @return the unformatted text content of the docx file
+   */
   public String getOriginalText(WordprocessingMLPackage mlPackage) {
     if (mlPackage == null) {
       return "<no word file selected>";
@@ -111,6 +128,11 @@ public class DocxConverterService {
     return originalText;
   }
 
+  /**
+   * Get all docx files
+   *
+   * @return
+   */
   public Mono<List<String>> getDocxFiles() {
     ListObjectsV2Request request = ListObjectsV2Request.builder().bucket(bucketName).build();
 
@@ -120,6 +142,12 @@ public class DocxConverterService {
         .map(response -> response.contents().stream().map(S3Object::key).toList());
   }
 
+  /**
+   * Get the word file from the file storage and convert it to XHTML.
+   *
+   * @param fileName UUID file name in the file storage
+   * @return converted word file as XHTML
+   */
   public Mono<Docx2Html> getHtml(String fileName) {
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 
@@ -144,6 +172,12 @@ public class DocxConverterService {
         .doOnError(ex -> LOGGER.error("Couldn't convert docx", ex));
   }
 
+  /**
+   * Convert a local word file to a list of internal used DocumentUnitDocx objects.
+   *
+   * @param inputStream input stream of the word file
+   * @return list of DocumentUnitDocx objects
+   */
   public List<DocumentUnitDocx> parseAsDocumentUnitDocxList(InputStream inputStream) {
     if (inputStream == null) {
       return Collections.emptyList();
@@ -171,6 +205,12 @@ public class DocxConverterService {
     return documentUnitDocxList;
   }
 
+  /**
+   * Get numbering list information for the word file.
+   *
+   * @param mlPackage word file object
+   * @return map of used id to the concrete definition
+   */
   private Map<String, ListNumberingDefinition> readNumbering(WordprocessingMLPackage mlPackage) {
     if (mlPackage == null
         || mlPackage.getMainDocumentPart() == null
@@ -184,6 +224,12 @@ public class DocxConverterService {
         .getInstanceListDefinitions();
   }
 
+  /**
+   * Get style information for the word file.
+   *
+   * @param mlPackage word file object
+   * @return map of used id to the concrete definition
+   */
   private Map<String, Style> readStyles(WordprocessingMLPackage mlPackage) {
     if (mlPackage == null
         || mlPackage.getMainDocumentPart() == null
@@ -200,6 +246,12 @@ public class DocxConverterService {
         .collect(Collectors.toMap(k -> k.getStyleId(), Function.identity()));
   }
 
+  /**
+   * Get image information for the word file.
+   *
+   * @param mlPackage word file object
+   * @return map of used id to the concrete definition
+   */
   private Map<String, DocxImagePart> readImages(WordprocessingMLPackage mlPackage) {
     if (mlPackage == null
         || mlPackage.getParts() == null
@@ -240,6 +292,13 @@ public class DocxConverterService {
     return images;
   }
 
+  /**
+   * Convert EMF images to png and replace it in the image definition map.
+   *
+   * @param mlPackage word file object
+   * @param images map of id to image definition
+   * @param emfPart emf data
+   */
   private void convertEMF(
       WordprocessingMLPackage mlPackage,
       Map<String, DocxImagePart> images,
