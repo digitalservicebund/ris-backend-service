@@ -25,9 +25,15 @@ const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
 function saveChip() {
-  chips.value.push(currentInput.value)
-  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
-  currentInput.value = ""
+  const trimmed = currentInput.value.trim()
+  if (trimmed.length > 0) {
+    chips.value.push(trimmed)
+    emit(
+      "update:modelValue",
+      chips.value.length === 0 ? undefined : chips.value
+    )
+    currentInput.value = ""
+  }
 }
 
 function deleteChip(index: number) {
@@ -39,8 +45,13 @@ function resetFocus() {
 }
 
 function backspaceDelete() {
-  chips.value.splice(chips.value.length - 1)
-  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  if (currentInput.value === "") {
+    chips.value.splice(chips.value.length - 1)
+    emit(
+      "update:modelValue",
+      chips.value.length === 0 ? undefined : chips.value
+    )
+  }
 }
 
 function enterDelete() {
