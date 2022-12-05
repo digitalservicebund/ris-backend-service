@@ -117,7 +117,7 @@ export const coreDataFields: InputField[] = [
   ),
   defineTupleField(
     "Toggle Abweichendes Aktenzeichen",
-    "fileNumbersAndDeviatingFileNumbers",
+    "TupleOfFileNumbersAndDeviatingFileNumbers",
     {
       parent: defineMultiTextField(
         "fileNumbers",
