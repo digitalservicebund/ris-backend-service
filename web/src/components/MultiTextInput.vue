@@ -24,21 +24,22 @@ const currentInput = ref<string>("")
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
+function updateModelValue() {
+  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+}
+
 function saveChip() {
   const trimmed = currentInput.value.trim()
   if (trimmed.length > 0) {
     chips.value.push(trimmed)
-    emit(
-      "update:modelValue",
-      chips.value.length === 0 ? undefined : chips.value
-    )
+    updateModelValue()
     currentInput.value = ""
   }
 }
 
 function deleteChip(index: number) {
   chips.value.splice(index, 1)
-  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  updateModelValue()
 }
 
 function resetFocus() {
@@ -48,10 +49,7 @@ function resetFocus() {
 function backspaceDelete() {
   if (currentInput.value === "") {
     chips.value.splice(chips.value.length - 1)
-    emit(
-      "update:modelValue",
-      chips.value.length === 0 ? undefined : chips.value
-    )
+    updateModelValue()
   }
 }
 
@@ -67,7 +65,7 @@ function enterDelete() {
     }
   }
 
-  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  updateModelValue()
 }
 
 const focusPrevious = () => {
