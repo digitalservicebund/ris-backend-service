@@ -3,23 +3,31 @@ import { ModelType } from "@/domain/types"
 
 type FieldData = { [fieldName: string]: ModelType }
 
+function uppercaseFirstLetter(string: string) {
+  return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+function lowercaseFirstLetter(string: string) {
+  return string.charAt(0).toLowerCase() + string.slice(1)
+}
+
 function getTupleKey(parentKey: string, childKey: string) {
-  const sentenceCaseChildKey =
-    childKey.charAt(0).toUpperCase() + childKey.slice(1)
-  return `${parentKey}And${sentenceCaseChildKey}`
+  return (
+    "TupleOf" +
+    uppercaseFirstLetter(parentKey) +
+    "And" +
+    uppercaseFirstLetter(childKey)
+  )
 }
 
 function getKeysFromTupleKey(combinedTupleKey: string) {
-  const parentKey = combinedTupleKey.substring(
-    0,
-    combinedTupleKey.indexOf("And")
-  )
-  let childKey = combinedTupleKey.substring(
-    combinedTupleKey.indexOf("And") + 3,
-    combinedTupleKey.length
-  )
-  childKey = childKey.charAt(0).toLowerCase() + childKey.slice(1)
-  return { parentKey, childKey }
+  const matches = /^TupleOf(.*)And(.*)/g.exec(combinedTupleKey)
+  if (matches)
+    return {
+      parentKey: lowercaseFirstLetter(matches[1]),
+      childKey: lowercaseFirstLetter(matches[2]),
+    }
+  throw new Error("Could not extract keys from tuple key")
 }
 
 //TODO Naming to be done

@@ -17,7 +17,7 @@ describe("useTransformTupleData", () => {
     )
 
     expect(values.value).toEqual({
-      testKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
+      TupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
       testKey3: "testValue3",
       testKey4: "testValue4",
     })
@@ -34,8 +34,8 @@ describe("useTransformTupleData", () => {
     )
 
     expect(values.value).toEqual({
-      testKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
-      testKey3AndTestKey4: { parent: "testValue3", child: "testValue4" },
+      TupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
+      TupleOfTestKey3AndTestKey4: { parent: "testValue3", child: "testValue4" },
     })
   })
 
@@ -51,7 +51,7 @@ describe("useTransformTupleData", () => {
     )
 
     values.value = {
-      testKey1AndTestKey2: {
+      TupleOfTestKey1AndTestKey2: {
         parent: "newTestValue1",
         child: "newTestValue2",
       },
