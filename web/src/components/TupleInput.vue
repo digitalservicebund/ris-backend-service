@@ -4,40 +4,32 @@ import InputElement from "@/components/InputElement.vue"
 import InputFieldComponent from "@/components/InputField.vue"
 import SubField from "@/components/SubField.vue"
 import { useInputModel } from "@/composables/useInputModel"
-import { ValidationError } from "@/domain"
-import type { InputField, ModelType } from "@/domain"
+import {
+  ValidationError,
+  TupleInputAttributes,
+  TupleInputModelType,
+} from "@/domain"
 
 interface Props {
   ariaLabel: string
-  value?: { parent: ModelType; child: ModelType }
-  modelValue?: { parent: ModelType; child: ModelType }
-  fields: { parent: InputField; child: InputField }
+  value?: TupleInputModelType
+  modelValue?: TupleInputModelType
+  fields: TupleInputAttributes["fields"]
   validationError?: ValidationError
 }
 
 interface Emits {
-  (
-    event: "update:modelValue",
-    value: { parent: ModelType; child: ModelType } | undefined
-  ): void
+  (event: "update:modelValue", value: TupleInputModelType | undefined): void
   (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const { inputValue } = useInputModel<
-  { parent: ModelType; child: ModelType },
-  Props,
-  Emits
->(props, emit)
-
-// const parentValue = computed({
-//   get: () => (props.modelValue ? props.modelValue.parent : undefined),
-//   set: (value) => {
-//     if (inputValue.value) inputValue.value.parent = value
-//   },
-// })
+const { inputValue } = useInputModel<TupleInputModelType, Props, Emits>(
+  props,
+  emit
+)
 
 const parentValue = computed({
   get: () => inputValue.value?.parent,
@@ -52,11 +44,6 @@ const childValue = computed({
     if (value && inputValue.value) inputValue.value.child = value
   },
 })
-
-// const value = computed({
-//   get: () => props.modelValue,
-//   set: (newValue) => emit("update:modelValue", newValue),
-// })
 </script>
 
 <template>

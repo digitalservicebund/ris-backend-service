@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import TupleInput from "@/components/TupleInput.vue"
-import type { InputField } from "@/domain"
-import { defineDateField } from "@/domain"
+import { defineDateField, TupleInputAttributes } from "@/domain"
 
-const tupleFields: { parent: InputField; child: InputField } = {
+const tupleFields: TupleInputAttributes["fields"] = {
   parent: defineDateField(
     "decisionDate",
     "Entscheidungsdatum",

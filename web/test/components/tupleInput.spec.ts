@@ -1,14 +1,13 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
 import TupleInput from "@/components/TupleInput.vue"
-import { InputField } from "@/domain"
-import type { ModelType } from "@/domain"
+import { TupleInputAttributes, TupleInputModelType } from "@/domain"
 import { defineTextField, defineDateField } from "@/domain/coreDataFields"
 
 function renderComponent(options?: {
   ariaLabel?: string
-  modelValue?: { parent: ModelType; child: ModelType }
-  fields?: { parent: InputField; child: InputField }
+  modelValue?: TupleInputModelType
+  fields?: TupleInputAttributes["fields"]
 }) {
   const props = {
     ariaLabel: options?.ariaLabel ?? "Toggle label",

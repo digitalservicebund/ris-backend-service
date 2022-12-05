@@ -1,4 +1,9 @@
-import { InputType, LookupTableEndpoint, ValidationError } from "./types"
+import {
+  InputType,
+  LookupTableEndpoint,
+  TupleInputAttributes,
+  ValidationError,
+} from "./types"
 import type { InputField, DropdownItem } from "./types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 
@@ -92,7 +97,7 @@ export function defineDropdownField(
 export function defineTupleField(
   ariaLabel: string,
   name: string,
-  fields: { parent: InputField; child: InputField }
+  fields: TupleInputAttributes["fields"]
 ): InputField {
   return {
     name,
