@@ -58,13 +58,11 @@ const value = computed({
 </script>
 
 <template>
-  <div>
-    <component
-      :is="component"
-      :id="id"
-      v-model="value"
-      v-bind="attributes"
-      :validation-error="validationError"
-    />
-  </div>
+  <component
+    :is="component"
+    :id="id"
+    v-model="value"
+    v-bind="attributes"
+    :validation-error="validationError"
+  />
 </template>
