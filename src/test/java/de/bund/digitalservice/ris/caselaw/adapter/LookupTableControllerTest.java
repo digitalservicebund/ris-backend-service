@@ -27,17 +27,17 @@ class LookupTableControllerTest {
 
   @Test
   void testGetDocumentTypes() {
-    when(service.getDocumentTypes(Optional.empty())).thenReturn(Flux.empty());
+    when(service.getCaselawDocumentTypes(Optional.empty())).thenReturn(Flux.empty());
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/lookuptable/documentTypes")
+        .uri("/api/v1/caselaw/lookuptable/documentTypes/caselaw")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getDocumentTypes(Optional.empty());
+    verify(service, times(1)).getCaselawDocumentTypes(Optional.empty());
   }
 
   @Test

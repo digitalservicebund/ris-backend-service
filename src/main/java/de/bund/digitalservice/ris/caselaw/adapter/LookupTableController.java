@@ -22,9 +22,9 @@ public class LookupTableController {
     this.service = service;
   }
 
-  @GetMapping(value = "documentTypes")
-  public Flux<DocumentType> getDocumentTypes(@RequestParam Optional<String> searchStr) {
-    return service.getDocumentTypes(searchStr);
+  @GetMapping(value = "documentTypes/caselaw")
+  public Flux<DocumentType> getCaselawDocumentTypes(@RequestParam Optional<String> searchStr) {
+    return service.getCaselawDocumentTypes(searchStr);
   }
 
   @GetMapping(value = "courts")

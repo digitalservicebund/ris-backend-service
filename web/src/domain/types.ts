@@ -44,7 +44,7 @@ export interface DateInputField extends BaseInputField {
 }
 
 export enum LookupTableEndpoint {
-  documentTypes = "lookuptable/documentTypes",
+  documentTypes = "lookuptable/documentTypes/caselaw",
   courts = "lookuptable/courts",
 }
 
