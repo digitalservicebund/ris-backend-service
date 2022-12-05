@@ -32,17 +32,24 @@ const { inputValue } = useInputModel<
   Emits
 >(props, emit)
 
+// const parentValue = computed({
+//   get: () => (props.modelValue ? props.modelValue.parent : undefined),
+//   set: (value) => {
+//     if (inputValue.value) inputValue.value.parent = value
+//   },
+// })
+
 const parentValue = computed({
-  get: () => (props.modelValue ? props.modelValue.parent : ""),
+  get: () => inputValue.value?.parent,
   set: (value) => {
-    if (inputValue.value) inputValue.value.parent = value
+    if (value && inputValue.value) inputValue.value.parent = value
   },
 })
 
 const childValue = computed({
-  get: () => (props.modelValue ? props.modelValue.child : ""),
+  get: () => inputValue.value?.child,
   set: (value) => {
-    if (inputValue.value) inputValue.value.child = value
+    if (value && inputValue.value) inputValue.value.child = value
   },
 })
 
