@@ -13,7 +13,7 @@ interface Props {
 }
 
 interface Emits {
-  (event: "update:modelValue", value: string[] | undefined): void
+  (event: "update:modelValue", value?: string[]): void
 }
 
 const props = defineProps<Props>()

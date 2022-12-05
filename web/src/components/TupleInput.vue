@@ -19,7 +19,7 @@ interface Props {
 }
 
 interface Emits {
-  (event: "update:modelValue", value: TupleInputModelType | undefined): void
+  (event: "update:modelValue", value?: TupleInputModelType): void
   (event: "input", value: Event): void
 }
 
