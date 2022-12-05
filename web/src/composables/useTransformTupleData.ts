@@ -76,19 +76,21 @@ interface Emits {
 
 export function useTransformTupleData<E extends Emits>(
   data: Ref<FieldData>,
-  tuples: { parentKey: string; childKey: string }[],
-  emit: E
+  emit: E,
+  tuples?: { parentKey: string; childKey: string }[]
 ) {
   return computed({
     get: () => {
       let nestedData = data.value
-      tuples.map((tuple) => {
-        nestedData = transformToNestedData(
-          nestedData,
-          tuple.parentKey,
-          tuple.childKey
-        )
-      })
+      if (tuples) {
+        tuples.map((tuple) => {
+          nestedData = transformToNestedData(
+            nestedData,
+            tuple.parentKey,
+            tuple.childKey
+          )
+        })
+      }
       return nestedData
     },
     set: (newValues) => {

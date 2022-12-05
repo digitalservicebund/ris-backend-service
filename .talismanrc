@@ -127,6 +127,12 @@ fileignoreconfig:
     checksum: 9e2f18f6e3158066ab114e5b396d0862479d7f8e6fc4d903b0d55b54d948e548
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
     checksum: 498ed59ed0b895f2d86bbb37a70dec87dcd00b40f1c022e08e93b4c59150dc64
+  - filename: web/test/composables/useTransformTupleData.spec.ts
+    checksum: db6389cd3905056f0db053bf329530b6ef61c5a29507a84e166963d254e991a5
+  - filename: web/src/components/DocumentUnitCoreData.vue
+    checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
+  - filename: web/src/composables/useTransformTupleData.ts
+    checksum: 2e8ccbc5ebcea1230ba2b1009097d76b0c28c77c4d9d8446905fdfe43ce31793
 
 scopeconfig:
   - scope: node

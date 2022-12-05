@@ -9,6 +9,8 @@ import {
   prefilledDataFields,
   moreCategories,
   ValidationError,
+  InputType,
+  TupleInputField,
 } from "@/domain"
 
 interface Props {
@@ -28,8 +30,15 @@ const { modelValue } = toRefs(props)
 
 const values = useTransformTupleData(
   modelValue,
-  [{ parentKey: "fileNumbers", childKey: "deviatingFileNumbers" }],
-  emit
+  emit,
+  coreDataFields
+    .filter((field): field is TupleInputField => field.type === InputType.TUPLE)
+    .map((tuple) => {
+      return {
+        parentKey: tuple.inputAttributes.fields.parent.name,
+        childKey: tuple.inputAttributes.fields.child.name,
+      }
+    })
 )
 
 const containerWidth = ref()

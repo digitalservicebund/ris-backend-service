@@ -10,11 +10,9 @@ const data = ref({
 
 describe("useTransformTupleData", () => {
   it("correctly transforms tuple based on model value property", () => {
-    const values = useTransformTupleData(
-      data,
-      [{ parentKey: "testKey1", childKey: "testKey2" }],
-      vi.fn()
-    )
+    const values = useTransformTupleData(data, vi.fn(), [
+      { parentKey: "testKey1", childKey: "testKey2" },
+    ])
 
     expect(values.value).toEqual({
       TupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
@@ -24,14 +22,10 @@ describe("useTransformTupleData", () => {
   })
 
   it("correctly transforms multiple tuple based on model value property", () => {
-    const values = useTransformTupleData(
-      data,
-      [
-        { parentKey: "testKey1", childKey: "testKey2" },
-        { parentKey: "testKey3", childKey: "testKey4" },
-      ],
-      vi.fn()
-    )
+    const values = useTransformTupleData(data, vi.fn(), [
+      { parentKey: "testKey1", childKey: "testKey2" },
+      { parentKey: "testKey3", childKey: "testKey4" },
+    ])
 
     expect(values.value).toEqual({
       TupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
@@ -41,14 +35,10 @@ describe("useTransformTupleData", () => {
 
   it("transforms manipulated data back to flat data structure", () => {
     const emit = vi.fn()
-    const values = useTransformTupleData(
-      data,
-      [
-        { parentKey: "testKey1", childKey: "testKey2" },
-        { parentKey: "testKey3", childKey: "testKey4" },
-      ],
-      emit
-    )
+    const values = useTransformTupleData(data, emit, [
+      { parentKey: "testKey1", childKey: "testKey2" },
+      { parentKey: "testKey3", childKey: "testKey4" },
+    ])
 
     values.value = {
       TupleOfTestKey1AndTestKey2: {
