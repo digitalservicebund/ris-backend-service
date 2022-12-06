@@ -4,7 +4,6 @@ import { InputField, ValidationError } from "@/domain"
 
 interface Props {
   id: string
-  value?: string
   modelValue?: string[]
   ariaLabel: string
   placeholder?: string
