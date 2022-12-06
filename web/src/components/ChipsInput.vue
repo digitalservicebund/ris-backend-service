@@ -45,16 +45,19 @@ function deleteChip(index: number) {
   currentInput.value = ""
   chips.value.splice(index, 1)
   updateModelValue()
+  resetFocus()
 }
 
 function resetFocus() {
   focusedItemIndex.value = undefined
+  currentInputField.value?.focus()
 }
 
 function backspaceDelete() {
   if (currentInput.value === "") {
     chips.value.splice(chips.value.length - 1)
     updateModelValue()
+    resetFocus()
   }
 }
 
@@ -94,7 +97,6 @@ const focusNext = () => {
   }
   if (focusedItemIndex.value == chips.value.length - 1) {
     resetFocus()
-    currentInputField.value?.focus()
     return
   }
   focusedItemIndex.value =
@@ -103,6 +105,10 @@ const focusNext = () => {
     focusedItemIndex.value
   ] as HTMLElement
   if (next) next.focus()
+}
+
+const setFocusedItemIndex = (index: number) => {
+  focusedItemIndex.value = index
 }
 
 const handleOnBlur = () => {
@@ -126,6 +132,7 @@ onMounted(() => {
         :key="i"
         class="bg-blue-500 body-01-reg chip"
         tabindex="0"
+        @click="setFocusedItemIndex(i)"
         @input="emitInputEvent"
         @keypress.enter="enterDelete"
         @keyup.left="focusPrevious"
