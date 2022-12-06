@@ -181,50 +181,6 @@ describe("MultiTextInput", () => {
     expect(chipList[0]).toHaveFocus()
   })
 
-  it("sets next chip active on arrow key 'right'", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
-    expect(input).toHaveValue("")
-
-    await user.type(input, "one")
-    await user.type(input, "{enter}")
-    await user.type(input, "two")
-    await user.type(input, "{enter}")
-
-    const chipList = container.getElementsByClassName("chip")
-    expect(chipList.length).toBe(2)
-    await user.type(input, "{arrowright}")
-    expect(chipList[0]).toHaveFocus()
-    await user.type(input, "{arrowright}")
-    expect(chipList[1]).toHaveFocus()
-  })
-
-  it("loops through the chips list with arrow keys", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
-    expect(input).toHaveValue("")
-
-    await user.type(input, "one")
-    await user.type(input, "{enter}")
-    await user.type(input, "two")
-    await user.type(input, "{enter}")
-
-    const chipList = container.getElementsByClassName("chip")
-    expect(chipList.length).toBe(2)
-    await user.type(input, "{arrowright}")
-    expect(chipList[0]).toHaveFocus()
-    await user.type(input, "{arrowright}")
-    expect(chipList[1]).toHaveFocus()
-    await user.type(input, "{arrowright}")
-    expect(chipList[0]).toHaveFocus()
-    await user.type(input, "{arrowleft}")
-    expect(chipList[1]).toHaveFocus()
-    await user.type(input, "{arrowleft}")
-    expect(chipList[0]).toHaveFocus()
-    await user.type(input, "{arrowleft}")
-    expect(chipList[1]).toHaveFocus()
-  })
-
   it("deletes active chip on press enter", async () => {
     const { getByRole, user, container } = renderComponent()
     const input: HTMLInputElement = getByRole("textbox")
