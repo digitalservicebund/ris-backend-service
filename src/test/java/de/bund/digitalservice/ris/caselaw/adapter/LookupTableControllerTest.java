@@ -32,7 +32,7 @@ class LookupTableControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/lookuptable/documentTypes/caselaw")
+        .uri("/api/v1/caselaw/lookuptable/documentTypes")
         .exchange()
         .expectStatus()
         .isOk();
