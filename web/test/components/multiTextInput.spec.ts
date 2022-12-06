@@ -126,6 +126,28 @@ describe("MultiTextInput", () => {
     expect(input).toHaveValue("")
   })
 
+  it("deletes written input first on backspace", async () => {
+    const { getByRole, user, container } = renderComponent()
+    const input: HTMLInputElement = getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+    await user.type(input, "two")
+    await user.type(input, "{enter}")
+    await user.type(input, "three")
+
+    const chipList = container.getElementsByClassName("chip")
+    expect(chipList.length).toBe(2)
+    expect(chipList[0]).toHaveTextContent("one")
+    expect(chipList[1]).toHaveTextContent("two")
+
+    await user.type(input, "{backspace}")
+    expect(chipList.length).toBe(2)
+
+    expect(input).toHaveValue("thre")
+  })
+
   it("sets previous chip active on arrow key 'left'", async () => {
     const { getByRole, user, container } = renderComponent()
     const input: HTMLInputElement = getByRole("textbox")
