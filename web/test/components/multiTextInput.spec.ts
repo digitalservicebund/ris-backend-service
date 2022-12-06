@@ -61,6 +61,21 @@ describe("MultiTextInput", () => {
     expect(input).toHaveValue("")
   })
 
+  it("press enter saves chip without whitespaces", async () => {
+    const { getByRole, user, container } = renderComponent()
+    const input: HTMLInputElement = getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, " one ")
+    await user.type(input, "{enter}")
+
+    const chipList = container.getElementsByClassName("chip")
+    expect(chipList.length).toBe(1)
+    expect(chipList[0]).toHaveTextContent("one")
+
+    expect(input).toHaveValue("")
+  })
+
   it("adds multiple values in chips", async () => {
     const { getByRole, user, container } = renderComponent()
     const input: HTMLInputElement = getByRole("textbox")
