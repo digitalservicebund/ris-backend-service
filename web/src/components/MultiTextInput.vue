@@ -20,6 +20,7 @@ const emit = defineEmits<Emits>()
 
 const chips = ref<string[]>(props.modelValue ?? [])
 const currentInput = ref<string>("")
+const currentInputField = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
@@ -37,6 +38,7 @@ function saveChip() {
 }
 
 function deleteChip(index: number) {
+  currentInput.value = ""
   chips.value.splice(index, 1)
   updateModelValue()
 }
@@ -54,6 +56,7 @@ function backspaceDelete() {
 
 function enterDelete() {
   if (focusedItemIndex.value !== undefined) {
+    currentInput.value = ""
     chips.value.splice(focusedItemIndex.value, 1)
     // bring focus on second last item if last item was deleted
     if (focusedItemIndex.value === chips.value.length) {
@@ -68,10 +71,13 @@ function enterDelete() {
 }
 
 const focusPrevious = () => {
+  if (currentInput.value.length > 0 || focusedItemIndex.value === 0) {
+    return
+  }
   focusedItemIndex.value =
-    focusedItemIndex.value === undefined || focusedItemIndex.value === 0
+    focusedItemIndex.value === undefined
       ? chips.value.length - 1
-      : (focusedItemIndex.value -= 1)
+      : focusedItemIndex.value - 1
   const prev = containerRef.value?.children[
     focusedItemIndex.value
   ] as HTMLElement
@@ -79,25 +85,29 @@ const focusPrevious = () => {
 }
 
 const focusNext = () => {
+  if (currentInput.value.length > 0 || focusedItemIndex.value === undefined) {
+    return
+  }
+  if (focusedItemIndex.value == chips.value.length - 1) {
+    resetFocus()
+    currentInputField.value?.focus()
+    return
+  }
   focusedItemIndex.value =
-    focusedItemIndex.value === undefined ||
-    focusedItemIndex.value === chips.value.length - 1
-      ? 0
-      : (focusedItemIndex.value += 1)
+    focusedItemIndex.value === undefined ? 0 : focusedItemIndex.value + 1
   const next = containerRef.value?.children[
     focusedItemIndex.value
   ] as HTMLElement
   if (next) next.focus()
 }
 
+const handleOnBlur = () => {
+  currentInput.value = ""
+}
+
 onMounted(() => {
   document.addEventListener("keydown", (e) => {
-    if (
-      e.key === "ArrowUp" ||
-      e.key === "ArrowDown" ||
-      e.key === "ArrowLeft" ||
-      e.key === "ArrowRight"
-    ) {
+    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
       e.preventDefault()
     }
   })
@@ -131,9 +141,11 @@ onMounted(() => {
 
     <input
       :id="id"
+      ref="currentInputField"
       v-model="currentInput"
       :aria-label="ariaLabel"
       type="text"
+      @blur="handleOnBlur"
       @keydown.delete="backspaceDelete"
       @keypress.enter="saveChip"
       @keyup.left="focusPrevious"
