@@ -1,5 +1,6 @@
 import { ref } from "vue"
 import { useTransformTupleData } from "@/composables/useTransformTupleData"
+import { InputField, InputType } from "@/domain"
 
 const data = ref({
   testKey1: "testValue1",
@@ -8,40 +9,78 @@ const data = ref({
   testKey4: "testValue4",
 })
 
+const oneField: InputField[] = [
+  {
+    name: "tupleOfTestKey1AndTestKey2",
+    type: InputType.TUPLE,
+    inputAttributes: {
+      ariaLabel: "baz",
+      fields: {
+        parent: {
+          name: "testKey1",
+          type: InputType.TEXT,
+          inputAttributes: { ariaLabel: "foo" },
+        },
+        child: {
+          name: "testKey2",
+          type: InputType.TEXT,
+          inputAttributes: { ariaLabel: "bar" },
+        },
+      },
+    },
+  },
+]
+
+const twoFields = [
+  ...oneField,
+  {
+    name: "tupleOfTestKey3AndTestKey4",
+    type: InputType.TUPLE,
+    inputAttributes: {
+      ariaLabel: "baz",
+      fields: {
+        parent: {
+          name: "testKey3",
+          type: InputType.TEXT,
+          inputAttributes: { ariaLabel: "foo" },
+        },
+        child: {
+          name: "testKey4",
+          type: InputType.TEXT,
+          inputAttributes: { ariaLabel: "bar" },
+        },
+      },
+    },
+  } as InputField,
+]
+
 describe("useTransformTupleData", () => {
   it("correctly transforms tuple based on model value property", () => {
-    const values = useTransformTupleData(data, vi.fn(), [
-      { parentKey: "testKey1", childKey: "testKey2" },
-    ])
+    const values = useTransformTupleData(data, oneField, vi.fn())
 
     expect(values.value).toEqual({
-      TupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
+      tupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
       testKey3: "testValue3",
       testKey4: "testValue4",
     })
   })
 
   it("correctly transforms multiple tuple based on model value property", () => {
-    const values = useTransformTupleData(data, vi.fn(), [
-      { parentKey: "testKey1", childKey: "testKey2" },
-      { parentKey: "testKey3", childKey: "testKey4" },
-    ])
+    const values = useTransformTupleData(data, twoFields, vi.fn())
 
     expect(values.value).toEqual({
-      TupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
-      TupleOfTestKey3AndTestKey4: { parent: "testValue3", child: "testValue4" },
+      tupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
+      tupleOfTestKey3AndTestKey4: { parent: "testValue3", child: "testValue4" },
     })
   })
 
   it("transforms manipulated data back to flat data structure", () => {
     const emit = vi.fn()
-    const values = useTransformTupleData(data, emit, [
-      { parentKey: "testKey1", childKey: "testKey2" },
-      { parentKey: "testKey3", childKey: "testKey4" },
-    ])
+
+    const values = useTransformTupleData(data, twoFields, emit)
 
     values.value = {
-      TupleOfTestKey1AndTestKey2: {
+      tupleOfTestKey1AndTestKey2: {
         parent: "newTestValue1",
         child: "newTestValue2",
       },

@@ -122,7 +122,7 @@ export const coreDataFields: InputField[] = [
   ),
   defineTupleField(
     "Toggle Abweichendes Aktenzeichen",
-    "TupleOfFileNumbersAndDeviatingFileNumbers",
+    "tupleOfFileNumbersAndDeviatingFileNumbers",
     {
       parent: defineMultiTextField(
         "fileNumbers",
@@ -166,13 +166,6 @@ export const coreDataFields: InputField[] = [
     "",
     { defaultMessage: "", field: "" },
     false
-    // defineMultiTextField(
-    //   "divergentECLI",
-    //   "Abweichender ECLI",
-    //   "Abweichender ECLI",
-    //   false,
-    //   ""
-    // )
   ),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(

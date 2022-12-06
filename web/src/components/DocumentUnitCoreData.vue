@@ -9,8 +9,6 @@ import {
   prefilledDataFields,
   moreCategories,
   ValidationError,
-  InputType,
-  TupleInputField,
 } from "@/domain"
 
 interface Props {
@@ -28,18 +26,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const { modelValue } = toRefs(props)
 
-const values = useTransformTupleData(
-  modelValue,
-  emit,
-  coreDataFields
-    .filter((field): field is TupleInputField => field.type === InputType.TUPLE)
-    .map((tuple) => {
-      return {
-        parentKey: tuple.inputAttributes.fields.parent.name,
-        childKey: tuple.inputAttributes.fields.child.name,
-      }
-    })
-)
+const values = useTransformTupleData(modelValue, coreDataFields, emit)
 
 const containerWidth = ref()
 const columnCount = computed(() => (containerWidth.value < 600 ? 1 : 2))

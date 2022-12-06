@@ -1,5 +1,10 @@
 import { Ref, computed } from "vue"
-import { ModelType } from "@/domain/types"
+import {
+  ModelType,
+  InputField,
+  TupleInputField,
+  InputType,
+} from "@/domain/types"
 
 type FieldData = { [fieldName: string]: ModelType }
 
@@ -13,7 +18,7 @@ function lowercaseFirstLetter(string: string) {
 
 function getTupleKey(parentKey: string, childKey: string) {
   return (
-    "TupleOf" +
+    "tupleOf" +
     uppercaseFirstLetter(parentKey) +
     "And" +
     uppercaseFirstLetter(childKey)
@@ -21,7 +26,7 @@ function getTupleKey(parentKey: string, childKey: string) {
 }
 
 function getKeysFromTupleKey(combinedTupleKey: string) {
-  const matches = /^TupleOf(.*)And(.*)/g.exec(combinedTupleKey)
+  const matches = /^tupleOf(.*)And(.*)/g.exec(combinedTupleKey)
   if (matches)
     return {
       parentKey: lowercaseFirstLetter(matches[1]),
@@ -30,8 +35,7 @@ function getKeysFromTupleKey(combinedTupleKey: string) {
   throw new Error("Could not extract keys from tuple key")
 }
 
-//TODO Naming to be done
-function transformToNestedData(
+function tupalizeData(
   data: Record<string, ModelType>,
   parentKey: string,
   childKey: string
@@ -49,25 +53,17 @@ function transformToNestedData(
   return nestedData
 }
 
-function transformToFlatData(newValues: Record<string, ModelType>) {
-  for (const tupleKey in newValues) {
-    const tupleValue = newValues[tupleKey]
-    if (
-      typeof tupleValue === "object" &&
-      "parent" in tupleValue &&
-      "child" in tupleValue
-    ) {
-      const { parentKey, childKey } = getKeysFromTupleKey(tupleKey)
-
-      const flattenData = { ...newValues }
-      delete flattenData[tupleKey]
-      flattenData[parentKey] = tupleValue.parent
-      flattenData[childKey] = tupleValue.child
-      return flattenData
-      // } else throw new Error(`Can not flatten tuple key: ${tupleKey}`)
+function flattenData(newValues: Record<string, ModelType>) {
+  const flatData = { ...newValues }
+  for (const [key, value] of Object.entries(newValues)) {
+    if (typeof value === "object" && "parent" in value && "child" in value) {
+      const { parentKey, childKey } = getKeysFromTupleKey(key)
+      delete flatData[key]
+      flatData[parentKey] = value.parent
+      flatData[childKey] = value.child
     }
   }
-  return newValues
+  return flatData
 }
 
 interface Emits {
@@ -76,25 +72,27 @@ interface Emits {
 
 export function useTransformTupleData<E extends Emits>(
   data: Ref<FieldData>,
-  emit: E,
-  tuples?: { parentKey: string; childKey: string }[]
+  fields: InputField[],
+  emit: E
 ) {
   return computed({
     get: () => {
       let nestedData = data.value
-      if (tuples) {
-        tuples.map((tuple) => {
-          nestedData = transformToNestedData(
+      fields
+        .filter(
+          (field): field is TupleInputField => field.type === InputType.TUPLE
+        )
+        .map((tuple) => {
+          nestedData = tupalizeData(
             nestedData,
-            tuple.parentKey,
-            tuple.childKey
+            tuple.inputAttributes.fields.parent.name,
+            tuple.inputAttributes.fields.child.name
           )
         })
-      }
       return nestedData
     },
     set: (newValues) => {
-      const flatData = transformToFlatData(newValues)
+      const flatData = flattenData(newValues)
       emit("update:modelValue", flatData)
     },
   })
