@@ -30,7 +30,7 @@ export function defineTextField(
   }
 }
 
-export function defineMultiTextField(
+export function defineChipsField(
   name: string,
   label: string,
   ariaLabel: string,
@@ -39,7 +39,7 @@ export function defineMultiTextField(
 ): InputField {
   return {
     name,
-    type: InputType.MULTITEXT,
+    type: InputType.CHIPS,
     label,
     required,
     inputAttributes: {
@@ -124,14 +124,14 @@ export const coreDataFields: InputField[] = [
     "Toggle Abweichendes Aktenzeichen",
     "tupleOfFileNumbersAndDeviatingFileNumbers",
     {
-      parent: defineMultiTextField(
+      parent: defineChipsField(
         "fileNumbers",
         "Aktenzeichen",
         "Aktenzeichen",
         true,
         ""
       ),
-      child: defineMultiTextField(
+      child: defineChipsField(
         "deviatingFileNumbers",
         "Abweichendes Aktenzeichen",
         "Abweichendes Aktenzeichen",

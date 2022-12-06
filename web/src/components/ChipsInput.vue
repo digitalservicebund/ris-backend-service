@@ -1,9 +1,11 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
+import { useInputModel } from "@/composables/useInputModel"
 import { InputField, ValidationError } from "@/domain"
 
 interface Props {
   id: string
+  value?: string[]
   modelValue?: string[]
   ariaLabel: string
   placeholder?: string
@@ -13,11 +15,13 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value?: string[]): void
+  (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const emits = defineEmits<Emits>()
 
+const { emitInputEvent } = useInputModel<string[], Props, Emits>(props, emits)
 const chips = ref<string[]>(props.modelValue ?? [])
 const currentInput = ref<string>("")
 const currentInputField = ref<HTMLInputElement>()
@@ -25,7 +29,7 @@ const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
 function updateModelValue() {
-  emit("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
 function saveChip() {
@@ -122,6 +126,7 @@ onMounted(() => {
         :key="i"
         class="bg-blue-500 body-01-reg chip"
         tabindex="0"
+        @input="emitInputEvent"
         @keypress.enter="enterDelete"
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
@@ -146,6 +151,7 @@ onMounted(() => {
       :aria-label="ariaLabel"
       type="text"
       @blur="handleOnBlur"
+      @input="emitInputEvent"
       @keydown.delete="backspaceDelete"
       @keypress.enter="saveChip"
       @keyup.left="focusPrevious"

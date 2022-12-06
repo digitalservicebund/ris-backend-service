@@ -6,7 +6,7 @@ export enum InputType {
   DROPDOWN = "dropdown",
   DATE = "date",
   CHECKBOX = "checkbox",
-  MULTITEXT = "multitext",
+  CHIPS = "chips",
   TUPLE = "tuple",
 }
 
@@ -37,16 +37,16 @@ export interface TextInputField extends BaseInputField {
   inputAttributes: TextInputAttributes
 }
 
-//MULTITEXT
-export type MultitextInputModelType = string[]
+//CHIPS
+export type ChipsInputModelType = string[]
 
-export interface MultitextInputAttributes extends BaseInputAttributes {
+export interface ChipsInputAttributes extends BaseInputAttributes {
   placeholder?: string
 }
 
-export interface MultitextInputField extends BaseInputField {
-  type: InputType.MULTITEXT
-  inputAttributes: MultitextInputAttributes
+export interface ChipsInputField extends BaseInputField {
+  type: InputType.CHIPS
+  inputAttributes: ChipsInputAttributes
 }
 
 //TUPLE
@@ -116,13 +116,13 @@ export type InputField =
   | DropdownInputField
   | DateInputField
   | CheckboxInputField
-  | MultitextInputField
+  | ChipsInputField
   | TupleInputField
 
 export type InputAttributes =
   | TextInputAttributes
   | DropdownAttributes
-  | MultitextInputAttributes
+  | ChipsInputAttributes
   | TupleInputAttributes
 
 export type ModelType =
@@ -131,7 +131,7 @@ export type ModelType =
   | DropdownInputModelType
   | BooleanModelType
   | CheckboxInputModelType
-  | MultitextInputModelType
+  | ChipsInputModelType
   | TupleInputModelType
 
 export type ValidationError = {

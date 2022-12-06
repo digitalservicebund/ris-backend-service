@@ -1,6 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import MultiTextInput from "@/components/MultiTextInput.vue"
+import ChipsInput from "@/components/ChipsInput.vue"
 
 function renderComponent(options?: {
   ariaLabel?: string
@@ -16,12 +16,12 @@ function renderComponent(options?: {
     ariaLabel: options?.ariaLabel ?? "aria-label",
     placeholder: options?.placeholder,
   }
-  const renderResult = render(MultiTextInput, { props })
+  const renderResult = render(ChipsInput, { props })
   return { user, props, ...renderResult }
 }
 
-describe("MultiTextInput", () => {
-  it("shows a multi text input element", () => {
+describe("ChipsInput", () => {
+  it("shows a chips input element", () => {
     const { queryByRole } = renderComponent()
     const input: HTMLInputElement | null = queryByRole("textbox")
 
@@ -29,7 +29,7 @@ describe("MultiTextInput", () => {
     expect(input?.type).toBe("text")
   })
 
-  it("shows multi text input with an aria label", () => {
+  it("shows chips input with an aria label", () => {
     const { queryByLabelText } = renderComponent({
       ariaLabel: "test-label",
     })
