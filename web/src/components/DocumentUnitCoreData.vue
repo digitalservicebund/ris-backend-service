@@ -4,12 +4,7 @@ import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
 import { useTransformTupleData } from "@/composables/useTransformTupleData"
-import {
-  coreDataFields,
-  prefilledDataFields,
-  moreCategories,
-  ValidationError,
-} from "@/domain"
+import { coreDataFields, ValidationError } from "@/domain"
 
 interface Props {
   modelValue: CoreData
@@ -53,18 +48,6 @@ const resizeObserver = new ResizeObserver((entries) => {
       v-model="values"
       :column-count="columnCount"
       :fields="coreDataFields"
-      :validation-errors="props.validationErrors"
-    />
-    <InputGroup
-      v-model="values"
-      :column-count="columnCount"
-      :fields="prefilledDataFields"
-      :validation-errors="props.validationErrors"
-    />
-    <InputGroup
-      v-model="values"
-      :column-count="columnCount"
-      :fields="moreCategories"
       :validation-errors="props.validationErrors"
     />
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>
