@@ -59,7 +59,9 @@ describe("useTransformTupleData", () => {
     const values = useTransformTupleData(data, oneField, vi.fn())
 
     expect(values.value).toEqual({
-      tupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
+      tupleOfTestKey1AndTestKey2: {
+        fields: { parent: "testValue1", child: "testValue2" },
+      },
       testKey3: "testValue3",
       testKey4: "testValue4",
     })
@@ -69,8 +71,12 @@ describe("useTransformTupleData", () => {
     const values = useTransformTupleData(data, twoFields, vi.fn())
 
     expect(values.value).toEqual({
-      tupleOfTestKey1AndTestKey2: { parent: "testValue1", child: "testValue2" },
-      tupleOfTestKey3AndTestKey4: { parent: "testValue3", child: "testValue4" },
+      tupleOfTestKey1AndTestKey2: {
+        fields: { parent: "testValue1", child: "testValue2" },
+      },
+      tupleOfTestKey3AndTestKey4: {
+        fields: { parent: "testValue3", child: "testValue4" },
+      },
     })
   })
 
@@ -81,8 +87,10 @@ describe("useTransformTupleData", () => {
 
     values.value = {
       tupleOfTestKey1AndTestKey2: {
-        parent: "newTestValue1",
-        child: "newTestValue2",
+        fields: {
+          parent: "newTestValue1",
+          child: "newTestValue2",
+        },
       },
       testKey3: "newTestValue3",
     }

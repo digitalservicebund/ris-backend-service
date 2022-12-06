@@ -49,7 +49,7 @@ describe("TupleInput", () => {
 
   it("updates value when user types in input fields", async () => {
     const { queryByLabelText, getByDisplayValue, user } = renderComponent({
-      modelValue: { parent: "foo", child: "bar" },
+      modelValue: { fields: { parent: "foo", child: "bar" } },
     })
 
     const input1 = queryByLabelText("text input 1 label") as HTMLInputElement

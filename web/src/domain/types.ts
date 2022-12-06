@@ -51,8 +51,10 @@ export interface MultitextInputField extends BaseInputField {
 
 //TUPLE
 export interface TupleInputModelType {
-  parent: ModelType
-  child: ModelType
+  fields: {
+    parent: ModelType
+    child: ModelType
+  }
 }
 
 export interface TupleInputAttributes extends BaseInputAttributes {

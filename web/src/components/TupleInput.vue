@@ -32,16 +32,16 @@ const { inputValue } = useInputModel<TupleInputModelType, Props, Emits>(
 )
 
 const parentValue = computed({
-  get: () => inputValue.value?.parent,
+  get: () => inputValue.value?.fields.parent,
   set: (value) => {
-    if (value && inputValue.value) inputValue.value.parent = value
+    if (value && inputValue.value) inputValue.value.fields.parent = value
   },
 })
 
 const childValue = computed({
-  get: () => inputValue.value?.child,
+  get: () => inputValue.value?.fields.child,
   set: (value) => {
-    if (value && inputValue.value) inputValue.value.child = value
+    if (value && inputValue.value) inputValue.value.fields.child = value
   },
 })
 </script>

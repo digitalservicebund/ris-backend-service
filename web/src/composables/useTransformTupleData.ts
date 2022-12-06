@@ -46,8 +46,10 @@ function tupalizeData(
   const tupleKey = getTupleKey(parentKey, childKey)
   Object.assign(nestedData, {
     [tupleKey]: {
-      parent: data[parentKey],
-      child: data[childKey],
+      fields: {
+        parent: data[parentKey],
+        child: data[childKey],
+      },
     },
   })
   return nestedData
@@ -56,11 +58,16 @@ function tupalizeData(
 function flattenData(newValues: Record<string, ModelType>) {
   const flatData = { ...newValues }
   for (const [key, value] of Object.entries(newValues)) {
-    if (typeof value === "object" && "parent" in value && "child" in value) {
+    if (
+      typeof value === "object" &&
+      "fields" in value &&
+      "parent" in value.fields &&
+      "child" in value.fields
+    ) {
       const { parentKey, childKey } = getKeysFromTupleKey(key)
       delete flatData[key]
-      flatData[parentKey] = value.parent
-      flatData[childKey] = value.child
+      flatData[parentKey] = value.fields.parent
+      flatData[childKey] = value.fields.child
     }
   }
   return flatData
