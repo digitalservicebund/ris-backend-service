@@ -208,22 +208,23 @@ describe("MultiTextInput", () => {
     expect(chipList[0]).toHaveFocus()
   })
 
-  // it("emits input event when user adds an input", async () => {
-  //   const { emitted, getByRole, user } = renderComponent()
-  //   const input: HTMLInputElement = getByRole("textbox")
+  it("emits input event when user adds an input", async () => {
+    const { emitted, getByRole, user } = renderComponent()
+    const input: HTMLInputElement = getByRole("textbox")
 
-  //   await user.type(input, "ab")
+    await user.type(input, "ab")
 
-  //   expect(emitted().input).toHaveLength(2)
-  //   expect(emitted().input).toEqual([[expect.any(Event)], [expect.any(Event)]])
-  // })
+    expect(emitted().input).toHaveLength(2)
+    expect(emitted().input).toEqual([[expect.any(Event)], [expect.any(Event)]])
+  })
 
-  // it("emits model update event when user adds an input", async () => {
-  //   const { emitted, user, getByRole } = renderComponent()
-  //   const input: HTMLInputElement = getByRole("textbox")
-  //   await user.type(input, "ab")
-  //   await userEvent.tab()
+  it("emits model update event when user adds an input", async () => {
+    const { emitted, user, getByRole } = renderComponent()
+    const input: HTMLInputElement = getByRole("textbox")
+    await user.type(input, "ab")
+    await user.type(input, "{enter}")
+    await userEvent.tab()
 
-  //   expect(emitted()["update:modelValue"]).toEqual([["ab"]])
-  // })
+    expect(emitted()["update:modelValue"]).toEqual([[["ab"]]])
+  })
 })
