@@ -24,11 +24,11 @@ interface Emits {
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
+const emits = defineEmits<Emits>()
 
 const { inputValue } = useInputModel<TupleInputModelType, Props, Emits>(
   props,
-  emit
+  emits
 )
 
 const parentValue = computed({
