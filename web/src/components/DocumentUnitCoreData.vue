@@ -3,7 +3,7 @@ import { computed, onMounted, ref, toRefs } from "vue"
 import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
-import { useTransformTupleData } from "@/composables/useTransformTupleData"
+import { useTransformNestedData } from "@/composables/useTransformNestedData"
 import { coreDataFields, ValidationError } from "@/domain"
 
 interface Props {
@@ -21,7 +21,7 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const { modelValue } = toRefs(props)
 
-const values = useTransformTupleData(modelValue, coreDataFields, emit)
+const values = useTransformNestedData(modelValue, coreDataFields, emit)
 
 const containerWidth = ref()
 const columnCount = computed(() => (containerWidth.value < 600 ? 1 : 2))

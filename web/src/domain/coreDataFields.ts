@@ -1,7 +1,7 @@
 import {
   InputType,
   LookupTableEndpoint,
-  TupleInputAttributes,
+  NestedInputAttributes,
   ValidationError,
 } from "./types"
 import type { InputField, DropdownItem } from "./types"
@@ -94,14 +94,14 @@ export function defineDropdownField(
   }
 }
 
-export function defineTupleField(
+export function defineNestedInputField(
   ariaLabel: string,
   name: string,
-  fields: TupleInputAttributes["fields"]
+  fields: NestedInputAttributes["fields"]
 ): InputField {
   return {
     name,
-    type: InputType.TUPLE,
+    type: InputType.NESTED,
     inputAttributes: {
       ariaLabel,
       fields,
@@ -120,9 +120,9 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.courts
   ),
-  defineTupleField(
+  defineNestedInputField(
     "Toggle Abweichendes Aktenzeichen",
-    "tupleOfFileNumbersAndDeviatingFileNumbers",
+    "nestedInputOfFileNumbersAndDeviatingFileNumbers",
     {
       parent: defineChipsField(
         "fileNumbers",

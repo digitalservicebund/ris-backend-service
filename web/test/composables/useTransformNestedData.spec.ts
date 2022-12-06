@@ -1,5 +1,5 @@
 import { ref } from "vue"
-import { useTransformTupleData } from "@/composables/useTransformTupleData"
+import { useTransformNestedData } from "@/composables/useTransformNestedData"
 import { InputField, InputType } from "@/domain"
 
 const data = ref({
@@ -11,8 +11,8 @@ const data = ref({
 
 const oneField: InputField[] = [
   {
-    name: "tupleOfTestKey1AndTestKey2",
-    type: InputType.TUPLE,
+    name: "nestedInputOfTestKey1AndTestKey2",
+    type: InputType.NESTED,
     inputAttributes: {
       ariaLabel: "baz",
       fields: {
@@ -34,8 +34,8 @@ const oneField: InputField[] = [
 const twoFields = [
   ...oneField,
   {
-    name: "tupleOfTestKey3AndTestKey4",
-    type: InputType.TUPLE,
+    name: "nestedInputOfTestKey3AndTestKey4",
+    type: InputType.NESTED,
     inputAttributes: {
       ariaLabel: "baz",
       fields: {
@@ -54,12 +54,12 @@ const twoFields = [
   } as InputField,
 ]
 
-describe("useTransformTupleData", () => {
-  it("correctly transforms tuple based on model value property", () => {
-    const values = useTransformTupleData(data, oneField, vi.fn())
+describe("useTransformNestedData", () => {
+  it("correctly transforms nested inputs based on model value property", () => {
+    const values = useTransformNestedData(data, oneField, vi.fn())
 
     expect(values.value).toEqual({
-      tupleOfTestKey1AndTestKey2: {
+      nestedInputOfTestKey1AndTestKey2: {
         fields: { parent: "testValue1", child: "testValue2" },
       },
       testKey3: "testValue3",
@@ -67,14 +67,14 @@ describe("useTransformTupleData", () => {
     })
   })
 
-  it("correctly transforms multiple tuple based on model value property", () => {
-    const values = useTransformTupleData(data, twoFields, vi.fn())
+  it("correctly transforms multiple nested inputs based on model value property", () => {
+    const values = useTransformNestedData(data, twoFields, vi.fn())
 
     expect(values.value).toEqual({
-      tupleOfTestKey1AndTestKey2: {
+      nestedInputOfTestKey1AndTestKey2: {
         fields: { parent: "testValue1", child: "testValue2" },
       },
-      tupleOfTestKey3AndTestKey4: {
+      nestedInputOfTestKey3AndTestKey4: {
         fields: { parent: "testValue3", child: "testValue4" },
       },
     })
@@ -83,10 +83,10 @@ describe("useTransformTupleData", () => {
   it("transforms manipulated data back to flat data structure", () => {
     const emit = vi.fn()
 
-    const values = useTransformTupleData(data, twoFields, emit)
+    const values = useTransformNestedData(data, twoFields, emit)
 
     values.value = {
-      tupleOfTestKey1AndTestKey2: {
+      nestedInputOfTestKey1AndTestKey2: {
         fields: {
           parent: "newTestValue1",
           child: "newTestValue2",

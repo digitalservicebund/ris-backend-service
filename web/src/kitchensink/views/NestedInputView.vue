@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import TupleInput from "@/components/TupleInput.vue"
-import { defineDateField, TupleInputAttributes } from "@/domain"
+import NestedInput from "@/components/NestedInput.vue"
+import { defineDateField, NestedInputAttributes } from "@/domain"
 
-const tupleFields: TupleInputAttributes["fields"] = {
+const nestedInputFields: NestedInputAttributes["fields"] = {
   parent: defineDateField(
     "decisionDate",
     "Entscheidungsdatum",
@@ -25,7 +25,10 @@ const tupleFields: TupleInputAttributes["fields"] = {
     <h1 class="font-bold text-24">Text Input</h1>
 
     <div>
-      <TupleInput aria-label="Tuple Input" :fields="tupleFields"></TupleInput>
+      <NestedInput
+        aria-label="Nested Input"
+        :fields="nestedInputFields"
+      ></NestedInput>
     </div>
   </div>
 </template>

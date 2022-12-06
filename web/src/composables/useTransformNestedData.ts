@@ -2,7 +2,7 @@ import { Ref, computed } from "vue"
 import {
   ModelType,
   InputField,
-  TupleInputField,
+  NestedInputField,
   InputType,
 } from "@/domain/types"
 
@@ -16,26 +16,26 @@ function lowercaseFirstLetter(string: string) {
   return string.charAt(0).toLowerCase() + string.slice(1)
 }
 
-function getTupleKey(parentKey: string, childKey: string) {
+function getNestedInputKey(parentKey: string, childKey: string) {
   return (
-    "tupleOf" +
+    "nestedInputOf" +
     uppercaseFirstLetter(parentKey) +
     "And" +
     uppercaseFirstLetter(childKey)
   )
 }
 
-function getKeysFromTupleKey(combinedTupleKey: string) {
-  const matches = /^tupleOf(.*)And(.*)/g.exec(combinedTupleKey)
+function getKeysFromNestedInputKey(combinedKey: string) {
+  const matches = /^nestedInputOf(.*)And(.*)/g.exec(combinedKey)
   if (matches)
     return {
       parentKey: lowercaseFirstLetter(matches[1]),
       childKey: lowercaseFirstLetter(matches[2]),
     }
-  throw new Error("Could not extract keys from tuple key")
+  throw new Error("Could not extract keys from neste input key")
 }
 
-function tupalizeData(
+function mapData(
   data: Record<string, ModelType>,
   parentKey: string,
   childKey: string
@@ -43,9 +43,9 @@ function tupalizeData(
   const nestedData = { ...data }
   delete nestedData[parentKey]
   delete nestedData[childKey]
-  const tupleKey = getTupleKey(parentKey, childKey)
+  const key = getNestedInputKey(parentKey, childKey)
   Object.assign(nestedData, {
-    [tupleKey]: {
+    [key]: {
       fields: {
         parent: data[parentKey],
         child: data[childKey],
@@ -64,7 +64,7 @@ function flattenData(newValues: Record<string, ModelType>) {
       "parent" in value.fields &&
       "child" in value.fields
     ) {
-      const { parentKey, childKey } = getKeysFromTupleKey(key)
+      const { parentKey, childKey } = getKeysFromNestedInputKey(key)
       delete flatData[key]
       flatData[parentKey] = value.fields.parent
       flatData[childKey] = value.fields.child
@@ -77,7 +77,7 @@ interface Emits {
   (event: "update:modelValue", value: FieldData): void
 }
 
-export function useTransformTupleData<E extends Emits>(
+export function useTransformNestedData<E extends Emits>(
   data: Ref<FieldData>,
   fields: InputField[],
   emit: E
@@ -87,13 +87,13 @@ export function useTransformTupleData<E extends Emits>(
       let nestedData = data.value
       fields
         .filter(
-          (field): field is TupleInputField => field.type === InputType.TUPLE
+          (field): field is NestedInputField => field.type === InputType.NESTED
         )
-        .map((tuple) => {
-          nestedData = tupalizeData(
+        .map((item) => {
+          nestedData = mapData(
             nestedData,
-            tuple.inputAttributes.fields.parent.name,
-            tuple.inputAttributes.fields.child.name
+            item.inputAttributes.fields.parent.name,
+            item.inputAttributes.fields.child.name
           )
         })
       return nestedData

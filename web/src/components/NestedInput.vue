@@ -6,27 +6,27 @@ import SubField from "@/components/SubField.vue"
 import { useInputModel } from "@/composables/useInputModel"
 import {
   ValidationError,
-  TupleInputAttributes,
-  TupleInputModelType,
+  NestedInputAttributes,
+  NestedInputModelType,
 } from "@/domain"
 
 interface Props {
   ariaLabel: string
-  value?: TupleInputModelType
-  modelValue?: TupleInputModelType
-  fields: TupleInputAttributes["fields"]
+  value?: NestedInputModelType
+  modelValue?: NestedInputModelType
+  fields: NestedInputAttributes["fields"]
   validationError?: ValidationError
 }
 
 interface Emits {
-  (event: "update:modelValue", value?: TupleInputModelType): void
+  (event: "update:modelValue", value?: NestedInputModelType): void
   (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
 
-const { inputValue } = useInputModel<TupleInputModelType, Props, Emits>(
+const { inputValue } = useInputModel<NestedInputModelType, Props, Emits>(
   props,
   emits
 )

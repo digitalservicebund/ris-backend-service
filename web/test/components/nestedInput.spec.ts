@@ -1,13 +1,13 @@
 import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
-import TupleInput from "@/components/TupleInput.vue"
-import { TupleInputAttributes, TupleInputModelType } from "@/domain"
+import NestedInput from "@/components/NestedInput.vue"
+import { NestedInputAttributes, NestedInputModelType } from "@/domain"
 import { defineTextField, defineDateField } from "@/domain/coreDataFields"
 
 function renderComponent(options?: {
   ariaLabel?: string
-  modelValue?: TupleInputModelType
-  fields?: TupleInputAttributes["fields"]
+  modelValue?: NestedInputModelType
+  fields?: NestedInputAttributes["fields"]
 }) {
   const props = {
     ariaLabel: options?.ariaLabel ?? "Toggle label",
@@ -27,14 +27,14 @@ function renderComponent(options?: {
       ),
     },
   }
-  const renderResult = render(TupleInput, { props })
+  const renderResult = render(NestedInput, { props })
   const user = userEvent.setup()
   return { user, props, ...renderResult }
 }
 
-describe("TupleInput", () => {
+describe("NestedInput", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
-  it("renders tuple input with two text input fields", async () => {
+  it("renders nested input with two text input fields", async () => {
     const { queryByLabelText } = renderComponent()
 
     const input1 = queryByLabelText("text input 1 label") as HTMLInputElement

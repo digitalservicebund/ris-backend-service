@@ -5,8 +5,8 @@ import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import FileInput from "@/components/FileInput.vue"
+import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
-import TupleInput from "@/components/TupleInput.vue"
 import type { InputAttributes, ModelType } from "@/domain"
 import { InputType, ValidationError } from "@/domain"
 
@@ -44,8 +44,8 @@ const component = computed(() => {
       return CheckboxInput
     case InputType.CHIPS:
       return ChipsInput
-    case InputType.TUPLE:
-      return TupleInput
+    case InputType.NESTED:
+      return NestedInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }

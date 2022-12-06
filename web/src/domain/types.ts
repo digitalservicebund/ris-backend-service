@@ -7,7 +7,7 @@ export enum InputType {
   DATE = "date",
   CHECKBOX = "checkbox",
   CHIPS = "chips",
-  TUPLE = "tuple",
+  NESTED = "nested",
 }
 
 //BASE
@@ -49,21 +49,21 @@ export interface ChipsInputField extends BaseInputField {
   inputAttributes: ChipsInputAttributes
 }
 
-//TUPLE
-export interface TupleInputModelType {
+//NESTED INPUT
+export interface NestedInputModelType {
   fields: {
     parent: ModelType
     child: ModelType
   }
 }
 
-export interface TupleInputAttributes extends BaseInputAttributes {
+export interface NestedInputAttributes extends BaseInputAttributes {
   fields: { parent: InputField; child: InputField }
 }
 
-export interface TupleInputField extends BaseInputField {
-  type: InputType.TUPLE
-  inputAttributes: TupleInputAttributes
+export interface NestedInputField extends BaseInputField {
+  type: InputType.NESTED
+  inputAttributes: NestedInputAttributes
 }
 
 //DATE
@@ -117,13 +117,13 @@ export type InputField =
   | DateInputField
   | CheckboxInputField
   | ChipsInputField
-  | TupleInputField
+  | NestedInputField
 
 export type InputAttributes =
   | TextInputAttributes
   | DropdownAttributes
   | ChipsInputAttributes
-  | TupleInputAttributes
+  | NestedInputAttributes
 
 export type ModelType =
   | TextInputModelType
@@ -132,7 +132,7 @@ export type ModelType =
   | BooleanModelType
   | CheckboxInputModelType
   | ChipsInputModelType
-  | TupleInputModelType
+  | NestedInputModelType
 
 export type ValidationError = {
   defaultMessage: string
