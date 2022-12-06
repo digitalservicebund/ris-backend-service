@@ -36,13 +36,13 @@ paths:
                       properties:
                         guid:
                           $ref: "#/components/schemas/Guid"
-                        longTitle:
+                        officialLongTitle:
                           type: string
                 example:
                   - guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
-                    longTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
+                    officialLongTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
                   - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
-                    longTitle: "Übereinkommen über das umweltgerechte Recycling von Schiffen"
+                    officialLongTitle: "Übereinkommen über das umweltgerechte Recycling von Schiffen"
         "400":
           description: ""
 
@@ -100,7 +100,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/MetadataFields"
+              $ref: "#/components/schemas/NormFrame"
       responses:
         "204":
           description: Norm was updated
@@ -157,10 +157,10 @@ components:
 
     NormWithoutGuid:
       allOf:
-        - $ref: "#/components/schemas/MetadataFields"
+        - $ref: "#/components/schemas/NormFrame"
         - type: object
           required:
-            - longTitle
+            - officialLongTitle
             - articles
           properties:
             articles:
@@ -206,10 +206,10 @@ components:
               items:
                 $ref: "#/components/schemas/Article"
 
-    MetadataFields:
+    NormFrame:
       type: object
       properties:
-        longTitle:
+        officialLongTitle:
           type: string
           example: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
         officialShortTitle:
@@ -230,13 +230,13 @@ components:
         frameKeywords:
           type: string
           example: "BGBl I 2021, Nr 031;geltendes Bundesrecht;Umsetzung EG-Recht;Umsetzung EURL 2019/1161;Beschaffung;sauber;Straßenfahrzeug"
-        authorEntity:
+        providerEntity:
           type: string
           example: "DEU"
-        authorDecidingBody:
+        providerDecidingBody:
           type: string
           example: "BT"
-        authorIsResolutionMajority:
+        providerIsResolutionMajority:
           type: boolean
           example: true
         leadJurisdiction:
