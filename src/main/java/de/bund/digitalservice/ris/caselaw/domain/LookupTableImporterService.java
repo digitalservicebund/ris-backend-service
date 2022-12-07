@@ -35,6 +35,7 @@ public class LookupTableImporterService {
     this.courtRepository = courtRepository;
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<String> importDocumentTypeLookupTable(ByteBuffer byteBuffer) {
     XmlMapper mapper = new XmlMapper();
     DocumentTypesXML documentTypesXML;
@@ -73,7 +74,6 @@ public class LookupTableImporterService {
     return Mono.just("Successfully imported the document type lookup table");
   }
 
-  @Transactional
   public void importDocumentTypeJPA(DocumentTypesXML documentTypesXML) {
     List<JPADocumentTypeDTO> documentTypeDTOS =
         documentTypesXML.getList().stream()
