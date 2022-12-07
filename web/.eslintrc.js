@@ -88,5 +88,10 @@ module.exports = {
       files: ["test/**/*.ts"],
       extends: ["plugin:jest-dom/recommended"],
     },
+    {
+      files: ["**/e2e/**/*.ts", "**/a11y/**/*.ts"],
+      extends: ["plugin:playwright/playwright-test"],
+      rules: { ...moduleImportRules },
+    },
   ],
 }

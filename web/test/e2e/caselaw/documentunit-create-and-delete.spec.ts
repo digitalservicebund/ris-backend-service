@@ -12,9 +12,10 @@ test.describe("create a doc unit and delete it again", () => {
     )
 
     // Given the earlier expectation we can assume that the regex will match...
-    const documentNumber = (/caselaw\/documentunit\/(.*)\/files/g.exec(
+    const documentNumber = /caselaw\/documentunit\/(.*)\/files/g.exec(
       page.url()
-    ) || [])[1]
+    )?.[1]
+
     const response = await request.get(
       `${backendHost}/api/v1/caselaw/documentunits`
     )
@@ -51,7 +52,7 @@ test.describe("create a doc unit and delete it again", () => {
     await page.locator('button:has-text("Löschen")').click()
     await expect(
       page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
-    ).not.toBeVisible()
+    ).toBeHidden()
   })
 
   testWithDocumentUnit(

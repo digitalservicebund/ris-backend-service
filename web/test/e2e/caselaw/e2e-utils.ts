@@ -20,6 +20,6 @@ export const uploadTestfile = async (page: Page, filename: string) => {
     page.locator("text=oder Datei auswählen").click(),
   ])
   await fileChooser.setFiles("./test/e2e/caselaw/testfiles/" + filename)
-  await expect(page.locator("text=Upload läuft")).not.toBeVisible()
-  await expect(page.locator("text=Dokument wird geladen.")).not.toBeVisible()
+  await expect(page.locator("text=Upload läuft")).toBeHidden()
+  await expect(page.locator("text=Dokument wird geladen.")).toBeHidden()
 }

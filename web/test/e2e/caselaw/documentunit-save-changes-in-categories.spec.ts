@@ -201,27 +201,31 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await fillPreviousDecisionInputs(page)
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
 
-    await page.pause()
-
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
         .nth(1)
         .inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Gerichtsort Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtsort Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtsort Rechtszug']")
         .nth(1)
         .inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
+    await expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
     expect(
       await page.locator("[aria-label='Datum Rechtszug']").nth(1).inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Aktenzeichen Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Aktenzeichen Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Aktenzeichen Rechtszug']")
@@ -240,7 +244,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
     await fillPreviousDecisionInputs(page, { courtType: "Type Two" }, 1)
 
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
@@ -256,7 +262,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await page.locator("[aria-label='Entscheidung Entfernen']").click()
 
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(1)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(1)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
