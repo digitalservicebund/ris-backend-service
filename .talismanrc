@@ -69,8 +69,6 @@ fileignoreconfig:
     checksum: 16e46413ee49c4c9fb05d316ba084962d06eaf082e7b9e1fe75ff76419f9257c
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: 47f990fbfb7224c8cf331d56e4df8f2c7ba22509f4c41e4253507a3b3dc5795a
-  - filename: web/src/data/courts.json
-    checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
     checksum: 90323728634b3210ac3264334fb8906739a8d795b3162ba81824d41ef8f7ded9
   - filename: src/test/kotlin/norms/domain/entity/NormTest.kt
