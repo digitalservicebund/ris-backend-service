@@ -109,7 +109,7 @@ export function defineNestedInputField(
   }
 }
 
-export const coreDataFields: InputField[] = [
+export const courtFields: InputField[] = [
   defineDropdownField(
     "court",
     "Gericht",
@@ -120,6 +120,8 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.courts
   ),
+]
+export const coreDataFields: InputField[] = [
   defineNestedInputField(
     "Toggle Abweichendes Aktenzeichen",
     "nestedInputOfFileNumbersAndDeviatingFileNumbers",

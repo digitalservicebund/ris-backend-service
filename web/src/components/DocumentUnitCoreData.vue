@@ -4,7 +4,7 @@ import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
 import { useTransformNestedData } from "@/composables/useTransformNestedData"
-import { coreDataFields, ValidationError } from "@/domain"
+import { courtFields, coreDataFields, ValidationError } from "@/domain"
 
 interface Props {
   modelValue: CoreData
@@ -22,6 +22,14 @@ const emit = defineEmits<Emits>()
 const { modelValue } = toRefs(props)
 
 const values = useTransformNestedData(modelValue, coreDataFields, emit)
+const courtValues = computed({
+  get() {
+    return { court: values.value.court }
+  },
+  set(newCourtValue) {
+    values.value = Object.assign(values.value, newCourtValue)
+  },
+})
 
 const containerWidth = ref()
 const columnCount = computed(() => (containerWidth.value < 600 ? 1 : 2))
@@ -44,6 +52,12 @@ const resizeObserver = new ResizeObserver((entries) => {
   <div v-else class="mb-[4rem]">
     <h1 class="core-data heading-02-regular mb-[1rem]">Stammdaten</h1>
 
+    <InputGroup
+      v-model="courtValues"
+      :column-count="1"
+      :fields="courtFields"
+      :validation-errors="props.validationErrors"
+    />
     <InputGroup
       v-model="values"
       :column-count="columnCount"
