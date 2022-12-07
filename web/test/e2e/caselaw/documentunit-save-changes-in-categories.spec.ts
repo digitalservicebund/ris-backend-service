@@ -54,6 +54,19 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.reload()
     expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("")
     expect(await page.inputValue("[aria-label='ECLI']")).toBe("abc123")
+  })
+
+  test("saved changes also visible in document unit entry list", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+    await page.locator("[aria-label='ECLI']").fill("abc123")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
     await page.goto("/")
     await expect(
@@ -65,6 +78,87 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator(".table-row", {
       hasText: "abc",
     })
+  })
+
+  test("nested input toggles child input and correctly displays data", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("one")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("two")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=one").first()).toBeVisible()
+    await expect(page.locator("text=two").first()).toBeVisible()
+
+    await expect(
+      page.locator("text=Abweichendes Aktenzeichen>")
+    ).not.toBeVisible()
+
+    await page.locator("[aria-label='Abweichendes Feld öffnen']").click()
+
+    await expect(
+      page.locator("text=Abweichendes Aktenzeichen").first()
+    ).toBeVisible()
+
+    await page.locator("[aria-label='Abweichendes Aktenzeichen']").fill("three")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+
+    await page.reload()
+
+    await page.locator("[aria-label='Abweichendes Feld öffnen']").click()
+
+    await expect(page.locator("text=three").first()).toBeVisible()
+  })
+
+  test("adding and deleting multiple inputs", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("testone")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("testtwo")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("testthree")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=testone").first()).toBeVisible()
+    await expect(page.locator("text=testtwo").first()).toBeVisible()
+
+    await page.keyboard.press("ArrowLeft")
+    await page.keyboard.press("ArrowLeft")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=testtwo").first()).not.toBeVisible()
+
+    await page.keyboard.press("ArrowLeft")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=testone").first()).not.toBeVisible()
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+
+    await page.reload()
+
+    await expect(page.locator("text=testthree").first()).toBeVisible()
   })
 
   test("test previous decision data change", async ({
