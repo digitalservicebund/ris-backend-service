@@ -48,7 +48,7 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
   }
 
   @Override
-  @Transactional
+  @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Mono<DocumentUnitDTO> save(DocumentUnitDTO documentUnitDTO) {
     return repository
         .save(documentUnitDTO)
