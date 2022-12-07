@@ -33,7 +33,7 @@ class LoadNormControllerTest {
 
     @Test
     fun `it calls the load norm service with the correct query to get a norm by GUID`() {
-        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "long title")
+        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), officialLongTitle = "long title")
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -50,7 +50,7 @@ class LoadNormControllerTest {
 
     @Test
     fun `it responds with ok status if the norm was loaded successfully`() {
-        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "long title")
+        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), officialLongTitle = "long title")
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -71,14 +71,32 @@ class LoadNormControllerTest {
         val article = Article(articleGuid, "title", "marker", listOf(paragraph))
         val normGuid = UUID.fromString("72631e54-78a4-11d0-bcf7-00aa00b7b32a")
         val norm = Norm(
-            normGuid, "long title", listOf(article), "official short title", "official abbreviation",
-            null, LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "author entity", "author deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3", "unofficial title", "unofficial short title",
-            "unofficial abbreviation", "ris abbreviation"
+            normGuid, listOf(article), "long title", "ris abbreviation", "ris abbreviation international law",
+            "document number", "divergent document number", "document category",
+            "frame keywords", "document type name", "document norm category", "document template name",
+            "provider entity", "provider deciding body",
+            true, "participation type",
+            "participation institution", "lead jurisdiction", "lead unit",
+            "subject fna", "subject previous fna",
+            "subject gesta", "subject bgb3", "official short title",
+            "official abbreviation", "unofficial long title", "unofficial short title",
+            "unofficial abbreviation", null, null, null,
+            null, null, null, null,
+            null, null, null, null,
+            null, null, null, LocalDate.parse("2020-10-28"),
+            LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-29"), null, null,
+            null, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null, null,
+            null, null, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null, null,
+            null, null, null, null, null,
+            null, null, null, null, null
         )
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
@@ -93,7 +111,7 @@ class LoadNormControllerTest {
                 """
         {
           "guid": "72631e54-78a4-11d0-bcf7-00aa00b7b32a",
-          "longTitle": "long title",
+          "officialLongTitle": "long title",
           "articles": [
             {
               "guid": "53d29ef7-377c-4d14-864b-eb3a85769359",
@@ -115,9 +133,9 @@ class LoadNormControllerTest {
           "announcementDate": "2020-10-28",
           "citationDate": "2020-10-29",
           "frameKeywords": "frame keywords",
-          "authorEntity": "author entity",
-          "authorDecidingBody": "author deciding body",
-          "authorIsResolutionMajority": true,
+          "providerEntity": "provider entity",
+          "providerDecidingBody": "provider deciding body",
+          "providerIsResolutionMajority": true,
           "leadJurisdiction": "lead jurisdiction",
           "leadUnit": "lead unit",
           "participationType": "participation type",
@@ -129,7 +147,7 @@ class LoadNormControllerTest {
           "subjectPreviousFna": "subject previous fna",
           "subjectGesta": "subject gesta",
           "subjectBgb3": "subject bgb3",
-          "unofficialTitle": "unofficial title",
+          "unofficialLongTitle": "unofficial long title",
           "unofficialShortTitle": "unofficial short title",
           "unofficialAbbreviation": "unofficial abbreviation",
           "risAbbreviation": "ris abbreviation"

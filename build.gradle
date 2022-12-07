@@ -121,6 +121,9 @@ dependencies {
   runtimeOnly "org.postgresql:r2dbc-postgresql"
   implementation "org.flywaydb:flyway-core"
   implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+  testImplementation "org.jeasy:easy-random-core:5.0.0"
+
 }
 
 jar { // We have no need for the plain archive, thus skip creation for build speedup!

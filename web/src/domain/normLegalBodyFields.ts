@@ -2,7 +2,7 @@ import { InputField, InputType } from "./types"
 
 export const normLegalBodyFields: InputField[] = [
   {
-    name: "authorEntity",
+    name: "providerEntity",
     type: InputType.TEXT,
     label: "Staat, Land, Stadt, Landkreis oder juristische Person",
     inputAttributes: {
@@ -10,7 +10,7 @@ export const normLegalBodyFields: InputField[] = [
     },
   },
   {
-    name: "authorDecidingBody",
+    name: "providerDecidingBody",
     type: InputType.TEXT,
     label: "Beschließendes Organ",
     inputAttributes: {
@@ -18,7 +18,7 @@ export const normLegalBodyFields: InputField[] = [
     },
   },
   {
-    name: "authorIsResolutionMajority",
+    name: "providerIsResolutionMajority",
     type: InputType.CHECKBOX,
     label: "Beschlussfassung mit qualifizierter Mehrheit",
     inputAttributes: {

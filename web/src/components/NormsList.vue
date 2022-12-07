@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 interface Norm {
-  longTitle: string
+  officialLongTitle: string
   guid: string
 }
 
@@ -17,7 +17,7 @@ defineProps<{ norms: Norm[] }>()
             params: { normGuid: norm.guid },
           }"
         >
-          {{ norm.longTitle }}
+          {{ norm.officialLongTitle }}
         </router-link>
       </div>
     </div>

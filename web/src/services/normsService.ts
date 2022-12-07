@@ -4,11 +4,11 @@ import utc from "dayjs/plugin/utc"
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Norm } from "@/domain/Norm"
 
-type NormList = { longTitle: string; guid: string }[]
+type NormList = { officialLongTitle: string; guid: string }[]
 dayjs.extend(utc)
 dayjs.extend(timezone)
 type FrameData = {
-  longTitle: string
+  officialLongTitle: string
   officialShortTitle?: string
   officialAbbreviation?: string
   referenceNumber?: string
@@ -16,9 +16,9 @@ type FrameData = {
   announcementDate?: string
   citationDate?: string
   frameKeywords?: string
-  authorEntity?: string
-  authorDecidingBody?: string
-  authorIsResolutionMajority?: boolean
+  providerEntity?: string
+  providerDecidingBody?: string
+  providerIsResolutionMajority?: boolean
   leadJurisdiction?: string
   leadUnit?: string
   participationType?: string
@@ -30,7 +30,7 @@ type FrameData = {
   subjectPreviousFna?: string
   subjectGesta?: string
   subjectBgb3?: string
-  unofficialTitle?: string
+  unofficialLongTitle?: string
   unofficialShortTitle?: string
   unofficialAbbreviation?: string
   risAbbreviation?: string
@@ -57,7 +57,7 @@ function encodeDate(data?: string): string | null {
 
 function encodeFrameData(data: FrameData) {
   return {
-    longTitle: encodeString(data.longTitle),
+    officialLongTitle: encodeString(data.officialLongTitle),
     officialShortTitle: encodeString(data.officialShortTitle),
     officialAbbreviation: encodeString(data.officialAbbreviation),
     referenceNumber: encodeString(data.referenceNumber),
@@ -65,9 +65,11 @@ function encodeFrameData(data: FrameData) {
     announcementDate: encodeDate(data.announcementDate),
     citationDate: encodeDate(data.citationDate),
     frameKeywords: encodeString(data.frameKeywords),
-    authorEntity: encodeString(data.authorEntity),
-    authorDecidingBody: encodeString(data.authorDecidingBody),
-    authorIsResolutionMajority: encodeBoolean(data.authorIsResolutionMajority),
+    providerEntity: encodeString(data.providerEntity),
+    providerDecidingBody: encodeString(data.providerDecidingBody),
+    providerIsResolutionMajority: encodeBoolean(
+      data.providerIsResolutionMajority
+    ),
     leadJurisdiction: encodeString(data.leadJurisdiction),
     leadUnit: encodeString(data.leadUnit),
     participationType: encodeString(data.participationType),
@@ -79,7 +81,7 @@ function encodeFrameData(data: FrameData) {
     subjectPreviousFna: encodeString(data.subjectPreviousFna),
     subjectGesta: encodeString(data.subjectGesta),
     subjectBgb3: encodeString(data.subjectBgb3),
-    unofficialTitle: encodeString(data.unofficialTitle),
+    unofficialLongTitle: encodeString(data.unofficialLongTitle),
     unofficialShortTitle: encodeString(data.unofficialShortTitle),
     unofficialAbbreviation: encodeString(data.unofficialAbbreviation),
     risAbbreviation: encodeString(data.risAbbreviation),

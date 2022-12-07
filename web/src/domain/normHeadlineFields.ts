@@ -2,7 +2,7 @@ import { InputField, InputType } from "./types"
 
 export const normHeadlineFields: InputField[] = [
   {
-    name: "longTitle",
+    name: "officialLongTitle",
     type: InputType.TEXT,
     label: "Amtliche Langüberschrift",
     inputAttributes: {

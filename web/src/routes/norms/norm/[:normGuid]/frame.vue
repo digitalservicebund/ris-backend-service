@@ -25,10 +25,10 @@ const { loadedNorm } = storeToRefs(store)
 const frameData = computed({
   get: () => ({
     announcementDate: loadedNorm.value?.announcementDate ?? "",
-    authorDecidingBody: loadedNorm.value?.authorDecidingBody ?? "",
-    authorEntity: loadedNorm.value?.authorEntity ?? "",
-    authorIsResolutionMajority:
-      loadedNorm.value?.authorIsResolutionMajority ?? false,
+    providerDecidingBody: loadedNorm.value?.providerDecidingBody ?? "",
+    providerEntity: loadedNorm.value?.providerEntity ?? "",
+    providerIsResolutionMajority:
+      loadedNorm.value?.providerIsResolutionMajority ?? false,
     citationDate: loadedNorm.value?.citationDate ?? "",
     documentNormCategory: loadedNorm.value?.documentNormCategory ?? "",
     documentTemplateName: loadedNorm.value?.documentTemplateName ?? "",
@@ -36,7 +36,7 @@ const frameData = computed({
     frameKeywords: loadedNorm.value?.frameKeywords ?? "",
     leadJurisdiction: loadedNorm.value?.leadJurisdiction ?? "",
     leadUnit: loadedNorm.value?.leadUnit ?? "",
-    longTitle: loadedNorm.value?.longTitle ?? "",
+    officialLongTitle: loadedNorm.value?.officialLongTitle ?? "",
     officialAbbreviation: loadedNorm.value?.officialAbbreviation ?? "",
     officialShortTitle: loadedNorm.value?.officialShortTitle ?? "",
     participationInstitution: loadedNorm.value?.participationInstitution ?? "",
@@ -47,7 +47,7 @@ const frameData = computed({
     subjectFna: loadedNorm.value?.subjectFna ?? "",
     subjectGesta: loadedNorm.value?.subjectGesta ?? "",
     subjectPreviousFna: loadedNorm.value?.subjectPreviousFna ?? "",
-    unofficialTitle: loadedNorm.value?.unofficialTitle ?? "",
+    unofficialLongTitle: loadedNorm.value?.unofficialLongTitle ?? "",
     unofficialShortTitle: loadedNorm.value?.unofficialShortTitle ?? "",
     unofficialAbbreviation: loadedNorm.value?.unofficialAbbreviation ?? "",
     risAbbreviation: loadedNorm.value?.risAbbreviation ?? "",
@@ -55,10 +55,10 @@ const frameData = computed({
   set: (data) => {
     if (loadedNorm.value !== undefined) {
       loadedNorm.value.announcementDate = data.announcementDate
-      loadedNorm.value.authorDecidingBody = data.authorDecidingBody
-      loadedNorm.value.authorEntity = data.authorEntity
-      loadedNorm.value.authorIsResolutionMajority =
-        data.authorIsResolutionMajority
+      loadedNorm.value.providerDecidingBody = data.providerDecidingBody
+      loadedNorm.value.providerEntity = data.providerEntity
+      loadedNorm.value.providerIsResolutionMajority =
+        data.providerIsResolutionMajority
       loadedNorm.value.citationDate = data.citationDate
       loadedNorm.value.documentNormCategory = data.documentNormCategory
       loadedNorm.value.documentTemplateName = data.documentTemplateName
@@ -66,7 +66,7 @@ const frameData = computed({
       loadedNorm.value.frameKeywords = data.frameKeywords
       loadedNorm.value.leadJurisdiction = data.leadJurisdiction
       loadedNorm.value.leadUnit = data.leadUnit
-      loadedNorm.value.longTitle = data.longTitle
+      loadedNorm.value.officialLongTitle = data.officialLongTitle
       loadedNorm.value.officialAbbreviation = data.officialAbbreviation
       loadedNorm.value.officialShortTitle = data.officialShortTitle
       loadedNorm.value.participationInstitution = data.participationInstitution
@@ -77,7 +77,7 @@ const frameData = computed({
       loadedNorm.value.subjectFna = data.subjectFna
       loadedNorm.value.subjectGesta = data.subjectGesta
       loadedNorm.value.subjectPreviousFna = data.subjectPreviousFna
-      loadedNorm.value.unofficialTitle = data.unofficialTitle
+      loadedNorm.value.unofficialLongTitle = data.unofficialLongTitle
       loadedNorm.value.unofficialShortTitle = data.unofficialShortTitle
       loadedNorm.value.unofficialAbbreviation = data.unofficialAbbreviation
       loadedNorm.value.risAbbreviation = data.risAbbreviation

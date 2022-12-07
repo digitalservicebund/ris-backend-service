@@ -1,5 +1,5 @@
 {
-  "longTitle": "Gesetz über die Beschaffung sauberer Straßenfahrzeuge",
+  "officialLongTitle": "Gesetz über die Beschaffung sauberer Straßenfahrzeuge",
   "articles": [
     {
       "marker": "§ 1",
@@ -22,16 +22,16 @@
   "announcementDate": "2021-06-14",
   "citationDate": "2021-06-09",
   "frameKeywords": "BGBl I 2021, Nr 031;geltendes Bundesrecht;Umsetzung EG-Recht;Umsetzung EURL 2019/1161;Beschaffung;sauber;Straßenfahrzeug",
-  "authorEntity": "DEU",
-  "authorDecidingBody": "BT",
-  "authorIsResolutionMajority": true,
+  "providerEntity": "DEU",
+  "providerDecidingBody": "BT",
+  "providerIsResolutionMajority": true,
   "leadJurisdiction": "BMVI",
   "leadUnit": "G 22",
   "participationType": null,
   "participationInstitution": null,
   "subjectFna": "FNA 703-12",
   "subjectGesta": "GESTA J040",
-  "unofficialTitle": null,
+  "unofficialLongTitle": null,
   "unofficialShortTitle": null,
   "unofficialAbbreviation": null,
   "risAbbreviation": "SaubFahrzeugBeschG"

@@ -22,7 +22,7 @@ private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
     val articles = data.articles.map { createArticle(it) }
     return Norm(
         guid = guid,
-        longTitle = data.longTitle,
+        officialLongTitle = data.officialLongTitle,
         articles = articles,
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
@@ -31,9 +31,9 @@ private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
         announcementDate = data.announcementDate,
         citationDate = data.citationDate,
         frameKeywords = data.frameKeywords,
-        authorEntity = data.authorEntity,
-        authorDecidingBody = data.authorDecidingBody,
-        authorIsResolutionMajority = data.authorIsResolutionMajority,
+        providerEntity = data.providerEntity,
+        providerDecidingBody = data.providerDecidingBody,
+        providerIsResolutionMajority = data.providerIsResolutionMajority,
         leadJurisdiction = data.leadJurisdiction,
         leadUnit = data.leadUnit,
         participationType = data.participationType,
@@ -45,7 +45,7 @@ private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
         subjectPreviousFna = data.subjectPreviousFna,
         subjectGesta = data.subjectGesta,
         subjectBgb3 = data.subjectBgb3,
-        unofficialTitle = data.unofficialTitle,
+        unofficialLongTitle = data.unofficialLongTitle,
         unofficialShortTitle = data.unofficialShortTitle,
         unofficialAbbreviation = data.unofficialAbbreviation,
         risAbbreviation = data.risAbbreviation

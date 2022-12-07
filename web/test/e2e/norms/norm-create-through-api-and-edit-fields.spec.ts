@@ -7,7 +7,7 @@ import normCleanCars from "./testdata/norm_clean_cars.json"
 testWithImportedNorm(
   "Check if fields can be edited",
   async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.longTitle, createdGuid)
+    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()
@@ -51,11 +51,11 @@ testWithImportedNorm(
     const selectorInputLongTitle =
       'role=textbox[name="Amtliche Langüberschrift"]'
     expect(await page.inputValue(selectorInputLongTitle)).toBe(
-      normCleanCars.longTitle
+      normCleanCars.officialLongTitle
     )
     const locatorInputLongTitle = page.locator(selectorInputLongTitle)
     await expect(locatorInputLongTitle).toBeEditable()
-    await locatorInputLongTitle.fill("longTitle")
+    await locatorInputLongTitle.fill("officialLongTitle")
 
     // Update category Normgeber
     await expect(
@@ -64,7 +64,7 @@ testWithImportedNorm(
     const selectorInputDecidingBody =
       'role=textbox[name="Beschließendes Organ"]'
     expect(await page.inputValue(selectorInputDecidingBody)).toBe(
-      normCleanCars.authorDecidingBody
+      normCleanCars.providerDecidingBody
     )
     const locatorInputDecidingBody = page.locator(selectorInputDecidingBody)
     await expect(locatorInputDecidingBody).toBeEditable()
@@ -76,12 +76,12 @@ testWithImportedNorm(
       )
     ).toBeVisible()
 
-    const selectorCheckboxAuthorIsResolutionMajority =
+    const selectorCheckboxProviderIsResolutionMajority =
       'role=checkbox[name="Beschlussfassung mit qualifizierter Mehrheit"]'
     expect(
-      await page.isChecked(selectorCheckboxAuthorIsResolutionMajority)
+      await page.isChecked(selectorCheckboxProviderIsResolutionMajority)
     ).toBeTruthy()
-    await page.uncheck(selectorCheckboxAuthorIsResolutionMajority)
+    await page.uncheck(selectorCheckboxProviderIsResolutionMajority)
 
     // Update category Federführung
     await expect(page.locator('label:text-is("Ressort")')).toBeVisible()
@@ -125,7 +125,9 @@ testWithImportedNorm(
       page.locator("text=Zuletzt gespeichert um").first()
     ).toBeVisible()
     await page.reload()
-    expect(await page.inputValue(selectorInputLongTitle)).toBe("longTitle")
+    expect(await page.inputValue(selectorInputLongTitle)).toBe(
+      "officialLongTitle"
+    )
     expect(await page.inputValue(selectInputReferencenumber)).toBe(
       "referenceNumber"
     )
@@ -137,7 +139,7 @@ testWithImportedNorm(
       "deciding body"
     )
     expect(
-      await page.isChecked(selectorCheckboxAuthorIsResolutionMajority)
+      await page.isChecked(selectorCheckboxProviderIsResolutionMajority)
     ).toBeFalsy()
     expect(await page.inputValue(selectorInputLeadJurisdiction)).toBe(
       "lead jurisdiction"

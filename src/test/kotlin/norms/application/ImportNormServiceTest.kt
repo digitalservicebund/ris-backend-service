@@ -32,7 +32,7 @@ class ImportNormServiceTest {
         verify {
             port.saveNorm(
                 withArg {
-                    assertTrue(it.longTitle == "long title")
+                    assertTrue(it.officialLongTitle == "long title")
                     assertTrue(it.articles.size == 1)
                     assertTrue(it.articles[0].title == "title")
                     assertTrue(it.articles[0].marker == "marker")
@@ -46,9 +46,9 @@ class ImportNormServiceTest {
                     assertTrue(it.announcementDate == null)
                     assertTrue(it.citationDate == null)
                     assertTrue(it.frameKeywords == null)
-                    assertTrue(it.authorEntity == null)
-                    assertTrue(it.authorDecidingBody == null)
-                    assertTrue(it.authorIsResolutionMajority == null)
+                    assertTrue(it.providerEntity == null)
+                    assertTrue(it.providerDecidingBody == null)
+                    assertTrue(it.providerIsResolutionMajority == null)
                     assertTrue(it.leadJurisdiction == null)
                     assertTrue(it.leadUnit == null)
                     assertTrue(it.participationType == null)
@@ -74,11 +74,11 @@ class ImportNormServiceTest {
         val norm = ImportNormUseCase.NormData(
             "long title", listOf(article), "official short title", "official abbreviation",
             "reference number", LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "author entity", "author deciding body",
+            "frame keywords", "provider entity", "provider deciding body",
             true, "lead jurisdiction", "lead unit", "participation type",
             "participation institution", "document type name", "document norm category",
             "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3", "unofficial title", "unofficial short title",
+            "subject gesta", "subject bgb3", "unofficial long title", "unofficial short title",
             "unofficial abbreviation", "ris abbreviation"
         )
         val command = ImportNormUseCase.Command(norm)
@@ -91,7 +91,7 @@ class ImportNormServiceTest {
         verify {
             port.saveNorm(
                 withArg {
-                    assertTrue(it.longTitle == "long title")
+                    assertTrue(it.officialLongTitle == "long title")
                     assertTrue(it.articles.size == 1)
                     assertTrue(it.articles[0].title == "title")
                     assertTrue(it.articles[0].marker == "marker")
@@ -105,9 +105,9 @@ class ImportNormServiceTest {
                     assertTrue(it.announcementDate == LocalDate.parse("2020-10-28"))
                     assertTrue(it.citationDate == LocalDate.parse("2020-10-29"))
                     assertTrue(it.frameKeywords == "frame keywords")
-                    assertTrue(it.authorEntity == "author entity")
-                    assertTrue(it.authorDecidingBody == "author deciding body")
-                    assertTrue(it.authorIsResolutionMajority == true)
+                    assertTrue(it.providerEntity == "provider entity")
+                    assertTrue(it.providerDecidingBody == "provider deciding body")
+                    assertTrue(it.providerIsResolutionMajority == true)
                     assertTrue(it.leadJurisdiction == "lead jurisdiction")
                     assertTrue(it.leadUnit == "lead unit")
                     assertTrue(it.participationType == "participation type")
@@ -119,7 +119,7 @@ class ImportNormServiceTest {
                     assertTrue(it.subjectPreviousFna == "subject previous fna")
                     assertTrue(it.subjectGesta == "subject gesta")
                     assertTrue(it.subjectBgb3 == "subject bgb3")
-                    assertTrue(it.unofficialTitle == "unofficial title")
+                    assertTrue(it.unofficialLongTitle == "unofficial long title")
                     assertTrue(it.unofficialShortTitle == "unofficial short title")
                     assertTrue(it.unofficialAbbreviation == "unofficial abbreviation")
                     assertTrue(it.risAbbreviation == "ris abbreviation")

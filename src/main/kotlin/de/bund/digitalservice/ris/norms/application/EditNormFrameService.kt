@@ -15,7 +15,7 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
         return editNormOutputPort.editNorm(
             Norm(
                 guid = command.guid,
-                longTitle = properties.longTitle,
+                officialLongTitle = properties.officialLongTitle,
                 officialShortTitle = properties.officialShortTitle,
                 officialAbbreviation = properties.officialAbbreviation,
                 referenceNumber = properties.referenceNumber,
@@ -23,9 +23,9 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
                 announcementDate = properties.announcementDate,
                 citationDate = properties.citationDate,
                 frameKeywords = properties.frameKeywords,
-                authorEntity = properties.authorEntity,
-                authorDecidingBody = properties.authorDecidingBody,
-                authorIsResolutionMajority = properties.authorIsResolutionMajority,
+                providerEntity = properties.providerEntity,
+                providerDecidingBody = properties.providerDecidingBody,
+                providerIsResolutionMajority = properties.providerIsResolutionMajority,
                 leadJurisdiction = properties.leadJurisdiction,
                 leadUnit = properties.leadUnit,
                 participationType = properties.participationType,
@@ -37,7 +37,7 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
                 subjectPreviousFna = properties.subjectPreviousFna,
                 subjectGesta = properties.subjectGesta,
                 subjectBgb3 = properties.subjectBgb3,
-                unofficialTitle = properties.unofficialTitle,
+                unofficialLongTitle = properties.unofficialLongTitle,
                 unofficialShortTitle = properties.unofficialShortTitle,
                 unofficialAbbreviation = properties.unofficialAbbreviation,
                 risAbbreviation = properties.risAbbreviation

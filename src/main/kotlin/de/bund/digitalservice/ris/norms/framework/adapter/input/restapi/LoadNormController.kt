@@ -33,7 +33,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     data class NormResponseSchema
     private constructor(
         val guid: String,
-        val longTitle: String,
+        val officialLongTitle: String,
         val articles: List<ArticleResponseSchema>,
         val officialShortTitle: String?,
         val officialAbbreviation: String?,
@@ -42,9 +42,9 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val announcementDate: String?,
         val citationDate: String?,
         val frameKeywords: String?,
-        val authorEntity: String?,
-        val authorDecidingBody: String?,
-        val authorIsResolutionMajority: Boolean?,
+        val providerEntity: String?,
+        val providerDecidingBody: String?,
+        val providerIsResolutionMajority: Boolean?,
         val leadJurisdiction: String?,
         val leadUnit: String?,
         val participationType: String?,
@@ -56,7 +56,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val subjectPreviousFna: String?,
         val subjectGesta: String?,
         val subjectBgb3: String?,
-        val unofficialTitle: String?,
+        val unofficialLongTitle: String?,
         val unofficialShortTitle: String?,
         val unofficialAbbreviation: String?,
         val risAbbreviation: String?
@@ -66,7 +66,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                 val articles = data.articles.map { ArticleResponseSchema.fromUseCaseData(it) }
                 return NormResponseSchema(
                     guid = encodeGuid(data.guid),
-                    longTitle = data.longTitle,
+                    officialLongTitle = data.officialLongTitle,
                     articles = articles,
                     officialShortTitle = data.officialShortTitle,
                     officialAbbreviation = data.officialAbbreviation,
@@ -75,9 +75,9 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     announcementDate = encodeLocalDate(data.announcementDate),
                     citationDate = encodeLocalDate(data.citationDate),
                     frameKeywords = data.frameKeywords,
-                    authorEntity = data.authorEntity,
-                    authorDecidingBody = data.authorDecidingBody,
-                    authorIsResolutionMajority = data.authorIsResolutionMajority,
+                    providerEntity = data.providerEntity,
+                    providerDecidingBody = data.providerDecidingBody,
+                    providerIsResolutionMajority = data.providerIsResolutionMajority,
                     leadJurisdiction = data.leadJurisdiction,
                     leadUnit = data.leadUnit,
                     participationType = data.participationType,
@@ -89,7 +89,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     subjectPreviousFna = data.subjectPreviousFna,
                     subjectGesta = data.subjectGesta,
                     subjectBgb3 = data.subjectBgb3,
-                    unofficialTitle = data.unofficialTitle,
+                    unofficialLongTitle = data.unofficialLongTitle,
                     unofficialShortTitle = data.unofficialShortTitle,
                     unofficialAbbreviation = data.unofficialAbbreviation,
                     risAbbreviation = data.risAbbreviation

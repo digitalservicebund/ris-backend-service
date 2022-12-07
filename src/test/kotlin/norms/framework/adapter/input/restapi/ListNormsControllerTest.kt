@@ -73,8 +73,8 @@ class ListNormsControllerTest {
                 """
         {
           "data": [
-            { "guid": "761b5537-5aa5-4901-81f7-fbf7e040a7c8", "longTitle": "first title" },
-            { "guid": "53d29ef7-377c-4d14-864b-eb3a85769359", "longTitle": "second title" }
+            { "guid": "761b5537-5aa5-4901-81f7-fbf7e040a7c8", "officialLongTitle": "first title" },
+            { "guid": "53d29ef7-377c-4d14-864b-eb3a85769359", "officialLongTitle": "second title" }
           ]
         }
         """

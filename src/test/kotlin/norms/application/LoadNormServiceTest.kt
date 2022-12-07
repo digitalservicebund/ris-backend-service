@@ -18,7 +18,7 @@ class LoadNormServiceTest {
         val service = LoadNormService(port)
         val guid = UUID.randomUUID()
         val query = LoadNormUseCase.Query(guid)
-        val norm = Norm(guid, "title")
+        val norm = Norm(guid, officialLongTitle = "title")
 
         every { port.getNormByGuid(guid) } returns Mono.just(norm)
 
