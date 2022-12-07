@@ -68,7 +68,7 @@ fileignoreconfig:
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: 16e46413ee49c4c9fb05d316ba084962d06eaf082e7b9e1fe75ff76419f9257c
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
-    checksum: 5b648fae36a5fa772afe7014b747b838d286250e590ee9ed6307e3f355b0796c
+    checksum: da75b8d128332115a08b26fb98d7e37f337e9ef144e8cd96c3e08a6fa3236e21
   - filename: web/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
@@ -130,11 +130,13 @@ fileignoreconfig:
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts
-    checksum: ec8f23a038f0683ac1d630967dabb1722c10681a1c5ec046bbd41b8705ddd416
+    checksum: cc6475406d878e2bb1b38841d8b2b995e7e3e1bbd1c2f84e4aea8550788e08ea
   - filename: src/main/resources/db/migration/V0.12__norms_rename_columns.sql
     checksum: 41fa9e571f68749cff49867214aac6f43a4beeb9c875a568ec3377579126494c
   - filename: src/main/resources/db/migration/V0.13__norms_add_remaining_metadata_fields.sql
     checksum: 8d412911921585bd91aa44397d73028e9416237578eeda5815905f3ba470a856
+  - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
+    checksum: 0a6c0e6bd3a9373472a2ed7c0e6b7973be7e4f78715a09b1495d15d2d0d1522f
 
 scopeconfig:
   - scope: node
