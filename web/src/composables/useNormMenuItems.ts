@@ -32,7 +32,7 @@ export function useNormMenuItems(
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
-            hash: "#coreData",
+            hash: "#generalDataFields",
           },
         },
         {
@@ -40,15 +40,7 @@ export function useNormMenuItems(
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
-            hash: "#documentType",
-          },
-        },
-        {
-          label: "Überschriften und Abkürzungen",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#headings_abbreviations",
+            hash: "#documentTypeFields",
           },
         },
         {
@@ -56,23 +48,7 @@ export function useNormMenuItems(
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
-            hash: "#normOriginator",
-          },
-        },
-        {
-          label: "Federführung",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#leadManagement",
-          },
-        },
-        {
-          label: "Sachgebiet",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#subjectArea",
+            hash: "#normProviderFields",
           },
         },
         {
@@ -80,7 +56,191 @@ export function useNormMenuItems(
           route: {
             ...baseRoute,
             name: "norms-norm-:normGuid-frame",
-            hash: "#participatingInstitutions",
+            hash: "#participatingInstitutionsFields",
+          },
+        },
+        {
+          label: "Federführung",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#leadFields",
+          },
+        },
+        {
+          label: "Überschriften und Abkürzungen",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#headingsAndAbbreviations",
+          },
+        },
+        {
+          label: "Inkrafttreten",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#entryIntoForceFields",
+          },
+        },
+        {
+          label: "Außerkrafttreten",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#expirationFields",
+          },
+        },
+        {
+          label: "Verkündungsdatum",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#announcementDateFields",
+          },
+        },
+        {
+          label: "Zitierdatum",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#citationDateFields",
+          },
+        },
+        {
+          label: "Amtliche Fundstelle",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#officialAnnouncementFields",
+          },
+        },
+        {
+          label: "Nichtamtliche Fundstelle",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#unofficialReferenceFields",
+          },
+        },
+        {
+          label: "Vollzitat",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#completeCitationFields",
+          },
+        },
+        {
+          label: "Stand-Angabe",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#statusIndicationFields",
+          },
+        },
+        {
+          label: "Stand der dokumentarischen Bearbeitung",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#documentProcessingStatusFields",
+          },
+        },
+        {
+          label: "Räumlicher Geltungsbereich",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#applicationScopeFields",
+          },
+        },
+        {
+          label: "Aktivverweisung",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#categorizedReferenceFields",
+          },
+        },
+        {
+          label: "Fußnote",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#otherFootnoteFields",
+          },
+        },
+        {
+          label: "Gültigkeitsregelung",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#validityRuleFields",
+          },
+        },
+        {
+          label: "Elektronischer Nachweis",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#digitalEvidenceFields",
+          },
+        },
+        {
+          label: "Aktenzeichen",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#referenceNumberFields",
+          },
+        },
+        {
+          label: "ELI",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#europeanLegalIdentifierFields",
+          },
+        },
+        {
+          label: "CELEX-Nummer",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#celexNumberFields",
+          },
+        },
+        {
+          label: "Altersangabe",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#ageIndicationFields",
+          },
+        },
+        {
+          label: "Definition",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#definitionFields",
+          },
+        },
+        {
+          label: "Angaben zur Volljährigkeit",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#ageOfMajorityIndicationFields",
+          },
+        },
+        {
+          label: "Text",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#textFields",
           },
         },
       ],
