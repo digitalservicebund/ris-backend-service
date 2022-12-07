@@ -1,14 +1,17 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
+import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import FileInput from "@/components/FileInput.vue"
+import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
 import type { InputAttributes, ModelType } from "@/domain"
 import { InputType, ValidationError } from "@/domain"
 
 interface Props {
+  id: string
   type?: InputType
   modelValue?: ModelType
   attributes: InputAttributes
@@ -39,6 +42,10 @@ const component = computed(() => {
       return DateInput
     case InputType.CHECKBOX:
       return CheckboxInput
+    case InputType.CHIPS:
+      return ChipsInput
+    case InputType.NESTED:
+      return NestedInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }
@@ -53,6 +60,7 @@ const value = computed({
 <template>
   <component
     :is="component"
+    :id="id"
     v-model="value"
     v-bind="attributes"
     :validation-error="validationError"

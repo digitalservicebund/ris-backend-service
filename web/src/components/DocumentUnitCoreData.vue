@@ -1,18 +1,13 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue"
+import { computed, onMounted, ref, toRefs } from "vue"
 import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
-import {
-  courtFields,
-  coreDataFields,
-  prefilledDataFields,
-  moreCategories,
-  ValidationError,
-} from "@/domain"
+import { useTransformNestedData } from "@/composables/useTransformNestedData"
+import { courtFields, coreDataFields, ValidationError } from "@/domain"
 
 interface Props {
-  modelValue?: CoreData
+  modelValue: CoreData
   updateStatus: number
   validationErrors?: ValidationError[]
 }
@@ -24,10 +19,16 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const { modelValue } = toRefs(props)
 
-const values = computed({
-  get: () => props.modelValue ?? {},
-  set: (newValues) => emit("update:modelValue", newValues),
+const values = useTransformNestedData(modelValue, coreDataFields, emit)
+const courtValues = computed({
+  get() {
+    return { court: values.value.court }
+  },
+  set(newCourtValue) {
+    values.value = Object.assign(values.value, newCourtValue)
+  },
 })
 
 const containerWidth = ref()
@@ -52,7 +53,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     <h1 class="core-data heading-02-regular mb-[1rem]">Stammdaten</h1>
 
     <InputGroup
-      v-model="values"
+      v-model="courtValues"
       :column-count="1"
       :fields="courtFields"
       :validation-errors="props.validationErrors"
@@ -61,18 +62,6 @@ const resizeObserver = new ResizeObserver((entries) => {
       v-model="values"
       :column-count="columnCount"
       :fields="coreDataFields"
-      :validation-errors="props.validationErrors"
-    />
-    <InputGroup
-      v-model="values"
-      :column-count="columnCount"
-      :fields="prefilledDataFields"
-      :validation-errors="props.validationErrors"
-    />
-    <InputGroup
-      v-model="values"
-      :column-count="columnCount"
-      :fields="moreCategories"
       :validation-errors="props.validationErrors"
     />
     <div class="mt-4">* Pflichtfelder zum Veröffentlichen</div>

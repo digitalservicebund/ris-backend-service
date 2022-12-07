@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 65056ccfc263418e043d9d395a955bb983a892b034e7412c55a8285e5ce7764b
+    checksum: a524e08759343da05acc6a92bf8e7e53066dbe1e8d88bebc736653672de7aabf
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
@@ -127,6 +127,10 @@ fileignoreconfig:
     checksum: cec2d13117312bd551eea45b9501c6d525b4c9019544d26a78b06ae1c54c019a
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
     checksum: 498ed59ed0b895f2d86bbb37a70dec87dcd00b40f1c022e08e93b4c59150dc64
+  - filename: web/src/components/DocumentUnitCoreData.vue
+    checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
+  - filename: web/src/composables/useTransformNestedData.ts
+    checksum: ec8f23a038f0683ac1d630967dabb1722c10681a1c5ec046bbd41b8705ddd416
   - filename: src/main/resources/db/migration/V0.12__norms_rename_columns.sql
     checksum: 41fa9e571f68749cff49867214aac6f43a4beeb9c875a568ec3377579126494c
   - filename: src/main/resources/db/migration/V0.13__norms_add_remaining_metadata_fields.sql

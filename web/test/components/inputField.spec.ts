@@ -12,7 +12,7 @@ function renderComponent(options?: {
   const slots = { default: options?.slot ?? `<input id="${id}" />` }
   const props = {
     id,
-    label: options?.label ?? "label",
+    label: options?.label,
     required: options?.required ?? options?.required,
     errorMessage: options?.errorMessage,
   }
@@ -57,5 +57,13 @@ describe("InputField", () => {
     const input = container.getElementsByTagName("input")[0] as HTMLInputElement
     expect(input).toBeInTheDocument()
     expect(input?.type).toBe("radio")
+  })
+
+  it("does not render label if not given", () => {
+    renderComponent({
+      id: "test",
+    })
+    const labels = document.getElementsByTagName("LABEL")
+    expect(labels.length).toBe(0)
   })
 })

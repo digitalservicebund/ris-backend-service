@@ -7,14 +7,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.r2dbc.AutoConfigureDataR2dbc;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
@@ -31,6 +29,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Import({
   DocumentUnitService.class,
   DocumentUnitRepositoryImpl.class,
+  DocumentUnitListEntryRepositoryImpl.class,
   FlywayConfig.class,
   PostgresConfig.class
 })
@@ -38,9 +37,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Testcontainers(disabledWithoutDocker = true)
 @WithMockUser
 @AutoConfigureDataR2dbc
-// This is because retryWhen(Retry.backoff... in DocumentUnitService can take up to ~127 seconds
-@AutoConfigureWebTestClient(timeout = "150000")
-public class DocumentUnitIntegrationTest {
+public class DocumentUnitListEntryIntegrationTest {
   @Container
   static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
 
@@ -55,10 +52,10 @@ public class DocumentUnitIntegrationTest {
 
   @MockBean S3AsyncClient s3AsyncClient;
   @MockBean EmailPublishService publishService;
-  @MockBean DocumentUnitListEntryRepository listEntryRepository;
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
+  @Autowired private DatabaseDocumentUnitListEntryRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
 
   @BeforeEach
@@ -68,76 +65,43 @@ public class DocumentUnitIntegrationTest {
   }
 
   @Test
-  void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
-    DocumentUnitCreationInfo info = new DocumentUnitCreationInfo("ABC", "D");
+  void testForCorrectResponseWhenRequestingAll() {
+    DocumentUnitDTO savedDto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("1234567890123")
+                    .build())
+            .block();
+
+    // TODO remove this after Ralph's changes are on main
+    fileNumberRepository
+        .save(
+            FileNumberDTO.builder()
+                .documentUnitId(savedDto.getId())
+                .fileNumber("AkteX")
+                .isDeviating(false)
+                .build())
+        .block();
 
     webClient
         .mutateWith(csrf())
-        .post()
-        .uri("/api/v1/caselaw/documentunits/")
-        .bodyValue(info)
-        .exchange()
-        .expectStatus()
-        .isCreated()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("ABCD");
-            });
-
-    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
-    assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentnumber()).startsWith("ABCD");
-  }
-
-  @Test
-  void testForCorrectDbEntriesAfterUpdateByUuid() {
-    UUID uuid = UUID.randomUUID();
-
-    DocumentUnitDTO dto =
-        DocumentUnitDTO.builder()
-            .uuid(uuid)
-            .creationtimestamp(Instant.now())
-            .documentnumber("1234567890123")
-            .build();
-
-    DocumentUnitDTO savedDto = repository.save(dto).block();
-
-    DocumentUnit documentUnitFromFrontend =
-        DocumentUnit.builder()
-            .id(savedDto.id)
-            .uuid(dto.getUuid())
-            .creationtimestamp(dto.getCreationtimestamp())
-            .documentNumber(dto.getDocumentnumber())
-            .coreData(CoreData.builder().fileNumbers(List.of("AkteX")).build())
-            .texts(Texts.builder().decisionName("decisionName").build())
-            .build();
-
-    webClient
-        .mutateWith(csrf())
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
-        .bodyValue(documentUnitFromFrontend)
+        .get()
+        .uri("/api/v1/caselaw/documentunits")
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnit.class)
+        .expectBody(DocumentUnitListEntry[].class)
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
-              assertThat(response.getResponseBody().coreData().fileNumbers().get(0))
-                  .isEqualTo("AkteX");
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody()[0].getDocumentNumber())
+                  .isEqualTo("1234567890123");
+              assertThat(response.getResponseBody()[0].getUuid()).isEqualTo(savedDto.getUuid());
+              assertThat(response.getResponseBody()[0].getFileNumber()).isEqualTo("AkteX");
             });
-
-    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
-    assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
-
-    List<FileNumberDTO> fileNumberEntries =
-        fileNumberRepository.findAllByDocumentUnitId(list.get(0).id).collectList().block();
-    assertThat(fileNumberEntries).hasSize(1);
-    assertThat(fileNumberEntries.get(0).getFileNumber()).isEqualTo("AkteX");
   }
 }

@@ -11,6 +11,7 @@ import FileViewerView from "@/kitchensink/views/FileViewerView.vue"
 import InfoModalView from "@/kitchensink/views/InfoModalView.vue"
 import InputView from "@/kitchensink/views/InputView.vue"
 import NavbarView from "@/kitchensink/views/NavbarView.vue"
+import NestedInputView from "@/kitchensink/views/NestedInputView.vue"
 import OriginalFileSidePanelView from "@/kitchensink/views/OriginalFileSidePanelView.vue"
 import PopupModalView from "@/kitchensink/views/PopupModalView.vue"
 import PropertyInfoView from "@/kitchensink/views/PropertyInfoView.vue"
@@ -37,6 +38,8 @@ const component = computed(() => {
       return FileViewerView
     case "InputView":
       return InputView
+    case "NestedInputView":
+      return NestedInputView
     case "NavbarView":
       return NavbarView
     case "OriginalFileSidePanelView":

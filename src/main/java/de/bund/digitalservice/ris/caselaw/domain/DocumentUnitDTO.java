@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.Instant;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -45,11 +44,8 @@ public class DocumentUnitDTO {
         .s3path(documentUnit.s3path())
         .filetype(documentUnit.filetype())
         .filename(documentUnit.filename())
-        .fileNumbers(
-            documentUnit.coreData().fileNumber() == null
-                ? Collections.emptyList()
-                : List.of(documentUnit.coreData().fileNumber()))
-        .deviatingFileNumbers(Collections.emptyList())
+        .fileNumbers(documentUnit.coreData().fileNumbers())
+        .deviatingFileNumbers(documentUnit.coreData().deviatingFileNumbers())
         .courtType(
             documentUnit.coreData().court() == null ? null : documentUnit.coreData().court().type())
         .category(documentUnit.coreData().category())

@@ -45,15 +45,18 @@ const resizeObserver = new ResizeObserver((entries) => {
 <template>
   <div class="expandable-content">
     <button
-      :aria-label="
-        isExpanded ? 'Abweichendes Feld schließen' : 'Abweichendes Feld öffnen'
-      "
-      class="-mt-[2.625rem] expandable-content__header h-[1.25rem] text-white"
+      class="-mt-[3.5rem] expandable-content__header h-[1.25rem] text-white"
       @click="toggleContentVisibility"
     >
-      <span class="bg-blue-800 material-icons rounded-full w-icon">{{
-        iconName
-      }}</span>
+      <span
+        :aria-label="
+          isExpanded
+            ? 'Abweichendes Feld schließen'
+            : 'Abweichendes Feld öffnen'
+        "
+        class="bg-blue-800 material-icons rounded-full w-icon"
+        >{{ iconName }}</span
+      >
     </button>
     <transition
       ref="expandableContainer"

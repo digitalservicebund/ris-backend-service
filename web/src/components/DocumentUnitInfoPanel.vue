@@ -9,7 +9,7 @@ const props = defineProps<{ documentUnit: DocumentUnit }>()
 const entries = computed(() => [
   {
     label: "Aktenzeichen",
-    value: props.documentUnit.coreData.fileNumber,
+    value: props.documentUnit.coreData.fileNumbers?.[0],
   },
   {
     label: "Entscheidungsdatum",

@@ -18,7 +18,7 @@ describe("documentUnit InfoPanel", () => {
       props: {
         documentUnit: new DocumentUnit("123", {
           coreData: {
-            fileNumber: "foo",
+            fileNumbers: ["foo"],
           },
         }),
       },
@@ -43,7 +43,7 @@ describe("documentUnit InfoPanel", () => {
               location: "baz",
               label: "baz",
             },
-            fileNumber: undefined,
+            fileNumbers: undefined,
           },
           documentNumber: "qux",
         }),
@@ -83,7 +83,7 @@ describe("documentUnit InfoPanel", () => {
       props: {
         documentUnit: new DocumentUnit("123", {
           coreData: {
-            fileNumber: "foo",
+            fileNumbers: ["foo"],
             court: {
               type: "baz",
               location: "baz",
@@ -128,7 +128,7 @@ describe("documentUnit InfoPanel", () => {
       props: {
         documentUnit: new DocumentUnit("123", {
           coreData: {
-            fileNumber: "foo",
+            fileNumbers: ["foo"],
             decisionDate: "2024-01-31",
           },
           documentNumber: "qux",

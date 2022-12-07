@@ -16,6 +16,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 @ExtendWith(SpringExtension.class)
 @TestPropertySource(locations = "classpath:application.properties")
 @Tag("journey")
+// These tests will fail locally unless you have your local server running
 class APIJourneyTest {
 
   @Value("${application.staging.password}")
