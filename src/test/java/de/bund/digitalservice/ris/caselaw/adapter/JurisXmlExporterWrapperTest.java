@@ -44,7 +44,7 @@ public class JurisXmlExporterWrapperTest {
         CoreData.builder()
             .fileNumbers(List.of("fileNumber1", "fileNumber2"))
             .deviatingFileNumbers(List.of("deviatingFileNumber1", "deviatingFileNumber2"))
-            .court(new Court("courtType", null, null))
+            .court(new Court("courtType", null, null, null))
             .category("category")
             .ecli("ecli")
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))

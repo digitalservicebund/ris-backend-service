@@ -51,14 +51,28 @@ public class LookupTableService {
     return courtRepository.findAllByOrderByCourttypeAscCourtlocationAsc().map(this::buildCort);
   }
 
+  public static String extractRevoked(String additional) {
+    if (additional == null || additional.isBlank()) {
+      return null;
+    }
+    if (additional.toLowerCase().contains("aufgehoben")) {
+      // TODO extract year if given
+      return "aufgehoben";
+    }
+    // TODO add more cases
+    return null;
+  }
+
   private Court buildCort(CourtDTO courtDTO) {
+    String revoked = extractRevoked(courtDTO.getAdditional());
     if (courtDTO.getSuperiorcourt().equalsIgnoreCase("ja")
         && courtDTO.getForeigncountry().equalsIgnoreCase("nein")) {
-      return new Court(courtDTO.getCourttype(), null, courtDTO.getCourttype());
+      return new Court(courtDTO.getCourttype(), null, courtDTO.getCourttype(), revoked);
     }
     return new Court(
         courtDTO.getCourttype(),
         courtDTO.getCourtlocation(),
-        courtDTO.getCourttype() + " " + courtDTO.getCourtlocation());
+        courtDTO.getCourttype() + " " + courtDTO.getCourtlocation(),
+        revoked);
   }
 }

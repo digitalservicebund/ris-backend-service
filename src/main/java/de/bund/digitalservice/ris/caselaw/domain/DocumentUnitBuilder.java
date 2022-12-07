@@ -60,7 +60,7 @@ public class DocumentUnitBuilder {
     String courtLocation = documentUnitDTO.getCourtLocation();
     if (courtType != null) {
       String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
-      court = new Court(courtType, courtLocation, label);
+      court = new Court(courtType, courtLocation, label, null);
     }
 
     return new DocumentUnit(
