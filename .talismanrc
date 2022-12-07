@@ -130,7 +130,7 @@ fileignoreconfig:
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts
-    checksum: cc6475406d878e2bb1b38841d8b2b995e7e3e1bbd1c2f84e4aea8550788e08ea
+    checksum: 45bd69e2bb261d86ba40108a417f55b90ffa6b10e41f238ba52f00c9fad4cc5f
   - filename: src/main/resources/db/migration/V0.12__norms_rename_columns.sql
     checksum: 41fa9e571f68749cff49867214aac6f43a4beeb9c875a568ec3377579126494c
   - filename: src/main/resources/db/migration/V0.13__norms_add_remaining_metadata_fields.sql

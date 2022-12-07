@@ -142,11 +142,11 @@ onMounted(() => {
         <div class="label-wrapper">{{ chip }}</div>
 
         <div class="icon-wrapper">
-          <i
+          <em
             class="material-icons"
             @click="deleteChip(i)"
             @keydown.enter="deleteChip(i)"
-            >clear</i
+            >clear</em
           >
         </div>
       </div>
@@ -201,7 +201,7 @@ onMounted(() => {
       padding: 4px 3px;
       border-radius: 0 10px 10px 0;
 
-      i {
+      em {
         cursor: pointer;
       }
     }
@@ -218,7 +218,7 @@ onMounted(() => {
       .icon-wrapper {
         @apply bg-blue-900;
 
-        i {
+        em {
           color: white;
         }
       }
