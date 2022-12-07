@@ -31,10 +31,10 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
         }
     }
 
-    data class NormDataResponseSchema private constructor(val guid: String, val longTitle: String) {
+    data class NormDataResponseSchema private constructor(val guid: String, val officialLongTitle: String) {
         companion object {
             fun fromUseCaseData(data: ListNormsUseCase.NormData): NormDataResponseSchema {
-                return NormDataResponseSchema(encodeGuid(data.guid), data.longTitle)
+                return NormDataResponseSchema(encodeGuid(data.guid), data.officialLongTitle)
             }
         }
     }

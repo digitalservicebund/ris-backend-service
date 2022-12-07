@@ -6,8 +6,8 @@ vi.mock("vue-router")
 describe("norms list", () => {
   it("shows the title of each norm", async () => {
     const norms = [
-      { longTitle: "first title", guid: "first guid" },
-      { longTitle: "second title", guid: "second guid" },
+      { officialLongTitle: "first title", guid: "first guid" },
+      { officialLongTitle: "second title", guid: "second guid" },
     ]
     const { queryByText } = renderComponent({ norms })
 
@@ -20,7 +20,7 @@ describe("norms list", () => {
 })
 
 function renderComponent(options?: {
-  norms?: { longTitle: string; guid: string }[]
+  norms?: { officialLongTitle: string; guid: string }[]
 }) {
   const global = { stubs: { routerLink: { template: "<a><slot/></a>" } } }
   const props = { norms: options?.norms ?? [] }

@@ -58,12 +58,14 @@ const items = ref(props.dropdownItems ?? [])
 const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
+const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
 
 const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
   if (isShowDropdown.value) {
     updateCurrentItems()
+    inputFieldRef.value?.focus()
   }
 }
 
@@ -72,6 +74,7 @@ const clearSelection = () => {
   filter.value = ""
   inputText.value = ""
   updateCurrentItems()
+  inputFieldRef.value?.focus()
 }
 
 const setChosenItem = (value: DropdownInputModelType) => {
@@ -167,6 +170,7 @@ onBeforeUnmount(() => {
       <div class="bg-white input-container">
         <input
           :id="id"
+          ref="inputFieldRef"
           v-model="inputText"
           :aria-label="ariaLabel"
           autocomplete="off"

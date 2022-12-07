@@ -12,7 +12,7 @@ interface Props {
 }
 
 interface Emits {
-  (event: "update:modelValue", value: string | undefined): void
+  (event: "update:modelValue", value?: string): void
 }
 
 const props = defineProps<Props>()
@@ -61,6 +61,8 @@ function handleOnBlur() {
     :aria-label="ariaLabel"
     class="bg-white input"
     :class="conditionalClasses"
+    max="9999-12-31"
+    min="1000-01-01"
     type="date"
     @blur="handleOnBlur"
   />

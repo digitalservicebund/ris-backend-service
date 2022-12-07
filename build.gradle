@@ -121,6 +121,9 @@ dependencies {
   runtimeOnly "org.postgresql:r2dbc-postgresql"
   implementation "org.flywaydb:flyway-core"
   implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+  testImplementation "org.jeasy:easy-random-core:5.0.0"
+
 }
 
 jar { // We have no need for the plain archive, thus skip creation for build speedup!
@@ -209,7 +212,7 @@ sonarqube {
     property "sonar.projectKey", "digitalservicebund_ris-backend-service"
     property "sonar.organization", "digitalservicebund"
     property "sonar.host.url", "https://sonarcloud.io"
-    property "sonar.coverage.exclusions", "**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/NormsMemoryRepository.kt"
+    property "sonar.coverage.exclusions", "**/src/fields/**,**/config/**,**/S3AsyncMockClient.java,**/Application.java,**/NormsMemoryRepository.kt"
   }
 }
 

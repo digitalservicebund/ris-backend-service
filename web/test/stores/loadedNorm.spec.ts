@@ -68,7 +68,7 @@ describe("loadedNorm", () => {
   it("calls the norms service on update with the frame data of the loaded norm", async () => {
     const norm = generateNorm({
       guid: "test guid",
-      longTitle: "test long title",
+      officialLongTitle: "test long title",
       officialShortTitle: "test official short title",
       officialAbbreviation: "test official abbreviation",
       referenceNumber: "test reference number",
@@ -76,9 +76,9 @@ describe("loadedNorm", () => {
       announcementDate: "test announcement date",
       citationDate: "test citation date",
       frameKeywords: "test frame keywords",
-      authorEntity: "test author entity",
-      authorDecidingBody: "test author deciding body",
-      authorIsResolutionMajority: true,
+      providerEntity: "test provider entity",
+      providerDecidingBody: "test provider deciding body",
+      providerIsResolutionMajority: true,
       leadJurisdiction: "test lead jurisdiction",
       leadUnit: "test lead unit",
       participationType: "test participation type",
@@ -98,7 +98,7 @@ describe("loadedNorm", () => {
 
     expect(editNormFrame).toHaveBeenCalledOnce()
     expect(editNormFrame).toHaveBeenLastCalledWith("test guid", {
-      longTitle: "test long title",
+      officialLongTitle: "test long title",
       officialShortTitle: "test official short title",
       officialAbbreviation: "test official abbreviation",
       referenceNumber: "test reference number",
@@ -106,9 +106,9 @@ describe("loadedNorm", () => {
       announcementDate: "test announcement date",
       citationDate: "test citation date",
       frameKeywords: "test frame keywords",
-      authorEntity: "test author entity",
-      authorDecidingBody: "test author deciding body",
-      authorIsResolutionMajority: true,
+      providerEntity: "test provider entity",
+      providerDecidingBody: "test provider deciding body",
+      providerIsResolutionMajority: true,
       leadJurisdiction: "test lead jurisdiction",
       leadUnit: "test lead unit",
       participationType: "test participation type",

@@ -32,7 +32,7 @@ class ImportNormControllerTest {
         val importJson =
             """
 {
-	"longTitle": "long title",
+	"officialLongTitle": "long title",
 	"articles": [
 		{
 			"marker": "§ 1",
@@ -55,16 +55,16 @@ class ImportNormControllerTest {
 	"announcementDate": "2021-06-14",
 	"citationDate": "2021-06-09",
 	"frameKeywords": "frame keywords",
-	"authorEntity": "DEU",
-	"authorDecidingBody": "BT",
-	"authorIsResolutionMajority": true,
+	"providerEntity": "DEU",
+	"providerDecidingBody": "BT",
+	"providerIsResolutionMajority": true,
 	"leadJurisdiction": "BMVI",
 	"leadUnit": "G 22",
 	"participationType": null,
 	"participationInstitution": null,
 	"subjectFna": "FNA 703-12",
 	"subjectGesta": "GESTA J040",
-  "unofficialTitle": "unofficial title",
+  "unofficialLongTitle": "unofficial long title",
   "unofficialShortTitle": "unofficial short title",
   "unofficialAbbreviation": "unofficial abbreviation",
   "risAbbreviation": "ris abbreviation"
@@ -84,7 +84,7 @@ class ImportNormControllerTest {
         verify(exactly = 1) {
             importNormService.importNorm(
                 withArg {
-                    assertTrue(it.data.longTitle == "long title")
+                    assertTrue(it.data.officialLongTitle == "long title")
                     assertTrue(it.data.articles.size == 1)
                     assertTrue(it.data.articles[0].title == "article title")
                     assertTrue(it.data.articles[0].marker == "§ 1")
@@ -100,16 +100,16 @@ class ImportNormControllerTest {
                     assertTrue(it.data.announcementDate == LocalDate.parse("2021-06-14"))
                     assertTrue(it.data.citationDate == LocalDate.parse("2021-06-09"))
                     assertTrue(it.data.frameKeywords == "frame keywords")
-                    assertTrue(it.data.authorEntity == "DEU")
-                    assertTrue(it.data.authorDecidingBody == "BT")
-                    assertTrue(it.data.authorIsResolutionMajority == true)
+                    assertTrue(it.data.providerEntity == "DEU")
+                    assertTrue(it.data.providerDecidingBody == "BT")
+                    assertTrue(it.data.providerIsResolutionMajority == true)
                     assertTrue(it.data.leadJurisdiction == "BMVI")
                     assertTrue(it.data.leadUnit == "G 22")
                     assertTrue(it.data.participationType == null)
                     assertTrue(it.data.participationInstitution == null)
                     assertTrue(it.data.subjectFna == "FNA 703-12")
                     assertTrue(it.data.subjectGesta == "GESTA J040")
-                    assertTrue(it.data.unofficialTitle == "unofficial title")
+                    assertTrue(it.data.unofficialLongTitle == "unofficial long title")
                     assertTrue(it.data.unofficialShortTitle == "unofficial short title")
                     assertTrue(it.data.unofficialAbbreviation == "unofficial abbreviation")
                     assertTrue(it.data.risAbbreviation == "ris abbreviation")
@@ -127,7 +127,7 @@ class ImportNormControllerTest {
             .post()
             .uri("/api/v1/norms")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "long title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
             .exchange()
             .expectStatus()
             .isCreated()
@@ -143,7 +143,7 @@ class ImportNormControllerTest {
             .post()
             .uri("/api/v1/norms")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "long title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
             .exchange()
             .expectHeader()
             .location("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
@@ -158,7 +158,7 @@ class ImportNormControllerTest {
             .post()
             .uri("/api/v1/norms")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "long title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
             .exchange()
             .expectStatus()
             .is5xxServerError()

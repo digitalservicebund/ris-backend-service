@@ -6,5 +6,5 @@ import java.util.UUID
 interface ListNormsUseCase {
     fun listNorms(): Flux<NormData>
 
-    data class NormData(val guid: UUID, val longTitle: String)
+    data class NormData(val guid: UUID, val officialLongTitle: String)
 }

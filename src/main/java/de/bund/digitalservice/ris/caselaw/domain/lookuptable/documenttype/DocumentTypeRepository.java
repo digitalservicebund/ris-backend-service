@@ -8,9 +8,9 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface DocumentTypeRepository extends ReactiveSortingRepository<DocumentTypeDTO, Long> {
 
-  Flux<DocumentTypeDTO> findAllByOrderByJurisShortcutAscLabelAsc();
+  Flux<DocumentTypeDTO> findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc(char documentType);
 
   @Query(
-      "SELECT * FROM lookuptable_documenttype WHERE UPPER(CONCAT(juris_shortcut, ' ', label)) LIKE UPPER('%'||:searchStr||'%') ORDER BY juris_shortcut, label")
-  Flux<DocumentTypeDTO> findBySearchStr(String searchStr);
+      "SELECT * FROM lookuptable_documenttype WHERE UPPER(CONCAT(juris_shortcut, ' ', label)) LIKE UPPER('%'||:searchStr||'%') AND document_type = 'R' ORDER BY juris_shortcut, label")
+  Flux<DocumentTypeDTO> findCaselawBySearchStr(String searchStr);
 }

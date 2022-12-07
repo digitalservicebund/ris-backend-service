@@ -29,7 +29,7 @@ class EditNormFrameServiceTest {
         verify {
             editNormOutputPort.editNorm(
                 withArg {
-                    assertTrue(it.longTitle == "new title")
+                    assertTrue(it.officialLongTitle == "new title")
                     assertTrue(it.officialShortTitle == null)
                     assertTrue(it.officialAbbreviation == null)
                     assertTrue(it.referenceNumber == null)
@@ -37,9 +37,9 @@ class EditNormFrameServiceTest {
                     assertTrue(it.announcementDate == null)
                     assertTrue(it.citationDate == null)
                     assertTrue(it.frameKeywords == null)
-                    assertTrue(it.authorEntity == null)
-                    assertTrue(it.authorDecidingBody == null)
-                    assertTrue(it.authorIsResolutionMajority == null)
+                    assertTrue(it.providerEntity == null)
+                    assertTrue(it.providerDecidingBody == null)
+                    assertTrue(it.providerIsResolutionMajority == null)
                     assertTrue(it.leadJurisdiction == null)
                     assertTrue(it.leadUnit == null)
                     assertTrue(it.participationType == null)
@@ -71,8 +71,8 @@ class EditNormFrameServiceTest {
                 LocalDate.parse("2020-10-28"),
                 LocalDate.parse("2020-10-29"),
                 "frame keywords",
-                "author entity",
-                "author deciding body",
+                "provider entity",
+                "provider deciding body",
                 true,
                 "lead jurisdiction",
                 "lead unit",
@@ -85,7 +85,7 @@ class EditNormFrameServiceTest {
                 "subject previous fna",
                 "subject gesta",
                 "subject bgb3",
-                "unofficial title",
+                "unofficial long title",
                 "unofficial short title",
                 "unofficial abbreviation",
                 "ris abbreviation"
@@ -100,7 +100,7 @@ class EditNormFrameServiceTest {
         verify {
             editNormOutputPort.editNorm(
                 withArg {
-                    assertTrue(it.longTitle == "long title")
+                    assertTrue(it.officialLongTitle == "long title")
                     assertTrue(it.officialShortTitle == "official short title")
                     assertTrue(it.officialAbbreviation == "official abbreviation")
                     assertTrue(it.referenceNumber == "reference number")
@@ -108,9 +108,9 @@ class EditNormFrameServiceTest {
                     assertTrue(it.announcementDate == LocalDate.parse("2020-10-28"))
                     assertTrue(it.citationDate == LocalDate.parse("2020-10-29"))
                     assertTrue(it.frameKeywords == "frame keywords")
-                    assertTrue(it.authorEntity == "author entity")
-                    assertTrue(it.authorDecidingBody == "author deciding body")
-                    assertTrue(it.authorIsResolutionMajority == true)
+                    assertTrue(it.providerEntity == "provider entity")
+                    assertTrue(it.providerDecidingBody == "provider deciding body")
+                    assertTrue(it.providerIsResolutionMajority == true)
                     assertTrue(it.leadJurisdiction == "lead jurisdiction")
                     assertTrue(it.leadUnit == "lead unit")
                     assertTrue(it.participationType == "participation type")
@@ -121,7 +121,7 @@ class EditNormFrameServiceTest {
                     assertTrue(it.subjectFna == "subject fna")
                     assertTrue(it.subjectPreviousFna == "subject previous fna")
                     assertTrue(it.subjectGesta == "subject gesta")
-                    assertTrue(it.unofficialTitle == "unofficial title")
+                    assertTrue(it.unofficialLongTitle == "unofficial long title")
                     assertTrue(it.unofficialShortTitle == "unofficial short title")
                     assertTrue(it.unofficialAbbreviation == "unofficial abbreviation")
                     assertTrue(it.risAbbreviation == "ris abbreviation")

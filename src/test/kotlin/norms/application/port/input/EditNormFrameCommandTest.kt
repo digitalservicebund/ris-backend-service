@@ -13,7 +13,7 @@ class EditNormFrameCommandTest {
         val command = EditNormFrameUseCase.Command(guid, properties)
 
         assertTrue(command.guid == guid)
-        assertTrue(command.properties.longTitle == "new title")
+        assertTrue(command.properties.officialLongTitle == "new title")
         assertTrue(command.properties.officialShortTitle == null)
         assertTrue(command.properties.officialAbbreviation == null)
         assertTrue(command.properties.referenceNumber == null)
@@ -21,9 +21,9 @@ class EditNormFrameCommandTest {
         assertTrue(command.properties.announcementDate == null)
         assertTrue(command.properties.citationDate == null)
         assertTrue(command.properties.frameKeywords == null)
-        assertTrue(command.properties.authorEntity == null)
-        assertTrue(command.properties.authorDecidingBody == null)
-        assertTrue(command.properties.authorIsResolutionMajority == null)
+        assertTrue(command.properties.providerEntity == null)
+        assertTrue(command.properties.providerDecidingBody == null)
+        assertTrue(command.properties.providerIsResolutionMajority == null)
         assertTrue(command.properties.leadJurisdiction == null)
         assertTrue(command.properties.leadUnit == null)
         assertTrue(command.properties.participationType == null)
@@ -50,8 +50,8 @@ class EditNormFrameCommandTest {
                 LocalDate.parse("2020-10-28"),
                 LocalDate.parse("2020-10-29"),
                 "frame keywords",
-                "author entity",
-                "author deciding body",
+                "provider entity",
+                "provider deciding body",
                 true,
                 "lead jurisdiction",
                 "lead unit",
@@ -68,7 +68,7 @@ class EditNormFrameCommandTest {
         val command = EditNormFrameUseCase.Command(guid, properties)
 
         assertTrue(command.guid == guid)
-        assertTrue(command.properties.longTitle == "long title")
+        assertTrue(command.properties.officialLongTitle == "long title")
         assertTrue(command.properties.officialShortTitle == "official short title")
         assertTrue(command.properties.officialAbbreviation == "official abbreviation")
         assertTrue(command.properties.referenceNumber == "reference number")
@@ -76,9 +76,9 @@ class EditNormFrameCommandTest {
         assertTrue(command.properties.announcementDate == LocalDate.parse("2020-10-28"))
         assertTrue(command.properties.citationDate == LocalDate.parse("2020-10-29"))
         assertTrue(command.properties.frameKeywords == "frame keywords")
-        assertTrue(command.properties.authorEntity == "author entity")
-        assertTrue(command.properties.authorDecidingBody == "author deciding body")
-        assertTrue(command.properties.authorIsResolutionMajority == true)
+        assertTrue(command.properties.providerEntity == "provider entity")
+        assertTrue(command.properties.providerDecidingBody == "provider deciding body")
+        assertTrue(command.properties.providerIsResolutionMajority == true)
         assertTrue(command.properties.leadJurisdiction == "lead jurisdiction")
         assertTrue(command.properties.leadUnit == "lead unit")
         assertTrue(command.properties.participationType == "participation type")

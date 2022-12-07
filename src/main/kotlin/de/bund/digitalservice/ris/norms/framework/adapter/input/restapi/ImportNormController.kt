@@ -28,7 +28,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
     }
 
     class NormRequestSchema {
-        lateinit var longTitle: String
+        lateinit var officialLongTitle: String
         var articles: List<ArticleRequestSchema> = listOf()
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
@@ -37,9 +37,9 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var announcementDate: String? = null
         var citationDate: String? = null
         var frameKeywords: String? = null
-        var authorEntity: String? = null
-        var authorDecidingBody: String? = null
-        var authorIsResolutionMajority: Boolean? = null
+        var providerEntity: String? = null
+        var providerDecidingBody: String? = null
+        var providerIsResolutionMajority: Boolean? = null
         var leadJurisdiction: String? = null
         var leadUnit: String? = null
         var participationType: String? = null
@@ -51,14 +51,14 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var subjectPreviousFna: String? = null
         var subjectGesta: String? = null
         var subjectBgb3: String? = null
-        var unofficialTitle: String? = null
+        var unofficialLongTitle: String? = null
         var unofficialShortTitle: String? = null
         var unofficialAbbreviation: String? = null
         var risAbbreviation: String? = null
 
         fun toUseCaseData(): ImportNormUseCase.NormData {
             return ImportNormUseCase.NormData(
-                longTitle = this.longTitle,
+                officialLongTitle = this.officialLongTitle,
                 articles = this.articles.map { it.toUseCaseData() },
                 officialShortTitle = this.officialShortTitle,
                 officialAbbreviation = this.officialAbbreviation,
@@ -67,9 +67,9 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 announcementDate = decodeLocalDate(this.announcementDate),
                 citationDate = decodeLocalDate(this.citationDate),
                 frameKeywords = this.frameKeywords,
-                authorEntity = this.authorEntity,
-                authorDecidingBody = this.authorDecidingBody,
-                authorIsResolutionMajority = this.authorIsResolutionMajority,
+                providerEntity = this.providerEntity,
+                providerDecidingBody = this.providerDecidingBody,
+                providerIsResolutionMajority = this.providerIsResolutionMajority,
                 leadJurisdiction = this.leadJurisdiction,
                 leadUnit = this.leadUnit,
                 participationType = this.participationType,
@@ -81,7 +81,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 subjectPreviousFna = this.subjectPreviousFna,
                 subjectGesta = this.subjectGesta,
                 subjectBgb3 = this.subjectBgb3,
-                unofficialTitle = this.unofficialTitle,
+                unofficialLongTitle = this.unofficialLongTitle,
                 unofficialShortTitle = this.unofficialShortTitle,
                 unofficialAbbreviation = this.unofficialAbbreviation,
                 risAbbreviation = this.risAbbreviation

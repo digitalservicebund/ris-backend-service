@@ -7,10 +7,10 @@ import normCleanCars from "./testdata/norm_clean_cars.json"
 testWithImportedNorm(
   "Check display of norm complex",
   async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.longTitle, createdGuid)
+    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
 
     await expect(page).toHaveURL(`/norms/norm/${createdGuid}`)
-    await expect(page.getByText(normCleanCars.longTitle)).toBeVisible()
+    await expect(page.getByText(normCleanCars.officialLongTitle)).toBeVisible()
     await expect(page.getByText(normCleanCars.articles[0].marker)).toBeVisible()
     await expect(page.getByText(normCleanCars.articles[0].title)).toBeVisible()
     await expect(
@@ -31,7 +31,7 @@ testWithImportedNorm(
 testWithImportedNorm(
   "Check if frame fields are correctly displayed",
   async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.longTitle, createdGuid)
+    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
 
     // Outer menu
     await expect(page.locator("a:has-text('Normenkomplex')")).toBeVisible()
@@ -107,7 +107,7 @@ testWithImportedNorm(
     ).toBeVisible()
     expect(
       await page.inputValue('role=textbox[name="Amtliche Langüberschrift"]')
-    ).toBe(normCleanCars.longTitle)
+    ).toBe(normCleanCars.officialLongTitle)
     await expect(
       page.locator('label:text-is("Amtliche Kurzüberschrift")')
     ).toBeVisible()
@@ -160,13 +160,13 @@ testWithImportedNorm(
       await page.inputValue(
         'role=textbox[name="Staat, Land, Stadt, Landkreis oder juristische Person"]'
       )
-    ).toBe(normCleanCars.authorEntity)
+    ).toBe(normCleanCars.providerEntity)
     await expect(
       page.locator('label:text-is("Beschließendes Organ")')
     ).toBeVisible()
     expect(
       await page.inputValue('role=textbox[name="Beschließendes Organ"]')
-    ).toBe(normCleanCars.authorDecidingBody)
+    ).toBe(normCleanCars.providerDecidingBody)
     await expect(
       page.locator(
         'label:text-is("Beschlussfassung mit qualifizierter Mehrheit")'
@@ -234,7 +234,7 @@ testWithImportedNorm(
 testWithImportedNorm(
   "Check if switching frame sections affects sections being inside or outside viewport",
   async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.longTitle, createdGuid)
+    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()

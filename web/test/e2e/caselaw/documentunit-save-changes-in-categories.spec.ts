@@ -264,4 +264,32 @@ test.describe("save changes in core data and texts and verify it persists", () =
         .inputValue()
     ).toBe("Type Two")
   })
+
+  test("text editor fields should have predefined height", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    // small
+    const smallEditor = page.locator("[aria-label='Titelzeile Editor Feld']")
+    const smallEditorHeight = await smallEditor.evaluate((element) =>
+      window.getComputedStyle(element).getPropertyValue("height")
+    )
+    expect(parseInt(smallEditorHeight)).toBeGreaterThanOrEqual(60)
+
+    //medium
+    const mediumEditor = page.locator("[aria-label='Leitsatz Editor Feld']")
+    const mediumEditorHeight = await mediumEditor.evaluate((element) =>
+      window.getComputedStyle(element).getPropertyValue("height")
+    )
+    expect(parseInt(mediumEditorHeight)).toBeGreaterThanOrEqual(120)
+
+    //large
+    const largeEditor = page.locator("[aria-label='Gründe Editor Feld']")
+    const largeEditorHeight = await largeEditor.evaluate((element) =>
+      window.getComputedStyle(element).getPropertyValue("height")
+    )
+    expect(parseInt(largeEditorHeight)).toBeGreaterThanOrEqual(320)
+  })
 })

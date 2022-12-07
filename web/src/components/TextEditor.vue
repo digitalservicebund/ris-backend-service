@@ -389,3 +389,19 @@ const resizeObserver = new ResizeObserver((entries) => {
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.editor-content {
+  &--small {
+    height: 60px;
+  }
+
+  &--medium {
+    height: 120px;
+  }
+
+  &--large {
+    height: 320px;
+  }
+}
+</style>

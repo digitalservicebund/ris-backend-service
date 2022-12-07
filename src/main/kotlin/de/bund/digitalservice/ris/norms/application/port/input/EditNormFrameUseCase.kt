@@ -10,7 +10,7 @@ interface EditNormFrameUseCase {
     data class Command(val guid: UUID, val properties: NormFrameProperties)
 
     data class NormFrameProperties(
-        val longTitle: String,
+        val officialLongTitle: String,
         val officialShortTitle: String? = null,
         val officialAbbreviation: String? = null,
         val referenceNumber: String? = null,
@@ -18,9 +18,9 @@ interface EditNormFrameUseCase {
         val announcementDate: LocalDate? = null,
         val citationDate: LocalDate? = null,
         val frameKeywords: String? = null,
-        val authorEntity: String? = null,
-        val authorDecidingBody: String? = null,
-        val authorIsResolutionMajority: Boolean? = null,
+        val providerEntity: String? = null,
+        val providerDecidingBody: String? = null,
+        val providerIsResolutionMajority: Boolean? = null,
         val leadJurisdiction: String? = null,
         val leadUnit: String? = null,
         val participationType: String? = null,
@@ -32,7 +32,7 @@ interface EditNormFrameUseCase {
         val subjectPreviousFna: String? = null,
         val subjectGesta: String? = null,
         val subjectBgb3: String? = null,
-        val unofficialTitle: String? = null,
+        val unofficialLongTitle: String? = null,
         val unofficialShortTitle: String? = null,
         val unofficialAbbreviation: String? = null,
         val risAbbreviation: String? = null

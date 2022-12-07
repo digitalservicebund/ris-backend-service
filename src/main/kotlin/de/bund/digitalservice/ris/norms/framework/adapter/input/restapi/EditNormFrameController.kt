@@ -31,7 +31,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     }
 
     class NormFramePropertiesRequestSchema {
-        lateinit var longTitle: String
+        lateinit var officialLongTitle: String
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
         var referenceNumber: String? = null
@@ -39,9 +39,9 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var announcementDate: String? = null
         var citationDate: String? = null
         var frameKeywords: String? = null
-        var authorEntity: String? = null
-        var authorDecidingBody: String? = null
-        var authorIsResolutionMajority: Boolean? = null
+        var providerEntity: String? = null
+        var providerDecidingBody: String? = null
+        var providerIsResolutionMajority: Boolean? = null
         var leadJurisdiction: String? = null
         var leadUnit: String? = null
         var participationType: String? = null
@@ -53,14 +53,14 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var subjectPreviousFna: String? = null
         var subjectGesta: String? = null
         var subjectBgb3: String? = null
-        var unofficialTitle: String? = null
+        var unofficialLongTitle: String? = null
         var unofficialShortTitle: String? = null
         var unofficialAbbreviation: String? = null
         var risAbbreviation: String? = null
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
             return EditNormFrameUseCase.NormFrameProperties(
-                longTitle = this.longTitle,
+                officialLongTitle = this.officialLongTitle,
                 officialShortTitle = this.officialShortTitle,
                 officialAbbreviation = this.officialAbbreviation,
                 referenceNumber = this.referenceNumber,
@@ -68,9 +68,9 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 announcementDate = decodeLocalDate(this.announcementDate),
                 citationDate = decodeLocalDate(this.citationDate),
                 frameKeywords = this.frameKeywords,
-                authorEntity = this.authorEntity,
-                authorDecidingBody = this.authorDecidingBody,
-                authorIsResolutionMajority = this.authorIsResolutionMajority,
+                providerEntity = this.providerEntity,
+                providerDecidingBody = this.providerDecidingBody,
+                providerIsResolutionMajority = this.providerIsResolutionMajority,
                 leadJurisdiction = this.leadJurisdiction,
                 leadUnit = this.leadUnit,
                 participationType = this.participationType,
@@ -82,7 +82,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 subjectPreviousFna = this.subjectPreviousFna,
                 subjectGesta = this.subjectGesta,
                 subjectBgb3 = this.subjectBgb3,
-                unofficialTitle = this.unofficialTitle,
+                unofficialLongTitle = this.unofficialLongTitle,
                 unofficialShortTitle = this.unofficialShortTitle,
                 unofficialAbbreviation = this.unofficialAbbreviation,
                 risAbbreviation = this.risAbbreviation

@@ -14,7 +14,7 @@ export type Paragraph = {
 export interface Norm {
   readonly guid: string
   readonly articles: Article[]
-  longTitle: string
+  officialLongTitle: string
   officialShortTitle?: string
   officialAbbreviation?: string
   referenceNumber?: string
@@ -22,9 +22,9 @@ export interface Norm {
   announcementDate?: string
   citationDate?: string
   frameKeywords?: string
-  authorEntity?: string
-  authorDecidingBody?: string
-  authorIsResolutionMajority?: boolean
+  providerEntity?: string
+  providerDecidingBody?: string
+  providerIsResolutionMajority?: boolean
   leadJurisdiction?: string
   leadUnit?: string
   participationType?: string
@@ -36,7 +36,7 @@ export interface Norm {
   subjectPreviousFna?: string
   subjectGesta?: string
   subjectBgb3?: string
-  unofficialTitle: string
+  unofficialLongTitle: string
   unofficialShortTitle: string
   unofficialAbbreviation: string
   risAbbreviation: string

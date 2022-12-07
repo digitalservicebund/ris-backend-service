@@ -32,7 +32,7 @@ class EditNormFrameControllerTest {
         val editJson =
             """
             {
-              "longTitle": "new title",
+              "officialLongTitle": "new title",
               "officialShortTitle": "official short title",
               "officialAbbreviation": "official abbreviation",
               "referenceNumber": "reference number",
@@ -40,9 +40,9 @@ class EditNormFrameControllerTest {
               "announcementDate": "2020-10-21",
               "citationDate": "2020-10-22",
               "frameKeywords": "frame keywords",
-              "authorEntity": "author entity",
-              "authorDecidingBody": "author deciding body",
-              "authorIsResolutionMajority": true,
+              "providerEntity": "provider entity",
+              "providerDecidingBody": "provider deciding body",
+              "providerIsResolutionMajority": true,
               "leadJurisdiction": "lead jurisdiction",
               "leadUnit": "lead unit",
               "participationType": "participation type",
@@ -54,7 +54,7 @@ class EditNormFrameControllerTest {
               "subjectPreviousFna": "subject previous fna",
               "subjectGesta": "subject gesta",
               "subjectBgb3": "subject bgb3",
-              "unofficialTitle": "unofficial title",
+              "unofficialLongTitle": "unofficial long title",
               "unofficialShortTitle": "unofficial short title",
               "unofficialAbbreviation": "unofficial abbreviation",
               "risAbbreviation": "ris abbreviation"
@@ -74,7 +74,7 @@ class EditNormFrameControllerTest {
             editNormFrameService.editNormFrame(
                 withArg {
                     assertTrue(it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
-                    assertTrue(it.properties.longTitle == "new title")
+                    assertTrue(it.properties.officialLongTitle == "new title")
                     assertTrue(it.properties.officialShortTitle == "official short title")
                     assertTrue(it.properties.officialAbbreviation == "official abbreviation")
                     assertTrue(it.properties.referenceNumber == "reference number")
@@ -82,9 +82,9 @@ class EditNormFrameControllerTest {
                     assertTrue(it.properties.announcementDate == LocalDate.parse("2020-10-21"))
                     assertTrue(it.properties.citationDate == LocalDate.parse("2020-10-22"))
                     assertTrue(it.properties.frameKeywords == "frame keywords")
-                    assertTrue(it.properties.authorEntity == "author entity")
-                    assertTrue(it.properties.authorDecidingBody == "author deciding body")
-                    assertTrue(it.properties.authorIsResolutionMajority == true)
+                    assertTrue(it.properties.providerEntity == "provider entity")
+                    assertTrue(it.properties.providerDecidingBody == "provider deciding body")
+                    assertTrue(it.properties.providerIsResolutionMajority == true)
                     assertTrue(it.properties.leadJurisdiction == "lead jurisdiction")
                     assertTrue(it.properties.leadUnit == "lead unit")
                     assertTrue(it.properties.participationType == "participation type")
@@ -96,7 +96,7 @@ class EditNormFrameControllerTest {
                     assertTrue(it.properties.subjectPreviousFna == "subject previous fna")
                     assertTrue(it.properties.subjectGesta == "subject gesta")
                     assertTrue(it.properties.subjectBgb3 == "subject bgb3")
-                    assertTrue(it.properties.unofficialTitle == "unofficial title")
+                    assertTrue(it.properties.unofficialLongTitle == "unofficial long title")
                     assertTrue(it.properties.unofficialShortTitle == "unofficial short title")
                     assertTrue(it.properties.unofficialAbbreviation == "unofficial abbreviation")
                     assertTrue(it.properties.risAbbreviation == "ris abbreviation")
@@ -114,7 +114,7 @@ class EditNormFrameControllerTest {
             .put()
             .uri("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "new title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "new title" }"""))
             .exchange()
             .expectStatus()
             .isNoContent()
@@ -131,7 +131,7 @@ class EditNormFrameControllerTest {
             .put()
             .uri("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "new title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "new title" }"""))
             .exchange()
             .expectStatus()
             .is5xxServerError()

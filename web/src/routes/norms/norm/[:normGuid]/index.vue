@@ -10,7 +10,7 @@ const { loadedNorm } = storeToRefs(store)
   <div v-if="loadedNorm">
     <div class="max-w-screen-md">
       <h1 class="heading-02-regular mb-44">
-        {{ loadedNorm.longTitle }}
+        {{ loadedNorm.officialLongTitle }}
       </h1>
 
       <div v-for="article in loadedNorm.articles" :key="article.guid">

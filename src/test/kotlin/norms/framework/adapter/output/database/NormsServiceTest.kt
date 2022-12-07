@@ -4,9 +4,12 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
+import org.jeasy.random.EasyRandom
+import org.jeasy.random.EasyRandomParameters
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -28,16 +31,9 @@ import java.util.*
 class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     companion object {
-        private val NORM: Norm = Norm(
-            UUID.randomUUID(), "Norm title", listOf(), "official short title", "official abbreviation",
-            null, LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "author entity", "author deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3", "unofficial title", "unofficial short title",
-            "unofficial abbreviation", "ris abbreviation"
-        )
+        private val parameters: EasyRandomParameters = EasyRandomParameters().stringLengthRange(5, 20) // needed for marker fields
+        private val easyRandom: EasyRandom = EasyRandom(parameters)
+        private val NORM: Norm = easyRandom.nextObject(Norm::class.java)
         private val ARTICLE1: Article = Article(UUID.randomUUID(), "Article1 title", "§ 1")
         private val ARTICLE2: Article = Article(UUID.randomUUID(), "Article2 title", "§ 2")
         private val PARAGRAPH1: Paragraph = Paragraph(UUID.randomUUID(), "(1)", "Text1")
@@ -140,7 +136,13 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        val updatedNorm = NORM.copy(longTitle = "new title")
+        val updatedNorm = NORM.copy(
+            officialLongTitle = "new title", documentNumber = "document number",
+            providerEntity = "provider entity", entryIntoForceDate = LocalDate.now(),
+            expirationDateState = UndefinedDate.UNDEFINED_FUTURE, printAnnouncementGazette = "print gazette",
+            completeCitation = "complete citation", unofficialAbbreviation = "unofficial abbreviation",
+            celexNumber = "celex number"
+        )
         normsService.editNorm(updatedNorm)
             .`as`(StepVerifier::create)
             .expectNextCount(1)

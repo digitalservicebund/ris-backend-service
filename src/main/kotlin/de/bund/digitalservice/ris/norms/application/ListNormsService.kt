@@ -11,6 +11,6 @@ class ListNormsService(private val getAllNormsPort: GetAllNormsOutputPort) : Lis
     override fun listNorms(): Flux<ListNormsUseCase.NormData> {
         return getAllNormsPort
             .getAllNorms()
-            .map({ norm -> ListNormsUseCase.NormData(norm.guid, norm.longTitle) })
+            .map({ norm -> ListNormsUseCase.NormData(norm.guid, norm.officialLongTitle) })
     }
 }

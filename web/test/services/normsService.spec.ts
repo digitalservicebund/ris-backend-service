@@ -119,7 +119,7 @@ describe("normsService", () => {
         .put.mockResolvedValueOnce({ status: 204, data: "" })
 
       await editNormFrame("fake-guid", {
-        longTitle: "new title",
+        officialLongTitle: "new title",
         officialShortTitle: "",
         officialAbbreviation: undefined,
         referenceNumber: "",
@@ -127,9 +127,9 @@ describe("normsService", () => {
         announcementDate: "",
         citationDate: undefined,
         frameKeywords: "",
-        authorEntity: "new author entity",
-        authorDecidingBody: undefined,
-        authorIsResolutionMajority: undefined,
+        providerEntity: "new provider entity",
+        providerDecidingBody: undefined,
+        providerIsResolutionMajority: undefined,
         leadJurisdiction: undefined,
         leadUnit: undefined,
         participationType: undefined,
@@ -146,7 +146,7 @@ describe("normsService", () => {
           },
         },
         {
-          longTitle: "new title",
+          officialLongTitle: "new title",
           officialShortTitle: null,
           officialAbbreviation: null,
           referenceNumber: null,
@@ -154,9 +154,9 @@ describe("normsService", () => {
           announcementDate: null,
           citationDate: null,
           frameKeywords: null,
-          authorEntity: "new author entity",
-          authorDecidingBody: null,
-          authorIsResolutionMajority: null,
+          providerEntity: "new provider entity",
+          providerDecidingBody: null,
+          providerIsResolutionMajority: null,
           leadJurisdiction: null,
           leadUnit: null,
           participationType: null,
@@ -168,7 +168,7 @@ describe("normsService", () => {
           subjectPreviousFna: null,
           subjectGesta: null,
           subjectBgb3: null,
-          unofficialTitle: null,
+          unofficialLongTitle: null,
           unofficialShortTitle: null,
           unofficialAbbreviation: null,
           risAbbreviation: null,
@@ -183,7 +183,7 @@ describe("normsService", () => {
       })
 
       const response = await editNormFrame("fake-guid", {
-        longTitle: "new title",
+        officialLongTitle: "new title",
       })
 
       expect(response.error?.title).toBe(
@@ -198,7 +198,7 @@ describe("normsService", () => {
       })
 
       const response = await editNormFrame("fake-guid", {
-        longTitle: "new title",
+        officialLongTitle: "new title",
       })
 
       expect(response.error?.title).toBe(

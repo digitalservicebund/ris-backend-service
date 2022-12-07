@@ -6,7 +6,7 @@ import { editNormFrame, getNormByGuid } from "@/services/normsService"
 
 function getFrameDataOfNorm(norm: Norm) {
   return {
-    longTitle: norm.longTitle,
+    officialLongTitle: norm.officialLongTitle,
     officialShortTitle: norm.officialShortTitle,
     officialAbbreviation: norm.officialAbbreviation,
     referenceNumber: norm.referenceNumber,
@@ -14,9 +14,9 @@ function getFrameDataOfNorm(norm: Norm) {
     announcementDate: norm.announcementDate,
     citationDate: norm.citationDate,
     frameKeywords: norm.frameKeywords,
-    authorEntity: norm.authorEntity,
-    authorDecidingBody: norm.authorDecidingBody,
-    authorIsResolutionMajority: norm.authorIsResolutionMajority,
+    providerEntity: norm.providerEntity,
+    providerDecidingBody: norm.providerDecidingBody,
+    providerIsResolutionMajority: norm.providerIsResolutionMajority,
     leadJurisdiction: norm.leadJurisdiction,
     leadUnit: norm.leadUnit,
     participationType: norm.participationType,
