@@ -220,19 +220,6 @@ describe("Dropdown Element", () => {
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
   })
 
-  it("Dropdown renders with preselected item", async () => {
-    const { queryByDisplayValue } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "testItem4",
-        ariaLabel: "",
-        dropdownItems: DROPDOWN_ITEMS,
-        preselectedValue: "test",
-      },
-    })
-    expect(queryByDisplayValue("test")).not.toBeInTheDocument()
-  })
-
   it("Dropdown uses endpoint to fetch all DocumentType items", async () => {
     const user = userEvent.setup()
     const dropdownItems: DropdownItem[] = [
