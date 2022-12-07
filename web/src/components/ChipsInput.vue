@@ -134,6 +134,7 @@ onMounted(() => {
         tabindex="0"
         @click="setFocusedItemIndex(i)"
         @input="emitInputEvent"
+        @keydown.delete="backspaceDelete"
         @keypress.enter="enterDelete"
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
