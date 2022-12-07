@@ -43,11 +43,13 @@ watch(inputValue, () => {
   checkInputValueType()
 })
 
+function isCourt(input?: DropdownInputModelType): input is Court {
+  return typeof input === "object" && "location" in input && "type" in input
+}
+
 function checkInputValueType() {
-  // TODO better solution to check for court type
-  if (typeof inputValue.value === "object") {
-    const court = inputValue.value as Court
-    inputText.value = court.label
+  if (isCourt(inputValue.value)) {
+    inputText.value = inputValue.value.label
   } else {
     inputText.value = inputValue.value as string
   }
