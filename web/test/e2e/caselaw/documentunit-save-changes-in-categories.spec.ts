@@ -292,4 +292,30 @@ test.describe("save changes in core data and texts and verify it persists", () =
     )
     expect(parseInt(largeEditorHeight)).toBeGreaterThanOrEqual(320)
   })
+
+  test("updated fileNumber should update info panel", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const infoPanel = page.locator("div", { hasText: documentNumber }).nth(-2)
+    const fileNumberPanel = infoPanel
+      .locator("div", { hasText: "Aktenzeichen" })
+      .nth(-2)
+    expect(fileNumberPanel).toHaveText("Aktenzeichen - ")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("-firstChip")
+    await page.keyboard.press("Enter")
+    expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("-secondChip")
+    await page.keyboard.press("Enter")
+    expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+
+    // delete first chip
+    await page.locator("div", { hasText: "-firstChip" }).nth(-2).click()
+    await page.keyboard.press("Enter")
+    expect(fileNumberPanel).toHaveText("Aktenzeichen-secondChip")
+  })
 })
