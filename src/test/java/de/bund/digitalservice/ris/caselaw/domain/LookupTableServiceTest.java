@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtReposito
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,18 +49,27 @@ class LookupTableServiceTest {
   }
 
   @Test
-  void testGetCourts() {
-    CourtDTO courtDTO = CourtDTO.EMPTY;
-    courtDTO.setCourttype("BGH");
+  void testGetTwoDifferentCourts() {
+    // court where the location will be intentionally dropped
+    CourtDTO courtA = new CourtDTO();
+    courtA.setCourttype("ABC");
+    courtA.setCourtlocation("Berlin");
+    courtA.setSuperiorcourt("Ja");
+    courtA.setForeigncountry("Nein");
+
+    // court where the location will be kept
+    CourtDTO courtB = new CourtDTO();
+    courtB.setCourttype("XYZ");
+    courtB.setCourtlocation("Hamburg");
+    courtB.setSuperiorcourt("Nein");
+    courtB.setForeigncountry("Nein");
+
     when(courtRepository.findAllByOrderByCourttypeAscCourtlocationAsc())
-        .thenReturn(Flux.just(courtDTO));
+        .thenReturn(Flux.fromIterable(List.of(courtA, courtB)));
 
     StepVerifier.create(service.getCourts(Optional.empty()))
-        .consumeNextWith(
-            court -> {
-              assertThat(court).isInstanceOf(Court.class);
-              assertThat(court.type()).isEqualTo("BGH");
-            })
+        .expectNext(new Court("ABC", null, "ABC"))
+        .expectNext(new Court("XYZ", "Hamburg", "XYZ Hamburg"))
         .verifyComplete();
 
     verify(courtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();

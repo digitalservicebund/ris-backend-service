@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
@@ -45,22 +46,19 @@ public class LookupTableService {
 
   public Flux<Court> getCourts(Optional<String> searchStr) {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return courtRepository
-          .findBySearchStr(searchStr.get().trim())
-          .map(
-              courtDTO ->
-                  new Court(
-                      courtDTO.getCourttype(),
-                      courtDTO.getCourtlocation(),
-                      courtDTO.getCourttype() + " " + courtDTO.getCourtlocation()));
+      return courtRepository.findBySearchStr(searchStr.get().trim()).map(this::buildCort);
     }
-    return courtRepository
-        .findAllByOrderByCourttypeAscCourtlocationAsc()
-        .map(
-            courtDTO ->
-                new Court(
-                    courtDTO.getCourttype(),
-                    courtDTO.getCourtlocation(),
-                    courtDTO.getCourttype() + " " + courtDTO.getCourtlocation()));
+    return courtRepository.findAllByOrderByCourttypeAscCourtlocationAsc().map(this::buildCort);
+  }
+
+  private Court buildCort(CourtDTO courtDTO) {
+    if (courtDTO.getSuperiorcourt().equalsIgnoreCase("ja")
+        && courtDTO.getForeigncountry().equalsIgnoreCase("nein")) {
+      return new Court(courtDTO.getCourttype(), null, courtDTO.getCourttype());
+    }
+    return new Court(
+        courtDTO.getCourttype(),
+        courtDTO.getCourtlocation(),
+        courtDTO.getCourttype() + " " + courtDTO.getCourtlocation());
   }
 }

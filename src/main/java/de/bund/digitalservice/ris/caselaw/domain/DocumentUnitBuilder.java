@@ -56,12 +56,11 @@ public class DocumentUnitBuilder {
     }
 
     Court court = null;
-    if (documentUnitDTO.getCourtType() != null && documentUnitDTO.getCourtLocation() != null) {
-      court =
-          new Court(
-              documentUnitDTO.getCourtType(),
-              documentUnitDTO.getCourtLocation(),
-              documentUnitDTO.getCourtType() + " " + documentUnitDTO.getCourtLocation());
+    String courtType = documentUnitDTO.getCourtType();
+    String courtLocation = documentUnitDTO.getCourtLocation();
+    if (courtType != null) {
+      String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
+      court = new Court(courtType, courtLocation, label);
     }
 
     return new DocumentUnit(

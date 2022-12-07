@@ -47,7 +47,10 @@ public class DocumentUnitDTO {
         .fileNumbers(documentUnit.coreData().fileNumbers())
         .deviatingFileNumbers(documentUnit.coreData().deviatingFileNumbers())
         .courtType(
-            documentUnit.coreData().court() == null ? null : documentUnit.coreData().court().type())
+            documentUnit.coreData().court() == null
+                    || documentUnit.coreData().court().type() == null
+                ? null
+                : documentUnit.coreData().court().type())
         .category(documentUnit.coreData().category())
         .procedure(documentUnit.coreData().procedure())
         .ecli(documentUnit.coreData().ecli())
@@ -58,6 +61,7 @@ public class DocumentUnitDTO {
                 : null)
         .courtLocation(
             documentUnit.coreData().court() == null
+                    || documentUnit.coreData().court().location() == null
                 ? null
                 : documentUnit.coreData().court().location())
         .legalEffect(documentUnit.coreData().legalEffect())
