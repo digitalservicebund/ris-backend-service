@@ -72,9 +72,7 @@ export function defineDropdownField(
   }
 }
 
-export const coreDataFields: InputField[] = [
-  // defineTextField("courtType", "Gerichtstyp", "Gerichtstyp", true),
-  // defineTextField("courtLocation", "Gerichtssitz", "Gerichtssitz"),
+export const courtFields: InputField[] = [
   defineDropdownField(
     "court",
     "Gericht",
@@ -85,6 +83,8 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.courts
   ),
+]
+export const coreDataFields: InputField[] = [
   defineTextField(
     "fileNumber",
     "Aktenzeichen",

@@ -4,6 +4,7 @@ import { CoreData } from "../domain/documentUnit"
 import InputGroup from "./InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
 import {
+  courtFields,
   coreDataFields,
   prefilledDataFields,
   moreCategories,
@@ -50,6 +51,12 @@ const resizeObserver = new ResizeObserver((entries) => {
   <div v-else class="mb-[4rem]">
     <h1 class="core-data heading-02-regular mb-[1rem]">Stammdaten</h1>
 
+    <InputGroup
+      v-model="values"
+      :column-count="1"
+      :fields="courtFields"
+      :validation-errors="props.validationErrors"
+    />
     <InputGroup
       v-model="values"
       :column-count="columnCount"
