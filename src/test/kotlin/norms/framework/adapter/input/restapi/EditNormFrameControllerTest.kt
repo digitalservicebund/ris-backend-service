@@ -4,6 +4,9 @@ import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import io.mockk.every
 import io.mockk.verify
+import norms.utils.assertEditNormFrameProperties
+import norms.utils.convertEditNormFramePropertiesToJson
+import norms.utils.createRandomNormFameProperties
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -16,7 +19,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -29,37 +31,9 @@ class EditNormFrameControllerTest {
 
     @Test
     fun `it correctly maps the parameter and body to the command calling the service`() {
-        val editJson =
-            """
-            {
-              "officialLongTitle": "new title",
-              "officialShortTitle": "official short title",
-              "officialAbbreviation": "official abbreviation",
-              "referenceNumber": "reference number",
-              "publicationDate": null,
-              "announcementDate": "2020-10-21",
-              "citationDate": "2020-10-22",
-              "frameKeywords": "frame keywords",
-              "providerEntity": "provider entity",
-              "providerDecidingBody": "provider deciding body",
-              "providerIsResolutionMajority": true,
-              "leadJurisdiction": "lead jurisdiction",
-              "leadUnit": "lead unit",
-              "participationType": "participation type",
-              "participationInstitution": "participation institution",
-              "documentTypeName": "document type name",
-              "documentNormCategory": "document norm category",
-              "documentTemplateName": "document template name",
-              "subjectFna": "subject fna",
-              "subjectPreviousFna": "subject previous fna",
-              "subjectGesta": "subject gesta",
-              "subjectBgb3": "subject bgb3",
-              "unofficialLongTitle": "unofficial long title",
-              "unofficialShortTitle": "unofficial short title",
-              "unofficialAbbreviation": "unofficial abbreviation",
-              "risAbbreviation": "ris abbreviation"
-            }
-        """
+        val normFrameProperties: EditNormFrameUseCase.NormFrameProperties = createRandomNormFameProperties()
+        val editJson = convertEditNormFramePropertiesToJson(normFrameProperties)
+
         every { editNormFrameService.editNormFrame(any()) } returns Mono.just(true)
 
         webClient
@@ -74,32 +48,7 @@ class EditNormFrameControllerTest {
             editNormFrameService.editNormFrame(
                 withArg {
                     assertTrue(it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
-                    assertTrue(it.properties.officialLongTitle == "new title")
-                    assertTrue(it.properties.officialShortTitle == "official short title")
-                    assertTrue(it.properties.officialAbbreviation == "official abbreviation")
-                    assertTrue(it.properties.referenceNumber == "reference number")
-                    assertTrue(it.properties.publicationDate == null)
-                    assertTrue(it.properties.announcementDate == LocalDate.parse("2020-10-21"))
-                    assertTrue(it.properties.citationDate == LocalDate.parse("2020-10-22"))
-                    assertTrue(it.properties.frameKeywords == "frame keywords")
-                    assertTrue(it.properties.providerEntity == "provider entity")
-                    assertTrue(it.properties.providerDecidingBody == "provider deciding body")
-                    assertTrue(it.properties.providerIsResolutionMajority == true)
-                    assertTrue(it.properties.leadJurisdiction == "lead jurisdiction")
-                    assertTrue(it.properties.leadUnit == "lead unit")
-                    assertTrue(it.properties.participationType == "participation type")
-                    assertTrue(it.properties.participationInstitution == "participation institution")
-                    assertTrue(it.properties.documentTypeName == "document type name")
-                    assertTrue(it.properties.documentNormCategory == "document norm category")
-                    assertTrue(it.properties.documentTemplateName == "document template name")
-                    assertTrue(it.properties.subjectFna == "subject fna")
-                    assertTrue(it.properties.subjectPreviousFna == "subject previous fna")
-                    assertTrue(it.properties.subjectGesta == "subject gesta")
-                    assertTrue(it.properties.subjectBgb3 == "subject bgb3")
-                    assertTrue(it.properties.unofficialLongTitle == "unofficial long title")
-                    assertTrue(it.properties.unofficialShortTitle == "unofficial short title")
-                    assertTrue(it.properties.unofficialAbbreviation == "unofficial abbreviation")
-                    assertTrue(it.properties.risAbbreviation == "ris abbreviation")
+                    assertEditNormFrameProperties(it.properties, normFrameProperties)
                 }
             )
         }

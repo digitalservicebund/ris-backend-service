@@ -132,6 +132,7 @@ dependencies {
   implementation("org.jetbrains.kotlin:kotlin-reflect")
 
   testImplementation "org.jeasy:easy-random-core:5.0.0"
+  testImplementation "com.google.code.gson:gson:2.10"
 
 }
 

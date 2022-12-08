@@ -6,10 +6,9 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
+import norms.utils.createRandomNorm
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.jeasy.random.EasyRandom
-import org.jeasy.random.EasyRandomParameters
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -31,9 +30,7 @@ import java.util.*
 class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     companion object {
-        private val parameters: EasyRandomParameters = EasyRandomParameters().stringLengthRange(5, 20) // needed for marker fields
-        private val easyRandom: EasyRandom = EasyRandom(parameters)
-        private val NORM: Norm = easyRandom.nextObject(Norm::class.java)
+        private val NORM: Norm = createRandomNorm()
         private val ARTICLE1: Article = Article(UUID.randomUUID(), "Article1 title", "§ 1")
         private val ARTICLE2: Article = Article(UUID.randomUUID(), "Article2 title", "§ 2")
         private val PARAGRAPH1: Paragraph = Paragraph(UUID.randomUUID(), "(1)", "Text1")
