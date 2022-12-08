@@ -45,6 +45,8 @@ public class JurisXmlExporterWrapperTest {
             .fileNumbers(List.of("fileNumber1", "fileNumber2"))
             .deviatingFileNumbers(List.of("deviatingFileNumber1", "deviatingFileNumber2"))
             .court(new Court("courtType", null, null))
+            .ecli("ecli")
+            .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .category("category")
             .ecli("ecli")
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
@@ -74,7 +76,7 @@ public class JurisXmlExporterWrapperTest {
     encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
 
     assertEquals(
-        "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",
+        "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",
         encryptedXml);
   }
 
@@ -116,6 +118,7 @@ public class JurisXmlExporterWrapperTest {
             .category("category")
             .procedure("procedure")
             .ecli("ecli")
+            .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
             .appraisalBody("appraisalBody")
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
             .legalEffect("legalEffect")
