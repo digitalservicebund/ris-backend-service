@@ -95,9 +95,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await expect(page.locator("text=one").first()).toBeVisible()
     await expect(page.locator("text=two").first()).toBeVisible()
 
-    await expect(
-      page.locator("text=Abweichendes Aktenzeichen>")
-    ).not.toBeVisible()
+    await expect(page.locator("text=Abweichendes Aktenzeichen>")).toBeHidden()
 
     await page.locator("[aria-label='Abweichendes Feld öffnen']").click()
 
@@ -143,12 +141,12 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("Enter")
 
-    await expect(page.locator("text=testtwo").first()).not.toBeVisible()
+    await expect(page.locator("text=testtwo").first()).toBeHidden()
 
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("Enter")
 
-    await expect(page.locator("text=testone").first()).not.toBeVisible()
+    await expect(page.locator("text=testone").first()).toBeHidden()
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
@@ -311,19 +309,19 @@ test.describe("save changes in core data and texts and verify it persists", () =
     const fileNumberPanel = infoPanel
       .locator("div", { hasText: "Aktenzeichen" })
       .nth(-2)
-    expect(fileNumberPanel).toHaveText("Aktenzeichen - ")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen - ")
 
     await page.locator("[aria-label='Aktenzeichen']").fill("-firstChip")
     await page.keyboard.press("Enter")
-    expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
 
     await page.locator("[aria-label='Aktenzeichen']").fill("-secondChip")
     await page.keyboard.press("Enter")
-    expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
 
     // delete first chip
     await page.locator("div", { hasText: "-firstChip" }).nth(-2).click()
     await page.keyboard.press("Enter")
-    expect(fileNumberPanel).toHaveText("Aktenzeichen-secondChip")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-secondChip")
   })
 })
