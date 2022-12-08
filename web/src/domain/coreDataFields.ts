@@ -160,15 +160,6 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.documentTypes
   ),
-  defineTextField(
-    "ecli",
-    "ECLI",
-    "ECLI",
-    false,
-    "",
-    { defaultMessage: "", field: "" },
-    false
-  ),
   defineNestedInputField(
     "Toggle Abweichender ECLI",
     "nestedInputOfEcliAndDeviatingEcli",
