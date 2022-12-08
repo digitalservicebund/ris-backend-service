@@ -82,15 +82,15 @@ fileignoreconfig:
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt
     checksum: 8e2955fd349affac3f2dbc641f523d43ff34c104c2496edb474848e3520baccd
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
-    checksum: b63e5e615e11190bf92783377b4e6d2099864c885c1a79f2cae3990dd2027360
+    checksum: 5420c7fe3e2039e03bf49e0c14121f1884307e96c01f5ea4d6297a6905a2ad1a
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/ImportNormController.kt
-    checksum: f75ce4e04416d10a4f128205f747b6db0890c45c15d64729230c202850cc4d24
+    checksum: 0780ed3492e79c077c93ae222bc902b83015dcfa5962792ff752eb6cfcbe353e
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/NormsMapper.kt
     checksum: 5ba13a8c7cb57cac6cf27629f31ef85dc380d8207eb9725eeb5500bae7e8bf52
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/ImportNormService.kt
-    checksum: 656037793cdd2f8796131b7aa3172f6150f3e70d3dfed6abb4c25f79d8e88d85
+    checksum: a747650eb3cb83d429b8323f198ba5e7a8bd5e475c1b4c7b8d1ec55e7421fe4d
   - filename: src/test/kotlin/norms/application/ImportNormServiceTest.kt
-    checksum: 12631d4ada69a6afb323055ec4651baef85351e06e64ec26e6dd70ab037dcacb
+    checksum: b8f31215b86fb72f5ddeb6c736097e158b94a48d5be0df835de841174279e2bf
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/ImportNormControllerTest.kt
     checksum: 86f6f61e9c6b86c2b5b876bda2c27704d342895f0c53b0c04e5e15e62a40bedd
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/LoadNormController.kt
@@ -136,7 +136,7 @@ fileignoreconfig:
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
     checksum: 0a6c0e6bd3a9373472a2ed7c0e6b7973be7e4f78715a09b1495d15d2d0d1522f
   - filename: src/test/kotlin/norms/application/port/input/ImportNormCommandTest.kt
-    checksum: 23eb83162782f33229356ac5c9134c1845ac3fcf83d4ac3bb5a4997477eb6988
+    checksum: 47bfc1ce1d770f7f4afcb61fa9a0566fda4d234f1eae90e0be8f124663ab5ca9
 
 scopeconfig:
   - scope: node

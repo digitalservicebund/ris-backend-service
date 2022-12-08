@@ -89,8 +89,9 @@ class ImportNormCommandTest {
             referenceNumber = "reference number", announcementDate = LocalDate.parse("2020-10-27"), citationDate = LocalDate.parse("2020-10-28"),
             frameKeywords = "frame keywords", providerEntity = "provider entity", providerDecidingBody = "provider deciding body",
             providerIsResolutionMajority = true, leadJurisdiction = "lead jurisdiction", leadUnit = "lead unit", participationType = "participation type",
-            participationInstitution = "participation institution", subjectFna = "subject fna", subjectGesta = "subject gesta",
-            unofficialLongTitle = "unofficial long title", unofficialShortTitle = "unofficial short title",
+            participationInstitution = "participation institution", subjectFna = "subject fna", subjectGesta = "subject gesta", documentNumber = "document number", documentCategory = "document category", risAbbreviationInternationalLaw = "ris abbreviation international Law", unofficialReference = "unofficial reference",
+            applicationScopeArea = "application scope area", applicationScopeStartDate = LocalDate.parse("2020-10-02"), applicationScopeEndDate = LocalDate.parse("2020-10-03"), validityRule = "validity rule", celexNumber = "celex number", definition = "definition", categorizedReference = "categorized reference", otherFootnote = "other footnote",
+            expirationDate = LocalDate.parse("2020-10-04"), entryIntoForceDate = LocalDate.parse("2020-10-01"), unofficialLongTitle = "unofficial long title", unofficialShortTitle = "unofficial short title",
             unofficialAbbreviation = "unofficial abbreviation", risAbbreviation = "ris abbreviation"
         )
         val command = ImportNormUseCase.Command(normData)
