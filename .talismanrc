@@ -94,7 +94,7 @@ fileignoreconfig:
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/ImportNormControllerTest.kt
     checksum: 86f6f61e9c6b86c2b5b876bda2c27704d342895f0c53b0c04e5e15e62a40bedd
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/LoadNormController.kt
-    checksum: 124f72e19d2db314b147e8f3cef01b1a0e63ebbf8489a6636c57f060dbad988a
+    checksum: ade9fc075a654532ad39c79fd214f1d1abc7b29256d8dfd88282fafeecf93ade
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 7a3e86d1e8e6479150fa18795ad36e0da7f5b16f0fa8251a52e7e9c58a8ea2b4
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
