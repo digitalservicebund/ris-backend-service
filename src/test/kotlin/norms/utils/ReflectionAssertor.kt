@@ -7,9 +7,6 @@ import kotlin.reflect.full.memberProperties
 
 fun assertEditNormFrameProperties(commandProperties: EditNormFrameUseCase.NormFrameProperties, normFrameProperties: EditNormFrameUseCase.NormFrameProperties) {
     EditNormFrameUseCase.NormFrameProperties::class.memberProperties.forEach {
-        if (it.get(commandProperties) != it.get(normFrameProperties)) {
-            println(it.name)
-        }
         assertTrue(it.get(commandProperties) == it.get(normFrameProperties))
     }
 }
