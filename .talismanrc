@@ -126,7 +126,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: cec2d13117312bd551eea45b9501c6d525b4c9019544d26a78b06ae1c54c019a
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 498ed59ed0b895f2d86bbb37a70dec87dcd00b40f1c022e08e93b4c59150dc64
+    checksum: 5abe6438ebc906ee3fd3cc464de0f1fb5624ad09fd330d881d3195ec0ca14577
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts
@@ -137,6 +137,8 @@ fileignoreconfig:
     checksum: 8d412911921585bd91aa44397d73028e9416237578eeda5815905f3ba470a856
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
     checksum: 0a6c0e6bd3a9373472a2ed7c0e6b7973be7e4f78715a09b1495d15d2d0d1522f
+  - filename: src/main/resources/db/migration/V0.14__caselaw_add_ecli_table.sql
+    checksum: 4d502defeedc8f4f82895c14d6e4c332cba031166db71a16d4d16967f1623e78
 
 scopeconfig:
   - scope: node

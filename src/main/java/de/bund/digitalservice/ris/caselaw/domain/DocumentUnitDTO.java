@@ -54,6 +54,7 @@ public class DocumentUnitDTO {
         .category(documentUnit.coreData().category())
         .procedure(documentUnit.coreData().procedure())
         .ecli(documentUnit.coreData().ecli())
+        .deviatingEclis(documentUnit.coreData().deviatingEclis())
         .appraisalBody(documentUnit.coreData().appraisalBody())
         .decisionDate(
             documentUnit.coreData().decisionDate() != null
@@ -111,6 +112,8 @@ public class DocumentUnitDTO {
 
   @Column("ecli")
   String ecli;
+
+  @Transient List<String> deviatingEclis;
 
   @Column("spruchkoerper")
   String appraisalBody;
