@@ -169,6 +169,28 @@ export const coreDataFields: InputField[] = [
     { defaultMessage: "", field: "" },
     false
   ),
+  defineNestedInputField(
+    "Toggle Abweichender ECLI",
+    "nestedInputOfEcliAndDeviatingEcli",
+    {
+      parent: defineTextField(
+        "ecli",
+        "ECLI",
+        "ECLI",
+        false,
+        "",
+        { defaultMessage: "", field: "" },
+        false
+      ),
+      child: defineChipsField(
+        "deviatingEcli",
+        "Abweichender ECLI",
+        "Abweichender ECLI",
+        false,
+        ""
+      ),
+    }
+  ),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(
     "legalEffect",
