@@ -10,7 +10,7 @@ import type {
   InputAttributes,
   ModelType,
 } from "@/domain"
-import { InputType, ValidationError, defineTextField } from "@/domain"
+import { InputType, ValidationError } from "@/domain"
 import type { DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 
@@ -77,22 +77,6 @@ const dropdownInputAttribute: InputAttributes = {
         value=""
       />
     </div>
-    <div>
-      <TextInput
-        id="textInputWithValue"
-        aria-label="text input"
-        :sub-field="
-          defineTextField(
-            'testField',
-            'Divergent Subfield',
-            'Divergent Subfield',
-            true
-          )
-        "
-        value="this input has a subcategory"
-      />
-    </div>
-
     <h1 class="font-bold text-24">Dropdown Input</h1>
     <div class="pb-4">
       <DropdownInput

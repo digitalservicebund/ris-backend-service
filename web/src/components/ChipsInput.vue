@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
-import { InputField, ValidationError } from "@/domain"
+import { ValidationError } from "@/domain"
 
 interface Props {
   id: string
@@ -9,7 +9,6 @@ interface Props {
   modelValue?: string[]
   ariaLabel: string
   placeholder?: string
-  subField?: InputField
   validationError?: ValidationError
 }
 
