@@ -68,6 +68,14 @@ export function useNormMenuItems(
           },
         },
         {
+          label: "Sachgebiet",
+          route: {
+            ...baseRoute,
+            name: "norms-norm-:normGuid-frame",
+            hash: "#subjectAreaFields",
+          },
+        },
+        {
           label: "Überschriften und Abkürzungen",
           route: {
             ...baseRoute,
