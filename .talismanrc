@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: build.gradle
-    checksum: 8d8d84cfc31e469dc8e1f2c202e6871a45a6e4b3b42a1d1a70f2bb9ebc037ffd
+    checksum: 27c12e6dafee9ed5a0e7066d8fe726d9ea0d190bd54d93b5dd9e2e256331603d
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
@@ -98,7 +98,7 @@ fileignoreconfig:
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 7a3e86d1e8e6479150fa18795ad36e0da7f5b16f0fa8251a52e7e9c58a8ea2b4
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
-    checksum: 538e4406c7ff550200c89c3b96d96041eb9a5e2709206be6f3de178e6b7bb84f
+    checksum: 20113d771fb0875de004a5d486c2ee1c6669b4365a161fc23d59c546766221a1
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/EditNormFrameService.kt
     checksum: 698f56dab5b14d359725b33988fa50d93f62018541d5a8842c13be9cf2587c98
   - filename: src/test/kotlin/norms/application/EditNormFrameServiceTest.kt
@@ -106,7 +106,7 @@ fileignoreconfig:
   - filename: src/test/kotlin/norms/application/port/input/EditNormFrameCommandTest.kt
     checksum: d8a4ae650b457f23b242e027e9abd17f8fa3cfacf3f636357e2d7fb804167b95
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/EditNormFrameController.kt
-    checksum: 668784ee3929285631f58f75ae6f51d44822ba1f92d29c9a9671e6c94d13c211
+    checksum: 5f9a92a71fcea075fe37520ad896d7f916c17ad0a1c62e0a9fac073266dc52b3
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/EditNormFrameControllerTest.kt
     checksum: 7b7eff7276f5c1902184d77a94c6128bdda5bcd5809722c744d345f5a40fc780
   - filename: web/src/domain/Norm.ts
