@@ -63,7 +63,7 @@ const childValue = computed({
       ></InputElement>
     </InputFieldComponent>
 
-    <SubField>
+    <SubField :aria-label="ariaLabel">
       <div class="mt-[3.5rem]">
         <InputFieldComponent
           :id="fields.child.name"

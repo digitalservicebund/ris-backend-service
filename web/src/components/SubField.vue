@@ -2,6 +2,7 @@
 import { computed, ref, watch, onMounted } from "vue"
 
 interface Props {
+  ariaLabel: string
   isExpanded?: boolean
   iconExpanding?: string
   iconClosing?: string
@@ -50,9 +51,7 @@ const resizeObserver = new ResizeObserver((entries) => {
     >
       <span
         :aria-label="
-          isExpanded
-            ? 'Abweichendes Feld schließen'
-            : 'Abweichendes Feld öffnen'
+          isExpanded ? ariaLabel + ' schließen' : ariaLabel + ' anzeigen'
         "
         class="bg-blue-800 material-icons rounded-full w-icon"
         >{{ iconName }}</span
