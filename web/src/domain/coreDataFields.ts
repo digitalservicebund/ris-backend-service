@@ -121,7 +121,7 @@ export const courtFields: InputField[] = [
 ]
 export const coreDataFields: InputField[] = [
   defineNestedInputField(
-    "Toggle Abweichendes Aktenzeichen",
+    "Abweichendes Aktenzeichen",
     "nestedInputOfFileNumbersAndDeviatingFileNumbers",
     {
       parent: defineChipsField(
@@ -158,14 +158,27 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.documentTypes
   ),
-  defineTextField(
-    "ecli",
-    "ECLI",
-    "ECLI",
-    false,
-    "",
-    { defaultMessage: "", field: "" },
-    false
+  defineNestedInputField(
+    "Abweichender ECLI",
+    "nestedInputOfEcliAndDeviatingEclis",
+    {
+      parent: defineTextField(
+        "ecli",
+        "ECLI",
+        "ECLI",
+        false,
+        "",
+        { defaultMessage: "", field: "" },
+        false
+      ),
+      child: defineChipsField(
+        "deviatingEclis",
+        "Abweichender ECLI",
+        "Abweichender ECLI",
+        false,
+        ""
+      ),
+    }
   ),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(

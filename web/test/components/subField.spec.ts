@@ -2,16 +2,18 @@ import { fireEvent, render } from "@testing-library/vue"
 import SubField from "@/components/SubField.vue"
 
 function renderComponent({
+  ariaLabel = "Test Feld",
   isExpanded = false,
   iconExpanding = "add",
   iconClosing = "horizontal_rule",
 }: {
+  ariaLabel?: string
   isExpanded?: boolean
   iconExpanding?: string
   iconClosing?: string
 } = {}) {
   return render(SubField, {
-    props: { isExpanded, iconExpanding, iconClosing },
+    props: { ariaLabel, isExpanded, iconExpanding, iconClosing },
     slots: { default: "<div>foo slot</div>" },
   })
 }
@@ -35,8 +37,8 @@ describe("SubField", () => {
     })
     expect(getByText("foo slot")).toBeVisible()
 
-    await fireEvent.click(getByLabelText("Abweichendes Feld schließen"))
-    expect(getByLabelText("Abweichendes Feld öffnen")).toBeVisible()
+    await fireEvent.click(getByLabelText("Test Feld schließen"))
+    expect(getByLabelText("Test Feld anzeigen")).toBeVisible()
     expect(emitted()["update:isExpanded"][0]).toEqual([false])
   })
 
@@ -46,8 +48,21 @@ describe("SubField", () => {
     })
     expect(getByText("foo slot")).not.toBeVisible()
 
-    await fireEvent.click(getByLabelText("Abweichendes Feld öffnen"))
+    await fireEvent.click(getByLabelText("Test Feld anzeigen"))
+    expect(getByLabelText("Test Feld schließen")).toBeVisible()
+    expect(emitted()["update:isExpanded"][0]).toEqual([true])
+  })
+
+  it("should render dynamic aria label", async () => {
+    const { emitted, getByText, getByLabelText } = renderComponent({
+      ariaLabel: "Abweichendes Feld",
+    })
+    expect(getByText("foo slot")).not.toBeVisible()
+
+    await fireEvent.click(getByLabelText("Abweichendes Feld anzeigen"))
     expect(getByLabelText("Abweichendes Feld schließen")).toBeVisible()
+    await fireEvent.click(getByLabelText("Abweichendes Feld schließen"))
+    expect(getByLabelText("Abweichendes Feld anzeigen")).toBeVisible()
     expect(emitted()["update:isExpanded"][0]).toEqual([true])
   })
 

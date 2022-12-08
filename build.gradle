@@ -93,7 +93,7 @@ dependencies {
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
   // package served by private repo, requires authentication:
-  implementation "de.bund.digitalservice:neuris-juris-xml-export:0.3.8"
+  implementation "de.bund.digitalservice:neuris-juris-xml-export:0.3.9"
   // for local development:
   // implementation files("../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 

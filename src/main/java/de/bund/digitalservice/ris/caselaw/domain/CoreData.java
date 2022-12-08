@@ -15,6 +15,7 @@ public record CoreData(
     String category, // DocumentType TODO
     String procedure,
     String ecli,
+    List<String> deviatingEclis,
     String appraisalBody,
     @PastOrPresent Instant decisionDate,
     @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,

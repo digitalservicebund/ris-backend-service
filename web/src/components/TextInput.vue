@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
-import { InputField, ValidationError } from "@/domain"
+import { ValidationError } from "@/domain"
 
 interface Props {
   id: string
@@ -11,7 +11,6 @@ interface Props {
   placeholder?: string
   validationError?: ValidationError
   readOnly?: boolean
-  subField?: InputField
 }
 
 interface Emits {
