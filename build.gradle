@@ -58,10 +58,19 @@ dependencies {
   implementation("org.yaml:snakeyaml:1.33") { because("CVE-2022-25857") }
   implementation "ch.qos.logback:logback-classic:1.2.11"
   implementation "ch.qos.logback:logback-core:1.4.0"
+
   implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
   implementation "io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE"
   implementation "io.r2dbc:r2dbc-spi:1.0.0.RELEASE"
   implementation "io.r2dbc:r2dbc-pool:0.9.2.RELEASE"
+
+  implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+  implementation "org.postgresql:postgresql:42.5.1"
+  implementation "javax.xml.bind:jaxb-api:2.3.1"
+  //  implementation "org.hibernate.orm:hibernate-core:6.1.5.Final"
+  //  implementation "org.hibernate.common:hibernate-commons-annotations:6.0.5.Final"
+  //  implementation "jakarta.persistence:jakarta.persistence-api:3.1.0"
+  //  implementation "org.springframework:spring-orm:6.0.2"
 
   implementation "com.sendinblue:sib-api-v3-sdk:6.0.0"
 
@@ -117,12 +126,13 @@ dependencies {
   // this is to force transitive dependencies to use 1.0.24 instead of
   // 1.0.23 as that is affected by CVE-2022-31684
   implementation "io.projectreactor.netty:reactor-netty-http:1.0.24"
-  runtimeOnly "org.postgresql:postgresql:42.5.0"
+  runtimeOnly "org.postgresql:postgresql:42.5.1"
   runtimeOnly "org.postgresql:r2dbc-postgresql"
   implementation "org.flywaydb:flyway-core"
   implementation("org.jetbrains.kotlin:kotlin-reflect")
 
   testImplementation "org.jeasy:easy-random-core:5.0.0"
+  testImplementation "com.google.code.gson:gson:2.10"
 
 }
 

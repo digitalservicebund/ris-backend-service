@@ -17,6 +17,7 @@ export type Court = {
   type: string
   location: string
   label: string
+  revoked?: string
 }
 
 export type Texts = {

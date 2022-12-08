@@ -72,14 +72,13 @@ class ImportNormServiceTest {
         val paragraph = ImportNormUseCase.ParagraphData("marker", "text")
         val article = ImportNormUseCase.ArticleData("title", "marker", listOf(paragraph))
         val norm = ImportNormUseCase.NormData(
-            "long title", listOf(article), "official short title", "official abbreviation",
-            "reference number", LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "provider entity", "provider deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3", "unofficial long title", "unofficial short title",
-            "unofficial abbreviation", "ris abbreviation"
+            officialLongTitle = "long title", articles = listOf(article), officialShortTitle = "official short title", officialAbbreviation = "official abbreviation",
+            referenceNumber = "reference number", announcementDate = LocalDate.parse("2020-10-27"), citationDate = LocalDate.parse("2020-10-28"),
+            frameKeywords = "frame keywords", providerEntity = "provider entity", providerDecidingBody = "provider deciding body",
+            providerIsResolutionMajority = true, leadJurisdiction = "lead jurisdiction", leadUnit = "lead unit", participationType = "participation type",
+            participationInstitution = "participation institution", subjectFna = "subject fna", subjectGesta = "subject gesta",
+            unofficialLongTitle = "unofficial long title", unofficialShortTitle = "unofficial short title",
+            unofficialAbbreviation = "unofficial abbreviation", risAbbreviation = "ris abbreviation"
         )
         val command = ImportNormUseCase.Command(norm)
 
@@ -101,9 +100,8 @@ class ImportNormServiceTest {
                     assertTrue(it.officialShortTitle == "official short title")
                     assertTrue(it.officialAbbreviation == "official abbreviation")
                     assertTrue(it.referenceNumber == "reference number")
-                    assertTrue(it.publicationDate == LocalDate.parse("2020-10-27"))
-                    assertTrue(it.announcementDate == LocalDate.parse("2020-10-28"))
-                    assertTrue(it.citationDate == LocalDate.parse("2020-10-29"))
+                    assertTrue(it.announcementDate == LocalDate.parse("2020-10-27"))
+                    assertTrue(it.citationDate == LocalDate.parse("2020-10-28"))
                     assertTrue(it.frameKeywords == "frame keywords")
                     assertTrue(it.providerEntity == "provider entity")
                     assertTrue(it.providerDecidingBody == "provider deciding body")
@@ -112,13 +110,8 @@ class ImportNormServiceTest {
                     assertTrue(it.leadUnit == "lead unit")
                     assertTrue(it.participationType == "participation type")
                     assertTrue(it.participationInstitution == "participation institution")
-                    assertTrue(it.documentTypeName == "document type name")
-                    assertTrue(it.documentNormCategory == "document norm category")
-                    assertTrue(it.documentTemplateName == "document template name")
                     assertTrue(it.subjectFna == "subject fna")
-                    assertTrue(it.subjectPreviousFna == "subject previous fna")
                     assertTrue(it.subjectGesta == "subject gesta")
-                    assertTrue(it.subjectBgb3 == "subject bgb3")
                     assertTrue(it.unofficialLongTitle == "unofficial long title")
                     assertTrue(it.unofficialShortTitle == "unofficial short title")
                     assertTrue(it.unofficialAbbreviation == "unofficial abbreviation")

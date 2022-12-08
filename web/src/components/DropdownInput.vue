@@ -14,7 +14,6 @@ interface Props {
   dropdownItems?: DropdownItem[]
   endpoint?: LookupTableEndpoint
   isCombobox?: boolean
-  preselectedValue?: string
 }
 
 interface Emits {
@@ -154,7 +153,6 @@ const closeDropdown = () => {
 }
 
 onMounted(() => {
-  if (props.preselectedValue) inputValue.value = props.preselectedValue
   window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
 

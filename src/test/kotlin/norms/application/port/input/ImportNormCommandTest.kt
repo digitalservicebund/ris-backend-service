@@ -85,14 +85,13 @@ class ImportNormCommandTest {
     @Test
     fun `can create command with optional fields`() {
         val normData = ImportNormUseCase.NormData(
-            "long title", listOf(validArticle), "official short title", "official abbreviation",
-            "reference number", LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "provider entity", "provider deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3", "unofficial title", "unofficial short title",
-            "unofficial abbreviation", "ris abbreviation"
+            officialLongTitle = "long title", articles = listOf(validArticle), officialShortTitle = "official short title", officialAbbreviation = "official abbreviation",
+            referenceNumber = "reference number", announcementDate = LocalDate.parse("2020-10-27"), citationDate = LocalDate.parse("2020-10-28"),
+            frameKeywords = "frame keywords", providerEntity = "provider entity", providerDecidingBody = "provider deciding body",
+            providerIsResolutionMajority = true, leadJurisdiction = "lead jurisdiction", leadUnit = "lead unit", participationType = "participation type",
+            participationInstitution = "participation institution", subjectFna = "subject fna", subjectGesta = "subject gesta",
+            unofficialLongTitle = "unofficial long title", unofficialShortTitle = "unofficial short title",
+            unofficialAbbreviation = "unofficial abbreviation", risAbbreviation = "ris abbreviation"
         )
         val command = ImportNormUseCase.Command(normData)
 

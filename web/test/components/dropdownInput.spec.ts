@@ -2,44 +2,51 @@ import userEvent from "@testing-library/user-event"
 import { render } from "@testing-library/vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import { Court } from "@/domain/documentUnit"
-import type { DropdownItem } from "@/domain/types"
-import { LookupTableEndpoint } from "@/domain/types"
+import { DropdownItem, LookupTableEndpoint } from "@/domain/types"
 import dropdownInputService from "@/services/dropdownItemService"
 
-const DROPDOWN_ITEMS: DropdownItem[] = [
-  { text: "testItem1", value: "t1" },
-  { text: "testItem2", value: "t2" },
-  { text: "testItem3", value: "t3" },
-]
+function renderComponent(
+  options: {
+    id?: string
+    modelValue?: string
+    ariaLabel?: string
+    dropdownItems?: DropdownItem[]
+    isCombobox?: boolean
+    preselectedValue?: string
+    endpoint?: LookupTableEndpoint
+  } = {}
+) {
+  return render(DropdownInput, {
+    props: {
+      id: options.id ?? "dropdown-test",
+      modelValue: options.modelValue,
+      ariaLabel: options.ariaLabel ?? "test label",
+      dropdownItems: options.dropdownItems ?? [
+        { text: "testItem1", value: "t1" },
+        { text: "testItem2", value: "t2" },
+        { text: "testItem3", value: "t3" },
+      ],
+      isCombobox: options.isCombobox ?? false,
+      preselectedValue: options.preselectedValue,
+      endpoint: options.endpoint,
+    },
+  })
+}
 
 describe("Dropdown Element", () => {
   const user = userEvent.setup()
+
   it("Dropdown is closed", () => {
-    const { queryByDisplayValue } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "",
-        dropdownItems: DROPDOWN_ITEMS,
-      },
-    })
-    const item1 = queryByDisplayValue(DROPDOWN_ITEMS[0].text)
-    const item2 = queryByDisplayValue(DROPDOWN_ITEMS[1].text)
-    const item3 = queryByDisplayValue(DROPDOWN_ITEMS[2].text)
-    expect(item1).not.toBeInTheDocument()
-    expect(item2).not.toBeInTheDocument()
-    expect(item3).not.toBeInTheDocument()
+    const { queryByDisplayValue } = renderComponent()
+
+    expect(queryByDisplayValue("testItem1")).not.toBeInTheDocument()
+    expect(queryByDisplayValue("testItem2")).not.toBeInTheDocument()
+    expect(queryByDisplayValue("testItem3")).not.toBeInTheDocument()
   })
 
   it("Dropdown is opened", async () => {
-    const { container } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "",
-        dropdownItems: DROPDOWN_ITEMS,
-      },
-    })
+    const { container } = renderComponent()
+
     const openDropdownContainer = container.querySelector(
       ".input-expand-icon"
     ) as HTMLElement
@@ -56,16 +63,7 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should be filtered", async () => {
-    const user = userEvent.setup()
-    const { container, getByLabelText } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "test label",
-        dropdownItems: DROPDOWN_ITEMS,
-        isCombobox: true,
-      },
-    })
+    const { container, getByLabelText } = renderComponent({ isCombobox: true })
 
     const input = getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem2")
@@ -79,16 +77,7 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should not be filtered after selection", async () => {
-    const user = userEvent.setup()
-    const { container, getByLabelText } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "test label",
-        dropdownItems: DROPDOWN_ITEMS,
-        isCombobox: true,
-      },
-    })
+    const { container, getByLabelText } = renderComponent({ isCombobox: true })
 
     const input = getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem2")
@@ -114,16 +103,7 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should stay filtered after typing without selection", async () => {
-    const user = userEvent.setup()
-    const { container, getByLabelText } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "test label",
-        dropdownItems: DROPDOWN_ITEMS,
-        isCombobox: true,
-      },
-    })
+    const { container, getByLabelText } = renderComponent({ isCombobox: true })
 
     const input = getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem2")
@@ -148,14 +128,8 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items shouldn't be filtered if no combobox", async () => {
-    const { container } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "testItem1",
-        ariaLabel: "",
-        dropdownItems: DROPDOWN_ITEMS,
-      },
-    })
+    const { container } = renderComponent({ modelValue: "testItem1" })
+
     const openDropdownContainer = container.querySelector(
       ".input-expand-icon"
     ) as HTMLElement
@@ -165,23 +139,14 @@ describe("Dropdown Element", () => {
       ".dropdown-container__dropdown-item"
     )
     expect(dropdownItems).toHaveLength(3)
-    const item1 = dropdownItems[0]
-    const item2 = dropdownItems[1]
-    const item3 = dropdownItems[2]
-    expect(item1).toHaveTextContent(DROPDOWN_ITEMS[0].text)
-    expect(item2).toHaveTextContent(DROPDOWN_ITEMS[1].text)
-    expect(item3).toHaveTextContent(DROPDOWN_ITEMS[2].text)
+    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+    expect(dropdownItems[1]).toHaveTextContent("testItem2")
+    expect(dropdownItems[2]).toHaveTextContent("testItem3")
   })
 
   it("Text should be selected when click", async () => {
-    const { container } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "testItem1",
-        ariaLabel: "",
-        dropdownItems: DROPDOWN_ITEMS,
-      },
-    })
+    const { container } = renderComponent({ modelValue: "testItem1" })
+
     const inputField = container.querySelector("input") as HTMLInputElement
     expect(inputField).toHaveValue("testItem1")
     await user.click(inputField)
@@ -199,16 +164,7 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown items should show message if no items matched", async () => {
-    const user = userEvent.setup()
-    const { container, getByLabelText } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "test label",
-        dropdownItems: DROPDOWN_ITEMS,
-        isCombobox: true,
-      },
-    })
+    const { container, getByLabelText } = renderComponent({ isCombobox: true })
 
     const input = getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem10")
@@ -220,41 +176,24 @@ describe("Dropdown Element", () => {
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
   })
 
-  it("Dropdown renders with preselected item", async () => {
-    const { queryByDisplayValue } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "testItem4",
-        ariaLabel: "",
-        dropdownItems: DROPDOWN_ITEMS,
-        preselectedValue: "test",
-      },
-    })
-    expect(queryByDisplayValue("test")).not.toBeInTheDocument()
-  })
-
   it("Dropdown uses endpoint to fetch all DocumentType items", async () => {
-    const user = userEvent.setup()
-    const dropdownItems: DropdownItem[] = [
-      {
-        text: "AO - Anordnung",
-        value: "Anordnung", // <-- string
-      },
-    ]
     const fetchSpy = vi
       .spyOn(dropdownInputService, "fetch")
       .mockImplementation(() =>
-        Promise.resolve({ status: 200, data: dropdownItems })
+        Promise.resolve({
+          status: 200,
+          data: [
+            {
+              text: "AO - Anordnung",
+              value: "Anordnung", // <-- string
+            },
+          ],
+        })
       )
 
-    const { container } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "",
-        endpoint: LookupTableEndpoint.documentTypes,
-        isCombobox: true,
-      },
+    const { container } = renderComponent({
+      endpoint: LookupTableEndpoint.documentTypes,
+      isCombobox: true,
     })
 
     const openDropdownContainer = container.querySelector(
@@ -276,7 +215,6 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown uses endpoint to fetch all Court items", async () => {
-    const user = userEvent.setup()
     const court: Court = {
       type: "BGH",
       location: "Karlsruhe",
@@ -294,14 +232,9 @@ describe("Dropdown Element", () => {
         Promise.resolve({ status: 200, data: dropdownItems })
       )
 
-    const { container } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "",
-        endpoint: LookupTableEndpoint.courts,
-        isCombobox: true,
-      },
+    const { container } = renderComponent({
+      endpoint: LookupTableEndpoint.courts,
+      isCombobox: true,
     })
 
     const openDropdownContainer = container.querySelector(
@@ -320,7 +253,6 @@ describe("Dropdown Element", () => {
   })
 
   it("Dropdown uses endpoint to fetch Court items based on search string", async () => {
-    const user = userEvent.setup()
     const court: Court = {
       type: "BGH",
       location: "Karlsruhe",
@@ -338,14 +270,9 @@ describe("Dropdown Element", () => {
         Promise.resolve({ status: 200, data: dropdownItems })
       )
 
-    const { container, getByLabelText } = render(DropdownInput, {
-      props: {
-        id: "dropdown-test",
-        modelValue: "",
-        ariaLabel: "test label",
-        endpoint: LookupTableEndpoint.courts,
-        isCombobox: true,
-      },
+    const { container, getByLabelText } = renderComponent({
+      endpoint: LookupTableEndpoint.courts,
+      isCombobox: true,
     })
 
     const input = getByLabelText("test label") as HTMLInputElement

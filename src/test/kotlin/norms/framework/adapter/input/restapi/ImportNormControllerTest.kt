@@ -96,7 +96,6 @@ class ImportNormControllerTest {
                     assertTrue(it.data.officialShortTitle == "official short title")
                     assertTrue(it.data.officialAbbreviation == "official abbreviation")
                     assertTrue(it.data.referenceNumber == null)
-                    assertTrue(it.data.publicationDate == null)
                     assertTrue(it.data.announcementDate == LocalDate.parse("2021-06-14"))
                     assertTrue(it.data.citationDate == LocalDate.parse("2021-06-09"))
                     assertTrue(it.data.frameKeywords == "frame keywords")

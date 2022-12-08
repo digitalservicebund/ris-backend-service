@@ -93,7 +93,6 @@ export interface DropdownAttributes extends BaseInputAttributes {
   placeholder?: string
   dropdownItems?: DropdownItem[]
   endpoint?: LookupTableEndpoint
-  preselectedValue?: string
 }
 
 export interface DropdownInputField extends BaseInputField {

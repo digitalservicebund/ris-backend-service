@@ -44,6 +44,7 @@ testWithImportedNorm(
     await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
 
     // Inner menu
+    // TODO Add new sections to inner menu
     await expect(page.locator("a:has-text('Allgemeine Angaben')")).toBeVisible()
     await expect(page.locator("a:has-text('Dokumenttyp')")).toBeVisible()
     await expect(
@@ -228,6 +229,7 @@ testWithImportedNorm(
     await expect(
       page.locator('role=textbox[name="Mitwirkendes Organ"]')
     ).toBeEmpty()
+    // TODO Add the fields of new sections
   }
 )
 
@@ -245,20 +247,21 @@ testWithImportedNorm(
     await expect(page).toHaveOutsideViewport('h2:text-is("Mitwirkende Organe")')
     await expect(page).toHaveOutsideViewport('h2:text-is("Normgeber")')
 
-    const locatorAuthor = page.locator("a:has-text('Normgeber')")
-    await expect(locatorAuthor).toBeVisible()
-    await locatorAuthor.click()
-
-    await expect(page).toHaveInsideViewport('h2:text-is("Normgeber")')
-    await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
-    await expect(page).toHaveOutsideViewport('h2:text-is("Mitwirkende Organe")')
-
-    const locatorLead = page.locator("a:has-text('Mitwirkende Organe')")
-    await expect(locatorLead).toBeVisible()
-    await locatorLead.click()
-
-    await expect(page).toHaveInsideViewport('h2:text-is("Mitwirkende Organe")')
-    await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
-    await expect(page).toHaveOutsideViewport('h2:text-is("Normgeber")')
+    // TODO Uncomment and add new fields when fields are added
+    // const locatorAuthor = page.locator("a:has-text('Normgeber')")
+    // await expect(locatorAuthor).toBeVisible()
+    // await locatorAuthor.click()
+    //
+    // await expect(page).toHaveInsideViewport('h2:text-is("Normgeber")')
+    // await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
+    // await expect(page).toHaveOutsideViewport('h2:text-is("Mitwirkende Organe")')
+    //
+    // const locatorLead = page.locator("a:has-text('Mitwirkende Organe')")
+    // await expect(locatorLead).toBeVisible()
+    // await locatorLead.click()
+    //
+    // await expect(page).toHaveInsideViewport('h2:text-is("Mitwirkende Organe")')
+    // await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
+    // await expect(page).toHaveOutsideViewport('h2:text-is("Normgeber")')
   }
 )

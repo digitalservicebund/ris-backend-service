@@ -1,10 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Mono;
 
@@ -21,14 +23,19 @@ import reactor.core.publisher.Mono;
 public class LookupTableImporterService {
 
   private final DocumentTypeRepository documentTypeRepository;
+  private final JPADocumentTypeRepository jpaDocumentTypeRepository;
   private final CourtRepository courtRepository;
 
   public LookupTableImporterService(
-      DocumentTypeRepository documentTypeRepository, CourtRepository courtRepository) {
+      DocumentTypeRepository documentTypeRepository,
+      JPADocumentTypeRepository jpaDocumentTypeRepository,
+      CourtRepository courtRepository) {
     this.documentTypeRepository = documentTypeRepository;
+    this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.courtRepository = courtRepository;
   }
 
+  @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<String> importDocumentTypeLookupTable(ByteBuffer byteBuffer) {
     XmlMapper mapper = new XmlMapper();
     DocumentTypesXML documentTypesXML;
@@ -39,11 +46,40 @@ public class LookupTableImporterService {
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
     }
 
-    List<DocumentTypeDTO> documentTypeDTOs =
+    importDocumentTypeJPA(documentTypesXML);
+
+    //    List<DocumentTypeDTO> documentTypeDTOs =
+    //        documentTypesXML.getList().stream()
+    //            .map(
+    //                documentTypeXML ->
+    //                    DocumentTypeDTO.builder()
+    //                        .id(documentTypeXML.getId())
+    //                        .changeDateClient(documentTypeXML.getChangeDateClient())
+    //                        .changeIndicator(documentTypeXML.getChangeIndicator())
+    //                        .version(documentTypeXML.getVersion())
+    //                        .jurisShortcut(documentTypeXML.getJurisShortcut())
+    //                        .documentType(documentTypeXML.getDocumentType())
+    //                        .multiple(documentTypeXML.getMultiple())
+    //                        .label(documentTypeXML.getLabel())
+    //                        .superlabel1(documentTypeXML.getSuperlabel1())
+    //                        .superlabel2(documentTypeXML.getSuperlabel2())
+    //                        .build())
+    //            .toList();
+    //
+    //    documentTypeRepository
+    //        .deleteAll()
+    //        .thenMany(documentTypeRepository.saveAll(documentTypeDTOs))
+    //        .subscribe();
+
+    return Mono.just("Successfully imported the document type lookup table");
+  }
+
+  public void importDocumentTypeJPA(DocumentTypesXML documentTypesXML) {
+    List<JPADocumentTypeDTO> documentTypeDTOS =
         documentTypesXML.getList().stream()
             .map(
                 documentTypeXML ->
-                    DocumentTypeDTO.builder()
+                    JPADocumentTypeDTO.builder()
                         .id(documentTypeXML.getId())
                         .changeDateClient(documentTypeXML.getChangeDateClient())
                         .changeIndicator(documentTypeXML.getChangeIndicator())
@@ -57,12 +93,7 @@ public class LookupTableImporterService {
                         .build())
             .toList();
 
-    documentTypeRepository
-        .deleteAll()
-        .thenMany(documentTypeRepository.saveAll(documentTypeDTOs))
-        .subscribe();
-
-    return Mono.just("Successfully imported the document type lookup table");
+    jpaDocumentTypeRepository.saveAll(documentTypeDTOS);
   }
 
   public Mono<String> importCourtLookupTable(ByteBuffer byteBuffer) {

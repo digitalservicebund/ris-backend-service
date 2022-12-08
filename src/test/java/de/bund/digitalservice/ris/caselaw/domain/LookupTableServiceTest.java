@@ -68,8 +68,8 @@ class LookupTableServiceTest {
         .thenReturn(Flux.fromIterable(List.of(courtA, courtB)));
 
     StepVerifier.create(service.getCourts(Optional.empty()))
-        .expectNext(new Court("ABC", null, "ABC"))
-        .expectNext(new Court("XYZ", "Hamburg", "XYZ Hamburg"))
+        .expectNext(new Court("ABC", null, "ABC", null))
+        .expectNext(new Court("XYZ", "Hamburg", "XYZ Hamburg", null))
         .verifyComplete();
 
     verify(courtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();

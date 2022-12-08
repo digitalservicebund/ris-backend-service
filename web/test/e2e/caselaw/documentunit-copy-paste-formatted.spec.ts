@@ -2,6 +2,7 @@ import { expect } from "@playwright/test"
 import { navigateToFiles, uploadTestfile } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
+// eslint-disable-next-line playwright/no-skipped-test
 test.skip(
   ({ browserName }) => browserName !== "chromium",
   "Skipping in engines other than chromium, reason playwright diriven for firefox and safari does not support copy paste type='text/html' from clipboard"
@@ -37,7 +38,7 @@ test("copy-paste from side panel", async ({ page }) => {
   // Click on "Rubriken" und check if original document loaded
   await page.locator("a >> text=Rubriken").click()
   await page.locator("[aria-label='Originaldokument öffnen']").click()
-  await expect(page.locator("text=Dokument wird geladen")).not.toBeVisible()
+  await expect(page.locator("text=Dokument wird geladen")).toBeHidden()
   await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${justifyAlignText}`)).toBeVisible()
@@ -46,22 +47,24 @@ test("copy-paste from side panel", async ({ page }) => {
 
   // Selected all text from sidepanel
   await originalFileParagraph.evaluate((element) => {
-    const originalFile = element.parentElement.parentElement
-    if (originalFile !== null) {
-      const selection = window.getSelection()
-      const elementChildsLength = originalFile.childNodes.length
-      const startOffset = 0
-      const range = document.createRange()
-      range.setStart(originalFile.childNodes[0], startOffset)
-      range.setEnd(
-        originalFile.childNodes[elementChildsLength - 1],
-        startOffset
-      )
-      selection?.removeAllRanges()
-      selection?.addRange(range)
+    const originalFile = element.parentElement?.parentElement
+
+    if (!originalFile) {
+      throw new Error("No original file available.")
     }
+
+    const selection = window.getSelection()
+    const elementChildsLength = originalFile.childNodes.length
+    const startOffset = 0
+    const range = document.createRange()
+    range.setStart(originalFile.childNodes[0], startOffset)
+    range.setEnd(originalFile.childNodes[elementChildsLength - 1], startOffset)
+    selection?.removeAllRanges()
+    selection?.addRange(range)
   })
+
   // copy from sidepanel to clipboard
+  // eslint-disable-next-line playwright/no-conditional-in-test
   const modifier = (await page.evaluate(() => navigator.platform))
     .toLowerCase()
     .includes("mac")

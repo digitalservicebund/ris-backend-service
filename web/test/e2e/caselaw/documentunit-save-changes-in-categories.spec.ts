@@ -95,9 +95,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await expect(page.locator("text=one").first()).toBeVisible()
     await expect(page.locator("text=two").first()).toBeVisible()
 
-    await expect(
-      page.locator("text=Abweichendes Aktenzeichen>")
-    ).not.toBeVisible()
+    await expect(page.locator("text=Abweichendes Aktenzeichen>")).toBeHidden()
 
     await page
       .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
@@ -130,7 +128,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await expect(
       page.locator("text=Abweichendes Aktenzeichen").first()
-    ).not.toBeVisible()
+    ).toBeHidden()
   })
 
   test("nested 'ECLI' input toggles child input and correctly displays data", async ({
@@ -142,7 +140,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='ECLI']").fill("one")
     await expect(page.locator("text=one").first()).toBeVisible()
 
-    await expect(page.locator("text=Abweichender ECLI>")).not.toBeVisible()
+    await expect(page.locator("text=Abweichender ECLI>")).toBeHidden()
 
     await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
 
@@ -167,9 +165,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await page.locator("[aria-label='Abweichender ECLI schließen']").click()
 
-    await expect(
-      page.locator("text=Abweichender ECLI").first()
-    ).not.toBeVisible()
+    await expect(page.locator("text=Abweichender ECLI").first()).toBeHidden()
   })
 
   test("adding and deleting multiple inputs", async ({
@@ -194,12 +190,12 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("Enter")
 
-    await expect(page.locator("text=testtwo").first()).not.toBeVisible()
+    await expect(page.locator("text=testtwo").first()).toBeHidden()
 
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("Enter")
 
-    await expect(page.locator("text=testone").first()).not.toBeVisible()
+    await expect(page.locator("text=testone").first()).toBeHidden()
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
@@ -252,27 +248,31 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await fillPreviousDecisionInputs(page)
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
 
-    await page.pause()
-
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
         .nth(1)
         .inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Gerichtsort Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtsort Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtsort Rechtszug']")
         .nth(1)
         .inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
+    await expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
     expect(
       await page.locator("[aria-label='Datum Rechtszug']").nth(1).inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Aktenzeichen Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Aktenzeichen Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Aktenzeichen Rechtszug']")
@@ -291,7 +291,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
     await fillPreviousDecisionInputs(page, { courtType: "Type Two" }, 1)
 
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
@@ -307,7 +309,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await page.locator("[aria-label='Entscheidung Entfernen']").click()
 
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(1)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(1)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
@@ -354,19 +358,19 @@ test.describe("save changes in core data and texts and verify it persists", () =
     const fileNumberPanel = infoPanel
       .locator("div", { hasText: "Aktenzeichen" })
       .nth(-2)
-    expect(fileNumberPanel).toHaveText("Aktenzeichen - ")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen - ")
 
     await page.locator("[aria-label='Aktenzeichen']").fill("-firstChip")
     await page.keyboard.press("Enter")
-    expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
 
     await page.locator("[aria-label='Aktenzeichen']").fill("-secondChip")
     await page.keyboard.press("Enter")
-    expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
 
     // delete first chip
     await page.locator("div", { hasText: "-firstChip" }).nth(-2).click()
     await page.keyboard.press("Enter")
-    expect(fileNumberPanel).toHaveText("Aktenzeichen-secondChip")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-secondChip")
   })
 })

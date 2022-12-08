@@ -74,7 +74,6 @@ export function defineDropdownField(
   isCombobox?: boolean,
   dropdownItems?: DropdownItem[],
   endpoint?: LookupTableEndpoint,
-  preselectedValue?: string,
   validationError?: ValidationError
 ): InputField {
   return {
@@ -88,7 +87,6 @@ export function defineDropdownField(
       dropdownItems,
       endpoint,
       isCombobox,
-      preselectedValue,
       validationError,
     },
   }
@@ -191,7 +189,6 @@ export const coreDataFields: InputField[] = [
     "",
     false,
     legalEffectTypes.items,
-    undefined,
-    legalEffectTypes.items[0].value
+    undefined
   ),
 ]

@@ -33,7 +33,6 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
         var referenceNumber: String? = null
-        var publicationDate: String? = null
         var announcementDate: String? = null
         var citationDate: String? = null
         var frameKeywords: String? = null
@@ -44,13 +43,8 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var leadUnit: String? = null
         var participationType: String? = null
         var participationInstitution: String? = null
-        var documentTypeName: String? = null
-        var documentNormCategory: String? = null
-        var documentTemplateName: String? = null
         var subjectFna: String? = null
-        var subjectPreviousFna: String? = null
         var subjectGesta: String? = null
-        var subjectBgb3: String? = null
         var unofficialLongTitle: String? = null
         var unofficialShortTitle: String? = null
         var unofficialAbbreviation: String? = null
@@ -62,9 +56,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 articles = this.articles.map { it.toUseCaseData() },
                 officialShortTitle = this.officialShortTitle,
                 officialAbbreviation = this.officialAbbreviation,
-                referenceNumber = this.referenceNumber,
-                publicationDate = decodeLocalDate(this.publicationDate),
-                announcementDate = decodeLocalDate(this.announcementDate),
+                referenceNumber = this.referenceNumber, announcementDate = decodeLocalDate(this.announcementDate),
                 citationDate = decodeLocalDate(this.citationDate),
                 frameKeywords = this.frameKeywords,
                 providerEntity = this.providerEntity,
@@ -73,14 +65,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 leadJurisdiction = this.leadJurisdiction,
                 leadUnit = this.leadUnit,
                 participationType = this.participationType,
-                participationInstitution = this.participationInstitution,
-                documentTypeName = this.documentTypeName,
-                documentNormCategory = this.documentNormCategory,
-                documentTemplateName = this.documentTemplateName,
-                subjectFna = this.subjectFna,
-                subjectPreviousFna = this.subjectPreviousFna,
-                subjectGesta = this.subjectGesta,
-                subjectBgb3 = this.subjectBgb3,
+                participationInstitution = this.participationInstitution, subjectFna = this.subjectFna, subjectGesta = this.subjectGesta,
                 unofficialLongTitle = this.unofficialLongTitle,
                 unofficialShortTitle = this.unofficialShortTitle,
                 unofficialAbbreviation = this.unofficialAbbreviation,

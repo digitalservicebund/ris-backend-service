@@ -11,6 +11,15 @@ export function useNormMenuItems(
     query: route.query,
   }
 
+  const getChildItem = (label: string, id: string) => ({
+    label: label,
+    route: {
+      ...baseRoute,
+      name: "norms-norm-:normGuid-frame",
+      hash: `#${id}`,
+    },
+  })
+
   return computed(() => [
     {
       label: "Normenkomplex",
@@ -27,62 +36,43 @@ export function useNormMenuItems(
       },
       isDisabled: true,
       children: [
-        {
-          label: "Allgemeine Angaben",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#coreData",
-          },
-        },
-        {
-          label: "Dokumenttyp",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#documentType",
-          },
-        },
-        {
-          label: "Überschriften und Abkürzungen",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#headings_abbreviations",
-          },
-        },
-        {
-          label: "Normgeber",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#normOriginator",
-          },
-        },
-        {
-          label: "Federführung",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#leadManagement",
-          },
-        },
-        {
-          label: "Sachgebiet",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#subjectArea",
-          },
-        },
-        {
-          label: "Mitwirkende Organe",
-          route: {
-            ...baseRoute,
-            name: "norms-norm-:normGuid-frame",
-            hash: "#participatingInstitutions",
-          },
-        },
+        getChildItem("Allgemeine Angaben", "generalDataFields"),
+        getChildItem("Dokumenttyp", "documentTypeFields"),
+        getChildItem("Normgeber", "normProviderFields"),
+        getChildItem("Mitwirkende Organe", "participatingInstitutionsFields"),
+        getChildItem("Federführung", "leadFields"),
+        getChildItem("Sachgebiet", "subjectAreaFields"),
+        getChildItem(
+          "Überschriften und Abkürzungen",
+          "headingsAndAbbreviations"
+        ),
+        getChildItem("Inkrafttreten", "entryIntoForceFields"),
+        getChildItem("Außerkrafttreten", "expirationFields"),
+        getChildItem("Verkündungsdatum", "announcementDateFields"),
+        getChildItem("Zitierdatum", "citationDateFields"),
+        getChildItem("Amtliche Fundstelle", "officialAnnouncementFields"),
+        getChildItem("Nichtamtliche Fundstelle", "unofficialReferenceFields"),
+        getChildItem("Vollzitat", "completeCitationFields"),
+        getChildItem("Stand-Angabe", "statusIndicationFields"),
+        getChildItem(
+          "Stand der dokumentarischen Bearbeitung",
+          "documentProcessingStatusFields"
+        ),
+        getChildItem("Räumlicher Geltungsbereich", "applicationScopeFields"),
+        getChildItem("Aktivverweisung", "categorizedReferenceFields"),
+        getChildItem("Fußnote", "otherFootnoteFields"),
+        getChildItem("Gültigkeitsregelung", "validityRuleFields"),
+        getChildItem("Elektronischer Nachweis", "digitalEvidenceFields"),
+        getChildItem("Aktenzeichen", "referenceNumberFields"),
+        getChildItem("ELI", "europeanLegalIdentifierFields"),
+        getChildItem("CELEX-Nummer", "celexNumberFields"),
+        getChildItem("Altersangabe", "ageIndicationFields"),
+        getChildItem("Definition", "definitionFields"),
+        getChildItem(
+          "Angaben zur Volljährigkeit",
+          "ageOfMajorityIndicationFields"
+        ),
+        getChildItem("Text", "textFields"),
       ],
     },
     {
