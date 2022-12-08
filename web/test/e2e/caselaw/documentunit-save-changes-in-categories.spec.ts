@@ -80,7 +80,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     })
   })
 
-  test("nested input toggles child input and correctly displays data", async ({
+  test("nested 'Aktenzeichen' input toggles child input and correctly displays data", async ({
     page,
     documentNumber,
   }) => {
@@ -99,7 +99,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
       page.locator("text=Abweichendes Aktenzeichen>")
     ).not.toBeVisible()
 
-    await page.locator("[aria-label='Abweichendes Feld öffnen']").click()
+    await page
+      .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
+      .click()
 
     await expect(
       page.locator("text=Abweichendes Aktenzeichen").first()
@@ -116,9 +118,58 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await page.reload()
 
-    await page.locator("[aria-label='Abweichendes Feld öffnen']").click()
+    await page
+      .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
+      .click()
 
     await expect(page.locator("text=three").first()).toBeVisible()
+
+    await page
+      .locator("[aria-label='Abweichendes Aktenzeichen schließen']")
+      .click()
+
+    await expect(
+      page.locator("text=Abweichendes Aktenzeichen").first()
+    ).not.toBeVisible()
+  })
+
+  test("nested 'ECLI' input toggles child input and correctly displays data", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='ECLI']").fill("one")
+    await expect(page.locator("text=one").first()).toBeVisible()
+
+    await expect(page.locator("text=Abweichender ECLI>")).not.toBeVisible()
+
+    await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
+
+    await expect(page.locator("text=Abweichender ECLI").first()).toBeVisible()
+
+    await page.locator("[aria-label='Abweichender ECLI']").fill("two")
+    await page.keyboard.press("Enter")
+    await page.locator("[aria-label='Abweichender ECLI']").fill("three")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+
+    await page.reload()
+
+    await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
+    await expect(page.locator("text=two").first()).toBeVisible()
+    await expect(page.locator("text=three").first()).toBeVisible()
+
+    await page.locator("[aria-label='Abweichender ECLI schließen']").click()
+
+    await expect(
+      page.locator("text=Abweichender ECLI").first()
+    ).not.toBeVisible()
   })
 
   test("adding and deleting multiple inputs", async ({
