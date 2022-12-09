@@ -287,4 +287,50 @@ describe("Dropdown Element", () => {
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
   })
+
+  it("Court without location and with revoked string gets displayed correctly", async () => {
+    const court: Court = {
+      type: "ABC",
+      location: "",
+      label: "ABC",
+      revoked: "aufgehoben seit: 1973",
+    }
+    const dropdownItems: DropdownItem[] = [
+      {
+        text: "ABC",
+        value: court,
+      },
+    ]
+    const fetchSpy = vi
+      .spyOn(dropdownInputService, "fetch")
+      .mockImplementation(() =>
+        Promise.resolve({ status: 200, data: dropdownItems })
+      )
+
+    const { container } = renderComponent({
+      endpoint: LookupTableEndpoint.courts,
+      isCombobox: true,
+    })
+
+    const openDropdownContainer = container.querySelector(
+      ".input-expand-icon"
+    ) as HTMLElement
+    await user.click(openDropdownContainer)
+
+    const dropdownItemElements = container.querySelectorAll(
+      ".dropdown-container__dropdown-item"
+    )
+    expect(fetchSpy).toHaveBeenCalledTimes(1)
+    expect(fetchSpy).toHaveBeenCalledWith(LookupTableEndpoint.courts, undefined)
+    expect(dropdownItemElements).toHaveLength(1)
+    expect(dropdownItemElements[0]).toHaveTextContent(
+      "ABC aufgehoben seit: 1973"
+    )
+
+    const additionalInfoElement = container.querySelectorAll(
+      ".dropdown-container__dropdown-item__additional-info"
+    )
+    expect(additionalInfoElement.length).toBe(1)
+    expect(additionalInfoElement[0]).toHaveTextContent("aufgehoben seit: 1973")
+  })
 })
