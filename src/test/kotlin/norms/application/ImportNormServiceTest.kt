@@ -7,11 +7,12 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import io.mockk.verify
+import norms.utils.assertNormAndNormDataWithoutArticles
+import norms.utils.createRandomImportNormData
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import java.time.LocalDate
 
 // TODO: Improve by using behavior driven testing concept with documentation.
 class ImportNormServiceTest {
@@ -21,8 +22,8 @@ class ImportNormServiceTest {
         val service = ImportNormService(port)
         val paragraph = ImportNormUseCase.ParagraphData("marker", "text")
         val article = ImportNormUseCase.ArticleData("title", "marker", listOf(paragraph))
-        val norm = ImportNormUseCase.NormData("long title", listOf(article))
-        val command = ImportNormUseCase.Command(norm)
+        val normData = ImportNormUseCase.NormData("long title", listOf(article))
+        val command = ImportNormUseCase.Command(normData)
 
         every { port.saveNorm(any()) } returns Mono.just(true)
 
@@ -32,34 +33,13 @@ class ImportNormServiceTest {
         verify {
             port.saveNorm(
                 withArg {
-                    assertTrue(it.officialLongTitle == "long title")
                     assertTrue(it.articles.size == 1)
                     assertTrue(it.articles[0].title == "title")
                     assertTrue(it.articles[0].marker == "marker")
                     assertTrue(it.articles[0].paragraphs.size == 1)
                     assertTrue(it.articles[0].paragraphs[0].marker == "marker")
                     assertTrue(it.articles[0].paragraphs[0].text == "text")
-                    assertTrue(it.officialShortTitle == null)
-                    assertTrue(it.officialAbbreviation == null)
-                    assertTrue(it.referenceNumber == null)
-                    assertTrue(it.publicationDate == null)
-                    assertTrue(it.announcementDate == null)
-                    assertTrue(it.citationDate == null)
-                    assertTrue(it.frameKeywords == null)
-                    assertTrue(it.providerEntity == null)
-                    assertTrue(it.providerDecidingBody == null)
-                    assertTrue(it.providerIsResolutionMajority == null)
-                    assertTrue(it.leadJurisdiction == null)
-                    assertTrue(it.leadUnit == null)
-                    assertTrue(it.participationType == null)
-                    assertTrue(it.participationInstitution == null)
-                    assertTrue(it.documentTypeName == null)
-                    assertTrue(it.documentNormCategory == null)
-                    assertTrue(it.documentTemplateName == null)
-                    assertTrue(it.subjectFna == null)
-                    assertTrue(it.subjectPreviousFna == null)
-                    assertTrue(it.subjectGesta == null)
-                    assertTrue(it.subjectBgb3 == null)
+                    assertNormAndNormDataWithoutArticles(it, normData)
                 }
             )
         }
@@ -69,19 +49,9 @@ class ImportNormServiceTest {
     fun `it saves norm to output port with data from command including optional fields`() {
         val port = mockk<SaveNormOutputPort>()
         val service = ImportNormService(port)
-        val paragraph = ImportNormUseCase.ParagraphData("marker", "text")
-        val article = ImportNormUseCase.ArticleData("title", "marker", listOf(paragraph))
-        val norm = ImportNormUseCase.NormData(
-            officialLongTitle = "long title", articles = listOf(article), officialShortTitle = "official short title", officialAbbreviation = "official abbreviation",
-            referenceNumber = "reference number", announcementDate = LocalDate.parse("2020-10-27"), citationDate = LocalDate.parse("2020-10-28"),
-            frameKeywords = "frame keywords", providerEntity = "provider entity", providerDecidingBody = "provider deciding body",
-            providerIsResolutionMajority = true, leadJurisdiction = "lead jurisdiction", leadUnit = "lead unit", participationType = "participation type",
-            participationInstitution = "participation institution", subjectFna = "subject fna", subjectGesta = "subject gesta", documentNumber = "document number", documentCategory = "document category", risAbbreviationInternationalLaw = "ris abbreviation international Law", unofficialReference = "unofficial reference",
-            applicationScopeArea = "application scope area", applicationScopeStartDate = LocalDate.parse("2020-10-02"), applicationScopeEndDate = LocalDate.parse("2020-10-03"), validityRule = "validity rule", celexNumber = "celex number", definition = "definition", categorizedReference = "categorized reference", otherFootnote = "other footnote",
-            expirationDate = LocalDate.parse("2020-10-04"), entryIntoForceDate = LocalDate.parse("2020-10-01"), unofficialLongTitle = "unofficial long title", unofficialShortTitle = "unofficial short title",
-            unofficialAbbreviation = "unofficial abbreviation", risAbbreviation = "ris abbreviation"
-        )
-        val command = ImportNormUseCase.Command(norm)
+
+        val normData = createRandomImportNormData()
+        val command = ImportNormUseCase.Command(normData)
 
         every { port.saveNorm(any()) } returns Mono.just(true)
 
@@ -91,46 +61,22 @@ class ImportNormServiceTest {
         verify {
             port.saveNorm(
                 withArg {
-                    assertTrue(it.officialLongTitle == "long title")
-                    assertTrue(it.articles.size == 1)
-                    assertTrue(it.articles[0].title == "title")
-                    assertTrue(it.articles[0].marker == "marker")
-                    assertTrue(it.articles[0].paragraphs.size == 1)
-                    assertTrue(it.articles[0].paragraphs[0].marker == "marker")
-                    assertTrue(it.articles[0].paragraphs[0].text == "text")
-                    assertTrue(it.officialShortTitle == "official short title")
-                    assertTrue(it.officialAbbreviation == "official abbreviation")
-                    assertTrue(it.referenceNumber == "reference number")
-                    assertTrue(it.announcementDate == LocalDate.parse("2020-10-27"))
-                    assertTrue(it.citationDate == LocalDate.parse("2020-10-28"))
-                    assertTrue(it.frameKeywords == "frame keywords")
-                    assertTrue(it.providerEntity == "provider entity")
-                    assertTrue(it.providerDecidingBody == "provider deciding body")
-                    assertTrue(it.providerIsResolutionMajority == true)
-                    assertTrue(it.leadJurisdiction == "lead jurisdiction")
-                    assertTrue(it.leadUnit == "lead unit")
-                    assertTrue(it.participationType == "participation type")
-                    assertTrue(it.participationInstitution == "participation institution")
-                    assertTrue(it.subjectFna == "subject fna")
-                    assertTrue(it.subjectGesta == "subject gesta")
-                    assertTrue(it.documentNumber == "document number")
-                    assertTrue(it.documentCategory == "document category")
-                    assertTrue(it.risAbbreviationInternationalLaw == "ris abbreviation international Law")
-                    assertTrue(it.unofficialReference == "unofficial reference")
-                    assertTrue(it.applicationScopeArea == "application scope area")
-                    assertTrue(it.applicationScopeStartDate == LocalDate.parse("2020-10-02"))
-                    assertTrue(it.applicationScopeEndDate == LocalDate.parse("2020-10-03"))
-                    assertTrue(it.validityRule == "validity rule")
-                    assertTrue(it.celexNumber == "celex number")
-                    assertTrue(it.definition == "definition")
-                    assertTrue(it.categorizedReference == "categorized reference")
-                    assertTrue(it.otherFootnote == "other footnote")
-                    assertTrue(it.expirationDate == LocalDate.parse("2020-10-04"))
-                    assertTrue(it.entryIntoForceDate == LocalDate.parse("2020-10-01"))
-                    assertTrue(it.unofficialLongTitle == "unofficial long title")
-                    assertTrue(it.unofficialShortTitle == "unofficial short title")
-                    assertTrue(it.unofficialAbbreviation == "unofficial abbreviation")
-                    assertTrue(it.risAbbreviation == "ris abbreviation")
+                    assertTrue(it.articles.size == 2)
+                    assertTrue(it.articles[0].title == normData.articles[0].title)
+                    assertTrue(it.articles[0].marker == normData.articles[0].marker)
+                    assertTrue(it.articles[0].paragraphs.size == 2)
+                    assertTrue(it.articles[0].paragraphs[0].marker == normData.articles[0].paragraphs[0].marker)
+                    assertTrue(it.articles[0].paragraphs[0].text == normData.articles[0].paragraphs[0].text)
+                    assertTrue(it.articles[0].paragraphs[1].marker == normData.articles[0].paragraphs[1].marker)
+                    assertTrue(it.articles[0].paragraphs[1].text == normData.articles[0].paragraphs[1].text)
+                    assertTrue(it.articles[1].title == normData.articles[1].title)
+                    assertTrue(it.articles[1].marker == normData.articles[1].marker)
+                    assertTrue(it.articles[1].paragraphs.size == 2)
+                    assertTrue(it.articles[1].paragraphs[0].marker == normData.articles[1].paragraphs[0].marker)
+                    assertTrue(it.articles[1].paragraphs[0].text == normData.articles[1].paragraphs[0].text)
+                    assertTrue(it.articles[1].paragraphs[1].marker == normData.articles[1].paragraphs[1].marker)
+                    assertTrue(it.articles[1].paragraphs[1].text == normData.articles[1].paragraphs[1].text)
+                    assertNormAndNormDataWithoutArticles(it, normData)
                 }
             )
         }

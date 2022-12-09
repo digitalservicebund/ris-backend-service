@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
+import norms.utils.createRandomImportNormData
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import java.time.LocalDate
 
 class ImportNormCommandTest {
     private val validParagraph = ImportNormUseCase.ParagraphData("maker", "text")
@@ -84,16 +84,7 @@ class ImportNormCommandTest {
 
     @Test
     fun `can create command with optional fields`() {
-        val normData = ImportNormUseCase.NormData(
-            officialLongTitle = "long title", articles = listOf(validArticle), officialShortTitle = "official short title", officialAbbreviation = "official abbreviation",
-            referenceNumber = "reference number", announcementDate = LocalDate.parse("2020-10-27"), citationDate = LocalDate.parse("2020-10-28"),
-            frameKeywords = "frame keywords", providerEntity = "provider entity", providerDecidingBody = "provider deciding body",
-            providerIsResolutionMajority = true, leadJurisdiction = "lead jurisdiction", leadUnit = "lead unit", participationType = "participation type",
-            participationInstitution = "participation institution", subjectFna = "subject fna", subjectGesta = "subject gesta", documentNumber = "document number", documentCategory = "document category", risAbbreviationInternationalLaw = "ris abbreviation international Law", unofficialReference = "unofficial reference",
-            applicationScopeArea = "application scope area", applicationScopeStartDate = LocalDate.parse("2020-10-02"), applicationScopeEndDate = LocalDate.parse("2020-10-03"), validityRule = "validity rule", celexNumber = "celex number", definition = "definition", categorizedReference = "categorized reference", otherFootnote = "other footnote",
-            expirationDate = LocalDate.parse("2020-10-04"), entryIntoForceDate = LocalDate.parse("2020-10-01"), unofficialLongTitle = "unofficial long title", unofficialShortTitle = "unofficial short title",
-            unofficialAbbreviation = "unofficial abbreviation", risAbbreviation = "ris abbreviation"
-        )
+        val normData = createRandomImportNormData()
         val command = ImportNormUseCase.Command(normData)
 
         assertTrue(command.data == normData)

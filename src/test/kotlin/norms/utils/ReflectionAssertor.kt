@@ -60,3 +60,20 @@ fun assertNormDataAndImportNormRequestSchemaWithoutArticles(normData: ImportNorm
         }
     }
 }
+
+fun assertNormAndNormDataWithoutArticles(norm: Norm, normData: ImportNormUseCase.NormData) {
+    val normMembers = Norm::class.memberProperties
+    val normDataMembers = ImportNormUseCase.NormData::class.memberProperties
+    normMembers.filter { it.name !in listOf("articles", "guid") }.forEach { normMember ->
+        val found = normDataMembers.find { normDataMember ->
+            normMember.name == normDataMember.name
+        }
+        when (val normMemberValue = normMember.get(norm)) {
+            is LocalDate ->
+                assertTrue(normMemberValue == decodeLocalDate(found?.get(normData).toString()))
+            else -> {
+                assertTrue(normMemberValue == found?.get(normData))
+            }
+        }
+    }
+}

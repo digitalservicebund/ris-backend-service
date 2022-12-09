@@ -1,6 +1,7 @@
 package norms.utils
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
+import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.EditNormFrameController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ImportNormController
@@ -22,6 +23,11 @@ fun createRandomEditNormRequestSchema(): EditNormFrameController.NormFrameProper
 fun createRandomNorm(): Norm {
     val parameters: EasyRandomParameters = EasyRandomParameters().randomize(named("marker")) { createRandomStringWithMaxLength(20) } // needed for marker fields
     return EasyRandom(parameters).nextObject(Norm::class.java)
+}
+
+fun createRandomImportNormData(): ImportNormUseCase.NormData {
+    val parameters: EasyRandomParameters = EasyRandomParameters().collectionSizeRange(2, 2)
+    return EasyRandom(parameters).nextObject(ImportNormUseCase.NormData::class.java)
 }
 
 fun createRandomImportNormRequestSchema(): ImportNormController.NormRequestSchema {
