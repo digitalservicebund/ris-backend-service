@@ -82,7 +82,7 @@
     "eslint-plugin-jest-dom": "^4.0.2",
     "eslint-plugin-playwright": "^0.11.2",
     "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-testing-library": "^5.7.0",
+    "eslint-plugin-testing-library": "^5.9.1",
     "eslint-plugin-vue": "^9.6.0",
     "eslint-plugin-vue-scoped-css": "^2.2.0",
     "eslint-plugin-vuejs-accessibility": "^1.2.0",

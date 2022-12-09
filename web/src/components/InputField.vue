@@ -13,6 +13,7 @@ defineProps<Props>()
   <div class="flex flex-col flex-start">
     <label
       v-if="label"
+      :aria-label="id"
       class="flex gap-4 items-center label-03-regular mb-2 text-gray-900"
       :for="id"
     >

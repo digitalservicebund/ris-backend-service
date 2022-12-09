@@ -89,6 +89,11 @@ module.exports = {
       rules: { ...moduleImportRules },
     },
     {
+      files: ["**/test/components/**/*.ts"],
+      extends: ["plugin:testing-library/vue"],
+      rules: { ...moduleImportRules },
+    },
+    {
       files: ["test/**/*.ts"],
       extends: ["plugin:jest-dom/recommended"],
     },

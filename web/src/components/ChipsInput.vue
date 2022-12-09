@@ -129,6 +129,7 @@ onMounted(() => {
       <div
         v-for="(chip, i) in chips"
         :key="i"
+        aria-label="chip"
         class="bg-blue-500 body-01-reg chip"
         tabindex="0"
         @click="setFocusedItemIndex(i)"
@@ -142,6 +143,7 @@ onMounted(() => {
 
         <div class="icon-wrapper">
           <em
+            aria-Label="Löschen"
             class="material-icons"
             @click="deleteChip(i)"
             @keydown.enter="deleteChip(i)"

@@ -1,83 +1,84 @@
 import userEvent from "@testing-library/user-event"
-import { render, RenderResult, fireEvent } from "@testing-library/vue"
+import { render, fireEvent, screen } from "@testing-library/vue"
 import PublicationDocument from "@/components/PublicationDocument.vue"
 
+const setupWithPublishedDocument = () =>
+  render(PublicationDocument, {
+    props: {
+      lastPublishedXmlMail: {
+        xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
+        statusMessages: "success",
+        statusCode: "200",
+        receiverAddress: "receiver address",
+        mailSubject: "mail subject",
+        publishDate: "01.02.2000",
+      },
+    },
+  })
+
 describe("PublicationDocument:", () => {
-  let renderResult: RenderResult
-
   describe("with earlier published document unit", () => {
-    beforeEach(() => {
-      renderResult = render(PublicationDocument, {
-        props: {
-          lastPublishedXmlMail: {
-            xml: '<?xml version="1.0"?>\n<!DOCTYPE juris-r SYSTEM "juris-r.dtd">\n<xml>content</xml>',
-            statusMessages: "success",
-            statusCode: "200",
-            receiverAddress: "receiver address",
-            mailSubject: "mail subject",
-            publishDate: "01.02.2000",
-          },
-        },
-      })
-    })
-
     it("render text", async () => {
-      expect(renderResult.container).toHaveTextContent(
+      const { container } = setupWithPublishedDocument()
+      expect(container).toHaveTextContent(
         `VeröffentlichenPlausibilitätsprüfung help Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst. Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectalsxml1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content</xml>`
       )
     })
 
     describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
       it("without email address", async () => {
-        const publishButton = renderResult.getByRole("button", {
+        const { emitted } = setupWithPublishedDocument()
+        const publishButton = screen.getByRole("button", {
           name: "Dokumentationseinheit veröffentlichen",
         })
         await fireEvent.click(publishButton)
 
-        expect(renderResult.emitted().publishADocument).toBeFalsy()
+        expect(emitted().publishADocument).toBeFalsy()
       })
 
       it("with invalid email address", async () => {
-        const inputReceiverAddress = renderResult.getByLabelText(
+        const { emitted } = setupWithPublishedDocument()
+        const inputReceiverAddress = screen.getByLabelText(
           "Empfängeradresse E-Mail"
         )
         await fireEvent.update(inputReceiverAddress, "test-email")
 
-        const publishButton = renderResult.getByRole("button", {
+        const publishButton = screen.getByRole("button", {
           name: "Dokumentationseinheit veröffentlichen",
         })
         await fireEvent.click(publishButton)
 
-        expect(renderResult.emitted().publishADocument).toBeFalsy()
+        expect(emitted().publishADocument).toBeFalsy()
       })
 
       it("with valid email address", async () => {
-        const inputReceiverAddress = renderResult.getByLabelText(
+        const { emitted } = setupWithPublishedDocument()
+        const inputReceiverAddress = screen.getByLabelText(
           "Empfängeradresse E-Mail"
         )
 
         await userEvent.type(inputReceiverAddress, "test.email@test.com")
         await userEvent.tab()
 
-        const publishButton = renderResult.getByRole("button", {
+        const publishButton = screen.getByRole("button", {
           name: "Dokumentationseinheit veröffentlichen",
         })
         await fireEvent.click(publishButton)
 
-        expect(renderResult.emitted().publishADocument).toBeTruthy()
+        expect(emitted().publishADocument).toBeTruthy()
       })
     })
   })
 
   it("without earlier published document unit", async () => {
-    renderResult = render(PublicationDocument)
-    expect(renderResult.container).toHaveTextContent(
+    const { container } = render(PublicationDocument)
+    expect(container).toHaveTextContent(
       `VeröffentlichenPlausibilitätsprüfung help Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst. Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`
     )
   })
 
   it("with error message", async () => {
-    renderResult = render(PublicationDocument, {
+    const { container } = render(PublicationDocument, {
       props: {
         publishResult: {
           xml: "xml",
@@ -93,13 +94,13 @@ describe("PublicationDocument:", () => {
         },
       },
     })
-    expect(renderResult.container).toHaveTextContent(
+    expect(container).toHaveTextContent(
       `VeröffentlichenPlausibilitätsprüfung keyboard_arrow_down 2 Pflichtfelder nicht befüllt error message 1error message 2Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenerrorerror message titleerror message descriptionLetzte Veröffentlichungen Diese Dokumentationseinheit wurde bisher nicht veröffentlicht`
     )
   })
 
   it("with stubbing", () => {
-    renderResult = render(PublicationDocument, {
+    const { container } = render(PublicationDocument, {
       global: {
         stubs: {
           CodeSnippet: {
@@ -118,11 +119,11 @@ describe("PublicationDocument:", () => {
         },
       },
     })
-    expect(renderResult.container).toHaveTextContent(
+    expect(container).toHaveTextContent(
       `VeröffentlichenPlausibilitätsprüfung help Durch Klick auf Veröffentlichen wird die Plausibilitätsprüfung ausgelöst. Empfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000über E-Mail an: receiver address Betreff: mail subjectals`
     )
 
-    const codeSnippet = renderResult.queryByTestId("code-snippet")
+    const codeSnippet = screen.queryByTestId("code-snippet")
 
     expect(codeSnippet).toBeInTheDocument()
     expect(codeSnippet?.title).toBe("xml")

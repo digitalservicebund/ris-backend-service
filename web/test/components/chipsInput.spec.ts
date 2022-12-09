@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import ChipsInput from "@/components/ChipsInput.vue"
 
 function renderComponent(options?: {
@@ -16,31 +16,31 @@ function renderComponent(options?: {
     ariaLabel: options?.ariaLabel ?? "aria-label",
     placeholder: options?.placeholder,
   }
-  const renderResult = render(ChipsInput, { props })
-  return { user, props, ...renderResult }
+  const utils = render(ChipsInput, { props })
+  return { screen, user, props, ...utils }
 }
 
 describe("ChipsInput", () => {
   it("shows a chips input element", () => {
-    const { queryByRole } = renderComponent()
-    const input: HTMLInputElement | null = queryByRole("textbox")
+    renderComponent()
+    const input = screen.getByRole("textbox") as HTMLInputElement
 
     expect(input).toBeInTheDocument()
     expect(input?.type).toBe("text")
   })
 
   it("shows chips input with an aria label", () => {
-    const { queryByLabelText } = renderComponent({
+    renderComponent({
       ariaLabel: "test-label",
     })
-    const input = queryByLabelText("test-label")
+    const input = screen.queryByLabelText("test-label")
 
     expect(input).toBeInTheDocument()
   })
 
   it("allows to type text inside input", async () => {
-    const { getByRole, user } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -49,27 +49,29 @@ describe("ChipsInput", () => {
   })
 
   it("press enter renders value in chip", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
     await user.type(input, "{enter}")
 
-    expect(container.getElementsByClassName("chip").length).toBe(1)
+    const chipList = screen.getAllByLabelText("chip")
+    expect(chipList.length).toBe(1)
 
     expect(input).toHaveValue("")
   })
 
   it("press enter saves chip without whitespaces", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, " one ")
     await user.type(input, "{enter}")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
+
     expect(chipList.length).toBe(1)
     expect(chipList[0]).toHaveTextContent("one")
 
@@ -77,16 +79,17 @@ describe("ChipsInput", () => {
   })
 
   it("adds multiple values in chips", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
     await user.type(input, "{enter}")
     await user.type(input, "two")
     await user.type(input, "{enter}")
+    screen.getAllByLabelText("chip")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
@@ -95,8 +98,8 @@ describe("ChipsInput", () => {
   })
 
   it("deletes chip per click on delete icon", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -104,24 +107,22 @@ describe("ChipsInput", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
 
-    const deleteButton = container.getElementsByClassName(
-      "material-icons"
-    )[0] as HTMLElement
+    const deleteButton = screen.getAllByLabelText("Löschen")[0] as HTMLElement
     await user.click(deleteButton)
 
-    expect(chipList.length).toBe(1)
+    expect(screen.getAllByLabelText("chip").length).toBe(1)
     expect(chipList[0]).toHaveTextContent("two")
     expect(input).toHaveValue("")
   })
 
   it("deletes chip per backspace", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -129,7 +130,7 @@ describe("ChipsInput", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
@@ -142,8 +143,8 @@ describe("ChipsInput", () => {
   })
 
   it("deletes written input first on backspace", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -152,7 +153,7 @@ describe("ChipsInput", () => {
     await user.type(input, "{enter}")
     await user.type(input, "three")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
@@ -164,8 +165,8 @@ describe("ChipsInput", () => {
   })
 
   it("sets previous chip active on arrow key 'left'", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -173,7 +174,7 @@ describe("ChipsInput", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
     await user.type(input, "{arrowleft}")
     expect(chipList[1]).toHaveFocus()
@@ -182,8 +183,8 @@ describe("ChipsInput", () => {
   })
 
   it("deletes active chip on press enter", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -191,7 +192,7 @@ describe("ChipsInput", () => {
     await user.type(input, "two")
     await user.type(input, "{enter}")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
     expect(chipList[0]).toHaveTextContent("one")
     expect(chipList[1]).toHaveTextContent("two")
@@ -202,8 +203,8 @@ describe("ChipsInput", () => {
   })
 
   it("chips and text: focus via arrow keys behaves as expected", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -213,7 +214,7 @@ describe("ChipsInput", () => {
     await user.type(input, "x") // just text, not a confirmed chip
     expect(input).toHaveValue("x")
 
-    const chipList = container.getElementsByClassName("chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
 
     // now happens: 2x arrowleft, click on chip "two", 2x arrowleft, 3x arrowright
@@ -247,8 +248,8 @@ describe("ChipsInput", () => {
   })
 
   it("click middle chip and continue navigating by arrow keys", async () => {
-    const { getByRole, user, container } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
 
     await user.type(input, "one")
@@ -258,7 +259,9 @@ describe("ChipsInput", () => {
     await user.type(input, "three")
     await user.type(input, "{enter}")
 
-    const chipList = container.getElementsByClassName("chip")
+    screen.getAllByLabelText("chip")
+
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(3)
 
     // now happens: click on chip "two", arrowright, click on chip "two", arrowleft
@@ -275,8 +278,8 @@ describe("ChipsInput", () => {
   })
 
   it("emits input event when user adds an input", async () => {
-    const { emitted, getByRole, user } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { emitted, user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
 
     await user.type(input, "ab")
 
@@ -285,8 +288,8 @@ describe("ChipsInput", () => {
   })
 
   it("emits model update event when user adds an input", async () => {
-    const { emitted, user, getByRole } = renderComponent()
-    const input: HTMLInputElement = getByRole("textbox")
+    const { emitted, user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
     await user.type(input, "ab")
     await user.type(input, "{enter}")
     await userEvent.tab()

@@ -1,4 +1,4 @@
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import type { Router, RouteRecordRaw, RouteLocationRaw } from "vue-router"
 import NavbarSide from "@/components/NavbarSide.vue"
@@ -6,32 +6,34 @@ import { generateString } from "~/test-helper/dataGenerators"
 
 describe("NavbarSide", () => {
   it("displays the go back label with related route", async () => {
-    const { queryByText } = await renderComponent({
-      goBackLabel: "return",
+    await renderComponent({
+      goBackLabel: "Zurück",
       goBackRoute: "/origin-route",
     })
 
-    const goBackItem = queryByText("return")?.closest("a")
+    const goBackItem = screen.getByLabelText("Zurück")
 
     expect(goBackItem).toBeVisible()
     expect(goBackItem?.getAttribute("href")).toBe("/origin-route")
   })
 
-  it("shows a router link for each configured menu item", async () => {
+  it("renders sidenav with multiple items and correct routes", async () => {
     const menuItems = [
       { label: "first item", route: "/first-route" },
       { label: "second item", route: "/second-route" },
     ]
 
-    const { queryByText } = await renderComponent({ menuItems })
-    const firstItem = queryByText("first item")?.closest("a")
-    const secondItem = queryByText("second item")?.closest("a")
+    await renderComponent({ menuItems })
+    const itemList = screen.getAllByLabelText("Menü Eintrag")
+    const firstItem = itemList[0] as HTMLElement
+    const secondItem = itemList[1] as HTMLElement
 
+    expect(itemList.length).toBe(2)
     expect(firstItem).toBeVisible()
-    expect(firstItem?.getAttribute("href")).toBe("/first-route")
-
     expect(secondItem).toBeVisible()
-    expect(secondItem?.getAttribute("href")).toBe("/second-route")
+
+    expect(firstItem).toHaveAttribute("href", "/first-route")
+    expect(secondItem).toHaveAttribute("href", "/second-route")
   })
 
   it("allows to render level one item with level two items as children", async () => {
@@ -46,15 +48,17 @@ describe("NavbarSide", () => {
       },
     ]
 
-    const { queryByText } = await renderComponent({ menuItems })
-    const firstLevelTwo = queryByText("first level two")?.closest("a")
-    const secondLevelTwo = queryByText("second level two")?.closest("a")
+    await renderComponent({ menuItems })
+    const subItemList = screen.getAllByLabelText("Submenü Eintrag")
+    const firstSubItem = subItemList[0] as HTMLElement
+    const secondSubItem = subItemList[1] as HTMLElement
 
-    expect(firstLevelTwo).toBeVisible()
-    expect(firstLevelTwo?.getAttribute("href")).toBe("/first-level-two")
+    expect(subItemList.length).toBe(2)
+    expect(firstSubItem).toBeVisible()
+    expect(secondSubItem).toBeVisible()
 
-    expect(secondLevelTwo).toBeVisible()
-    expect(secondLevelTwo?.getAttribute("href")).toBe("/second-level-two")
+    expect(firstSubItem).toHaveAttribute("href", "/first-level-two")
+    expect(secondSubItem).toHaveAttribute("href", "/second-level-two")
   })
 
   it("allows to disable a menu item", async () => {
@@ -62,8 +66,8 @@ describe("NavbarSide", () => {
       { label: "disabled item", route: "/route", isDisabled: true },
     ]
 
-    const { queryByText } = await renderComponent({ menuItems })
-    const disabledItem = queryByText("disabled item")
+    await renderComponent({ menuItems })
+    const disabledItem = screen.queryByText("disabled item")
 
     expect(disabledItem?.getAttribute("disabled")).toBeDefined()
   })
@@ -74,13 +78,13 @@ describe("NavbarSide", () => {
         { label: "active item", route: { path: "/matching" } },
         { label: "passive item", route: { path: "/not-matching" } },
       ]
-      const { getByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: { path: "/matching" },
       })
 
-      expect(getByText("active item")).toHaveClass("bg-blue-200")
-      expect(getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
     })
 
     it("routes match also by name", async () => {
@@ -88,13 +92,13 @@ describe("NavbarSide", () => {
         { label: "active item", route: { name: "active" } },
         { label: "passive item", route: { name: "passive" } },
       ]
-      const { getByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: { name: "active" },
       })
 
-      expect(getByText("active item")).toHaveClass("bg-blue-200")
-      expect(getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
     })
 
     it("routes match includes hash if given", async () => {
@@ -102,13 +106,13 @@ describe("NavbarSide", () => {
         { label: "active item", route: { path: "/foo", hash: "#matching" } },
         { label: "passive item", route: { path: "/foo", hash: "#no-match" } },
       ]
-      const { getByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: { path: "/foo", hash: "#matching" },
       })
 
-      expect(getByText("active item")).toHaveClass("bg-blue-200")
-      expect(getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
     })
 
     it("ignores queries of any to match route", async () => {
@@ -118,12 +122,12 @@ describe("NavbarSide", () => {
           route: { name: "foo", query: { key: "value" } },
         },
       ]
-      const { getByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: { name: "foo", query: { key: "other-value" } },
       })
 
-      expect(getByText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
     })
 
     it("can also match with URL encoded hashes", async () => {
@@ -131,13 +135,13 @@ describe("NavbarSide", () => {
         { label: "active item", route: "/foo#matching" },
         { label: "passive item", route: "/foo#not-matching" },
       ]
-      const { getByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: { path: "/foo", hash: "#matching" },
       })
 
-      expect(getByText("active item")).toHaveClass("bg-blue-200")
-      expect(getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
     })
 
     it("ignore level one item if any of its level two matches active route ", async () => {
@@ -152,14 +156,16 @@ describe("NavbarSide", () => {
         },
       ]
 
-      const { getByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: "/matching#hash",
       })
 
-      expect(getByText("level one")).not.toHaveClass("bg-blue-200")
-      expect(getByText("first level two")).toHaveClass("bg-blue-200")
-      expect(getByText("second level two")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByText("level one")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByText("first level two")).toHaveClass("bg-blue-200")
+      expect(screen.getByText("second level two")).not.toHaveClass(
+        "bg-blue-200"
+      )
     })
   })
 
@@ -178,12 +184,12 @@ describe("NavbarSide", () => {
         },
       ]
 
-      const { queryByText } = await renderComponent({ menuItems })
+      await renderComponent({ menuItems })
 
-      expect(queryByText("first level one")).toBeVisible()
-      expect(queryByText("first level two")).not.toBeVisible()
-      expect(queryByText("second level one")).toBeVisible()
-      expect(queryByText("second level two")).not.toBeVisible()
+      expect(screen.queryByText("first level one")).toBeVisible()
+      expect(screen.queryByText("first level two")).not.toBeVisible()
+      expect(screen.queryByText("second level one")).toBeVisible()
+      expect(screen.queryByText("second level two")).not.toBeVisible()
     })
 
     it("shows all level two items of an active level one item", async () => {
@@ -203,16 +209,16 @@ describe("NavbarSide", () => {
         },
       ]
 
-      const { queryByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: "/matching",
       })
 
-      expect(queryByText("first level one")).toBeVisible()
-      expect(queryByText("first level two")).toBeVisible()
-      expect(queryByText("second level two")).toBeVisible()
-      expect(queryByText("second level one")).toBeVisible()
-      expect(queryByText("third level two")).not.toBeVisible()
+      expect(screen.queryByText("first level one")).toBeVisible()
+      expect(screen.queryByText("first level two")).toBeVisible()
+      expect(screen.queryByText("second level two")).toBeVisible()
+      expect(screen.queryByText("second level one")).toBeVisible()
+      expect(screen.queryByText("third level two")).not.toBeVisible()
     })
 
     it("shows all siblings of an active level two item", async () => {
@@ -232,16 +238,16 @@ describe("NavbarSide", () => {
         },
       ]
 
-      const { queryByText } = await renderComponent({
+      await renderComponent({
         menuItems,
         activeRoute: "/matching",
       })
 
-      expect(queryByText("first level one")).toBeVisible()
-      expect(queryByText("first level two")).toBeVisible()
-      expect(queryByText("second level two")).toBeVisible()
-      expect(queryByText("second level one")).toBeVisible()
-      expect(queryByText("third level two")).not.toBeVisible()
+      expect(screen.queryByText("first level one")).toBeVisible()
+      expect(screen.queryByText("first level two")).toBeVisible()
+      expect(screen.queryByText("second level two")).toBeVisible()
+      expect(screen.queryByText("second level one")).toBeVisible()
+      expect(screen.queryByText("third level two")).not.toBeVisible()
     })
   })
 })

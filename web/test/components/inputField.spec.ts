@@ -1,4 +1,4 @@
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import InputField from "@/components/InputField.vue"
 
 function renderComponent(options?: {
@@ -22,39 +22,40 @@ function renderComponent(options?: {
 
 describe("InputField", () => {
   it("shows input with given label", () => {
-    const { queryByLabelText } = renderComponent({ label: "test label" })
+    renderComponent({ label: "test label" })
 
-    const input = queryByLabelText("test label", { exact: false })
+    const input = screen.queryByLabelText("test label", { exact: false })
 
     expect(input).toBeInTheDocument()
   })
 
   it("shows input with given label and required text", () => {
-    const { queryByLabelText } = renderComponent({
+    renderComponent({
       label: "test label",
       required: true,
     })
 
-    const input = queryByLabelText("test label *", { exact: false })
+    const input = screen.queryByLabelText("test label *", { exact: false })
     expect(input).toBeInTheDocument()
   })
 
   it("shows input with given error message", () => {
-    const { queryByText } = renderComponent({ errorMessage: "error message" })
+    renderComponent({ errorMessage: "error message" })
 
-    const icon = queryByText("error message")
+    const icon = screen.queryByText("error message")
 
     expect(icon).toBeInTheDocument()
   })
 
   it("injects given input element into slot", () => {
-    const { container } = renderComponent({
-      slot: "<template v-slot='slotProps'><input v-bind='slotProps' type='radio' /></template>",
+    renderComponent({
+      slot: "<template v-slot='slotProps'><input aria-label='test-input' v-bind='slotProps' type='radio' /></template>",
       id: "test-identifier",
       label: "test label",
     })
 
-    const input = container.getElementsByTagName("input")[0] as HTMLInputElement
+    const input = screen.getByLabelText("test-input") as HTMLInputElement
+
     expect(input).toBeInTheDocument()
     expect(input?.type).toBe("radio")
   })
@@ -63,7 +64,6 @@ describe("InputField", () => {
     renderComponent({
       id: "test",
     })
-    const labels = document.getElementsByTagName("LABEL")
-    expect(labels.length).toBe(0)
+    expect(screen.queryByLabelText("test")).not.toBeInTheDocument
   })
 })

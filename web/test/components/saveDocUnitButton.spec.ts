@@ -17,31 +17,31 @@ describe("SaveDocumentUnitButton", () => {
     expect(emitted().updateDocumentUnit).toBeTruthy()
   })
   it("renders with on update status", async () => {
-    const { getByText } = await render(SaveDocumentUnitButton, {
+    await render(SaveDocumentUnitButton, {
       props: {
         ariaLabel: "Foo",
         updateStatus: 1,
       },
     })
-    getByText("Daten werden gespeichert")
+    screen.getByText("Daten werden gespeichert")
   })
   it("renders with has update error status", async () => {
-    const { getByText } = await render(SaveDocumentUnitButton, {
+    await render(SaveDocumentUnitButton, {
       props: {
         ariaLabel: "Foo",
         updateStatus: 400,
       },
     })
-    getByText("Fehler beim Speichern")
+    screen.getByText("Fehler beim Speichern")
   })
-  it("renders with update succeed status", async () => {
-    const { getByText } = await render(SaveDocumentUnitButton, {
+  it("renders feedback when saving was successful", async () => {
+    await render(SaveDocumentUnitButton, {
       props: {
         ariaLabel: "Foo",
         updateStatus: 200,
       },
     })
-    const label = getByText("Zuletzt gespeichert um", { exact: false })
-    expect(label.firstElementChild?.className).toEqual("on-succeed")
+    expect(screen.getByText("Zuletzt gespeichert um", { exact: false }))
+      .toBeVisible
   })
 })

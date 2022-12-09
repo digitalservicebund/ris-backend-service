@@ -1,4 +1,4 @@
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import NormsList from "@/components/NormsList.vue"
 
 vi.mock("vue-router")
@@ -9,10 +9,10 @@ describe("norms list", () => {
       { officialLongTitle: "first title", guid: "first guid" },
       { officialLongTitle: "second title", guid: "second guid" },
     ]
-    const { queryByText } = renderComponent({ norms })
+    renderComponent({ norms })
 
-    const firstEntry = queryByText("first title")
-    const secondEntry = queryByText("second title")
+    const firstEntry = screen.queryByText("first title")
+    const secondEntry = screen.queryByText("second title")
 
     expect(firstEntry).toBeVisible()
     expect(secondEntry).toBeVisible()

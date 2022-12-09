@@ -7,17 +7,17 @@ const MODAL_CONFIRM_BTN_TEXT = "Löschen"
 const MODAL_CANCEL_BTN_TEXT = "Abbrechen"
 describe("popup modal", () => {
   test("popup modal should be rendered without error", async () => {
-    const { getByText } = render(PopupModal, {
+    render(PopupModal, {
       props: {
         headerText: MODAL_HEADER_TEXT,
         contentText: MODAL_CONTENT_TEXT,
         confirmText: MODAL_CONFIRM_BTN_TEXT,
       },
     })
-    getByText(MODAL_HEADER_TEXT)
-    getByText(MODAL_CONTENT_TEXT)
-    getByText(MODAL_CONFIRM_BTN_TEXT)
-    getByText(MODAL_CANCEL_BTN_TEXT)
+    screen.getByText(MODAL_HEADER_TEXT)
+    screen.getByText(MODAL_CONTENT_TEXT)
+    screen.getByText(MODAL_CONFIRM_BTN_TEXT)
+    screen.getByText(MODAL_CANCEL_BTN_TEXT)
   })
 
   test("popup modal closed by pressing Abbrechen button", async () => {
@@ -32,14 +32,14 @@ describe("popup modal", () => {
   })
 
   test("popup modal closed by pressing escape button", async () => {
-    const { emitted, getByText } = render(PopupModal, {
+    const { emitted } = render(PopupModal, {
       props: {
         headerText: MODAL_HEADER_TEXT,
         contentText: MODAL_CONTENT_TEXT,
         confirmText: MODAL_CONFIRM_BTN_TEXT,
       },
     })
-    await fireEvent.keyDown(getByText(MODAL_HEADER_TEXT), {
+    await fireEvent.keyDown(screen.getByText(MODAL_HEADER_TEXT), {
       key: "Escape",
       code: "Escape",
       keyCode: 27,

@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import InputGroup from "@/components/InputGroup.vue"
 import type { InputField } from "@/domain"
 import { generateTextInputField } from "~/test-helper/dataGenerators"
@@ -12,9 +12,9 @@ function renderComponent(options?: {
     fields: options?.fields ?? [],
     modelValue: options?.modelValue ?? {},
   }
-  const renderResult = render(InputGroup, { props })
+  const utils = render(InputGroup, { props })
   const user = userEvent.setup()
-  return { user, ...renderResult }
+  return { user, ...utils }
 }
 
 describe("InputFieldGroup", () => {
@@ -23,10 +23,10 @@ describe("InputFieldGroup", () => {
       generateTextInputField({ inputAttributes: { ariaLabel: "Foo Label" } }),
       generateTextInputField({ inputAttributes: { ariaLabel: "Bar Label" } }),
     ]
-    const { queryByLabelText } = renderComponent({ fields })
+    renderComponent({ fields })
 
-    const fooInput = queryByLabelText("Foo Label")
-    const barInput = queryByLabelText("Bar Label")
+    const fooInput = screen.queryByLabelText("Foo Label")
+    const barInput = screen.queryByLabelText("Bar Label")
 
     expect(fooInput).toBeInTheDocument()
     expect(barInput).toBeInTheDocument()
@@ -38,9 +38,9 @@ describe("InputFieldGroup", () => {
       generateTextInputField({ inputAttributes: { ariaLabel: "Bar Label" } }),
       generateTextInputField({ inputAttributes: { ariaLabel: "Baz Label" } }),
     ]
-    const { queryAllByRole } = renderComponent({ fields })
+    renderComponent({ fields })
 
-    const inputs = queryAllByRole("textbox")
+    const inputs = screen.queryAllByRole("textbox")
 
     expect(inputs[0]).toContainHTML("Foo Label")
     expect(inputs[1]).toContainHTML("Bar Label")
@@ -53,10 +53,10 @@ describe("InputFieldGroup", () => {
       generateTextInputField({ name: "bar" }),
     ]
     const modelValue = { foo: "foo value", bar: "bar value" }
-    const { queryByDisplayValue } = renderComponent({ fields, modelValue })
+    renderComponent({ fields, modelValue })
 
-    const fooInput = queryByDisplayValue("foo value")
-    const barInput = queryByDisplayValue("bar value")
+    const fooInput = screen.queryByDisplayValue("foo value")
+    const barInput = screen.queryByDisplayValue("bar value")
 
     expect(fooInput).toBeInTheDocument()
     expect(barInput).toBeInTheDocument()
@@ -65,9 +65,9 @@ describe("InputFieldGroup", () => {
   it("shows empty value for inputs with missing model value entry", () => {
     const fields = [generateTextInputField({ name: "foo" })]
     const modelValue = {}
-    const { getByRole } = renderComponent({ fields, modelValue })
+    renderComponent({ fields, modelValue })
 
-    const input = getByRole("textbox")
+    const input = screen.getByRole("textbox")
 
     expect(input).toHaveValue("")
   })
@@ -75,12 +75,12 @@ describe("InputFieldGroup", () => {
   it("emits update model value event when input value changes", async () => {
     const fields = [generateTextInputField({ name: "foo" })]
     const modelValue = { foo: "ab" }
-    const { emitted, user, getByRole } = renderComponent({
+    const { emitted, user } = renderComponent({
       fields,
       modelValue,
     })
 
-    const input = getByRole("textbox")
+    const input = screen.getByRole("textbox")
     await user.type(input, "c")
     await userEvent.tab()
 
@@ -91,12 +91,12 @@ describe("InputFieldGroup", () => {
   it("emits a model update event also for inputs without model value entry", async () => {
     const fields = [generateTextInputField({ name: "foo" })]
     const modelValue = {}
-    const { emitted, user, getByRole } = renderComponent({
+    const { emitted, user } = renderComponent({
       fields,
       modelValue,
     })
 
-    const input = getByRole("textbox")
+    const input = screen.getByRole("textbox")
     await user.type(input, "a")
     await userEvent.tab()
 

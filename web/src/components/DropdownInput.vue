@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
 import { Court } from "@/domain/documentUnit"
 import type { DropdownItem } from "@/domain/types"
 import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
@@ -61,6 +61,9 @@ const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
+const ariaLabelDropdownIcon = computed(() =>
+  isShowDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
+)
 
 const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
@@ -206,6 +209,7 @@ onBeforeUnmount(() => {
           </span>
         </button>
         <button
+          :aria-label="ariaLabelDropdownIcon"
           class="input-expand-icon"
           tabindex="0"
           @click="toggleDropdown"
@@ -230,6 +234,7 @@ onBeforeUnmount(() => {
       <div
         v-for="(item, index) in currentItems"
         :key="index"
+        aria-label="dropdown-option"
         class="dropdown-container__dropdown-item"
         :class="{
           'dropdown-container__dropdown-item__with-additional-info':
@@ -245,6 +250,7 @@ onBeforeUnmount(() => {
           {{ item.text }}
           <span
             v-if="isRevokedCourt(item)"
+            aria-label="additional-dropdown-info"
             class="body-02-reg dropdown-container__dropdown-item__additional-info"
             >{{ getRevokedCourtString(item) }}</span
           ></span
