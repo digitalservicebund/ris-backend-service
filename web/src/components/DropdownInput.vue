@@ -64,6 +64,7 @@ const focusedItemIndex = ref<number>(0)
 
 const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
+  focusedItemIndex.value = 0
   if (isShowDropdown.value) {
     updateCurrentItems()
     inputFieldRef.value?.focus()
@@ -103,6 +104,7 @@ const keydown = () => {
 }
 
 const onTextChange = () => {
+  focusedItemIndex.value = 0
   isShowDropdown.value = true
   filter.value = inputText.value
   updateCurrentItems()
@@ -182,6 +184,7 @@ onBeforeUnmount(() => {
           tabindex="0"
           @click="selectAllText"
           @input="onTextChange"
+          @keyup.down="keydown"
         />
         <button
           v-if="isCombobox && inputText"
