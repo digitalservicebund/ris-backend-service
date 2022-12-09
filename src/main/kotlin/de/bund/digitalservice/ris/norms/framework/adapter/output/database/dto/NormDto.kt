@@ -124,8 +124,8 @@ data class NormDto(
     var printAnnouncementExplanations: String? = null,
     @Column("digital_announcement_medium")
     var digitalAnnouncementMedium: String? = null,
-    @Column("digital_accouncement_date")
-    var digitalAccouncementDate: LocalDate? = null,
+    @Column("digital_announcement_date")
+    var digitalAnnouncementDate: LocalDate? = null,
     @Column("digital_announcement_edition")
     var digitalAnnouncementEdition: String? = null,
     @Column("digital_announcement_year")

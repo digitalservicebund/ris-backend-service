@@ -67,7 +67,7 @@ classDiagram
     String printAnnouncementInfo
     String printAnnouncementExplanations
     String digitalAnnouncementMedium
-    Date digitalAccouncementDate
+    Date digitalAnnouncementDate
     String digitalAnnouncementEdition
     String digitalAnnouncementYear
     String digitalAnnouncementPage

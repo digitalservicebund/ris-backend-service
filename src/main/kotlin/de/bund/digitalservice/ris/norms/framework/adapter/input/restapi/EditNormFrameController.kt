@@ -96,7 +96,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var printAnnouncementInfo: String? = null
         var printAnnouncementExplanations: String? = null
         var digitalAnnouncementMedium: String? = null
-        var digitalAccouncementDate: String? = null
+        var digitalAnnouncementDate: String? = null
         var digitalAnnouncementEdition: String? = null
         var digitalAnnouncementYear: String? = null
         var digitalAnnouncementPage: String? = null
@@ -187,7 +187,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.expirationNormCategory, decodeLocalDate(this.announcementDate), decodeLocalDate(this.publicationDate), decodeLocalDate(this.citationDate),
                 this.printAnnouncementGazette, this.printAnnouncementYear, this.printAnnouncementNumber,
                 this.printAnnouncementPage, this.printAnnouncementInfo, this.printAnnouncementExplanations,
-                this.digitalAnnouncementMedium, decodeLocalDate(this.digitalAccouncementDate), this.digitalAnnouncementEdition,
+                this.digitalAnnouncementMedium, decodeLocalDate(this.digitalAnnouncementDate), this.digitalAnnouncementEdition,
                 this.digitalAnnouncementYear, this.digitalAnnouncementPage, this.digitalAnnouncementArea,
                 this.digitalAnnouncementAreaNumber, this.digitalAnnouncementInfo, this.digitalAnnouncementExplanations,
                 this.euAnnouncementGazette, this.euAnnouncementYear, this.euAnnouncementSeries,

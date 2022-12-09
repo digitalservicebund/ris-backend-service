@@ -72,7 +72,7 @@ interface EditNormFrameUseCase {
         var printAnnouncementInfo: String? = null,
         var printAnnouncementExplanations: String? = null,
         var digitalAnnouncementMedium: String? = null,
-        var digitalAccouncementDate: LocalDate? = null,
+        var digitalAnnouncementDate: LocalDate? = null,
         var digitalAnnouncementEdition: String? = null,
         var digitalAnnouncementYear: String? = null,
         var digitalAnnouncementPage: String? = null,

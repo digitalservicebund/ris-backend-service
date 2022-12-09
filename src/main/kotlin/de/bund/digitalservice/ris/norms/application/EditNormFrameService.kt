@@ -29,7 +29,7 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
                 properties.expirationNormCategory, properties.announcementDate, properties.publicationDate, properties.citationDate,
                 properties.printAnnouncementGazette, properties.printAnnouncementYear, properties.printAnnouncementNumber,
                 properties.printAnnouncementPage, properties.printAnnouncementInfo, properties.printAnnouncementExplanations,
-                properties.digitalAnnouncementMedium, properties.digitalAccouncementDate, properties.digitalAnnouncementEdition,
+                properties.digitalAnnouncementMedium, properties.digitalAnnouncementDate, properties.digitalAnnouncementEdition,
                 properties.digitalAnnouncementYear, properties.digitalAnnouncementPage, properties.digitalAnnouncementArea,
                 properties.digitalAnnouncementAreaNumber, properties.digitalAnnouncementInfo, properties.digitalAnnouncementExplanations,
                 properties.euAnnouncementGazette, properties.euAnnouncementYear, properties.euAnnouncementSeries,

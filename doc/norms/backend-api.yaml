@@ -350,7 +350,7 @@ components:
             digitalAnnouncementMedium:
               type: string
               example: ""
-            digitalAccouncementDate:
+            digitalAnnouncementDate:
               $ref: "#/components/schemas/Date"
             digitalAnnouncementEdition:
               type: string
