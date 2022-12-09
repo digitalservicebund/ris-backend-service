@@ -143,6 +143,8 @@ fileignoreconfig:
     checksum: 47bfc1ce1d770f7f4afcb61fa9a0566fda4d234f1eae90e0be8f124663ab5ca9
   - filename: src/main/resources/db/migration/V0.15__norms_rename_digitalAccouncementDate_fields.sql
     checksum: 8427174186b782f60c37c01f0738158e12ca19182aac6e1554a61d7765ada657
+  - filename: src/main/resources/db/migration/V0.16__norms_resize_otherfootnote_field.sql
+    checksum: a3c395357ffe854d65f419645a617b90ae1c965238e53d1615ce7bffcd36874e
 
 scopeconfig:
   - scope: node
