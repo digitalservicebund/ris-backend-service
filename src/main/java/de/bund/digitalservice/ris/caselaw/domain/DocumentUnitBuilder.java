@@ -79,6 +79,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getCategory(),
             documentUnitDTO.getProcedure(),
             documentUnitDTO.getEcli(),
+            documentUnitDTO.getDeviatingEclis(),
             documentUnitDTO.getAppraisalBody(),
             documentUnitDTO.getDecisionDate() != null
                 ? Instant.parse(documentUnitDTO.getDecisionDate())

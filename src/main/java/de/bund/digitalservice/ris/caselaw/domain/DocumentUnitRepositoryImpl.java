@@ -10,11 +10,15 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
 
   private final DatabaseDocumentUnitRepository repository;
   private final FileNumberRepository fileNumberRepository;
+  private final DeviatingEcliRepository deviatingEcliRepository;
 
   public DocumentUnitRepositoryImpl(
-      DatabaseDocumentUnitRepository repository, FileNumberRepository fileNumberRepository) {
+      DatabaseDocumentUnitRepository repository,
+      FileNumberRepository fileNumberRepository,
+      DeviatingEcliRepository deviatingEcliRepository) {
     this.repository = repository;
     this.fileNumberRepository = fileNumberRepository;
+    this.deviatingEcliRepository = deviatingEcliRepository;
   }
 
   private Mono<DocumentUnitDTO> injectFileNumbers(DocumentUnitDTO documentUnitDTO) {
@@ -37,14 +41,32 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
             });
   }
 
+  private Mono<DocumentUnitDTO> injectDeviatingEclis(DocumentUnitDTO documentUnitDTO) {
+    return deviatingEcliRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            deviatingEclis -> {
+              documentUnitDTO.setDeviatingEclis(
+                  deviatingEclis.stream().map(DeviatingEcliDTO::getEcli).toList());
+              return Mono.just(documentUnitDTO);
+            });
+  }
+
   @Override
   public Mono<DocumentUnitDTO> findByDocumentnumber(String documentnumber) {
-    return repository.findByDocumentnumber(documentnumber).flatMap(this::injectFileNumbers);
+    return repository
+        .findByDocumentnumber(documentnumber)
+        .flatMap(this::injectFileNumbers)
+        .flatMap(this::injectDeviatingEclis);
   }
 
   @Override
   public Mono<DocumentUnitDTO> findByUuid(UUID uuid) {
-    return repository.findByUuid(uuid).flatMap(this::injectFileNumbers);
+    return repository
+        .findByUuid(uuid)
+        .flatMap(this::injectFileNumbers)
+        .flatMap(this::injectDeviatingEclis);
   }
 
   @Override
@@ -92,12 +114,34 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
                           .toList())
                   .collectList()
                   .map(f -> duDTO);
+            })
+        .flatMap(
+            duDTO ->
+                deviatingEcliRepository.deleteAllByDocumentUnitId(duDTO.getId()).thenReturn(duDTO))
+        .flatMap(
+            duDTO -> {
+              if (documentUnitDTO.getDeviatingEclis() == null) {
+                return Mono.just(duDTO);
+              }
+              return deviatingEcliRepository
+                  .saveAll(
+                      documentUnitDTO.getDeviatingEclis().stream()
+                          .map(
+                              deviatingEcli ->
+                                  DeviatingEcliDTO.builder()
+                                      .documentUnitId(duDTO.getId())
+                                      .ecli(deviatingEcli)
+                                      .build())
+                          .toList())
+                  .collectList()
+                  .map(f -> duDTO);
             });
   }
 
   @Override
   public Mono<Void> delete(DocumentUnitDTO documentUnitDTO) {
-    // CASCADE takes care of deleting the entry in the FileNumberRepository
+    // CASCADE takes care of deleting the connected entries in the FileNumberRepository and
+    // DeviatingEcliRepository
     return repository.delete(documentUnitDTO);
   }
 }

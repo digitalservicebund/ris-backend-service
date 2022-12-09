@@ -1,8 +1,10 @@
 package norms.utils
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
+import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.EditNormFrameController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ImportNormController
 import decodeLocalDate
 import org.junit.jupiter.api.Assertions.assertTrue
 import java.time.LocalDate
@@ -14,17 +16,19 @@ fun assertEditNormFrameProperties(commandProperties: EditNormFrameUseCase.NormFr
     }
 }
 
-fun assertEditNormFramePropertiesAndEditNormFrameRequestSchema(normFrameProperties: EditNormFrameUseCase.NormFrameProperties, normFrameRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema) {
+fun assertEditNormFramePropertiesAndEditNormRequestSchema(normFrameProperties: EditNormFrameUseCase.NormFrameProperties, normFrameRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema) {
     val normFrameRequestSchemaMembers = EditNormFrameController.NormFramePropertiesRequestSchema::class.memberProperties
     val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
         val found = normFrameRequestSchemaMembers.find { normFrameRequestSchemaMember ->
             normFramePropertiesMember.name == normFrameRequestSchemaMember.name
         }
-        if (normFramePropertiesMember.get(normFrameProperties) is LocalDate) {
-            assertTrue(normFramePropertiesMember.get(normFrameProperties) == decodeLocalDate(found?.get(normFrameRequestSchema).toString()))
-        } else {
-            assertTrue(normFramePropertiesMember.get(normFrameProperties) == found?.get(normFrameRequestSchema))
+        when (val normFramePropertiesMemberValue = normFramePropertiesMember.get(normFrameProperties)) {
+            is LocalDate ->
+                assertTrue(normFramePropertiesMemberValue == decodeLocalDate(found?.get(normFrameRequestSchema).toString()))
+            else -> {
+                assertTrue(normFramePropertiesMemberValue == found?.get(normFrameRequestSchema))
+            }
         }
     }
 }
@@ -37,5 +41,22 @@ fun assertNormAndEditNormFrameProperties(norm: Norm, normFrameProperties: EditNo
             normFramePropertiesMember.name == normMember.name
         }
         assertTrue(normFramePropertiesMember.get(normFrameProperties) == found?.get(norm))
+    }
+}
+
+fun assertNormDataAndImportNormRequestSchemaWithoutArticles(normData: ImportNormUseCase.NormData, importNormRequestSchema: ImportNormController.NormRequestSchema) {
+    val normDataMembers = ImportNormUseCase.NormData::class.memberProperties
+    val importNormRequestSchemaMembers = ImportNormController.NormRequestSchema::class.memberProperties
+    normDataMembers.filter { it.name != "articles" }.forEach { normDataMember ->
+        val found = importNormRequestSchemaMembers.find { importNormRequestSchemaMember ->
+            normDataMember.name == importNormRequestSchemaMember.name
+        }
+        when (val normDataMemberValue = normDataMember.get(normData)) {
+            is LocalDate ->
+                assertTrue(normDataMemberValue == decodeLocalDate(found?.get(importNormRequestSchema).toString()))
+            else -> {
+                assertTrue(normDataMemberValue == found?.get(importNormRequestSchema))
+            }
+        }
     }
 }

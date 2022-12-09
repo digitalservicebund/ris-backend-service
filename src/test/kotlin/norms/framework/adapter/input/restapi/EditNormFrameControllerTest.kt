@@ -4,9 +4,9 @@ import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import io.mockk.every
 import io.mockk.verify
-import norms.utils.assertEditNormFramePropertiesAndEditNormFrameRequestSchema
-import norms.utils.convertNormFrameRequestSchemaToJson
-import norms.utils.createRandomNormFramePropertiesRequestSchema
+import norms.utils.assertEditNormFramePropertiesAndEditNormRequestSchema
+import norms.utils.convertEditNormRequestSchemaToJson
+import norms.utils.createRandomEditNormRequestSchema
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -31,8 +31,8 @@ class EditNormFrameControllerTest {
 
     @Test
     fun `it correctly maps the parameter and body to the command calling the service`() {
-        val normFramePropertiesRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema = createRandomNormFramePropertiesRequestSchema()
-        val editJson = convertNormFrameRequestSchemaToJson(normFramePropertiesRequestSchema)
+        val editNormRequestSchema = createRandomEditNormRequestSchema()
+        val editJson = convertEditNormRequestSchemaToJson(editNormRequestSchema)
 
         every { editNormFrameService.editNormFrame(any()) } returns Mono.just(true)
 
@@ -48,7 +48,7 @@ class EditNormFrameControllerTest {
             editNormFrameService.editNormFrame(
                 withArg {
                     assertTrue(it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
-                    assertEditNormFramePropertiesAndEditNormFrameRequestSchema(it.properties, normFramePropertiesRequestSchema)
+                    assertEditNormFramePropertiesAndEditNormRequestSchema(it.properties, editNormRequestSchema)
                 }
             )
         }

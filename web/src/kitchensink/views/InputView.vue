@@ -1,41 +1,62 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
+import ChipsInput from "@/components/ChipsInput.vue"
+import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
-import InputElement from "@/components/InputElement.vue"
-import InputField from "@/components/InputField.vue"
+import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
 import type {
   DropdownInputModelType,
-  InputAttributes,
-  ModelType,
+  DateInputModelType,
+  ChipsInputModelType,
 } from "@/domain"
-import { InputType, ValidationError, defineTextField } from "@/domain"
+import {
+  ValidationError,
+  defineDateField,
+  NestedInputAttributes,
+} from "@/domain"
 import type { DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 
 const items: DropdownItem[] = dropdownItems.items
-const modelValue1 = ref<DropdownInputModelType>()
-const modelValue2 = ref<ModelType>()
+const dropdownModelValue = ref<DropdownInputModelType>()
+const dateModelValue = ref<DateInputModelType>()
+const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const isReadonly = ref(true)
 const mockValidationError: ValidationError = {
   defaultMessage: "wrong date",
   field: "coreData.decisionDate",
 }
-const updateValue1 = (textValue: DropdownInputModelType | undefined) => {
-  if (!!textValue) modelValue1.value = textValue
+const nestedInputFields: NestedInputAttributes["fields"] = {
+  parent: defineDateField(
+    "decisionDate",
+    "Entscheidungsdatum",
+    "Entscheidungsdatum",
+    true,
+    undefined
+  ),
+  child: defineDateField(
+    "decisionDate",
+    "Entscheidungsdatum",
+    "Entscheidungsdatum",
+    true,
+    undefined
+  ),
 }
-const updateValue2 = (textValue: ModelType | undefined) => {
-  if (!!textValue) modelValue2.value = textValue
+
+const updateDropdownModelValue = (
+  textValue: DropdownInputModelType | undefined
+) => {
+  if (!!textValue) dropdownModelValue.value = textValue
 }
-const textInputAttribute: InputAttributes = {
-  ariaLabel: "text input",
-  placeholder: "This is a text field",
+
+const updateDateModelValue = (textValue: DateInputModelType | undefined) => {
+  if (!!textValue) dateModelValue.value = textValue
 }
-const dropdownInputAttribute: InputAttributes = {
-  ariaLabel: "text input",
-  placeholder: "This is a dropdown",
-  dropdownItems: items,
+
+const updateChipsModelValue = (textValue: ChipsInputModelType | undefined) => {
+  if (!!textValue) chipsModelValue.value = textValue
 }
 </script>
 
@@ -77,91 +98,41 @@ const dropdownInputAttribute: InputAttributes = {
         value=""
       />
     </div>
-    <div>
-      <TextInput
-        id="textInputWithValue"
-        aria-label="text input"
-        :sub-field="
-          defineTextField(
-            'testField',
-            'Divergent Subfield',
-            'Divergent Subfield',
-            true
-          )
-        "
-        value="this input has a subcategory"
-      />
-    </div>
-
+    <h1 class="font-bold text-24">Date Input</h1>
+    <DateInput
+      id="dateInput"
+      aria-label="date input"
+      :model-value="dateModelValue"
+      :value="dateModelValue"
+      @update:model-value="updateDateModelValue"
+    ></DateInput>
     <h1 class="font-bold text-24">Dropdown Input</h1>
     <div class="pb-4">
       <DropdownInput
         id="dropdownInput"
         aria-label="dropdown input"
         :dropdown-items="items"
-        :model-value="modelValue1"
+        :model-value="dropdownModelValue"
         placeholder="Bitte auswählen"
-        :value="modelValue1"
-        @update:model-value="updateValue1"
+        :value="dropdownModelValue"
+        @update:model-value="updateDropdownModelValue"
       />
     </div>
-    <h1 class="font-bold text-24">Input Element</h1>
-    <span class="text-20">Type="Textfield"</span>
-    <InputElement
-      id="text"
-      :attributes="textInputAttribute"
-      :type="InputType.TEXT"
-    />
-    <span class="text-20">Type="Dropdown"</span>
-    <div class="pb-4">
-      <InputElement
-        id="dropdown"
-        :attributes="dropdownInputAttribute"
-        :type="InputType.DROPDOWN"
-        :value="modelValue2"
-        @update:model-value="updateValue2"
-      />
+    <h1 class="font-bold text-24">Chips Input</h1>
+    <ChipsInput
+      id="chipsInput"
+      aria-label="chips input"
+      :model-value="chipsModelValue"
+      :value="chipsModelValue"
+      @update:model-value="updateChipsModelValue"
+    ></ChipsInput>
+    <h1 class="font-bold text-24">Nested Input</h1>
+    <div class="mb-24">
+      <NestedInput
+        aria-label="Nested Input"
+        :fields="nestedInputFields"
+      ></NestedInput>
     </div>
-    <h1 class="font-bold text-24">Input Field</h1>
-    <InputField id="inputTextBox" label="This input field has only label"
-      ><InputElement
-        id="textlabel"
-        :attributes="textInputAttribute"
-        :type="InputType.TEXT"
-      />
-    </InputField>
-    <InputField
-      id="inputTextBox"
-      icon-name="location_on"
-      label="This input field is not required"
-      ><InputElement
-        id="notrequired"
-        :attributes="textInputAttribute"
-        :type="InputType.TEXT"
-      />
-    </InputField>
-    <InputField
-      id="inputTextBox"
-      icon-name="location_on"
-      label="This input field is required"
-      required
-      ><InputElement
-        id="required"
-        :attributes="textInputAttribute"
-        :type="InputType.TEXT"
-      />
-    </InputField>
-    <InputField
-      id="inputTextBox"
-      icon-name="location_on"
-      label="This input field is a dropdown"
-    >
-      <InputElement
-        id="dropdownInput"
-        :attributes="dropdownInputAttribute"
-        :type="InputType.DROPDOWN"
-      />
-    </InputField>
 
     <h1 class="font-bold text-24">Checkbox Input</h1>
 

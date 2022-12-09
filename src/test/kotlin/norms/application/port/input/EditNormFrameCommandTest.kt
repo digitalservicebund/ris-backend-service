@@ -20,7 +20,7 @@ class EditNormFrameCommandTest {
 
     @Test
     fun `can create command with optional fields`() {
-        val normFrameProperties: EditNormFrameUseCase.NormFrameProperties = createRandomNormFameProperties()
+        val normFrameProperties = createRandomNormFameProperties()
 
         val guid = UUID.randomUUID()
         val command = EditNormFrameUseCase.Command(guid, normFrameProperties)

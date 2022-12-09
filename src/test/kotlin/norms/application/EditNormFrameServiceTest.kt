@@ -38,7 +38,7 @@ class EditNormFrameServiceTest {
 
     @Test
     fun `it calls the output port to save the norm with changed title and optional fields`() {
-        val normFrameProperties: EditNormFrameUseCase.NormFrameProperties = createRandomNormFameProperties()
+        val normFrameProperties = createRandomNormFameProperties()
 
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)

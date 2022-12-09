@@ -60,11 +60,13 @@ public class DocumentUnitIntegrationTest {
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private FileNumberRepository fileNumberRepository;
+  @Autowired private DeviatingEcliRepository deviatingEcliRepository;
 
   @BeforeEach
   void setUp() {
     repository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
+    deviatingEcliRepository.deleteAll().block();
   }
 
   @Test
@@ -92,7 +94,7 @@ public class DocumentUnitIntegrationTest {
   }
 
   @Test
-  void testForCorrectDbEntriesAfterUpdateByUuid() {
+  void testForFileNumbersDbEntryAfterUpdateByUuid() {
     UUID uuid = UUID.randomUUID();
 
     DocumentUnitDTO dto =
@@ -139,5 +141,59 @@ public class DocumentUnitIntegrationTest {
         fileNumberRepository.findAllByDocumentUnitId(list.get(0).id).collectList().block();
     assertThat(fileNumberEntries).hasSize(1);
     assertThat(fileNumberEntries.get(0).getFileNumber()).isEqualTo("AkteX");
+  }
+
+  @Test
+  void testForDeviatingEcliDbEntryAfterUpdateByUuid() {
+    UUID uuid = UUID.randomUUID();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(uuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .build();
+
+    DocumentUnitDTO savedDto = repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .id(savedDto.id)
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(CoreData.builder().deviatingEclis(List.of("ecli123", "ecli456")).build())
+            .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody().coreData().deviatingEclis().get(0))
+                  .isEqualTo("ecli123");
+              assertThat(response.getResponseBody().coreData().deviatingEclis().get(1))
+                  .isEqualTo("ecli456");
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
+
+    List<DeviatingEcliDTO> deviatingEclis =
+        deviatingEcliRepository.findAllByDocumentUnitId(list.get(0).id).collectList().block();
+
+    assertThat(deviatingEclis).hasSize(2);
+    assertThat(deviatingEclis.get(0).getEcli()).isEqualTo("ecli123");
+    assertThat(deviatingEclis.get(1).getEcli()).isEqualTo("ecli456");
   }
 }
