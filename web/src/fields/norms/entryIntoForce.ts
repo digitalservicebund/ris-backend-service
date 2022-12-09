@@ -1,4 +1,5 @@
 import { InputField, InputType } from "@/domain"
+import { dropdown, undefinedDropDownItems } from "@/fields/norms/fieldGenerator"
 
 export const entryIntoForce: InputField[] = [
   {
@@ -9,44 +10,35 @@ export const entryIntoForce: InputField[] = [
       ariaLabel: "Datum des Inkrafttretens",
     },
   },
-  {
-    name: "entryIntoForceDateState",
-    type: InputType.DROPDOWN,
-    label: "Unbestimmtes Datum des Inkrafttretens",
-    inputAttributes: {
-      ariaLabel: "Unbestimmtes Datum des Inkrafttretens",
-    },
-  },
+  dropdown(
+    "entryIntoForceDateState",
+    "Unbestimmtes Datum des Inkrafttretens",
+    undefinedDropDownItems
+  ),
   {
     name: "principleEntryIntoForceDate",
-    type: InputType.TEXT,
+    type: InputType.DATE,
     label: "Grundsätzliches Inkrafttretedatum",
     inputAttributes: {
       ariaLabel: "Grundsätzliches Inkrafttretedatum",
     },
   },
-  {
-    name: "principleEntryIntoForceDateState",
-    type: InputType.DROPDOWN,
-    label: "Unbestimmtes Grundsätzliches Inkrafttretedatum",
-    inputAttributes: {
-      ariaLabel: "Unbestimmtes Grundsätzliches Inkrafttretedatum",
-    },
-  },
+  dropdown(
+    "principleEntryIntoForceDateState",
+    "Unbestimmtes Grundsätzliches Inkrafttretedatum",
+    undefinedDropDownItems
+  ),
   {
     name: "divergentEntryIntoForceDate",
-    type: InputType.TEXT,
+    type: InputType.DATE,
     label: "Abweichendes Inkrafttretedatum",
     inputAttributes: {
       ariaLabel: "Abweichendes Inkrafttretedatum",
     },
   },
-  {
-    name: "divergentEntryIntoForceDateState",
-    type: InputType.DROPDOWN,
-    label: "Unbestimmtes Abweichendes Inkrafttretedatum",
-    inputAttributes: {
-      ariaLabel: "Unbestimmtes Abweichendes Inkrafttretedatum",
-    },
-  },
+  dropdown(
+    "divergentEntryIntoForceDateState",
+    "Unbestimmtes Abweichendes Inkrafttretedatum",
+    undefinedDropDownItems
+  ),
 ]

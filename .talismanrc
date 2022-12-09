@@ -1,6 +1,10 @@
 fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
+  - filename: web/src/utilities/normUtilities.ts
+    checksum: 81116ce9097165fc9534eada4c9a6842cdef5ee6e5667a05a7a72480cc817431
+  - filename: web/test/e2e/norms/testdata/norm_edited_fields.json
+    checksum: 2f4d5d20b8c7d623b10ff0bc51ff53bd202fd790fa35d8a383165b5673996cb5
   - filename: build.gradle
     checksum: 6bacfc3dee66f93bcd47e194cde9283344720acf727e0530c409e5c6e071e8b0
   - filename: run.sh
@@ -66,7 +70,7 @@ fileignoreconfig:
   - filename: web/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: web/test/test-helper/dataGenerators.ts
-    checksum: 16e46413ee49c4c9fb05d316ba084962d06eaf082e7b9e1fe75ff76419f9257c
+    checksum: 1e3c6a42728ea1cd3aee5080b355be084ba7c50ca74e845e1e7f404df75c82af
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: a7f18e6362eb0738d975bea6e2b235a22b64750d119e0e16a47719304134a44a
   - filename: web/src/data/courts.json
@@ -122,9 +126,9 @@ fileignoreconfig:
   - filename: web/src/stores/loadedNorm.ts
     checksum: e4acaebeadbb4b178008672148af32c7507bacc19f93bdde15a06ca352928278
   - filename: web/test/stores/loadedNorm.spec.ts
-    checksum: 1cf78c87f8cb44f13379ca84c0b3c5500e18a8a92159587b9f39ef7ca0c55682
+    checksum: 59895ce7ab328eabe145a79e364a449f32fcd4ac748aa038eb026ddcfd84d646
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
-    checksum: cec2d13117312bd551eea45b9501c6d525b4c9019544d26a78b06ae1c54c019a
+    checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
     checksum: 5abe6438ebc906ee3fd3cc464de0f1fb5624ad09fd330d881d3195ec0ca14577
   - filename: web/src/components/DocumentUnitCoreData.vue

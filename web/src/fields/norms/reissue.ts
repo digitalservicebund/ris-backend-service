@@ -18,7 +18,7 @@ export const reissue: InputField[] = [
     },
   },
   {
-    name: "Bezeichnung der Bekanntmachung",
+    name: "reissueDate",
     type: InputType.DATE,
     label: "Datum der Bekanntmachung",
     inputAttributes: {

@@ -10,7 +10,7 @@ export const digitalAnnouncement: InputField[] = [
     },
   },
   {
-    name: "digitalAccouncementDate",
+    name: "digitalAnnouncementDate",
     type: InputType.DATE,
     label: "Verkündungsdatum",
     inputAttributes: {

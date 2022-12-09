@@ -76,8 +76,8 @@ describe("loadedNorm", () => {
       announcementDate: "test announcement date",
       citationDate: "test citation date",
       frameKeywords: "test frame keywords",
-      providerEntity: "test provider entity",
-      providerDecidingBody: "test provider deciding body",
+      providerEntity: "test author entity",
+      providerDecidingBody: "test author deciding body",
       providerIsResolutionMajority: true,
       leadJurisdiction: "test lead jurisdiction",
       leadUnit: "test lead unit",
@@ -97,29 +97,7 @@ describe("loadedNorm", () => {
     await store.update()
 
     expect(editNormFrame).toHaveBeenCalledOnce()
-    expect(editNormFrame).toHaveBeenLastCalledWith("test guid", {
-      officialLongTitle: "test long title",
-      officialShortTitle: "test official short title",
-      officialAbbreviation: "test official abbreviation",
-      referenceNumber: "test reference number",
-      publicationDate: "test publication date",
-      announcementDate: "test announcement date",
-      citationDate: "test citation date",
-      frameKeywords: "test frame keywords",
-      providerEntity: "test provider entity",
-      providerDecidingBody: "test provider deciding body",
-      providerIsResolutionMajority: true,
-      leadJurisdiction: "test lead jurisdiction",
-      leadUnit: "test lead unit",
-      participationType: "test participation type",
-      participationInstitution: "test participation institution",
-      documentTypeName: "test document type name",
-      documentNormCategory: "test document norm category",
-      documentTemplateName: "test document template name",
-      subjectFna: "test subject fna",
-      subjectPreviousFna: "test subject previous fna",
-      subjectGesta: "test subject gesta",
-      subjectBgb3: "test subject bgb3",
-    })
+    const { guid, articles, ...frameData } = norm
+    expect(editNormFrame).toHaveBeenLastCalledWith(guid, frameData)
   })
 })

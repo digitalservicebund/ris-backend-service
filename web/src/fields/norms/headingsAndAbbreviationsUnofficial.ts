@@ -1,6 +1,6 @@
-import { InputField, InputType } from "./types"
+import { InputField, InputType } from "@/domain"
 
-export const unofficialNormHeadlineFields: InputField[] = [
+export const headingsAndAbbreviationsUnofficial: InputField[] = [
   {
     name: "unofficialLongTitle",
     type: InputType.TEXT,

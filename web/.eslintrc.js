@@ -77,6 +77,10 @@ module.exports = {
         "vue/static-class-names-order": "error",
         "vue/v-for-delimiter-style": "error",
         "vue/v-on-function-call": "error",
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { ignoreRestSiblings: true },
+        ],
       },
     }, // ...and avoid linting TypeScript files with ES rules for JavaScript config files!
     {

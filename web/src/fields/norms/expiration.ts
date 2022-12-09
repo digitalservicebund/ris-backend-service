@@ -1,4 +1,5 @@
 import { InputField, InputType } from "@/domain"
+import { dropdown, undefinedDropDownItems } from "@/fields/norms/fieldGenerator"
 
 export const expiration: InputField[] = [
   {
@@ -9,14 +10,11 @@ export const expiration: InputField[] = [
       ariaLabel: "Datum des Außerkrafttretens",
     },
   },
-  {
-    name: "expirationDateState",
-    type: InputType.DROPDOWN,
-    label: "Unbestimmtes Datum des Außerkrafttretens",
-    inputAttributes: {
-      ariaLabel: "Unbestimmtes Datum des Außerkrafttretens",
-    },
-  },
+  dropdown(
+    "expirationDateState",
+    "Unbestimmtes Datum des Außerkrafttretens",
+    undefinedDropDownItems
+  ),
   {
     name: "isExpirationDateTemp",
     type: InputType.CHECKBOX,
@@ -33,14 +31,11 @@ export const expiration: InputField[] = [
       ariaLabel: "Grundsätzliches Außerkrafttretedatum",
     },
   },
-  {
-    name: "principleExpirationDateState",
-    type: InputType.DROPDOWN,
-    label: "Unbestimmtes Grundsätzliches Außerkrafttretdatum",
-    inputAttributes: {
-      ariaLabel: "Unbestimmtes Grundsätzliches Außerkrafttretdatum",
-    },
-  },
+  dropdown(
+    "principleExpirationDateState",
+    "Unbestimmtes Grundsätzliches Außerkrafttretdatum",
+    undefinedDropDownItems
+  ),
   {
     name: "divergentExpirationDate",
     type: InputType.DATE,
@@ -49,14 +44,11 @@ export const expiration: InputField[] = [
       ariaLabel: "Abweichendes Außerkrafttretedatum",
     },
   },
-  {
-    name: "divergentExpirationDateState",
-    type: InputType.DROPDOWN,
-    label: "Unbestimmtes Abweichendes Außerkrafttretdatum",
-    inputAttributes: {
-      ariaLabel: "Unbestimmtes Abweichendes Außerkrafttretdatum",
-    },
-  },
+  dropdown(
+    "divergentExpirationDateState",
+    "Unbestimmtes Abweichendes Außerkrafttretdatum",
+    undefinedDropDownItems
+  ),
   {
     name: "expirationNormCategory",
     type: InputType.TEXT,

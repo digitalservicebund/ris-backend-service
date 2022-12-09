@@ -1,8 +1,34 @@
 import { expect } from "@playwright/test"
 
 import { openNorm } from "./e2e-utils"
-import { testWithImportedNorm } from "./fixtures"
+import { getNormBySections, testWithImportedNorm } from "./fixtures"
 import normCleanCars from "./testdata/norm_clean_cars.json"
+
+const sections = getNormBySections(normCleanCars)
+
+async function expectInputFields(page, fields) {
+  for (const field of fields) {
+    await expect(
+      page.locator(`label:text-is("${field.label}")`).first()
+    ).toBeVisible()
+    if (field.isCheckbox) {
+      expect(await page.isChecked(`role=checkbox[name="${field.label}"]`)).toBe(
+        field.value ?? false
+      )
+    } else {
+      expect(await page.inputValue(`input#${field.name}`)).toBe(
+        field.value ?? ""
+      )
+    }
+  }
+}
+
+async function expectHeadingAppearAfterScroll(page, heading) {
+  const locator = page.locator(`a:text-is('${heading}')`)
+  await expect(locator).toBeVisible()
+  await locator.click()
+  await expect(page).toHaveInsideViewport(`h2:text-is("${heading}")`)
+}
 
 testWithImportedNorm(
   "Check display of norm complex",
@@ -42,194 +68,27 @@ testWithImportedNorm(
 
     await locatorFrameButton.click()
     await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
-
-    // Inner menu
-    // TODO Add new sections to inner menu
-    await expect(page.locator("a:has-text('Allgemeine Angaben')")).toBeVisible()
-    await expect(page.locator("a:has-text('Dokumenttyp')")).toBeVisible()
-    await expect(
-      page.locator("a:has-text('Überschriften und Abkürzungen')")
-    ).toBeVisible()
-    await expect(page.locator("a:has-text('Normgeber')")).toBeVisible()
-    await expect(page.locator("a:has-text('Federführung')")).toBeVisible()
-    await expect(page.locator("a:has-text('Sachgebiet')")).toBeVisible()
-    await expect(page.locator("a:has-text('Mitwirkende Organe')")).toBeVisible()
-
-    // Allgemeine Angaben
-    await expect(page.locator('h2:text-is("Allgemeine Angaben")')).toBeVisible()
-    await expect(page.locator('label:text-is("Aktenzeichen")')).toBeVisible()
-    await expect(page.locator('role=textbox[name="Aktenzeichen"]')).toBeEmpty()
-    await expect(
-      page.locator('label:text-is("Veröffentlichungsdatum")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Veröffentlichungsdatum"]')
-    ).toBeEmpty()
-    await expect(
-      page.locator('label:text-is("Verkündungsdatum")')
-    ).toBeVisible()
-    expect(await page.inputValue('role=textbox[name="Verkündungsdatum"]')).toBe(
-      normCleanCars.announcementDate
+    const locatorHeadingsButton = page.locator(
+      "#headingsAndAbbreviationsUnofficial"
     )
-    await expect(page.locator('label:text-is("Zitierdatum")')).toBeVisible()
-    expect(await page.inputValue('role=textbox[name="Zitierdatum"]')).toBe(
-      normCleanCars.citationDate
-    )
-    await expect(
-      page.locator('label:text-is("Schlagwörter im Rahmenelement")')
-    ).toBeVisible()
-    expect(
-      await page.inputValue(
-        'role=textbox[name="Schlagwörter im Rahmenelement"]'
-      )
-    ).toBe(normCleanCars.frameKeywords)
+    await expect(locatorHeadingsButton).toBeVisible()
+    await locatorHeadingsButton.click()
 
-    // Dokumenttyp
-    await expect(page.locator('h2:text-is("Dokumenttyp")')).toBeVisible()
-    await expect(page.locator('label:text-is("Typbezeichnung")')).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Typbezeichnung"]')
-    ).toBeEmpty()
-    await expect(page.locator('label:text-is("Art der Norm")')).toBeVisible()
-    await expect(page.locator('role=textbox[name="Art der Norm"]')).toBeEmpty()
-    await expect(
-      page.locator('label:text-is("Bezeichnung gemäß Vorlage")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Bezeichnung gemäß Vorlage"]')
-    ).toBeEmpty()
-
-    // Überschriften und Abkürzungen
-    await expect(
-      page.locator('h2:text-is("Überschriften und Abkürzungen")')
-    ).toBeVisible()
-    await expect(
-      page.locator('label:text-is("Amtliche Langüberschrift")')
-    ).toBeVisible()
-    expect(
-      await page.inputValue('role=textbox[name="Amtliche Langüberschrift"]')
-    ).toBe(normCleanCars.officialLongTitle)
-    await expect(
-      page.locator('label:text-is("Amtliche Kurzüberschrift")')
-    ).toBeVisible()
-    expect(
-      await page.inputValue('role=textbox[name="Amtliche Kurzüberschrift"]')
-    ).toBe(normCleanCars.officialShortTitle)
-    await expect(
-      page.locator('label:text-is("Amtliche Buchstabenabkürzung")')
-    ).toBeVisible()
-    expect(
-      await page.inputValue('role=textbox[name="Amtliche Buchstabenabkürzung"]')
-    ).toBe(normCleanCars.officialAbbreviation)
-    await expect(page.locator('label:text-is("RIS-Abkürzung")')).toBeVisible()
-    expect(await page.inputValue('role=textbox[name="RIS-Abkürzung"]')).toBe(
-      normCleanCars.risAbbreviation
-    )
-    // Hidden fields
-    const locatorHiddenh1 = page.locator(
-      'h2:text-is("Nichtamtliche Überschriften und Abkürzungen")'
-    )
-    await expect(locatorHiddenh1).toBeVisible()
-    await locatorHiddenh1.click()
-    await expect(
-      page.locator('label:text-is("Nichtamtliche Langüberschrift")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Nichtamtliche Langüberschrift"]')
-    ).toBeEmpty()
-    await expect(
-      page.locator('label:text-is("Nichtamtliche Kurzüberschrift")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Nichtamtliche Kurzüberschrift"]')
-    ).toBeEmpty()
-    await expect(
-      page.locator('label:text-is("Nichtamtliche Buchstabenabkürzung")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Nichtamtliche Buchstabenabkürzung"]')
-    ).toBeEmpty()
-
-    // Normgeber
-    await expect(page.locator('h2:text-is("Normgeber")')).toBeVisible()
-    await expect(
-      page.locator(
-        'label:text-is("Staat, Land, Stadt, Landkreis oder juristische Person")'
-      )
-    ).toBeVisible()
-    expect(
-      await page.inputValue(
-        'role=textbox[name="Staat, Land, Stadt, Landkreis oder juristische Person"]'
-      )
-    ).toBe(normCleanCars.providerEntity)
-    await expect(
-      page.locator('label:text-is("Beschließendes Organ")')
-    ).toBeVisible()
-    expect(
-      await page.inputValue('role=textbox[name="Beschließendes Organ"]')
-    ).toBe(normCleanCars.providerDecidingBody)
-    await expect(
-      page.locator(
-        'label:text-is("Beschlussfassung mit qualifizierter Mehrheit")'
-      )
-    ).toBeVisible()
-    expect(
-      await page.isChecked(
-        'role=checkbox[name="Beschlussfassung mit qualifizierter Mehrheit"]'
-      )
-    ).toBeTruthy()
-
-    // Federführung
-    await expect(page.locator('h2:text-is("Federführung")')).toBeVisible()
-    await expect(page.locator('label:text-is("Ressort")')).toBeVisible()
-    expect(await page.inputValue('role=textbox[name="Ressort"]')).toBe(
-      normCleanCars.leadJurisdiction
-    )
-    await expect(
-      page.locator('label:text-is("Organisationseinheit")')
-    ).toBeVisible()
-    expect(
-      await page.inputValue('role=textbox[name="Organisationseinheit"]')
-    ).toBe(normCleanCars.leadUnit)
-
-    // Sachgebiet
-    await expect(page.locator('h2:text-is("Sachgebiet")')).toBeVisible()
-    await expect(page.locator('label:text-is("FNA-Nummer")')).toBeVisible()
-    expect(await page.inputValue('role=textbox[name="FNA-Nummer"]')).toBe(
-      normCleanCars.subjectFna
-    )
-    await expect(
-      page.locator('label:text-is("Frühere FNA-Nummer")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Frühere FNA-Nummer"]')
-    ).toBeEmpty()
-    await expect(page.locator('label:text-is("GESTA-Nummer")')).toBeVisible()
-    expect(await page.inputValue('role=textbox[name="GESTA-Nummer"]')).toBe(
-      normCleanCars.subjectGesta
-    )
-    await expect(
-      page.locator('label:text-is("Bundesgesetzblatt Teil III")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Bundesgesetzblatt Teil III"]')
-    ).toBeEmpty()
-
-    // Mitwirkende Organe
-    await expect(page.locator('h2:text-is("Mitwirkende Organe")')).toBeVisible()
-    await expect(
-      page.locator('label:text-is("Art der Mitwirkung")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Art der Mitwirkung"]')
-    ).toBeEmpty()
-    await expect(
-      page.locator('label:text-is("Mitwirkendes Organ")')
-    ).toBeVisible()
-    await expect(
-      page.locator('role=textbox[name="Mitwirkendes Organ"]')
-    ).toBeEmpty()
-    // TODO Add the fields of new sections
+    for (const section of sections) {
+      await expect(
+        page.locator(`a:text-is("${section.heading}")`)
+      ).toBeVisible()
+      await expect(
+        page.locator(`h2:text-is("${section.heading}")`)
+      ).toBeVisible()
+      await expectInputFields(page, section.fields ?? [])
+      for (const subSection of section.sections ?? []) {
+        await expect(
+          page.locator(`h3:text-is("${subSection.heading}")`).first()
+        ).toBeVisible()
+        await expectInputFields(page, subSection.fields ?? [])
+      }
+    }
   }
 )
 
@@ -242,26 +101,10 @@ testWithImportedNorm(
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
     await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
-
     await expect(page).toHaveInsideViewport('h2:text-is("Allgemeine Angaben")')
-    await expect(page).toHaveOutsideViewport('h2:text-is("Mitwirkende Organe")')
-    await expect(page).toHaveOutsideViewport('h2:text-is("Normgeber")')
 
-    // TODO Uncomment and add new fields when fields are added
-    // const locatorAuthor = page.locator("a:has-text('Normgeber')")
-    // await expect(locatorAuthor).toBeVisible()
-    // await locatorAuthor.click()
-    //
-    // await expect(page).toHaveInsideViewport('h2:text-is("Normgeber")')
-    // await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
-    // await expect(page).toHaveOutsideViewport('h2:text-is("Mitwirkende Organe")')
-    //
-    // const locatorLead = page.locator("a:has-text('Mitwirkende Organe')")
-    // await expect(locatorLead).toBeVisible()
-    // await locatorLead.click()
-    //
-    // await expect(page).toHaveInsideViewport('h2:text-is("Mitwirkende Organe")')
-    // await expect(page).toHaveOutsideViewport('h2:text-is("Allgemeine Angaben")')
-    // await expect(page).toHaveOutsideViewport('h2:text-is("Normgeber")')
+    for (const section of sections) {
+      await expectHeadingAppearAfterScroll(page, section.heading)
+    }
   }
 )
