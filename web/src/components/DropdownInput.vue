@@ -174,7 +174,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :id="id" class="dropdown-container" @keydown.esc="closeDropdown">
+  <div class="dropdown-container" @keydown.esc="closeDropdown">
     <div
       class="dropdown-container__open-dropdown"
       @keydown.enter="toggleDropdown"
