@@ -6,6 +6,8 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtReposito
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -51,15 +53,23 @@ public class LookupTableService {
     return courtRepository.findAllByOrderByCourttypeAscCourtlocationAsc().map(this::buildCort);
   }
 
-  public static String extractRevoked(String additional) {
+  // YYYY-MM-DD
+  private static final Pattern DATE_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+
+  private String extractRevoked(String additional) {
     if (additional == null || additional.isBlank()) {
       return null;
     }
-    if (additional.toLowerCase().contains("aufgehoben")) {
-      // TODO extract year if given
-      return "aufgehoben";
+    additional = additional.toLowerCase();
+    if (additional.contains("aufgehoben")) {
+      String revoked = "aufgehoben";
+      Matcher matcher = DATE_PATTERN.matcher(additional);
+      if (matcher.find()) {
+        revoked += " seit: " + matcher.group().substring(0, 4);
+      }
+      return revoked;
     }
-    // TODO add more cases
+    // detect more patterns?
     return null;
   }
 
