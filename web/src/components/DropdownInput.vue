@@ -74,7 +74,9 @@ const clearSelection = () => {
   emit("update:modelValue", undefined)
   filter.value = ""
   inputText.value = ""
-  updateCurrentItems()
+  if (isShowDropdown.value) {
+    updateCurrentItems()
+  }
   inputFieldRef.value?.focus()
 }
 
