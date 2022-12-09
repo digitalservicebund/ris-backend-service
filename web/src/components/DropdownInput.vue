@@ -156,6 +156,14 @@ const closeDropdown = () => {
   isShowDropdown.value = false
 }
 
+const isRevokedCourt = (item: DropdownItem) => {
+  return !!(isCourt(item.value) && item.value.revoked)
+}
+
+const getRevokedCourtString = (item: DropdownItem) => {
+  return (item.value as Court).revoked
+}
+
 onMounted(() => {
   window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
@@ -229,7 +237,14 @@ onBeforeUnmount(() => {
         @keyup.down="keydown"
         @keyup.up="keyup"
       >
-        <span> {{ item.text }}</span>
+        <span>
+          {{ item.text }}
+          <span
+            v-if="isRevokedCourt(item)"
+            class="body-02-reg dropdown-container__dropdown-item__additional-info"
+            >{{ getRevokedCourtString(item) }}</span
+          ></span
+        >
       </div>
     </div>
   </div>
@@ -296,6 +311,12 @@ onBeforeUnmount(() => {
 
     &:focus {
       @apply bg-blue-200;
+    }
+
+    &__additional-info {
+      @apply text-gray-900;
+
+      float: right;
     }
   }
 }
