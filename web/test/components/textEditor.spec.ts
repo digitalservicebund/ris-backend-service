@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "../../src/components/TextEditor.vue"
@@ -55,9 +56,12 @@ describe("text editor", async () => {
       global: { plugins: [router] },
     })
     await screen.findByText("Test Value")
+
     const editorField = screen.getByLabelText("Test Editor Feld")
 
-    await fireEvent.focus(editorField)
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
+    }
 
     expect(
       screen.getByLabelText("Test Editor Feld Button Leiste")
@@ -71,10 +75,13 @@ describe("text editor", async () => {
     })
 
     await screen.findByText("Test Value")
-    const editorField = screen.getAllByLabelText("Test Editor Feld")
-    if (editorField[0] !== null) {
-      await fireEvent.blur(editorField[0])
+
+    const editorField = screen.getByLabelText("Test Editor Feld")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.blur(editorField.firstElementChild)
     }
+
     expect(
       screen.queryByLabelText("Test Editor Feld Button Leiste")
     ).not.toBeInTheDocument()
@@ -103,10 +110,11 @@ describe("text editor", async () => {
       global: { plugins: [router] },
     })
     await screen.findByText("Test Value")
-    const editorField = screen.getAllByLabelText("Test Editor Feld")
 
-    if (editorField[0] !== null) {
-      await fireEvent.focus(editorField[0])
+    const editorField = screen.getByLabelText("Test Editor Feld")
+
+    if (editorField.firstElementChild !== null) {
+      await fireEvent.focus(editorField.firstElementChild)
     }
 
     expect(screen.getByText("undo")).toBeInTheDocument()
