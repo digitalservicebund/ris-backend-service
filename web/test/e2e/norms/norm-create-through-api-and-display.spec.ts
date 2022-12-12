@@ -11,15 +11,17 @@ async function expectInputFields(page, fields) {
     await expect(
       page.locator(`label:text-is("${field.label}")`).first()
     ).toBeVisible()
-    if (field.isCheckbox) {
+    if (field.type === "checkbox") {
       expect(await page.isChecked(`role=checkbox[name="${field.label}"]`)).toBe(
         field.value ?? false
       )
-    } else {
+    }
+    if (field.type === "text") {
       expect(await page.inputValue(`input#${field.name}`)).toBe(
         field.value ?? ""
       )
     }
+    // TODO Check the dropdown data
   }
 }
 

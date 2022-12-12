@@ -50,7 +50,9 @@ function checkInputValueType() {
   if (isCourt(inputValue.value)) {
     inputText.value = inputValue.value.label
   } else {
-    inputText.value = inputValue.value as string
+    inputText.value = props.dropdownItems?.find(
+      (item) => item.value === inputValue.value
+    )?.text
   }
 }
 

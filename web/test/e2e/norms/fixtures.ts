@@ -1,7 +1,6 @@
 import { expect, test } from "@playwright/test"
 import normCleanCars from "./testdata/norm_clean_cars.json"
 
-// Declare the types of your fixtures.
 type MyFixtures = {
   createdGuid: string
 }
@@ -26,43 +25,43 @@ export function getNormBySections(norm) {
       heading: "Allgemeine Angaben",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "officialLongTitle",
           label: "Amtliche Langüberschrift",
           value: norm.officialLongTitle,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "risAbbreviation",
           label: "Juris-Abkürzung",
           value: norm.risAbbreviation,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "risAbbreviationInternationalLaw",
           label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
           value: norm.risAbbreviationInternationalLaw,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "documentNumber",
           label: "Dokumentennummer",
           value: norm.documentNumber,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "divergentDocumentNumber",
           label: "Abweichende Dokumentnummer",
           value: norm.divergentDocumentNumber,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "documentCategory",
           label: "Dokumentart",
           value: norm.documentCategory,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "frameKeywords",
           label: "Schlagwörter im Rahmenelement",
           value: norm.frameKeywords,
@@ -73,19 +72,19 @@ export function getNormBySections(norm) {
       heading: "Dokumenttyp",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "documentTypeName",
           label: "Typbezeichnung",
           value: norm.documentTypeName,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "documentNormCategory",
           label: "Art der Norm",
           value: norm.documentNormCategory,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "documentTemplateName",
           label: "Bezeichnung gemäß Vorlage",
           value: norm.documentTemplateName,
@@ -96,19 +95,19 @@ export function getNormBySections(norm) {
       heading: "Normgeber",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "providerEntity",
           label: "Staat, Land, Stadt, Landkreis oder juristische Person",
           value: norm.providerEntity,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "providerDecidingBody",
           label: "Beschließendes Organ",
           value: norm.providerDecidingBody,
         },
         {
-          isCheckbox: true,
+          type: "checkbox",
           name: "providerIsResolutionMajority",
           label: "Beschlussfassung mit qualifizierter Mehrheit",
           value: norm.providerIsResolutionMajority,
@@ -119,13 +118,13 @@ export function getNormBySections(norm) {
       heading: "Mitwirkende Organe",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "participationType",
           label: "Art der Mitwirkung",
           value: norm.participationType,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "participationInstitution",
           label: "Mitwirkendes Organ",
           value: norm.participationInstitution,
@@ -136,13 +135,13 @@ export function getNormBySections(norm) {
       heading: "Federführung",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "leadJurisdiction",
           label: "Ressort",
           value: norm.leadJurisdiction,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "leadUnit",
           label: "Organisationseinheit",
           value: norm.leadUnit,
@@ -153,25 +152,25 @@ export function getNormBySections(norm) {
       heading: "Sachgebiet",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "subjectFna",
           label: "FNA-Nummer",
           value: norm.subjectFna,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "subjectPreviousFna",
           label: "Frühere FNA-Nummer",
           value: norm.subjectPreviousFna,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "subjectGesta",
           label: "GESTA number",
           value: norm.subjectGesta,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "subjectBgb3",
           label: "Bundesgesetzblatt Teil III",
           value: norm.subjectBgb3,
@@ -182,31 +181,31 @@ export function getNormBySections(norm) {
       heading: "Überschriften und Abkürzungen",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "officialShortTitle",
           label: "Amtliche Kurzüberschrift",
           value: norm.officialShortTitle,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "officialAbbreviation",
           label: "Amtliche Buchstabenabkürzung",
           value: norm.officialAbbreviation,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "unofficialLongTitle",
           label: "Nichtamtliche Langüberschrift",
           value: norm.unofficialLongTitle,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "unofficialShortTitle",
           label: "Nichtamtliche Kurzüberschrift",
           value: norm.unofficialShortTitle,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "unofficialAbbreviation",
           label: "Nichtamtliche Buchstabenabkürzung",
           value: norm.unofficialAbbreviation,
@@ -217,37 +216,37 @@ export function getNormBySections(norm) {
       heading: "Inkrafttreten",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "entryIntoForceDate",
           label: "Datum des Inkrafttretens",
           value: norm.entryIntoForceDate,
         },
         {
-          isCheckbox: false,
+          type: "dropdown",
           name: "entryIntoForceDateState",
           label: "Unbestimmtes Datum des Inkrafttretens",
           value: norm.entryIntoForceDateState,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "principleEntryIntoForceDate",
           label: "Grundsätzliches Inkrafttretedatum",
           value: norm.principleEntryIntoForceDate,
         },
         {
-          isCheckbox: false,
+          type: "dropdown",
           name: "principleEntryIntoForceDateState",
           label: "Unbestimmtes Grundsätzliches Inkrafttretedatum",
           value: norm.principleEntryIntoForceDateState,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "divergentEntryIntoForceDate",
           label: "Abweichendes Inkrafttretedatum",
           value: norm.divergentEntryIntoForceDate,
         },
         {
-          isCheckbox: false,
+          type: "dropdown",
           name: "divergentEntryIntoForceDateState",
           label: "Unbestimmtes Abweichendes Inkrafttretedatum",
           value: norm.divergentEntryIntoForceDateState,
@@ -258,49 +257,49 @@ export function getNormBySections(norm) {
       heading: "Außerkrafttreten",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "expirationDate",
           label: "Datum des Außerkrafttretens",
           value: norm.expirationDate,
         },
         {
-          isCheckbox: false,
+          type: "dropdown",
           name: "expirationDateState",
           label: "Unbestimmtes Datum des Außerkrafttretens",
           value: norm.expirationDateState,
         },
         {
-          isCheckbox: true,
+          type: "checkbox",
           name: "isExpirationDateTemp",
           label: "Befristet",
           value: norm.isExpirationDateTemp,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "principleExpirationDate",
           label: "Grundsätzliches Außerkrafttretedatum",
           value: norm.principleExpirationDate,
         },
         {
-          isCheckbox: false,
+          type: "dropdown",
           name: "principleExpirationDateState",
           label: "Unbestimmtes Grundsätzliches Außerkrafttretdatum",
           value: norm.principleExpirationDateState,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "divergentExpirationDate",
           label: "Abweichendes Außerkrafttretedatum",
           value: norm.divergentExpirationDate,
         },
         {
-          isCheckbox: false,
+          type: "dropdown",
           name: "divergentExpirationDateState",
           label: "Unbestimmtes Abweichendes Außerkrafttretdatum",
           value: norm.divergentExpirationDateState,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "expirationNormCategory",
           label: "Art der Norm",
           value: norm.expirationNormCategory,
@@ -311,13 +310,13 @@ export function getNormBySections(norm) {
       heading: "Verkündungsdatum",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "announcementDate",
           label: "Verkündungsdatum",
           value: norm.announcementDate,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "publicationDate",
           label: "Veröffentlichungsdatum",
           value: norm.publicationDate,
@@ -328,7 +327,7 @@ export function getNormBySections(norm) {
       heading: "Zitierdatum",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "citationDate",
           label: "Zitierdatum",
           value: norm.citationDate,
@@ -342,37 +341,37 @@ export function getNormBySections(norm) {
           heading: "Papierverkündung",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "printAnnouncementGazette",
               label: "Verkündungsblatt",
               value: norm.printAnnouncementGazette,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "printAnnouncementYear",
               label: "Jahr",
               value: norm.printAnnouncementYear,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "printAnnouncementNumber",
               label: "Nummer",
               value: norm.printAnnouncementNumber,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "printAnnouncementPage",
               label: "Seitenzahl",
               value: norm.printAnnouncementPage,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "printAnnouncementInfo",
               label: "Zusatzangaben",
               value: norm.printAnnouncementInfo,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "printAnnouncementExplanations",
               label: "Erläuterungen",
               value: norm.printAnnouncementExplanations,
@@ -383,55 +382,55 @@ export function getNormBySections(norm) {
           heading: "Elektronisches Verkündungsblatt",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementMedium",
               label: "Verkündungsmedium",
               value: norm.digitalAnnouncementMedium,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementDate",
               label: "Verkündungsdatum",
               value: norm.digitalAnnouncementDate,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementEdition",
               label: "Ausgabenummer",
               value: norm.digitalAnnouncementEdition,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementYear",
               label: "Jahr",
               value: norm.digitalAnnouncementYear,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementPage",
               label: "Seitenzahlen",
               value: norm.digitalAnnouncementPage,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementArea",
               label: "Bereich der Veröffentlichung",
               value: norm.digitalAnnouncementArea,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementAreaNumber",
               label: "Nummer der Veröffentlichung im jeweiligen Bereich",
               value: norm.digitalAnnouncementAreaNumber,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementInfo",
               label: "Zusatzangaben",
               value: norm.digitalAnnouncementInfo,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "digitalAnnouncementExplanations",
               label: "Erläuterungen",
               value: norm.digitalAnnouncementExplanations,
@@ -442,43 +441,43 @@ export function getNormBySections(norm) {
           heading: "Amtsblatt der EU",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "euAnnouncementGazette",
               label: "Amtsblatt der EU",
               value: norm.euAnnouncementGazette,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "euAnnouncementYear",
               label: "Jahresangabe",
               value: norm.euAnnouncementYear,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "euAnnouncementSeries",
               label: "Reihe",
               value: norm.euAnnouncementSeries,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "euAnnouncementNumber",
               label: "Nummer des Amtsblatts",
               value: norm.euAnnouncementNumber,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "euAnnouncementPage",
               label: "Seitenzahl",
               value: norm.euAnnouncementPage,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "euAnnouncementInfo",
               label: "Zusatzangaben",
               value: norm.euAnnouncementInfo,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "euAnnouncementExplanations",
               label: "Erläuterungen",
               value: norm.euAnnouncementExplanations,
@@ -489,7 +488,7 @@ export function getNormBySections(norm) {
           heading: "Sonstige amtliche Fundstelle",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "otherOfficialAnnouncement",
               label: "Sonstige amtliche Fundstelle",
               value: norm.otherOfficialAnnouncement,
@@ -503,7 +502,7 @@ export function getNormBySections(norm) {
       heading: "Nichtamtliche Fundstelle",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "unofficialReference",
           label: "Nichtamtliche Fundstelle",
           value: norm.unofficialReference,
@@ -514,7 +513,7 @@ export function getNormBySections(norm) {
       heading: "Vollzitat",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "completeCitation",
           label: "Vollzitat",
           value: norm.completeCitation,
@@ -528,25 +527,25 @@ export function getNormBySections(norm) {
           heading: "Stand",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "statusNote",
               label: "Änderungshinweis",
               value: norm.statusNote,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "statusDescription",
               label: "Bezeichnung der Änderungsvorschrift",
               value: norm.statusDescription,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "statusDate",
               label: "Datum der Änderungsvorschrift",
               value: norm.statusDate,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "statusReference",
               label: "Fundstellen der Änderungsvorschrift",
               value: norm.statusReference,
@@ -557,25 +556,25 @@ export function getNormBySections(norm) {
           heading: "Aufhebung",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "repealNote",
               label: "Änderungshinweis",
               value: norm.repealNote,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "repealArticle",
               label: "Artikel der Änderungsvorschrift",
               value: norm.repealArticle,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "repealDate",
               label: "Datum der Änderungsvorschrift",
               value: norm.repealDate,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "repealReferences",
               label: "Fundstellen der Änderungsvorschrift",
               value: norm.repealReferences,
@@ -586,25 +585,25 @@ export function getNormBySections(norm) {
           heading: "Neufassung",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "reissueNote",
               label: "Neufassungshinweis",
               value: norm.reissueNote,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "reissueArticle",
               label: "Bezeichnung der Bekanntmachung",
               value: norm.reissueArticle,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "reissueDate",
               label: "Datum der Bekanntmachung",
               value: norm.reissueDate,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "reissueReference",
               label: "Fundstelle der Bekanntmachung",
               value: norm.reissueReference,
@@ -615,7 +614,7 @@ export function getNormBySections(norm) {
           heading: "Sonstiger Hinweis",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "otherStatusNote",
               label: "Sonstiger Hinweis",
               value: norm.otherStatusNote,
@@ -631,37 +630,37 @@ export function getNormBySections(norm) {
           heading: "Stand der dokumentarischen Bearbeitung",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "documentStatusWorkNote",
               label: "Bearbeitungshinweis",
               value: norm.documentStatusWorkNote,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "documentStatusDescription",
               label: "Bezeichnung der Änderungsvorschrift",
               value: norm.documentStatusDescription,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "documentStatusDate",
               label: "Datum des Änderungsvorschrift",
               value: norm.documentStatusDate,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "documentStatusReference",
               label: "Fundstelle der Änderungsvorschrift",
               value: norm.documentStatusReference,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "documentStatusEntryIntoForceDate",
               label: "Datum des Inkrafttretens der Änderung",
               value: norm.documentStatusEntryIntoForceDate,
             },
             {
-              isCheckbox: false,
+              type: "text",
               name: "documentStatusProof",
               label:
                 "Angaben zum textlichen und/oder dokumentarischen Nachweis",
@@ -673,7 +672,7 @@ export function getNormBySections(norm) {
           heading: "Textnachweis",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "documentTextProof",
               label: "Textnachweis",
               value: norm.documentTextProof,
@@ -684,7 +683,7 @@ export function getNormBySections(norm) {
           heading: "Sonstiger Hinweis",
           fields: [
             {
-              isCheckbox: false,
+              type: "text",
               name: "otherDocumentNote",
               label: "Sonstiger Hinweis",
               value: norm.otherDocumentNote,
@@ -697,19 +696,19 @@ export function getNormBySections(norm) {
       heading: "Räumlicher Geltungsbereich",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "applicationScopeArea",
           label: "Gebiet",
           value: norm.applicationScopeArea,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "applicationScopeStartDate",
           label: "Anfangsdatum",
           value: norm.applicationScopeStartDate,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "applicationScopeEndDate",
           label: "Endedatum",
           value: norm.applicationScopeEndDate,
@@ -720,7 +719,7 @@ export function getNormBySections(norm) {
       heading: "Aktivverweisung",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "categorizedReference",
           label: "Aktivverweisung",
           value: norm.categorizedReference,
@@ -731,7 +730,7 @@ export function getNormBySections(norm) {
       heading: "Fußnote",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "otherFootnote",
           label: "Sonstige Fußnote",
           value: norm.otherFootnote,
@@ -742,7 +741,7 @@ export function getNormBySections(norm) {
       heading: "Gültigkeitsregelung",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "validityRule",
           label: "Gültigkeitsregelung",
           value: norm.validityRule,
@@ -753,25 +752,25 @@ export function getNormBySections(norm) {
       heading: "Elektronischer Nachweis",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "digitalEvidenceLink",
           label: "Verlinkung",
           value: norm.digitalEvidenceLink,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "digitalEvidenceRelatedData",
           label: "Zugehörige Dateien",
           value: norm.digitalEvidenceRelatedData,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "digitalEvidenceExternalDataNote",
           label: "Hinweis auf fremde Verlinkung oder Daten",
           value: norm.digitalEvidenceExternalDataNote,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "digitalEvidenceAppendix",
           label: "Zusatz zum Nachweis",
           value: norm.digitalEvidenceAppendix,
@@ -782,7 +781,7 @@ export function getNormBySections(norm) {
       heading: "Aktenzeichen",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "referenceNumber",
           label: "Aktenzeichen",
           value: norm.referenceNumber,
@@ -793,7 +792,7 @@ export function getNormBySections(norm) {
       heading: "ELI",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "europeanLegalIdentifier",
           label: "ELI",
           value: norm.europeanLegalIdentifier,
@@ -804,7 +803,7 @@ export function getNormBySections(norm) {
       heading: "CELEX-Nummer",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "celexNumber",
           label: "Celex Nummer",
           value: norm.celexNumber,
@@ -815,13 +814,13 @@ export function getNormBySections(norm) {
       heading: "Altersangabe",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "ageIndicationStart",
           label: "Anfang",
           value: norm.ageIndicationStart,
         },
         {
-          isCheckbox: false,
+          type: "text",
           name: "ageIndicationEnd",
           label: "Ende",
           value: norm.ageIndicationEnd,
@@ -832,7 +831,7 @@ export function getNormBySections(norm) {
       heading: "Definition",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "definition",
           label: "Definition",
           value: norm.definition,
@@ -843,7 +842,7 @@ export function getNormBySections(norm) {
       heading: "Angaben zur Volljährigkeit",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "ageOfMajorityIndication",
           label: "Angaben zur Volljährigkeit",
           value: norm.ageOfMajorityIndication,
@@ -854,7 +853,7 @@ export function getNormBySections(norm) {
       heading: "Text",
       fields: [
         {
-          isCheckbox: false,
+          type: "text",
           name: "text",
           label: "Text",
           value: norm.text,

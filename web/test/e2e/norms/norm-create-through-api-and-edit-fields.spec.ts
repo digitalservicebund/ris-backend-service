@@ -24,24 +24,28 @@ async function fillTextInput(page, field, value) {
 async function editFields(page, fields, data) {
   for (const field of fields) {
     await expect(page.locator(`label[for="${field.name}"]`)).toBeVisible()
-    if (field.isCheckbox) {
+    if (field.type === "checkbox") {
       await fillCheckbox(page, field, data[field.name])
-    } else {
+    }
+    if (field.type === "text") {
       await fillTextInput(page, field, data[field.name])
     }
+    // TODO Properly inject data into the dropdown
   }
 }
 
 async function expectUpdatedFields(page, fields, data) {
   for (const field of fields) {
-    if (field.isCheckbox) {
+    if (field.type === "checkbox") {
       const checkbox = `role=checkbox[name="${field.label}"]`
       expect(await page.isChecked(checkbox)).toBe(data[field.name])
-    } else {
+    }
+    if (field.type === "text") {
       const input = `input#${field.name}`
       await expect(page.locator(input)).toBeVisible()
       expect(await page.inputValue(input)).toBe(data[field.name])
     }
+    // TODO Check the dropdown data
   }
 }
 
@@ -77,9 +81,6 @@ testWithImportedNorm(
     await locatorHeadingsButton.click()
 
     for (const section of sections) {
-      if (section.heading === "Überschriften und Abkürzungen") {
-        break
-      }
       await expectUpdatedFields(page, section.fields ?? [], newNorm)
       for (const subSection of section.sections ?? []) {
         await expectUpdatedFields(page, subSection.fields ?? [], newNorm)
