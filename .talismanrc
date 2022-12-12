@@ -122,7 +122,7 @@ fileignoreconfig:
   - filename: web/test/services/normsService.spec.ts
     checksum: b023f40aa4fb5132e3abe24d14ad345bd6e1d59c44009a8c2a3764951b91787d
   - filename: web/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: 38b0f61471983cf1895346ad0c9cba2f761b5e5429e4f51fb7f44f20b610e2e5
+    checksum: 5318a644f69c341b8847706387e6fa57b41ff1276b4e902d3a44958a1fab616b
   - filename: web/src/stores/loadedNorm.ts
     checksum: e4acaebeadbb4b178008672148af32c7507bacc19f93bdde15a06ca352928278
   - filename: web/test/stores/loadedNorm.spec.ts

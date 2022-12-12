@@ -75,14 +75,134 @@ const frameData = computed({
     ) as FrameData
   },
   set: (data: FrameData) => {
-    if (loadedNorm.value) {
-      const newData = {
-        guid: loadedNorm.value.guid,
-        articles: loadedNorm.value.articles,
-        ...data,
-      }
-      console.log(loadedNorm.value)
-      loadedNorm.value = newData
+    if (loadedNorm.value !== undefined) {
+      loadedNorm.value.documentTemplateName = data.documentTemplateName
+      loadedNorm.value.leadUnit = data.leadUnit
+      loadedNorm.value.participationInstitution = data.participationInstitution
+      loadedNorm.value.subjectBgb3 = data.subjectBgb3
+      loadedNorm.value.ageIndicationEnd = data.ageIndicationEnd
+      loadedNorm.value.ageIndicationStart = data.ageIndicationStart
+      loadedNorm.value.ageOfMajorityIndication = data.ageOfMajorityIndication
+      loadedNorm.value.announcementDate = data.announcementDate
+      loadedNorm.value.applicationScopeArea = data.applicationScopeArea
+      loadedNorm.value.applicationScopeEndDate = data.applicationScopeEndDate
+      loadedNorm.value.applicationScopeStartDate =
+        data.applicationScopeStartDate
+      loadedNorm.value.categorizedReference = data.categorizedReference
+      loadedNorm.value.celexNumber = data.celexNumber
+      loadedNorm.value.citationDate = data.citationDate
+      loadedNorm.value.completeCitation = data.completeCitation
+      loadedNorm.value.definition = data.definition
+      loadedNorm.value.digitalAnnouncementDate = data.digitalAnnouncementDate
+      loadedNorm.value.digitalAnnouncementArea = data.digitalAnnouncementArea
+      loadedNorm.value.digitalAnnouncementAreaNumber =
+        data.digitalAnnouncementAreaNumber
+      loadedNorm.value.digitalAnnouncementEdition =
+        data.digitalAnnouncementEdition
+      loadedNorm.value.digitalAnnouncementExplanations =
+        data.digitalAnnouncementExplanations
+      loadedNorm.value.digitalAnnouncementInfo = data.digitalAnnouncementInfo
+      loadedNorm.value.digitalAnnouncementMedium =
+        data.digitalAnnouncementMedium
+      loadedNorm.value.digitalAnnouncementPage = data.digitalAnnouncementPage
+      loadedNorm.value.digitalAnnouncementYear = data.digitalAnnouncementYear
+      loadedNorm.value.digitalEvidenceAppendix = data.digitalEvidenceAppendix
+      loadedNorm.value.digitalEvidenceExternalDataNote =
+        data.digitalEvidenceExternalDataNote
+      loadedNorm.value.digitalEvidenceLink = data.digitalEvidenceLink
+      loadedNorm.value.digitalEvidenceRelatedData =
+        data.digitalEvidenceRelatedData
+      loadedNorm.value.divergentDocumentNumber = data.divergentDocumentNumber
+      loadedNorm.value.divergentEntryIntoForceDate =
+        data.divergentEntryIntoForceDate
+      loadedNorm.value.divergentEntryIntoForceDateState =
+        data.divergentEntryIntoForceDateState
+      loadedNorm.value.divergentExpirationDate = data.divergentExpirationDate
+      loadedNorm.value.divergentExpirationDateState =
+        data.divergentExpirationDateState
+      loadedNorm.value.documentCategory = data.documentCategory
+      loadedNorm.value.documentNormCategory = data.documentNormCategory
+      loadedNorm.value.documentNumber = data.documentNumber
+      loadedNorm.value.documentStatusDate = data.documentStatusDate
+      loadedNorm.value.documentStatusDescription =
+        data.documentStatusDescription
+      loadedNorm.value.documentStatusEntryIntoForceDate =
+        data.documentStatusEntryIntoForceDate
+      loadedNorm.value.documentStatusProof = data.documentStatusProof
+      loadedNorm.value.documentStatusReference = data.documentStatusReference
+      loadedNorm.value.documentStatusWorkNote = data.documentStatusWorkNote
+      loadedNorm.value.documentTextProof = data.documentTextProof
+      loadedNorm.value.documentTypeName = data.documentTypeName
+      loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate
+      loadedNorm.value.entryIntoForceDateState = data.entryIntoForceDateState
+      loadedNorm.value.euAnnouncementExplanations =
+        data.euAnnouncementExplanations
+      loadedNorm.value.euAnnouncementGazette = data.euAnnouncementGazette
+      loadedNorm.value.euAnnouncementInfo = data.euAnnouncementInfo
+      loadedNorm.value.euAnnouncementNumber = data.euAnnouncementNumber
+      loadedNorm.value.euAnnouncementPage = data.euAnnouncementPage
+      loadedNorm.value.euAnnouncementSeries = data.euAnnouncementSeries
+      loadedNorm.value.euAnnouncementYear = data.euAnnouncementYear
+      loadedNorm.value.europeanLegalIdentifier = data.europeanLegalIdentifier
+      loadedNorm.value.expirationDate = data.expirationDate
+      loadedNorm.value.expirationDateState = data.expirationDateState
+      loadedNorm.value.expirationNormCategory = data.expirationNormCategory
+      loadedNorm.value.frameKeywords = data.frameKeywords
+      loadedNorm.value.isExpirationDateTemp = data.isExpirationDateTemp
+      loadedNorm.value.leadJurisdiction = data.leadJurisdiction
+      loadedNorm.value.officialAbbreviation = data.officialAbbreviation
+      loadedNorm.value.officialLongTitle = data.officialLongTitle
+      loadedNorm.value.officialShortTitle = data.officialShortTitle
+      loadedNorm.value.otherDocumentNote = data.otherDocumentNote
+      loadedNorm.value.otherFootnote = data.otherFootnote
+      loadedNorm.value.otherOfficialAnnouncement =
+        data.otherOfficialAnnouncement
+      loadedNorm.value.otherStatusNote = data.otherStatusNote
+      loadedNorm.value.participationType = data.participationType
+      loadedNorm.value.principleEntryIntoForceDate =
+        data.principleEntryIntoForceDate
+      loadedNorm.value.principleEntryIntoForceDateState =
+        data.principleEntryIntoForceDateState
+      loadedNorm.value.principleExpirationDate = data.principleExpirationDate
+      loadedNorm.value.principleExpirationDateState =
+        data.principleExpirationDateState
+      loadedNorm.value.printAnnouncementExplanations =
+        data.printAnnouncementExplanations
+      loadedNorm.value.printAnnouncementGazette = data.printAnnouncementGazette
+      loadedNorm.value.printAnnouncementInfo = data.printAnnouncementInfo
+      loadedNorm.value.printAnnouncementNumber = data.printAnnouncementNumber
+      loadedNorm.value.printAnnouncementPage = data.printAnnouncementPage
+      loadedNorm.value.printAnnouncementYear = data.printAnnouncementYear
+      loadedNorm.value.providerEntity = data.providerEntity
+      loadedNorm.value.providerDecidingBody = data.providerDecidingBody
+      loadedNorm.value.providerIsResolutionMajority =
+        data.providerIsResolutionMajority
+      loadedNorm.value.publicationDate = data.publicationDate
+      loadedNorm.value.referenceNumber = data.referenceNumber
+      loadedNorm.value.reissueArticle = data.reissueArticle
+      loadedNorm.value.reissueDate = data.reissueDate
+      loadedNorm.value.reissueNote = data.reissueNote
+      loadedNorm.value.reissueReference = data.reissueReference
+      loadedNorm.value.repealArticle = data.repealArticle
+      loadedNorm.value.repealDate = data.repealDate
+      loadedNorm.value.repealNote = data.repealNote
+      loadedNorm.value.repealReferences = data.repealReferences
+      loadedNorm.value.risAbbreviation = data.risAbbreviation
+      loadedNorm.value.risAbbreviationInternationalLaw =
+        data.risAbbreviationInternationalLaw
+      loadedNorm.value.statusDate = data.statusDate
+      loadedNorm.value.statusDescription = data.statusDescription
+      loadedNorm.value.statusNote = data.statusNote
+      loadedNorm.value.statusReference = data.statusReference
+      loadedNorm.value.subjectFna = data.subjectFna
+      loadedNorm.value.subjectGesta = data.subjectGesta
+      loadedNorm.value.subjectPreviousFna = data.subjectPreviousFna
+      loadedNorm.value.text = data.text
+      loadedNorm.value.unofficialAbbreviation = data.unofficialAbbreviation
+      loadedNorm.value.unofficialLongTitle = data.unofficialLongTitle
+      loadedNorm.value.unofficialReference = data.unofficialReference
+      loadedNorm.value.unofficialShortTitle = data.unofficialShortTitle
+      loadedNorm.value.validityRule = data.validityRule
     }
   },
 })
