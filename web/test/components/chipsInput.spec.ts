@@ -136,7 +136,7 @@ describe("ChipsInput", () => {
     expect(chipList[1]).toHaveTextContent("two")
 
     await user.type(input, "{backspace}")
-    expect(chipList.length).toBe(1)
+    expect(screen.getAllByLabelText("chip").length).toBe(1)
     expect(chipList[0]).toHaveTextContent("one")
 
     expect(input).toHaveValue("")

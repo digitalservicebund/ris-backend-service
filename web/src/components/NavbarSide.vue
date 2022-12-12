@@ -154,8 +154,8 @@ export interface LevelTwoMenuItem {
       <div v-show="levelOneItem.isExpanded">
         <router-link
           v-for="levelTwoItem in levelOneItem.children"
-          aria-label="Submenü Eintrag"
           :key="levelTwoItem.label"
+          aria-label="Submenü Eintrag"
           class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg pl-[2rem] py-[1rem]"
           :class="levelTwoItem.classes"
           :to="levelTwoItem.route"

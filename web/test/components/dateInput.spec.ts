@@ -42,7 +42,7 @@ describe("DateInput", () => {
     renderComponent({
       ariaLabel: "test-label",
     })
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    const input = screen.queryByLabelText("test-label") as HTMLInputElement
 
     expect(input).toBeInTheDocument()
   })

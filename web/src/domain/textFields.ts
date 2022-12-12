@@ -4,12 +4,16 @@ function defineTextEntry(name: string, label: string, fieldSize: FieldSize) {
   return { name, label, fieldSize }
 }
 export const texts = [
-  defineTextEntry("decisionName", "Entscheidungsname", "small"),
-  defineTextEntry("headline", "Titelzeile", "small"),
-  defineTextEntry("guidingPrinciple", "Leitsatz", "medium"),
-  defineTextEntry("headnote", "Orientierungssatz", "small"),
-  defineTextEntry("tenor", "Tenor", "medium"),
-  defineTextEntry("reasons", "Gründe", "large"),
-  defineTextEntry("caseFacts", "Tatbestand", "large"),
-  defineTextEntry("decisionReasons", "Entscheidungsgründe", "large"),
+  defineTextEntry("decisionName", "Entscheidungsname Editor Feld", "small"),
+  defineTextEntry("headline", "Titelzeile Editor Feld", "small"),
+  defineTextEntry("guidingPrinciple", "Leitsatz Editor Feld", "medium"),
+  defineTextEntry("headnote", "Orientierungssatz Editor Feld", "small"),
+  defineTextEntry("tenor", "Tenor Editor Feld", "medium"),
+  defineTextEntry("reasons", "Gründe Editor Feld", "large"),
+  defineTextEntry("caseFacts", "Tatbestand Editor Feld", "large"),
+  defineTextEntry(
+    "decisionReasons",
+    "Entscheidungsgründe Editor Feld",
+    "large"
+  ),
 ]

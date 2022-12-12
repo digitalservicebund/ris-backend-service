@@ -24,7 +24,7 @@ describe("text editor", async () => {
     expect(screen.getAllByLabelText("Editor Feld").length).toBe(1)
 
     expect(
-      screen.queryByLabelText("Testzeile Editor Feld Button Leiste")
+      screen.queryByLabelText("Editor Feld Button Leiste")
     ).not.toBeInTheDocument()
   })
 
@@ -55,10 +55,9 @@ describe("text editor", async () => {
       global: { plugins: [router] },
     })
     await screen.findByText("Test Value")
-    const editorField = screen.getAllByLabelText("Test Editor Feld")
-    if (editorField[0] !== null) {
-      await fireEvent.focus(editorField[0])
-    }
+    const editorField = screen.getByLabelText("Test Editor Feld")
+
+    await fireEvent.focus(editorField)
 
     expect(
       screen.getByLabelText("Test Editor Feld Button Leiste")

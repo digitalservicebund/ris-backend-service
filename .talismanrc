@@ -82,7 +82,7 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: 9958c0459654c74faa57b5a47de5aeb4698ba7e3713b313a4864ec3e701e8e46
   - filename: web/test/components/navbarSide.spec.ts
-    checksum: 8030252ce80874af1ba09c4c89ae1671f456816824a95d92e50fa5e109b7541a
+    checksum: dfde114fc27862fdecef66c556dff3010568e07f1168e141d2b92af471e5e140
   - filename: src/main/resources/db/migration/V0.9__norms_rename_metadata_fields.sql
     checksum: 4da1c4c487c4c0a1d7f02de20b029a549554b6df9a9c999fcd79a8bed1fa3269
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt
