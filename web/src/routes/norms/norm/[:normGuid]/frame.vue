@@ -75,12 +75,14 @@ const frameData = computed({
     ) as FrameData
   },
   set: (data: FrameData) => {
-    if (loadedNorm.value !== undefined) {
-      loadedNorm.value = {
+    if (loadedNorm.value) {
+      const newData = {
         guid: loadedNorm.value.guid,
         articles: loadedNorm.value.articles,
         ...data,
       }
+      console.log(loadedNorm.value)
+      loadedNorm.value = newData
     }
   },
 })

@@ -20,9 +20,9 @@ export const useLoadedNormStore = defineStore("loaded-norm", () => {
         loadedNorm.value.guid,
         getFrameDataFromNorm(loadedNorm.value)
       )
+    } else {
+      return { status: 404, data: undefined }
     }
-
-    return { status: 404, data: undefined }
   }
 
   return { loadedNorm, load, update }
