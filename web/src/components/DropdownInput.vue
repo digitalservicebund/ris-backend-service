@@ -306,11 +306,11 @@ onBeforeUnmount(() => {
     }
 
     &:hover {
-      @apply bg-blue-200;
+      @apply bg-blue-300;
     }
 
     &:focus {
-      @apply bg-blue-200;
+      @apply bg-blue-300;
     }
 
     &__additional-info {
