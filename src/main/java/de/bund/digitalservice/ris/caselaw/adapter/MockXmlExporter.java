@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
 import java.time.Instant;
-import java.util.Collections;
+import java.util.List;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
@@ -13,7 +13,8 @@ public class MockXmlExporter implements XmlExporter {
   @Override
   public XmlResultObject generateXml(DocumentUnit documentUnit)
       throws ParserConfigurationException, TransformerException {
-    return new XmlResultObject("xml", "200", Collections.emptyList(), "test.xml", Instant.now());
+    return new XmlResultObject(
+        "xml", "200", List.of("message 1", "message 2"), "test.xml", Instant.now());
   }
 
   @Override

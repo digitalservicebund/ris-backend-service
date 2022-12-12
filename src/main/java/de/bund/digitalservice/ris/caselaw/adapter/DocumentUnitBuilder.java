@@ -1,8 +1,12 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.time.Instant;
+import java.util.List;
 
 public class DocumentUnitBuilder {
 
@@ -33,8 +37,23 @@ public class DocumentUnitBuilder {
               documentUnitDTO.getCourtType() + " " + documentUnitDTO.getCourtLocation());
     }
 
+    List<PreviousDecision> previousDecisions = null;
+    if (documentUnitDTO.getPreviousDecisions() != null) {
+      previousDecisions =
+          documentUnitDTO.getPreviousDecisions().stream()
+              .map(
+                  previousDecisionDTO ->
+                      PreviousDecision.builder()
+                          .id(previousDecisionDTO.getId())
+                          .courtType(previousDecisionDTO.getCourtType())
+                          .courtPlace(previousDecisionDTO.getCourtLocation())
+                          .fileNumber(previousDecisionDTO.getFileNumber())
+                          .date(previousDecisionDTO.getDecisionDate())
+                          .build())
+              .toList();
+    }
+
     return new DocumentUnit(
-        documentUnitDTO.getId(),
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
         documentUnitDTO.getCreationtimestamp(),
@@ -56,17 +75,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),
             documentUnitDTO.getRegion()),
-        documentUnitDTO.getPreviousDecisions().stream()
-            .map(
-                previousDecisionDTO ->
-                    PreviousDecision.builder()
-                        .id(previousDecisionDTO.getId())
-                        .courtType(previousDecisionDTO.getCourtType())
-                        .courtPlace(previousDecisionDTO.getCourtLocation())
-                        .fileNumber(previousDecisionDTO.getFileNumber())
-                        .date(previousDecisionDTO.getDecisionDate())
-                        .build())
-            .toList(),
+        previousDecisions,
         new Texts(
             documentUnitDTO.getDecisionName(),
             documentUnitDTO.getHeadline(),

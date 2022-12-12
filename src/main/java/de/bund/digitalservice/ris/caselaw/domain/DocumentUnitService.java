@@ -197,9 +197,6 @@ public class DocumentUnitService {
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
-    return repository
-        .findByUuid(documentUuid)
-        .flatMap(
-            documentUnit -> publishService.getLastPublishedXml(documentUnit.id(), documentUuid));
+    return publishService.getLastPublishedXml(documentUuid);
   }
 }

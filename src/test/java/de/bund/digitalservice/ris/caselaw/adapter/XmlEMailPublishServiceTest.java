@@ -42,24 +42,22 @@ class XmlEMailPublishServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final XmlMail EXPECTED_BEFORE_SAVE =
       new XmlMail(
-          null,
-          123L,
+          TEST_UUID,
           "test-to@mail.com",
           MAIL_SUBJECT,
           "xml",
           "200",
-          "succeed",
+          List.of("succeed"),
           "test.xml",
           PUBLISH_DATE);
   private static final XmlMail SAVED_XML_MAIL =
       new XmlMail(
-          1L,
-          123L,
+          TEST_UUID,
           "test-to@mail.com",
           MAIL_SUBJECT,
           "xml",
           "200",
-          "succeed",
+          List.of("succeed"),
           "test.xml",
           PUBLISH_DATE);
   private static final XmlMailResponse EXPECTED_RESPONSE =
@@ -82,11 +80,7 @@ class XmlEMailPublishServiceTest {
   @BeforeEach
   void setUp() throws ParserConfigurationException, TransformerException {
     documentUnit =
-        DocumentUnit.builder()
-            .id(123L)
-            .uuid(TEST_UUID)
-            .documentNumber("test-document-number")
-            .build();
+        DocumentUnit.builder().uuid(TEST_UUID).documentNumber("test-document-number").build();
     when(xmlExporter.generateXml(documentUnit)).thenReturn(FORMATTED_XML);
 
     when(repository.save(EXPECTED_BEFORE_SAVE)).thenReturn(Mono.just(SAVED_XML_MAIL));
@@ -114,7 +108,8 @@ class XmlEMailPublishServiceTest {
   void testPublish_withValidationError() throws ParserConfigurationException, TransformerException {
     var xmlWithValidationError =
         new XmlResultObject("xml", "400", List.of("status-message"), "test.xml", PUBLISH_DATE);
-    var xmlMail = new XmlMail(null, 123L, null, null, null, "400", "status-message", null, null);
+    var xmlMail =
+        new XmlMail(TEST_UUID, null, null, null, "400", List.of("status-message"), null, null);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
     when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
 
@@ -204,15 +199,15 @@ class XmlEMailPublishServiceTest {
 
   @Test
   void testGetLastPublishedXml() {
-    when(repository.findTopByDocumentUnitIdOrderByPublishDateDesc(123L))
-        .thenReturn(Mono.just(SAVED_XML_MAIL));
+    when(repository.getLastPublishedXml(TEST_UUID))
+        .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL)));
 
-    StepVerifier.create(service.getLastPublishedXml(123L, TEST_UUID))
+    StepVerifier.create(service.getLastPublishedXml(TEST_UUID))
         .consumeNextWith(
             response ->
                 assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
         .verifyComplete();
 
-    verify(repository).findTopByDocumentUnitIdOrderByPublishDateDesc(123L);
+    verify(repository).getLastPublishedXml(TEST_UUID);
   }
 }

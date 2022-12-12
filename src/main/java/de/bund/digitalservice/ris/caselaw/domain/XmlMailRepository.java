@@ -1,9 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import org.springframework.data.repository.reactive.ReactiveCrudRepository;
+import java.util.UUID;
 import reactor.core.publisher.Mono;
 
-public interface XmlMailRepository extends ReactiveCrudRepository<XmlMail, Long> {
+public interface XmlMailRepository {
+  Mono<XmlMail> save(XmlMail xmlMail);
 
-  Mono<XmlMail> findTopByDocumentUnitIdOrderByPublishDateDesc(Long documentUnitId);
+  Mono<MailResponse> getLastPublishedXml(UUID documentUnitUuid);
 }

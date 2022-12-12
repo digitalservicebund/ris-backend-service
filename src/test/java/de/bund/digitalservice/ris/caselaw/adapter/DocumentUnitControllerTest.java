@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -17,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -232,13 +232,12 @@ class DocumentUnitControllerTest {
                 new XmlMailResponse(
                     TEST_UUID,
                     new XmlMail(
-                        1L,
-                        123L,
+                        TEST_UUID,
                         "receiver address",
                         "mailSubject",
                         "xml",
                         "status-code",
-                        "status-messages",
+                        List.of("status-messages"),
                         "test.xml",
                         Instant.parse("2020-01-01T01:01:01.00Z")))));
 
@@ -296,13 +295,12 @@ class DocumentUnitControllerTest {
                 new XmlMailResponse(
                     TEST_UUID,
                     new XmlMail(
-                        1L,
-                        123L,
+                        TEST_UUID,
                         "receiver address",
                         "mailSubject",
                         "xml",
                         "status-code",
-                        "status-messages",
+                        List.of("status-messages"),
                         "test.xml",
                         Instant.parse("2020-01-01T01:01:01.00Z")))));
 

@@ -62,7 +62,6 @@ public class JurisXmlExporterWrapperTest {
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
-            .id(99L)
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
             .coreData(coreData)
@@ -84,7 +83,6 @@ public class JurisXmlExporterWrapperTest {
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
-            .id(99L)
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
             .creationtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
@@ -137,6 +135,7 @@ public class JurisXmlExporterWrapperTest {
     List<PreviousDecision> previousDecisions =
         List.of(
             PreviousDecision.builder()
+                .id(1L)
                 .courtType("courtType")
                 .courtPlace("courtPlace")
                 .date("date")
@@ -144,7 +143,6 @@ public class JurisXmlExporterWrapperTest {
                 .build());
     DocumentUnit documentUnit =
         DocumentUnit.builder()
-            .id(99L)
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
             .creationtimestamp(Instant.parse("2021-01-01T00:00:00Z"))

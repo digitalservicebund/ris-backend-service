@@ -10,7 +10,6 @@ import lombok.Builder;
 
 @Builder(toBuilder = true)
 public record DocumentUnit(
-    Long id,
     UUID uuid,
     @Size(min = 13, max = 14, message = "documentNumber has to be 13 or 14 characters long")
         String documentNumber,
@@ -23,5 +22,5 @@ public record DocumentUnit(
     List<PreviousDecision> previousDecisions,
     Texts texts) {
   public static final DocumentUnit EMPTY =
-      new DocumentUnit(null, null, null, null, null, null, null, null, null, null, null);
+      new DocumentUnit(null, null, null, null, null, null, null, null, null, null);
 }

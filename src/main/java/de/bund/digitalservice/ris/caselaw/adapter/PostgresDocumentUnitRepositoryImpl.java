@@ -1,15 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Repository
@@ -62,61 +65,110 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
+  @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
     return repository
-        .save(DocumentUnitDTO.buildFromDocumentUnit(documentUnit))
-        .flatMap(
-            documentUnitDTO ->
-                previousDecisionRepository
-                    .deleteAllByDocumentUnitId(documentUnitDTO.getId())
-                    .thenReturn(documentUnitDTO))
-        .flatMap(
-            documentUnitDTO -> {
-              List<Long> existingIds =
-                  documentUnit.previousDecisions().stream().map(PreviousDecision::id).toList();
-
-              if (existingIds.isEmpty()) {
-                return Mono.just(documentUnitDTO);
-              }
-
-              return previousDecisionRepository
-                  .findAllById(existingIds)
-                  .collectList()
-                  .doOnNext(
-                      list -> {
-                        if (!list.isEmpty()) {
-                          throw new RuntimeException(
-                              "previous decision id exist for other document unit id");
-                        }
-                      })
-                  .thenReturn(documentUnitDTO);
-            })
-        .flatMap(
-            documentUnitDTO -> {
-              List<PreviousDecisionDTO> previousDecisionDTOs =
-                  documentUnit.previousDecisions().stream()
-                      .map(
-                          previousDecision ->
-                              PreviousDecisionDTO.builder()
-                                  .id(previousDecision.id())
-                                  .documentUnitId(documentUnitDTO.getId())
-                                  .decisionDate(previousDecision.date())
-                                  .fileNumber(previousDecision.fileNumber())
-                                  .courtType(previousDecision.courtType())
-                                  .courtLocation(previousDecision.courtPlace())
-                                  .build())
-                      .toList();
-
-              documentUnitDTO.setPreviousDecisions(previousDecisionDTOs);
-
-              return previousDecisionRepository
-                  .saveAll(documentUnitDTO.getPreviousDecisions())
-                  .collectList()
-                  .map(v -> documentUnitDTO);
-            })
+        .findByUuid(documentUnit.uuid())
+        .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
+        .flatMap(repository::save)
+        .flatMap(documentUnitDTO -> savePreviousDecisions(documentUnitDTO, documentUnit))
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+  }
+
+  private Mono<DocumentUnitDTO> savePreviousDecisions(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    return previousDecisionRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            previousDecisionDTOs -> {
+              List<Long> toDeleteIds = new ArrayList<>();
+              List<PreviousDecisionDTO> toUpdate = new ArrayList<>();
+              List<PreviousDecisionDTO> toInsert = new ArrayList<>();
+
+              List<Long> updateIds = new ArrayList<>();
+
+              if (documentUnit.previousDecisions() == null
+                  || documentUnit.previousDecisions().isEmpty()) {
+                toDeleteIds.addAll(
+                    previousDecisionDTOs.stream().map(PreviousDecisionDTO::getId).toList());
+              } else {
+                toInsert.addAll(
+                    documentUnit.previousDecisions().stream()
+                        .filter(previousDecision -> previousDecision.id() == null)
+                        .map(
+                            previousDecision ->
+                                PreviousDecisionTransformer.generateDTO(
+                                    previousDecision, documentUnitDTO.getId()))
+                        .toList());
+                List<PreviousDecision> toUpdateOrToDelete =
+                    new ArrayList<>(
+                        documentUnit.previousDecisions().stream()
+                            .filter(previousDecision -> previousDecision.id() != null)
+                            .toList());
+
+                previousDecisionDTOs.forEach(
+                    previousDecisionDTO -> {
+                      Optional<PreviousDecision> previousDecisionOptional =
+                          toUpdateOrToDelete.stream()
+                              .filter(
+                                  previousDecision ->
+                                      previousDecisionDTO.getId().equals(previousDecision.id()))
+                              .findFirst();
+                      if (previousDecisionOptional.isPresent()) {
+                        toUpdate.add(
+                            PreviousDecisionTransformer.enrichDTO(
+                                previousDecisionDTO, previousDecisionOptional.get()));
+                        updateIds.add(previousDecisionDTO.getId());
+                        toUpdateOrToDelete.removeIf(
+                            previousDecision ->
+                                previousDecision.id().equals(previousDecisionDTO.getId()));
+                      } else {
+                        toDeleteIds.add(previousDecisionDTO.getId());
+                      }
+                    });
+
+                updateIds.addAll(toUpdateOrToDelete.stream().map(PreviousDecision::id).toList());
+              }
+
+              List<PreviousDecisionDTO> savedPreviousDecisions = new ArrayList<>();
+
+              return previousDecisionRepository
+                  .findAllById(updateIds)
+                  .collectList()
+                  .map(
+                      updateList -> {
+                        updateList.forEach(
+                            previousDecisionDTO -> {
+                              if (!Objects.equals(
+                                  previousDecisionDTO.documentUnitId, documentUnitDTO.getId())) {
+                                throw new RuntimeException(
+                                    "previous decision not for the right document unit");
+                              }
+                            });
+                        return updateList;
+                      })
+                  .flatMap(list -> previousDecisionRepository.deleteAllById(toDeleteIds))
+                  .then(previousDecisionRepository.saveAll(toUpdate).collectList())
+                  .map(
+                      updatedPreviousDecisions -> {
+                        savedPreviousDecisions.addAll(updatedPreviousDecisions);
+                        return documentUnitDTO;
+                      })
+                  .flatMap(v -> previousDecisionRepository.saveAll(toInsert).collectList())
+                  .map(
+                      insertedPreviousDecisions -> {
+                        savedPreviousDecisions.addAll(insertedPreviousDecisions);
+                        return documentUnitDTO;
+                      })
+                  .map(
+                      oldDocumentUnitDTO -> {
+                        oldDocumentUnitDTO.setPreviousDecisions(savedPreviousDecisions);
+                        return oldDocumentUnitDTO;
+                      });
+            });
   }
 
   @Override
@@ -160,7 +212,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<Void> delete(DocumentUnit documentUnit) {
-    return repository.deleteById(documentUnit.id());
+    return repository
+        .findByUuid(documentUnit.uuid())
+        .flatMap(documentUnitDTO -> repository.deleteById(documentUnitDTO.getId()));
   }
 
   private Mono<DocumentUnitDTO> addPreviousDecisions(DocumentUnitDTO documentUnit) {

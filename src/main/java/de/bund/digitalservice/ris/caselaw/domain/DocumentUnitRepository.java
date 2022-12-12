@@ -16,7 +16,7 @@ public interface DocumentUnitRepository {
   Mono<DocumentUnit> save(DocumentUnit documentUnit);
 
   Mono<DocumentUnit> attachFile(
-      UUID documentUnitUuid, String fileUuid, String docx, String fileName);
+      UUID documentUnitUuid, String fileUuid, String type, String fileName);
 
   Mono<DocumentUnit> removeFile(UUID documentUnitId);
 

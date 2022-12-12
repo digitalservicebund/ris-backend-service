@@ -34,6 +34,7 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   public XmlEMailPublishService(
       XmlExporter xmlExporter, HttpMailSender mailSender, XmlMailRepository repository) {
+
     this.xmlExporter = xmlExporter;
     this.mailSender = mailSender;
     this.repository = repository;
@@ -49,7 +50,7 @@ public class XmlEMailPublishService implements EmailPublishService {
     }
 
     return generateMailSubject(documentUnit)
-        .map(mailSubject -> generateXmlMail(documentUnit.id(), receiverAddress, mailSubject, xml))
+        .map(mailSubject -> generateXmlMail(documentUnit.uuid(), receiverAddress, mailSubject, xml))
         .doOnNext(this::generateAndSendMail)
         .flatMap(this::savePublishInformation)
         .doOnError(ex -> LOGGER.error("Error by generation of mail message", ex))
@@ -57,10 +58,8 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   @Override
-  public Mono<MailResponse> getLastPublishedXml(Long documentUnitId, UUID documentUnitUuid) {
-    return repository
-        .findTopByDocumentUnitIdOrderByPublishDateDesc(documentUnitId)
-        .map(xmlMail -> new XmlMailResponse(documentUnitUuid, xmlMail));
+  public Mono<MailResponse> getLastPublishedXml(UUID documentUnitUuid) {
+    return repository.getLastPublishedXml(documentUnitUuid);
   }
 
   private Mono<String> generateMailSubject(DocumentUnit documentUnit) {
@@ -101,22 +100,20 @@ public class XmlEMailPublishService implements EmailPublishService {
   }
 
   private XmlMail generateXmlMail(
-      Long documentUnitId, String receiverAddress, String mailSubject, XmlResultObject xml) {
+      UUID documentUnitUuid, String receiverAddress, String mailSubject, XmlResultObject xml) {
 
-    String statusMessages = String.join("|", xml.statusMessages());
     if (xml.statusCode().equals("400")) {
       return new XmlMail(
-          null, documentUnitId, null, null, null, xml.statusCode(), statusMessages, null, null);
+          documentUnitUuid, null, null, null, xml.statusCode(), xml.statusMessages(), null, null);
     }
 
     return new XmlMail(
-        null,
-        documentUnitId,
+        documentUnitUuid,
         receiverAddress,
         mailSubject,
         xml.xml(),
         xml.statusCode(),
-        statusMessages,
+        xml.statusMessages(),
         xml.fileName(),
         xml.publishDate());
   }

@@ -1,18 +1,21 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Getter
+@NoArgsConstructor
+@Data
 public class XmlMailResponse implements MailResponse {
-  private final UUID documentUnitUuid;
-  private final String receiverAddress;
-  private final String mailSubject;
-  private final String xml;
-  private final String statusCode;
-  private final String[] statusMessages;
-  private final Instant publishDate;
+  private UUID documentUnitUuid;
+  private String receiverAddress;
+  private String mailSubject;
+  private String xml;
+  private String statusCode;
+  private List<String> statusMessages;
+  private Instant publishDate;
 
   public XmlMailResponse(UUID documentUnitUuid, XmlMail xmlMail) {
     this.documentUnitUuid = documentUnitUuid;
@@ -23,7 +26,7 @@ public class XmlMailResponse implements MailResponse {
 
     this.statusCode = xmlMail.statusCode();
     if (xmlMail.statusMessages() != null) {
-      this.statusMessages = xmlMail.statusMessages().split("\\|");
+      this.statusMessages = xmlMail.statusMessages();
     } else {
       this.statusMessages = null;
     }
