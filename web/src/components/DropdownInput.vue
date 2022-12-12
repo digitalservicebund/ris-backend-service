@@ -231,6 +231,10 @@ onBeforeUnmount(() => {
         v-for="(item, index) in currentItems"
         :key="index"
         class="dropdown-container__dropdown-item"
+        :class="{
+          'dropdown-container__dropdown-item__with-additional-info':
+            isRevokedCourt(item),
+        }"
         tabindex="0"
         @click="setChosenItem(item.value)"
         @keypress.enter="setChosenItem(item.value)"
@@ -311,6 +315,10 @@ onBeforeUnmount(() => {
 
     &:focus {
       @apply bg-blue-300;
+    }
+
+    &__with-additional-info {
+      @apply bg-gray-100;
     }
 
     &__additional-info {
