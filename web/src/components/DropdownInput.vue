@@ -68,6 +68,7 @@ const items = ref(props.dropdownItems ?? [])
 const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
+const dropdownItemsRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
 const ariaLabelDropdownIcon = computed(() =>
@@ -101,7 +102,7 @@ const setChosenItem = (value: DropdownInputModelType) => {
 
 const keyup = () => {
   focusedItemIndex.value -= 1
-  const prev = dropdownContainerRef.value?.childNodes[
+  const prev = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
   if (prev) prev.focus()
@@ -109,7 +110,7 @@ const keyup = () => {
 
 const keydown = () => {
   focusedItemIndex.value += 1
-  const next = dropdownContainerRef.value?.childNodes[
+  const next = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
   if (next) next.focus()
@@ -147,9 +148,9 @@ const insertItemIfEmpty = () => {
 }
 
 const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
-  const dropdown = document.querySelector(`#${props.id}.dropdown-container`)
-  if (dropdown == null) return
+  const dropdown = dropdownContainerRef.value
   if (
+    !dropdown ||
     (event.target as HTMLElement) === dropdown ||
     event.composedPath().includes(dropdown)
   )
@@ -183,7 +184,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="dropdown-container" @keydown.esc="closeDropdown">
+  <div
+    ref="dropdownContainerRef"
+    class="dropdown-container"
+    @keydown.esc="closeDropdown"
+  >
     <div
       class="dropdown-container__open-dropdown"
       @keydown.enter="toggleDropdown"
@@ -232,7 +237,7 @@ onBeforeUnmount(() => {
     </div>
     <div
       v-if="isShowDropdown"
-      ref="dropdownContainerRef"
+      ref="dropdownItemsRef"
       class="dropdown-container__dropdown-items"
       tabindex="-1"
     >
