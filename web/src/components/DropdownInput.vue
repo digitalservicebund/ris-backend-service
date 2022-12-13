@@ -158,10 +158,7 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
 }
 
 const selectAllText = () => {
-  const inputField = document.querySelector(
-    `input#${props.id}`
-  ) as HTMLInputElement
-  if (!!props.modelValue) inputField.select()
+  inputFieldRef.value?.select()
 }
 
 const closeDropdown = () => {
@@ -193,7 +190,6 @@ onBeforeUnmount(() => {
     >
       <div class="bg-white input-container">
         <input
-          :id="id"
           ref="inputFieldRef"
           v-model="inputText"
           :aria-label="ariaLabel"
