@@ -7,6 +7,7 @@ export const announcementDate: InputField[] = [
     label: "Verkündungsdatum",
     inputAttributes: {
       ariaLabel: "Verkündungsdatum",
+      isFutureDate: true,
     },
   },
   {
@@ -15,6 +16,7 @@ export const announcementDate: InputField[] = [
     label: "Veröffentlichungsdatum",
     inputAttributes: {
       ariaLabel: "Veröffentlichungsdatum",
+      isFutureDate: true,
     },
   },
 ]

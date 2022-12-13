@@ -7,6 +7,7 @@ export const citationDate: InputField[] = [
     label: "Zitierdatum",
     inputAttributes: {
       ariaLabel: "Zitierdatum",
+      isFutureDate: true,
     },
   },
 ]

@@ -69,7 +69,7 @@ export interface NestedInputField extends BaseInputField {
 //DATE
 export interface DateInputField extends BaseInputField {
   type: InputType.DATE
-  inputAttributes: BaseInputAttributes
+  inputAttributes: DateAttributes
 }
 
 export type DateInputModelType = string
@@ -86,6 +86,10 @@ export type DropdownInputModelType = string | Court
 export type DropdownItem = {
   text: string
   value: DropdownInputModelType
+}
+
+export interface DateAttributes extends BaseInputAttributes {
+  isFutureDate?: boolean
 }
 
 export interface DropdownAttributes extends BaseInputAttributes {
@@ -123,6 +127,7 @@ export type InputAttributes =
   | DropdownAttributes
   | ChipsInputAttributes
   | NestedInputAttributes
+  | DateAttributes
 
 export type ModelType =
   | TextInputModelType

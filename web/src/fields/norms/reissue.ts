@@ -23,6 +23,7 @@ export const reissue: InputField[] = [
     label: "Datum der Bekanntmachung",
     inputAttributes: {
       ariaLabel: "Datum der Bekanntmachung",
+      isFutureDate: true,
     },
   },
   {

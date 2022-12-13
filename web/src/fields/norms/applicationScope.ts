@@ -15,6 +15,7 @@ export const applicationScope: InputField[] = [
     label: "Anfangsdatum",
     inputAttributes: {
       ariaLabel: "Anfangsdatum",
+      isFutureDate: true,
     },
   },
   {
@@ -23,6 +24,7 @@ export const applicationScope: InputField[] = [
     label: "Endedatum",
     inputAttributes: {
       ariaLabel: "Endedatum",
+      isFutureDate: true,
     },
   },
 ]

@@ -23,6 +23,7 @@ export const repeal: InputField[] = [
     label: "Datum der Änderungsvorschrift",
     inputAttributes: {
       ariaLabel: "Datum der Änderungsvorschrift",
+      isFutureDate: true,
     },
   },
   {

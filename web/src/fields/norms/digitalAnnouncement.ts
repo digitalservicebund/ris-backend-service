@@ -15,6 +15,7 @@ export const digitalAnnouncement: InputField[] = [
     label: "Verkündungsdatum",
     inputAttributes: {
       ariaLabel: "Verkündungsdatum",
+      isFutureDate: true,
     },
   },
   {
