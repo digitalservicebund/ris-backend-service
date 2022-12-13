@@ -48,11 +48,18 @@ function isCourt(input?: DropdownInputModelType): input is Court {
 
 function checkInputValueType() {
   if (isCourt(inputValue.value)) {
+    // currently only court (Gericht)
     inputText.value = inputValue.value.label
   } else {
-    inputText.value = props.dropdownItems?.find(
-      (item) => item.value === inputValue.value
-    )?.text
+    if (props.endpoint) {
+      // currently only category (Dokumenttyp)
+      inputText.value = inputValue.value as string
+    } else {
+      // currently only legalEffect (Rechtskraft)
+      inputText.value = props.dropdownItems?.find(
+        (item) => item.value === inputValue.value
+      )?.text
+    }
   }
 }
 
