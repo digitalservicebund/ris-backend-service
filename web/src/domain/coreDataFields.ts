@@ -49,6 +49,25 @@ export function defineChipsField(
   }
 }
 
+export function defineChipsDateField(
+  name: string,
+  label: string,
+  ariaLabel: string,
+  required?: boolean,
+  placeholder?: string
+): InputField {
+  return {
+    name,
+    type: InputType.DATECHIPS,
+    label,
+    required,
+    inputAttributes: {
+      ariaLabel,
+      placeholder,
+    },
+  }
+}
+
 export function defineDateField(
   name: string,
   label: string,
@@ -140,12 +159,25 @@ export const coreDataFields: InputField[] = [
       ),
     }
   ),
-  defineDateField(
-    "decisionDate",
-    "Entscheidungsdatum",
-    "Entscheidungsdatum",
-    true,
-    undefined
+  defineNestedInputField(
+    "Toggle Abweichendes Entscheidungsdatum",
+    "nestedInputOfDecisionDateAndDeviatingDecisionDate",
+    {
+      parent: defineDateField(
+        "decisionDate",
+        "Entscheidungsdatum",
+        "Entscheidungsdatum",
+        true,
+        undefined
+      ),
+      child: defineChipsDateField(
+        "deviationDecisionDate",
+        "Abweichendes Entscheidungsdatum",
+        "AbweichendesEntscheidungsdatum",
+        true,
+        undefined
+      ),
+    }
   ),
   defineTextField("appraisalBody", "Spruchkörper", "Spruchkörper"),
   defineDropdownField(

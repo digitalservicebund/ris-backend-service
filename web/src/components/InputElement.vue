@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
+import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
@@ -44,6 +45,8 @@ const component = computed(() => {
       return CheckboxInput
     case InputType.CHIPS:
       return ChipsInput
+    case InputType.DATECHIPS:
+      return ChipsDateInput
     case InputType.NESTED:
       return NestedInput
     default:

@@ -7,6 +7,7 @@ export enum InputType {
   DATE = "date",
   CHECKBOX = "checkbox",
   CHIPS = "chips",
+  DATECHIPS = "datechips",
   NESTED = "nested",
 }
 
@@ -46,6 +47,11 @@ export interface ChipsInputAttributes extends BaseInputAttributes {
 
 export interface ChipsInputField extends BaseInputField {
   type: InputType.CHIPS
+  inputAttributes: ChipsInputAttributes
+}
+
+export interface DateChipsInputField extends BaseInputField {
+  type: InputType.DATECHIPS
   inputAttributes: ChipsInputAttributes
 }
 
@@ -120,6 +126,7 @@ export type InputField =
   | DateInputField
   | CheckboxInputField
   | ChipsInputField
+  | DateChipsInputField
   | NestedInputField
 
 export type InputAttributes =

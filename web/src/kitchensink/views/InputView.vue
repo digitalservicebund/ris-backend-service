@@ -1,16 +1,13 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
+import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
-import type {
-  DropdownInputModelType,
-  DateInputModelType,
-  ChipsInputModelType,
-} from "@/domain"
+import type { DropdownInputModelType, DateInputModelType } from "@/domain"
 import {
   ValidationError,
   defineDateField,
@@ -22,7 +19,6 @@ import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 const items: DropdownItem[] = dropdownItems.items
 const dropdownModelValue = ref<DropdownInputModelType>()
 const dateModelValue = ref<DateInputModelType>()
-const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const isReadonly = ref(true)
 const mockValidationError: ValidationError = {
   defaultMessage: "wrong date",
@@ -49,14 +45,6 @@ const updateDropdownModelValue = (
   textValue: DropdownInputModelType | undefined
 ) => {
   if (!!textValue) dropdownModelValue.value = textValue
-}
-
-const updateDateModelValue = (textValue: DateInputModelType | undefined) => {
-  if (!!textValue) dateModelValue.value = textValue
-}
-
-const updateChipsModelValue = (textValue: ChipsInputModelType | undefined) => {
-  if (!!textValue) chipsModelValue.value = textValue
 }
 </script>
 
@@ -104,7 +92,6 @@ const updateChipsModelValue = (textValue: ChipsInputModelType | undefined) => {
       aria-label="date input"
       :model-value="dateModelValue"
       :value="dateModelValue"
-      @update:model-value="updateDateModelValue"
     ></DateInput>
     <h1 class="font-bold text-24">Dropdown Input</h1>
     <div class="pb-4">
@@ -118,14 +105,16 @@ const updateChipsModelValue = (textValue: ChipsInputModelType | undefined) => {
         @update:model-value="updateDropdownModelValue"
       />
     </div>
+
     <h1 class="font-bold text-24">Chips Input</h1>
-    <ChipsInput
-      id="chipsInput"
-      aria-label="chips input"
-      :model-value="chipsModelValue"
-      :value="chipsModelValue"
-      @update:model-value="updateChipsModelValue"
-    ></ChipsInput>
+    <ChipsInput id="ChipsInput" aria-label="chips input"></ChipsInput>
+
+    <h1 class="font-bold text-24">Chips Date Input</h1>
+    <ChipsDateInput
+      id="chipsDateInput"
+      aria-label="chips date input"
+    ></ChipsDateInput>
+
     <h1 class="font-bold text-24">Nested Input</h1>
     <div class="mb-24">
       <NestedInput
