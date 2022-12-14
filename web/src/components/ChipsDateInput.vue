@@ -1,8 +1,16 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
 import { ref, onMounted, watch } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { ValidationError } from "@/domain"
+
+const props = defineProps<Props>()
+const emits = defineEmits<Emits>()
+
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 interface Props {
   id: string
@@ -18,9 +26,6 @@ interface Emits {
   (event: "input", value: Event): void
 }
 
-const props = defineProps<Props>()
-const emits = defineEmits<Emits>()
-
 const { emitInputEvent } = useInputModel<string[], Props, Emits>(props, emits)
 const chips = ref<string[]>(props.modelValue ?? [])
 const currentInput = ref<string>("")
@@ -32,7 +37,9 @@ watch(
   props,
   () =>
     (chips.value = props.modelValue
-      ? props.modelValue.map((value) => dayjs(value).format("YYYY-MM-DD"))
+      ? props.modelValue.map((value) =>
+          dayjs(value).tz("Europe/Berlin").format("YYYY-MM-DD")
+        )
       : []),
   {
     immediate: true,
@@ -44,7 +51,9 @@ function updateModelValue() {
     "update:modelValue",
     chips.value.length === 0
       ? undefined
-      : chips.value.map((value) => dayjs(value).toISOString())
+      : chips.value.map((value) =>
+          dayjs(value).tz("Europe/Berlin").toISOString()
+        )
   )
 }
 
