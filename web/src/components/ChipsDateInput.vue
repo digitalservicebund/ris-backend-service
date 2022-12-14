@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import dayjs from "dayjs"
+import { ref, onMounted, watch } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { ValidationError } from "@/domain"
 
@@ -27,8 +28,24 @@ const currentInputField = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
+watch(
+  props,
+  () =>
+    (chips.value = props.modelValue
+      ? props.modelValue.map((value) => dayjs(value).format("YYYY-MM-DD"))
+      : []),
+  {
+    immediate: true,
+  }
+)
+
 function updateModelValue() {
-  emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  emits(
+    "update:modelValue",
+    chips.value.length === 0
+      ? undefined
+      : chips.value.map((value) => dayjs(value).toISOString())
+  )
 }
 
 function formatDate(date: string) {

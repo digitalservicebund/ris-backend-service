@@ -13,29 +13,25 @@ import {
   defineDateField,
   NestedInputAttributes,
 } from "@/domain"
-import type { DropdownItem } from "@/domain/types"
+import type { ChipsInputModelType, DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 
 const items: DropdownItem[] = dropdownItems.items
 const dropdownModelValue = ref<DropdownInputModelType>()
 const dateModelValue = ref<DateInputModelType>()
+const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
+const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])
 const isReadonly = ref(true)
 const mockValidationError: ValidationError = {
   defaultMessage: "wrong date",
   field: "coreData.decisionDate",
 }
 const nestedInputFields: NestedInputAttributes["fields"] = {
-  parent: defineDateField(
-    "decisionDate",
-    "Entscheidungsdatum",
-    "Entscheidungsdatum",
-    true,
-    undefined
-  ),
+  parent: defineDateField("field", "Input", "Input", true, undefined),
   child: defineDateField(
-    "decisionDate",
-    "Entscheidungsdatum",
-    "Entscheidungsdatum",
+    "deviatingField",
+    "Abweichender Input",
+    "Abweichender Input",
     true,
     undefined
   ),
@@ -107,12 +103,19 @@ const updateDropdownModelValue = (
     </div>
 
     <h1 class="font-bold text-24">Chips Input</h1>
-    <ChipsInput id="ChipsInput" aria-label="chips input"></ChipsInput>
+    <ChipsInput
+      id="ChipsInput"
+      aria-label="chips input"
+      :model-value="chipsModelValue"
+      :value="chipsModelValue"
+    ></ChipsInput>
 
     <h1 class="font-bold text-24">Chips Date Input</h1>
     <ChipsDateInput
-      id="chipsDateInput"
+      id="ChipsDateInput"
       aria-label="chips date input"
+      :model-value="chipsDateModelValue"
+      :value="chipsDateModelValue"
     ></ChipsDateInput>
 
     <h1 class="font-bold text-24">Nested Input</h1>

@@ -18,6 +18,7 @@ public record CoreData(
     List<String> deviatingEclis,
     String appraisalBody,
     @PastOrPresent Instant decisionDate,
+    List<Instant> deviatingDecisionDates,
     @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,
     String inputType,
     String center,

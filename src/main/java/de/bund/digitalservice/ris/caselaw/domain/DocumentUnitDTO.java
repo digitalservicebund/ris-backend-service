@@ -60,6 +60,12 @@ public class DocumentUnitDTO {
             documentUnit.coreData().decisionDate() != null
                 ? documentUnit.coreData().decisionDate().toString()
                 : null)
+        .deviatingDecisionDates(
+            documentUnit.coreData().deviatingDecisionDates() != null
+                ? documentUnit.coreData().deviatingDecisionDates().stream()
+                    .map(deviatingDecisionDate -> deviatingDecisionDate.toString())
+                    .toList()
+                : null)
         .courtLocation(
             documentUnit.coreData().court() == null
                     || documentUnit.coreData().court().location() == null
@@ -120,6 +126,8 @@ public class DocumentUnitDTO {
 
   @Column("entscheidungsdatum")
   String decisionDate;
+
+  @Transient List<String> deviatingDecisionDates;
 
   @Column("gerichtssitz")
   String courtLocation;

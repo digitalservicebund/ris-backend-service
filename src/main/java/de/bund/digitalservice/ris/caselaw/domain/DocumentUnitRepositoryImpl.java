@@ -11,14 +11,17 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
   private final DatabaseDocumentUnitRepository repository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
+  private final DeviatingDecisionDateRepository deviatingDecisionDateRepository;
 
   public DocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
       FileNumberRepository fileNumberRepository,
-      DeviatingEcliRepository deviatingEcliRepository) {
+      DeviatingEcliRepository deviatingEcliRepository,
+      DeviatingDecisionDateRepository deviatingDecisionDateRepository) {
     this.repository = repository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
+    this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
   }
 
   private Mono<DocumentUnitDTO> injectFileNumbers(DocumentUnitDTO documentUnitDTO) {
@@ -53,12 +56,27 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
             });
   }
 
+  private Mono<DocumentUnitDTO> injectDeviatingDecisionDates(DocumentUnitDTO documentUnitDTO) {
+    return deviatingDecisionDateRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            deviatingDecisionDateDTOs -> {
+              documentUnitDTO.setDeviatingDecisionDates(
+                  deviatingDecisionDateDTOs.stream()
+                      .map(deviatingDecisionDate -> deviatingDecisionDate.getDecisiondate())
+                      .toList());
+              return Mono.just(documentUnitDTO);
+            });
+  }
+
   @Override
   public Mono<DocumentUnitDTO> findByDocumentnumber(String documentnumber) {
     return repository
         .findByDocumentnumber(documentnumber)
         .flatMap(this::injectFileNumbers)
-        .flatMap(this::injectDeviatingEclis);
+        .flatMap(this::injectDeviatingEclis)
+        .flatMap(this::injectDeviatingDecisionDates);
   }
 
   @Override
@@ -66,7 +84,8 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
     return repository
         .findByUuid(uuid)
         .flatMap(this::injectFileNumbers)
-        .flatMap(this::injectDeviatingEclis);
+        .flatMap(this::injectDeviatingEclis)
+        .flatMap(this::injectDeviatingDecisionDates);
   }
 
   @Override
@@ -135,12 +154,36 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
                           .toList())
                   .collectList()
                   .map(f -> duDTO);
+            })
+        .flatMap(
+            duDTO ->
+                deviatingDecisionDateRepository
+                    .deleteAllByDocumentUnitId(duDTO.getId())
+                    .thenReturn(duDTO))
+        .flatMap(
+            duDTO -> {
+              if (documentUnitDTO.getDeviatingDecisionDates() == null) {
+                return Mono.just(duDTO);
+              }
+              return deviatingDecisionDateRepository
+                  .saveAll(
+                      documentUnitDTO.getDeviatingDecisionDates().stream()
+                          .map(
+                              deviatingDecisionDate ->
+                                  DeviatingDecisionDateDTO.builder()
+                                      .documentUnitId(duDTO.getId())
+                                      .decisiondate(deviatingDecisionDate)
+                                      .build())
+                          .toList())
+                  .collectList()
+                  .map(f -> duDTO);
             });
   }
 
   @Override
   public Mono<Void> delete(DocumentUnitDTO documentUnitDTO) {
-    // CASCADE takes care of deleting the connected entries in the FileNumberRepository and
+    // CASCADE takes care of deleting the connected entries in the
+    // FileNumberRepository and
     // DeviatingEcliRepository
     return repository.delete(documentUnitDTO);
   }

@@ -84,6 +84,11 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getDecisionDate() != null
                 ? Instant.parse(documentUnitDTO.getDecisionDate())
                 : null,
+            documentUnitDTO.getDeviatingDecisionDates() != null
+                ? documentUnitDTO.getDeviatingDecisionDates().stream()
+                    .map(deviatingDecisionDate -> Instant.parse(deviatingDecisionDate))
+                    .toList()
+                : null,
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),
