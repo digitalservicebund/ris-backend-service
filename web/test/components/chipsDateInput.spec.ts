@@ -53,7 +53,7 @@ describe("ChipsInput", () => {
 
     const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(1)
-    expect(chipList[0]).toHaveTextContent("02.03.2022")
+    expect(chipList[0]).toHaveTextContent("03.02.2022")
 
     expect(input).toHaveValue("")
   })
@@ -84,8 +84,8 @@ describe("ChipsInput", () => {
 
     const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
-    expect(chipList[0]).toHaveTextContent("02.03.2022")
-    expect(chipList[1]).toHaveTextContent("01.03.2022")
+    expect(chipList[0]).toHaveTextContent("03.02.2022")
+    expect(chipList[1]).toHaveTextContent("03.01.2022")
 
     expect(input).toHaveValue("")
   })

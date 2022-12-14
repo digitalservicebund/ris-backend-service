@@ -48,11 +48,6 @@ function updateModelValue() {
   )
 }
 
-function formatDate(date: string) {
-  const [year, month, day] = date.split("-")
-  return [month, day, year].join(".")
-}
-
 function saveChip() {
   if (currentInput.value.length > 0) {
     chips.value.push(currentInput.value)
@@ -160,7 +155,7 @@ onMounted(() => {
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
       >
-        <div class="label-wrapper">{{ formatDate(chip) }}</div>
+        <div class="label-wrapper">{{ dayjs(chip).format("DD.MM.YYYY") }}</div>
 
         <div class="icon-wrapper">
           <em

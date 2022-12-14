@@ -160,7 +160,7 @@ export const coreDataFields: InputField[] = [
     }
   ),
   defineNestedInputField(
-    "Toggle Abweichendes Entscheidungsdatum",
+    "Abweichendes Entscheidungsdatum",
     "nestedInputOfDecisionDateAndDeviatingDecisionDates",
     {
       parent: defineDateField(
@@ -173,7 +173,7 @@ export const coreDataFields: InputField[] = [
       child: defineChipsDateField(
         "deviatingDecisionDates",
         "Abweichendes Entscheidungsdatum",
-        "AbweichendesEntscheidungsdatum",
+        "Abweichendes Entscheidungsdatum",
         true,
         undefined
       ),
