@@ -21,6 +21,26 @@ async function fillTextInput(page, field, value) {
   await locator.fill(value)
 }
 
+async function fillDropdown(page, field, value) {
+  const selector = `input#${field.name}`
+  expect(await page.inputValue(selector)).toBe(field.value ?? "")
+  const locatorInput = page.locator(selector + "+ button")
+  await locatorInput.click()
+  const locatorDropdownOptions = await page.locator(
+    '[aria-label="dropdown-option"]'
+  )
+
+  const count = await locatorDropdownOptions.count()
+  for (let i = 0; i < count; i++) {
+    const locatorOption = locatorDropdownOptions.nth(i)
+    if ((await locatorOption.innerText()) === value) {
+      await expect(locatorOption).toBeVisible()
+      await locatorOption.click()
+      break
+    }
+  }
+}
+
 async function editFields(page, fields, data) {
   for (const field of fields) {
     await expect(page.locator(`label[for="${field.name}"]`)).toBeVisible()
@@ -30,7 +50,9 @@ async function editFields(page, fields, data) {
     if (field.type === "text") {
       await fillTextInput(page, field, data[field.name])
     }
-    // TODO Properly inject data into the dropdown
+    if (field.type === "dropdown") {
+      await fillDropdown(page, field, data[field.name])
+    }
   }
 }
 
@@ -45,7 +67,11 @@ async function expectUpdatedFields(page, fields, data) {
       await expect(page.locator(input)).toBeVisible()
       expect(await page.inputValue(input)).toBe(data[field.name])
     }
-    // TODO Check the dropdown data
+    if (field.type === "dropdown") {
+      const input = `input#${field.name}`
+      await expect(page.locator(input)).toBeVisible()
+      expect(await page.inputValue(input)).toBe(data[field.name])
+    }
   }
 }
 

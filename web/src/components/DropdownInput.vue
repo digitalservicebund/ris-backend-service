@@ -195,6 +195,7 @@ onBeforeUnmount(() => {
     >
       <div class="bg-white input-container">
         <input
+          :id="id"
           ref="inputFieldRef"
           v-model="inputText"
           :aria-label="ariaLabel"
