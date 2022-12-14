@@ -4,7 +4,7 @@ fileignoreconfig:
   - filename: web/src/utilities/normUtilities.ts
     checksum: 81116ce9097165fc9534eada4c9a6842cdef5ee6e5667a05a7a72480cc817431
   - filename: web/test/e2e/norms/testdata/norm_edited_fields.json
-    checksum: 2f4d5d20b8c7d623b10ff0bc51ff53bd202fd790fa35d8a383165b5673996cb5
+    checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
   - filename: build.gradle
     checksum: 6bacfc3dee66f93bcd47e194cde9283344720acf727e0530c409e5c6e071e8b0
   - filename: run.sh
