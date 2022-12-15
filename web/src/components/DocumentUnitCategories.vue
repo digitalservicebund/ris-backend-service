@@ -39,9 +39,12 @@ const handleUpdateDocumentUnit = async () => {
   } else {
     validationErrors.value = []
   }
+  if (response.data) {
+    // TODO
+  }
   setTimeout(() => {
     hasDataChange.value = false
-    lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit)
+    lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit) // <-- updatedDocumentUnit?
     updateStatus.value = response.status
     if (updateStatus.value !== UpdateStatus.SUCCEED) return
   }, 1000)
