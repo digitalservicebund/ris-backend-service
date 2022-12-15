@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -61,12 +62,14 @@ public class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
+  @Autowired private StateRepository stateRepository;
 
   @BeforeEach
   void setUp() {
     repository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
     deviatingEcliRepository.deleteAll().block();
+    stateRepository.deleteAll().block();
   }
 
   @Test
