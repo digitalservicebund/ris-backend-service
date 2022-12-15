@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
 import java.nio.ByteBuffer;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -33,6 +34,8 @@ class LookupTableImporterServiceTest {
   @MockBean private JPADocumentTypeRepository jpaDocumentTypeRepository;
 
   @MockBean private CourtRepository courtRepository;
+
+  @MockBean private StateRepository stateRepository;
 
   @Test
   void testImportDocumentTypeLookupTable() {

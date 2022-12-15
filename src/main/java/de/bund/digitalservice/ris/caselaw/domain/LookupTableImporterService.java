@@ -8,6 +8,9 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtReposito
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
@@ -25,14 +28,17 @@ public class LookupTableImporterService {
   private final DocumentTypeRepository documentTypeRepository;
   private final JPADocumentTypeRepository jpaDocumentTypeRepository;
   private final CourtRepository courtRepository;
+  private final StateRepository stateRepository;
 
   public LookupTableImporterService(
       DocumentTypeRepository documentTypeRepository,
       JPADocumentTypeRepository jpaDocumentTypeRepository,
-      CourtRepository courtRepository) {
+      CourtRepository courtRepository,
+      StateRepository stateRepository) {
     this.documentTypeRepository = documentTypeRepository;
     this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.courtRepository = courtRepository;
+    this.stateRepository = stateRepository;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -151,6 +157,34 @@ public class LookupTableImporterService {
             .toList();
 
     courtRepository.deleteAll().thenMany(courtRepository.saveAll(courtsDTO)).subscribe();
+
+    return Mono.just("Successfully imported the court lookup table");
+  }
+
+  public Mono<String> importStateLookupTable(ByteBuffer byteBuffer) {
+    XmlMapper mapper = new XmlMapper();
+    StatesXML statesXML;
+    try {
+      statesXML = mapper.readValue(byteBuffer.array(), StatesXML.class);
+    } catch (IOException e) {
+      throw new ResponseStatusException(
+          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to StatesXML", e);
+    }
+
+    List<StateDTO> statesDTO =
+        statesXML.getList().stream()
+            .map(
+                stateXML ->
+                    StateDTO.builder()
+                        .id(stateXML.getId())
+                        .changeindicator(stateXML.getChangeIndicator())
+                        .version(stateXML.getVersion())
+                        .jurisshortcut(stateXML.getJurisShortcut())
+                        .label(stateXML.getLabel())
+                        .build())
+            .toList();
+
+    stateRepository.deleteAll().thenMany(stateRepository.saveAll(statesDTO)).subscribe();
 
     return Mono.just("Successfully imported the court lookup table");
   }

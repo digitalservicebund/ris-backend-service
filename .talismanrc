@@ -151,6 +151,8 @@ fileignoreconfig:
     checksum: a3c395357ffe854d65f419645a617b90ae1c965238e53d1615ce7bffcd36874e
   - filename: src/main/resources/db/migration/V0.17__caselaw_add_deviating_decisiondate_table.sql
     checksum: 00c110e0076f04049444474ab1bc884dbfe188039d5727d0dec575f044f50aae
+  - filename: src/main/resources/db/migration/V0.18__caselaw_add_statelookuptable.sql
+    checksum: b2c24a69d918b8b9c8012a94770d154bd57479fb2aeb6ab5737654bd25d1d36f
 
 scopeconfig:
   - scope: node
