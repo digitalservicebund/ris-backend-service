@@ -75,8 +75,18 @@ watch(
 
 const coreData = computed({
   get: () => props.documentUnit.coreData,
-  set: (newValues) =>
-    Object.assign(updatedDocumentUnit.value.coreData, newValues),
+  set: (newValues) => {
+    let triggerSaving = false
+    if (
+      updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
+    ) {
+      triggerSaving = true
+    }
+    Object.assign(updatedDocumentUnit.value.coreData, newValues)
+    if (triggerSaving) {
+      handleUpdateDocumentUnit()
+    }
+  },
 })
 
 const previousDecisions = computed({
