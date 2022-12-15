@@ -223,4 +223,13 @@ export const coreDataFields: InputField[] = [
     legalEffectTypes.items,
     undefined
   ),
+  defineTextField(
+    "region",
+    "Region",
+    "Region",
+    false,
+    "",
+    { defaultMessage: "", field: "" },
+    true
+  ),
 ]
