@@ -186,6 +186,6 @@ public class LookupTableImporterService {
 
     stateRepository.deleteAll().thenMany(stateRepository.saveAll(statesDTO)).subscribe();
 
-    return Mono.just("Successfully imported the court lookup table");
+    return Mono.just("Successfully imported the state lookup table");
   }
 }

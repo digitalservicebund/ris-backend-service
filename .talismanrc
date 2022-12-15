@@ -130,7 +130,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 5abe6438ebc906ee3fd3cc464de0f1fb5624ad09fd330d881d3195ec0ca14577
+    checksum: 29fe888228ab1d238bddb358d55336f0ee7695056353a03f2c241fdfb6f60ca8
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts

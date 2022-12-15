@@ -101,6 +101,9 @@ public class DocumentUnitRepositoryImpl implements DocumentUnitRepository {
   @Override
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Mono<DocumentUnitDTO> save(DocumentUnitDTO documentUnitDTO) {
+    // Do we want to make the state-injection everytime? If not we'd have to:
+    // - do it only when there is no region set, or
+    // - do it only when the court has changed <-- how to check that?
     return courtRepository
         .findByCourttypeAndCourtlocation(
             documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation())

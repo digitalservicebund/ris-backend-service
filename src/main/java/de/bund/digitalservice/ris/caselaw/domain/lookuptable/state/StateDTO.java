@@ -14,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 public class StateDTO {
   public static final StateDTO EMPTY = new StateDTO();
   long id;
-  char changeindicator;
+  Character changeindicator;
   String version;
   String jurisshortcut;
   String label;

@@ -6,6 +6,10 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
 import java.time.Instant;
 import java.util.List;
@@ -62,6 +66,7 @@ public class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
+  @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
 
   @BeforeEach
@@ -69,6 +74,7 @@ public class DocumentUnitIntegrationTest {
     repository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
     deviatingEcliRepository.deleteAll().block();
+    courtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
   }
 
@@ -198,5 +204,120 @@ public class DocumentUnitIntegrationTest {
     assertThat(deviatingEclis).hasSize(2);
     assertThat(deviatingEclis.get(0).getEcli()).isEqualTo("ecli123");
     assertThat(deviatingEclis.get(1).getEcli()).isEqualTo("ecli456");
+  }
+
+  @Test
+  void testRegionFilledBasedOnCourt_courtHasStateShortcut_shouldUseStateName() {
+    DocumentUnit documentUnitFromFrontend =
+        testRegionFilledBasedOnCourt("BE", "Berlin", "region123");
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().court().label())
+                  .isEqualTo(documentUnitFromFrontend.coreData().court().label());
+              assertThat(response.getResponseBody().coreData().region()).isEqualTo("Berlin");
+            });
+  }
+
+  @Test
+  void testRegionFilledBasedOnCourt_courtHasNoStateShortcut_shouldUseCourtRegion() {
+    DocumentUnit documentUnitFromFrontend = testRegionFilledBasedOnCourt(null, null, "region123");
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().court().label())
+                  .isEqualTo(documentUnitFromFrontend.coreData().court().label());
+              assertThat(response.getResponseBody().coreData().region()).isEqualTo("region123");
+            });
+  }
+
+  @Test
+  void testRegionFilledBasedOnCourt_courtHasNoStateShortcutAndNoRegion_shouldLeaveEmpty() {
+    DocumentUnit documentUnitFromFrontend = testRegionFilledBasedOnCourt(null, null, null);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().court().label())
+                  .isEqualTo(documentUnitFromFrontend.coreData().court().label());
+              assertThat(response.getResponseBody().coreData().region()).isNull();
+            });
+  }
+
+  private DocumentUnit testRegionFilledBasedOnCourt(
+      String stateShortcutInCourtAndState, String stateNameInState, String regionInCourt) {
+    CourtDTO courtDTO =
+        CourtDTO.builder()
+            .courttype("ABC")
+            .courtlocation("location123")
+            .federalstate(stateShortcutInCourtAndState)
+            .region(regionInCourt)
+            .build();
+    courtRepository.save(courtDTO).block();
+    stateRepository
+        .save(
+            StateDTO.builder()
+                .jurisshortcut(stateShortcutInCourtAndState)
+                .label(stateNameInState)
+                .build())
+        .block();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(UUID.randomUUID())
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .courtType(courtDTO.getCourttype())
+            .courtLocation(courtDTO.getCourtlocation())
+            .build();
+
+    DocumentUnitDTO savedDto = repository.save(dto).block();
+    assert savedDto != null;
+
+    return DocumentUnit.builder()
+        .id(savedDto.id)
+        .uuid(dto.getUuid())
+        .creationtimestamp(dto.getCreationtimestamp())
+        .documentNumber(dto.getDocumentnumber())
+        .coreData(
+            CoreData.builder()
+                .court(
+                    new Court(
+                        savedDto.getCourtType(),
+                        savedDto.getCourtLocation(),
+                        savedDto.getCourtType() + " " + savedDto.getCourtLocation(),
+                        ""))
+                .build())
+        .texts(Texts.builder().decisionName("decisionName").build())
+        .build();
   }
 }
