@@ -53,6 +53,7 @@ function saveChip() {
     chips.value.push(currentInput.value)
     updateModelValue()
     currentInput.value = ""
+    resetFocus()
   }
 }
 
@@ -64,6 +65,7 @@ function deleteChip(index: number) {
 }
 
 function resetFocus() {
+  currentInputField.value?.blur()
   focusedItemIndex.value = undefined
   currentInputField.value?.focus()
 }
