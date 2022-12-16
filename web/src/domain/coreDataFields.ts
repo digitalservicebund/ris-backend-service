@@ -1,4 +1,9 @@
-import { InputType, LookupTableEndpoint, ValidationError } from "./types"
+import {
+  InputType,
+  LookupTableEndpoint,
+  NestedInputAttributes,
+  ValidationError,
+} from "./types"
 import type { InputField, DropdownItem } from "./types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 
@@ -9,8 +14,7 @@ export function defineTextField(
   required?: boolean,
   placeholder?: string,
   validationError?: ValidationError,
-  readOnly?: boolean,
-  subField?: InputField
+  readOnly?: boolean
 ): InputField {
   return {
     name,
@@ -22,7 +26,25 @@ export function defineTextField(
       placeholder,
       validationError,
       readOnly,
-      subField,
+    },
+  }
+}
+
+export function defineChipsField(
+  name: string,
+  label: string,
+  ariaLabel: string,
+  required?: boolean,
+  placeholder?: string
+): InputField {
+  return {
+    name,
+    type: InputType.CHIPS,
+    label,
+    required,
+    inputAttributes: {
+      ariaLabel,
+      placeholder,
     },
   }
 }
@@ -52,7 +74,6 @@ export function defineDropdownField(
   isCombobox?: boolean,
   dropdownItems?: DropdownItem[],
   endpoint?: LookupTableEndpoint,
-  preselectedValue?: string,
   validationError?: ValidationError
 ): InputField {
   return {
@@ -66,15 +87,27 @@ export function defineDropdownField(
       dropdownItems,
       endpoint,
       isCombobox,
-      preselectedValue,
       validationError,
     },
   }
 }
 
-export const coreDataFields: InputField[] = [
-  // defineTextField("courtType", "Gerichtstyp", "Gerichtstyp", true),
-  // defineTextField("courtLocation", "Gerichtssitz", "Gerichtssitz"),
+export function defineNestedInputField(
+  ariaLabel: string,
+  name: string,
+  fields: NestedInputAttributes["fields"]
+): InputField {
+  return {
+    name,
+    type: InputType.NESTED,
+    inputAttributes: {
+      ariaLabel,
+      fields,
+    },
+  }
+}
+
+export const courtFields: InputField[] = [
   defineDropdownField(
     "court",
     "Gericht",
@@ -85,20 +118,27 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.courts
   ),
-  defineTextField(
-    "fileNumber",
-    "Aktenzeichen",
-    "Aktenzeichen",
-    true,
-    "",
-    undefined,
-    false,
-    defineTextField(
-      "divergentFileNumber",
-      "Abweichendes Aktenzeichen",
-      "Abweichendes Aktenzeichen",
-      true
-    )
+]
+export const coreDataFields: InputField[] = [
+  defineNestedInputField(
+    "Abweichendes Aktenzeichen",
+    "nestedInputOfFileNumbersAndDeviatingFileNumbers",
+    {
+      parent: defineChipsField(
+        "fileNumbers",
+        "Aktenzeichen",
+        "Aktenzeichen",
+        true,
+        ""
+      ),
+      child: defineChipsField(
+        "deviatingFileNumbers",
+        "Abweichendes Aktenzeichen",
+        "Abweichendes Aktenzeichen",
+        false,
+        ""
+      ),
+    }
   ),
   defineDateField(
     "decisionDate",
@@ -118,7 +158,28 @@ export const coreDataFields: InputField[] = [
     [],
     LookupTableEndpoint.documentTypes
   ),
-  defineTextField("ecli", "ECLI", "ECLI"),
+  defineNestedInputField(
+    "Abweichender ECLI",
+    "nestedInputOfEcliAndDeviatingEclis",
+    {
+      parent: defineTextField(
+        "ecli",
+        "ECLI",
+        "ECLI",
+        false,
+        "",
+        { defaultMessage: "", field: "" },
+        false
+      ),
+      child: defineChipsField(
+        "deviatingEclis",
+        "Abweichender ECLI",
+        "Abweichender ECLI",
+        false,
+        ""
+      ),
+    }
+  ),
   defineTextField("procedure", "Vorgang", "Vorgang"),
   defineDropdownField(
     "legalEffect",
@@ -128,58 +189,6 @@ export const coreDataFields: InputField[] = [
     "",
     false,
     legalEffectTypes.items,
-    undefined,
-    legalEffectTypes.items[0].value
-  ),
-]
-
-export const prefilledDataFields: InputField[] = [
-  defineTextField(
-    "center",
-    "Dokumentationsstelle",
-    "Dokumentationsstelle",
-    false,
-    "",
-    { defaultMessage: "", field: "" },
-    true
-  ),
-  defineTextField(
-    "region",
-    "Region",
-    "Region",
-    false,
-    "",
-    { defaultMessage: "", field: "" },
-    true
-  ),
-  defineTextField(
-    "type",
-    "Dokumentart",
-    "Dokumentart",
-    false,
-    "",
-    { defaultMessage: "", field: "" },
-    true
-  ),
-  defineTextField(
-    "judicature",
-    "Gerichtbarkeit",
-    "Gerichtbarkeit",
-    false,
-    "",
-    { defaultMessage: "", field: "" },
-    true
-  ),
-]
-
-export const moreCategories: InputField[] = [
-  defineDropdownField(
-    "moreCategories",
-    "Weitere Rubrik",
-    "Weitere Rubrik",
-    false,
-    "Bitte auswählen",
-    false,
-    []
+    undefined
   ),
 ]

@@ -1,4 +1,4 @@
-import { fireEvent, render, waitFor } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, test } from "vitest"
 import { createRouter, createWebHistory } from "vue-router"
@@ -21,14 +21,14 @@ describe("FileUpload", () => {
   })
 
   test("renders file upload with default props", async () => {
-    const { getByText } = render(FileUpload, {
+    render(FileUpload, {
       props: {
         documentUnitUuid: "1",
       },
       global: { plugins: [router] },
     })
 
-    getByText(
+    screen.getByText(
       "Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus"
     )
   })
@@ -41,14 +41,14 @@ describe("FileUpload", () => {
       })
     )
 
-    const { getByLabelText, emitted } = render(FileUpload, {
+    const { emitted } = render(FileUpload, {
       props: {
         documentUnitUuid: "1",
       },
       global: { plugins: [router] },
     })
 
-    const inputEl = getByLabelText("oder Datei auswählen", {
+    const inputEl = screen.getByLabelText("oder Datei auswählen", {
       selector: "input",
       exact: false,
     })
@@ -62,7 +62,7 @@ describe("FileUpload", () => {
       configurable: true,
     })
 
-    await waitFor(() => fireEvent.update(inputEl))
+    await fireEvent.update(inputEl)
 
     await flushPromises()
 
@@ -70,14 +70,14 @@ describe("FileUpload", () => {
   })
 
   test("upload fails if file has no docx format", async () => {
-    const { getByText, getByLabelText, emitted } = render(FileUpload, {
+    const { emitted } = render(FileUpload, {
       props: {
         documentUnitUuid: "1",
       },
       global: { plugins: [router] },
     })
 
-    const inputEl = getByLabelText("Upload File")
+    const inputEl = screen.getByLabelText("Upload File")
 
     const file = new File(["test"], "sample.png", {
       type: "image/png",
@@ -88,10 +88,10 @@ describe("FileUpload", () => {
       configurable: true,
     })
 
-    await waitFor(() => fireEvent.update(inputEl))
+    await fireEvent.update(inputEl)
 
     expect(emitted().updateDocumentUnit).not.toBeTruthy()
-    getByText("Datei in diesen Bereich ziehen", { exact: false })
+    screen.getByText("Datei in diesen Bereich ziehen", { exact: false })
   })
 
   test("upload fails because the file is too large", async () => {
@@ -105,7 +105,7 @@ describe("FileUpload", () => {
       })
     )
 
-    const { getByText, getByLabelText } = render(FileUpload, {
+    render(FileUpload, {
       props: {
         documentUnitUuid: "1",
       },
@@ -114,7 +114,7 @@ describe("FileUpload", () => {
 
     const file = new File(["test"], "sample.docx")
 
-    const inputEl = getByLabelText("oder Datei auswählen", {
+    const inputEl = screen.getByLabelText("oder Datei auswählen", {
       selector: "input",
       exact: false,
     })
@@ -124,12 +124,14 @@ describe("FileUpload", () => {
       configurable: true,
     })
 
-    await waitFor(() => fireEvent.update(inputEl))
+    await fireEvent.update(inputEl)
 
     await flushPromises()
 
-    getByText("Die Datei darf max. 20 MB groß sein.", { exact: false })
-    getByText("Bitte laden Sie eine kleinere Datei hoch.", { exact: false })
+    screen.getByText("Die Datei darf max. 20 MB groß sein.", { exact: false })
+    screen.getByText("Bitte laden Sie eine kleinere Datei hoch.", {
+      exact: false,
+    })
   })
 
   test.skip("upload fails due to unknown error while sending via service", async () => {
@@ -144,7 +146,7 @@ describe("FileUpload", () => {
       })
     )
 
-    const { getByText, getByLabelText } = render(FileUpload, {
+    render(FileUpload, {
       props: {
         documentUnitUuid: "1",
       },
@@ -153,7 +155,7 @@ describe("FileUpload", () => {
 
     const file = new File(["test"], "sample.docx")
 
-    const inputEl = getByLabelText("oder Datei auswählen", {
+    const inputEl = screen.getByLabelText("oder Datei auswählen", {
       selector: "input",
       exact: false,
     })
@@ -163,13 +165,16 @@ describe("FileUpload", () => {
       configurable: true,
     })
 
-    await waitFor(() => fireEvent.update(inputEl))
+    await fireEvent.update(inputEl)
 
     await flushPromises()
 
-    getByText("Leider ist ein Fehler aufgetreten.", { exact: false })
-    getByText("Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.", {
-      exact: false,
-    })
+    screen.getByText("Leider ist ein Fehler aufgetreten.", { exact: false })
+    screen.getByText(
+      "Bitte versuchen Sie es zu einem späteren Zeitpunkt erneut.",
+      {
+        exact: false,
+      }
+    )
   })
 })

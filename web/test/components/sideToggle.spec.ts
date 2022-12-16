@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import ExpandableContentnt from "@/components/ExpandableContent.vue"
 
 function renderComponent({
@@ -18,73 +18,73 @@ function renderComponent({
     header: headerSlot,
   }
   const props = { header, isExpanded }
-  const renderResult = render(ExpandableContentnt, { slots, props })
+  const utils = render(ExpandableContentnt, { slots, props })
   const user = userEvent.setup()
 
-  return { user, ...renderResult }
+  return { user, ...utils }
 }
 
 describe("ExpandableContent", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
   it("displays given header property as regular text", () => {
-    const { queryByText } = renderComponent({ header: "test header" })
-    const header = queryByText("test header")
+    renderComponent({ header: "test header" })
+    const header = screen.queryByText("test header")
 
     expect(header).toBeInTheDocument()
   })
 
   it("renders given header slot", () => {
-    const { queryByText } = renderComponent({
+    renderComponent({
       headerSlot: "<span>test header</span>",
     })
-    const header = queryByText("test header")
+    const header = screen.queryByText("test header")
 
     expect(header).toBeInTheDocument()
   })
 
   it("renders default slot into content", () => {
-    const { getByText } = renderComponent({ defaultSlot: "test content" })
-    const content = getByText("test content")
+    renderComponent({ defaultSlot: "test content" })
+    const content = screen.getByText("test content")
 
     expect(content).toBeInTheDocument()
   })
 
   it("hides content per default", () => {
-    const { getByText } = renderComponent({ defaultSlot: "test content" })
-    const content = getByText("test content")
+    renderComponent({ defaultSlot: "test content" })
+    const content = screen.getByText("test content")
 
     expect(content).not.toBeVisible()
   })
 
   it("can open content per default with property", () => {
-    const { getByText } = renderComponent({
+    renderComponent({
       isExpanded: true,
       defaultSlot: "test content",
     })
-    const content = getByText("test content")
+    const content = screen.getByText("test content")
 
     expect(content).toBeVisible()
   })
 
   it("body can be toggled by clicking", async () => {
-    const { getByText, getByRole, user } = renderComponent({
+    const { user } = renderComponent({
       defaultSlot: "test content",
     })
-    const header = getByRole("button")
-    let content = getByText("test content")
+    const header = screen.getByRole("button")
+    let content = screen.getByText("test content")
 
     expect(content).not.toBeVisible()
     await user.click(header)
-    content = getByText("test content")
+    content = screen.getByText("test content")
     expect(content).toBeVisible()
     await user.click(header)
-    content = getByText("test content")
+    content = screen.getByText("test content")
     expect(content).not.toBeVisible()
   })
 
   it("emits update event when content gets toggled", async () => {
-    const { emitted, getByRole, user } = renderComponent()
-    const header = getByRole("button")
+    const { emitted, user } = renderComponent()
+    const header = screen.getByRole("button")
 
     await user.click(header)
     await user.click(header)

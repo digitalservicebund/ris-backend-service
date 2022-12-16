@@ -4,15 +4,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseXmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
-import de.bund.digitalservice.ris.caselaw.adapter.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.PostgresXmlMailRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
-import de.bund.digitalservice.ris.caselaw.adapter.XmlMailDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlMailRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import java.time.Instant;
@@ -41,6 +42,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
   DocumentUnitService.class,
   DatabaseDocumentNumberService.class,
   PostgresDocumentUnitRepositoryImpl.class,
+  PostgresDocumentUnitListEntryRepositoryImpl.class,
   PostgresXmlMailRepositoryImpl.class,
   XmlEMailPublishService.class,
   MockXmlExporter.class,

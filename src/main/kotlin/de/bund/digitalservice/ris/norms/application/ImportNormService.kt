@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 import java.util.*
 
 @Service
@@ -22,18 +21,42 @@ class ImportNormService(private val saveNormPort: SaveNormOutputPort) : ImportNo
 private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
     val articles = data.articles.map { createArticle(it) }
     return Norm(
-        guid, data.longTitle, articles, data.officialShortTitle,
-        data.officialAbbreviation, data.referenceNumber,
-        if (data.publicationDate != null) LocalDate.parse(data.publicationDate) else null,
-        if (data.announcementDate != null) LocalDate.parse(data.announcementDate) else null,
-        if (data.citationDate != null) LocalDate.parse(data.citationDate) else null,
-        data.frameKeywords, data.authorEntity,
-        data.authorDecidingBody, data.authorIsResolutionMajority,
-        data.leadJurisdiction,
-        data.leadUnit, data.participationType, data.participationInstitution,
-        data.documentTypeName, data.documentNormCategory, data.documentTemplateName,
-        data.subjectFna, data.subjectPreviousFna, data.subjectGesta,
-        data.subjectBgb3
+        guid = guid,
+        officialLongTitle = data.officialLongTitle,
+        articles = articles,
+        officialShortTitle = data.officialShortTitle,
+        officialAbbreviation = data.officialAbbreviation,
+        referenceNumber = data.referenceNumber,
+        announcementDate = data.announcementDate,
+        citationDate = data.citationDate,
+        frameKeywords = data.frameKeywords,
+        providerEntity = data.providerEntity,
+        providerDecidingBody = data.providerDecidingBody,
+        providerIsResolutionMajority = data.providerIsResolutionMajority,
+        leadJurisdiction = data.leadJurisdiction,
+        leadUnit = data.leadUnit,
+        participationType = data.participationType,
+        participationInstitution = data.participationInstitution,
+        subjectFna = data.subjectFna,
+        subjectGesta = data.subjectGesta,
+        documentNumber = data.documentNumber,
+        documentCategory = data.documentCategory,
+        risAbbreviationInternationalLaw = data.risAbbreviationInternationalLaw,
+        unofficialReference = data.unofficialReference,
+        applicationScopeArea = data.applicationScopeArea,
+        applicationScopeStartDate = data.applicationScopeStartDate,
+        applicationScopeEndDate = data.applicationScopeEndDate,
+        validityRule = data.validityRule,
+        celexNumber = data.celexNumber,
+        definition = data.definition,
+        categorizedReference = data.categorizedReference,
+        otherFootnote = data.otherFootnote,
+        expirationDate = data.expirationDate,
+        entryIntoForceDate = data.entryIntoForceDate,
+        unofficialLongTitle = data.unofficialLongTitle,
+        unofficialShortTitle = data.unofficialShortTitle,
+        unofficialAbbreviation = data.unofficialAbbreviation,
+        risAbbreviation = data.risAbbreviation
     )
 }
 

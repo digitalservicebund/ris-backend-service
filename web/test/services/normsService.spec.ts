@@ -114,27 +114,158 @@ describe("normsService", () => {
 
   describe("edit norm frame", () => {
     it("sends command to the backend with the correct parameters", async () => {
-      const httpClientPatch = vi
+      const httpClientPut = vi
         .mocked(httpClient)
-        .patch.mockResolvedValueOnce({ status: 204, data: "" })
+        .put.mockResolvedValueOnce({ status: 204, data: "" })
 
-      await editNormFrame("fake-guid", "new title")
+      await editNormFrame("fake-guid", {
+        officialLongTitle: "new title",
+        officialShortTitle: "",
+        officialAbbreviation: undefined,
+        referenceNumber: "",
+        publicationDate: "2022-11-14T23:00:00.000Z",
+        announcementDate: "",
+        citationDate: undefined,
+        frameKeywords: "",
+        providerEntity: "new provider entity",
+        providerDecidingBody: undefined,
+        providerIsResolutionMajority: undefined,
+        leadJurisdiction: undefined,
+        leadUnit: undefined,
+        participationType: undefined,
+        participationInstitution: undefined,
+      })
 
-      expect(httpClientPatch).toHaveBeenCalledOnce()
-      expect(httpClientPatch).toHaveBeenLastCalledWith(
+      expect(httpClientPut).toHaveBeenCalledOnce()
+      expect(httpClientPut).toHaveBeenLastCalledWith(
         "norms/fake-guid",
-        undefined,
-        { longTitle: "new title" }
+        {
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+        },
+        {
+          announcementDate: null,
+          documentTemplateName: null,
+          citationDate: null,
+          frameKeywords: null,
+          officialAbbreviation: null,
+          officialLongTitle: "new title",
+          participationType: null,
+          providerDecidingBody: null,
+          providerEntity: "new provider entity",
+          providerIsResolutionMajority: null,
+          publicationDate: "2022-11-15",
+          referenceNumber: null,
+          officialShortTitle: null,
+          isExpirationDateTemp: null,
+          leadJurisdiction: null,
+          risAbbreviation: null,
+          leadUnit: null,
+          participationInstitution: null,
+          subjectBgb3: null,
+          ageIndicationEnd: null,
+          ageIndicationStart: null,
+          ageOfMajorityIndication: null,
+          applicationScopeArea: null,
+          applicationScopeEndDate: null,
+          applicationScopeStartDate: null,
+          categorizedReference: null,
+          celexNumber: null,
+          completeCitation: null,
+          definition: null,
+          digitalAnnouncementDate: null,
+          digitalAnnouncementArea: null,
+          digitalAnnouncementAreaNumber: null,
+          digitalAnnouncementEdition: null,
+          digitalAnnouncementExplanations: null,
+          digitalAnnouncementInfo: null,
+          digitalAnnouncementMedium: null,
+          digitalAnnouncementPage: null,
+          digitalAnnouncementYear: null,
+          digitalEvidenceAppendix: null,
+          digitalEvidenceExternalDataNote: null,
+          digitalEvidenceLink: null,
+          digitalEvidenceRelatedData: null,
+          divergentDocumentNumber: null,
+          divergentEntryIntoForceDate: null,
+          divergentEntryIntoForceDateState: null,
+          divergentExpirationDate: null,
+          divergentExpirationDateState: null,
+          documentCategory: null,
+          documentNormCategory: null,
+          documentNumber: null,
+          documentStatusDate: null,
+          documentStatusDescription: null,
+          documentStatusEntryIntoForceDate: null,
+          documentStatusProof: null,
+          documentStatusReference: null,
+          documentStatusWorkNote: null,
+          documentTextProof: null,
+          documentTypeName: null,
+          entryIntoForceDate: null,
+          entryIntoForceDateState: null,
+          euAnnouncementExplanations: null,
+          euAnnouncementGazette: null,
+          euAnnouncementInfo: null,
+          euAnnouncementNumber: null,
+          euAnnouncementPage: null,
+          euAnnouncementSeries: null,
+          euAnnouncementYear: null,
+          europeanLegalIdentifier: null,
+          expirationDate: null,
+          expirationDateState: null,
+          expirationNormCategory: null,
+          otherDocumentNote: null,
+          otherFootnote: null,
+          otherOfficialAnnouncement: null,
+          otherStatusNote: null,
+          principleEntryIntoForceDate: null,
+          principleEntryIntoForceDateState: null,
+          principleExpirationDate: null,
+          principleExpirationDateState: null,
+          printAnnouncementExplanations: null,
+          printAnnouncementGazette: null,
+          printAnnouncementInfo: null,
+          printAnnouncementNumber: null,
+          printAnnouncementPage: null,
+          printAnnouncementYear: null,
+          reissueArticle: null,
+          reissueDate: null,
+          reissueNote: null,
+          reissueReference: null,
+          repealArticle: null,
+          repealDate: null,
+          repealNote: null,
+          repealReferences: null,
+          risAbbreviationInternationalLaw: null,
+          statusDate: null,
+          statusDescription: null,
+          statusNote: null,
+          statusReference: null,
+          subjectFna: null,
+          subjectGesta: null,
+          subjectPreviousFna: null,
+          text: null,
+          unofficialAbbreviation: null,
+          unofficialLongTitle: null,
+          unofficialReference: null,
+          unofficialShortTitle: null,
+          validityRule: null,
+        }
       )
     })
 
     it("responds with correct error message if server response status is above 300", async () => {
-      vi.mocked(httpClient).patch.mockResolvedValueOnce({
+      vi.mocked(httpClient).put.mockResolvedValueOnce({
         status: 300,
         data: "",
       })
 
-      const response = await editNormFrame("fake-guid", "new title")
+      const response = await editNormFrame("fake-guid", {
+        officialLongTitle: "new title",
+      })
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden."
@@ -142,12 +273,14 @@ describe("normsService", () => {
     })
 
     it("responds with correct error message if connection failed", async () => {
-      vi.mocked(httpClient).patch.mockResolvedValueOnce({
+      vi.mocked(httpClient).put.mockResolvedValueOnce({
         status: 500,
         error: { title: "error" },
       })
 
-      const response = await editNormFrame("fake-guid", "new title")
+      const response = await editNormFrame("fake-guid", {
+        officialLongTitle: "new title",
+      })
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden."

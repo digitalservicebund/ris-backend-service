@@ -27,7 +27,7 @@ class LookupTableControllerTest {
 
   @Test
   void testGetDocumentTypes() {
-    when(service.getDocumentTypes(Optional.empty())).thenReturn(Flux.empty());
+    when(service.getCaselawDocumentTypes(Optional.empty())).thenReturn(Flux.empty());
 
     webClient
         .mutateWith(csrf())
@@ -37,7 +37,7 @@ class LookupTableControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getDocumentTypes(Optional.empty());
+    verify(service, times(1)).getCaselawDocumentTypes(Optional.empty());
   }
 
   @Test

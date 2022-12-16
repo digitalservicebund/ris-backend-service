@@ -3,8 +3,10 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import io.mockk.every
-import io.mockk.slot
 import io.mockk.verify
+import norms.utils.assertEditNormFramePropertiesAndEditNormRequestSchema
+import norms.utils.convertEditNormRequestSchemaToJson
+import norms.utils.createRandomEditNormRequestSchema
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -17,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
-import java.util.*
+import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [EditNormFrameController::class])
@@ -29,20 +31,27 @@ class EditNormFrameControllerTest {
 
     @Test
     fun `it correctly maps the parameter and body to the command calling the service`() {
+        val editNormRequestSchema = createRandomEditNormRequestSchema()
+        val editJson = convertEditNormRequestSchemaToJson(editNormRequestSchema)
+
         every { editNormFrameService.editNormFrame(any()) } returns Mono.just(true)
 
         webClient
             .mutateWith(csrf())
-            .patch()
+            .put()
             .uri("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "new title" }"""))
+            .body(BodyInserters.fromValue(editJson))
             .exchange()
 
-        var command = slot<EditNormFrameUseCase.Command>()
-        verify(exactly = 1) { editNormFrameService.editNormFrame(capture(command)) }
-        assertTrue(command.captured.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
-        assertTrue(command.captured.longTitle == "new title")
+        verify(exactly = 1) {
+            editNormFrameService.editNormFrame(
+                withArg {
+                    assertTrue(it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
+                    assertEditNormFramePropertiesAndEditNormRequestSchema(it.properties, editNormRequestSchema)
+                }
+            )
+        }
     }
 
     @Test
@@ -51,10 +60,10 @@ class EditNormFrameControllerTest {
 
         webClient
             .mutateWith(csrf())
-            .patch()
+            .put()
             .uri("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "new title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "new title" }"""))
             .exchange()
             .expectStatus()
             .isNoContent()
@@ -68,10 +77,10 @@ class EditNormFrameControllerTest {
 
         webClient
             .mutateWith(csrf())
-            .patch()
+            .put()
             .uri("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "new title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "new title" }"""))
             .exchange()
             .expectStatus()
             .is5xxServerError()

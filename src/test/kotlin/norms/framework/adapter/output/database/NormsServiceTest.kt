@@ -4,7 +4,9 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
+import norms.utils.createRandomNorm
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -28,15 +30,7 @@ import java.util.*
 class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     companion object {
-        private val NORM: Norm = Norm(
-            UUID.randomUUID(), "Norm title", listOf(), "official short title", "official abbreviation",
-            null, LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "author entity", "author deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
-        )
+        private val NORM: Norm = createRandomNorm()
         private val ARTICLE1: Article = Article(UUID.randomUUID(), "Article1 title", "§ 1")
         private val ARTICLE2: Article = Article(UUID.randomUUID(), "Article2 title", "§ 2")
         private val PARAGRAPH1: Paragraph = Paragraph(UUID.randomUUID(), "(1)", "Text1")
@@ -124,6 +118,36 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(norm.guid)
             .`as`(StepVerifier::create)
             .assertNext { validateNorm(norm, it) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save norm and edit norm`() {
+        normsService.saveNorm(NORM)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(NORM.guid)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        val updatedNorm = NORM.copy(
+            officialLongTitle = "new title", documentNumber = "document number",
+            providerEntity = "provider entity", entryIntoForceDate = LocalDate.now(),
+            expirationDateState = UndefinedDate.UNDEFINED_FUTURE, printAnnouncementGazette = "print gazette",
+            completeCitation = "complete citation", unofficialAbbreviation = "unofficial abbreviation",
+            celexNumber = "celex number"
+        )
+        normsService.editNorm(updatedNorm)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(NORM.guid)
+            .`as`(StepVerifier::create)
+            .assertNext { validateNorm(updatedNorm, it) }
             .verifyComplete()
     }
 

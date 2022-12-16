@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import { computed, defineComponent, markRaw } from "vue"
 import ModelComponentRepeater from "@/components/ModelComponentRepeater.vue"
 
@@ -37,27 +37,27 @@ function renderComponent(options?: {
     addButton: options?.addButtonSlot ?? "",
     removeButton: options?.removeButtonSlot ?? "",
   }
-  const renderResult = render(ModelComponentRepeater, { props, slots })
+  const utils = render(ModelComponentRepeater, { props, slots })
   const user = userEvent.setup()
-  return { user, ...renderResult }
+  return { user, ...utils }
 }
 
 describe("ModelComponentRepeater", () => {
   it("renders a component instance per model entry", () => {
     const modelValue = ["", ""]
-    const { queryAllByRole } = renderComponent({ modelValue })
+    renderComponent({ modelValue })
 
-    const textboxes = queryAllByRole("textbox")
+    const textboxes = screen.queryAllByRole("textbox")
 
     expect(textboxes).toHaveLength(2)
   })
 
   it("injects model value entries into component instances", () => {
     const modelValue = ["foo", "bar"]
-    const { queryByDisplayValue } = renderComponent({ modelValue })
+    renderComponent({ modelValue })
 
-    const fooInstance = queryByDisplayValue("foo")
-    const barInstance = queryByDisplayValue("bar")
+    const fooInstance = screen.queryByDisplayValue("foo")
+    const barInstance = screen.queryByDisplayValue("bar")
 
     expect(fooInstance).toBeInTheDocument()
     expect(barInstance).toBeInTheDocument()
@@ -65,9 +65,9 @@ describe("ModelComponentRepeater", () => {
 
   it("renders components in the same order as the model value entries", () => {
     const modelValue = ["foo", "bar"]
-    const { queryAllByRole } = renderComponent({ modelValue })
+    renderComponent({ modelValue })
 
-    const instances = queryAllByRole("textbox")
+    const instances = screen.queryAllByRole("textbox")
 
     expect(instances).toHaveLength(2)
     expect(instances[0]).toHaveValue("foo")
@@ -76,8 +76,8 @@ describe("ModelComponentRepeater", () => {
 
   it("emits update model value event when any component changes its value", async () => {
     const modelValue = ["a", "c"]
-    const { emitted, getByDisplayValue, user } = renderComponent({ modelValue })
-    const instance = getByDisplayValue("a")
+    const { emitted, user } = renderComponent({ modelValue })
+    const instance = screen.getByDisplayValue("a")
 
     await user.type(instance, "b")
 
@@ -86,31 +86,33 @@ describe("ModelComponentRepeater", () => {
   })
 
   it("shows a single add button", () => {
-    const { queryAllByRole } = renderComponent()
+    renderComponent()
 
-    const addButton = queryAllByRole("button", { name: "Eintrag Hinzufügen" })
+    const addButton = screen.queryAllByRole("button", {
+      name: "Eintrag Hinzufügen",
+    })
 
     expect(addButton.length).toBe(1) // Small "hack" to test `single`.
   })
 
   it("adds another component instance when add button gets clicked", async () => {
     const modelValue = ["", ""]
-    const { queryAllByRole, getByRole, user } = renderComponent({ modelValue })
-    const addButton = getByRole("button", { name: "Eintrag Hinzufügen" })
+    const { user } = renderComponent({ modelValue })
+    const addButton = screen.getByRole("button", { name: "Eintrag Hinzufügen" })
 
-    expect(queryAllByRole("textbox")).toHaveLength(2)
+    expect(screen.queryAllByRole("textbox")).toHaveLength(2)
 
     await user.click(addButton)
 
-    expect(queryAllByRole("textbox")).toHaveLength(3)
+    expect(screen.queryAllByRole("textbox")).toHaveLength(3)
   })
 
   it("adds another model entry with default value when add button gets clicked", async () => {
-    const { emitted, getByRole, user } = renderComponent({
+    const { emitted, user } = renderComponent({
       modelValue: ["old"],
       defaultValue: "new",
     })
-    const addButton = getByRole("button", { name: "Eintrag Hinzufügen" })
+    const addButton = screen.getByRole("button", { name: "Eintrag Hinzufügen" })
 
     await user.click(addButton)
 
@@ -121,9 +123,9 @@ describe("ModelComponentRepeater", () => {
   it("renders optional add button slot", async () => {
     const addButtonSlot =
       "<button aria-label='Add Button'>Custom Button</button>"
-    const { queryByLabelText } = renderComponent({ addButtonSlot })
+    renderComponent({ addButtonSlot })
 
-    const addButton = queryByLabelText("Add Button")
+    const addButton = screen.queryByLabelText("Add Button")
 
     expect(addButton).toBeInTheDocument()
     expect(addButton).toHaveTextContent("Custom Button")
@@ -131,9 +133,9 @@ describe("ModelComponentRepeater", () => {
 
   it("shows a remove button for each entry except last", () => {
     const modelValue = ["", "", ""]
-    const { queryAllByRole } = renderComponent({ modelValue })
+    renderComponent({ modelValue })
 
-    const removeButtons = queryAllByRole("button", {
+    const removeButtons = screen.queryAllByRole("button", {
       name: "Eintrag Entfernen",
     })
 
@@ -142,20 +144,24 @@ describe("ModelComponentRepeater", () => {
 
   it("removes the related instance if a remove button gets clicked", async () => {
     const modelValue = ["", "", ""]
-    const { getAllByRole, user } = renderComponent({ modelValue })
-    const removeButtons = getAllByRole("button", { name: "Eintrag Entfernen" })
+    const { user } = renderComponent({ modelValue })
+    const removeButtons = screen.getAllByRole("button", {
+      name: "Eintrag Entfernen",
+    })
 
-    expect(getAllByRole("textbox")).toHaveLength(3)
+    expect(screen.getAllByRole("textbox")).toHaveLength(3)
 
     await user.click(removeButtons[0])
 
-    expect(getAllByRole("textbox")).toHaveLength(2)
+    expect(screen.getAllByRole("textbox")).toHaveLength(2)
   })
 
   it("emits update model value event when any instance gets removed", async () => {
     const modelValue = ["a", "b", "c"]
-    const { emitted, getAllByRole, user } = renderComponent({ modelValue })
-    const removeButtons = getAllByRole("button", { name: "Eintrag Entfernen" })
+    const { emitted, user } = renderComponent({ modelValue })
+    const removeButtons = screen.getAllByRole("button", {
+      name: "Eintrag Entfernen",
+    })
 
     await user.click(removeButtons[1])
 
@@ -164,13 +170,13 @@ describe("ModelComponentRepeater", () => {
   })
 
   it("renders optional remove button slot", async () => {
-    const { queryByLabelText } = renderComponent({
+    renderComponent({
       modelValue: ["", ""],
       removeButtonSlot:
         "<button aria-label='Remove Button'>Custom Button</button>",
     })
 
-    const removeButton = queryByLabelText("Remove Button")
+    const removeButton = screen.queryByLabelText("Remove Button")
 
     expect(removeButton).toBeInTheDocument()
     expect(removeButton).toHaveTextContent("Custom Button")

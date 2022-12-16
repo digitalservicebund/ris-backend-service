@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
 import { Court } from "@/domain/documentUnit"
 import type { DropdownItem } from "@/domain/types"
 import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
-import lookupTableService from "@/services/lookupTableService"
+import dropdownItemService from "@/services/dropdownItemService"
 
 interface Props {
   id: string
@@ -14,7 +14,6 @@ interface Props {
   dropdownItems?: DropdownItem[]
   endpoint?: LookupTableEndpoint
   isCombobox?: boolean
-  preselectedValue?: string
 }
 
 interface Emits {
@@ -31,7 +30,7 @@ watch(
   props,
   () => {
     inputValue.value = props.modelValue ?? props.value
-    checkValue()
+    checkInputValueType()
   },
   {
     immediate: true,
@@ -40,16 +39,20 @@ watch(
 
 watch(inputValue, () => {
   emit("update:modelValue", inputValue.value)
-  checkValue()
+  checkInputValueType()
 })
 
-function checkValue() {
-  // TODO better solution to check for court type
-  if (typeof inputValue.value === "object") {
-    const court = inputValue.value as Court
-    inputText.value = court.label
+function isCourt(input?: DropdownInputModelType): input is Court {
+  return typeof input === "object" && "location" in input && "type" in input
+}
+
+function checkInputValueType() {
+  if (isCourt(inputValue.value)) {
+    inputText.value = inputValue.value.label
   } else {
-    inputText.value = inputValue.value as string
+    inputText.value = props.dropdownItems?.find(
+      (item) => item.value === inputValue.value
+    )?.text
   }
 }
 
@@ -58,12 +61,18 @@ const items = ref(props.dropdownItems ?? [])
 const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
+const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
+const ariaLabelDropdownIcon = computed(() =>
+  isShowDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
+)
 
 const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
+  focusedItemIndex.value = 0
   if (isShowDropdown.value) {
     updateCurrentItems()
+    inputFieldRef.value?.focus()
   }
 }
 
@@ -71,7 +80,10 @@ const clearSelection = () => {
   emit("update:modelValue", undefined)
   filter.value = ""
   inputText.value = ""
-  updateCurrentItems()
+  if (isShowDropdown.value) {
+    updateCurrentItems()
+  }
+  inputFieldRef.value?.focus()
 }
 
 const setChosenItem = (value: DropdownInputModelType) => {
@@ -97,24 +109,27 @@ const keydown = () => {
 }
 
 const onTextChange = () => {
+  focusedItemIndex.value = 0
   isShowDropdown.value = true
   filter.value = inputText.value
   updateCurrentItems()
 }
 
-const updateCurrentItems = () => {
-  if (!!props.endpoint) {
-    lookupTableService
-      .fetch(props.endpoint, filter.value)
-      .then((dropdownItems: DropdownItem[]) => {
-        currentItems.value = dropdownItems
-        insertItemIfEmpty()
-      })
-  } else {
+const updateCurrentItems = async () => {
+  if (!props.endpoint) {
     currentItems.value = items.value.filter((item) =>
       item.text.includes(!!filter.value ? filter.value : "")
     )
     insertItemIfEmpty()
+    return
+  }
+
+  const response = await dropdownItemService.fetch(props.endpoint, filter.value)
+  if (response.data) {
+    currentItems.value = response.data
+    insertItemIfEmpty()
+  } else {
+    console.error(response.error)
   }
 }
 
@@ -146,8 +161,15 @@ const closeDropdown = () => {
   isShowDropdown.value = false
 }
 
+const isRevokedCourt = (item: DropdownItem) => {
+  return !!(isCourt(item.value) && item.value.revoked)
+}
+
+const getRevokedCourtString = (item: DropdownItem) => {
+  return (item.value as Court).revoked
+}
+
 onMounted(() => {
-  if (props.preselectedValue) inputValue.value = props.preselectedValue
   window.addEventListener("click", closeDropDownWhenClickOutSide)
 })
 
@@ -157,7 +179,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :id="id" class="dropdown-container" @keydown.esc="closeDropdown">
+  <div class="dropdown-container" @keydown.esc="closeDropdown">
     <div
       class="dropdown-container__open-dropdown"
       @keydown.enter="toggleDropdown"
@@ -165,6 +187,7 @@ onBeforeUnmount(() => {
       <div class="bg-white input-container">
         <input
           :id="id"
+          ref="inputFieldRef"
           v-model="inputText"
           :aria-label="ariaLabel"
           autocomplete="off"
@@ -174,6 +197,7 @@ onBeforeUnmount(() => {
           tabindex="0"
           @click="selectAllText"
           @input="onTextChange"
+          @keyup.down="keydown"
         />
         <button
           v-if="isCombobox && inputText"
@@ -187,6 +211,7 @@ onBeforeUnmount(() => {
           </span>
         </button>
         <button
+          :aria-label="ariaLabelDropdownIcon"
           class="input-expand-icon"
           tabindex="0"
           @click="toggleDropdown"
@@ -211,14 +236,27 @@ onBeforeUnmount(() => {
       <div
         v-for="(item, index) in currentItems"
         :key="index"
+        aria-label="dropdown-option"
         class="dropdown-container__dropdown-item"
+        :class="{
+          'dropdown-container__dropdown-item__with-additional-info':
+            isRevokedCourt(item),
+        }"
         tabindex="0"
         @click="setChosenItem(item.value)"
         @keypress.enter="setChosenItem(item.value)"
         @keyup.down="keydown"
         @keyup.up="keyup"
       >
-        <span> {{ item.text }}</span>
+        <span>
+          {{ item.text }}
+          <span
+            v-if="isRevokedCourt(item)"
+            aria-label="additional-dropdown-info"
+            class="body-02-reg dropdown-container__dropdown-item__additional-info"
+            >{{ getRevokedCourtString(item) }}</span
+          ></span
+        >
       </div>
     </div>
   </div>
@@ -232,15 +270,14 @@ onBeforeUnmount(() => {
   user-select: none;
 
   &__open-dropdown {
-    @apply border-2 border-solid border-blue-900;
-
     .input-container {
-      @apply hover:shadow-hover hover:shadow-blue-900 focus:shadow-focus focus:shadow-blue-900;
+      @apply border-2 border-solid border-blue-800 hover:shadow-hover hover:shadow-blue-800 focus:shadow-focus focus:shadow-blue-800;
 
       display: flex;
+      height: 3.75rem;
       flex: row nowrap;
       justify-content: space-between;
-      padding: 17px 24px;
+      padding: 12px 16px;
 
       .text-input {
         width: 100%;
@@ -281,11 +318,21 @@ onBeforeUnmount(() => {
     }
 
     &:hover {
-      @apply bg-blue-200;
+      @apply bg-blue-300;
     }
 
     &:focus {
-      @apply bg-blue-200;
+      @apply bg-blue-300;
+    }
+
+    &__with-additional-info {
+      @apply bg-gray-100;
+    }
+
+    &__additional-info {
+      @apply text-gray-900;
+
+      float: right;
     }
   }
 }

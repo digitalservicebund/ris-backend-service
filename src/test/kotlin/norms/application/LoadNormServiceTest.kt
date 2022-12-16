@@ -2,9 +2,9 @@ package de.bund.digitalservice.ris.norms.application
 
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import io.mockk.every
 import io.mockk.mockk
+import norms.utils.createRandomNorm
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
@@ -18,7 +18,7 @@ class LoadNormServiceTest {
         val service = LoadNormService(port)
         val guid = UUID.randomUUID()
         val query = LoadNormUseCase.Query(guid)
-        val norm = Norm(guid, "title")
+        val norm = createRandomNorm()
 
         every { port.getNormByGuid(guid) } returns Mono.just(norm)
 

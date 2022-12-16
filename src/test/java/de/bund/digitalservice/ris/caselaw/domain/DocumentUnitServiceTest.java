@@ -13,7 +13,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitTransformer;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
@@ -569,7 +568,6 @@ class DocumentUnitServiceTest {
             .fileuploadtimestamp(Instant.now())
             .previousDecisions(null)
             .build();
-    var documentUnitDTO = DocumentUnitTransformer.generateDTO(documentUnit);
     when(repository.save(documentUnit)).thenReturn(Mono.just(documentUnit));
     StepVerifier.create(service.updateDocumentUnit(documentUnit))
         .consumeNextWith(du -> assertEquals(du, documentUnit))

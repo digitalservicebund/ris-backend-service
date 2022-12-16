@@ -32,7 +32,7 @@ class ArchitectureFitnessTest {
   void packagesShouldBeFreeOfCycles() {
     SliceRule rule =
         SlicesRuleDefinition.slices()
-            .matching("de.bund.digitalservice.(**)")
+            .matching("de.bund.digitalservice.ris.caselaw.(*)")
             .should()
             .beFreeOfCycles();
     rule.check(classes);

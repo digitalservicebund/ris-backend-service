@@ -2,11 +2,6 @@ import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import NavbarTop from "../../src/components/NavbarTop.vue"
 
-const HEADER_TEXT_SUB_TEXT = "Rechtsinformationen"
-const HEADER_TEXT = " Rechtsinformationen des Bundes "
-const NAVBAR_TOP_LINK_TEXT = "Rechtsprechung"
-const NAVBAR_TOP_LINK_URL = "/"
-
 describe("navbar top", () => {
   const router = createRouter({
     history: createWebHistory(),
@@ -30,12 +25,9 @@ describe("navbar top", () => {
       global: { plugins: [router] },
     })
 
-    const header_text = screen
-      .getByText(HEADER_TEXT_SUB_TEXT, { exact: false })
-      .closest("div")
-    expect(header_text?.textContent).toEqual(HEADER_TEXT)
-
-    const navLink = screen.getByText(NAVBAR_TOP_LINK_TEXT).closest("a")
-    expect(navLink?.href).contains(NAVBAR_TOP_LINK_URL)
+    expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
+    expect(screen.getByText("Normen")).toBeInTheDocument()
+    expect(screen.getByText("Rechtsinformationen")).toBeInTheDocument()
+    expect(screen.getByText("des Bundes")).toBeInTheDocument()
   })
 })

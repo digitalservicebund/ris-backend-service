@@ -8,6 +8,7 @@ const norms = ref((await getAllNorms()).data)
 
 <template>
   <div class="bg-gray-100 flex flex-col gap-16">
+    <h1 class="heading-02-regular p-16 pl-64">Dokumentationseinheiten</h1>
     <NormsList
       v-if="norms && norms.length !== 0"
       class="grow max-w-screen-lg"

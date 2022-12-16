@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onUnmounted, watch } from "vue"
+import { onUnmounted } from "vue"
 import TextButton from "./TextButton.vue"
 import { useSaveToRemote } from "@/composables/useSaveToRemote"
 import { ServiceResponse } from "@/services/httpClient"
@@ -7,10 +7,6 @@ import { ServiceResponse } from "@/services/httpClient"
 const props = defineProps<{
   ariaLabel: string
   serviceCallback: () => Promise<ServiceResponse<void>>
-}>()
-
-const emit = defineEmits<{
-  (e: "fetchNorm"): void
 }>()
 
 const getCurrentTime = (dateSaved: Date) => {
@@ -21,12 +17,6 @@ const getCurrentTime = (dateSaved: Date) => {
 
 const { saveIsInProgress, triggerSave, lastSaveError, lastSavedOn, timer } =
   useSaveToRemote(props.serviceCallback, 10000)
-
-const handleNormUpdate = () => {
-  emit("fetchNorm")
-}
-
-watch(() => lastSavedOn, handleNormUpdate, { immediate: true })
 
 onUnmounted(() => {
   clearInterval(timer)

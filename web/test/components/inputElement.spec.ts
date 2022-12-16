@@ -1,14 +1,16 @@
 import userEvent from "@testing-library/user-event"
-import { fireEvent, render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import InputElement from "@/components/InputElement.vue"
 import { InputType } from "@/domain"
 import type { ModelType } from "@/domain"
 
 function renderComponent(options?: {
+  id?: string
   type?: InputType
   modelValue?: ModelType
 }) {
   const props = {
+    id: "test",
     type: options?.type,
     modelValue: options?.modelValue,
     attributes: {
@@ -16,44 +18,45 @@ function renderComponent(options?: {
       ariaLabel: "test-label",
     },
   }
-  const renderResult = render(InputElement, { props })
+  const utils = render(InputElement, { props })
   const user = userEvent.setup()
-  return { user, ...renderResult }
+  return { user, ...utils }
 }
 
 describe("InputElement", () => {
   it("renders per default a textbox element", () => {
-    const { queryByRole } = renderComponent({ type: undefined })
+    renderComponent({ type: undefined })
 
-    const textbox = queryByRole("textbox")
+    const textbox = screen.queryByRole("textbox")
 
     expect(textbox).toBeInTheDocument()
   })
 
   it("renders a textbox when type property defines so", () => {
-    const { queryByRole } = renderComponent({ type: InputType.TEXT })
+    renderComponent({ type: InputType.TEXT })
 
-    const textbox = queryByRole("textbox")
+    const textbox = screen.queryByRole("textbox")
 
     expect(textbox).toBeInTheDocument()
   })
 
   it("displays model value into input element", () => {
-    const { queryByDisplayValue } = renderComponent({
+    renderComponent({
       modelValue: "test value",
     })
 
-    const input = queryByDisplayValue("test value")
+    const input = screen.queryByDisplayValue("test value")
 
     expect(input).toBeInTheDocument()
   })
 
   it("emits update model value event when input is used", async () => {
-    const { emitted, getByRole } = renderComponent({
+    const { emitted, user } = renderComponent({
       type: InputType.TEXT,
     })
-    const input = getByRole("textbox")
-    await fireEvent.change(input, { target: { value: "a" } })
+    const input = screen.getByRole("textbox")
+    await user.type(input, "a")
+    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([["a"]])

@@ -127,8 +127,9 @@ export interface LevelTwoMenuItem {
 </script>
 
 <template>
-  <div class="w-[16rem]">
+  <aside aria-label="sidebar navigation" class="w-[16rem]">
     <router-link
+      aria-label="Zurück"
       class="border-b-1 border-gray-400 flex gap-12 h-80 items-center link-01-bold px-14 text-blue-800"
       :to="goBackRoute"
     >
@@ -142,6 +143,7 @@ export interface LevelTwoMenuItem {
       class="border-b-1 border-gray-400"
     >
       <router-link
+        aria-label="Menü Eintrag"
         class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold pl-[1rem] py-[1.25rem]"
         :class="levelOneItem.classes"
         :to="levelOneItem.route"
@@ -153,6 +155,7 @@ export interface LevelTwoMenuItem {
         <router-link
           v-for="levelTwoItem in levelOneItem.children"
           :key="levelTwoItem.label"
+          aria-label="Submenü Eintrag"
           class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg pl-[2rem] py-[1rem]"
           :class="levelTwoItem.classes"
           :to="levelTwoItem.route"
@@ -161,5 +164,5 @@ export interface LevelTwoMenuItem {
         </router-link>
       </div>
     </div>
-  </div>
+  </aside>
 </template>

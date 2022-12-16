@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentNumberCounterRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import java.util.Calendar;
@@ -37,8 +38,8 @@ public class DatabaseDocumentNumberService implements DocumentNumberService {
             documentNumberCounter ->
                 String.format(
                     "%s%s%04d%05d",
-                    documentUnitCreationInfo.getDocumentationCenterAbbreviation(),
-                    documentUnitCreationInfo.getDocumentType(),
+                    documentUnitCreationInfo.documentationCenterAbbreviation(),
+                    documentUnitCreationInfo.documentType(),
                     currentYear,
                     documentNumberCounter.getNextnumber() - 1));
   }

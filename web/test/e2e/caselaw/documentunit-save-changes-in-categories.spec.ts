@@ -42,6 +42,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+    await page.locator("[aria-label='ECLI']").fill("abc123")
+    await page.keyboard.press("Enter")
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
@@ -50,7 +52,21 @@ test.describe("save changes in core data and texts and verify it persists", () =
     ).toBeVisible()
 
     await page.reload()
-    expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("abc")
+    expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("")
+    expect(await page.inputValue("[aria-label='ECLI']")).toBe("abc123")
+  })
+
+  test("saved changes also visible in document unit entry list", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+    await page.locator("[aria-label='ECLI']").fill("abc123")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
     await page.goto("/")
     await expect(
@@ -62,6 +78,134 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator(".table-row", {
       hasText: "abc",
     })
+  })
+
+  test("nested 'Aktenzeichen' input toggles child input and correctly displays data", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("one")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("two")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=one").first()).toBeVisible()
+    await expect(page.locator("text=two").first()).toBeVisible()
+
+    await expect(page.locator("text=Abweichendes Aktenzeichen>")).toBeHidden()
+
+    await page
+      .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
+      .click()
+
+    await expect(
+      page.locator("text=Abweichendes Aktenzeichen").first()
+    ).toBeVisible()
+
+    await page.locator("[aria-label='Abweichendes Aktenzeichen']").fill("three")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+
+    await page.reload()
+
+    await page
+      .locator("[aria-label='Abweichendes Aktenzeichen anzeigen']")
+      .click()
+
+    await expect(page.locator("text=three").first()).toBeVisible()
+
+    await page
+      .locator("[aria-label='Abweichendes Aktenzeichen schließen']")
+      .click()
+
+    await expect(
+      page.locator("text=Abweichendes Aktenzeichen").first()
+    ).toBeHidden()
+  })
+
+  test("nested 'ECLI' input toggles child input and correctly displays data", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='ECLI']").fill("one")
+    await expect(page.locator("text=one").first()).toBeVisible()
+
+    await expect(page.locator("text=Abweichender ECLI>")).toBeHidden()
+
+    await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
+
+    await expect(page.locator("text=Abweichender ECLI").first()).toBeVisible()
+
+    await page.locator("[aria-label='Abweichender ECLI']").fill("two")
+    await page.keyboard.press("Enter")
+    await page.locator("[aria-label='Abweichender ECLI']").fill("three")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+
+    await page.reload()
+
+    await page.locator("[aria-label='Abweichender ECLI anzeigen']").click()
+    await expect(page.locator("text=two").first()).toBeVisible()
+    await expect(page.locator("text=three").first()).toBeVisible()
+
+    await page.locator("[aria-label='Abweichender ECLI schließen']").click()
+
+    await expect(page.locator("text=Abweichender ECLI").first()).toBeHidden()
+  })
+
+  test("adding and deleting multiple inputs", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("testone")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("testtwo")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("testthree")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=testone").first()).toBeVisible()
+    await expect(page.locator("text=testtwo").first()).toBeVisible()
+
+    await page.keyboard.press("ArrowLeft")
+    await page.keyboard.press("ArrowLeft")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=testtwo").first()).toBeHidden()
+
+    await page.keyboard.press("ArrowLeft")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=testone").first()).toBeHidden()
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+
+    await page.reload()
+
+    await expect(page.locator("text=testthree").first()).toBeVisible()
   })
 
   test("test previous decision data change", async ({
@@ -104,27 +248,31 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await fillPreviousDecisionInputs(page)
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
 
-    await page.pause()
-
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
         .nth(1)
         .inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Gerichtsort Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtsort Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtsort Rechtszug']")
         .nth(1)
         .inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
+    await expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
     expect(
       await page.locator("[aria-label='Datum Rechtszug']").nth(1).inputValue()
     ).toBe("")
-    expect(page.locator("[aria-label='Aktenzeichen Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Aktenzeichen Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Aktenzeichen Rechtszug']")
@@ -143,7 +291,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
     await fillPreviousDecisionInputs(page, { courtType: "Type Two" }, 1)
 
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(2)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(2)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
@@ -159,12 +309,68 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await page.locator("[aria-label='Entscheidung Entfernen']").click()
 
-    expect(page.locator("[aria-label='Gerichtstyp Rechtszug']")).toHaveCount(1)
+    await expect(
+      page.locator("[aria-label='Gerichtstyp Rechtszug']")
+    ).toHaveCount(1)
     expect(
       await page
         .locator("[aria-label='Gerichtstyp Rechtszug']")
         .nth(0)
         .inputValue()
     ).toBe("Type Two")
+  })
+
+  test("text editor fields should have predefined height", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    // small
+    const smallEditor = page.locator("[aria-label='Titelzeile Editor Feld']")
+    const smallEditorHeight = await smallEditor.evaluate((element) =>
+      window.getComputedStyle(element).getPropertyValue("height")
+    )
+    expect(parseInt(smallEditorHeight)).toBeGreaterThanOrEqual(60)
+
+    //medium
+    const mediumEditor = page.locator("[aria-label='Leitsatz Editor Feld']")
+    const mediumEditorHeight = await mediumEditor.evaluate((element) =>
+      window.getComputedStyle(element).getPropertyValue("height")
+    )
+    expect(parseInt(mediumEditorHeight)).toBeGreaterThanOrEqual(120)
+
+    //large
+    const largeEditor = page.locator("[aria-label='Gründe Editor Feld']")
+    const largeEditorHeight = await largeEditor.evaluate((element) =>
+      window.getComputedStyle(element).getPropertyValue("height")
+    )
+    expect(parseInt(largeEditorHeight)).toBeGreaterThanOrEqual(320)
+  })
+
+  test("updated fileNumber should update info panel", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const infoPanel = page.locator("div", { hasText: documentNumber }).nth(-2)
+    const fileNumberPanel = infoPanel
+      .locator("div", { hasText: "Aktenzeichen" })
+      .nth(-2)
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen - ")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("-firstChip")
+    await page.keyboard.press("Enter")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("-secondChip")
+    await page.keyboard.press("Enter")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-firstChip")
+
+    // delete first chip
+    await page.locator("div", { hasText: "-firstChip" }).nth(-2).click()
+    await page.keyboard.press("Enter")
+    await expect(fileNumberPanel).toHaveText("Aktenzeichen-secondChip")
   })
 })

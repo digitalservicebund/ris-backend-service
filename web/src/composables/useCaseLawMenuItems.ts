@@ -53,14 +53,6 @@ export function useCaseLawMenuItems(
       },
     },
     {
-      label: "Bearbeitungsstand",
-      route: {
-        ...baseRoute,
-        name: "caselaw",
-      },
-      isDisabled: true,
-    },
-    {
       label: "Veröffentlichen",
       route: {
         ...baseRoute,

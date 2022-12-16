@@ -3,8 +3,10 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import io.mockk.every
-import io.mockk.slot
 import io.mockk.verify
+import norms.utils.assertNormDataAndImportNormRequestSchemaWithoutArticles
+import norms.utils.convertImportormRequestSchemaToJson
+import norms.utils.createRandomImportNormRequestSchema
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -17,7 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
-import java.util.*
+import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
 @WebFluxTest(controllers = [ImportNormController::class])
@@ -29,43 +31,8 @@ class ImportNormControllerTest {
 
     @Test
     fun `it correctly maps the data to the command to call the import norm service`() {
-        val importJson =
-            """
-{
-	"longTitle": "long title",
-	"articles": [
-		{
-			"marker": "§ 1",
-			"title": "article title",
-			"paragraphs": [
-				{
-					"marker": "(1)",
-					"text": "paragraph text 1"
-				},
-				{
-					"marker": "(2)",
-					"text": "paragraph text 2"
-				}
-			]
-		}
-	],
-	"officialShortTitle": "official short title",
-	"officialAbbreviation": "official abbreviation",
-	"referenceNumber": null,
-	"announcementDate": "2021-06-14",
-	"citationDate": "2021-06-09",
-	"frameKeywords": "frame keywords",
-	"authorEntity": "DEU",
-	"authorDecidingBody": "BT",
-	"authorIsResolutionMajority": true,
-	"leadJurisdiction": "BMVI",
-	"leadUnit": "G 22",
-	"participationType": null,
-	"participationInstitution": null,
-	"subjectFna": "FNA 703-12",
-	"subjectGesta": "GESTA J040"
-}
-    """
+        val importNormRequestSchema = createRandomImportNormRequestSchema()
+        val importJson = convertImportormRequestSchemaToJson(importNormRequestSchema)
 
         every { importNormService.importNorm(any()) } returns Mono.just(UUID.randomUUID())
 
@@ -77,33 +44,28 @@ class ImportNormControllerTest {
             .body(BodyInserters.fromValue(importJson))
             .exchange()
 
-        val command = slot<ImportNormUseCase.Command>()
-        verify(exactly = 1) { importNormService.importNorm(capture(command)) }
-
-        assertTrue(command.captured.data.longTitle == "long title")
-        assertTrue(command.captured.data.articles.size == 1)
-        assertTrue(command.captured.data.articles[0].title == "article title")
-        assertTrue(command.captured.data.articles[0].marker == "§ 1")
-        assertTrue(command.captured.data.articles[0].paragraphs.size == 2)
-        assertTrue(command.captured.data.articles[0].paragraphs[0].marker == "(1)")
-        assertTrue(command.captured.data.articles[0].paragraphs[0].text == "paragraph text 1")
-        assertTrue(command.captured.data.articles[0].paragraphs[1].marker == "(2)")
-        assertTrue(command.captured.data.articles[0].paragraphs[1].text == "paragraph text 2")
-        assertTrue(command.captured.data.officialShortTitle == "official short title")
-        assertTrue(command.captured.data.officialAbbreviation == "official abbreviation")
-        assertTrue(command.captured.data.referenceNumber == null)
-        assertTrue(command.captured.data.announcementDate == "2021-06-14")
-        assertTrue(command.captured.data.citationDate == "2021-06-09")
-        assertTrue(command.captured.data.frameKeywords == "frame keywords")
-        assertTrue(command.captured.data.authorEntity == "DEU")
-        assertTrue(command.captured.data.authorDecidingBody == "BT")
-        assertTrue(command.captured.data.authorIsResolutionMajority == true)
-        assertTrue(command.captured.data.leadJurisdiction == "BMVI")
-        assertTrue(command.captured.data.leadUnit == "G 22")
-        assertTrue(command.captured.data.participationType == null)
-        assertTrue(command.captured.data.participationInstitution == null)
-        assertTrue(command.captured.data.subjectFna == "FNA 703-12")
-        assertTrue(command.captured.data.subjectGesta == "GESTA J040")
+        verify(exactly = 1) {
+            importNormService.importNorm(
+                withArg {
+                    assertTrue(it.data.articles.size == 2)
+                    assertTrue(it.data.articles[0].title == importNormRequestSchema.articles[0].title)
+                    assertTrue(it.data.articles[0].marker == importNormRequestSchema.articles[0].marker)
+                    assertTrue(it.data.articles[0].paragraphs.size == 2)
+                    assertTrue(it.data.articles[0].paragraphs[0].marker == importNormRequestSchema.articles[0].paragraphs[0].marker)
+                    assertTrue(it.data.articles[0].paragraphs[0].text == importNormRequestSchema.articles[0].paragraphs[0].text)
+                    assertTrue(it.data.articles[0].paragraphs[1].marker == importNormRequestSchema.articles[0].paragraphs[1].marker)
+                    assertTrue(it.data.articles[0].paragraphs[1].text == importNormRequestSchema.articles[0].paragraphs[1].text)
+                    assertTrue(it.data.articles[1].title == importNormRequestSchema.articles[1].title)
+                    assertTrue(it.data.articles[1].marker == importNormRequestSchema.articles[1].marker)
+                    assertTrue(it.data.articles[1].paragraphs.size == 2)
+                    assertTrue(it.data.articles[1].paragraphs[0].marker == importNormRequestSchema.articles[1].paragraphs[0].marker)
+                    assertTrue(it.data.articles[1].paragraphs[0].text == importNormRequestSchema.articles[1].paragraphs[0].text)
+                    assertTrue(it.data.articles[1].paragraphs[1].marker == importNormRequestSchema.articles[1].paragraphs[1].marker)
+                    assertTrue(it.data.articles[1].paragraphs[1].text == importNormRequestSchema.articles[1].paragraphs[1].text)
+                    assertNormDataAndImportNormRequestSchemaWithoutArticles(it.data, importNormRequestSchema)
+                }
+            )
+        }
     }
 
     @Test
@@ -115,7 +77,7 @@ class ImportNormControllerTest {
             .post()
             .uri("/api/v1/norms")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "long title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
             .exchange()
             .expectStatus()
             .isCreated()
@@ -131,7 +93,7 @@ class ImportNormControllerTest {
             .post()
             .uri("/api/v1/norms")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "long title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
             .exchange()
             .expectHeader()
             .location("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
@@ -146,7 +108,7 @@ class ImportNormControllerTest {
             .post()
             .uri("/api/v1/norms")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "longTitle": "long title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
             .exchange()
             .expectStatus()
             .is5xxServerError()

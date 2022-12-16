@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
 import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
+import decodeLocalDate
+import encodeGuid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -19,41 +21,83 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
 
         return importNormService
             .importNorm(command)
-            .map { guid -> URI("${ApiConfiguration.API_BASE_PATH}/$guid") }
+            .map { guid -> encodeGuid(guid) }
+            .map { encodedGuid -> URI("${ApiConfiguration.API_BASE_PATH}/$encodedGuid") }
             .map { uri -> ResponseEntity.created(uri).build<Void>() }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
 
     class NormRequestSchema {
-        lateinit var longTitle: String
+        lateinit var officialLongTitle: String
         var articles: List<ArticleRequestSchema> = listOf()
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
         var referenceNumber: String? = null
-        var publicationDate: String? = null
         var announcementDate: String? = null
         var citationDate: String? = null
         var frameKeywords: String? = null
-        var authorEntity: String? = null
-        var authorDecidingBody: String? = null
-        var authorIsResolutionMajority: Boolean? = null
+        var providerEntity: String? = null
+        var providerDecidingBody: String? = null
+        var providerIsResolutionMajority: Boolean? = null
         var leadJurisdiction: String? = null
         var leadUnit: String? = null
         var participationType: String? = null
         var participationInstitution: String? = null
-        var documentTypeName: String? = null
-        var documentNormCategory: String? = null
-        var documentTemplateName: String? = null
         var subjectFna: String? = null
-        var subjectPreviousFna: String? = null
         var subjectGesta: String? = null
-        var subjectBgb3: String? = null
+        val documentNumber: String? = null
+        val documentCategory: String? = null
+        val risAbbreviationInternationalLaw: String? = null
+        val unofficialReference: String? = null
+        val applicationScopeArea: String? = null
+        val applicationScopeStartDate: String? = null
+        val applicationScopeEndDate: String? = null
+        val validityRule: String? = null
+        val celexNumber: String? = null
+        val definition: String? = null
+        val categorizedReference: String? = null
+        val otherFootnote: String? = null
+        val expirationDate: String? = null
+        val entryIntoForceDate: String? = null
+        var unofficialLongTitle: String? = null
+        var unofficialShortTitle: String? = null
+        var unofficialAbbreviation: String? = null
+        var risAbbreviation: String? = null
 
         fun toUseCaseData(): ImportNormUseCase.NormData {
             return ImportNormUseCase.NormData(
-                longTitle, articles.map { it.toUseCaseData() }, officialShortTitle, officialAbbreviation,
-                referenceNumber, publicationDate, announcementDate, citationDate, frameKeywords, authorEntity, authorDecidingBody,
-                authorIsResolutionMajority, leadJurisdiction, leadUnit, participationType, participationInstitution, documentTypeName, documentNormCategory, documentTemplateName, subjectFna, subjectPreviousFna, subjectGesta, subjectBgb3
+                officialLongTitle = this.officialLongTitle,
+                articles = this.articles.map { it.toUseCaseData() },
+                officialShortTitle = this.officialShortTitle,
+                officialAbbreviation = this.officialAbbreviation,
+                referenceNumber = this.referenceNumber, announcementDate = decodeLocalDate(this.announcementDate),
+                citationDate = decodeLocalDate(this.citationDate),
+                frameKeywords = this.frameKeywords,
+                providerEntity = this.providerEntity,
+                providerDecidingBody = this.providerDecidingBody,
+                providerIsResolutionMajority = this.providerIsResolutionMajority,
+                leadJurisdiction = this.leadJurisdiction,
+                leadUnit = this.leadUnit,
+                participationType = this.participationType,
+                participationInstitution = this.participationInstitution, subjectFna = this.subjectFna, subjectGesta = this.subjectGesta,
+                documentNumber = this.documentNumber,
+                documentCategory = this.documentCategory,
+                risAbbreviationInternationalLaw = this.risAbbreviationInternationalLaw,
+                unofficialReference = this.unofficialReference,
+                applicationScopeArea = this.applicationScopeArea,
+                applicationScopeStartDate = decodeLocalDate(this.applicationScopeStartDate),
+                applicationScopeEndDate = decodeLocalDate(this.applicationScopeEndDate),
+                validityRule = this.validityRule,
+                celexNumber = this.celexNumber,
+                definition = this.definition,
+                categorizedReference = this.categorizedReference,
+                otherFootnote = this.otherFootnote,
+                expirationDate = decodeLocalDate(this.expirationDate),
+                entryIntoForceDate = decodeLocalDate(this.entryIntoForceDate),
+                unofficialLongTitle = this.unofficialLongTitle,
+                unofficialShortTitle = this.unofficialShortTitle,
+                unofficialAbbreviation = this.unofficialAbbreviation,
+                risAbbreviation = this.risAbbreviation
             )
         }
     }

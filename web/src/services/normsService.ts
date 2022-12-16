@@ -1,7 +1,40 @@
+import dayjs from "dayjs"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
 import httpClient, { ServiceResponse } from "./httpClient"
-import { Norm } from "@/domain/Norm"
+import { FrameData, Norm } from "@/domain/Norm"
+import {
+  applyToFrameData,
+  NullableBoolean,
+  NullableString,
+} from "@/utilities/normUtilities"
 
-type NormList = { longTitle: string; guid: string }[]
+type NormList = { officialLongTitle: string; guid: string }[]
+dayjs.extend(utc)
+dayjs.extend(timezone)
+
+function encodeString(data: NullableString): NullableString {
+  return data && data.length > 0 ? data : null
+}
+
+function encodeBoolean(data: NullableBoolean): NullableBoolean {
+  return data ?? null
+}
+
+// Makes the assumption that we currently get a date string in the following
+// format: `2022-11-14T23:00:00.000Z`. To comply with the expected date format
+// of the API, we only take the first 10 characters.
+//
+// TODO: Improve by working with enriched date type.
+function encodeDate(data?: string | null): string | null {
+  return data && data.length > 0
+    ? dayjs(data).tz("Europe/Berlin").format("YYYY-MM-DD")
+    : null
+}
+
+function encodeFrameData(data: FrameData) {
+  return applyToFrameData(data, encodeString, encodeBoolean, encodeDate)
+}
 
 export async function getAllNorms(): Promise<ServiceResponse<NormList>> {
   const { data, status, error } = await httpClient.get<{ data: NormList }>(
@@ -44,12 +77,18 @@ export async function getNormByGuid(
 
 export async function editNormFrame(
   guid: string,
-  longTitle: string
+  frameData: FrameData
 ): Promise<ServiceResponse<void>> {
-  const { status, error } = await httpClient.patch<{ longTitle: string }, void>(
+  const body = encodeFrameData(frameData)
+  const { status, error } = await httpClient.put(
     `norms/${guid}`,
-    undefined,
-    { longTitle }
+    {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    },
+    body
   )
 
   if (status >= 300 || error) {

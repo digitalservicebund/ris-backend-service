@@ -40,6 +40,7 @@ const modalAttribute = computed((): ModalAttribute => {
       }
   }
 })
+const ariaLabel = props.title + " icon"
 </script>
 
 <template>
@@ -50,9 +51,11 @@ const modalAttribute = computed((): ModalAttribute => {
       modalAttribute.backgroundColorClass,
     ]"
   >
-    <span :class="[staticIconClass, modalAttribute.textColorClass]">{{
-      modalAttribute.icon
-    }}</span>
+    <span
+      :aria-label="ariaLabel"
+      :class="[staticIconClass, modalAttribute.textColorClass]"
+      >{{ modalAttribute.icon }}</span
+    >
 
     <div class="flex flex-col">
       <span class="label-02-bold">{{ title }}</span>

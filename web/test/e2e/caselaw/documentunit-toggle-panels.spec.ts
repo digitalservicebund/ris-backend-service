@@ -13,7 +13,7 @@ test.describe("test the different layout options", () => {
     ).toBeVisible()
     await expect(
       page.locator("text=Es wurde noch kein Originaldokument hochgeladen")
-    ).not.toBeVisible()
+    ).toBeHidden()
   })
 
   test("open and close original document panel without attached files", async ({
@@ -35,11 +35,11 @@ test.describe("test the different layout options", () => {
     await navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Navigation schließen']").click()
     await expect(page).toHaveURL(/showNavBar=false/)
-    await expect(page.locator("text=Bearbeitungsstand")).not.toBeVisible()
+    await expect(page.locator("aside", { hasText: "Zurück" })).toBeHidden()
 
     await page.locator("[aria-label='Navigation öffnen']").click()
     await expect(page).toHaveURL(/showNavBar=true/)
-    await expect(page.locator("text=Bearbeitungsstand")).toBeVisible()
+    await expect(page.locator("aside", { hasText: "Zurück" })).toBeVisible()
   })
 
   test("persist toggle queries for new pages", async ({

@@ -1,15 +1,18 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyCollection;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import java.nio.ByteBuffer;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,12 +30,12 @@ class LookupTableImporterServiceTest {
 
   @MockBean private DocumentTypeRepository documentTypeRepository;
 
+  @MockBean private JPADocumentTypeRepository jpaDocumentTypeRepository;
+
   @MockBean private CourtRepository courtRepository;
 
   @Test
   void testImportDocumentTypeLookupTable() {
-    when(documentTypeRepository.save(any(DocumentTypeDTO.class)))
-        .thenReturn(Mono.just(DocumentTypeDTO.EMPTY));
     when(documentTypeRepository.deleteAll()).thenReturn(Mono.empty());
 
     String doctypeXml =
@@ -47,6 +50,17 @@ class LookupTableImporterServiceTest {
           </juris-doktyp>
         </juris-table>""";
     ByteBuffer byteBuffer = ByteBuffer.wrap(doctypeXml.getBytes());
+    List<JPADocumentTypeDTO> documentTypeDTOs =
+        List.of(
+            JPADocumentTypeDTO.builder()
+                .id(1L)
+                .changeIndicator('N')
+                .version("1.0")
+                .jurisShortcut("ÄN")
+                .documentType('N')
+                .multiple("Ja")
+                .label("Änderungsnorm")
+                .build());
 
     StepVerifier.create(service.importDocumentTypeLookupTable(byteBuffer))
         .consumeNextWith(
@@ -55,13 +69,14 @@ class LookupTableImporterServiceTest {
                     "Successfully imported the document type lookup table", documentTypeDTO))
         .verifyComplete();
 
-    verify(documentTypeRepository).save(any(DocumentTypeDTO.class));
-    verify(documentTypeRepository).deleteAll();
+    verify(documentTypeRepository, never()).deleteAll();
+    verify(documentTypeRepository, never()).saveAll(anyCollection());
+    verify(jpaDocumentTypeRepository, atMostOnce()).deleteAll();
+    verify(jpaDocumentTypeRepository, atMostOnce()).saveAll(documentTypeDTOs);
   }
 
   @Test
   void testImportCourtLookupTable() {
-    when(courtRepository.save(any(CourtDTO.class))).thenReturn(Mono.just(CourtDTO.EMPTY));
     when(courtRepository.deleteAll()).thenReturn(Mono.empty());
 
     String courtXml =
@@ -84,7 +99,6 @@ class LookupTableImporterServiceTest {
             courtDTO -> assertEquals("Successfully imported the court lookup table", courtDTO))
         .verifyComplete();
 
-    verify(courtRepository).save(any(CourtDTO.class));
     verify(courtRepository).deleteAll();
   }
 }

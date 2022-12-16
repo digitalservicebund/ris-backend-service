@@ -5,12 +5,17 @@ import static org.assertj.core.api.Assertions.tuple;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.DatabasePreviousDecisionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePreviousDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import java.time.Instant;
@@ -39,6 +44,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
   DocumentUnitService.class,
   DatabaseDocumentNumberService.class,
   PostgresDocumentUnitRepositoryImpl.class,
+  PostgresDocumentUnitListEntryRepositoryImpl.class,
   FlywayConfig.class,
   PostgresConfig.class
 })
@@ -61,16 +67,18 @@ class DocumentUnitIntegrationTest {
   }
 
   @Autowired private WebTestClient webClient;
-
   @Autowired private DatabaseDocumentUnitRepository repository;
-
   @Autowired private DatabasePreviousDecisionRepository previousDecisionRepository;
+  @Autowired private FileNumberRepository fileNumberRepository;
+  @Autowired private DeviatingEcliRepository deviatingEcliRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
 
   @AfterEach
   void cleanUp() {
+    fileNumberRepository.deleteAll().block();
+    deviatingEcliRepository.deleteAll().block();
     previousDecisionRepository.deleteAll().block();
     repository.deleteAll().block();
   }
@@ -167,68 +175,6 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
-  void testUpdateDocumentUnit_withPreviousDecisionIdsForOtherDocumentUnit() {
-    UUID documentUnitUuid1 = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(documentUnitUuid1)
-            .documentnumber("docnr12345678")
-            .creationtimestamp(Instant.now())
-            .build();
-    DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
-    List<PreviousDecisionDTO> previousDecisionDTOs =
-        List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
-
-    documentUnitDTO =
-        DocumentUnitDTO.builder()
-            .uuid(UUID.randomUUID())
-            .documentnumber("docnr23456789")
-            .creationtimestamp(Instant.now())
-            .build();
-    savedDocumentUnit = repository.save(documentUnitDTO).block();
-    previousDecisionDTOs =
-        List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
-
-    DocumentUnit documentUnit =
-        DocumentUnit.builder()
-            .uuid(documentUnitUuid1)
-            .documentNumber("newdocnumber12")
-            .creationtimestamp(Instant.now())
-            .previousDecisions(
-                List.of(
-                    PreviousDecision.builder().id(3L).fileNumber("prev1").build(),
-                    PreviousDecision.builder().id(4L).fileNumber("prev2").build()))
-            .build();
-
-    webClient
-        .mutateWith(csrf())
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/docx")
-        .bodyValue(documentUnit)
-        .exchange()
-        .expectStatus()
-        .is5xxServerError();
-
-    List<DocumentUnitDTO> documentUnitDTOs = repository.findAll().collectList().block();
-    assertThat(documentUnitDTOs).hasSize(2);
-    assertThat(documentUnitDTOs)
-        .extracting("documentnumber")
-        .containsExactly("docnr12345678", "docnr23456789");
-
-    previousDecisionDTOs = previousDecisionRepository.findAll().collectList().block();
-    assertThat(previousDecisionDTOs).hasSize(4);
-    assertThat(previousDecisionDTOs)
-        .extracting("fileNumber")
-        .containsExactly(null, null, null, null);
-  }
-
-  @Test
   void testUpdateDocumentUnit_withPreviousDecisionToInsertToDeleteAndToUpdate() {
     UUID documentUnitUuid1 = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
@@ -272,5 +218,131 @@ class DocumentUnitIntegrationTest {
     assertThat(previousDecisionDTOs)
         .extracting("id", "fileNumber")
         .containsExactly(tuple(1L, "prev1"), tuple(3L, "prev2"));
+  }
+
+  @Test
+  void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
+    DocumentUnitCreationInfo info = new DocumentUnitCreationInfo("ABC", "D");
+
+    webClient
+        .mutateWith(csrf())
+        .post()
+        .uri("/api/v1/caselaw/documentunits/")
+        .bodyValue(info)
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).startsWith("ABCD");
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentnumber()).startsWith("ABCD");
+  }
+
+  @Test
+  void testForFileNumbersDbEntryAfterUpdateByUuid() {
+    UUID uuid = UUID.randomUUID();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(uuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .build();
+
+    DocumentUnitDTO savedDto = repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(CoreData.builder().fileNumbers(List.of("AkteX")).build())
+            .texts(Texts.builder().decisionName("decisionName").build())
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody().coreData().fileNumbers().get(0))
+                  .isEqualTo("AkteX");
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
+
+    List<FileNumberDTO> fileNumberEntries =
+        fileNumberRepository.findAllByDocumentUnitId(list.get(0).getId()).collectList().block();
+    assertThat(fileNumberEntries).hasSize(1);
+    assertThat(fileNumberEntries.get(0).getFileNumber()).isEqualTo("AkteX");
+  }
+
+  @Test
+  void testForDeviatingEcliDbEntryAfterUpdateByUuid() {
+    UUID uuid = UUID.randomUUID();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(uuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .build();
+
+    DocumentUnitDTO savedDto = repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(CoreData.builder().deviatingEclis(List.of("ecli123", "ecli456")).build())
+            .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody().coreData().deviatingEclis().get(0))
+                  .isEqualTo("ecli123");
+              assertThat(response.getResponseBody().coreData().deviatingEclis().get(1))
+                  .isEqualTo("ecli456");
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
+
+    List<DeviatingEcliDTO> deviatingEclis =
+        deviatingEcliRepository.findAllByDocumentUnitId(list.get(0).getId()).collectList().block();
+
+    assertThat(deviatingEclis).hasSize(2);
+    assertThat(deviatingEclis.get(0).getEcli()).isEqualTo("ecli123");
+    assertThat(deviatingEclis.get(1).getEcli()).isEqualTo("ecli456");
   }
 }

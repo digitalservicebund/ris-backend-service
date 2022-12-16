@@ -55,7 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
   value: undefined,
   fieldSize: "small",
   editable: false,
-  ariaLabel: "",
+  ariaLabel: "Editor Feld",
 })
 
 const emit = defineEmits<{
@@ -322,7 +322,7 @@ const showButtons = () => {
   return showButtons
 }
 
-const ariaLabel = props.ariaLabel ? props.ariaLabel + " Editor Feld" : null
+const ariaLabel = props.ariaLabel ? props.ariaLabel : null
 
 onMounted(() => {
   const editorContainer = document.querySelector(".editor")
@@ -341,7 +341,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   <div ref="container" class="bg-white editor" fluid>
     <div v-if="showButtons()">
       <div
-        :aria-label="props.ariaLabel + ' Editor Button Leiste'"
+        :aria-label="props.ariaLabel + ' Button Leiste'"
         class="flex flex-row flex-wrap justify-between pa-1"
       >
         <div class="flex flex-row">
@@ -389,3 +389,19 @@ const resizeObserver = new ResizeObserver((entries) => {
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.editor-content {
+  &--small {
+    height: 60px;
+  }
+
+  &--medium {
+    height: 120px;
+  }
+
+  &--large {
+    height: 320px;
+  }
+}
+</style>

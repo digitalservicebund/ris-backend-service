@@ -10,7 +10,7 @@ describe("DocumentUnit", () => {
 
   it("returns core Data as object", () => {
     const documentUnit = new DocumentUnit("foo")
-    documentUnit.coreData.fileNumber = "bar"
+    documentUnit.coreData.fileNumbers = ["bar"]
     documentUnit.coreData.court = {
       type: "baz",
       location: "baz",
@@ -18,7 +18,7 @@ describe("DocumentUnit", () => {
     }
 
     const coreData: CoreData = documentUnit.coreData
-    expect(coreData.fileNumber).toBe("bar")
+    expect(coreData.fileNumbers).toStrictEqual(["bar"])
     expect(coreData.court?.location).toBe("baz")
   })
 

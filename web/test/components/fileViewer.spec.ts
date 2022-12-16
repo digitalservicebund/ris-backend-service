@@ -8,7 +8,6 @@ const FILE_TYPE = "docx"
 const USER_NAME = "USER NAME"
 const LABEL_TEXTES = ["Hochgeladen am", "Format", "Von", "Dateiname"]
 const DELETE_BTN_TEXT = "Datei löschen"
-const DEFAULT_EDITOR_TEXT = "Loading data ...."
 describe("file viewer", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")
   vi.mock("@/services/fileService", () => {
@@ -30,7 +29,7 @@ describe("file viewer", async () => {
   })
 
   test("file viewer should be rendered", async () => {
-    const { getByText, container } = render(FileViewer, {
+    render(FileViewer, {
       props: {
         s3Path: S3PATH,
         fileName: FILE_NAME,
@@ -40,15 +39,12 @@ describe("file viewer", async () => {
       global: { plugins: [router] },
     })
 
-    LABEL_TEXTES.forEach((labelText) => getByText(labelText))
-    getByText(FILE_TYPE)
-    getByText(FILE_NAME)
-    getByText(USER_NAME)
-    getByText(DELETE_BTN_TEXT)
-    getByText(getUploadTimeStampToCheck())
-    // To check if default value of textEditor in page shoud'nt be found.
-    // Because after mounted, the value will be replaced by docx content.
-    expect(container.textContent?.includes(DEFAULT_EDITOR_TEXT)).toBeFalsy()
+    LABEL_TEXTES.forEach((labelText) => screen.getByText(labelText))
+    screen.getByText(FILE_TYPE)
+    screen.getByText(FILE_NAME)
+    screen.getByText(USER_NAME)
+    screen.getByText(DELETE_BTN_TEXT)
+    screen.getByText(getUploadTimeStampToCheck())
   })
 
   test("file viewer emitted delete uploadfile event", async () => {

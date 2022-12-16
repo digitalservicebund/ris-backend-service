@@ -1,13 +1,13 @@
 import userEvent from "@testing-library/user-event"
-import { fireEvent, render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import type { PreviousDecision } from "@/domain/documentUnit"
 
 function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
   const props = { modelValue: options?.modelValue }
-  const renderResult = render(DocumentUnitPreviousDecisions, { props })
+  const utils = render(DocumentUnitPreviousDecisions, { props })
   const user = userEvent.setup()
-  return { user, ...renderResult }
+  return { user, ...utils }
 }
 
 describe("DocumentUnitPreviousDecisions", async () => {
@@ -27,16 +27,16 @@ describe("DocumentUnitPreviousDecisions", async () => {
         fileNumber: "identifier two",
       },
     ]
-    const { queryByDisplayValue } = renderComponent({ modelValue })
+    renderComponent({ modelValue })
 
-    expect(queryByDisplayValue("type one")).toBeInTheDocument()
-    expect(queryByDisplayValue("location one")).toBeInTheDocument()
-    expect(queryByDisplayValue("date one")).toBeInTheDocument()
-    expect(queryByDisplayValue("identifier one")).toBeInTheDocument()
-    expect(queryByDisplayValue("type two")).toBeInTheDocument()
-    expect(queryByDisplayValue("location two")).toBeInTheDocument()
-    expect(queryByDisplayValue("date two")).toBeInTheDocument()
-    expect(queryByDisplayValue("identifier two")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("type one")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("location one")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("date one")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("identifier one")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("type two")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("location two")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("date two")).toBeInTheDocument()
+    expect(screen.getByDisplayValue("identifier two")).toBeInTheDocument()
   })
 
   it("emits update model value event when input value changes", async () => {
@@ -48,9 +48,10 @@ describe("DocumentUnitPreviousDecisions", async () => {
         fileNumber: "test identifier",
       },
     ]
-    const { emitted, getByDisplayValue } = renderComponent({ modelValue })
-    const input = getByDisplayValue("ab")
-    await fireEvent.change(input, { target: { value: "abc" } })
+    const { emitted, user } = renderComponent({ modelValue })
+    const input = screen.getByDisplayValue("ab")
+    await user.type(input, "c")
+    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"][0]).toEqual([
@@ -66,10 +67,10 @@ describe("DocumentUnitPreviousDecisions", async () => {
   })
 
   it("does not emit update model event when inputs are empty and model is empty too", async () => {
-    const { emitted, user, getByLabelText } = renderComponent({
+    const { emitted, user } = renderComponent({
       modelValue: undefined,
     })
-    const input = getByLabelText("Gerichtstyp Rechtszug")
+    const input = screen.getByLabelText("Gerichtstyp Rechtszug")
 
     // Do anything without changing the inputs.
     await user.click(input)
@@ -78,12 +79,12 @@ describe("DocumentUnitPreviousDecisions", async () => {
   })
 
   it("always shows at least one input group despite empty model list", () => {
-    const { queryByLabelText } = renderComponent({ modelValue: [] })
+    renderComponent({ modelValue: [] })
 
-    const typeInput = queryByLabelText("Gerichtstyp Rechtszug")
-    const locationInput = queryByLabelText("Gerichtsort Rechtszug")
-    const dateInput = queryByLabelText("Datum Rechtszug")
-    const identifierInput = queryByLabelText("Aktenzeichen Rechtszug")
+    const typeInput = screen.queryByLabelText("Gerichtstyp Rechtszug")
+    const locationInput = screen.queryByLabelText("Gerichtsort Rechtszug")
+    const dateInput = screen.queryByLabelText("Datum Rechtszug")
+    const identifierInput = screen.queryByLabelText("Aktenzeichen Rechtszug")
 
     expect(typeInput).toBeInTheDocument()
     expect(typeInput).toHaveDisplayValue("")

@@ -1,5 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
@@ -29,12 +32,11 @@ public class DocumentUnitBuilder {
     }
 
     Court court = null;
-    if (documentUnitDTO.getCourtType() != null && documentUnitDTO.getCourtLocation() != null) {
-      court =
-          new Court(
-              documentUnitDTO.getCourtType(),
-              documentUnitDTO.getCourtLocation(),
-              documentUnitDTO.getCourtType() + " " + documentUnitDTO.getCourtLocation());
+    String courtType = documentUnitDTO.getCourtType();
+    String courtLocation = documentUnitDTO.getCourtLocation();
+    if (courtType != null) {
+      String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
+      court = new Court(courtType, courtLocation, label, null);
     }
 
     List<PreviousDecision> previousDecisions = null;
@@ -53,6 +55,26 @@ public class DocumentUnitBuilder {
               .toList();
     }
 
+    List<String> fileNumbers = null;
+    if (documentUnitDTO.getFileNumbers() != null) {
+      fileNumbers =
+          documentUnitDTO.getFileNumbers().stream().map(FileNumberDTO::getFileNumber).toList();
+    }
+
+    List<String> deviatingFileNumbers = null;
+    if (documentUnitDTO.getDeviatingFileNumbers() != null) {
+      deviatingFileNumbers =
+          documentUnitDTO.getDeviatingFileNumbers().stream()
+              .map(FileNumberDTO::getFileNumber)
+              .toList();
+    }
+
+    List<String> deviatingEclis = null;
+    if (documentUnitDTO.getDeviatingEclis() != null) {
+      deviatingEclis =
+          documentUnitDTO.getDeviatingEclis().stream().map(DeviatingEcliDTO::getEcli).toList();
+    }
+
     return new DocumentUnit(
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
@@ -62,11 +84,13 @@ public class DocumentUnitBuilder {
         documentUnitDTO.getFiletype(),
         documentUnitDTO.getFilename(),
         new CoreData(
-            documentUnitDTO.getFileNumber(),
+            fileNumbers,
+            deviatingFileNumbers,
             court,
             documentUnitDTO.getCategory(),
             documentUnitDTO.getProcedure(),
             documentUnitDTO.getEcli(),
+            deviatingEclis,
             documentUnitDTO.getAppraisalBody(),
             documentUnitDTO.getDecisionDate() != null
                 ? Instant.parse(documentUnitDTO.getDecisionDate())

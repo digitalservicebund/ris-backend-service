@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnit from "@/domain/documentUnit"
 
@@ -7,33 +7,35 @@ describe("Texts", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
 
   test("renders all text fields with labels", async () => {
-    const { getByText } = render(DocumentUnitTexts, {
+    render(DocumentUnitTexts, {
       props: {
         texts: new DocumentUnit("foo").texts,
         updateStatus: 0,
       },
     })
 
-    getByText("Entscheidungsname")
-    getByText("Titelzeile")
-    getByText("Leitsatz")
-    getByText("Orientierungssatz")
-    getByText("Tenor")
-    getByText("Gründe")
-    getByText("Tatbestand")
-    getByText("Entscheidungsgründe")
+    screen.getByText("Entscheidungsname Editor Feld")
+    screen.getByText("Titelzeile Editor Feld")
+    screen.getByText("Leitsatz Editor Feld")
+    screen.getByText("Orientierungssatz Editor Feld")
+    screen.getByText("Tenor Editor Feld")
+    screen.getByText("Gründe Editor Feld")
+    screen.getByText("Tatbestand Editor Feld")
+    screen.getByText("Entscheidungsgründe Editor Feld")
   })
 
   test("emits update DocumentUnit event", async () => {
     const user = userEvent.setup()
-    const { getByLabelText, emitted } = render(DocumentUnitTexts, {
+    const { emitted } = render(DocumentUnitTexts, {
       props: {
         texts: new DocumentUnit("foo").texts,
         updateStatus: 0,
       },
     })
 
-    await user.click(getByLabelText("Kurz- und Langtexte Speichern Button"))
+    await user.click(
+      screen.getByLabelText("Kurz- und Langtexte Speichern Button")
+    )
     expect(emitted().updateDocumentUnit).toBeTruthy()
   })
 

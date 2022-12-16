@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
+import norms.utils.createRandomImportNormData
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -62,7 +63,7 @@ class ImportNormCommandTest {
     fun `it requires norms to have a non empty norm long`() {
         assertThrows(
             IllegalArgumentException::class.java,
-            { ImportNormUseCase.NormData(longTitle = "", listOf()) }
+            { ImportNormUseCase.NormData(officialLongTitle = "", listOf()) }
         )
     }
 
@@ -70,7 +71,7 @@ class ImportNormCommandTest {
     fun `can create norm with valid data input`() {
         val norm = ImportNormUseCase.NormData("long title", listOf(validArticle))
 
-        assertTrue(norm.longTitle == "long title")
+        assertTrue(norm.officialLongTitle == "long title")
         assertTrue(norm.articles == listOf(validArticle))
     }
 
@@ -83,15 +84,7 @@ class ImportNormCommandTest {
 
     @Test
     fun `can create command with optional fields`() {
-        val normData = ImportNormUseCase.NormData(
-            "long title", listOf(validArticle), "official short title", "official abbreviation",
-            "reference number", "2020-10-27", "2020-10-28", "2020-10-29",
-            "frame keywords", "author entity", "author deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
-        )
+        val normData = createRandomImportNormData()
         val command = ImportNormUseCase.Command(normData)
 
         assertTrue(command.data == normData)

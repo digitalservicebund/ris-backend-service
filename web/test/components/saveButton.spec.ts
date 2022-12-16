@@ -15,8 +15,8 @@ describe("SaveButton", () => {
       lastSavedOn: ref<Date | undefined>(undefined),
       timer: setInterval(() => vi.fn()),
     })
-    const getByText = await renderAndClick()
-    expect(getByText("Daten werden gespeichert")).toBeVisible()
+    await renderAndClick()
+    expect(screen.getByText("Daten werden gespeichert")).toBeVisible()
   })
 
   it("renders with info message that data was last saved on a specific time", async () => {
@@ -27,8 +27,10 @@ describe("SaveButton", () => {
       lastSavedOn: ref<Date | undefined>(new Date()),
       timer: setInterval(() => vi.fn()),
     })
-    const getByText = await renderAndClick()
-    expect(getByText("Zuletzt gespeichert um", { exact: false })).toBeVisible()
+    await renderAndClick()
+    expect(
+      screen.getByText("Zuletzt gespeichert um", { exact: false })
+    ).toBeVisible()
   })
 
   it("renders with info message that there was an error when saving data", async () => {
@@ -41,13 +43,13 @@ describe("SaveButton", () => {
       lastSavedOn: ref<Date | undefined>(new Date()),
       timer: setInterval(() => vi.fn()),
     })
-    const getByText = await renderAndClick()
-    expect(getByText("Fehler beim Speichern")).toBeVisible()
+    await renderAndClick()
+    expect(screen.getByText("Fehler beim Speichern")).toBeVisible()
   })
 })
 
 async function renderAndClick() {
-  const { emitted, getByText } = render(SaveButton, {
+  render(SaveButton, {
     props: {
       ariaLabel: "Foo",
       serviceCallback: vi.fn(),
@@ -59,6 +61,4 @@ async function renderAndClick() {
   expect(saveButton.textContent?.replace(/\s/g, "")).toEqual("Speichern")
   expect(saveButton).toHaveAttribute("aria-label", "Foo")
   await fireEvent.click(saveButton)
-  expect(emitted().fetchNorm).toBeTruthy()
-  return getByText
 }

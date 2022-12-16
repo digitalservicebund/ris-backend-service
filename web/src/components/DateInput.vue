@@ -12,7 +12,7 @@ interface Props {
 }
 
 interface Emits {
-  (event: "update:modelValue", value: string | undefined): void
+  (event: "update:modelValue", value?: string): void
 }
 
 const props = defineProps<Props>()
@@ -57,10 +57,12 @@ function handleOnBlur() {
 <template>
   <input
     :id="id"
-    v-model.lazy="inputValue"
+    v-model="inputValue"
     :aria-label="ariaLabel"
     class="bg-white input"
     :class="conditionalClasses"
+    max="9999-12-31"
+    min="1000-01-01"
     type="date"
     @blur="handleOnBlur"
   />
@@ -69,7 +71,8 @@ function handleOnBlur() {
 <style lang="scss" scoped>
 .input {
   width: 100%;
-  padding: 17px 24px;
+  height: 3.75rem;
+  padding: 12px 16px;
   @apply border-2 border-solid border-blue-800 uppercase;
 
   &:focus {

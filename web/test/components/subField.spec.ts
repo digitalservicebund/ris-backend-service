@@ -1,17 +1,19 @@
-import { fireEvent, render } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import SubField from "@/components/SubField.vue"
 
 function renderComponent({
+  ariaLabel = "Test Feld",
   isExpanded = false,
   iconExpanding = "add",
   iconClosing = "horizontal_rule",
 }: {
+  ariaLabel?: string
   isExpanded?: boolean
   iconExpanding?: string
   iconClosing?: string
 } = {}) {
   return render(SubField, {
-    props: { isExpanded, iconExpanding, iconClosing },
+    props: { ariaLabel, isExpanded, iconExpanding, iconClosing },
     slots: { default: "<div>foo slot</div>" },
   })
 }
@@ -20,51 +22,64 @@ describe("SubField", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
 
   it("should be hidden by default", () => {
-    const { getByText } = renderComponent()
-    expect(getByText("foo slot")).not.toBeVisible()
+    renderComponent()
+    expect(screen.getByText("foo slot")).not.toBeVisible()
   })
 
   it("should be expanded if prop says so", () => {
-    const { getByText } = renderComponent({ isExpanded: true })
-    expect(getByText("foo slot")).toBeVisible()
+    renderComponent({ isExpanded: true })
+    expect(screen.getByText("foo slot")).toBeVisible()
   })
 
   it("should close on toggle if open", async () => {
-    const { emitted, getByText, getByLabelText } = renderComponent({
+    const { emitted } = renderComponent({
       isExpanded: true,
     })
-    expect(getByText("foo slot")).toBeVisible()
+    expect(screen.getByText("foo slot")).toBeVisible()
 
-    await fireEvent.click(getByLabelText("Abweichendes Feld schließen"))
-    expect(getByLabelText("Abweichendes Feld öffnen")).toBeVisible()
+    await fireEvent.click(screen.getByLabelText("Test Feld schließen"))
+    expect(screen.getByLabelText("Test Feld anzeigen")).toBeVisible()
     expect(emitted()["update:isExpanded"][0]).toEqual([false])
   })
 
-  it("should close on toggle if open", async () => {
-    const { emitted, getByText, getByLabelText } = renderComponent({
+  it("should open on toggle if close", async () => {
+    const { emitted } = renderComponent({
       isExpanded: false,
     })
-    expect(getByText("foo slot")).not.toBeVisible()
+    expect(screen.getByText("foo slot")).not.toBeVisible()
 
-    await fireEvent.click(getByLabelText("Abweichendes Feld öffnen"))
-    expect(getByLabelText("Abweichendes Feld schließen")).toBeVisible()
+    await fireEvent.click(screen.getByLabelText("Test Feld anzeigen"))
+    expect(screen.getByLabelText("Test Feld schließen")).toBeVisible()
+    expect(emitted()["update:isExpanded"][0]).toEqual([true])
+  })
+
+  it("should render dynamic aria label", async () => {
+    const { emitted } = renderComponent({
+      ariaLabel: "Abweichendes Feld",
+    })
+    expect(screen.getByText("foo slot")).not.toBeVisible()
+
+    await fireEvent.click(screen.getByLabelText("Abweichendes Feld anzeigen"))
+    expect(screen.getByLabelText("Abweichendes Feld schließen")).toBeVisible()
+    await fireEvent.click(screen.getByLabelText("Abweichendes Feld schließen"))
+    expect(screen.getByLabelText("Abweichendes Feld anzeigen")).toBeVisible()
     expect(emitted()["update:isExpanded"][0]).toEqual([true])
   })
 
   it("should render correct icon if closed", () => {
-    const { getByText } = renderComponent({
+    renderComponent({
       iconExpanding: "foo icon",
     })
 
-    expect(getByText("foo icon")).toBeVisible()
+    expect(screen.getByText("foo icon")).toBeVisible()
   })
 
   it("should render correct icon if open", () => {
-    const { getByText } = renderComponent({
+    renderComponent({
       isExpanded: true,
       iconClosing: "foo icon",
     })
 
-    expect(getByText("foo icon")).toBeVisible()
+    expect(screen.getByText("foo icon")).toBeVisible()
   })
 })

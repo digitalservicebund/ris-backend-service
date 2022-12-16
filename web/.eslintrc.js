@@ -77,6 +77,10 @@ module.exports = {
         "vue/static-class-names-order": "error",
         "vue/v-for-delimiter-style": "error",
         "vue/v-on-function-call": "error",
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { ignoreRestSiblings: true },
+        ],
       },
     }, // ...and avoid linting TypeScript files with ES rules for JavaScript config files!
     {
@@ -85,8 +89,18 @@ module.exports = {
       rules: { ...moduleImportRules },
     },
     {
+      files: ["**/test/components/**/*.ts"],
+      extends: ["plugin:testing-library/vue"],
+      rules: { ...moduleImportRules },
+    },
+    {
       files: ["test/**/*.ts"],
       extends: ["plugin:jest-dom/recommended"],
+    },
+    {
+      files: ["**/e2e/**/*.ts", "**/a11y/**/*.ts"],
+      extends: ["plugin:playwright/playwright-test"],
+      rules: { ...moduleImportRules },
     },
   ],
 }

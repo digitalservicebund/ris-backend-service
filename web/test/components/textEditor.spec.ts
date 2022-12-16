@@ -1,3 +1,4 @@
+/* eslint-disable testing-library/no-node-access */
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import TextEditor from "../../src/components/TextEditor.vue"
@@ -16,71 +17,73 @@ describe("text editor", async () => {
   })
 
   test("renders text editor with default props", async () => {
-    const { queryByLabelText, container } = render(TextEditor, {
+    render(TextEditor, {
       props: {},
       global: { plugins: [router] },
     })
 
+    expect(screen.getAllByLabelText("Editor Feld").length).toBe(1)
+
     expect(
-      container.getElementsByClassName("editor-content--small").length
-    ).toBe(1)
-    expect(
-      queryByLabelText("Testzeile Editor Button Leiste")
+      screen.queryByLabelText("Editor Feld Button Leiste")
     ).not.toBeInTheDocument()
   })
 
   test("renders text editor with props", async () => {
-    const { queryByLabelText, queryByText, getByLabelText, container } = render(
-      TextEditor,
-      {
-        props: {
-          value: "Test Value",
-          fieldSize: "large",
-          ariaLabel: "test label",
-        },
-        global: { plugins: [router] },
-      }
-    )
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        fieldSize: "large",
+        ariaLabel: "Test Editor Feld",
+      },
+      global: { plugins: [router] },
+    })
 
-    queryByText("Test Value")
+    screen.queryByText("Test Value")
     expect(
-      container.getElementsByClassName("editor-content--large").length
-    ).toBe(1)
-    expect(
-      queryByLabelText("test label Editor Button Leiste")
+      screen.queryByLabelText("Test Editor Feld Button Leiste")
     ).not.toBeInTheDocument()
-    getByLabelText("test label Editor Feld")
+    screen.getByLabelText("Test Editor Feld")
   })
 
   test("show buttons on focus", async () => {
-    const { getByLabelText } = render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "test label", editable: true },
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: "Test Editor Feld",
+        editable: true,
+      },
       global: { plugins: [router] },
     })
     await screen.findByText("Test Value")
-    const editorField = getByLabelText("test label Editor Feld")
+
+    const editorField = screen.getByLabelText("Test Editor Feld")
+
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
     expect(
-      getByLabelText("test label Editor Button Leiste")
+      screen.getByLabelText("Test Editor Feld Button Leiste")
     ).toBeInTheDocument()
   })
 
   test("hide buttons on blur", async () => {
-    const { getByLabelText, queryByLabelText } = render(TextEditor, {
-      props: { value: "Test Value", ariaLabel: "test label" },
+    render(TextEditor, {
+      props: { value: "Test Value", ariaLabel: "Test Editor Feld" },
       global: { plugins: [router] },
     })
 
     await screen.findByText("Test Value")
-    const editorField = getByLabelText("test label Editor Feld")
+
+    const editorField = screen.getByLabelText("Test Editor Feld")
+
     if (editorField.firstElementChild !== null) {
       await fireEvent.blur(editorField.firstElementChild)
     }
+
     expect(
-      queryByLabelText("test label Editor Button Leiste")
+      screen.queryByLabelText("Test Editor Feld Button Leiste")
     ).not.toBeInTheDocument()
   })
 
@@ -98,37 +101,39 @@ describe("text editor", async () => {
    * The test should be continuosly improved to very that all buttons exist.
    */
   it("shows all necessary editor buttons", async () => {
-    const { getByLabelText, getAllByText, findByText, getByText } = render(
-      TextEditor,
-      {
-        props: { value: "Test Value", ariaLabel: "test label", editable: true },
-        global: { plugins: [router] },
-      }
-    )
-    await findByText("Test Value")
-    const editorField = getByLabelText("test label Editor Feld")
+    render(TextEditor, {
+      props: {
+        value: "Test Value",
+        ariaLabel: "Test Editor Feld",
+        editable: true,
+      },
+      global: { plugins: [router] },
+    })
+    await screen.findByText("Test Value")
+
+    const editorField = screen.getByLabelText("Test Editor Feld")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
     }
 
-    expect(getByText("undo")).toBeInTheDocument()
-    expect(getByText("redo")).toBeInTheDocument()
-    expect(getByText("format_bold")).toBeInTheDocument()
-    expect(getByText("format_italic")).toBeInTheDocument()
-    expect(getByText("format_underlined")).toBeInTheDocument()
-    expect(getByText("strikethrough_s")).toBeInTheDocument()
-    expect(getByText("format_align_left")).toBeInTheDocument()
-    expect(getByText("format_align_center")).toBeInTheDocument()
-    expect(getByText("format_align_right")).toBeInTheDocument()
-    expect(getByText("format_align_justify")).toBeInTheDocument()
-    expect(getByText("superscript")).toBeInTheDocument()
-    expect(getByText("subscript")).toBeInTheDocument()
-    expect(getByText("format_list_numbered")).toBeInTheDocument()
-    expect(getByText("format_list_bulleted")).toBeInTheDocument()
-    expect(getAllByText("vertical_split")).toHaveLength(2)
-    expect(getByText("table_chart")).toBeInTheDocument()
-    expect(getByText("123")).toBeInTheDocument()
-    expect(getByText("open_in_full")).toBeInTheDocument()
+    expect(screen.getByText("undo")).toBeInTheDocument()
+    expect(screen.getByText("redo")).toBeInTheDocument()
+    expect(screen.getByText("format_bold")).toBeInTheDocument()
+    expect(screen.getByText("format_italic")).toBeInTheDocument()
+    expect(screen.getByText("format_underlined")).toBeInTheDocument()
+    expect(screen.getByText("strikethrough_s")).toBeInTheDocument()
+    expect(screen.getByText("format_align_left")).toBeInTheDocument()
+    expect(screen.getByText("format_align_center")).toBeInTheDocument()
+    expect(screen.getByText("format_align_right")).toBeInTheDocument()
+    expect(screen.getByText("format_align_justify")).toBeInTheDocument()
+    expect(screen.getByText("superscript")).toBeInTheDocument()
+    expect(screen.getByText("subscript")).toBeInTheDocument()
+    expect(screen.getByText("format_list_numbered")).toBeInTheDocument()
+    expect(screen.getByText("format_list_bulleted")).toBeInTheDocument()
+    expect(screen.getAllByText("vertical_split")).toHaveLength(2)
+    expect(screen.getByText("table_chart")).toBeInTheDocument()
+    expect(screen.getByText("123")).toBeInTheDocument()
+    expect(screen.getByText("open_in_full")).toBeInTheDocument()
   })
 })

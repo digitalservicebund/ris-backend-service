@@ -2,12 +2,12 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
-import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
+import norms.utils.convertNormToJson
+import norms.utils.createRandomNorm
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -18,7 +18,6 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 import java.util.*
 
 @ExtendWith(SpringExtension::class)
@@ -33,7 +32,7 @@ class LoadNormControllerTest {
 
     @Test
     fun `it calls the load norm service with the correct query to get a norm by GUID`() {
-        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "long title")
+        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), officialLongTitle = "long title")
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -50,7 +49,7 @@ class LoadNormControllerTest {
 
     @Test
     fun `it responds with ok status if the norm was loaded successfully`() {
-        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "long title")
+        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), officialLongTitle = "long title")
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -65,20 +64,8 @@ class LoadNormControllerTest {
 
     @Test
     fun `it maps the norm entity to the expected data schema`() {
-        val paragraphGuid = UUID.fromString("e0cbf06c-cd8b-4647-bb8a-263b43f0f974")
-        val paragraph = Paragraph(paragraphGuid, "marker", "text")
-        val articleGuid = UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359")
-        val article = Article(articleGuid, "title", "marker", listOf(paragraph))
-        val normGuid = UUID.fromString("72631e54-78a4-11d0-bcf7-00aa00b7b32a")
-        val norm = Norm(
-            normGuid, "long title", listOf(article), "official short title", "official abbreviation",
-            null, LocalDate.parse("2020-10-27"), LocalDate.parse("2020-10-28"), LocalDate.parse("2020-10-29"),
-            "frame keywords", "author entity", "author deciding body",
-            true, "lead jurisdiction", "lead unit", "participation type",
-            "participation institution", "document type name", "document norm category",
-            "document template name", "subject fna", "subject previous fna",
-            "subject gesta", "subject bgb3"
-        )
+        val norm = createRandomNorm()
+        val responseJson = convertNormToJson(norm)
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -88,50 +75,7 @@ class LoadNormControllerTest {
             .uri("/api/v1/norms/72631e54-78a4-11d0-bcf7-00aa00b7b32a")
             .exchange()
             .expectBody()
-            .json(
-                """
-        {
-          "guid": "72631e54-78a4-11d0-bcf7-00aa00b7b32a",
-          "longTitle": "long title",
-          "articles": [
-            {
-              "guid": "53d29ef7-377c-4d14-864b-eb3a85769359",
-              "title": "title",
-              "marker": "marker",
-              "paragraphs": [
-                {
-                  "guid": "e0cbf06c-cd8b-4647-bb8a-263b43f0f974",
-                  "marker": "marker",
-                  "text": "text"
-                }
-              ]
-            }
-          ],
-          "officialShortTitle": "official short title",
-          "officialAbbreviation": "official abbreviation",
-          "referenceNumber": null,
-          "publicationDate": "2020-10-27",
-          "announcementDate": "2020-10-28",
-          "citationDate": "2020-10-29",
-          "frameKeywords": "frame keywords",
-          "authorEntity": "author entity",
-          "authorDecidingBody": "author deciding body",
-          "authorIsResolutionMajority": true,
-          "leadJurisdiction": "lead jurisdiction",
-          "leadUnit": "lead unit",
-          "participationType": "participation type",
-          "participationInstitution": "participation institution",
-          "documentTypeName": "document type name",
-          "documentNormCategory": "document norm category",
-          "documentTemplateName": "document template name",
-          "subjectFna": "subject fna",
-          "subjectPreviousFna": "subject previous fna",
-          "subjectGesta": "subject gesta",
-          "subjectBgb3": "subject bgb3"
-        }
-        """,
-                true
-            )
+            .json(responseJson, true)
     }
 
     @Test
