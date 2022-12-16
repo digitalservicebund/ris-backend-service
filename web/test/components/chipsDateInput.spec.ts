@@ -1,6 +1,10 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
+import dayjs from "dayjs"
+import timezone from "dayjs/plugin/timezone"
 import ChipsDateInput from "@/components/ChipsDateInput.vue"
+
+dayjs.extend(timezone)
 
 function renderComponent(options?: {
   ariaLabel?: string
@@ -21,6 +25,14 @@ function renderComponent(options?: {
 }
 
 describe("ChipsInput", () => {
+  beforeEach(() => {
+    dayjs.tz.setDefault("Europe/Berlin")
+  })
+
+  afterEach(() => {
+    dayjs.tz.setDefault()
+  })
+
   it("shows a chips input element with type of date", () => {
     renderComponent({
       ariaLabel: "test-label",
@@ -102,15 +114,15 @@ describe("ChipsInput", () => {
     expect(input).toHaveValue("")
   })
 
-  // it("emits model update event when user adds an input", async () => {
-  //   const { emitted, user } = renderComponent()
-  //   const input = screen.getByLabelText("aria-label")
-  //   await user.type(input, "2022-02-03")
-  //   await user.type(input, "{enter}")
-  //   await userEvent.tab()
+  it("emits model update event when user adds an input", async () => {
+    const { emitted, user } = renderComponent()
+    const input = screen.getByLabelText("aria-label")
+    await user.type(input, "2022-02-03")
+    await user.type(input, "{enter}")
+    await userEvent.tab()
 
-  //   expect(emitted()["update:modelValue"]).toEqual([
-  //     [["2022-02-02T23:00:00.000Z"]],
-  //   ])
-  // })
+    expect(emitted()["update:modelValue"]).toEqual([
+      [["2022-02-02T23:00:00.000Z"]],
+    ])
+  })
 })

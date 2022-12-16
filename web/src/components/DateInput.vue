@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import timezone from "dayjs/plugin/timezone"
-import utc from "dayjs/plugin/utc"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/domain"
 
@@ -22,14 +20,11 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const inputValue = ref<string>()
 
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
 watch(
   props,
   () =>
     (inputValue.value = props.modelValue
-      ? dayjs(props.modelValue).tz("Europe/Berlin").format("YYYY-MM-DD")
+      ? dayjs(props.modelValue).format("YYYY-MM-DD")
       : props.value),
   {
     immediate: true,
@@ -57,10 +52,7 @@ const conditionalClasses = computed(() => ({
 
 function handleOnBlur() {
   if (!hasError.value)
-    emit(
-      "update:modelValue",
-      dayjs(inputValue.value).tz("Europe/Berlin").toISOString()
-    )
+    emit("update:modelValue", dayjs(inputValue.value).toISOString())
   // TODO support clearing date and sending undefined to backend
   // empty field should not be an error
 }
