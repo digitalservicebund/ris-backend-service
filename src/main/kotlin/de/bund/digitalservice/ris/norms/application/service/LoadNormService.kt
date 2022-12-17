@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.application
+package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
