@@ -1,6 +1,6 @@
-import { DropdownInputField, DropdownItem, InputType } from "@/domain"
+import { ComboboxInputField, ComboboxItem, InputType } from "@/domain"
 
-export const undefinedDropDownItems: DropdownItem[] = [
+export const undefinedDropDownItems: ComboboxItem[] = [
   {
     text: "unbestimmt (unbekannt)",
     value: "UNDEFINED_UNKNOWN",
@@ -18,16 +18,16 @@ export const undefinedDropDownItems: DropdownItem[] = [
 export function dropdown(
   name: string,
   label: string,
-  items: DropdownItem[]
-): DropdownInputField {
+  items: ComboboxItem[]
+): ComboboxInputField {
   return {
     name: name,
-    type: InputType.DROPDOWN,
+    type: InputType.COMBOBOX,
     label: label,
     inputAttributes: {
       ariaLabel: label,
       isCombobox: true,
-      dropdownItems: items,
+      items: items,
     },
   }
 }

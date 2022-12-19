@@ -3,8 +3,10 @@ import {
   LookupTableEndpoint,
   NestedInputAttributes,
   ValidationError,
+  InputField,
+  DropdownItem,
+  ComboboxItem,
 } from "./types"
-import type { InputField, DropdownItem } from "./types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import DocumentUnit from "@/domain/documentUnit"
 
@@ -81,14 +83,39 @@ export function defineDateField(
   }
 }
 
-export function defineDropdownField(
+export function defineComboboxField(
   name: string,
   label: string,
   ariaLabel: string,
   placeholder?: string,
   isCombobox?: boolean,
-  dropdownItems?: DropdownItem[],
+  items?: ComboboxItem[],
   endpoint?: LookupTableEndpoint,
+  validationError?: ValidationError
+): InputField {
+  return {
+    name,
+    type: InputType.COMBOBOX,
+    label,
+    required,
+    inputAttributes: {
+      ariaLabel,
+      placeholder,
+      items,
+      endpoint,
+      isCombobox,
+      validationError,
+    },
+  }
+}
+
+export function defineDropdownField(
+  name: string,
+  label: string,
+  ariaLabel: string,
+  items: DropdownItem[],
+  required?: boolean,
+  placeholder?: string,
   validationError?: ValidationError
 ): InputField {
   return {
@@ -99,9 +126,7 @@ export function defineDropdownField(
     inputAttributes: {
       ariaLabel,
       placeholder,
-      dropdownItems,
-      endpoint,
-      isCombobox,
+      items,
       validationError,
     },
   }
@@ -123,7 +148,7 @@ export function defineNestedInputField(
 }
 
 export const courtFields: InputField[] = [
-  defineDropdownField(
+  defineComboboxField(
     "court",
     "Gericht",
     "Gericht",
@@ -171,7 +196,7 @@ export const coreDataFields: InputField[] = [
     }
   ),
   defineTextField("appraisalBody", "Spruchkörper", "Spruchkörper"),
-  defineDropdownField(
+  defineComboboxField(
     "category",
     "Dokumenttyp",
     "Dokumenttyp",
@@ -201,10 +226,14 @@ export const coreDataFields: InputField[] = [
     "legalEffect",
     "Rechtskraft",
     "Rechtskraft",
+<<<<<<< HEAD
     "",
     false,
     legalEffectTypes.items,
     undefined
+=======
+    legalEffectTypes.items
+>>>>>>> fbe16aa0 (Extract combobox)
   ),
   defineTextField(
     "region",
