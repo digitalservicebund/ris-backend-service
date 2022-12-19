@@ -225,7 +225,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await expect(page.locator("text=Abweichender ECLI").first()).toBeHidden()
   })
 
-  test("adding and deleting multiple inputs", async ({
+  test("adding, navigating, deleting multiple chips inputs", async ({
     page,
     documentNumber,
   }) => {
@@ -243,13 +243,28 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await expect(page.locator("text=testone").first()).toBeVisible()
     await expect(page.locator("text=testtwo").first()).toBeVisible()
 
+    //Navigate back and delete on enter
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("Enter")
 
     await expect(page.locator("text=testtwo").first()).toBeHidden()
 
+    // Tab out and in
+    await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
+
+    await page.keyboard.down("Shift")
+    await page.keyboard.press("Tab")
+    await page.keyboard.up("Shift")
+
+    await page.keyboard.down("Shift")
+    await page.keyboard.press("Tab")
+    await page.keyboard.up("Shift")
+
     await page.keyboard.press("ArrowLeft")
+
+    //Navigate back and delete on backspace
     await page.keyboard.press("Enter")
 
     await expect(page.locator("text=testone").first()).toBeHidden()
