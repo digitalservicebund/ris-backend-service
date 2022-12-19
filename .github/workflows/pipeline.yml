@@ -476,7 +476,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
       - name: Deploy new backend image
-        uses: digitalservicebund/github-actions/argocd-deploy@ec00b78b67a807cae4f0bdbee9af17a1cd2c880e
+        uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: staging
           version: ${{ needs.build-and-push-backend-image.outputs.version }}
@@ -487,7 +487,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Deploy new frontend image
-        uses: digitalservicebund/github-actions/argocd-deploy@ec00b78b67a807cae4f0bdbee9af17a1cd2c880e
+        uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: staging
           version: ${{ needs.build-and-push-frontend-image.outputs.version }}
@@ -606,7 +606,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
       - name: Deploy new backend image
-        uses: digitalservicebund/github-actions/argocd-deploy@ec00b78b67a807cae4f0bdbee9af17a1cd2c880e
+        uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: production
           version: ${{ needs.build-and-push-backend-image.outputs.version }}
@@ -617,7 +617,7 @@ jobs:
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
           argocd_server: ${{ secrets.ARGOCD_SERVER }}
       - name: Deploy new frontend image
-        uses: digitalservicebund/github-actions/argocd-deploy@ec00b78b67a807cae4f0bdbee9af17a1cd2c880e
+        uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: production
           version: ${{ needs.build-and-push-frontend-image.outputs.version }}
