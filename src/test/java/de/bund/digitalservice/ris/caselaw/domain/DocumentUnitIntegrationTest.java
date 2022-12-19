@@ -43,7 +43,8 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
 @Testcontainers(disabledWithoutDocker = true)
 @WithMockUser
 @AutoConfigureDataR2dbc
-// This is because retryWhen(Retry.backoff... in DocumentUnitService can take up to ~127 seconds
+// This is because retryWhen(Retry.backoff... in DocumentUnitService can take up
+// to ~127 seconds
 @AutoConfigureWebTestClient(timeout = "150000")
 public class DocumentUnitIntegrationTest {
   @Container
@@ -68,6 +69,7 @@ public class DocumentUnitIntegrationTest {
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
+  @Autowired private DeviatingDecisionDateRepository deviatingDecisionDateRepository;
 
   @BeforeEach
   void setUp() {
@@ -76,6 +78,7 @@ public class DocumentUnitIntegrationTest {
     deviatingEcliRepository.deleteAll().block();
     courtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
+    deviatingDecisionDateRepository.deleteAll().block();
   }
 
   @Test
@@ -204,6 +207,69 @@ public class DocumentUnitIntegrationTest {
     assertThat(deviatingEclis).hasSize(2);
     assertThat(deviatingEclis.get(0).getEcli()).isEqualTo("ecli123");
     assertThat(deviatingEclis.get(1).getEcli()).isEqualTo("ecli456");
+  }
+
+  @Test
+  void testForDeviatingDecisionDateDbEntryAfterUpdateByUuid() {
+    UUID uuid = UUID.randomUUID();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(uuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .build();
+
+    DocumentUnitDTO savedDto = repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .id(savedDto.id)
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(
+                CoreData.builder()
+                    .deviatingDecisionDates(
+                        (List.of(
+                            Instant.parse("2022-01-31T23:00:00Z"),
+                            Instant.parse("2022-01-31T23:00:00Z"))))
+                    .build())
+            .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody().coreData().deviatingDecisionDates().get(0))
+                  .isEqualTo("2022-01-31T23:00:00Z");
+              assertThat(response.getResponseBody().coreData().deviatingDecisionDates().get(1))
+                  .isEqualTo("2022-01-31T23:00:00Z");
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
+
+    List<DeviatingDecisionDateDTO> deviatingDecisionDates =
+        deviatingDecisionDateRepository
+            .findAllByDocumentUnitId(list.get(0).id)
+            .collectList()
+            .block();
+
+    assertThat(deviatingDecisionDates).hasSize(2);
+    assertThat(deviatingDecisionDates.get(0).getDecisiondate()).isEqualTo("2022-01-31T23:00:00Z");
+    assertThat(deviatingDecisionDates.get(1).getDecisiondate()).isEqualTo("2022-01-31T23:00:00Z");
   }
 
   @Test
