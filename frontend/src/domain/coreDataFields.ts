@@ -1,14 +1,15 @@
 import {
   InputType,
-  LookupTableEndpoint,
   NestedInputAttributes,
   ValidationError,
   InputField,
   DropdownItem,
   ComboboxItem,
+  ComboboxAttributes,
 } from "./types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import DocumentUnit from "@/domain/documentUnit"
+import comboboxItemService from "@/services/comboboxItemService"
 
 export function defineTextField(
   name: string,
@@ -90,14 +91,14 @@ export function defineComboboxField(
   placeholder?: string,
   isCombobox?: boolean,
   items?: ComboboxItem[],
-  endpoint?: LookupTableEndpoint,
+  endpoint?: ComboboxAttributes["endpoint"],
   validationError?: ValidationError
 ): InputField {
   return {
     name,
     type: InputType.COMBOBOX,
     label,
-    required,
+    required: DocumentUnit.isRequiredField(name),
     inputAttributes: {
       ariaLabel,
       placeholder,
@@ -114,7 +115,6 @@ export function defineDropdownField(
   label: string,
   ariaLabel: string,
   items: DropdownItem[],
-  required?: boolean,
   placeholder?: string,
   validationError?: ValidationError
 ): InputField {
@@ -155,7 +155,7 @@ export const courtFields: InputField[] = [
     "Gerichtstyp Gerichtsort",
     true,
     [],
-    LookupTableEndpoint.courts
+    comboboxItemService.getCourts
   ),
 ]
 export const coreDataFields: InputField[] = [
@@ -203,7 +203,7 @@ export const coreDataFields: InputField[] = [
     "Bitte auswählen",
     true,
     [],
-    LookupTableEndpoint.documentTypes
+    comboboxItemService.getDocumentTypes
   ),
   defineNestedInputField(
     "Abweichender ECLI",
@@ -226,14 +226,7 @@ export const coreDataFields: InputField[] = [
     "legalEffect",
     "Rechtskraft",
     "Rechtskraft",
-<<<<<<< HEAD
-    "",
-    false,
-    legalEffectTypes.items,
-    undefined
-=======
     legalEffectTypes.items
->>>>>>> fbe16aa0 (Extract combobox)
   ),
   defineTextField(
     "region",

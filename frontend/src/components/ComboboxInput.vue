@@ -2,11 +2,10 @@
 import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
 import { Court } from "@/domain/documentUnit"
 import {
-  LookupTableEndpoint,
   ComboboxItem,
   ComboboxInputModelType,
+  ComboboxAttributes,
 } from "@/domain/types"
-import dropdownItemService from "@/services/dropdownItemService"
 
 interface Props {
   id: string
@@ -15,7 +14,7 @@ interface Props {
   ariaLabel: string
   placeholder?: string
   items?: ComboboxItem[]
-  endpoint?: LookupTableEndpoint
+  endpoint?: ComboboxAttributes["endpoint"]
   isCombobox?: boolean
 }
 
@@ -135,7 +134,7 @@ const updateCurrentItems = async () => {
     return
   }
 
-  const response = await dropdownItemService.fetch(props.endpoint, filter.value)
+  const response = await props.endpoint(filter.value)
   if (response.data) {
     currentItems.value = response.data
     insertItemIfEmpty()

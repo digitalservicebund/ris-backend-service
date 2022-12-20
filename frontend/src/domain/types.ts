@@ -1,4 +1,5 @@
 import { Court } from "@/domain/documentUnit"
+import { ServiceResponse } from "@/services/httpClient"
 
 export enum InputType {
   TEXT = "text",
@@ -85,12 +86,6 @@ export interface DateInputField extends BaseInputField {
 
 export type DateInputModelType = string
 
-//LOOKUP
-export enum LookupTableEndpoint {
-  documentTypes = "lookuptable/documentTypes",
-  courts = "lookuptable/courts",
-}
-
 //DROPDOWN
 export type DropdownInputModelType = string
 
@@ -120,7 +115,7 @@ export type ComboboxItem = {
 export interface ComboboxAttributes extends BaseInputAttributes {
   isCombobox?: boolean
   items?: ComboboxItem[]
-  endpoint?: LookupTableEndpoint
+  endpoint?: (searchString?: string) => Promise<ServiceResponse<ComboboxItem[]>>
   placeholder?: string
 }
 

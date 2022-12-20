@@ -3,8 +3,9 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { Court } from "@/domain/documentUnit"
-import { ComboboxItem, LookupTableEndpoint } from "@/domain/types"
-import dropdownInputService from "@/services/dropdownItemService"
+import { ComboboxItem } from "@/domain/types"
+import service from "@/services/comboboxItemService"
+import { ServiceResponse } from "@/services/httpClient"
 
 function renderComponent(
   options: {
@@ -13,7 +14,7 @@ function renderComponent(
     ariaLabel?: string
     items?: ComboboxItem[]
     isCombobox?: boolean
-    endpoint?: LookupTableEndpoint
+    endpoint?: (filter: string) => Promise<ServiceResponse<ComboboxItem[]>>
   } = {}
 ) {
   return render(ComboboxInput, {
@@ -159,7 +160,7 @@ describe("Combobox Element", () => {
 
   it("uses endpoint to fetch all DocumentType items", async () => {
     const fetchSpy = vi
-      .spyOn(dropdownInputService, "filterItems")
+      .spyOn(service, "getDocumentTypes")
       .mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -173,7 +174,7 @@ describe("Combobox Element", () => {
       )
 
     renderComponent({
-      endpoint: LookupTableEndpoint.documentTypes,
+      endpoint: service.getDocumentTypes,
       isCombobox: true,
     })
 
@@ -183,10 +184,7 @@ describe("Combobox Element", () => {
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
 
     expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(fetchSpy).toHaveBeenCalledWith(
-      LookupTableEndpoint.documentTypes,
-      undefined
-    )
+    expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("AO - Anordnung")
   })
@@ -204,13 +202,13 @@ describe("Combobox Element", () => {
       },
     ]
     const fetchSpy = vi
-      .spyOn(dropdownInputService, "fetch")
+      .spyOn(service, "getCourts")
       .mockImplementation(() =>
         Promise.resolve({ status: 200, data: dropdownItems })
       )
 
     renderComponent({
-      endpoint: LookupTableEndpoint.courts,
+      endpoint: service.getCourts,
       isCombobox: true,
     })
 
@@ -221,7 +219,7 @@ describe("Combobox Element", () => {
     const dropdownItemElements = screen.getAllByLabelText("dropdown-option")
 
     expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(fetchSpy).toHaveBeenCalledWith(LookupTableEndpoint.courts, undefined)
+    expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent("BGH Karlsruhe")
   })
@@ -239,13 +237,13 @@ describe("Combobox Element", () => {
       },
     ]
     const fetchSpy = vi
-      .spyOn(dropdownInputService, "fetch")
+      .spyOn(service, "getCourts")
       .mockImplementation(() =>
         Promise.resolve({ status: 200, data: dropdownItems })
       )
 
     renderComponent({
-      endpoint: LookupTableEndpoint.courts,
+      endpoint: service.getCourts,
       isCombobox: true,
     })
 
@@ -274,13 +272,13 @@ describe("Combobox Element", () => {
       },
     ]
     const fetchSpy = vi
-      .spyOn(dropdownInputService, "fetch")
+      .spyOn(service, "getCourts")
       .mockImplementation(() =>
         Promise.resolve({ status: 200, data: dropdownItems })
       )
 
     renderComponent({
-      endpoint: LookupTableEndpoint.courts,
+      endpoint: service.getCourts,
       isCombobox: true,
     })
 
@@ -289,7 +287,7 @@ describe("Combobox Element", () => {
 
     const dropdownItemElements = screen.getAllByLabelText("dropdown-option")
     expect(fetchSpy).toHaveBeenCalledTimes(1)
-    expect(fetchSpy).toHaveBeenCalledWith(LookupTableEndpoint.courts, undefined)
+    expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent(
       "ABC aufgehoben seit: 1973"
