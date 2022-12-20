@@ -259,5 +259,7 @@ licenseReport {
     // https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
     new LicenseBundleNormalizer("$projectDir/license-normalizer-bundle.json", true)
   ]
-  renderers = [new CsvReportRenderer('backend-licences.csv')]
+  renderers = [
+    new CsvReportRenderer("backend-licences.csv")
+  ]
 }
