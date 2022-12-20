@@ -215,7 +215,10 @@ onBeforeUnmount(() => {
           @click="clearSelection"
           @keydown.enter="clearSelection"
         >
-          <span class="icon material-icons pr-[1.5rem] text-blue-800">
+          <span
+            aria-label="Auswahl zurücksetzen"
+            class="icon material-icons pr-[1.5rem] text-blue-800"
+          >
             close
           </span>
         </button>
