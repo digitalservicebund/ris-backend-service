@@ -4,10 +4,19 @@
       "moduleLicense": "Apache License, Version 2.0"
     },
     {
+      "moduleLicense": "Apache-2.0"
+    },
+    {
       "moduleLicense": "MIT License"
     },
     {
       "moduleLicense": "MIT-0"
+    },
+    {
+      "moduleLicense": "MIT"
+    },
+    {
+      "moduleLicense": "ISC"
     },
     {
       "moduleLicense": "Eclipse Public License - v 2.0"
@@ -20,6 +29,9 @@
     },
     {
       "moduleLicense": "The 3-Clause BSD License"
+    },
+    {
+      "moduleLicense": "BSD-3-Clause"
     },
     {
       "moduleLicense": "BSD 4-Clause \"Original\" or \"Old\" License"

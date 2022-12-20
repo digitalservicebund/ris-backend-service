@@ -43,3 +43,4 @@ lefthook-local.yml
 ## local ##
 /.config
 /.local-storage
+web/audit-licences.csv

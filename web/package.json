@@ -19,7 +19,7 @@
     "lint:fix": "eslint --max-warnings=0 --ext .js,.ts,.vue --ignore-path .gitignore --fix . && stylelint --fix ./src/**/*.{vue,scss}",
     "style:check": "vue-tsc && npm run format:check && npm run lint:check",
     "style:fix": "npm run format:fix && npm run lint:fix",
-    "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow ''"
+    "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow \"$(. ./parseAllowedLicences.sh)\" --out ./audit-licences.csv"
   },
   "dependencies": {
     "@tiptap/extension-bold": "^2.0.0-beta.28",
