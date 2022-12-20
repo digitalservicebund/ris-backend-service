@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
 import java.nio.ByteBuffer;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -34,11 +35,13 @@ class LookupTableImporterServiceTest {
 
   @MockBean private CourtRepository courtRepository;
 
+  @MockBean private StateRepository stateRepository;
+
   @Test
   void testImportDocumentTypeLookupTable() {
     when(documentTypeRepository.deleteAll()).thenReturn(Mono.empty());
 
-    String doctypeXml =
+    String doctypesXml =
         """
         <?xml version="1.0" encoding="utf-8"?>
         <juris-table>
@@ -49,7 +52,7 @@ class LookupTableImporterServiceTest {
             <bezeichnung>Änderungsnorm</bezeichnung>
           </juris-doktyp>
         </juris-table>""";
-    ByteBuffer byteBuffer = ByteBuffer.wrap(doctypeXml.getBytes());
+    ByteBuffer byteBuffer = ByteBuffer.wrap(doctypesXml.getBytes());
     List<JPADocumentTypeDTO> documentTypeDTOs =
         List.of(
             JPADocumentTypeDTO.builder()
@@ -79,7 +82,7 @@ class LookupTableImporterServiceTest {
   void testImportCourtLookupTable() {
     when(courtRepository.deleteAll()).thenReturn(Mono.empty());
 
-    String courtXml =
+    String courtsXml =
         """
             <?xml version="1.0"?>
             <juris-table>
@@ -92,7 +95,7 @@ class LookupTableImporterServiceTest {
                 </juris-gericht>
             </juris-table>
             """;
-    ByteBuffer byteBuffer = ByteBuffer.wrap(courtXml.getBytes());
+    ByteBuffer byteBuffer = ByteBuffer.wrap(courtsXml.getBytes());
 
     StepVerifier.create(service.importCourtLookupTable(byteBuffer))
         .consumeNextWith(
@@ -100,5 +103,29 @@ class LookupTableImporterServiceTest {
         .verifyComplete();
 
     verify(courtRepository).deleteAll();
+  }
+
+  @Test
+  void testImportStateLookupTable() {
+    when(stateRepository.deleteAll()).thenReturn(Mono.empty());
+
+    String statesXml =
+        """
+            <?xml version="1.0"?>
+            <juris-table>
+                <juris-buland id="1" aendkz="A" version="1.0">
+                    <jurisabk>jurisabk123</jurisabk>
+                    <bezeichnung>bezeichnung123</bezeichnung>
+                </juris-buland>
+            </juris-table>
+            """;
+    ByteBuffer byteBuffer = ByteBuffer.wrap(statesXml.getBytes());
+
+    StepVerifier.create(service.importStateLookupTable(byteBuffer))
+        .consumeNextWith(
+            stateDTO -> assertEquals("Successfully imported the state lookup table", stateDTO))
+        .verifyComplete();
+
+    verify(stateRepository).deleteAll();
   }
 }

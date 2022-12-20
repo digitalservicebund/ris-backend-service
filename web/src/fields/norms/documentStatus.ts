@@ -23,6 +23,7 @@ export const documentStatus: InputField[] = [
     label: "Datum des Änderungsvorschrift",
     inputAttributes: {
       ariaLabel: "Datum des Änderungsvorschrift",
+      isFutureDate: true,
     },
   },
   {
@@ -39,6 +40,7 @@ export const documentStatus: InputField[] = [
     label: "Datum des Inkrafttretens der Änderung",
     inputAttributes: {
       ariaLabel: "Datum des Inkrafttretens der Änderung",
+      isFutureDate: true,
     },
   },
   {

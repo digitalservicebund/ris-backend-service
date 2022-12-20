@@ -39,9 +39,12 @@ const handleUpdateDocumentUnit = async () => {
   } else {
     validationErrors.value = []
   }
+  if (response.data) {
+    // TODO
+  }
   setTimeout(() => {
     hasDataChange.value = false
-    lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit)
+    lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit) // <-- updatedDocumentUnit?
     updateStatus.value = response.status
     if (updateStatus.value !== UpdateStatus.SUCCEED) return
   }, 1000)
@@ -75,8 +78,18 @@ watch(
 
 const coreData = computed({
   get: () => props.documentUnit.coreData,
-  set: (newValues) =>
-    Object.assign(updatedDocumentUnit.value.coreData, newValues),
+  set: (newValues) => {
+    let triggerSaving = false
+    if (
+      updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
+    ) {
+      triggerSaving = true
+    }
+    Object.assign(updatedDocumentUnit.value.coreData, newValues)
+    if (triggerSaving) {
+      handleUpdateDocumentUnit()
+    }
+  },
 })
 
 const previousDecisions = computed({

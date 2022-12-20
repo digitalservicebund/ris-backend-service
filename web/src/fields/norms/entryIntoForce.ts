@@ -8,6 +8,7 @@ export const entryIntoForce: InputField[] = [
     label: "Datum des Inkrafttretens",
     inputAttributes: {
       ariaLabel: "Datum des Inkrafttretens",
+      isFutureDate: true,
     },
   },
   dropdown(
@@ -21,6 +22,7 @@ export const entryIntoForce: InputField[] = [
     label: "Grundsätzliches Inkrafttretedatum",
     inputAttributes: {
       ariaLabel: "Grundsätzliches Inkrafttretedatum",
+      isFutureDate: true,
     },
   },
   dropdown(
@@ -34,6 +36,7 @@ export const entryIntoForce: InputField[] = [
     label: "Abweichendes Inkrafttretedatum",
     inputAttributes: {
       ariaLabel: "Abweichendes Inkrafttretedatum",
+      isFutureDate: true,
     },
   },
   dropdown(

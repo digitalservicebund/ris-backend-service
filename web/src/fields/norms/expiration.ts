@@ -8,6 +8,7 @@ export const expiration: InputField[] = [
     label: "Datum des Außerkrafttretens",
     inputAttributes: {
       ariaLabel: "Datum des Außerkrafttretens",
+      isFutureDate: true,
     },
   },
   dropdown(
@@ -29,6 +30,7 @@ export const expiration: InputField[] = [
     label: "Grundsätzliches Außerkrafttretedatum",
     inputAttributes: {
       ariaLabel: "Grundsätzliches Außerkrafttretedatum",
+      isFutureDate: true,
     },
   },
   dropdown(
@@ -42,6 +44,7 @@ export const expiration: InputField[] = [
     label: "Abweichendes Außerkrafttretedatum",
     inputAttributes: {
       ariaLabel: "Abweichendes Außerkrafttretedatum",
+      isFutureDate: true,
     },
   },
   dropdown(

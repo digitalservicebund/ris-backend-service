@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
@@ -75,6 +76,14 @@ public class DocumentUnitBuilder {
           documentUnitDTO.getDeviatingEclis().stream().map(DeviatingEcliDTO::getEcli).toList();
     }
 
+    List<Instant> deviatingDecisionDates = null;
+    if (documentUnitDTO.getDeviatingDecisionDates() != null) {
+      deviatingDecisionDates =
+          documentUnitDTO.getDeviatingDecisionDates().stream()
+              .map(DeviatingDecisionDateDTO::decisionDate)
+              .toList();
+    }
+
     return new DocumentUnit(
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
@@ -95,6 +104,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getDecisionDate() != null
                 ? Instant.parse(documentUnitDTO.getDecisionDate())
                 : null,
+            deviatingDecisionDates,
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),

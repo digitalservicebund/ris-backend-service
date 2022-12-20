@@ -4,7 +4,7 @@ fileignoreconfig:
   - filename: web/src/utilities/normUtilities.ts
     checksum: 81116ce9097165fc9534eada4c9a6842cdef5ee6e5667a05a7a72480cc817431
   - filename: web/test/e2e/norms/testdata/norm_edited_fields.json
-    checksum: 2f4d5d20b8c7d623b10ff0bc51ff53bd202fd790fa35d8a383165b5673996cb5
+    checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
   - filename: build.gradle
     checksum: 6bacfc3dee66f93bcd47e194cde9283344720acf727e0530c409e5c6e071e8b0
   - filename: run.sh
@@ -130,7 +130,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 5abe6438ebc906ee3fd3cc464de0f1fb5624ad09fd330d881d3195ec0ca14577
+    checksum: 29fe888228ab1d238bddb358d55336f0ee7695056353a03f2c241fdfb6f60ca8
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts
@@ -149,6 +149,10 @@ fileignoreconfig:
     checksum: 8427174186b782f60c37c01f0738158e12ca19182aac6e1554a61d7765ada657
   - filename: src/main/resources/db/migration/V0.16__norms_resize_otherfootnote_field.sql
     checksum: a3c395357ffe854d65f419645a617b90ae1c965238e53d1615ce7bffcd36874e
+  - filename: src/main/resources/db/migration/V0.17__caselaw_add_deviating_decisiondate_table.sql
+    checksum: 00c110e0076f04049444474ab1bc884dbfe188039d5727d0dec575f044f50aae
+  - filename: src/main/resources/db/migration/V0.18__caselaw_add_statelookuptable.sql
+    checksum: b2c24a69d918b8b9c8012a94770d154bd57479fb2aeb6ab5737654bd25d1d36f
 
 scopeconfig:
   - scope: node

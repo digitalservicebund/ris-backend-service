@@ -1,45 +1,37 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
+import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
-import type {
-  DropdownInputModelType,
-  DateInputModelType,
-  ChipsInputModelType,
-} from "@/domain"
+import type { DropdownInputModelType, DateInputModelType } from "@/domain"
 import {
   ValidationError,
   defineDateField,
   NestedInputAttributes,
 } from "@/domain"
-import type { DropdownItem } from "@/domain/types"
+import type { ChipsInputModelType, DropdownItem } from "@/domain/types"
 import dropdownItems from "@/kitchensink/data/dropdownItems.json"
 
 const items: DropdownItem[] = dropdownItems.items
 const dropdownModelValue = ref<DropdownInputModelType>()
 const dateModelValue = ref<DateInputModelType>()
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
+const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])
 const isReadonly = ref(true)
 const mockValidationError: ValidationError = {
   defaultMessage: "wrong date",
   field: "coreData.decisionDate",
 }
 const nestedInputFields: NestedInputAttributes["fields"] = {
-  parent: defineDateField(
-    "decisionDate",
-    "Entscheidungsdatum",
-    "Entscheidungsdatum",
-    true,
-    undefined
-  ),
+  parent: defineDateField("field", "Input", "Input", true, undefined),
   child: defineDateField(
-    "decisionDate",
-    "Entscheidungsdatum",
-    "Entscheidungsdatum",
+    "deviatingField",
+    "Abweichender Input",
+    "Abweichender Input",
     true,
     undefined
   ),
@@ -49,14 +41,6 @@ const updateDropdownModelValue = (
   textValue: DropdownInputModelType | undefined
 ) => {
   if (!!textValue) dropdownModelValue.value = textValue
-}
-
-const updateDateModelValue = (textValue: DateInputModelType | undefined) => {
-  if (!!textValue) dateModelValue.value = textValue
-}
-
-const updateChipsModelValue = (textValue: ChipsInputModelType | undefined) => {
-  if (!!textValue) chipsModelValue.value = textValue
 }
 </script>
 
@@ -104,7 +88,6 @@ const updateChipsModelValue = (textValue: ChipsInputModelType | undefined) => {
       aria-label="date input"
       :model-value="dateModelValue"
       :value="dateModelValue"
-      @update:model-value="updateDateModelValue"
     ></DateInput>
     <h1 class="font-bold text-24">Dropdown Input</h1>
     <div class="pb-4">
@@ -118,14 +101,23 @@ const updateChipsModelValue = (textValue: ChipsInputModelType | undefined) => {
         @update:model-value="updateDropdownModelValue"
       />
     </div>
+
     <h1 class="font-bold text-24">Chips Input</h1>
     <ChipsInput
-      id="chipsInput"
+      id="ChipsInput"
       aria-label="chips input"
       :model-value="chipsModelValue"
       :value="chipsModelValue"
-      @update:model-value="updateChipsModelValue"
     ></ChipsInput>
+
+    <h1 class="font-bold text-24">Chips Date Input</h1>
+    <ChipsDateInput
+      id="ChipsDateInput"
+      aria-label="chips date input"
+      :model-value="chipsDateModelValue"
+      :value="chipsDateModelValue"
+    ></ChipsDateInput>
+
     <h1 class="font-bold text-24">Nested Input</h1>
     <div class="mb-24">
       <NestedInput

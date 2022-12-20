@@ -6,6 +6,7 @@ import { ValidationError } from "@/domain"
 
 function renderComponent(options?: {
   ariaLabel?: string
+  isFutureDate?: boolean
   value?: string
   modelValue?: string
   placeholder?: string
@@ -17,6 +18,7 @@ function renderComponent(options?: {
     value: options?.value,
     modelValue: options?.modelValue,
     ariaLabel: options?.ariaLabel ?? "aria-label",
+    isFutureDate: options?.isFutureDate ?? false,
     placeholder: options?.placeholder,
     validationError: options?.validationError,
   }
@@ -89,6 +91,23 @@ describe("DateInput", () => {
     await nextTick()
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
+  })
+
+  it("it allows dates in the future if flag is set", async () => {
+    const { emitted } = renderComponent({ isFutureDate: true })
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    const futureDate = "2024-02-10"
+    Object.defineProperty(input, "target", {
+      value: futureDate,
+    })
+
+    await userEvent.clear(input)
+    await userEvent.type(input, futureDate)
+    await userEvent.tab()
+    await nextTick()
+
+    expect(input).toHaveValue(futureDate)
+    expect(emitted()["update:modelValue"]).toBeTruthy()
   })
 
   it("does not allow invalid dates", async () => {

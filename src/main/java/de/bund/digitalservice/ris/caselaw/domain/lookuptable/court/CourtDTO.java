@@ -16,7 +16,7 @@ public class CourtDTO {
   long id;
   String changedatemail;
   String changedateclient;
-  char changeindicator;
+  Character changeindicator;
   String version;
   String courttype;
   String courtlocation;

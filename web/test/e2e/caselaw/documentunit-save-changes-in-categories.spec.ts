@@ -80,7 +80,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     })
   })
 
-  test("nested 'Aktenzeichen' input toggles child input and correctly displays data", async ({
+  test("nested 'Aktenzeichen' input toggles child input and correctly saves and displays data", async ({
     page,
     documentNumber,
   }) => {
@@ -131,7 +131,64 @@ test.describe("save changes in core data and texts and verify it persists", () =
     ).toBeHidden()
   })
 
-  test("nested 'ECLI' input toggles child input and correctly displays data", async ({
+  test("nested 'Entscheidungsdatum' input toggles child input and correctly saves and displays data", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
+    expect(
+      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+    ).toBe("2022-02-03")
+
+    await expect(
+      page.locator("text=Abweichendes Entscheidungsdatum>")
+    ).toBeHidden()
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+      .click()
+
+    await expect(
+      page.locator("text=Abweichendes Entscheidungsdatum").first()
+    ).toBeVisible()
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .fill("2022-02-02")
+    await page.keyboard.press("Enter")
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .fill("2022-02-01")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+
+    await page.reload()
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+      .click()
+
+    await expect(page.locator(".label-wrapper").nth(0)).toHaveText("02.02.2022")
+
+    await expect(page.locator(".label-wrapper").nth(1)).toHaveText("01.02.2022")
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum schließen']")
+      .click()
+
+    await expect(
+      page.locator("text=Abweichendes Entscheidungsdatum").first()
+    ).toBeHidden()
+  })
+
+  test("nested 'ECLI' input toggles child input and correctly saves and displays data", async ({
     page,
     documentNumber,
   }) => {

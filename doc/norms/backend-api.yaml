@@ -47,8 +47,8 @@ paths:
           description: ""
 
     post:
-      summary: Create new norm
-      operationId: createNorm
+      summary: Import data to create a new norm
+      operationId: importNorm
       requestBody:
         required: true
         content:
@@ -68,7 +68,7 @@ paths:
 
   /norms/{guid}:
     get:
-      summary: Obtain a single norm by its Guid
+      summary: Load a single norm
       operationId: loadNorm
       parameters:
         - name: guid
@@ -84,7 +84,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/Norm"
         "404":
-          description: No norm found for this Guid
+          description: No norm found for this query
 
     put:
       summary: Edit the frame data of a norm
@@ -106,6 +106,27 @@ paths:
           description: Norm was updated
         "400":
           description: ""
+
+  /norms/xml/{guid}:
+    get:
+      summary: Load a single as XML in LegalDocML format
+      operationId: loadNormAsXML
+      parameters:
+        - name: guid
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/Guid"
+      responses:
+        "200":
+          description: Norm was found
+          content:
+            application/xml:
+              schema:
+                $ref: "#/components/schemas/LegalDocML"
+
+        "404":
+          description: No norm found for this query
 
 components:
   securitySchemes:
@@ -519,6 +540,12 @@ components:
             entryIntoForceDateState:
               type: string
               example: ""
+    LegalDocML:
+      type: object
+      xml:
+        name: akomaNtoso
+        namespace: http://Inhaltsdaten.LegalDocML.de/1.4
+        prefix: akn
 
 security:
   - BasicAuth: []

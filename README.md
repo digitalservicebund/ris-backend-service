@@ -78,7 +78,7 @@ See `web/README.md`
 
 ### Lookup tables
 
-Some dropdown menus in the frontend get populated via calls to the backend which query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables.
+Some dropdown menus in the frontend get populated via calls to the backend that query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables. Furthermore, some e2e tests are testing this behaviour. Those will fail locally if your lookup tables are not populated.
 
 These are the endpoints and the respective XML files (find those in our wiki) that need to be uploaded to them:
 
@@ -86,8 +86,9 @@ These are the endpoints and the respective XML files (find those in our wiki) th
 | ---------------------------------------------------------------------- | ------------------------ |
 | `http://localhost:8080/api/v1/caselaw/lookuptableimporter/doktyp`      | `doktyp.xml`             |
 | `http://localhost:8080/api/v1/caselaw/lookuptableimporter/gerichtdata` | `gerichtdata_gesamt.xml` |
+| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/buland`      | `buland.xml`             |
 
-In both cases you need to do a `PUT` call: in _Postman_ go to _Body_, set it to _raw_, change from _Text_ to _XML_ on the blue dropdown to the right and paste the entire XML content in.
+In all cases you need to do a `PUT` call: in _Postman_ go to _Body_, set it to _raw_, change from _Text_ to _XML_ on the blue dropdown to the right and paste the entire XML content in.
 
 ## Tests
 

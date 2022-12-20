@@ -1,11 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PreviousDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,31 +18,36 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
-  private static final Logger LOGGER =
-      LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
   private final DatabaseDocumentUnitRepository repository;
   private final DatabasePreviousDecisionRepository previousDecisionRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
+  private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
+  private final CourtRepository courtRepository;
+  private final StateRepository stateRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      DatabasePreviousDecisionRepository previousDecisionRepository) {
+      DatabasePreviousDecisionRepository previousDecisionRepository,
+      DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
+      CourtRepository courtRepository,
+      StateRepository stateRepository) {
 
     this.repository = repository;
     this.previousDecisionRepository = previousDecisionRepository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
+    this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
+    this.courtRepository = courtRepository;
+    this.stateRepository = stateRepository;
   }
 
   @Override
@@ -47,6 +57,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectPreviousDecisions)
         .flatMap(this::injectFileNumbers)
         .flatMap(this::injectDeviatingEclis)
+        .flatMap(this::injectDeviatingDecisionDates)
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
@@ -59,6 +70,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectPreviousDecisions)
         .flatMap(this::injectFileNumbers)
         .flatMap(this::injectDeviatingEclis)
+        .flatMap(this::injectDeviatingDecisionDates)
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
@@ -83,15 +95,73 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
     return repository
         .findByUuid(documentUnit.uuid())
+        .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
         .flatMap(documentUnitDTO -> savePreviousDecisions(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingEcli(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+  }
+
+  private Mono<DocumentUnitDTO> enrichRegion(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    boolean courtHasNotChanged =
+        documentUnit != null
+            && documentUnit.coreData() != null
+            && documentUnit.coreData().court() != null
+            && Objects.equals(documentUnitDTO.courtType, documentUnit.coreData().court().type())
+            && Objects.equals(
+                documentUnitDTO.courtLocation, documentUnit.coreData().court().location());
+
+    if (courtHasNotChanged) {
+      return Mono.just(documentUnitDTO);
+    }
+
+    // Do we want to make the state-injection everytime? If not we'd have to:
+    // - do it only when there is no region set, or
+    // - do it only when the court has changed <-- how to check that?
+    return getCourt(documentUnit)
+        .flatMap(
+            courtDTO -> {
+              // This covers both the case of no result from findByCourttypeAndCourtlocation()
+              // (which should not happen! throw exception?) as well as a result but without a
+              // federal state value.
+              if (courtDTO.getFederalstate() == null) {
+                // Here we use the StateDTO object just as a "messenger" to pass the
+                // region through to the next reactive block where it is used as label.
+                // Seems easier than trying to switch on empty etc.?
+                // Ideally StateRepository should be a JpaStateRepository though:
+                //    tried and it caused application context bean errors in the integration test
+                //    that I couldn't find a fix for. TODO?
+                return Mono.just(StateDTO.builder().label(courtDTO.getRegion()).build());
+              }
+              return stateRepository
+                  .findByJurisshortcut(courtDTO.getFederalstate())
+                  .defaultIfEmpty(StateDTO.builder().build());
+            })
+        .map(
+            stateDTO -> {
+              documentUnitDTO.setRegion(stateDTO.getLabel());
+              return documentUnitDTO;
+            });
+  }
+
+  private Mono<CourtDTO> getCourt(DocumentUnit documentUnit) {
+    if (documentUnit == null
+        || documentUnit.coreData() == null
+        || documentUnit.coreData().court() == null) {
+      return Mono.just(CourtDTO.builder().build());
+    }
+
+    return courtRepository
+        .findByCourttypeAndCourtlocation(
+            documentUnit.coreData().court().type(), documentUnit.coreData().court().location())
+        .defaultIfEmpty(CourtDTO.builder().build());
   }
 
   private Mono<DocumentUnitDTO> savePreviousDecisions(
@@ -336,6 +406,59 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
+  private Mono<DocumentUnitDTO> saveDeviatingDecisionDate(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    return deviatingDecisionDateRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            deviatingDecisionDateDTOs -> {
+              List<Instant> deviatingDecisionDates = new ArrayList<>();
+              if (documentUnit.coreData() != null
+                  && documentUnit.coreData().deviatingDecisionDates() != null) {
+                deviatingDecisionDates.addAll(documentUnit.coreData().deviatingDecisionDates());
+              }
+
+              AtomicInteger deviatingDecisionDateIndex = new AtomicInteger(0);
+              List<DeviatingDecisionDateDTO> toSave = new ArrayList<>();
+              List<DeviatingDecisionDateDTO> toDelete = new ArrayList<>();
+
+              deviatingDecisionDateDTOs.forEach(
+                  deviatingDecisionDateDTO -> {
+                    if (deviatingDecisionDateIndex.get() < deviatingDecisionDates.size()) {
+                      deviatingDecisionDateDTO =
+                          DeviatingDecisionDateTransformer.enrichDTO(
+                              deviatingDecisionDateDTO,
+                              deviatingDecisionDates.get(
+                                  deviatingDecisionDateIndex.getAndIncrement()));
+                      toSave.add(deviatingDecisionDateDTO);
+                    } else {
+                      toDelete.add(deviatingDecisionDateDTO);
+                    }
+                  });
+
+              while (deviatingDecisionDateIndex.get() < deviatingDecisionDates.size()) {
+                DeviatingDecisionDateDTO deviatingDecisionDateDTO =
+                    DeviatingDecisionDateDTO.builder()
+                        .decisionDate(
+                            deviatingDecisionDates.get(
+                                deviatingDecisionDateIndex.getAndIncrement()))
+                        .documentUnitId(documentUnitDTO.getId())
+                        .build();
+                toSave.add(deviatingDecisionDateDTO);
+              }
+
+              return deviatingDecisionDateRepository
+                  .deleteAll(toDelete)
+                  .then(deviatingDecisionDateRepository.saveAll(toSave).collectList())
+                  .map(
+                      savedDeviatingDecisionDateList -> {
+                        documentUnitDTO.setDeviatingDecisionDates(savedDeviatingDecisionDateList);
+                        return documentUnitDTO;
+                      });
+            });
+  }
+
   @Override
   public Mono<DocumentUnit> attachFile(
       UUID documentUnitUuid, String fileUuid, String type, String fileName) {
@@ -415,8 +538,19 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findAllByDocumentUnitId(documentUnitDTO.getId())
         .collectList()
         .flatMap(
-            deviatingEclis -> {
-              documentUnitDTO.setDeviatingEclis(deviatingEclis);
+            deviatingEcliDTOs -> {
+              documentUnitDTO.setDeviatingEclis(deviatingEcliDTOs);
+              return Mono.just(documentUnitDTO);
+            });
+  }
+
+  private Mono<DocumentUnitDTO> injectDeviatingDecisionDates(DocumentUnitDTO documentUnitDTO) {
+    return deviatingDecisionDateRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            deviatingDecisionDateDTOs -> {
+              documentUnitDTO.setDeviatingDecisionDates(deviatingDecisionDateDTOs);
               return Mono.just(documentUnitDTO);
             });
   }

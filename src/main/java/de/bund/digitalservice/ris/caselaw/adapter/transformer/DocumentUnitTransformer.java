@@ -12,27 +12,20 @@ public class DocumentUnitTransformer {
   public static DocumentUnitDTO enrichDTO(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
-    return fillData(documentUnitDTO, documentUnitDTO.toBuilder(), documentUnit);
-  }
-
-  private static DocumentUnitDTO fillData(
-      DocumentUnitDTO documentUnitDTO,
-      DocumentUnitDTO.DocumentUnitDTOBuilder documentUnitDTOBuilder,
-      DocumentUnit documentUnit) {
-
-    documentUnitDTOBuilder
-        .uuid(documentUnit.uuid())
-        .documentnumber(documentUnit.documentNumber())
-        .creationtimestamp(documentUnit.creationtimestamp())
-        .fileuploadtimestamp(documentUnit.fileuploadtimestamp())
-        .s3path(documentUnit.s3path())
-        .filetype(documentUnit.filetype())
-        .filename(documentUnit.filename());
+    DocumentUnitDTO.DocumentUnitDTOBuilder builder =
+        documentUnitDTO.toBuilder()
+            .uuid(documentUnit.uuid())
+            .documentnumber(documentUnit.documentNumber())
+            .creationtimestamp(documentUnit.creationtimestamp())
+            .fileuploadtimestamp(documentUnit.fileuploadtimestamp())
+            .s3path(documentUnit.s3path())
+            .filetype(documentUnit.filetype())
+            .filename(documentUnit.filename());
 
     if (documentUnit.coreData() != null) {
       CoreData coreData = documentUnit.coreData();
 
-      documentUnitDTOBuilder
+      builder
           .category(coreData.category())
           .procedure(coreData.procedure())
           .ecli(coreData.ecli())
@@ -40,11 +33,10 @@ public class DocumentUnitTransformer {
           .decisionDate(coreData.decisionDate() != null ? coreData.decisionDate().toString() : null)
           .legalEffect(documentUnit.coreData().legalEffect())
           .inputType(documentUnit.coreData().inputType())
-          .center(documentUnit.coreData().center())
-          .region(documentUnit.coreData().region());
+          .center(documentUnit.coreData().center());
 
       if (coreData.court() != null) {
-        documentUnitDTOBuilder
+        builder
             .courtType(documentUnit.coreData().court().type())
             .courtLocation(coreData.court().location());
       }
@@ -60,7 +52,7 @@ public class DocumentUnitTransformer {
     }
 
     if (documentUnit.previousDecisions() != null) {
-      documentUnitDTOBuilder.previousDecisions(
+      builder.previousDecisions(
           documentUnit.previousDecisions().stream()
               .map(
                   previousDecision ->
@@ -78,7 +70,7 @@ public class DocumentUnitTransformer {
     if (documentUnit.texts() != null) {
       Texts texts = documentUnit.texts();
 
-      documentUnitDTOBuilder
+      builder
           .decisionName(texts.decisionName())
           .headline(texts.headline())
           .guidingPrinciple(texts.guidingPrinciple())
@@ -89,6 +81,6 @@ public class DocumentUnitTransformer {
           .decisionReasons(texts.decisionReasons());
     }
 
-    return documentUnitDTOBuilder.build();
+    return builder.build();
   }
 }

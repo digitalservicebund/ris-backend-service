@@ -48,11 +48,18 @@ function isCourt(input?: DropdownInputModelType): input is Court {
 
 function checkInputValueType() {
   if (isCourt(inputValue.value)) {
+    // currently only court (Gericht)
     inputText.value = inputValue.value.label
   } else {
-    inputText.value = props.dropdownItems?.find(
-      (item) => item.value === inputValue.value
-    )?.text
+    if (props.endpoint) {
+      // currently only category (Dokumenttyp)
+      inputText.value = inputValue.value as string
+    } else {
+      // currently only legalEffect (Rechtskraft)
+      inputText.value = props.dropdownItems?.find(
+        (item) => item.value === inputValue.value
+      )?.text
+    }
   }
 }
 
@@ -61,6 +68,7 @@ const items = ref(props.dropdownItems ?? [])
 const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
 const filter = ref<string>()
 const dropdownContainerRef = ref<HTMLElement>()
+const dropdownItemsRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
 const ariaLabelDropdownIcon = computed(() =>
@@ -94,7 +102,7 @@ const setChosenItem = (value: DropdownInputModelType) => {
 
 const keyup = () => {
   focusedItemIndex.value -= 1
-  const prev = dropdownContainerRef.value?.childNodes[
+  const prev = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
   if (prev) prev.focus()
@@ -102,7 +110,7 @@ const keyup = () => {
 
 const keydown = () => {
   focusedItemIndex.value += 1
-  const next = dropdownContainerRef.value?.childNodes[
+  const next = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
   if (next) next.focus()
@@ -140,9 +148,9 @@ const insertItemIfEmpty = () => {
 }
 
 const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
-  const dropdown = document.querySelector(`#${props.id}.dropdown-container`)
-  if (dropdown == null) return
+  const dropdown = dropdownContainerRef.value
   if (
+    !dropdown ||
     (event.target as HTMLElement) === dropdown ||
     event.composedPath().includes(dropdown)
   )
@@ -151,10 +159,7 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
 }
 
 const selectAllText = () => {
-  const inputField = document.querySelector(
-    `input#${props.id}`
-  ) as HTMLInputElement
-  if (!!props.modelValue) inputField.select()
+  inputFieldRef.value?.select()
 }
 
 const closeDropdown = () => {
@@ -179,7 +184,11 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="dropdown-container" @keydown.esc="closeDropdown">
+  <div
+    ref="dropdownContainerRef"
+    class="dropdown-container"
+    @keydown.esc="closeDropdown"
+  >
     <div
       class="dropdown-container__open-dropdown"
       @keydown.enter="toggleDropdown"
@@ -229,7 +238,7 @@ onBeforeUnmount(() => {
     </div>
     <div
       v-if="isShowDropdown"
-      ref="dropdownContainerRef"
+      ref="dropdownItemsRef"
       class="dropdown-container__dropdown-items"
       tabindex="-1"
     >

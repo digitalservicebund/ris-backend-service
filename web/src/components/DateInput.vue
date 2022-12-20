@@ -8,6 +8,7 @@ interface Props {
   value?: string
   modelValue?: string
   ariaLabel: string
+  isFutureDate?: boolean
   validationError?: ValidationError
 }
 
@@ -39,7 +40,10 @@ const isInPast = computed(() => {
 })
 
 const hasError = computed(
-  () => props.validationError || !isInPast.value || inputValue.value == ""
+  () =>
+    props.validationError ||
+    (!isInPast.value && !props.isFutureDate) ||
+    inputValue.value == ""
 )
 
 const conditionalClasses = computed(() => ({

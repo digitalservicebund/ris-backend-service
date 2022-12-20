@@ -7,6 +7,7 @@ export enum InputType {
   DATE = "date",
   CHECKBOX = "checkbox",
   CHIPS = "chips",
+  DATECHIPS = "datechips",
   NESTED = "nested",
 }
 
@@ -49,6 +50,11 @@ export interface ChipsInputField extends BaseInputField {
   inputAttributes: ChipsInputAttributes
 }
 
+export interface DateChipsInputField extends BaseInputField {
+  type: InputType.DATECHIPS
+  inputAttributes: ChipsInputAttributes
+}
+
 //NESTED INPUT
 export interface NestedInputModelType {
   fields: {
@@ -69,7 +75,7 @@ export interface NestedInputField extends BaseInputField {
 //DATE
 export interface DateInputField extends BaseInputField {
   type: InputType.DATE
-  inputAttributes: BaseInputAttributes
+  inputAttributes: DateAttributes
 }
 
 export type DateInputModelType = string
@@ -86,6 +92,10 @@ export type DropdownInputModelType = string | Court
 export type DropdownItem = {
   text: string
   value: DropdownInputModelType
+}
+
+export interface DateAttributes extends BaseInputAttributes {
+  isFutureDate?: boolean
 }
 
 export interface DropdownAttributes extends BaseInputAttributes {
@@ -116,6 +126,7 @@ export type InputField =
   | DateInputField
   | CheckboxInputField
   | ChipsInputField
+  | DateChipsInputField
   | NestedInputField
 
 export type InputAttributes =
@@ -123,6 +134,7 @@ export type InputAttributes =
   | DropdownAttributes
   | ChipsInputAttributes
   | NestedInputAttributes
+  | DateAttributes
 
 export type ModelType =
   | TextInputModelType

@@ -95,4 +95,5 @@ public class DocumentUnitDTO {
   @Transient List<FileNumberDTO> fileNumbers;
   @Transient List<FileNumberDTO> deviatingFileNumbers;
   @Transient List<DeviatingEcliDTO> deviatingEclis;
+  @Transient List<DeviatingDecisionDateDTO> deviatingDecisionDates;
 }
