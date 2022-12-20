@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_edited_fields.json
     checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
   - filename: build.gradle
-    checksum: 6bacfc3dee66f93bcd47e194cde9283344720acf727e0530c409e5c6e071e8b0
+    checksum: 7bec5ae6f40f7a249697370b3f11d293ef35d90fd4aac836a6326dfe76fbdbf4
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
@@ -20,7 +20,7 @@ fileignoreconfig:
   - filename: .github/workflows/playwright.yml
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: src/test/resources/application.properties
-    checksum: 3b330b6390ddb0c4ed3ce344ace2e4a8afc48d3bb4bef4f66f6465f4f2632254
+    checksum: 7e7b85953b4826f7496af7c368ab869ba9163e771c867a477f5ee951d4bc2adf
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/HealthEndpointIntegrationTest.java
     checksum: 84e3e4e6d3ef71f16220dbda3808b6e0943a5c43029a167fa9d89be70fa6db5a
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/SecurityIntegrationTest.java
@@ -72,7 +72,7 @@ fileignoreconfig:
   - filename: web/test/test-helper/dataGenerators.ts
     checksum: 1e3c6a42728ea1cd3aee5080b355be084ba7c50ca74e845e1e7f404df75c82af
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
-    checksum: a7f18e6362eb0738d975bea6e2b235a22b64750d119e0e16a47719304134a44a
+    checksum: 66747b3fadb18854ab0392a514fea38ca1a114c861f407f99c4af5e5e1798047
   - filename: web/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
@@ -130,7 +130,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: e89e56c68975833d65b3fc368146f9b7139ec9b4aff55420b9f1f1be6098c615
+    checksum: cbaac63b7f675892be19aadef273a8fb5015b69f81d34cdb1eaad145d08924da
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts
@@ -140,7 +140,7 @@ fileignoreconfig:
   - filename: src/main/resources/db/migration/V0.13__norms_add_remaining_metadata_fields.sql
     checksum: 8d412911921585bd91aa44397d73028e9416237578eeda5815905f3ba470a856
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
-    checksum: 0a6c0e6bd3a9373472a2ed7c0e6b7973be7e4f78715a09b1495d15d2d0d1522f
+    checksum: 11c05bc925bf9c84854c8040b85ee31d70e3f4e10be2a83210fb98449b31ddd7
   - filename: src/main/resources/db/migration/V0.14__caselaw_add_ecli_table.sql
     checksum: 4d502defeedc8f4f82895c14d6e4c332cba031166db71a16d4d16967f1623e78
   - filename: src/test/kotlin/norms/application/port/input/ImportNormCommandTest.kt
@@ -153,6 +153,14 @@ fileignoreconfig:
     checksum: 00c110e0076f04049444474ab1bc884dbfe188039d5727d0dec575f044f50aae
   - filename: src/main/resources/db/migration/V0.18__caselaw_add_statelookuptable.sql
     checksum: b2c24a69d918b8b9c8012a94770d154bd57479fb2aeb6ab5737654bd25d1d36f
+  - filename: src/main/resources/db/migration/V0.19__caselaw_add_join_column_previous_decision.sql
+    checksum: 5a2cce3752d5397e4ef20730707ed603449e05b6278267f45f81cdb4d01f5e19
+  - filename: src/main/resources/db/migration/V0.20__caselaw_change_deviating_decision_date_to_datetime.sql
+    checksum: 1b489a5f95009d5be25e24270d4424ae98d94c1c3879d6f332b5975b818fb8e9
+  - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitWrongDocumentUnitIntegrationTest.java
+    checksum: 9c87a2cbd40308841b01dd9c3b0d780b8e3f97f96dd173734ea843c925208908
+  - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/PublishDocumentUnitIntegrationTest.java
+    checksum: 7910631f80ed3107081a49746e18bdf513fb08c17456c6b00d6adc8160affba8
 
 scopeconfig:
   - scope: node
