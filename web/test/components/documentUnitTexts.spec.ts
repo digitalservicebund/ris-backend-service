@@ -14,14 +14,14 @@ describe("Texts", () => {
       },
     })
 
-    screen.getByText("Entscheidungsname Editor Feld")
-    screen.getByText("Titelzeile Editor Feld")
-    screen.getByText("Leitsatz Editor Feld")
-    screen.getByText("Orientierungssatz Editor Feld")
-    screen.getByText("Tenor Editor Feld")
-    screen.getByText("Gründe Editor Feld")
-    screen.getByText("Tatbestand Editor Feld")
-    screen.getByText("Entscheidungsgründe Editor Feld")
+    screen.getByText("Entscheidungsname")
+    screen.getByText("Titelzeile")
+    screen.getByText("Leitsatz")
+    screen.getByText("Orientierungssatz")
+    screen.getByText("Tenor")
+    screen.getByText("Gründe")
+    screen.getByText("Tatbestand")
+    screen.getByText("Entscheidungsgründe")
   })
 
   test("emits update DocumentUnit event", async () => {

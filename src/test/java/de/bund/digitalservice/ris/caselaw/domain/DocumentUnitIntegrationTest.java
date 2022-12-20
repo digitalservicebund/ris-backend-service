@@ -6,8 +6,10 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePreviousDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -78,6 +80,7 @@ class DocumentUnitIntegrationTest {
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
+  @Autowired private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -89,6 +92,7 @@ class DocumentUnitIntegrationTest {
     previousDecisionRepository.deleteAll().block();
     courtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
+    deviatingDecisionDateRepository.deleteAll().block();
     repository.deleteAll().block();
   }
 
@@ -353,6 +357,68 @@ class DocumentUnitIntegrationTest {
     assertThat(deviatingEclis).hasSize(2);
     assertThat(deviatingEclis.get(0).getEcli()).isEqualTo("ecli123");
     assertThat(deviatingEclis.get(1).getEcli()).isEqualTo("ecli456");
+  }
+
+  @Test
+  void testForDeviatingDecisionDateDbEntryAfterUpdateByUuid() {
+    UUID uuid = UUID.randomUUID();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(uuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .build();
+
+    repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(
+                CoreData.builder()
+                    .deviatingDecisionDates(
+                        (List.of(
+                            Instant.parse("2022-01-31T23:00:00Z"),
+                            Instant.parse("2022-01-31T23:00:00Z"))))
+                    .build())
+            .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody().coreData().deviatingDecisionDates().get(0))
+                  .isEqualTo("2022-01-31T23:00:00Z");
+              assertThat(response.getResponseBody().coreData().deviatingDecisionDates().get(1))
+                  .isEqualTo("2022-01-31T23:00:00Z");
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
+
+    List<DeviatingDecisionDateDTO> deviatingDecisionDates =
+        deviatingDecisionDateRepository
+            .findAllByDocumentUnitId(list.get(0).getId())
+            .collectList()
+            .block();
+
+    assertThat(deviatingDecisionDates).hasSize(2);
+    assertThat(deviatingDecisionDates.get(0).decisionDate()).isEqualTo("2022-01-31T23:00:00Z");
+    assertThat(deviatingDecisionDates.get(1).decisionDate()).isEqualTo("2022-01-31T23:00:00Z");
   }
 
   @Test

@@ -25,9 +25,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
 
   editorField: async ({ page, documentNumber }, use) => {
     await navigateToCategories(page, documentNumber)
-    const editorField = page.locator(
-      "[aria-label='Entscheidungsname Editor Feld'] >> div"
-    )
+    const editorField = page.locator("[aria-label='Entscheidungsname'] >> div")
     await editorField.click()
     await editorField.type("this is text")
 

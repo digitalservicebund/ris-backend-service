@@ -225,7 +225,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await expect(page.locator("text=Abweichender ECLI").first()).toBeHidden()
   })
 
-  test("adding and deleting multiple inputs", async ({
+  test("adding, navigating, deleting multiple chips inputs", async ({
     page,
     documentNumber,
   }) => {
@@ -243,13 +243,28 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await expect(page.locator("text=testone").first()).toBeVisible()
     await expect(page.locator("text=testtwo").first()).toBeVisible()
 
+    //Navigate back and delete on enter
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("ArrowLeft")
     await page.keyboard.press("Enter")
 
     await expect(page.locator("text=testtwo").first()).toBeHidden()
 
+    // Tab out and in
+    await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
+
+    await page.keyboard.down("Shift")
+    await page.keyboard.press("Tab")
+    await page.keyboard.up("Shift")
+
+    await page.keyboard.down("Shift")
+    await page.keyboard.press("Tab")
+    await page.keyboard.up("Shift")
+
     await page.keyboard.press("ArrowLeft")
+
+    //Navigate back and delete on backspace
     await page.keyboard.press("Enter")
 
     await expect(page.locator("text=testone").first()).toBeHidden()
@@ -384,21 +399,21 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await navigateToCategories(page, documentNumber)
 
     // small
-    const smallEditor = page.locator("[aria-label='Titelzeile Editor Feld']")
+    const smallEditor = page.locator("[aria-label='Titelzeile']")
     const smallEditorHeight = await smallEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height")
     )
     expect(parseInt(smallEditorHeight)).toBeGreaterThanOrEqual(60)
 
     //medium
-    const mediumEditor = page.locator("[aria-label='Leitsatz Editor Feld']")
+    const mediumEditor = page.locator("[aria-label='Leitsatz']")
     const mediumEditorHeight = await mediumEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height")
     )
     expect(parseInt(mediumEditorHeight)).toBeGreaterThanOrEqual(120)
 
     //large
-    const largeEditor = page.locator("[aria-label='Gründe Editor Feld']")
+    const largeEditor = page.locator("[aria-label='Gründe']")
     const largeEditorHeight = await largeEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height")
     )

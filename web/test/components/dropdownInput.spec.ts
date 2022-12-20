@@ -138,6 +138,27 @@ describe("Dropdown Element", () => {
     expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
   })
 
+  it("Dropdown item should be visible after selecting", async () => {
+    renderComponent({ isCombobox: true })
+
+    const input = screen.getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "testItem2")
+
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("testItem2")
+
+    await user.click(dropdownItems[0])
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(input).toHaveValue("testItem2")
+
+    const openDropdownContainer = screen.getByLabelText(
+      "Dropdown öffnen"
+    ) as HTMLElement
+    await user.click(openDropdownContainer)
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+  })
+
   it("Dropdown uses endpoint to fetch all DocumentType items", async () => {
     const fetchSpy = vi
       .spyOn(dropdownInputService, "fetch")

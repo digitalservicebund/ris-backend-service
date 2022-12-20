@@ -10,7 +10,7 @@ fileignoreconfig:
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
-    checksum: cf83e9ea913733c5d1486963648d3dc9df39cd77e3d2eae3562fc8483042ba14
+    checksum: c66792a815402f11e40c00a04a0edea609185e095d4a2550c28ab880757de566
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml
@@ -130,7 +130,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 29fe888228ab1d238bddb358d55336f0ee7695056353a03f2c241fdfb6f60ca8
+    checksum: e89e56c68975833d65b3fc368146f9b7139ec9b4aff55420b9f1f1be6098c615
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts
