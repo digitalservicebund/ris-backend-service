@@ -248,6 +248,7 @@ bootBuildImage {
 
 
 import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.CsvReportRenderer
 
 licenseReport {
   // If there's a new dependency with a yet unknown license causing this task to fail
@@ -258,4 +259,5 @@ licenseReport {
     // https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
     new LicenseBundleNormalizer("$projectDir/license-normalizer-bundle.json", true)
   ]
+  renderers = [new CsvReportRenderer('backend-licences.csv')]
 }
