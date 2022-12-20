@@ -152,8 +152,7 @@ jobs:
       - audit-licenses-backend
       - audit-licenses-frontend
     steps:
-      - run: pwd
-      - run: ls -hla
+      - uses: actions/checkout@v3
       - name: Move license reports to pages folder
         run: cp web/frontend-licences.csv build/reports/dependency-license/backend-licences.csv _site/
       - name: Upload GitHub license page
