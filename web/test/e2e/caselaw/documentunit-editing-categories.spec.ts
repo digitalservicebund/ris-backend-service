@@ -1,6 +1,15 @@
-import { expect } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 import { navigateToCategories } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
+
+async function waitForSaving(page: Page): Promise<void> {
+  await expect(
+    page.locator("text=Daten werden gespeichert >> nth=0")
+  ).toBeVisible()
+  await expect(
+    page.locator("text=Zuletzt gespeichert um >> nth=0")
+  ).toBeVisible()
+}
 
 test.describe("ensuring the editing experience in categories is as expected", () => {
   test("test legal effect dropdown", async ({ page, documentNumber }) => {
@@ -115,6 +124,43 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("bayern")
   })
 
-  // TODO
-  // test("test that setting a court sets the region automatically", async ({ page, documentNumber }) => {})
+  test("test that setting a court sets the region automatically", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Gericht']").fill("aalen")
+
+    // clicking on dropdown item triggers auto save
+    await page.locator("text=AG Aalen").click()
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+
+    // saving... and then saved
+    await waitForSaving(page)
+
+    // TODO remove reload when region gets updated via response.data
+    await page.reload()
+    await expect(page.locator("text=Region")).toBeVisible()
+
+    // region was set by the backend based on state database table
+    expect(await page.inputValue("[aria-label='Region']")).toBe(
+      "Baden-Württemberg"
+    )
+
+    // clear the court
+    await page.locator("[aria-label='Auswahl zurücksetzen']").click()
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    // dropdown should not open
+    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+
+    await waitForSaving(page)
+    await page.reload()
+    await expect(page.locator("text=Region")).toBeVisible()
+
+    // region was cleared by the backend
+    expect(await page.inputValue("[aria-label='Region']")).toBe("")
+  })
+
+  // TODO test that arrow keys behave correctly in dropdowns?
 })
