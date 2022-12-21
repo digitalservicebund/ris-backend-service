@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.ToLegalDocMLConverter
 import norms.utils.createRandomNorm
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -18,7 +19,6 @@ class ToLegalDocMLConverterTest {
     @Test
     fun `it creates a Akoma Ntoso document with correct schema and version`() {
         val document = convertNormToLegalDocML()
-
         assertThat(document.getElementsByTagName("akn:akomaNtoso").getLength()).isEqualTo(1)
         assertThat(document.firstChild.getNodeName()).isEqualTo("akn:akomaNtoso")
 
@@ -34,10 +34,9 @@ class ToLegalDocMLConverterTest {
     fun `it adds the correct main element with name`() {
         val document = convertNormToLegalDocML()
 
-        val mainElement = document.firstChild.firstChild
-        val mainAttributes = mainElement.getAttributes()
+        val mainElement = document.getElementsByTagName("akn:documentCollection")
 
-        assertThat(mainElement.getNodeName()).isEqualTo("akn:documentCollection")
+        assertThat(mainElement.item(0).parentNode.nodeName).isEqualTo("akn:akomaNtoso")
     }
 
     @Test
@@ -56,8 +55,8 @@ class ToLegalDocMLConverterTest {
         val shortTitle = getFirstChildNodeWithTagName(preface, "akn:shortTitle")
         val shortTitleP = getFirstChildNodeWithTagName(shortTitle, "akn:p")
 
-        assertThat(longTitleP.getTextContent()).isEqualTo("test official long title")
-        assertThat(shortTitleP.getTextContent()).isEqualTo("test official short title")
+        assertThat(longTitleP.textContent.trim()).isEqualTo("test official long title")
+        assertThat(shortTitleP.textContent.trim()).isEqualTo("test official short title")
     }
 
     @Test
@@ -83,10 +82,10 @@ class ToLegalDocMLConverterTest {
         val paragraphContent = getFirstChildNodeWithTagName(paragraphElement, "akn:content")
         val paragraphContentP = getFirstChildNodeWithTagName(paragraphContent, "akn:p")
 
-        assertThat(articleHeading.getTextContent()).isEqualTo("test article title")
-        assertThat(articleNumber.getTextContent()).isEqualTo("test article marker")
-        assertThat(paragraphNumber.getTextContent()).isEqualTo("test paragraph marker")
-        assertThat(paragraphContentP.getTextContent()).isEqualTo("test paragraph text")
+        assertThat(articleHeading.textContent.trim()).isEqualTo("test article title")
+        assertThat(articleNumber.textContent.trim()).isEqualTo("test article marker")
+        assertThat(paragraphNumber.textContent.trim()).isEqualTo("test paragraph marker")
+        assertThat(paragraphContentP.textContent.trim()).isEqualTo("test paragraph text")
     }
 }
 
@@ -96,14 +95,14 @@ private fun convertNormToLegalDocML(norm: Norm? = null): Document {
     var xmlContent = ""
 
     converter
-        .convertNormToXml(toConvertNorm)
+        .convertNormToXml(toConvertNorm).log()
         .`as`(StepVerifier::create)
-        .consumeNextWith({ xmlContent = it })
+        .consumeNextWith { xmlContent = it }
         .verifyComplete()
 
     val builder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
-    val document = builder.parse(InputSource(StringReader(xmlContent)))
-    return document
+
+    return builder.parse(InputSource(StringReader(xmlContent)))
 }
 
 private fun getFirstChildNodeWithTagName(node: Node, tagName: String): Node {
@@ -111,13 +110,12 @@ private fun getFirstChildNodeWithTagName(node: Node, tagName: String): Node {
         throw Exception("Node has no children!")
     }
 
-    val childNodes = node.getChildNodes()
+    val childNodes = node.childNodes
 
-    for (i in 0..childNodes.getLength() - 1) {
+    for (i in 0 until childNodes.length) {
         val child = childNodes.item(i)
-        println(child.getNodeName())
 
-        if (child.getNodeName() == tagName) {
+        if (child.nodeName == tagName) {
             return child
         }
     }
