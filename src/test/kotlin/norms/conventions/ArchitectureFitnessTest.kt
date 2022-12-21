@@ -1,8 +1,11 @@
 package de.bund.digitalservice.ris.norms.conventions
 
-import com.tngtech.archunit.core.domain.JavaClass.Predicates.implement
 import com.tngtech.archunit.core.domain.JavaClass.Predicates.resideInAnyPackage
+import com.tngtech.archunit.lang.conditions.ArchConditions.beInterfaces
+import com.tngtech.archunit.lang.conditions.ArchConditions.bePublic
+import com.tngtech.archunit.lang.conditions.ArchConditions.implement
 import com.tngtech.archunit.lang.conditions.ArchConditions.notImplement
+import com.tngtech.archunit.lang.conditions.ArchConditions.onlyDependOnClassesThat
 import com.tngtech.archunit.lang.syntax.ArchRuleDefinition
 import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition
 import de.bund.digitalservice.ris.norms.conventions.condition.Conditions.haveAParameterWithTypeName
@@ -29,8 +32,7 @@ class ArchitectureFitnessTest {
     fun `the domain package should depend on nothing except very specific standard libraries`() {
         ArchRuleDefinition.classes()
             .that(areFromTheDomain)
-            .should()
-            .onlyDependOnClassesThat(areFromTheDomain.or(areFromAnyStandardLibrary))
+            .should(onlyDependOnClassesThat(areFromTheDomain.or(areFromAnyStandardLibrary)))
             .check(allClasses)
     }
 
@@ -38,19 +40,20 @@ class ArchitectureFitnessTest {
     fun `the application package should depend only on the domain and specific extras`() {
         ArchRuleDefinition.classes()
             .that(areFromTheApplication)
-            .should()
-            .onlyDependOnClassesThat(
-                areFromTheDomain
-                    .or(areFromTheApplication)
-                    .or(areFromAnyStandardLibrary)
-                    .or(resideInAnyPackage("reactor.core..", "org.springframework.stereotype.."))
+            .should(
+                onlyDependOnClassesThat(
+                    areFromTheDomain
+                        .or(areFromTheApplication)
+                        .or(areFromAnyStandardLibrary)
+                        .or(resideInAnyPackage("reactor.core..", "org.springframework.stereotype.."))
+                )
             )
             .check(allClasses)
     }
 
     @Test
     fun `ports are interfaces`() {
-        ArchRuleDefinition.classes().that(areAnyPort).should().beInterfaces().check(allClasses)
+        ArchRuleDefinition.classes().that(areAnyPort).should(beInterfaces()).check(allClasses)
     }
 
     @Test
@@ -67,8 +70,7 @@ class ArchitectureFitnessTest {
         ArchRuleDefinition.classes()
             .that(areAnyPort)
             .should(haveASingleMethod)
-            .andShould()
-            .bePublic()
+            .andShould(bePublic())
             .check(allClasses)
     }
 
@@ -91,8 +93,7 @@ class ArchitectureFitnessTest {
         ArchRuleDefinition.classes()
             .that(areAService)
             .should(implementASingleInterface)
-            .andShould()
-            .implement(anInputPort)
+            .andShould(implement(anInputPort))
             .check(allClasses)
     }
 

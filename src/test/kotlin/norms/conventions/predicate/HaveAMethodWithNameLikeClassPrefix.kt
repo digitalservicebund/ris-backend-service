@@ -8,11 +8,9 @@ class HaveAMethodWithNameLikeClassPrefix(private val classPostfix: String) :
         "have a method named like class prefix where prefix is '$classPostfix'"
     ) {
     override fun test(item: JavaClass): Boolean {
-        val classPrefix = item.simpleName.replace(this.classPostfix, "")
         val expectedMethodName = this.getExpectedMethodName(item)
-
-        val classHasPostfix = item.simpleName.endsWith(this.classPostfix)
         val classHasMethod = HaveAMethodWithName(expectedMethodName).test(item)
+        val classHasPostfix = item.simpleName.endsWith(this.classPostfix)
 
         return classHasPostfix && classHasMethod
     }
