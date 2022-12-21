@@ -31,20 +31,20 @@ class ArchitectureFitnessTest {
     @Test
     fun `the domain package should depend on nothing except very specific standard libraries`() {
         ArchRuleDefinition.classes()
-            .that(areFromTheDomain)
-            .should(onlyDependOnClassesThat(areFromTheDomain.or(areFromAnyStandardLibrary)))
+            .that(areFromTheDomain())
+            .should(onlyDependOnClassesThat(areFromTheDomain().or(areFromAnyStandardLibrary())))
             .check(allClasses)
     }
 
     @Test
     fun `the application package should depend only on the domain and specific extras`() {
         ArchRuleDefinition.classes()
-            .that(areFromTheApplication)
+            .that(areFromTheApplication())
             .should(
                 onlyDependOnClassesThat(
-                    areFromTheDomain
-                        .or(areFromTheApplication)
-                        .or(areFromAnyStandardLibrary)
+                    areFromTheDomain()
+                        .or(areFromTheApplication())
+                        .or(areFromAnyStandardLibrary())
                         .or(resideInAnyPackage("reactor.core..", "org.springframework.stereotype.."))
                 )
             )
@@ -53,7 +53,7 @@ class ArchitectureFitnessTest {
 
     @Test
     fun `ports are interfaces`() {
-        ArchRuleDefinition.classes().that(areAnyPort).should(beInterfaces()).check(allClasses)
+        ArchRuleDefinition.classes().that(areAnyPort()).should(beInterfaces()).check(allClasses)
     }
 
     @Test
@@ -68,8 +68,8 @@ class ArchitectureFitnessTest {
     @Test
     fun `ports have a single, public method only`() {
         ArchRuleDefinition.classes()
-            .that(areAnyPort)
-            .should(haveASingleMethod)
+            .that(areAnyPort())
+            .should(haveASingleMethod())
             .andShould(bePublic())
             .check(allClasses)
     }
@@ -81,27 +81,27 @@ class ArchitectureFitnessTest {
 
         ArchRuleDefinition.methods()
             .that()
-            .areDeclaredInClassesThat(areAnInputPort)
-            .should(haveASingleParameter.and(haveACommandParameter))
-            .orShould(haveASingleParameter.and(haveAQueryParameter))
-            .orShould(haveNoParameter)
+            .areDeclaredInClassesThat(areAnInputPort())
+            .should(haveASingleParameter().and(haveACommandParameter))
+            .orShould(haveASingleParameter().and(haveAQueryParameter))
+            .orShould(haveNoParameter())
             .check(allClasses)
     }
 
     @Test
     fun `application services implement a single input port`() {
         ArchRuleDefinition.classes()
-            .that(areAService)
-            .should(implementASingleInterface)
-            .andShould(implement(anInputPort))
+            .that(areAService())
+            .should(implementASingleInterface())
+            .andShould(implement(anInputPort()))
             .check(allClasses)
     }
 
     @Test
     fun `application services do not implement output ports`() {
         ArchRuleDefinition.classes()
-            .that(areAService)
-            .should(notImplement(anyOutputPort))
+            .that(areAService())
+            .should(notImplement(anyOutputPort()))
             .check(allClasses)
     }
 }

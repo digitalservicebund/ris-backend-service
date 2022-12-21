@@ -18,7 +18,7 @@ class ImplementInterfaceWithSamePrefix(
     ) {
     override fun test(item: JavaClass): Boolean {
         val classHasPostfix = simpleNameEndingWith(this.classPostfix).test(item)
-        val classImplementsSingleInterface = implementASingleInterface.test(item)
+        val classImplementsSingleInterface = implementASingleInterface().test(item)
 
         if (!classHasPostfix || !classImplementsSingleInterface) {
             return false

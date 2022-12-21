@@ -17,27 +17,37 @@ val allClasses =
     ClassFileImporter()
         .withImportOption(Predefined.DO_NOT_INCLUDE_TESTS)
         .importPackages("$BASE_PACKAGE_PATH..")
-        .that(are(not(aKotlinStaticClass)))
+        .that(are(not(aKotlinStaticClass())))
 
-val areFromTheDomain = resideInAPackage("$BASE_PACKAGE_PATH.domain..")
-val areFromTheApplication = resideInAPackage("$BASE_PACKAGE_PATH.application..")
+fun areFromTheDomain() = resideInAPackage("$BASE_PACKAGE_PATH.domain..")
 
-private val inputPortPackage = "$BASE_PACKAGE_PATH.application.port.input.."
-val areFromTheInputPortPackage = resideInAPackage(inputPortPackage)
-val beInsideTheInputPortPackage = ArchCondition.from<JavaClass>(areFromTheInputPortPackage)
-val areAnInputPort = areFromTheInputPortPackage.and(simpleNameEndingWith("UseCase"))
-val anInputPort = areAnInputPort
+fun areFromTheApplication() = resideInAPackage("$BASE_PACKAGE_PATH.application..")
+
+private fun inputPortPackage() = "$BASE_PACKAGE_PATH.application.port.input.."
+
+fun areFromTheInputPortPackage() = resideInAPackage(inputPortPackage())
+
+fun beInsideTheInputPortPackage() = ArchCondition.from<JavaClass>(areFromTheInputPortPackage())
+
+fun areAnInputPort() = areFromTheInputPortPackage().and(simpleNameEndingWith("UseCase"))
+
+fun anInputPort() = areAnInputPort()
 
 private val outputPortPackage = "$BASE_PACKAGE_PATH.application.port.output.."
-val areFromTheOutputPortPackage = resideInAPackage(outputPortPackage)
-val beInsideTheOutputPortPackage = ArchCondition.from<JavaClass>(areFromTheOutputPortPackage)
-val areAnOutputPort = areFromTheOutputPortPackage.and(simpleNameEndingWith("OutputPort"))
-val anyOutputPort = areAnOutputPort
 
-val areAnyPort = areAnInputPort.or(areAnOutputPort)
+fun areFromTheOutputPortPackage() = resideInAPackage(outputPortPackage)
 
-val areFromTheServicePackage = resideInAPackage("$BASE_PACKAGE_PATH.application.service..")
-val areAService = areFromTheServicePackage.and(simpleNameEndingWith("Service"))
+fun beInsideTheOutputPortPackage() = ArchCondition.from<JavaClass>(areFromTheOutputPortPackage())
 
-val areFromAnyStandardLibrary =
+fun areAnOutputPort() = areFromTheOutputPortPackage().and(simpleNameEndingWith("OutputPort"))
+
+fun anyOutputPort() = areAnOutputPort()
+
+fun areAnyPort() = areAnInputPort().or(areAnOutputPort())
+
+fun areFromTheServicePackage() = resideInAPackage("$BASE_PACKAGE_PATH.application.service..")
+
+fun areAService() = areFromTheServicePackage().and(simpleNameEndingWith("Service"))
+
+fun areFromAnyStandardLibrary() =
     resideInAnyPackage("kotlin..", "java..", "org.jetbrains.annotations..")
