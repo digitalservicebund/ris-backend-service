@@ -1,0 +1,42 @@
+<akn:akomaNtoso xmlns:akn="http://Inhaltsdaten.LegalDocML.de/1.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <akn:documentCollection name="null">
+        <akn:meta>
+            <akn:identification source="null">
+                <akn:FRBRManifestation>
+                    <akn:FRBRdate date="{{entryIntoForceDate}}"/>
+                    <akn:FRBRauhtor date="{{providerEntity}}"/>
+                </akn:FRBRManifestation>
+            </akn:identification>
+        </akn:meta>
+        <akn:preface>
+            <akn:longTitle GUID="null" eId="">
+                <akn:p GUID="null" eId="">
+                    {{officialLongTitle}}
+                </akn:p>
+            </akn:longTitle>
+            <akn:shortTitle GUID="null" eId="">
+                <akn:p GUID="null" eId="">{{officialShortTitle}}</akn:p>
+            </akn:shortTitle>
+        </akn:preface>
+        <akn:body refersTo="null">
+            {{#articles}}
+                <akn:article GUID="{{guid}}" eId="">
+                    <akn:heading GUID="null" eId="">
+                        {{title}}
+                    </akn:heading>
+                    <akn:num GUID="null" eId="">{{marker}}</akn:num>
+                    {{#paragraphs}}
+                        <akn:paragraph GUID="{{guid}}" eId="">
+                            <akn:num GUID="null" eId="">{{marker}}</akn:num>
+                            <akn:content GUID="null" eId="">
+                                <akn:p GUID="null" eId="">
+                                    {{text}}
+                                </akn:p>
+                            </akn:content>
+                        </akn:paragraph>
+                    {{/paragraphs}}
+                </akn:article>
+            {{/articles}}
+        </akn:body>
+    </akn:documentCollection>
+</akn:akomaNtoso>

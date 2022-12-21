@@ -83,6 +83,8 @@ dependencies {
   implementation "com.fasterxml.jackson:jackson-bom:2.14.0-rc1"
   implementation "com.fasterxml.jackson.core:jackson-databind:2.14.0-rc1"
 
+  implementation "com.github.spullara.mustache.java:compiler:0.9.10"
+
   // CVE-2022-40153
   implementation "com.fasterxml.woodstox:woodstox-core:6.4.0"
 
@@ -134,7 +136,6 @@ dependencies {
 
   testImplementation "org.jeasy:easy-random-core:5.0.0"
   testImplementation "com.google.code.gson:gson:2.10"
-
 }
 
 jar { // We have no need for the plain archive, thus skip creation for build speedup!
