@@ -174,7 +174,7 @@ export const coreDataFields: InputField[] = [
         "deviatingDecisionDates",
         "Abweichendes Entscheidungsdatum",
         "Abweichendes Entscheidungsdatum",
-        true,
+        false,
         undefined
       ),
     }
