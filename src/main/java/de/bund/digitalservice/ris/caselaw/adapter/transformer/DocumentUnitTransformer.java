@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisio
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
+import java.util.Collections;
 
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
@@ -31,15 +32,30 @@ public class DocumentUnitTransformer {
           .ecli(coreData.ecli())
           .appraisalBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate() != null ? coreData.decisionDate().toString() : null)
-          .legalEffect(documentUnit.coreData().legalEffect())
-          .inputType(documentUnit.coreData().inputType())
-          .center(documentUnit.coreData().center());
+          .legalEffect(coreData.legalEffect())
+          .inputType(coreData.inputType())
+          .center(coreData.center());
 
       if (coreData.court() != null) {
         builder
             .courtType(documentUnit.coreData().court().type())
             .courtLocation(coreData.court().location());
+      } else {
+        builder.courtType(null);
+        builder.courtLocation(null);
       }
+    } else {
+      builder
+          .category(null)
+          .procedure(null)
+          .ecli(null)
+          .appraisalBody(null)
+          .decisionDate(null)
+          .legalEffect(null)
+          .inputType(null)
+          .center(null)
+          .courtType(null)
+          .courtLocation(null);
     }
 
     if (documentUnitDTO.getId() == null
@@ -65,6 +81,8 @@ public class DocumentUnitTransformer {
                           .decisionDate(previousDecision.date())
                           .build())
               .toList());
+    } else {
+      builder.previousDecisions(Collections.emptyList());
     }
 
     if (documentUnit.texts() != null) {
@@ -79,6 +97,16 @@ public class DocumentUnitTransformer {
           .reasons(texts.reasons())
           .caseFacts(texts.caseFacts())
           .decisionReasons(texts.decisionReasons());
+    } else {
+      builder
+          .decisionName(null)
+          .headline(null)
+          .guidingPrinciple(null)
+          .headnote(null)
+          .tenor(null)
+          .reasons(null)
+          .caseFacts(null)
+          .decisionReasons(null);
     }
 
     return builder.build();
