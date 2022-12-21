@@ -12,8 +12,13 @@ fun normToDto(norm: Norm): NormDto {
         norm.guid,
         norm.officialLongTitle,
         norm.officialShortTitle,
-        norm.providerEntity,
-        norm.entryIntoForceDate,
+        norm.publicationDate?.toString(),
+        norm.documentTypeName,
+        norm.documentNormCategory,
+        norm.providerDecidingBody,
+        norm.participationInstitution,
+        norm.printAnnouncementGazette,
+        norm.printAnnouncementPage,
         articlesToDto(norm.articles)
     )
 }

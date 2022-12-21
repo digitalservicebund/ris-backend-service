@@ -1,35 +1,72 @@
-<akn:akomaNtoso xmlns:akn="http://Inhaltsdaten.LegalDocML.de/1.4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-    <akn:documentCollection name="null">
+<?xml version="1.0" encoding="UTF-8"?>
+<akn:akomaNtoso xmlns:akn="http://Inhaltsdaten.LegalDocML.de/1.4/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://Metadaten.LegalDocML.de/1.4/ ../Grammatiken/legalDocML.de-metadaten.xsd http://Inhaltsdaten.LegalDocML.de/1.4/ ../Grammatiken/legalDocML.de-regelungstextentwurfsfassung.xsd">
+    <akn:bill name="regelungstext">
         <akn:meta>
-            <akn:identification source="null">
+            <akn:identification source="attributsemantik-noch-undefiniert">
+                <akn:FRBRWork>
+                    <akn:FRBRthis value="eli/{{printAnnouncementGazette}}/{{publicationYear}}/s{{printAnnouncementPage}}/regelungstext-1"/>
+                    <akn:FRBRuri value="eli/{{printAnnouncementGazette}}/{{publicationYear}}/s{{printAnnouncementPage}}"/>
+                    <akn:FRBRalias name="übergreifende-id" value="{{guid}}"/>
+                    <akn:FRBRdate date="{{publicationDate}}" name="verkuendungsfassung"/>
+                    <akn:FRBRauthor href="recht.bund.de/institution/bundesregierung"/>
+                    <akn:FRBRcountry value="de"/>
+                    <akn:FRBRnumber value="s{{printAnnouncementPage}}"/>
+                    <akn:FRBRname value="{{printAnnouncementGazette}}"/>
+                    <akn:FRBRsubtype value="regelungstext-1"/>
+                </akn:FRBRWork>
+                <akn:FRBRExpression>
+                    <akn:FRBRthis value="eli/{{printAnnouncementGazette}}/{{publicationYear}}/s{{printAnnouncementPage}}/{{publicationDate}}/1/deu/regelungstext-1"/>
+                    <akn:FRBRuri value="eli/{{printAnnouncementGazette}}/{{publicationYear}}/s{{printAnnouncementPage}}/{{publicationDate}}/1/deu"/>
+                    <akn:FRBRauthor href="recht.bund.de/institution/bundesregierung"/>
+                    <akn:FRBRdate date="{{publicationDate}}" name="verkuendung"/>
+                    <akn:FRBRlanguage language="deu"/>
+                    <akn:FRBRversionNumber value="1"/>
+                </akn:FRBRExpression>
                 <akn:FRBRManifestation>
-                    <akn:FRBRdate date="{{entryIntoForceDate}}"/>
-                    <akn:FRBRauhtor date="{{providerEntity}}"/>
+                    <akn:FRBRthis value="eli/{{printAnnouncementGazette}}/{{publicationYear}}/s{{printAnnouncementPage}}/{{publicationDate}}/1/deu/regelungstext-1.xml"/>
+                    <akn:FRBRuri value="eli/{{printAnnouncementGazette}}/{{publicationYear}}/s{{printAnnouncementPage}}/{{publicationDate}}/1/deu/regelungstext-1.xml"/>
+                    <akn:FRBRdate date="{{publicationDate}}" name="generierung"/>
+                    <akn:FRBRauthor href="recht.bund.de"/>
+                    <akn:FRBRformat value="xml"/>
                 </akn:FRBRManifestation>
             </akn:identification>
+            <akn:proprietary source="attributsemantik-noch-undefiniert">
+                <meta:legalDocML.de_metadaten xmlns:meta="http://Metadaten.LegalDocML.de/1.4/">
+                    <meta:typ>{{documentTypeName}}</meta:typ>
+                    <meta:form>stammform</meta:form>
+                    <meta:fassung>verkuendungsfassung</meta:fassung>
+                    <meta:art>{{documentNormCategory}}</meta:art>
+                    <meta:initiant>{{providerDecidingBody}}</meta:initiant>
+                    <meta:bearbeitendeInstitution>{{participatingInstitution}}</meta:bearbeitendeInstitution>
+                </meta:legalDocML.de_metadaten>
+            </akn:proprietary>
         </akn:meta>
         <akn:preface>
-            <akn:longTitle GUID="null" eId="">
-                <akn:p GUID="null" eId="">
-                    {{officialLongTitle}}
+            <akn:longTitle GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="doktitel-1">
+                <akn:p GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="doktitel-1_text-1">
+                    <akn:docTitle>{{officialLongTitle}}</akn:docTitle>
+                    <akn:shortTitle GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="doktitel-1_text-1_kurztitel-1">{{officialShortTitle}}</akn:shortTitle>
                 </akn:p>
             </akn:longTitle>
-            <akn:shortTitle GUID="null" eId="">
-                <akn:p GUID="null" eId="">{{officialShortTitle}}</akn:p>
-            </akn:shortTitle>
         </akn:preface>
-        <akn:body refersTo="null">
+        <akn:body refersTo="hauptteil-stammform">
             {{#articles}}
-                <akn:article GUID="{{guid}}" eId="">
-                    <akn:heading GUID="null" eId="">
+                <akn:article refersTo="einzelvorschrift-stammform" GUID="{{guid}}" eId="para-1"><!-- refersTo value is constant for us-->
+                    <akn:num GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_bezeichnung-1">
+                        <akn:marker name="1"/>
+                        {{marker}}
+                    </akn:num>
+                    <akn:heading GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_überschrift-1">
                         {{title}}
                     </akn:heading>
-                    <akn:num GUID="null" eId="">{{marker}}</akn:num>
                     {{#paragraphs}}
-                        <akn:paragraph GUID="{{guid}}" eId="">
-                            <akn:num GUID="null" eId="">{{marker}}</akn:num>
-                            <akn:content GUID="null" eId="">
-                                <akn:p GUID="null" eId="">
+                        <akn:paragraph GUID="{{guid}}" eId="para-1_abs-1">
+                            <akn:num GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_abs-1_bezeichnung-1"><akn:marker name="1"/>
+                                {{marker}}</akn:num>
+                            <akn:content GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_abs-1_inhalt-1">
+                                <akn:p GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_abs-1_inhalt-1_text-1">
                                     {{text}}
                                 </akn:p>
                             </akn:content>
@@ -38,5 +75,5 @@
                 </akn:article>
             {{/articles}}
         </akn:body>
-    </akn:documentCollection>
+    </akn:bill>
 </akn:akomaNtoso>

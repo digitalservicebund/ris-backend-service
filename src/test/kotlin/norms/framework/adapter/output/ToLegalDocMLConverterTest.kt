@@ -25,7 +25,7 @@ class ToLegalDocMLConverterTest {
         val attributes = document.firstChild.getAttributes()
 
         assertThat(attributes.getNamedItem("xmlns:akn").getNodeValue())
-            .isEqualTo("http://Inhaltsdaten.LegalDocML.de/1.4")
+            .isEqualTo("http://Inhaltsdaten.LegalDocML.de/1.4/")
         assertThat(attributes.getNamedItem("xmlns:xsi").getNodeValue())
             .isEqualTo("http://www.w3.org/2001/XMLSchema-instance")
     }
@@ -34,7 +34,7 @@ class ToLegalDocMLConverterTest {
     fun `it adds the correct main element with name`() {
         val document = convertNormToLegalDocML()
 
-        val mainElement = document.getElementsByTagName("akn:documentCollection")
+        val mainElement = document.getElementsByTagName("akn:bill")
 
         assertThat(mainElement.item(0).parentNode.nodeName).isEqualTo("akn:akomaNtoso")
     }
@@ -52,11 +52,11 @@ class ToLegalDocMLConverterTest {
         val preface = document.getElementsByTagName("akn:preface").item(0)
         val longTitle = getFirstChildNodeWithTagName(preface, "akn:longTitle")
         val longTitleP = getFirstChildNodeWithTagName(longTitle, "akn:p")
-        val shortTitle = getFirstChildNodeWithTagName(preface, "akn:shortTitle")
-        val shortTitleP = getFirstChildNodeWithTagName(shortTitle, "akn:p")
+        val shortTitle = getFirstChildNodeWithTagName(longTitleP, "akn:shortTitle")
+        val docTitle = getFirstChildNodeWithTagName(longTitleP, "akn:docTitle")
 
-        assertThat(longTitleP.textContent.trim()).isEqualTo("test official long title")
-        assertThat(shortTitleP.textContent.trim()).isEqualTo("test official short title")
+        assertThat(docTitle.textContent.trim()).isEqualTo("test official long title")
+        assertThat(shortTitle.textContent.trim()).isEqualTo("test official short title")
     }
 
     @Test
@@ -95,7 +95,7 @@ private fun convertNormToLegalDocML(norm: Norm? = null): Document {
     var xmlContent = ""
 
     converter
-        .convertNormToXml(toConvertNorm).log()
+        .convertNormToXml(toConvertNorm)
         .`as`(StepVerifier::create)
         .consumeNextWith { xmlContent = it }
         .verifyComplete()
