@@ -38,7 +38,7 @@ fun beInsideTheObjectValuePackage() =
 
 fun areFromTheApplication() = resideInAPackage("$BASE_PACKAGE_PATH.application..")
 
-private fun inputPortPackage() = "$BASE_PACKAGE_PATH.application.port.input.."
+private fun inputPortPackage() = "$BASE_PACKAGE_PATH.application.port.input"
 
 fun areFromTheInputPortPackage() = resideInAPackage(inputPortPackage())
 
@@ -48,7 +48,7 @@ fun areAnInputPort() = areFromTheInputPortPackage().and(simpleNameEndingWith("Us
 
 fun anInputPort() = areAnInputPort()
 
-private val outputPortPackage = "$BASE_PACKAGE_PATH.application.port.output.."
+private val outputPortPackage = "$BASE_PACKAGE_PATH.application.port.output"
 
 fun areFromTheOutputPortPackage() = resideInAPackage(outputPortPackage)
 
@@ -60,7 +60,9 @@ fun anyOutputPort() = areAnOutputPort()
 
 fun areAnyPort() = areAnInputPort().or(areAnOutputPort())
 
-fun areFromTheServicePackage() = resideInAPackage("$BASE_PACKAGE_PATH.application.service..")
+fun areFromTheServicePackage() = resideInAPackage("$BASE_PACKAGE_PATH.application.service")
+
+fun beInsideTheServicePackage() = ArchCondition.from<JavaClass>(areFromTheServicePackage())
 
 fun areAService() = areFromTheServicePackage().and(simpleNameEndingWith("Service"))
 

@@ -61,6 +61,16 @@ class ArchitectureFitnessTest {
     }
 
     @Test
+    fun `all classes of the application should be sorted into the following packages`() {
+        ArchRuleDefinition.classes()
+            .that(areFromTheApplication())
+            .should(beInsideTheInputPortPackage())
+            .orShould(beInsideTheOutputPortPackage())
+            .orShould(beInsideTheServicePackage())
+            .check(sourceClasses)
+    }
+
+    @Test
     fun `ports are interfaces`() {
         ArchRuleDefinition.classes().that(areAnyPort()).should(beInterfaces()).check(sourceClasses)
     }
