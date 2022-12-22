@@ -14,8 +14,17 @@ import de.bund.digitalservice.ris.norms.conventions.predicate.Predicates.aKotlin
 const val BASE_PACKAGE_PATH = "de.bund.digitalservice.ris.norms"
 
 val allClasses =
+    ClassFileImporter().importPackages("$BASE_PACKAGE_PATH..").that(are(not(aKotlinStaticClass())))
+
+val sourceClasses =
     ClassFileImporter()
         .withImportOption(Predefined.DO_NOT_INCLUDE_TESTS)
+        .importPackages("$BASE_PACKAGE_PATH..")
+        .that(are(not(aKotlinStaticClass())))
+
+val testClasses =
+    ClassFileImporter()
+        .withImportOption(Predefined.ONLY_INCLUDE_TESTS)
         .importPackages("$BASE_PACKAGE_PATH..")
         .that(are(not(aKotlinStaticClass())))
 

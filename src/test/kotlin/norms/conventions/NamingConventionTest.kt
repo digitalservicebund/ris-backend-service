@@ -21,12 +21,12 @@ class NamingConventionTest {
             .that(areFromTheInputPortPackage())
             .should(haveSimpleNameEndingWith("UseCase"))
             .orShould(beMemberClasses())
-            .check(allClasses)
+            .check(sourceClasses)
 
         classes()
             .that(have(simpleNameEndingWith("UseCase")))
             .should(beInsideTheInputPortPackage())
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -34,7 +34,7 @@ class NamingConventionTest {
         classes()
             .that(areAnInputPort())
             .should(haveAMethodWithNameLikeClassPrefix("UseCase"))
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -42,12 +42,12 @@ class NamingConventionTest {
         classes()
             .that(areFromTheOutputPortPackage())
             .should(haveSimpleNameEndingWith("OutputPort"))
-            .check(allClasses)
+            .check(sourceClasses)
 
         classes()
             .that(have(simpleNameEndingWith("OutputPort")))
             .should(beInsideTheOutputPortPackage())
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -55,7 +55,7 @@ class NamingConventionTest {
         classes()
             .that(areAnOutputPort())
             .should(haveAMethodWithNameLikeClassPrefix("OutputPort"))
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -63,7 +63,7 @@ class NamingConventionTest {
         classes()
             .that(areFromTheServicePackage())
             .should(haveSimpleNameEndingWith("Service"))
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     /**
@@ -72,7 +72,7 @@ class NamingConventionTest {
      */
     @Test
     fun `application services are annotated as service`() {
-        classes().that(areAService()).should(beAnnotatedWith(Service::class.java)).check(allClasses)
+        classes().that(areAService()).should(beAnnotatedWith(Service::class.java)).check(sourceClasses)
     }
 
     @Test
@@ -80,6 +80,6 @@ class NamingConventionTest {
         classes()
             .that(areAService())
             .should(implementInterfaceWithSamePrefix("Service", "UseCase"))
-            .check(allClasses)
+            .check(sourceClasses)
     }
 }

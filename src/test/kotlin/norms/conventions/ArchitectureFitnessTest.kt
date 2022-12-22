@@ -25,7 +25,7 @@ class ArchitectureFitnessTest {
             .matching("$BASE_PACKAGE_PATH.(**)")
             .should()
             .beFreeOfCycles()
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -33,7 +33,7 @@ class ArchitectureFitnessTest {
         ArchRuleDefinition.classes()
             .that(areFromTheDomain())
             .should(onlyDependOnClassesThat(areFromTheDomain().or(areFromAnyStandardLibrary())))
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -48,12 +48,12 @@ class ArchitectureFitnessTest {
                         .or(resideInAnyPackage("reactor.core..", "org.springframework.stereotype.."))
                 )
             )
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
     fun `ports are interfaces`() {
-        ArchRuleDefinition.classes().that(areAnyPort()).should(beInterfaces()).check(allClasses)
+        ArchRuleDefinition.classes().that(areAnyPort()).should(beInterfaces()).check(sourceClasses)
     }
 
     @Test
@@ -62,7 +62,7 @@ class ArchitectureFitnessTest {
             .matching("$BASE_PACKAGE_PATH.application.port.(*)..")
             .should()
             .notDependOnEachOther()
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -71,7 +71,7 @@ class ArchitectureFitnessTest {
             .that(areAnyPort())
             .should(haveASingleMethod())
             .andShould(bePublic())
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -85,7 +85,7 @@ class ArchitectureFitnessTest {
             .should(haveASingleParameter().and(haveACommandParameter))
             .orShould(haveASingleParameter().and(haveAQueryParameter))
             .orShould(haveNoParameter())
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -94,7 +94,7 @@ class ArchitectureFitnessTest {
             .that(areAService())
             .should(implementASingleInterface())
             .andShould(implement(anInputPort()))
-            .check(allClasses)
+            .check(sourceClasses)
     }
 
     @Test
@@ -102,6 +102,6 @@ class ArchitectureFitnessTest {
         ArchRuleDefinition.classes()
             .that(areAService())
             .should(notImplement(anyOutputPort()))
-            .check(allClasses)
+            .check(sourceClasses)
     }
 }
