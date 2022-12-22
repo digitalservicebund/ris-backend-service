@@ -168,7 +168,7 @@ jobs:
       - name: Download licence reports
         uses: actions/download-artifact@v3.0.1
         with:
-          name: Licence reports
+          name: licence-reports
           path: _site
       - name: Upload GitHub licence page
         uses: actions/upload-pages-artifact@v1.0.7
