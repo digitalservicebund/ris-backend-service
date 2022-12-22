@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 import ApiConfiguration
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
-import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import decodeGuid
 import decodeLocalDate
 import org.springframework.http.ResponseEntity

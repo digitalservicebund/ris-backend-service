@@ -37,6 +37,15 @@ class ArchitectureFitnessTest {
     }
 
     @Test
+    fun `all classes of the domain should be sorted into the following packages`() {
+        ArchRuleDefinition.classes()
+            .that(areFromTheDomain())
+            .should(beInsideTheEntityPackage())
+            .orShould(beInsideTheObjectValuePackage())
+            .check(sourceClasses)
+    }
+
+    @Test
     fun `the application package should depend only on the domain and specific extras`() {
         ArchRuleDefinition.classes()
             .that(areFromTheApplication())

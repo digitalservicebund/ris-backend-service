@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto
 
-import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table

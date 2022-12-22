@@ -8,6 +8,7 @@ import com.tngtech.archunit.core.domain.JavaClass.Predicates.simpleNameEndingWit
 import com.tngtech.archunit.core.importer.ClassFileImporter
 import com.tngtech.archunit.core.importer.ImportOption.Predefined
 import com.tngtech.archunit.lang.ArchCondition
+import com.tngtech.archunit.lang.conditions.ArchConditions
 import com.tngtech.archunit.lang.conditions.ArchPredicates.are
 import de.bund.digitalservice.ris.norms.conventions.predicate.Predicates.aKotlinStaticClass
 
@@ -29,6 +30,11 @@ val testClasses =
         .that(are(not(aKotlinStaticClass())))
 
 fun areFromTheDomain() = resideInAPackage("$BASE_PACKAGE_PATH.domain..")
+
+fun beInsideTheEntityPackage() = ArchConditions.resideInAPackage("$BASE_PACKAGE_PATH.domain.entity")
+
+fun beInsideTheObjectValuePackage() =
+    ArchConditions.resideInAPackage("$BASE_PACKAGE_PATH.domain.value")
 
 fun areFromTheApplication() = resideInAPackage("$BASE_PACKAGE_PATH.application..")
 

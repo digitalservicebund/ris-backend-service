@@ -4,7 +4,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import norms.utils.createRandomNorm
 import org.hamcrest.CoreMatchers.`is`

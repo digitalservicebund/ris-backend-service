@@ -5,7 +5,7 @@ import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import encodeGuid
 import encodeLocalDate
 import org.springframework.http.ResponseEntity

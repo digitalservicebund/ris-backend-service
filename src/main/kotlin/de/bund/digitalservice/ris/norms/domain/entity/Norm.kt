@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
-import de.bund.digitalservice.ris.norms.domain.entity.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
 import java.util.UUID
 

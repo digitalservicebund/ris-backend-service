@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.domain.entity.value
+package de.bund.digitalservice.ris.norms.domain.value
 
 enum class UndefinedDate {
     UNDEFINED_UNKNOWN,
