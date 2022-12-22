@@ -6,11 +6,11 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_edited_fields.json
     checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
   - filename: build.gradle
-    checksum: 549c1bd7037a6044258ebe98b1c6f0fd5a775dae35fe61649f6231fe4c5ae9b6
+    checksum: 70401b79f1f7173495d9e3aff38b331c89f16b7bdbd69cf7f5786b92cb31f36b
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
-    checksum: ad0195506c244cd476617aff3f05e8edc35643986bf5c92e5d9c626768afc665
+    checksum: 52927b02bc263e1bc6a24a15b4170e4434a6e9a515b7df95a5287614c0f7862b
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: .github/workflows/scan.yml

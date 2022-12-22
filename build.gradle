@@ -261,6 +261,6 @@ licenseReport {
     new LicenseBundleNormalizer("$projectDir/license-normalizer-bundle.json", true)
   ]
   renderers = [
-    new CsvReportRenderer("backend-licences.csv")
+    new CsvReportRenderer("backend-licence-report.csv")
   ]
 }

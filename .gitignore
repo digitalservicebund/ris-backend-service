@@ -43,4 +43,4 @@ lefthook-local.yml
 ## local ##
 /.config
 /.local-storage
-web/frontend-licences.csv
+web/frontend-licence-report.csv
