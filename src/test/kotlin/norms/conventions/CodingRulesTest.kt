@@ -1,12 +1,25 @@
 package de.bund.digitalservice.ris.norms.conventions
 
+import com.tngtech.archunit.base.DescribedPredicate.not
+import com.tngtech.archunit.core.domain.JavaClass.Predicates.equivalentTo
+import com.tngtech.archunit.lang.conditions.ArchConditions.dependOnClassesThat
 import com.tngtech.archunit.lang.conditions.ArchConditions.not
+import com.tngtech.archunit.lang.conditions.ArchPredicates.are
+import com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes
 import com.tngtech.archunit.library.GeneralCodingRules
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CodingRulesTest {
+    @Test
+    fun `tests do not use the JUnit assertions`() {
+        classes()
+            .that(are(not(equivalentTo(this::class.java))))
+            .should(not(dependOnClassesThat(are(equivalentTo(Assertions::class.java)))))
+            .check(testClasses)
+    }
 
     @Test
     fun `the standard output or error streams should not be used`() {

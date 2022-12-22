@@ -78,7 +78,7 @@ fileignoreconfig:
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
     checksum: 2210f343c78a42a831747323fb55e87e0f03a1a1aee38a39b24798d6f7db84ab
   - filename: src/test/kotlin/norms/domain/entity/NormTest.kt
-    checksum: ee0a3e5af6cc3743668cc2f7d3e7e5e887e25db02c08dd8d30b073dd9fde4398
+    checksum: 7365afc914a5fc0531f4fd406a590e69a63b461a9aca2ed30901af8123b39f80
   - filename: doc/norms/backend-api.yaml
     checksum: 9958c0459654c74faa57b5a47de5aeb4698ba7e3713b313a4864ec3e701e8e46
   - filename: web/test/components/navbarSide.spec.ts

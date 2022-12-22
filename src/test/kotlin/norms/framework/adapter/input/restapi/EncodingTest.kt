@@ -2,7 +2,7 @@ package norms.framework.adapter.input.restapi
 
 import decodeLocalDate
 import encodeLocalDate
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
@@ -13,14 +13,14 @@ class EncodingTest {
         val dateString = "2020-10-21"
         val date = decodeLocalDate(dateString)
 
-        assertTrue(date == LocalDate.of(2020, 10, 21))
+        assertThat(date).isEqualTo(LocalDate.of(2020, 10, 21))
     }
 
     @Test
     fun `can decode an empty date from string to null`() {
         val date = decodeLocalDate(null)
 
-        assertTrue(date == null)
+        assertThat(date).isNull()
     }
 
     @Test
@@ -28,13 +28,13 @@ class EncodingTest {
         val date = LocalDate.of(2020, 10, 21)
         val dateString = encodeLocalDate(date)
 
-        assertTrue(dateString == "2020-10-21")
+        assertThat(dateString).isEqualTo("2020-10-21")
     }
 
     @Test
     fun `can encode an empty date from localdate to null`() {
         val date = encodeLocalDate(null)
 
-        assertTrue(date == null)
+        assertThat(date).isNull()
     }
 }

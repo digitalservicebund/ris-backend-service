@@ -9,7 +9,7 @@ import io.mockk.slot
 import io.mockk.verify
 import norms.utils.assertNormAndNormDataWithoutArticles
 import norms.utils.createRandomImportNormData
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
@@ -33,12 +33,12 @@ class ImportNormServiceTest {
         verify {
             port.saveNorm(
                 withArg {
-                    assertTrue(it.articles.size == 1)
-                    assertTrue(it.articles[0].title == "title")
-                    assertTrue(it.articles[0].marker == "marker")
-                    assertTrue(it.articles[0].paragraphs.size == 1)
-                    assertTrue(it.articles[0].paragraphs[0].marker == "marker")
-                    assertTrue(it.articles[0].paragraphs[0].text == "text")
+                    assertThat(it.articles).hasSize(1)
+                    assertThat(it.articles[0].title).isEqualTo("title")
+                    assertThat(it.articles[0].marker).isEqualTo("marker")
+                    assertThat(it.articles[0].paragraphs).hasSize(1)
+                    assertThat(it.articles[0].paragraphs[0].marker).isEqualTo("marker")
+                    assertThat(it.articles[0].paragraphs[0].text).isEqualTo("text")
                     assertNormAndNormDataWithoutArticles(it, normData)
                 }
             )
@@ -61,21 +61,29 @@ class ImportNormServiceTest {
         verify {
             port.saveNorm(
                 withArg {
-                    assertTrue(it.articles.size == 2)
-                    assertTrue(it.articles[0].title == normData.articles[0].title)
-                    assertTrue(it.articles[0].marker == normData.articles[0].marker)
-                    assertTrue(it.articles[0].paragraphs.size == 2)
-                    assertTrue(it.articles[0].paragraphs[0].marker == normData.articles[0].paragraphs[0].marker)
-                    assertTrue(it.articles[0].paragraphs[0].text == normData.articles[0].paragraphs[0].text)
-                    assertTrue(it.articles[0].paragraphs[1].marker == normData.articles[0].paragraphs[1].marker)
-                    assertTrue(it.articles[0].paragraphs[1].text == normData.articles[0].paragraphs[1].text)
-                    assertTrue(it.articles[1].title == normData.articles[1].title)
-                    assertTrue(it.articles[1].marker == normData.articles[1].marker)
-                    assertTrue(it.articles[1].paragraphs.size == 2)
-                    assertTrue(it.articles[1].paragraphs[0].marker == normData.articles[1].paragraphs[0].marker)
-                    assertTrue(it.articles[1].paragraphs[0].text == normData.articles[1].paragraphs[0].text)
-                    assertTrue(it.articles[1].paragraphs[1].marker == normData.articles[1].paragraphs[1].marker)
-                    assertTrue(it.articles[1].paragraphs[1].text == normData.articles[1].paragraphs[1].text)
+                    assertThat(it.articles.size).isEqualTo(2)
+                    assertThat(it.articles[0].title).isEqualTo(normData.articles[0].title)
+                    assertThat(it.articles[0].marker).isEqualTo(normData.articles[0].marker)
+                    assertThat(it.articles[0].paragraphs).hasSize(2)
+                    assertThat(it.articles[0].paragraphs[0].marker)
+                        .isEqualTo(normData.articles[0].paragraphs[0].marker)
+                    assertThat(it.articles[0].paragraphs[0].text)
+                        .isEqualTo(normData.articles[0].paragraphs[0].text)
+                    assertThat(it.articles[0].paragraphs[1].marker)
+                        .isEqualTo(normData.articles[0].paragraphs[1].marker)
+                    assertThat(it.articles[0].paragraphs[1].text)
+                        .isEqualTo(normData.articles[0].paragraphs[1].text)
+                    assertThat(it.articles[1].title).isEqualTo(normData.articles[1].title)
+                    assertThat(it.articles[1].marker).isEqualTo(normData.articles[1].marker)
+                    assertThat(it.articles[1].paragraphs).hasSize(2)
+                    assertThat(it.articles[1].paragraphs[0].marker)
+                        .isEqualTo(normData.articles[1].paragraphs[0].marker)
+                    assertThat(it.articles[1].paragraphs[0].text)
+                        .isEqualTo(normData.articles[1].paragraphs[0].text)
+                    assertThat(it.articles[1].paragraphs[1].marker)
+                        .isEqualTo(normData.articles[1].paragraphs[1].marker)
+                    assertThat(it.articles[1].paragraphs[1].text)
+                        .isEqualTo(normData.articles[1].paragraphs[1].text)
                     assertNormAndNormDataWithoutArticles(it, normData)
                 }
             )
@@ -102,7 +110,7 @@ class ImportNormServiceTest {
         val savedNorms = mutableListOf<Norm>()
         verify(exactly = 3) { port.saveNorm(capture(savedNorms)) }
         val usedGuids = savedNorms.map { it.guid }
-        assertTrue(usedGuids.toSet().size == usedGuids.size)
+        assertThat(usedGuids.toSet().size).isEqualTo(usedGuids.size)
     }
 
     @Test

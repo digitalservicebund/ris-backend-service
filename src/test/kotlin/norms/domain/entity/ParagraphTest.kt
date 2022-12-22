@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
 
@@ -10,8 +10,8 @@ class ParagraphTest {
         val guid = UUID.randomUUID()
         val paragraph = Paragraph(guid, "marker", "text")
 
-        assertTrue(paragraph.guid == guid)
-        assertTrue(paragraph.marker == "marker")
-        assertTrue(paragraph.text == "text")
+        assertThat(paragraph.guid).isEqualTo(guid)
+        assertThat(paragraph.marker).isEqualTo("marker")
+        assertThat(paragraph.text).isEqualTo("text")
     }
 }

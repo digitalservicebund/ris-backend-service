@@ -6,56 +6,83 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.EditNormFrameController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ImportNormController
 import decodeLocalDate
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
 import kotlin.reflect.full.memberProperties
 
-fun assertEditNormFrameProperties(commandProperties: EditNormFrameUseCase.NormFrameProperties, normFrameProperties: EditNormFrameUseCase.NormFrameProperties) {
+fun assertEditNormFrameProperties(
+    commandProperties: EditNormFrameUseCase.NormFrameProperties,
+    normFrameProperties: EditNormFrameUseCase.NormFrameProperties
+) {
     EditNormFrameUseCase.NormFrameProperties::class.memberProperties.forEach {
-        assertTrue(it.get(commandProperties) == it.get(normFrameProperties))
+        assertThat(it.get(commandProperties)).isEqualTo(it.get(normFrameProperties))
     }
 }
 
-fun assertEditNormFramePropertiesAndEditNormRequestSchema(normFrameProperties: EditNormFrameUseCase.NormFrameProperties, normFrameRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema) {
-    val normFrameRequestSchemaMembers = EditNormFrameController.NormFramePropertiesRequestSchema::class.memberProperties
-    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
+fun assertEditNormFramePropertiesAndEditNormRequestSchema(
+    normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
+    normFrameRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema
+) {
+    val normFrameRequestSchemaMembers =
+        EditNormFrameController.NormFramePropertiesRequestSchema::class.memberProperties
+    val normFramePropertiesMembers =
+        EditNormFrameUseCase.NormFrameProperties::class.memberProperties
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
-        val found = normFrameRequestSchemaMembers.find { normFrameRequestSchemaMember ->
-            normFramePropertiesMember.name == normFrameRequestSchemaMember.name
-        }
-        when (val normFramePropertiesMemberValue = normFramePropertiesMember.get(normFrameProperties)) {
+        val found =
+            normFrameRequestSchemaMembers.find { normFrameRequestSchemaMember ->
+                normFramePropertiesMember.name == normFrameRequestSchemaMember.name
+            }
+        when (
+            val normFramePropertiesMemberValue =
+                normFramePropertiesMember.get(normFrameProperties)
+        ) {
             is LocalDate ->
-                assertTrue(normFramePropertiesMemberValue == decodeLocalDate(found?.get(normFrameRequestSchema).toString()))
+                assertThat(normFramePropertiesMemberValue)
+                    .isEqualTo(
+                        decodeLocalDate(found?.get(normFrameRequestSchema).toString())
+                    )
             else -> {
-                assertTrue(normFramePropertiesMemberValue == found?.get(normFrameRequestSchema))
+                assertThat(normFramePropertiesMemberValue)
+                    .isEqualTo(found?.get(normFrameRequestSchema))
             }
         }
     }
 }
 
-fun assertNormAndEditNormFrameProperties(norm: Norm, normFrameProperties: EditNormFrameUseCase.NormFrameProperties) {
+fun assertNormAndEditNormFrameProperties(
+    norm: Norm,
+    normFrameProperties: EditNormFrameUseCase.NormFrameProperties
+) {
     val normMembers = Norm::class.memberProperties
-    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
+    val normFramePropertiesMembers =
+        EditNormFrameUseCase.NormFrameProperties::class.memberProperties
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
-        val found = normMembers.find { normMember ->
-            normFramePropertiesMember.name == normMember.name
-        }
-        assertTrue(normFramePropertiesMember.get(normFrameProperties) == found?.get(norm))
+        val found =
+            normMembers.find { normMember -> normFramePropertiesMember.name == normMember.name }
+        assertThat(normFramePropertiesMember.get(normFrameProperties)).isEqualTo(found?.get(norm))
     }
 }
 
-fun assertNormDataAndImportNormRequestSchemaWithoutArticles(normData: ImportNormUseCase.NormData, importNormRequestSchema: ImportNormController.NormRequestSchema) {
+fun assertNormDataAndImportNormRequestSchemaWithoutArticles(
+    normData: ImportNormUseCase.NormData,
+    importNormRequestSchema: ImportNormController.NormRequestSchema
+) {
     val normDataMembers = ImportNormUseCase.NormData::class.memberProperties
-    val importNormRequestSchemaMembers = ImportNormController.NormRequestSchema::class.memberProperties
+    val importNormRequestSchemaMembers =
+        ImportNormController.NormRequestSchema::class.memberProperties
     normDataMembers.filter { it.name != "articles" }.forEach { normDataMember ->
-        val found = importNormRequestSchemaMembers.find { importNormRequestSchemaMember ->
-            normDataMember.name == importNormRequestSchemaMember.name
-        }
+        val found =
+            importNormRequestSchemaMembers.find { importNormRequestSchemaMember ->
+                normDataMember.name == importNormRequestSchemaMember.name
+            }
         when (val normDataMemberValue = normDataMember.get(normData)) {
             is LocalDate ->
-                assertTrue(normDataMemberValue == decodeLocalDate(found?.get(importNormRequestSchema).toString()))
+                assertThat(normDataMemberValue)
+                    .isEqualTo(
+                        decodeLocalDate(found?.get(importNormRequestSchema).toString())
+                    )
             else -> {
-                assertTrue(normDataMemberValue == found?.get(importNormRequestSchema))
+                assertThat(normDataMemberValue).isEqualTo(found?.get(importNormRequestSchema))
             }
         }
     }
@@ -65,14 +92,14 @@ fun assertNormAndNormDataWithoutArticles(norm: Norm, normData: ImportNormUseCase
     val normMembers = Norm::class.memberProperties
     val normDataMembers = ImportNormUseCase.NormData::class.memberProperties
     normMembers.filter { it.name !in listOf("articles", "guid") }.forEach { normMember ->
-        val found = normDataMembers.find { normDataMember ->
-            normMember.name == normDataMember.name
-        }
+        val found =
+            normDataMembers.find { normDataMember -> normMember.name == normDataMember.name }
         when (val normMemberValue = normMember.get(norm)) {
             is LocalDate ->
-                assertTrue(normMemberValue == decodeLocalDate(found?.get(normData).toString()))
+                assertThat(normMemberValue)
+                    .isEqualTo(decodeLocalDate(found?.get(normData).toString()))
             else -> {
-                assertTrue(normMemberValue == found?.get(normData))
+                assertThat(normMemberValue).isEqualTo(found?.get(normData))
             }
         }
     }

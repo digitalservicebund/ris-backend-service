@@ -8,7 +8,7 @@ import io.mockk.slot
 import io.mockk.verify
 import norms.utils.convertNormToJson
 import norms.utils.createRandomNorm
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -24,15 +24,17 @@ import java.util.*
 @WebFluxTest(controllers = [LoadNormController::class])
 @WithMockUser
 class LoadNormControllerTest {
-    @Autowired
-    lateinit var webClient: WebTestClient
+    @Autowired lateinit var webClient: WebTestClient
 
-    @MockkBean
-    lateinit var loadNormService: LoadNormUseCase
+    @MockkBean lateinit var loadNormService: LoadNormUseCase
 
     @Test
     fun `it calls the load norm service with the correct query to get a norm by GUID`() {
-        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), officialLongTitle = "long title")
+        val norm =
+            Norm(
+                UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
+                officialLongTitle = "long title"
+            )
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -44,12 +46,16 @@ class LoadNormControllerTest {
 
         val query = slot<LoadNormUseCase.Query>()
         verify(exactly = 1) { loadNormService.loadNorm(capture(query)) }
-        assertTrue(query.captured.guid.toString() == "761b5537-5aa5-4901-81f7-fbf7e040a7c8")
+        assertThat(query.captured.guid.toString()).isEqualTo("761b5537-5aa5-4901-81f7-fbf7e040a7c8")
     }
 
     @Test
     fun `it responds with ok status if the norm was loaded successfully`() {
-        val norm = Norm(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), officialLongTitle = "long title")
+        val norm =
+            Norm(
+                UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
+                officialLongTitle = "long title"
+            )
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 

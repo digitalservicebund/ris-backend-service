@@ -7,7 +7,7 @@ import io.mockk.verify
 import norms.utils.assertEditNormFramePropertiesAndEditNormRequestSchema
 import norms.utils.convertEditNormRequestSchemaToJson
 import norms.utils.createRandomEditNormRequestSchema
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,8 +47,12 @@ class EditNormFrameControllerTest {
         verify(exactly = 1) {
             editNormFrameService.editNormFrame(
                 withArg {
-                    assertTrue(it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
-                    assertEditNormFramePropertiesAndEditNormRequestSchema(it.properties, editNormRequestSchema)
+                    assertThat(it.guid)
+                        .isEqualTo(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
+                    assertEditNormFramePropertiesAndEditNormRequestSchema(
+                        it.properties,
+                        editNormRequestSchema
+                    )
                 }
             )
         }

@@ -7,7 +7,7 @@ import io.mockk.verify
 import norms.utils.assertNormDataAndImportNormRequestSchemaWithoutArticles
 import norms.utils.convertImportormRequestSchemaToJson
 import norms.utils.createRandomImportNormRequestSchema
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -47,22 +47,37 @@ class ImportNormControllerTest {
         verify(exactly = 1) {
             importNormService.importNorm(
                 withArg {
-                    assertTrue(it.data.articles.size == 2)
-                    assertTrue(it.data.articles[0].title == importNormRequestSchema.articles[0].title)
-                    assertTrue(it.data.articles[0].marker == importNormRequestSchema.articles[0].marker)
-                    assertTrue(it.data.articles[0].paragraphs.size == 2)
-                    assertTrue(it.data.articles[0].paragraphs[0].marker == importNormRequestSchema.articles[0].paragraphs[0].marker)
-                    assertTrue(it.data.articles[0].paragraphs[0].text == importNormRequestSchema.articles[0].paragraphs[0].text)
-                    assertTrue(it.data.articles[0].paragraphs[1].marker == importNormRequestSchema.articles[0].paragraphs[1].marker)
-                    assertTrue(it.data.articles[0].paragraphs[1].text == importNormRequestSchema.articles[0].paragraphs[1].text)
-                    assertTrue(it.data.articles[1].title == importNormRequestSchema.articles[1].title)
-                    assertTrue(it.data.articles[1].marker == importNormRequestSchema.articles[1].marker)
-                    assertTrue(it.data.articles[1].paragraphs.size == 2)
-                    assertTrue(it.data.articles[1].paragraphs[0].marker == importNormRequestSchema.articles[1].paragraphs[0].marker)
-                    assertTrue(it.data.articles[1].paragraphs[0].text == importNormRequestSchema.articles[1].paragraphs[0].text)
-                    assertTrue(it.data.articles[1].paragraphs[1].marker == importNormRequestSchema.articles[1].paragraphs[1].marker)
-                    assertTrue(it.data.articles[1].paragraphs[1].text == importNormRequestSchema.articles[1].paragraphs[1].text)
-                    assertNormDataAndImportNormRequestSchemaWithoutArticles(it.data, importNormRequestSchema)
+                    assertThat(it.data.articles).hasSize(2)
+                    assertThat(it.data.articles[0].title)
+                        .isEqualTo(importNormRequestSchema.articles[0].title)
+                    assertThat(it.data.articles[0].marker)
+                        .isEqualTo(importNormRequestSchema.articles[0].marker)
+                    assertThat(it.data.articles[0].paragraphs).hasSize(2)
+                    assertThat(it.data.articles[0].paragraphs[0].marker)
+                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[0].marker)
+                    assertThat(it.data.articles[0].paragraphs[0].text)
+                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[0].text)
+                    assertThat(it.data.articles[0].paragraphs[1].marker)
+                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[1].marker)
+                    assertThat(it.data.articles[0].paragraphs[1].text)
+                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[1].text)
+                    assertThat(it.data.articles[1].title)
+                        .isEqualTo(importNormRequestSchema.articles[1].title)
+                    assertThat(it.data.articles[1].marker)
+                        .isEqualTo(importNormRequestSchema.articles[1].marker)
+                    assertThat(it.data.articles[1].paragraphs).hasSize(2)
+                    assertThat(it.data.articles[1].paragraphs[0].marker)
+                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[0].marker)
+                    assertThat(it.data.articles[1].paragraphs[0].text)
+                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[0].text)
+                    assertThat(it.data.articles[1].paragraphs[1].marker)
+                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[1].marker)
+                    assertThat(it.data.articles[1].paragraphs[1].text)
+                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[1].text)
+                    assertNormDataAndImportNormRequestSchemaWithoutArticles(
+                        it.data,
+                        importNormRequestSchema
+                    )
                 }
             )
         }
