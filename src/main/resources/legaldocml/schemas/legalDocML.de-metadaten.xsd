@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns="http://Metadaten.LegalDocML.de/1.4/"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified"
+           targetNamespace="http://Metadaten.LegalDocML.de/1.4/"
+           version="LegalDocML.de 1.4 (Oktober 2022)">
+
+    <!--   
+        E-Gesetzgebung: Metadaten
+	    ]init[ AG für digitale Kommunikation 
+    -->
+   <xs:element name="legalDocML.de_metadaten">
+      <xs:complexType>
+         <xs:sequence>
+            <xs:element name="typ" type="typen"/>
+            <xs:element name="form" type="formen"/>
+            <xs:element name="fassung" type="fassungen"/>
+            <xs:element name="art" type="arten"/>
+            <xs:element name="initiant" type="institution"/>
+            <xs:element name="bearbeitendeInstitution" type="institution"/>
+         </xs:sequence>
+      </xs:complexType>
+   </xs:element>
+   <xs:simpleType name="typen" final="restriction">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="gesetz"/>
+         <xs:enumeration value="verordnung"/>
+         <xs:enumeration value="satzung"/>
+         <xs:enumeration value="verwaltungsvorschrift"/>
+         <xs:enumeration value="vertragsgesetz"/>
+         <xs:enumeration value="vertragsverordnung"/>
+         <xs:enumeration value="sonstige-bekanntmachung"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="formen" final="restriction">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="mantelform"/>
+         <xs:enumeration value="stammform"/>
+         <xs:enumeration value="eingebundene-stammform"/>
+         <xs:enumeration value="nicht-vorhanden"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="fassungen" final="restriction">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="entwurfsfassung"/>
+         <xs:enumeration value="verkuendungsfassung"/>
+         <xs:enumeration value="neufassung"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="arten" final="restriction">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="rechtsetzungsdokument"/>
+         <xs:enumeration value="regelungstext"/>
+         <xs:enumeration value="vorblatt"/>
+         <xs:enumeration value="begruendung"/>
+         <xs:enumeration value="anschreiben"/>
+         <xs:enumeration value="denkschrift"/>
+         <xs:enumeration value="vereinbarung"/>
+         <xs:enumeration value="offene-struktur"/>
+         <xs:enumeration value="bekanntmachungstext"/>
+      </xs:restriction>
+   </xs:simpleType>
+   <xs:simpleType name="institution" final="restriction">
+      <xs:restriction base="xs:string">
+         <xs:enumeration value="bundesregierung"/>
+         <xs:enumeration value="bundestag"/>
+         <xs:enumeration value="bundesrat"/>
+         <xs:enumeration value="bundespräsident"/>
+         <xs:enumeration value="bundeskanzler"/>
+         <xs:enumeration value="nicht-vorhanden"/>
+      </xs:restriction>
+   </xs:simpleType>
+</xs:schema>

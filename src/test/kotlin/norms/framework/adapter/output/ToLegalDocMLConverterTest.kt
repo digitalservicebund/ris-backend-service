@@ -11,22 +11,31 @@ import org.w3c.dom.Document
 import org.w3c.dom.Node
 import org.xml.sax.InputSource
 import reactor.test.StepVerifier
+import java.io.File
 import java.io.StringReader
-import java.util.UUID
+import java.io.StringWriter
+import java.util.*
+import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.Transformer
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
+import javax.xml.transform.stream.StreamSource
+import javax.xml.validation.SchemaFactory
 
 class ToLegalDocMLConverterTest {
     @Test
     fun `it creates a Akoma Ntoso document with correct schema and version`() {
         val document = convertNormToLegalDocML()
-        assertThat(document.getElementsByTagName("akn:akomaNtoso").getLength()).isEqualTo(1)
-        assertThat(document.firstChild.getNodeName()).isEqualTo("akn:akomaNtoso")
+        assertThat(document.getElementsByTagName("akn:akomaNtoso").length).isEqualTo(1)
+        assertThat(document.firstChild.nodeName).isEqualTo("akn:akomaNtoso")
 
-        val attributes = document.firstChild.getAttributes()
+        val attributes = document.firstChild.attributes
 
-        assertThat(attributes.getNamedItem("xmlns:akn").getNodeValue())
+        assertThat(attributes.getNamedItem("xmlns:akn").nodeValue)
             .isEqualTo("http://Inhaltsdaten.LegalDocML.de/1.4/")
-        assertThat(attributes.getNamedItem("xmlns:xsi").getNodeValue())
+        assertThat(attributes.getNamedItem("xmlns:xsi").nodeValue)
             .isEqualTo("http://www.w3.org/2001/XMLSchema-instance")
     }
 
@@ -87,10 +96,36 @@ class ToLegalDocMLConverterTest {
         assertThat(paragraphNumber.textContent.trim()).isEqualTo("test paragraph marker")
         assertThat(paragraphContentP.textContent.trim()).isEqualTo("test paragraph text")
     }
+
+    @Test
+    fun `it produces valid xml content according to xml schema definition`() {
+        val norm = createRandomNorm()
+        val document = convertNormToLegalDocML(norm)
+        val domSource = DOMSource(document)
+        val writer = StringWriter()
+        val result = StreamResult(writer)
+        val tf = TransformerFactory.newInstance()
+        val transformer: Transformer = tf.newTransformer()
+        transformer.transform(domSource, result)
+        val schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI)
+        val schema =
+            schemaFactory.newSchema(File("src/main/resources/legaldocml/schemas/legalDocML.de-regelungstextentwurfsfassung.xsd"))
+        val validator = schema.newValidator()
+        val source = StreamSource(StringReader(writer.toString()))
+
+        val isValid = try {
+            validator.validate(source)
+            true
+        } catch (e: Exception) {
+            false
+        }
+
+        assertThat(isValid).isTrue
+    }
 }
 
 private fun convertNormToLegalDocML(norm: Norm? = null): Document {
-    var toConvertNorm = norm ?: createRandomNorm()
+    val toConvertNorm = norm ?: createRandomNorm()
     val converter = ToLegalDocMLConverter()
     var xmlContent = ""
 
