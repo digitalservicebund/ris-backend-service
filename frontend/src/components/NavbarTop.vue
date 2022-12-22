@@ -8,7 +8,6 @@ const route = useRoute()
 <template>
   <nav
     class="border-gray-400 border-y flex items-center justify-between px-16 py-24"
-    role="navigation"
   >
     <div class="flex gap-44 items-center">
       <div class="flex items-center">
