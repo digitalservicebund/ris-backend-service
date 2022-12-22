@@ -130,12 +130,12 @@ export interface LevelTwoMenuItem {
   <aside aria-labelledby="sidebarNavigation" class="w-[16rem]">
     <span id="sidebarNavigation" hidden>SideBar Navigation</span>
     <router-link
-      aria-label="Zurück"
+      aria-labelledby="toOverviewButton"
       class="border-b-1 border-gray-400 flex gap-12 h-80 items-center link-01-bold px-14 text-blue-800"
       :to="goBackRoute"
     >
       <span class="material-icons">arrow_back</span>
-      <span>{{ goBackLabel }}</span>
+      <span id="toOverviewButton">{{ goBackLabel }}</span>
     </router-link>
 
     <div
@@ -144,24 +144,24 @@ export interface LevelTwoMenuItem {
       class="border-b-1 border-gray-400"
     >
       <router-link
-        aria-label="Menü Eintrag"
+        :aria-labelledby="levelOneItem.label"
         class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold pl-[1rem] py-[1.25rem]"
         :class="levelOneItem.classes"
         :to="levelOneItem.route"
       >
-        {{ levelOneItem.label }}
+        <span :id="levelOneItem.label">{{ levelOneItem.label }}</span>
       </router-link>
 
       <div v-show="levelOneItem.isExpanded">
         <router-link
           v-for="levelTwoItem in levelOneItem.children"
           :key="levelTwoItem.label"
-          aria-label="Submenü Eintrag"
+          :aria-label="levelTwoItem.label"
           class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg pl-[2rem] py-[1rem]"
           :class="levelTwoItem.classes"
           :to="levelTwoItem.route"
         >
-          {{ levelTwoItem.label }}
+          <span :id="levelTwoItem.label">{{ levelTwoItem.label }}</span>
         </router-link>
       </div>
     </div>
