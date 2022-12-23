@@ -86,7 +86,7 @@ onMounted(() => {
   const coreData = { ...props.documentUnit.coreData }
 
   //TODO: do this check in documentUnit
-  requiredFields.map((field) => {
+  requiredFields.forEach((field) => {
     if (
       !Object.keys(coreData).includes(field.name) ||
       checkMissingValues(coreData[field.name as keyof CoreData])
