@@ -52,7 +52,7 @@ function formatDate(date?: string): string {
   const fullHour = ("0" + publicationDate.getHours()).slice(-2)
   const fullMinute = ("0" + publicationDate.getMinutes()).slice(-2)
 
-  return `${fullYear}-${fullMonth}-${fullDate} ${fullHour}: ${fullMinute} Uhr`
+  return `${fullDate}.${fullMonth}.${fullYear} um ${fullHour}:${fullMinute} Uhr`
 }
 
 onMounted(async () => {
@@ -87,6 +87,7 @@ onMounted(async () => {
     <div :class="classes">
       <PublicationDocument
         v-if="loadDone"
+        :document-unit="documentUnit"
         :error-message="errorMessage"
         :last-published-xml-mail="lastPublishedXmlMail"
         :publish-result="publishResult"

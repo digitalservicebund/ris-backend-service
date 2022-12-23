@@ -4,11 +4,13 @@ import { InfoStatus } from "@/enum/enumInfoStatus"
 
 const props = withDefaults(
   defineProps<{
+    ariaLabel?: string
     title: string
     description?: string
     status?: InfoStatus
   }>(),
   {
+    ariaLabel: "Infomodal",
     description: "",
     status: InfoStatus.ERROR,
   }
@@ -40,11 +42,12 @@ const modalAttribute = computed((): ModalAttribute => {
       }
   }
 })
-const ariaLabel = props.title + " icon"
+const ariaLabelIcon = props.title + " icon"
 </script>
 
 <template>
   <div
+    :aria-label="ariaLabel"
     :class="[
       staticContainerClass,
       modalAttribute.borderClass,
@@ -52,7 +55,7 @@ const ariaLabel = props.title + " icon"
     ]"
   >
     <span
-      :aria-label="ariaLabel"
+      :aria-label="ariaLabelIcon"
       :class="[staticIconClass, modalAttribute.textColorClass]"
       >{{ modalAttribute.icon }}</span
     >

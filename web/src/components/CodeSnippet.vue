@@ -23,8 +23,8 @@ watch(
 
 <!-- TODO use tiptap with XML plugin instead of building it ourselves -->
 <template>
-  <div class="xml-container">
-    <p class="text-color-black xml-container-title">{{ title }}</p>
+  <div class="flex flex-col gap-24 text-base xml-container">
+    <p class="label-03-bold">{{ title }}</p>
     <div class="border-1 border-solid border-white code-lines">
       <div v-for="(line, index) in codeLines" :key="index" class="code-line">
         <code
@@ -44,13 +44,6 @@ watch(
 
 <style lang="scss" scoped>
 .xml-container {
-  .xml-container-title {
-    font-size: 16px;
-    font-weight: 700;
-    line-height: 26px;
-    text-transform: uppercase;
-  }
-
   .code-lines {
     overflow: auto;
     width: 60vw;

@@ -1,15 +1,17 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import InputField from "./InputField.vue"
 import TextButton from "./TextButton.vue"
 import TextInput from "./TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import InfoModal from "@/components/InfoModal.vue"
+import DocumentUnit, { CoreData, Court } from "@/domain/documentUnit"
 import XmlMail from "@/domain/xmlMail"
 import { InfoStatus } from "@/enum/enumInfoStatus"
 import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{
+  documentUnit: DocumentUnit
   publishResult?: XmlMail
   lastPublishedXmlMail?: XmlMail
   errorMessage?: ResponseError
@@ -20,20 +22,26 @@ const emits = defineEmits<{
   (e: "publishADocument", newValue: string): void
 }>()
 
-const showIssuesDetails = ref(false)
-const toggleShowIssuesDetails = () => {
-  showIssuesDetails.value = !showIssuesDetails.value
-}
-const receiverAddress = ref("dokmbx@juris.de")
+const categoriesRoute = computed(() => ({
+  name: "caselaw-documentUnit-:documentNumber-categories",
+  params: { documentNumber: props.documentUnit.documentNumber },
+}))
+const receiverAddress = ref("")
 const emailAddressInvalid = ref(false)
 const isFirstTimePublication = computed(() => {
   return !props.lastPublishedXmlMail
 })
-const hasValidationError = computed(() => {
-  return props.publishResult?.statusCode === "400"
-})
+
+const errorMessage = ref(props.errorMessage)
 
 function publishDocumentUnit() {
+  if (fieldsMissing.value) {
+    errorMessage.value = {
+      title: "Es sind noch nicht alle Pflichtfelder befüllt.",
+      description:
+        "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
+    }
+  }
   if (validateEmailAddress()) {
     emailAddressInvalid.value = false
     // console.log("address: " + receiverAddress.value)
@@ -54,124 +62,153 @@ function validateEmailAddress(): boolean {
 function selectAll(event: Event) {
   ;(event.target as HTMLInputElement).select()
 }
+//TODO: import coreDatefields, filter for required fields
+const requiredFields = [
+  { name: "fileNumbers", displayName: "Aktenzeichen" },
+  { name: "court", displayName: "Gericht" },
+  { name: "decisionDate", displayName: "Entscheidungsdatum" },
+  { name: "legalEffect", displayName: "Rechtskraft" },
+  { name: "category", displayName: "Dokumenttyp" },
+]
+
+const missingFields = ref<string[]>([])
+const fieldsMissing = computed(() =>
+  missingFields.value.length ? true : false
+)
+
+function checkMissingValues(value: string | unknown[] | Court | undefined) {
+  //TODO: check for any invalid/ missing values
+  if (value instanceof Array && value.length === 0) return true
+  else return false
+}
+
+onMounted(() => {
+  const coreData = { ...props.documentUnit.coreData }
+
+  //TODO: do this check in documentUnit
+  requiredFields.map((field) => {
+    if (
+      !Object.keys(coreData).includes(field.name) ||
+      checkMissingValues(coreData[field.name as keyof CoreData])
+    ) {
+      missingFields.value.push(field.displayName)
+    }
+  })
+})
 </script>
 
 <template>
-  <div class="flex-col-container publication-container">
+  <div class="flex flex-col flex-start gap-40 justify-start max-w-[42rem]">
     <h1 class="heading-02-regular">Veröffentlichen</h1>
-    <div class="flex-col-container publication-check-container">
-      <div
-        class="bg-white publication-check-infos-container"
-        :class="{
-          'publication-check-infos-container__in-error': hasValidationError,
-        }"
-      >
-        <p class="publication-text-header">Plausibilitätsprüfung</p>
-
-        <div v-if="!publishResult" class="text-icon">
-          <span
-            class="material-icons material-symbols-outlined text-icon--outlined"
-          >
-            help
-          </span>
-          <p class="help-text">
-            Durch Klick auf <em>Veröffentlichen</em> wird die
-            Plausibilitätsprüfung ausgelöst.
-          </p>
-        </div>
-        <div v-if="!!publishResult && !hasValidationError" class="text-icon">
-          <div class="icon">
-            <span class="material-icons"> done </span>
-          </div>
-          <p>0 Fehler</p>
-        </div>
-        <div v-if="hasValidationError" class="xml-validation-error-container">
-          <div class="text-icon">
-            <button class="icon" @click="toggleShowIssuesDetails">
-              <span v-if="showIssuesDetails" class="material-icons">
-                keyboard_arrow_up
-              </span>
-              <span v-else class="material-icons"> keyboard_arrow_down </span>
-            </button>
-            <p>
-              {{ props.publishResult?.statusMessages?.length }} Pflichtfelder
-              nicht befüllt
-            </p>
-          </div>
-          <div
-            v-show="showIssuesDetails"
-            class="flex-col-container xml-validation-error-details"
-          >
-            <p
-              v-for="issue in props.publishResult?.statusMessages"
-              :key="issue"
-            >
-              {{ issue }}
-            </p>
-          </div>
-        </div>
+    <div aria-label="Plausibilitätsprüfung" class="flex flex-row gap-16">
+      <div class="w-[15.625rem]">
+        <p class="subheading">1. Plausibilitätsprüfung</p>
+      </div>
+      <div v-if="fieldsMissing" class="flex flex-row gap-8">
         <div>
-          <InputField
-            id="receiverAddress"
-            key="receiverAddress"
-            :error-message="
-              emailAddressInvalid ? 'E-Mail-Adresse ungültig' : undefined
-            "
-            label="Empfänger-E-Mail-Adresse:"
-          >
-            <TextInput
-              id="receiverAddress"
-              v-model="receiverAddress"
-              aria-label="Empfängeradresse E-Mail"
-              @focus="selectAll($event)"
-            />
-          </InputField>
+          <span class="bg-red-800 material-icons rounded-full text-white">
+            error
+          </span>
         </div>
-        <div class="publication-button-container">
-          <div class="publication-button">
-            <TextButton
-              aria-label="Dokumentationseinheit veröffentlichen"
-              button-type="primary"
-              icon="campaign"
-              label="Dokumentationseinheit veröffentlichen"
-              @click="publishDocumentUnit"
-            />
+        <div class="flex flex-col gap-32">
+          <div>
+            <p class="body-01-reg">
+              Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:
+            </p>
+            <ul class="list-disc">
+              <li
+                v-for="field in missingFields"
+                :key="field"
+                class="body-01-reg list-item ml-[1rem]"
+              >
+                {{ field }}
+              </li>
+            </ul>
           </div>
+          <router-link :to="categoriesRoute"
+            ><TextButton
+              aria-label="Rubriken bearbeiten"
+              button-type="tertiary"
+              class="w-fit"
+              label="Rubriken bearbeiten"
+          /></router-link>
         </div>
       </div>
-
-      <InfoModal v-if="errorMessage" class="mt-8" v-bind="errorMessage" />
-      <InfoModal
-        v-if="succeedMessage"
-        class="mt-8"
-        v-bind="succeedMessage"
-        :status="InfoStatus.SUCCEED"
-      />
+      <div v-else class="flex flex-row gap-8">
+        <span class="material-icons text-green-700"> check </span>
+        <p class="body-01-reg">Alle Pflichtfelder sind korrekt ausgefüllt</p>
+      </div>
     </div>
-    <div class="flex-col-container publication-infos-container">
-      <p class="publication-text-header">Letzte Veröffentlichungen</p>
+    <div class="border-b-1 border-b-gray-400"></div>
+    <div class="flex flex-row gap-16">
+      <div class="w-[15.625rem]">
+        <p class="subheading">2. Empfänger der Export-Email</p>
+      </div>
+      <div class="grow">
+        <InputField
+          id="receiverAddress"
+          key="receiverAddress"
+          :error-message="
+            emailAddressInvalid ? 'E-Mail-Adresse ungültig' : undefined
+          "
+          label="Empfänger-E-Mail-Adresse:"
+        >
+          <TextInput
+            id="receiverAddress"
+            v-model="receiverAddress"
+            aria-label="Empfängeradresse E-Mail"
+            @focus="selectAll($event)"
+          />
+        </InputField>
+      </div>
+    </div>
+    <div class="border-b-1 border-b-gray-400"></div>
+    <InfoModal
+      v-if="errorMessage"
+      aria-label="Fehler bei Veröffentlichung"
+      class="mt-8"
+      v-bind="errorMessage"
+    />
+    <InfoModal
+      v-if="succeedMessage"
+      aria-label="Erfolg der Veröffentlichung"
+      class="mt-8"
+      v-bind="succeedMessage"
+      :status="InfoStatus.SUCCEED"
+    />
+    <TextButton
+      aria-label="Dokumentationseinheit veröffentlichen"
+      button-type="secondary"
+      class="w-fit"
+      icon="campaign"
+      label="Dokumentationseinheit veröffentlichen"
+      @click="publishDocumentUnit"
+    />
+    <div aria-label="Letzte Veröffentlichungen" class="flex flex-col gap-24">
+      <h3 class="heading-03-regular">Letzte Veröffentlichungen</h3>
       <p v-if="isFirstTimePublication">
         Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
       </p>
-      <div v-else class="email-infos-container flex-col-container">
-        <p>
+      <div v-else class="flex flex-col gap-24">
+        <div class="label-02-regular">
           Letzte Veröffentlichung am
           {{ props.lastPublishedXmlMail?.publishDate }}
-        </p>
-        <p class="publication-text-label">über</p>
-        <div class="receiver-info">
-          <p>
-            E-Mail an:
-            <span>{{ props.lastPublishedXmlMail?.receiverAddress }}</span>
-          </p>
-          <p>
-            Betreff: <span>{{ props.lastPublishedXmlMail?.mailSubject }}</span>
-          </p>
         </div>
-        <p class="publication-text-label">als</p>
+        <div class="label-section text-gray-900">ÜBER</div>
+        <div class="label-02-regular">
+          <div>
+            <span class="label-02-bold">E-Mail an:</span>
+            {{ props.lastPublishedXmlMail?.receiverAddress }}
+          </div>
+          <div>
+            <span class="label-02-bold"> Betreff: </span>
+            {{ props.lastPublishedXmlMail?.mailSubject }}
+          </div>
+        </div>
+        <div class="label-section text-gray-900">ALS</div>
         <CodeSnippet
           v-if="!!props.lastPublishedXmlMail?.xml"
-          title="xml"
+          title="XML"
           :xml="props.lastPublishedXmlMail.xml"
         />
       </div>
@@ -180,17 +217,7 @@ function selectAll(event: Event) {
 </template>
 
 <style lang="scss" scoped>
-.flex-col-container {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-}
-
 .publication-container {
-  min-height: 100vh;
-  background-color: #f6f7f8;
-  row-gap: 32px;
-
   .icon {
     display: flex;
     width: 15px;
@@ -233,7 +260,7 @@ function selectAll(event: Event) {
 
       &__in-error {
         max-width: 50vw;
-        border: solid 1px #b0243f;
+        border: solid 2px #b0243f;
       }
 
       .publication-button-container {
@@ -262,20 +289,6 @@ function selectAll(event: Event) {
           font-weight: 400;
         }
       }
-    }
-  }
-
-  .text-icon {
-    display: flex;
-    flex: row nowrap;
-    align-items: center;
-    justify-content: flex-start;
-    column-gap: 12px;
-
-    &--outlined {
-      border-radius: 50%;
-      background-color: black;
-      color: white;
     }
   }
 

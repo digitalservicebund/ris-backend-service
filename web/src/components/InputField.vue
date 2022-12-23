@@ -14,7 +14,7 @@ defineProps<Props>()
     <label
       v-if="label"
       :aria-label="id"
-      class="flex gap-4 items-center label-03-regular mb-2 text-gray-900"
+      class="flex gap-4 items-center label-03-reg mb-2 text-gray-900"
       :for="id"
     >
       {{ label }}
@@ -23,7 +23,7 @@ defineProps<Props>()
 
     <slot :id="id" />
 
-    <div class="h-16 text-16 text-red-800">
+    <div class="h-16 label-03-reg text-red-800">
       {{ errorMessage }}
     </div>
   </div>

@@ -37,8 +37,8 @@ const labels = computed(() => ({
     :rounded="0"
   >
     <slot>
-      <span v-if="icon" class="material-icons pr-2"> {{ icon }} </span>
-      <span class="label-01-bold" :class="labels">{{ label }} </span>
+      <span v-if="icon" class="material-icons mr-12"> {{ icon }} </span>
+      <span class="label-02-bold" :class="labels">{{ label }} </span>
     </slot>
   </button>
 </template>
@@ -48,9 +48,10 @@ const labels = computed(() => ({
   @apply align-middle bg-blue-800 inline-flex items-center 
   justify-center max-w-full
   no-underline overflow-hidden outline-none shrink-0 select-none
-  relative tracking-widest no-underline normal-case 
+  relative no-underline normal-case 
   indent-[0.1em] px-[1.5rem] py-[1.188rem] whitespace-nowrap;
 
+  letter-spacing: 0.16px;
   line-height: normal;
 
   &:focus-visible {
@@ -115,7 +116,7 @@ const labels = computed(() => ({
 }
 
 .btn-tertiary {
-  @apply border-solid border-2 border-blue-800 text-blue-800 bg-white;
+  @apply border-solid border-2 border-blue-800 text-blue-800 bg-transparent;
 
   &:hover {
     @apply bg-blue-200;
