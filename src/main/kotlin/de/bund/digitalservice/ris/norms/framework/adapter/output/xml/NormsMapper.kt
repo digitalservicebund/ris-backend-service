@@ -9,17 +9,17 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.Paragra
 
 fun normToDto(norm: Norm): NormDto {
     return NormDto(
-        norm.guid,
-        norm.officialLongTitle,
-        norm.officialShortTitle,
-        norm.publicationDate?.toString(),
-        norm.documentTypeName,
-        norm.documentNormCategory,
-        norm.providerDecidingBody,
-        norm.participationInstitution,
-        norm.printAnnouncementGazette,
-        norm.printAnnouncementPage,
-        articlesToDto(norm.articles)
+        guid = norm.guid,
+        officialLongTitle = norm.officialLongTitle,
+        officialShortTitle = norm.officialShortTitle,
+        publicationDate = norm.publicationDate?.toString(),
+        documentTypeName = norm.documentTypeName,
+        documentNormCategory = norm.documentNormCategory,
+        providerDecidingBody = norm.providerDecidingBody,
+        participationInstitution = norm.participationInstitution,
+        printAnnouncementGazette = norm.printAnnouncementGazette,
+        printAnnouncementPage = norm.printAnnouncementPage,
+        articles = articlesToDto(norm.articles)
     )
 }
 

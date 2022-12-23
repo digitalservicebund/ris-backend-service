@@ -14,6 +14,7 @@ import reactor.test.StepVerifier
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
+import java.time.LocalDate
 import java.util.*
 import javax.xml.XMLConstants
 import javax.xml.parsers.DocumentBuilderFactory
@@ -66,6 +67,94 @@ class ToLegalDocMLConverterTest {
 
         assertThat(docTitle.textContent.trim()).isEqualTo("test official long title")
         assertThat(shortTitle.textContent.trim()).isEqualTo("test official short title")
+    }
+
+    @Test
+    fun `it creates the identification tag with proper data`() {
+        val guid = UUID.randomUUID()
+        val norm =
+            createRandomNorm()
+                .copy(
+                    guid = guid,
+                    printAnnouncementGazette = "printAnnouncementGazette",
+                    publicationDate = LocalDate.parse("2001-01-01"),
+                    printAnnouncementPage = "1102"
+                )
+        val document = convertNormToLegalDocML(norm)
+
+        val identification = document.getElementsByTagName("akn:identification").item(0)
+        val work = getFirstChildNodeWithTagName(identification, "akn:FRBRWork")
+        val manifestation = getFirstChildNodeWithTagName(identification, "akn:FRBRManifestation")
+        val expression = getFirstChildNodeWithTagName(identification, "akn:FRBRExpression")
+        // Work
+        val workThis = getFirstChildNodeWithTagName(work, "akn:FRBRthis")
+        val workUri = getFirstChildNodeWithTagName(work, "akn:FRBRuri")
+        val workDate = getFirstChildNodeWithTagName(work, "akn:FRBRdate")
+        val workAuthor = getFirstChildNodeWithTagName(work, "akn:FRBRauthor")
+        val workAlias = getFirstChildNodeWithTagName(work, "akn:FRBRalias")
+        val workCountry = getFirstChildNodeWithTagName(work, "akn:FRBRcountry")
+        val workNumber = getFirstChildNodeWithTagName(work, "akn:FRBRnumber")
+        val workName = getFirstChildNodeWithTagName(work, "akn:FRBRname")
+        val workSubtype = getFirstChildNodeWithTagName(work, "akn:FRBRsubtype")
+        // Manifestation
+        val manifestationThis = getFirstChildNodeWithTagName(manifestation, "akn:FRBRthis")
+        val manifestationUri = getFirstChildNodeWithTagName(manifestation, "akn:FRBRuri")
+        val manifestationDate = getFirstChildNodeWithTagName(manifestation, "akn:FRBRdate")
+        val manifestationAuthor = getFirstChildNodeWithTagName(manifestation, "akn:FRBRauthor")
+        // Expression
+        val expressionThis = getFirstChildNodeWithTagName(expression, "akn:FRBRthis")
+        val expressionUri = getFirstChildNodeWithTagName(expression, "akn:FRBRuri")
+        val expressionDate = getFirstChildNodeWithTagName(expression, "akn:FRBRdate")
+        val expressionAuthor = getFirstChildNodeWithTagName(expression, "akn:FRBRauthor")
+
+        // Assert Work
+        assertThat(workThis.attributes.getNamedItem("value").nodeValue).isEqualTo("eli/printAnnouncementGazette/2001/s1102/regelungstext-1")
+        assertThat(workUri.attributes.getNamedItem("value").nodeValue).isEqualTo("eli/printAnnouncementGazette/2001/s1102")
+        assertThat(workAlias.attributes.getNamedItem("value").nodeValue).isEqualTo("$guid")
+        assertThat(workDate.attributes.getNamedItem("date").nodeValue).isEqualTo("2001-01-01")
+        assertThat(workAuthor.attributes.getNamedItem("href").nodeValue).isEqualTo("recht.bund.de/institution/bundesregierung")
+        assertThat(workCountry.attributes.getNamedItem("value").nodeValue).isEqualTo("de")
+        assertThat(workNumber.attributes.getNamedItem("value").nodeValue).isEqualTo("s1102")
+        assertThat(workName.attributes.getNamedItem("value").nodeValue).isEqualTo("printAnnouncementGazette")
+        assertThat(workSubtype.attributes.getNamedItem("value").nodeValue).isEqualTo("regelungstext-1")
+        // AssertManifestation
+        assertThat(manifestationThis.attributes.getNamedItem("value").nodeValue).isEqualTo("eli/printAnnouncementGazette/2001/s1102/2001-01-01/1/deu/regelungstext-1.xml")
+        assertThat(manifestationUri.attributes.getNamedItem("value").nodeValue).isEqualTo("eli/printAnnouncementGazette/2001/s1102/2001-01-01/1/deu/regelungstext-1.xml")
+        assertThat(manifestationDate.attributes.getNamedItem("date").nodeValue).isEqualTo("2001-01-01")
+        assertThat(manifestationAuthor.attributes.getNamedItem("href").nodeValue).isEqualTo("recht.bund.de")
+        // AssertExpression
+        assertThat(expressionThis.attributes.getNamedItem("value").nodeValue).isEqualTo("eli/printAnnouncementGazette/2001/s1102/2001-01-01/1/deu/regelungstext-1")
+        assertThat(expressionUri.attributes.getNamedItem("value").nodeValue).isEqualTo("eli/printAnnouncementGazette/2001/s1102/2001-01-01/1/deu")
+        assertThat(expressionDate.attributes.getNamedItem("date").nodeValue).isEqualTo("2001-01-01")
+        assertThat(expressionAuthor.attributes.getNamedItem("href").nodeValue).isEqualTo("recht.bund.de/institution/bundesregierung")
+    }
+
+    @Test
+    fun `it creates the metadata tag with proper data`() {
+        val norm =
+            createRandomNorm()
+                .copy(
+                    documentTypeName = "documentTypeName",
+                    documentNormCategory = "documentNormCategory",
+                    providerDecidingBody = "providerDecidingBody",
+                    participationInstitution = "participationInstitution"
+                )
+        val document = convertNormToLegalDocML(norm)
+
+        val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
+        val type = getFirstChildNodeWithTagName(metadata, "meta:typ")
+        val form = getFirstChildNodeWithTagName(metadata, "meta:form")
+        val summary = getFirstChildNodeWithTagName(metadata, "meta:fassung")
+        val category = getFirstChildNodeWithTagName(metadata, "meta:art")
+        val initiant = getFirstChildNodeWithTagName(metadata, "meta:initiant")
+        val participant = getFirstChildNodeWithTagName(metadata, "meta:bearbeitendeInstitution")
+
+        assertThat(type.textContent.trim()).isEqualTo("documentTypeName")
+        assertThat(form.textContent.trim()).isEqualTo("stammform")
+        assertThat(summary.textContent.trim()).isEqualTo("verkuendungsfassung")
+        assertThat(category.textContent.trim()).isEqualTo("documentNormCategory")
+        assertThat(initiant.textContent.trim()).isEqualTo("providerDecidingBody")
+        assertThat(participant.textContent.trim()).isEqualTo("participationInstitution")
     }
 
     @Test
