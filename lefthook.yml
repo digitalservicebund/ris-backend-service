@@ -11,6 +11,12 @@ pre-commit:
     check-format-frontend:
       tags: style frontend
       run: cd web && npm run style:check
+    secrets-audit:
+      tags: security audit
+      run: >
+        talisman --githook pre-commit ||
+        (echo "Verify the content and fix it with: talisman --githook pre-commit --interactive"; exit 1)
+
 pre-push:
   parallel: true
   commands:
