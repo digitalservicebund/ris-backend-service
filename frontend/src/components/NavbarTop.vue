@@ -12,9 +12,13 @@ const route = useRoute()
     <div class="flex gap-44 items-center">
       <div class="flex items-center">
         <img alt="Neuris Logo" :src="Logo" />
-        <span class="leading-20 px-[1rem] text-16">
-          <span class="font-bold"> Rechtsinformationen</span><br />
-          des Bundes
+        <span aria-labelledby="menuTitlte" class="leading-20 px-[1rem] text-16">
+          <span aria-hidden="true" class="font-bold"> Rechtsinformationen</span>
+          <span id="menuTitlte" aria-hidden="true" class="font-bold" hidden>
+            Rechtsinformationen des Bundes</span
+          >
+          <br />
+          <span aria-hidden="true">des Bundes</span>
         </span>
       </div>
 
