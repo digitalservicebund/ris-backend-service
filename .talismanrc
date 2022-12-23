@@ -76,7 +76,7 @@ fileignoreconfig:
   - filename: web/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
-    checksum: 2210f343c78a42a831747323fb55e87e0f03a1a1aee38a39b24798d6f7db84ab
+    checksum: e074c30267525e7a4af1a7a48f5be66202592893bfec1b49a7fe09fd63238a69
   - filename: src/test/kotlin/norms/domain/entity/NormTest.kt
     checksum: 7365afc914a5fc0531f4fd406a590e69a63b461a9aca2ed30901af8123b39f80
   - filename: doc/norms/backend-api.yaml
@@ -86,7 +86,7 @@ fileignoreconfig:
   - filename: src/main/resources/db/migration/V0.9__norms_rename_metadata_fields.sql
     checksum: 4da1c4c487c4c0a1d7f02de20b029a549554b6df9a9c999fcd79a8bed1fa3269
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt
-    checksum: e01befabaf0e4c2eb771f40cef1d926cbb605277db9a36225c9055b58692b40c
+    checksum: 086cd5f7b8f3a54f47a7c667a54ca0999493a197f9e4d57cddcbd0fdbbd71abd
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
     checksum: 5420c7fe3e2039e03bf49e0c14121f1884307e96c01f5ea4d6297a6905a2ad1a
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/ImportNormController.kt
@@ -104,7 +104,7 @@ fileignoreconfig:
   - filename: src/test/kotlin/norms/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 7a3e86d1e8e6479150fa18795ad36e0da7f5b16f0fa8251a52e7e9c58a8ea2b4
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
-    checksum: 1e8a06eae25dfc23a5a3b175cc223a3ab3ea97c2f6f31cec7d1dc65ff71ec8a4
+    checksum: d771b98e4c7deeb639a85aa904a1bc74c47d3c619d423263bdda8db5019b6e02
   - filename: src/main/kotlin/de/bund/digitalservice/ris/norms/application/EditNormFrameService.kt
     checksum: 698f56dab5b14d359725b33988fa50d93f62018541d5a8842c13be9cf2587c98
   - filename: src/test/kotlin/norms/application/EditNormFrameServiceTest.kt
