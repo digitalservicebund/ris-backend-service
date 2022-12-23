@@ -86,7 +86,7 @@ _dev() {
     _fail "Dev requires docker, please install first: \`brew install docker\`"
     exit 1
   fi
-  docker build ./web -f web/Dockerfile -t neuris/frontend --no-cache
+  docker build ./frontend -f frontend/Dockerfile -t neuris/frontend --no-cache
   eval "$(_gradle_env)"
   docker compose up
 }

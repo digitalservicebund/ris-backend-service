@@ -54,20 +54,20 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version-file: ./web/.node-version
+          node-version-file: ./frontend/.node-version
           cache: npm
-          cache-dependency-path: ./web/package-lock.json
+          cache-dependency-path: ./frontend/package-lock.json
       - name: Install dependencies
         run: |
           npm ci
-        working-directory: ./web
+        working-directory: ./frontend
       - name: Check style
         run: npm run style:check
-        working-directory: ./web
+        working-directory: ./frontend
       - name: Run tests
         run: |
           npm test
-        working-directory: ./web
+        working-directory: ./frontend
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -127,21 +127,21 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version-file: ./web/.node-version
+          node-version-file: ./frontend/.node-version
           cache: npm
-          cache-dependency-path: ./web/package-lock.json
+          cache-dependency-path: ./frontend/package-lock.json
       - name: Install dependencies
         run: npm ci
-        working-directory: ./web
+        working-directory: ./frontend
       - name: Run license scanner
         run: npm run audit:licences
-        working-directory: ./web
+        working-directory: ./frontend
       - name: Upload licence report
         uses: actions/upload-artifact@v3.1.1
         with:
           name: licence-reports
           retention-days: 3
-          path: web/frontend-licence-report.csv
+          path: frontend/frontend-licence-report.csv
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -250,7 +250,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Build frontend image
-        run: docker build --file web/Dockerfile.prod --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./web
+        run: docker build --file frontend/Dockerfile.prod --tag ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }} ./frontend
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -273,7 +273,7 @@ jobs:
         uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
         with:
           scan-type: "fs"
-          scan-ref: "./web"
+          scan-ref: "./frontend"
           skip-dirs: "node_modules" # See https://github.com/aquasecurity/trivy/issues/1283
           format: "sarif"
           output: "trivy-results.sarif"
@@ -370,11 +370,11 @@ jobs:
           npm install vitest
           npm run coverage
           sonar-scanner
-        working-directory: ./web
+        working-directory: ./frontend
       - name: Check SonarQube Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@15767f0e4eb489cfdd989dc717fa78c038d0de8a
         with:
-          scanMetadataReportFile: web/.scannerwork/report-task.txt
+          scanMetadataReportFile: frontend/.scannerwork/report-task.txt
         timeout-minutes: 3
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -483,8 +483,8 @@ jobs:
         with:
           push: true
           tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-          context: ./web
-          file: ./web/Dockerfile.prod
+          context: ./frontend
+          file: ./frontend/Dockerfile.prod
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions

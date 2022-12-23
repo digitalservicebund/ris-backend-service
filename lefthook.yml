@@ -10,7 +10,7 @@ pre-commit:
       run: ./gradlew spotlessCheck
     check-format-frontend:
       tags: style frontend
-      run: cd web && npm run style:check
+      run: cd frontend && npm run style:check
     secrets-audit:
       tags: security audit
       run: >
@@ -25,7 +25,7 @@ pre-push:
       run: ./gradlew checkLicense
     licenses-audit-frontend:
       tags: licenses audit frontend
-      run: cd web && npm run audit:licences > /dev/null;
+      run: cd frontend && npm run audit:licences > /dev/null;
     secrets-audit:
       # NOTE: there's one caveat with this hook! When pushing, it will only correctly scan the range of
       # outgoing commits when pushing to a matching branch on the remote (e.g. `git push`) - pushing to a

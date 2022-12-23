@@ -205,7 +205,7 @@ spotless {
   }
   format "misc", {
     target "**/*.js", "**/*.json", "**/*.md", "**/*.properties", "**/*.sh", "**/*.sql", "**/*.yaml", "**/*.yml"
-    targetExclude "web/**", // Has its own prettier setup!
+    targetExclude "frontend/**", // Has its own prettier setup!
         "**/dist/**", "**/static/**"
     // spotless:off
     prettier(["prettier": "2.6.1", "prettier-plugin-properties": "0.1.0", "prettier-plugin-sh": "0.7.1", "prettier-plugin-sql": "0.10.0"])

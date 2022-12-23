@@ -2,7 +2,7 @@ services:
   frontend:
     image: neuris/frontend
     volumes:
-      - ./web/src/:/usr/src/app/src
+      - ./frontend/src/:/usr/src/app/src
     environment:
       - BACKEND_HOST=backend
     command: npm run dev -- --host
