@@ -72,7 +72,7 @@ const dropdownItemsRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
 const ariaLabelDropdownIcon = computed(() =>
-  isShowDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
+  isShowDropdown.value ? "closeDropdown" : "openDropdown"
 )
 
 const toggleDropdown = () => {
@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
           </span>
         </button>
         <button
-          :aria-label="ariaLabelDropdownIcon"
+          :aria-labelledby="ariaLabelDropdownIcon"
           class="input-expand-icon"
           tabindex="0"
           @click="toggleDropdown"
@@ -234,7 +234,10 @@ onBeforeUnmount(() => {
             class="icon material-icons text-blue-800"
           >
             expand_more
+            <span id="closeDropdown" hidden>Dropdown schließen</span>
+            <span id="openDropdown" hidden>Dropdown öffnen</span>
           </span>
+
           <span v-else class="icon material-icons"> expand_less </span>
         </button>
       </div>
