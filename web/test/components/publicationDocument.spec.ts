@@ -28,6 +28,13 @@ describe("PublicationDocument:", () => {
     describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
       it("without email address", async () => {
         const { emitted } = setupWithPublishedDocument()
+        const inputReceiverAddress = screen.getByLabelText(
+          "Empfängeradresse E-Mail"
+        )
+
+        await userEvent.clear(inputReceiverAddress)
+        await userEvent.tab()
+
         const publishButton = screen.getByRole("button", {
           name: "Dokumentationseinheit veröffentlichen",
         })
@@ -41,7 +48,9 @@ describe("PublicationDocument:", () => {
         const inputReceiverAddress = screen.getByLabelText(
           "Empfängeradresse E-Mail"
         )
-        await fireEvent.update(inputReceiverAddress, "test-email")
+
+        await userEvent.type(inputReceiverAddress, "test.email")
+        await userEvent.tab()
 
         const publishButton = screen.getByRole("button", {
           name: "Dokumentationseinheit veröffentlichen",
@@ -66,6 +75,7 @@ describe("PublicationDocument:", () => {
         await fireEvent.click(publishButton)
 
         expect(emitted().publishADocument).toBeTruthy()
+        expect(emitted().publishADocument[0]).toEqual(["test.email@test.com"])
       })
     })
   })

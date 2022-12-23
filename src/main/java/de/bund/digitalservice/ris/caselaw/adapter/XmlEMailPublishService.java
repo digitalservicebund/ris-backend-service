@@ -10,6 +10,10 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
+import java.time.Clock;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
@@ -22,6 +26,7 @@ import reactor.core.publisher.Mono;
 @Service
 public class XmlEMailPublishService implements EmailPublishService {
   private static final Logger LOGGER = LoggerFactory.getLogger(XmlEMailPublishService.class);
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
   private final XmlExporter xmlExporter;
 
@@ -68,13 +73,18 @@ public class XmlEMailPublishService implements EmailPublishService {
           new DocumentUnitPublishException("No document number has set in the document unit."));
     }
 
-    String subject = "id=BGH";
-    subject += " name=jDVNAME";
+    String deliveryDate =
+        LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
+
+    String subject = "id=juris";
+    subject += " name=NeuRIS";
     subject += " da=R";
     subject += " df=X";
     subject += " dt=N";
-    subject += " mod=A";
+    subject += " mod=T";
+    subject += " ld=" + deliveryDate;
     subject += " vg=Testvorgang";
+
     return Mono.just(subject);
   }
 

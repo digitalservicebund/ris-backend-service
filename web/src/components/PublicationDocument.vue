@@ -24,7 +24,7 @@ const showIssuesDetails = ref(false)
 const toggleShowIssuesDetails = () => {
   showIssuesDetails.value = !showIssuesDetails.value
 }
-const receiverAddress = ref("")
+const receiverAddress = ref("dokmbx@juris.de")
 const emailAddressInvalid = ref(false)
 const isFirstTimePublication = computed(() => {
   return !props.lastPublishedXmlMail
@@ -36,6 +36,7 @@ const hasValidationError = computed(() => {
 function publishDocumentUnit() {
   if (validateEmailAddress()) {
     emailAddressInvalid.value = false
+    // console.log("address: " + receiverAddress.value)
     emits("publishADocument", receiverAddress.value)
   } else {
     emailAddressInvalid.value = true
@@ -48,6 +49,10 @@ function validateEmailAddress(): boolean {
     /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/ // NOSONAR
 
   return EMAIL_REGEX.test(receiverAddress.value)
+}
+
+function selectAll(event: Event) {
+  ;(event.target as HTMLInputElement).select()
 }
 </script>
 
@@ -118,6 +123,7 @@ function validateEmailAddress(): boolean {
               id="receiverAddress"
               v-model="receiverAddress"
               aria-label="Empfängeradresse E-Mail"
+              @focus="selectAll($event)"
             />
           </InputField>
         </div>

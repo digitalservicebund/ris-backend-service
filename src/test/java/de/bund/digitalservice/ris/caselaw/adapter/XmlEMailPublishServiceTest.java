@@ -16,7 +16,11 @@ import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.XmlResultObject;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import javax.xml.parsers.ParserConfigurationException;
@@ -37,8 +41,11 @@ import reactor.test.StepVerifier;
 @TestPropertySource(properties = "mail.exporter.senderAddress=export@neuris")
 class XmlEMailPublishServiceTest {
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final String DELIVER_DATE =
+      LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
   private static final String MAIL_SUBJECT =
-      "id=BGH name=jDVNAME da=R df=X dt=N mod=A vg=Testvorgang";
+      "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang";
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final XmlMail EXPECTED_BEFORE_SAVE =
       new XmlMail(

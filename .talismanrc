@@ -160,7 +160,7 @@ fileignoreconfig:
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitWrongDocumentUnitIntegrationTest.java
     checksum: 9c87a2cbd40308841b01dd9c3b0d780b8e3f97f96dd173734ea843c925208908
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/PublishDocumentUnitIntegrationTest.java
-    checksum: 7910631f80ed3107081a49746e18bdf513fb08c17456c6b00d6adc8160affba8
+    checksum: 669aa3fb005d1742c4badfc8879de7e17df2ab6e8094f10aaf65aa0cf5c321fa
   - filename: src/main/resources/legaldocml/schemas/legalDocML.de-baukasten.xsd
     checksum: f0cd055a3148f5f5f842a8ba3614a9b89f31ad9c4f71160cda8d9e0dfd8e9f9c
 

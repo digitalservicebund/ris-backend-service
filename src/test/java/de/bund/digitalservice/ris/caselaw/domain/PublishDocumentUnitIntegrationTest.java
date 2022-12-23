@@ -16,7 +16,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMail
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
@@ -66,6 +70,10 @@ class PublishDocumentUnitIntegrationTest {
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
   }
 
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final String DELIVER_DATE =
+      LocalDate.now(Clock.system(ZoneId.of("Europe/Berlin"))).format(DATE_FORMATTER);
+
   @Autowired private WebTestClient webClient;
 
   @Autowired private DatabaseDocumentUnitRepository repository;
@@ -95,7 +103,7 @@ class PublishDocumentUnitIntegrationTest {
             1L,
             savedDocumentUnitDTO.getId(),
             "exporter@neuris.de",
-            "id=BGH name=jDVNAME da=R df=X dt=N mod=A vg=Testvorgang",
+            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang",
             "xml",
             "200",
             "message 1|message 2",
@@ -105,7 +113,7 @@ class PublishDocumentUnitIntegrationTest {
         new XmlMail(
             documentUnitUuid1,
             "exporter@neuris.de",
-            "id=BGH name=jDVNAME da=R df=X dt=N mod=A vg=Testvorgang",
+            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang",
             "xml",
             "200",
             List.of("message 1", "message 2"),
