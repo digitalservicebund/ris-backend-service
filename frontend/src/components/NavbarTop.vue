@@ -33,7 +33,7 @@ const route = useRoute()
     </div>
 
     <div class="flex font-bold gap-8 items-center">
-      <span class="material-icons"> perm_identity </span>
+      <span aria-hidden="true" class="material-icons"> perm_identity </span>
       User Name
     </div>
   </nav>
