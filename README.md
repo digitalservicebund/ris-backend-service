@@ -74,7 +74,7 @@ If you use IntelliJ: the run configuration _Application_ should be created autom
 
 #### Frontend only
 
-See `web/README.md`
+See `frontend/README.md`
 
 ### Lookup tables
 
