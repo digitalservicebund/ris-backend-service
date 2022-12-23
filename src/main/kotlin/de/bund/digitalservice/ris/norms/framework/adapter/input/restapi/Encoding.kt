@@ -1,3 +1,5 @@
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
+
 import java.time.LocalDate
 import java.util.UUID
 

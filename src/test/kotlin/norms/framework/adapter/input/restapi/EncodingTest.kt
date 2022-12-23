@@ -1,7 +1,5 @@
-package norms.framework.adapter.input.restapi
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
-import decodeLocalDate
-import encodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate

@@ -3,9 +3,9 @@ package norms.utils
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.EditNormFrameController
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ImportNormController
-import decodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ImportNormController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
 import kotlin.reflect.full.memberProperties

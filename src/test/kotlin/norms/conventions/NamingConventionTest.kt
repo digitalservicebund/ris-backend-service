@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.norms.conventions.condition.Conditions.impleme
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.stereotype.Service
+import org.springframework.web.bind.annotation.RestController
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class NamingConventionTest {
@@ -67,12 +68,15 @@ class NamingConventionTest {
     }
 
     /**
-     * The annotation as a service is used for discovery by the Spring framework as well as some minor
-     * documentation purpose.
+     * The annotation as a service is used for discovery by the Spring framework as well as some
+     * minor documentation purpose.
      */
     @Test
     fun `application services are annotated as service`() {
-        classes().that(areAService()).should(beAnnotatedWith(Service::class.java)).check(sourceClasses)
+        classes()
+            .that(areAService())
+            .should(beAnnotatedWith(Service::class.java))
+            .check(sourceClasses)
     }
 
     @Test
@@ -80,6 +84,27 @@ class NamingConventionTest {
         classes()
             .that(areAService())
             .should(implementInterfaceWithSamePrefix("Service", "UseCase"))
+            .check(sourceClasses)
+    }
+
+    @Test
+    fun `REST controllers are named as controller`() {
+        classes()
+            .that(areFromTheRestControllerPackage())
+            .should(haveSimpleNameEndingWith("Controller"))
+            .orShould(beMemberClasses())
+            .check(sourceClasses)
+    }
+
+    /**
+     * The annotation as a service is used for discovery by the Spring framework as well as some
+     * minor documentation purpose.
+     */
+    @Test
+    fun `REST controllers are annotated as rest controller`() {
+        classes()
+            .that(areARestController())
+            .should(beAnnotatedWith(RestController::class.java))
             .check(sourceClasses)
     }
 }

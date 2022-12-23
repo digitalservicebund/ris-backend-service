@@ -1,9 +1,9 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
-import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
-import decodeLocalDate
-import encodeGuid
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -70,7 +70,8 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 articles = this.articles.map { it.toUseCaseData() },
                 officialShortTitle = this.officialShortTitle,
                 officialAbbreviation = this.officialAbbreviation,
-                referenceNumber = this.referenceNumber, announcementDate = decodeLocalDate(this.announcementDate),
+                referenceNumber = this.referenceNumber,
+                announcementDate = decodeLocalDate(this.announcementDate),
                 citationDate = decodeLocalDate(this.citationDate),
                 frameKeywords = this.frameKeywords,
                 providerEntity = this.providerEntity,
@@ -79,7 +80,9 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 leadJurisdiction = this.leadJurisdiction,
                 leadUnit = this.leadUnit,
                 participationType = this.participationType,
-                participationInstitution = this.participationInstitution, subjectFna = this.subjectFna, subjectGesta = this.subjectGesta,
+                participationInstitution = this.participationInstitution,
+                subjectFna = this.subjectFna,
+                subjectGesta = this.subjectGesta,
                 documentNumber = this.documentNumber,
                 documentCategory = this.documentCategory,
                 risAbbreviationInternationalLaw = this.risAbbreviationInternationalLaw,
@@ -108,7 +111,11 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var paragraphs: List<ParagraphRequestSchema> = listOf()
 
         fun toUseCaseData(): ImportNormUseCase.ArticleData {
-            return ImportNormUseCase.ArticleData(title, marker, paragraphs.map { it.toUseCaseData() })
+            return ImportNormUseCase.ArticleData(
+                title,
+                marker,
+                paragraphs.map { it.toUseCaseData() }
+            )
         }
     }
 

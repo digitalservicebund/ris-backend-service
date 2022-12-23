@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
@@ -59,8 +59,10 @@ class ListNormsControllerTest {
 
     @Test
     fun `it maps the norm entity to the expected data schema`() {
-        val normOne = NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title")
-        val normTwo = NormData(UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"), "second title")
+        val normOne =
+            NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title")
+        val normTwo =
+            NormData(UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"), "second title")
         every { listNormsService.listNorms() } returns Flux.fromArray(arrayOf(normOne, normTwo))
 
         webClient

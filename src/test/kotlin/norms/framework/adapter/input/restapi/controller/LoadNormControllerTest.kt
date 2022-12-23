@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase

@@ -1,8 +1,8 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
-import ApiConfiguration
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormAsXmlUseCase
-import decodeGuid
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
 import org.springframework.http.MediaType.APPLICATION_XML
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -21,7 +21,9 @@ class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUse
 
         return loadNormAsXmlService
             .loadNormAsXml(query)
-            .map({ normAsXml -> ResponseEntity.ok().contentType(APPLICATION_XML).body(normAsXml) })
+            .map({ normAsXml ->
+                ResponseEntity.ok().contentType(APPLICATION_XML).body(normAsXml)
+            })
             .defaultIfEmpty(ResponseEntity.notFound().build())
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }

@@ -3,8 +3,8 @@ package norms.utils
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.EditNormFrameController
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ImportNormController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ImportNormController
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
 import org.jeasy.random.FieldPredicates.named
@@ -16,12 +16,19 @@ fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
 }
 
 fun createRandomEditNormRequestSchema(): EditNormFrameController.NormFramePropertiesRequestSchema {
-    val parameters: EasyRandomParameters = EasyRandomParameters().randomize(named(".+Date\$")) { createRandomLocalDateInString() } // needed for string date fields
-    return EasyRandom(parameters).nextObject(EditNormFrameController.NormFramePropertiesRequestSchema::class.java)
+    val parameters: EasyRandomParameters =
+        EasyRandomParameters().randomize(named(".+Date\$")) {
+            createRandomLocalDateInString()
+        } // needed for string date fields
+    return EasyRandom(parameters)
+        .nextObject(EditNormFrameController.NormFramePropertiesRequestSchema::class.java)
 }
 
 fun createRandomNorm(): Norm {
-    val parameters: EasyRandomParameters = EasyRandomParameters().randomize(named("marker")) { createRandomStringWithMaxLength(20) } // needed for marker fields
+    val parameters: EasyRandomParameters =
+        EasyRandomParameters().randomize(named("marker")) {
+            createRandomStringWithMaxLength(20)
+        } // needed for marker fields
     return EasyRandom(parameters).nextObject(Norm::class.java)
 }
 
@@ -31,8 +38,12 @@ fun createRandomImportNormData(): ImportNormUseCase.NormData {
 }
 
 fun createRandomImportNormRequestSchema(): ImportNormController.NormRequestSchema {
-    val parameters: EasyRandomParameters = EasyRandomParameters().randomize(named(".+Date\$")) { createRandomLocalDateInString() } // needed for string date fields
-    val importNormRequestSchema = EasyRandom(parameters).nextObject(ImportNormController.NormRequestSchema::class.java)
+    val parameters: EasyRandomParameters =
+        EasyRandomParameters().randomize(named(".+Date\$")) {
+            createRandomLocalDateInString()
+        } // needed for string date fields
+    val importNormRequestSchema =
+        EasyRandom(parameters).nextObject(ImportNormController.NormRequestSchema::class.java)
     importNormRequestSchema.articles = createRandomListOfArticleRequestSchema()
     return importNormRequestSchema
 }
@@ -46,12 +57,19 @@ private fun createRandomStringWithMaxLength(maxLength: Int): String {
     return EasyRandom(parameters).nextObject(String::class.java)
 }
 
-private fun createRandomListOfArticleRequestSchema(): List<ImportNormController.ArticleRequestSchema> {
-    val articles = EasyRandom().objects(ImportNormController.ArticleRequestSchema::class.java, 2).collect(Collectors.toList())
+private fun createRandomListOfArticleRequestSchema():
+    List<ImportNormController.ArticleRequestSchema> {
+    val articles =
+        EasyRandom()
+            .objects(ImportNormController.ArticleRequestSchema::class.java, 2)
+            .collect(Collectors.toList())
     articles.forEach { it.paragraphs = createRandomListOfParagraphRequestSchema() }
     return articles
 }
 
-private fun createRandomListOfParagraphRequestSchema(): List<ImportNormController.ParagraphRequestSchema> {
-    return EasyRandom().objects(ImportNormController.ParagraphRequestSchema::class.java, 2).collect(Collectors.toList())
+private fun createRandomListOfParagraphRequestSchema():
+    List<ImportNormController.ParagraphRequestSchema> {
+    return EasyRandom()
+        .objects(ImportNormController.ParagraphRequestSchema::class.java, 2)
+        .collect(Collectors.toList())
 }

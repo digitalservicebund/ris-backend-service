@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
+package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormAsXmlUseCase
@@ -34,7 +34,8 @@ class LoadNormAsXmlControllerTest {
         verify(exactly = 1) {
             loadNormAsXmlService.loadNormAsXml(
                 withArg {
-                    assertThat(it.guid).isEqualTo(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
+                    assertThat(it.guid)
+                        .isEqualTo(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
                 }
             )
         }
