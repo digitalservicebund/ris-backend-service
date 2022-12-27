@@ -90,7 +90,7 @@
     "jest-fail-on-console": "^3.0.2",
     "jsdom": "^20.0.0",
     "license-checker": "^25.0.1",
-    "playwright": "^1.27.1",
+    "playwright": "^1.29.1",
     "postcss": "^8.4.16",
     "postcss-import": "^15.0.0",
     "postcss-scrollbar": "^0.5.1",
