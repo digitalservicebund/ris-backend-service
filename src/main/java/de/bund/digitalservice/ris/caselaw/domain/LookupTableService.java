@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -19,7 +19,11 @@ import org.springframework.data.r2dbc.config.AbstractR2dbcConfiguration;
 import org.springframework.data.r2dbc.repository.config.EnableR2dbcRepositories;
 
 @Configuration
-@EnableR2dbcRepositories
+@EnableR2dbcRepositories(
+    basePackages = {
+      "de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc",
+      "de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository"
+    })
 public class PostgresConfig extends AbstractR2dbcConfiguration {
   @Value("${database.user:test}")
   private String user;

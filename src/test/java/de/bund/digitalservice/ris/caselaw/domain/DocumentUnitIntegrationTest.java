@@ -18,13 +18,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepos
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;

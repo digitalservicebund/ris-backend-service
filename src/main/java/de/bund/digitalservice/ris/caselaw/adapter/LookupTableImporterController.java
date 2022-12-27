@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.LookupTableImporterService;
 import java.nio.ByteBuffer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

@@ -10,12 +10,18 @@ import com.tngtech.archunit.library.dependencies.SlicesRuleDefinition;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RestController;
 
 class ArchitectureFitnessTest {
 
   static final String ADAPTER_LAYER_PACKAGES = "de.bund.digitalservice.ris.caselaw.adapter..";
+  static final String R2DBC_LAYER_PACKAGES =
+      "de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc..";
+  static final String JPA_LAYER_PACKAGES =
+      "de.bund.digitalservice.ris.caselaw.adapter.database.jpa..";
   static final String DOMAIN_LAYER_PACKAGES = "de.bund.digitalservice.ris.caselaw.domain..";
 
   static JavaClasses classes;
@@ -79,6 +85,51 @@ class ArchitectureFitnessTest {
             .andShould()
             .dependOnClassesThat()
             .areAnnotatedWith(RestController.class);
+    rule.check(classes);
+  }
+
+  @Test
+  void onlyRepositoryInterfacesWithoutExtensionAllowedInDomain() {
+    ArchRule rule =
+        ArchRuleDefinition.classes()
+            .that()
+            .resideInAPackage(DOMAIN_LAYER_PACKAGES)
+            .and()
+            .haveSimpleNameEndingWith("Repository")
+            .should()
+            .beInterfaces()
+            .andShould()
+            .notBeAssignableTo(Object.class);
+    rule.check(classes);
+  }
+
+  @Test
+  void repositoryInR2DBCAdapterPackageAreInterfacesWhichExtendReactiveCrudRepository() {
+    ArchRule rule =
+        ArchRuleDefinition.classes()
+            .that()
+            .resideInAPackage(R2DBC_LAYER_PACKAGES)
+            .and()
+            .haveSimpleNameEndingWith("Repository")
+            .should()
+            .beInterfaces()
+            .andShould()
+            .beAssignableTo(ReactiveCrudRepository.class);
+    rule.check(classes);
+  }
+
+  @Test
+  void repositoryInJPAAdapterPackageAreInterfacesWhichExtendJpaCrudRepository() {
+    ArchRule rule =
+        ArchRuleDefinition.classes()
+            .that()
+            .resideInAPackage(JPA_LAYER_PACKAGES)
+            .and()
+            .haveSimpleNameEndingWith("Repository")
+            .should()
+            .beInterfaces()
+            .andShould()
+            .beAssignableTo(JpaRepository.class);
     rule.check(classes);
   }
 }

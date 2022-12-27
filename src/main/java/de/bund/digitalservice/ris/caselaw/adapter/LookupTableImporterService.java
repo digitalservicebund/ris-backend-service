@@ -1,15 +1,15 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.adapter;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateDTO;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StateRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
 import java.io.IOException;
 import java.nio.ByteBuffer;

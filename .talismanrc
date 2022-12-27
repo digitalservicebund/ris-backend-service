@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_edited_fields.json
     checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
   - filename: build.gradle
-    checksum: 70401b79f1f7173495d9e3aff38b331c89f16b7bdbd69cf7f5786b92cb31f36b
+    checksum: a304dd4e57d96c20619001e83fc36bfdfdde20af1b148518ac3b3af052329558
   - filename: run.sh
     checksum: 8264b9c27c4718925962dae062bbdcd3cb75262f86189fc245948ce2ca3db3d7
   - filename: .github/workflows/pipeline.yml
@@ -130,7 +130,7 @@ fileignoreconfig:
   - filename: web/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
   - filename: src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: cbaac63b7f675892be19aadef273a8fb5015b69f81d34cdb1eaad145d08924da
+    checksum: 03ea5108f9e51ea8da5ed999ad6f20fa483b3d62e8ab0a85a81c1f5602cf2257
   - filename: web/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: web/src/composables/useTransformNestedData.ts

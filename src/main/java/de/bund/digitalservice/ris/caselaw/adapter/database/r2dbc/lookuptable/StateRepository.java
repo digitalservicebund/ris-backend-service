@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.lookuptable.state;
+package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
 import org.springframework.data.repository.reactive.ReactiveSortingRepository;
 import org.springframework.stereotype.Repository;

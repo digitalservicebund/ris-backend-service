@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype;
+package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
