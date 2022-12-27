@@ -1,4 +1,4 @@
-# frontend
+# Frontend
 
 Built with Vue
 
@@ -6,12 +6,16 @@ Built with Vue
 
 **Node.js 16.14.2**
 
+```bash
+brew install node
+```
+
 The repository contains a `.node-version` file to set up the required Node.js version automatically with [nodenv](https://github.com/nodenv/nodenv).
 
 Install dependencies:
 
 ```bash
-npm i
+npm install
 ```
 
 For E2E and a11y testing with [Playwright](https://playwright.dev/docs/intro) you will need to install the supported browsers:

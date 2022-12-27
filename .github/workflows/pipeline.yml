@@ -28,8 +28,10 @@ jobs:
           distribution: "temurin"
           cache: gradle
       - name: Grant execute permission for gradlew
+        working-directory: ./frontend
         run: chmod +x gradlew
       - name: Build with Gradle
+        working-directory: ./frontend
         run: ./gradlew build
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
@@ -95,15 +97,17 @@ jobs:
           distribution: "temurin"
           cache: gradle
       - name: Grant execute permission for gradlew
+        working-directory: ./frontend
         run: chmod +x gradlew
       - name: Run license scanner
+        working-directory: ./frontend
         run: ./gradlew checkLicense
       - name: Upload licence report
         uses: actions/upload-artifact@v3.1.1
         with:
           name: licence-reports
           retention-days: 3
-          path: build/reports/dependency-license/backend-licence-report.csv
+          path: backend/build/reports/dependency-license/backend-licence-report.csv
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -208,8 +212,10 @@ jobs:
           distribution: "temurin"
           cache: gradle
       - name: Grant execute permission for gradlew
+        working-directory: ./backend
         run: chmod +x gradlew
       - name: Build container image
+        working-directory: ./backend
         run: ./gradlew bootBuildImage
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
@@ -321,8 +327,10 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
       - name: Grant execute permission for gradlew
+        working-directory: ./backend
         run: chmod +x gradlew
       - name: Scan with SonarQube
+        working-directory: ./backend
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -332,7 +340,7 @@ jobs:
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sonarsource/sonarqube-quality-gate-action@15767f0e4eb489cfdd989dc717fa78c038d0de8a
         with:
-          scanMetadataReportFile: build/sonar/report-task.txt
+          scanMetadataReportFile: backend/build/sonar/report-task.txt
         timeout-minutes: 3 # Force to fail step after specific time
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -416,6 +424,7 @@ jobs:
           distribution: "temurin"
           cache: gradle
       - name: Grant execute permission for gradlew
+        working-directory: ./backend
         run: chmod +x gradlew
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
@@ -426,6 +435,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish backend container image
+        working-directory: ./backend
         run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} ./gradlew bootBuildImage --publishImage
       - name: Install cosign
         # Third-party action, pin to commit SHA!
