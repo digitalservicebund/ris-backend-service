@@ -1,10 +1,9 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto
 
 import java.time.LocalDate
-import java.util.*
 
 class NormDto(
-    val guid: UUID,
+    val guid: String,
     val officialLongTitle: String,
     var officialShortTitle: String?,
     var publicationDate: String?,

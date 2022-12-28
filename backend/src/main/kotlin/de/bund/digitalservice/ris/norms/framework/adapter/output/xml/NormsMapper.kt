@@ -7,9 +7,9 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.Article
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ParagraphDto
 
-fun mapNormToDto(norm: Norm): NormDto {
-    return NormDto(
-        guid = norm.guid,
+fun mapNormToDto(norm: Norm) =
+    NormDto(
+        guid = norm.guid.toString(),
         officialLongTitle = norm.officialLongTitle,
         officialShortTitle = norm.officialShortTitle,
         publicationDate = norm.publicationDate?.toString(),
@@ -19,21 +19,32 @@ fun mapNormToDto(norm: Norm): NormDto {
         participationInstitution = getMappedValue(Property.PARTICIPATION_INSTITUTION, norm.participationInstitution ?: ""),
         printAnnouncementGazette = norm.printAnnouncementGazette,
         printAnnouncementPage = norm.printAnnouncementPage,
-        articles = norm.articles.map { mapArticleToDto(it) }
+        articles = norm.articles.mapIndexed { index, article ->
+            mapArticleToDto(article, index)
+        }
     )
-}
 
-fun mapArticleToDto(article: Article) =
+fun mapArticleToDto(article: Article, ordinalNumber: Int = 1) =
     ArticleDto(
         guid = article.guid.toString(),
         title = article.title,
-        marker = article.marker,
-        paragraphs = article.paragraphs.map { mapParagraphToDto(it) }
+        marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber",
+        markerText = article.marker,
+        paragraphs =
+        article.paragraphs.mapIndexed { index, paragraph ->
+            mapParagraphToDto(paragraph, index)
+        }
     )
 
-fun mapParagraphToDto(paragraph: Paragraph) =
+fun mapParagraphToDto(paragraph: Paragraph, ordinalNumber: Int = 1) =
     ParagraphDto(
         guid = paragraph.guid.toString(),
-        marker = paragraph.marker,
+        marker = parseMarkerFromMarkerText(paragraph.marker) ?: "$ordinalNumber",
+        markerText = paragraph.marker,
         text = paragraph.text
     )
+
+const val MARKER_PATTERN = "[a-zäöüß0-9]+(\\.[a-zäöüß0-9]+)*"
+
+fun parseMarkerFromMarkerText(markerText: String?) =
+    markerText?.let { MARKER_PATTERN.toRegex().find(markerText)?.value }

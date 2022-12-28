@@ -6,5 +6,6 @@ data class ArticleDto(
     val guid: String,
     var title: String? = null,
     val marker: String,
+    val markerText: String,
     var paragraphs: List<ParagraphDto> = listOf()
 )

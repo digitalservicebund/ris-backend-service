@@ -234,12 +234,12 @@ class ToLegalDocMLConverterTest {
     @Test
     fun `it creates and article element with its paragraph and content`() {
         val paragraph =
-            Paragraph(UUID.randomUUID(), marker = "test paragraph marker", text = "test paragraph text")
+            Paragraph(UUID.randomUUID(), marker = "§ 1.1", text = "test paragraph text")
         val article =
             Article(
                 UUID.randomUUID(),
                 title = "test article title",
-                marker = "test article marker",
+                marker = "§ 9a",
                 paragraphs = listOf(paragraph)
             )
         val norm = createRandomNorm().copy(articles = listOf(article))
@@ -249,14 +249,18 @@ class ToLegalDocMLConverterTest {
         val articleElement = getFirstChildNodeWithTagName(body, "akn:article")
         val articleHeading = getFirstChildNodeWithTagName(articleElement, "akn:heading")
         val articleNumber = getFirstChildNodeWithTagName(articleElement, "akn:num")
+        val articleMarker = getFirstChildNodeWithTagName(articleNumber, "akn:marker")
         val paragraphElement = getFirstChildNodeWithTagName(articleElement, "akn:paragraph")
         val paragraphNumber = getFirstChildNodeWithTagName(paragraphElement, "akn:num")
+        val paragraphMarker = getFirstChildNodeWithTagName(paragraphNumber, "akn:marker")
         val paragraphContent = getFirstChildNodeWithTagName(paragraphElement, "akn:content")
         val paragraphContentP = getFirstChildNodeWithTagName(paragraphContent, "akn:p")
 
         assertThat(articleHeading.textContent.trim()).isEqualTo("test article title")
-        assertThat(articleNumber.textContent.trim()).isEqualTo("test article marker")
-        assertThat(paragraphNumber.textContent.trim()).isEqualTo("test paragraph marker")
+        assertThat(articleNumber.textContent.trim()).isEqualTo("§ 9a")
+        assertThat(articleMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("9a")
+        assertThat(paragraphNumber.textContent.trim()).isEqualTo("§ 1.1")
+        assertThat(paragraphMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("1.1")
         assertThat(paragraphContentP.textContent.trim()).isEqualTo("test paragraph text")
     }
 
