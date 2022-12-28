@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.Article
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ParagraphDto
 
-fun normToDto(norm: Norm): NormDto {
+fun mapNormToDto(norm: Norm): NormDto {
     return NormDto(
         guid = norm.guid,
         officialLongTitle = norm.officialLongTitle,
@@ -19,14 +19,21 @@ fun normToDto(norm: Norm): NormDto {
         participationInstitution = norm.participationInstitution,
         printAnnouncementGazette = norm.printAnnouncementGazette,
         printAnnouncementPage = norm.printAnnouncementPage,
-        articles = articlesToDto(norm.articles)
+        articles = norm.articles.map { mapArticleToDto(it) }
     )
 }
 
-fun articlesToDto(articles: List<Article>): List<ArticleDto> {
-    return articles.map { ArticleDto(it.guid, it.title, it.marker, paragraphsToDto(it.paragraphs)) }
-}
+fun mapArticleToDto(article: Article) =
+    ArticleDto(
+        guid = article.guid.toString(),
+        title = article.title,
+        marker = article.marker,
+        paragraphs = article.paragraphs.map { mapParagraphToDto(it) }
+    )
 
-fun paragraphsToDto(paragraphs: List<Paragraph>): List<ParagraphDto> {
-    return paragraphs.map { ParagraphDto(it.guid, it.marker, it.text) }
-}
+fun mapParagraphToDto(paragraph: Paragraph) =
+    ParagraphDto(
+        guid = paragraph.guid.toString(),
+        marker = paragraph.marker,
+        text = paragraph.text
+    )

@@ -13,7 +13,7 @@ class ToLegalDocMLConverter() : ConvertNormToXmlOutputPort {
         val writer = StringWriter()
         DefaultMustacheFactory()
             .compile("legaldocml/templates/regular-form.mustache")
-            .execute(writer, normToDto(norm))
+            .execute(writer, mapNormToDto(norm))
             .flush()
         return Mono.just(writer.toString())
     }
