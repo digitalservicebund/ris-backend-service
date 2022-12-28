@@ -138,7 +138,7 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: 9958c0459654c74faa57b5a47de5aeb4698ba7e3713b313a4864ec3e701e8e46
   - filename: frontend/.env.development
-    checksum: 131da0ec785871a9d38af7866c14edc7fa4af46bd1030c5eaef8a3b2ea6302fb
+    checksum: b87426c20cb1da4785bf52714577b2211ced4673c555418bf8c2e198fa615ea3
   - filename: frontend/playwright.config.ts
     checksum: beb96d2152ae186fe622a43cba45cfb6c39c626fd22c315b39b7a1a08aff6688
   - filename: frontend/sonar-project.properties
