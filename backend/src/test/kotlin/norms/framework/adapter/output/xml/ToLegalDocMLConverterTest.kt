@@ -130,8 +130,20 @@ class ToLegalDocMLConverterTest {
     }
 
     @Test
-    fun `it creates the metadata tag with proper data`() {
-        val norm =
+    fun `it creates the constant metadata tags `() {
+        val document = convertNormToLegalDocML(createRandomNorm())
+
+        val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
+        val form = getFirstChildNodeWithTagName(metadata, "meta:form")
+        val summary = getFirstChildNodeWithTagName(metadata, "meta:fassung")
+
+        assertThat(form.textContent.trim()).isEqualTo("stammform")
+        assertThat(summary.textContent.trim()).isEqualTo("verkuendungsfassung")
+    }
+
+    @Test
+    fun `it creates the metadata tag with default values if no match found`() {
+        val document = convertNormToLegalDocML(
             createRandomNorm()
                 .copy(
                     documentTypeName = "documentTypeName",
@@ -139,22 +151,84 @@ class ToLegalDocMLConverterTest {
                     providerDecidingBody = "providerDecidingBody",
                     participationInstitution = "participationInstitution"
                 )
-        val document = convertNormToLegalDocML(norm)
+        )
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
         val type = getFirstChildNodeWithTagName(metadata, "meta:typ")
-        val form = getFirstChildNodeWithTagName(metadata, "meta:form")
-        val summary = getFirstChildNodeWithTagName(metadata, "meta:fassung")
         val category = getFirstChildNodeWithTagName(metadata, "meta:art")
         val initiant = getFirstChildNodeWithTagName(metadata, "meta:initiant")
         val participant = getFirstChildNodeWithTagName(metadata, "meta:bearbeitendeInstitution")
 
-        assertThat(type.textContent.trim()).isEqualTo("documentTypeName")
-        assertThat(form.textContent.trim()).isEqualTo("stammform")
-        assertThat(summary.textContent.trim()).isEqualTo("verkuendungsfassung")
-        assertThat(category.textContent.trim()).isEqualTo("documentNormCategory")
-        assertThat(initiant.textContent.trim()).isEqualTo("providerDecidingBody")
-        assertThat(participant.textContent.trim()).isEqualTo("participationInstitution")
+        assertThat(type.textContent.trim()).isEqualTo("gesetz")
+        assertThat(category.textContent.trim()).isEqualTo("regelungstext")
+        assertThat(initiant.textContent.trim()).isEqualTo("nicht-vorhanden")
+        assertThat(participant.textContent.trim()).isEqualTo("nicht-vorhanden")
+    }
+
+    @Test
+    fun `it creates the metadata tag with default values if null provided`() {
+        val document = convertNormToLegalDocML(
+            createRandomNorm()
+                .copy(
+                    documentTypeName = null,
+                    documentNormCategory = null,
+                    providerDecidingBody = null,
+                    participationInstitution = null
+                )
+        )
+
+        val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
+        val type = getFirstChildNodeWithTagName(metadata, "meta:typ")
+        val category = getFirstChildNodeWithTagName(metadata, "meta:art")
+        val initiant = getFirstChildNodeWithTagName(metadata, "meta:initiant")
+        val participant = getFirstChildNodeWithTagName(metadata, "meta:bearbeitendeInstitution")
+
+        assertThat(type.textContent.trim()).isEqualTo("gesetz")
+        assertThat(category.textContent.trim()).isEqualTo("regelungstext")
+        assertThat(initiant.textContent.trim()).isEqualTo("nicht-vorhanden")
+        assertThat(participant.textContent.trim()).isEqualTo("nicht-vorhanden")
+    }
+
+    @Test
+    fun `it creates the metadata tag with mapped values if a match found`() {
+        val document = convertNormToLegalDocML(
+            createRandomNorm()
+                .copy(
+                    documentTypeName = "SO",
+                    documentNormCategory = "Rechtsetzungsdokument",
+                    providerDecidingBody = "Präsident des Deutschen Bundestages",
+                    participationInstitution = "Bundeskanzleramt"
+                )
+        )
+
+        val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
+        val type = getFirstChildNodeWithTagName(metadata, "meta:typ")
+        val category = getFirstChildNodeWithTagName(metadata, "meta:art")
+        val initiant = getFirstChildNodeWithTagName(metadata, "meta:initiant")
+        val participant = getFirstChildNodeWithTagName(metadata, "meta:bearbeitendeInstitution")
+
+        assertThat(type.textContent.trim()).isEqualTo("sonstige-bekanntmachung")
+        assertThat(category.textContent.trim()).isEqualTo("rechtsetzungsdokument")
+        assertThat(initiant.textContent.trim()).isEqualTo("bundestag")
+        assertThat(participant.textContent.trim()).isEqualTo("bundesregierung")
+    }
+
+    @Test
+    fun `it creates the metadata tag with mapped values if a partial match found`() {
+        val document = convertNormToLegalDocML(
+            createRandomNorm()
+                .copy(
+                    providerDecidingBody = "Bundesministerinnen",
+                    participationInstitution = "BMinisterium"
+                )
+        )
+
+        val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
+        val initiant = getFirstChildNodeWithTagName(metadata, "meta:initiant")
+        val participant = getFirstChildNodeWithTagName(metadata, "meta:bearbeitendeInstitution")
+
+        assertThat(initiant.textContent.trim()).isEqualTo("bundesregierung")
+        assertThat(participant.textContent.trim()).isEqualTo("bundesregierung")
     }
 
     @Test

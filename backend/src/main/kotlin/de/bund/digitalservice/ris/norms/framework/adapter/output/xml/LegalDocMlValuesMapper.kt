@@ -24,9 +24,8 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
         "gesetz",
         listOf(
             MappedValue("verordnung", listOf("RV")),
-            MappedValue("satzung", listOf("SN")),
             MappedValue("verwaltungsvorschrift", listOf("VV")),
-            MappedValue("sonstige-bekanntmachung", listOf("SB"))
+            MappedValue("sonstige-bekanntmachung", listOf("SB", "OQ", "SO"))
         )
     ),
     MappedValues(
@@ -56,8 +55,8 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
             MappedValue(
                 "bundesregierung",
                 listOf(
-                    "BMin*",
-                    "Bundesminister*",
+                    "BMin.*",
+                    "Bundesminister.*",
                     "BMVBS",
                     "BMU",
                     "BMV",
@@ -89,11 +88,7 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
                     "BMZ",
                     "BMWA",
                     "BMIBH",
-                    "BMFJ",
-                    "BT",
-                    "Präsident des Deutschen Bundestages",
-                    "Präsidentin des Deutschen Bundestages",
-                    "Direktor beim Deutschen Bundestag"
+                    "BMFJ"
                 )
             )
         )
@@ -118,7 +113,7 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
             MappedValue(
                 "bundesregierung",
                 listOf(
-                    "BMin*",
+                    "BMin.*",
                     "BMAS",
                     "BMA",
                     "BMP",
@@ -127,7 +122,7 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
                     "BMWi",
                     "BMJ",
                     "BMPT",
-                    "Bundesminister*",
+                    "Bundesminister.*",
                     "BMWF",
                     "BML",
                     "BMV",
@@ -156,6 +151,6 @@ fun getMappedValue(property: Property, value: String): String? {
     }
 
     return mappedValues?.values?.firstOrNull {
-        it.oldValues.contains(value)
+        it.oldValues.any { oldValue -> value.contains(Regex("^$oldValue$")) }
     }?.newValue ?: mappedValues?.defaultValue
 }
