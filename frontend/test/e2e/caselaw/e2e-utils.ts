@@ -14,6 +14,14 @@ export const navigateToFiles = async (page: Page, documentNumber: string) => {
   await expect(page.locator("h1:has-text('Dokumente')")).toBeVisible()
 }
 
+export const navigateToPublication = async (
+  page: Page,
+  documentNumber: string
+) => {
+  await page.goto(`/caselaw/documentunit/${documentNumber}/publication`)
+  await expect(page.locator("h1:has-text('Veröffentlichen')")).toBeVisible()
+}
+
 export const uploadTestfile = async (page: Page, filename: string) => {
   const [fileChooser] = await Promise.all([
     page.waitForEvent("filechooser"),
