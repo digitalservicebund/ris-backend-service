@@ -14,7 +14,7 @@ import { InputType, ValidationError } from "@/domain"
 interface Props {
   id: string
   type?: InputType
-  modelValue?: ModelType
+  modelValue: ModelType
   attributes: InputAttributes
   validationError?: ValidationError
 }

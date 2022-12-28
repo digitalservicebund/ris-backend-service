@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useRoute } from "vue-router"
-import type { RouteLocationRaw } from "vue-router"
+import type { RouteLocationRaw, RouteRecordName } from "vue-router"
 
 interface Props {
   menuItems: LevelOneMenuItem[]
@@ -95,7 +95,7 @@ function routesAreMatching(
   )
 }
 
-type ParsedLocation = { path?: string; name?: string; hash?: string }
+type ParsedLocation = { path?: string; name?: RouteRecordName; hash?: string }
 
 function parseRouteLocation(route: RouteLocationRaw): ParsedLocation {
   if (typeof route === "string") {
