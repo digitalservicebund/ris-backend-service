@@ -55,7 +55,7 @@ dependencies {
     exclude group: "io.netty", module: "netty-tcnative-classes"
     because("CVE-2021-43797, not using Tomcat")
   }
-  implementation "io.projectreactor.netty:reactor-netty-core:1.0.24"
+  implementation "io.projectreactor.netty:reactor-netty-core:1.1.1"
   implementation("org.yaml:snakeyaml:1.33") { because("CVE-2022-25857") }
 
   // update this, when update spring boot to 3.x
