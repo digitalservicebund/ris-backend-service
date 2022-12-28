@@ -44,4 +44,81 @@ describe("DocumentUnit", () => {
     const documentUnit = new DocumentUnit("foo", { s3path: "foo-path" })
     expect(documentUnit.hasFile).toBeTruthy()
   })
+
+  it("returns all missing required fields", () => {
+    const documentUnit = new DocumentUnit("foo", { s3path: "foo-path" })
+    expect(documentUnit.missingRequiredFields).toStrictEqual([
+      "fileNumbers",
+      "court",
+      "decisionDate",
+      "legalEffect",
+      "category",
+    ])
+  })
+
+  //TODO naming
+  it("returns all missing required fields but one", () => {
+    const documentUnit = new DocumentUnit("foo", {
+      s3path: "foo-path",
+      coreData: { legalEffect: "foo" },
+    })
+    expect(documentUnit.missingRequiredFields).toStrictEqual([
+      "fileNumbers",
+      "court",
+      "decisionDate",
+      "category",
+    ])
+  })
+
+  //TODO naming
+  it("returns all missing required with empty array", () => {
+    const documentUnit = new DocumentUnit("foo", {
+      s3path: "foo-path",
+      coreData: { fileNumbers: [] },
+    })
+    expect(documentUnit.missingRequiredFields).toStrictEqual([
+      "fileNumbers",
+      "court",
+      "decisionDate",
+      "legalEffect",
+      "category",
+    ])
+  })
+
+  //TODO naming
+  it("returns all missing required fields with empty string", () => {
+    const documentUnit = new DocumentUnit("foo", {
+      s3path: "foo-path",
+      coreData: { decisionDate: "" },
+    })
+    expect(documentUnit.missingRequiredFields).toStrictEqual([
+      "fileNumbers",
+      "court",
+      "decisionDate",
+      "legalEffect",
+      "category",
+    ])
+  })
+
+  //TODO naming
+  it("returns all missing required fields", () => {
+    const documentUnit = new DocumentUnit("foo", {
+      s3path: "foo-path",
+      coreData: { legalEffect: "foo" },
+    })
+    expect(documentUnit.missingRequiredFields).toStrictEqual([
+      "fileNumbers",
+      "court",
+      "decisionDate",
+      "category",
+    ])
+  })
+
+  it("returns true when field is required", () => {
+    expect(DocumentUnit.isRequiredField("fileNumbers")).toBeTruthy()
+  })
+
+  it("returns true when field is required", () => {
+    expect(DocumentUnit.isRequiredField("ECLI")).toBeFalsy()
+  })
 })

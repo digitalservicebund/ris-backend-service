@@ -111,14 +111,15 @@ describe("PublicationDocument:", () => {
   })
 
   describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
-    it("without email address", async () => {
+    it("with default email address", async () => {
       const { emitted } = setupWithAllRequiredFields()
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
       })
       await fireEvent.click(publishButton)
 
-      expect(emitted().publishADocument).toBeFalsy()
+      expect(emitted().publishADocument).toBeTruthy()
+      expect(emitted().publishADocument[0]).toEqual(["dokmbx@juris.de"])
     })
 
     it("with invalid email address", async () => {
@@ -126,7 +127,10 @@ describe("PublicationDocument:", () => {
       const inputReceiverAddress = screen.getByLabelText(
         "Empfängeradresse E-Mail"
       )
-      await fireEvent.update(inputReceiverAddress, "test-email")
+
+      await userEvent.clear(inputReceiverAddress)
+      await userEvent.type(inputReceiverAddress, "test.email")
+      await userEvent.tab()
 
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
@@ -214,89 +218,6 @@ describe("PublicationDocument:", () => {
         `errorEs sind noch nicht alle Pflichtfelder befüllt.Die Dokumentationseinheit kann nicht veröffentlicht werden.`
       )
     })
-
-    describe("on press 'Dokumentationseinheit veröffentlichen'", () => {
-      it("without email address", async () => {
-        const { emitted } = setupWithPublishedDocument()
-        const inputReceiverAddress = screen.getByLabelText(
-          "Empfängeradresse E-Mail"
-        )
-
-        await userEvent.clear(inputReceiverAddress)
-        await userEvent.tab()
-
-        const publishButton = screen.getByRole("button", {
-          name: "Dokumentationseinheit veröffentlichen",
-        })
-        await fireEvent.click(publishButton)
-
-        expect(emitted().publishADocument).toBeFalsy()
-      })
-
-      it("with invalid email address", async () => {
-        const { emitted } = setupWithPublishedDocument()
-        const inputReceiverAddress = screen.getByLabelText(
-          "Empfängeradresse E-Mail"
-        )
-
-        await userEvent.type(inputReceiverAddress, "test.email")
-        await userEvent.tab()
-
-        const publishButton = screen.getByRole("button", {
-          name: "Dokumentationseinheit veröffentlichen",
-        })
-        await fireEvent.click(publishButton)
-
-        expect(emitted().publishADocument).toBeFalsy()
-      })
-
-      it("with valid email address", async () => {
-        const { emitted } = setupWithPublishedDocument()
-        const inputReceiverAddress = screen.getByLabelText(
-          "Empfängeradresse E-Mail"
-        )
-
-        await userEvent.type(inputReceiverAddress, "test.email@test.com")
-        await userEvent.tab()
-
-        const publishButton = screen.getByRole("button", {
-          name: "Dokumentationseinheit veröffentlichen",
-        })
-        await fireEvent.click(publishButton)
-
-        expect(emitted().publishADocument).toBeTruthy()
-        expect(emitted().publishADocument[0]).toEqual(["test.email@test.com"])
-      })
-      it("shows success modal when successfully published xml", async () => {
-        render(PublicationDocument, {
-          props: {
-            documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
-            publishResult: {
-              xml: "xml",
-              statusMessages: [],
-              statusCode: "200",
-              receiverAddress: "receiver address",
-              mailSubject: "mail subject",
-              publishDate: undefined,
-            },
-            succeedMessage: {
-              title: "success title",
-              description: "success description",
-            },
-          },
-          global: {
-            plugins: [router],
-          },
-        })
-
-        expect(
-          screen.getByLabelText("Erfolg der Veröffentlichung")
-        ).toBeInTheDocument()
-        expect(
-          screen.queryByLabelText("Fehler bei Veröffentlichung")
-        ).not.toBeInTheDocument()
-      })
-    })
   })
 
   describe("last published xml", () => {
@@ -328,27 +249,16 @@ describe("PublicationDocument:", () => {
 
   it("with stubbing", () => {
     const { container } = render(PublicationDocument, {
-      global: {
-        plugins: [
-          createRouter({
-            history: createWebHistory(),
-            routes: [
-              {
-                path: "",
-                name: "caselaw-documentUnit-:documentNumber-categories",
-                component: {},
-              },
-            ],
-          }),
-        ],
-        stubs: {
-          CodeSnippet: {
-            template: '<div data-testid="code-snippet"/>',
-          },
-        },
-      },
       props: {
-        documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
+        documentUnit: new DocumentUnit("123", {
+          coreData: {
+            fileNumbers: ["foo"],
+            court: { type: "type", location: "location", label: "label" },
+            decisionDate: "2022-02-01",
+            legalEffect: "legalEffect",
+            category: "category",
+          },
+        }),
         lastPublishedXmlMail: {
           xml: "xml content",
           statusMessages: "success",
@@ -358,7 +268,16 @@ describe("PublicationDocument:", () => {
           publishDate: "01.02.2000",
         },
       },
+      global: {
+        plugins: [router],
+        stubs: {
+          CodeSnippet: {
+            template: '<div data-testid="code-snippet"/>',
+          },
+        },
+      },
     })
+
     expect(container).toHaveTextContent(
       `Veröffentlichen1. Plausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefüllt2. Empfänger der Export-EmailEmpfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000ÜBERE-Mail an: receiver address Betreff: mail subjectALS`
     )

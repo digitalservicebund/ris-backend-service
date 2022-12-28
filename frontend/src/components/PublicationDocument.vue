@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue"
+import { ref, computed } from "vue"
+import { RouterLink } from "vue-router"
 import InputField from "./InputField.vue"
 import TextButton from "./TextButton.vue"
 import TextInput from "./TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import DocumentUnit, { CoreData, Court } from "@/domain/documentUnit"
+import { fieldLabels } from "@/domain"
+import DocumentUnit from "@/domain/documentUnit"
 import XmlMail from "@/domain/xmlMail"
 import { InfoStatus } from "@/enum/enumInfoStatus"
 import { ResponseError } from "@/services/httpClient"
@@ -26,7 +28,7 @@ const categoriesRoute = computed(() => ({
   name: "caselaw-documentUnit-:documentNumber-categories",
   params: { documentNumber: props.documentUnit.documentNumber },
 }))
-const receiverAddress = ref("")
+const receiverAddress = ref("dokmbx@juris.de")
 const emailAddressInvalid = ref(false)
 const isFirstTimePublication = computed(() => {
   return !props.lastPublishedXmlMail
@@ -62,39 +64,13 @@ function validateEmailAddress(): boolean {
 function selectAll(event: Event) {
   ;(event.target as HTMLInputElement).select()
 }
-//TODO: import coreDatefields, filter for required fields
-const requiredFields = [
-  { name: "fileNumbers", displayName: "Aktenzeichen" },
-  { name: "court", displayName: "Gericht" },
-  { name: "decisionDate", displayName: "Entscheidungsdatum" },
-  { name: "legalEffect", displayName: "Rechtskraft" },
-  { name: "category", displayName: "Dokumenttyp" },
-]
 
-const missingFields = ref<string[]>([])
+const missingFields = ref(
+  props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field])
+)
 const fieldsMissing = computed(() =>
   missingFields.value.length ? true : false
 )
-
-function checkMissingValues(value: string | unknown[] | Court | undefined) {
-  //TODO: check for any invalid/ missing values
-  if (value instanceof Array && value.length === 0) return true
-  else return false
-}
-
-onMounted(() => {
-  const coreData = { ...props.documentUnit.coreData }
-
-  //TODO: do this check in documentUnit
-  requiredFields.forEach((field) => {
-    if (
-      !Object.keys(coreData).includes(field.name) ||
-      checkMissingValues(coreData[field.name as keyof CoreData])
-    ) {
-      missingFields.value.push(field.displayName)
-    }
-  })
-})
 </script>
 
 <template>
@@ -125,13 +101,13 @@ onMounted(() => {
               </li>
             </ul>
           </div>
-          <router-link :to="categoriesRoute"
+          <RouterLink :to="categoriesRoute"
             ><TextButton
               aria-label="Rubriken bearbeiten"
               button-type="tertiary"
               class="w-fit"
               label="Rubriken bearbeiten"
-          /></router-link>
+          /></RouterLink>
         </div>
       </div>
       <div v-else class="flex flex-row gap-8">

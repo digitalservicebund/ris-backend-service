@@ -53,6 +53,14 @@ export default class DocumentUnit {
   public texts: Texts = {}
   public previousDecisions?: PreviousDecision[]
 
+  static requiredFields = [
+    "fileNumbers",
+    "court",
+    "decisionDate",
+    "legalEffect",
+    "category",
+  ] as const
+
   constructor(uuid: string, data: Partial<DocumentUnit> = {}) {
     this.uuid = String(uuid)
 
@@ -75,5 +83,31 @@ export default class DocumentUnit {
   }
   get hasFile(): boolean {
     return !!this.s3path
+  }
+  get missingRequiredFields() {
+    return DocumentUnit.requiredFields.filter((field) =>
+      this.isEmpty(this.coreData[field])
+    )
+  }
+  public static isRequiredField(fieldName: string) {
+    return DocumentUnit.requiredFields.some(
+      (requiredfieldName) => requiredfieldName === fieldName
+    )
+  }
+  public isEmpty(
+    value: CoreData[
+      | "fileNumbers"
+      | "court"
+      | "decisionDate"
+      | "legalEffect"
+      | "category"]
+  ) {
+    if (value === undefined || !value) {
+      return true
+    }
+    if (value instanceof Array && value.length === 0) {
+      return true
+    }
+    return false
   }
 }

@@ -6,12 +6,12 @@ import {
 } from "./types"
 import type { InputField, DropdownItem } from "./types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
+import DocumentUnit from "@/domain/documentUnit"
 
 export function defineTextField(
   name: string,
   label: string,
   ariaLabel: string,
-  required?: boolean,
   placeholder?: string,
   validationError?: ValidationError,
   readOnly?: boolean
@@ -20,7 +20,7 @@ export function defineTextField(
     name,
     type: InputType.TEXT,
     label,
-    required,
+    required: DocumentUnit.isRequiredField(name),
     inputAttributes: {
       ariaLabel,
       placeholder,
@@ -34,14 +34,13 @@ export function defineChipsField(
   name: string,
   label: string,
   ariaLabel: string,
-  required?: boolean,
   placeholder?: string
 ): InputField {
   return {
     name,
     type: InputType.CHIPS,
     label,
-    required,
+    required: DocumentUnit.isRequiredField(name),
     inputAttributes: {
       ariaLabel,
       placeholder,
@@ -53,14 +52,13 @@ export function defineChipsDateField(
   name: string,
   label: string,
   ariaLabel: string,
-  required?: boolean,
   placeholder?: string
 ): InputField {
   return {
     name,
     type: InputType.DATECHIPS,
     label,
-    required,
+    required: DocumentUnit.isRequiredField(name),
     inputAttributes: {
       ariaLabel,
       placeholder,
@@ -72,14 +70,13 @@ export function defineDateField(
   name: string,
   label: string,
   ariaLabel: string,
-  required?: boolean,
   validationError?: ValidationError
 ): InputField {
   return {
     name,
     type: InputType.DATE,
     label,
-    required,
+    required: DocumentUnit.isRequiredField(name),
     inputAttributes: { ariaLabel, validationError },
   }
 }
@@ -88,7 +85,6 @@ export function defineDropdownField(
   name: string,
   label: string,
   ariaLabel: string,
-  required?: boolean,
   placeholder?: string,
   isCombobox?: boolean,
   dropdownItems?: DropdownItem[],
@@ -99,7 +95,7 @@ export function defineDropdownField(
     name,
     type: InputType.DROPDOWN,
     label,
-    required,
+    required: DocumentUnit.isRequiredField(name),
     inputAttributes: {
       ariaLabel,
       placeholder,
@@ -131,7 +127,6 @@ export const courtFields: InputField[] = [
     "court",
     "Gericht",
     "Gericht",
-    true,
     "Gerichtstyp Gerichtsort",
     true,
     [],
@@ -147,14 +142,12 @@ export const coreDataFields: InputField[] = [
         "fileNumbers",
         "Aktenzeichen",
         "Aktenzeichen",
-        true,
         ""
       ),
       child: defineChipsField(
         "deviatingFileNumbers",
         "Abweichendes Aktenzeichen",
         "Abweichendes Aktenzeichen",
-        false,
         ""
       ),
     }
@@ -167,14 +160,12 @@ export const coreDataFields: InputField[] = [
         "decisionDate",
         "Entscheidungsdatum",
         "Entscheidungsdatum",
-        true,
         undefined
       ),
       child: defineChipsDateField(
         "deviatingDecisionDates",
         "Abweichendes Entscheidungsdatum",
         "Abweichendes Entscheidungsdatum",
-        false,
         undefined
       ),
     }
@@ -184,7 +175,6 @@ export const coreDataFields: InputField[] = [
     "category",
     "Dokumenttyp",
     "Dokumenttyp",
-    true,
     "Bitte auswählen",
     true,
     [],
@@ -194,20 +184,14 @@ export const coreDataFields: InputField[] = [
     "Abweichender ECLI",
     "nestedInputOfEcliAndDeviatingEclis",
     {
-      parent: defineTextField(
-        "ecli",
-        "ECLI",
-        "ECLI",
-        false,
-        "",
-        { defaultMessage: "", field: "" },
-        false
-      ),
+      parent: defineTextField("ecli", "ECLI", "ECLI", "", {
+        defaultMessage: "",
+        field: "",
+      }),
       child: defineChipsField(
         "deviatingEclis",
         "Abweichender ECLI",
         "Abweichender ECLI",
-        false,
         ""
       ),
     }
@@ -217,7 +201,6 @@ export const coreDataFields: InputField[] = [
     "legalEffect",
     "Rechtskraft",
     "Rechtskraft",
-    true,
     "",
     false,
     legalEffectTypes.items,
@@ -227,9 +210,22 @@ export const coreDataFields: InputField[] = [
     "region",
     "Region",
     "Region",
-    false,
     "",
     { defaultMessage: "", field: "" },
     true
   ),
 ]
+
+export const fieldLabels: { [name: string]: string } = Object.assign(
+  {},
+  ...[...coreDataFields, ...courtFields]
+    .reduce((flatArray, field) => {
+      if (field.type === InputType.NESTED) {
+        flatArray.push(field.inputAttributes.fields.parent)
+        flatArray.push(field.inputAttributes.fields.child)
+      } else flatArray.push(field)
+
+      return flatArray
+    }, [] as InputField[])
+    .map((field) => ({ [field.name]: field.label as string }))
+)
