@@ -8,7 +8,7 @@ pre-commit:
     check-format-backend:
       tags: style backend
       root: backend/
-      run: ./gradlew spotlessCheck
+      run: ./gradlew spotlessCheck -DspotlessFiles='{staged_files}'
     frontend-prettier:
       tags: frontend format
       root: frontend/
