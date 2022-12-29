@@ -4,8 +4,8 @@ import java.time.LocalDate
 
 class NormDto(
     val guid: String,
-    val officialLongTitle: String,
-    var officialShortTitle: String?,
+    val officialLongTitle: IdentifiedElement,
+    var officialShortTitle: IdentifiedElement?,
     var publicationDate: String?,
     var documentTypeName: String?,
     var documentNormCategory: String?,

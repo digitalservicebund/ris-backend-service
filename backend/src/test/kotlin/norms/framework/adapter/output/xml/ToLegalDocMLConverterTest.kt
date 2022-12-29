@@ -297,7 +297,7 @@ class ToLegalDocMLConverterTest {
     }
 }
 
-private fun convertNormToLegalDocML(norm: Norm? = null): Document {
+fun convertNormToLegalDocML(norm: Norm? = null): Document {
     val toConvertNorm = norm ?: createRandomNorm()
     val converter = ToLegalDocMLConverter()
     var xmlContent = ""
@@ -313,7 +313,7 @@ private fun convertNormToLegalDocML(norm: Norm? = null): Document {
     return builder.parse(InputSource(StringReader(xmlContent)))
 }
 
-private fun getFirstChildNodeWithTagName(node: Node, tagName: String): Node {
+fun getFirstChildNodeWithTagName(node: Node, tagName: String): Node {
     if (!node.hasChildNodes()) {
         throw Exception("Node has no children!")
     }

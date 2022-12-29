@@ -4,8 +4,8 @@ import kotlin.collections.List
 
 data class ArticleDto(
     val guid: String,
-    var title: String? = null,
+    var title: IdentifiedElement?,
     val marker: String,
-    val markerText: String,
+    val markerText: IdentifiedElement,
     var paragraphs: List<ParagraphDto> = listOf()
 )
