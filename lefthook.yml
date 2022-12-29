@@ -9,10 +9,18 @@ pre-commit:
       tags: style backend
       root: backend/
       run: ./gradlew spotlessCheck
-    check-format-frontend:
-      tags: style frontend
+    frontend-prettier:
+      tags: frontend format
       root: frontend/
-      run: npm run style:check
+      run: npm run --silent prettier:check {staged_files}
+    frontend-eslint:
+      tags: frontend lint
+      root: frontend/
+      run: npm run --silent eslint:check {staged_files}
+    frontend-stylelint:
+      tags: frontend lint
+      root: frontend/
+      run: npm run --silent stylelint:check {staged_files}
     secrets-audit:
       tags: security audit
       run: >
@@ -55,3 +63,7 @@ pre-push:
       # exit 0
       tags: security audit
       run: currentbranch=$(git rev-parse --abbrev-ref HEAD); echo "refs/heads/$currentbranch HEAD refs/heads/$currentbranch $(git log -1 origin/$currentbranch --format='%H')" | talisman --githook pre-push
+
+skip_output:
+  - meta
+  - execution
