@@ -60,7 +60,7 @@ dependencies {
   implementation("org.yaml:snakeyaml:1.33") { because("CVE-2022-25857") }
 
   // update this, when update spring boot to 3.x
-  implementation "ch.qos.logback:logback-classic:1.2.11"
+  implementation "ch.qos.logback:logback-classic:1.4.5"
   implementation "ch.qos.logback:logback-core:1.4.5"
 
   implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
