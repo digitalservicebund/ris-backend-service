@@ -27,6 +27,3 @@ out/
 /dist/
 /nbdist/
 /.nb-gradle/
-
-## local ##
-.local-storage/
