@@ -7,11 +7,11 @@ pre-commit:
   commands:
     check-format-backend:
       tags: style backend
-      root: ./backend/
+      root: backend/
       run: ./gradlew spotlessCheck
     check-format-frontend:
       tags: style frontend
-      root: ./frontend/
+      root: frontend/
       run: npm run style:check
     secrets-audit:
       tags: security audit
@@ -24,11 +24,11 @@ pre-push:
   commands:
     licenses-audit-backend:
       tags: licenses audit backend
-      root: ./backend/
+      root: backend/
       run: ./gradlew checkLicense
     licenses-audit-frontend:
       tags: licenses audit frontend
-      root: ./frontend/
+      root: frontend/
       run: npm run audit:licences > /dev/null;
     secrets-audit:
       # NOTE: there's one caveat with this hook! When pushing, it will only correctly scan the range of
