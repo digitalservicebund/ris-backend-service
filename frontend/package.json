@@ -14,7 +14,7 @@
     "check": "vue-tsc --noEmit && npm run style:check && npm test && npm run test:e2e && npm run test:a11y",
     "dev": "vite",
     "format:check": "prettier --check .",
-    "format:fix": "prettier --write --ignore-unknown .",
+    "format:fix": "prettier --write .",
     "lint:check": "eslint --max-warnings=0 . && stylelint ./src/**/*.{vue,scss}",
     "lint:fix": "eslint --max-warnings=0 --fix . && stylelint --fix ./src/**/*.{vue,scss}",
     "style:check": "vue-tsc && npm run format:check && npm run lint:check",
