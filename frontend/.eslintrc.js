@@ -33,6 +33,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 2022,
   },
+  ignorePatterns: ["dist/"],
   overrides: [
     // Avoid linting JavaScript config files with TypeScript rules...
     {
