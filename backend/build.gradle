@@ -65,8 +65,8 @@ dependencies {
 
   implementation "org.springframework.boot:spring-boot-starter-data-r2dbc"
   implementation "org.postgresql:r2dbc-postgresql:0.9.3.RELEASE"
-//  implementation "org.postgresql:r2dbc-postgresql:1.0.0.RELEASE"
-//  implementation "io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE"
+  //  implementation "org.postgresql:r2dbc-postgresql:1.0.0.RELEASE"
+  //  implementation "io.r2dbc:r2dbc-postgresql:0.8.13.RELEASE"
   implementation "io.r2dbc:r2dbc-spi:1.0.0.RELEASE"
   implementation "io.r2dbc:r2dbc-pool:1.0.0.RELEASE"
 
@@ -133,7 +133,7 @@ dependencies {
   // this is to force transitive dependencies to use 1.0.24 instead of
   // 1.0.23 as that is affected by CVE-2022-31684
   implementation "io.projectreactor.netty:reactor-netty-http:1.1.1"
-  implementation 'org.flywaydb:flyway-core:9.10.2'
+  implementation "org.flywaydb:flyway-core:9.10.2"
   implementation("org.jetbrains.kotlin:kotlin-reflect")
 
   testImplementation "org.jeasy:easy-random-core:5.0.0"
