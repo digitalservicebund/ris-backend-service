@@ -226,3 +226,13 @@ is being added with a yet unknown license the build is going to fail.
 ```bash
 ./gradlew checkLicense
 ```
+
+## Dependency Updates
+
+Can be used to show the latest release version for every dependency. Generate a report in `build/dependencyUpdates/report.txt`.
+
+**To run a scan locally:**
+
+```bash
+./gradlew dependencyUpdates -Drevision=release
+```
