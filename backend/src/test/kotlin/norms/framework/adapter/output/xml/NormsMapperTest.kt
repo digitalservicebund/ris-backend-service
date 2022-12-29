@@ -16,11 +16,12 @@ class MapParagraphToDto {
                 text = "test text"
             )
 
-        val data = mapParagraphToDto(paragraph)
+        val data = mapParagraphToDto(paragraph, articleMarker = "2")
 
         assertThat(data.guid).isEqualTo("53d29ef7-377c-4d14-864b-eb3a85769359")
         assertThat(data.marker).isEqualTo("1")
         assertThat(data.markerText).isEqualTo("1")
+        assertThat(data.articleMarker).isEqualTo("2")
         assertThat(data.text).isEqualTo("test text")
     }
 
@@ -28,7 +29,7 @@ class MapParagraphToDto {
     fun `it correctly parses the marker from the marker text`() {
         val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§ 1a", text = "text")
 
-        val data = mapParagraphToDto(paragraph)
+        val data = mapParagraphToDto(paragraph, "")
 
         assertThat(data.marker).isEqualTo("1a")
         assertThat(data.markerText).isEqualTo("§ 1a")
@@ -38,7 +39,7 @@ class MapParagraphToDto {
     fun `it falls back to the orginal number if no marker could be parsed`() {
         val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§", text = "text")
 
-        val data = mapParagraphToDto(paragraph, 2)
+        val data = mapParagraphToDto(paragraph, "", ordinalNumber = 2)
 
         assertThat(data.marker).isEqualTo("2")
         assertThat(data.markerText).isEqualTo("§")

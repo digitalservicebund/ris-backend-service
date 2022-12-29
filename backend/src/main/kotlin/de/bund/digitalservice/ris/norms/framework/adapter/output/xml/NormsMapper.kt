@@ -24,23 +24,27 @@ fun mapNormToDto(norm: Norm) =
         }
     )
 
-fun mapArticleToDto(article: Article, ordinalNumber: Int = 1) =
-    ArticleDto(
+fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
+    val marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber"
+
+    return ArticleDto(
         guid = article.guid.toString(),
         title = article.title,
-        marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber",
+        marker = marker,
         markerText = article.marker,
         paragraphs =
         article.paragraphs.mapIndexed { index, paragraph ->
-            mapParagraphToDto(paragraph, index)
+            mapParagraphToDto(paragraph, marker, index)
         }
     )
+}
 
-fun mapParagraphToDto(paragraph: Paragraph, ordinalNumber: Int = 1) =
+fun mapParagraphToDto(paragraph: Paragraph, articleMarker: String, ordinalNumber: Int = 1) =
     ParagraphDto(
         guid = paragraph.guid.toString(),
         marker = parseMarkerFromMarkerText(paragraph.marker) ?: "$ordinalNumber",
         markerText = paragraph.marker,
+        articleMarker = articleMarker,
         text = paragraph.text
     )
 

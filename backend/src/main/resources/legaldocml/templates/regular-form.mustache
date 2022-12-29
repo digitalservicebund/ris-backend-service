@@ -53,22 +53,22 @@
         </akn:preface>
         <akn:body refersTo="hauptteil-stammform">
             {{#articles}}
-                <akn:article refersTo="einzelvorschrift-stammform" GUID="{{guid}}" eId="para-1"><!-- refersTo value is constant for us-->
-                    <akn:num GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_bezeichnung-1">
+                <akn:article refersTo="einzelvorschrift-stammform" GUID="{{guid}}" eId="para-{{marker}}"><!-- refersTo value is constant for us-->
+                    <akn:num GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-{{marker}}_bezeichnung-1">
                         <akn:marker name="{{marker}}"/>
                         {{markerText}}
                     </akn:num>
-                    <akn:heading GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_überschrift-1">
+                    <akn:heading GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-{{marker}}_überschrift-1">
                         {{title}}
                     </akn:heading>
                     {{#paragraphs}}
-                        <akn:paragraph GUID="{{guid}}" eId="para-1_abs-1">
-                            <akn:num GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_abs-1_bezeichnung-1">
+                        <akn:paragraph GUID="{{guid}}" eId="para-{{articleMarker}}_abs-{{marker}}">
+                            <akn:num GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-{{articleMarker}}_abs-{{marker}}_bezeichnung-1">
                                 <akn:marker name="{{marker}}"/>
                                 {{markerText}}
                             </akn:num>
-                            <akn:content GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_abs-1_inhalt-1">
-                                <akn:p GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-1_abs-1_inhalt-1_text-1">
+                            <akn:content GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-{{articleMarker}}_abs-{{marker}}_inhalt-1">
+                                <akn:p GUID="abbb08de-e7e2-40ab-aba0-079ce786e6d6" eId="para-{{articleMarker}}_abs-{{marker}}_inhalt-1_text-1">
                                     {{text}}
                                 </akn:p>
                             </akn:content>
