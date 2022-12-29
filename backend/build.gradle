@@ -46,7 +46,7 @@ dependencies {
     because("CVE-2021-43797, not using Tomcat")
   }
   // update this, when update spring boot to 3.x
-  implementation "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:2.1.3"
+  implementation "org.springframework.cloud:spring-cloud-starter-kubernetes-client-config:3.0.0"
 
   // CVE-2022-3171
   implementation "com.google.protobuf:protobuf-java:3.21.12"
