@@ -15,8 +15,8 @@
     "dev": "vite",
     "format:check": "prettier --check .",
     "format:fix": "prettier --write .",
-    "lint:check": "eslint --max-warnings=0 . && stylelint ./src/**/*.{vue,scss}",
-    "lint:fix": "eslint --max-warnings=0 --fix . && stylelint --fix ./src/**/*.{vue,scss}",
+    "lint:check": "eslint --max-warnings=0 . && stylelint .",
+    "lint:fix": "eslint --max-warnings=0 --fix . && stylelint --fix .",
     "style:check": "vue-tsc && npm run format:check && npm run lint:check",
     "style:fix": "npm run format:fix && npm run lint:fix",
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow \"$(. ./parseAllowedLicences.sh)\" --csv --out ./frontend-licence-report.csv"
