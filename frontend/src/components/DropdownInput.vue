@@ -1,11 +1,13 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
+import { onBeforeUnmount, onMounted, ref, computed } from "vue"
+import { useInputModel } from "@/composables/useInputModel"
 import { DropdownInputModelType, DropdownItem } from "@/domain/types"
 
 interface Props {
   id: string
   items: DropdownItem[]
   modelValue?: DropdownInputModelType
+  value?: DropdownInputModelType
   ariaLabel: string
   placeholder?: string
 }
@@ -17,40 +19,33 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
-const selectedLabel = ref<DropdownItem["label"]>()
 
-watch(
-  props,
-  () => {
-    selectedLabel.value = props.items.find(
-      (item) => item.value === props.modelValue
-    )?.label
-  },
-  {
-    immediate: true,
-  }
-)
+const { inputValue } = useInputModel<string, Props, Emits>(props, emits)
+const selectedLabel = computed(() => getLabel(inputValue.value))
 
 const showDropdown = ref(false)
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
 )
-
 const dropdownContainerRef = ref<HTMLElement>()
 const dropdownItemsRef = ref<HTMLElement>()
 const focusedItemIndex = ref(0)
 
-const toggleDropdown = () => {
+function getLabel(value?: DropdownInputModelType) {
+  return props.items.find((item) => item.value === value)?.label
+}
+
+function toggleDropdown() {
   showDropdown.value = !showDropdown.value
   focusedItemIndex.value = 0
 }
 
-const choseItem = (value: DropdownInputModelType) => {
-  showDropdown.value = false
-  emits("update:modelValue", value)
+function choseItem(value: DropdownInputModelType) {
+  closeDropdown()
+  inputValue.value = value
 }
 
-const focusPreviousItem = () => {
+function focusPreviousItem() {
   focusedItemIndex.value -= 1
   const prev = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
@@ -58,7 +53,7 @@ const focusPreviousItem = () => {
   if (prev) prev.focus()
 }
 
-const focusNextItem = () => {
+function focusNextItem() {
   focusedItemIndex.value += 1
   const next = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
@@ -66,7 +61,7 @@ const focusNextItem = () => {
   if (next) next.focus()
 }
 
-const closeDropDownWhenClickOutside = (event: MouseEvent) => {
+function closeDropDownWhenClickOutside(event: MouseEvent) {
   const dropdown = dropdownContainerRef.value
   if (
     !dropdown ||
@@ -77,7 +72,7 @@ const closeDropDownWhenClickOutside = (event: MouseEvent) => {
   closeDropdown()
 }
 
-const closeDropdown = () => {
+function closeDropdown() {
   showDropdown.value = false
 }
 

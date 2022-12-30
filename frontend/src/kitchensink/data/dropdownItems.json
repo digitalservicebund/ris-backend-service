@@ -1,7 +1,0 @@
-{
-  "items": [
-    { "text": "I1 - Dropdown item 1", "value": "I1" },
-    { "text": "I2 - Dropdown item 2", "value": "I2" },
-    { "text": "I3 - Dropdown item 3", "value": "I3" }
-  ]
-}

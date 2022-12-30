@@ -4,7 +4,6 @@ import CheckboxInput from "@/components/CheckboxInput.vue"
 import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
-import ComboboxInput from "@/components/DropdownInput.vue"
 import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
 import {
@@ -13,11 +12,8 @@ import {
   ValidationError,
   NestedInputAttributes,
 } from "@/domain"
-import type { ChipsInputModelType, DropdownItem } from "@/domain/types"
-import dropdownItems from "@/kitchensink/data/dropdownItems.json"
+import type { ChipsInputModelType } from "@/domain/types"
 
-const items: DropdownItem[] = dropdownItems.items
-const comboboxModelValue = ref<string>()
 const dateModelValue = ref<DateInputModelType>()
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])
@@ -34,10 +30,6 @@ const nestedInputFields: NestedInputAttributes["fields"] = {
     "Abweichender Input",
     undefined
   ),
-}
-
-const updateComboboxModelValue = (textValue?: string) => {
-  if (!!textValue) comboboxModelValue.value = textValue
 }
 </script>
 
@@ -86,19 +78,6 @@ const updateComboboxModelValue = (textValue?: string) => {
       :model-value="dateModelValue"
       :value="dateModelValue"
     ></DateInput>
-    <h1 class="font-bold text-24">Dropdown Input</h1>
-    <div class="pb-4">
-      <ComboboxInput
-        id="comboboxInput"
-        aria-label="combobox input"
-        :items="items"
-        :model-value="comboboxModelValue"
-        placeholder="Bitte auswählen"
-        :value="comboboxModelValue"
-        @update:model-value="updateComboboxModelValue"
-      />
-    </div>
-
     <h1 class="font-bold text-24">Chips Input</h1>
     <ChipsInput
       id="ChipsInput"
