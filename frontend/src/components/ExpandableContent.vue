@@ -6,6 +6,7 @@ interface Props {
   isExpanded?: boolean
   openIconName?: string
   closeIconName?: string
+  headerId?: string
 }
 interface Emits {
   (event: "update:isExpanded", value: boolean): void
@@ -15,6 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
   isExpanded: false,
   openIconName: "add",
   closeIconName: "horizontal_rule",
+  headerId: "",
 })
 const emit = defineEmits<Emits>()
 const expandableContainer = ref()
@@ -47,7 +49,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 <template>
   <div class="expandable-content mb-[4rem]">
     <button
-      aria-label="Toggle Content Visibility"
+      :aria-labelledby="headerId"
       class="expandable-content__header"
       @click="toggleContentVisibility"
     >
@@ -70,8 +72,8 @@ const resizeObserver = new ResizeObserver((entries) => {
   </div>
 </template>
 
-<!-- Transitions are difficult to handle with dynamic heights. To use the max-height as 
-  transition parameter is a known workaround for this issue, the max-height doesn't have 
+<!-- Transitions are difficult to handle with dynamic heights. To use the max-height as
+  transition parameter is a known workaround for this issue, the max-height doesn't have
   an effect on the actual height, but is just used to get the transition effect. -->
 
 <style lang="scss" scoped>

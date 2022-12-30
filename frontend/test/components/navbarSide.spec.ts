@@ -7,11 +7,11 @@ import { generateString } from "~/test-helper/dataGenerators"
 describe("NavbarSide", () => {
   it("displays the go back label with related route", async () => {
     await renderComponent({
-      goBackLabel: "Zurück",
+      goBackLabel: "Zur Übersicht",
       goBackRoute: "/origin-route",
     })
 
-    const goBackItem = screen.getByLabelText("Zurück")
+    const goBackItem = screen.getByLabelText("Zur Übersicht")
 
     expect(goBackItem).toBeVisible()
     expect(goBackItem?.getAttribute("href")).toBe("/origin-route")
@@ -24,11 +24,9 @@ describe("NavbarSide", () => {
     ]
 
     await renderComponent({ menuItems })
-    const itemList = screen.getAllByLabelText("Menü Eintrag")
-    const firstItem = itemList[0] as HTMLElement
-    const secondItem = itemList[1] as HTMLElement
+    const firstItem = screen.getByLabelText("first item") as HTMLElement
+    const secondItem = screen.getByLabelText("second item") as HTMLElement
 
-    expect(itemList.length).toBe(2)
     expect(firstItem).toBeVisible()
     expect(secondItem).toBeVisible()
 
@@ -49,11 +47,11 @@ describe("NavbarSide", () => {
     ]
 
     await renderComponent({ menuItems })
-    const subItemList = screen.getAllByLabelText("Submenü Eintrag")
-    const firstSubItem = subItemList[0] as HTMLElement
-    const secondSubItem = subItemList[1] as HTMLElement
+    const firstSubItem = screen.getByLabelText("first level two") as HTMLElement
+    const secondSubItem = screen.getByLabelText(
+      "second level two"
+    ) as HTMLElement
 
-    expect(subItemList.length).toBe(2)
     expect(firstSubItem).toBeVisible()
     expect(secondSubItem).toBeVisible()
 
@@ -83,8 +81,10 @@ describe("NavbarSide", () => {
         activeRoute: { path: "/matching" },
       })
 
-      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
-      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("passive item")).not.toHaveClass(
+        "bg-blue-200"
+      )
     })
 
     it("routes match also by name", async () => {
@@ -97,8 +97,10 @@ describe("NavbarSide", () => {
         activeRoute: { name: "active" },
       })
 
-      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
-      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("passive item")).not.toHaveClass(
+        "bg-blue-200"
+      )
     })
 
     it("routes match includes hash if given", async () => {
@@ -111,8 +113,10 @@ describe("NavbarSide", () => {
         activeRoute: { path: "/foo", hash: "#matching" },
       })
 
-      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
-      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("passive item")).not.toHaveClass(
+        "bg-blue-200"
+      )
     })
 
     it("ignores queries of any to match route", async () => {
@@ -127,7 +131,7 @@ describe("NavbarSide", () => {
         activeRoute: { name: "foo", query: { key: "other-value" } },
       })
 
-      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
     })
 
     it("can also match with URL encoded hashes", async () => {
@@ -140,8 +144,10 @@ describe("NavbarSide", () => {
         activeRoute: { path: "/foo", hash: "#matching" },
       })
 
-      expect(screen.getByText("active item")).toHaveClass("bg-blue-200")
-      expect(screen.getByText("passive item")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("active item")).toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("passive item")).not.toHaveClass(
+        "bg-blue-200"
+      )
     })
 
     it("ignore level one item if any of its level two matches active route ", async () => {
@@ -161,9 +167,11 @@ describe("NavbarSide", () => {
         activeRoute: "/matching#hash",
       })
 
-      expect(screen.getByText("level one")).not.toHaveClass("bg-blue-200")
-      expect(screen.getByText("first level two")).toHaveClass("bg-blue-200")
-      expect(screen.getByText("second level two")).not.toHaveClass(
+      expect(screen.getByLabelText("level one")).not.toHaveClass("bg-blue-200")
+      expect(screen.getByLabelText("first level two")).toHaveClass(
+        "bg-blue-200"
+      )
+      expect(screen.getByLabelText("second level two")).not.toHaveClass(
         "bg-blue-200"
       )
     })

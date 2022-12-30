@@ -8,14 +8,14 @@ const route = useRoute()
 <template>
   <nav
     class="border-gray-400 border-y flex items-center justify-between px-16 py-24"
-    role="navigation"
   >
     <div class="flex gap-44 items-center">
       <div class="flex items-center">
         <img alt="Neuris Logo" :src="Logo" />
         <span class="leading-20 px-[1rem] text-16">
-          <span class="font-bold"> Rechtsinformationen</span><br />
-          des Bundes
+          <span aria-hidden="true" class="font-bold"> Rechtsinformationen</span>
+          <br />
+          <span aria-hidden="true">des Bundes</span>
         </span>
       </div>
 
@@ -34,7 +34,7 @@ const route = useRoute()
     </div>
 
     <div class="flex font-bold gap-8 items-center">
-      <span class="material-icons"> perm_identity </span>
+      <span aria-hidden="true" class="material-icons"> perm_identity </span>
       User Name
     </div>
   </nav>

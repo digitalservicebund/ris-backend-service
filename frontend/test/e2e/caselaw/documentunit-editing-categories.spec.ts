@@ -18,7 +18,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     await expect(page.locator("text=Keine Angabe")).toBeHidden()
 
     await page
-      .locator("[aria-label='Rechtskraft'] + [aria-label='Dropdown öffnen']")
+      .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
     await expect(page.locator("text=Ja")).toBeVisible()
@@ -37,7 +37,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     // open dropdown
     await page
-      .locator("[aria-label='Dokumenttyp'] + [aria-label='Dropdown öffnen']")
+      .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
       totalCaselawDocumentTypes
@@ -59,7 +59,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     // close dropdown
     await page
-      .locator("[aria-label='Dokumenttyp'] + [aria-label='Dropdown schließen']")
+      .locator("[aria-label='Dokumenttyp'] + button.input-expand-icon")
       .click()
     expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
@@ -85,7 +85,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     // open dropdown
     await page
-      .locator("[aria-label='Gericht'] + [aria-label='Dropdown öffnen']")
+      .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
       totalCourts
@@ -107,7 +107,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     // close dropdown
     await page
-      .locator("[aria-label='Gericht'] + [aria-label='Dropdown schließen']")
+      .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()

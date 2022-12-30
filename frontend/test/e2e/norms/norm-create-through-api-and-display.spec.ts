@@ -26,10 +26,12 @@ async function expectInputFields(page, fields) {
 }
 
 async function expectHeadingAppearAfterScroll(page, heading) {
-  const locator = page.locator(`a:text-is('${heading}')`)
+  const locator = page.locator(`a span:text-is('${heading}')`)
   await expect(locator).toBeVisible()
   await locator.click()
-  await expect(page).toHaveInsideViewport(`h2:text-is("${heading}")`)
+  await expect(page).toHaveInsideViewport(
+    `legend:text-is("${heading}"), h2:text-is("${heading}")`
+  )
 }
 
 testWithImportedNorm(
@@ -78,15 +80,19 @@ testWithImportedNorm(
 
     for (const section of sections) {
       await expect(
-        page.locator(`a:text-is("${section.heading}")`)
+        page.locator(`a span:text-is("${section.heading}")`)
       ).toBeVisible()
       await expect(
-        page.locator(`h2:text-is("${section.heading}")`)
+        page
+          .locator(
+            `h2:text-is("${section.heading}"), legend:text-is("${section.heading}")`
+          )
+          .first()
       ).toBeVisible()
       await expectInputFields(page, section.fields ?? [])
       for (const subSection of section.sections ?? []) {
         await expect(
-          page.locator(`h3:text-is("${subSection.heading}")`).first()
+          page.locator(`legend:text-is("${subSection.heading}")`).first()
         ).toBeVisible()
         await expectInputFields(page, subSection.fields ?? [])
       }
@@ -103,7 +109,9 @@ testWithImportedNorm(
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
     await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
-    await expect(page).toHaveInsideViewport('h2:text-is("Allgemeine Angaben")')
+    await expect(page).toHaveInsideViewport(
+      'legend:text-is("Allgemeine Angaben")'
+    )
 
     for (const section of sections) {
       await expectHeadingAppearAfterScroll(page, section.heading)
