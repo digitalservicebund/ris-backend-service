@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
+import { onBeforeUnmount, onMounted, ref, watch } from "vue"
 import { Court } from "@/domain/documentUnit"
 import type { DropdownItem } from "@/domain/types"
 import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
@@ -71,9 +71,6 @@ const dropdownContainerRef = ref<HTMLElement>()
 const dropdownItemsRef = ref<HTMLElement>()
 const inputFieldRef = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>(0)
-const ariaLabelDropdownIcon = computed(() =>
-  isShowDropdown.value ? "closeDropdown" : "openDropdown"
-)
 
 const toggleDropdown = () => {
   isShowDropdown.value = !isShowDropdown.value
@@ -223,7 +220,7 @@ onBeforeUnmount(() => {
           </span>
         </button>
         <button
-          :aria-labelledby="ariaLabelDropdownIcon"
+          :aria-labelledby="`labelDropdownIcon` + id"
           class="input-expand-icon"
           tabindex="0"
           @click="toggleDropdown"
@@ -234,11 +231,21 @@ onBeforeUnmount(() => {
             class="icon material-icons text-blue-800"
           >
             expand_more
-            <span id="closeDropdown" hidden>Dropdown schließen</span>
-            <span id="openDropdown" hidden>Dropdown öffnen</span>
+            <span
+              :id="`labelDropdownIcon` + id"
+              class="block h-[1px] overflow-hidden w-[1px]"
+              >Dropdown öffnen</span
+            >
           </span>
 
-          <span v-else class="icon material-icons"> expand_less </span>
+          <span v-else class="icon material-icons">
+            expand_less
+            <span
+              :id="`labelDropdownIcon` + id"
+              class="block h-[1px] overflow-hidden w-[1px]"
+              >Dropdown schließen</span
+            >
+          </span>
         </button>
       </div>
     </div>

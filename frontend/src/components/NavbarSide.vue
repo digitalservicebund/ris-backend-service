@@ -139,29 +139,33 @@ export interface LevelTwoMenuItem {
     </router-link>
 
     <div
-      v-for="levelOneItem in enhencedMenuItems"
+      v-for="(levelOneItem, levelOneIndex) in enhencedMenuItems"
       :key="levelOneItem.label"
       class="border-b-1 border-gray-400"
     >
       <router-link
-        :aria-labelledby="levelOneItem.label"
+        :aria-labelledby="`levelOneSideMenuItem` + levelOneIndex"
         class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-bold pl-[1rem] py-[1.25rem]"
         :class="levelOneItem.classes"
         :to="levelOneItem.route"
       >
-        <span :id="levelOneItem.label">{{ levelOneItem.label }}</span>
+        <span :id="`levelOneSideMenuItem` + levelOneIndex">{{
+          levelOneItem.label
+        }}</span>
       </router-link>
 
       <div v-show="levelOneItem.isExpanded">
         <router-link
-          v-for="levelTwoItem in levelOneItem.children"
+          v-for="(levelTwoItem, levelTwoIndex) in levelOneItem.children"
           :key="levelTwoItem.label"
-          :aria-label="levelTwoItem.label"
+          :aria-labelledby="`levelTwoSideMenuItem` + levelTwoIndex"
           class="block focus:bg-blue-200 focus:underline hover:bg-blue-200 hover:underline label-02-reg pl-[2rem] py-[1rem]"
           :class="levelTwoItem.classes"
           :to="levelTwoItem.route"
         >
-          <span :id="levelTwoItem.label">{{ levelTwoItem.label }}</span>
+          <span :id="`levelTwoSideMenuItem` + levelTwoIndex">{{
+            levelTwoItem.label
+          }}</span>
         </router-link>
       </div>
     </div>

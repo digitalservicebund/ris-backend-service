@@ -213,51 +213,78 @@ const frameData = computed({
     <h1 class="h-[1px] overflow-hidden w-[1px]">
       Dokumentation des Rahmenelements
     </h1>
-    <h2 id="generalDataFields" class="heading-02-regular mb-[1rem]">
-      Allgemeine Angaben
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="generalData" />
+    <fieldset>
+      <legend id="generalDataFields" class="heading-02-regular mb-[1rem]">
+        Allgemeine Angaben
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="generalData" />
+    </fieldset>
 
-    <h2 id="documentTypeFields" class="heading-02-regular mb-[1rem]">
-      Dokumenttyp
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="documentType" />
+    <fieldset>
+      <legend id="documentTypeFields" class="heading-02-regular mb-[1rem]">
+        Dokumenttyp
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="documentType"
+      />
+    </fieldset>
 
-    <h2 id="normProviderFields" class="heading-02-regular mb-[1rem]">
-      Normgeber
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="normProvider" />
+    <fieldset>
+      <legend id="normProviderFields" class="heading-02-regular mb-[1rem]">
+        Normgeber
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="normProvider"
+      />
+    </fieldset>
 
-    <h2
-      id="participatingInstitutionsFields"
-      class="heading-02-regular mb-[1rem]"
-    >
-      Mitwirkende Organe
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="participatingInstitutions"
-    />
+    <fieldset>
+      <legend
+        id="participatingInstitutionsFields"
+        class="heading-02-regular mb-[1rem]"
+      >
+        Mitwirkende Organe
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="participatingInstitutions"
+      />
+    </fieldset>
 
-    <h2 id="leadFields" class="heading-02-regular mb-[1rem]">Federführung</h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="lead" />
+    <fieldset>
+      <legend id="leadFields" class="heading-02-regular mb-[1rem]">
+        Federführung
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="lead" />
+    </fieldset>
 
-    <h2 id="subjectAreaFields" class="heading-02-regular mb-[1rem]">
-      Sachgebiet
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="subjectArea" />
+    <fieldset>
+      <legend id="subjectAreaFields" class="heading-02-regular mb-[1rem]">
+        Sachgebiet
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="subjectArea" />
+    </fieldset>
 
-    <h2 id="headingsAndAbbreviations" class="heading-02-regular mb-[1rem]">
-      Überschriften und Abkürzungen
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="headingsAndAbbreviations"
-    />
+    <fieldset>
+      <legend
+        id="headingsAndAbbreviations"
+        class="heading-02-regular mb-[1rem]"
+      >
+        Überschriften und Abkürzungen
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="headingsAndAbbreviations"
+      />
+    </fieldset>
 
-    <ExpandableContent>
+    <ExpandableContent header-id="headingsAndAbbreviationsUnofficial">
       <template #header>
         <h2
           id="headingsAndAbbreviationsUnofficial"
@@ -273,105 +300,152 @@ const frameData = computed({
       />
     </ExpandableContent>
 
-    <h2 id="entryIntoForceFields" class="heading-02-regular mb-[1rem]">
-      Inkrafttreten
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="entryIntoForce"
-    />
+    <fieldset>
+      <legend id="entryIntoForceFields" class="heading-02-regular mb-[1rem]">
+        Inkrafttreten
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="entryIntoForce"
+      />
+    </fieldset>
 
-    <h2 id="expirationFields" class="heading-02-regular mb-[1rem]">
-      Außerkrafttreten
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="expiration" />
+    <fieldset>
+      <legend id="expirationFields" class="heading-02-regular mb-[1rem]">
+        Außerkrafttreten
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="expiration" />
+    </fieldset>
 
-    <h2 id="announcementDateFields" class="heading-02-regular mb-[1rem]">
-      Verkündungsdatum
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="announcementDate"
-    />
+    <fieldset>
+      <legend id="announcementDateFields" class="heading-02-regular mb-[1rem]">
+        Verkündungsdatum
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="announcementDate"
+      />
+    </fieldset>
 
-    <h2 id="citationDateFields" class="heading-02-regular mb-[1rem]">
-      Zitierdatum
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="citationDate" />
+    <fieldset>
+      <legend id="citationDateFields" class="heading-02-regular mb-[1rem]">
+        Zitierdatum
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="citationDate"
+      />
+    </fieldset>
 
     <h2 id="officialAnnouncementFields" class="heading-02-regular mb-[1rem]">
       Amtliche Fundstelle
     </h2>
-    <h3 id="printAnnouncementFields" class="heading-03-regular mb-[1rem]">
-      Papierverkündung
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="printAnnouncement"
-    />
-    <h3 id="digitalAnnouncementFields" class="heading-03-regular mb-[1rem]">
-      Elektronisches Verkündungsblatt
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="digitalAnnouncement"
-    />
-    <h3 id="euAnnouncementFields" class="heading-03-regular mb-[1rem]">
-      Amtsblatt der EU
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="euAnnouncement"
-    />
-    <h3 id="otherOfficialReferencesFields" class="heading-03-regular mb-[1rem]">
-      Sonstige amtliche Fundstelle
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="otherOfficialReferences"
-    />
+    <fieldset>
+      <legend id="printAnnouncementFields" class="heading-03-regular mb-[1rem]">
+        Papierverkündung
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="printAnnouncement"
+      />
+    </fieldset>
+    <fieldset>
+      <legend
+        id="digitalAnnouncementFields"
+        class="heading-03-regular mb-[1rem]"
+      >
+        Elektronisches Verkündungsblatt
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="digitalAnnouncement"
+      />
+    </fieldset>
+    <fieldset>
+      <legend id="euAnnouncementFields" class="heading-03-regular mb-[1rem]">
+        Amtsblatt der EU
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="euAnnouncement"
+      />
+    </fieldset>
+    <fieldset>
+      <legend
+        id="otherOfficialReferencesFields"
+        class="heading-03-regular mb-[1rem]"
+      >
+        Sonstige amtliche Fundstelle
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="otherOfficialReferences"
+      />
+    </fieldset>
 
-    <h2 id="unofficialReferenceFields" class="heading-02-regular mb-[1rem]">
-      Nichtamtliche Fundstelle
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="unofficialReference"
-    />
+    <fieldset>
+      <legend
+        id="unofficialReferenceFields"
+        class="heading-02-regular mb-[1rem]"
+      >
+        Nichtamtliche Fundstelle
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="unofficialReference"
+      />
+    </fieldset>
 
-    <h2 id="completeCitationFields" class="heading-02-regular mb-[1rem]">
-      Vollzitat
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="completeCitation"
-    />
+    <fieldset>
+      <legend id="completeCitationFields" class="heading-02-regular mb-[1rem]">
+        Vollzitat
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="completeCitation"
+      />
+    </fieldset>
 
     <h2 id="statusIndicationFields" class="heading-02-regular mb-[1rem]">
       Stand-Angabe
     </h2>
-    <h3 id="statusFields" class="heading-03-regular mb-[1rem]">Stand</h3>
-    <InputGroup v-model="frameData" :column-count="1" :fields="status" />
-    <h3 id="repealFields" class="heading-03-regular mb-[1rem]">Aufhebung</h3>
-    <InputGroup v-model="frameData" :column-count="1" :fields="repeal" />
-    <h3 id="reissueFields" class="heading-03-regular mb-[1rem]">Neufassung</h3>
-    <InputGroup v-model="frameData" :column-count="1" :fields="reissue" />
-    <h3 id="otherStatusNoteFields" class="heading-03-regular mb-[1rem]">
-      Sonstiger Hinweis
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="otherStatusNote"
-    />
+    <fieldset>
+      <legend id="statusFields" class="heading-03-regular mb-[1rem]">
+        Stand
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="status" />
+    </fieldset>
+    <fieldset>
+      <legend id="repealFields" class="heading-03-regular mb-[1rem]">
+        Aufhebung
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="repeal" />
+    </fieldset>
+    <fieldset>
+      <legend id="reissueFields" class="heading-03-regular mb-[1rem]">
+        Neufassung
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="reissue" />
+    </fieldset>
+    <fieldset>
+      <legend id="otherStatusNoteFields" class="heading-03-regular mb-[1rem]">
+        Sonstiger Hinweis
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="otherStatusNote"
+      />
+    </fieldset>
 
     <h2
       id="documentProcessingStatusFields"
@@ -379,112 +453,163 @@ const frameData = computed({
     >
       Stand der dokumentarischen Bearbeitung
     </h2>
-    <h3 id="documentStatusFields" class="heading-03-regular mb-[1rem]">
-      Stand der dokumentarischen Bearbeitung
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="documentStatus"
-    />
-    <h3 id="documentTextProofFields" class="heading-03-regular mb-[1rem]">
-      Textnachweis
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="documentTextProof"
-    />
-    <h3 id="otherDocumentNoteFields" class="heading-03-regular mb-[1rem]">
-      Sonstiger Hinweis
-    </h3>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="otherDocumentNote"
-    />
+    <fieldset>
+      <legend id="documentStatusFields" class="heading-03-regular mb-[1rem]">
+        Stand der dokumentarischen Bearbeitung
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="documentStatus"
+      />
+    </fieldset>
+    <fieldset>
+      <legend id="documentTextProofFields" class="heading-03-regular mb-[1rem]">
+        Textnachweis
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="documentTextProof"
+      />
+    </fieldset>
+    <fieldset>
+      <legend id="otherDocumentNoteFields" class="heading-03-regular mb-[1rem]">
+        Sonstiger Hinweis
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="otherDocumentNote"
+      />
+    </fieldset>
 
-    <h2 id="applicationScopeFields" class="heading-02-regular mb-[1rem]">
-      Räumlicher Geltungsbereich
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="applicationScope"
-    />
+    <fieldset>
+      <legend id="applicationScopeFields" class="heading-02-regular mb-[1rem]">
+        Räumlicher Geltungsbereich
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="applicationScope"
+      />
+    </fieldset>
 
-    <h2 id="categorizedReferenceFields" class="heading-02-regular mb-[1rem]">
-      Aktivverweisung
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="categorizedReference"
-    />
+    <fieldset>
+      <legend
+        id="categorizedReferenceFields"
+        class="heading-02-regular mb-[1rem]"
+      >
+        Aktivverweisung
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="categorizedReference"
+      />
+    </fieldset>
 
-    <h2 id="otherFootnoteFields" class="heading-02-regular mb-[1rem]">
-      Fußnote
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="otherFootnote" />
+    <fieldset>
+      <legend id="otherFootnoteFields" class="heading-02-regular mb-[1rem]">
+        Fußnote
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="otherFootnote"
+      />
+    </fieldset>
 
-    <h2 id="validityRuleFields" class="heading-02-regular mb-[1rem]">
-      Gültigkeitsregelung
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="validityRule" />
+    <fieldset>
+      <legend id="validityRuleFields" class="heading-02-regular mb-[1rem]">
+        Gültigkeitsregelung
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="validityRule"
+      />
+    </fieldset>
 
-    <h2 id="digitalEvidenceFields" class="heading-02-regular mb-[1rem]">
-      Elektronischer Nachweis
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="digitalEvidence"
-    />
+    <fieldset>
+      <legend id="digitalEvidenceFields" class="heading-02-regular mb-[1rem]">
+        Elektronischer Nachweis
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="digitalEvidence"
+      />
+    </fieldset>
 
-    <h2 id="referenceNumberFields" class="heading-02-regular mb-[1rem]">
-      Aktenzeichen
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="referenceNumber"
-    />
+    <fieldset>
+      <legend id="referenceNumberFields" class="heading-02-regular mb-[1rem]">
+        Aktenzeichen
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="referenceNumber"
+      />
+    </fieldset>
 
-    <h2 id="europeanLegalIdentifierFields" class="heading-02-regular mb-[1rem]">
-      ELI
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="europeanLegalIdentifier"
-    />
+    <fieldset>
+      <legend
+        id="europeanLegalIdentifierFields"
+        class="heading-02-regular mb-[1rem]"
+      >
+        ELI
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="europeanLegalIdentifier"
+      />
+    </fieldset>
 
-    <h2 id="celexNumberFields" class="heading-02-regular mb-[1rem]">
-      CELEX-Nummer
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="celexNumber" />
+    <fieldset>
+      <legend id="celexNumberFields" class="heading-02-regular mb-[1rem]">
+        CELEX-Nummer
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="celexNumber" />
+    </fieldset>
 
-    <h2 id="ageIndicationFields" class="heading-02-regular mb-[1rem]">
-      Altersangabe
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="ageIndication" />
+    <fieldset>
+      <legend id="ageIndicationFields" class="heading-02-regular mb-[1rem]">
+        Altersangabe
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="ageIndication"
+      />
+    </fieldset>
 
-    <h2 id="definitionFields" class="heading-02-regular mb-[1rem]">
-      Definition
-    </h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="definition" />
+    <fieldset>
+      <legend id="definitionFields" class="heading-02-regular mb-[1rem]">
+        Definition
+      </legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="definition" />
+    </fieldset>
 
-    <h2 id="ageOfMajorityIndicationFields" class="heading-02-regular mb-[1rem]">
-      Angaben zur Volljährigkeit
-    </h2>
-    <InputGroup
-      v-model="frameData"
-      :column-count="1"
-      :fields="ageOfMajorityIndication"
-    />
+    <fieldset>
+      <legend
+        id="ageOfMajorityIndicationFields"
+        class="heading-02-regular mb-[1rem]"
+      >
+        Angaben zur Volljährigkeit
+      </legend>
+      <InputGroup
+        v-model="frameData"
+        :column-count="1"
+        :fields="ageOfMajorityIndication"
+      />
+    </fieldset>
 
-    <h2 id="textFields" class="heading-02-regular mb-[1rem]">Text</h2>
-    <InputGroup v-model="frameData" :column-count="1" :fields="text" />
+    <fieldset>
+      <legend id="textFields" class="heading-02-regular mb-[1rem]">Text</legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="text" />
+    </fieldset>
 
     <SaveButton
       aria-label="Rahmendaten Speichern Button"

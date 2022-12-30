@@ -128,7 +128,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await page.locator("text=AnU - Anerkenntnisurteil").click()
 
     await page
-      .locator("[aria-label='Rechtskraft'] + [aria-label='Dropdown öffnen']")
+      .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
     await page.locator("text=Ja").click()
