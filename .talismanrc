@@ -20,7 +20,7 @@ fileignoreconfig:
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: 4d9a96bd2d898fa27a34a197286b1f72e091d8a11a31f1fa1a4666b54d488a78
+    checksum: 4cc1a5c01a20163c842ad01ce5b8ec64f50818eeae64a44c9afda1e01b53e214
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: 5f9e16c2840935aebaf5e6c88d0ab0685374d4edac09018993678f51d660d304
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
