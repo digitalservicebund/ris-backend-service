@@ -106,6 +106,8 @@ dependencies {
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.1"
 
   implementation "io.micrometer:micrometer-registry-prometheus:1.10.2"
+  implementation "io.micrometer:micrometer-core:1.10.2"
+
   implementation "io.sentry:sentry-spring-boot-starter:6.10.0"
   implementation "org.springframework.boot:spring-boot-starter-validation"
 
