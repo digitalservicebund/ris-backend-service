@@ -46,19 +46,4 @@ describe("Dropdown Input", () => {
     await user.keyboard("{escape}")
     expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
   })
-
-  it("items shouldn't be filtered if no combobox", async () => {
-    renderComponent({ modelValue: "testItem1" })
-
-    const openDropdownContainer = screen.getByLabelText(
-      "Dropdown öffnen"
-    ) as HTMLElement
-
-    await user.click(openDropdownContainer)
-    const dropdownItems = screen.getAllByLabelText("dropdown-option")
-    expect(dropdownItems).toHaveLength(3)
-    expect(dropdownItems[0]).toHaveTextContent("testItem1")
-    expect(dropdownItems[1]).toHaveTextContent("testItem2")
-    expect(dropdownItems[2]).toHaveTextContent("testItem3")
-  })
 })

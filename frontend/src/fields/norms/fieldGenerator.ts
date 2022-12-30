@@ -1,16 +1,16 @@
-import { ComboboxInputField, ComboboxItem, InputType } from "@/domain"
+import { DropdownInputField, DropdownItem, InputType } from "@/domain"
 
-export const undefinedDropDownItems: ComboboxItem[] = [
+export const undefinedDropDownItems: DropdownItem[] = [
   {
-    text: "unbestimmt (unbekannt)",
+    label: "unbestimmt (unbekannt)",
     value: "UNDEFINED_UNKNOWN",
   },
   {
-    text: "unbestimmt (zukünftig)",
+    label: "unbestimmt (zukünftig)",
     value: "UNDEFINED_FUTURE",
   },
   {
-    text: "nicht vorhanden",
+    label: "nicht vorhanden",
     value: "UNDEFINED_NOT_PRESENT",
   },
 ]
@@ -18,15 +18,14 @@ export const undefinedDropDownItems: ComboboxItem[] = [
 export function dropdown(
   name: string,
   label: string,
-  items: ComboboxItem[]
-): ComboboxInputField {
+  items: DropdownItem[]
+): DropdownInputField {
   return {
     name: name,
-    type: InputType.COMBOBOX,
+    type: InputType.DROPDOWN,
     label: label,
     inputAttributes: {
       ariaLabel: label,
-      isCombobox: true,
       items: items,
     },
   }

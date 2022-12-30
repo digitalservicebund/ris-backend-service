@@ -3,18 +3,15 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { Court } from "@/domain/documentUnit"
-import { ComboboxItem } from "@/domain/types"
+import { ComboboxItem, ComboboxAttributes } from "@/domain/types"
 import service from "@/services/comboboxItemService"
-import { ServiceResponse } from "@/services/httpClient"
 
 function renderComponent(
   options: {
     id?: string
     modelValue?: string
+    itemService?: ComboboxAttributes["itemService"]
     ariaLabel?: string
-    items?: ComboboxItem[]
-    isCombobox?: boolean
-    endpoint?: (filter: string) => Promise<ServiceResponse<ComboboxItem[]>>
   } = {}
 ) {
   return render(ComboboxInput, {
@@ -22,13 +19,13 @@ function renderComponent(
       id: options.id ?? "combobox-test",
       modelValue: options.modelValue,
       ariaLabel: options.ariaLabel ?? "test label",
-      items: options.items ?? [
-        { text: "testItem1", value: "t1" },
-        { text: "testItem2", value: "t2" },
-        { text: "testItem3", value: "t3" },
-      ],
-      isCombobox: options.isCombobox ?? false,
-      endpoint: options.endpoint,
+      itemService:
+        options.itemService ??
+        service.filterItems([
+          { label: "testItem1", value: "t1" },
+          { label: "testItem2", value: "t2" },
+          { label: "testItem3", value: "t3" },
+        ]),
     },
   })
 }
@@ -55,7 +52,7 @@ describe("Combobox Element", () => {
   })
 
   it("items should be filtered", async () => {
-    renderComponent({ isCombobox: true })
+    renderComponent()
 
     const input = screen.getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem2")
@@ -67,7 +64,7 @@ describe("Combobox Element", () => {
   })
 
   it("items should not be filtered after selection", async () => {
-    renderComponent({ isCombobox: true })
+    renderComponent()
 
     const input = screen.getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem2")
@@ -88,7 +85,7 @@ describe("Combobox Element", () => {
   })
 
   it("items should stay filtered after typing without selection", async () => {
-    renderComponent({ isCombobox: true })
+    renderComponent()
 
     const input = screen.getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem2")
@@ -127,7 +124,7 @@ describe("Combobox Element", () => {
   })
 
   it("items should show message if no items matched", async () => {
-    renderComponent({ isCombobox: true })
+    renderComponent()
 
     const input = screen.getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem10")
@@ -138,7 +135,7 @@ describe("Combobox Element", () => {
   })
 
   it("Dropdown item should be visible after selecting", async () => {
-    renderComponent({ isCombobox: true })
+    renderComponent()
 
     const input = screen.getByLabelText("test label") as HTMLInputElement
     await user.type(input, "testItem2")
@@ -166,7 +163,7 @@ describe("Combobox Element", () => {
           status: 200,
           data: [
             {
-              text: "AO - Anordnung",
+              label: "AO - Anordnung",
               value: "Anordnung", // <-- string
             },
           ],
@@ -174,8 +171,7 @@ describe("Combobox Element", () => {
       )
 
     renderComponent({
-      endpoint: service.getDocumentTypes,
-      isCombobox: true,
+      itemService: service.getDocumentTypes,
     })
 
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
@@ -197,7 +193,7 @@ describe("Combobox Element", () => {
     }
     const dropdownItems: ComboboxItem[] = [
       {
-        text: "BGH Karlsruhe",
+        label: "BGH Karlsruhe",
         value: court, // <-- Court
       },
     ]
@@ -208,8 +204,7 @@ describe("Combobox Element", () => {
       )
 
     renderComponent({
-      endpoint: service.getCourts,
-      isCombobox: true,
+      itemService: service.getCourts,
     })
 
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")
@@ -232,7 +227,7 @@ describe("Combobox Element", () => {
     }
     const dropdownItems: ComboboxItem[] = [
       {
-        text: "BGH Karlsruhe",
+        label: "BGH Karlsruhe",
         value: court,
       },
     ]
@@ -243,8 +238,7 @@ describe("Combobox Element", () => {
       )
 
     renderComponent({
-      endpoint: service.getCourts,
-      isCombobox: true,
+      itemService: service.getCourts,
     })
 
     const input = screen.getByLabelText("test label") as HTMLInputElement
@@ -267,7 +261,7 @@ describe("Combobox Element", () => {
     }
     const dropdownItems: ComboboxItem[] = [
       {
-        text: "ABC",
+        label: "ABC",
         value: court,
       },
     ]
@@ -278,8 +272,7 @@ describe("Combobox Element", () => {
       )
 
     renderComponent({
-      endpoint: service.getCourts,
-      isCombobox: true,
+      itemService: service.getCourts,
     })
 
     const openDropdownContainer = screen.getByLabelText("Dropdown öffnen")

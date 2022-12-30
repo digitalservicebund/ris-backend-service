@@ -24,7 +24,7 @@ describe("comboboxItemService", () => {
     const result = (await service.getDocumentTypes()).data as DropdownItem[]
 
     expect(httpClientGet).toHaveBeenCalledOnce()
-    expect(result[0].text).toEqual("AO - Anordnung")
+    expect(result[0].label).toEqual("AO - Anordnung")
     expect(result[0].value).toEqual("Anordnung")
   })
 
@@ -42,33 +42,33 @@ describe("comboboxItemService", () => {
     const result = (await service.getCourts()).data as DropdownItem[]
 
     expect(httpClientGet).toHaveBeenCalledOnce()
-    expect(result[0].text).toEqual("BGH Karlsruhe")
+    expect(result[0].label).toEqual("BGH Karlsruhe")
     expect(result[0].value).toEqual(court)
   })
 
   it("should return local items if no filter", async () => {
     const result = (
       await service.filterItems([
-        { text: "testItem1", value: "t1" },
-        { text: "testItem2", value: "t2" },
-        { text: "testItem3", value: "t3" },
+        { label: "testItem1", value: "t1" },
+        { label: "testItem2", value: "t2" },
+        { label: "testItem3", value: "t3" },
       ])()
     ).data as DropdownItem[]
 
     expect(result.length).toEqual(3)
-    expect(result[1]).toEqual({ text: "testItem2", value: "t2" })
+    expect(result[1]).toEqual({ label: "testItem2", value: "t2" })
   })
 
   it("should filter local items", async () => {
     const result = (
       await service.filterItems([
-        { text: "testItem1", value: "t1" },
-        { text: "testItem2", value: "t2" },
-        { text: "testItem3", value: "t3" },
+        { label: "testItem1", value: "t1" },
+        { label: "testItem2", value: "t2" },
+        { label: "testItem3", value: "t3" },
       ])("Item3")
     ).data as DropdownItem[]
 
     expect(result.length).toEqual(1)
-    expect(result[0]).toEqual({ text: "testItem3", value: "t3" })
+    expect(result[0]).toEqual({ label: "testItem3", value: "t3" })
   })
 })

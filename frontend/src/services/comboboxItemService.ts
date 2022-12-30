@@ -22,13 +22,13 @@ function formatDropdownItems(
   switch (endpoint) {
     case Endpoint.documentTypes: {
       return (responseData as DocumentType[]).map((item) => ({
-        text: item.jurisShortcut + " - " + item.label,
+        label: item.jurisShortcut + " - " + item.label,
         value: item.label,
       }))
     }
     case Endpoint.courts: {
       return (responseData as Court[]).map((item) => ({
-        text: item.label,
+        label: item.label,
         value: item,
       }))
     }
@@ -69,7 +69,7 @@ type ComboboxItemService = {
 const service: ComboboxItemService = {
   filterItems: (items: ComboboxItem[]) => (filter?: string) => {
     const filteredItems = filter
-      ? items.filter((item) => item.text.includes(filter))
+      ? items.filter((item) => item.label.includes(filter))
       : items
     return Promise.resolve({ status: 200, data: filteredItems })
   },

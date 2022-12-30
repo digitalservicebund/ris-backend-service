@@ -4,7 +4,6 @@ import {
   ValidationError,
   InputField,
   DropdownItem,
-  ComboboxItem,
   ComboboxAttributes,
 } from "./types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
@@ -88,10 +87,8 @@ export function defineComboboxField(
   name: string,
   label: string,
   ariaLabel: string,
+  itemService: ComboboxAttributes["itemService"],
   placeholder?: string,
-  isCombobox?: boolean,
-  items?: ComboboxItem[],
-  endpoint?: ComboboxAttributes["endpoint"],
   validationError?: ValidationError
 ): InputField {
   return {
@@ -102,9 +99,7 @@ export function defineComboboxField(
     inputAttributes: {
       ariaLabel,
       placeholder,
-      items,
-      endpoint,
-      isCombobox,
+      itemService,
       validationError,
     },
   }
@@ -152,10 +147,8 @@ export const courtFields: InputField[] = [
     "court",
     "Gericht",
     "Gericht",
-    "Gerichtstyp Gerichtsort",
-    true,
-    [],
-    comboboxItemService.getCourts
+    comboboxItemService.getCourts,
+    "Gerichtstyp Gerichtsort"
   ),
 ]
 export const coreDataFields: InputField[] = [
@@ -200,10 +193,8 @@ export const coreDataFields: InputField[] = [
     "category",
     "Dokumenttyp",
     "Dokumenttyp",
-    "Bitte auswählen",
-    true,
-    [],
-    comboboxItemService.getDocumentTypes
+    comboboxItemService.getDocumentTypes,
+    "Bitte auswählen"
   ),
   defineNestedInputField(
     "Abweichender ECLI",

@@ -1,4 +1,3 @@
-import { Court } from "@/domain/documentUnit"
 import { ServiceResponse } from "@/services/httpClient"
 
 export enum InputType {
@@ -90,7 +89,7 @@ export type DateInputModelType = string
 export type DropdownInputModelType = string
 
 export type DropdownItem = {
-  text: string
+  label: string
   value: DropdownInputModelType
 }
 
@@ -105,17 +104,17 @@ export interface DropdownInputField extends BaseInputField {
 }
 
 //COMBOBOX
-export type ComboboxInputModelType = string | Court
+export type ComboboxInputModelType =
+  | string
+  | { label: string; [other: string]: string }
 
 export type ComboboxItem = {
-  text: string
+  label: string
   value: ComboboxInputModelType
 }
 
 export interface ComboboxAttributes extends BaseInputAttributes {
-  isCombobox?: boolean
-  items?: ComboboxItem[]
-  endpoint?: (searchString?: string) => Promise<ServiceResponse<ComboboxItem[]>>
+  itemService: (filter?: string) => Promise<ServiceResponse<ComboboxItem[]>>
   placeholder?: string
 }
 

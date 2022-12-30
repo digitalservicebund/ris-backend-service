@@ -5,7 +5,6 @@ import { DropdownInputModelType, DropdownItem } from "@/domain/types"
 interface Props {
   id: string
   items: DropdownItem[]
-  value?: DropdownInputModelType
   modelValue?: DropdownInputModelType
   ariaLabel: string
   placeholder?: string
@@ -18,12 +17,14 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()
-const inputValue = ref<DropdownInputModelType>()
+const selectedLabel = ref<DropdownItem["label"]>()
 
 watch(
   props,
   () => {
-    inputValue.value = props.modelValue ?? props.value
+    selectedLabel.value = props.items.find(
+      (item) => item.value === props.modelValue
+    )?.label
   },
   {
     immediate: true,
@@ -73,7 +74,7 @@ const closeDropDownWhenClickOutside = (event: MouseEvent) => {
     event.composedPath().includes(dropdown)
   )
     return
-  showDropdown.value = false
+  closeDropdown()
 }
 
 const closeDropdown = () => {
@@ -103,7 +104,7 @@ onBeforeUnmount(() => {
       <div class="bg-white input-container">
         <input
           :id="id"
-          v-model="inputValue"
+          v-model="selectedLabel"
           :aria-label="ariaLabel"
           autocomplete="off"
           class="cursor-pointer text-input"
@@ -143,7 +144,7 @@ onBeforeUnmount(() => {
         @keyup.up="focusPreviousItem"
       >
         <span>
-          {{ item.text }}
+          {{ item.label }}
         </span>
       </div>
     </div>
