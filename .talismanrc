@@ -154,7 +154,7 @@ fileignoreconfig:
   - filename: frontend/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: frontend/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: 5318a644f69c341b8847706387e6fa57b41ff1276b4e902d3a44958a1fab616b
+    checksum: ca6e1ba9464c9e562a67cbca4cf957bdac6d6f271b1befc4f9f5b4ac1719e65c
   - filename: frontend/src/services/normsService.ts
     checksum: f474267a7d13a14b54606f816cf2b1d5b5b3432b6bfd9cf2ccef857cade64201
   - filename: frontend/src/stores/loadedNorm.ts
@@ -162,7 +162,7 @@ fileignoreconfig:
   - filename: frontend/src/utilities/normUtilities.ts
     checksum: 81116ce9097165fc9534eada4c9a6842cdef5ee6e5667a05a7a72480cc817431
   - filename: frontend/test/components/navbarSide.spec.ts
-    checksum: dfde114fc27862fdecef66c556dff3010568e07f1168e141d2b92af471e5e140
+    checksum: 65f85c8e6280ce6e6587ce00f6b1aed643bc8714cd9e5006fbdadfdfa0e866cd
   - filename: frontend/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
   - filename: frontend/test/e2e/norms/testdata/norm_edited_fields.json
