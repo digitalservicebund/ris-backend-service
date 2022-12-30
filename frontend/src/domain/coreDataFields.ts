@@ -2,6 +2,7 @@ import {
   InputType,
   LookupTableEndpoint,
   NestedInputAttributes,
+  NestedInputField,
   ValidationError,
 } from "./types"
 import type { InputField, DropdownItem } from "./types"
@@ -109,7 +110,7 @@ export function defineDropdownField(
 
 export function defineNestedInputField(
   ariaLabel: string,
-  name: string,
+  name: NestedInputField["name"],
   fields: NestedInputAttributes["fields"]
 ): InputField {
   return {

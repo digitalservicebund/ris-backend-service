@@ -67,7 +67,8 @@ export interface NestedInputAttributes extends BaseInputAttributes {
   fields: { parent: InputField; child: InputField }
 }
 
-export interface NestedInputField extends BaseInputField {
+export interface NestedInputField extends Omit<BaseInputField, "name"> {
+  name: `nestedInputOf${Capitalize<string>}And${Capitalize<string>}`
   type: InputType.NESTED
   inputAttributes: NestedInputAttributes
 }
