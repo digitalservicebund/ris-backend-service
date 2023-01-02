@@ -38,15 +38,15 @@ fileignoreconfig:
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
     checksum: 627f84f25de4080fbe40c847278daeb39bd71f37d46dc639e4e9527d9aa7a890
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
-    checksum: b0166cfdb9405e37c833533bf6a02efea8662e9befcb0a0d433f10754c90c3ea
+    checksum: 062db944fec5c8a2341d4ffa75a65a7db6694b1f3ee49cc8ff30733829e39066
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/service/ImportNormService.kt
-    checksum: 299948f3e7f5edfd80dee7fa8b8c2436ada74d36a161e3ac54ca8d15546b6328
+    checksum: a593b350fbb4714a198cdf3a6da71b713a4700ab0f70cb92a0720d497df4197d
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
     checksum: d0a015e7fa9150a6be394c804508d575d91daa9cfcc62553a93000df8a37ab83
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/EditNormFrameController.kt
     checksum: 92b1f65e6bd44a50511b72d26a510a56bb9a4bd25cb152a5df70473cac0d10b8
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/ImportNormController.kt
-    checksum: 0780ed3492e79c077c93ae222bc902b83015dcfa5962792ff752eb6cfcbe353e
+    checksum: c886d672d5369863c419d2084f315ea77297640bb0f7c5c0a20e896323330a69
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/LoadNormController.kt
     checksum: dadc85c1627cf2a36e2c8e84ee40f2287ec17a712d10bb7ae73fea236f51ae1e
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/EditNormFrameController.kt
