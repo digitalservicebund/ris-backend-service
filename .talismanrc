@@ -174,7 +174,7 @@ fileignoreconfig:
   - filename: run.sh
     checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
   - filename: backend/src/main/resources/db/migration/V0.21__caselaw_migrate_category_to_new_documentTypeId_column.sql
-    checksum: 766f6999248bd8f3f2164ce36ecb49fdfa563d70e9cb1f28a9357166c8eb0892
+    checksum: 7b44490422f3b2cdcd0061848bb68ec29735a7f053ec10e7e5087df6b1375388
 
 scopeconfig:
   - scope: node
