@@ -231,7 +231,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             previousDecisionDTO -> {
                               if (!Objects.equals(
                                   previousDecisionDTO.documentUnitId, documentUnitDTO.getId())) {
-                                throw new RuntimeException(
+                                throw new DocumentUnitException(
                                     "previous decision not for the right document unit");
                               }
                             });
