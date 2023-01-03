@@ -18,5 +18,6 @@
       }
     ]
   },
-  "reportNeedlessDisables": true
+  "reportNeedlessDisables": true,
+  "ignoreFiles": ["!**/*.vue", "!**/*.scss"]
 }

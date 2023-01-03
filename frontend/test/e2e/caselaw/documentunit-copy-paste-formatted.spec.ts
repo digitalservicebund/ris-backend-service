@@ -37,7 +37,7 @@ test("copy-paste from side panel", async ({ page }) => {
 
   // Click on "Rubriken" und check if original document loaded
   await page.locator("a >> text=Rubriken").click()
-  await page.locator("[aria-label='Originaldokument öffnen']").click()
+  await page.locator("span:text-is('Originaldokument öffnen') + button").click()
   await expect(page.locator("text=Dokument wird geladen")).toBeHidden()
   await expect(page.locator(`text=${rightAlignText}`)).toBeVisible()
   await expect(page.locator(`text=${centerAlignText}`)).toBeVisible()

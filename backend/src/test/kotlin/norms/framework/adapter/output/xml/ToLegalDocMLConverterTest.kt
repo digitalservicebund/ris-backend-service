@@ -1,9 +1,8 @@
-package de.bund.digitalservice.ris.norms.framework.adapter.output
+package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.ToLegalDocMLConverter
 import norms.utils.createRandomNorm
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -256,11 +255,18 @@ class ToLegalDocMLConverterTest {
         val paragraphContent = getFirstChildNodeWithTagName(paragraphElement, "akn:content")
         val paragraphContentP = getFirstChildNodeWithTagName(paragraphContent, "akn:p")
 
-        assertThat(articleHeading.textContent.trim()).isEqualTo("test article title")
+        assertThat(articleElement.attributes.getNamedItem("eId").nodeValue).isEqualTo("para-9a")
+        assertThat(articleNumber.attributes.getNamedItem("eId").nodeValue).isEqualTo("para-9a_bezeichnung-1")
         assertThat(articleNumber.textContent.trim()).isEqualTo("§ 9a")
         assertThat(articleMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("9a")
+        assertThat(articleHeading.attributes.getNamedItem("eId").nodeValue).isEqualTo("para-9a_überschrift-1")
+        assertThat(articleHeading.textContent.trim()).isEqualTo("test article title")
+        assertThat(paragraphElement.attributes.getNamedItem("eId").nodeValue).isEqualTo("para-9a_abs-1.1")
+        assertThat(paragraphNumber.attributes.getNamedItem("eId").nodeValue).isEqualTo("para-9a_abs-1.1_bezeichnung-1")
         assertThat(paragraphNumber.textContent.trim()).isEqualTo("§ 1.1")
         assertThat(paragraphMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("1.1")
+        assertThat(paragraphContent.attributes.getNamedItem("eId").nodeValue).isEqualTo("para-9a_abs-1.1_inhalt-1")
+        assertThat(paragraphContentP.attributes.getNamedItem("eId").nodeValue).isEqualTo("para-9a_abs-1.1_inhalt-1_text-1")
         assertThat(paragraphContentP.textContent.trim()).isEqualTo("test paragraph text")
     }
 
@@ -291,7 +297,7 @@ class ToLegalDocMLConverterTest {
     }
 }
 
-private fun convertNormToLegalDocML(norm: Norm? = null): Document {
+fun convertNormToLegalDocML(norm: Norm? = null): Document {
     val toConvertNorm = norm ?: createRandomNorm()
     val converter = ToLegalDocMLConverter()
     var xmlContent = ""
@@ -307,7 +313,7 @@ private fun convertNormToLegalDocML(norm: Norm? = null): Document {
     return builder.parse(InputSource(StringReader(xmlContent)))
 }
 
-private fun getFirstChildNodeWithTagName(node: Node, tagName: String): Node {
+fun getFirstChildNodeWithTagName(node: Node, tagName: String): Node {
     if (!node.hasChildNodes()) {
         throw Exception("Node has no children!")
     }

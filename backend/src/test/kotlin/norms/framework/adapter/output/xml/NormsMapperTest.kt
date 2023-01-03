@@ -16,32 +16,37 @@ class MapParagraphToDto {
                 text = "test text"
             )
 
-        val data = mapParagraphToDto(paragraph)
+        val data = mapParagraphToDto(paragraph, articleMarker = "2")
 
         assertThat(data.guid).isEqualTo("53d29ef7-377c-4d14-864b-eb3a85769359")
         assertThat(data.marker).isEqualTo("1")
-        assertThat(data.markerText).isEqualTo("1")
-        assertThat(data.text).isEqualTo("test text")
+        assertThat(data.articleMarker).isEqualTo("2")
+        assertThat(data.markerText?.value).isEqualTo("1")
+        assertThat(data.markerText?.guid).isInstanceOf(UUID::class.java).isNotNull
+        assertThat(data.text.value).isEqualTo("test text")
+        assertThat(data.text.guid).isInstanceOf(UUID::class.java).isNotNull
     }
 
     @Test
     fun `it correctly parses the marker from the marker text`() {
         val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§ 1a", text = "text")
 
-        val data = mapParagraphToDto(paragraph)
+        val data = mapParagraphToDto(paragraph, "")
 
         assertThat(data.marker).isEqualTo("1a")
-        assertThat(data.markerText).isEqualTo("§ 1a")
+        assertThat(data.markerText?.value).isEqualTo("§ 1a")
+        assertThat(data.markerText?.guid).isInstanceOf(UUID::class.java).isNotNull
     }
 
     @Test
     fun `it falls back to the orginal number if no marker could be parsed`() {
         val paragraph = Paragraph(guid = UUID.randomUUID(), marker = "§", text = "text")
 
-        val data = mapParagraphToDto(paragraph, 2)
+        val data = mapParagraphToDto(paragraph, "", ordinalNumber = 2)
 
         assertThat(data.marker).isEqualTo("2")
-        assertThat(data.markerText).isEqualTo("§")
+        assertThat(data.markerText?.value).isEqualTo("§")
+        assertThat(data.markerText?.guid).isInstanceOf(UUID::class.java).isNotNull
     }
 }
 
@@ -60,7 +65,8 @@ class MapArticleToDto {
         val data = mapArticleToDto(article)
 
         assertThat(data.guid).isEqualTo("761b5537-5aa5-4901-81f7-fbf7e040a7c8")
-        assertThat(data.title).isEqualTo("test title")
+        assertThat(data.title?.value).isEqualTo("test title")
+        assertThat(data.title?.guid).isInstanceOf(UUID::class.java).isNotNull
         assertThat(data.marker).isEqualTo("1")
         assertThat(data.paragraphs).hasSize(1)
     }
@@ -72,7 +78,8 @@ class MapArticleToDto {
         val data = mapArticleToDto(article)
 
         assertThat(data.marker).isEqualTo("1.1")
-        assertThat(data.markerText).isEqualTo("§ 1.1")
+        assertThat(data.markerText.value).isEqualTo("§ 1.1")
+        assertThat(data.markerText.guid).isInstanceOf(UUID::class.java).isNotNull
     }
 
     @Test
@@ -82,7 +89,8 @@ class MapArticleToDto {
         val data = mapArticleToDto(article, ordinalNumber = 9)
 
         assertThat(data.marker).isEqualTo("9")
-        assertThat(data.markerText).isEqualTo("")
+        assertThat(data.markerText.value).isEqualTo("")
+        assertThat(data.markerText.guid).isInstanceOf(UUID::class.java).isNotNull
     }
 }
 

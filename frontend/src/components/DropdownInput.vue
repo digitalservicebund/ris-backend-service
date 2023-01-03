@@ -1,7 +1,15 @@
 <script lang="ts" setup>
+<<<<<<< HEAD
 import { onBeforeUnmount, onMounted, ref, computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { DropdownInputModelType, DropdownItem } from "@/domain/types"
+=======
+import { onBeforeUnmount, onMounted, ref, watch } from "vue"
+import { Court } from "@/domain/documentUnit"
+import type { DropdownItem } from "@/domain/types"
+import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
+import dropdownItemService from "@/services/dropdownItemService"
+>>>>>>> main
 
 interface Props {
   id: string
@@ -109,15 +117,28 @@ onBeforeUnmount(() => {
           @keyup.down="focusNextItem"
         />
         <button
-          :aria-label="ariaLabelDropdownIcon"
+          :aria-labelledby="`labelDropdownIcon` + id"
           class="input-expand-icon"
           tabindex="0"
           @keydown.enter="toggleDropdown"
         >
           <span v-if="!showDropdown" class="icon material-icons text-blue-800">
             expand_more
+            <span
+              :id="`labelDropdownIcon` + id"
+              class="block h-[1px] overflow-hidden w-[1px]"
+              >Dropdown öffnen</span
+            >
           </span>
-          <span v-else class="icon material-icons"> expand_less </span>
+
+          <span v-else class="icon material-icons">
+            expand_less
+            <span
+              :id="`labelDropdownIcon` + id"
+              class="block h-[1px] overflow-hidden w-[1px]"
+              >Dropdown schließen</span
+            >
+          </span>
         </button>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import {
   InputType,
   NestedInputAttributes,
+  NestedInputField,
   ValidationError,
   InputField,
   DropdownItem,
@@ -129,7 +130,7 @@ export function defineDropdownField(
 
 export function defineNestedInputField(
   ariaLabel: string,
-  name: string,
+  name: NestedInputField["name"],
   fields: NestedInputAttributes["fields"]
 ): InputField {
   return {

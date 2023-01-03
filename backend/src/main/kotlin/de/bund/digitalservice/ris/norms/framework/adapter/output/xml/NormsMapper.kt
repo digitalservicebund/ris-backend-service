@@ -4,14 +4,15 @@ import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ArticleDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.IdentifiedElement
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ParagraphDto
 
 fun mapNormToDto(norm: Norm) =
     NormDto(
         guid = norm.guid.toString(),
-        officialLongTitle = norm.officialLongTitle,
-        officialShortTitle = norm.officialShortTitle,
+        officialLongTitle = IdentifiedElement(norm.officialLongTitle),
+        officialShortTitle = IdentifiedElement(norm.officialShortTitle),
         publicationDate = norm.publicationDate?.toString(),
         documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
         documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
@@ -24,24 +25,28 @@ fun mapNormToDto(norm: Norm) =
         }
     )
 
-fun mapArticleToDto(article: Article, ordinalNumber: Int = 1) =
-    ArticleDto(
+fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
+    val marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber"
+
+    return ArticleDto(
         guid = article.guid.toString(),
-        title = article.title,
-        marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber",
-        markerText = article.marker,
+        title = IdentifiedElement(article.title),
+        marker = marker,
+        markerText = IdentifiedElement(article.marker),
         paragraphs =
         article.paragraphs.mapIndexed { index, paragraph ->
-            mapParagraphToDto(paragraph, index)
+            mapParagraphToDto(paragraph, marker, index)
         }
     )
+}
 
-fun mapParagraphToDto(paragraph: Paragraph, ordinalNumber: Int = 1) =
+fun mapParagraphToDto(paragraph: Paragraph, articleMarker: String, ordinalNumber: Int = 1) =
     ParagraphDto(
         guid = paragraph.guid.toString(),
         marker = parseMarkerFromMarkerText(paragraph.marker) ?: "$ordinalNumber",
-        markerText = paragraph.marker,
-        text = paragraph.text
+        markerText = IdentifiedElement(paragraph.marker),
+        articleMarker = articleMarker,
+        text = IdentifiedElement(paragraph.text)
     )
 
 const val MARKER_PATTERN = "[a-zäöüß0-9]+(\\.[a-zäöüß0-9]+)*"
