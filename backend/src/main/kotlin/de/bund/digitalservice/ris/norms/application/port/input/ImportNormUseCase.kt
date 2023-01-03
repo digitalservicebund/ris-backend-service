@@ -44,7 +44,8 @@ interface ImportNormUseCase {
         val unofficialLongTitle: String? = null,
         val unofficialShortTitle: String? = null,
         val unofficialAbbreviation: String? = null,
-        val risAbbreviation: String? = null
+        val risAbbreviation: String? = null,
+        var europeanLegalIdentifier: String? = null
     ) {
         init {
             require(officialLongTitle.isNotBlank())

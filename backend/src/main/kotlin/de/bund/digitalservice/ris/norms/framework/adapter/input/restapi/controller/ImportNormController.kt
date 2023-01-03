@@ -63,6 +63,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var unofficialShortTitle: String? = null
         var unofficialAbbreviation: String? = null
         var risAbbreviation: String? = null
+        var europeanLegalIdentifier: String? = null
 
         fun toUseCaseData(): ImportNormUseCase.NormData {
             return ImportNormUseCase.NormData(
@@ -100,7 +101,8 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 unofficialLongTitle = this.unofficialLongTitle,
                 unofficialShortTitle = this.unofficialShortTitle,
                 unofficialAbbreviation = this.unofficialAbbreviation,
-                risAbbreviation = this.risAbbreviation
+                risAbbreviation = this.risAbbreviation,
+                europeanLegalIdentifier = this.europeanLegalIdentifier
             )
         }
     }

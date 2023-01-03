@@ -56,7 +56,8 @@ private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
         unofficialLongTitle = data.unofficialLongTitle,
         unofficialShortTitle = data.unofficialShortTitle,
         unofficialAbbreviation = data.unofficialAbbreviation,
-        risAbbreviation = data.risAbbreviation
+        risAbbreviation = data.risAbbreviation,
+        europeanLegalIdentifier = data.europeanLegalIdentifier
     )
 }
 
