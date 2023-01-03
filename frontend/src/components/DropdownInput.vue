@@ -1,15 +1,7 @@
 <script lang="ts" setup>
-<<<<<<< HEAD
 import { onBeforeUnmount, onMounted, ref, computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { DropdownInputModelType, DropdownItem } from "@/domain/types"
-=======
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
-import { Court } from "@/domain/documentUnit"
-import type { DropdownItem } from "@/domain/types"
-import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
-import dropdownItemService from "@/services/dropdownItemService"
->>>>>>> main
 
 interface Props {
   id: string
@@ -32,9 +24,6 @@ const { inputValue } = useInputModel<string, Props, Emits>(props, emits)
 const selectedLabel = computed(() => getLabel(inputValue.value))
 
 const showDropdown = ref(false)
-const ariaLabelDropdownIcon = computed(() =>
-  showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
-)
 const dropdownContainerRef = ref<HTMLElement>()
 const dropdownItemsRef = ref<HTMLElement>()
 const focusedItemIndex = ref(0)
