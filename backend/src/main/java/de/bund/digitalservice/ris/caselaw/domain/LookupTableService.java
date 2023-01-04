@@ -31,19 +31,13 @@ public class LookupTableService {
           .findCaselawBySearchStr(searchStr.get().trim())
           .map(
               documentTypeDTO ->
-                  new DocumentType(
-                      documentTypeDTO.getId(),
-                      documentTypeDTO.getJurisShortcut(),
-                      documentTypeDTO.getLabel()));
+                  new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel()));
     }
     return documentTypeRepository
         .findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R')
         .map(
             documentTypeDTO ->
-                new DocumentType(
-                    documentTypeDTO.getId(),
-                    documentTypeDTO.getJurisShortcut(),
-                    documentTypeDTO.getLabel()));
+                new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel()));
   }
 
   public Flux<Court> getCourts(Optional<String> searchStr) {
