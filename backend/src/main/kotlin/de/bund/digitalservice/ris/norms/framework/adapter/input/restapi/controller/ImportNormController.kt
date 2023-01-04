@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeUndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -64,6 +65,36 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var unofficialAbbreviation: String? = null
         var risAbbreviation: String? = null
         var europeanLegalIdentifier: String? = null
+        val printAnnouncementGazette: String? = null
+        val printAnnouncementYear: String? = null
+        val printAnnouncementPage: String? = null
+        val documentStatusWorkNote: String? = null
+        val documentStatusDescription: String? = null
+        var documentStatusDate: String? = null
+        val statusNote: String? = null
+        val statusDescription: String? = null
+        val statusDate: String? = null
+        val statusReference: String? = null
+        val repealNote: String? = null
+        val repealArticle: String? = null
+        val repealDate: String? = null
+        val repealReferences: String? = null
+        val reissueNote: String? = null
+        val reissueArticle: String? = null
+        val reissueDate: String? = null
+        val reissueReference: String? = null
+        val otherStatusNote: String? = null
+        val text: String? = null
+        val ageOfMajorityIndication: String? = null
+        val divergentExpirationDate: String? = null
+        val divergentExpirationDateState: String? = null
+        val principleExpirationDate: String? = null
+        val principleExpirationDateState: String? = null
+        val expirationNormCategory: String? = null
+        val divergentEntryIntoForceDate: String? = null
+        val divergentEntryIntoForceDateState: String? = null
+        val principleEntryIntoForceDate: String? = null
+        val principleEntryIntoForceDateState: String? = null
 
         fun toUseCaseData(): ImportNormUseCase.NormData {
             return ImportNormUseCase.NormData(
@@ -102,7 +133,37 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 unofficialShortTitle = this.unofficialShortTitle,
                 unofficialAbbreviation = this.unofficialAbbreviation,
                 risAbbreviation = this.risAbbreviation,
-                europeanLegalIdentifier = this.europeanLegalIdentifier
+                europeanLegalIdentifier = this.europeanLegalIdentifier,
+                printAnnouncementGazette = this.printAnnouncementGazette,
+                printAnnouncementYear = this.printAnnouncementYear,
+                printAnnouncementPage = this.printAnnouncementPage,
+                documentStatusWorkNote = this.documentStatusWorkNote,
+                documentStatusDescription = this.documentStatusDescription,
+                documentStatusDate = decodeLocalDate(this.documentStatusDate),
+                statusNote = this.statusNote,
+                statusDescription = this.statusDescription,
+                statusDate = decodeLocalDate(this.statusDate),
+                statusReference = this.statusReference,
+                repealNote = this.repealNote,
+                repealArticle = this.repealArticle,
+                repealDate = decodeLocalDate(this.repealDate),
+                repealReferences = this.repealReferences,
+                reissueNote = this.reissueNote,
+                reissueArticle = this.reissueArticle,
+                reissueDate = decodeLocalDate(this.reissueDate),
+                reissueReference = this.reissueReference,
+                otherStatusNote = this.otherStatusNote,
+                text = this.text,
+                ageOfMajorityIndication = this.ageOfMajorityIndication,
+                divergentExpirationDate = decodeLocalDate(this.divergentExpirationDate),
+                divergentExpirationDateState = decodeUndefinedDate(this.divergentExpirationDateState),
+                principleExpirationDate = decodeLocalDate(this.principleExpirationDate),
+                principleExpirationDateState = decodeUndefinedDate(this.principleExpirationDateState),
+                expirationNormCategory = this.expirationNormCategory,
+                divergentEntryIntoForceDate = decodeLocalDate(this.divergentEntryIntoForceDate),
+                divergentEntryIntoForceDateState = decodeUndefinedDate(this.divergentEntryIntoForceDateState),
+                principleEntryIntoForceDate = decodeLocalDate(this.principleEntryIntoForceDate),
+                principleEntryIntoForceDateState = decodeUndefinedDate(this.principleEntryIntoForceDateState)
             )
         }
     }
