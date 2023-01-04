@@ -1,15 +1,6 @@
-import { expect, Page } from "@playwright/test"
-import { navigateToCategories } from "./e2e-utils"
+import { expect } from "@playwright/test"
+import { navigateToCategories, waitForSaving } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
-
-async function waitForSaving(page: Page): Promise<void> {
-  await expect(
-    page.locator("text=Daten werden gespeichert >> nth=0")
-  ).toBeVisible()
-  await expect(
-    page.locator("text=Zuletzt gespeichert um >> nth=0")
-  ).toBeVisible()
-}
 
 test.describe("ensuring the editing experience in categories is as expected", () => {
   test("test legal effect dropdown", async ({ page, documentNumber }) => {

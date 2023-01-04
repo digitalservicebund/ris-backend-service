@@ -13,6 +13,7 @@ public record CoreData(
     List<String> fileNumbers,
     List<String> deviatingFileNumbers,
     Court court,
+    List<String> incorrectCourts,
     String category, // TODO remove
     DocumentType documentType,
     String procedure,

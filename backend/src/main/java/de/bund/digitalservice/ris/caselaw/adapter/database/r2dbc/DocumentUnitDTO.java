@@ -100,6 +100,7 @@ public class DocumentUnitDTO {
   @Transient List<PreviousDecisionDTO> previousDecisions;
   @Transient List<FileNumberDTO> fileNumbers;
   @Transient List<FileNumberDTO> deviatingFileNumbers;
+  @Transient List<IncorrectCourtDTO> incorrectCourts;
   @Transient List<DeviatingEcliDTO> deviatingEclis;
   @Transient List<DeviatingDecisionDateDTO> deviatingDecisionDates;
 }

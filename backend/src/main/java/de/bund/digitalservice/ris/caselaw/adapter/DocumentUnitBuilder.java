@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisi
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -93,6 +94,12 @@ public class DocumentUnitBuilder {
               .toList();
     }
 
+    List<String> incorrectCourts = null;
+    if (documentUnitDTO.getIncorrectCourts() != null) {
+      incorrectCourts =
+          documentUnitDTO.getIncorrectCourts().stream().map(IncorrectCourtDTO::court).toList();
+    }
+
     return new DocumentUnit(
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
@@ -105,6 +112,7 @@ public class DocumentUnitBuilder {
             fileNumbers,
             deviatingFileNumbers,
             court,
+            incorrectCourts,
             documentUnitDTO.getCategory(),
             documentType,
             documentUnitDTO.getProcedure(),

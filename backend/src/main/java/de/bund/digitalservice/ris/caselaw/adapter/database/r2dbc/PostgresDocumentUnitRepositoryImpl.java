@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PreviousDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
@@ -31,6 +32,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
+
+  private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
   private final DocumentTypeRepository documentTypeRepository;
@@ -41,6 +44,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DeviatingEcliRepository deviatingEcliRepository,
       DatabasePreviousDecisionRepository previousDecisionRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
+      DatabaseIncorrectCourtRepository incorrectCourtRepository,
       CourtRepository courtRepository,
       StateRepository stateRepository,
       DocumentTypeRepository documentTypeRepository) {
@@ -50,6 +54,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
     this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
+    this.incorrectCourtRepository = incorrectCourtRepository;
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
     this.documentTypeRepository = documentTypeRepository;
@@ -63,6 +68,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectFileNumbers)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
+        .flatMap(this::injectIncorrectCourt)
         .flatMap(this::injectDocumentType)
         .map(
             documentUnitDTO ->
@@ -77,6 +83,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectFileNumbers)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
+        .flatMap(this::injectIncorrectCourt)
         .flatMap(this::injectDocumentType)
         .map(
             documentUnitDTO ->
@@ -111,6 +118,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingEcli(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
@@ -488,6 +496,56 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
+  private Mono<DocumentUnitDTO> saveIncorrectCourt(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    return incorrectCourtRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            incorrectCourtDTOs -> {
+              List<String> incorrectCourts = new ArrayList<>();
+              if (documentUnit.coreData() != null
+                  && documentUnit.coreData().incorrectCourts() != null) {
+                incorrectCourts.addAll(documentUnit.coreData().incorrectCourts());
+              }
+
+              AtomicInteger incorrectCourtIndex = new AtomicInteger(0);
+              List<IncorrectCourtDTO> toSave = new ArrayList<>();
+              List<IncorrectCourtDTO> toDelete = new ArrayList<>();
+
+              incorrectCourtDTOs.forEach(
+                  incorrectCourtDTO -> {
+                    if (incorrectCourtIndex.get() < incorrectCourts.size()) {
+                      incorrectCourtDTO =
+                          IncorrectCourtTransformer.enrichDTO(
+                              incorrectCourtDTO,
+                              incorrectCourts.get(incorrectCourtIndex.getAndIncrement()));
+                      toSave.add(incorrectCourtDTO);
+                    } else {
+                      toDelete.add(incorrectCourtDTO);
+                    }
+                  });
+
+              while (incorrectCourtIndex.get() < incorrectCourts.size()) {
+                IncorrectCourtDTO incorrectCourtDTO =
+                    IncorrectCourtDTO.builder()
+                        .court(incorrectCourts.get(incorrectCourtIndex.getAndIncrement()))
+                        .documentUnitId(documentUnitDTO.getId())
+                        .build();
+                toSave.add(incorrectCourtDTO);
+              }
+
+              return incorrectCourtRepository
+                  .deleteAll(toDelete)
+                  .then(incorrectCourtRepository.saveAll(toSave).collectList())
+                  .map(
+                      savedIncorrectCourtList -> {
+                        documentUnitDTO.setIncorrectCourts(savedIncorrectCourtList);
+                        return documentUnitDTO;
+                      });
+            });
+  }
+
   @Override
   public Mono<DocumentUnit> attachFile(
       UUID documentUnitUuid, String fileUuid, String type, String fileName) {
@@ -595,6 +653,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             documentTypeDTO -> {
               documentUnitDTO.setDocumentTypeDTO(documentTypeDTO);
               return documentUnitDTO;
+            });
+  }
+
+  private Mono<DocumentUnitDTO> injectIncorrectCourt(DocumentUnitDTO documentUnitDTO) {
+    return incorrectCourtRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            incorrectCourtDTOs -> {
+              documentUnitDTO.setIncorrectCourts(incorrectCourtDTOs);
+              return Mono.just(documentUnitDTO);
             });
   }
 }
