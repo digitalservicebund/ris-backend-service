@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
@@ -13,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("lookuptable_court")
 public class CourtDTO {
   public static final CourtDTO EMPTY = new CourtDTO();
-  long id;
+  @Id Long id;
   String changedatemail;
   String changedateclient;
   Character changeindicator;
