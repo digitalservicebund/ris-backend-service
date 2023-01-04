@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
@@ -31,6 +33,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
+  private final DocumentTypeRepository documentTypeRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -39,7 +42,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabasePreviousDecisionRepository previousDecisionRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       CourtRepository courtRepository,
-      StateRepository stateRepository) {
+      StateRepository stateRepository,
+      DocumentTypeRepository documentTypeRepository) {
 
     this.repository = repository;
     this.previousDecisionRepository = previousDecisionRepository;
@@ -48,6 +52,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
+    this.documentTypeRepository = documentTypeRepository;
   }
 
   @Override
@@ -58,6 +63,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectFileNumbers)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
+        .flatMap(this::injectDocumentType)
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
@@ -71,6 +77,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectFileNumbers)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
+        .flatMap(this::injectDocumentType)
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
@@ -95,6 +102,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
     return repository
         .findByUuid(documentUnit.uuid())
+        .flatMap(documentUnitDTO -> enrichDocumentType(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
@@ -106,6 +114,27 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+  }
+
+  private Mono<DocumentUnitDTO> enrichDocumentType(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    if (documentUnit.coreData() == null || documentUnit.coreData().documentType() == null) {
+      return Mono.just(documentUnitDTO);
+    }
+    return documentTypeRepository
+        .findByJurisShortcut(documentUnit.coreData().documentType().jurisShortcut())
+        .map(
+            documentTypeDTO -> {
+              if (!documentTypeDTO
+                  .getLabel()
+                  .equals(documentUnit.coreData().documentType().label())) {
+                throw new DocumentUnitException(
+                    "DocumentType label does not match the database entry, this should not happen");
+              }
+              documentUnitDTO.setDocumentTypeDTO(documentTypeDTO);
+              documentUnitDTO.setDocumentTypeId(documentTypeDTO.getId());
+              return documentUnitDTO;
+            });
   }
 
   private Mono<DocumentUnitDTO> enrichRegion(
@@ -552,6 +581,20 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             deviatingDecisionDateDTOs -> {
               documentUnitDTO.setDeviatingDecisionDates(deviatingDecisionDateDTOs);
               return Mono.just(documentUnitDTO);
+            });
+  }
+
+  private Mono<DocumentUnitDTO> injectDocumentType(DocumentUnitDTO documentUnitDTO) {
+    if (documentUnitDTO.getDocumentTypeId() == null) {
+      return Mono.just(documentUnitDTO);
+    }
+    return documentTypeRepository
+        .findById(documentUnitDTO.getDocumentTypeId())
+        .defaultIfEmpty(DocumentTypeDTO.builder().build())
+        .map(
+            documentTypeDTO -> {
+              documentUnitDTO.setDocumentTypeDTO(documentTypeDTO);
+              return documentUnitDTO;
             });
   }
 }

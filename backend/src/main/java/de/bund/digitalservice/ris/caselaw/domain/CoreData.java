@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.validator.LookupTableConstraint;
 import java.time.Instant;
 import java.util.List;
@@ -12,7 +13,8 @@ public record CoreData(
     List<String> fileNumbers,
     List<String> deviatingFileNumbers,
     Court court,
-    String category, // DocumentType TODO
+    String category, // TODO remove
+    DocumentType documentType,
     String procedure,
     String ecli,
     List<String> deviatingEclis,

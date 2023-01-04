@@ -4,11 +4,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisi
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.List;
 
@@ -38,6 +40,13 @@ public class DocumentUnitBuilder {
     if (courtType != null) {
       String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
       court = new Court(courtType, courtLocation, label, null);
+    }
+
+    DocumentType documentType = null;
+    DocumentTypeDTO documentTypeDTO = documentUnitDTO.getDocumentTypeDTO();
+    if (documentTypeDTO != null) {
+      documentType =
+          new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
     }
 
     List<PreviousDecision> previousDecisions = null;
@@ -97,6 +106,7 @@ public class DocumentUnitBuilder {
             deviatingFileNumbers,
             court,
             documentUnitDTO.getCategory(),
+            documentType,
             documentUnitDTO.getProcedure(),
             documentUnitDTO.getEcli(),
             deviatingEclis,
