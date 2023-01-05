@@ -31,12 +31,3 @@ export const uploadTestfile = async (page: Page, filename: string) => {
   await expect(page.locator("text=Upload läuft")).toBeHidden()
   await expect(page.locator("text=Dokument wird geladen.")).toBeHidden()
 }
-
-export const waitForSaving = async (page: Page): Promise<void> => {
-  await expect(
-    page.locator("text=Daten werden gespeichert >> nth=0")
-  ).toBeVisible()
-  await expect(
-    page.locator("text=Zuletzt gespeichert um >> nth=0")
-  ).toBeVisible()
-}

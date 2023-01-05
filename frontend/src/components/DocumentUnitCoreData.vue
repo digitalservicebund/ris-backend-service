@@ -22,7 +22,14 @@ const emit = defineEmits<Emits>()
 const { modelValue } = toRefs(props)
 
 const values = useTransformNestedData(modelValue, coreDataFields, emit)
-const courtValues = useTransformNestedData(modelValue, courtFields, emit)
+const courtValues = computed({
+  get() {
+    return { court: values.value.court }
+  },
+  set(newCourtValue) {
+    values.value = Object.assign(values.value, newCourtValue)
+  },
+})
 
 const containerWidth = ref()
 const columnCount = computed(() => (containerWidth.value < 600 ? 1 : 2))

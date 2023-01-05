@@ -124,26 +124,14 @@ export function defineNestedInputField(
 }
 
 export const courtFields: InputField[] = [
-  defineNestedInputField(
-    "Fehlerhaftes Gericht",
-    "nestedInputOfCourtAndIncorrectCourts",
-    {
-      parent: defineDropdownField(
-        "court",
-        "Gericht",
-        "Gericht",
-        "Gerichtstyp Gerichtsort",
-        true,
-        [],
-        LookupTableEndpoint.courts
-      ),
-      child: defineChipsField(
-        "incorrectCourts",
-        "Fehlerhaftes Gericht",
-        "Fehlerhaftes Gericht",
-        ""
-      ),
-    }
+  defineDropdownField(
+    "court",
+    "Gericht",
+    "Gericht",
+    "Gerichtstyp Gerichtsort",
+    true,
+    [],
+    LookupTableEndpoint.courts
   ),
 ]
 export const coreDataFields: InputField[] = [
