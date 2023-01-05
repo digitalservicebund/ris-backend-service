@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
@@ -13,7 +14,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("lookuptable_state")
 public class StateDTO {
   public static final StateDTO EMPTY = new StateDTO();
-  long id;
+  @Id Long id;
   Character changeindicator;
   String version;
   String jurisshortcut;

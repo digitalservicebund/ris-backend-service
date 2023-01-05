@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import NavbarSide from "@/components/NavbarSide.vue"
@@ -19,8 +19,6 @@ const navigationIsOpen = useToggleStateInRouteQuery(
   route,
   router.replace
 )
-
-const documentUnit = ref<DocumentUnit>(props.documentUnit)
 </script>
 
 <template>

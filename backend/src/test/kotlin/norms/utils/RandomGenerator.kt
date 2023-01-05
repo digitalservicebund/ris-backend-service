@@ -3,6 +3,7 @@ package norms.utils
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ImportNormController
 import org.jeasy.random.EasyRandom
@@ -41,11 +42,17 @@ fun createRandomImportNormRequestSchema(): ImportNormController.NormRequestSchem
     val parameters: EasyRandomParameters =
         EasyRandomParameters().randomize(named(".+Date\$")) {
             createRandomLocalDateInString()
-        } // needed for string date fields
+        }.randomize(named(".+DateState\$")) {
+            createRandomUndefinedDate()
+        }
     val importNormRequestSchema =
         EasyRandom(parameters).nextObject(ImportNormController.NormRequestSchema::class.java)
     importNormRequestSchema.articles = createRandomListOfArticleRequestSchema()
     return importNormRequestSchema
+}
+
+private fun createRandomUndefinedDate(): String {
+    return EasyRandom().nextObject(UndefinedDate::class.java).toString()
 }
 
 private fun createRandomLocalDateInString(): String {

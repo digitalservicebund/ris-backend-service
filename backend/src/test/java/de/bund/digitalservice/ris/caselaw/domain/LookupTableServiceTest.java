@@ -33,7 +33,8 @@ class LookupTableServiceTest {
   @Test
   void testGetDocumentTypes() {
     DocumentTypeDTO documentTypeDTO = DocumentTypeDTO.EMPTY;
-    documentTypeDTO.setId(3L);
+    documentTypeDTO.setJurisShortcut("ABC");
+    documentTypeDTO.setLabel("LabelABC");
     when(documentTypeRepository.findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R'))
         .thenReturn(Flux.just(documentTypeDTO));
 
@@ -41,7 +42,8 @@ class LookupTableServiceTest {
         .consumeNextWith(
             documentType -> {
               assertThat(documentType).isInstanceOf(DocumentType.class);
-              assertThat(documentType.id()).isEqualTo(3L);
+              assertThat(documentType.jurisShortcut()).isEqualTo("ABC");
+              assertThat(documentType.label()).isEqualTo("LabelABC");
             })
         .verifyComplete();
 

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.UUID
@@ -45,7 +46,37 @@ interface ImportNormUseCase {
         val unofficialShortTitle: String? = null,
         val unofficialAbbreviation: String? = null,
         val risAbbreviation: String? = null,
-        var europeanLegalIdentifier: String? = null
+        var europeanLegalIdentifier: String? = null,
+        val printAnnouncementGazette: String? = null,
+        val printAnnouncementYear: String? = null,
+        val printAnnouncementPage: String? = null,
+        val documentStatusWorkNote: String? = null,
+        val documentStatusDescription: String? = null,
+        val documentStatusDate: LocalDate? = null,
+        val statusNote: String? = null,
+        val statusDescription: String? = null,
+        val statusDate: LocalDate? = null,
+        val statusReference: String? = null,
+        val repealNote: String? = null,
+        val repealArticle: String? = null,
+        val repealDate: LocalDate? = null,
+        val repealReferences: String? = null,
+        val reissueNote: String? = null,
+        val reissueArticle: String? = null,
+        val reissueDate: LocalDate? = null,
+        val reissueReference: String? = null,
+        val otherStatusNote: String? = null,
+        val text: String? = null,
+        val ageOfMajorityIndication: String? = null,
+        val divergentExpirationDate: LocalDate? = null,
+        val divergentExpirationDateState: UndefinedDate? = null,
+        val principleExpirationDate: LocalDate? = null,
+        val principleExpirationDateState: UndefinedDate? = null,
+        val expirationNormCategory: String? = null,
+        val divergentEntryIntoForceDate: LocalDate? = null,
+        val divergentEntryIntoForceDateState: UndefinedDate? = null,
+        val principleEntryIntoForceDate: LocalDate? = null,
+        val principleEntryIntoForceDateState: UndefinedDate? = null
     ) {
         init {
             require(officialLongTitle.isNotBlank())

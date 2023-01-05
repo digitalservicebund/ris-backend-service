@@ -147,6 +147,11 @@ components:
       pattern: '^[1-2]\d{3}-[0-1]\d-[0-3]\d$'
       example: "2020-10-21"
 
+    UndefinedDate:
+      description: A field that takes one of three values
+      type: string
+      enum: [UNDEFINED_UNKNOWN, UNDEFINED_FUTURE, UNDEFINED_NOT_PRESENT]
+
     ParagraphWithoutGuid:
       type: object
       required:
@@ -327,6 +332,87 @@ components:
         risAbbreviation:
           type: string
           example: "SaubFahrzeugBeschG"
+        europeanLegalIdentifier:
+          type: string
+          example: "recht.bund.de/eli/bgbl-1/2021/1102/regelungstext-1"
+        printAnnouncementGazette:
+          type: string
+          example: ""
+        printAnnouncementYear:
+          type: string
+          example: "1996"
+        printAnnouncementPage:
+          type: string
+          example: "1102"
+        documentStatusWorkNote:
+          type: string
+          example: ""
+        documentStatusDescription:
+          type: string
+          example: ""
+        documentStatusDate:
+          $ref: "#/components/schemas/Date"
+        statusNote:
+          type: string
+          example: ""
+        statusDescription:
+          type: string
+          example: ""
+        statusDate:
+          $ref: "#/components/schemas/Date"
+        statusReference:
+          type: string
+          example: ""
+        repealNote:
+          type: string
+          example: ""
+        repealArticle:
+          type: string
+          example: ""
+        repealDate:
+          $ref: "#/components/schemas/Date"
+        repealReferences:
+          type: string
+          example: ""
+        reissueNote:
+          type: string
+          example: ""
+        reissueArticle:
+          type: string
+          example: ""
+        reissueDate:
+          $ref: "#/components/schemas/Date"
+        reissueReference:
+          type: string
+          example: ""
+        otherStatusNote:
+          type: string
+          example: ""
+        text:
+          type: string
+          example: "text"
+        ageOfMajorityIndication:
+          type: string
+          example: ""
+        divergentExpirationDate:
+          $ref: "#/components/schemas/Date"
+        divergentExpirationDateState:
+          $ref: "#/components/schemas/UndefinedDate"
+        principleExpirationDate:
+          $ref: "#/components/schemas/Date"
+        principleExpirationDateState:
+          $ref: "#/components/schemas/UndefinedDate"
+        expirationNormCategory:
+          type: string
+          example: ""
+        divergentEntryIntoForceDate:
+          $ref: "#/components/schemas/Date"
+        divergentEntryIntoForceDateState:
+          $ref: "#/components/schemas/UndefinedDate"
+        principleEntryIntoForceDate:
+          $ref: "#/components/schemas/Date"
+        principleEntryIntoForceDateState:
+          $ref: "#/components/schemas/UndefinedDate"
 
     NormFrame:
       allOf:
@@ -530,8 +616,6 @@ components:
               example: ""
             divergentEntryIntoForceDate:
               $ref: "#/components/schemas/Date"
-              type: string
-              example: ""
             principleEntryIntoForceDate:
               $ref: "#/components/schemas/Date"
             principleEntryIntoForceDateState:

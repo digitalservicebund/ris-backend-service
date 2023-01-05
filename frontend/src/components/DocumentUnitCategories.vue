@@ -17,7 +17,7 @@ import fileService from "@/services/fileService"
 const props = defineProps<{
   documentUnit: DocumentUnit
 }>()
-const updatedDocumentUnit = computed(() => props.documentUnit)
+const updatedDocumentUnit = ref<DocumentUnit>(props.documentUnit)
 
 const handleUpdateValueDocumentUnitTexts = async (
   updatedValue: [keyof Texts, string]
@@ -40,7 +40,7 @@ const handleUpdateDocumentUnit = async () => {
     validationErrors.value = []
   }
   if (response.data) {
-    // TODO
+    // updatedDocumentUnit.value = response.data as DocumentUnit
   }
   setTimeout(() => {
     hasDataChange.value = false
@@ -183,7 +183,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <DocumentUnitWrapper v-slot="{ classes }" :document-unit="documentUnit">
+  <DocumentUnitWrapper
+    v-slot="{ classes }"
+    :document-unit="updatedDocumentUnit"
+  >
     <div class="flex w-full">
       <div :class="classes">
         <DocumentUnitCoreData

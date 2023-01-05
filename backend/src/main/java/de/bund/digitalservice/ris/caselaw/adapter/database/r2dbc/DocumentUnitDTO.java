@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +38,12 @@ public class DocumentUnitDTO {
   String courtType;
 
   @Column("dokumenttyp")
-  String category; // <-- long id of entry in DocumentType table TODO
+  String category; // TODO remove
+
+  @Column("document_type_id")
+  Long documentTypeId; // points to lookup table row id
+
+  @Transient DocumentTypeDTO documentTypeDTO;
 
   @Column("vorgang")
   String procedure;
