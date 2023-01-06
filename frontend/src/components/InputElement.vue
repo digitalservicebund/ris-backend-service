@@ -3,6 +3,7 @@ import { computed } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
 import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
+import ComboboxInput from "@/components/ComboboxInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import DropdownInput from "@/components/DropdownInput.vue"
 import FileInput from "@/components/FileInput.vue"
@@ -49,6 +50,8 @@ const component = computed(() => {
       return ChipsDateInput
     case InputType.NESTED:
       return NestedInput
+    case InputType.COMBOBOX:
+      return ComboboxInput
     default:
       throw new Error(`Unknown input type: ${props.type}`)
   }

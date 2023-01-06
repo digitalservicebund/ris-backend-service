@@ -1,103 +1,48 @@
 <script lang="ts" setup>
-import { onBeforeUnmount, onMounted, ref, watch } from "vue"
-import { Court } from "@/domain/documentUnit"
-import type { DropdownItem } from "@/domain/types"
-import { DropdownInputModelType, LookupTableEndpoint } from "@/domain/types"
-import dropdownItemService from "@/services/dropdownItemService"
+import { onBeforeUnmount, onMounted, ref, computed } from "vue"
+import { useInputModel } from "@/composables/useInputModel"
+import { DropdownInputModelType, DropdownItem } from "@/domain/types"
 
 interface Props {
   id: string
-  value?: DropdownInputModelType // TODO do we need this?
+  items: DropdownItem[]
   modelValue?: DropdownInputModelType
+  value?: DropdownInputModelType
   ariaLabel: string
   placeholder?: string
-  dropdownItems?: DropdownItem[]
-  endpoint?: LookupTableEndpoint
-  isCombobox?: boolean
 }
 
 interface Emits {
-  (event: "update:modelValue", value: DropdownInputModelType | undefined): void
+  (event: "update:modelValue", value?: DropdownInputModelType): void
   (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
-const inputValue = ref<DropdownInputModelType>()
-const inputText = ref<string>()
+const emits = defineEmits<Emits>()
 
-watch(
-  props,
-  () => {
-    inputValue.value = props.modelValue ?? props.value
-    checkInputValueType()
-  },
-  {
-    immediate: true,
-  }
-)
+const { inputValue } = useInputModel<string, Props, Emits>(props, emits)
+const selectedLabel = computed(() => getLabel(inputValue.value))
 
-watch(inputValue, () => {
-  emit("update:modelValue", inputValue.value)
-  checkInputValueType()
-})
-
-function isCourt(input?: DropdownInputModelType): input is Court {
-  return typeof input === "object" && "location" in input && "type" in input
-}
-
-function checkInputValueType() {
-  if (isCourt(inputValue.value)) {
-    // currently only court (Gericht)
-    inputText.value = inputValue.value.label
-  } else {
-    if (props.endpoint) {
-      // currently only category (Dokumenttyp)
-      inputText.value = inputValue.value as string
-    } else {
-      // currently only legalEffect (Rechtskraft)
-      inputText.value = props.dropdownItems?.find(
-        (item) => item.value === inputValue.value
-      )?.text
-    }
-  }
-}
-
-const isShowDropdown = ref(false)
-const items = ref(props.dropdownItems ?? [])
-const currentItems = ref<DropdownItem[]>([]) // the items currently displayed in the dropdown
-const filter = ref<string>()
+const showDropdown = ref(false)
 const dropdownContainerRef = ref<HTMLElement>()
 const dropdownItemsRef = ref<HTMLElement>()
-const inputFieldRef = ref<HTMLInputElement>()
-const focusedItemIndex = ref<number>(0)
+const focusedItemIndex = ref(0)
 
-const toggleDropdown = () => {
-  isShowDropdown.value = !isShowDropdown.value
+function getLabel(value?: DropdownInputModelType) {
+  return props.items.find((item) => item.value === value)?.label
+}
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
   focusedItemIndex.value = 0
-  if (isShowDropdown.value) {
-    updateCurrentItems()
-    inputFieldRef.value?.focus()
-  }
 }
 
-const clearSelection = () => {
-  emit("update:modelValue", undefined)
-  filter.value = ""
-  inputText.value = ""
-  if (isShowDropdown.value) {
-    updateCurrentItems()
-  }
-  inputFieldRef.value?.focus()
+function choseItem(value: DropdownInputModelType) {
+  closeDropdown()
+  inputValue.value = value
 }
 
-const setChosenItem = (value: DropdownInputModelType) => {
-  isShowDropdown.value = false
-  emit("update:modelValue", value)
-  filter.value = ""
-}
-
-const keyup = () => {
+function focusPreviousItem() {
   focusedItemIndex.value -= 1
   const prev = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
@@ -105,7 +50,7 @@ const keyup = () => {
   if (prev) prev.focus()
 }
 
-const keydown = () => {
+function focusNextItem() {
   focusedItemIndex.value += 1
   const next = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
@@ -113,38 +58,7 @@ const keydown = () => {
   if (next) next.focus()
 }
 
-const onTextChange = () => {
-  focusedItemIndex.value = 0
-  isShowDropdown.value = true
-  filter.value = inputText.value
-  updateCurrentItems()
-}
-
-const updateCurrentItems = async () => {
-  if (!props.endpoint) {
-    currentItems.value = items.value.filter((item) =>
-      item.text.includes(!!filter.value ? filter.value : "")
-    )
-    insertItemIfEmpty()
-    return
-  }
-
-  const response = await dropdownItemService.fetch(props.endpoint, filter.value)
-  if (response.data) {
-    currentItems.value = response.data
-    insertItemIfEmpty()
-  } else {
-    console.error(response.error)
-  }
-}
-
-const insertItemIfEmpty = () => {
-  if (currentItems.value.length === 0) {
-    currentItems.value = [{ text: "Kein passender Eintrag", value: "" }]
-  }
-}
-
-const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
+function closeDropDownWhenClickOutside(event: MouseEvent) {
   const dropdown = dropdownContainerRef.value
   if (
     !dropdown ||
@@ -152,31 +66,19 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
     event.composedPath().includes(dropdown)
   )
     return
-  isShowDropdown.value = false
+  closeDropdown()
 }
 
-const selectAllText = () => {
-  inputFieldRef.value?.select()
-}
-
-const closeDropdown = () => {
-  isShowDropdown.value = false
-}
-
-const isRevokedCourt = (item: DropdownItem) => {
-  return !!(isCourt(item.value) && item.value.revoked)
-}
-
-const getRevokedCourtString = (item: DropdownItem) => {
-  return (item.value as Court).revoked
+function closeDropdown() {
+  showDropdown.value = false
 }
 
 onMounted(() => {
-  window.addEventListener("click", closeDropDownWhenClickOutSide)
+  window.addEventListener("click", closeDropDownWhenClickOutside)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener("click", closeDropDownWhenClickOutSide)
+  window.removeEventListener("click", closeDropDownWhenClickOutside)
 })
 </script>
 
@@ -187,49 +89,29 @@ onBeforeUnmount(() => {
     @keydown.esc="closeDropdown"
   >
     <div
-      class="dropdown-container__open-dropdown"
+      class="cursor-pointer dropdown-container__open-dropdown"
+      @click="toggleDropdown"
       @keydown.enter="toggleDropdown"
     >
       <div class="bg-white input-container">
         <input
           :id="id"
-          ref="inputFieldRef"
-          v-model="inputText"
+          v-model="selectedLabel"
           :aria-label="ariaLabel"
           autocomplete="off"
-          class="text-input"
+          class="cursor-pointer text-input"
           :placeholder="placeholder"
-          :readonly="!props.isCombobox"
+          :readonly="true"
           tabindex="0"
-          @click="selectAllText"
-          @input="onTextChange"
-          @keyup.down="keydown"
+          @keyup.down="focusNextItem"
         />
-        <button
-          v-if="isCombobox && inputText"
-          class="input-close-icon"
-          tabindex="0"
-          @click="clearSelection"
-          @keydown.enter="clearSelection"
-        >
-          <span
-            aria-label="Auswahl zurücksetzen"
-            class="icon material-icons pr-[1.5rem] text-blue-800"
-          >
-            close
-          </span>
-        </button>
         <button
           :aria-labelledby="`labelDropdownIcon` + id"
           class="input-expand-icon"
           tabindex="0"
-          @click="toggleDropdown"
           @keydown.enter="toggleDropdown"
         >
-          <span
-            v-if="!isShowDropdown"
-            class="icon material-icons text-blue-800"
-          >
+          <span v-if="!showDropdown" class="icon material-icons text-blue-800">
             expand_more
             <span
               :id="`labelDropdownIcon` + id"
@@ -250,35 +132,25 @@ onBeforeUnmount(() => {
       </div>
     </div>
     <div
-      v-if="isShowDropdown"
+      v-if="showDropdown"
       ref="dropdownItemsRef"
       class="dropdown-container__dropdown-items"
       tabindex="-1"
     >
       <div
-        v-for="(item, index) in currentItems"
+        v-for="(item, index) in items"
         :key="index"
         aria-label="dropdown-option"
         class="dropdown-container__dropdown-item"
-        :class="{
-          'dropdown-container__dropdown-item__with-additional-info':
-            isRevokedCourt(item),
-        }"
         tabindex="0"
-        @click="setChosenItem(item.value)"
-        @keypress.enter="setChosenItem(item.value)"
-        @keyup.down="keydown"
-        @keyup.up="keyup"
+        @click="choseItem(item.value)"
+        @keypress.enter="choseItem(item.value)"
+        @keyup.down="focusNextItem"
+        @keyup.up="focusPreviousItem"
       >
         <span>
-          {{ item.text }}
-          <span
-            v-if="isRevokedCourt(item)"
-            aria-label="additional-dropdown-info"
-            class="body-02-reg dropdown-container__dropdown-item__additional-info"
-            >{{ getRevokedCourtString(item) }}</span
-          ></span
-        >
+          {{ item.label }}
+        </span>
       </div>
     </div>
   </div>
@@ -309,7 +181,6 @@ onBeforeUnmount(() => {
         }
       }
 
-      .input-close-icon,
       .input-expand-icon {
         height: 5px;
         margin-top: 3px;
@@ -345,16 +216,6 @@ onBeforeUnmount(() => {
 
     &:focus {
       @apply bg-blue-300;
-    }
-
-    &__with-additional-info {
-      @apply bg-gray-100;
-    }
-
-    &__additional-info {
-      @apply text-gray-900;
-
-      float: right;
     }
   }
 }

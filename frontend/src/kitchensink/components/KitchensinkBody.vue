@@ -4,6 +4,7 @@ import type { risComponent } from "@/kitchensink/types/types"
 import ButtonView from "@/kitchensink/views/ButtonView.vue"
 import CodeSnippetView from "@/kitchensink/views/CodeSnippetView.vue"
 import DocumentUnitInfoPanelView from "@/kitchensink/views/DocumentUnitInfoPanelView.vue"
+import DropdownView from "@/kitchensink/views/DropdownView.vue"
 import ErrorView from "@/kitchensink/views/ErrorView.vue"
 import ExpandableContentView from "@/kitchensink/views/ExpandableContentView.vue"
 import FileUploadView from "@/kitchensink/views/FileUploadView.vue"
@@ -37,6 +38,8 @@ const component = computed(() => {
       return FileViewerView
     case "InputView":
       return InputView
+    case "DropdownView":
+      return DropdownView
     case "NavbarView":
       return NavbarView
     case "OriginalFileSidePanelView":

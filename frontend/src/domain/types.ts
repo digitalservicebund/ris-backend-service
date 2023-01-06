@@ -1,4 +1,4 @@
-import { Court } from "@/domain/documentUnit"
+import { ServiceResponse } from "@/services/httpClient"
 
 export enum InputType {
   TEXT = "text",
@@ -9,6 +9,7 @@ export enum InputType {
   CHIPS = "chips",
   DATECHIPS = "datechips",
   NESTED = "nested",
+  COMBOBOX = "combobox",
 }
 
 //BASE
@@ -74,6 +75,10 @@ export interface NestedInputField extends Omit<BaseInputField, "name"> {
 }
 
 //DATE
+export interface DateAttributes extends BaseInputAttributes {
+  isFutureDate?: boolean
+}
+
 export interface DateInputField extends BaseInputField {
   type: InputType.DATE
   inputAttributes: DateAttributes
@@ -81,34 +86,40 @@ export interface DateInputField extends BaseInputField {
 
 export type DateInputModelType = string
 
-//LOOKUP
-export enum LookupTableEndpoint {
-  documentTypes = "lookuptable/documentTypes",
-  courts = "lookuptable/courts",
-}
-
 //DROPDOWN
-export type DropdownInputModelType = string | Court
+export type DropdownInputModelType = string
 
 export type DropdownItem = {
-  text: string
+  label: string
   value: DropdownInputModelType
 }
 
-export interface DateAttributes extends BaseInputAttributes {
-  isFutureDate?: boolean
-}
-
 export interface DropdownAttributes extends BaseInputAttributes {
-  isCombobox?: boolean
   placeholder?: string
-  dropdownItems?: DropdownItem[]
-  endpoint?: LookupTableEndpoint
+  items: DropdownItem[]
 }
 
 export interface DropdownInputField extends BaseInputField {
   type: InputType.DROPDOWN
   inputAttributes: DropdownAttributes
+}
+
+//COMBOBOX
+export type ComboboxInputModelType = string | { label: string }
+
+export type ComboboxItem = {
+  label: string
+  value: ComboboxInputModelType
+}
+
+export interface ComboboxAttributes extends BaseInputAttributes {
+  itemService: (filter?: string) => Promise<ServiceResponse<ComboboxItem[]>>
+  placeholder?: string
+}
+
+export interface ComboboxInputField extends BaseInputField {
+  type: InputType.COMBOBOX
+  inputAttributes: ComboboxAttributes
 }
 
 //CHECKBOX
@@ -129,6 +140,7 @@ export type InputField =
   | ChipsInputField
   | DateChipsInputField
   | NestedInputField
+  | ComboboxInputField
 
 export type InputAttributes =
   | TextInputAttributes
@@ -136,6 +148,7 @@ export type InputAttributes =
   | ChipsInputAttributes
   | NestedInputAttributes
   | DateAttributes
+  | ComboboxAttributes
 
 export type ModelType =
   | TextInputModelType
@@ -145,6 +158,7 @@ export type ModelType =
   | CheckboxInputModelType
   | ChipsInputModelType
   | NestedInputModelType
+  | ComboboxInputModelType
 
 export type ValidationError = {
   defaultMessage: string

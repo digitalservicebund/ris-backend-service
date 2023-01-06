@@ -1,13 +1,15 @@
 import {
   InputType,
-  LookupTableEndpoint,
   NestedInputAttributes,
   NestedInputField,
   ValidationError,
+  InputField,
+  DropdownItem,
+  ComboboxAttributes,
 } from "./types"
-import type { InputField, DropdownItem } from "./types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import DocumentUnit from "@/domain/documentUnit"
+import comboboxItemService from "@/services/comboboxItemService"
 
 export function defineTextField(
   name: string,
@@ -82,14 +84,34 @@ export function defineDateField(
   }
 }
 
+export function defineComboboxField(
+  name: string,
+  label: string,
+  ariaLabel: string,
+  itemService: ComboboxAttributes["itemService"],
+  placeholder?: string,
+  validationError?: ValidationError
+): InputField {
+  return {
+    name,
+    type: InputType.COMBOBOX,
+    label,
+    required: DocumentUnit.isRequiredField(name),
+    inputAttributes: {
+      ariaLabel,
+      placeholder,
+      itemService,
+      validationError,
+    },
+  }
+}
+
 export function defineDropdownField(
   name: string,
   label: string,
   ariaLabel: string,
+  items: DropdownItem[],
   placeholder?: string,
-  isCombobox?: boolean,
-  dropdownItems?: DropdownItem[],
-  endpoint?: LookupTableEndpoint,
   validationError?: ValidationError
 ): InputField {
   return {
@@ -100,9 +122,7 @@ export function defineDropdownField(
     inputAttributes: {
       ariaLabel,
       placeholder,
-      dropdownItems,
-      endpoint,
-      isCombobox,
+      items,
       validationError,
     },
   }
@@ -124,14 +144,12 @@ export function defineNestedInputField(
 }
 
 export const courtFields: InputField[] = [
-  defineDropdownField(
+  defineComboboxField(
     "court",
     "Gericht",
     "Gericht",
-    "Gerichtstyp Gerichtsort",
-    true,
-    [],
-    LookupTableEndpoint.courts
+    comboboxItemService.getCourts,
+    "Gerichtstyp Gerichtsort"
   ),
 ]
 export const coreDataFields: InputField[] = [
@@ -172,14 +190,12 @@ export const coreDataFields: InputField[] = [
     }
   ),
   defineTextField("appraisalBody", "Spruchkörper", "Spruchkörper"),
-  defineDropdownField(
+  defineComboboxField(
     "category",
     "Dokumenttyp",
     "Dokumenttyp",
-    "Bitte auswählen",
-    true,
-    [],
-    LookupTableEndpoint.documentTypes
+    comboboxItemService.getDocumentTypes,
+    "Bitte auswählen"
   ),
   defineNestedInputField(
     "Abweichender ECLI",
@@ -202,10 +218,7 @@ export const coreDataFields: InputField[] = [
     "legalEffect",
     "Rechtskraft",
     "Rechtskraft",
-    "",
-    false,
-    legalEffectTypes.items,
-    undefined
+    legalEffectTypes.items
   ),
   defineTextField(
     "region",

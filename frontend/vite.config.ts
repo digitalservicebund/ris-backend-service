@@ -1,6 +1,7 @@
 import path from "path"
 import vue from "@vitejs/plugin-vue"
 import { defineConfig } from "vite"
+import EnvironmentPlugin from "vite-plugin-environment"
 import Pages from "vite-plugin-pages"
 
 // https://vitejs.dev/config/
@@ -13,6 +14,7 @@ export default defineConfig({
     Pages({
       dirs: "src/routes",
     }),
+    EnvironmentPlugin({ BACKEND_HOST: "" }),
   ],
   test: {
     setupFiles: ["test/setup.ts"],
