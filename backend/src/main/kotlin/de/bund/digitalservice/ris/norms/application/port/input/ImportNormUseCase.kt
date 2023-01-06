@@ -76,6 +76,7 @@ interface ImportNormUseCase {
         val divergentEntryIntoForceDateState: UndefinedDate? = null,
         val principleEntryIntoForceDate: LocalDate? = null,
         val principleEntryIntoForceDateState: UndefinedDate? = null,
+        var entryIntoForceNormCategory: String? = null,
         val entryIntoForceDateState: UndefinedDate? = null,
         val expirationDateState: UndefinedDate? = null
     ) {

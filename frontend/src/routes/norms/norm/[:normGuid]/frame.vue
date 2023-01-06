@@ -135,6 +135,8 @@ const frameData = computed({
       loadedNorm.value.documentTypeName = data.documentTypeName
       loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate
       loadedNorm.value.entryIntoForceDateState = data.entryIntoForceDateState
+      loadedNorm.value.entryIntoForceNormCategory =
+        data.entryIntoForceNormCategory
       loadedNorm.value.euAnnouncementExplanations =
         data.euAnnouncementExplanations
       loadedNorm.value.euAnnouncementGazette = data.euAnnouncementGazette

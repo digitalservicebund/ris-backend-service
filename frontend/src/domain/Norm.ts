@@ -65,6 +65,7 @@ export type FrameData = {
   documentTypeName?: string
   entryIntoForceDate?: string
   entryIntoForceDateState?: string
+  entryIntoForceNormCategory?: string
   euAnnouncementExplanations?: string
   euAnnouncementGazette?: string
   euAnnouncementInfo?: string

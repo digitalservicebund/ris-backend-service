@@ -24,6 +24,7 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
                 properties.unofficialShortTitle, properties.unofficialAbbreviation,
                 properties.entryIntoForceDate, properties.entryIntoForceDateState, properties.principleEntryIntoForceDate,
                 properties.principleEntryIntoForceDateState, properties.divergentEntryIntoForceDate, properties.divergentEntryIntoForceDateState,
+                properties.entryIntoForceNormCategory,
                 properties.expirationDate, properties.expirationDateState, properties.isExpirationDateTemp, properties.principleExpirationDate,
                 properties.principleExpirationDateState, properties.divergentExpirationDate, properties.divergentExpirationDateState,
                 properties.expirationNormCategory, properties.announcementDate, properties.publicationDate, properties.citationDate,

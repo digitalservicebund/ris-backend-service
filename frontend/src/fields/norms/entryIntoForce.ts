@@ -44,4 +44,12 @@ export const entryIntoForce: InputField[] = [
     "Unbestimmtes Abweichendes Inkrafttretedatum",
     undefinedDropDownItems
   ),
+  {
+    name: "entryIntoForceNormCategory",
+    type: InputType.TEXT,
+    label: "Art der Norm",
+    inputAttributes: {
+      ariaLabel: "Art der Norm",
+    },
+  },
 ]

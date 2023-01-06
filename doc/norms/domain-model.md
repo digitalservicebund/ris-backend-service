@@ -45,6 +45,7 @@ classDiagram
     UndefinedDate principleEntryIntoForceDateState
     Date divergentEntryIntoForceDate
     UndefinedDate divergentEntryIntoForceDateState
+    String entryIntoForceNormCategory
 
     Date expirationDate
     String expirationDateState

@@ -84,6 +84,8 @@ data class NormDto(
     var divergentEntryIntoForceDate: LocalDate? = null,
     @Column("divergent_entry_into_force_date_state")
     var divergentEntryIntoForceDateState: UndefinedDate? = null,
+    @Column("entry_into_force_norm_category")
+    var entryIntoForceNormCategory: String? = null,
 
     @Column("expiration_date")
     var expirationDate: LocalDate? = null,

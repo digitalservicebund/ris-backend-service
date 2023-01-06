@@ -72,6 +72,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var principleEntryIntoForceDateState: UndefinedDate? = null
         var divergentEntryIntoForceDate: String? = null
         var divergentEntryIntoForceDateState: UndefinedDate? = null
+        var entryIntoForceNormCategory: String? = null
 
         var expirationDate: String? = null
         var expirationDateState: UndefinedDate? = null
@@ -204,6 +205,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.principleEntryIntoForceDateState,
                 decodeLocalDate(this.divergentEntryIntoForceDate),
                 this.divergentEntryIntoForceDateState,
+                this.entryIntoForceNormCategory,
                 decodeLocalDate(this.expirationDate),
                 this.expirationDateState,
                 this.isExpirationDateTemp,

@@ -50,6 +50,7 @@ interface EditNormFrameUseCase {
         var principleEntryIntoForceDateState: UndefinedDate? = null,
         var divergentEntryIntoForceDate: LocalDate? = null,
         var divergentEntryIntoForceDateState: UndefinedDate? = null,
+        var entryIntoForceNormCategory: String? = null,
 
         var expirationDate: LocalDate? = null,
         var expirationDateState: UndefinedDate? = null,

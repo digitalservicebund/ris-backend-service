@@ -90,6 +90,9 @@ export function applyToFrameData(
     documentTypeName: stringCallback(frameData?.documentTypeName),
     entryIntoForceDate: dateCallback(frameData?.entryIntoForceDate),
     entryIntoForceDateState: stringCallback(frameData?.entryIntoForceDateState),
+    entryIntoForceNormCategory: stringCallback(
+      frameData?.entryIntoForceNormCategory
+    ),
     euAnnouncementExplanations: stringCallback(
       frameData?.euAnnouncementExplanations
     ),

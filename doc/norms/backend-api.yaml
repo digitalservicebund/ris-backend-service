@@ -410,6 +410,9 @@ components:
           $ref: "#/components/schemas/Date"
         principleEntryIntoForceDateState:
           $ref: "#/components/schemas/UndefinedDate"
+        entryIntoForceNormCategory:
+          type: string
+          example: ""
 
     NormFrame:
       allOf:
@@ -621,6 +624,10 @@ components:
             entryIntoForceDateState:
               type: string
               example: ""
+            entryIntoForceNormCategory:
+              type: string
+              example: ""
+
     LegalDocML:
       type: object
       xml:

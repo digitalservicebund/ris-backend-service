@@ -87,6 +87,7 @@ private fun createNorm(guid: UUID, data: ImportNormUseCase.NormData): Norm {
         divergentEntryIntoForceDateState = data.divergentEntryIntoForceDateState,
         principleEntryIntoForceDate = data.principleEntryIntoForceDate,
         principleEntryIntoForceDateState = data.principleEntryIntoForceDateState,
+        entryIntoForceNormCategory = data.entryIntoForceNormCategory,
         entryIntoForceDateState = data.entryIntoForceDateState,
         expirationDateState = data.expirationDateState
     )
