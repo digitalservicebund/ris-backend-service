@@ -14,7 +14,7 @@ export default defineConfig({
     Pages({
       dirs: "src/routes",
     }),
-    EnvironmentPlugin(["BACKEND_HOST"]),
+    EnvironmentPlugin({ BACKEND_HOST: "" }),
   ],
   test: {
     setupFiles: ["test/setup.ts"],
