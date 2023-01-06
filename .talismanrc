@@ -34,27 +34,23 @@ fileignoreconfig:
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/EditNormFrameService.kt
     checksum: 698f56dab5b14d359725b33988fa50d93f62018541d5a8842c13be9cf2587c98
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
-    checksum: 627f84f25de4080fbe40c847278daeb39bd71f37d46dc639e4e9527d9aa7a890
+    checksum: 1ffc5f29f1dc0d2fc373c81033000d54f5914bdbb3fb1717a675a02d12eaa36e
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
-    checksum: 37520e3f7847f5a8c5aecd8e5a4866e3b5dc3ce6cc010fa77937a73a32d95104
+    checksum: 18a6cf50996bc14be66d93877822ab474c2e8aa89a28f1c0279af32beb3621e8
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/service/ImportNormService.kt
-    checksum: a684337f89456175526445daa55b0cbc95487e42dca1130108a5e3c789847fb4
+    checksum: 1d76a7a018fb922d9d5ee95a219b4271c201b0992d2a7a25f32f4fd2b8ece500
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
-    checksum: d0a015e7fa9150a6be394c804508d575d91daa9cfcc62553a93000df8a37ab83
-  - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/EditNormFrameController.kt
-    checksum: 92b1f65e6bd44a50511b72d26a510a56bb9a4bd25cb152a5df70473cac0d10b8
-  - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/LoadNormController.kt
-    checksum: dadc85c1627cf2a36e2c8e84ee40f2287ec17a712d10bb7ae73fea236f51ae1e
+    checksum: 11e324f1479a9bf21f1c3ca0f86fa4877d25f802b6377869d1f8b4875a59c7f2
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/EditNormFrameController.kt
-    checksum: d4ee59bb4722a3b1877d9bbc4e181a371b232772ad670ee1d2db0f840cf42969
+    checksum: a5e44eb514b404f0c02f7f2ccb5fd7925c03db02c0bc283aafc3d279e2b34c91
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/ImportNormController.kt
-    checksum: 5c04fa25fbccab25aa26277230e93c698289b40edc82c69bd479fe4a287a1164
+    checksum: 133a41736ad0b83155ef42cfd9e0345a0efcffccd4cb963256901d9cc05dcaab
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/LoadNormController.kt
-    checksum: d9f0957f35638225a1174a715e79a502452bdd37b9875b46fcffb185d548e70c
+    checksum: ad9c2cbb2001c2f3082b977a4bf86854888e0c7164256a6c249dbe0201254fcd
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/NormsMapper.kt
     checksum: 5ba13a8c7cb57cac6cf27629f31ef85dc380d8207eb9725eeb5500bae7e8bf52
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt
-    checksum: a2e9db6aca2881f4a76c875b6cb155659e900c30e21e10e0a5b2bc59ddd9302d
+    checksum: 7ffb87689610f5e1b5a5f13a264943764e9647e84581b49bdd1338d86a73bcf1
   - filename: backend/src/main/resources/bootstrap.properties
     checksum: 419c8cbdd9b47b94f2a8b0134045be82ed63b0059e74e78618c9ced6c7d085b3
   - filename: backend/src/main/resources/db/migration/V0.10__norms_extend_norms_table.sql
@@ -150,13 +146,13 @@ fileignoreconfig:
   - filename: frontend/src/env.d.ts
     checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
   - filename: frontend/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: ca6e1ba9464c9e562a67cbca4cf957bdac6d6f271b1befc4f9f5b4ac1719e65c
+    checksum: aabf1405de5549c1c5ef4b8094531bc623a84137388cebddc6960d9c4e669a81
   - filename: frontend/src/services/normsService.ts
     checksum: f474267a7d13a14b54606f816cf2b1d5b5b3432b6bfd9cf2ccef857cade64201
   - filename: frontend/src/stores/loadedNorm.ts
     checksum: e4acaebeadbb4b178008672148af32c7507bacc19f93bdde15a06ca352928278
   - filename: frontend/src/utilities/normUtilities.ts
-    checksum: 81116ce9097165fc9534eada4c9a6842cdef5ee6e5667a05a7a72480cc817431
+    checksum: e31253c5f175a02acc7c6a6b77f47778088f1e5f36ddec31369884d6a7d771c7
   - filename: frontend/test/components/navbarSide.spec.ts
     checksum: 65f85c8e6280ce6e6587ce00f6b1aed643bc8714cd9e5006fbdadfdfa0e866cd
   - filename: frontend/test/e2e/norms/testdata/norm_clean_cars.json
