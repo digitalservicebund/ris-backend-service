@@ -40,7 +40,7 @@ fileignoreconfig:
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
     checksum: 6074ae88eda5599505a0a5f2b1bcbb49cf9557125c294d33700e432bd840a496
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/EditNormFrameController.kt
-    checksum: e985d1b2ec5c3bb043f8560015a6fad661c4ff447cb42f3a7fb732e21a482af0
+    checksum: 141f624fc1597ce1109d735b74138dbed85aa2325ceb630a004e32de4445b6bd
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/ImportNormController.kt
     checksum: 133a41736ad0b83155ef42cfd9e0345a0efcffccd4cb963256901d9cc05dcaab
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/LoadNormController.kt

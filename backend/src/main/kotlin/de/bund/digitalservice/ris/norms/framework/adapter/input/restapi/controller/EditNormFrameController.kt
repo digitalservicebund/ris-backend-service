@@ -158,6 +158,8 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         var referenceNumber: String? = null
 
+        var europeanLegalIdentifier: String? = null
+
         var celexNumber: String? = null
 
         var ageIndicationStart: String? = null

@@ -7,6 +7,7 @@ export const europeanLegalIdentifier: InputField[] = [
     label: "ELI",
     inputAttributes: {
       ariaLabel: "ELI",
+      readOnly: true,
     },
   },
 ]
