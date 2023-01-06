@@ -19,11 +19,29 @@ servers:
 paths:
   /norms:
     get:
-      summary: Get a list of all available norms
+      summary: Get a list of norms filtered by a query
+      description: If no query is provided, all available norms are listed.
       operationId: listNorms
+      parameters:
+        - in: query
+          name: q
+          required: false
+          description: |
+            Searches for a substring in the following properties of a norm:
+              - officialLongTitle
+              - officialShortTitle
+              - unofficialLongTitle
+              - unofficialShortTitle
+
+            The search term is used as is without any postprocessing and is case sensitive.
+
+          schema:
+            type: string
+            example: "umweltgerechtes Recycling"
+
       responses:
         "200":
-          description: Successful response with list of all norms
+          description: Successful response with list of norms
           content:
             application/json:
               schema:
@@ -36,12 +54,16 @@ paths:
                       properties:
                         guid:
                           $ref: "#/components/schemas/Guid"
+                        eli:
+                          $ref: "#/components/schemas/ELI"
                         officialLongTitle:
                           type: string
                 example:
                   - guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
+                    eli: "eli/bgbl-1/1976/s3341/rechtsetzungsdokument-1"
                     officialLongTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
                   - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
+                    eli: "eli/bgbl-1/2004/s1673/rechtsetzungsdokument-1"
                     officialLongTitle: "Übereinkommen über das umweltgerechte Recycling von Schiffen"
         "400":
           description: ""
@@ -140,6 +162,11 @@ components:
       type: string
       format: uuid
       example: "6a18380f-5c65-4f4d-902d-d49694f25de2"
+
+    ELI:
+      description: A european legislation identifier
+      type: string
+      example: eli/bgbl-1/1976/s3341/rechtsetzungsdokument-1
 
     Date:
       description: The date format in XML files
@@ -571,9 +598,8 @@ components:
             text:
               type: string
               example: ""
-            europeanLegalIdentifier:
-              type: string
-              example: ""
+            eli:
+              $ref: "#/components/schemas/ELI"
             completeCitation:
               type: string
               example: ""
