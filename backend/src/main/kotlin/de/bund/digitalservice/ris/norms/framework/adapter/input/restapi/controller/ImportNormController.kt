@@ -64,7 +64,6 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         var unofficialShortTitle: String? = null
         var unofficialAbbreviation: String? = null
         var risAbbreviation: String? = null
-        var europeanLegalIdentifier: String? = null
         val printAnnouncementGazette: String? = null
         val printAnnouncementYear: String? = null
         val printAnnouncementPage: String? = null
@@ -135,7 +134,6 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 unofficialShortTitle = this.unofficialShortTitle,
                 unofficialAbbreviation = this.unofficialAbbreviation,
                 risAbbreviation = this.risAbbreviation,
-                europeanLegalIdentifier = this.europeanLegalIdentifier,
                 printAnnouncementGazette = this.printAnnouncementGazette,
                 printAnnouncementYear = this.printAnnouncementYear,
                 printAnnouncementPage = this.printAnnouncementPage,

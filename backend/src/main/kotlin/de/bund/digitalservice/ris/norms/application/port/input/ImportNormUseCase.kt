@@ -46,7 +46,6 @@ interface ImportNormUseCase {
         val unofficialShortTitle: String? = null,
         val unofficialAbbreviation: String? = null,
         val risAbbreviation: String? = null,
-        var europeanLegalIdentifier: String? = null,
         val printAnnouncementGazette: String? = null,
         val printAnnouncementYear: String? = null,
         val printAnnouncementPage: String? = null,
