@@ -42,7 +42,7 @@ interface HttpClient {
   ): Promise<ServiceResponse<TResponse>>
 }
 
-const backendHost = process.env.BACKEND_HOST
+const backendHost = process.env.BACKEND_HOST ?? ""
 
 async function baseHttp<T>(
   url: string,
