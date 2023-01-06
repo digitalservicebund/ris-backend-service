@@ -19,6 +19,7 @@ pre-commit:
     frontend-eslint:
       tags: frontend lint
       root: frontend/
+      glob: "*.{vue,ts,js,json}"
       run: npm run --silent eslint:check {staged_files}
     frontend-stylelint:
       tags: frontend lint
