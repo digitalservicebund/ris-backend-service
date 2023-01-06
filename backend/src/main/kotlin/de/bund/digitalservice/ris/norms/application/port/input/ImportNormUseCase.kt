@@ -76,7 +76,9 @@ interface ImportNormUseCase {
         val divergentEntryIntoForceDate: LocalDate? = null,
         val divergentEntryIntoForceDateState: UndefinedDate? = null,
         val principleEntryIntoForceDate: LocalDate? = null,
-        val principleEntryIntoForceDateState: UndefinedDate? = null
+        val principleEntryIntoForceDateState: UndefinedDate? = null,
+        val entryIntoForceDateState: UndefinedDate? = null,
+        val expirationDateState: UndefinedDate? = null
     ) {
         init {
             require(officialLongTitle.isNotBlank())

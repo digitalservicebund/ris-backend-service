@@ -95,6 +95,8 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         val divergentEntryIntoForceDateState: String? = null
         val principleEntryIntoForceDate: String? = null
         val principleEntryIntoForceDateState: String? = null
+        val entryIntoForceDateState: String? = null
+        val expirationDateState: String? = null
 
         fun toUseCaseData(): ImportNormUseCase.NormData {
             return ImportNormUseCase.NormData(
@@ -163,7 +165,9 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 divergentEntryIntoForceDate = decodeLocalDate(this.divergentEntryIntoForceDate),
                 divergentEntryIntoForceDateState = decodeUndefinedDate(this.divergentEntryIntoForceDateState),
                 principleEntryIntoForceDate = decodeLocalDate(this.principleEntryIntoForceDate),
-                principleEntryIntoForceDateState = decodeUndefinedDate(this.principleEntryIntoForceDateState)
+                principleEntryIntoForceDateState = decodeUndefinedDate(this.principleEntryIntoForceDateState),
+                entryIntoForceDateState = decodeUndefinedDate(this.entryIntoForceDateState),
+                expirationDateState = decodeUndefinedDate(this.expirationDateState)
             )
         }
     }
