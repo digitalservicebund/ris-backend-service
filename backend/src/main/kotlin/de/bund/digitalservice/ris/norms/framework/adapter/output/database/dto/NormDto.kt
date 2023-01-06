@@ -237,9 +237,6 @@ data class NormDto(
     @Column("reference_number")
     var referenceNumber: String? = null,
 
-    @Column("european_legal_identifier")
-    var europeanLegalIdentifier: String? = null,
-
     @Column("celex_number")
     var celexNumber: String? = null,
 

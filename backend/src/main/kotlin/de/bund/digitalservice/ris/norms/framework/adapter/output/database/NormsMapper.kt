@@ -41,7 +41,7 @@ interface NormsMapper {
             normDto.applicationScopeStartDate, normDto.applicationScopeEndDate, normDto.categorizedReference,
             normDto.otherFootnote, normDto.validityRule, normDto.digitalEvidenceLink, normDto.digitalEvidenceRelatedData,
             normDto.digitalEvidenceExternalDataNote, normDto.digitalEvidenceAppendix, normDto.referenceNumber,
-            normDto.europeanLegalIdentifier, normDto.celexNumber, normDto.ageIndicationStart, normDto.ageIndicationEnd,
+            normDto.celexNumber, normDto.ageIndicationStart, normDto.ageIndicationEnd,
             normDto.definition, normDto.ageOfMajorityIndication, normDto.text
         )
     }
@@ -87,7 +87,7 @@ interface NormsMapper {
             norm.applicationScopeStartDate, norm.applicationScopeEndDate, norm.categorizedReference,
             norm.otherFootnote, norm.validityRule, norm.digitalEvidenceLink, norm.digitalEvidenceRelatedData,
             norm.digitalEvidenceExternalDataNote, norm.digitalEvidenceAppendix, norm.referenceNumber,
-            norm.europeanLegalIdentifier, norm.celexNumber, norm.ageIndicationStart, norm.ageIndicationEnd,
+            norm.celexNumber, norm.ageIndicationStart, norm.ageIndicationEnd,
             norm.definition, norm.ageOfMajorityIndication, norm.text
         )
     }

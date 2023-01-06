@@ -46,9 +46,9 @@ fileignoreconfig:
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/LoadNormController.kt
     checksum: ad9c2cbb2001c2f3082b977a4bf86854888e0c7164256a6c249dbe0201254fcd
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/NormsMapper.kt
-    checksum: 5ba13a8c7cb57cac6cf27629f31ef85dc380d8207eb9725eeb5500bae7e8bf52
+    checksum: 629b2ff36eac0ed374715b1d15c54249d6d0cc9b3b67a076513a011bea5ffe95
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt
-    checksum: 7ffb87689610f5e1b5a5f13a264943764e9647e84581b49bdd1338d86a73bcf1
+    checksum: b50cc882bccc60d3a18f9d8f0b504ab9858729b915280375e33183c763e3bfc4
   - filename: backend/src/main/resources/bootstrap.properties
     checksum: 419c8cbdd9b47b94f2a8b0134045be82ed63b0059e74e78618c9ced6c7d085b3
   - filename: backend/src/main/resources/db/migration/V0.10__norms_extend_norms_table.sql
@@ -173,6 +173,8 @@ fileignoreconfig:
     checksum: f2090a1f25608146c3e9e99cc3de6325cae8d4be6d0942a8e2d9613fd3409716
   - filename: backend/src/main/resources/db/migration/V0.24__norms_add_column_entry_norm_category.sql
     checksum: 933da2fe45e34322e0f0e5cae0b9d690df47fb3040131854bddcdc94488480ba
+  - filename: backend/src/main/resources/db/migration/V0.25__norms_remove_column_european_legal_identifier.sql
+    checksum: cd5e7df34f7fe66b18fcc65cd79a5bef93f00547954315b10a988945ca6b96fe
 
 scopeconfig:
   - scope: node
