@@ -175,6 +175,8 @@ fileignoreconfig:
     checksum: d7b39b35ebe607d294a554435c60633c012f7b603ff97638aa752c416272264c
   - filename: backend/src/main/resources/db/migration/V0.22__caselaw_add_incorrect_court_field.sql
     checksum: 292a73bb4501d21fe95f39acd63d841c687787f174447b7f0a422468a69179f2
+  - filename: backend/src/main/resources/db/migration/V0.23__norms_resize_otherfootnote_field_again.sql
+    checksum: f2090a1f25608146c3e9e99cc3de6325cae8d4be6d0942a8e2d9613fd3409716
 
 scopeconfig:
   - scope: node
