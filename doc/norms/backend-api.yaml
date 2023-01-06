@@ -332,9 +332,6 @@ components:
         risAbbreviation:
           type: string
           example: "SaubFahrzeugBeschG"
-        europeanLegalIdentifier:
-          type: string
-          example: "recht.bund.de/eli/bgbl-1/2021/1102/regelungstext-1"
         printAnnouncementGazette:
           type: string
           example: ""

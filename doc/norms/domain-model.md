@@ -128,8 +128,6 @@ classDiagram
 
     String referenceNumber
 
-    String europeanLegalIdentifier
-
     String celexNumber
 
     String ageIndicationStart
