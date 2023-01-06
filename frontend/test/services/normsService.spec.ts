@@ -207,6 +207,7 @@ describe("normsService", () => {
           entryIntoForceDate: null,
           entryIntoForceDateState: null,
           euAnnouncementExplanations: null,
+          entryIntoForceNormCategory: null,
           euAnnouncementGazette: null,
           euAnnouncementInfo: null,
           euAnnouncementNumber: null,
