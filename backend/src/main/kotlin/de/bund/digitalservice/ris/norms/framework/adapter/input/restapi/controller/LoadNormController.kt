@@ -27,8 +27,8 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
 
         return loadNormService
             .loadNorm(query)
-            .map({ norm -> NormResponseSchema.fromUseCaseData(norm) })
-            .map({ normResponseSchema -> ResponseEntity.ok(normResponseSchema) })
+            .map { norm -> NormResponseSchema.fromUseCaseData(norm) }
+            .map { normResponseSchema -> ResponseEntity.ok(normResponseSchema) }
             .defaultIfEmpty(ResponseEntity.notFound().build<NormResponseSchema>())
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
@@ -138,7 +138,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var digitalEvidenceExternalDataNote: String?,
         var digitalEvidenceAppendix: String?,
         var referenceNumber: String?,
-        var europeanLegalIdentifier: String?,
+        var europeanLegalIdentifier: String,
         var celexNumber: String?,
         var ageIndicationStart: String?,
         var ageIndicationEnd: String?,
@@ -253,7 +253,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.digitalEvidenceExternalDataNote,
                     data.digitalEvidenceAppendix,
                     data.referenceNumber,
-                    data.europeanLegalIdentifier,
+                    data.europeanLegalIdentifier(),
                     data.celexNumber,
                     data.ageIndicationStart,
                     data.ageIndicationEnd,

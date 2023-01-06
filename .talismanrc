@@ -30,21 +30,21 @@ fileignoreconfig:
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/utils/DocxTableBuilder.java
     checksum: f6ae53ede0079c50b9b288741cf36ba8fce990bf806b39b9bb21ed012df0009c
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/EditNormFrameService.kt
-    checksum: 698f56dab5b14d359725b33988fa50d93f62018541d5a8842c13be9cf2587c98
+    checksum: d12f84d85234dd5f01ec717e7b105a6971e8ca236b802bb55f1e3a87cea7ea60
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
-    checksum: 1ffc5f29f1dc0d2fc373c81033000d54f5914bdbb3fb1717a675a02d12eaa36e
+    checksum: b45d400e1973ed44cac769feffa4062ea4d443d52724007c5adda8e22371348f
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
     checksum: 18a6cf50996bc14be66d93877822ab474c2e8aa89a28f1c0279af32beb3621e8
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/service/ImportNormService.kt
     checksum: 1d76a7a018fb922d9d5ee95a219b4271c201b0992d2a7a25f32f4fd2b8ece500
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
-    checksum: 11e324f1479a9bf21f1c3ca0f86fa4877d25f802b6377869d1f8b4875a59c7f2
+    checksum: 6074ae88eda5599505a0a5f2b1bcbb49cf9557125c294d33700e432bd840a496
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/EditNormFrameController.kt
-    checksum: a5e44eb514b404f0c02f7f2ccb5fd7925c03db02c0bc283aafc3d279e2b34c91
+    checksum: e985d1b2ec5c3bb043f8560015a6fad661c4ff447cb42f3a7fb732e21a482af0
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/ImportNormController.kt
     checksum: 133a41736ad0b83155ef42cfd9e0345a0efcffccd4cb963256901d9cc05dcaab
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/LoadNormController.kt
-    checksum: ad9c2cbb2001c2f3082b977a4bf86854888e0c7164256a6c249dbe0201254fcd
+    checksum: b604eb6694d39b876cc0dc99f64d62a3a7b5b29447b644dc41daed3bb631ee06
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/NormsMapper.kt
     checksum: 629b2ff36eac0ed374715b1d15c54249d6d0cc9b3b67a076513a011bea5ffe95
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt

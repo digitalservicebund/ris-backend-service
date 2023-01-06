@@ -789,17 +789,6 @@ export function getNormBySections(norm) {
       ],
     },
     {
-      heading: "ELI",
-      fields: [
-        {
-          type: "text",
-          name: "europeanLegalIdentifier",
-          label: "ELI",
-          value: norm.europeanLegalIdentifier,
-        },
-      ],
-    },
-    {
       heading: "CELEX-Nummer",
       fields: [
         {

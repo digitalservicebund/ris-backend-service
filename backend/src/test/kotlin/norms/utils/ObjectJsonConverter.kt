@@ -6,9 +6,9 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ImportNormController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.LoadNormController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import java.lang.reflect.Type
 import java.time.LocalDate
@@ -25,7 +25,7 @@ fun convertImportormRequestSchemaToJson(
     return Gson().toJson(importNormRequestSchema)
 }
 
-fun convertNormToJson(norm: Norm): String {
+fun convertNormToJson(norm: LoadNormController.NormResponseSchema): String {
     class LocalDateSerializer : JsonSerializer<LocalDate> {
         override fun serialize(
             src: LocalDate?,

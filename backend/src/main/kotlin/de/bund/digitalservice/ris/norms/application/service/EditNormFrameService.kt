@@ -45,7 +45,7 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
                 properties.applicationScopeStartDate, properties.applicationScopeEndDate, properties.categorizedReference,
                 properties.otherFootnote, properties.validityRule, properties.digitalEvidenceLink, properties.digitalEvidenceRelatedData,
                 properties.digitalEvidenceExternalDataNote, properties.digitalEvidenceAppendix, properties.referenceNumber,
-                properties.europeanLegalIdentifier, properties.celexNumber, properties.ageIndicationStart, properties.ageIndicationEnd,
+                properties.celexNumber, properties.ageIndicationStart, properties.ageIndicationEnd,
                 properties.definition, properties.ageOfMajorityIndication, properties.text
             )
         )

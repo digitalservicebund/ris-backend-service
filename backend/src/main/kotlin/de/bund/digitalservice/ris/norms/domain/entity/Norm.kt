@@ -131,8 +131,6 @@ data class Norm(
 
     var referenceNumber: String? = null,
 
-    var europeanLegalIdentifier: String? = null,
-
     var celexNumber: String? = null,
 
     var ageIndicationStart: String? = null,
@@ -144,4 +142,6 @@ data class Norm(
 
     var text: String? = null
 
-)
+) {
+    fun europeanLegalIdentifier(): String = "eli/$printAnnouncementGazette/${publicationDate?.year}/s$printAnnouncementPage"
+}

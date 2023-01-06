@@ -158,8 +158,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         var referenceNumber: String? = null
 
-        var europeanLegalIdentifier: String? = null
-
         var celexNumber: String? = null
 
         var ageIndicationStart: String? = null
@@ -274,7 +272,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.digitalEvidenceExternalDataNote,
                 this.digitalEvidenceAppendix,
                 this.referenceNumber,
-                this.europeanLegalIdentifier,
                 this.celexNumber,
                 this.ageIndicationStart,
                 this.ageIndicationEnd,
