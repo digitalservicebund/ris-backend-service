@@ -69,7 +69,7 @@
     "@types/node": "^18.11.18",
     "@types/webfontloader": "^1.6.35",
     "@typescript-eslint/eslint-plugin": "^5.47.1",
-    "@typescript-eslint/parser": "^5.47.1",
+    "@typescript-eslint/parser": "^5.48.1",
     "@vitejs/plugin-vue": "^4.0.0",
     "@vitest/coverage-c8": "^0.26.2",
     "@vue/eslint-config-prettier": "^7.0.0",
