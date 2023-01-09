@@ -1,7 +1,5 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto
 
-import java.time.LocalDate
-
 class NormDto(
     val guid: String,
     val officialLongTitle: IdentifiedElement,
@@ -13,7 +11,6 @@ class NormDto(
     var participationInstitution: String?,
     var printAnnouncementGazette: String?,
     var printAnnouncementPage: String?,
+    var europeanLegalIdentifier: String?,
     var articles: List<ArticleDto> = listOf()
-) {
-    var publicationYear: String? = publicationDate?.let { LocalDate.parse(it).year.toString() }
-}
+)

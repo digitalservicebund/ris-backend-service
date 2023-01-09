@@ -20,6 +20,7 @@ fun mapNormToDto(norm: Norm) =
         participationInstitution = getMappedValue(Property.PARTICIPATION_INSTITUTION, norm.participationInstitution ?: ""),
         printAnnouncementGazette = norm.printAnnouncementGazette,
         printAnnouncementPage = norm.printAnnouncementPage,
+        europeanLegalIdentifier = norm.europeanLegalIdentifier(),
         articles = norm.articles.mapIndexed { index, article ->
             mapArticleToDto(article, index)
         }
