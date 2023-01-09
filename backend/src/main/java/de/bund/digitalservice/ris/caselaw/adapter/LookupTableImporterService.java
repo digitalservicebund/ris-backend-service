@@ -118,6 +118,7 @@ public class LookupTableImporterService {
                 courtXML ->
                     CourtDTO.builder()
                         .id(courtXML.getId())
+                        .newEntry(true)
                         .changedatemail(courtXML.getChangeDateMail())
                         .changedateclient(courtXML.getChangeDateClient())
                         .changeindicator(courtXML.getChangeIndicator())
@@ -177,6 +178,7 @@ public class LookupTableImporterService {
                 stateXML ->
                     StateDTO.builder()
                         .id(stateXML.getId())
+                        .newEntry(true)
                         .changeindicator(stateXML.getChangeIndicator())
                         .version(stateXML.getVersion())
                         .jurisshortcut(stateXML.getJurisShortcut())
