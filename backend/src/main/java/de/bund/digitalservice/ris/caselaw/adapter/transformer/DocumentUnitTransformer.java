@@ -27,7 +27,6 @@ public class DocumentUnitTransformer {
       CoreData coreData = documentUnit.coreData();
 
       builder
-          .category(coreData.category())
           .procedure(coreData.procedure())
           .ecli(coreData.ecli())
           .appraisalBody(coreData.appraisalBody())
@@ -46,7 +45,6 @@ public class DocumentUnitTransformer {
       }
     } else {
       builder
-          .category(null)
           .procedure(null)
           .ecli(null)
           .appraisalBody(null)

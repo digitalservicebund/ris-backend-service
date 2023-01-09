@@ -191,7 +191,7 @@ export const coreDataFields: InputField[] = [
   ),
   defineTextField("appraisalBody", "Spruchkörper", "Spruchkörper"),
   defineComboboxField(
-    "category",
+    "documentType",
     "Dokumenttyp",
     "Dokumenttyp",
     comboboxItemService.getDocumentTypes,

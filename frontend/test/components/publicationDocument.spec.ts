@@ -42,7 +42,10 @@ const setupWithAllRequiredFields = () =>
           court: { type: "type", location: "location", label: "label" },
           decisionDate: "2022-02-01",
           legalEffect: "legalEffect",
-          category: "category",
+          documentType: {
+            jurisShortcut: "ca",
+            label: "category",
+          },
         },
       }),
     },
@@ -256,7 +259,10 @@ describe("PublicationDocument:", () => {
             court: { type: "type", location: "location", label: "label" },
             decisionDate: "2022-02-01",
             legalEffect: "legalEffect",
-            category: "category",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "category",
+            },
           },
         }),
         lastPublishedXmlMail: {

@@ -2,7 +2,7 @@ export type CoreData = {
   fileNumbers?: string[]
   deviatingFileNumbers?: string[]
   court?: Court
-  category?: string // TODO should this be DocumentType from lookupTables.ts?
+  documentType?: DocumentType
   procedure?: string
   ecli?: string
   appraisalBody?: string
@@ -11,6 +11,11 @@ export type CoreData = {
   inputType?: string
   center?: string
   region?: string
+}
+
+export type DocumentType = {
+  jurisShortcut: string
+  label: string
 }
 
 export type Court = {
@@ -58,7 +63,7 @@ export default class DocumentUnit {
     "court",
     "decisionDate",
     "legalEffect",
-    "category",
+    "documentType",
   ] as const
 
   constructor(uuid: string, data: Partial<DocumentUnit> = {}) {

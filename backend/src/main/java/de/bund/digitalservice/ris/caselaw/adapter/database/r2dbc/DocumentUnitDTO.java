@@ -37,9 +37,6 @@ public class DocumentUnitDTO {
   @Column("gerichtstyp")
   String courtType;
 
-  @Column("dokumenttyp")
-  String category; // TODO remove
-
   @Column("document_type_id")
   Long documentTypeId; // points to lookup table row id
 

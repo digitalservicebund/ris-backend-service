@@ -23,7 +23,7 @@ function formatDropdownItems(
     case Endpoint.documentTypes: {
       return (responseData as DocumentType[]).map((item) => ({
         label: item.jurisShortcut + " - " + item.label,
-        value: item.label,
+        value: item,
       }))
     }
     case Endpoint.courts: {

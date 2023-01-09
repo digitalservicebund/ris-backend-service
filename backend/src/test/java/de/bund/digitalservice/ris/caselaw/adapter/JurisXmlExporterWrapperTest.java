@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -47,7 +48,8 @@ public class JurisXmlExporterWrapperTest {
             .court(new Court("courtType", null, null, null))
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))
-            .category("category")
+            .documentType(
+                DocumentType.builder().jurisShortcut("category").label("category123").build())
             .ecli("ecli")
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
             .deviatingDecisionDates(
@@ -116,7 +118,7 @@ public class JurisXmlExporterWrapperTest {
     CoreData coreData =
         CoreData.builder()
             .fileNumbers(List.of("fileNumber"))
-            .category("category")
+            .documentType(DocumentType.builder().jurisShortcut("ca").label("category").build())
             .procedure("procedure")
             .ecli("ecli")
             .deviatingEclis(List.of("dev-ecli-1", "dev-ecli-2"))

@@ -105,7 +105,6 @@ public class DocumentUnitBuilder {
             fileNumbers,
             deviatingFileNumbers,
             court,
-            documentUnitDTO.getCategory(),
             documentType,
             documentUnitDTO.getProcedure(),
             documentUnitDTO.getEcli(),

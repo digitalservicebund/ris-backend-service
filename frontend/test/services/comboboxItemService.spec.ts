@@ -12,7 +12,6 @@ describe("comboboxItemService", () => {
 
   it("should fetch document type from lookup table", async () => {
     const doctype = {
-      id: 1,
       jurisShortcut: "AO",
       label: "Anordnung",
     }
@@ -25,7 +24,7 @@ describe("comboboxItemService", () => {
 
     expect(httpClientGet).toHaveBeenCalledOnce()
     expect(result[0].label).toEqual("AO - Anordnung")
-    expect(result[0].value).toEqual("Anordnung")
+    expect(result[0].value).toEqual(doctype)
   })
 
   it("should fetch court from lookup table", async () => {

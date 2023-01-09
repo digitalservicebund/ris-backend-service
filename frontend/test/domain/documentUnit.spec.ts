@@ -52,7 +52,7 @@ describe("DocumentUnit", () => {
       "court",
       "decisionDate",
       "legalEffect",
-      "category",
+      "documentType",
     ])
   })
 
@@ -66,7 +66,7 @@ describe("DocumentUnit", () => {
       "fileNumbers",
       "court",
       "decisionDate",
-      "category",
+      "documentType",
     ])
   })
 
@@ -81,7 +81,7 @@ describe("DocumentUnit", () => {
       "court",
       "decisionDate",
       "legalEffect",
-      "category",
+      "documentType",
     ])
   })
 
@@ -96,7 +96,7 @@ describe("DocumentUnit", () => {
       "court",
       "decisionDate",
       "legalEffect",
-      "category",
+      "documentType",
     ])
   })
 
@@ -110,7 +110,7 @@ describe("DocumentUnit", () => {
       "fileNumbers",
       "court",
       "decisionDate",
-      "category",
+      "documentType",
     ])
   })
 
