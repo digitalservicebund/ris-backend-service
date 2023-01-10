@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPo
 import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
@@ -13,18 +14,40 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.reposi
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
 import org.springframework.context.annotation.Primary
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
+import org.springframework.data.r2dbc.dialect.PostgresDialect
+import org.springframework.data.relational.core.query.Criteria
+import org.springframework.data.relational.core.query.Query
+import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.util.*
+import java.time.LocalDate
+import java.util.UUID
 
 @Component
 @Primary
 class NormsService(
     val normsRepository: NormsRepository,
     val articlesRepository: ArticlesRepository,
-    val paragraphsRepository: ParagraphsRepository
-) : NormsMapper, GetAllNormsOutputPort, GetNormByGuidOutputPort, SaveNormOutputPort, EditNormOutputPort {
+    val paragraphsRepository: ParagraphsRepository,
+    client: DatabaseClient
+) : NormsMapper,
+    GetAllNormsOutputPort,
+    GetNormByGuidOutputPort,
+    SaveNormOutputPort,
+    EditNormOutputPort,
+    SearchNormsOutputPort {
+
+    private val template: R2dbcEntityTemplate = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
+
+    override fun searchNorms(
+        query: List<SearchNormsOutputPort.QueryParameter>
+    ): Flux<Norm> {
+        return template.select(NormDto::class.java).matching(Query.query(getCriteria(query)))
+            .all()
+            .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
+    }
 
     override fun getNormByGuid(guid: UUID): Mono<Norm> {
         return normsRepository
@@ -93,5 +116,19 @@ class NormsService(
             .map { paragraphs: List<ParagraphDto> ->
                 articleToEntity(articleDto, paragraphs.map { paragraphToEntity(it) })
             }
+    }
+
+    private fun getCriteria(query: List<SearchNormsOutputPort.QueryParameter>): Criteria {
+        val criteria = query.map {
+            if (it.isYearForDate) {
+                return Criteria.where(it.name)
+                    .between(LocalDate.of(it.value.toInt(), 1, 1), LocalDate.of(it.value.toInt() + 1, 1, 1))
+            }
+            if (it.isFuzzyMatch) {
+                return Criteria.where(it.name).like("%${it.value}%")
+            }
+            return Criteria.where(it.name).`is`(it.value)
+        }
+        return Criteria.from(criteria)
     }
 }

@@ -129,16 +129,29 @@ paths:
         "400":
           description: ""
 
-  /norms/xml/{guid}:
+  /norms/xml/eli/{printAnnouncementGazette}/{publicationYear}/s{printAnnouncementPage}:
     get:
-      summary: Load a single as XML in LegalDocML format
+      summary: Load a single as XML in LegalDocML format by eli
       operationId: loadNormAsXML
       parameters:
-        - name: guid
+        - name: printAnnouncementGazette
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/Guid"
+            type: string
+            example: "bgbl-1"
+        - name: publicationYear
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "1976"
+        - name: printAnnouncementPage
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "3341"
       responses:
         "200":
           description: Norm was found

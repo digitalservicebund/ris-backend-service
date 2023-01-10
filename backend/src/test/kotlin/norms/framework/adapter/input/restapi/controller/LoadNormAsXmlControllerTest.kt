@@ -12,7 +12,6 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import java.util.UUID
 
 @WebFluxTest(controllers = [LoadNormAsXmlController::class])
 @WithMockUser
@@ -28,14 +27,18 @@ class LoadNormAsXmlControllerTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/norms/xml/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
+            .uri("/api/v1/norms/xml/eli/bg-1/2022/s1125")
             .exchange()
 
         verify(exactly = 1) {
             loadNormAsXmlService.loadNormAsXml(
                 withArg {
-                    assertThat(it.guid)
-                        .isEqualTo(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
+                    assertThat(it.printAnnouncementGazette)
+                        .isEqualTo("bg-1")
+                    assertThat(it.publicationYear)
+                        .isEqualTo("2022")
+                    assertThat(it.printAnnouncementPage)
+                        .isEqualTo("1125")
                 }
             )
         }
@@ -48,7 +51,7 @@ class LoadNormAsXmlControllerTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/norms/xml/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
+            .uri("/api/v1/norms/xml/eli/bg-1/2022/s1125")
             .exchange()
             .expectStatus()
             .isOk()
@@ -62,7 +65,7 @@ class LoadNormAsXmlControllerTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/norms/xml/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
+            .uri("/api/v1/norms/xml/eli/bg-1/2022/s1125")
             .exchange()
             .expectBody()
             .xml("<?xml version=\"1.0\" encoding=\"utf-8\"?><foo/>")
@@ -75,7 +78,7 @@ class LoadNormAsXmlControllerTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/norms/xml/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
+            .uri("/api/v1/norms/xml/eli/bg-1/2022/s1125")
             .exchange()
             .expectStatus()
             .isNotFound()
@@ -90,7 +93,7 @@ class LoadNormAsXmlControllerTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/norms/xml/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
+            .uri("/api/v1/norms/xml/eli/bg-1/2022/s1125")
             .exchange()
             .expectStatus()
             .is5xxServerError()

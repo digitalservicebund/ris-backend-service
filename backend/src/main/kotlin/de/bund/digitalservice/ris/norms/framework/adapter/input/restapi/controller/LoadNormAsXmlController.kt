@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormAsXmlUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
 import org.springframework.http.MediaType.APPLICATION_XML
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,15 +14,19 @@ import reactor.core.publisher.Mono
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
 class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUseCase) {
 
-    @GetMapping(path = ["/xml/{guid}"])
-    fun loadNormAsXml(@PathVariable guid: String): Mono<ResponseEntity<String>> {
-        val query = LoadNormAsXmlUseCase.Query(decodeGuid(guid))
+    @GetMapping(path = ["/xml/eli/{printAnnouncementGazette}/{publicationYear}/s{printAnnouncementPage}"])
+    fun loadNormAsXml(
+        @PathVariable printAnnouncementGazette: String,
+        @PathVariable publicationYear: String,
+        @PathVariable printAnnouncementPage: String
+    ): Mono<ResponseEntity<String>> {
+        val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, publicationYear, printAnnouncementPage)
 
         return loadNormAsXmlService
             .loadNormAsXml(query)
-            .map({ normAsXml ->
+            .map { normAsXml ->
                 ResponseEntity.ok().contentType(APPLICATION_XML).body(normAsXml)
-            })
+            }
             .defaultIfEmpty(ResponseEntity.notFound().build())
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }

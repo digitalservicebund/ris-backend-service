@@ -126,7 +126,7 @@ fileignoreconfig:
   - filename: backend/src/test/resources/application.properties
     checksum: 926890c72991e9d7df4a940ade6be4f90204060f0174c98a8e1daeb35f66470d
   - filename: doc/norms/backend-api.yaml
-    checksum: cb5786ff234e427763d353aa617452a2a51e60a4086f4d824548df302d88a4c1
+    checksum: 1133547398369848b7d58b9b917a35db4f3881d24897c9c3351ae8a21d41082b
   - filename: frontend/.env.development
     checksum: b87426c20cb1da4785bf52714577b2211ced4673c555418bf8c2e198fa615ea3
   - filename: frontend/playwright.config.ts

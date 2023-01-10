@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -70,6 +71,30 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .verifyComplete()
 
         normsService.getAllNorms()
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save simple norm and retrieved by eli`() {
+        val norm = NORM
+        norm.publicationDate = LocalDate.parse("2022-02-02")
+        norm.printAnnouncementPage = "1125"
+        norm.printAnnouncementGazette = "bg-1"
+
+        normsService.saveNorm(norm).log()
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        val query = listOf<SearchNormsOutputPort.QueryParameter> (
+            SearchNormsOutputPort.QueryParameter("print_announcement_gazette", "bg-1"),
+            SearchNormsOutputPort.QueryParameter("print_announcement_page", "1125"),
+            SearchNormsOutputPort.QueryParameter("publication_year", "2022", true)
+        )
+
+        normsService.searchNorms(query).log()
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()

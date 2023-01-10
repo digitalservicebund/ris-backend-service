@@ -43,11 +43,13 @@ class NamingConventionTest {
         classes()
             .that(areFromTheOutputPortPackage())
             .should(haveSimpleNameEndingWith("OutputPort"))
+            .orShould(beMemberClasses())
             .check(sourceClasses)
 
         classes()
             .that(have(simpleNameEndingWith("OutputPort")))
             .should(beInsideTheOutputPortPackage())
+            .orShould(beMemberClasses())
             .check(sourceClasses)
     }
 

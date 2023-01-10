@@ -1,10 +1,13 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
 import reactor.core.publisher.Mono
-import java.util.UUID
 
 interface LoadNormAsXmlUseCase {
     fun loadNormAsXml(query: Query): Mono<String>
 
-    data class Query(val guid: UUID)
+    data class Query(
+        val printAnnouncementGazette: String,
+        val publicationYear: String,
+        val printAnnouncementPage: String
+    )
 }
