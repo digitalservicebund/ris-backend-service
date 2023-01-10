@@ -1,13 +1,13 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
 import org.springframework.data.r2dbc.repository.Query;
-import org.springframework.data.repository.reactive.ReactiveSortingRepository;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface CourtRepository extends ReactiveSortingRepository<CourtDTO, Long> {
+public interface CourtRepository extends R2dbcRepository<CourtDTO, Long> {
 
   Mono<CourtDTO> findByCourttypeAndCourtlocation(String courttype, String courtlocation);
 

@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.domain.validator;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class LookupTableValidator implements ConstraintValidator<LookupTableConstraint, String> {
 

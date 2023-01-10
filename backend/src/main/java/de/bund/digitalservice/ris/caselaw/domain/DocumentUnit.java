@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Size;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import javax.validation.Valid;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.Size;
 import lombok.Builder;
 
 @Builder(toBuilder = true)

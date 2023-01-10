@@ -37,6 +37,9 @@
       "moduleLicense": "BSD 4-Clause \"Original\" or \"Old\" License"
     },
     {
+      "moduleLicense": "The BSD License"
+    },
+    {
       "moduleLicense": "Creative Commons Legal Code"
     },
     {
@@ -65,6 +68,19 @@
     {
       "moduleLicense": null,
       "moduleName": "org.junit:junit-bom"
+    },
+    {
+      "moduleLicense": null,
+      "moduleName": "org.jetbrains.kotlin:kotlin-bom"
+    },
+    {
+      "moduleLicense": null,
+      "moduleName": "org.ow2.asm:asm-bom"
+    },
+    {
+      "moduleLicense": null,
+      "moduleVersion": "3.0.0",
+      "moduleName": "com.squareup.okio:okio"
     }
   ]
 }

@@ -104,7 +104,10 @@ public class DocumentUnitService {
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
-    var zip = new ZipInputStream(new ByteArrayInputStream(byteBuffer.array()));
+    byteBuffer.rewind();
+    byte[] byteBufferArray = new byte[byteBuffer.remaining()];
+    byteBuffer.get(byteBufferArray);
+    var zip = new ZipInputStream(new ByteArrayInputStream(byteBufferArray));
     ZipEntry entry;
     try {
       while ((entry = zip.getNextEntry()) != null) {
@@ -131,6 +134,7 @@ public class DocumentUnitService {
 
     log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
 
+    byteBuffer.rewind();
     var asyncRequestBody = AsyncRequestBody.fromPublisher(Mono.just(byteBuffer));
     var putObjectRequestBuilder =
         PutObjectRequest.builder()

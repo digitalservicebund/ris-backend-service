@@ -3,9 +3,9 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.validator.LookupTableConstraint;
+import jakarta.validation.constraints.PastOrPresent;
 import java.time.Instant;
 import java.util.List;
-import javax.validation.constraints.PastOrPresent;
 import lombok.Builder;
 
 @Builder

@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import org.springframework.data.repository.reactive.ReactiveSortingRepository;
+import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface FileNumberRepository extends ReactiveSortingRepository<FileNumberDTO, Long> {
+public interface FileNumberRepository extends R2dbcRepository<FileNumberDTO, Long> {
 
   Mono<Void> deleteAllByDocumentUnitId(Long documentUnitId);
 

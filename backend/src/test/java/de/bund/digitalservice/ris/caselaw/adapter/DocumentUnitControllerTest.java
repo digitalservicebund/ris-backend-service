@@ -131,7 +131,7 @@ class DocumentUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunits/")
+        .uri("/api/v1/caselaw/documentunits")
         .exchange()
         .expectStatus()
         .isOk();
