@@ -175,7 +175,7 @@ fileignoreconfig:
     checksum: 933da2fe45e34322e0f0e5cae0b9d690df47fb3040131854bddcdc94488480ba
   - filename: backend/src/main/resources/db/migration/V0.25__norms_remove_column_european_legal_identifier.sql
     checksum: cd5e7df34f7fe66b18fcc65cd79a5bef93f00547954315b10a988945ca6b96fe
-  - filename: backend/src/main/resources/db/migration/V0.26_caselaw_remigrate_category_to_documentTypeld_column.sql
+  - filename: backend/src/main/resources/db/migration/V0.26__caselaw_remigrate_category_to_documentTypeld_column.sql
     checksum: 8c6eee02511b1fea5e33d6115e76d7abd60acc957e8562b64ee72e9f3c5601b2
 
 scopeconfig:
