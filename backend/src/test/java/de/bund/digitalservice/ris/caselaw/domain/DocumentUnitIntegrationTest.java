@@ -240,7 +240,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .post()
-        .uri("/api/v1/caselaw/documentunits/")
+        .uri("/api/v1/caselaw/documentunits")
         .bodyValue(info)
         .exchange()
         .expectStatus()
