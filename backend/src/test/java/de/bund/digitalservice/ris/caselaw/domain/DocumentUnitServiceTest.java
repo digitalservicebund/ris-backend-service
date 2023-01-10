@@ -587,7 +587,8 @@ class DocumentUnitServiceTest {
             "200",
             List.of("status messages"),
             "filename",
-            null);
+            null,
+            PublishState.UNKNOWN);
     when(publishService.publish(DocumentUnit.EMPTY, RECEIVER_ADDRESS))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
@@ -621,7 +622,8 @@ class DocumentUnitServiceTest {
             "200",
             List.of("message"),
             "filename",
-            null);
+            null,
+            PublishState.UNKNOWN);
     when(publishService.getLastPublishedXml(TEST_UUID))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
 

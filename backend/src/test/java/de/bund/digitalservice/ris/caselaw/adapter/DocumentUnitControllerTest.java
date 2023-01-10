@@ -13,6 +13,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
@@ -240,7 +241,8 @@ class DocumentUnitControllerTest {
                         "status-code",
                         List.of("status-messages"),
                         "test.xml",
-                        Instant.parse("2020-01-01T01:01:01.00Z")))));
+                        Instant.parse("2020-01-01T01:01:01.00Z"),
+                        PublishState.UNKNOWN))));
 
     webClient
         .mutateWith(csrf())
@@ -303,7 +305,8 @@ class DocumentUnitControllerTest {
                         "status-code",
                         List.of("status-messages"),
                         "test.xml",
-                        Instant.parse("2020-01-01T01:01:01.00Z")))));
+                        Instant.parse("2020-01-01T01:01:01.00Z"),
+                        PublishState.SENT))));
 
     webClient
         .mutateWith(csrf())

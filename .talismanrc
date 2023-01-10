@@ -20,9 +20,9 @@ fileignoreconfig:
   - filename: backend/build.gradle
     checksum: 7763e4e2d127188f1b49917b7d417191e2cbb7410ecdaf14f3ee0b25f86cead4
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
-    checksum: 5f9e16c2840935aebaf5e6c88d0ab0685374d4edac09018993678f51d660d304
+    checksum: 5ac01c3b6a5d2909ffbc054ac98d43962047e762b86654207591aeaecdf7a434
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
-    checksum: 7462adfc908c8d2d188f754251407005a21687eacda896b8a77cb9b7c862c31d
+    checksum: d0f2ad5af16a6c032ebbe7bbcefaa4e4d8a3a0bfdb48ad8184b3161479d1bb1b
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/domain/docx/StyledElement.java
     checksum: 24b18e225fcdf8142181bff0c3518a2173504808027ab65b52732730f90c8707
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/utils/DocumentUnitDocxBuilder.java
@@ -106,7 +106,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitWrongDocumentUnitIntegrationTest.java
     checksum: c6e6f17ba1da77e4b0ed836ea9b48828b56e8f0ec725ad1b185170dd64c40f7e
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/PublishDocumentUnitIntegrationTest.java
-    checksum: e123a96f27bdf319529faf02ebe2dd1b2a6b1516c941cc8eb00cbfc2b6f4e8a2
+    checksum: f65ea3b6e3a4418aff400912bb1bda7f13f1fe06b58770099e1c66a3dacfdfc4
   - filename: backend/src/test/kotlin/norms/application/EditNormFrameServiceTest.kt
     checksum: b6b2f895f9d97a5cb0d084f22d0a40534f713c41f5f91fdcca41325e150271c0
   - filename: backend/src/test/kotlin/norms/application/ImportNormServiceTest.kt
@@ -177,6 +177,8 @@ fileignoreconfig:
     checksum: cd5e7df34f7fe66b18fcc65cd79a5bef93f00547954315b10a988945ca6b96fe
   - filename: backend/src/main/resources/db/migration/V0.26__caselaw_remigrate_category_to_documentTypeld_column.sql
     checksum: 8c6eee02511b1fea5e33d6115e76d7abd60acc957e8562b64ee72e9f3c5601b2
+  - filename: backend/src/main/resources/db/migration/V0.27__caselaw_add-email-tracking.sql
+    checksum: 713d9729f15a702988e15fa7de7d340ade031a59b76fe2f0b89eed1144ae0827
 
 scopeconfig:
   - scope: node

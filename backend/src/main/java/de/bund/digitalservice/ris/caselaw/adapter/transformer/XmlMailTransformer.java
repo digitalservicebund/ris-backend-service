@@ -16,6 +16,7 @@ public class XmlMailTransformer {
         .xml(xmlMail.xml())
         .receiverAddress(xmlMail.receiverAddress())
         .publishDate(xmlMail.publishDate())
+        .publishState(xmlMail.publishState())
         .mailSubject(xmlMail.mailSubject())
         .fileName(xmlMail.fileName())
         .build();
@@ -29,6 +30,7 @@ public class XmlMailTransformer {
         .xml(xmlMailDTO.xml())
         .receiverAddress(xmlMailDTO.receiverAddress())
         .publishDate(xmlMailDTO.publishDate())
+        .publishState(xmlMailDTO.publishState())
         .mailSubject(xmlMailDTO.mailSubject())
         .fileName(xmlMailDTO.fileName())
         .build();

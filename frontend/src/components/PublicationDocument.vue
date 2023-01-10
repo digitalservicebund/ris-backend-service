@@ -169,6 +169,7 @@ const fieldsMissing = computed(() =>
         <div class="label-02-regular">
           Letzte Veröffentlichung am
           {{ props.lastPublishedXmlMail?.publishDate }}
+          ({{ props.lastPublishedXmlMail?.publishState }})
         </div>
         <div class="label-section text-gray-900">ÜBER</div>
         <div class="label-02-regular">

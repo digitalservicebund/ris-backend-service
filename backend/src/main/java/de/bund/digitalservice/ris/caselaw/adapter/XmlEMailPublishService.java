@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
@@ -34,7 +35,7 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   private final XmlMailRepository repository;
 
-  @Value("${mail.exporter.senderAddress:test}")
+  @Value("${mail.exporter.senderAddress:export.test@neuris}")
   private String senderAddress;
 
   public XmlEMailPublishService(
@@ -64,7 +65,7 @@ public class XmlEMailPublishService implements EmailPublishService {
 
   @Override
   public Mono<MailResponse> getLastPublishedXml(UUID documentUnitUuid) {
-    return repository.getLastPublishedXml(documentUnitUuid);
+    return repository.getLastPublishedMailResponse(documentUnitUuid);
   }
 
   private Mono<String> generateMailSubject(DocumentUnit documentUnit) {
@@ -106,7 +107,8 @@ public class XmlEMailPublishService implements EmailPublishService {
         xmlMail.receiverAddress(),
         xmlMail.mailSubject(),
         xmlMail.xml(),
-        xmlMail.fileName());
+        xmlMail.fileName(),
+        xmlMail.documentUnitUuid());
   }
 
   private XmlMail generateXmlMail(
@@ -114,7 +116,15 @@ public class XmlEMailPublishService implements EmailPublishService {
 
     if (xml.statusCode().equals("400")) {
       return new XmlMail(
-          documentUnitUuid, null, null, null, xml.statusCode(), xml.statusMessages(), null, null);
+          documentUnitUuid,
+          null,
+          null,
+          null,
+          xml.statusCode(),
+          xml.statusMessages(),
+          null,
+          null,
+          PublishState.UNKNOWN);
     }
 
     return new XmlMail(
@@ -125,7 +135,8 @@ public class XmlEMailPublishService implements EmailPublishService {
         xml.statusCode(),
         xml.statusMessages(),
         xml.fileName(),
-        xml.publishDate());
+        xml.publishDate(),
+        PublishState.SENT);
   }
 
   private Mono<XmlMail> savePublishInformation(XmlMail xmlMail) {

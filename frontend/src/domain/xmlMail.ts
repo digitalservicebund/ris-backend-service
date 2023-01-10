@@ -5,4 +5,5 @@ export default class XmlMail {
   public receiverAddress?: string
   public mailSubject?: string
   public publishDate?: string
+  public publishState?: string
 }

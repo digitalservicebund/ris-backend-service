@@ -6,5 +6,7 @@ import reactor.core.publisher.Mono;
 public interface XmlMailRepository {
   Mono<XmlMail> save(XmlMail xmlMail);
 
-  Mono<MailResponse> getLastPublishedXml(UUID documentUnitUuid);
+  Mono<MailResponse> getLastPublishedMailResponse(UUID documentUnitUuid);
+
+  Mono<XmlMail> getLastPublishedXmlMail(UUID documentUnitUuid);
 }

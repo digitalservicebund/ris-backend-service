@@ -34,7 +34,7 @@ public class PostgresXmlMailRepositoryImpl implements XmlMailRepository {
   }
 
   @Override
-  public Mono<MailResponse> getLastPublishedXml(UUID documentUnitUuid) {
+  public Mono<MailResponse> getLastPublishedMailResponse(UUID documentUnitUuid) {
     return documentUnitRepository
         .findByUuid(documentUnitUuid)
         .flatMap(
@@ -45,5 +45,15 @@ public class PostgresXmlMailRepositoryImpl implements XmlMailRepository {
                 new XmlMailResponse(
                     documentUnitUuid,
                     XmlMailTransformer.transformToDomain(xmlMailDTO, documentUnitUuid)));
+  }
+
+  @Override
+  public Mono<XmlMail> getLastPublishedXmlMail(UUID documentUnitUuid) {
+    return documentUnitRepository
+        .findByUuid(documentUnitUuid)
+        .flatMap(
+            documentUnitDTO ->
+                repository.findTopByDocumentUnitIdOrderByPublishDateDesc(documentUnitDTO.getId()))
+        .map(xmlMailDTO -> XmlMailTransformer.transformToDomain(xmlMailDTO, documentUnitUuid));
   }
 }

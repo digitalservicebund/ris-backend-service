@@ -16,6 +16,7 @@ public class XmlMailResponse implements MailResponse {
   private String statusCode;
   private List<String> statusMessages;
   private Instant publishDate;
+  private PublishState publishState;
 
   public XmlMailResponse(UUID documentUnitUuid, XmlMail xmlMail) {
     this.documentUnitUuid = documentUnitUuid;
@@ -23,6 +24,7 @@ public class XmlMailResponse implements MailResponse {
     this.mailSubject = xmlMail.mailSubject();
     this.xml = xmlMail.xml();
     this.publishDate = xmlMail.publishDate();
+    this.publishState = xmlMail.publishState();
 
     this.statusCode = xmlMail.statusCode();
     if (xmlMail.statusMessages() != null) {

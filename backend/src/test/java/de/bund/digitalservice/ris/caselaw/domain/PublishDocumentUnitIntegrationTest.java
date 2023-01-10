@@ -108,7 +108,8 @@ class PublishDocumentUnitIntegrationTest {
             "200",
             "message 1|message 2",
             "test.xml",
-            null);
+            null,
+            PublishState.SENT);
     XmlMail expectedXmlMail =
         new XmlMail(
             documentUnitUuid1,
@@ -118,7 +119,8 @@ class PublishDocumentUnitIntegrationTest {
             "200",
             List.of("message 1", "message 2"),
             "text.xml",
-            null);
+            null,
+            PublishState.SENT);
     XmlMailResponse expectedXmlResultObject =
         new XmlMailResponse(documentUnitUuid1, expectedXmlMail);
 
@@ -170,7 +172,8 @@ class PublishDocumentUnitIntegrationTest {
             "200",
             "message 1|message 2",
             "test.xml",
-            Instant.now());
+            Instant.now(),
+            PublishState.SENT);
     xmlMailRepository.save(xmlMailDTO).block();
 
     XmlMail expectedXmlMail =
@@ -182,7 +185,8 @@ class PublishDocumentUnitIntegrationTest {
             "200",
             List.of("message 1", "message 2"),
             "text.xml",
-            null);
+            null,
+            PublishState.SENT);
     XmlMailResponse expectedXmlResultObject =
         new XmlMailResponse(documentUnitUuid1, expectedXmlMail);
 

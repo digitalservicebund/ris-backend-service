@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sendinblue.ApiClient;
@@ -32,7 +33,8 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
       String receiverAddress,
       String subject,
       String content,
-      String fileName) {
+      String fileName,
+      UUID documentUnitUuid) {
 
     ApiClient defaultClient = Configuration.getDefaultApiClient();
     ApiKeyAuth apiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
@@ -51,12 +53,15 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     attachment.setContent(content.getBytes(StandardCharsets.UTF_8));
     List<SendSmtpEmailAttachment> attachmentList = new ArrayList<>();
     attachmentList.add(attachment);
+    List<String> tags = new ArrayList<>();
+    tags.add(documentUnitUuid.toString());
     SendSmtpEmail sendSmtpEmail = new SendSmtpEmail();
     sendSmtpEmail.setSender(sender);
     sendSmtpEmail.setTo(toList);
     sendSmtpEmail.setTextContent("neuris");
     sendSmtpEmail.setSubject(subject);
     sendSmtpEmail.setAttachment(attachmentList);
+    sendSmtpEmail.setTags(tags);
 
     try {
       api.sendTransacEmail(sendSmtpEmail);

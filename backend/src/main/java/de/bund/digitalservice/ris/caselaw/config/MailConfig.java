@@ -21,7 +21,7 @@ public class MailConfig {
   @Bean
   @Profile({"!production & !staging"})
   public HttpMailSender httpMailSenderMock() {
-    return (senderAddress, receiverAddress, subject, content, fileName) -> {
+    return (senderAddress, receiverAddress, subject, content, fileName, documentUnitUuid) -> {
       // mock for sending publish xml via email
     };
   }

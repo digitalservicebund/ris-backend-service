@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record XmlMail(
     UUID documentUnitUuid,
     String receiverAddress,
@@ -14,4 +14,8 @@ public record XmlMail(
     String statusCode,
     List<String> statusMessages,
     String fileName,
-    Instant publishDate) {}
+    Instant publishDate,
+    PublishState publishState) {
+  public static final XmlMail EMPTY =
+      new XmlMail(null, null, null, null, null, null, null, null, null);
+}

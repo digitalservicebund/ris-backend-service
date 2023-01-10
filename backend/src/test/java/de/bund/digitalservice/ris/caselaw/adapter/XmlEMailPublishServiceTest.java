@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlExporter;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailRepository;
@@ -40,6 +41,8 @@ import reactor.test.StepVerifier;
 @Import({XmlEMailPublishService.class})
 @TestPropertySource(properties = "mail.exporter.senderAddress=export@neuris")
 class XmlEMailPublishServiceTest {
+  private static final String RECEIVER_ADDRESS = "test-to@mail.com"; // TODO
+  private static final String SENDER_ADDRESS = "export@neuris";
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   private static final String DELIVER_DATE =
@@ -50,29 +53,29 @@ class XmlEMailPublishServiceTest {
   private static final XmlMail EXPECTED_BEFORE_SAVE =
       new XmlMail(
           TEST_UUID,
-          "test-to@mail.com",
+          RECEIVER_ADDRESS,
           MAIL_SUBJECT,
           "xml",
           "200",
           List.of("succeed"),
           "test.xml",
-          PUBLISH_DATE);
+          PUBLISH_DATE,
+          PublishState.SENT);
   private static final XmlMail SAVED_XML_MAIL =
       new XmlMail(
           TEST_UUID,
-          "test-to@mail.com",
+          RECEIVER_ADDRESS,
           MAIL_SUBJECT,
           "xml",
           "200",
           List.of("succeed"),
           "test.xml",
-          PUBLISH_DATE);
+          PUBLISH_DATE,
+          PublishState.SENT);
   private static final XmlMailResponse EXPECTED_RESPONSE =
       new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL);
   private static final XmlResultObject FORMATTED_XML =
       new XmlResultObject("xml", "200", List.of("succeed"), "test.xml", PUBLISH_DATE);
-  private static final String RECEIVER_ADDRESS = "test-to@mail.com";
-  private static final String SENDER_ADDRESS = "export@neuris";
 
   private DocumentUnit documentUnit;
 
@@ -108,7 +111,8 @@ class XmlEMailPublishServiceTest {
             RECEIVER_ADDRESS,
             SAVED_XML_MAIL.mailSubject(),
             SAVED_XML_MAIL.xml(),
-            SAVED_XML_MAIL.fileName());
+            SAVED_XML_MAIL.fileName(),
+            SAVED_XML_MAIL.documentUnitUuid());
   }
 
   @Test
@@ -116,7 +120,16 @@ class XmlEMailPublishServiceTest {
     var xmlWithValidationError =
         new XmlResultObject("xml", "400", List.of("status-message"), "test.xml", PUBLISH_DATE);
     var xmlMail =
-        new XmlMail(TEST_UUID, null, null, null, "400", List.of("status-message"), null, null);
+        new XmlMail(
+            TEST_UUID,
+            null,
+            null,
+            null,
+            "400",
+            List.of("status-message"),
+            null,
+            null,
+            PublishState.UNKNOWN);
     var expected = new XmlMailResponse(TEST_UUID, xmlMail);
     when(xmlExporter.generateXml(documentUnit)).thenReturn(xmlWithValidationError);
 
@@ -127,7 +140,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
   }
 
   @Test
@@ -144,7 +157,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
   }
 
   @Test
@@ -160,7 +173,7 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
   }
 
   @Test
@@ -172,7 +185,8 @@ class XmlEMailPublishServiceTest {
         .verify();
 
     verify(repository).save(any(XmlMail.class));
-    verify(mailSender).sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
+    verify(mailSender)
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
   }
 
   @Test
@@ -187,26 +201,27 @@ class XmlEMailPublishServiceTest {
 
     verify(repository, times(0)).save(any(XmlMail.class));
     verify(mailSender, times(0))
-        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString());
+        .sendMail(anyString(), anyString(), anyString(), anyString(), anyString(), any(UUID.class));
   }
 
   @Test
   void testPublish_withExceptionBySendingEmail() {
     doThrow(DocumentUnitPublishException.class)
         .when(mailSender)
-        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml");
+        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml", TEST_UUID);
 
     StepVerifier.create(service.publish(documentUnit, RECEIVER_ADDRESS))
         .expectErrorMatches(DocumentUnitPublishException.class::isInstance)
         .verify();
 
     verify(repository, times(0)).save(any(XmlMail.class));
-    verify(mailSender).sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml");
+    verify(mailSender)
+        .sendMail(SENDER_ADDRESS, RECEIVER_ADDRESS, MAIL_SUBJECT, "xml", "test.xml", TEST_UUID);
   }
 
   @Test
   void testGetLastPublishedXml() {
-    when(repository.getLastPublishedXml(TEST_UUID))
+    when(repository.getLastPublishedMailResponse(TEST_UUID))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, SAVED_XML_MAIL)));
 
     StepVerifier.create(service.getLastPublishedXml(TEST_UUID))
@@ -215,6 +230,6 @@ class XmlEMailPublishServiceTest {
                 assertThat(response).usingRecursiveComparison().isEqualTo(EXPECTED_RESPONSE))
         .verifyComplete();
 
-    verify(repository).getLastPublishedXml(TEST_UUID);
+    verify(repository).getLastPublishedMailResponse(TEST_UUID);
   }
 }
