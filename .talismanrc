@@ -100,7 +100,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: eb660181bdfba7c488193f0538cc30f2763994763de91bef2daf00193553015c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: a5526df02900094b20721c8c4f16c59411fa276260ab59f512139be8c6154ed8
+    checksum: 3e4cfde009ebe219d32f82ed0d98bc1fb9aa344d8f665c16af2964611e4d975a
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
     checksum: 844cfec4dfe67bc0c14a5c4d804a44a64e438e413a7fe84af9a1f85134cb9b7c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitWrongDocumentUnitIntegrationTest.java

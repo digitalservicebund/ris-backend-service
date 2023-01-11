@@ -20,11 +20,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -81,6 +84,7 @@ class DocumentUnitIntegrationTest {
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
   @Autowired private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
+  @Autowired private DocumentTypeRepository documentTypeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -94,6 +98,7 @@ class DocumentUnitIntegrationTest {
     stateRepository.deleteAll().block();
     deviatingDecisionDateRepository.deleteAll().block();
     repository.deleteAll().block();
+    documentTypeRepository.deleteAll().block();
   }
 
   @Test
@@ -573,5 +578,64 @@ class DocumentUnitIntegrationTest {
         .coreData(CoreData.builder().court(court).build())
         .texts(Texts.builder().decisionName("decisionName").build())
         .build();
+  }
+
+  @Test
+  void testDocumentTypeToSetIdFromLookuptable() {
+    DocumentTypeDTO documentTypeDTO =
+        DocumentTypeDTO.builder()
+            .changeIndicator('c')
+            .jurisShortcut("ABC")
+            .documentType('R')
+            .label("ABC123")
+            .build();
+    documentTypeRepository.save(documentTypeDTO).block();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(UUID.randomUUID())
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .documentTypeDTO(documentTypeDTO)
+            .build();
+    repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(
+                CoreData.builder()
+                    .documentType(
+                        DocumentType.builder()
+                            .jurisShortcut(documentTypeDTO.getJurisShortcut())
+                            .label(documentTypeDTO.getLabel())
+                            .build())
+                    .build())
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().documentType().label())
+                  .isEqualTo(documentTypeDTO.getLabel());
+              assertThat(response.getResponseBody().coreData().documentType().jurisShortcut())
+                  .isEqualTo(documentTypeDTO.getJurisShortcut());
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentTypeId()).isEqualTo(1L);
+    assertThat(list.get(0).getDocumentTypeDTO()).isNull();
   }
 }
