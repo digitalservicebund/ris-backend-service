@@ -31,7 +31,6 @@ public class DocumentUnitTransformer {
           .ecli(coreData.ecli())
           .appraisalBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate() != null ? coreData.decisionDate().toString() : null)
-          .legalEffect(coreData.legalEffect())
           .inputType(coreData.inputType())
           .center(coreData.center());
 
@@ -49,7 +48,6 @@ public class DocumentUnitTransformer {
           .ecli(null)
           .appraisalBody(null)
           .decisionDate(null)
-          .legalEffect(null)
           .inputType(null)
           .center(null)
           .courtType(null)

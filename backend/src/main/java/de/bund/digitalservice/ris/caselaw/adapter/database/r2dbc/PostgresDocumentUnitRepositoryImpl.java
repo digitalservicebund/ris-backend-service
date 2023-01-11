@@ -105,7 +105,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return repository
         .findByUuid(documentUnit.uuid())
         .flatMap(documentUnitDTO -> enrichDocumentType(documentUnitDTO, documentUnit))
-        .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> enrichRegionAndLegalEffect(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
         .flatMap(documentUnitDTO -> savePreviousDecisions(documentUnitDTO, documentUnit))
@@ -139,7 +139,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> enrichRegion(
+  private Mono<DocumentUnitDTO> enrichRegionAndLegalEffect(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
     boolean courtHasNotChanged =
         documentUnit != null
@@ -148,6 +148,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             && Objects.equals(documentUnitDTO.courtType, documentUnit.coreData().court().type())
             && Objects.equals(
                 documentUnitDTO.courtLocation, documentUnit.coreData().court().location());
+
+    documentUnitDTO.setLegalEffect(LegalEffect.deriveFrom(documentUnit, courtHasNotChanged));
 
     if (courtHasNotChanged) {
       return Mono.just(documentUnitDTO);
