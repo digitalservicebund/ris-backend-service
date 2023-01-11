@@ -151,22 +151,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       return Mono.just(documentUnitDTO);
     }
 
-    // Do we want to make the state-injection everytime? If not we'd have to:
-    // - do it only when there is no region set, or
-    // - do it only when the court has changed <-- how to check that?
     return getCourt(documentUnit)
         .flatMap(
             courtDTO -> {
-              // This covers both the case of no result from findByCourttypeAndCourtlocation()
-              // (which should not happen! throw exception?) as well as a result but without a
-              // federal state value.
               if (courtDTO.getFederalstate() == null) {
-                // Here we use the StateDTO object just as a "messenger" to pass the
-                // region through to the next reactive block where it is used as label.
-                // Seems easier than trying to switch on empty etc.?
-                // Ideally StateRepository should be a JpaStateRepository though:
-                //    tried and it caused application context bean errors in the integration test
-                //    that I couldn't find a fix for. TODO?
                 return Mono.just(StateDTO.builder().label(courtDTO.getRegion()).build());
               }
               return stateRepository
