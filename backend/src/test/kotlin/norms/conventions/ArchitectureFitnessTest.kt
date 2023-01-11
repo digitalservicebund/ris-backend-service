@@ -54,7 +54,13 @@ class ArchitectureFitnessTest {
                     areFromTheDomain()
                         .or(areFromTheApplication())
                         .or(areFromAnyStandardLibrary())
-                        .or(resideInAnyPackage("reactor.core..", "org.springframework.stereotype.."))
+                        .or(
+                            resideInAnyPackage(
+                                "reactor.core..",
+                                "org.springframework.stereotype..",
+                                "org.reactivestreams.."
+                            )
+                        )
                 )
             )
             .check(sourceClasses)

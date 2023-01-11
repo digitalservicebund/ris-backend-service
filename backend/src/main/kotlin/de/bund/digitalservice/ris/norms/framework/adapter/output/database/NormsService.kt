@@ -120,26 +120,22 @@ class NormsService(
 
     private fun getCriteria(query: List<SearchNormsOutputPort.QueryParameter>): Criteria {
         val criteria = query.map {
+            if (it.value == null) {
+                return Criteria.where(queryFieldToDatabaseColumn(it.field)).isNull
+            }
+
             if (it.isYearForDate) {
-                if (it.field == SearchNormsOutputPort.QueryFields.ANNOUNCEMENT_OR_CITATION_YEAR) {
-                    return Criteria.where("announcement_date").between(
-                        LocalDate.of(it.value.toInt(), 1, 1),
-                        LocalDate.of(it.value.toInt() + 1, 1, 1)
-                    ).or("citation_date").between(
+                return Criteria.where(queryFieldToDatabaseColumn(it.field))
+                    .between(
                         LocalDate.of(it.value.toInt(), 1, 1),
                         LocalDate.of(it.value.toInt() + 1, 1, 1)
                     )
-                } else {
-                    return Criteria.where(queryFieldToDatabaseColumn(it.field))
-                        .between(
-                            LocalDate.of(it.value.toInt(), 1, 1),
-                            LocalDate.of(it.value.toInt() + 1, 1, 1)
-                        )
-                }
             }
+
             if (it.isFuzzyMatch) {
                 return Criteria.where(queryFieldToDatabaseColumn(it.field)).like("%${it.value}%")
             }
+
             return Criteria.where(queryFieldToDatabaseColumn(it.field)).`is`(it.value)
         }
         return Criteria.from(criteria)

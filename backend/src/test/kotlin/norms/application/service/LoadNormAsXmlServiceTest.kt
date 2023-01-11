@@ -20,7 +20,13 @@ class LoadNormAsXmlServiceTest {
     private val printAnnouncementPage = "1125"
     private val searchNormQuery = listOf(
         QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, printAnnouncementGazette),
-        QueryParameter(QueryFields.ANNOUNCEMENT_OR_CITATION_YEAR, announcementYear, isYearForDate = true),
+        QueryParameter(QueryFields.ANNOUNCEMENT_DATE, announcementYear, isYearForDate = true),
+        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, printAnnouncementPage)
+    )
+    private val secondSearchNormQuery = listOf(
+        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, printAnnouncementGazette),
+        QueryParameter(QueryFields.ANNOUNCEMENT_DATE, null),
+        QueryParameter(QueryFields.CITATION_DATE, announcementYear, isYearForDate = true),
         QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, printAnnouncementPage)
     )
 
@@ -32,6 +38,7 @@ class LoadNormAsXmlServiceTest {
         val service = LoadNormAsXmlService(searchNormAdapter, convertNormToXmlAdapter)
 
         every { searchNormAdapter.searchNorms(searchNormQuery) } returns Flux.empty()
+        every { searchNormAdapter.searchNorms(secondSearchNormQuery) } returns Flux.empty()
         every { convertNormToXmlAdapter.convertNormToXml(any()) } returns Mono.just("")
 
         service.loadNormAsXml(query).`as`(StepVerifier::create).expectNextCount(0).verifyComplete()

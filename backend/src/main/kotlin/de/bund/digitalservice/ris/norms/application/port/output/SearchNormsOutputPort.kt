@@ -8,13 +8,14 @@ interface SearchNormsOutputPort {
 
     enum class QueryFields {
         PRINT_ANNOUNCEMENT_GAZETTE,
-        ANNOUNCEMENT_OR_CITATION_YEAR,
+        ANNOUNCEMENT_DATE,
+        CITATION_DATE,
         PRINT_ANNOUNCEMENT_PAGE
     }
 
     data class QueryParameter(
         val field: QueryFields,
-        val value: String,
+        val value: String?,
         val isFuzzyMatch: Boolean = false,
         val isYearForDate: Boolean = false
     )

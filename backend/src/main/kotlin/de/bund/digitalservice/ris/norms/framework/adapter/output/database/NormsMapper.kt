@@ -104,8 +104,9 @@ interface NormsMapper {
     fun queryFieldToDatabaseColumn(field: QueryFields): String {
         return when (field) {
             QueryFields.PRINT_ANNOUNCEMENT_PAGE -> "print_announcement_page"
-            QueryFields.ANNOUNCEMENT_OR_CITATION_YEAR -> "placeholder"
+            QueryFields.ANNOUNCEMENT_DATE -> "announcement_date"
             QueryFields.PRINT_ANNOUNCEMENT_GAZETTE -> "print_announcement_gazette"
+            QueryFields.CITATION_DATE -> "citation_date"
         }
     }
 }

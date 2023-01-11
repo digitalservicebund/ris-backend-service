@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.ConvertNormToXml
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryParameter
+import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 
@@ -17,28 +18,21 @@ class LoadNormAsXmlService(
     override fun loadNormAsXml(query: LoadNormAsXmlUseCase.Query): Mono<String> {
         return searchNormsAdapter.searchNorms(
             listOf(
-                QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, transformEliGazetteToDbGazette(query.printAnnouncementGazette)),
-                QueryParameter(QueryFields.ANNOUNCEMENT_OR_CITATION_YEAR, query.announcementOrCitationYear, isYearForDate = true),
+                QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, EuropeanLegalIdentifier.parseGazette(query.printAnnouncementGazette)),
+                QueryParameter(QueryFields.ANNOUNCEMENT_DATE, query.announcementOrCitationYear, isYearForDate = true),
                 QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, query.printAnnouncementPage)
             )
-        ).filter { norm ->
-            (
-                (norm.announcementDate != null && norm.announcementDate?.year.toString() == query.announcementOrCitationYear) ||
-                    (norm.announcementDate == null && norm.citationDate?.year.toString() == query.announcementOrCitationYear)
+        ).or {
+            searchNormsAdapter.searchNorms(
+                listOf(
+                    QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, EuropeanLegalIdentifier.parseGazette(query.printAnnouncementGazette)),
+                    QueryParameter(QueryFields.ANNOUNCEMENT_DATE, null),
+                    QueryParameter(QueryFields.CITATION_DATE, query.announcementOrCitationYear, isYearForDate = true),
+                    QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, query.printAnnouncementPage)
                 )
+            )
         }.next().flatMap { norm ->
             convertNormToXmlAdapter.convertNormToXml(norm)
-        }
-    }
-
-    private fun transformEliGazetteToDbGazette(gazette: String): String {
-        return when (gazette) {
-            "bgbl-1" -> "BGBl I"
-            "bgbl-2" -> "BGBl II"
-            "banz-at" -> "BAnz"
-            else -> {
-                gazette
-            }
         }
     }
 }

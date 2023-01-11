@@ -253,7 +253,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.digitalEvidenceExternalDataNote,
                     data.digitalEvidenceAppendix,
                     data.referenceNumber,
-                    data.europeanLegalIdentifier(),
+                    data.getEuropeanLegalIdentifier().toString(),
                     data.celexNumber,
                     data.ageIndicationStart,
                     data.ageIndicationEnd,

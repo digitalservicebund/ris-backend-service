@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
+import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
 import java.util.UUID
@@ -143,15 +144,10 @@ data class Norm(
     var text: String? = null
 
 ) {
-    fun europeanLegalIdentifier(): String {
-        val mappedGazette = when (printAnnouncementGazette) {
-            "BGBl I" -> "bgbl-1"
-            "BGBl II" -> "bgbl-2"
-            "BAnz" -> "banz-at"
-            else -> {
-                printAnnouncementGazette
-            }
-        }
-        return "eli/$mappedGazette/${announcementDate?.year ?: citationDate?.year}/s$printAnnouncementPage"
-    }
+    fun getEuropeanLegalIdentifier(): EuropeanLegalIdentifier = EuropeanLegalIdentifier(
+        printAnnouncementGazette,
+        announcementDate,
+        citationDate,
+        printAnnouncementPage
+    )
 }
