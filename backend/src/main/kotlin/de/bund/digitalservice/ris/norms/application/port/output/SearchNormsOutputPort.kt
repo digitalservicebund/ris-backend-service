@@ -6,8 +6,14 @@ import reactor.core.publisher.Flux
 interface SearchNormsOutputPort {
     fun searchNorms(query: List<QueryParameter>): Flux<Norm>
 
+    enum class QueryFields {
+        PRINT_ANNOUNCEMENT_GAZETTE,
+        PUBLICATION_YEAR,
+        PRINT_ANNOUNCEMENT_PAGE
+    }
+
     data class QueryParameter(
-        val name: String,
+        val field: QueryFields,
         val value: String,
         val isFuzzyMatch: Boolean = false,
         val isYearForDate: Boolean = false

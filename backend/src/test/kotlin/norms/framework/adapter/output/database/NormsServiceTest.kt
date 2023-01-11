@@ -1,7 +1,8 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryParameter
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -88,10 +89,10 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        val query = listOf<SearchNormsOutputPort.QueryParameter> (
-            SearchNormsOutputPort.QueryParameter("print_announcement_gazette", "bg-1"),
-            SearchNormsOutputPort.QueryParameter("print_announcement_page", "1125"),
-            SearchNormsOutputPort.QueryParameter("publication_year", "2022", true)
+        val query = listOf<QueryParameter> (
+            QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, "bg-1"),
+            QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, "1125"),
+            QueryParameter(QueryFields.PUBLICATION_YEAR, "2022", true)
         )
 
         normsService.searchNorms(query).log()

@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.LocalDate
-import java.util.UUID
+import java.util.*
 
 @Component
 @Primary
@@ -121,13 +121,16 @@ class NormsService(
     private fun getCriteria(query: List<SearchNormsOutputPort.QueryParameter>): Criteria {
         val criteria = query.map {
             if (it.isYearForDate) {
-                return Criteria.where(it.name)
-                    .between(LocalDate.of(it.value.toInt(), 1, 1), LocalDate.of(it.value.toInt() + 1, 1, 1))
+                return Criteria.where(queryFieldToDatabaseColumn(it.field))
+                    .between(
+                        LocalDate.of(it.value.toInt(), 1, 1),
+                        LocalDate.of(it.value.toInt() + 1, 1, 1)
+                    )
             }
             if (it.isFuzzyMatch) {
-                return Criteria.where(it.name).like("%${it.value}%")
+                return Criteria.where(queryFieldToDatabaseColumn(it.field)).like("%${it.value}%")
             }
-            return Criteria.where(it.name).`is`(it.value)
+            return Criteria.where(queryFieldToDatabaseColumn(it.field)).`is`(it.value)
         }
         return Criteria.from(criteria)
     }

@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.norms.application.service
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormAsXmlUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.ConvertNormToXmlOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryParameter
 import io.mockk.every
 import io.mockk.mockk
 import norms.utils.createRandomNorm
@@ -17,9 +19,9 @@ class LoadNormAsXmlServiceTest {
     private val printAnnouncementGazette = "bg-1"
     private val printAnnouncementPage = "1125"
     private val searchNormQuery = listOf(
-        SearchNormsOutputPort.QueryParameter("print_announcement_gazette", printAnnouncementGazette),
-        SearchNormsOutputPort.QueryParameter("publication_date", publicationYear, isYearForDate = true),
-        SearchNormsOutputPort.QueryParameter("print_announcement_page", printAnnouncementPage)
+        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, printAnnouncementGazette),
+        QueryParameter(QueryFields.PUBLICATION_YEAR, publicationYear, isYearForDate = true),
+        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, printAnnouncementPage)
     )
 
     @Test

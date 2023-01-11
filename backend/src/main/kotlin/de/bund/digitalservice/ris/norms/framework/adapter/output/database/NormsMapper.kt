@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -98,5 +99,13 @@ interface NormsMapper {
 
     fun paragraphsToDto(paragraphs: List<Paragraph>, articleId: Int, id: Int = 0): List<ParagraphDto> {
         return paragraphs.map { ParagraphDto(id, it.guid, it.marker, it.text, articleId) }
+    }
+
+    fun queryFieldToDatabaseColumn(field: QueryFields): String {
+        return when (field) {
+            QueryFields.PRINT_ANNOUNCEMENT_PAGE -> "print_announcement_page"
+            QueryFields.PUBLICATION_YEAR -> "publication_date"
+            QueryFields.PRINT_ANNOUNCEMENT_GAZETTE -> "print_announcement_gazette"
+        }
     }
 }
