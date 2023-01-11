@@ -11,7 +11,7 @@ pre-commit:
     check-format-backend:
       tags: style backend
       root: backend/
-      run: ./gradlew spotlessCheck -DspotlessFiles=$(echo {staged_files} | sed 's/ /,/')
+      run: ./gradlew spotlessCheck -DspotlessFiles=$(echo {staged_files} | sed 's/ /,/g')
     frontend-prettier:
       tags: frontend format
       root: frontend/
