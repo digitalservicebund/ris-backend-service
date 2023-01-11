@@ -143,5 +143,17 @@ data class Norm(
     var text: String? = null
 
 ) {
-    fun europeanLegalIdentifier(): String = "eli/$printAnnouncementGazette/${publicationDate?.year}/s$printAnnouncementPage"
+    fun europeanLegalIdentifier(): String {
+        var mappedGazette = printAnnouncementGazette
+        if (printAnnouncementGazette in listOf("BGBl I", "BGBL I")) {
+            mappedGazette = "bgbl-1"
+        }
+        if (printAnnouncementGazette in listOf("BGBl II", "BGBL II")) {
+            mappedGazette = "bgbl-2"
+        }
+        if (printAnnouncementGazette == "BAnz") {
+            mappedGazette = "banz-at"
+        }
+        return "eli/$mappedGazette/${publicationDate?.year}/s$printAnnouncementPage"
+    }
 }

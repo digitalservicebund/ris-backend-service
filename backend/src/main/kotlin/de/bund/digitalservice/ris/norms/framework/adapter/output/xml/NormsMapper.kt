@@ -8,8 +8,8 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.Identif
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ParagraphDto
 
-fun mapNormToDto(norm: Norm) =
-    NormDto(
+fun mapNormToDto(norm: Norm): NormDto {
+    return NormDto(
         guid = norm.guid.toString(),
         officialLongTitle = IdentifiedElement(norm.officialLongTitle),
         officialShortTitle = IdentifiedElement(norm.officialShortTitle),
@@ -25,6 +25,7 @@ fun mapNormToDto(norm: Norm) =
             mapArticleToDto(article, index)
         }
     )
+}
 
 fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
     val marker = parseMarkerFromMarkerText(article.marker) ?: "$ordinalNumber"
