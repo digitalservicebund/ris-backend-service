@@ -17,12 +17,28 @@ class LoadNormAsXmlService(
     override fun loadNormAsXml(query: LoadNormAsXmlUseCase.Query): Mono<String> {
         return searchNormsAdapter.searchNorms(
             listOf(
-                QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, query.printAnnouncementGazette),
-                QueryParameter(QueryFields.PUBLICATION_YEAR, query.publicationYear, isYearForDate = true),
+                QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, transformEliGazetteToDbGazette(query.printAnnouncementGazette)),
+                QueryParameter(QueryFields.ANNOUNCEMENT_OR_CITATION_YEAR, query.announcementOrCitationYear, isYearForDate = true),
                 QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, query.printAnnouncementPage)
             )
-        ).next().flatMap { norm ->
+        ).filter { norm ->
+            (
+                (norm.announcementDate != null && norm.announcementDate?.year.toString() == query.announcementOrCitationYear) ||
+                    (norm.announcementDate == null && norm.citationDate?.year.toString() == query.announcementOrCitationYear)
+                )
+        }.next().flatMap { norm ->
             convertNormToXmlAdapter.convertNormToXml(norm)
+        }
+    }
+
+    private fun transformEliGazetteToDbGazette(gazette: String): String {
+        return when (gazette) {
+            "bgbl-1" -> "BGBl I"
+            "bgbl-2" -> "BGBl II"
+            "banz-at" -> "BAnz"
+            else -> {
+                gazette
+            }
         }
     }
 }

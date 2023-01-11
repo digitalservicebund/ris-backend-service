@@ -80,7 +80,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     @Test
     fun `save simple norm and retrieved by eli`() {
         val norm = NORM
-        norm.publicationDate = LocalDate.parse("2022-02-02")
+        norm.announcementDate = LocalDate.parse("2022-02-02")
         norm.printAnnouncementPage = "1125"
         norm.printAnnouncementGazette = "bg-1"
 
@@ -89,15 +89,51 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        val query = listOf<QueryParameter> (
+        val query = listOf(
             QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, "bg-1"),
             QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, "1125"),
-            QueryParameter(QueryFields.PUBLICATION_YEAR, "2022", true)
+            QueryParameter(QueryFields.ANNOUNCEMENT_OR_CITATION_YEAR, "2022", isYearForDate = true)
         )
 
         normsService.searchNorms(query).log()
             .`as`(StepVerifier::create)
             .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save two norms and retrieved both by eli`() {
+        val normWithAnnouncementDate = NORM
+        normWithAnnouncementDate.announcementDate = LocalDate.parse("2022-02-02")
+        normWithAnnouncementDate.citationDate = null
+        normWithAnnouncementDate.printAnnouncementPage = "1125"
+        normWithAnnouncementDate.printAnnouncementGazette = "bg-1"
+
+        normsService.saveNorm(normWithAnnouncementDate).log()
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        val normWithCitationDate = NORM
+        normWithCitationDate.citationDate = LocalDate.parse("2022-02-02")
+        normWithAnnouncementDate.announcementDate = null
+        normWithCitationDate.printAnnouncementPage = "1125"
+        normWithCitationDate.printAnnouncementGazette = "bg-1"
+
+        normsService.saveNorm(normWithCitationDate).log()
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        val query = listOf(
+            QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, "bg-1"),
+            QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, "1125"),
+            QueryParameter(QueryFields.ANNOUNCEMENT_OR_CITATION_YEAR, "2022", isYearForDate = true)
+        )
+
+        normsService.searchNorms(query).log()
+            .`as`(StepVerifier::create)
+            .expectNextCount(2)
             .verifyComplete()
     }
 

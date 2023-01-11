@@ -4,7 +4,7 @@ class NormDto(
     val guid: String,
     val officialLongTitle: IdentifiedElement,
     var officialShortTitle: IdentifiedElement?,
-    var publicationDate: String?,
+    var announcementDate: String?,
     var documentTypeName: String?,
     var documentNormCategory: String?,
     var providerDecidingBody: String?,

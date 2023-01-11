@@ -8,7 +8,7 @@ interface SearchNormsOutputPort {
 
     enum class QueryFields {
         PRINT_ANNOUNCEMENT_GAZETTE,
-        PUBLICATION_YEAR,
+        ANNOUNCEMENT_OR_CITATION_YEAR,
         PRINT_ANNOUNCEMENT_PAGE
     }
 

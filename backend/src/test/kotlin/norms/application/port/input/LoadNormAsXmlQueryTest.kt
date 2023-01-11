@@ -7,12 +7,12 @@ class LoadNormAsXmlQueryTest {
     @Test
     fun `can create query with GUID`() {
         val printAnnouncementGazette = "bg-1"
-        val publicationYear = "2022"
+        val announcementOrCitationYear = "2022"
         val printAnnouncementPage = "1125"
-        val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, publicationYear, printAnnouncementPage)
+        val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, announcementOrCitationYear, printAnnouncementPage)
 
         assertThat(query.printAnnouncementGazette).isEqualTo(printAnnouncementGazette)
-        assertThat(query.publicationYear).isEqualTo(publicationYear)
+        assertThat(query.announcementOrCitationYear).isEqualTo(announcementOrCitationYear)
         assertThat(query.printAnnouncementPage).isEqualTo(printAnnouncementPage)
     }
 }

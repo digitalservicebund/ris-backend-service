@@ -13,7 +13,7 @@ fun mapNormToDto(norm: Norm): NormDto {
         guid = norm.guid.toString(),
         officialLongTitle = IdentifiedElement(norm.officialLongTitle),
         officialShortTitle = IdentifiedElement(norm.officialShortTitle),
-        publicationDate = norm.publicationDate?.toString(),
+        announcementDate = norm.announcementDate?.toString() ?: norm.citationDate?.toString(),
         documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
         documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
         providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, norm.providerDecidingBody ?: ""),

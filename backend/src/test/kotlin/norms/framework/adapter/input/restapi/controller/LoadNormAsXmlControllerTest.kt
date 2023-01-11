@@ -35,7 +35,7 @@ class LoadNormAsXmlControllerTest {
                 withArg {
                     assertThat(it.printAnnouncementGazette)
                         .isEqualTo("bg-1")
-                    assertThat(it.publicationYear)
+                    assertThat(it.announcementOrCitationYear)
                         .isEqualTo("2022")
                     assertThat(it.printAnnouncementPage)
                         .isEqualTo("1125")

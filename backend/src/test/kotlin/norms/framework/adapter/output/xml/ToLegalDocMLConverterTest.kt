@@ -76,7 +76,7 @@ class ToLegalDocMLConverterTest {
                 .copy(
                     guid = guid,
                     printAnnouncementGazette = "printAnnouncementGazette",
-                    publicationDate = LocalDate.parse("2001-01-01"),
+                    announcementDate = LocalDate.parse("2001-01-01"),
                     printAnnouncementPage = "1102"
                 )
         val document = convertNormToLegalDocML(norm)
