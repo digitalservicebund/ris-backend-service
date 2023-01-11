@@ -181,6 +181,8 @@ fileignoreconfig:
     checksum: 713d9729f15a702988e15fa7de7d340ade031a59b76fe2f0b89eed1144ae0827
   - filename: backend/src/main/resources/db/migration/V0.28__caselaw_migrate_dokumenttyp_as_jurisshortcut_to_documenttypeid_column.sql
     checksum: 3210192153538bc86174f06eb80ddfdbc285278215a629717201a34665cf98a2
+  - filename: backend/src/main/resources/db/migration/V0.29__caselaw_remigrate_dokumenttyp_for_both_cases.sql
+    checksum: 2962980a50ab7088cf55ea023a53f2f66ccdab0969ed7c48d24f8e11bb589aa0
 
 scopeconfig:
   - scope: node
