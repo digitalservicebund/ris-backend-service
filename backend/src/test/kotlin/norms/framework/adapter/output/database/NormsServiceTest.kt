@@ -200,7 +200,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             providerEntity = "provider entity", entryIntoForceDate = LocalDate.now(),
             expirationDateState = UndefinedDate.UNDEFINED_FUTURE, printAnnouncementGazette = "print gazette",
             completeCitation = "complete citation", unofficialAbbreviation = "unofficial abbreviation",
-            celexNumber = "celex number",
+            celexNumber = "celex number"
         )
 
         normsService.editNorm(updatedNorm)
@@ -225,10 +225,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     private fun validateNorm(normBeforePersist: Norm, normAfterPersist: Norm) {
-        if (normBeforePersist != normAfterPersist) {
-            println(normBeforePersist)
-            println(normAfterPersist)
-        }
         assertThat(normBeforePersist == normAfterPersist, `is`(true))
     }
 }
