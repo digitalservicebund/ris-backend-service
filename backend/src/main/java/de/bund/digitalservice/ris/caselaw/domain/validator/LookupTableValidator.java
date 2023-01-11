@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.validator;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashMap;
@@ -12,7 +13,12 @@ public class LookupTableValidator implements ConstraintValidator<LookupTableCons
   private static final Map<String, List<String>> lookupTables = new HashMap<>();
 
   static {
-    lookupTables.put("legalEffect", List.of("Ja", "Nein", "Keine Angabe"));
+    lookupTables.put(
+        "legalEffect",
+        List.of(
+            LegalEffect.YES.getLabel(),
+            LegalEffect.NO.getLabel(),
+            LegalEffect.NOT_SPECIFIED.getLabel()));
   }
 
   @Override

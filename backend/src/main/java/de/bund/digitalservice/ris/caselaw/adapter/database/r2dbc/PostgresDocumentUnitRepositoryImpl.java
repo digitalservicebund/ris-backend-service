@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
@@ -91,6 +92,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 .uuid(UUID.randomUUID())
                 .creationtimestamp(Instant.now())
                 .documentnumber(documentNumber)
+                .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                 .build())
         .map(
             documentUnitDTO ->
