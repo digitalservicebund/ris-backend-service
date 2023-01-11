@@ -596,7 +596,6 @@ class DocumentUnitIntegrationTest {
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
-            .documentTypeDTO(documentTypeDTO)
             .build();
     repository.save(dto).block();
 

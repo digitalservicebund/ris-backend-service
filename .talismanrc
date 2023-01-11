@@ -100,7 +100,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: eb660181bdfba7c488193f0538cc30f2763994763de91bef2daf00193553015c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 3e4cfde009ebe219d32f82ed0d98bc1fb9aa344d8f665c16af2964611e4d975a
+    checksum: 04b341268003c933631ab2e5affcd7995b74e224b1a40eedf70459485b36b320
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
     checksum: 844cfec4dfe67bc0c14a5c4d804a44a64e438e413a7fe84af9a1f85134cb9b7c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitWrongDocumentUnitIntegrationTest.java
@@ -179,6 +179,8 @@ fileignoreconfig:
     checksum: 8c6eee02511b1fea5e33d6115e76d7abd60acc957e8562b64ee72e9f3c5601b2
   - filename: backend/src/main/resources/db/migration/V0.27__caselaw_add-email-tracking.sql
     checksum: 713d9729f15a702988e15fa7de7d340ade031a59b76fe2f0b89eed1144ae0827
+  - filename: backend/src/main/resources/db/migration/V0.28__caselaw_migrate_dokumenttyp_as_jurisshortcut_to_documenttypeid_column.sql
+    checksum: 3210192153538bc86174f06eb80ddfdbc285278215a629717201a34665cf98a2
 
 scopeconfig:
   - scope: node
