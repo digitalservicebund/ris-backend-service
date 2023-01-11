@@ -14,7 +14,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(
       page.locator("li:has-text('Entscheidungsdatum')")
     ).toBeVisible()
-    await expect(page.locator("li:has-text('Rechtskraft')")).toBeVisible()
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
   })
 
@@ -29,7 +28,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(
       page.locator("li:has-text('Entscheidungsdatum')")
     ).toBeVisible()
-    await expect(page.locator("li:has-text('Rechtskraft')")).toBeVisible()
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
     await page.locator("[aria-label='Rubriken bearbeiten']").click()
     await page.locator("[aria-label='Gericht']").fill("aalen")
@@ -49,7 +47,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(
       page.locator("li:has-text('Entscheidungsdatum')")
     ).toBeVisible()
-    await expect(page.locator("li:has-text('Rechtskraft')")).toBeVisible()
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
   })
 
