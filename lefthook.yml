@@ -35,6 +35,15 @@ post-commit:
   commands:
     secrets-checkum-test:
       tags: security
+      skip: rebase
+      fail_text: |
+
+        This commit has touched files which are known to include false positives of the secret scanner.
+        It does not mean you have introduced new secrets, but this are "old" reports.
+        But due to the file content change, the checksum Talisman is using for the verification has changed too.
+        Please double check the reported file(s) and update their checksums in the `.talismanrc` file.
+        Afterwards stage the file and amend this commit which was just created with `git commit --amend --no-edit`
+
       run: |
         local_reference=$(git rev-parse --symbolic-full-name HEAD)
         local_object_name=$(git rev-parse HEAD)
