@@ -13,7 +13,6 @@ import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
@@ -185,7 +184,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
-    @Disabled
     fun `save norm and edit norm`() {
         normsService.saveNorm(NORM)
             .`as`(StepVerifier::create)
@@ -202,8 +200,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             providerEntity = "provider entity", entryIntoForceDate = LocalDate.now(),
             expirationDateState = UndefinedDate.UNDEFINED_FUTURE, printAnnouncementGazette = "print gazette",
             completeCitation = "complete citation", unofficialAbbreviation = "unofficial abbreviation",
-            celexNumber = "celex number"
+            celexNumber = "celex number",
         )
+
         normsService.editNorm(updatedNorm)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
@@ -211,11 +210,25 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByGuid(NORM.guid)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(updatedNorm, it) }
+            .assertNext {
+                assertThat(it.officialLongTitle == updatedNorm.officialLongTitle, `is`(true))
+                assertThat(it.documentNumber == updatedNorm.documentNumber, `is`(true))
+                assertThat(it.providerEntity == updatedNorm.providerEntity, `is`(true))
+                assertThat(it.entryIntoForceDate == updatedNorm.entryIntoForceDate, `is`(true))
+                assertThat(it.expirationDateState == updatedNorm.expirationDateState, `is`(true))
+                assertThat(it.printAnnouncementGazette == updatedNorm.printAnnouncementGazette, `is`(true))
+                assertThat(it.completeCitation == updatedNorm.completeCitation, `is`(true))
+                assertThat(it.unofficialAbbreviation == updatedNorm.unofficialAbbreviation, `is`(true))
+                assertThat(it.celexNumber == updatedNorm.celexNumber, `is`(true))
+            }
             .verifyComplete()
     }
 
     private fun validateNorm(normBeforePersist: Norm, normAfterPersist: Norm) {
+        if (normBeforePersist != normAfterPersist) {
+            println(normBeforePersist)
+            println(normAfterPersist)
+        }
         assertThat(normBeforePersist == normAfterPersist, `is`(true))
     }
 }
