@@ -10,7 +10,11 @@ interface SearchNormsOutputPort {
         PRINT_ANNOUNCEMENT_GAZETTE,
         ANNOUNCEMENT_DATE,
         CITATION_DATE,
-        PRINT_ANNOUNCEMENT_PAGE
+        PRINT_ANNOUNCEMENT_PAGE,
+        OFFICIAL_LONG_TITLE,
+        OFFICIAL_SHORT_TITLE,
+        UNOFFICIAL_LONG_TITLE,
+        UNOFFICIAL_SHORT_TITLE
     }
 
     data class QueryParameter(

@@ -107,6 +107,10 @@ interface NormsMapper {
             QueryFields.ANNOUNCEMENT_DATE -> "announcement_date"
             QueryFields.PRINT_ANNOUNCEMENT_GAZETTE -> "print_announcement_gazette"
             QueryFields.CITATION_DATE -> "citation_date"
+            QueryFields.OFFICIAL_LONG_TITLE -> "official_long_title"
+            QueryFields.OFFICIAL_SHORT_TITLE -> "official_short_title"
+            QueryFields.UNOFFICIAL_LONG_TITLE -> "unofficial_long_title"
+            QueryFields.UNOFFICIAL_SHORT_TITLE -> "unofficial_short_title"
         }
     }
 }

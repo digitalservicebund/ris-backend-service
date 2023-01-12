@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase.NormData
 import io.mockk.every
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -25,17 +26,30 @@ class ListNormsControllerTest {
     @MockkBean lateinit var listNormsService: ListNormsUseCase
 
     @Test
-    fun `it calls the list norms service to get all norms`() {
-        every { listNormsService.listNorms() } returns Flux.empty()
+    fun `it calls the list norms service with an empty query if none was provided`() {
+        every { listNormsService.listNorms(any()) } returns Flux.empty()
 
         webClient.mutateWith(csrf()).get().uri("/api/v1/norms").exchange()
 
-        verify(exactly = 1) { listNormsService.listNorms() }
+        verify(exactly = 1) {
+            listNormsService.listNorms(withArg({ assertThat(it.searchTerm).isNull() }))
+        }
+    }
+
+    @Test
+    fun `it calls the list norms service with given query if provided`() {
+        every { listNormsService.listNorms(any()) } returns Flux.empty()
+
+        webClient.mutateWith(csrf()).get().uri("/api/v1/norms?q=foo").exchange()
+
+        verify(exactly = 1) {
+            listNormsService.listNorms(withArg({ assertThat(it.searchTerm).isEqualTo("foo") }))
+        }
     }
 
     @Test
     fun `it always responds an ok status also if the service lists no norms`() {
-        every { listNormsService.listNorms() } returns Flux.empty()
+        every { listNormsService.listNorms(any()) } returns Flux.empty()
 
         webClient.mutateWith(csrf()).get().uri("/api/v1/norms").exchange().expectStatus().isOk()
     }
@@ -43,7 +57,7 @@ class ListNormsControllerTest {
     @Test
     fun `it reponds with a data property that holds the list of norms`() {
         val norm = NormData(UUID.randomUUID(), "long title")
-        every { listNormsService.listNorms() } returns Flux.fromArray(arrayOf(norm))
+        every { listNormsService.listNorms(any()) } returns Flux.fromArray(arrayOf(norm))
 
         webClient
             .mutateWith(csrf())
@@ -59,11 +73,9 @@ class ListNormsControllerTest {
 
     @Test
     fun `it maps the norm entity to the expected data schema`() {
-        val normOne =
-            NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title")
-        val normTwo =
-            NormData(UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"), "second title")
-        every { listNormsService.listNorms() } returns Flux.fromArray(arrayOf(normOne, normTwo))
+        val normOne = NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title")
+        val normTwo = NormData(UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"), "second title")
+        every { listNormsService.listNorms(any()) } returns Flux.fromArray(arrayOf(normOne, normTwo))
 
         webClient
             .mutateWith(csrf())
@@ -85,7 +97,7 @@ class ListNormsControllerTest {
 
     @Test
     fun `it sends an internal error response if the list norms service throws an exception`() {
-        every { listNormsService.listNorms() } throws Error()
+        every { listNormsService.listNorms(any()) } throws Error()
 
         webClient
             .mutateWith(csrf())

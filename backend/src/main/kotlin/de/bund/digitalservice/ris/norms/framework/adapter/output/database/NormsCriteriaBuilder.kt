@@ -28,7 +28,7 @@ class NormsCriteriaBuilder : NormsMapper {
 
     fun getSearchCriteria(query: List<QueryParameter>): Criteria {
         var criteria = Criteria.empty()
-        query.forEach { criteria = criteria.and(getFieldCriteria(it)) }
+        query.forEach { criteria = criteria.or(getFieldCriteria(it)) }
 
         return Criteria.from(criteria)
     }

@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGu
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
@@ -14,15 +15,18 @@ import reactor.core.publisher.Mono
 class ListNormsController(private val listNormsService: ListNormsUseCase) {
 
     @GetMapping
-    fun getAllNorms(): Mono<ResponseEntity<PaginatedNormListResponseSchema>> =
-        listNormsService
-            .listNorms()
+    fun listNorms(@RequestParam q: String?): Mono<ResponseEntity<PaginatedNormListResponseSchema>> {
+        val query = ListNormsUseCase.Query(searchTerm = q)
+
+        return listNormsService
+            .listNorms(query)
             .collectList()
             .map({ normDataList ->
                 PaginatedNormListResponseSchema.fromUseCaseData(normDataList)
             })
             .map({ paginationData -> ResponseEntity.ok(paginationData) })
             .onErrorReturn(ResponseEntity.internalServerError().build())
+    }
 
     data class PaginatedNormListResponseSchema
     private constructor(val data: List<NormDataResponseSchema>) {
