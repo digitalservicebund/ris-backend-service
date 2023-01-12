@@ -144,10 +144,12 @@ data class Norm(
     var text: String? = null
 
 ) {
-    fun getEuropeanLegalIdentifier(): EuropeanLegalIdentifier = EuropeanLegalIdentifier(
-        printAnnouncementGazette,
-        announcementDate,
-        citationDate,
-        printAnnouncementPage
-    )
+    val europeanLegalIdentifier: EuropeanLegalIdentifier
+        get() =
+            EuropeanLegalIdentifier(
+                printAnnouncementGazette,
+                announcementDate,
+                citationDate,
+                printAnnouncementPage
+            )
 }

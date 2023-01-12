@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEuropeanLegalIdentifier
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import org.springframework.http.ResponseEntity
@@ -253,7 +254,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.digitalEvidenceExternalDataNote,
                     data.digitalEvidenceAppendix,
                     data.referenceNumber,
-                    data.getEuropeanLegalIdentifier().toString(),
+                    encodeEuropeanLegalIdentifier(data.europeanLegalIdentifier),
                     data.celexNumber,
                     data.ageIndicationStart,
                     data.ageIndicationEnd,

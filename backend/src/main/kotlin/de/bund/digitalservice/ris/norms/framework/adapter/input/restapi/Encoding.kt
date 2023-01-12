@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi
 
+import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
 import java.util.UUID
@@ -13,4 +14,7 @@ fun decodeLocalDate(dateString: String?): LocalDate? =
 
 fun encodeLocalDate(date: LocalDate?): String? = if (date != null) date.toString() else null
 
-fun decodeUndefinedDate(undefinedDate: String?): UndefinedDate? = undefinedDate?.let { UndefinedDate.valueOf(undefinedDate) }
+fun decodeUndefinedDate(undefinedDate: String?): UndefinedDate? =
+    undefinedDate?.let { UndefinedDate.valueOf(undefinedDate) }
+
+fun encodeEuropeanLegalIdentifier(identifier: EuropeanLegalIdentifier) = identifier.toString()

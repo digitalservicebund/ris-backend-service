@@ -86,7 +86,9 @@ fun assertNormDataAndImportNormRequestSchemaWithoutArticles(
             is UndefinedDate ->
                 assertThat(normDataMemberValue)
                     .isEqualTo(
-                        decodeUndefinedDate(found?.get(importNormRequestSchema).toString())
+                        decodeUndefinedDate(
+                            found?.get(importNormRequestSchema).toString()
+                        )
                     )
             else -> {
                 assertThat(normDataMemberValue).isEqualTo(found?.get(importNormRequestSchema))
@@ -98,16 +100,18 @@ fun assertNormDataAndImportNormRequestSchemaWithoutArticles(
 fun assertNormAndNormDataWithoutArticles(norm: Norm, normData: ImportNormUseCase.NormData) {
     val normMembers = Norm::class.memberProperties
     val normDataMembers = ImportNormUseCase.NormData::class.memberProperties
-    normMembers.filter { it.name !in listOf("articles", "guid") }.forEach { normMember ->
-        val found =
-            normDataMembers.find { normDataMember -> normMember.name == normDataMember.name }
-        when (val normMemberValue = normMember.get(norm)) {
-            is LocalDate ->
-                assertThat(normMemberValue)
-                    .isEqualTo(decodeLocalDate(found?.get(normData).toString()))
-            else -> {
-                assertThat(normMemberValue).isEqualTo(found?.get(normData))
+    normMembers
+        .filter { it.name !in listOf("articles", "guid", "europeanLegalIdentifier") }
+        .forEach { normMember ->
+            val found =
+                normDataMembers.find { normDataMember -> normMember.name == normDataMember.name }
+            when (val normMemberValue = normMember.get(norm)) {
+                is LocalDate ->
+                    assertThat(normMemberValue)
+                        .isEqualTo(decodeLocalDate(found?.get(normData).toString()))
+                else -> {
+                    assertThat(normMemberValue).isEqualTo(found?.get(normData))
+                }
             }
         }
-    }
 }
