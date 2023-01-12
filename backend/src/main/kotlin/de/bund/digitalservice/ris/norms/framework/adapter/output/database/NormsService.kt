@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
@@ -16,14 +17,12 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.reposi
 import org.springframework.context.annotation.Primary
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.dialect.PostgresDialect
-import org.springframework.data.relational.core.query.Criteria
 import org.springframework.data.relational.core.query.Query
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @Component
 @Primary
@@ -37,14 +36,24 @@ class NormsService(
     GetNormByGuidOutputPort,
     SaveNormOutputPort,
     EditNormOutputPort,
-    SearchNormsOutputPort {
+    SearchNormsOutputPort,
+    GetNormByEliOutputPort {
 
     private val template: R2dbcEntityTemplate = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
+    private val criteria: NormsCriteriaBuilder = NormsCriteriaBuilder()
+
+    override fun getNormByEli(gazette: String, year: String, page: String): Mono<Norm> {
+        return template.select(NormDto::class.java)
+            .matching(Query.query(criteria.getEliCriteria(gazette, year, page)))
+            .first()
+            .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
+    }
 
     override fun searchNorms(
         query: List<SearchNormsOutputPort.QueryParameter>
     ): Flux<Norm> {
-        return template.select(NormDto::class.java).matching(Query.query(getCriteria(query)))
+        return template.select(NormDto::class.java)
+            .matching(Query.query(criteria.getSearchCriteria(query)))
             .all()
             .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
     }
@@ -116,28 +125,5 @@ class NormsService(
             .map { paragraphs: List<ParagraphDto> ->
                 articleToEntity(articleDto, paragraphs.map { paragraphToEntity(it) })
             }
-    }
-
-    private fun getCriteria(query: List<SearchNormsOutputPort.QueryParameter>): Criteria {
-        val criteria = query.map {
-            if (it.value == null) {
-                return Criteria.where(queryFieldToDatabaseColumn(it.field)).isNull
-            }
-
-            if (it.isYearForDate) {
-                return Criteria.where(queryFieldToDatabaseColumn(it.field))
-                    .between(
-                        LocalDate.of(it.value.toInt(), 1, 1),
-                        LocalDate.of(it.value.toInt() + 1, 1, 1)
-                    )
-            }
-
-            if (it.isFuzzyMatch) {
-                return Criteria.where(queryFieldToDatabaseColumn(it.field)).like("%${it.value}%")
-            }
-
-            return Criteria.where(queryFieldToDatabaseColumn(it.field)).`is`(it.value)
-        }
-        return Criteria.from(criteria)
     }
 }

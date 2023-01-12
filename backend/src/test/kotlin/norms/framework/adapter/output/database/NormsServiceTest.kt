@@ -1,8 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryParameter
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -79,26 +77,50 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save simple norm and retrieved by eli`() {
-        val norm = NORM
-        norm.announcementDate = LocalDate.parse("2022-02-02")
-        norm.citationDate = null
-        norm.printAnnouncementPage = "1125"
-        norm.printAnnouncementGazette = "bg-1"
+        val norm = NORM.copy(
+            announcementDate = LocalDate.parse("2022-02-02"),
+            citationDate = null,
+            printAnnouncementPage = "1125",
+            printAnnouncementGazette = "bg-1"
+        )
 
         normsService.saveNorm(norm)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
 
-        val query = listOf(
-            QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, "bg-1"),
-            QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, "1125"),
-            QueryParameter(QueryFields.ANNOUNCEMENT_DATE, "2022", isYearForDate = true)
-        )
-
-        normsService.searchNorms(query)
+        normsService.getNormByEli("bg-1", "2022", "1125")
             .`as`(StepVerifier::create)
             .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save multiple norms and retrieve only one by eli parameters`() {
+        val firstNorm = NORM.copy(
+            announcementDate = LocalDate.parse("2022-02-02"),
+            printAnnouncementPage = "1125",
+            printAnnouncementGazette = "bg-1"
+        )
+        val secondNorm = NORM.copy(
+            announcementDate = LocalDate.parse("2022-02-02"),
+            printAnnouncementPage = "111",
+            printAnnouncementGazette = "bg-1"
+        )
+
+        normsService.saveNorm(firstNorm)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.saveNorm(secondNorm)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli("bg-1", "2022", "111")
+            .`as`(StepVerifier::create)
+            .assertNext { validateNorm(secondNorm, it) }
             .verifyComplete()
     }
 

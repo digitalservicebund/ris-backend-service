@@ -9,7 +9,7 @@ data class EuropeanLegalIdentifier(
     val printAnnouncementPage: String?
 ) {
     companion object {
-        fun parseGazette(gazette: String?): String? = when (gazette) {
+        fun parseGazette(gazette: String): String = when (gazette) {
             "bgbl-1" -> "BGBl I"
             "bgbl-2" -> "BGBl II"
             "banz-at" -> "BAnz"

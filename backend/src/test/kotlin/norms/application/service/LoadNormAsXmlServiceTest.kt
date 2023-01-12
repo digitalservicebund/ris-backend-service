@@ -2,14 +2,11 @@ package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormAsXmlUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.ConvertNormToXmlOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
-import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryParameter
+import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
 import io.mockk.every
 import io.mockk.mockk
 import norms.utils.createRandomNorm
 import org.junit.jupiter.api.Test
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
 import java.time.LocalDate
@@ -18,27 +15,16 @@ class LoadNormAsXmlServiceTest {
     private val announcementYear = "2022"
     private val printAnnouncementGazette = "bg-1"
     private val printAnnouncementPage = "1125"
-    private val searchNormQuery = listOf(
-        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, printAnnouncementGazette),
-        QueryParameter(QueryFields.ANNOUNCEMENT_DATE, announcementYear, isYearForDate = true),
-        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, printAnnouncementPage)
-    )
-    private val secondSearchNormQuery = listOf(
-        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE, printAnnouncementGazette),
-        QueryParameter(QueryFields.ANNOUNCEMENT_DATE, null),
-        QueryParameter(QueryFields.CITATION_DATE, announcementYear, isYearForDate = true),
-        QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, printAnnouncementPage)
-    )
 
     @Test
     fun `it returns nothing if norm could not be found by search queries`() {
-        val searchNormAdapter = mockk<SearchNormsOutputPort>()
+        val getNormByEliAdapter = mockk<GetNormByEliOutputPort>()
         val convertNormToXmlAdapter = mockk<ConvertNormToXmlOutputPort>()
         val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, announcementYear, printAnnouncementPage)
-        val service = LoadNormAsXmlService(searchNormAdapter, convertNormToXmlAdapter)
+        val service = LoadNormAsXmlService(getNormByEliAdapter, convertNormToXmlAdapter)
 
-        every { searchNormAdapter.searchNorms(searchNormQuery) } returns Flux.empty()
-        every { searchNormAdapter.searchNorms(secondSearchNormQuery) } returns Flux.empty()
+        every { getNormByEliAdapter.getNormByEli(printAnnouncementGazette, announcementYear, printAnnouncementPage) } returns Mono.empty()
+        every { getNormByEliAdapter.getNormByEli(printAnnouncementGazette, announcementYear, printAnnouncementPage) } returns Mono.empty()
         every { convertNormToXmlAdapter.convertNormToXml(any()) } returns Mono.just("")
 
         service.loadNormAsXml(query).`as`(StepVerifier::create).expectNextCount(0).verifyComplete()
@@ -46,16 +32,16 @@ class LoadNormAsXmlServiceTest {
 
     @Test
     fun `it returns output of conversion adapter if norm was found by search queries`() {
-        val searchNormAdapter = mockk<SearchNormsOutputPort>()
+        val getNormByEliAdapter = mockk<GetNormByEliOutputPort>()
         val convertNormToXmlAdapter = mockk<ConvertNormToXmlOutputPort>()
         val norm = createRandomNorm()
         norm.printAnnouncementGazette = printAnnouncementGazette
         norm.printAnnouncementPage = printAnnouncementPage
         norm.announcementDate = LocalDate.parse("2022-01-01")
         val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, announcementYear, printAnnouncementPage)
-        val service = LoadNormAsXmlService(searchNormAdapter, convertNormToXmlAdapter)
+        val service = LoadNormAsXmlService(getNormByEliAdapter, convertNormToXmlAdapter)
 
-        every { searchNormAdapter.searchNorms(searchNormQuery) } returns Flux.just(norm)
+        every { getNormByEliAdapter.getNormByEli(printAnnouncementGazette, announcementYear, printAnnouncementPage) } returns Mono.just(norm)
         every { convertNormToXmlAdapter.convertNormToXml(any()) } returns Mono.just("fake test xml")
 
         service
@@ -67,11 +53,11 @@ class LoadNormAsXmlServiceTest {
 
     @Test
     fun `it returns norm by eli that matched announcement date`() {
-        val searchNormAdapter = mockk<SearchNormsOutputPort>()
+        val getNormByEliAdapter = mockk<GetNormByEliOutputPort>()
         val convertNormToXmlAdapter = mockk<ConvertNormToXmlOutputPort>()
 
         val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, announcementYear, printAnnouncementPage)
-        val service = LoadNormAsXmlService(searchNormAdapter, convertNormToXmlAdapter)
+        val service = LoadNormAsXmlService(getNormByEliAdapter, convertNormToXmlAdapter)
 
         val normWithAnnouncementDate = createRandomNorm()
         normWithAnnouncementDate.printAnnouncementGazette = printAnnouncementGazette
@@ -83,9 +69,8 @@ class LoadNormAsXmlServiceTest {
         normWithCitationDate.printAnnouncementPage = printAnnouncementPage
         normWithCitationDate.citationDate = LocalDate.parse("2022-01-01")
 
-        every { searchNormAdapter.searchNorms(searchNormQuery) } returns Flux.just(normWithAnnouncementDate, normWithCitationDate)
+        every { getNormByEliAdapter.getNormByEli(printAnnouncementGazette, announcementYear, printAnnouncementPage) } returns Mono.just(normWithAnnouncementDate)
         every { convertNormToXmlAdapter.convertNormToXml(normWithAnnouncementDate) } returns Mono.just("norm with announcement date")
-        every { convertNormToXmlAdapter.convertNormToXml(normWithCitationDate) } returns Mono.just("norm with citation date")
 
         service
             .loadNormAsXml(query)

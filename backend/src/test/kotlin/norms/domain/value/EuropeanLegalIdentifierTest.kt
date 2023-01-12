@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.norms.domain.entity
+package de.bund.digitalservice.ris.norms.domain.value
 
-import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
