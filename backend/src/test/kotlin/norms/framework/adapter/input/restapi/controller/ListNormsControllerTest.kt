@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase.NormData
+import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
 import io.mockk.every
 import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
@@ -15,6 +16,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
+import java.time.LocalDate
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -56,7 +58,7 @@ class ListNormsControllerTest {
 
     @Test
     fun `it reponds with a data property that holds the list of norms`() {
-        val norm = NormData(UUID.randomUUID(), "long title")
+        val norm = NormData(UUID.randomUUID(), "long title", EuropeanLegalIdentifier(null, null, null, null))
         every { listNormsService.listNorms(any()) } returns Flux.fromArray(arrayOf(norm))
 
         webClient
@@ -73,8 +75,10 @@ class ListNormsControllerTest {
 
     @Test
     fun `it maps the norm entity to the expected data schema`() {
-        val normOne = NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title")
-        val normTwo = NormData(UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"), "second title")
+        val eliOne = EuropeanLegalIdentifier("bgbl-1", LocalDate.of(2022, 1, 1), null, "1")
+        val eliTwo = EuropeanLegalIdentifier("bgbl-2", LocalDate.of(2022, 1, 2), null, "2")
+        val normOne = NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title", eliOne)
+        val normTwo = NormData(UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"), "second title", eliTwo)
         every { listNormsService.listNorms(any()) } returns Flux.fromArray(arrayOf(normOne, normTwo))
 
         webClient
@@ -87,8 +91,8 @@ class ListNormsControllerTest {
                 """
         {
           "data": [
-            { "guid": "761b5537-5aa5-4901-81f7-fbf7e040a7c8", "officialLongTitle": "first title" },
-            { "guid": "53d29ef7-377c-4d14-864b-eb3a85769359", "officialLongTitle": "second title" }
+            { "guid": "761b5537-5aa5-4901-81f7-fbf7e040a7c8", "officialLongTitle": "first title", "eli": "$eliOne" },
+            { "guid": "53d29ef7-377c-4d14-864b-eb3a85769359", "officialLongTitle": "second title", "eli": "$eliTwo" }
           ]
         }
         """

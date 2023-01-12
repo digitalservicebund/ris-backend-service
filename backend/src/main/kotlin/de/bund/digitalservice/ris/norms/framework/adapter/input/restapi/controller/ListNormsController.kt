@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEuropeanLegalIdentifier
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -41,11 +42,13 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
     }
 
     data class NormDataResponseSchema
-    private constructor(val guid: String, val officialLongTitle: String) {
+    private constructor(val guid: String, val officialLongTitle: String, val eli: String) {
         companion object {
-            fun fromUseCaseData(data: ListNormsUseCase.NormData): NormDataResponseSchema {
-                return NormDataResponseSchema(encodeGuid(data.guid), data.officialLongTitle)
-            }
+            fun fromUseCaseData(data: ListNormsUseCase.NormData) = NormDataResponseSchema(
+                encodeGuid(data.guid),
+                data.officialLongTitle,
+                encodeEuropeanLegalIdentifier(data.europeanLegalIdentifier)
+            )
         }
     }
 }
