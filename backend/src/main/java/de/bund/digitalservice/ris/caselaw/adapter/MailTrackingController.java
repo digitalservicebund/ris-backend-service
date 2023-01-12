@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.MailTrackingService;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,7 @@ public class MailTrackingController {
 
   @PostMapping("/webhook")
   public Mono<ResponseEntity<String>> setPublishState(
-      @RequestBody MailTrackingResponsePayload payload) {
+      @RequestBody @Valid MailTrackingResponsePayload payload) {
     UUID documentUnitUuid = UUID.fromString(payload.tags().get(0));
     PublishState publishState = service.getMappedPublishState(payload.event());
 
