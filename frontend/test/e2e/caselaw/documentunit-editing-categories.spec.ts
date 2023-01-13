@@ -15,7 +15,9 @@ test.describe("ensuring the editing experience in categories is as expected", ()
   test("test legal effect dropdown", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await expect(page.locator("text=Keine Angabe")).toBeHidden()
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
+      "Keine Angabe"
+    )
 
     await page
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
@@ -139,8 +141,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     // saving... and then saved
     await waitForSaving(page)
 
-    // TODO remove reload when region gets updated via response.data
-    await page.reload()
+    await page.reload() // TODO remove reload when region gets updated via response.data
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was set by the backend based on state database table
@@ -163,4 +164,57 @@ test.describe("ensuring the editing experience in categories is as expected", ()
   })
 
   // TODO test that arrow keys behave correctly in dropdowns?
+
+  test("test that setting a special court sets legal effect to yes, but it can be changed afterwards", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
+      "Keine Angabe"
+    )
+
+    await page.locator("[aria-label='Gericht']").fill("bgh")
+    await page.locator("text=BGH").click()
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("BGH")
+    await waitForSaving(page)
+
+    await page.reload() // TODO remove reload when update via response.data works
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Ja")
+
+    await page
+      .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
+      .click()
+
+    await page.locator("text=Nein").click()
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Nein")
+
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+    await waitForSaving(page)
+    await page.reload() // TODO remove reload when update via response.data works
+
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Nein")
+  })
+
+  test("test that setting a non-special court leaves legal effect unchanged", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
+      "Keine Angabe"
+    )
+
+    await page.locator("[aria-label='Gericht']").fill("aachen")
+    await page.locator("text=AG Aachen").click()
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aachen")
+    await waitForSaving(page)
+
+    await page.reload() // TODO remove reload when update via response.data works
+    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
+      "Keine Angabe"
+    )
+  })
 })

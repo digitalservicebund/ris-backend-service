@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -636,5 +637,157 @@ class DocumentUnitIntegrationTest {
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentTypeId()).isEqualTo(1L);
     assertThat(list.get(0).getDocumentTypeDTO()).isNull();
+  }
+
+  @Test
+  void testLegalEffectToBeSetFromNotSpecifiedToYesBySpecialCourtChangeButBeChangeableAfterwards() {
+    testLegalEffectChanges(LegalEffect.NOT_SPECIFIED, "BGH", LegalEffect.YES);
+  }
+
+  @Test
+  void testLegalEffectToBeSetFromNoToYesBySpecialCourtChangeButBeChangeableAfterwards() {
+    testLegalEffectChanges(LegalEffect.NO, "BVerfG", LegalEffect.YES);
+  }
+
+  @Test
+  void testLegalEffectToBeKeptAtYesBySpecialCourtChangeAndBeChangeableAfterwards() {
+    testLegalEffectChanges(LegalEffect.YES, "BSG", LegalEffect.YES);
+  }
+
+  @Test
+  void testLegalEffectToBeKeptByNonSpecialCourtChangeAndBeChangeableAfterwards() {
+    testLegalEffectChanges(LegalEffect.NO, "ABC", LegalEffect.NO);
+  }
+
+  private void testLegalEffectChanges(
+      LegalEffect valueBefore, String courtType, LegalEffect expectedValueAfter) {
+    // outsource and reuse this default way of building a new DocumentUnitDTO? TODO
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(UUID.randomUUID())
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .legalEffect(valueBefore.getLabel())
+            .build();
+
+    repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, valueBefore);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().court().type()).isEqualTo(courtType);
+              assertThat(response.getResponseBody().coreData().legalEffect())
+                  .isEqualTo(expectedValueAfter.getLabel());
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getLegalEffect()).isEqualTo(expectedValueAfter.getLabel());
+
+    // Change to NO
+    documentUnitFromFrontend =
+        buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, LegalEffect.NO);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().court().type()).isEqualTo(courtType);
+              assertThat(response.getResponseBody().coreData().legalEffect())
+                  .isEqualTo(LegalEffect.NO.getLabel());
+            });
+
+    list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getLegalEffect()).isEqualTo(LegalEffect.NO.getLabel());
+
+    // Change to NOT_SPECIFIED
+    documentUnitFromFrontend =
+        buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, LegalEffect.NOT_SPECIFIED);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().court().type()).isEqualTo(courtType);
+              assertThat(response.getResponseBody().coreData().legalEffect())
+                  .isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
+            });
+
+    list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getLegalEffect()).isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
+
+    // Remove court, should stay NOT_SPECIFIED
+    documentUnitFromFrontend =
+        buildDocumentUnitFromFrontendWithLegalEffect(dto, null, LegalEffect.NOT_SPECIFIED);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().legalEffect())
+                  .isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
+            });
+
+    list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getLegalEffect()).isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
+  }
+
+  private DocumentUnit buildDocumentUnitFromFrontendWithLegalEffect(
+      DocumentUnitDTO dto, String courtType, LegalEffect legalEffect) {
+    CoreData coreData;
+    if (courtType == null) {
+      coreData = CoreData.builder().legalEffect(legalEffect.getLabel()).build();
+    } else {
+      coreData =
+          CoreData.builder()
+              .court(Court.builder().type(courtType).build())
+              .legalEffect(legalEffect.getLabel())
+              .build();
+    }
+    return DocumentUnit.builder()
+        .uuid(dto.getUuid())
+        .creationtimestamp(dto.getCreationtimestamp())
+        .documentNumber(dto.getDocumentnumber())
+        .coreData(coreData)
+        .build();
   }
 }
