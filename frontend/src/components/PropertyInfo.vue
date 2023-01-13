@@ -9,6 +9,10 @@ interface Props {
 
 const props = defineProps<Props>()
 
+const noValue = computed(() => {
+  return props.value === undefined || props.value === ""
+})
+
 const classes = computed(() => ({
   "flex-row": props.direction == "row",
   "flex-col": props.direction == "column",
@@ -18,6 +22,6 @@ const classes = computed(() => ({
 <template>
   <div class="flex items-baseline" :class="classes">
     <div class="label-03-caps pr-[0.4rem]">{{ label }}</div>
-    <div class="label-03-bold">{{ value ?? " - " }}</div>
+    <div class="label-03-bold">{{ noValue ? " - " : value }}</div>
   </div>
 </template>

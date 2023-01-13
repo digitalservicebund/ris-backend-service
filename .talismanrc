@@ -100,7 +100,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: eb660181bdfba7c488193f0538cc30f2763994763de91bef2daf00193553015c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 17c6cc17dd1c79835eacbf994351c17a79b3fe5f77a05af6bbc4cbb2aa08f900
+    checksum: 4dbd9c02e2a296c4c32cdd4cadc07e36035ad68d41986d31dc668927ba75ba96
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
     checksum: 844cfec4dfe67bc0c14a5c4d804a44a64e438e413a7fe84af9a1f85134cb9b7c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitWrongDocumentUnitIntegrationTest.java
@@ -136,7 +136,7 @@ fileignoreconfig:
   - filename: frontend/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
   - filename: frontend/src/composables/useTransformNestedData.ts
-    checksum: 45bd69e2bb261d86ba40108a417f55b90ffa6b10e41f238ba52f00c9fad4cc5f
+    checksum: a092bbf72c9a9e09973d629f6a3cfc19c659a8e7408eec3d38de41e927e9380d
   - filename: frontend/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: frontend/src/domain/Norm.ts

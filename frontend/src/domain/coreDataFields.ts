@@ -144,12 +144,24 @@ export function defineNestedInputField(
 }
 
 export const courtFields: InputField[] = [
-  defineComboboxField(
-    "court",
-    "Gericht",
-    "Gericht",
-    comboboxItemService.getCourts,
-    "Gerichtstyp Gerichtsort"
+  defineNestedInputField(
+    "Fehlerhaftes Gericht",
+    "nestedInputOfCourtAndIncorrectCourts",
+    {
+      parent: defineComboboxField(
+        "court",
+        "Gericht",
+        "Gericht",
+        comboboxItemService.getCourts,
+        "Gerichtstyp Gerichtsort"
+      ),
+      child: defineChipsField(
+        "incorrectCourts",
+        "Fehlerhaftes Gericht",
+        "Fehlerhaftes Gericht",
+        ""
+      ),
+    }
   ),
 ]
 export const coreDataFields: InputField[] = [
