@@ -23,8 +23,8 @@ class MapParagraphToDto {
         assertThat(data.articleMarker).isEqualTo("2")
         assertThat(data.markerText?.value).isEqualTo("1")
         assertThat(data.markerText?.guid).isInstanceOf(UUID::class.java).isNotNull
-        assertThat(data.text.value).isEqualTo("test text")
-        assertThat(data.text.guid).isInstanceOf(UUID::class.java).isNotNull
+        assertThat(data.content.text?.value).isEqualTo("test text")
+        assertThat(data.content.text?.guid).isInstanceOf(UUID::class.java).isNotNull
     }
 
     @Test
