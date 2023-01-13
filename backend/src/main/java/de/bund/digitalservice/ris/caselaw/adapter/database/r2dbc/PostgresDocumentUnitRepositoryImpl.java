@@ -105,7 +105,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return repository
         .findByUuid(documentUnit.uuid())
         .flatMap(documentUnitDTO -> enrichDocumentType(documentUnitDTO, documentUnit))
-        .flatMap(documentUnitDTO -> enrichRegionAndLegalEffect(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> enrichLegalEffect(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
         .flatMap(documentUnitDTO -> savePreviousDecisions(documentUnitDTO, documentUnit))
@@ -139,19 +140,25 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> enrichRegionAndLegalEffect(
+  private boolean hasCourtChanged(DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    return documentUnit == null
+        || documentUnit.coreData() == null
+        || documentUnit.coreData().court() == null
+        || !Objects.equals(documentUnitDTO.courtType, documentUnit.coreData().court().type())
+        || !Objects.equals(
+            documentUnitDTO.courtLocation, documentUnit.coreData().court().location());
+  }
+
+  private Mono<DocumentUnitDTO> enrichLegalEffect(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    boolean courtHasNotChanged =
-        documentUnit != null
-            && documentUnit.coreData() != null
-            && documentUnit.coreData().court() != null
-            && Objects.equals(documentUnitDTO.courtType, documentUnit.coreData().court().type())
-            && Objects.equals(
-                documentUnitDTO.courtLocation, documentUnit.coreData().court().location());
+    documentUnitDTO.setLegalEffect(
+        LegalEffect.deriveFrom(documentUnit, hasCourtChanged(documentUnitDTO, documentUnit)));
+    return Mono.just(documentUnitDTO);
+  }
 
-    documentUnitDTO.setLegalEffect(LegalEffect.deriveFrom(documentUnit, courtHasNotChanged));
-
-    if (courtHasNotChanged) {
+  private Mono<DocumentUnitDTO> enrichRegion(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    if (!hasCourtChanged(documentUnitDTO, documentUnit)) {
       return Mono.just(documentUnitDTO);
     }
 

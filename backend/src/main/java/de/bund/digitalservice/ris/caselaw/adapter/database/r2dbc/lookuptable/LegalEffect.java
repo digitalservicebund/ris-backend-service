@@ -22,11 +22,11 @@ public enum LegalEffect {
     return label;
   }
 
-  public static String deriveFrom(DocumentUnit documentUnit, boolean courtHasNotChanged) {
+  public static String deriveFrom(DocumentUnit documentUnit, boolean courtHasChanged) {
     if (documentUnit == null || documentUnit.coreData() == null) {
       return null;
     }
-    if (!courtHasNotChanged
+    if (courtHasChanged
         && documentUnit.coreData().court() != null
         && documentUnit.coreData().court().type() != null
         && autoYesCourtTypes.contains(documentUnit.coreData().court().type())) {
