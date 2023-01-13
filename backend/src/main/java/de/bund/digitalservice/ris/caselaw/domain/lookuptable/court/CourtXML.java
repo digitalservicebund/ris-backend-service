@@ -18,7 +18,7 @@ public class CourtXML {
   String changeDateClient;
 
   @JacksonXmlProperty(isAttribute = true, localName = "aendkz")
-  char changeIndicator;
+  Character changeIndicator;
 
   @JacksonXmlProperty(isAttribute = true)
   String version;
