@@ -185,6 +185,8 @@ fileignoreconfig:
     checksum: 2962980a50ab7088cf55ea023a53f2f66ccdab0969ed7c48d24f8e11bb589aa0
   - filename: backend/src/main/resources/db/migration/V0.30__caselaw_drop_outdated_dokumenttyp_column.sql
     checksum: 8a2445827eb23916c7beeae8779ed904b4a7680a3c3d9e908495323ad9fe8f92
+  - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/LookupTableImporterIntegrationTest.java
+    checksum: 202521a85ff71bdb6535c2ba12f8e4c0ce0d4ae7ef77b2b497e696fccb74c5be
 
 scopeconfig:
   - scope: node

@@ -157,9 +157,11 @@ public class LookupTableImporterService {
                         .build())
             .toList();
 
-    courtRepository.deleteAll().thenMany(courtRepository.saveAll(courtsDTO)).subscribe();
-
-    return Mono.just("Successfully imported the court lookup table");
+    return courtRepository
+        .deleteAll()
+        .thenMany(courtRepository.saveAll(courtsDTO))
+        .collectList()
+        .map(list -> "Successfully imported the court lookup table");
   }
 
   public Mono<String> importStateLookupTable(ByteBuffer byteBuffer) {
@@ -186,8 +188,10 @@ public class LookupTableImporterService {
                         .build())
             .toList();
 
-    stateRepository.deleteAll().thenMany(stateRepository.saveAll(statesDTO)).subscribe();
-
-    return Mono.just("Successfully imported the state lookup table");
+    return stateRepository
+        .deleteAll()
+        .thenMany(stateRepository.saveAll(statesDTO))
+        .collectList()
+        .map(list -> "Successfully imported the state lookup table");
   }
 }
