@@ -16,7 +16,6 @@ interface SearchNormsOutputPort {
     data class QueryParameter(
         val field: QueryFields,
         val value: String?,
-        val isFuzzyMatch: Boolean = false,
-        val isYearForDate: Boolean = false
+        val isFuzzyMatch: Boolean = false
     )
 }

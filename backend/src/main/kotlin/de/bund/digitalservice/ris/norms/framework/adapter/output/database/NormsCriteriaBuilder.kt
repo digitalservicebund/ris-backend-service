@@ -38,10 +38,6 @@ class NormsCriteriaBuilder : NormsMapper {
             return Criteria.where(queryFieldToDbColumn(queryParameter.field)).isNull
         }
 
-        if (queryParameter.isYearForDate) {
-            return getYearInDateCriteria(queryFieldToDbColumn(queryParameter.field), queryParameter.value)
-        }
-
         if (queryParameter.isFuzzyMatch) {
             return Criteria.where(queryFieldToDbColumn(queryParameter.field)).like("%${queryParameter.value}%")
         }
