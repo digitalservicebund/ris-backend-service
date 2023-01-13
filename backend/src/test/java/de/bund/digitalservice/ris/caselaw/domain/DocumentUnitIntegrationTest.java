@@ -696,79 +696,17 @@ class DocumentUnitIntegrationTest {
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getLegalEffect()).isEqualTo(expectedValueAfter.getLabel());
 
-    // Change to NO
-    documentUnitFromFrontend =
-        buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, LegalEffect.NO);
+    // Change to NO, should stay NO
+    testCorrectFEtoBECallBehaviourWithLegalEffect(
+        buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, LegalEffect.NO));
 
-    webClient
-        .mutateWith(csrf())
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().type()).isEqualTo(courtType);
-              assertThat(response.getResponseBody().coreData().legalEffect())
-                  .isEqualTo(LegalEffect.NO.getLabel());
-            });
-
-    list = repository.findAll().collectList().block();
-    assertThat(list).hasSize(1);
-    assertThat(list.get(0).getLegalEffect()).isEqualTo(LegalEffect.NO.getLabel());
-
-    // Change to NOT_SPECIFIED
-    documentUnitFromFrontend =
-        buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, LegalEffect.NOT_SPECIFIED);
-
-    webClient
-        .mutateWith(csrf())
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().court().type()).isEqualTo(courtType);
-              assertThat(response.getResponseBody().coreData().legalEffect())
-                  .isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
-            });
-
-    list = repository.findAll().collectList().block();
-    assertThat(list).hasSize(1);
-    assertThat(list.get(0).getLegalEffect()).isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
+    // Change to NOT_SPECIFIED, should stay NOT_SPECIFIED
+    testCorrectFEtoBECallBehaviourWithLegalEffect(
+        buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, LegalEffect.NOT_SPECIFIED));
 
     // Remove court, should stay NOT_SPECIFIED
-    documentUnitFromFrontend =
-        buildDocumentUnitFromFrontendWithLegalEffect(dto, null, LegalEffect.NOT_SPECIFIED);
-
-    webClient
-        .mutateWith(csrf())
-        .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
-        .bodyValue(documentUnitFromFrontend)
-        .exchange()
-        .expectStatus()
-        .isOk()
-        .expectBody(DocumentUnit.class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().coreData().legalEffect())
-                  .isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
-            });
-
-    list = repository.findAll().collectList().block();
-    assertThat(list).hasSize(1);
-    assertThat(list.get(0).getLegalEffect()).isEqualTo(LegalEffect.NOT_SPECIFIED.getLabel());
+    testCorrectFEtoBECallBehaviourWithLegalEffect(
+        buildDocumentUnitFromFrontendWithLegalEffect(dto, null, LegalEffect.NOT_SPECIFIED));
   }
 
   private DocumentUnit buildDocumentUnitFromFrontendWithLegalEffect(
@@ -789,5 +727,33 @@ class DocumentUnitIntegrationTest {
         .documentNumber(dto.getDocumentnumber())
         .coreData(coreData)
         .build();
+  }
+
+  private void testCorrectFEtoBECallBehaviourWithLegalEffect(
+      DocumentUnit documentUnitFromFrontend) {
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              if (documentUnitFromFrontend.coreData().court() != null) {
+                assertThat(response.getResponseBody().coreData().court().type())
+                    .isEqualTo(documentUnitFromFrontend.coreData().court().type());
+              }
+              assertThat(response.getResponseBody().coreData().legalEffect())
+                  .isEqualTo(documentUnitFromFrontend.coreData().legalEffect());
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getLegalEffect())
+        .isEqualTo(documentUnitFromFrontend.coreData().legalEffect());
   }
 }
