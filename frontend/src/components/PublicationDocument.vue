@@ -46,7 +46,6 @@ function publishDocumentUnit() {
   }
   if (validateEmailAddress()) {
     emailAddressInvalid.value = false
-    // console.log("address: " + receiverAddress.value)
     emits("publishADocument", receiverAddress.value)
   } else {
     emailAddressInvalid.value = true

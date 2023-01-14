@@ -77,7 +77,14 @@ const toggleDropdown = () => {
 }
 
 const clearSelection = () => {
-  emit("update:modelValue", undefined)
+  if (isCourt(props.modelValue)) {
+    emit("update:modelValue", {
+      type: "",
+      location: "",
+      label: "",
+      revoked: "",
+    } as Court)
+  } else emit("update:modelValue", undefined)
   filter.value = ""
   inputText.value = ""
   if (showDropdown.value) {

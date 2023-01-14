@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePreviousDecisionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
@@ -15,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRe
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
@@ -86,6 +88,7 @@ class DocumentUnitIntegrationTest {
   @Autowired private StateRepository stateRepository;
   @Autowired private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @Autowired private DocumentTypeRepository documentTypeRepository;
+  @Autowired private DatabaseIncorrectCourtRepository incorrectCourtRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -98,6 +101,7 @@ class DocumentUnitIntegrationTest {
     courtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
     deviatingDecisionDateRepository.deleteAll().block();
+    incorrectCourtRepository.deleteAll().block();
     repository.deleteAll().block();
     documentTypeRepository.deleteAll().block();
   }
@@ -425,6 +429,77 @@ class DocumentUnitIntegrationTest {
     assertThat(deviatingDecisionDates).hasSize(2);
     assertThat(deviatingDecisionDates.get(0).decisionDate()).isEqualTo("2022-01-31T23:00:00Z");
     assertThat(deviatingDecisionDates.get(1).decisionDate()).isEqualTo("2022-01-31T23:00:00Z");
+  }
+
+  @Test
+  void testUpdate_withIncorrectCourts_shouldHaveIncorrectCourtsSavedInDB() {
+    UUID uuid = UUID.randomUUID();
+
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(uuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .build();
+
+    DocumentUnitDTO savedDto = repository.save(dto).block();
+
+    IncorrectCourtDTO incorrectCourtDTO =
+        IncorrectCourtDTO.builder()
+            .documentUnitId(savedDto.getId())
+            .court("incorrectCourt1")
+            .build();
+    incorrectCourtRepository.save(incorrectCourtDTO).block();
+    incorrectCourtDTO =
+        IncorrectCourtDTO.builder()
+            .documentUnitId(savedDto.getId())
+            .court("incorrectCourt2")
+            .build();
+    incorrectCourtRepository.save(incorrectCourtDTO).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .coreData(
+                CoreData.builder()
+                    .incorrectCourts(
+                        List.of("incorrectCourt1", "incorrectCourt3", "incorrectCourt4"))
+                    .build())
+            .texts(Texts.builder().decisionName("decisionName").build()) // TODO why is this needed?
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody().coreData()).isNotNull();
+              assertThat(response.getResponseBody().coreData().incorrectCourts()).hasSize(3);
+              assertThat(response.getResponseBody().coreData().incorrectCourts())
+                  .containsExactly("incorrectCourt1", "incorrectCourt3", "incorrectCourt4");
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
+
+    List<IncorrectCourtDTO> incorrectCourtDTOs =
+        incorrectCourtRepository.findAllByDocumentUnitId(list.get(0).getId()).collectList().block();
+
+    assertThat(incorrectCourtDTOs).hasSize(3);
+    assertThat(incorrectCourtDTOs)
+        .extracting("court")
+        .containsExactly("incorrectCourt1", "incorrectCourt3", "incorrectCourt4");
   }
 
   @Test

@@ -2,6 +2,7 @@ export type CoreData = {
   fileNumbers?: string[]
   deviatingFileNumbers?: string[]
   court?: Court
+  incorrectCourts?: string[]
   documentType?: DocumentType
   procedure?: string
   ecli?: string

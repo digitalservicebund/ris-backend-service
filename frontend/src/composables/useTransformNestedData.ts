@@ -60,6 +60,7 @@ function flattenData(newValues: Record<string, ModelType>) {
   for (const [key, value] of Object.entries(newValues)) {
     if (
       typeof value === "object" &&
+      value !== null &&
       "fields" in value &&
       "parent" in value.fields &&
       "child" in value.fields
