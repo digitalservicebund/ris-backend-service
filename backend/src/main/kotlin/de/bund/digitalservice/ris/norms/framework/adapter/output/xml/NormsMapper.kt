@@ -82,7 +82,10 @@ fun toContentDto(htmlAsString: String, paragraphMarker: String = "0"): ContentDt
     contentDto.points.addAll(parseChildren(doc.body().child(0), paragraphMarker))
     contentDto.paragraphMarker = paragraphMarker
 
-    contentDto.points.forEach { p1 ->
+    contentDto.points.forEachIndexed { index, p1 ->
+        if (p1.marker == "-") {
+            p1.markerClean = index.toString()
+        }
         p1.points.forEach { p2 ->
             p2.listMarkerParent = p1.markerClean
             p2.points.forEach { p3 ->
@@ -91,7 +94,6 @@ fun toContentDto(htmlAsString: String, paragraphMarker: String = "0"): ContentDt
             }
         }
     }
-
     return contentDto
 }
 
