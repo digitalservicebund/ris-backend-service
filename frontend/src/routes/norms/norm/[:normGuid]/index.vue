@@ -9,6 +9,16 @@ if (loadedNorm.value !== undefined) {
   loadedNorm.value.articles.sort((a, b) =>
     Number(a.marker.substring(2)) < Number(b.marker.substring(2)) ? -1 : 1
   )
+  loadedNorm.value.articles.forEach((article) => {
+    if (article.paragraphs.filter((f) => f.marker == null).length == 0) {
+      article.paragraphs.sort((a, b) =>
+        Number(a.marker.substring(1, a.marker.length - 1)) <
+        Number(b.marker.substring(1, b.marker.length - 1))
+          ? -1
+          : 1
+      )
+    }
+  })
 }
 </script>
 
