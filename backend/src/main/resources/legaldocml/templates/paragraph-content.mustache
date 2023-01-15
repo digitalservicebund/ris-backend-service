@@ -1,0 +1,96 @@
+{{#content.isText}}
+    <akn:content GUID="{{content.guid}}" eId="para-{{articleMarker}}_abs-{{marker}}_inhalt-1">
+        <akn:p GUID="{{content.text.guid}}" eId="para-{{articleMarker}}_abs-{{marker}}_inhalt-1_text-1">
+            {{content.text.value}}
+        </akn:p>
+    </akn:content>
+{{/content.isText}}
+{{#content.isList}}
+    <akn:list GUID="{{content.guid}}" eId="para-{{articleMarker}}_abs-{{marker}}_untergl-1">
+        <akn:intro GUID="{{content.intro.guid}}" eId="para-{{articleMarker}}_abs-{{marker}}_untergl-1_intro-1">
+            <akn:p GUID="{{content.intro.childGuid}}"
+                   eId="para-{{articleMarker}}_abs-{{marker}}_untergl-1_intro-1_text-1">
+                {{content.intro.value}}
+            </akn:p>
+        </akn:intro>
+        {{#content.points}}
+            <akn:point GUID="{{guid}}" eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{markerClean}}">
+                <akn:num GUID="a5e0f415-85f8-4e67-a944-5de26305f657"
+                         eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{markerClean}}_bezeichnung-1">
+                    <akn:marker name="{{markerClean}}"/>
+                    {{marker}}
+                </akn:num>
+                {{#isText}}
+                    <akn:content GUID="{{text.guid}}"
+                                 eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{markerClean}}_inhalt-1">
+                        <akn:p GUID="{{text.childGuid}}"
+                               eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{markerClean}}_inhalt-1_text-1">
+                            {{text.value}}
+                        </akn:p>
+                    </akn:content>
+                {{/isText}}
+                {{#isList}}
+                    <akn:list GUID="f8685276-25df-43a8-81f2-90fe48c30639"
+                              eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{markerClean}}_untergl-1">
+                        <akn:intro GUID="{{intro.guid}}"
+                                   eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{markerClean}}_untergl-1_intro-1">
+                            <akn:p GUID="{{intro.childGuid}}"
+                                   eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{markerClean}}_untergl-1_intro-1_text-1">
+                                {{intro.value}}
+                            </akn:p>
+                        </akn:intro>
+                        {{#points}}
+                            <akn:point GUID="{{guid}}"
+                                       eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}">
+                                <akn:num GUID="a5e0f415-85f8-4e67-a944-5de26305f657"
+                                         eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_bezeichnung-1">
+                                    <akn:marker name="{{markerClean}}"/>
+                                    {{marker}}
+                                </akn:num>
+                                {{#isText}}
+                                    <akn:content GUID="{{text.guid}}"
+                                                 eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_inhalt-1">
+                                        <akn:p GUID="{{text.childGuid}}"
+                                               eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_inhalt-1_text-1">
+                                            {{text.value}}
+                                        </akn:p>
+                                    </akn:content>
+                                {{/isText}}
+                                {{#isList}}
+                                    <akn:list GUID="{{guid}}"
+                                              eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_untergl-1">
+                                        <akn:intro GUID="{{intro.guid}}"
+                                                   eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_untergl-1_intro-1">
+                                            <akn:p GUID="{{intro.childGuid}}"
+                                                   eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_untergl-1_intro-1_text-1">
+                                                {{intro.value}}
+                                            </akn:p>
+                                        </akn:intro>
+                                        {{#points}}
+                                            <akn:point GUID="{{guid}}"
+                                                       eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerGrandparent}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}">
+                                                <akn:num GUID="a5e0f415-85f8-4e67-a944-5de26305f657"
+                                                         eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerGrandparent}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_bezeichnung-1">
+                                                    <akn:marker name="{{markerClean}}"/>
+                                                    {{marker}}
+                                                </akn:num>
+                                                <akn:content GUID="{{text.guid}}"
+                                                             eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerGrandparent}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_inhalt-1">
+                                                    <akn:p GUID="{{text.childGuid}}"
+                                                           eId="para-{{articleMarker}}_abs-{{paragraphMarker}}_untergl-1_listenelem-{{listMarkerGrandparent}}_untergl-1_listenelem-{{listMarkerParent}}_untergl-1_listenelem-{{markerClean}}_inhalt-1_text-1">
+                                                        {{text.value}}
+                                                    </akn:p>
+                                                </akn:content>
+                                            </akn:point>
+                                        {{/points}}
+                                    </akn:list>
+                                {{/isList}}
+                            </akn:point>
+                        {{/points}}
+                    </akn:list>
+                {{/isList}}
+            </akn:point>
+        {{/content.points}}
+    </akn:list>
+{{/content.isList}}
+

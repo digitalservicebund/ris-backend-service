@@ -23,6 +23,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.stream.StreamSource
 import javax.xml.validation.SchemaFactory
+import kotlin.collections.ArrayList
 
 class ToLegalDocMLConverterTest {
     @Test
@@ -271,6 +272,175 @@ class ToLegalDocMLConverterTest {
     }
 
     @Test
+    fun `it creates and article element with its paragraph and content containing a not nested list`() {
+        val paragraph =
+            Paragraph(
+                UUID.randomUUID(),
+                marker = "(1)",
+                text = "test list intro text:\n" +
+                    "                    <DL Type=\"arabic\">\n" +
+                    "                            <DT>1.</DT>\n" +
+                    "                        <DD Font=\"normal\">\n" +
+                    "                            <LA>test first point\n" +
+                    "                            </LA>\n" +
+                    "                        </DD>\n" +
+                    "                        <DT>2.</DT>\n" +
+                    "                        <DD Font=\"normal\">\n" +
+                    "                            <LA>test second point\n" +
+                    "                            </LA>\n" +
+                    "                        </DD>\n" +
+                    "                    </DL>\n" +
+                    "                "
+            )
+        val article =
+            Article(
+                UUID.randomUUID(),
+                title = "test article title",
+                marker = "§ 1",
+                paragraphs = listOf(paragraph)
+            )
+        val norm = createRandomNorm().copy(articles = listOf(article))
+        val document = convertNormToLegalDocML(norm)
+
+        val body = document.getElementsByTagName("akn:body").item(0)
+        val articleElement = getFirstChildNodeWithTagName(body, "akn:article")
+        val paragraphElement = getFirstChildNodeWithTagName(articleElement, "akn:paragraph")
+        val paragraphList = getFirstChildNodeWithTagName(paragraphElement, "akn:list")
+        val paragraphListIntro = getFirstChildNodeWithTagName(paragraphList, "akn:intro")
+        val paragraphListIntroP = getFirstChildNodeWithTagName(paragraphListIntro, "akn:p")
+        val paragraphListPoints = getChildrenWithTagName(paragraphList, "akn:point")
+
+        val listFirstPointNum = getFirstChildNodeWithTagName(paragraphListPoints[0], "akn:num")
+        val listFirstPointMarker = getFirstChildNodeWithTagName(listFirstPointNum, "akn:marker")
+        val listFirstPointContent = getFirstChildNodeWithTagName(paragraphListPoints[0], "akn:content")
+        val listFirstPointContentP = getFirstChildNodeWithTagName(listFirstPointContent, "akn:p")
+
+        val listSecondPointNum = getFirstChildNodeWithTagName(paragraphListPoints[1], "akn:num")
+        val listSecondPointMarker = getFirstChildNodeWithTagName(listSecondPointNum, "akn:marker")
+        val listSecondPointContent = getFirstChildNodeWithTagName(paragraphListPoints[1], "akn:content")
+        val listSecondPointContentP = getFirstChildNodeWithTagName(listSecondPointContent, "akn:p")
+
+        assertThat(paragraphListIntroP.textContent.trim()).isEqualTo("test list intro text:")
+        assertThat(listFirstPointNum.textContent.trim()).isEqualTo("1.")
+        assertThat(listFirstPointMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("1")
+        assertThat(listFirstPointContentP.textContent.trim()).isEqualTo("test first point")
+        assertThat(listSecondPointNum.textContent.trim()).isEqualTo("2.")
+        assertThat(listSecondPointMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("2")
+        assertThat(listSecondPointContentP.textContent.trim()).isEqualTo("test second point")
+    }
+
+    @Test
+    fun `it creates and article element with its paragraph and content containing a nested list`() {
+        val paragraph =
+            Paragraph(
+                UUID.randomUUID(),
+                marker = "(1)",
+                text =
+                "test list intro text:\n" +
+                    "                    <DL Font=\"normal\" Type=\"arabic\">\n" +
+                    "                        <DT>1.</DT>\n" +
+                    "                        <DD Font=\"normal\">\n" +
+                    "                            <LA Size=\"normal\">test 1. point text\n" +
+                    "                                <DL Font=\"normal\" Type=\"alpha\">\n" +
+                    "                                    <DT>a)</DT>\n" +
+                    "                                    <DD Font=\"normal\">\n" +
+                    "                                        <LA Size=\"normal\">test a) point text\n" +
+                    "                                        </LA>\n" +
+                    "                                    </DD>\n" +
+                    "                                    <DT>b)</DT>\n" +
+                    "                                    <DD Font=\"normal\">\n" +
+                    "                                        <LA Size=\"normal\">test b) point text\n" +
+                    "                                            <DL Font=\"normal\" Type=\"a-alpha\">\n" +
+                    "                                                <DT>aa)</DT>\n" +
+                    "                                                <DD Font=\"normal\">\n" +
+                    "                                                    <LA Size=\"normal\">test aa) point text\n" +
+                    "                                                    </LA>\n" +
+                    "                                                </DD>\n" +
+                    "                                                <DT>bb)</DT>\n" +
+                    "                                                <DD Font=\"normal\">\n" +
+                    "                                                    <LA Size=\"normal\">test bb) point text\n" +
+                    "                                                    </LA>\n" +
+                    "                                                </DD>\n" +
+                    "                                            </DL>\n" +
+                    "                                        </LA>\n" +
+                    "                                    </DD>\n" +
+                    "                                </DL>\n" +
+                    "                            </LA>\n" +
+                    "                        </DD>\n" +
+                    "                    </DL>"
+            )
+        val article =
+            Article(
+                UUID.randomUUID(),
+                title = "test article title",
+                marker = "§ 1",
+                paragraphs = listOf(paragraph)
+            )
+        val norm = createRandomNorm().copy(articles = listOf(article))
+        val document = convertNormToLegalDocML(norm)
+
+        val body = document.getElementsByTagName("akn:body").item(0)
+        val articleElement = getFirstChildNodeWithTagName(body, "akn:article")
+        val paragraphElement = getFirstChildNodeWithTagName(articleElement, "akn:paragraph")
+
+        // 1. Nest level
+        val paragraphList = getFirstChildNodeWithTagName(paragraphElement, "akn:list")
+        val paragraphListIntro = getFirstChildNodeWithTagName(paragraphList, "akn:intro")
+        val paragraphListIntroP = getFirstChildNodeWithTagName(paragraphListIntro, "akn:p")
+        val paragraphListPoints = getChildrenWithTagName(paragraphList, "akn:point")
+        val firstPointNum = getFirstChildNodeWithTagName(paragraphListPoints[0], "akn:num")
+        val firstPointMarker = getFirstChildNodeWithTagName(firstPointNum, "akn:marker")
+
+        assertThat(paragraphListIntroP.textContent.trim()).isEqualTo("test list intro text:")
+        assertThat(paragraphListPoints.size).isEqualTo(1)
+        assertThat(firstPointNum.textContent.trim()).isEqualTo("1.")
+        assertThat(firstPointMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("1")
+
+        // 2. Nest level
+        val firstPointList = getFirstChildNodeWithTagName(paragraphListPoints[0], "akn:list")
+        val firstPointListIntro = getFirstChildNodeWithTagName(firstPointList, "akn:intro")
+        val firstPointListIntroP = getFirstChildNodeWithTagName(firstPointListIntro, "akn:p")
+        val firstPointListPoints = getChildrenWithTagName(firstPointList, "akn:point")
+        val firstPoint2ndLevelNum = getFirstChildNodeWithTagName(firstPointListPoints[0], "akn:num")
+        val firstPoint2ndLevelMarker = getFirstChildNodeWithTagName(firstPoint2ndLevelNum, "akn:marker")
+        val firstPoint2ndLevelContent = getFirstChildNodeWithTagName(firstPointListPoints[0], "akn:content")
+        val firstPoint2ndLevelContentP = getFirstChildNodeWithTagName(firstPoint2ndLevelContent, "akn:p")
+        val secondPoint2ndLevelNum = getFirstChildNodeWithTagName(firstPointListPoints[1], "akn:num")
+        val secondPoint2ndLevelMarker = getFirstChildNodeWithTagName(secondPoint2ndLevelNum, "akn:marker")
+
+        assertThat(firstPointListIntroP.textContent.trim()).isEqualTo("test 1. point text")
+        assertThat(firstPointListPoints.size).isEqualTo(2)
+        assertThat(firstPoint2ndLevelNum.textContent.trim()).isEqualTo("a)")
+        assertThat(firstPoint2ndLevelMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("a")
+        assertThat(firstPoint2ndLevelContentP.textContent.trim()).isEqualTo("test a) point text")
+        assertThat(secondPoint2ndLevelNum.textContent.trim()).isEqualTo("b)")
+        assertThat(secondPoint2ndLevelMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("b")
+
+        // 3. Nest level
+        val secondPoint2ndLevelList = getFirstChildNodeWithTagName(firstPointListPoints[1], "akn:list")
+        val secondPoint2ndLevelListIntro = getFirstChildNodeWithTagName(secondPoint2ndLevelList, "akn:intro")
+        val secondPoint2ndLevelListIntroP = getFirstChildNodeWithTagName(secondPoint2ndLevelListIntro, "akn:p")
+        val secondPoint2ndLevelPoints = getChildrenWithTagName(secondPoint2ndLevelList, "akn:point")
+        val firstPoint3ndLevelNum = getFirstChildNodeWithTagName(secondPoint2ndLevelPoints[0], "akn:num")
+        val firstPoint3ndLevelMarker = getFirstChildNodeWithTagName(firstPoint3ndLevelNum, "akn:marker")
+        val firstPoint3ndLevelContent = getFirstChildNodeWithTagName(secondPoint2ndLevelPoints[0], "akn:content")
+        val firstPoint3ndLevelContentP = getFirstChildNodeWithTagName(firstPoint3ndLevelContent, "akn:p")
+        val secondPoint3ndLevelNum = getFirstChildNodeWithTagName(secondPoint2ndLevelPoints[1], "akn:num")
+        val secondPoint3ndLevelMarker = getFirstChildNodeWithTagName(secondPoint3ndLevelNum, "akn:marker")
+        val secondPoint3ndLevelContent = getFirstChildNodeWithTagName(secondPoint2ndLevelPoints[1], "akn:content")
+        val secondPoint3ndLevelContentP = getFirstChildNodeWithTagName(secondPoint3ndLevelContent, "akn:p")
+
+        assertThat(secondPoint2ndLevelListIntroP.textContent.trim()).isEqualTo("test b) point text")
+        assertThat(secondPoint2ndLevelPoints.size).isEqualTo(2)
+        assertThat(firstPoint3ndLevelNum.textContent.trim()).isEqualTo("aa)")
+        assertThat(firstPoint3ndLevelMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("aa")
+        assertThat(firstPoint3ndLevelContentP.textContent.trim()).isEqualTo("test aa) point text")
+        assertThat(secondPoint3ndLevelNum.textContent.trim()).isEqualTo("bb)")
+        assertThat(secondPoint3ndLevelMarker.attributes.getNamedItem("name").nodeValue).isEqualTo("bb")
+        assertThat(secondPoint3ndLevelContentP.textContent.trim()).isEqualTo("test bb) point text")
+    }
+
+    @Test
     fun `it produces valid xml content according to xml schema definition`() {
         val norm = createRandomNorm()
         val document = convertNormToLegalDocML(norm)
@@ -329,4 +499,24 @@ fun getFirstChildNodeWithTagName(node: Node, tagName: String): Node {
     }
 
     throw Exception("No child node found for $tagName!")
+}
+
+private fun getChildrenWithTagName(node: Node, tagName: String): ArrayList<Node> {
+    if (!node.hasChildNodes()) {
+        throw Exception("Node has no children!")
+    }
+
+    val childNodes = node.childNodes
+    val nodeList = ArrayList<Node>()
+    for (i in 0 until childNodes.length) {
+        val child = childNodes.item(i)
+
+        if (child.nodeName == tagName) {
+            nodeList.add(child)
+        }
+    }
+    if (nodeList.size > 0) {
+        return nodeList
+    }
+    throw Exception("No child nodes found for $tagName!")
 }

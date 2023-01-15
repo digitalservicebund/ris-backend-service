@@ -67,11 +67,7 @@
                                 <akn:marker name="{{marker}}"/>
                                 {{markerText.value}}
                             </akn:num>
-                            <akn:content GUID="{{text.guid}}" eId="para-{{articleMarker}}_abs-{{marker}}_inhalt-1">
-                                <akn:p GUID="{{text.childGuid}}" eId="para-{{articleMarker}}_abs-{{marker}}_inhalt-1_text-1">
-                                    {{text.value}}
-                                </akn:p>
-                            </akn:content>
+                            {{> paragraph-content }}
                         </akn:paragraph>
                     {{/paragraphs}}
                 </akn:article>

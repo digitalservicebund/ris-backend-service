@@ -187,6 +187,8 @@ fileignoreconfig:
     checksum: 8a2445827eb23916c7beeae8779ed904b4a7680a3c3d9e908495323ad9fe8f92
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/LookupTableImporterIntegrationTest.java
     checksum: 202521a85ff71bdb6535c2ba12f8e4c0ce0d4ae7ef77b2b497e696fccb74c5be
+  - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/xml/NormsMapper.kt
+    checksum: f42e4e5b4f3a364f138e30f7da56a76a4ee4c5b0c09e7854b1b5ba116441f3ff
 
 scopeconfig:
   - scope: node

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ContentDto
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.util.UUID
@@ -23,8 +24,8 @@ class MapParagraphToDto {
         assertThat(data.articleMarker).isEqualTo("2")
         assertThat(data.markerText?.value).isEqualTo("1")
         assertThat(data.markerText?.guid).isInstanceOf(UUID::class.java).isNotNull
-        assertThat(data.text.value).isEqualTo("test text")
-        assertThat(data.text.guid).isInstanceOf(UUID::class.java).isNotNull
+        assertThat(data.content.text?.value).isEqualTo("test text")
+        assertThat(data.content.text?.guid).isInstanceOf(UUID::class.java).isNotNull
     }
 
     @Test
@@ -128,5 +129,200 @@ class ParseMarkerFromMarkerTextTest {
         val marker = parseMarkerFromMarkerText("§")
 
         assertThat(marker).isNull()
+    }
+
+    @Test
+    fun `it creates content from html string with simple list`() {
+        val content = toContentDto(
+            "list intro text:\n" +
+                "                    <DL Type=\"arabic\">\n" +
+                "                            <DT>1.</DT>\n" +
+                "                        <DD Font=\"normal\">\n" +
+                "                            <LA>1. text\n" +
+                "                            </LA>\n" +
+                "                        </DD>\n" +
+                "                        <DT>2.</DT>\n" +
+                "                        <DD Font=\"normal\">\n" +
+                "                            <LA>2. text\n" +
+                "                            </LA>\n" +
+                "                        </DD>\n" +
+                "                    </DL>\n" +
+                "                "
+        )
+        assertThat(content).isNotNull
+
+        validateListContent(
+            content,
+            listMarkerParent = null,
+            listMarkerGrandparent = null,
+            isList = true,
+            listIntro = "list intro text:",
+            isText = false,
+            text = null,
+            pointsSize = 2
+        )
+        validateListContent(
+            content.points[0],
+            listMarkerParent = null,
+            listMarkerGrandparent = null,
+            isList = false,
+            listIntro = null,
+            isText = true,
+            text = "1. text",
+            pointsSize = 0
+        )
+        validateListContent(
+            content.points[1],
+            listMarkerParent = null,
+            listMarkerGrandparent = null,
+            isList = false,
+            listIntro = null,
+            isText = true,
+            text = "2. text",
+            pointsSize = 0
+        )
+    }
+
+    @Test
+    fun `it creates content from html string with nested list`() {
+        val content = toContentDto(
+            "list intro text:\n" +
+                "                    <DL Font=\"normal\" Type=\"arabic\">\n" +
+                "                        <DT>1.</DT>\n" +
+                "                        <DD Font=\"normal\">\n" +
+                "                            <LA Size=\"normal\">1. point text\n" +
+                "                                <DL Font=\"normal\" Type=\"alpha\">\n" +
+                "                                    <DT>a)</DT>\n" +
+                "                                    <DD Font=\"normal\">\n" +
+                "                                        <LA Size=\"normal\">a) point text\n" +
+                "                                        </LA>\n" +
+                "                                    </DD>\n" +
+                "                                    <DT>b)</DT>\n" +
+                "                                    <DD Font=\"normal\">\n" +
+                "                                        <LA Size=\"normal\">b) point text\n" +
+                "                                            <DL Font=\"normal\" Type=\"a-alpha\">\n" +
+                "                                                <DT>aa)</DT>\n" +
+                "                                                <DD Font=\"normal\">\n" +
+                "                                                    <LA Size=\"normal\">aa) point text\n" +
+                "                                                    </LA>\n" +
+                "                                                </DD>\n" +
+                "                                                <DT>bb)</DT>\n" +
+                "                                                <DD Font=\"normal\">\n" +
+                "                                                    <LA Size=\"normal\">bb) point text\n" +
+                "                                                    </LA>\n" +
+                "                                                </DD>\n" +
+                "                                            </DL>\n" +
+                "                                        </LA>\n" +
+                "                                    </DD>\n" +
+                "                                </DL>\n" +
+                "                            </LA>\n" +
+                "                        </DD>\n" +
+                "                    </DL>"
+        )
+        assertThat(content).isNotNull
+
+        validateListContent(
+            content,
+            listMarkerParent = null,
+            listMarkerGrandparent = null,
+            isList = true,
+            listIntro = "list intro text:",
+            isText = false,
+            text = null,
+            pointsSize = 1
+        )
+
+        val firstPointFirstLevel = content.points[0]
+        validateListContent(
+            firstPointFirstLevel,
+            listMarkerParent = null,
+            listMarkerGrandparent = null,
+            isList = true,
+            listIntro = "1. point text",
+            isText = false,
+            text = null,
+            pointsSize = 2
+        )
+
+        val firstPointSecondLevel = firstPointFirstLevel.points[0]
+        validateListContent(
+            firstPointSecondLevel,
+            listMarkerParent = "1",
+            listMarkerGrandparent = null,
+            isList = false,
+            listIntro = null,
+            isText = true,
+            text = "a) point text",
+            pointsSize = 0
+        )
+
+        val secondPointSecondLevel = firstPointFirstLevel.points[1]
+        validateListContent(
+            secondPointSecondLevel,
+            listMarkerParent = "1",
+            listMarkerGrandparent = null,
+            isList = true,
+            listIntro = "b) point text",
+            isText = false,
+            text = null,
+            pointsSize = 2
+        )
+
+        val firstPointThirdLevel = secondPointSecondLevel.points[0]
+        validateListContent(
+            firstPointThirdLevel,
+            listMarkerParent = "b",
+            listMarkerGrandparent = "1",
+            isList = false,
+            listIntro = null,
+            isText = true,
+            text = "aa) point text",
+            pointsSize = 0
+        )
+
+        val secondPointThirdLevel = secondPointSecondLevel.points[1]
+        validateListContent(
+            secondPointThirdLevel,
+            listMarkerParent = "b",
+            listMarkerGrandparent = "1",
+            isList = false,
+            listIntro = null,
+            isText = true,
+            text = "bb) point text",
+            pointsSize = 0
+        )
+    }
+
+    private fun validateListContent(
+        content: ContentDto,
+        paragraphMarker: String = "0",
+        listMarkerParent: String?,
+        listMarkerGrandparent: String?,
+        isList: Boolean,
+        listIntro: String?,
+        isText: Boolean,
+        text: String?,
+        pointsSize: Int
+    ) {
+        assertThat(content.guid).isNotNull
+        assertThat(content.paragraphMarker).isEqualTo(paragraphMarker)
+        assertThat(content.listMarkerParent).isEqualTo(listMarkerParent)
+        assertThat(content.listMarkerGrandparent).isEqualTo(listMarkerGrandparent)
+        if (listIntro == null) {
+            assertThat(content.intro).isNull()
+        } else {
+            assertThat(content.intro?.value?.trim()).isEqualTo(listIntro)
+            assertThat(content.intro?.guid).isInstanceOf(UUID::class.java).isNotNull
+        }
+
+        assertThat(content.isList).isEqualTo(isList)
+        assertThat(content.isText).isEqualTo(isText)
+        if (text == null) {
+            assertThat(content.text).isNull()
+        } else {
+            assertThat(content.text?.value?.trim()).isEqualTo(text)
+            assertThat(content.text?.guid).isInstanceOf(UUID::class.java).isNotNull
+        }
+        assertThat(content.points).hasSize(pointsSize)
     }
 }

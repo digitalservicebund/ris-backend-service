@@ -2,14 +2,18 @@ package norms.utils
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
+import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ImportNormController
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
+import org.jeasy.random.FieldPredicates.inClass
 import org.jeasy.random.FieldPredicates.named
 import java.time.LocalDate
+import java.util.Random
 import java.util.stream.Collectors
 
 fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
@@ -27,9 +31,11 @@ fun createRandomEditNormRequestSchema(): EditNormFrameController.NormFrameProper
 
 fun createRandomNorm(): Norm {
     val parameters: EasyRandomParameters =
-        EasyRandomParameters().randomize(named("marker")) {
-            createRandomStringWithMaxLength(20)
-        } // needed for marker fields
+        EasyRandomParameters().randomize(named("marker").and(inClass(Article::class.java))) {
+            "§ " + Random().nextInt(1, 50).toString()
+        }.randomize(named("marker").and(inClass(Paragraph::class.java))) {
+            "(" + Random().nextInt(1, 50).toString() + ")"
+        }
     return EasyRandom(parameters).nextObject(Norm::class.java)
 }
 
@@ -57,11 +63,6 @@ private fun createRandomUndefinedDate(): String {
 
 private fun createRandomLocalDateInString(): String {
     return EasyRandom().nextObject(LocalDate::class.java).toString()
-}
-
-private fun createRandomStringWithMaxLength(maxLength: Int): String {
-    val parameters: EasyRandomParameters = EasyRandomParameters().stringLengthRange(1, maxLength)
-    return EasyRandom(parameters).nextObject(String::class.java)
 }
 
 private fun createRandomListOfArticleRequestSchema():

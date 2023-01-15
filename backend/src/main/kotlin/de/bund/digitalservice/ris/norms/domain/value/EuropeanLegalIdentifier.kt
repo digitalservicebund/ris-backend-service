@@ -17,7 +17,7 @@ data class EuropeanLegalIdentifier(
         }
     }
     private val year: Int? = announcementDate?.year ?: citationDate?.year
-    private val gazette: String? = when (printAnnouncementGazette) {
+    val gazette: String? = when (printAnnouncementGazette) {
         "BGBl I" -> "bgbl-1"
         "BGBl II" -> "bgbl-2"
         "BAnz" -> "banz-at"
