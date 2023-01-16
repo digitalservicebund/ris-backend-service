@@ -48,5 +48,7 @@
   "otherFootnote": null,
   "risAbbreviationInternationalLaw": null,
   "unofficialReference": null,
-  "validityRule": null
+  "validityRule": null,
+  "printAnnouncementGazette": "BGBl I",
+  "printAnnouncementPage": "1691"
 }

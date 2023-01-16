@@ -77,9 +77,11 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save simple norm and retrieved by eli`() {
-        val norm = NORM.copy(
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
-            citationDate = null,
             printAnnouncementPage = "1125",
             printAnnouncementGazette = "bg-1"
         )
@@ -97,12 +99,18 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save multiple norms and retrieve only one by eli parameters`() {
-        val firstNorm = NORM.copy(
+        val firstNorm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
             printAnnouncementPage = "1125",
             printAnnouncementGazette = "bg-1"
         )
-        val secondNorm = NORM.copy(
+        val secondNorm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
             printAnnouncementPage = "111",
             printAnnouncementGazette = "bg-1"

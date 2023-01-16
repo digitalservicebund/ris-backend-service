@@ -1,10 +1,9 @@
-import { ValidationError } from "./../../src/domain/types"
 import userEvent from "@testing-library/user-event"
-import { fireEvent, render, screen } from "@testing-library/vue"
+import { render, screen } from "@testing-library/vue"
+import { ValidationError } from "./../../src/domain/types"
 import InputElement from "@/components/InputElement.vue"
 import { InputType } from "@/domain"
 import type { ModelType } from "@/domain"
-import { nextTick } from "vue"
 
 function renderComponent(options?: {
   id?: string

@@ -1,0 +1,23 @@
+{
+  "officialLongTitle": "Gesetz für das Testen von der Abholung nach ELI",
+  "officialShortTitle": "ELI",
+  "announcementDate": "1900-01-01",
+  "printAnnouncementGazette": "BGBl II",
+  "printAnnouncementPage": "9999",
+  "articles": [
+    {
+      "marker": "§ 1",
+      "title": "Prozedur für die ELI-Abholung",
+      "paragraphs": [
+        {
+          "marker": "(1)",
+          "text": "Zuerst wird eine Norm persistiert."
+        },
+        {
+          "marker": "(2)",
+          "text": "Dann wird die Norm nach dem ELI abgerufen"
+        }
+      ]
+    }
+  ]
+}
