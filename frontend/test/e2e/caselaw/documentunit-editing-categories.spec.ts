@@ -208,4 +208,19 @@ test.describe("ensuring the editing experience in categories is as expected", ()
       "Keine Angabe"
     )
   })
+
+  test("invalid 'Entscheidungsdatum' shows error", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("2024-02-03")
+
+    await expect(
+      page.locator(
+        "text=Das Entscheidungsdatum darf nicht in der Zukunft liegen"
+      )
+    ).toBeVisible()
+  })
 })

@@ -63,7 +63,7 @@ const value = computed({
   set: (newValue) => emit("update:modelValue", newValue),
 })
 
-const errorMessage = ref<ValidationError>()
+const errorMessage = ref<ValidationError>(props.validationError)
 
 const validationError = computed({
   get: () => props.validationError,

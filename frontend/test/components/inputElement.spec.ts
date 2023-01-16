@@ -1,18 +1,22 @@
+import { ValidationError } from "./../../src/domain/types"
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import InputElement from "@/components/InputElement.vue"
 import { InputType } from "@/domain"
 import type { ModelType } from "@/domain"
+import { nextTick } from "vue"
 
 function renderComponent(options?: {
   id?: string
   type?: InputType
   modelValue?: ModelType
+  validationError?: ValidationError
 }) {
   const props = {
     id: "test",
     type: options?.type,
     modelValue: options?.modelValue,
+    validationError: options?.validationError,
     attributes: {
       id: "test-id",
       ariaLabel: "test-label",
@@ -60,5 +64,24 @@ describe("InputElement", () => {
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([["a"]])
+  })
+
+  it("renders an error message if input is not valid", async () => {
+    renderComponent({
+      id: "Testfeld",
+      type: InputType.DATE,
+      modelValue: "2024-02-10",
+      validationError: {
+        defaultMessage:
+          "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
+        field: "Testfeld",
+      },
+    })
+
+    expect(
+      screen.getByText(
+        "Das Entscheidungsdatum darf nicht in der Zukunft liegen"
+      )
+    ).toBeInTheDocument()
   })
 })
