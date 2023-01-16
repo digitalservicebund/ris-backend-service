@@ -100,14 +100,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val firstNorm = NORM.copy(
             announcementDate = LocalDate.parse("2022-02-02"),
             printAnnouncementPage = "1125",
-            printAnnouncementGazette = "bg-1",
-            articles = listOf()
+            printAnnouncementGazette = "bg-1"
         )
         val secondNorm = NORM.copy(
             announcementDate = LocalDate.parse("2022-02-02"),
             printAnnouncementPage = "111",
-            printAnnouncementGazette = "bg-1",
-            articles = listOf()
+            printAnnouncementGazette = "bg-1"
         )
 
         normsService.saveNorm(firstNorm)
