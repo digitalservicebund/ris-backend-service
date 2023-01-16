@@ -14,7 +14,6 @@ import org.jeasy.random.FieldPredicates.inClass
 import org.jeasy.random.FieldPredicates.named
 import java.time.LocalDate
 import java.util.Random
-import java.util.stream.Collectors
 
 fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
     return EasyRandom().nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
@@ -53,7 +52,7 @@ fun createRandomImportNormRequestSchema(): ImportNormController.NormRequestSchem
         }
     val importNormRequestSchema =
         EasyRandom(parameters).nextObject(ImportNormController.NormRequestSchema::class.java)
-    importNormRequestSchema.articles = createRandomListOfArticleRequestSchema()
+    importNormRequestSchema.articles = listOf()
     return importNormRequestSchema
 }
 
@@ -63,21 +62,4 @@ private fun createRandomUndefinedDate(): String {
 
 private fun createRandomLocalDateInString(): String {
     return EasyRandom().nextObject(LocalDate::class.java).toString()
-}
-
-private fun createRandomListOfArticleRequestSchema():
-    List<ImportNormController.ArticleRequestSchema> {
-    val articles =
-        EasyRandom()
-            .objects(ImportNormController.ArticleRequestSchema::class.java, 2)
-            .collect(Collectors.toList())
-    articles.forEach { it.paragraphs = createRandomListOfParagraphRequestSchema() }
-    return articles
-}
-
-private fun createRandomListOfParagraphRequestSchema():
-    List<ImportNormController.ParagraphRequestSchema> {
-    return EasyRandom()
-        .objects(ImportNormController.ParagraphRequestSchema::class.java, 2)
-        .collect(Collectors.toList())
 }

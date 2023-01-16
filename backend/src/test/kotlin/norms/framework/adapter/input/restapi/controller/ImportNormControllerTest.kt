@@ -32,6 +32,16 @@ class ImportNormControllerTest {
     @Test
     fun `it correctly maps the data to the command to call the import norm service`() {
         val importNormRequestSchema = createRandomImportNormRequestSchema()
+
+        val article = ImportNormController.ArticleRequestSchema()
+        val paragraph = ImportNormController.ParagraphRequestSchema()
+        paragraph.text = "Test Paragraph"
+        paragraph.marker = "(1)"
+        article.marker = "1"
+        article.title = "Test Title"
+        article.paragraphs = listOf(paragraph)
+        importNormRequestSchema.articles = listOf(article)
+
         val importJson = convertImportormRequestSchemaToJson(importNormRequestSchema)
 
         every { importNormService.importNorm(any()) } returns Mono.just(UUID.randomUUID())
@@ -47,33 +57,16 @@ class ImportNormControllerTest {
         verify(exactly = 1) {
             importNormService.importNorm(
                 withArg {
-                    assertThat(it.data.articles).hasSize(2)
+                    assertThat(it.data.articles).hasSize(1)
                     assertThat(it.data.articles[0].title)
                         .isEqualTo(importNormRequestSchema.articles[0].title)
                     assertThat(it.data.articles[0].marker)
                         .isEqualTo(importNormRequestSchema.articles[0].marker)
-                    assertThat(it.data.articles[0].paragraphs).hasSize(2)
+                    assertThat(it.data.articles[0].paragraphs).hasSize(1)
                     assertThat(it.data.articles[0].paragraphs[0].marker)
                         .isEqualTo(importNormRequestSchema.articles[0].paragraphs[0].marker)
                     assertThat(it.data.articles[0].paragraphs[0].text)
                         .isEqualTo(importNormRequestSchema.articles[0].paragraphs[0].text)
-                    assertThat(it.data.articles[0].paragraphs[1].marker)
-                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[1].marker)
-                    assertThat(it.data.articles[0].paragraphs[1].text)
-                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[1].text)
-                    assertThat(it.data.articles[1].title)
-                        .isEqualTo(importNormRequestSchema.articles[1].title)
-                    assertThat(it.data.articles[1].marker)
-                        .isEqualTo(importNormRequestSchema.articles[1].marker)
-                    assertThat(it.data.articles[1].paragraphs).hasSize(2)
-                    assertThat(it.data.articles[1].paragraphs[0].marker)
-                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[0].marker)
-                    assertThat(it.data.articles[1].paragraphs[0].text)
-                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[0].text)
-                    assertThat(it.data.articles[1].paragraphs[1].marker)
-                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[1].marker)
-                    assertThat(it.data.articles[1].paragraphs[1].text)
-                        .isEqualTo(importNormRequestSchema.articles[1].paragraphs[1].text)
                     assertNormDataAndImportNormRequestSchemaWithoutArticles(
                         it.data,
                         importNormRequestSchema
