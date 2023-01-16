@@ -4,9 +4,9 @@ export const repeal: InputField[] = [
   {
     name: "repealNote",
     type: InputType.TEXT,
-    label: "Änderungshinweis",
+    label: "Aufhebungshinweis",
     inputAttributes: {
-      ariaLabel: "Änderungshinweis",
+      ariaLabel: "Aufhebungshinweis",
     },
   },
   {

@@ -35,21 +35,21 @@ export const expiration: InputField[] = [
   },
   dropdown(
     "principleExpirationDateState",
-    "Unbestimmtes Grundsätzliches Außerkrafttretdatum",
+    "Unbestimmtes grundsätzliches Außerkrafttretdatum",
     undefinedDropDownItems
   ),
   {
     name: "divergentExpirationDate",
     type: InputType.DATE,
-    label: "Abweichendes Außerkrafttretedatum",
+    label: "Bestimmtes abweichendes Außerkrafttretedatum",
     inputAttributes: {
-      ariaLabel: "Abweichendes Außerkrafttretedatum",
+      ariaLabel: "Bestimmtes abweichendes Außerkrafttretedatum",
       isFutureDate: true,
     },
   },
   dropdown(
     "divergentExpirationDateState",
-    "Unbestimmtes Abweichendes Außerkrafttretdatum",
+    "Unbestimmtes abweichendes Außerkrafttretdatum",
     undefinedDropDownItems
   ),
   {

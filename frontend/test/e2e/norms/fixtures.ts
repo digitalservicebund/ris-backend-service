@@ -236,19 +236,19 @@ export function getNormBySections(norm) {
         {
           type: "dropdown",
           name: "principleEntryIntoForceDateState",
-          label: "Unbestimmtes Grundsätzliches Inkrafttretedatum",
+          label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
           value: norm.principleEntryIntoForceDateState,
         },
         {
           type: "text",
           name: "divergentEntryIntoForceDate",
-          label: "Abweichendes Inkrafttretedatum",
+          label: "Bestimmtes abweichendes Inkrafttretedatum",
           value: norm.divergentEntryIntoForceDate,
         },
         {
           type: "dropdown",
           name: "divergentEntryIntoForceDateState",
-          label: "Unbestimmtes Abweichendes Inkrafttretedatum",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
           value: norm.divergentEntryIntoForceDateState,
         },
       ],
@@ -283,19 +283,19 @@ export function getNormBySections(norm) {
         {
           type: "dropdown",
           name: "principleExpirationDateState",
-          label: "Unbestimmtes Grundsätzliches Außerkrafttretdatum",
+          label: "Unbestimmtes grundsätzliches Außerkrafttretdatum",
           value: norm.principleExpirationDateState,
         },
         {
           type: "text",
           name: "divergentExpirationDate",
-          label: "Abweichendes Außerkrafttretedatum",
+          label: "Bestimmtes abweichendes Außerkrafttretedatum",
           value: norm.divergentExpirationDate,
         },
         {
           type: "dropdown",
           name: "divergentExpirationDateState",
-          label: "Unbestimmtes Abweichendes Außerkrafttretdatum",
+          label: "Unbestimmtes abweichendes Außerkrafttretdatum",
           value: norm.divergentExpirationDateState,
         },
         {
