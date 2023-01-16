@@ -14,7 +14,7 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value?: string): void
-  (event: "validationError", value: string): void
+  (event: "update:validationError", value?: ValidationError): void
 }
 
 const props = defineProps<Props>()
@@ -47,6 +47,16 @@ const hasError = computed(
     inputValue.value == ""
 )
 
+watch(isInPast, () => {
+  !isInPast.value
+    ? emit("update:validationError", {
+        defaultMessage:
+          "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
+        field: props.id,
+      })
+    : emit("update:validationError", undefined)
+})
+
 const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
@@ -54,12 +64,6 @@ const conditionalClasses = computed(() => ({
 function handleOnBlur() {
   if (!hasError.value)
     emit("update:modelValue", dayjs(inputValue.value).toISOString())
-  if (!isInPast.value) {
-    emit(
-      "validationError",
-      "Das Entscheidungsdatum darf nicht in der Zukunft liegen"
-    )
-  }
   // TODO support clearing date and sending undefined to backend
   // empty field should not be an error
 }

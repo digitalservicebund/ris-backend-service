@@ -213,10 +213,7 @@ export const coreDataFields: InputField[] = [
     "Abweichender ECLI",
     "nestedInputOfEcliAndDeviatingEclis",
     {
-      parent: defineTextField("ecli", "ECLI", "ECLI", "", {
-        defaultMessage: "",
-        field: "",
-      }),
+      parent: defineTextField("ecli", "ECLI", "ECLI", ""),
       child: defineChipsField(
         "deviatingEclis",
         "Abweichender ECLI",

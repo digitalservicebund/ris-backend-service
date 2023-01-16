@@ -1,6 +1,4 @@
 <script lang="ts" setup>
-import { ref } from "vue"
-
 interface Props {
   id: string
   label?: string
@@ -9,13 +7,6 @@ interface Props {
 }
 
 defineProps<Props>()
-
-const errorMessage = ref("")
-
-function onValidationError(validationError: string) {
-  console.log("Validation Error in Input Field", validationError)
-  errorMessage.value = validationError
-}
 </script>
 
 <template>
@@ -30,7 +21,7 @@ function onValidationError(validationError: string) {
       <span v-if="!!required">*</span>
     </label>
 
-    <slot :id="id" @validation-error="onValidationError"> </slot>
+    <slot :id="id"> </slot>
 
     <div class="h-16 label-03-reg text-red-800">
       {{ errorMessage }}

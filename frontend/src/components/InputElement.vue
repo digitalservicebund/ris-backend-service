@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
 import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
@@ -22,7 +22,7 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value: ModelType): void
-  (event: "validationError", value: string): void
+  (event: "update:validationError", value: ValidationError): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,10 +63,15 @@ const value = computed({
   set: (newValue) => emit("update:modelValue", newValue),
 })
 
-function onValidationError(validationError: string) {
-  console.log("Validation Error in Input Element", validationError)
-  emit("validationError", validationError)
-}
+const errorMessage = ref<ValidationError>()
+
+const validationError = computed({
+  get: () => props.validationError,
+  set: (newValue) => {
+    errorMessage.value = newValue
+    emit("update:validationError", newValue)
+  },
+})
 </script>
 
 <template>
@@ -75,7 +80,9 @@ function onValidationError(validationError: string) {
     :id="id"
     v-model="value"
     v-bind="attributes"
-    :validation-error="validationError"
-    @validation-error="onValidationError"
+    v-model:validation-error="validationError"
   />
+  <div class="h-16 label-03-reg text-red-800">
+    {{ errorMessage?.defaultMessage }}
+  </div>
 </template>

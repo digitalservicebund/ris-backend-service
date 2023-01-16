@@ -46,7 +46,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 <template>
   <div class="expandable-content">
     <button
-      class="-mt-[3.5rem] expandable-content__header h-[1.25rem] text-white"
+      class="-mt-[4.5rem] expandable-content__header h-[1.25rem] text-white"
       @click="toggleContentVisibility"
     >
       <span

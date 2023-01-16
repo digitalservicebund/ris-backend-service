@@ -160,6 +160,8 @@ export type ModelType =
   | NestedInputModelType
   | ComboboxInputModelType
 
+// TODO We keep the name `defaultMessage` from the backend response,
+// but this could ne misleading. We should rename this to `message`.
 export type ValidationError = {
   defaultMessage: string
   field: string
