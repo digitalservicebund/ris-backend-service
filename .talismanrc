@@ -154,7 +154,7 @@ fileignoreconfig:
   - filename: frontend/test/components/navbarSide.spec.ts
     checksum: 65f85c8e6280ce6e6587ce00f6b1aed643bc8714cd9e5006fbdadfdfa0e866cd
   - filename: frontend/test/e2e/norms/testdata/norm_clean_cars.json
-    checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
+    checksum: be054e48163807a2bcd369d9be7db173d5a2ecbc269a096f6e516dcd442d6a50
   - filename: frontend/test/e2e/norms/testdata/norm_edited_fields.json
     checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
   - filename: frontend/test/services/normsService.spec.ts
