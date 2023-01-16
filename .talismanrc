@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: frontend/test/e2e/norms/testdata/norm_edited_fields.json
-    checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
+    checksum: 3b589809ac2b03d2732b8cbe6e382faabc311220167e22a4075b6f90c8500ff1
   - filename: run.sh
     checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
   - filename: .github/workflows/clean-staging.yml
@@ -130,11 +130,13 @@ fileignoreconfig:
   - filename: frontend/.env.development
     checksum: b87426c20cb1da4785bf52714577b2211ced4673c555418bf8c2e198fa615ea3
   - filename: frontend/playwright.config.ts
-    checksum: beb96d2152ae186fe622a43cba45cfb6c39c626fd22c315b39b7a1a08aff6688
+    checksum: b39672c8ea9e2128e297dde71ef2345bb44e1c26d96d4ed00df0b8fdf55ff3cf
   - filename: frontend/sonar-project.properties
-    checksum: 8fa8db24e8b523d44c8b624854e3c478ff22f6b102ecc68c0a764b083bea1383
+    checksum: 861eaf5de8f7daaac7a9571862f527a6e9f9d2a0936a2ab52378e9fa018719e4
   - filename: frontend/src/components/DocumentUnitCoreData.vue
     checksum: fa426f0d5630e58f2d8dc6666346381e9e71a674f410f8f887266a2a8d9ca893
+  - filename: frontend/test/composables/useTransformNestedData.spec.ts
+    checksum: 08af9980b85f7ac464bd49a2efd25d8e112fccfb04b4fcae10bbddd2232b1ad8
   - filename: frontend/src/composables/useTransformNestedData.ts
     checksum: a092bbf72c9a9e09973d629f6a3cfc19c659a8e7408eec3d38de41e927e9380d
   - filename: frontend/src/data/courts.json
@@ -142,7 +144,7 @@ fileignoreconfig:
   - filename: frontend/src/domain/Norm.ts
     checksum: 767152817b3382f25cb478d3cd7ac3b7da48ca5c19e8d7892a88a91217512538
   - filename: frontend/src/env.d.ts
-    checksum: 853a6b132a9c80dd715c412de54946abc08d403688bff8959d83cd135264f718
+    checksum: fabcbd7e77e14618c1edd71a7fd357b0e003daaf4d073422c7e3c5a6c0da5f11
   - filename: frontend/src/routes/norms/norm/\[:normGuid\]/frame.vue
     checksum: aabf1405de5549c1c5ef4b8094531bc623a84137388cebddc6960d9c4e669a81
   - filename: frontend/src/services/normsService.ts
@@ -154,15 +156,15 @@ fileignoreconfig:
   - filename: frontend/test/components/navbarSide.spec.ts
     checksum: 65f85c8e6280ce6e6587ce00f6b1aed643bc8714cd9e5006fbdadfdfa0e866cd
   - filename: frontend/test/e2e/norms/testdata/norm_clean_cars.json
-    checksum: 17960eb374fc0ee51a42c076c28984b4ba4ce9dbff5ab12f8848203336581731
+    checksum: 626ea6c20acacf82d7cba420234831581515a74e9eeff1111e71bf94749570f0
   - filename: frontend/test/e2e/norms/testdata/norm_edited_fields.json
     checksum: c6e82ebc837e83583ad459f5a001cb9e0518bad04f6fe64b748678ed929e3b5d
   - filename: frontend/test/services/normsService.spec.ts
     checksum: b023f40aa4fb5132e3abe24d14ad345bd6e1d59c44009a8c2a3764951b91787d
   - filename: frontend/test/stores/loadedNorm.spec.ts
-    checksum: 59895ce7ab328eabe145a79e364a449f32fcd4ac748aa038eb026ddcfd84d646
+    checksum: fa7f616a8338e14cee3811c89cbe811ae669f417c30bcfcf9b3d4ebbee7a9671
   - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 1e3c6a42728ea1cd3aee5080b355be084ba7c50ca74e845e1e7f404df75c82af
+    checksum: 8efc67f75a253e0bc06532c1b57f0f4ec034b8c5228ee224a6545a247ef31a80
   - filename: run.sh
     checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
   - filename: backend/src/main/resources/db/migration/V0.21__caselaw_migrate_category_to_new_documentTypeId_column.sql
@@ -176,7 +178,7 @@ fileignoreconfig:
   - filename: backend/src/main/resources/db/migration/V0.25__norms_remove_column_european_legal_identifier.sql
     checksum: cd5e7df34f7fe66b18fcc65cd79a5bef93f00547954315b10a988945ca6b96fe
   - filename: backend/src/main/resources/db/migration/V0.26__caselaw_remigrate_category_to_documentTypeld_column.sql
-    checksum: 8c6eee02511b1fea5e33d6115e76d7abd60acc957e8562b64ee72e9f3c5601b2
+    checksum: 5f9fa5c51909d06f156921212de0f22c6d64d089d7efc468f9d6fa6f11b08144
   - filename: backend/src/main/resources/db/migration/V0.27__caselaw_add-email-tracking.sql
     checksum: 713d9729f15a702988e15fa7de7d340ade031a59b76fe2f0b89eed1144ae0827
   - filename: backend/src/main/resources/db/migration/V0.28__caselaw_migrate_dokumenttyp_as_jurisshortcut_to_documenttypeid_column.sql
@@ -189,6 +191,8 @@ fileignoreconfig:
     checksum: 202521a85ff71bdb6535c2ba12f8e4c0ce0d4ae7ef77b2b497e696fccb74c5be
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/xml/NormsMapper.kt
     checksum: a2fcc92a52b3858e32c0a2d194f371ff981f7ef648006f320633b7e28afaec79
+  - filename: frontend/src/vite.env.d.ts
+    checksum: bb59c1fbb5151f08ef04550afa9b33a32799a234ae4518b45a3e123e6e18c439
 
 scopeconfig:
   - scope: node

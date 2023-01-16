@@ -22,6 +22,7 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value: ModelType): void
+  (event: "validationError", value: string): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -61,6 +62,11 @@ const value = computed({
   get: () => props.modelValue,
   set: (newValue) => emit("update:modelValue", newValue),
 })
+
+function onValidationError(validationError: string) {
+  console.log("Validation Error in Input Element", validationError)
+  emit("validationError", validationError)
+}
 </script>
 
 <template>
@@ -70,5 +76,6 @@ const value = computed({
     v-model="value"
     v-bind="attributes"
     :validation-error="validationError"
+    @validation-error="onValidationError"
   />
 </template>
