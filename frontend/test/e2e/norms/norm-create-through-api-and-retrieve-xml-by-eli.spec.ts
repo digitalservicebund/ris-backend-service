@@ -2,13 +2,14 @@ import { expect } from "@playwright/test"
 import jsdom from "jsdom"
 import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
-import normCleanCars from "./testdata/norm_clean_cars.json"
+import norm from "./testdata/norm_for_retrieve_by_eli.json"
 
+testWithImportedNorm.use({ normToImport: norm })
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
   async ({ page, createdGuid, request }) => {
     // Open frame data
-    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
+    await openNorm(page, norm.officialLongTitle, createdGuid)
     await page.locator("a:has-text('Rahmen')").click()
 
     const eliInputValue = await page.inputValue("input#europeanLegalIdentifier")
@@ -19,7 +20,6 @@ testWithImportedNorm(
     const response = await request.get(
       `${backendHost}/api/v1/norms/xml/${eliInputValue}`
     )
-
     expect(response.ok()).toBeTruthy()
     expect(response.headers()["content-type"]).toBe("application/xml")
 
@@ -39,9 +39,7 @@ testWithImportedNorm(
       .querySelectorAll("akn\\:FRBRdate")
       .forEach((frbrDate) => {
         // eslint-disable-next-line jest-dom/prefer-to-have-attribute
-        expect(frbrDate.getAttribute("date")).toBe(
-          normCleanCars.announcementDate
-        )
+        expect(frbrDate.getAttribute("date")).toBe(norm.announcementDate)
       })
 
     // eslint-disable-next-line jest-dom/prefer-to-have-attribute
@@ -49,14 +47,14 @@ testWithImportedNorm(
       xmlDOM.window.document
         .querySelector("akn\\:FRBRnumber")
         .getAttribute("value")
-    ).toBe(`s${normCleanCars.printAnnouncementPage}`)
+    ).toBe(`s${norm.printAnnouncementPage}`)
 
     // eslint-disable-next-line jest-dom/prefer-to-have-attribute
     expect(
       xmlDOM.window.document
         .querySelector("akn\\:FRBRname")
         .getAttribute("value")
-    ).toBe("bgbl-1")
+    ).toBe("bgbl-2")
 
     const proprietary =
       xmlDOM.window.document.querySelector("akn\\:proprietary")
@@ -74,7 +72,7 @@ testWithImportedNorm(
     )
     expect(
       proprietary.querySelector("meta\\:initiant").textContent.trim()
-    ).toBe("bundestag")
+    ).toBe("nicht-vorhanden")
     expect(
       proprietary
         .querySelector("meta\\:bearbeitendeInstitution")
@@ -83,21 +81,21 @@ testWithImportedNorm(
 
     expect(
       xmlDOM.window.document.querySelector("akn\\:docTitle").textContent.trim()
-    ).toBe(normCleanCars.officialLongTitle)
+    ).toBe(norm.officialLongTitle)
     expect(
       xmlDOM.window.document
         .querySelector("akn\\:shortTitle")
         .textContent.trim()
-    ).toBe(normCleanCars.officialShortTitle)
+    ).toBe(norm.officialShortTitle)
 
     xmlDOM.window.document
       .querySelectorAll("akn\\:article")
       .forEach((article, index) => {
         expect(article.querySelector("akn\\:marker").textContent.trim()).toBe(
-          normCleanCars.articles[index].marker
+          norm.articles[index].marker
         )
         expect(article.querySelector("akn\\:heading").textContent.trim()).toBe(
-          normCleanCars.articles[index].title
+          norm.articles[index].title
         )
       })
 
@@ -105,10 +103,10 @@ testWithImportedNorm(
       .querySelectorAll("akn\\:paragraph")
       .forEach((paragraph, index) => {
         expect(paragraph.querySelector("akn\\:marker").textContent.trim()).toBe(
-          normCleanCars.articles[0].paragraphs[index].marker
+          norm.articles[0].paragraphs[index].marker
         )
         expect(paragraph.querySelector("akn\\:p").textContent.trim()).toBe(
-          normCleanCars.articles[0].paragraphs[index].text
+          norm.articles[0].paragraphs[index].text
         )
       })
   }

@@ -2,14 +2,16 @@ import { expect, test } from "@playwright/test"
 import normCleanCars from "./testdata/norm_clean_cars.json"
 
 type MyFixtures = {
+  normToImport: object
   createdGuid: string
 }
 
 export const testWithImportedNorm = test.extend<MyFixtures>({
-  createdGuid: async ({ request }, use) => {
+  normToImport: normCleanCars,
+  createdGuid: async ({ normToImport, request }, use) => {
     const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
     const response = await request.post(`${backendHost}/api/v1/norms`, {
-      data: normCleanCars,
+      data: normToImport,
     })
     expect(response.ok()).toBeTruthy()
     const location = response.headers()["location"]
