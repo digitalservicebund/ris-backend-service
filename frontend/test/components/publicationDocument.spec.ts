@@ -26,7 +26,7 @@ const setupWithPublishedDocument = () =>
         receiverAddress: "receiver address",
         mailSubject: "mail subject",
         publishDate: "01.02.2000",
-        publishState: "SUCCESS",
+        publishStateDisplayText: "erfolgreich angekommen",
       },
     },
     global: {
@@ -172,7 +172,7 @@ describe("PublicationDocument:", () => {
             receiverAddress: "receiver address",
             mailSubject: "mail subject",
             publishDate: undefined,
-            publishState: "ERROR",
+            publishStateDisplayText: "fehlgeschlagen",
           },
           errorMessage: {
             title: "error message title",
@@ -231,7 +231,7 @@ describe("PublicationDocument:", () => {
       expect(
         screen.getByLabelText("Letzte Veröffentlichungen")
       ).toHaveTextContent(
-        `Letzte Veröffentlichungen Letzte Veröffentlichung am 01\.02\.2000 (SUCCESS) ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content<\/xml>`
+        `Letzte Veröffentlichungen Letzte Veröffentlichung am 01\.02\.2000 (Zustellung: erfolgreich angekommen) ÜBERE-Mail an: receiver address Betreff: mail subjectALSXML1<?xml version="1.0"?>2<!DOCTYPE juris-r SYSTEM "juris-r.dtd">3<xml>content<\/xml>`
       )
     })
 
@@ -274,7 +274,7 @@ describe("PublicationDocument:", () => {
           receiverAddress: "receiver address",
           mailSubject: "mail subject",
           publishDate: "01.02.2000",
-          publishState: "SUCCESS",
+          publishStateDisplayText: "erfolgreich angekommen",
         },
       },
       global: {
@@ -288,7 +288,7 @@ describe("PublicationDocument:", () => {
     })
 
     expect(container).toHaveTextContent(
-      `Veröffentlichen1. Plausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefüllt2. Empfänger der Export-EmailEmpfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000 (SUCCESS) ÜBERE-Mail an: receiver address Betreff: mail subjectALS`
+      `Veröffentlichen1. Plausibilitätsprüfung check Alle Pflichtfelder sind korrekt ausgefüllt2. Empfänger der Export-EmailEmpfänger-E-Mail-Adresse: campaignDokumentationseinheit veröffentlichenLetzte Veröffentlichungen Letzte Veröffentlichung am 01.02.2000 (Zustellung: erfolgreich angekommen) ÜBERE-Mail an: receiver address Betreff: mail subjectALS`
     )
 
     const codeSnippet = screen.queryByTestId("code-snippet")
