@@ -40,8 +40,8 @@ const handleUpdateDocumentUnit = async () => {
     validationErrors.value = []
   }
   if (response.data) {
-    // updateStatus.value = response.status
-    // updatedDocumentUnit.value = response.data as DocumentUnit
+    updateStatus.value = response.status
+    updatedDocumentUnit.value = response.data as DocumentUnit
   }
   setTimeout(() => {
     hasDataChange.value = false
@@ -78,8 +78,8 @@ watch(
 )
 
 const coreData = computed({
-  get: () => props.documentUnit.coreData,
-  // get: () => updatedDocumentUnit.value.coreData,
+  // get: () => props.documentUnit.coreData,
+  get: () => updatedDocumentUnit.value.coreData,
   set: (newValues) => {
     let triggerSaving = false
     if (
