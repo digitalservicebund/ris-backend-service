@@ -22,22 +22,19 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
         return listNormsService
             .listNorms(query)
             .collectList()
-            .map({ normDataList ->
+            .map { normDataList ->
                 PaginatedNormListResponseSchema.fromUseCaseData(normDataList)
-            })
-            .map({ paginationData -> ResponseEntity.ok(paginationData) })
+            }
+            .map { paginationData -> ResponseEntity.ok(paginationData) }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
 
     data class PaginatedNormListResponseSchema
     private constructor(val data: List<NormDataResponseSchema>) {
         companion object {
-            fun fromUseCaseData(
-                data: List<ListNormsUseCase.NormData>
-            ): PaginatedNormListResponseSchema {
-                val foo = data.map { NormDataResponseSchema.fromUseCaseData(it) }
-                return PaginatedNormListResponseSchema(foo)
-            }
+            fun fromUseCaseData(data: List<ListNormsUseCase.NormData>): PaginatedNormListResponseSchema = PaginatedNormListResponseSchema(
+                data.map { NormDataResponseSchema.fromUseCaseData(it) }
+            )
         }
     }
 
