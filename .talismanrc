@@ -8,17 +8,17 @@ fileignoreconfig:
   - filename: .github/workflows/clean-staging.yml
     checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
-    checksum: 5226818b43fd609373b58763690cef24b7e31d28e027c33fb704d070d968dedf
+    checksum: 55430b42bfd05a6258ec550710a0104d8d56dfae37bcde8dbf44e146c188d23a
   - filename: .github/workflows/playwright-test.yml
     checksum: 8f77e3a1a06c534055c151dd1151b550ab600d253d67566a68ebf6a84f88b5a8
   - filename: .github/workflows/playwright.yml
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: .github/workflows/scan.yml
-    checksum: 55beb9dbf6e45536fc6867a2857c5d249e9be0801204e5003ea561eaef8b632e
+    checksum: 341260840898288b619da7cfe62ecd61e87a7100305e7803293b45f97f9e12f4
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: b047bff36a69f2bbb5c03dfefe30c0549cb04dc0b2cf325cad5b6a2cb52b2496
+    checksum: 43cec177ed0a8777aaabe505f01b2be2371f0c76da498b04417a377e952f0185
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: 5ac01c3b6a5d2909ffbc054ac98d43962047e762b86654207591aeaecdf7a434
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java

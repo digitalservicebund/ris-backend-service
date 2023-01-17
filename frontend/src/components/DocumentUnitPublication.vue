@@ -32,7 +32,7 @@ async function publishADocument(email: string) {
       ? lastPublishedXmlMail.value.xml.replace(/[ \t]{2,}/g, "")
       : ""
     succeedMessage.value = {
-      title: "Email wurde erfolgreich versendet",
+      title: "Email wurde versendet",
       description: "",
     }
   } else {

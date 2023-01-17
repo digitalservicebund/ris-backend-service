@@ -8,13 +8,8 @@ info:
     url: https://mit-license.org
 
 servers:
-  # Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/VICTORDELCAMPO_1/neu-ris_normen_service_api/0.0.1
-  - url: https://ris.prod.ds4g.net/api/norms
+  - url: https://ris.prod.ds4g.net/api/v1
     description: Public production server
-  - url: http://localhost:3000
-    description: Local development server
 
 paths:
   /norms:
@@ -37,7 +32,7 @@ paths:
 
           schema:
             type: string
-            example: "umweltgerechtes Recycling"
+            example: "Koordinierung der Systeme"
 
       responses:
         "200":

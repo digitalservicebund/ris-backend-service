@@ -135,7 +135,7 @@ dependencies {
   implementation "org.flywaydb:flyway-core:9.10.2"
   implementation "org.jetbrains.kotlin:kotlin-reflect"
 
-  implementation "org.jsoup:jsoup:1.14.3"
+  implementation "org.jsoup:jsoup:1.15.3"
 
   testImplementation "org.jeasy:easy-random-core:5.0.0"
   testImplementation "com.google.code.gson:gson:2.10"
