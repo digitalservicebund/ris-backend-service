@@ -109,28 +109,34 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await navigateToPublication(page, documentNumber)
     await page.locator("[aria-label='Rubriken bearbeiten']").click()
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
-    await page.locator("text=AG Aalen").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
-
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
     await page.keyboard.press("Enter")
+    await expect(page.getByText("abc").first()).toBeVisible()
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
     await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
     expect(
       await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
     ).toBe("2022-02-03")
+    await page.keyboard.press("Tab")
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
+    await page.locator("[aria-label='Gericht']").fill("aalen")
+    await page.locator("text=AG Aalen").click()
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
     await page.locator("[aria-label='Dokumenttyp']").fill("AnU")
     await page.locator("text=AnU - Anerkenntnisurteil").click()
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
     await page
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
     await page.locator("text=Ja").click()
-
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
     await expect(
       page.locator("text=Zuletzt gespeichert um").first()
     ).toBeVisible()
