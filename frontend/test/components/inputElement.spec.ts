@@ -69,7 +69,7 @@ describe("InputElement", () => {
     renderComponent({
       id: "Testfeld",
       type: InputType.DATE,
-      modelValue: "2024-02-10",
+      modelValue: "2034-02-10",
       validationError: {
         defaultMessage:
           "Das Entscheidungsdatum darf nicht in der Zukunft liegen",

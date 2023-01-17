@@ -82,6 +82,7 @@ const validationError = computed({
     v-bind="attributes"
     v-model:validation-error="validationError"
   />
+  <!-- TODO this is a workaround, errors shoudld be displayes in in the InputField component in the future -->
   <div class="h-16 label-03-reg text-red-800">
     {{ errorMessage?.defaultMessage }}
   </div>

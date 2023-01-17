@@ -21,7 +21,7 @@ defineProps<Props>()
       <span v-if="!!required">*</span>
     </label>
 
-    <slot :id="id"> </slot>
+    <slot :id="id" />
 
     <div class="h-16 label-03-reg text-red-800">
       {{ errorMessage }}
