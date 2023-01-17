@@ -107,6 +107,9 @@ export default class DocumentUnit {
     if (value instanceof Array && value.length === 0) {
       return true
     }
+    if (typeof value === "object" && "location" in value && "type" in value) {
+      return value.location === "" && value.type === ""
+    }
     return false
   }
 }

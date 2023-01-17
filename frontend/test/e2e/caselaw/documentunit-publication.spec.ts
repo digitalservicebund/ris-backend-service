@@ -150,9 +150,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       .locator("[aria-label='Dokumentationseinheit veröffentlichen']")
       .click()
 
-    await expect(
-      page.locator("text=Email wurde erfolgreich versendet")
-    ).toBeVisible()
+    await expect(page.locator("text=Email wurde versendet")).toBeVisible()
 
     await expect(page.locator("text=Letzte Veröffentlichung am")).toBeVisible()
   })
