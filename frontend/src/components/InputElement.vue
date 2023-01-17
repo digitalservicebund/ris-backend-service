@@ -22,7 +22,7 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value: ModelType): void
-  (event: "update:validationError", value: ValidationError): void
+  (event: "update:validationError", value: ValidationError | undefined): void
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -63,7 +63,7 @@ const value = computed({
   set: (newValue) => emit("update:modelValue", newValue),
 })
 
-const errorMessage = ref<ValidationError>(props.validationError)
+const errorMessage = ref<ValidationError | undefined>(props.validationError)
 
 const validationError = computed({
   get: () => props.validationError,
