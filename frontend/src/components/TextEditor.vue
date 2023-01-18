@@ -381,9 +381,9 @@ const resizeObserver = new ResizeObserver((entries) => {
     </div>
     <div>
       <EditorContent
-        :aria-label="ariaLabel"
         class="p-[2rem]"
         :class="'editor-content editor-content--' + fieldSize"
+        :data-testid="ariaLabel"
         :editor="editor"
       />
     </div>

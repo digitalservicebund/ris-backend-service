@@ -399,21 +399,21 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await navigateToCategories(page, documentNumber)
 
     // small
-    const smallEditor = page.locator("[aria-label='Titelzeile']")
+    const smallEditor = page.locator("[data-testid='Titelzeile']")
     const smallEditorHeight = await smallEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height")
     )
     expect(parseInt(smallEditorHeight)).toBeGreaterThanOrEqual(60)
 
     //medium
-    const mediumEditor = page.locator("[aria-label='Leitsatz']")
+    const mediumEditor = page.locator("[data-testid='Leitsatz']")
     const mediumEditorHeight = await mediumEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height")
     )
     expect(parseInt(mediumEditorHeight)).toBeGreaterThanOrEqual(120)
 
     //large
-    const largeEditor = page.locator("[aria-label='Gründe']")
+    const largeEditor = page.locator("[data-testid='Gründe']")
     const largeEditorHeight = await largeEditor.evaluate((element) =>
       window.getComputedStyle(element).getPropertyValue("height")
     )
