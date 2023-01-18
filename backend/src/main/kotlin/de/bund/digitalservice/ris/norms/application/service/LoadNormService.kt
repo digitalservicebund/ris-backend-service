@@ -10,6 +10,7 @@ import reactor.core.publisher.Mono
 class LoadNormService(private val getNormByGuidPort: GetNormByGuidOutputPort) : LoadNormUseCase {
 
     override fun loadNorm(query: LoadNormUseCase.Query): Mono<Norm> {
-        return getNormByGuidPort.getNormByGuid(query.guid)
+        val guidQuery = GetNormByGuidOutputPort.Query(query.guid)
+        return getNormByGuidPort.getNormByGuid(guidQuery)
     }
 }

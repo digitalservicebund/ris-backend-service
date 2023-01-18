@@ -19,8 +19,8 @@ class NormsMemoryRepository : GetAllNormsOutputPort, GetNormByGuidOutputPort, Sa
         return Mono.just(true)
     }
 
-    override fun getNormByGuid(guid: UUID): Mono<Norm> =
-        data[guid]?.let { Mono.just(it) } ?: Mono.empty()
+    override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> =
+        data[query.guid]?.let { Mono.just(it) } ?: Mono.empty()
 
     override fun getAllNorms(): Flux<Norm> =
         if (data.isNotEmpty()) Flux.fromIterable(data.values.toList()) else Flux.empty()

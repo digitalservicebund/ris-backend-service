@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -140,12 +141,14 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save simple norm and retrieved by guid`() {
+        val query = GetNormByGuidOutputPort.Query(NORM.guid)
+
         normsService.saveNorm(NORM)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getNormByGuid(NORM.guid)
+        normsService.getNormByGuid(query)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
@@ -155,13 +158,14 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     fun `save norm with 1 article and 2 paragraphs and retrieved by guid`() {
         val article = ARTICLE1.copy(paragraphs = listOf(PARAGRAPH1, PARAGRAPH2))
         val norm = NORM.copy(articles = listOf(article))
+        val query = GetNormByGuidOutputPort.Query(norm.guid)
 
         normsService.saveNorm(norm)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getNormByGuid(norm.guid)
+        normsService.getNormByGuid(query)
             .`as`(StepVerifier::create)
             .assertNext { validateNorm(norm, it) }
             .verifyComplete()
@@ -172,13 +176,14 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val article1 = ARTICLE1.copy(paragraphs = listOf(PARAGRAPH1, PARAGRAPH2))
         val article2 = ARTICLE2.copy(paragraphs = listOf(PARAGRAPH3, PARAGRAPH4))
         val norm = NORM.copy(articles = listOf(article1, article2))
+        val query = GetNormByGuidOutputPort.Query(norm.guid)
 
         normsService.saveNorm(norm)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getNormByGuid(norm.guid)
+        normsService.getNormByGuid(query)
             .`as`(StepVerifier::create)
             .assertNext { validateNorm(norm, it) }
             .verifyComplete()
@@ -186,12 +191,14 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save norm and edit norm`() {
+        val query = GetNormByGuidOutputPort.Query(NORM.guid)
+
         normsService.saveNorm(NORM)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getNormByGuid(NORM.guid)
+        normsService.getNormByGuid(query)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
@@ -211,7 +218,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getNormByGuid(NORM.guid)
+        normsService.getNormByGuid(query)
             .`as`(StepVerifier::create)
             .assertNext {
                 assertThat(it.officialLongTitle == updatedNorm.officialLongTitle, `is`(true))

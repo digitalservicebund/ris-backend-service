@@ -22,7 +22,6 @@ import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.util.UUID
 
 @Component
 @Primary
@@ -58,9 +57,9 @@ class NormsService(
             .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
     }
 
-    override fun getNormByGuid(guid: UUID): Mono<Norm> {
+    override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
         return normsRepository
-            .findByGuid(guid)
+            .findByGuid(query.guid)
             .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
     }
 

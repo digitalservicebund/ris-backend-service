@@ -5,5 +5,7 @@ import reactor.core.publisher.Mono
 import java.util.UUID
 
 interface GetNormByGuidOutputPort {
-    fun getNormByGuid(guid: UUID): Mono<Norm>
+    fun getNormByGuid(query: Query): Mono<Norm>
+
+    data class Query(val guid: UUID)
 }
