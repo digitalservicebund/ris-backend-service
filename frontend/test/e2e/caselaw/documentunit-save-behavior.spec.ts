@@ -21,25 +21,18 @@ test.describe("autosave on documentation units", () => {
     ).toBeVisible()
   })
 
-  // TODO fix this test
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("test could not update documentUnit", async ({
+  test("test could not update documentUnit", async ({
     page,
     documentNumber,
   }) => {
-    await page.route(
-      "**/api/v1/caselaw/documentunits/*/docx",
-      async (route) => {
-        route.fulfill({
-          status: 400,
-          contentType: "text/plain",
-          body: "Not Found!",
-        })
-      }
-    )
-    navigateToCategories(page, documentNumber)
+    await navigateToCategories(page, documentNumber)
+
+    await page.route("**/*", async (route) => {
+      await route.abort("internetdisconnected")
+    })
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+
     await expect(
       page.locator("text='Daten werden gespeichert'").nth(0)
     ).toBeVisible()
