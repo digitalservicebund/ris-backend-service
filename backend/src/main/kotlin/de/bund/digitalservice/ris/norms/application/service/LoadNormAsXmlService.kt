@@ -13,11 +13,13 @@ class LoadNormAsXmlService(
 ) : LoadNormAsXmlUseCase {
 
     override fun loadNormAsXml(query: LoadNormAsXmlUseCase.Query): Mono<String> {
-        return getNormByEliAdapter.getNormByEli(
+        val getByEliQuery = GetNormByEliOutputPort.Query(
             query.printAnnouncementGazette,
             query.announcementOrCitationYear,
             query.printAnnouncementPage
-        ).flatMap { norm ->
+        )
+
+        return getNormByEliAdapter.getNormByEli(getByEliQuery).flatMap { norm ->
             convertNormToXmlAdapter.convertNormToXml(norm)
         }
     }

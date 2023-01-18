@@ -42,9 +42,9 @@ class NormsService(
     private val template: R2dbcEntityTemplate = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
     private val criteria: NormsCriteriaBuilder = NormsCriteriaBuilder()
 
-    override fun getNormByEli(gazette: String, year: String, page: String): Mono<Norm> {
+    override fun getNormByEli(query: GetNormByEliOutputPort.Query): Mono<Norm> {
         return template.select(NormDto::class.java)
-            .matching(Query.query(criteria.getEliCriteria(gazette, year, page)))
+            .matching(Query.query(criteria.getEliCriteria(query.gazette, query.year, query.page)))
             .first()
             .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
     }

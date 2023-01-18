@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -92,7 +93,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getNormByEli("bg-1", "2022", "1125")
+        val query = GetNormByEliOutputPort.Query("bg-1", "2022", "1125")
+
+        normsService.getNormByEli(query)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
@@ -127,7 +130,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getNormByEli("bg-1", "2022", "111")
+        val query = GetNormByEliOutputPort.Query("bg-1", "2022", "111")
+
+        normsService.getNormByEli(query)
             .`as`(StepVerifier::create)
             .assertNext { validateNorm(secondNorm, it) }
             .verifyComplete()
