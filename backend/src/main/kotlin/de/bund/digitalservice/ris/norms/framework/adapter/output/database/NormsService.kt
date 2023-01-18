@@ -69,11 +69,11 @@ class NormsService(
             .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
     }
 
-    override fun saveNorm(norm: Norm): Mono<Boolean> {
+    override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
         return normsRepository
-            .save(normToDto(norm))
+            .save(normToDto(command.norm))
             .flatMap { normDto ->
-                saveNormArticles(norm, normDto)
+                saveNormArticles(command.norm, normDto)
                     .then(Mono.just(true))
             }
     }

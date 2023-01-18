@@ -14,8 +14,8 @@ import kotlin.collections.HashMap
 class NormsMemoryRepository : GetAllNormsOutputPort, GetNormByGuidOutputPort, SaveNormOutputPort {
     private val data = HashMap<UUID, Norm>()
 
-    override fun saveNorm(norm: Norm): Mono<Boolean> {
-        data[norm.guid] = norm
+    override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
+        data[command.norm.guid] = command.norm
         return Mono.just(true)
     }
 

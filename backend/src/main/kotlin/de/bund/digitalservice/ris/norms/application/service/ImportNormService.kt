@@ -14,7 +14,8 @@ class ImportNormService(private val saveNormPort: SaveNormOutputPort) : ImportNo
     override fun importNorm(command: ImportNormUseCase.Command): Mono<UUID> {
         val guid = UUID.randomUUID()
         val norm = createNorm(guid, command.data)
-        return saveNormPort.saveNorm(norm).map { guid }
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        return saveNormPort.saveNorm(saveCommand).map { guid }
     }
 }
 

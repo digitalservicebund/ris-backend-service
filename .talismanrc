@@ -34,7 +34,7 @@ fileignoreconfig:
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
     checksum: 18a6cf50996bc14be66d93877822ab474c2e8aa89a28f1c0279af32beb3621e8
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/service/ImportNormService.kt
-    checksum: 1d76a7a018fb922d9d5ee95a219b4271c201b0992d2a7a25f32f4fd2b8ece500
+    checksum: 50a7dc2c5cdd9417341c007e6587a10869fab8dc0da649ceea37e39d1154b45a
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
     checksum: 06fb50779fe297689d42ee228a8fd690d253b9921a0f60c8f4c482d0100662d9
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/EditNormFrameController.kt
