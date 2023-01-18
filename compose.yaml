@@ -1,19 +1,30 @@
 services:
-  frontend:
-    image: neuris/frontend
+  traefik:
+    image: traefik:v2.9
+    container_name: "traefik"
     volumes:
-      - ./frontend/src/:/usr/src/app/src
-    environment:
-      - BACKEND_HOST=backend
-    command: npm run dev -- --host
+      - /var/run/docker.sock:/var/run/docker.sock:ro"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
     ports:
-      - 3000:3000
-    networks:
-      - dev
-    depends_on:
-      - backend
+      - 80:80
+  whoami:
+    image: "traefik/whoami"
+    container_name: "simple-service"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`localhost`) && PathPrefix(`/whoami`)"
+      - "traefik.http.routers.whoami.entrypoints=web"
   backend:
     image: gradle:7-jdk17
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+      - "traefik.http.routers.backend.entrypoints=web"
     volumes:
       - ./:/app
     working_dir: /app
@@ -23,13 +34,22 @@ services:
       - GH_PACKAGES_REPOSITORY_TOKEN=${GH_PACKAGES_REPOSITORY_TOKEN}
       - JAVA_OPTS=-XX:MaxDirectMemorySize=100M
     command: sh run.sh _start
-    ports:
-      - 8080:8080 # service
-      - 5005:5005 # debugger
-    networks:
-      - dev
     depends_on:
       - db
+  frontend:
+    image: neuris/frontend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.entrypoints=web"
+    volumes:
+      - ./frontend/src/:/usr/src/app/src
+    environment:
+      - BACKEND_HOST=http://localhost
+    command: npm run dev -- --host
+    depends_on:
+      - backend
+  
   db:
     image: postgres:12-alpine
     restart: always
@@ -41,9 +61,5 @@ services:
       - POSTGRES_USER=test
     ports:
       - 5432:5432
-    networks:
-      - dev
 volumes:
   db-data:
-networks:
-  dev:

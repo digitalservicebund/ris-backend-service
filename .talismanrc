@@ -121,8 +121,6 @@ fileignoreconfig:
     checksum: 86f6f61e9c6b86c2b5b876bda2c27704d342895f0c53b0c04e5e15e62a40bedd
   - filename: backend/src/test/kotlin/unit/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 7a3e86d1e8e6479150fa18795ad36e0da7f5b16f0fa8251a52e7e9c58a8ea2b4
-  - filename: backend/src/test/resources/application.properties
-    checksum: 926890c72991e9d7df4a940ade6be4f90204060f0174c98a8e1daeb35f66470d
   - filename: doc/norms/backend-api.yaml
     checksum: 99ff251dd46a0035450c82062fe2982c23650c793a5e16dc30b0c6e1cfcfd9e2
   - filename: frontend/.env.development
@@ -199,6 +197,8 @@ fileignoreconfig:
     checksum: bb59c1fbb5151f08ef04550afa9b33a32799a234ae4518b45a3e123e6e18c439
   - filename: backend/src/main/resources/db/migration/V0.34__caselaw_migrate_two_date_columns.sql
     checksum: a7db3ec44b464cc778f8f981487662d6b03701121480a988088c592f9c3df6dd
+  - filename: backend/src/main/resources/application.yaml
+    checksum: 9adeacd9d9439f0d7ba02f699ed704e36d894f1b3f60b74ab2673c32164ae4fe
 
 scopeconfig:
   - scope: node

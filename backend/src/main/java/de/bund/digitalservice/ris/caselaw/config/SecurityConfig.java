@@ -13,7 +13,11 @@ public class SecurityConfig {
   public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
     return http.authorizeExchange()
         .anyExchange()
-        .permitAll()
+        .authenticated()
+        .and()
+        .oauth2Login()
+        .and()
+        .oauth2Client()
         .and()
         .csrf()
         .disable()
