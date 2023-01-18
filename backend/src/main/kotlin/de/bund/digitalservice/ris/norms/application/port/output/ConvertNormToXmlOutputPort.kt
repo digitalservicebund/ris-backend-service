@@ -4,5 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import reactor.core.publisher.Mono
 
 interface ConvertNormToXmlOutputPort {
-    fun convertNormToXml(norm: Norm): Mono<String>
+    fun convertNormToXml(command: Command): Mono<String>
+
+    data class Command(val norm: Norm)
 }

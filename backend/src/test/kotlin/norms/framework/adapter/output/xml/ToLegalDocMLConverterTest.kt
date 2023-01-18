@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 
+import de.bund.digitalservice.ris.norms.application.port.output.ConvertNormToXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -470,10 +471,11 @@ class ToLegalDocMLConverterTest {
 fun convertNormToLegalDocML(norm: Norm? = null): Document {
     val toConvertNorm = norm ?: createRandomNorm()
     val converter = ToLegalDocMLConverter()
+    val command = ConvertNormToXmlOutputPort.Command(toConvertNorm)
     var xmlContent = ""
 
     converter
-        .convertNormToXml(toConvertNorm)
+        .convertNormToXml(command)
         .`as`(StepVerifier::create)
         .consumeNextWith { xmlContent = it }
         .verifyComplete()
