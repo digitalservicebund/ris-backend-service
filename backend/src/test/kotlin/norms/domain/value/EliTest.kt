@@ -4,10 +4,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
 
-class EuropeanLegalIdentifierTest {
+class EliTest {
     @Test
     fun `eli returns an empty string if one of the parameters is null`() {
-        val eli = EuropeanLegalIdentifier(
+        val eli = Eli(
             "printAnnouncementGazette",
             LocalDate.now(),
             LocalDate.now(),
@@ -18,7 +18,7 @@ class EuropeanLegalIdentifierTest {
 
     @Test
     fun `eli returns the mapped value for gazette when converted to string`() {
-        val eli = EuropeanLegalIdentifier(
+        val eli = Eli(
             "BAnz",
             LocalDate.now(),
             LocalDate.now(),
@@ -29,7 +29,7 @@ class EuropeanLegalIdentifierTest {
 
     @Test
     fun `eli returns empty string if the gazette is passed as empty string`() {
-        val eli = EuropeanLegalIdentifier(
+        val eli = Eli(
             "",
             LocalDate.now(),
             LocalDate.now(),
@@ -40,7 +40,7 @@ class EuropeanLegalIdentifierTest {
 
     @Test
     fun `gazette value can be mapped back to its original juris value`() {
-        val gazette = EuropeanLegalIdentifier.parseGazette("banz-at")
+        val gazette = Eli.parseGazette("banz-at")
         assertThat(gazette).isEqualTo("BAnz")
     }
 }

@@ -12,7 +12,7 @@ testWithImportedNorm(
     await openNorm(page, norm.officialLongTitle, createdGuid)
     await page.locator("a:has-text('Rahmen')").click()
 
-    const eliInputValue = await page.inputValue("input#europeanLegalIdentifier")
+    const eliInputValue = await page.inputValue("input#eli")
 
     await page.goto(`/api/v1/norms/xml/${eliInputValue}`)
 

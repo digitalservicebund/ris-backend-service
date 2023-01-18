@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryParameter
-import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
+import de.bund.digitalservice.ris.norms.domain.value.Eli
 import org.springframework.data.relational.core.query.Criteria
 import java.time.LocalDate
 
@@ -13,7 +13,7 @@ class NormsCriteriaBuilder : NormsMapper {
         val citationDateColumn = queryFieldToDbColumn(QueryFields.CITATION_DATE)
         val announcementDateColumn = queryFieldToDbColumn(QueryFields.ANNOUNCEMENT_DATE)
         return Criteria.from(
-            Criteria.where(gazetteColumn).`is`(EuropeanLegalIdentifier.parseGazette(gazette))
+            Criteria.where(gazetteColumn).`is`(Eli.parseGazette(gazette))
                 .and(
                     Criteria.where(pageColumn).`is`(page)
                 )

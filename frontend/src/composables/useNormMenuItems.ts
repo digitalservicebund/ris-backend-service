@@ -64,7 +64,7 @@ export function useNormMenuItems(
         getChildItem("Gültigkeitsregelung", "validityRuleFields"),
         getChildItem("Elektronischer Nachweis", "digitalEvidenceFields"),
         getChildItem("Aktenzeichen", "referenceNumberFields"),
-        getChildItem("ELI", "europeanLegalIdentifierFields"),
+        getChildItem("ELI", "eliFields"),
         getChildItem("CELEX-Nummer", "celexNumberFields"),
         getChildItem("Altersangabe", "ageIndicationFields"),
         getChildItem("Definition", "definitionFields"),

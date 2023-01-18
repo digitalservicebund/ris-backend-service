@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
-import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
+import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
 import java.util.UUID
@@ -144,9 +144,9 @@ data class Norm(
     var text: String? = null
 
 ) {
-    val europeanLegalIdentifier: EuropeanLegalIdentifier
+    val eli: Eli
         get() =
-            EuropeanLegalIdentifier(
+            Eli(
                 printAnnouncementGazette,
                 announcementDate,
                 citationDate,

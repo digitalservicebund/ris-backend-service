@@ -101,7 +101,7 @@ fun assertNormAndNormDataWithoutArticles(norm: Norm, normData: ImportNormUseCase
     val normMembers = Norm::class.memberProperties
     val normDataMembers = ImportNormUseCase.NormData::class.memberProperties
     normMembers
-        .filter { it.name !in listOf("articles", "guid", "europeanLegalIdentifier") }
+        .filter { it.name !in listOf("articles", "guid", "eli") }
         .forEach { normMember ->
             val found =
                 normDataMembers.find { normDataMember -> normMember.name == normDataMember.name }

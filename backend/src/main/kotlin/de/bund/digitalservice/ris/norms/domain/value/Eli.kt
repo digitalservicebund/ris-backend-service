@@ -2,7 +2,17 @@ package de.bund.digitalservice.ris.norms.domain.value
 
 import java.time.LocalDate
 
-data class EuropeanLegalIdentifier(
+/**
+ * The acronym ELI stands for European Legislation Identifier, which is a system used to standardise the format with
+ * which a legislation can be accessed online. In our application it is a computed value built from the properties
+ * passed within the primary constructor.
+ *
+ * @property printAnnouncementGazette the printed gazette on which the norm was announced.
+ * @property announcementDate the date on which the norm was announced.
+ * @property citationDate the date on which the norm was citated.
+ * @property printAnnouncementPage the printed page number on which the norm was announced.
+ */
+data class Eli(
     val printAnnouncementGazette: String?,
     val announcementDate: LocalDate?,
     val citationDate: LocalDate?,

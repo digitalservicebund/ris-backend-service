@@ -23,9 +23,9 @@ fun mapNormToDto(norm: Norm): NormDto {
         documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
         providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, norm.providerDecidingBody ?: ""),
         participationInstitution = getMappedValue(Property.PARTICIPATION_INSTITUTION, norm.participationInstitution ?: ""),
-        printAnnouncementGazette = norm.europeanLegalIdentifier.gazette,
+        printAnnouncementGazette = norm.eli.gazette,
         printAnnouncementPage = norm.printAnnouncementPage,
-        europeanLegalIdentifier = norm.europeanLegalIdentifier.toString(),
+        eli = norm.eli.toString(),
         articles = norm.articles.sortedBy { it.marker.substring(2).toInt() }.mapIndexed { index, article ->
             mapArticleToDto(article, index)
         }

@@ -92,7 +92,7 @@ class ListNormsServiceTest {
             .expectNextMatches({
                 it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") &&
                     it.officialLongTitle == "title" &&
-                    it.europeanLegalIdentifier == norm.europeanLegalIdentifier
+                    it.eli == norm.eli
             })
             .verifyComplete()
     }

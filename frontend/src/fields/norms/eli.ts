@@ -1,8 +1,8 @@
 import { InputField, InputType } from "@/domain"
 
-export const europeanLegalIdentifier: InputField[] = [
+export const eli: InputField[] = [
   {
-    name: "europeanLegalIdentifier",
+    name: "eli",
     type: InputType.TEXT,
     label: "ELI",
     inputAttributes: {

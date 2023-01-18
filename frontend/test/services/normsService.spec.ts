@@ -214,7 +214,7 @@ describe("normsService", () => {
           euAnnouncementPage: null,
           euAnnouncementSeries: null,
           euAnnouncementYear: null,
-          europeanLegalIdentifier: null,
+          eli: null,
           expirationDate: null,
           expirationDateState: null,
           expirationNormCategory: null,

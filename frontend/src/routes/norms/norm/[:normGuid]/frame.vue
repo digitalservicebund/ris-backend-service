@@ -21,9 +21,9 @@ import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
 import { documentType } from "@/fields/norms/documentType"
+import { eli } from "@/fields/norms/eli"
 import { entryIntoForce } from "@/fields/norms/entryIntoForce"
 import { euAnnouncement } from "@/fields/norms/euAnnouncement"
-import { europeanLegalIdentifier } from "@/fields/norms/europeanLegalIdentifier"
 import { expiration } from "@/fields/norms/expiration"
 import { generalData } from "@/fields/norms/generalData"
 import { headingsAndAbbreviations } from "@/fields/norms/headingsAndAbbreviations"
@@ -145,7 +145,7 @@ const frameData = computed({
       loadedNorm.value.euAnnouncementPage = data.euAnnouncementPage
       loadedNorm.value.euAnnouncementSeries = data.euAnnouncementSeries
       loadedNorm.value.euAnnouncementYear = data.euAnnouncementYear
-      loadedNorm.value.europeanLegalIdentifier = data.europeanLegalIdentifier
+      loadedNorm.value.eli = data.eli
       loadedNorm.value.expirationDate = data.expirationDate
       loadedNorm.value.expirationDateState = data.expirationDateState
       loadedNorm.value.expirationNormCategory = data.expirationNormCategory
@@ -556,17 +556,8 @@ const frameData = computed({
     </fieldset>
 
     <fieldset>
-      <legend
-        id="europeanLegalIdentifierFields"
-        class="heading-02-regular mb-[1rem]"
-      >
-        ELI
-      </legend>
-      <InputGroup
-        v-model="frameData"
-        :column-count="1"
-        :fields="europeanLegalIdentifier"
-      />
+      <legend id="eliFields" class="heading-02-regular mb-[1rem]">ELI</legend>
+      <InputGroup v-model="frameData" :column-count="1" :fields="eli" />
     </fieldset>
 
     <fieldset>

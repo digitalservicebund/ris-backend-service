@@ -11,6 +11,6 @@ class NormDto(
     var participationInstitution: String?,
     var printAnnouncementGazette: String?,
     var printAnnouncementPage: String?,
-    var europeanLegalIdentifier: String?,
+    var eli: String?,
     var articles: List<ArticleDto> = listOf()
 )

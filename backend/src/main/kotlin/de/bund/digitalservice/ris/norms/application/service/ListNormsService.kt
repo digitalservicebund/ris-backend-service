@@ -41,5 +41,5 @@ private fun createSearchTermQuery(term: String): List<SearchNormsOutputPort.Quer
 private fun mapToNormData(norm: Norm) = ListNormsUseCase.NormData(
     norm.guid,
     norm.officialLongTitle,
-    norm.europeanLegalIdentifier
+    norm.eli
 )

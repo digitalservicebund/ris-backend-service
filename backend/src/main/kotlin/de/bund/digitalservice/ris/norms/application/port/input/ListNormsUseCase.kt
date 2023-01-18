@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
-import de.bund.digitalservice.ris.norms.domain.value.EuropeanLegalIdentifier
+import de.bund.digitalservice.ris.norms.domain.value.Eli
 import reactor.core.publisher.Flux
 import java.util.UUID
 
@@ -12,6 +12,6 @@ interface ListNormsUseCase {
     data class NormData(
         val guid: UUID,
         val officialLongTitle: String,
-        val europeanLegalIdentifier: EuropeanLegalIdentifier
+        val eli: Eli
     )
 }

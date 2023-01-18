@@ -102,7 +102,7 @@ export function applyToFrameData(
     euAnnouncementPage: stringCallback(frameData?.euAnnouncementPage),
     euAnnouncementSeries: stringCallback(frameData?.euAnnouncementSeries),
     euAnnouncementYear: stringCallback(frameData?.euAnnouncementYear),
-    europeanLegalIdentifier: stringCallback(frameData?.europeanLegalIdentifier),
+    eli: stringCallback(frameData?.eli),
     expirationDate: dateCallback(frameData?.expirationDate),
     expirationDateState: stringCallback(frameData?.expirationDateState),
     expirationNormCategory: stringCallback(frameData?.expirationNormCategory),

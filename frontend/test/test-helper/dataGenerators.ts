@@ -172,7 +172,7 @@ export function generateNorm(partialNorm?: Partial<Norm>): Norm {
     euAnnouncementPage: generateString(),
     euAnnouncementSeries: generateString(),
     euAnnouncementYear: generateString(),
-    europeanLegalIdentifier: generateString(),
+    eli: generateString(),
     expirationDate: generateString(),
     expirationDateState: generateString(),
     expirationNormCategory: generateString(),

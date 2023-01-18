@@ -73,7 +73,7 @@ export type FrameData = {
   euAnnouncementPage?: string
   euAnnouncementSeries?: string
   euAnnouncementYear?: string
-  europeanLegalIdentifier?: string
+  eli?: string
   expirationDate?: string
   expirationDateState?: string
   expirationNormCategory?: string
