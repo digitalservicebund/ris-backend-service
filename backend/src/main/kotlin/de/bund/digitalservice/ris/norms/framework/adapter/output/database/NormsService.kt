@@ -79,12 +79,12 @@ class NormsService(
             }
     }
 
-    override fun editNorm(norm: Norm): Mono<Boolean> {
+    override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
         return normsRepository
-            .findByGuid(norm.guid)
+            .findByGuid(command.norm.guid)
             .flatMap { normDto ->
                 normsRepository
-                    .save(normToDto(norm, normDto.id))
+                    .save(normToDto(command.norm, normDto.id))
                     .flatMap { Mono.just(true) }
             }
     }

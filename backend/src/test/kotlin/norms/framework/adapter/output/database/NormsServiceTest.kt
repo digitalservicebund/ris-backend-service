@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
+import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -198,7 +199,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             celexNumber = "celex number"
         )
 
-        normsService.editNorm(updatedNorm)
+        val command = EditNormOutputPort.Command(updatedNorm)
+
+        normsService.editNorm(command)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
