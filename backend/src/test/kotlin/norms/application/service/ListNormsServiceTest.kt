@@ -23,7 +23,7 @@ class ListNormsServiceTest {
 
         every { getAllNormsAdapter.getAllNorms() } returns Flux.empty()
 
-        service.listNorms(query).`as`(StepVerifier::create).expectNextCount(0).verifyComplete()
+        service.listNorms(query).blockLast()
 
         verify(exactly = 1) { getAllNormsAdapter.getAllNorms() }
     }
@@ -37,14 +37,14 @@ class ListNormsServiceTest {
 
         every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
 
-        service.listNorms(query).`as`(StepVerifier::create).expectNextCount(0).verifyComplete()
+        service.listNorms(query).blockLast()
 
         verify(exactly = 1) {
             searchNormsAdapter.searchNorms(
                 withArg {
-                    assertThat(it).hasSize(4)
+                    assertThat(it.parameters).hasSize(4)
 
-                    assertThat(it.map { it.field }).isEqualTo(
+                    assertThat(it.parameters.map { it.field }).isEqualTo(
                         listOf(
                             SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE,
                             SearchNormsOutputPort.QueryFields.OFFICIAL_SHORT_TITLE,
@@ -53,7 +53,7 @@ class ListNormsServiceTest {
                         )
                     )
 
-                    it.forEach {
+                    it.parameters.forEach {
                         assertThat(it.value).isEqualTo("test")
                         assertThat(it.isFuzzyMatch).isTrue()
                     }
@@ -88,7 +88,7 @@ class ListNormsServiceTest {
 
         every { getAllNormsAdapter.getAllNorms() } returns Flux.fromArray(arrayOf(norm))
 
-        StepVerifier.create(service.listNorms(query))
+        service.listNorms(query).`as`(StepVerifier::create)
             .expectNextMatches({
                 it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") &&
                     it.officialLongTitle == "title" &&
@@ -122,7 +122,7 @@ class ListNormsServiceTest {
         every { getAllNormsAdapter.getAllNorms() } returns
             Flux.fromArray(arrayOf(normOne, normTwo, normThree))
 
-        StepVerifier.create(service.listNorms(query))
+        service.listNorms(query).`as`(StepVerifier::create)
             .expectNextMatches({
                 it.guid == UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8") &&
                     it.officialLongTitle == "title one"

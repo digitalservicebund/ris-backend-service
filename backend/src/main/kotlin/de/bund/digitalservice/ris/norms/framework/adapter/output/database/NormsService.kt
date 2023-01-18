@@ -49,7 +49,7 @@ class NormsService(
     }
 
     override fun searchNorms(
-        query: List<SearchNormsOutputPort.QueryParameter>
+        query: SearchNormsOutputPort.Query
     ): Flux<Norm> {
         return template.select(NormDto::class.java)
             .matching(Query.query(criteria.getSearchCriteria(query)))

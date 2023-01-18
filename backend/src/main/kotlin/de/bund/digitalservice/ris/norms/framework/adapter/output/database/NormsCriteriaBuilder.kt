@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.Query
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryParameter
 import de.bund.digitalservice.ris.norms.domain.value.Eli
@@ -26,9 +27,9 @@ class NormsCriteriaBuilder : NormsMapper {
         )
     }
 
-    fun getSearchCriteria(query: List<QueryParameter>): Criteria {
+    fun getSearchCriteria(query: Query): Criteria {
         var criteria = Criteria.empty()
-        query.forEach { criteria = criteria.or(getFieldCriteria(it)) }
+        query.parameters.forEach { criteria = criteria.or(getFieldCriteria(it)) }
 
         return Criteria.from(criteria)
     }

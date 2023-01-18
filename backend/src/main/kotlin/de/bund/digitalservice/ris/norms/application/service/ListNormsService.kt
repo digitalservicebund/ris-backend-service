@@ -33,10 +33,13 @@ private val SEARCH_TERM_QUERY_FIELDS = listOf(
     SearchNormsOutputPort.QueryFields.UNOFFICIAL_SHORT_TITLE
 )
 
-private fun createSearchTermQuery(term: String): List<SearchNormsOutputPort.QueryParameter> =
-    SEARCH_TERM_QUERY_FIELDS.map {
+private fun createSearchTermQuery(term: String): SearchNormsOutputPort.Query {
+    val parameters = SEARCH_TERM_QUERY_FIELDS.map {
         SearchNormsOutputPort.QueryParameter(it, term, isFuzzyMatch = true)
     }
+
+    return SearchNormsOutputPort.Query(parameters)
+}
 
 private fun mapToNormData(norm: Norm) = ListNormsUseCase.NormData(
     norm.guid,

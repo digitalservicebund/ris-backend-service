@@ -4,7 +4,15 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import reactor.core.publisher.Flux
 
 interface SearchNormsOutputPort {
-    fun searchNorms(query: List<QueryParameter>): Flux<Norm>
+    fun searchNorms(query: Query): Flux<Norm>
+
+    data class Query(val parameters: List<QueryParameter>)
+
+    data class QueryParameter(
+        val field: QueryFields,
+        val value: String?,
+        val isFuzzyMatch: Boolean = false
+    )
 
     enum class QueryFields {
         PRINT_ANNOUNCEMENT_GAZETTE,
@@ -16,10 +24,4 @@ interface SearchNormsOutputPort {
         UNOFFICIAL_LONG_TITLE,
         UNOFFICIAL_SHORT_TITLE
     }
-
-    data class QueryParameter(
-        val field: QueryFields,
-        val value: String?,
-        val isFuzzyMatch: Boolean = false
-    )
 }
