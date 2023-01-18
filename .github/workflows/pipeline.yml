@@ -103,7 +103,7 @@ jobs:
         working-directory: ./backend
         run: ./gradlew checkLicense
       - name: Upload licence report
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3
         with:
           name: licence-reports
           retention-days: 3
@@ -141,7 +141,7 @@ jobs:
         run: npm run audit:licences
         working-directory: ./frontend
       - name: Upload licence report
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3
         with:
           name: licence-reports
           retention-days: 3
@@ -170,7 +170,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Download licence reports
-        uses: actions/download-artifact@v3.0.1
+        uses: actions/download-artifact@v3
         with:
           name: licence-reports
           path: _site
@@ -220,7 +220,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
+        uses: aquasecurity/trivy-action@9ab158e8597f3b310480b9a69402b419bc03dbd5
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -234,6 +234,22 @@ jobs:
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
         with:
           sarif_file: "trivy-results.sarif"
+      - name: Generate cosign vulnerability scan record
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@9ab158e8597f3b310480b9a69402b419bc03dbd5
+        env:
+          TRIVY_OFFLINE_SCAN: true
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+          format: "cosign-vuln"
+          output: "vuln-backend.json"
+      - name: Upload cosign vulnerability scan record
+        uses: actions/upload-artifact@v3
+        with:
+          name: "vuln-backend.json"
+          path: "vuln-backend.json"
+          if-no-files-found: error
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -243,7 +259,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Vulnerability scan image :point_right:"
+          job_name: "Vulnerability scan backend :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
@@ -262,7 +278,7 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
+        uses: aquasecurity/trivy-action@9ab158e8597f3b310480b9a69402b419bc03dbd5
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
@@ -278,7 +294,7 @@ jobs:
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@1db49f532692e649dc5dc43c7c0444dac4790137
+        uses: aquasecurity/trivy-action@9ab158e8597f3b310480b9a69402b419bc03dbd5
         with:
           scan-type: "fs"
           scan-ref: "./frontend"
@@ -293,6 +309,20 @@ jobs:
         with:
           sarif_file: "trivy-results.sarif"
           category: trivy-fs-scan
+      - name: Generate cosign vulnerability scan record
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: aquasecurity/trivy-action@9ab158e8597f3b310480b9a69402b419bc03dbd5
+        with:
+          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+          format: "cosign-vuln"
+          output: "vuln-frontend.json"
+      - name: Upload cosign vulnerability scan record
+        uses: actions/upload-artifact@v3
+        with:
+          name: "vuln-frontend.json"
+          path: "vuln-frontend.json"
+          if-no-files-found: error
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -302,7 +332,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Vulnerability scan npm :point_right:"
+          job_name: "Vulnerability scan frontend :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
@@ -443,12 +473,20 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b
-      - name: Sign the published backend Docker image
+      - name: Sign the published Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Download cosign vulnerability scan record
+        uses: actions/download-artifact@v3
+        with:
+          name: "vuln-backend.json"
+      - name: Attest vulnerability scan
+        run: cosign attest --replace --predicate vuln-backend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
       - id: set-version
         run: echo "version=$CONTAINER_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Send status to Slack
@@ -501,12 +539,20 @@ jobs:
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
         uses: sigstore/cosign-installer@9becc617647dfa20ae7b1151972e9b3a2c338a2b
-      - name: Sign the published frontend Docker image
+      - name: Sign the published Docker image
         env:
           COSIGN_EXPERIMENTAL: "true"
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: cosign sign ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Download cosign vulnerability scan record
+        uses: actions/download-artifact@v3
+        with:
+          name: "vuln-frontend.json"
+      - name: Attest vulnerability scan
+        run: cosign attest --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+        env:
+          COSIGN_EXPERIMENTAL: "true"
       - id: set-version
         run: echo "version=$CONTAINER_IMAGE_VERSION" >> "$GITHUB_OUTPUT"
       - name: Send status to Slack
