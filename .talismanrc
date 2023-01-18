@@ -1,8 +1,6 @@
 fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
-  - filename: frontend/test/e2e/norms/testdata/norm_edited_fields.json
-    checksum: 3b589809ac2b03d2732b8cbe6e382faabc311220167e22a4075b6f90c8500ff1
   - filename: run.sh
     checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
   - filename: .github/workflows/clean-staging.yml
