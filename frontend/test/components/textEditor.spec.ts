@@ -22,7 +22,7 @@ describe("text editor", async () => {
       global: { plugins: [router] },
     })
 
-    expect(screen.getAllByLabelText("Editor Feld").length).toBe(1)
+    expect(screen.getAllByTestId("Editor Feld").length).toBe(1)
 
     expect(
       screen.queryByLabelText("Editor Feld Button Leiste")
@@ -43,7 +43,7 @@ describe("text editor", async () => {
     expect(
       screen.queryByLabelText("Test Editor Feld Button Leiste")
     ).not.toBeInTheDocument()
-    screen.getByLabelText("Test Editor Feld")
+    screen.getByTestId("Test Editor Feld")
   })
 
   test("show buttons on focus", async () => {
@@ -57,7 +57,7 @@ describe("text editor", async () => {
     })
     await screen.findByText("Test Value")
 
-    const editorField = screen.getByLabelText("Test Editor Feld")
+    const editorField = screen.getByTestId("Test Editor Feld")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
@@ -76,7 +76,7 @@ describe("text editor", async () => {
 
     await screen.findByText("Test Value")
 
-    const editorField = screen.getByLabelText("Test Editor Feld")
+    const editorField = screen.getByTestId("Test Editor Feld")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.blur(editorField.firstElementChild)
@@ -111,7 +111,7 @@ describe("text editor", async () => {
     })
     await screen.findByText("Test Value")
 
-    const editorField = screen.getByLabelText("Test Editor Feld")
+    const editorField = screen.getByTestId("Test Editor Feld")
 
     if (editorField.firstElementChild !== null) {
       await fireEvent.focus(editorField.firstElementChild)
