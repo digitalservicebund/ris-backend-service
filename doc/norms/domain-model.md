@@ -119,6 +119,11 @@ classDiagram
     String categorizedReference
 
     String otherFootnote
+    String footnoteChange
+    String footnoteComment
+    String footnoteDecision
+    String footnoteStateLaw
+    String footnoteEuLaw
 
     String validityRule
 

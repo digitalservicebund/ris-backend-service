@@ -351,6 +351,21 @@ components:
         otherFootnote:
           type: string
           example: "Das G wurde vom Bundestag beschlossen und ist am 1.1.1998 in Kraft getreten."
+        footnoteChange:
+          type: string
+          example: ""
+        footnoteComment:
+          type: string
+          example: ""
+        footnoteDecision:
+          type: string
+          example: ""
+        footnoteStateLaw:
+          type: string
+          example: ""
+        footnoteEuLaw:
+          type: string
+          example: ""
         expirationDate:
           $ref: "#/components/schemas/Date"
         entryIntoForceDate:
