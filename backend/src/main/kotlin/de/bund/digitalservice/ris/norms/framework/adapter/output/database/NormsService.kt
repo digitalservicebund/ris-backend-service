@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
-import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
@@ -31,7 +30,6 @@ class NormsService(
     val paragraphsRepository: ParagraphsRepository,
     client: DatabaseClient
 ) : NormsMapper,
-    GetAllNormsOutputPort,
     GetNormByGuidOutputPort,
     SaveNormOutputPort,
     EditNormOutputPort,
@@ -60,12 +58,6 @@ class NormsService(
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
         return normsRepository
             .findByGuid(query.guid)
-            .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
-    }
-
-    override fun getAllNorms(): Flux<Norm> {
-        return normsRepository
-            .findAll()
             .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
     }
 

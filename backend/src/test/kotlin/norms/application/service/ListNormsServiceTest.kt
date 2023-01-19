@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
-import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import io.mockk.every
@@ -15,24 +14,35 @@ import java.util.*
 
 class ListNormsServiceTest {
     @Test
-    fun `it calls the output adapter to list all norms if the search term is empty`() {
-        val getAllNormsAdapter = mockk<GetAllNormsOutputPort>()
+    fun `if the search term is missing, it does an empty search for everything`() {
         val searchNormsAdapter = mockk<SearchNormsOutputPort>()
-        val service = ListNormsService(getAllNormsAdapter, searchNormsAdapter)
+        val service = ListNormsService(searchNormsAdapter)
         val query = ListNormsUseCase.Query(searchTerm = null)
 
-        every { getAllNormsAdapter.getAllNorms() } returns Flux.empty()
+        every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
 
         service.listNorms(query).blockLast()
 
-        verify(exactly = 1) { getAllNormsAdapter.getAllNorms() }
+        verify(exactly = 1) { searchNormsAdapter.searchNorms(withArg { assertThat(it.parameters).hasSize(0) }) }
+    }
+
+    @Test
+    fun `if the search term is empty, it does an empty search for everything`() {
+        val searchNormsAdapter = mockk<SearchNormsOutputPort>()
+        val service = ListNormsService(searchNormsAdapter)
+        val query = ListNormsUseCase.Query(searchTerm = "")
+
+        every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
+
+        service.listNorms(query).blockLast()
+
+        verify(exactly = 1) { searchNormsAdapter.searchNorms(withArg { assertThat(it.parameters).hasSize(0) }) }
     }
 
     @Test
     fun `if a search term is given, it calls the search adapter with a fuzzy search in all title fields`() {
-        val getAllNormsAdapter = mockk<GetAllNormsOutputPort>()
         val searchNormsAdapter = mockk<SearchNormsOutputPort>()
-        val service = ListNormsService(getAllNormsAdapter, searchNormsAdapter)
+        val service = ListNormsService(searchNormsAdapter)
         val query = ListNormsUseCase.Query(searchTerm = "test")
 
         every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
@@ -64,21 +74,19 @@ class ListNormsServiceTest {
 
     @Test
     fun `lists nothing if output adapter provides no norms`() {
-        val getAllNormsAdapter = mockk<GetAllNormsOutputPort>()
         val searchNormsAdapter = mockk<SearchNormsOutputPort>()
-        val service = ListNormsService(getAllNormsAdapter, searchNormsAdapter)
+        val service = ListNormsService(searchNormsAdapter)
         val query = ListNormsUseCase.Query()
 
-        every { getAllNormsAdapter.getAllNorms() } returns Flux.empty()
+        every { searchNormsAdapter.searchNorms(any()) } returns Flux.empty()
 
-        StepVerifier.create(service.listNorms(query)).expectNextCount(0).verifyComplete()
+        service.listNorms(query).`as`(StepVerifier::create).expectNextCount(0).verifyComplete()
     }
 
     @Test
     fun `lists single norm if output adapter provides only one`() {
-        val getAllNormsAdapter = mockk<GetAllNormsOutputPort>()
         val searchNormsAdapter = mockk<SearchNormsOutputPort>()
-        val service = ListNormsService(getAllNormsAdapter, searchNormsAdapter)
+        val service = ListNormsService(searchNormsAdapter)
         val norm =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
@@ -86,7 +94,7 @@ class ListNormsServiceTest {
             )
         val query = ListNormsUseCase.Query()
 
-        every { getAllNormsAdapter.getAllNorms() } returns Flux.fromArray(arrayOf(norm))
+        every { searchNormsAdapter.searchNorms(any()) } returns Flux.fromArray(arrayOf(norm))
 
         service.listNorms(query).`as`(StepVerifier::create)
             .expectNextMatches({
@@ -99,9 +107,8 @@ class ListNormsServiceTest {
 
     @Test
     fun `continuously lists norms from output adapter if there are multiple`() {
-        val getAllNormsAdapter = mockk<GetAllNormsOutputPort>()
         val searchNormsAdapter = mockk<SearchNormsOutputPort>()
-        val service = ListNormsService(getAllNormsAdapter, searchNormsAdapter)
+        val service = ListNormsService(searchNormsAdapter)
         val normOne =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
@@ -119,7 +126,7 @@ class ListNormsServiceTest {
             )
         val query = ListNormsUseCase.Query()
 
-        every { getAllNormsAdapter.getAllNorms() } returns
+        every { searchNormsAdapter.searchNorms(any()) } returns
             Flux.fromArray(arrayOf(normOne, normTwo, normThree))
 
         service.listNorms(query).`as`(StepVerifier::create)

@@ -1,28 +1,22 @@
 package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.ListNormsUseCase
-import de.bund.digitalservice.ris.norms.application.port.output.GetAllNormsOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 
 @Service
-class ListNormsService(
-    private val getAllNormsAdapter: GetAllNormsOutputPort,
-    private val searchNormsOutputAdapter: SearchNormsOutputPort
-) : ListNormsUseCase {
+class ListNormsService(private val searchNormsOutputAdapter: SearchNormsOutputPort) : ListNormsUseCase {
 
     override fun listNorms(query: ListNormsUseCase.Query): Flux<ListNormsUseCase.NormData> {
-        val norms =
-            if (!query.searchTerm.isNullOrBlank()) {
-                val searchQuery = createSearchTermQuery(query.searchTerm)
-                searchNormsOutputAdapter.searchNorms(searchQuery)
-            } else {
-                getAllNormsAdapter.getAllNorms()
-            }
+        val searchQuery = if (query.searchTerm.isNullOrBlank()) {
+            SearchNormsOutputPort.Query(emptyList())
+        } else {
+            createSearchTermQuery(query.searchTerm)
+        }
 
-        return norms.map({ mapToNormData(it) })
+        return searchNormsOutputAdapter.searchNorms(searchQuery).map { mapToNormData(it) }
     }
 }
 

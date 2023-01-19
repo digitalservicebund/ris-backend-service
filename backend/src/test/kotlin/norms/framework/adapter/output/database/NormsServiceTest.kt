@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPo
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -62,10 +63,11 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
-    fun `save simple norm and verify it was saved with get all norms`() {
+    fun `save simple norm and verify it was saved with a search to get all norms`() {
         val saveCommand = SaveNormOutputPort.Command(NORM)
+        val getAllQuery = SearchNormsOutputPort.Query(emptyList())
 
-        normsService.getAllNorms()
+        normsService.searchNorms(getAllQuery)
             .`as`(StepVerifier::create)
             .expectNextCount(0)
             .verifyComplete()
@@ -75,7 +77,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        normsService.getAllNorms()
+        normsService.searchNorms(getAllQuery)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
