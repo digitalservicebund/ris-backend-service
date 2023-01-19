@@ -131,8 +131,6 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     // saving... and then saved
     await waitForSaving(page)
-
-    await page.reload() // TODO remove reload when region gets updated via response.data
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was set by the backend based on state database table
@@ -147,7 +145,6 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
     await waitForSaving(page)
-    await page.reload()
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was cleared by the backend
@@ -171,7 +168,6 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("BGH")
     await waitForSaving(page)
 
-    await page.reload() // TODO remove reload when update via response.data works
     expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Ja")
 
     await page
@@ -183,7 +179,6 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
     await waitForSaving(page)
-    await page.reload() // TODO remove reload when update via response.data works
 
     expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Nein")
   })
@@ -222,5 +217,72 @@ test.describe("ensuring the editing experience in categories is as expected", ()
         "text=Das Entscheidungsdatum darf nicht in der Zukunft liegen"
       )
     ).toBeVisible()
+  })
+
+  test("updated fileNumber should update info panel", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const infoPanel = page.locator("div", { hasText: documentNumber }).nth(-2)
+    const fileNumberInfo = infoPanel
+      .locator("div", { hasText: "Aktenzeichen" })
+      .nth(-2)
+    await expect(fileNumberInfo).toHaveText("Aktenzeichen - ")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("-firstChip")
+    await page.keyboard.press("Enter")
+    await expect(fileNumberInfo).toHaveText("Aktenzeichen-firstChip")
+
+    await page.locator("[aria-label='Aktenzeichen']").fill("-secondChip")
+    await page.keyboard.press("Enter")
+    await expect(fileNumberInfo).toHaveText("Aktenzeichen-firstChip")
+
+    // delete first chip
+    await page.locator("div", { hasText: "-firstChip" }).nth(-2).click()
+    await page.keyboard.press("Enter")
+    await expect(fileNumberInfo).toHaveText("Aktenzeichen-secondChip")
+  })
+
+  test("updated court should update info panel", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const infoPanel = page.locator("div", { hasText: documentNumber }).nth(-2)
+    const courtInfo = infoPanel.locator("div", { hasText: "Gericht" }).first()
+    await expect(courtInfo).toHaveText("Gericht - ")
+
+    await page.locator("[aria-label='Gericht']").fill("aalen")
+    await page.locator("text=AG Aalen").click()
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+    await expect(courtInfo).toContainText("AG Aalen")
+  })
+
+  test("updated decion date should update info panel", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    const infoPanel = page.locator("div", { hasText: documentNumber }).nth(-2)
+    const dateInfo = infoPanel
+      .locator("div", { hasText: "Entscheidungsdatum" })
+      .first()
+    await expect(dateInfo).toHaveText("Entscheidungsdatum - ")
+
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
+    expect(
+      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+    ).toBe("2022-02-03")
+
+    //when using the .fill() method, we need 3 tabs to leave the field
+    await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
+
+    await expect(dateInfo).toContainText("03.02.2022")
   })
 })
