@@ -11,18 +11,11 @@ services:
       - "--entrypoints.web.address=:80"
     ports:
       - 80:80
-  whoami:
-    image: "traefik/whoami"
-    container_name: "simple-service"
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`localhost`) && PathPrefix(`/whoami`)"
-      - "traefik.http.routers.whoami.entrypoints=web"
   backend:
     image: gradle:7-jdk17
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`localhost`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.rule=Host(`127.0.0.1`) && (PathPrefix(`/api`) ||  PathPrefix(`/actuator`) ||  PathPrefix(`/oauth`))"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
       - "traefik.http.routers.backend.entrypoints=web"
     volumes:
@@ -40,12 +33,12 @@ services:
     image: neuris/frontend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`localhost`)"
+      - "traefik.http.routers.frontend.rule=Host(`127.0.0.1`)"
       - "traefik.http.routers.frontend.entrypoints=web"
     volumes:
       - ./frontend/src/:/usr/src/app/src
     environment:
-      - BACKEND_HOST=http://localhost
+      - BACKEND_HOST=http://127.0.0.1
     command: npm run dev -- --host
     depends_on:
       - backend

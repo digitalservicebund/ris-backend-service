@@ -17,8 +17,6 @@ public class SecurityConfig {
         .and()
         .oauth2Login()
         .and()
-        .oauth2Client()
-        .and()
         .csrf()
         .disable()
         .headers(
