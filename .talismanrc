@@ -124,7 +124,7 @@ fileignoreconfig:
   - filename: backend/src/test/resources/application.properties
     checksum: 926890c72991e9d7df4a940ade6be4f90204060f0174c98a8e1daeb35f66470d
   - filename: doc/norms/backend-api.yaml
-    checksum: 1133547398369848b7d58b9b917a35db4f3881d24897c9c3351ae8a21d41082b
+    checksum: 99ff251dd46a0035450c82062fe2982c23650c793a5e16dc30b0c6e1cfcfd9e2
   - filename: frontend/.env.development
     checksum: b87426c20cb1da4785bf52714577b2211ced4673c555418bf8c2e198fa615ea3
   - filename: frontend/playwright.config.ts
@@ -185,6 +185,8 @@ fileignoreconfig:
     checksum: 2962980a50ab7088cf55ea023a53f2f66ccdab0969ed7c48d24f8e11bb589aa0
   - filename: backend/src/main/resources/db/migration/V0.30__caselaw_drop_outdated_dokumenttyp_column.sql
     checksum: 8a2445827eb23916c7beeae8779ed904b4a7680a3c3d9e908495323ad9fe8f92
+  - filename: backend/src/main/resources/db/migration/V0.31__norms_add_footnote_fields.sql
+    checksum: 5d8190fed3db9ffea0d9aa83e0cea9520fdb412d61e1bc3bea5fc38dfd3f0ffa
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/LookupTableImporterIntegrationTest.java
     checksum: 202521a85ff71bdb6535c2ba12f8e4c0ce0d4ae7ef77b2b497e696fccb74c5be
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/xml/NormsMapper.kt
