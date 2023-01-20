@@ -50,7 +50,7 @@ const hasError = computed(
 watch(
   isInPast,
   () => {
-    !isInPast.value
+    !isInPast.value && !props.isFutureDate
       ? emit("update:validationError", {
           defaultMessage:
             "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
