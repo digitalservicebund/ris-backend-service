@@ -105,21 +105,21 @@ fileignoreconfig:
     checksum: c6e6f17ba1da77e4b0ed836ea9b48828b56e8f0ec725ad1b185170dd64c40f7e
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/PublishDocumentUnitIntegrationTest.java
     checksum: f65ea3b6e3a4418aff400912bb1bda7f13f1fe06b58770099e1c66a3dacfdfc4
-  - filename: backend/src/test/kotlin/norms/application/EditNormFrameServiceTest.kt
+  - filename: backend/src/test/kotlin/unit/application/EditNormFrameServiceTest.kt
     checksum: b6b2f895f9d97a5cb0d084f22d0a40534f713c41f5f91fdcca41325e150271c0
-  - filename: backend/src/test/kotlin/norms/application/ImportNormServiceTest.kt
+  - filename: backend/src/test/kotlin/unit/application/ImportNormServiceTest.kt
     checksum: b8f31215b86fb72f5ddeb6c736097e158b94a48d5be0df835de841174279e2bf
-  - filename: backend/src/test/kotlin/norms/application/port/input/EditNormFrameCommandTest.kt
+  - filename: backend/src/test/kotlin/unit/application/port/input/EditNormFrameCommandTest.kt
     checksum: d8a4ae650b457f23b242e027e9abd17f8fa3cfacf3f636357e2d7fb804167b95
-  - filename: backend/src/test/kotlin/norms/application/port/input/ImportNormCommandTest.kt
+  - filename: backend/src/test/kotlin/unit/application/port/input/ImportNormCommandTest.kt
     checksum: 47bfc1ce1d770f7f4afcb61fa9a0566fda4d234f1eae90e0be8f124663ab5ca9
-  - filename: backend/src/test/kotlin/norms/domain/entity/NormTest.kt
+  - filename: backend/src/test/kotlin/unit/domain/entity/NormTest.kt
     checksum: 5dc0702d6b922bf6b7be26ab3b71d1e3187b2b113ec8e0f6b84e979c7412ae70
-  - filename: backend/src/test/kotlin/norms/framework/adapter/input/restapi/EditNormFrameControllerTest.kt
+  - filename: backend/src/test/kotlin/unit/framework/adapter/input/restapi/EditNormFrameControllerTest.kt
     checksum: 7b7eff7276f5c1902184d77a94c6128bdda5bcd5809722c744d345f5a40fc780
-  - filename: backend/src/test/kotlin/norms/framework/adapter/input/restapi/ImportNormControllerTest.kt
+  - filename: backend/src/test/kotlin/unit/framework/adapter/input/restapi/ImportNormControllerTest.kt
     checksum: 86f6f61e9c6b86c2b5b876bda2c27704d342895f0c53b0c04e5e15e62a40bedd
-  - filename: backend/src/test/kotlin/norms/framework/adapter/input/restapi/LoadNormControllerTest.kt
+  - filename: backend/src/test/kotlin/unit/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 7a3e86d1e8e6479150fa18795ad36e0da7f5b16f0fa8251a52e7e9c58a8ea2b4
   - filename: backend/src/test/resources/application.properties
     checksum: 926890c72991e9d7df4a940ade6be4f90204060f0174c98a8e1daeb35f66470d
