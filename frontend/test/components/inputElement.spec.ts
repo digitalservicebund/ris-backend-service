@@ -69,6 +69,22 @@ describe("InputElement", () => {
     renderComponent({
       id: "Testfeld",
       type: InputType.DATE,
+      modelValue: "2021-02-29",
+      validationError: {
+        defaultMessage: "Entscheidungsdatum ist kein valides Datum",
+        field: "Testfeld",
+      },
+    })
+
+    expect(
+      screen.getByText("Entscheidungsdatum ist kein valides Datum")
+    ).toBeInTheDocument()
+  })
+
+  it("renders an error message if input is in the future", async () => {
+    renderComponent({
+      id: "Testfeld",
+      type: InputType.DATE,
       modelValue: "2034-02-10",
       validationError: {
         defaultMessage:
