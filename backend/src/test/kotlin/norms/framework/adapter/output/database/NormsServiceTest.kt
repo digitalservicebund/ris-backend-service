@@ -63,6 +63,17 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
+    fun `save a norm with a text field exceeding 255 charachters`() {
+        val longTextField = (1..200).joinToString("") { "Abc" }
+        val saveCommand = SaveNormOutputPort.Command(NORM.copy(text = longTextField))
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
     fun `save simple norm and verify it was saved with a search to get all norms`() {
         val saveCommand = SaveNormOutputPort.Command(NORM)
         val getAllQuery = SearchNormsOutputPort.Query(emptyList())
