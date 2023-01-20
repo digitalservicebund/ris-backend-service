@@ -15,7 +15,7 @@ services:
     image: gradle:7-jdk17
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`127.0.0.1`) && (PathPrefix(`/api`) ||  PathPrefix(`/actuator`) ||  PathPrefix(`/oauth`))"
+      - "traefik.http.routers.backend.rule=Host(`127.0.0.1`) && (PathPrefix(`/api`) ||  PathPrefix(`/actuator`) ||  PathPrefix(`/login`) ||  PathPrefix(`/oauth`))"
       - "traefik.http.services.backend.loadbalancer.server.port=8080"
       - "traefik.http.routers.backend.entrypoints=web"
     volumes:
@@ -43,7 +43,7 @@ services:
     command: npm run dev -- --host
     depends_on:
       - backend
-  
+
   db:
     image: postgres:12-alpine
     restart: always
