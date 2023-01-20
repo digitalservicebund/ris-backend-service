@@ -94,7 +94,7 @@ describe("DateInput", () => {
   })
 
   it("it allows dates in the future if flag is set", async () => {
-    const { emitted } = renderComponent({ isFutureDate: true })
+    const { props, emitted } = renderComponent({ isFutureDate: true })
     const input = screen.queryByLabelText("aria-label") as HTMLInputElement
     const futureDate = "2024-02-10"
     Object.defineProperty(input, "target", {
@@ -105,7 +105,7 @@ describe("DateInput", () => {
     await userEvent.type(input, futureDate)
     await userEvent.tab()
     await nextTick()
-
+    expect(props.validationError).toBe(undefined)
     expect(input).toHaveValue(futureDate)
     expect(emitted()["update:modelValue"]).toBeTruthy()
   })
