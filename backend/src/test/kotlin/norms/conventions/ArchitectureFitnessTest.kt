@@ -100,13 +100,13 @@ class ArchitectureFitnessTest {
     }
 
     @Test
-    fun `input port methods have a single command or query parameter`() {
+    fun `port methods have a single command or query parameter`() {
         val haveACommandParameter = haveAParameterWithTypeName("Command")
         val haveAQueryParameter = haveAParameterWithTypeName("Query")
 
         ArchRuleDefinition.methods()
             .that()
-            .areDeclaredInClassesThat(areAnInputPort())
+            .areDeclaredInClassesThat(areAnyPort())
             .should(haveASingleParameter().and(haveACommandParameter))
             .orShould(haveASingleParameter().and(haveAQueryParameter))
             .orShould(haveNoParameter())
