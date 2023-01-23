@@ -27,26 +27,26 @@ fileignoreconfig:
     checksum: ad60ac05f2963dbe2999e739549b74e9c61849364767fe504cd92a49e10ce4de
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/utils/DocxTableBuilder.java
     checksum: f6ae53ede0079c50b9b288741cf36ba8fce990bf806b39b9bb21ed012df0009c
-  - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/EditNormFrameService.kt
-    checksum: d12f84d85234dd5f01ec717e7b105a6971e8ca236b802bb55f1e3a87cea7ea60
+  - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/service/EditNormFrameService.kt
+    checksum: b337e4d1b6d265d1be73eb1572ad903d8b286de608314b3152905a2e98886784
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/EditNormFrameUseCase.kt
-    checksum: b45d400e1973ed44cac769feffa4062ea4d443d52724007c5adda8e22371348f
+    checksum: a50707617ebd2c9b7f87c976b8ebe5393d5be4880b9de4a24a8d1c918f1c6bc1
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/port/input/ImportNormUseCase.kt
     checksum: 18a6cf50996bc14be66d93877822ab474c2e8aa89a28f1c0279af32beb3621e8
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/application/service/ImportNormService.kt
     checksum: 50a7dc2c5cdd9417341c007e6587a10869fab8dc0da649ceea37e39d1154b45a
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/domain/entity/Norm.kt
-    checksum: 06fb50779fe297689d42ee228a8fd690d253b9921a0f60c8f4c482d0100662d9
+    checksum: 3a0d2a128316188c330ec5e59a3f85084cbf0e8142013760c480219a46109aaf
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/EditNormFrameController.kt
-    checksum: 0e67917dc5c0017fb7be0fc6d085287da139d65c8bb6b311435063b360361f20
+    checksum: c67e7a2075afcae6c386410734a38a961800fe64c7ca228b2ec1104672896ba0
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/ImportNormController.kt
     checksum: 133a41736ad0b83155ef42cfd9e0345a0efcffccd4cb963256901d9cc05dcaab
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/input/restapi/controller/LoadNormController.kt
-    checksum: 0f923cf8413deb6713adfa493237a793b936b3ac95626ba23446035fc66bee63
+    checksum: fab630f6b0548da78b1fc2693e941a2e7369abb151a96f9a574f3a4178e2eb79
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/NormsMapper.kt
-    checksum: 629b2ff36eac0ed374715b1d15c54249d6d0cc9b3b67a076513a011bea5ffe95
+    checksum: d9f44c74db9f96b530b7e3921d7543619190adf1001e16a7f1409075d7ae9636
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/database/dto/NormDto.kt
-    checksum: b50cc882bccc60d3a18f9d8f0b504ab9858729b915280375e33183c763e3bfc4
+    checksum: 4786774e1263cf7d97d0615a780527b794bdd863c783a7d5d9b9541f33059a38
   - filename: backend/src/main/resources/bootstrap.properties
     checksum: 419c8cbdd9b47b94f2a8b0134045be82ed63b0059e74e78618c9ced6c7d085b3
   - filename: backend/src/main/resources/db/migration/V0.10__norms_extend_norms_table.sql
@@ -140,29 +140,29 @@ fileignoreconfig:
   - filename: frontend/src/data/courts.json
     checksum: 724781da223a68b72bb9f9c144bc8f5e51b0ad61352cefe2fdd686b7885aba84
   - filename: frontend/src/domain/Norm.ts
-    checksum: 767152817b3382f25cb478d3cd7ac3b7da48ca5c19e8d7892a88a91217512538
+    checksum: ff90a126683ca6054cc660fabb6a8a56826fab38d9171587b866e779a1cd86b4
   - filename: frontend/src/env.d.ts
     checksum: fabcbd7e77e14618c1edd71a7fd357b0e003daaf4d073422c7e3c5a6c0da5f11
   - filename: frontend/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: a10854cb47879edb3b4d91975df70e8719f15a9fc661d574b96178986669f6f6
+    checksum: e2bb584395ee6f3b865ac5df97d58acbd655e8aadb13b0238e78303f5e92dbe4
   - filename: frontend/src/services/normsService.ts
     checksum: f474267a7d13a14b54606f816cf2b1d5b5b3432b6bfd9cf2ccef857cade64201
   - filename: frontend/src/stores/loadedNorm.ts
     checksum: e4acaebeadbb4b178008672148af32c7507bacc19f93bdde15a06ca352928278
   - filename: frontend/src/utilities/normUtilities.ts
-    checksum: a280f3f34e3b03a258d39101dec9b4f4dafaf927f3d8e42a14669804fcf3bc10
+    checksum: ca316ce9c8b10c2d8c3ceff01c17fe2d4098c98825e7ec523b5eb3a330c154fb
   - filename: frontend/test/components/navbarSide.spec.ts
     checksum: 65f85c8e6280ce6e6587ce00f6b1aed643bc8714cd9e5006fbdadfdfa0e866cd
   - filename: frontend/test/e2e/norms/testdata/norm_clean_cars.json
     checksum: be054e48163807a2bcd369d9be7db173d5a2ecbc269a096f6e516dcd442d6a50
   - filename: frontend/test/e2e/norms/testdata/norm_edited_fields.json
-    checksum: 6f59560912b8353d995e4e5d549cfc5be4f2b33b6aa99def3c08c83c408ca48c
+    checksum: 6637c2cd75792f0ce7494e8783a717bc1859f40ccf8b0b82b8568bd232b6403f
   - filename: frontend/test/services/normsService.spec.ts
     checksum: b023f40aa4fb5132e3abe24d14ad345bd6e1d59c44009a8c2a3764951b91787d
   - filename: frontend/test/stores/loadedNorm.spec.ts
     checksum: fa7f616a8338e14cee3811c89cbe811ae669f417c30bcfcf9b3d4ebbee7a9671
   - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: c9b667ebd57905822b67e266355a3cf677052a54ece8f1deed33afbcac0fc5c4
+    checksum: 997bcab9f775f6a099ac372efb0d238dc79a3072f63d8c5ecc386a301c2340aa
   - filename: run.sh
     checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
   - filename: backend/src/main/resources/db/migration/V0.21__caselaw_migrate_category_to_new_documentTypeId_column.sql

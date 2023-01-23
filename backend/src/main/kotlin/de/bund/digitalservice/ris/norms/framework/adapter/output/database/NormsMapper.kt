@@ -40,9 +40,10 @@ interface NormsMapper {
             normDto.documentStatusDate, normDto.documentStatusReference, normDto.documentStatusEntryIntoForceDate,
             normDto.documentStatusProof, normDto.documentTextProof, normDto.otherDocumentNote, normDto.applicationScopeArea,
             normDto.applicationScopeStartDate, normDto.applicationScopeEndDate, normDto.categorizedReference,
-            normDto.otherFootnote, normDto.validityRule, normDto.digitalEvidenceLink, normDto.digitalEvidenceRelatedData,
-            normDto.digitalEvidenceExternalDataNote, normDto.digitalEvidenceAppendix, normDto.referenceNumber,
-            normDto.celexNumber, normDto.ageIndicationStart, normDto.ageIndicationEnd,
+            normDto.otherFootnote, normDto.footnoteChange, normDto.footnoteComment, normDto.footnoteDecision,
+            normDto.footnoteStateLaw, normDto.footnoteEuLaw, normDto.validityRule, normDto.digitalEvidenceLink,
+            normDto.digitalEvidenceRelatedData, normDto.digitalEvidenceExternalDataNote, normDto.digitalEvidenceAppendix,
+            normDto.referenceNumber, normDto.celexNumber, normDto.ageIndicationStart, normDto.ageIndicationEnd,
             normDto.definition, normDto.ageOfMajorityIndication, normDto.text
         )
     }
@@ -86,9 +87,10 @@ interface NormsMapper {
             norm.documentStatusDate, norm.documentStatusReference, norm.documentStatusEntryIntoForceDate,
             norm.documentStatusProof, norm.documentTextProof, norm.otherDocumentNote, norm.applicationScopeArea,
             norm.applicationScopeStartDate, norm.applicationScopeEndDate, norm.categorizedReference,
-            norm.otherFootnote, norm.validityRule, norm.digitalEvidenceLink, norm.digitalEvidenceRelatedData,
-            norm.digitalEvidenceExternalDataNote, norm.digitalEvidenceAppendix, norm.referenceNumber,
-            norm.celexNumber, norm.ageIndicationStart, norm.ageIndicationEnd,
+            norm.otherFootnote, norm.footnoteChange, norm.footnoteComment, norm.footnoteDecision,
+            norm.footnoteStateLaw, norm.footnoteEuLaw, norm.validityRule, norm.digitalEvidenceLink,
+            norm.digitalEvidenceRelatedData, norm.digitalEvidenceExternalDataNote, norm.digitalEvidenceAppendix,
+            norm.referenceNumber, norm.celexNumber, norm.ageIndicationStart, norm.ageIndicationEnd,
             norm.definition, norm.ageOfMajorityIndication, norm.text
         )
     }

@@ -48,8 +48,9 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     properties.documentStatusDate, properties.documentStatusReference, properties.documentStatusEntryIntoForceDate,
     properties.documentStatusProof, properties.documentTextProof, properties.otherDocumentNote, properties.applicationScopeArea,
     properties.applicationScopeStartDate, properties.applicationScopeEndDate, properties.categorizedReference,
-    properties.otherFootnote, properties.validityRule, properties.digitalEvidenceLink, properties.digitalEvidenceRelatedData,
-    properties.digitalEvidenceExternalDataNote, properties.digitalEvidenceAppendix, properties.referenceNumber,
-    properties.celexNumber, properties.ageIndicationStart, properties.ageIndicationEnd,
+    properties.otherFootnote, properties.footnoteChange, properties.footnoteComment, properties.footnoteDecision,
+    properties.footnoteStateLaw, properties.footnoteEuLaw, properties.validityRule, properties.digitalEvidenceLink,
+    properties.digitalEvidenceRelatedData, properties.digitalEvidenceExternalDataNote, properties.digitalEvidenceAppendix,
+    properties.referenceNumber, properties.celexNumber, properties.ageIndicationStart, properties.ageIndicationEnd,
     properties.definition, properties.ageOfMajorityIndication, properties.text
 )

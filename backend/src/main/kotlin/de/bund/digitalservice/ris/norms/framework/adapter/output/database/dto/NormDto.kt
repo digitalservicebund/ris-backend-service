@@ -221,6 +221,16 @@ data class NormDto(
 
     @Column("other_footnote")
     var otherFootnote: String? = null,
+    @Column("footnote_change")
+    var footnoteChange: String? = null,
+    @Column("footnote_comment")
+    var footnoteComment: String? = null,
+    @Column("footnote_decision")
+    var footnoteDecision: String? = null,
+    @Column("footnote_state_law")
+    var footnoteStateLaw: String? = null,
+    @Column("footnote_eu_law")
+    var footnoteEuLaw: String? = null,
 
     @Column("validity_rule")
     var validityRule: String? = null,

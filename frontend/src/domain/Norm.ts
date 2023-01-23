@@ -85,6 +85,11 @@ export type FrameData = {
   officialShortTitle?: string
   otherDocumentNote?: string
   otherFootnote?: string
+  footnoteChange?: string
+  footnoteComment?: string
+  footnoteDecision?: string
+  footnoteStateLaw?: string
+  footnoteEuLaw?: string
   otherOfficialAnnouncement?: string
   otherStatusNote?: string
   participationType?: string

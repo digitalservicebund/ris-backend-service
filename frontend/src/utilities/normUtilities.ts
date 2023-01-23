@@ -114,6 +114,11 @@ export function applyToFrameData(
     officialShortTitle: stringCallback(frameData?.officialShortTitle),
     otherDocumentNote: stringCallback(frameData?.otherDocumentNote),
     otherFootnote: stringCallback(frameData?.otherFootnote),
+    footnoteChange: stringCallback(frameData?.footnoteChange),
+    footnoteComment: stringCallback(frameData?.footnoteComment),
+    footnoteDecision: stringCallback(frameData?.footnoteDecision),
+    footnoteStateLaw: stringCallback(frameData?.footnoteStateLaw),
+    footnoteEuLaw: stringCallback(frameData?.footnoteEuLaw),
     otherOfficialAnnouncement: stringCallback(
       frameData?.otherOfficialAnnouncement
     ),

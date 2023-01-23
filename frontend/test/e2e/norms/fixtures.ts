@@ -13,6 +13,8 @@ export const testWithImportedNorm = test.extend<MyFixtures>({
     const response = await request.post(`${backendHost}/api/v1/norms`, {
       data: normToImport,
     })
+    const body = await response.text()
+    console.log(body)
     expect(response.ok()).toBeTruthy()
     const location = response.headers()["location"]
     const normsGuid = location.slice(location.lastIndexOf("/") + 1)
@@ -736,6 +738,36 @@ export function getNormBySections(norm) {
           name: "otherFootnote",
           label: "Sonstige Fußnote",
           value: norm.otherFootnote,
+        },
+        {
+          type: "text",
+          name: "footnoteChange",
+          label: "Änderungsfßnote",
+          value: norm.footnoteChange,
+        },
+        {
+          type: "text",
+          name: "footnoteComment",
+          label: "Kommentierende Fußnote",
+          value: norm.footnoteComment,
+        },
+        {
+          type: "text",
+          name: "footnoteDecision",
+          label: "BVerfG-Entscheidung",
+          value: norm.footnoteDecision,
+        },
+        {
+          type: "text",
+          name: "footnoteStateLaw",
+          label: "Landesrecht",
+          value: norm.footnoteStateLaw,
+        },
+        {
+          type: "text",
+          name: "footnoteEuLaw",
+          label: "EU/EG-Recht",
+          value: norm.footnoteEuLaw,
         },
       ],
     },

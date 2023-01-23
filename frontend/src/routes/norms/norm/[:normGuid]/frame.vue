@@ -157,6 +157,11 @@ const frameData = computed({
       loadedNorm.value.officialShortTitle = data.officialShortTitle
       loadedNorm.value.otherDocumentNote = data.otherDocumentNote
       loadedNorm.value.otherFootnote = data.otherFootnote
+      loadedNorm.value.footnoteChange = data.footnoteChange
+      loadedNorm.value.footnoteComment = data.footnoteComment
+      loadedNorm.value.footnoteDecision = data.footnoteDecision
+      loadedNorm.value.footnoteStateLaw = data.footnoteStateLaw
+      loadedNorm.value.footnoteEuLaw = data.footnoteEuLaw
       loadedNorm.value.otherOfficialAnnouncement =
         data.otherOfficialAnnouncement
       loadedNorm.value.otherStatusNote = data.otherStatusNote

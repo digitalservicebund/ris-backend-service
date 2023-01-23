@@ -122,6 +122,11 @@ data class Norm(
     var categorizedReference: String? = null,
 
     var otherFootnote: String? = null,
+    var footnoteChange: String? = null,
+    var footnoteComment: String? = null,
+    var footnoteDecision: String? = null,
+    var footnoteStateLaw: String? = null,
+    var footnoteEuLaw: String? = null,
 
     var validityRule: String? = null,
 
