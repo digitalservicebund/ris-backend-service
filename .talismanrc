@@ -6,13 +6,13 @@ fileignoreconfig:
   - filename: .github/workflows/clean-staging.yml
     checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
-    checksum: 63b94bb7d848cc03024128a33122ccb5bbb42647fef0528eb584489f749d448a
+    checksum: a8776cd48d672ec7c3c77e30691f5759f9928f055ab0bcfde32c2395867b55f0
   - filename: .github/workflows/playwright-test.yml
     checksum: 8f77e3a1a06c534055c151dd1151b550ab600d253d67566a68ebf6a84f88b5a8
   - filename: .github/workflows/playwright.yml
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: .github/workflows/scan.yml
-    checksum: b75faa004e56c365f0a9ee74124fcee8c1641eadacb6a60de2c7e3b0324a8fcf
+    checksum: f6f5463f9e709099ba78ef3969943b1e6b46cfca542650046457569c138329fb
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
