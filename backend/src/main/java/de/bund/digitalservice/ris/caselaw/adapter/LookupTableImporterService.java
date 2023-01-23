@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static de.bund.digitalservice.ris.caselaw.utils.ServiceUtils.byteBufferToArray;
+
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
@@ -46,7 +48,7 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     DocumentTypesXML documentTypesXML;
     try {
-      documentTypesXML = mapper.readValue(byteBuffer.array(), DocumentTypesXML.class);
+      documentTypesXML = mapper.readValue(byteBufferToArray(byteBuffer), DocumentTypesXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
@@ -106,7 +108,7 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     CourtsXML courtsXML;
     try {
-      courtsXML = mapper.readValue(byteBuffer.array(), CourtsXML.class);
+      courtsXML = mapper.readValue(byteBufferToArray(byteBuffer), CourtsXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
@@ -168,7 +170,7 @@ public class LookupTableImporterService {
     XmlMapper mapper = new XmlMapper();
     StatesXML statesXML;
     try {
-      statesXML = mapper.readValue(byteBuffer.array(), StatesXML.class);
+      statesXML = mapper.readValue(byteBufferToArray(byteBuffer), StatesXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to StatesXML", e);
