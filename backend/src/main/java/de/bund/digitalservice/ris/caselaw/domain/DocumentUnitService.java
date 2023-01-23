@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static de.bund.digitalservice.ris.caselaw.utils.ServiceUtils.byteBufferToArray;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -104,10 +106,7 @@ public class DocumentUnitService {
   }
 
   void checkDocx(ByteBuffer byteBuffer) {
-    byteBuffer.rewind();
-    byte[] byteBufferArray = new byte[byteBuffer.remaining()];
-    byteBuffer.get(byteBufferArray);
-    var zip = new ZipInputStream(new ByteArrayInputStream(byteBufferArray));
+    var zip = new ZipInputStream(new ByteArrayInputStream(byteBufferToArray(byteBuffer)));
     ZipEntry entry;
     try {
       while ((entry = zip.getNextEntry()) != null) {
@@ -134,7 +133,6 @@ public class DocumentUnitService {
 
     log.debug("upload header information: mediaType{}, contentLength={}", mediaType, contentLength);
 
-    byteBuffer.rewind();
     var asyncRequestBody = AsyncRequestBody.fromPublisher(Mono.just(byteBuffer));
     var putObjectRequestBuilder =
         PutObjectRequest.builder()
