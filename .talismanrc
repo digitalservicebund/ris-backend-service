@@ -189,6 +189,8 @@ fileignoreconfig:
     checksum: 5d8190fed3db9ffea0d9aa83e0cea9520fdb412d61e1bc3bea5fc38dfd3f0ffa
   - filename: backend/src/main/resources/db/migration/V0.32__norms_resize_metadata_text_fields.sql
     checksum: 6f7e4804e3b847dd25ef577c22c5429a29ff1062f7bb7b53ac8aca30a964201d
+  - filename: backend/src/main/resources/db/migration/V0.33__norms_resize_footnote_text_fields.sql
+    checksum: 67f00e1847d08c500b6bd9a82e8cfa47d61feb86e0dd5b1a0b7b4e9b2e8b0a89
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/LookupTableImporterIntegrationTest.java
     checksum: 202521a85ff71bdb6535c2ba12f8e4c0ce0d4ae7ef77b2b497e696fccb74c5be
   - filename: backend/src/main/kotlin/de/bund/digitalservice/ris/norms/framework/adapter/output/xml/NormsMapper.kt
