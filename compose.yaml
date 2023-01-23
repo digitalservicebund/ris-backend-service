@@ -29,6 +29,7 @@ services:
     command: sh run.sh _start
     depends_on:
       - db
+      - store-redis
   frontend:
     image: neuris/frontend
     labels:
@@ -54,5 +55,12 @@ services:
       - POSTGRES_USER=test
     ports:
       - 5432:5432
+
+  store-redis:
+    image: 'redis:7.0.8'
+    command: redis-server --requirepass password
+    hostname: redis
+    ports:
+      - '6379:6379'
 volumes:
   db-data:

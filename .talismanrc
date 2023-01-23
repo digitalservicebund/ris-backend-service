@@ -199,6 +199,8 @@ fileignoreconfig:
     checksum: a7db3ec44b464cc778f8f981487662d6b03701121480a988088c592f9c3df6dd
   - filename: backend/src/main/resources/application.yaml
     checksum: 9adeacd9d9439f0d7ba02f699ed704e36d894f1b3f60b74ab2673c32164ae4fe
+  - filename: backend/src/main/resources/application-local.properties
+    checksum: e950abc3c1f2fe81bc6ab2557451db4bd940d38ba82e49bbca869ac3deee07ce
 
 scopeconfig:
   - scope: node
