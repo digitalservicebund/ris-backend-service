@@ -27,7 +27,7 @@ watchEffect(() => store.load(props.normGuid))
 onUnmounted(() => (loadedNorm.value = undefined))
 </script>
 <template>
-  <div class="flex grow w-screen">
+  <div class="flex grow overflow-hidden w-screen">
     <SideToggle v-model:is-expanded="navigationIsOpen" label="Navigation">
       <NavbarSide
         go-back-label="Zur Übersicht"
