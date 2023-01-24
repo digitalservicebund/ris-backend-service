@@ -36,8 +36,6 @@ spring:
   sql:
     init:
       mode: always
-  session:
-    store-type: redis
   security:
     oauth2:
       client:

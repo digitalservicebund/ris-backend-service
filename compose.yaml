@@ -56,10 +56,9 @@ services:
     ports:
       - 5432:5432
 
-  store-redis:
+  redis:
     image: 'redis:7.0.8'
     command: redis-server --requirepass password
-    hostname: redis
     ports:
       - '6379:6379'
 volumes:
