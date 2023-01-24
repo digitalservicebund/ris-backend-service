@@ -742,7 +742,7 @@ export function getNormBySections(norm) {
         {
           type: "text",
           name: "footnoteChange",
-          label: "Änderungsfßnote",
+          label: "Änderungsfußnote",
           value: norm.footnoteChange,
         },
         {

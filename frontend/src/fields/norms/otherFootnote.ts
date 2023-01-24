@@ -12,9 +12,9 @@ export const otherFootnote: InputField[] = [
   {
     name: "footnoteChange",
     type: InputType.TEXT,
-    label: "Änderungsfßnote",
+    label: "Änderungsfußnote",
     inputAttributes: {
-      ariaLabel: "Änderungsfßnote",
+      ariaLabel: "Änderungsfußnote",
     },
   },
   {
