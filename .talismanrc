@@ -98,11 +98,11 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
     checksum: 99a81130c33076910212031b526979ee16cf16c2e9ec26e0f3a97b9ff6531f49
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
-    checksum: 4dbd9c02e2a296c4c32cdd4cadc07e36035ad68d41986d31dc668927ba75ba96
+    checksum: 95ef5a8ee1774a5e42c1c6340752cbc771baad6a71f23331e88421795c5d6b99
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
     checksum: 844cfec4dfe67bc0c14a5c4d804a44a64e438e413a7fe84af9a1f85134cb9b7c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitWrongDocumentUnitIntegrationTest.java
-    checksum: c6e6f17ba1da77e4b0ed836ea9b48828b56e8f0ec725ad1b185170dd64c40f7e
+    checksum: 83e04d238c7fadec57db9d30b1079613c013ae86b5c377560d39df09c64f21d5
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/PublishDocumentUnitIntegrationTest.java
     checksum: f65ea3b6e3a4418aff400912bb1bda7f13f1fe06b58770099e1c66a3dacfdfc4
   - filename: backend/src/test/kotlin/unit/application/EditNormFrameServiceTest.kt

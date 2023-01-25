@@ -71,7 +71,7 @@ public class DocumentUnitController {
 
   @GetMapping(value = "")
   public Mono<ResponseEntity<Flux<DocumentUnitListEntry>>> getAll() {
-    log.info("All DocumentUnits were requested");
+    log.debug("All DocumentUnits were requested");
 
     return service.getAll().map(ResponseEntity::ok);
   }
