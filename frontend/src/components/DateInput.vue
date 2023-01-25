@@ -50,18 +50,21 @@ const hasError = computed(
 watch(
   hasError,
   () => {
-    hasError.value
-      ? !isInPast.value && !props.isFutureDate
-        ? emit("update:validationError", {
-            defaultMessage:
-              "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
-            field: props.id,
-          })
-        : emit("update:validationError", {
-            defaultMessage: "Entscheidungsdatum ist kein valides Datum",
-            field: props.id,
-          })
-      : emit("update:validationError", undefined)
+    if (hasError.value) {
+      if (!isInPast.value && !props.isFutureDate) {
+        emit("update:validationError", {
+          defaultMessage:
+            "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
+          field: props.id,
+        })
+      } else
+        emit("update:validationError", {
+          defaultMessage: "Entscheidungsdatum ist kein valides Datum",
+          field: props.id,
+        })
+    } else {
+      emit("update:validationError", undefined)
+    }
   },
   { immediate: true }
 )

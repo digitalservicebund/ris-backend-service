@@ -149,21 +149,27 @@ const hasError = computed(
     currentInput.value == ""
 )
 
-watch(hasError, () => {
-  hasError.value
-    ? !isInPast.value && !props.isFutureDate
-      ? emits("update:validationError", {
+watch(
+  hasError,
+  () => {
+    if (hasError.value) {
+      if (!isInPast.value && !props.isFutureDate) {
+        emits("update:validationError", {
           defaultMessage:
             "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
           field: props.id,
         })
-      : emits("update:validationError", {
+      } else
+        emits("update:validationError", {
           defaultMessage: "Entscheidungsdatum ist kein valides Datum",
           field: props.id,
         })
-    : emits("update:validationError", undefined),
-    { immediate: true }
-})
+    } else {
+      emits("update:validationError", undefined)
+    }
+  },
+  { immediate: true }
+)
 
 const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
