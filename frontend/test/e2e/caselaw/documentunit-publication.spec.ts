@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToPublication } from "./e2e-utils"
+import { navigateToPublication, waitForSaving } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("ensuring the publishing of documentunits works as expected", () => {
@@ -30,17 +30,16 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     ).toBeVisible()
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
     await page.locator("[aria-label='Rubriken bearbeiten']").click()
-    await page.locator("[aria-label='Gericht']").fill("aalen")
 
-    await page.locator("text=AG Aalen").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
-    ).toBeVisible()
+    await page.locator("[aria-label='Gericht']").fill("aalen")
+    await page.locator("text=AG Aalen").click() // triggers autosave
+
+    await waitForSaving(page)
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+
     await navigateToPublication(page, documentNumber)
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeHidden()
     await expect(page.locator("li:has-text('Gericht')")).toBeHidden()
