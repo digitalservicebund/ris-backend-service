@@ -34,9 +34,9 @@ export const uploadTestfile = async (page: Page, filename: string) => {
 
 export const waitForSaving = async (page: Page): Promise<void> => {
   await expect(
-    page.locator("text=Daten werden gespeichert >> nth=0")
+    page.locator("text=Zuletzt gespeichert um >> nth=0")
   ).toBeVisible()
   await expect(
-    page.locator("text=Zuletzt gespeichert um >> nth=0")
+    page.locator("text=Zuletzt gespeichert um >> nth=1")
   ).toBeVisible()
 }

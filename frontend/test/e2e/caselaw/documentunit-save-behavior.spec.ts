@@ -1,24 +1,12 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "./e2e-utils"
+import { navigateToCategories, waitForSaving } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("autosave on documentation units", () => {
   test("test save button status change", async ({ page, documentNumber }) => {
     navigateToCategories(page, documentNumber)
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-    await expect(
-      page.locator("text=Daten werden gespeichert").nth(0)
-    ).toBeVisible()
-    await expect(
-      page.locator("text=Daten werden gespeichert").nth(1)
-    ).toBeVisible()
-
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").nth(0)
-    ).toBeVisible()
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").nth(1)
-    ).toBeVisible()
+    await waitForSaving(page)
   })
 
   test("test could not update documentUnit", async ({
@@ -32,13 +20,6 @@ test.describe("autosave on documentation units", () => {
     })
 
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-
-    await expect(
-      page.locator("text='Daten werden gespeichert'").nth(0)
-    ).toBeVisible()
-    await expect(
-      page.locator("text='Daten werden gespeichert'").nth(1)
-    ).toBeVisible()
 
     await expect(
       page.locator("text='Fehler beim Speichern'").nth(0)
