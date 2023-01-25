@@ -289,7 +289,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await fillPreviousDecisionInputs(page, {
       courtType: "Test Court",
       courtLocation: "Test City",
-      date: "12.03.2004",
+      date: "2004-12-03",
       fileNumber: "1a2b3c",
     })
 
@@ -304,7 +304,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
       "Test City"
     )
     expect(await page.inputValue("[aria-label='Datum Rechtszug']")).toBe(
-      "12.03.2004"
+      "2004-12-03"
     )
     expect(await page.inputValue("[aria-label='Aktenzeichen Rechtszug']")).toBe(
       "1a2b3c"
@@ -317,7 +317,9 @@ test.describe("save changes in core data and texts and verify it persists", () =
   }) => {
     await navigateToCategories(page, documentNumber)
     await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page)
+    await fillPreviousDecisionInputs(page, {
+      date: "2004-12-03",
+    })
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
 
     await expect(
@@ -359,9 +361,17 @@ test.describe("save changes in core data and texts and verify it persists", () =
   }) => {
     await navigateToCategories(page, documentNumber)
     await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page, { courtType: "Type One" }, 0)
+    await fillPreviousDecisionInputs(
+      page,
+      { courtType: "Type One", date: "2004-12-03" },
+      0
+    )
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
-    await fillPreviousDecisionInputs(page, { courtType: "Type Two" }, 1)
+    await fillPreviousDecisionInputs(
+      page,
+      { courtType: "Type Two", date: "2004-12-03" },
+      1
+    )
 
     await expect(
       page.locator("[aria-label='Gerichtstyp Rechtszug']")

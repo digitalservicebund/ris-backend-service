@@ -16,7 +16,7 @@ fileignoreconfig:
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: 1d80a0e55aa896de6b1e11afad0d35b52e2d2aa8995278d1fb34b62fde588b42
+    checksum: 186059ecaa2a20f8323ccae1e73431ff8e50da6d1c5da476aa92d447028a0890
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: 5ac01c3b6a5d2909ffbc054ac98d43962047e762b86654207591aeaecdf7a434
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
@@ -96,7 +96,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/SecurityIntegrationTest.java
     checksum: 211d462dc50b0eae0016bd072e83b4cf4ea355788afccc49f45ed8e7225055d5
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/adapter/JurisXmlExporterWrapperTest.java
-    checksum: eb660181bdfba7c488193f0538cc30f2763994763de91bef2daf00193553015c
+    checksum: 99a81130c33076910212031b526979ee16cf16c2e9ec26e0f3a97b9ff6531f49
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitIntegrationTest.java
     checksum: 4dbd9c02e2a296c4c32cdd4cadc07e36035ad68d41986d31dc668927ba75ba96
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/domain/DocumentUnitListEntryIntegrationTest.java
@@ -197,6 +197,8 @@ fileignoreconfig:
     checksum: 4c16c2d4efd341ab1363d8f2c6c2f9768d4e0c41e69b39c2fd6b289f72616ce9
   - filename: frontend/src/vite.env.d.ts
     checksum: bb59c1fbb5151f08ef04550afa9b33a32799a234ae4518b45a3e123e6e18c439
+  - filename: backend/src/main/resources/db/migration/V0.34__caselaw_migrate_two_date_columns.sql
+    checksum: a7db3ec44b464cc778f8f981487662d6b03701121480a988088c592f9c3df6dd
 
 scopeconfig:
   - scope: node

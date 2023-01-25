@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import java.time.Instant;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,7 +20,7 @@ public class PreviousDecisionDTO {
 
   String courtLocation;
 
-  String decisionDate;
+  Instant decisionDateTimestamp;
 
   String fileNumber;
 

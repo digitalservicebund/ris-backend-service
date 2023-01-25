@@ -30,7 +30,7 @@ public class DocumentUnitTransformer {
           .procedure(coreData.procedure())
           .ecli(coreData.ecli())
           .appraisalBody(coreData.appraisalBody())
-          .decisionDate(coreData.decisionDate() != null ? coreData.decisionDate().toString() : null)
+          .decisionDate(coreData.decisionDate())
           .inputType(coreData.inputType())
           .center(coreData.center());
 
@@ -74,7 +74,7 @@ public class DocumentUnitTransformer {
                           .courtLocation(previousDecision.courtPlace())
                           .courtType(previousDecision.courtType())
                           .fileNumber(previousDecision.fileNumber())
-                          .decisionDate(previousDecision.date())
+                          .decisionDateTimestamp(previousDecision.date())
                           .build())
               .toList());
     } else {

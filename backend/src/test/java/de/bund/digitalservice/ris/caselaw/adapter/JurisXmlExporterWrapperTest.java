@@ -64,7 +64,7 @@ public class JurisXmlExporterWrapperTest {
             PreviousDecision.builder()
                 .courtType("courtType")
                 .courtPlace("courtPlace")
-                .date("date")
+                .date(Instant.parse("2020-05-06T00:00:00Z"))
                 .fileNumber("fileNumber")
                 .build());
 
@@ -80,7 +80,7 @@ public class JurisXmlExporterWrapperTest {
     encryptedXml = jurisXmlExporter.generateEncryptedXMLString(documentUnit);
 
     assertEquals(
-        "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",
+        "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",
         encryptedXml);
   }
 
@@ -147,7 +147,7 @@ public class JurisXmlExporterWrapperTest {
                 .id(1L)
                 .courtType("courtType")
                 .courtPlace("courtPlace")
-                .date("date")
+                .date(Instant.parse("2020-04-05T00:00:00Z"))
                 .fileNumber("fileNumber")
                 .build());
     DocumentUnit documentUnit =

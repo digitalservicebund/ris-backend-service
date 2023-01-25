@@ -29,7 +29,7 @@ public class PreviousDecisionTransformer {
         .courtType(previousDecision.courtType())
         .fileNumber(previousDecision.fileNumber())
         .documentUnitId(documentUnitId)
-        .decisionDate(previousDecision.date())
+        .decisionDateTimestamp(previousDecision.date())
         .build();
   }
 }

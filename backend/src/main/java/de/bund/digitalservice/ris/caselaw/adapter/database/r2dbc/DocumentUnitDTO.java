@@ -51,8 +51,8 @@ public class DocumentUnitDTO {
   @Column("spruchkoerper")
   String appraisalBody;
 
-  @Column("entscheidungsdatum")
-  String decisionDate;
+  @Column("decision_date")
+  Instant decisionDate;
 
   @Column("gerichtssitz")
   String courtLocation;

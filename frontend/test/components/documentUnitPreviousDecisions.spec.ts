@@ -17,13 +17,13 @@ describe("DocumentUnitPreviousDecisions", async () => {
       {
         courtType: "type one",
         courtPlace: "location one",
-        date: "date one",
+        date: "",
         fileNumber: "identifier one",
       },
       {
         courtType: "type two",
         courtPlace: "location two",
-        date: "date two",
+        date: "",
         fileNumber: "identifier two",
       },
     ]
@@ -31,11 +31,9 @@ describe("DocumentUnitPreviousDecisions", async () => {
 
     expect(screen.getByDisplayValue("type one")).toBeInTheDocument()
     expect(screen.getByDisplayValue("location one")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("date one")).toBeInTheDocument()
     expect(screen.getByDisplayValue("identifier one")).toBeInTheDocument()
     expect(screen.getByDisplayValue("type two")).toBeInTheDocument()
     expect(screen.getByDisplayValue("location two")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("date two")).toBeInTheDocument()
     expect(screen.getByDisplayValue("identifier two")).toBeInTheDocument()
   })
 

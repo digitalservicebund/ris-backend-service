@@ -61,7 +61,7 @@ public class DocumentUnitBuilder {
                           .courtType(previousDecisionDTO.getCourtType())
                           .courtPlace(previousDecisionDTO.getCourtLocation())
                           .fileNumber(previousDecisionDTO.getFileNumber())
-                          .date(previousDecisionDTO.getDecisionDate())
+                          .date(previousDecisionDTO.getDecisionDateTimestamp())
                           .build())
               .toList();
     }
@@ -118,9 +118,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getEcli(),
             deviatingEclis,
             documentUnitDTO.getAppraisalBody(),
-            documentUnitDTO.getDecisionDate() != null
-                ? Instant.parse(documentUnitDTO.getDecisionDate())
-                : null,
+            documentUnitDTO.getDecisionDate(),
             deviatingDecisionDates,
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),

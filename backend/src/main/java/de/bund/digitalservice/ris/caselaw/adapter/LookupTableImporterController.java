@@ -21,7 +21,8 @@ public class LookupTableImporterController {
     this.service = service;
   }
 
-  // in Postman go to "Body", select "raw" and "XML" and paste the XML-contents
+  // In Postman go to "Body", select "raw" and "XML" and paste the XML-contents.
+  // Can we use @RequestBody @Valid DocumentTypesXML directly instead of ByteBuffer?
 
   @PutMapping(value = "doktyp")
   public Mono<ResponseEntity<String>> importDocumentTypeLookupTable(

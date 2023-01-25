@@ -20,7 +20,7 @@ export const previousDecisionFields: InputField[] = [
   },
   {
     name: "date",
-    type: InputType.TEXT,
+    type: InputType.DATE,
     label: "Datum",
     inputAttributes: {
       ariaLabel: "Datum Rechtszug",
