@@ -65,7 +65,16 @@ npm run coverage
 **To run the E2E tests:**
 
 ```bash
+# run all
 npm run test:e2e
+
+# run all from a specific file
+npm run test:e2e filename.spec.ts
+
+# run a specific test in a specific file
+npm run test:e2e filename.spec.ts -g "test name"
+
+# for a less cluttered terminal during dev, you can comment out a browser in playwright.config.ts
 ```
 
 **To run the a11y tests:**
