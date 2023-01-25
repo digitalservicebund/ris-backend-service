@@ -55,7 +55,6 @@ onUnmounted(() => {
     @mousedown.prevent=""
   >
     <span
-      :id="type"
       class="leading-default px-[0.5rem]"
       :class="{ dropdown: type == 'menu', 'material-icons': icon }"
       >{{ icon }}</span

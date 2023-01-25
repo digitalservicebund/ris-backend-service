@@ -1,41 +1,11 @@
-import { expect, Page } from "@playwright/test"
-import { generateString } from "../../test-helper/dataGenerators"
-import { navigateToCategories } from "./e2e-utils"
+import { expect } from "@playwright/test"
+import {
+  navigateToCategories,
+  clickSaveButton,
+  togglePreviousDecisionsSection,
+  fillPreviousDecisionInputs,
+} from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
-
-async function clickSaveButton(page: Page): Promise<void> {
-  await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-  await expect(
-    page.locator("text=Zuletzt gespeichert um").first()
-  ).toBeVisible()
-}
-
-async function togglePreviousDecisionsSection(page: Page): Promise<void> {
-  await page.locator("text=Vorgehende Entscheidungen").click()
-}
-
-async function fillPreviousDecisionInputs(
-  page: Page,
-  values?: {
-    courtType?: string
-    courtLocation?: string
-    date?: string
-    fileNumber?: string
-  },
-  decisionIndex = 0
-): Promise<void> {
-  const fillInput = async (ariaLabel: string, value?: string) => {
-    await page
-      .locator(`[aria-label='${ariaLabel}']`)
-      .nth(decisionIndex)
-      .fill(value ?? generateString())
-  }
-
-  await fillInput("Gerichtstyp Rechtszug", values?.courtType)
-  await fillInput("Gerichtsort Rechtszug", values?.courtLocation)
-  await fillInput("Datum Rechtszug", values?.date)
-  await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
-}
 
 test.describe("save changes in core data and texts and verify it persists", () => {
   test("test core data change", async ({ page, documentNumber }) => {
@@ -45,11 +15,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='ECLI']").fill("abc123")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
-    ).toBeVisible()
+    await clickSaveButton(page)
 
     await page.reload()
     expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("")
@@ -66,7 +32,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='ECLI']").fill("abc123")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+    await clickSaveButton(page)
 
     await page.goto("/")
     await expect(
@@ -108,11 +74,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='Abweichendes Aktenzeichen']").fill("three")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
-    ).toBeVisible()
+    await clickSaveButton(page)
 
     await page.reload()
 
@@ -163,11 +125,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
       .fill("2022-02-01")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
-    ).toBeVisible()
+    await clickSaveButton(page)
 
     await page.reload()
 
@@ -208,11 +166,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='Abweichender ECLI']").fill("three")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
-    ).toBeVisible()
+    await clickSaveButton(page)
 
     await page.reload()
 
@@ -269,11 +223,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await expect(page.locator("text=testone").first()).toBeHidden()
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
-    ).toBeVisible()
+    await clickSaveButton(page)
 
     await page.reload()
 

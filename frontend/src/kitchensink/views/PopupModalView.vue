@@ -22,6 +22,7 @@ const toggleModal = () => {
     </div>
     <PopupModal
       v-if="showModal"
+      aria-label="Popup Modal"
       cancel-button-type="ghost"
       confirm-button-type="secondary"
       confirm-text="Bestätigen"

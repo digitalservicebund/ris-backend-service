@@ -134,12 +134,6 @@ const setFocusedItemIndex = (index: number) => {
   focusedItemIndex.value = index
 }
 
-function handleOnBlur() {
-  if (!hasError.value) updateModelValue()
-  // TODO support clearing date and sending undefined to backend
-  // empty field should not be an error
-}
-
 const isInPast = computed(() => {
   if (currentInput.value) {
     const date = new Date(currentInput.value)
@@ -156,7 +150,6 @@ const hasError = computed(
 )
 
 watch(hasError, () => {
-  console.log(hasError.value, currentInput.value)
   hasError.value
     ? !isInPast.value && !props.isFutureDate
       ? emits("update:validationError", {
@@ -223,7 +216,6 @@ onMounted(() => {
       max="9999-12-31"
       min="1000-01-01"
       type="date"
-      @blur="handleOnBlur"
       @keydown.delete="backspaceDelete"
       @keypress.enter="saveChip"
       @keyup.left="focusPrevious"

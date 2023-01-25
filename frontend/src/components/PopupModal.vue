@@ -3,6 +3,7 @@ import { onMounted } from "vue"
 import TextButton from "./TextButton.vue"
 
 defineProps<{
+  ariaLabel?: string
   headerText?: string
   contentText: string
   confirmText: string
@@ -48,6 +49,7 @@ onMounted(() => {
 
 <template>
   <div
+    :aria-label="ariaLabel"
     class="bg-background fixed flex h-full items-center justify-center left-0 popup-modal-wrapper top-0 w-screen z-999"
     role="dialog"
     tabindex="0"

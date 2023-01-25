@@ -49,6 +49,7 @@ const onDelete = () => {
   <div>
     <PopupModal
       v-if="showModal"
+      :aria-label="modalHeaderText"
       :cancel-button-type="modalCancelButtonType"
       :confirm-button-type="modalConfirmButtonType"
       :confirm-text="modalConfirmText"

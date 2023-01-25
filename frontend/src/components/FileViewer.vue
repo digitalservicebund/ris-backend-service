@@ -87,6 +87,7 @@ onMounted(async () => {
 
     <PopupModal
       v-if="showModal"
+      aria-label="Dokument löschen"
       cancel-button-type="ghost"
       confirm-button-type="secondary"
       confirm-text="Löschen"

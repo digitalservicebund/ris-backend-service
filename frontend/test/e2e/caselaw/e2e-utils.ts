@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import { Page } from "playwright"
+import { generateString } from "../../test-helper/dataGenerators"
 
 export const navigateToCategories = async (
   page: Page,
@@ -39,4 +40,40 @@ export const waitForSaving = async (page: Page): Promise<void> => {
   await expect(
     page.locator("text=Zuletzt gespeichert um >> nth=1")
   ).toBeVisible()
+}
+
+export async function clickSaveButton(page: Page): Promise<void> {
+  await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+  await expect(
+    page.locator("text=Zuletzt gespeichert um").first()
+  ).toBeVisible()
+}
+
+export async function togglePreviousDecisionsSection(
+  page: Page
+): Promise<void> {
+  await page.locator("text=Vorgehende Entscheidungen").click()
+}
+
+export async function fillPreviousDecisionInputs(
+  page: Page,
+  values?: {
+    courtType?: string
+    courtLocation?: string
+    date?: string
+    fileNumber?: string
+  },
+  decisionIndex = 0
+): Promise<void> {
+  const fillInput = async (ariaLabel: string, value?: string) => {
+    await page
+      .locator(`[aria-label='${ariaLabel}']`)
+      .nth(decisionIndex)
+      .fill(value ?? generateString())
+  }
+
+  await fillInput("Gerichtstyp Rechtszug", values?.courtType)
+  await fillInput("Gerichtsort Rechtszug", values?.courtLocation)
+  await fillInput("Datum Rechtszug", values?.date)
+  await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
 }
