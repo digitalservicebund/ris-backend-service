@@ -18,8 +18,8 @@ spring:
       client:
         provider:
           keycloak:
-            issuer-uri: ${OAUTH2_CLIENT_ISSUER}
+            issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
         registration:
           keycloak:
-            client-id: ${OAUTH2_CLIENT_ID}
-            client-secret: ${OAUTH2_CLIENT_SECRET}
+            client-id: ${OAUTH2_CLIENT_ID:}
+            client-secret: ${OAUTH2_CLIENT_SECRET:}

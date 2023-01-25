@@ -1,0 +1,6 @@
+database:
+  host: db
+spring:
+  data:
+    redis:
+      host: redis

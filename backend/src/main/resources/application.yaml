@@ -39,13 +39,8 @@ spring:
   security:
     oauth2:
       client:
-        provider:
-          keycloak:
-            issuer-uri: fill-me
         registration:
           keycloak:
-            client-id: neuris-backend
-            client-secret: fill-me
             scope:
               - openid
               - profile

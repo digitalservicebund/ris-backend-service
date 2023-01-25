@@ -200,7 +200,9 @@ fileignoreconfig:
   - filename: backend/src/main/resources/application.yaml
     checksum: bc09474da7cfe8b7b876201f9aaf4dd4371643139185ccd156779175391a4901
   - filename: backend/src/main/resources/application-local.yaml
-    checksum: 714f1a4f86c736a6ec0d3c48abe0d0e352243ab7c3c0349c1261287339138583
+    checksum: 284c18e17109bf15931e1cab1d224c6a33acfec9f7cd9d5c8deeaff1c5985f96
+  - filename: compose.yaml
+    checksum: 3060112b523c24e31e980db5f5ccad781a1e80fcfd41edd767f4bd763e6831da
 
 scopeconfig:
   - scope: node
