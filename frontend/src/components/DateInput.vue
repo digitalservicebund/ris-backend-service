@@ -83,7 +83,7 @@ function handleOnBlur() {
     :id="id"
     v-model="inputValue"
     :aria-label="ariaLabel"
-    class="bg-white input"
+    class="bg-white border-2 border-blue-800 focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
     max="9999-12-31"
     min="1000-01-01"
@@ -94,15 +94,6 @@ function handleOnBlur() {
 
 <style lang="scss" scoped>
 .input {
-  width: 100%;
-  height: 3.75rem;
-  padding: 12px 16px;
-  @apply border-2 border-solid border-blue-800 uppercase;
-
-  &:focus {
-    outline: none;
-  }
-
   &:autofill {
     @apply shadow-white text-inherit;
   }

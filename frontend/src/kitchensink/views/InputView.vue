@@ -4,6 +4,7 @@ import CheckboxInput from "@/components/CheckboxInput.vue"
 import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
+import Dropdown from "@/components/DropdownInput.vue"
 import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
 import {
@@ -17,7 +18,6 @@ import type { ChipsInputModelType } from "@/domain/types"
 const dateModelValue = ref<DateInputModelType>()
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])
-const isReadonly = ref(true)
 const mockValidationError: ValidationError = {
   defaultMessage: "wrong date",
   field: "coreData.decisionDate",
@@ -31,46 +31,64 @@ const nestedInputFields: NestedInputAttributes["fields"] = {
     undefined
   ),
 }
+
+const dropdownItems = [
+  { label: "Item 1", value: "1" },
+  { label: "Item 2", value: "2" },
+  { label: "Item 3", value: "3" },
+  { label: "Item 4", value: "4" },
+  { label: "Item 5", value: "5" },
+]
 </script>
 
 <template>
   <div class="flex flex-col gap-y-20 h-auto w-1/2">
     <h1 class="font-bold text-24">Text Input</h1>
-    <div>
-      <TextInput id="textInputEmpty" aria-label="text input" value="" />
-    </div>
-    <div>
-      <TextInput
-        id="textInputWithValue"
-        aria-label="text input"
-        value="this is a text input with a value"
-      />
-    </div>
-    <div>
-      <TextInput
-        id="textInputPlaceholder"
-        aria-label="text input"
-        placeholder="this is text input placeholder"
-        value=""
-      />
-    </div>
-    <div>
-      <TextInput
-        id="textInputError"
-        aria-label="text input"
-        :validation-error="mockValidationError"
-        value="wrong value"
-      />
-    </div>
-    <div>
-      <TextInput
-        id="textInputReadonly"
-        aria-label="text input"
-        placeholder="this is text input readonly"
-        :read-only="isReadonly"
-        value=""
-      />
-    </div>
+
+    <h2>Regular Text Input</h2>
+    <TextInput id="regularTextInput" aria-label="regular text input" value="" />
+
+    <h2>Text Input with Placeholder</h2>
+    <TextInput
+      id="textInputWithPlaceholder"
+      aria-label="text input with placeholder"
+      placeholder="Placeholder"
+      value=""
+    />
+
+    <h2>Filled Text Input</h2>
+    <TextInput
+      id="filledTextInput"
+      aria-label="filled text input"
+      value="Loremipsum"
+    />
+
+    <h2>Invalid Text Input</h2>
+    <TextInput
+      id="textInputError"
+      aria-label="invalid text input"
+      :validation-error="mockValidationError"
+      value="Loremipsum"
+    />
+
+    <h2>Read-only Text Input</h2>
+    <TextInput
+      id="readonlyTextInput"
+      aria-label="readonly text input"
+      read-only
+      value="Loremipsum"
+    />
+
+    <h1 class="font-bold text-24">Dropdown Input</h1>
+
+    <h2>Regular Dropdown</h2>
+    <Dropdown
+      id="regularDropdown"
+      aria-label="regular dropdown"
+      :items="dropdownItems"
+      value=""
+    />
+
     <h1 class="font-bold text-24">Date Input</h1>
     <DateInput
       id="dateInput"

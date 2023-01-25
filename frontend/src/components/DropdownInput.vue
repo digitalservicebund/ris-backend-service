@@ -85,7 +85,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     ref="dropdownContainerRef"
-    class="dropdown-container"
+    class="dropdown-container relative w-full"
     @keydown.esc="closeDropdown"
   >
     <div
@@ -99,7 +99,7 @@ onBeforeUnmount(() => {
           v-model="selectedLabel"
           :aria-label="ariaLabel"
           autocomplete="off"
-          class="cursor-pointer text-input"
+          class="cursor-pointer outline-none w-full"
           :placeholder="placeholder"
           :readonly="true"
           tabindex="0"
@@ -107,11 +107,11 @@ onBeforeUnmount(() => {
         />
         <button
           :aria-labelledby="`labelDropdownIcon` + id"
-          class="input-expand-icon"
+          class="focus:outline-2 input-expand-icon mt-4 outline-0 outline-blue-800 outline-none"
           tabindex="0"
           @keydown.enter="toggleDropdown"
         >
-          <span v-if="!showDropdown" class="icon material-icons text-blue-800">
+          <span v-if="!showDropdown" class="icon material-icons">
             expand_more
             <span
               :id="`labelDropdownIcon` + id"
@@ -158,33 +158,14 @@ onBeforeUnmount(() => {
 
 <style lang="scss" scoped>
 .dropdown-container {
-  position: relative;
   display: inline-block;
-  width: 100%;
   user-select: none;
 
   &__open-dropdown {
     .input-container {
-      @apply border-2 border-solid border-blue-800 hover:shadow-hover hover:shadow-blue-800 focus:shadow-focus focus:shadow-blue-800;
+      @apply flex border-2 border-blue-800 disabled:focus:outline-0 focus-within:outline-2 hover:outline-2 outline-offset-[-4px] outline-0 outline-blue-800 outline-none;
 
-      display: flex;
-      height: 3.75rem;
-      flex: row nowrap;
-      justify-content: space-between;
       padding: 12px 16px;
-
-      .text-input {
-        width: 100%;
-
-        &:focus {
-          outline: none;
-        }
-      }
-
-      .input-expand-icon {
-        height: 5px;
-        margin-top: 3px;
-      }
     }
   }
 
