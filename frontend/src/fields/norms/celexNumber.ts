@@ -4,9 +4,9 @@ export const celexNumber: InputField[] = [
   {
     name: "celexNumber",
     type: InputType.TEXT,
-    label: "Celex Nummer",
+    label: "CELEX-Nummer",
     inputAttributes: {
-      ariaLabel: "Celex Nummer",
+      ariaLabel: "CELEX-Nummer",
     },
   },
 ]

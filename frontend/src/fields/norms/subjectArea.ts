@@ -20,9 +20,9 @@ export const subjectArea: InputField[] = [
   {
     name: "subjectGesta",
     type: InputType.TEXT,
-    label: "GESTA number",
+    label: "GESTA-Nummer",
     inputAttributes: {
-      ariaLabel: "GESTA number",
+      ariaLabel: "GESTA-Nummer",
     },
   },
   {

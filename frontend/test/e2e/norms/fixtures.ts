@@ -170,7 +170,7 @@ export function getNormBySections(norm) {
         {
           type: "text",
           name: "subjectGesta",
-          label: "GESTA number",
+          label: "GESTA-Nummer",
           value: norm.subjectGesta,
         },
         {
@@ -828,7 +828,7 @@ export function getNormBySections(norm) {
         {
           type: "text",
           name: "celexNumber",
-          label: "Celex Nummer",
+          label: "CELEX-Nummer",
           value: norm.celexNumber,
         },
       ],
