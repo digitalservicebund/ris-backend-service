@@ -29,7 +29,7 @@ services:
     command: sh run.sh _start
     depends_on:
       - db
-      - store-redis
+      - redis
   frontend:
     image: neuris/frontend
     labels:
@@ -57,9 +57,9 @@ services:
       - 5432:5432
 
   redis:
-    image: 'redis:7.0.8'
+    image: "redis:7.0.8"
     command: redis-server --requirepass password
     ports:
-      - '6379:6379'
+      - "6379:6379"
 volumes:
   db-data:
