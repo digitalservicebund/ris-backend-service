@@ -97,7 +97,7 @@ public class DocumentUnitController {
             ResponseEntity.internalServerError().body("Couldn't delete the DocumentUnit"));
   }
 
-  @PutMapping(value = "/{uuid}/docx", consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<DocumentUnit>> updateByUuid(
       @PathVariable UUID uuid, @Valid @RequestBody DocumentUnit documentUnit) {
     if (!uuid.equals(documentUnit.uuid())) {

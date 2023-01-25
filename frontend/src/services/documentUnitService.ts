@@ -69,7 +69,7 @@ const service: DocumentUnitService = {
 
   async update(documentUnit: DocumentUnit) {
     const response = await httpClient.put(
-      `caselaw/documentunits/${documentUnit.uuid}/docx`,
+      `caselaw/documentunits/${documentUnit.uuid}`,
       {
         headers: {
           Accept: "application/json",

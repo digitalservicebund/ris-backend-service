@@ -202,7 +202,7 @@ class DocumentUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + TEST_UUID)
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(documentUnit)
         .exchange()
@@ -218,7 +218,7 @@ class DocumentUnitControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/abc/docx")
+        .uri("/api/v1/caselaw/documentunits/abc")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(documentUnitDTO)
         .exchange()

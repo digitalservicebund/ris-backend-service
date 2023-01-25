@@ -182,7 +182,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1)
         .bodyValue(documentUnit)
         .exchange()
         .expectStatus()
@@ -227,7 +227,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1 + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid1)
         .bodyValue(documentUnit)
         .exchange()
         .expectStatus()
@@ -292,7 +292,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -341,7 +341,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -400,7 +400,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -473,7 +473,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + uuid + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + uuid)
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -510,7 +510,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -533,7 +533,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -555,7 +555,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -578,7 +578,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -693,7 +693,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -753,7 +753,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
@@ -809,7 +809,7 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid() + "/docx")
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
         .bodyValue(documentUnitFromFrontend)
         .exchange()
         .expectStatus()
