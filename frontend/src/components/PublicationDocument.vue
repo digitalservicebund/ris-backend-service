@@ -160,7 +160,7 @@ const fieldsMissing = computed(() =>
       @click="publishDocumentUnit"
     />
     <div aria-label="Letzte Veröffentlichungen" class="flex flex-col gap-24">
-      <div class="heading-03-regular">Letzte Veröffentlichungen</div>
+      <h2 class="heading-03-regular">Letzte Veröffentlichungen</h2>
       <p v-if="isFirstTimePublication">
         Diese Dokumentationseinheit wurde bisher nicht veröffentlicht
       </p>
