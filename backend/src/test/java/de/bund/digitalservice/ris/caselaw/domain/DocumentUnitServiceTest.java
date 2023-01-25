@@ -15,10 +15,10 @@ import static org.mockito.Mockito.when;
 
 import java.nio.ByteBuffer;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -187,12 +187,12 @@ class DocumentUnitServiceTest {
 
   @Test
   void testGetAll() {
+    List<DocumentUnitListEntry> entries =
+        Arrays.asList(new DocumentUnitListEntry(), new DocumentUnitListEntry());
     when(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber"))))
-        .thenReturn(Flux.empty());
+        .thenReturn(Flux.fromIterable(entries));
 
-    StepVerifier.create(service.getAll())
-        .consumeNextWith(Assertions::assertNotNull)
-        .verifyComplete();
+    StepVerifier.create(service.getAll()).expectNextSequence(entries).verifyComplete();
 
     verify(listEntryRepository).findAll(Sort.by(Order.desc("documentnumber")));
   }

@@ -33,6 +33,7 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -126,7 +127,7 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetAll() {
-    when(service.getAll()).thenReturn(Mono.empty());
+    when(service.getAll()).thenReturn(Flux.empty());
 
     webClient
         .mutateWith(csrf())

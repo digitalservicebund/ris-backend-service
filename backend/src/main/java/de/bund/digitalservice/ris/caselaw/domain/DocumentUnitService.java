@@ -159,8 +159,8 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Mono<Flux<DocumentUnitListEntry>> getAll() {
-    return Mono.just(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber"))));
+  public Flux<DocumentUnitListEntry> getAll() {
+    return listEntryRepository.findAll(Sort.by(Order.desc("documentnumber")));
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {
