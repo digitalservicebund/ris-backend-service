@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: run.sh
-    checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
+    checksum: dddf7982e8af63db48cbe9942d22d67cb3ad0cdb0deb8d9a74dfe26305b471c9
   - filename: .github/workflows/clean-staging.yml
     checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
@@ -199,8 +199,8 @@ fileignoreconfig:
     checksum: a7db3ec44b464cc778f8f981487662d6b03701121480a988088c592f9c3df6dd
   - filename: backend/src/main/resources/application.yaml
     checksum: bc09474da7cfe8b7b876201f9aaf4dd4371643139185ccd156779175391a4901
-  - filename: backend/src/main/resources/application-local.properties
-    checksum: 0cdf1f10efd8123369705600aa1c08ad5df21bda445faee93d69cd56bf7123f4
+  - filename: backend/src/main/resources/application-local.yaml
+    checksum: 714f1a4f86c736a6ec0d3c48abe0d0e352243ab7c3c0349c1261287339138583
 
 scopeconfig:
   - scope: node
