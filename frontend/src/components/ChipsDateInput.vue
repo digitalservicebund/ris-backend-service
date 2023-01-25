@@ -23,7 +23,7 @@ interface Emits {
 }
 
 const chips = ref<string[]>(props.modelValue ?? [])
-const currentInput = ref<string | undefined>(undefined)
+const currentInput = ref<string | undefined>()
 const currentInputField = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
@@ -135,7 +135,9 @@ const setFocusedItemIndex = (index: number) => {
 }
 
 function handleOnBlur() {
-  currentInput.value = undefined
+  if (!hasError.value) updateModelValue()
+  // TODO support clearing date and sending undefined to backend
+  // empty field should not be an error
 }
 
 const isInPast = computed(() => {
@@ -154,6 +156,7 @@ const hasError = computed(
 )
 
 watch(hasError, () => {
+  console.log(hasError.value, currentInput.value)
   hasError.value
     ? !isInPast.value && !props.isFutureDate
       ? emits("update:validationError", {
@@ -165,7 +168,8 @@ watch(hasError, () => {
           defaultMessage: "Entscheidungsdatum ist kein valides Datum",
           field: props.id,
         })
-    : emits("update:validationError", undefined)
+    : emits("update:validationError", undefined),
+    { immediate: true }
 })
 
 const conditionalClasses = computed(() => ({
