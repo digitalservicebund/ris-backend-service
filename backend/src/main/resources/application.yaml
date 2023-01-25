@@ -48,3 +48,4 @@ spring:
             client-secret: fill-me
             scope:
               - openid
+              - profile

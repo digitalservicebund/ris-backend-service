@@ -198,7 +198,7 @@ fileignoreconfig:
   - filename: backend/src/main/resources/db/migration/V0.34__caselaw_migrate_two_date_columns.sql
     checksum: a7db3ec44b464cc778f8f981487662d6b03701121480a988088c592f9c3df6dd
   - filename: backend/src/main/resources/application.yaml
-    checksum: 9850bbd3d528579c81ee58ac7daae2dc4980e55d4ddca75a54ccb33d33040586
+    checksum: bc09474da7cfe8b7b876201f9aaf4dd4371643139185ccd156779175391a4901
   - filename: backend/src/main/resources/application-local.properties
     checksum: 0cdf1f10efd8123369705600aa1c08ad5df21bda445faee93d69cd56bf7123f4
 
