@@ -81,6 +81,7 @@ watch(inputValues, () => emit("update:modelValue", inputValues.value), {
         :key="field.name"
         class="input-group__row__field"
         :label="field.label"
+        :label-position="field.inputAttributes.labelPosition"
         :required="field.required"
         :style="fieldStyle"
       >

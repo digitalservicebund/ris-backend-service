@@ -5,6 +5,8 @@ import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
 import DateInput from "@/components/DateInput.vue"
 import Dropdown from "@/components/DropdownInput.vue"
+import InputElement from "@/components/InputElement.vue"
+import InputField, { LabelPosition } from "@/components/InputField.vue"
 import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
 import {
@@ -12,6 +14,8 @@ import {
   DateInputModelType,
   ValidationError,
   NestedInputAttributes,
+  BaseInputAttributes,
+  InputType,
 } from "@/domain"
 import type { ChipsInputModelType } from "@/domain/types"
 
@@ -39,6 +43,11 @@ const dropdownItems = [
   { label: "Item 4", value: "4" },
   { label: "Item 5", value: "5" },
 ]
+
+const checkboxInputAttributes: BaseInputAttributes = {
+  ariaLabel: "test",
+  labelPosition: LabelPosition.RIGHT,
+}
 </script>
 
 <template>
@@ -152,5 +161,18 @@ const dropdownItems = [
         field: 'invalidCheckbox',
       }"
     />
+
+    Checkbox with label
+    <InputField
+      id="inputCheckBox"
+      label="This checkbox has the label at the right"
+      :label-position="LabelPosition.RIGHT"
+    >
+      <InputElement
+        id="test"
+        :attributes="checkboxInputAttributes"
+        :type="InputType.CHECKBOX"
+      />
+    </InputField>
   </div>
 </template>

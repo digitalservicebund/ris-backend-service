@@ -1,3 +1,4 @@
+import { LabelPosition } from "@/components/InputField.vue"
 import { InputField, InputType } from "@/domain"
 import { dropdown, undefinedDropDownItems } from "@/fields/norms/fieldGenerator"
 
@@ -22,6 +23,7 @@ export const expiration: InputField[] = [
     label: "Befristet",
     inputAttributes: {
       ariaLabel: "Befristet",
+      labelPosition: LabelPosition.RIGHT,
     },
   },
   {

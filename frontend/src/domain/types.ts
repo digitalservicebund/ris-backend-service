@@ -1,3 +1,4 @@
+import { LabelPosition } from "@/components/InputField.vue"
 import { ServiceResponse } from "@/services/httpClient"
 
 export enum InputType {
@@ -16,6 +17,7 @@ export enum InputType {
 export interface BaseInputAttributes {
   ariaLabel: string
   validationError?: ValidationError
+  labelPosition?: LabelPosition
 }
 
 export interface BaseInputField {

@@ -1,3 +1,4 @@
+import { LabelPosition } from "@/components/InputField.vue"
 import { InputField, InputType } from "@/domain"
 
 export const normProvider: InputField[] = [
@@ -23,6 +24,7 @@ export const normProvider: InputField[] = [
     label: "Beschlussfassung mit qualifizierter Mehrheit",
     inputAttributes: {
       ariaLabel: "Beschlussfassung mit qualifizierter Mehrheit",
+      labelPosition: LabelPosition.RIGHT,
     },
   },
 ]

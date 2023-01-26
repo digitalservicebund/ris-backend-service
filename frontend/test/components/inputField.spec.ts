@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/vue"
-import InputField from "@/components/InputField.vue"
+import InputField, { LabelPosition } from "@/components/InputField.vue"
 
 function renderComponent(options?: {
   id?: string
@@ -7,6 +7,7 @@ function renderComponent(options?: {
   slot?: string
   errorMessage?: string
   required?: true
+  labelPosition?: LabelPosition
 }) {
   const id = options?.id ?? "identifier"
   const slots = { default: options?.slot ?? `<input id="${id}" />` }
@@ -15,6 +16,7 @@ function renderComponent(options?: {
     label: options?.label,
     required: options?.required ?? options?.required,
     errorMessage: options?.errorMessage,
+    labelPosition: options?.labelPosition,
   }
 
   return render(InputField, { slots, props })
@@ -65,5 +67,22 @@ describe("InputField", () => {
       id: "test",
     })
     expect(screen.queryByLabelText("test")).not.toBeInTheDocument
+  })
+
+  it("shows label after the input field", () => {
+    renderComponent({ label: "test label", labelPosition: LabelPosition.RIGHT })
+
+    const input = screen.queryByLabelText("test label", {
+      exact: false,
+    }) as HTMLInputElement
+    expect(input).toBeInTheDocument()
+    const label = screen.queryByText("test label", {
+      exact: false,
+    }) as HTMLLabelElement
+    expect(label).toBeInTheDocument()
+
+    expect(input.compareDocumentPosition(label)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
   })
 })
