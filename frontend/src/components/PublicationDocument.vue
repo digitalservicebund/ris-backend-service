@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, computed, toRef } from "vue"
 import { RouterLink } from "vue-router"
 import InputField from "./InputField.vue"
 import TextButton from "./TextButton.vue"
@@ -34,7 +34,7 @@ const isFirstTimePublication = computed(() => {
   return !props.lastPublishedXmlMail
 })
 
-const errorMessage = ref(props.errorMessage)
+const errorMessage = toRef(props, "errorMessage")
 
 function publishDocumentUnit() {
   if (fieldsMissing.value) {
