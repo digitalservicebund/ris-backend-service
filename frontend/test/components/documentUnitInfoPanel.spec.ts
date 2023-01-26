@@ -1,143 +1,61 @@
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
-import DocumentUnit from "@/domain/documentUnit"
 
 describe("documentUnit InfoPanel", () => {
-  it("renders documentNumber if given", async () => {
+  it("renders heading if given", async () => {
     render(DocumentUnitInfoPanel, {
       props: {
-        documentUnit: new DocumentUnit("123", { documentNumber: "foo" }),
+        heading: "test heading",
       },
     })
 
-    screen.getAllByText("foo")
+    screen.getAllByText("test heading")
   })
 
-  it("renders aktenzeichen if given", async () => {
+  it("renders all given property infos in correct order", async () => {
     render(DocumentUnitInfoPanel, {
       props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            fileNumbers: ["foo"],
-          },
-        }),
+        propertyInfos: [
+          { label: "foo", value: "value-foo" },
+          { label: "bar", value: "value-bar" },
+        ],
       },
     })
 
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Aktenzeichen/)
-    })
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/foo/)
-    })
+    const fooLabel = await screen.findByText("foo")
+    const fooValue = await screen.findByText("value-foo")
+    const barLabel = await screen.findByText("bar")
+    const barValue = await screen.findByText("value-bar")
+
+    expect(fooLabel).toBeInTheDocument()
+    expect(fooValue).toBeInTheDocument()
+    expect(barLabel).toBeInTheDocument()
+    expect(barValue).toBeInTheDocument()
+
+    expect(fooLabel.compareDocumentPosition(fooValue)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
+    expect(fooValue.compareDocumentPosition(barLabel)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
+    expect(barLabel.compareDocumentPosition(barValue)).toBe(
+      Node.DOCUMENT_POSITION_FOLLOWING
+    )
   })
 
-  it("renders placeholder for aktenzeichen if not given", async () => {
+  it("renders a placeholder for an undefined property info value", async () => {
     render(DocumentUnitInfoPanel, {
       props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            decisionDate: "2024-01-31",
-            court: {
-              type: "baz",
-              location: "baz",
-              label: "baz",
-            },
-            fileNumbers: undefined,
-          },
-          documentNumber: "qux",
-        }),
+        propertyInfos: [{ label: "foo", value: undefined }],
       },
     })
 
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Aktenzeichen/)
-    })
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/-/)
-    })
-  })
+    const label = screen.getByText("foo")
+    const value = await screen.findByText("-")
 
-  it("renders Entscheidungsdatum if given", async () => {
-    render(DocumentUnitInfoPanel, {
-      props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            decisionDate: "2024-01-31",
-          },
-        }),
-      },
-    })
-
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Entscheidungsdatum/)
-    })
-
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/31.01.2024/)
-    })
-  })
-
-  it("renders placeholder for Entscheidungsdatum if not given", async () => {
-    render(DocumentUnitInfoPanel, {
-      props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            fileNumbers: ["foo"],
-            court: {
-              type: "baz",
-              location: "baz",
-              label: "baz",
-            },
-          },
-          documentNumber: "qux",
-        }),
-      },
-    })
-
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Entscheidungsdatum -/)
-    })
-  })
-
-  it("renders Gerichtstyp if given", async () => {
-    render(DocumentUnitInfoPanel, {
-      props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            court: {
-              type: "foo",
-              location: "foo",
-              label: "foo",
-            },
-          },
-        }),
-      },
-    })
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Gericht/)
-    })
-
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/foo/)
-    })
-  })
-
-  it("renders placeholder for Gerichtstyp if not given", async () => {
-    render(DocumentUnitInfoPanel, {
-      props: {
-        documentUnit: new DocumentUnit("123", {
-          coreData: {
-            fileNumbers: ["foo"],
-            decisionDate: "2024-01-31",
-          },
-          documentNumber: "qux",
-        }),
-      },
-    })
-
-    screen.getAllByText((_content, node) => {
-      return !!node?.textContent?.match(/Gericht -/)
-    })
+    expect(value).toBeInTheDocument()
+    expect(value.compareDocumentPosition(label)).toBe(
+      Node.DOCUMENT_POSITION_PRECEDING
+    )
   })
 })

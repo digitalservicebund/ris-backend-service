@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import dayjs from "dayjs"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
@@ -19,6 +20,24 @@ const navigationIsOpen = useToggleStateInRouteQuery(
   route,
   router.replace
 )
+
+const fileNumberInfo = computed(
+  () => props.documentUnit.coreData.fileNumbers?.[0]
+)
+
+const decisionDateInfo = computed(() =>
+  props.documentUnit.coreData.decisionDate
+    ? dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY")
+    : undefined
+)
+
+const courtInfo = computed(() => props.documentUnit.coreData.court?.label)
+
+const propertyInfos = computed(() => [
+  { label: "Aktenzeichen", value: fileNumberInfo.value },
+  { label: "Entscheidungsdatum", value: decisionDateInfo.value },
+  { label: "Gericht", value: courtInfo.value },
+])
 </script>
 
 <template>
@@ -36,7 +55,10 @@ const navigationIsOpen = useToggleStateInRouteQuery(
     </SideToggle>
 
     <div class="bg-gray-100 flex flex-col w-full">
-      <DocumentUnitInfoPanel :document-unit="documentUnit" />
+      <DocumentUnitInfoPanel
+        :heading="documentUnit.documentNumber ?? ''"
+        :property-infos="propertyInfos"
+      />
 
       <div class="flex flex-col grow items-start">
         <slot :classes="['p-[2rem] w-full grow']" />

@@ -1,42 +1,33 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
-import { computed } from "vue"
-import DocumentUnit from "../domain/documentUnit"
 import PropertyInfo from "@/components/PropertyInfo.vue"
 
-const props = defineProps<{ documentUnit: DocumentUnit }>()
+interface PropertyInfo {
+  label: string
+  value?: string
+}
 
-const entries = computed(() => [
-  {
-    label: "Aktenzeichen",
-    value: props.documentUnit.coreData.fileNumbers?.[0],
-  },
-  {
-    label: "Entscheidungsdatum",
-    value: props.documentUnit.coreData.decisionDate
-      ? dayjs(props.documentUnit.coreData.decisionDate).format("DD.MM.YYYY")
-      : undefined,
-  },
-  {
-    label: "Gericht",
-    value: props.documentUnit.coreData.court?.label,
-  },
-])
+interface Props {
+  heading?: string
+  propertyInfos?: PropertyInfo[]
+}
+
+withDefaults(defineProps<Props>(), {
+  heading: "",
+  propertyInfos: () => [],
+})
 </script>
 
 <template>
   <div
-    class="bg-blue-200 border-b border-gray-400 border-solid flex h-80 items-center px-[2rem]"
+    class="bg-blue-200 border-b border-gray-400 border-solid flex gap-20 h-80 items-center px-[2rem]"
   >
-    <div class="grow text-30">
-      {{ documentUnit.documentNumber || " - " }}
-    </div>
+    <div class="text-30">{{ heading }}</div>
 
-    <div v-for="entry in entries" :key="entry.label" class="grow">
+    <div v-for="entry in propertyInfos" :key="entry.label" class="grow">
       <PropertyInfo
         direction="row"
         :label="entry.label"
-        :value="entry.value"
+        :value="entry.value || ' - '"
       ></PropertyInfo>
     </div>
   </div>
