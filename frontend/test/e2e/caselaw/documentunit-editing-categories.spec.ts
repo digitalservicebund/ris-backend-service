@@ -61,10 +61,10 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
-    // close dropdown using the esc key, input text remains
+    // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("zwischen")
+    expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
   })
 
   test("test court dropdown", async ({ page, documentNumber }) => {
@@ -111,10 +111,10 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     // first search result displays a revoked string
     await expect(page.locator("text=aufgehoben seit: 1973")).toBeVisible()
 
-    // close dropdown using the esc key, input text remains
+    // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("bayern")
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
   })
 
   test("test that setting a court sets the region automatically", async ({

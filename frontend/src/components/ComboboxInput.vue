@@ -32,7 +32,7 @@ watch(
   props,
   () => {
     selectedValue.value = props.modelValue ?? props.value
-    checkInputValueType()
+    updateInputText()
   },
   {
     immediate: true,
@@ -41,14 +41,14 @@ watch(
 
 watch(selectedValue, () => {
   emit("update:modelValue", selectedValue.value)
-  checkInputValueType()
+  updateInputText()
 })
 
 function isCourt(input?: ComboboxInputModelType): input is Court {
   return typeof input === "object" && "location" in input && "type" in input
 }
 
-function checkInputValueType() {
+function updateInputText() {
   if (typeof selectedValue.value === "object" && "label" in selectedValue.value)
     inputText.value = selectedValue.value.label
   else {
@@ -154,7 +154,7 @@ const insertItemIfEmpty = () => {
   }
 }
 
-const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
+const handleClickOutside = (event: MouseEvent) => {
   const dropdown = dropdownContainerRef.value
   if (
     !dropdown ||
@@ -162,15 +162,17 @@ const closeDropDownWhenClickOutSide = (event: MouseEvent) => {
     event.composedPath().includes(dropdown)
   )
     return
-  showDropdown.value = false
+  closeDropdownAndRevertToLastSavedValue()
 }
 
 const selectAllText = () => {
   inputFieldRef.value?.select()
 }
 
-const closeDropdown = () => {
+const closeDropdownAndRevertToLastSavedValue = () => {
   showDropdown.value = false
+  updateInputText()
+  filter.value = inputText.value
 }
 
 const isRevokedCourt = (item: ComboboxItem) => {
@@ -182,11 +184,11 @@ const getRevokedCourtString = (item: ComboboxItem) => {
 }
 
 onMounted(() => {
-  window.addEventListener("click", closeDropDownWhenClickOutSide)
+  window.addEventListener("click", handleClickOutside)
 })
 
 onBeforeUnmount(() => {
-  window.removeEventListener("click", closeDropDownWhenClickOutSide)
+  window.removeEventListener("click", handleClickOutside)
 })
 </script>
 
@@ -194,7 +196,7 @@ onBeforeUnmount(() => {
   <div
     ref="dropdownContainerRef"
     class="dropdown-container"
-    @keydown.esc="closeDropdown"
+    @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
     <div
       class="dropdown-container__open-dropdown"
