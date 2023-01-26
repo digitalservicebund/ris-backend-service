@@ -94,10 +94,10 @@ const clearSelection = () => {
   inputFieldRef.value?.focus()
 }
 
-const setChosenItem = (value: ComboboxInputModelType) => {
+const setChosenItem = (item: ComboboxItem) => {
   showDropdown.value = false
-  emit("update:modelValue", value)
-  filter.value = ""
+  emit("update:modelValue", item.value)
+  filter.value = item.label
 }
 
 const keyup = () => {
@@ -256,8 +256,8 @@ onBeforeUnmount(() => {
             isRevokedCourt(item),
         }"
         tabindex="0"
-        @click="setChosenItem(item.value)"
-        @keypress.enter="setChosenItem(item.value)"
+        @click="setChosenItem(item)"
+        @keypress.enter="setChosenItem(item)"
         @keyup.down="keydown"
         @keyup.up="keyup"
       >

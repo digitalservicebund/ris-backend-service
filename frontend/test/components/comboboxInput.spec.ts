@@ -63,7 +63,7 @@ describe("Combobox Element", () => {
     expect(dropdownItems[0]).toHaveTextContent("testItem2")
   })
 
-  it("items should not be filtered after selection", async () => {
+  it("items should stay filtered after selection", async () => {
     renderComponent()
 
     const input = screen.getByLabelText("test label") as HTMLInputElement
@@ -81,7 +81,7 @@ describe("Combobox Element", () => {
 
     await user.click(openDropdownContainer)
 
-    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
   })
 
   it("items should stay filtered after typing without selection", async () => {
@@ -152,7 +152,8 @@ describe("Combobox Element", () => {
       "Dropdown öffnen"
     ) as HTMLElement
     await user.click(openDropdownContainer)
-    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+    // the filter is still set to "testItem2", so we expect only that one item
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
   })
 
   it("uses endpoint to fetch all DocumentType items", async () => {
