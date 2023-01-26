@@ -1,23 +1,21 @@
 services:
   traefik:
     image: traefik:v2.9
-    container_name: "traefik"
+    extra_hosts:
+      - localhost:host-gateway
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro"
+      - ./traefik.yaml:/etc/traefik/config.yml:ro
     command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
+      - "--api.dashboard=false"
+      - "--providers.file.filename=/etc/traefik/config.yml"
+      - "--entryPoints.http.address=:80"
     ports:
       - 80:80
+ 
   backend:
     image: gradle:7-jdk17
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.backend.rule=Host(`127.0.0.1`) && (PathPrefix(`/api`) || PathPrefix(`/actuator`) || PathPrefix(`/login`) || PathPrefix(`/logout`) || PathPrefix(`/oauth`))"
-      - "traefik.http.services.backend.loadbalancer.server.port=8080"
-      - "traefik.http.routers.backend.entrypoints=web"
+    extra_hosts:
+      - localhost:host-gateway
     volumes:
       - ./:/app
     working_dir: /app
@@ -31,24 +29,30 @@ services:
       - JAVA_OPTS=-XX:MaxDirectMemorySize=100M
     command: sh run.sh _start
     depends_on:
+      - traefik
       - db
       - redis
+    ports:
+      - 8080:8080
   frontend:
     image: neuris/frontend
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.frontend.rule=Host(`127.0.0.1`)"
-      - "traefik.http.routers.frontend.entrypoints=web"
+    extra_hosts:
+      - localhost:host-gateway
     volumes:
       - ./frontend/src/:/usr/src/app/src
     environment:
       - BACKEND_HOST=http://127.0.0.1
     command: npm run dev -- --host
     depends_on:
+      - traefik
       - backend
+    ports:
+      - 3000:3000
 
   db:
     image: postgres:12-alpine
+    extra_hosts:
+      - localhost:host-gateway
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -61,8 +65,11 @@ services:
 
   redis:
     image: "redis:7.0.8"
+    extra_hosts:
+      - localhost:host-gateway
     command: redis-server --requirepass password
     ports:
       - "6379:6379"
+
 volumes:
   db-data:
