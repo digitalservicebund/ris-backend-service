@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, toRef } from "vue"
+import { ref, computed } from "vue"
 import { RouterLink } from "vue-router"
 import InputField from "./InputField.vue"
 import TextButton from "./TextButton.vue"
@@ -34,11 +34,12 @@ const isFirstTimePublication = computed(() => {
   return !props.lastPublishedXmlMail
 })
 
-const errorMessage = toRef(props, "errorMessage")
+const frontendError = ref()
+const errorMessage = computed(() => frontendError.value ?? props.errorMessage)
 
 function publishDocumentUnit() {
   if (fieldsMissing.value) {
-    errorMessage.value = {
+    frontendError.value = {
       title: "Es sind noch nicht alle Pflichtfelder befüllt.",
       description:
         "Die Dokumentationseinheit kann nicht veröffentlicht werden.",
