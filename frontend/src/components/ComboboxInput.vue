@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
         <button
           v-if="inputText"
           class="input-close-icon"
-          tabindex="0"
+          tabindex="-1"
           @click="clearSelection"
           @keydown.enter="clearSelection"
         >
@@ -229,7 +229,7 @@ onBeforeUnmount(() => {
         <button
           :aria-label="ariaLabelDropdownIcon"
           class="input-expand-icon"
-          tabindex="0"
+          tabindex="-1"
           @click="toggleDropdown"
           @keydown.enter="toggleDropdown"
         >
