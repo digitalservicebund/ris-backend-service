@@ -16,10 +16,10 @@ spring:
   security:
     oauth2:
       client:
+        registration:
+          oidcclient:
+            client-id: ${OAUTH2_CLIENT_ID:}
+            client-secret: ${OAUTH2_CLIENT_SECRET:}
         provider:
           keycloak:
             issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
-        registration:
-          keycloak:
-            client-id: ${OAUTH2_CLIENT_ID:}
-            client-secret: ${OAUTH2_CLIENT_SECRET:}
