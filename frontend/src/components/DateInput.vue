@@ -50,7 +50,6 @@ const hasError = computed(
 watch(
   inputValue,
   () => {
-    console.log("inputValue changed", inputValue.value)
     if (hasError.value) {
       if (inputValue.value == "") {
         emit("update:validationError", {
@@ -68,7 +67,6 @@ watch(
 watch(
   isInPast,
   () => {
-    console.log("isInPast changed", isInPast.value)
     if (hasError.value) {
       if (!isInPast.value && !props.isFutureDate) {
         emit("update:validationError", {

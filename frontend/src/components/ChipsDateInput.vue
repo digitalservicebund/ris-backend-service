@@ -58,7 +58,6 @@ function saveChip() {
 }
 
 function deleteChip(index: number) {
-  currentInput.value = undefined
   chips.value.splice(index, 1)
   updateModelValue()
   resetFocus()
