@@ -49,7 +49,7 @@ export function getNormBySections(norm) {
         {
           type: "text",
           name: "documentNumber",
-          label: "Dokumentennummer",
+          label: "Dokumentnummer",
           value: norm.documentNumber,
         },
         {

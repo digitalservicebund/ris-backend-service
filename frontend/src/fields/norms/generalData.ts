@@ -28,9 +28,9 @@ export const generalData: InputField[] = [
   {
     name: "documentNumber",
     type: InputType.TEXT,
-    label: "Dokumentennummer",
+    label: "Dokumentnummer",
     inputAttributes: {
-      ariaLabel: "Dokumentennummer",
+      ariaLabel: "Dokumentnummer",
     },
   },
   {
