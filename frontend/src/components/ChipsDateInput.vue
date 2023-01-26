@@ -135,7 +135,7 @@ const setFocusedItemIndex = (index: number) => {
 }
 
 const isInPast = computed(() => {
-  if (currentInput.value) {
+  if (currentInput.value && currentInput.value !== "") {
     const date = new Date(currentInput.value)
     const today = new Date()
     return date < today
@@ -150,7 +150,24 @@ const hasError = computed(
 )
 
 watch(
-  hasError,
+  currentInput,
+  () => {
+    if (hasError.value) {
+      if (currentInput.value == "") {
+        emits("update:validationError", {
+          defaultMessage: "Entscheidungsdatum ist kein valides Datum",
+          field: props.id,
+        })
+      }
+    } else {
+      emits("update:validationError", undefined)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  isInPast,
   () => {
     if (hasError.value) {
       if (!isInPast.value && !props.isFutureDate) {
@@ -159,14 +176,8 @@ watch(
             "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
           field: props.id,
         })
-      } else
-        emits("update:validationError", {
-          defaultMessage: "Entscheidungsdatum ist kein valides Datum",
-          field: props.id,
-        })
-    } else {
-      emits("update:validationError", undefined)
-    }
+      }
+    } else emits("update:validationError", undefined)
   },
   { immediate: true }
 )

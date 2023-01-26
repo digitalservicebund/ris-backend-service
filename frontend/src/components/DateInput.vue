@@ -33,7 +33,7 @@ watch(
 )
 
 const isInPast = computed(() => {
-  if (inputValue.value) {
+  if (inputValue.value && inputValue.value !== "") {
     const date = new Date(inputValue.value)
     const today = new Date()
     return date < today
@@ -48,8 +48,27 @@ const hasError = computed(
 )
 
 watch(
-  hasError,
+  inputValue,
   () => {
+    console.log("inputValue changed", inputValue.value)
+    if (hasError.value) {
+      if (inputValue.value == "") {
+        emit("update:validationError", {
+          defaultMessage: "Entscheidungsdatum ist kein valides Datum",
+          field: props.id,
+        })
+      }
+    } else {
+      emit("update:validationError", undefined)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  isInPast,
+  () => {
+    console.log("isInPast changed", isInPast.value)
     if (hasError.value) {
       if (!isInPast.value && !props.isFutureDate) {
         emit("update:validationError", {
@@ -57,14 +76,8 @@ watch(
             "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
           field: props.id,
         })
-      } else
-        emit("update:validationError", {
-          defaultMessage: "Entscheidungsdatum ist kein valides Datum",
-          field: props.id,
-        })
-    } else {
-      emit("update:validationError", undefined)
-    }
+      }
+    } else emit("update:validationError", undefined)
   },
   { immediate: true }
 )
