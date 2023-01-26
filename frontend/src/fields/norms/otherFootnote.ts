@@ -2,14 +2,6 @@ import { InputField, InputType } from "@/domain"
 
 export const otherFootnote: InputField[] = [
   {
-    name: "otherFootnote",
-    type: InputType.TEXT,
-    label: "Sonstige Fußnote",
-    inputAttributes: {
-      ariaLabel: "Sonstige Fußnote",
-    },
-  },
-  {
     name: "footnoteChange",
     type: InputType.TEXT,
     label: "Änderungsfußnote",
@@ -47,6 +39,14 @@ export const otherFootnote: InputField[] = [
     label: "EU/EG-Recht",
     inputAttributes: {
       ariaLabel: "EU/EG-Recht",
+    },
+  },
+  {
+    name: "otherFootnote",
+    type: InputType.TEXT,
+    label: "Sonstige Fußnote",
+    inputAttributes: {
+      ariaLabel: "Sonstige Fußnote",
     },
   },
 ]
