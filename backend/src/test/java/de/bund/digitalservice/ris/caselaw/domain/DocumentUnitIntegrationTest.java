@@ -715,6 +715,45 @@ class DocumentUnitIntegrationTest {
   }
 
   @Test
+  void testUndoSettingDocumentType() {
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
+            .uuid(UUID.randomUUID())
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .documentTypeId(123L)
+            .build();
+    repository.save(dto).block();
+
+    DocumentUnit documentUnitFromFrontend =
+        DocumentUnit.builder()
+            .uuid(dto.getUuid())
+            .creationtimestamp(dto.getCreationtimestamp())
+            .documentNumber(dto.getDocumentnumber())
+            .build();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitFromFrontend.uuid())
+        .bodyValue(documentUnitFromFrontend)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().coreData().documentType()).isNull();
+            });
+
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getDocumentTypeId()).isNull();
+    assertThat(list.get(0).getDocumentTypeDTO()).isNull();
+  }
+
+  @Test
   void testLegalEffectToBeSetFromNotSpecifiedToYesBySpecialCourtChangeButBeChangeableAfterwards() {
     testLegalEffectChanges(LegalEffect.NOT_SPECIFIED, "BGH", LegalEffect.YES);
   }

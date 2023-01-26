@@ -130,6 +130,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<DocumentUnitDTO> enrichDocumentType(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
     if (documentUnit.coreData() == null || documentUnit.coreData().documentType() == null) {
+      documentUnitDTO.setDocumentTypeId(null);
       return Mono.just(documentUnitDTO);
     }
     return documentTypeRepository
