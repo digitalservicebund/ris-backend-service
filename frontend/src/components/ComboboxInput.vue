@@ -87,6 +87,7 @@ const clearSelection = () => {
   } else emit("update:modelValue", undefined)
   filter.value = ""
   inputText.value = ""
+  focusedItemIndex.value = 0
   if (showDropdown.value) {
     updateCurrentItems()
   }
