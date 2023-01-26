@@ -71,6 +71,9 @@ const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
   focusedItemIndex.value = 0
   if (showDropdown.value) {
+    if (inputText.value) {
+      filter.value = inputText.value
+    }
     updateCurrentItems()
     inputFieldRef.value?.focus()
   }

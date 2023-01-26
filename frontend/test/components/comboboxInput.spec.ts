@@ -108,7 +108,7 @@ describe("Combobox Element", () => {
     expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
   })
 
-  it("items shouldn't be filtered if no combobox", async () => {
+  it("items should be filtered if selected value exists", async () => {
     renderComponent({ modelValue: "testItem1" })
 
     const openDropdownContainer = screen.getByLabelText(
@@ -117,10 +117,8 @@ describe("Combobox Element", () => {
 
     await user.click(openDropdownContainer)
     const dropdownItems = screen.getAllByLabelText("dropdown-option")
-    expect(dropdownItems).toHaveLength(3)
+    expect(dropdownItems).toHaveLength(1)
     expect(dropdownItems[0]).toHaveTextContent("testItem1")
-    expect(dropdownItems[1]).toHaveTextContent("testItem2")
-    expect(dropdownItems[2]).toHaveTextContent("testItem3")
   })
 
   it("items should show message if no items matched", async () => {
