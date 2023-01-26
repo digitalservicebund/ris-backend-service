@@ -32,7 +32,13 @@ public class MailTrackingController {
 
     return service
         .setPublishState(documentUnitUuid, publishState)
-        .map(resultString -> ResponseEntity.status(HttpStatus.OK).body(resultString))
-        .onErrorReturn(ResponseEntity.internalServerError().body("Could not set publish state"));
+        .map(
+            uuid -> ResponseEntity.status(HttpStatus.OK).body("Publish state was set successfully"))
+        .defaultIfEmpty(
+            ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body("Publish state could not be set: invalid payload"))
+        .onErrorReturn(
+            ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Publish state could not be set"));
   }
 }

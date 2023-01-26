@@ -27,18 +27,17 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
   }
 
   @Override
-  public Mono<String> setPublishState(UUID documentUnitUuid, PublishState publishState) {
+  public Mono<UUID> setPublishState(UUID documentUnitUuid, PublishState publishState) {
     return mailRepository
         .getLastPublishedXmlMail(documentUnitUuid)
         .map(
             xmlMail -> {
               Instant publishDate = Instant.now();
-
               if (publishState == PublishState.SUCCESS) {
-                log.info("Mail delivery was successful: {}", documentUnitUuid);
+                log.info("Mail delivery ({}) was successful ({})", documentUnitUuid, publishState);
               } else {
                 log.warn(
-                    "Mail delivery was not successful: {} ({})", documentUnitUuid, publishState);
+                    "Mail delivery ({}) was not successful ({})", documentUnitUuid, publishState);
               }
               return xmlMail.toBuilder()
                   .publishState(publishState)
@@ -46,8 +45,17 @@ public class SendInBlueMailTrackingService implements MailTrackingService {
                   .build();
             })
         .flatMap(mailRepository::save)
-        .doOnNext(xmlMail -> log.info("Publish state was set for {}", documentUnitUuid))
-        .map(xmlMail -> "Publish state was set successfully")
-        .doOnError(ex -> log.error("Couldn't set publish state."));
+        .doOnSuccess(
+            xmlMail -> {
+              if (xmlMail == null) {
+                log.warn(
+                    "Mail publish state ({}) was not set: invalid DocumentUnitUuid",
+                    documentUnitUuid);
+              } else {
+                log.info("Mail publish state ({}) was set", documentUnitUuid);
+              }
+            })
+        .map(xmlMail -> documentUnitUuid)
+        .doOnError(ex -> log.error("Could not set publish state"));
   }
 }
