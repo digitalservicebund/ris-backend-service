@@ -100,7 +100,9 @@ const setChosenItem = (value: ComboboxInputModelType) => {
 }
 
 const keyup = () => {
-  focusedItemIndex.value -= 1
+  if (focusedItemIndex.value > 1) {
+    focusedItemIndex.value -= 1
+  }
   const prev = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
@@ -108,7 +110,12 @@ const keyup = () => {
 }
 
 const keydown = () => {
-  focusedItemIndex.value += 1
+  if (
+    currentlyDisplayedItems.value &&
+    focusedItemIndex.value < currentlyDisplayedItems.value.length
+  ) {
+    focusedItemIndex.value += 1
+  }
   const next = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
