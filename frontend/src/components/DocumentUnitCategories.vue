@@ -40,15 +40,11 @@ const handleUpdateDocumentUnit = async () => {
     validationErrors.value = []
   }
   if (response.data) {
-    updateStatus.value = response.status
     updatedDocumentUnit.value = response.data as DocumentUnit
   }
-  setTimeout(() => {
-    hasDataChange.value = false
-    lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit) // <-- updatedDocumentUnit?
-    updateStatus.value = response.status
-    if (updateStatus.value !== UpdateStatus.SUCCEED) return
-  }, 1000)
+  hasDataChange.value = false
+  lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit) // <-- updatedDocumentUnit?
+  updateStatus.value = response.status
 }
 const router = useRouter()
 const route = useRoute()
