@@ -16,107 +16,76 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const buttonClasses = computed(() => ({
-  "ris-btn": true,
   "btn-primary": props.buttonType == "primary",
   "btn-secondary": props.buttonType == "secondary",
   "btn-ghost": props.buttonType == "ghost",
   "btn-tertiary": props.buttonType == "tertiary",
-}))
-
-const labels = computed(() => ({
-  "label-ghost": props.buttonType == "ghost",
 }))
 </script>
 
 <template>
   <button
     :aria-label="ariaLabel"
+    class="flex gap-12 ris-btn"
     :class="buttonClasses"
     flat
     :ripple="false"
     :rounded="0"
   >
     <slot>
-      <span v-if="icon" class="material-icons mr-12"> {{ icon }} </span>
-      <span class="label-02-bold" :class="labels">{{ label }} </span>
+      <span v-if="icon" class="material-icons"> {{ icon }} </span>
+      <span v-if="label" class="label-02-bold">{{ label }} </span>
     </slot>
   </button>
 </template>
 
 <style lang="scss" scoped>
 .ris-btn {
-  @apply align-middle bg-blue-800 inline-flex items-center 
+  @apply align-middle bg-blue-800 text-white inline-flex items-center
   justify-center max-w-full
-  no-underline overflow-hidden outline-none shrink-0 select-none
-  relative no-underline normal-case 
-  indent-[0.1em] px-[1.5rem] py-[1.188rem] whitespace-nowrap;
+  overflow-hidden shrink-0 select-none
+  relative no-underline normal-case
+  indent-[0.1em] px-[1.5rem] py-[1.188rem] whitespace-nowrap
+  border-blue-800 border-2
+  outline-blue-800 outline-0 outline-offset-4 outline-none;
 
   letter-spacing: 0.16px;
-  line-height: normal;
-
-  &:focus-visible {
-    outline-offset: 2px;
-  }
-}
-
-.btn-primary {
-  @apply bg-blue-800 text-white;
 
   &:hover {
-    @apply bg-blue-800;
+    @apply bg-blue-700 border-blue-700;
+  }
+
+  &:focus {
+    @apply outline-4;
   }
 
   &:active {
-    @apply bg-blue-500;
-  }
-
-  &:focus-visible {
-    @apply border-2 border-solid border-blue-800;
+    @apply bg-blue-500 text-blue-800 border-0;
   }
 
   &:disabled {
-    @apply bg-gray-400 text-gray-900;
+    @apply bg-gray-400 text-gray-600 border-0;
   }
 }
 
 .btn-secondary {
-  @apply border-solid border-2 border-blue-800 text-blue-800 bg-yellow-500;
+  @apply text-blue-800 bg-yellow-500;
 
   &:hover {
     @apply bg-yellow-700;
   }
 
+  &:focus {
+    @apply border-yellow-500;
+  }
+
   &:active {
     @apply bg-yellow-400;
   }
-
-  &:focus-visible {
-    @apply border-solid border-2 border-blue-800;
-  }
-}
-
-.btn-ghost {
-  @apply border-2 border-solid border-transparent bg-transparent text-blue-800;
-
-  &:hover {
-    @apply border-2 border-solid border-blue-800 bg-white;
-  }
-
-  &:active {
-    @apply border-white bg-white;
-  }
-
-  &:focus-visible {
-    @apply border-2 border-solid border-blue-800 bg-white;
-  }
-}
-
-.label-ghost {
-  @apply underline;
 }
 
 .btn-tertiary {
-  @apply border-solid border-2 border-blue-800 text-blue-800 bg-transparent;
+  @apply text-blue-800 bg-transparent;
 
   &:hover {
     @apply bg-blue-200;
@@ -126,8 +95,29 @@ const labels = computed(() => ({
     @apply border-blue-200 bg-blue-200;
   }
 
-  &:focus-visible {
-    @apply border-solid border-2 border-blue-800 bg-blue-200;
+  &:disabled {
+    @apply bg-white border-2 border-gray-600;
+  }
+}
+
+.btn-ghost {
+  @apply border-transparent bg-transparent text-blue-800;
+
+  &:hover,
+  &:focus {
+    @apply border-gray-600 bg-white;
+  }
+
+  &:active {
+    @apply border-white bg-white;
+  }
+
+  &:disabled {
+    @apply bg-transparent;
+  }
+
+  .label-02-bold {
+    @apply underline;
   }
 }
 </style>

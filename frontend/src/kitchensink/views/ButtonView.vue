@@ -8,68 +8,63 @@ const updateStatus = ref(UpdateStatus)
 </script>
 
 <template>
-  <div class="flex flex-col gap-y-20 items-start">
+  <div class="flex flex-col gap-20 items-start w-full">
     <h2 class="heading-02-regular">Text Button</h2>
-    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
-      <div>
-        <TextButton button-type="primary" label="Button Primary" />
-      </div>
-      <div>
-        <TextButton
-          button-type="primary"
-          icon="close"
-          label="Button Primary With Icon"
-        />
-      </div>
-      <div>
-        <TextButton button-type="primary" icon="close" label="" />
-      </div>
+
+    <div class="flex gap-20 w-full">
+      <TextButton button-type="primary" label="Button Primary" />
+
+      <TextButton
+        button-type="primary"
+        icon="close"
+        label="Button Primary With Icon"
+      />
+
+      <TextButton button-type="primary" icon="close" label="" />
+
+      <TextButton button-type="primary" disabled label="Disabled" />
     </div>
 
-    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
-      <div>
-        <TextButton button-type="secondary" label="Button Secondary" />
-      </div>
-      <div>
-        <TextButton
-          button-type="secondary"
-          icon="close"
-          label="Button Secondary With Icon"
-        />
-      </div>
-      <div>
-        <TextButton button-type="secondary" icon="close" label="" />
-      </div>
+    <div class="flex gap-20 w-full">
+      <TextButton button-type="secondary" label="Button Secondary" />
+
+      <TextButton
+        button-type="secondary"
+        icon="close"
+        label="Button Secondary With Icon"
+      />
+
+      <TextButton button-type="secondary" icon="close" label="" />
+
+      <TextButton button-type="secondary" disabled label="Disabled" />
     </div>
-    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
-      <div>
-        <TextButton button-type="tertiary" label="Button Tertiary" />
-      </div>
-      <div>
-        <TextButton
-          button-type="tertiary"
-          icon="close"
-          label="Button Tertiary With Icon"
-        />
-      </div>
-      <div>
-        <TextButton button-type="tertiary" icon="close" label="" />
-      </div>
+
+    <div class="flex gap-20 w-full">
+      <TextButton button-type="tertiary" label="Button Tertiary" />
+
+      <TextButton
+        button-type="tertiary"
+        icon="close"
+        label="Button Tertiary With Icon"
+      />
+
+      <TextButton button-type="tertiary" icon="close" label="" />
+
+      <TextButton button-type="tertiary" disabled label="Disabled" />
     </div>
-    <div class="flex flex-row flex-wrap gap-8 items-start w-full">
-      <div>
-        <TextButton button-type="ghost" label="Button Ghost" />
-      </div>
-      <div>
-        <TextButton
-          button-type="ghost"
-          icon="close"
-          label="Button Ghost With Icon"
-        />
-      </div>
-      <div>
-        <TextButton button-type="ghost" icon="close" label="" />
-      </div>
+
+    <div class="flex gap-20 w-full">
+      <TextButton button-type="ghost" label="Button Ghost" />
+
+      <TextButton
+        button-type="ghost"
+        icon="close"
+        label="Button Ghost With Icon"
+      />
+
+      <TextButton button-type="ghost" icon="close" label="" />
+
+      <TextButton button-type="ghost" disabled label="Disabled" />
     </div>
 
     <div class="flex flex-col gap-y-20 items-start">
