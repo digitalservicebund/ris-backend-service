@@ -21,5 +21,6 @@ dist
 
 # playwright
 test-results
+storageState.json
 
 frontend-licence-report.csv

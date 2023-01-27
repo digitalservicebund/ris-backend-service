@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: run.sh
-    checksum: dddf7982e8af63db48cbe9942d22d67cb3ad0cdb0deb8d9a74dfe26305b471c9
+    checksum: 19dede0d2737b9e8cc548da7e595b847c2f4e0caf1c6775ce04e149d5ffc4c79
   - filename: .github/workflows/clean-staging.yml
     checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
@@ -124,7 +124,7 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: 99ff251dd46a0035450c82062fe2982c23650c793a5e16dc30b0c6e1cfcfd9e2
   - filename: frontend/.env.development
-    checksum: b87426c20cb1da4785bf52714577b2211ced4673c555418bf8c2e198fa615ea3
+    checksum: 29f341b3346b7eb7a74346878bd5698385c5104c13169f7f56e0a4f018305296
   - filename: frontend/playwright.config.ts
     checksum: b39672c8ea9e2128e297dde71ef2345bb44e1c26d96d4ed00df0b8fdf55ff3cf
   - filename: frontend/sonar-project.properties

@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test"
 import { testWithDocumentUnit } from "./fixtures"
 
 test.describe("create a doc unit and delete it again", () => {
-  const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
+  const backendHost = process.env.E2E_BASE_URL ?? "http://127.0.0.1"
   test("create new doc unit", async ({ page, request }) => {
     await page.goto("/")
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
