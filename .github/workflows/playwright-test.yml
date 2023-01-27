@@ -38,8 +38,12 @@ jobs:
       - name: Run ${{ inputs.mode }} tests in ${{ inputs.browser }}
         env:
           E2E_BASE_URL: ${{ secrets.STAGING_URL }}
+          # basicAuth
           STAGING_USER: ${{ secrets.STAGING_USER }}
           STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
+          # OIDC
+          E2E_TEST_USER: ${{ secrets.E2E_TEST_USER }}
+          E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
         run: npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
         working-directory: ./frontend
       - name: Upload screenshots of failed tests
