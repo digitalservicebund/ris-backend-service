@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: .github/workflows/clean-staging.yml
     checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
-    checksum: f05c1b49b55813cb969bbf1c75df27b92ac0fb57d34088bd4334d9a53453c3f6
+    checksum: 7676ee7d3cf052a011b7991f0c8643905deb00506e81156af856aa4531ccce34
   - filename: .github/workflows/playwright-test.yml
     checksum: 8f77e3a1a06c534055c151dd1151b550ab600d253d67566a68ebf6a84f88b5a8
   - filename: .github/workflows/playwright.yml
