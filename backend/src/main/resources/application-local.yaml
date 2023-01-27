@@ -1,0 +1,23 @@
+otc:
+  obs:
+    bucket-name: local
+local:
+  file-storage: .local-storage
+error:
+  nodes:
+    active: true
+spring:
+  data:
+    redis:
+      host: localhost
+      password: password
+  security:
+    oauth2:
+      client:
+        registration:
+          oidcclient:
+            client-id: ${OAUTH2_CLIENT_ID:}
+            client-secret: ${OAUTH2_CLIENT_SECRET:}
+        provider:
+          keycloak:
+            issuer-uri: ${OAUTH2_CLIENT_ISSUER:}

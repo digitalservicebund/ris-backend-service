@@ -1,8 +1,16 @@
 <script lang="ts" setup>
+import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import Logo from "../assets/neuRIS-logo.svg"
+import authService from "@/services/authService"
 
 const route = useRoute()
+const userName = ref<string>()
+
+onMounted(async () => {
+  const nameResponse = await authService.getName()
+  if (nameResponse.data) userName.value = nameResponse.data
+})
 </script>
 
 <template>
@@ -35,7 +43,7 @@ const route = useRoute()
 
     <div class="flex font-bold gap-8 items-center">
       <span aria-hidden="true" class="material-icons"> perm_identity </span>
-      User Name
+      {{ userName }}
     </div>
   </nav>
 </template>

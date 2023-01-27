@@ -16,7 +16,7 @@ testWithImportedNorm(
 
     await page.goto(`/api/v1/norms/xml/${eliInputValue}`)
 
-    const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
+    const backendHost = process.env.E2E_BASE_URL ?? "http://127.0.0.1"
     const response = await request.get(
       `${backendHost}/api/v1/norms/xml/${eliInputValue}`
     )

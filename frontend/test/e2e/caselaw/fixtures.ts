@@ -9,7 +9,7 @@ type MyFixtures = {
 
 export const testWithDocumentUnit = test.extend<MyFixtures>({
   documentNumber: async ({ request }, use) => {
-    const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
+    const backendHost = process.env.E2E_BASE_URL ?? "http://127.0.0.1"
     const response = await request.post(
       `${backendHost}/api/v1/caselaw/documentunits`,
       {

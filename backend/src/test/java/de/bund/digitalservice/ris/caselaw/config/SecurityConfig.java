@@ -2,25 +2,21 @@ package de.bund.digitalservice.ris.caselaw.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
+import org.springframework.context.annotation.Primary;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
-import org.springframework.security.web.server.authentication.HttpStatusServerEntryPoint;
 
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
   @Bean
+  @Primary
   public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
     return http.authorizeExchange()
         .anyExchange()
-        .authenticated()
-        .and()
-        .oauth2Login()
-        .and()
-        .exceptionHandling()
-        .authenticationEntryPoint(new HttpStatusServerEntryPoint(HttpStatus.UNAUTHORIZED))
+        .permitAll()
         .and()
         .csrf()
         .disable()
@@ -29,5 +25,15 @@ public class SecurityConfig {
                 headers.contentSecurityPolicy(
                     "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'"))
         .build();
+  }
+
+  @Bean
+  public AuthenticationManager
+      authenticationManager() { // to delete default username and password that is printed in the
+    // log every time, you can provide here any auth manager
+    // (InMemoryAuthenticationManager, etc) as you need
+    return authentication -> {
+      throw new UnsupportedOperationException();
+    };
   }
 }

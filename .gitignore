@@ -2,6 +2,9 @@
 .lefthook-local
 lefthook-local.yml
 
+### OS
+**/.DS_Store
+
 ### IntelliJ IDEA ###
 .idea
 *.iws

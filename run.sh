@@ -70,16 +70,26 @@ _start() {
   gradle bootRun
 }
 
-_gradle_env() {
+_env() {
   if ! command -v gopass > /dev/null 2>&1; then
     GH_PACKAGES_REPOSITORY_USER=$READ_PACKAGES_PAT_USERNAME
     GH_PACKAGES_REPOSITORY_TOKEN=$READ_PACKAGES_PAT_TOKEN
   else
     GH_PACKAGES_REPOSITORY_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username)
     GH_PACKAGES_REPOSITORY_TOKEN=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token)
+    OAUTH2_CLIENT_ISSUER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/issuer-uri)
+    OAUTH2_CLIENT_ID=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/client-id)
+    OAUTH2_CLIENT_SECRET=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/client-secret)
+    E2E_TEST_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/username)
+    E2E_TEST_PASSWORD=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/password)
   fi
   echo export GH_PACKAGES_REPOSITORY_USER="$GH_PACKAGES_REPOSITORY_USER"
   echo export GH_PACKAGES_REPOSITORY_TOKEN="$GH_PACKAGES_REPOSITORY_TOKEN"
+  echo export OAUTH2_CLIENT_ISSUER="$OAUTH2_CLIENT_ISSUER"
+  echo export OAUTH2_CLIENT_ID="$OAUTH2_CLIENT_ID"
+  echo export OAUTH2_CLIENT_SECRET="$OAUTH2_CLIENT_SECRET"
+  echo export E2E_TEST_USER="$E2E_TEST_USER"
+  echo export E2E_TEST_PASSWORD="$E2E_TEST_PASSWORD"
 }
 
 _dev() {
@@ -88,7 +98,7 @@ _dev() {
     exit 1
   fi
   docker build ./frontend -f frontend/Dockerfile -t neuris/frontend --no-cache
-  eval "$(_gradle_env)"
+  eval "$(_env)"
   docker compose up
 }
 
@@ -131,7 +141,7 @@ _help() {
   echo ""
   echo "Available commands:"
   echo "init                  Set up repository for development"
-  echo "gradle-env            Provide shell env for Java build tooling; usage: \`eval \"\$(./run.sh gradle-env)\"\`"
+  echo "env                   Provide shell env build/test tooling; usage: \`eval \"\$(./run.sh env)\"\`"
   echo "dev                   Start full-stack development environment"
   echo "clean-staging         Deletes all existing documentunits on staging"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
@@ -141,7 +151,7 @@ _help() {
 cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
-  "gradle-env") _gradle_env ;;
+  "env") _env ;;
   "dev") _dev ;;
   "clean-staging") _clean_staging ;;
   "_start") _start ;;

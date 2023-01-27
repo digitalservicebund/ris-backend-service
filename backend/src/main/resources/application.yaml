@@ -1,0 +1,47 @@
+error:
+  nodes:
+    active: false
+info:
+  git:
+    enabled: true
+    mode: full
+management:
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  health:
+    livenessState:
+      enabled: true
+    readinessState:
+      enabled: true
+otc:
+  obs:
+    endpoint: https://obs.eu-de.otc.t-systems.com
+sentry:
+  dsn: ${SENTRY_DSN:}
+server:
+  shutdown: graceful
+logging:
+  level:
+    org.springframework: DEBUG
+spring:
+  codec:
+    max-in-memory-size: 100MB
+  sql:
+    init:
+      mode: always
+  security:
+    oauth2:
+      client:
+        registration:
+          oidcclient:
+            provider: keycloak
+            scope:
+              - openid
+              - profile

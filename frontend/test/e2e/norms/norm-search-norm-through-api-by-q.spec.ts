@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
 import { testWithImportedNorm } from "./fixtures"
 
-const backendHost = process.env.E2E_BASE_URL ?? "http://localhost:8080"
+const backendHost = process.env.E2E_BASE_URL ?? "http://127.0.0.1"
 const officialLongTitle =
   "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
 

@@ -1,0 +1,12 @@
+application:
+  staging:
+    password: ${STAGING_PASSWORD:test}
+    url: ${STAGING_URL:http://127.0.0.1}
+    user: ${STAGING_USER:test}
+
+spring:
+  sql:
+    init:
+      mode: always
+  r2dbc:
+    url: r2dbc:tc:postgresql:///neuris?TC_IMAGE_TAG=12

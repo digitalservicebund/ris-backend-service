@@ -2,13 +2,13 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: run.sh
-    checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
+    checksum: 19dede0d2737b9e8cc548da7e595b847c2f4e0caf1c6775ce04e149d5ffc4c79
   - filename: .github/workflows/clean-staging.yml
     checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
-    checksum: 7676ee7d3cf052a011b7991f0c8643905deb00506e81156af856aa4531ccce34
+    checksum: 2cbd837e9cea369d9343a20f5fc6cd8f70ea040a526735126d6c307b9bb0041a
   - filename: .github/workflows/playwright-test.yml
-    checksum: 8f77e3a1a06c534055c151dd1151b550ab600d253d67566a68ebf6a84f88b5a8
+    checksum: 18ce292910ec2d9b28ede7e9ba97bcadb4905a735f882e29efe19ab31461cbf9
   - filename: .github/workflows/playwright.yml
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: .github/workflows/scan.yml
@@ -16,7 +16,7 @@ fileignoreconfig:
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: a45d2d40e5dc9b9a2b7869ce1301bc3bf04b9aca56df43675696329ed689a6ac
+    checksum: 886958e3915b51148bab9c5ad55c6d3aa50acc0a9a27fde14a85b6b230218893
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: 5ac01c3b6a5d2909ffbc054ac98d43962047e762b86654207591aeaecdf7a434
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
@@ -121,14 +121,12 @@ fileignoreconfig:
     checksum: 86f6f61e9c6b86c2b5b876bda2c27704d342895f0c53b0c04e5e15e62a40bedd
   - filename: backend/src/test/kotlin/unit/framework/adapter/input/restapi/LoadNormControllerTest.kt
     checksum: 7a3e86d1e8e6479150fa18795ad36e0da7f5b16f0fa8251a52e7e9c58a8ea2b4
-  - filename: backend/src/test/resources/application.properties
-    checksum: 926890c72991e9d7df4a940ade6be4f90204060f0174c98a8e1daeb35f66470d
   - filename: doc/norms/backend-api.yaml
     checksum: 99ff251dd46a0035450c82062fe2982c23650c793a5e16dc30b0c6e1cfcfd9e2
   - filename: frontend/.env.development
-    checksum: b87426c20cb1da4785bf52714577b2211ced4673c555418bf8c2e198fa615ea3
+    checksum: 29f341b3346b7eb7a74346878bd5698385c5104c13169f7f56e0a4f018305296
   - filename: frontend/playwright.config.ts
-    checksum: b39672c8ea9e2128e297dde71ef2345bb44e1c26d96d4ed00df0b8fdf55ff3cf
+    checksum: f1798af5d203991d92e9933276065810eb215d5e3ccfece1a9f5640d1490b1b9
   - filename: frontend/sonar-project.properties
     checksum: 861eaf5de8f7daaac7a9571862f527a6e9f9d2a0936a2ab52378e9fa018719e4
   - filename: frontend/src/components/DocumentUnitCoreData.vue
@@ -199,8 +197,19 @@ fileignoreconfig:
     checksum: bb59c1fbb5151f08ef04550afa9b33a32799a234ae4518b45a3e123e6e18c439
   - filename: backend/src/main/resources/db/migration/V0.34__caselaw_migrate_two_date_columns.sql
     checksum: a7db3ec44b464cc778f8f981487662d6b03701121480a988088c592f9c3df6dd
+  - filename: backend/src/main/resources/application.yaml
+    checksum: bc09474da7cfe8b7b876201f9aaf4dd4371643139185ccd156779175391a4901
+  - filename: backend/src/main/resources/application-local.yaml
+    checksum: 9305265671260f4be1564ee44fc8e32065346ccc28c1323e46f94e02759d615a
+  - filename: compose.yaml
+    checksum: 5205fc8e9d0099f6dee0503d87f56cc4facce8e1ff71aa60244155e8a571b514
+  - filename: backend/src/test/resources/application.yaml
+    checksum: c26464b0ae1a3f87f7eeb7345ce4e375a0ade3a8a76927723d72a09ff61f2e2b
+  - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/HealthEndpointIntegrationTest.java
+    checksum: 219d97511f52a87d3a85622899ab170267a96bc791ce32fee11bcd204f505a97
 
 scopeconfig:
   - scope: node
 allowed_patterns:
   - key
+threshold: medium

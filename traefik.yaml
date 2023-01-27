@@ -1,0 +1,19 @@
+http:
+  routers:
+    backend:
+      rule: "PathPrefix(`/api`) || PathPrefix(`/actuator`) || PathPrefix(`/login`) || PathPrefix(`/logout`) || PathPrefix(`/oauth`)"
+      service: backend
+    frontend:
+      rule: "PathPrefix(`/`)"
+      service: frontend 
+  
+  services:
+    backend:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:8080"
+
+    frontend:
+      loadBalancer:
+        servers:
+          - url: "http://localhost:3000"
