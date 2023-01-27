@@ -16,7 +16,7 @@ fileignoreconfig:
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: 186059ecaa2a20f8323ccae1e73431ff8e50da6d1c5da476aa92d447028a0890
+    checksum: f83222d0d51deae554a9221fd8bbb6ed36111be54c14ec73ac01b527fe2c7fe5
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: 5ac01c3b6a5d2909ffbc054ac98d43962047e762b86654207591aeaecdf7a434
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
@@ -200,11 +200,16 @@ fileignoreconfig:
   - filename: backend/src/main/resources/application.yaml
     checksum: bc09474da7cfe8b7b876201f9aaf4dd4371643139185ccd156779175391a4901
   - filename: backend/src/main/resources/application-local.yaml
-    checksum: d4fa4d2ac5a196838443e8a1ef20006ef7adfc8a61631267fe40120db3def397
+    checksum: 9305265671260f4be1564ee44fc8e32065346ccc28c1323e46f94e02759d615a
   - filename: compose.yaml
     checksum: 5205fc8e9d0099f6dee0503d87f56cc4facce8e1ff71aa60244155e8a571b514
+  - filename: backend/src/test/resources/application.yaml
+    checksum: c26464b0ae1a3f87f7eeb7345ce4e375a0ade3a8a76927723d72a09ff61f2e2b
+  - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/HealthEndpointIntegrationTest.java
+    checksum: 219d97511f52a87d3a85622899ab170267a96bc791ce32fee11bcd204f505a97
 
 scopeconfig:
   - scope: node
 allowed_patterns:
   - key
+threshold: medium

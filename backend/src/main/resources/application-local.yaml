@@ -7,8 +7,6 @@ error:
   nodes:
     active: true
 spring:
-  session:
-    store-type: redis
   data:
     redis:
       host: localhost
