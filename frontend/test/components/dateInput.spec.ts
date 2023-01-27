@@ -80,17 +80,19 @@ describe("DateInput", () => {
   })
 
   it("does not allow dates in the future", async () => {
-    const { emitted } = renderComponent()
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
-
-    Object.defineProperty(input, "target", {
-      value: "2024-02-10",
+    const { emitted } = renderComponent({
+      value: "2099-02-10",
     })
 
-    await fireEvent.update(input)
-    await nextTick()
-
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
+
+    expect(emitted()["update:validationError"]).toBeTruthy()
+
+    const array = emitted()["update:validationError"] as ValidationError[][]
+
+    expect(
+      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
+    ).toBe("Das aria-label darf nicht in der Zukunft liegen")
   })
 
   it("it allows dates in the future if flag is set", async () => {
@@ -122,6 +124,14 @@ describe("DateInput", () => {
     await nextTick()
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
+
+    expect(emitted()["update:validationError"]).toBeTruthy()
+
+    const array = emitted()["update:validationError"] as ValidationError[][]
+
+    expect(
+      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
+    ).toBe("Kein valides Datum")
   })
 
   it("show validation error coming from the backend", async () => {

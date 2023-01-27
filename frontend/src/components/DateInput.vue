@@ -53,7 +53,7 @@ watch(
     if (hasError.value) {
       if (inputValue.value == "") {
         emit("update:validationError", {
-          defaultMessage: "Entscheidungsdatum ist kein valides Datum",
+          defaultMessage: "Kein valides Datum",
           field: props.id,
         })
       }
@@ -71,7 +71,7 @@ watch(
       if (!isInPast.value && !props.isFutureDate) {
         emit("update:validationError", {
           defaultMessage:
-            "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
+            "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
           field: props.id,
         })
       }
