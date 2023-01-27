@@ -126,7 +126,7 @@ fileignoreconfig:
   - filename: frontend/.env.development
     checksum: 29f341b3346b7eb7a74346878bd5698385c5104c13169f7f56e0a4f018305296
   - filename: frontend/playwright.config.ts
-    checksum: b39672c8ea9e2128e297dde71ef2345bb44e1c26d96d4ed00df0b8fdf55ff3cf
+    checksum: f1798af5d203991d92e9933276065810eb215d5e3ccfece1a9f5640d1490b1b9
   - filename: frontend/sonar-project.properties
     checksum: 861eaf5de8f7daaac7a9571862f527a6e9f9d2a0936a2ab52378e9fa018719e4
   - filename: frontend/src/components/DocumentUnitCoreData.vue
