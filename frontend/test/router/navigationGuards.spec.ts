@@ -1,7 +1,7 @@
 import router, { beforeEach } from "@/router"
 import authService from "@/services/authService"
 
-vi.mock("@/services/authenticationService")
+vi.mock("@/services/authService")
 
 describe("router's auth navigation guards", () => {
   afterEach(() => {
