@@ -5,7 +5,7 @@ const config: PlaywrightTestConfig = {
   testDir: "./test/e2e",
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
-  globalSetup: "./test/e2e/shared/globalSetup.ts",
+  globalSetup: "test/e2e/shared/globalSetup.ts",
   use: {
     viewport: { width: 1280, height: 720 },
     acceptDownloads: true,
