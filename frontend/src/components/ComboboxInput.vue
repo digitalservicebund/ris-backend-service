@@ -339,6 +339,8 @@ onBeforeUnmount(() => {
 
     &:focus {
       @apply bg-blue-300;
+
+      outline: none;
     }
 
     &__with-additional-info {
