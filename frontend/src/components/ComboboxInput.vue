@@ -222,7 +222,6 @@ onBeforeUnmount(() => {
           class="input-close-icon"
           tabindex="-1"
           @click="clearSelection"
-          @keydown.enter="clearSelection"
         >
           <span
             aria-label="Auswahl zurücksetzen"
@@ -236,7 +235,6 @@ onBeforeUnmount(() => {
           class="input-expand-icon"
           tabindex="-1"
           @click="toggleDropdown"
-          @keydown.enter="toggleDropdown"
         >
           <span v-if="!showDropdown" class="icon material-icons text-blue-800">
             expand_more
