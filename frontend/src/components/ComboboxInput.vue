@@ -280,6 +280,8 @@ onBeforeUnmount(() => {
             isRevokedCourt(item),
           'dropdown-container__dropdown-item__candidate-for-selection':
             candidateForSelection === item,
+          'dropdown-container__dropdown-item__currently-selected':
+            getLabelFromSelectedValue() === item.label,
         }"
         tabindex="0"
         @click="setChosenItem(item)"
@@ -385,6 +387,10 @@ onBeforeUnmount(() => {
 
     &__candidate-for-selection {
       @apply bg-blue-200;
+    }
+
+    &__currently-selected {
+      @apply border-l-4 border-solid border-l-blue-800;
     }
   }
 }
