@@ -21,6 +21,7 @@ module.exports = {
         100: "#f6f7f8",
         400: "#dcdee1",
         600: "#b8bdc3",
+        800: "#717a88",
         900: "#4e596a",
       },
       green: {
@@ -39,6 +40,10 @@ module.exports = {
         500: "#f5e05d",
         700: "#e5ce5c",
         900: "#c3a91e",
+      },
+      neutral: {
+        20: "#f4f5f7",
+        700: "#253858",
       },
       background: "rgba(184, 189, 195, 0.5)",
     },

@@ -335,23 +335,31 @@ onBeforeUnmount(() => {
     }
 
     &:hover {
-      @apply bg-blue-300;
+      @apply bg-gray-400;
     }
 
     &:focus {
-      @apply bg-blue-300;
+      @apply bg-blue-200;
 
       outline: none;
     }
 
     &__with-additional-info {
-      @apply bg-gray-100;
+      @apply text-gray-800;
+
+      font-style: italic;
     }
 
     &__additional-info {
-      @apply text-gray-900;
+      @apply text-neutral-700;
+      @apply bg-neutral-20;
 
+      padding: 6px 22px;
+      border-radius: 100px;
       float: right;
+      font-size: 14px;
+      font-style: normal;
+    }
     }
   }
 }
