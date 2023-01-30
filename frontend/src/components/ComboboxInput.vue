@@ -120,12 +120,8 @@ const onEnter = () => {
     setChosenItem(candidateForSelection.value)
     return
   }
-  const emptyInput = !inputText.value || inputText.value === ""
-  const inputTextEqualsSelectedItem =
-    getLabelFromSelectedValue() === inputText.value
-  if (emptyInput || inputTextEqualsSelectedItem) {
-    toggleDropdown()
-  }
+  updateInputText()
+  toggleDropdown()
 }
 
 const keyup = () => {
