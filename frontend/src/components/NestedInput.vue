@@ -34,14 +34,14 @@ const { inputValue } = useInputModel<NestedInputModelType, Props, Emits>(
 const parentValue = computed({
   get: () => inputValue.value?.fields.parent,
   set: (value) => {
-    if (value && inputValue.value) inputValue.value.fields.parent = value
+    if (inputValue.value) inputValue.value.fields.parent = value
   },
 })
 
 const childValue = computed({
   get: () => inputValue.value?.fields.child,
   set: (value) => {
-    if (value && inputValue.value) inputValue.value.fields.child = value
+    if (inputValue.value) inputValue.value.fields.child = value
   },
 })
 </script>

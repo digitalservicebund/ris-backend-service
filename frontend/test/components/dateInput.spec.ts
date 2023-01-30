@@ -79,6 +79,19 @@ describe("DateInput", () => {
     expect(emitted()["update:modelValue"]).toBeTruthy()
   })
 
+  it("emits undefined on backspace delete", async () => {
+    const { emitted } = renderComponent({
+      value: "2022-02-03",
+    })
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    await userEvent.type(input, "{backspace}")
+    await nextTick()
+
+    expect(input).toHaveValue("")
+    expect(emitted()["update:modelValue"]).toBeTruthy()
+    expect(emitted().input).toEqual(undefined)
+  })
+
   it("does not allow dates in the future", async () => {
     const { emitted } = renderComponent({
       value: "2099-02-10",

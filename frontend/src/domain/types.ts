@@ -86,7 +86,7 @@ export interface DateInputField extends BaseInputField {
   inputAttributes: DateAttributes
 }
 
-export type DateInputModelType = string
+export type DateInputModelType = string | undefined
 
 //DROPDOWN
 export type DropdownInputModelType = string

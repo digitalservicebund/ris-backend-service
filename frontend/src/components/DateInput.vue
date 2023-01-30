@@ -23,10 +23,11 @@ const inputValue = ref<string>()
 
 watch(
   props,
-  () =>
-    (inputValue.value = props.modelValue
+  () => {
+    inputValue.value = props.modelValue
       ? dayjs(props.modelValue).format("YYYY-MM-DD")
-      : props.value),
+      : props.value
+  },
   {
     immediate: true,
   }
@@ -85,10 +86,12 @@ const conditionalClasses = computed(() => ({
 }))
 
 function handleOnBlur() {
-  if (!hasError.value)
+  if (!hasError.value && inputValue.value)
     emit("update:modelValue", dayjs(inputValue.value).toISOString())
-  // TODO support clearing date and sending undefined to backend
-  // empty field should not be an error
+}
+
+function backspaceDelete() {
+  emit("update:modelValue", undefined)
 }
 </script>
 
@@ -103,6 +106,7 @@ function handleOnBlur() {
     min="1000-01-01"
     type="date"
     @blur="handleOnBlur"
+    @keydown.delete="backspaceDelete"
   />
 </template>
 

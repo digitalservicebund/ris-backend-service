@@ -285,4 +285,36 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     await expect(dateInfo).toContainText("03.02.2022")
   })
+
+  test("backspace delete resets decision date", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
+    expect(
+      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+    ).toBe("2022-02-03")
+
+    await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
+    await page.keyboard.press("Tab")
+
+    const infoPanel = page.locator("div", { hasText: documentNumber }).nth(-2)
+    await expect(
+      infoPanel.locator("div", { hasText: "Entscheidungsdatum" }).first()
+    ).toContainText("03.02.2022")
+
+    await page.locator("[aria-label='Entscheidungsdatum']").click()
+    await page.keyboard.press("Backspace")
+
+    expect(
+      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+    ).toBe("")
+
+    await expect(
+      infoPanel.locator("div", { hasText: "Entscheidungsdatum" }).first()
+    ).toHaveText("Entscheidungsdatum -")
+  })
 })
