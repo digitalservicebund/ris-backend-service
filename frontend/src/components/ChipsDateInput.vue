@@ -85,7 +85,7 @@ function enterDelete() {
     if (focusedItemIndex.value === chips.value.length) {
       focusPrevious()
     }
-    if (focusedItemIndex.value === -1) {
+    if (focusedItemIndex.value === 0) {
       resetFocus()
     }
   }
