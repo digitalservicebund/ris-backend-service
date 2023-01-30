@@ -24,9 +24,21 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const selectedValue = ref<ComboboxInputModelType>()
 const inputText = ref<string>()
 const currentlyDisplayedItems = ref<ComboboxItem[]>()
+
+const getLabelFromSelectedValue = (): string | undefined => {
+  if (
+    typeof selectedValue.value === "object" &&
+    "label" in selectedValue.value
+  ) {
+    return selectedValue.value.label
+  } else {
+    return selectedValue.value
+  }
+}
 
 watch(
   props,
@@ -49,11 +61,7 @@ function isCourt(input?: ComboboxInputModelType): input is Court {
 }
 
 function updateInputText() {
-  if (typeof selectedValue.value === "object" && "label" in selectedValue.value)
-    inputText.value = selectedValue.value.label
-  else {
-    inputText.value = selectedValue.value
-  }
+  inputText.value = getLabelFromSelectedValue()
 }
 
 const showDropdown = ref(false)
@@ -101,6 +109,20 @@ const setChosenItem = (item: ComboboxItem) => {
   showDropdown.value = false
   emit("update:modelValue", item.value)
   filter.value = item.label
+  candidateForSelection.value = undefined
+}
+
+const onEnter = () => {
+  if (candidateForSelection.value) {
+    setChosenItem(candidateForSelection.value)
+    return
+  }
+  const emptyInput = !inputText.value || inputText.value === ""
+  const inputTextEqualsSelectedItem =
+    getLabelFromSelectedValue() === inputText.value
+  if (emptyInput || inputTextEqualsSelectedItem) {
+    toggleDropdown()
+  }
 }
 
 const keyup = () => {
@@ -121,6 +143,7 @@ const keydown = () => {
 }
 
 const updateFocusedItem = () => {
+  candidateForSelection.value = undefined
   const item = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
@@ -136,15 +159,11 @@ const onTextChange = () => {
 
 const updateCurrentItems = async () => {
   const response = await props.itemService(filter.value)
-  if (response.data) {
-    currentlyDisplayedItems.value = response.data
-    insertItemIfEmpty()
-  } else {
+  if (!response.data) {
     console.error(response.error)
+    return
   }
-}
-
-const insertItemIfEmpty = () => {
+  currentlyDisplayedItems.value = response.data
   if (
     !currentlyDisplayedItems.value ||
     currentlyDisplayedItems.value.length === 0
@@ -152,6 +171,10 @@ const insertItemIfEmpty = () => {
     currentlyDisplayedItems.value = [
       { label: "Kein passender Eintrag", value: "" },
     ]
+    candidateForSelection.value = undefined
+  } else {
+    candidateForSelection.value = currentlyDisplayedItems.value[0]
+    focusedItemIndex.value = 1
   }
 }
 
@@ -199,10 +222,7 @@ onBeforeUnmount(() => {
     class="dropdown-container"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
-    <div
-      class="dropdown-container__open-dropdown"
-      @keydown.enter="toggleDropdown"
-    >
+    <div class="dropdown-container__open-dropdown" @keydown.enter="onEnter">
       <div class="bg-white input-container">
         <input
           :id="id"
@@ -258,6 +278,8 @@ onBeforeUnmount(() => {
         :class="{
           'dropdown-container__dropdown-item__with-additional-info':
             isRevokedCourt(item),
+          'dropdown-container__dropdown-item__candidate-for-selection':
+            candidateForSelection === item,
         }"
         tabindex="0"
         @click="setChosenItem(item)"
@@ -360,6 +382,9 @@ onBeforeUnmount(() => {
       font-size: 14px;
       font-style: normal;
     }
+
+    &__candidate-for-selection {
+      @apply bg-blue-200;
     }
   }
 }
