@@ -317,4 +317,41 @@ test.describe("ensuring the editing experience in categories is as expected", ()
       infoPanel.locator("div", { hasText: "Entscheidungsdatum" }).first()
     ).toHaveText("Entscheidungsdatum -")
   })
+
+  test("backspace delete in deviating decision date", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+      .click()
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .fill("2022-02-02")
+    await page.keyboard.press("Enter")
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .fill("2022-02-01")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator(".label-wrapper").nth(0)).toHaveText("02.02.2022")
+    await expect(page.locator(".label-wrapper").nth(1)).toHaveText("01.02.2022")
+
+    await page
+      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+      .fill("2022-02-03")
+
+    expect(
+      await page.inputValue("[aria-label='Abweichendes Entscheidungsdatum']")
+    ).toBe("2022-02-03")
+
+    await page.keyboard.press("Backspace")
+    await page.keyboard.press("Backspace")
+    expect(
+      await page.inputValue("[aria-label='Abweichendes Entscheidungsdatum']")
+    ).toBe("")
+  })
 })

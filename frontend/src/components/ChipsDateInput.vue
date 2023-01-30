@@ -74,7 +74,7 @@ function backspaceDelete() {
     chips.value.splice(chips.value.length - 1)
     updateModelValue()
     resetFocus()
-  }
+  } else currentInput.value = undefined
 }
 
 function enterDelete() {

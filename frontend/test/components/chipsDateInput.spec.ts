@@ -127,4 +127,13 @@ describe("ChipsInput", () => {
       [["2022-02-03T00:00:00.000Z"]],
     ])
   })
+
+  it("resets date input on backspace delete", async () => {
+    const { user } = renderComponent()
+    const input = screen.getByLabelText("aria-label") as HTMLInputElement
+    await user.type(input, "2022-02-03")
+    expect(input).toHaveValue("2022-02-03")
+    await user.type(input, "{backspace}")
+    expect(input).toHaveValue("")
+  })
 })
