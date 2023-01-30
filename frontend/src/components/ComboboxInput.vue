@@ -107,10 +107,7 @@ const keyup = () => {
   if (focusedItemIndex.value > 1) {
     focusedItemIndex.value -= 1
   }
-  const prev = dropdownItemsRef.value?.childNodes[
-    focusedItemIndex.value
-  ] as HTMLElement
-  if (prev) prev.focus()
+  updateFocusedItem()
 }
 
 const keydown = () => {
@@ -120,10 +117,14 @@ const keydown = () => {
   ) {
     focusedItemIndex.value += 1
   }
-  const next = dropdownItemsRef.value?.childNodes[
+  updateFocusedItem()
+}
+
+const updateFocusedItem = () => {
+  const item = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
-  if (next) next.focus()
+  if (item) item.focus()
 }
 
 const onTextChange = () => {
