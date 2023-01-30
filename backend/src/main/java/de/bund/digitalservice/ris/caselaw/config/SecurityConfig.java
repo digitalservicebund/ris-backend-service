@@ -16,8 +16,6 @@ public class SecurityConfig {
     return http.authorizeExchange()
         .pathMatchers("/actuator/**")
         .permitAll()
-        .pathMatchers("/login/**")
-        .permitAll()
         .anyExchange()
         .authenticated()
         .and()
