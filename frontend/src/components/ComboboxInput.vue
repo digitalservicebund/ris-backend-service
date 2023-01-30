@@ -24,6 +24,8 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const NO_MATCHING_ENTRY = "Kein passender Eintrag"
+
 const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const selectedValue = ref<ComboboxInputModelType>()
 const inputText = ref<string>()
@@ -106,6 +108,7 @@ const clearSelection = () => {
 }
 
 const setChosenItem = (item: ComboboxItem) => {
+  if (item.label === NO_MATCHING_ENTRY) return
   showDropdown.value = false
   emit("update:modelValue", item.value)
   filter.value = item.label
@@ -147,7 +150,7 @@ const updateFocusedItem = () => {
   const item = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
-  if (item) item.focus()
+  if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
 const onTextChange = () => {
@@ -168,9 +171,7 @@ const updateCurrentItems = async () => {
     !currentlyDisplayedItems.value ||
     currentlyDisplayedItems.value.length === 0
   ) {
-    currentlyDisplayedItems.value = [
-      { label: "Kein passender Eintrag", value: "" },
-    ]
+    currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY, value: "" }]
     candidateForSelection.value = undefined
   } else {
     candidateForSelection.value = currentlyDisplayedItems.value[0]
@@ -282,6 +283,7 @@ onBeforeUnmount(() => {
             candidateForSelection === item,
           'dropdown-container__dropdown-item__currently-selected':
             getLabelFromSelectedValue() === item.label,
+          'no-matching-entry': item.label === NO_MATCHING_ENTRY,
         }"
         tabindex="0"
         @click="setChosenItem(item)"
@@ -358,11 +360,11 @@ onBeforeUnmount(() => {
       @apply border-b-0;
     }
 
-    &:hover {
+    &:not(.no-matching-entry):hover {
       @apply bg-gray-400;
     }
 
-    &:focus {
+    &:not(.no-matching-entry):focus {
       @apply bg-blue-200;
 
       outline: none;
