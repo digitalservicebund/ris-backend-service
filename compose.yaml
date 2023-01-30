@@ -45,7 +45,6 @@ services:
     command: npm run dev -- --host
     depends_on:
       - traefik
-      - backend
     ports:
       - 3000:3000
 
@@ -64,12 +63,21 @@ services:
       - 5432:5432
 
   redis:
-    image: "redis:7.0.8"
+    image: cgr.dev/chainguard/redis:7.0
     extra_hosts:
       - localhost:host-gateway
-    command: redis-server --requirepass password
+    command:
+      - "--maxmemory 256mb"
+      - "--maxmemory-policy allkeys-lru"
+      - "--timeout 300"
+      - "--tcp-keepalive 10"
+      - "--dir /data"
+      - "--user redis on +@all -CONFIG ~* >test"
+    volumes:
+      - redis-data:/data
     ports:
       - "6379:6379"
 
 volumes:
   db-data:
+  redis-data:

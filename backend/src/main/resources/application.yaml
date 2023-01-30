@@ -29,7 +29,7 @@ server:
   shutdown: graceful
 logging:
   level:
-    org.springframework: DEBUG
+    org.springframework: TRACE
 spring:
   codec:
     max-in-memory-size: 100MB
