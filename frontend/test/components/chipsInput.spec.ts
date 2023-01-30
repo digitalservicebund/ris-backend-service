@@ -200,6 +200,36 @@ describe("ChipsInput", () => {
     await user.type(input, "{arrowleft}")
     await user.type(input, "{arrowleft}")
     expect(chipList[0]).toHaveFocus()
+
+    await user.type(chipList[0], "{enter}")
+    expect(screen.getAllByLabelText("chip").length).toBe(1)
+    expect(chipList[0]).toHaveTextContent("two")
+  })
+
+  it("deleting chips multiple times correctly resets focus", async () => {
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+
+    expect(screen.getAllByLabelText("chip").length).toBe(1)
+
+    await user.type(input, "{arrowleft}")
+    await user.type(screen.getByLabelText("chip"), "{enter}")
+
+    expect(screen.queryAllByLabelText("chip").length).toBe(0)
+
+    await user.type(input, "two")
+    await user.type(input, "{enter}")
+
+    expect(screen.getAllByLabelText("chip").length).toBe(1)
+
+    await user.type(input, "{arrowleft}")
+    await user.type(screen.getByLabelText("chip"), "{enter}")
+
+    expect(screen.queryAllByLabelText("chip").length).toBe(0)
   })
 
   it("chips and text: focus via arrow keys behaves as expected", async () => {
