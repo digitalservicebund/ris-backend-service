@@ -52,4 +52,15 @@ public class LookupTableImporterController {
         .onErrorReturn(
             ResponseEntity.internalServerError().body("Could not import the state lookup table"));
   }
+
+  @PutMapping(value = "subjectField")
+  public Mono<ResponseEntity<String>> importSubjectFieldLookupTable(
+      @RequestBody ByteBuffer byteBuffer) {
+    return service
+        .importSubjectFieldLookupTable(byteBuffer)
+        .map(resultString -> ResponseEntity.status(HttpStatus.OK).body(resultString))
+        .onErrorReturn(
+            ResponseEntity.internalServerError()
+                .body("Could not import the subjectField lookup table"));
+  }
 }

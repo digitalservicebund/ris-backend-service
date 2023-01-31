@@ -12,13 +12,19 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldRepository;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -44,6 +50,10 @@ class LookupTableImporterServiceTest {
   @MockBean private CourtRepository courtRepository;
 
   @MockBean private StateRepository stateRepository;
+
+  @MockBean private SubjectFieldRepository subjectFieldRepository;
+
+  @MockBean private JPASubjectFieldRepository jpaSubjectFieldRepository;
 
   @Test
   void testImportDocumentTypeLookupTable() {
@@ -167,5 +177,87 @@ class LookupTableImporterServiceTest {
 
     verify(stateRepository).deleteAll();
     verify(stateRepository).saveAll(anyCollection());
+  }
+
+  @Test
+  void testImportSubjectFieldLookupTable() {
+    JPANormDTO childNorm1 =
+        JPANormDTO.builder()
+            .jpaSubjectFieldDTO(null)
+            .shortcut("normabk 2.1")
+            .enbez("§ 2.1")
+            .build();
+    JPANormDTO childNorm2 =
+        JPANormDTO.builder().jpaSubjectFieldDTO(null).shortcut("normabk 2.2").build();
+    Set<JPANormDTO> childNorms = Set.of(childNorm1, childNorm2);
+
+    JPAKeywordDTO childKeyword1 =
+        JPAKeywordDTO.builder().jpaSubjectFieldDTO(null).value("schlagwort 2.1").build();
+    JPAKeywordDTO childKeyword2 =
+        JPAKeywordDTO.builder().jpaSubjectFieldDTO(null).value("schlagwort 2.3").build();
+    Set<JPAKeywordDTO> childKeywords = Set.of(childKeyword1, childKeyword2);
+
+    JPASubjectFieldDTO parent =
+        JPASubjectFieldDTO.builder()
+            .id(1L)
+            .parentSubjectField(null)
+            .parent(true)
+            .subjectFieldNumber("TS-01")
+            .build();
+    JPASubjectFieldDTO child =
+        JPASubjectFieldDTO.builder()
+            .id(2L)
+            .parentSubjectField(parent)
+            .parent(false)
+            .changeDateMail("2022-12-22")
+            .changeDateClient("2022-12-24")
+            .changeIndicator('N')
+            .version("1.0")
+            .subjectFieldNumber("TS-01-01")
+            .subjectFieldText("stext 2")
+            .navigationTerm("navbez 2")
+            .keywords(childKeywords)
+            .norms(childNorms)
+            .build();
+    List<JPASubjectFieldDTO> jpaSubjectFieldDTOs = List.of(parent, child);
+
+    String subjectFieldXml =
+        """
+            <?xml version="1.0"?>
+            <juris-table>
+
+                <juris-sachg id="2" aenddatum_mail="2022-12-22" aendkz="J" version="1.0">
+                    <sachgebiet>TS-01-01</sachgebiet>
+                    <stext>stext 2</stext>
+                    <navbez>navbez 2</navbez>
+                    <norm>
+                        <normabk>normabk 2.1</normabk>
+                        <enbez>§ 2.1</enbez>
+                    </norm>
+                    <norm>
+                        <normabk>normabk 2.2</normabk>
+                    </norm>
+                    <schlagwort>schlagwort 2.1</schlagwort>
+                    <schlagwort>schlagwort 2.2</schlagwort>
+                </juris-sachg>
+
+                <juris-sachg id="1" aendkz="N">
+                    <sachgebiet>TS-01</sachgebiet>
+                </juris-sachg>
+
+            </juris-table>
+            """;
+    ByteBuffer byteBuffer = ByteBuffer.wrap(subjectFieldXml.getBytes());
+
+    StepVerifier.create(service.importSubjectFieldLookupTable(byteBuffer))
+        .consumeNextWith(
+            resultString ->
+                assertEquals("Successfully imported the subject field lookup table", resultString))
+        .verifyComplete();
+
+    verify(jpaSubjectFieldRepository, atMostOnce()).deleteAll();
+    verify(jpaSubjectFieldRepository, atMostOnce()).saveAll(jpaSubjectFieldDTOs);
+    verify(subjectFieldRepository, never()).deleteAll();
+    verify(subjectFieldRepository, never()).saveAll(anyCollection());
   }
 }

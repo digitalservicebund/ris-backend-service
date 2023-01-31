@@ -9,8 +9,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -62,6 +68,9 @@ class LookupTableImporterIntegrationTest {
   @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
+  @Autowired private SubjectFieldRepository subjectFieldRepository;
+  @Autowired private KeywordRepository keywordRepository;
+  @Autowired private NormRepository normRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -182,5 +191,111 @@ class LookupTableImporterIntegrationTest {
     assertThat(stateDTO.getChangeindicator()).isEqualTo('N');
     assertThat(stateDTO.getJurisshortcut()).isEqualTo("AB");
     assertThat(stateDTO.getLabel()).isEqualTo("Bezeichnung123");
+  }
+
+  @Test
+  void shouldImportSubjectFieldLookupTableCorrectly() {
+    SubjectFieldDTO expectedParent =
+        SubjectFieldDTO.builder()
+            .id(1L)
+            .parent(true)
+            .subjectFieldNumber("TS-01")
+            .changeIndicator('N')
+            .build();
+    // TODO clean Code: allArgs vs Builder
+    SubjectFieldDTO expectedChild =
+        new SubjectFieldDTO(
+            2L,
+            1L,
+            false,
+            "2022-12-22",
+            "2022-12-24",
+            'J',
+            "1.0",
+            "TS-01-01",
+            "stext 2",
+            "navbez 2",
+            false);
+    NormDTO expectedNorm1 =
+        NormDTO.builder().subjectFieldId(2L).shortcut("normabk 2.1").enbez("§ 2.1").build();
+    NormDTO expectedNorm2 = NormDTO.builder().subjectFieldId(2L).shortcut("normabk 2.2").build();
+    KeywordDTO expectedKeyword1 =
+        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
+    KeywordDTO expectedKeyword2 =
+        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
+
+    String subjectFieldXml =
+        """
+            <?xml version="1.0"?>
+            <juris-table>
+
+                <juris-sachg id="2" aenddatum_mail="2022-12-22" aenddatum_client="2022-12-24" aendkz="J" version="1.0">
+                    <sachgebiet>TS-01-01</sachgebiet>
+                    <stext>stext 2</stext>
+                    <navbez>navbez 2</navbez>
+                    <norm>
+                        <normabk>normabk 2.1</normabk>
+                        <enbez>§ 2.1</enbez>
+                    </norm>
+                    <norm>
+                        <normabk>normabk 2.2</normabk>
+                    </norm>
+                    <schlagwort>schlagwort 2.1</schlagwort>
+                    <schlagwort>schlagwort 2.2</schlagwort>
+                </juris-sachg>
+
+                <juris-sachg id="1" aendkz="N">
+                    <sachgebiet>TS-01-</sachgebiet>
+                </juris-sachg>
+
+            </juris-table>
+            """;
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/lookuptableimporter/subjectField")
+        .bodyValue(subjectFieldXml)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(String.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .isEqualTo("Successfully imported the subject field lookup table"));
+
+    List<SubjectFieldDTO> subjectFieldDTOs =
+        subjectFieldRepository.findAllByOrderBySubjectFieldNumberAsc().collectList().block();
+    List<KeywordDTO> keywordDTOs =
+        keywordRepository.findAllByOrderBySubjectFieldIdAscValueAsc().collectList().block();
+    List<NormDTO> normDTOs =
+        normRepository.findAllByOrderBySubjectFieldIdAscShortcutAsc().collectList().block();
+
+    assertThat(subjectFieldDTOs).hasSize(2);
+    assertThat(keywordDTOs).hasSize(2);
+    assertThat(normDTOs).hasSize(2);
+
+    SubjectFieldDTO parent = subjectFieldDTOs.get(0);
+    SubjectFieldDTO child = subjectFieldDTOs.get(1);
+    KeywordDTO keyword1 = keywordDTOs.get(0);
+    KeywordDTO keyword2 = keywordDTOs.get(1);
+    NormDTO norm1 = normDTOs.get(0);
+    NormDTO norm2 = normDTOs.get(1);
+
+    assertThat(parent).usingRecursiveComparison().isEqualTo(expectedParent);
+    assertThat(child).usingRecursiveComparison().isEqualTo(expectedChild);
+
+    assertThat(keyword1)
+        .usingRecursiveComparison()
+        .ignoringFields("id")
+        .isEqualTo(expectedKeyword1);
+    assertThat(keyword2)
+        .usingRecursiveComparison()
+        .ignoringFields("id")
+        .isEqualTo(expectedKeyword2);
+
+    assertThat(norm1).usingRecursiveComparison().ignoringFields("id").isEqualTo(expectedNorm1);
+    assertThat(norm2).usingRecursiveComparison().ignoringFields("id").isEqualTo(expectedNorm2);
   }
 }
