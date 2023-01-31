@@ -231,7 +231,6 @@ onBeforeUnmount(() => {
           :placeholder="placeholder"
           :readonly="false"
           tabindex="0"
-          @blur="closeDropdownAndRevertToLastSavedValue"
           @click="selectAllText"
           @input="onTextChange"
           @keyup.down="keydown"
