@@ -9,7 +9,7 @@
 For the provided Git hooks you will need:
 
 ```bash
-brew install lefthook talisman
+brew install lefthook talisman direnv
 ```
 
 Additionally install the prerequisites of the [backend](./backend/README.md#Prerequisites) and [frontend](./frontend/README.md#Prerequisites)
@@ -23,6 +23,55 @@ Additionally install the prerequisites of the [backend](./backend/README.md#Prer
 ```
 
 This will replace placeholders in the application template and install a couple of Git hooks.
+
+**Setup local env**
+
+Add this to the end of .zshrc (see [here](https://github.com/direnv/direnv/blob/master/docs/hook.md)):
+
+```bash
+eval "$(direnv hook zsh)"
+```
+
+Allow direnv to use `.env` files (see [here](https://github.com/direnv/direnv/blob/master/man/direnv.toml.1.md#codeloaddotenvcode))
+
+```bash
+ cat > ~/.config/direnv/direnv.toml<< EOF
+[global]
+load_dotenv = true
+EOF
+```
+
+Create .env file (repeat whenever values in gopass change)
+
+```bash
+./run.sh env
+direnv allow .
+```
+
+to test
+
+```bash
+echo $OAUTH2_CLIENT_ID
+```
+
+To launch from IDE, add the `.env` file in repo root. e.g. in vscode `launch.json`:
+
+```json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Launch Application",
+      "request": "launch",
+      "mainClass": "de.bund.digitalservice.ris.Application",
+      "projectName": "ris-backend-service",
+      "envFile": "${workspaceFolder}/../.env",
+      "args": "--spring.profiles.active=local"
+    }
+  ]
+}
+```
 
 ## Development
 

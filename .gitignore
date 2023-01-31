@@ -17,3 +17,4 @@ lefthook-local.yml
 ## local ##
 .config/
 .local-storage/
+.env
