@@ -24,9 +24,23 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+const NO_MATCHING_ENTRY = "Kein passender Eintrag"
+
+const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const selectedValue = ref<ComboboxInputModelType>()
 const inputText = ref<string>()
 const currentlyDisplayedItems = ref<ComboboxItem[]>()
+
+const getLabelFromSelectedValue = (): string | undefined => {
+  if (
+    typeof selectedValue.value === "object" &&
+    "label" in selectedValue.value
+  ) {
+    return selectedValue.value.label
+  } else {
+    return selectedValue.value
+  }
+}
 
 watch(
   props,
@@ -49,11 +63,7 @@ function isCourt(input?: ComboboxInputModelType): input is Court {
 }
 
 function updateInputText() {
-  if (typeof selectedValue.value === "object" && "label" in selectedValue.value)
-    inputText.value = selectedValue.value.label
-  else {
-    inputText.value = selectedValue.value
-  }
+  inputText.value = getLabelFromSelectedValue()
 }
 
 const showDropdown = ref(false)
@@ -98,19 +108,27 @@ const clearSelection = () => {
 }
 
 const setChosenItem = (item: ComboboxItem) => {
+  if (item.label === NO_MATCHING_ENTRY) return
   showDropdown.value = false
   emit("update:modelValue", item.value)
   filter.value = item.label
+  candidateForSelection.value = undefined
+}
+
+const onEnter = () => {
+  if (candidateForSelection.value) {
+    setChosenItem(candidateForSelection.value)
+    return
+  }
+  updateInputText()
+  toggleDropdown()
 }
 
 const keyup = () => {
   if (focusedItemIndex.value > 1) {
     focusedItemIndex.value -= 1
   }
-  const prev = dropdownItemsRef.value?.childNodes[
-    focusedItemIndex.value
-  ] as HTMLElement
-  if (prev) prev.focus()
+  updateFocusedItem()
 }
 
 const keydown = () => {
@@ -120,10 +138,15 @@ const keydown = () => {
   ) {
     focusedItemIndex.value += 1
   }
-  const next = dropdownItemsRef.value?.childNodes[
+  updateFocusedItem()
+}
+
+const updateFocusedItem = () => {
+  candidateForSelection.value = undefined
+  const item = dropdownItemsRef.value?.childNodes[
     focusedItemIndex.value
   ] as HTMLElement
-  if (next) next.focus()
+  if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
 const onTextChange = () => {
@@ -135,22 +158,20 @@ const onTextChange = () => {
 
 const updateCurrentItems = async () => {
   const response = await props.itemService(filter.value)
-  if (response.data) {
-    currentlyDisplayedItems.value = response.data
-    insertItemIfEmpty()
-  } else {
+  if (!response.data) {
     console.error(response.error)
+    return
   }
-}
-
-const insertItemIfEmpty = () => {
+  currentlyDisplayedItems.value = response.data
   if (
     !currentlyDisplayedItems.value ||
     currentlyDisplayedItems.value.length === 0
   ) {
-    currentlyDisplayedItems.value = [
-      { label: "Kein passender Eintrag", value: "" },
-    ]
+    currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY, value: "" }]
+    candidateForSelection.value = undefined
+  } else {
+    candidateForSelection.value = currentlyDisplayedItems.value[0]
+    focusedItemIndex.value = 1
   }
 }
 
@@ -198,10 +219,7 @@ onBeforeUnmount(() => {
     class="dropdown-container"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
-    <div
-      class="dropdown-container__open-dropdown"
-      @keydown.enter="toggleDropdown"
-    >
+    <div class="dropdown-container__open-dropdown" @keydown.enter="onEnter">
       <div class="bg-white input-container">
         <input
           :id="id"
@@ -213,6 +231,7 @@ onBeforeUnmount(() => {
           :placeholder="placeholder"
           :readonly="false"
           tabindex="0"
+          @blur="closeDropdownAndRevertToLastSavedValue"
           @click="selectAllText"
           @input="onTextChange"
           @keyup.down="keydown"
@@ -222,7 +241,6 @@ onBeforeUnmount(() => {
           class="input-close-icon"
           tabindex="-1"
           @click="clearSelection"
-          @keydown.enter="clearSelection"
         >
           <span
             aria-label="Auswahl zurücksetzen"
@@ -236,7 +254,6 @@ onBeforeUnmount(() => {
           class="input-expand-icon"
           tabindex="-1"
           @click="toggleDropdown"
-          @keydown.enter="toggleDropdown"
         >
           <span v-if="!showDropdown" class="icon material-icons text-blue-800">
             expand_more
@@ -259,6 +276,11 @@ onBeforeUnmount(() => {
         :class="{
           'dropdown-container__dropdown-item__with-additional-info':
             isRevokedCourt(item),
+          'dropdown-container__dropdown-item__candidate-for-selection':
+            candidateForSelection === item,
+          'dropdown-container__dropdown-item__currently-selected':
+            getLabelFromSelectedValue() === item.label,
+          'no-matching-entry': item.label === NO_MATCHING_ENTRY,
         }"
         tabindex="0"
         @click="setChosenItem(item)"
@@ -335,22 +357,39 @@ onBeforeUnmount(() => {
       @apply border-b-0;
     }
 
-    &:hover {
-      @apply bg-blue-300;
+    &:not(.no-matching-entry):hover {
+      @apply bg-gray-400;
     }
 
-    &:focus {
-      @apply bg-blue-300;
+    &:not(.no-matching-entry):focus {
+      @apply bg-blue-200;
+
+      outline: none;
     }
 
     &__with-additional-info {
-      @apply bg-gray-100;
+      @apply text-gray-800;
+
+      font-style: italic;
     }
 
     &__additional-info {
-      @apply text-gray-900;
+      @apply text-neutral-700;
+      @apply bg-neutral-20;
 
+      padding: 6px 22px;
+      border-radius: 100px;
       float: right;
+      font-size: 14px;
+      font-style: normal;
+    }
+
+    &__candidate-for-selection {
+      @apply bg-blue-200;
+    }
+
+    &__currently-selected {
+      @apply border-l-4 border-solid border-l-blue-800;
     }
   }
 }
