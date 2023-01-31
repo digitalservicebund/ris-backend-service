@@ -697,29 +697,6 @@ export function getNormBySections(norm) {
       ],
     },
     {
-      heading: "Räumlicher Geltungsbereich",
-      fields: [
-        {
-          type: "text",
-          name: "applicationScopeArea",
-          label: "Gebiet",
-          value: norm.applicationScopeArea,
-        },
-        {
-          type: "text",
-          name: "applicationScopeStartDate",
-          label: "Anfangsdatum",
-          value: norm.applicationScopeStartDate,
-        },
-        {
-          type: "text",
-          name: "applicationScopeEndDate",
-          label: "Endedatum",
-          value: norm.applicationScopeEndDate,
-        },
-      ],
-    },
-    {
       heading: "Aktivverweisung",
       fields: [
         {

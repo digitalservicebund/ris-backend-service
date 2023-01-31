@@ -58,7 +58,6 @@ export function useNormMenuItems(
           "Stand der dokumentarischen Bearbeitung",
           "documentProcessingStatusFields"
         ),
-        getChildItem("Räumlicher Geltungsbereich", "applicationScopeFields"),
         getChildItem("Aktivverweisung", "categorizedReferenceFields"),
         getChildItem("Fußnote", "otherFootnoteFields"),
         getChildItem("Gültigkeitsregelung", "validityRuleFields"),
