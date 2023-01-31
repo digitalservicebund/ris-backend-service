@@ -367,7 +367,7 @@ onBeforeUnmount(() => {
     }
 
     &__with-additional-info {
-      @apply text-gray-800;
+      @apply text-gray-900;
 
       font-style: italic;
     }
