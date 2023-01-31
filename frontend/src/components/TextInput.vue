@@ -73,6 +73,12 @@ const tabindex = computed(() => (props.readOnly ? -1 : 0))
       @apply shadow-error text-inherit;
     }
   }
+
+  &__readonly {
+    &:focus {
+      @apply outline-none;
+    }
+  }
 }
 
 .expand-enter-from {
