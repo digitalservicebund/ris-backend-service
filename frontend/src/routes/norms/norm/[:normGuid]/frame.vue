@@ -10,7 +10,6 @@ import { FrameData } from "@/domain/Norm"
 import { ageIndication } from "@/fields/norms/ageIndication"
 import { ageOfMajorityIndication } from "@/fields/norms/ageOfMajorityIndication"
 import { announcementDate } from "@/fields/norms/announcementDate"
-import { applicationScope } from "@/fields/norms/applicationScope"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { celexNumber } from "@/fields/norms/celexNumber"
 import { citationDate } from "@/fields/norms/citationDate"
@@ -488,17 +487,6 @@ const frameData = computed({
         v-model="frameData"
         :column-count="1"
         :fields="otherDocumentNote"
-      />
-    </fieldset>
-
-    <fieldset>
-      <legend id="applicationScopeFields" class="heading-02-regular mb-[1rem]">
-        Räumlicher Geltungsbereich
-      </legend>
-      <InputGroup
-        v-model="frameData"
-        :column-count="1"
-        :fields="applicationScope"
       />
     </fieldset>
 

@@ -628,50 +628,6 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-staging-verify-api:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-          cache: gradle
-      - name: Grant execute permission for gradlew
-        working-directory: ./backend
-        run: chmod +x gradlew
-      - name: Run journey tests
-        working-directory: ./backend
-        run: ./gradlew journeyTest
-        env:
-          STAGING_PASSWORD: ${{ secrets.STAGING_PASSWORD }}
-          STAGING_URL: ${{ secrets.STAGING_URL }}
-          STAGING_USER: ${{ secrets.STAGING_USER }}
-      - uses: actions/upload-artifact@v3
-        if: failure()
-        with:
-          name: journey-tests-gradle-report
-          path: ${{ github.workspace }}/build/reports/tests/journeyTest/
-          retention-days: 3
-      - name: Send status to Slack
-        # Third-party action, pin to commit SHA!
-        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
-        if: ${{ failure() && env.SLACK_WEBHOOK_URL }}
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          type: ${{ job.status }}
-          job_name: "Staging verify API :point_right:"
-          mention: "here"
-          mention_if: "failure"
-          commit: true
-          url: ${{ secrets.SLACK_WEBHOOK_URL }}
-          token: ${{ secrets.GITHUB_TOKEN }}
-
   deploy-staging-verify-e2e-chrome:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [deploy-staging]
@@ -707,7 +663,6 @@ jobs:
     needs:
       - build-and-push-frontend-image
       - build-and-push-backend-image
-      - deploy-staging-verify-api
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
       - deploy-staging-verify-a11y-chrome

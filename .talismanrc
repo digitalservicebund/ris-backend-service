@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: .github/workflows/clean-staging.yml
     checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
-    checksum: 7bfdb9d8a61df0205c941f2d4eba9957a08c4aa513a01ff795c6f700a801cb5c
+    checksum: 5b396da68540d75f410cfe5706b3ac017c752228c0f54f08095295c813a0564d
   - filename: .github/workflows/playwright-test.yml
     checksum: 18ce292910ec2d9b28ede7e9ba97bcadb4905a735f882e29efe19ab31461cbf9
   - filename: .github/workflows/playwright.yml
@@ -16,7 +16,7 @@ fileignoreconfig:
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: 886958e3915b51148bab9c5ad55c6d3aa50acc0a9a27fde14a85b6b230218893
+    checksum: f3b6fb8dcdbf1fd20614701e1f4c5a8c8fae0bcf47a3de74221acc20c2a3874c
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: 5ac01c3b6a5d2909ffbc054ac98d43962047e762b86654207591aeaecdf7a434
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
@@ -142,7 +142,7 @@ fileignoreconfig:
   - filename: frontend/src/env.d.ts
     checksum: fabcbd7e77e14618c1edd71a7fd357b0e003daaf4d073422c7e3c5a6c0da5f11
   - filename: frontend/src/routes/norms/norm/\[:normGuid\]/frame.vue
-    checksum: e2bb584395ee6f3b865ac5df97d58acbd655e8aadb13b0238e78303f5e92dbe4
+    checksum: 793121dd8624f6cbb2b41323f76d24261b5a8e1ecf992787bd9d2c32c7ea2637
   - filename: frontend/src/services/normsService.ts
     checksum: f474267a7d13a14b54606f816cf2b1d5b5b3432b6bfd9cf2ccef857cade64201
   - filename: frontend/src/stores/loadedNorm.ts
@@ -152,15 +152,15 @@ fileignoreconfig:
   - filename: frontend/test/components/navbarSide.spec.ts
     checksum: 65f85c8e6280ce6e6587ce00f6b1aed643bc8714cd9e5006fbdadfdfa0e866cd
   - filename: frontend/test/e2e/norms/testdata/norm_clean_cars.json
-    checksum: be054e48163807a2bcd369d9be7db173d5a2ecbc269a096f6e516dcd442d6a50
+    checksum: 1b5d4fc0772525f2a6eafda2728bab699374953ddf1308ceedefbcd4359f0275
   - filename: frontend/test/e2e/norms/testdata/norm_edited_fields.json
-    checksum: 6637c2cd75792f0ce7494e8783a717bc1859f40ccf8b0b82b8568bd232b6403f
+    checksum: da3ce92616864038d0132ae25e054bbdecd98fa738589fe9150ccdac73416077
   - filename: frontend/test/services/normsService.spec.ts
     checksum: b023f40aa4fb5132e3abe24d14ad345bd6e1d59c44009a8c2a3764951b91787d
   - filename: frontend/test/stores/loadedNorm.spec.ts
     checksum: fa7f616a8338e14cee3811c89cbe811ae669f417c30bcfcf9b3d4ebbee7a9671
   - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 997bcab9f775f6a099ac372efb0d238dc79a3072f63d8c5ecc386a301c2340aa
+    checksum: 19ca4c7e1fcc29fcbe16235e4fd543854563ba32e8eae67e321ef1de39b90b93
   - filename: run.sh
     checksum: d7ecff56936cf3985d6d7d74af80927b70e8477dbff1a9b4fdc7064291f9e472
   - filename: backend/src/main/resources/db/migration/V0.21__caselaw_migrate_category_to_new_documentTypeId_column.sql

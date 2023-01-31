@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.http.codec.json.Jackson2JsonDecoder;
 import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.session.data.redis.config.annotation.web.server.EnableRedisWebSession;
 import org.springframework.web.reactive.config.CorsRegistry;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
@@ -13,6 +14,7 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @Configuration
 @Profile("local")
 @EnableWebFlux
+@EnableRedisWebSession
 public class WebFluxConfiguration implements WebFluxConfigurer {
   private final ObjectMapper objectMapper;
 

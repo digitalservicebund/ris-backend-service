@@ -9,7 +9,7 @@ error:
 spring:
   data:
     redis:
-      host: localhost
+      username: redis
       password: password
   security:
     oauth2:
