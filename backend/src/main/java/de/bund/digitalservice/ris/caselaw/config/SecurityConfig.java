@@ -14,7 +14,7 @@ public class SecurityConfig {
   @Bean
   public SecurityWebFilterChain springSecurityFilterChain(ServerHttpSecurity http) {
     return http.authorizeExchange()
-        .pathMatchers("/actuator/**")
+        .pathMatchers("/actuator/**", "/api/v1/norms/xml/**", "/api/v1/norms")
         .permitAll()
         .anyExchange()
         .authenticated()
