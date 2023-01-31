@@ -71,13 +71,10 @@ services:
       - "--maxmemory-policy allkeys-lru"
       - "--timeout 300"
       - "--tcp-keepalive 10"
-      - "--dir /data"
-      - "--user redis on +@all -CONFIG ~* >test"
-    volumes:
-      - redis-data:/data
+      - "--user redis on +@all -CONFIG ~* >password"
+      - "--user default off resetchannels -@all"
     ports:
       - "6379:6379"
 
 volumes:
   db-data:
-  redis-data:
