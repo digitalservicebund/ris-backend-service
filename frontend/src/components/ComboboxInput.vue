@@ -30,6 +30,15 @@ const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const selectedValue = ref<ComboboxInputModelType>()
 const inputText = ref<string>()
 const currentlyDisplayedItems = ref<ComboboxItem[]>()
+const showDropdown = ref(false)
+const filter = ref<string>()
+const dropdownContainerRef = ref<HTMLElement>()
+const dropdownItemsRef = ref<HTMLElement>()
+const inputFieldRef = ref<HTMLInputElement>()
+const focusedItemIndex = ref<number>(0)
+const ariaLabelDropdownIcon = computed(() =>
+  showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
+)
 
 const getLabelFromSelectedValue = (): string | undefined => {
   if (
@@ -65,17 +74,6 @@ function isCourt(input?: ComboboxInputModelType): input is Court {
 function updateInputText() {
   inputText.value = getLabelFromSelectedValue()
 }
-
-const showDropdown = ref(false)
-
-const filter = ref<string>()
-const dropdownContainerRef = ref<HTMLElement>()
-const dropdownItemsRef = ref<HTMLElement>()
-const inputFieldRef = ref<HTMLInputElement>()
-const focusedItemIndex = ref<number>(0)
-const ariaLabelDropdownIcon = computed(() =>
-  showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
-)
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
