@@ -279,6 +279,7 @@ onBeforeUnmount(() => {
         }"
         tabindex="0"
         @click="setChosenItem(item)"
+        @keydown.tab="closeDropdownAndRevertToLastSavedValue"
         @keypress.enter="setChosenItem(item)"
         @keyup.down="keydown"
         @keyup.up="keyup"
