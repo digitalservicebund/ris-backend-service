@@ -272,7 +272,8 @@ onBeforeUnmount(() => {
             candidateForSelection === item,
           'dropdown-container__dropdown-item__currently-selected':
             getLabelFromSelectedValue() === item.label,
-          'no-matching-entry': item.label === NO_MATCHING_ENTRY,
+          'dropdown-container__dropdown-item__no-matching-entry':
+            item.label === NO_MATCHING_ENTRY,
         }"
         tabindex="0"
         @click="setChosenItem(item)"
@@ -349,14 +350,18 @@ onBeforeUnmount(() => {
       @apply border-b-0;
     }
 
-    &:not(.no-matching-entry):hover {
+    &:not(&__no-matching-entry):hover {
       @apply bg-gray-400;
     }
 
-    &:not(.no-matching-entry):focus {
+    &:not(&__no-matching-entry):focus {
       @apply bg-blue-200;
 
       outline: none;
+    }
+
+    &__no-matching-entry {
+      cursor: default !important;
     }
 
     &__with-additional-info {
