@@ -43,6 +43,7 @@ fun assertEditNormFramePropertiesAndEditNormRequestSchema(
                     .isEqualTo(
                         decodeLocalDate(found?.get(normFrameRequestSchema).toString())
                     )
+
             else -> {
                 assertThat(normFramePropertiesMemberValue)
                     .isEqualTo(found?.get(normFrameRequestSchema))
@@ -83,6 +84,7 @@ fun assertNormDataAndImportNormRequestSchemaWithoutArticles(
                     .isEqualTo(
                         decodeLocalDate(found?.get(importNormRequestSchema).toString())
                     )
+
             is UndefinedDate ->
                 assertThat(normDataMemberValue)
                     .isEqualTo(
@@ -90,6 +92,7 @@ fun assertNormDataAndImportNormRequestSchemaWithoutArticles(
                             found?.get(importNormRequestSchema).toString()
                         )
                     )
+
             else -> {
                 assertThat(normDataMemberValue).isEqualTo(found?.get(importNormRequestSchema))
             }
@@ -109,8 +112,31 @@ fun assertNormAndNormDataWithoutArticles(norm: Norm, normData: ImportNormUseCase
                 is LocalDate ->
                     assertThat(normMemberValue)
                         .isEqualTo(decodeLocalDate(found?.get(normData).toString()))
+
                 else -> {
                     assertThat(normMemberValue).isEqualTo(found?.get(normData))
+                }
+            }
+        }
+}
+
+fun assertNormsWithoutArticles(
+    norm1: Norm,
+    norm2: Norm
+) {
+    val normMembers = Norm::class.memberProperties
+    normMembers
+        .filter { it.name !in listOf("articles") }
+        .forEach { normMember ->
+            val normMemberValue1 = normMember.get(norm1)
+            val normMemberValue2 = normMember.get(norm2)
+            when (normMemberValue1) {
+                is LocalDate ->
+                    assertThat(normMemberValue1)
+                        .isEqualTo(decodeLocalDate(normMemberValue2.toString()))
+
+                else -> {
+                    assertThat(normMemberValue1).isEqualTo(normMemberValue2)
                 }
             }
         }

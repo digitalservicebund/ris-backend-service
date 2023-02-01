@@ -24,6 +24,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
+import utils.assertNormsWithoutArticles
 import utils.createRandomNorm
 import java.time.Duration
 import java.time.LocalDate
@@ -255,6 +256,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     private fun validateNorm(normBeforePersist: Norm, normAfterPersist: Norm) {
-        assertThat(normBeforePersist == normAfterPersist, `is`(true))
+        assertNormsWithoutArticles(normBeforePersist, normAfterPersist)
+
+        assertThat(
+            normBeforePersist.articles.size == normAfterPersist.articles.size &&
+                normBeforePersist.articles.toSet() == normAfterPersist.articles.toSet(),
+            `is`(true)
+        )
     }
 }
