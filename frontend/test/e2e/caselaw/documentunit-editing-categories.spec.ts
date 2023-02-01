@@ -117,6 +117,44 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
   })
 
+  test("test court dropdown, used with keyboard only", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    const totalCourts = 3925
+
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+
+    await page.locator("[aria-label='Gericht']").focus()
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
+      totalCourts
+    )
+
+    await page.keyboard.press("Enter") // select top result
+
+    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(page.locator("text=AG Aachen")).toBeVisible()
+
+    await page.locator("[aria-label='Gericht']").fill("BGH")
+
+    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(1)
+
+    await page.keyboard.press("Escape") // reset to last saved value
+
+    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(page.locator("text=AG Aachen")).toBeVisible()
+
+    await page.locator("[aria-label='Gericht']").fill("BGH")
+    await page.keyboard.press("Tab") // reset to last saved value
+
+    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await expect(page.locator("text=AG Aachen")).toBeVisible()
+  })
+
   test("test that setting a court sets the region automatically", async ({
     page,
     documentNumber,

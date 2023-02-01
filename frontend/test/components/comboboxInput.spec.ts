@@ -291,4 +291,85 @@ describe("Combobox Element", () => {
     expect(additionalInfoElement.length).toBe(1)
     expect(additionalInfoElement[0]).toHaveTextContent("aufgehoben seit: 1973")
   })
+
+  it("Should revert to last saved state when leaving the input field via esc/tab", async () => {
+    const { emitted } = renderComponent()
+
+    const input = screen.getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "foo")
+
+    let dropdownItems = screen.getAllByLabelText("dropdown-option")
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("Kein passender Eintrag")
+
+    await user.keyboard("{escape}")
+
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(input).toHaveValue("")
+
+    await user.type(input, "testItem1")
+    dropdownItems = screen.getAllByLabelText("dropdown-option")
+
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(1)
+    expect(dropdownItems[0]).toHaveTextContent("testItem1")
+
+    await user.keyboard("{enter}") // save the value
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(input).toHaveValue("testItem1")
+
+    await user.type(input, "foo")
+    await user.keyboard("{tab}")
+
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    // expect(input).toHaveValue("testItem1") does not work here anymore because
+    // it doesn't appear in the DOM --> gets tested via e2e test instead
+    // The workaround is to ensure that the model value was only updated once (on enter)
+    expect(emitted()["update:modelValue"]).toHaveLength(1)
+  })
+
+  it("Top search result should get chosen upon enter", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.getByLabelText("test label") as HTMLInputElement
+    await user.type(input, "test")
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+
+    await user.keyboard("{enter}")
+
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    // like in previous test: workaround for not being able to read testItem1 from the DOM
+    expect(emitted()["update:modelValue"]).toHaveLength(1)
+    expect(emitted()["update:modelValue"]).toEqual([["t1"]]) // value of testItem1
+  })
+
+  it("First Enter should open dropdown, second should select top value", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.getByLabelText("test label") as HTMLInputElement
+    input.focus()
+
+    await user.keyboard("{enter}")
+
+    expect(screen.getAllByLabelText("dropdown-option")).toHaveLength(3)
+
+    await user.keyboard("{enter}")
+
+    expect(emitted()["update:modelValue"]).toEqual([["t1"]])
+  })
+
+  it("Clear-button should unset the currently set value", async () => {
+    const { emitted } = renderComponent()
+    const input = screen.getByLabelText("test label") as HTMLInputElement
+
+    await user.type(input, "test")
+    const dropdownItems = screen.getAllByLabelText("dropdown-option")
+    await user.click(dropdownItems[1])
+
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+
+    const resetButton = screen.getByLabelText("Auswahl zurücksetzen")
+    await user.click(resetButton)
+
+    expect(screen.queryByLabelText("dropdown-option")).not.toBeInTheDocument()
+    expect(input).toHaveValue("")
+    expect(emitted()["update:modelValue"]).toEqual([["t2"], [undefined]])
+  })
 })
