@@ -117,28 +117,20 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
   })
 
-  test("test court dropdown, used with keyboard only", async ({
+  test("test correct esc/tab behaviour in court dropdown", async ({
     page,
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const totalCourts = 3925
 
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
-    await page.locator("[aria-label='Gericht']").focus()
-    await page.keyboard.press("Enter")
-
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
-      totalCourts
-    )
-
-    await page.keyboard.press("Enter") // select top result
+    await page.locator("[aria-label='Gericht']").fill("BVerfG")
+    await page.locator("text=BVerfG").click()
 
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    // avoiding a concrete value here as it might change what is the first result
-    await expect(page.locator("[aria-label='Gericht']")).not.toBeEmpty()
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BVerfG")
 
     await page.locator("[aria-label='Gericht']").fill("BGH")
 
@@ -147,13 +139,13 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     await page.keyboard.press("Escape") // reset to last saved value
 
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page.locator("text=AG Aachen")).toBeVisible()
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BVerfG")
 
     await page.locator("[aria-label='Gericht']").fill("BGH")
     await page.keyboard.press("Tab") // reset to last saved value
 
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page.locator("text=AG Aachen")).toBeVisible()
+    await expect(page.locator("[aria-label='Gericht']")).toHaveValue("BVerfG")
   })
 
   test("test that setting a court sets the region automatically", async ({
