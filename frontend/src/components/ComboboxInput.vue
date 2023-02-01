@@ -212,7 +212,11 @@ onBeforeUnmount(() => {
     class="dropdown-container"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
-    <div class="dropdown-container__open-dropdown" @keydown.enter="onEnter">
+    <div
+      class="dropdown-container__open-dropdown"
+      @keydown.enter="onEnter"
+      @keydown.tab="closeDropdownAndRevertToLastSavedValue"
+    >
       <div class="bg-white input-container">
         <input
           :id="id"
