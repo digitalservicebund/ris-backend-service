@@ -137,9 +137,8 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     await page.keyboard.press("Enter") // select top result
 
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    await expect(page.locator("[aria-label='Gericht']")).toHaveValue(
-      "AG Aachen"
-    )
+    // avoiding a concrete value here as it might change what is the first result
+    await expect(page.locator("[aria-label='Gericht']")).not.toBeEmpty()
 
     await page.locator("[aria-label='Gericht']").fill("BGH")
 
