@@ -14,7 +14,7 @@ import org.springframework.web.reactive.config.WebFluxConfigurer;
 @Configuration
 @Profile("local")
 @EnableWebFlux
-@EnableRedisWebSession
+@EnableRedisWebSession(maxInactiveIntervalInSeconds = 12 * 60 * 60)
 public class WebFluxConfiguration implements WebFluxConfigurer {
   private final ObjectMapper objectMapper;
 
