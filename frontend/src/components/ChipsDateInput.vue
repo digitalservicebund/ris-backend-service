@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { ref, onMounted, watch, computed } from "vue"
+import { ref, watch, computed } from "vue"
 import { ValidationError } from "@/domain"
 
 const props = defineProps<Props>()
@@ -184,14 +184,6 @@ watch(
 const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
-
-onMounted(() => {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      e.preventDefault()
-    }
-  })
-})
 </script>
 
 <template>
