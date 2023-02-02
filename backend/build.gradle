@@ -71,11 +71,11 @@ dependencies {
   implementation "io.r2dbc:r2dbc-pool:1.0.0.RELEASE"
 
   implementation "org.springframework.boot:spring-boot-starter-data-jpa"
-  implementation "org.postgresql:postgresql:42.5.1"
+  implementation "org.postgresql:postgresql:42.5.2"
 
   implementation "com.sendinblue:sib-api-v3-sdk:6.0.0"
 
-  implementation platform("software.amazon.awssdk:bom:2.19.25")
+  implementation platform("software.amazon.awssdk:bom:2.19.28")
   implementation "software.amazon.awssdk:netty-nio-client"
   implementation "software.amazon.awssdk:s3"
   implementation "org.springdoc:springdoc-openapi-webflux-ui:1.6.14"
@@ -102,7 +102,7 @@ dependencies {
   // for local development:
   // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 
-  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.1"
+  implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2"
 
   implementation "io.micrometer:micrometer-registry-prometheus:1.10.3"
   implementation "io.micrometer:micrometer-core:1.10.3"
