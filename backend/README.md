@@ -36,7 +36,8 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 **If you use IntelliJ:**
 
 - The run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
-- Install the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile/) and add the `.env` File in the repo root to the run config.
+- Install the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile/)
+- Use the checked in run config in `../.idea/runConfigurations/` (if you open just the backend folder with IntelliJ, you will need to create your own)
 
 **If you use VS Code:**
 
