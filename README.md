@@ -73,6 +73,8 @@ Note: This needs to be repeated every time the secrets change
 ./run.sh dev
 ```
 
+The Application is available at http://127.0.0.1
+
 This will start the backend with a Postgres database and [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
 Read the component individual documentation to figure out how to run them individually:
