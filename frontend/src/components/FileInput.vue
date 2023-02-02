@@ -22,10 +22,14 @@ const { inputValue, emitInputEvent } = useInputModel<FileList, Props, Emits>(
   props,
   emit
 )
+
+function onEnter() {
+  document.getElementById(props.id)?.click()
+}
 </script>
 
 <template>
-  <span role="link" tabIndex="0">
+  <span role="link" tabIndex="0" @keydown.enter="onEnter">
     <label :aria-label="ariaLabel" class="label" :for="id">
       <slot />
 
