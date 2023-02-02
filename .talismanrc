@@ -12,7 +12,7 @@ fileignoreconfig:
   - filename: .github/workflows/playwright.yml
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: .github/workflows/scan.yml
-    checksum: 153d3e2b54c7af5d4057bd39c0cea58fb47086062e84b4cf587e63387570f859
+    checksum: 0f3f9883a9fd472ff954cb8b2ab2f3465a9608b7321af585d30a974e566bc1cb
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
