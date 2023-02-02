@@ -22,7 +22,7 @@ npx playwright install
 
 ### Dev server
 
-The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://localhost:3000/).
+The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://127.0.0.1/).
 
 **Start server:**
 

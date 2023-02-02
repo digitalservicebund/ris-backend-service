@@ -12,11 +12,13 @@ lefthook-local.yml
 *.ipr
 
 ### VS Code ###
+**/.vscode/*.code-workspace
 .vscode/
 
 ### local ###
 .config/
 .local-storage/
+.env
 
 ### Brew ###
 Brewfile.lock.json

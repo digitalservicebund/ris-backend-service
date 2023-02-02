@@ -6,7 +6,7 @@ docker compose up
 
 ### Spring Boot
 
-Is exposing metrics at: `127.0.0.1/actuator/prometheus`
+Is exposing metrics at: http://127.0.0.1/actuator/prometheus
 
 ### Prometheus
 

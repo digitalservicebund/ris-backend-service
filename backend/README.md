@@ -10,7 +10,7 @@ Java service built with the [Spring WebFlux reactive stack](https://docs.spring.
 
 ### Setup Secrets
 
-The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env.
+The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env. If you didn't set up direnv, check the root readme:
 
 ```bash
 ../run.sh env
@@ -35,11 +35,12 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 
 **If you use IntelliJ:**
 
-The run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
+- The run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
+- Install the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile/) and add the `.env` File in the repo root to the run config.
 
 **If you use VS Code:**
 
-TODO
+- The launch config in `backend/.vscode/launch.json` should be used automatically
 
 ### Lookup tables
 
