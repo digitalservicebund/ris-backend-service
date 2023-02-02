@@ -8,6 +8,6 @@ interface LoadNormAsXmlUseCase {
     data class Query(
         val printAnnouncementGazette: String,
         val announcementOrCitationYear: String,
-        val printAnnouncementPage: String
+        val printAnnouncementPage: String,
     )
 }

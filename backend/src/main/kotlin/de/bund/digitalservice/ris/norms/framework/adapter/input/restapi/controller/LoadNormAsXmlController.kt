@@ -18,7 +18,7 @@ class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUse
     fun loadNormAsXml(
         @PathVariable printAnnouncementGazette: String,
         @PathVariable announcementYear: String,
-        @PathVariable printAnnouncementPage: String
+        @PathVariable printAnnouncementPage: String,
     ): Mono<ResponseEntity<String>> {
         val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, announcementYear, printAnnouncementPage)
 

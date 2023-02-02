@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -16,6 +16,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMail
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.HttpMailSender;
+import de.bund.digitalservice.ris.caselaw.domain.PublishState;
+import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
+import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -24,39 +29,30 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.r2dbc.AutoConfigureDataR2dbc;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-@WebFluxTest(controllers = {DocumentUnitController.class})
-@Import({
-  DocumentUnitService.class,
-  DatabaseDocumentNumberService.class,
-  PostgresDocumentUnitRepositoryImpl.class,
-  PostgresDocumentUnitListEntryRepositoryImpl.class,
-  PostgresXmlMailRepositoryImpl.class,
-  XmlEMailPublishService.class,
-  MockXmlExporter.class,
-  FlywayConfig.class,
-  PostgresConfig.class
-})
-@Tag("integration")
-@Testcontainers(disabledWithoutDocker = true)
-@WithMockUser
-@AutoConfigureDataR2dbc
+@RISIntegrationTest(
+    imports = {
+      DocumentUnitService.class,
+      DatabaseDocumentNumberService.class,
+      PostgresDocumentUnitRepositoryImpl.class,
+      PostgresDocumentUnitListEntryRepositoryImpl.class,
+      PostgresXmlMailRepositoryImpl.class,
+      XmlEMailPublishService.class,
+      MockXmlExporter.class,
+      FlywayConfig.class,
+      PostgresConfig.class
+    },
+    controllers = {DocumentUnitController.class})
 class PublishDocumentUnitIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");

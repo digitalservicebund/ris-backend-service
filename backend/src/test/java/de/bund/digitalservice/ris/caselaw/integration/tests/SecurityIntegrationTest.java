@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw;
+package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;

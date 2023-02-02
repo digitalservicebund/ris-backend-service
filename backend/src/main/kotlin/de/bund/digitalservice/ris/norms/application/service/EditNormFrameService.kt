@@ -52,5 +52,5 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     properties.footnoteStateLaw, properties.footnoteEuLaw, properties.validityRule, properties.digitalEvidenceLink,
     properties.digitalEvidenceRelatedData, properties.digitalEvidenceExternalDataNote, properties.digitalEvidenceAppendix,
     properties.referenceNumber, properties.celexNumber, properties.ageIndicationStart, properties.ageIndicationEnd,
-    properties.definition, properties.ageOfMajorityIndication, properties.text
+    properties.definition, properties.ageOfMajorityIndication, properties.text,
 )

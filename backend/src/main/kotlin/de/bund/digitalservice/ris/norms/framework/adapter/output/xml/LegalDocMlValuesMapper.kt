@@ -2,20 +2,20 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 
 data class MappedValue(
     val newValue: String,
-    val oldValues: List<String>
+    val oldValues: List<String>,
 )
 
 data class MappedValues(
     val property: Property,
     val defaultValue: String,
-    val values: List<MappedValue>
+    val values: List<MappedValue>,
 )
 
 enum class Property {
     DOCUMENT_TYPE_NAME,
     DOCUMENT_NORM_CATEGORY,
     PROVIDER_DECIDING_BODY,
-    PARTICIPATION_INSTITUTION
+    PARTICIPATION_INSTITUTION,
 }
 
 val legalDocMlValuesMap: List<MappedValues> = listOf(
@@ -25,16 +25,16 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
         listOf(
             MappedValue("verordnung", listOf("RV")),
             MappedValue("verwaltungsvorschrift", listOf("VV")),
-            MappedValue("sonstige-bekanntmachung", listOf("SB", "OQ", "SO"))
-        )
+            MappedValue("sonstige-bekanntmachung", listOf("SB", "OQ", "SO")),
+        ),
     ),
     MappedValues(
         Property.DOCUMENT_NORM_CATEGORY,
         "regelungstext",
         listOf(
             MappedValue("rechtsetzungsdokument", listOf("Rechtsetzungsdokument")),
-            MappedValue("vereinbarung", listOf("Vereinbarung"))
-        )
+            MappedValue("vereinbarung", listOf("Vereinbarung")),
+        ),
     ),
     MappedValues(
         Property.PROVIDER_DECIDING_BODY,
@@ -49,8 +49,8 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
                     "BT",
                     "Präsident des Deutschen Bundestages",
                     "Präsidentin des Deutschen Bundestages",
-                    "Direktor beim Deutschen Bundestag"
-                )
+                    "Direktor beim Deutschen Bundestag",
+                ),
             ),
             MappedValue(
                 "bundesregierung",
@@ -88,10 +88,10 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
                     "BMZ",
                     "BMWA",
                     "BMIBH",
-                    "BMFJ"
-                )
-            )
-        )
+                    "BMFJ",
+                ),
+            ),
+        ),
     ),
     MappedValues(
         Property.PARTICIPATION_INSTITUTION,
@@ -107,8 +107,8 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
                     "Beschluss des Bundestages",
                     "Rechte des Bundestages",
                     "Bundestag",
-                    "Direktor beim Deutschen Bundestag"
-                )
+                    "Direktor beim Deutschen Bundestag",
+                ),
             ),
             MappedValue(
                 "bundesregierung",
@@ -138,11 +138,11 @@ val legalDocMlValuesMap: List<MappedValues> = listOf(
                     "BMJFFG",
                     "BMFuS",
                     "Chef des Bundeskanzleramtes",
-                    "BMZE"
-                )
-            )
-        )
-    )
+                    "BMZE",
+                ),
+            ),
+        ),
+    ),
 )
 
 fun getMappedValue(property: Property, value: String): String? {

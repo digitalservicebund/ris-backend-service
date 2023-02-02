@@ -95,7 +95,7 @@ class ListNormsControllerTest {
             { "guid": "53d29ef7-377c-4d14-864b-eb3a85769359", "officialLongTitle": "second title", "eli": "$eliTwo" }
           ]
         }
-        """
+        """,
             )
     }
 

@@ -167,7 +167,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 principleEntryIntoForceDateState = decodeUndefinedDate(this.principleEntryIntoForceDateState),
                 entryIntoForceNormCategory = this.entryIntoForceNormCategory,
                 entryIntoForceDateState = decodeUndefinedDate(this.entryIntoForceDateState),
-                expirationDateState = decodeUndefinedDate(this.expirationDateState)
+                expirationDateState = decodeUndefinedDate(this.expirationDateState),
             )
         }
     }
@@ -181,7 +181,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
             return ImportNormUseCase.ArticleData(
                 title,
                 marker,
-                paragraphs.map { it.toUseCaseData() }
+                paragraphs.map { it.toUseCaseData() },
             )
         }
     }

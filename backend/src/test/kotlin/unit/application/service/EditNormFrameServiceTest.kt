@@ -31,7 +31,7 @@ class EditNormFrameServiceTest {
             editNormOutputPort.editNorm(
                 withArg {
                     assertNormAndEditNormFrameProperties(it.norm, properties)
-                }
+                },
             )
         }
     }
@@ -55,7 +55,7 @@ class EditNormFrameServiceTest {
             editNormOutputPort.editNorm(
                 withArg {
                     assertNormAndEditNormFrameProperties(it.norm, normFrameProperties)
-                }
+                },
             )
         }
     }

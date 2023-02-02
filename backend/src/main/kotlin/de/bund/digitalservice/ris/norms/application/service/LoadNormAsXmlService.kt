@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono
 @Service
 class LoadNormAsXmlService(
     private val getNormByEliAdapter: GetNormByEliOutputPort,
-    private val convertNormToXmlAdapter: ConvertNormToXmlOutputPort
+    private val convertNormToXmlAdapter: ConvertNormToXmlOutputPort,
 ) : LoadNormAsXmlUseCase {
 
     override fun loadNormAsXml(query: LoadNormAsXmlUseCase.Query): Mono<String> {
@@ -17,7 +17,7 @@ class LoadNormAsXmlService(
             GetNormByEliOutputPort.Query(
                 query.printAnnouncementGazette,
                 query.announcementOrCitationYear,
-                query.printAnnouncementPage
+                query.printAnnouncementPage,
             )
 
         return getNormByEliAdapter

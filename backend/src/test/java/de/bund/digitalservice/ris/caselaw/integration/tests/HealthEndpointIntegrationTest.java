@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw;
+package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -26,11 +26,11 @@ import org.testcontainers.utility.DockerImageName;
 class HealthEndpointIntegrationTest {
 
   @Container
-  static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
+  static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
 
   @Container
-  static GenericContainer redis =
-      new GenericContainer(DockerImageName.parse("redis:7.0")).withExposedPorts(6379);
+  static GenericContainer<?> redis =
+      new GenericContainer<>(DockerImageName.parse("redis:7.0")).withExposedPorts(6379);
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -39,6 +39,7 @@ class HealthEndpointIntegrationTest {
     registry.add("database.host", () -> postgreSQLContainer.getHost());
     registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
+
     registry.add("spring.data.redis.host", () -> redis.getHost());
     registry.add("spring.data.redis.port", () -> redis.getFirstMappedPort());
   }

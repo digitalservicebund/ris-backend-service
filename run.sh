@@ -23,28 +23,11 @@ _user() {
   printf "\033[0;33m%s\033[0m" "$1"
 }
 
-_find_placeholder_strings() {
-  grep -rlZ 'java-application-template' --exclude-dir=.git --exclude-dir=.gradle --exclude-dir=.idea --exclude-dir=build --exclude=run.sh .
-}
-
-_setup_repo() {
-  if _find_placeholder_strings > /dev/null; then
-    defaultname="$(basename "$(git rev-parse --show-toplevel)")"
-    _user "Name of the repository? ($defaultname) "
-    read -r name
-    newname=$name
-    if [ -z "$newname" ]; then
-      newname=$defaultname
-    fi
-    _find_placeholder_strings | xargs sed -i '' 's/java-application-template/'"$newname"'/g'
-    _info "Renamed, please commit the changes! You might have to adapt the package structure as well.."
-  fi
-}
-
 _setup_git_hooks() {
   _user "Do you want to install the Git hooks ? (y/n) "
   read -r answer
   if [ "$answer" = "y" ]; then
+
     if ! command -v lefthook > /dev/null 2>&1; then
       _fail "Setup requires Lefthook, please install first: \`brew install lefthook\`"
       exit 1
@@ -59,7 +42,6 @@ _setup_git_hooks() {
 }
 
 _init() {
-  _setup_repo
   _setup_git_hooks
 }
 

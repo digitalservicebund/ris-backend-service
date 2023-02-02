@@ -21,7 +21,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
     @PutMapping(path = ["/{guid}"])
     fun editNormFrame(
         @PathVariable guid: String,
-        @RequestBody request: NormFramePropertiesRequestSchema
+        @RequestBody request: NormFramePropertiesRequestSchema,
     ): Mono<ResponseEntity<Void>> {
         val properties = request.toUseCaseData()
         val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
@@ -289,7 +289,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.ageIndicationEnd,
                 this.definition,
                 this.ageOfMajorityIndication,
-                this.text
+                this.text,
             )
         }
     }

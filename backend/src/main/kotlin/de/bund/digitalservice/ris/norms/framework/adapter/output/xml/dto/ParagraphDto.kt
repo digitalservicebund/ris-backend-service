@@ -5,5 +5,5 @@ data class ParagraphDto(
     val marker: String,
     val markerText: IdentifiedElement?,
     val articleMarker: String,
-    val content: ContentDto
+    val content: ContentDto,
 )

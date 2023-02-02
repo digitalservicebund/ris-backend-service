@@ -28,7 +28,7 @@ class NormsService(
     val normsRepository: NormsRepository,
     val articlesRepository: ArticlesRepository,
     val paragraphsRepository: ParagraphsRepository,
-    client: DatabaseClient
+    client: DatabaseClient,
 ) : NormsMapper,
     GetNormByGuidOutputPort,
     SaveNormOutputPort,
@@ -47,7 +47,7 @@ class NormsService(
     }
 
     override fun searchNorms(
-        query: SearchNormsOutputPort.Query
+        query: SearchNormsOutputPort.Query,
     ): Flux<Norm> {
         return template.select(NormDto::class.java)
             .matching(Query.query(criteria.getSearchCriteria(query)))
@@ -92,8 +92,8 @@ class NormsService(
                 norm.articles
                     .find { it.guid == article.guid }
                     ?.paragraphs ?: listOf(),
-                article.id
-            )
+                article.id,
+            ),
         )
     }
 

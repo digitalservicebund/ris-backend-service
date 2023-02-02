@@ -33,7 +33,7 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
     private constructor(val data: List<NormDataResponseSchema>) {
         companion object {
             fun fromUseCaseData(data: List<ListNormsUseCase.NormData>): PaginatedNormListResponseSchema = PaginatedNormListResponseSchema(
-                data.map { NormDataResponseSchema.fromUseCaseData(it) }
+                data.map { NormDataResponseSchema.fromUseCaseData(it) },
             )
         }
     }
@@ -44,7 +44,7 @@ class ListNormsController(private val listNormsService: ListNormsUseCase) {
             fun fromUseCaseData(data: ListNormsUseCase.NormData) = NormDataResponseSchema(
                 encodeGuid(data.guid),
                 data.officialLongTitle,
-                encodeEli(data.eli)
+                encodeEli(data.eli),
             )
         }
     }

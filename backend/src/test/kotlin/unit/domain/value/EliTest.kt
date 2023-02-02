@@ -11,7 +11,7 @@ class EliTest {
             "printAnnouncementGazette",
             LocalDate.now(),
             LocalDate.now(),
-            null
+            null,
         )
         assertThat(eli.toString()).isEqualTo("")
     }
@@ -22,7 +22,7 @@ class EliTest {
             "BAnz",
             LocalDate.now(),
             LocalDate.now(),
-            "111"
+            "111",
         )
         assertThat(eli.toString()).isEqualTo("eli/banz-at/${LocalDate.now().year}/s111")
     }
@@ -33,7 +33,7 @@ class EliTest {
             "",
             LocalDate.now(),
             LocalDate.now(),
-            "111"
+            "111",
         )
         assertThat(eli.toString()).isEqualTo("")
     }

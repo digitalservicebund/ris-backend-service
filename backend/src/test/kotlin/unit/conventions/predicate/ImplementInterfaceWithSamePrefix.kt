@@ -11,10 +11,10 @@ import de.bund.digitalservice.ris.norms.conventions.predicate.Predicates.impleme
  */
 class ImplementInterfaceWithSamePrefix(
     private val classPostfix: String,
-    private val interfacePostfix: String
+    private val interfacePostfix: String,
 ) :
     DescribedPredicate<JavaClass>(
-        "with postfix '$classPostfix' has the same prefix as the interface it implements with postfix '$interfacePostfix'"
+        "with postfix '$classPostfix' has the same prefix as the interface it implements with postfix '$interfacePostfix'",
     ) {
     override fun test(item: JavaClass): Boolean {
         val classHasPostfix = simpleNameEndingWith(this.classPostfix).test(item)

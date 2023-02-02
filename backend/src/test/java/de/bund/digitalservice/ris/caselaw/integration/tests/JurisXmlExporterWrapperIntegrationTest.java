@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter;
+package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -21,7 +21,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
-public class JurisXmlExporterWrapperTest {
+@Tag("IntegrationTest")
+public class JurisXmlExporterWrapperIntegrationTest {
 
   private JurisXmlExporter jurisXmlExporter;
   private String encryptedXml;
@@ -37,7 +38,6 @@ public class JurisXmlExporterWrapperTest {
   }
 
   @Test
-  @Tag("IntegrationTest")
   void test_validDocumentUnit_shouldReturnEncryptedXMLString() throws Exception {
     this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
 
@@ -85,7 +85,6 @@ public class JurisXmlExporterWrapperTest {
   }
 
   @Test
-  @Tag("IntegrationTest")
   void test_invalidDocumentUnitMissingMandatoryFields_shouldReturnEmptyString() throws Exception {
     this.jurisXmlExporter = new JurisXmlExporter(objectMapper);
 
@@ -111,7 +110,6 @@ public class JurisXmlExporterWrapperTest {
   // documentUnit. The test documentUnit needs to be updated accordingly to be
   // in sync with the model.
   @Test
-  @Tag("IntegrationTest")
   public void testDocumentUnitIsSyncedWithModel()
       throws NoSuchFieldException, SecurityException, IllegalArgumentException,
           IllegalAccessException {

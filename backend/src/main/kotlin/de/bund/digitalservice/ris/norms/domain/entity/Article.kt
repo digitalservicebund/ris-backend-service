@@ -7,5 +7,5 @@ data class Article(
     val guid: UUID,
     var title: String? = null,
     val marker: String,
-    val paragraphs: List<Paragraph> = listOf()
+    val paragraphs: List<Paragraph> = listOf(),
 )

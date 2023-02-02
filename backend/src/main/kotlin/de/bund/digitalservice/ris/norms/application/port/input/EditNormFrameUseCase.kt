@@ -148,6 +148,6 @@ interface EditNormFrameUseCase {
 
         var ageOfMajorityIndication: String? = null,
 
-        var text: String? = null
+        var text: String? = null,
     )
 }

@@ -5,7 +5,7 @@ import com.tngtech.archunit.core.domain.JavaClass
 
 class HaveAMethodWithNameLikeClassPrefix(private val classPostfix: String) :
     DescribedPredicate<JavaClass>(
-        "have a method named like class prefix where prefix is '$classPostfix'"
+        "have a method named like class prefix where prefix is '$classPostfix'",
     ) {
     override fun test(item: JavaClass): Boolean {
         val expectedMethodName = this.getExpectedMethodName(item)

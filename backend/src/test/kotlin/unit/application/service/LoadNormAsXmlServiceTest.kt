@@ -33,7 +33,7 @@ class LoadNormAsXmlServiceTest {
                     assertThat(it.gazette).isEqualTo("bgbl-1")
                     assertThat(it.year).isEqualTo("2022")
                     assertThat(it.page).isEqualTo("1125")
-                }
+                },
             )
         }
     }
@@ -54,7 +54,7 @@ class LoadNormAsXmlServiceTest {
             convertNormToXmlAdapter.convertNormToXml(
                 withArg {
                     assertThat(it.norm).isEqualTo(norm)
-                }
+                },
             )
         }
     }

@@ -4,12 +4,6 @@ Built with Vue
 
 ## Prerequisites
 
-**Node.js 16.14.2**
-
-```bash
-brew install node
-```
-
 The repository contains a `.node-version` file to set up the required Node.js version automatically with [nodenv](https://github.com/nodenv/nodenv).
 
 Install dependencies:
@@ -28,9 +22,9 @@ npx playwright install
 
 ### Dev server
 
-The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://localhost:3000/).
+The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://127.0.0.1/).
 
-**Start server**:
+**Start server:**
 
 ```bash
 npm run dev
@@ -84,6 +78,8 @@ npm run test:a11y
 ```
 
 ### Style (linting & formatting)
+
+Check our [Frontend Styleguide](FRONTEND_STYLEGUIDE.md) document.
 
 Linting is done via [ESLint](https://eslint.org/docs/user-guide/getting-started); consistent formatting for a variety of source code files is being enforced using [Prettier](https://prettier.io/docs/en/index.html). ESLint and Prettier work in conjunction.
 

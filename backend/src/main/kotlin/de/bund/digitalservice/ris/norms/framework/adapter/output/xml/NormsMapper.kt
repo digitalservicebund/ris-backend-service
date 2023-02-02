@@ -28,7 +28,7 @@ fun mapNormToDto(norm: Norm): NormDto {
         eli = norm.eli.toString(),
         articles = norm.articles.sortedBy { it.marker.substring(2).toInt() }.mapIndexed { index, article ->
             mapArticleToDto(article, index)
-        }
+        },
     )
 }
 
@@ -47,7 +47,7 @@ fun mapArticleToDto(article: Article, ordinalNumber: Int = 1): ArticleDto {
         paragraphs =
         paragraphsToPass.mapIndexed { index, paragraph ->
             mapParagraphToDto(paragraph, marker, index)
-        }
+        },
     )
 }
 
@@ -68,7 +68,7 @@ fun mapParagraphToDto(paragraph: Paragraph, articleMarker: String, ordinalNumber
         marker = paragraphMarker,
         markerText = IdentifiedElement(paragraph.marker),
         articleMarker = articleMarker,
-        content = if (textNoUnknownTags.contains("<DL")) toContentDto(textNoUnknownTags, paragraphMarker) else ContentDto(isText = true, text = IdentifiedElement(textNoUnknownTags))
+        content = if (textNoUnknownTags.contains("<DL")) toContentDto(textNoUnknownTags, paragraphMarker) else ContentDto(isText = true, text = IdentifiedElement(textNoUnknownTags)),
     )
 }
 
