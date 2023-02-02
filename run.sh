@@ -44,6 +44,7 @@ _setup_git_hooks() {
 _setup_direnv() {
   # Allow direnv to use `.env` files as described here: 
   # https://github.com/direnv/direnv/blob/master/man/direnv.toml.1.md#codeloaddotenvcode
+  [ -d ~/.config/direnv/. ] || mkdir ~/.config/direnv
   cat > ~/.config/direnv/direnv.toml<< EOF
 [global]
 load_dotenv = true
