@@ -1,12 +1,12 @@
 ## Run
 
 ```sh
-docker-compose up
+docker compose up
 ```
 
 ### Spring Boot
 
-Is exposing metrics at: `localhost:8080/actuator/prometheus`
+Is exposing metrics at: `127.0.0.1/actuator/prometheus`
 
 ### Prometheus
 

@@ -4,35 +4,19 @@
 [![Scan](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml)
 [![Secrets Check](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml)
 
-Java service built with
-the [Spring WebFlux reactive stack](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#spring-webflux).
-
-## Prerequisites
-
-Java 17, Docker for building + running the containerized application:
-
-```bash
-brew install openjdk@17
-brew install --cask docker # or just `brew install docker` if you don't want the Desktop app
-```
-
-For the provided Git hooks you will need:
-
-```bash
-brew install lefthook node talisman
-```
+Java service built with the [Spring WebFlux reactive stack](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#spring-webflux).
 
 ## Development
 
-### Gradle Secrets
+### Setup Secrets
 
-The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env:
+The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env.
 
 ```bash
-eval "$(../run.sh gradle-env)"
+../run.sh env
 ```
 
-### Flyway
+### Database Setup & Migration with Flyway
 
 The application uses Flyway for maintaining and versioning database migrations. In order to create a change in the database, you should create a new sql file on the directory `src\main\resources\db\migration`.
 
@@ -41,17 +25,21 @@ The `teamname` can be replaced with: whether `caselaw` or `norms` and is normall
 
 Flyway automatically detects new files and run migrations accordingly on sprint boot start.
 
-The configuration is made to use `localhost` as a database host. However, if you're running from the container, you may need to use `db` instead to be recognized by the application (no need to take care of that as in the docker compose file profiles are defined and in those profiles the config is overwritten)
+### Run Service
 
-#### Run Service
-
-Requires the Postgres database to be running: `docker-compose up db`
+Requires the Postgres database to be running: `docker compose up db`
 
 ```bash
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
-If you use IntelliJ: the run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
+**If you use IntelliJ:**
+
+The run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
+
+**If you use VS Code:**
+
+TODO
 
 ### Lookup tables
 
@@ -59,11 +47,11 @@ Some dropdown menus in the frontend get populated via calls to the backend that 
 
 These are the endpoints and the respective XML files (find those in our wiki) that need to be uploaded to them:
 
-| Endpoint                                                               | XML file                 |
-| ---------------------------------------------------------------------- | ------------------------ |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/doktyp`      | `doktyp.xml`             |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/gerichtdata` | `gerichtdata_gesamt.xml` |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/buland`      | `buland.xml`             |
+| Endpoint                                                          | XML file                 |
+| ----------------------------------------------------------------- | ------------------------ |
+| `http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp`      | `doktyp.xml`             |
+| `http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata` | `gerichtdata_gesamt.xml` |
+| `http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland`      | `buland.xml`             |
 
 In all cases you need to do a `PUT` call: in _Postman_ go to _Body_, set it to _raw_, change from _Text_ to _XML_ on the blue dropdown to the right and paste the entire XML content in.
 
@@ -99,11 +87,9 @@ Furthermore, there is another type of test worth mentioning. We're
 using [ArchUnit](https://www.archunit.org/getting-started)
 for ensuring certain architectural characteristics, for instance making sure that there are no cyclic dependencies.
 
-## Formatting
+## Formatting & Styleguide
 
-Java source code formatting must conform to the [Google Java Style](https://google.github.io/styleguide/javaguide.html).
-Consistent formatting, for Java as well as various other types of source code, is being enforced
-via [Spotless](https://github.com/diffplug/spotless).
+Check our [Java Styleguides](JAVA_STYLEGUIDES.md) document. To set up IntelliJ IDEA follow [these instructions](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides). Consistent formatting, for Java as well as various other types of source code, is being enforced via [Spotless](https://github.com/diffplug/spotless).
 
 **Check formatting:**
 
@@ -128,8 +114,7 @@ token provided as `SONAR_TOKEN` repository secret that needs to be obtained from
 SONAR_TOKEN=[sonar-token] ./gradlew sonarqube
 ```
 
-Go to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service)
-for the analysis results.
+Go to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service) for the analysis results.
 
 ## Container image
 
@@ -203,13 +188,7 @@ Scanning container images for vulnerabilities is performed with [Trivy](https://
 as part of the pipeline's `build` job, as well as each night for the latest published image in the container
 repository.
 
-**To run a scan locally:**
-
-Install Trivy:
-
-```bash
-brew install aquasecurity/trivy/trivy
-```
+To run a scan locally:
 
 ```bash
 ./gradlew bootBuildImage

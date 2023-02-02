@@ -207,6 +207,8 @@ fileignoreconfig:
     checksum: c26464b0ae1a3f87f7eeb7345ce4e375a0ade3a8a76927723d72a09ff61f2e2b
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/HealthEndpointIntegrationTest.java
     checksum: 219d97511f52a87d3a85622899ab170267a96bc791ce32fee11bcd204f505a97
+  - filename: frontend/FRONTEND_STYLEGUIDE.md
+    checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
 
 scopeconfig:
   - scope: node
