@@ -19,6 +19,5 @@ lefthook-local.yml
 .config/
 .local-storage/
 .env
-
-### Brew ###
 Brewfile.lock.json
+

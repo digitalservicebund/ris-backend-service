@@ -53,7 +53,19 @@ This will install a couple of Git hooks which are supposed to help you to:
 
 ### Setup local env
 
-TODO
+Add this direnv to your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md). E.g. for ZSH add this to `~/.zshrc`
+
+```bash
+eval "$(direnv hook zsh)"
+```
+
+Create .env file (repeat whenever values in gopass change)
+
+```bash
+./run.sh env
+```
+
+Note: This needs to be repeated every time the secrets change
 
 ## Development
 
