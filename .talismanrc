@@ -8,7 +8,7 @@ fileignoreconfig:
   - filename: .github/workflows/pipeline.yml
     checksum: 0da7f0808c3568bbe2d7fc5353cbb8bf2c0777d8c5d20fd958b369946454641f
   - filename: .github/workflows/playwright-test.yml
-    checksum: 18ce292910ec2d9b28ede7e9ba97bcadb4905a735f882e29efe19ab31461cbf9
+    checksum: 80f91e4841a0ddd0596fd4ca6046e7dd69cafb92a5f4776aeb486c66b6e75cbb
   - filename: .github/workflows/playwright.yml
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: .github/workflows/scan.yml
