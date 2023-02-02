@@ -262,6 +262,6 @@ data class NormDto(
     var ageOfMajorityIndication: String? = null,
 
     @Column("text")
-    var text: String? = null
+    var text: String? = null,
 
 )

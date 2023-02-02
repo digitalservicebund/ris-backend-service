@@ -7,5 +7,5 @@ data class ArticleDto(
     var title: IdentifiedElement?,
     val marker: String,
     val markerText: IdentifiedElement,
-    var paragraphs: List<ParagraphDto> = listOf()
+    var paragraphs: List<ParagraphDto> = listOf(),
 )

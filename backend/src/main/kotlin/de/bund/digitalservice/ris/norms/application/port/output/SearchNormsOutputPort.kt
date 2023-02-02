@@ -11,7 +11,7 @@ interface SearchNormsOutputPort {
     data class QueryParameter(
         val field: QueryFields,
         val value: String?,
-        val isFuzzyMatch: Boolean = false
+        val isFuzzyMatch: Boolean = false,
     )
 
     enum class QueryFields {
@@ -22,6 +22,6 @@ interface SearchNormsOutputPort {
         OFFICIAL_LONG_TITLE,
         OFFICIAL_SHORT_TITLE,
         UNOFFICIAL_LONG_TITLE,
-        UNOFFICIAL_SHORT_TITLE
+        UNOFFICIAL_SHORT_TITLE,
     }
 }

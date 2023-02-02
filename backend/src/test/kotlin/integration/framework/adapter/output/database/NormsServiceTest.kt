@@ -103,7 +103,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
             printAnnouncementPage = "1125",
-            printAnnouncementGazette = "bg-1"
+            printAnnouncementGazette = "bg-1",
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2022", "1125")
@@ -127,7 +127,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
             printAnnouncementPage = "1125",
-            printAnnouncementGazette = "bg-1"
+            printAnnouncementGazette = "bg-1",
         )
         val secondNorm = Norm(
             guid = UUID.randomUUID(),
@@ -135,7 +135,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
             printAnnouncementPage = "111",
-            printAnnouncementGazette = "bg-1"
+            printAnnouncementGazette = "bg-1",
         )
         val saveFirstNormCommand = SaveNormOutputPort.Command(firstNorm)
         val saveSecondNormCommand = SaveNormOutputPort.Command(secondNorm)
@@ -229,7 +229,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             providerEntity = "provider entity", entryIntoForceDate = LocalDate.now(),
             expirationDateState = UndefinedDate.UNDEFINED_FUTURE, printAnnouncementGazette = "print gazette",
             completeCitation = "complete citation", unofficialAbbreviation = "unofficial abbreviation",
-            celexNumber = "celex number"
+            celexNumber = "celex number",
         )
 
         val editCommand = EditNormOutputPort.Command(updatedNorm)
@@ -261,7 +261,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         assertThat(
             normBeforePersist.articles.size == normAfterPersist.articles.size &&
                 normBeforePersist.articles.toSet() == normAfterPersist.articles.toSet(),
-            `is`(true)
+            `is`(true),
         )
     }
 }

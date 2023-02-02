@@ -56,7 +56,7 @@ class ToLegalDocMLConverterTest {
             createRandomNorm()
                 .copy(
                     officialLongTitle = "test official long title",
-                    officialShortTitle = "test official short title"
+                    officialShortTitle = "test official short title",
                 )
         val document = convertNormToLegalDocML(norm)
 
@@ -79,7 +79,7 @@ class ToLegalDocMLConverterTest {
                     guid = guid,
                     printAnnouncementGazette = "printAnnouncementGazette",
                     announcementDate = LocalDate.parse("2001-01-01"),
-                    printAnnouncementPage = "1102"
+                    printAnnouncementPage = "1102",
                 )
         val document = convertNormToLegalDocML(norm)
 
@@ -150,8 +150,8 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = "documentTypeName",
                     documentNormCategory = "documentNormCategory",
                     providerDecidingBody = "providerDecidingBody",
-                    participationInstitution = "participationInstitution"
-                )
+                    participationInstitution = "participationInstitution",
+                ),
         )
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
@@ -174,8 +174,8 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = null,
                     documentNormCategory = null,
                     providerDecidingBody = null,
-                    participationInstitution = null
-                )
+                    participationInstitution = null,
+                ),
         )
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
@@ -198,8 +198,8 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = "SO",
                     documentNormCategory = "Rechtsetzungsdokument",
                     providerDecidingBody = "Präsident des Deutschen Bundestages",
-                    participationInstitution = "Bundeskanzleramt"
-                )
+                    participationInstitution = "Bundeskanzleramt",
+                ),
         )
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
@@ -220,8 +220,8 @@ class ToLegalDocMLConverterTest {
             createRandomNorm()
                 .copy(
                     providerDecidingBody = "Bundesministerinnen",
-                    participationInstitution = "BMinisterium"
-                )
+                    participationInstitution = "BMinisterium",
+                ),
         )
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
@@ -241,7 +241,7 @@ class ToLegalDocMLConverterTest {
                 UUID.randomUUID(),
                 title = "test article title",
                 marker = "§ 9a",
-                paragraphs = listOf(paragraph)
+                paragraphs = listOf(paragraph),
             )
         val norm = createRandomNorm().copy(articles = listOf(article))
         val document = convertNormToLegalDocML(norm)
@@ -291,14 +291,14 @@ class ToLegalDocMLConverterTest {
                     "                            </LA>\n" +
                     "                        </DD>\n" +
                     "                    </DL>\n" +
-                    "                "
+                    "                ",
             )
         val article =
             Article(
                 UUID.randomUUID(),
                 title = "test article title",
                 marker = "§ 1",
-                paragraphs = listOf(paragraph)
+                paragraphs = listOf(paragraph),
             )
         val norm = createRandomNorm().copy(articles = listOf(article))
         val document = convertNormToLegalDocML(norm)
@@ -368,14 +368,14 @@ class ToLegalDocMLConverterTest {
                     "                                </DL>\n" +
                     "                            </LA>\n" +
                     "                        </DD>\n" +
-                    "                    </DL>"
+                    "                    </DL>",
             )
         val article =
             Article(
                 UUID.randomUUID(),
                 title = "test article title",
                 marker = "§ 1",
-                paragraphs = listOf(paragraph)
+                paragraphs = listOf(paragraph),
             )
         val norm = createRandomNorm().copy(articles = listOf(article))
         val document = convertNormToLegalDocML(norm)

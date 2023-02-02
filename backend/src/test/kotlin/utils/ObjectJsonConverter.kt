@@ -14,13 +14,13 @@ import java.lang.reflect.Type
 import java.time.LocalDate
 
 fun convertEditNormRequestSchemaToJson(
-    editNormRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema
+    editNormRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema,
 ): String {
     return Gson().toJson(editNormRequestSchema)
 }
 
 fun convertImportormRequestSchemaToJson(
-    importNormRequestSchema: ImportNormController.NormRequestSchema
+    importNormRequestSchema: ImportNormController.NormRequestSchema,
 ): String {
     return Gson().toJson(importNormRequestSchema)
 }
@@ -30,7 +30,7 @@ fun convertNormToJson(norm: LoadNormController.NormResponseSchema): String {
         override fun serialize(
             src: LocalDate?,
             typeOfSrc: Type?,
-            context: JsonSerializationContext?
+            context: JsonSerializationContext?,
         ): JsonElement {
             return JsonPrimitive(encodeLocalDate(src))
         }

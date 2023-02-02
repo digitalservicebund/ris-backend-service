@@ -146,7 +146,7 @@ data class Norm(
 
     var ageOfMajorityIndication: String? = null,
 
-    var text: String? = null
+    var text: String? = null,
 
 ) {
     val eli: Eli
@@ -155,6 +155,6 @@ data class Norm(
                 printAnnouncementGazette,
                 announcementDate,
                 citationDate,
-                printAnnouncementPage
+                printAnnouncementPage,
             )
 }

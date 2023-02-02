@@ -16,7 +16,7 @@ data class Eli(
     val printAnnouncementGazette: String?,
     val announcementDate: LocalDate?,
     val citationDate: LocalDate?,
-    val printAnnouncementPage: String?
+    val printAnnouncementPage: String?,
 ) {
     companion object {
         fun parseGazette(gazette: String): String = when (gazette) {

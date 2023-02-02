@@ -13,7 +13,7 @@ data class ContentDto(
     var intro: IdentifiedElement? = null,
     var points: MutableList<ContentDto> = mutableListOf(),
     var listMarkerGrandparent: String? = null,
-    var listMarkerParent: String? = null
+    var listMarkerParent: String? = null,
 ) {
     var markerClean: String? = null
         get() {

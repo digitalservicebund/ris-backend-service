@@ -14,7 +14,7 @@ import kotlin.reflect.full.memberProperties
 
 fun assertEditNormFrameProperties(
     commandProperties: EditNormFrameUseCase.NormFrameProperties,
-    normFrameProperties: EditNormFrameUseCase.NormFrameProperties
+    normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
 ) {
     EditNormFrameUseCase.NormFrameProperties::class.memberProperties.forEach {
         assertThat(it.get(commandProperties)).isEqualTo(it.get(normFrameProperties))
@@ -23,7 +23,7 @@ fun assertEditNormFrameProperties(
 
 fun assertEditNormFramePropertiesAndEditNormRequestSchema(
     normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
-    normFrameRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema
+    normFrameRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema,
 ) {
     val normFrameRequestSchemaMembers =
         EditNormFrameController.NormFramePropertiesRequestSchema::class.memberProperties
@@ -41,7 +41,7 @@ fun assertEditNormFramePropertiesAndEditNormRequestSchema(
             is LocalDate ->
                 assertThat(normFramePropertiesMemberValue)
                     .isEqualTo(
-                        decodeLocalDate(found?.get(normFrameRequestSchema).toString())
+                        decodeLocalDate(found?.get(normFrameRequestSchema).toString()),
                     )
 
             else -> {
@@ -54,7 +54,7 @@ fun assertEditNormFramePropertiesAndEditNormRequestSchema(
 
 fun assertNormAndEditNormFrameProperties(
     norm: Norm,
-    normFrameProperties: EditNormFrameUseCase.NormFrameProperties
+    normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
 ) {
     val normMembers = Norm::class.memberProperties
     val normFramePropertiesMembers =
@@ -68,7 +68,7 @@ fun assertNormAndEditNormFrameProperties(
 
 fun assertNormDataAndImportNormRequestSchemaWithoutArticles(
     normData: ImportNormUseCase.NormData,
-    importNormRequestSchema: ImportNormController.NormRequestSchema
+    importNormRequestSchema: ImportNormController.NormRequestSchema,
 ) {
     val normDataMembers = ImportNormUseCase.NormData::class.memberProperties
     val importNormRequestSchemaMembers =
@@ -82,15 +82,15 @@ fun assertNormDataAndImportNormRequestSchemaWithoutArticles(
             is LocalDate ->
                 assertThat(normDataMemberValue)
                     .isEqualTo(
-                        decodeLocalDate(found?.get(importNormRequestSchema).toString())
+                        decodeLocalDate(found?.get(importNormRequestSchema).toString()),
                     )
 
             is UndefinedDate ->
                 assertThat(normDataMemberValue)
                     .isEqualTo(
                         decodeUndefinedDate(
-                            found?.get(importNormRequestSchema).toString()
-                        )
+                            found?.get(importNormRequestSchema).toString(),
+                        ),
                     )
 
             else -> {
@@ -122,7 +122,7 @@ fun assertNormAndNormDataWithoutArticles(norm: Norm, normData: ImportNormUseCase
 
 fun assertNormsWithoutArticles(
     norm1: Norm,
-    norm2: Norm
+    norm2: Norm,
 ) {
     val normMembers = Norm::class.memberProperties
     normMembers

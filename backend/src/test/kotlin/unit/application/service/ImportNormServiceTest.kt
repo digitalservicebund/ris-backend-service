@@ -37,7 +37,7 @@ class ImportNormServiceTest {
                     assertThat(it.norm.articles[0].paragraphs[0].marker).isEqualTo("marker")
                     assertThat(it.norm.articles[0].paragraphs[0].text).isEqualTo("text")
                     assertNormAndNormDataWithoutArticles(it.norm, normData)
-                }
+                },
             )
         }
     }
@@ -80,7 +80,7 @@ class ImportNormServiceTest {
                     assertThat(it.norm.articles[1].paragraphs[1].text)
                         .isEqualTo(normData.articles[1].paragraphs[1].text)
                     assertNormAndNormDataWithoutArticles(it.norm, normData)
-                }
+                },
             )
         }
     }

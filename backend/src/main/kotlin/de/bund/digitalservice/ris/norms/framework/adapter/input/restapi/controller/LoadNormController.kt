@@ -150,7 +150,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var ageIndicationEnd: String?,
         var definition: String?,
         var ageOfMajorityIndication: String?,
-        var text: String?
+        var text: String?,
     ) {
         companion object {
             fun fromUseCaseData(data: Norm): NormResponseSchema {
@@ -270,7 +270,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.ageIndicationEnd,
                     data.definition,
                     data.ageOfMajorityIndication,
-                    data.text
+                    data.text,
                 )
             }
         }
@@ -281,7 +281,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val guid: String,
         var title: String? = null,
         val marker: String,
-        val paragraphs: List<ParagraphResponseSchema>
+        val paragraphs: List<ParagraphResponseSchema>,
     ) {
         companion object {
             fun fromUseCaseData(data: Article): ArticleResponseSchema {
@@ -290,7 +290,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     encodeGuid(data.guid),
                     data.title,
                     data.marker,
-                    paragraphs
+                    paragraphs,
                 )
             }
         }

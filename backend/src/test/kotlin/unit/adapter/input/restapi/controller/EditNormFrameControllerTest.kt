@@ -51,9 +51,9 @@ class EditNormFrameControllerTest {
                         .isEqualTo(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
                     assertEditNormFramePropertiesAndEditNormRequestSchema(
                         it.properties,
-                        editNormRequestSchema
+                        editNormRequestSchema,
                     )
-                }
+                },
             )
         }
     }
