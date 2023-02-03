@@ -10,11 +10,7 @@ Java service built with the [Spring WebFlux reactive stack](https://docs.spring.
 
 ### Setup Secrets
 
-The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env. If you didn't set up direnv, check the root readme:
-
-```bash
-../run.sh env
-```
+The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-env).
 
 ### Database Setup & Migration with Flyway
 
@@ -27,7 +23,13 @@ Flyway automatically detects new files and run migrations accordingly on sprint 
 
 ### Run Service
 
-Requires the Postgres database to be running: `docker compose up db`
+Requires the all but backend to be running in docker:
+
+```bash
+../run.sh dev --no-backend
+```
+
+Start the backend
 
 ```bash
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
@@ -41,7 +43,7 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 
 **If you use VS Code:**
 
-- The launch config in `backend/.vscode/launch.json` should be used automatically
+- The launch config in `.vscode/launch.json` should be used automatically
 
 ### Lookup tables
 

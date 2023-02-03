@@ -53,7 +53,9 @@ This will install a couple of Git hooks which are supposed to help you to:
 
 ### Setup local env
 
-Add this direnv to your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md). E.g. for ZSH add this to `~/.zshrc`
+Add this direnv to your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md).
+
+E.g. for ZSH add this to `~/.zshrc`
 
 ```bash
 eval "$(direnv hook zsh)"

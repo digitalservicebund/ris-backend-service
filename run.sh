@@ -29,11 +29,11 @@ _setup_git_hooks() {
   if [ "$answer" = "y" ]; then
 
     if ! command -v lefthook > /dev/null 2>&1; then
-      _fail "Setup requires Lefthook, please install first: \`brew install lefthook\`"
+      _fail "Setup requires Lefthook, please install first"
       exit 1
     fi
     if ! command -v talisman > /dev/null 2>&1; then
-      _fail "Setup requires Talisman, please install first: \`brew install talisman\`"
+      _fail "Setup requires Talisman, please install first"
       exit 1
     fi
     lefthook install
@@ -66,9 +66,8 @@ _start() {
 
 _env() {
   if ! command -v gopass > /dev/null 2>&1; then
-    GH_PACKAGES_REPOSITORY_USER=$READ_PACKAGES_PAT_USERNAME
-    GH_PACKAGES_REPOSITORY_TOKEN=$READ_PACKAGES_PAT_TOKEN
-    return
+    fail "Setup requires gopass, please install first"
+    exit 1
   fi
   
   cat > ./.env<< EOF
@@ -86,12 +85,16 @@ EOF
 
 _dev() {
   if ! command -v docker > /dev/null 2>&1; then
-    _fail "Dev requires docker, please install first: \`brew install docker\`"
+    _fail "Dev requires docker, please install first"
     exit 1
   fi
   docker build ./frontend -f frontend/Dockerfile -t neuris/frontend --no-cache
-  eval "$(_env)"
-  docker compose up
+  
+  if [ "${1#}" == "--no-backend" ]; then
+    docker-compose up traefik redis db frontend
+  else
+    docker-compose up
+  fi
 }
 
 _commit_message_template() {
@@ -133,8 +136,9 @@ _help() {
   echo ""
   echo "Available commands:"
   echo "init                  Set up repository for development"
-  echo "env                   Provide shell env build/test tooling; usage: \`eval \"\$(./run.sh env)\"\`"
+  echo "env                   Provide shell env build/test tooling"
   echo "dev                   Start full-stack development environment"
+  echo "                      Add '--no-backend' to start backend separately"
   echo "clean-staging         Deletes all existing documentunits on staging"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
@@ -144,7 +148,9 @@ cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
   "env") _env ;;
-  "dev") _dev ;;
+  "dev") 
+    shift 
+    _dev "$@";;
   "clean-staging") _clean_staging ;;
   "_start") _start ;;
   "cm")
