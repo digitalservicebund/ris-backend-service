@@ -119,8 +119,13 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
     }
 
     if (ppr.getPStyle() != null
-        && List.of("RandNummer", "ListParagraph", "Listenabsatz")
-            .contains(ppr.getPStyle().getVal())) {
+        && ppr.getPStyle().getVal().equals("Listenabsatz")
+        && ppr.getFramePr() != null) {
+      return true;
+    }
+
+    if (ppr.getPStyle() != null
+        && List.of("RandNummer", "ListParagraph").contains(ppr.getPStyle().getVal())) {
       return true;
     }
 
