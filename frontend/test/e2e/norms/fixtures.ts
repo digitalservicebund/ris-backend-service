@@ -648,7 +648,7 @@ export function getNormBySections(norm) {
             {
               type: "text",
               name: "documentStatusDate",
-              label: "Datum des Änderungsvorschrift",
+              label: "Datum der Änderungsvorschrift",
               value: norm.documentStatusDate,
             },
             {
