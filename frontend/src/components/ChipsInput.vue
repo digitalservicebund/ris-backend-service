@@ -192,11 +192,14 @@ const handleOnBlur = () => {
 
     .icon-wrapper {
       display: flex;
+      height: 100%;
+      align-items: center;
       padding: 4px 3px;
       border-radius: 0 10px 10px 0;
 
       em {
         cursor: pointer;
+        text-align: center;
       }
     }
 
