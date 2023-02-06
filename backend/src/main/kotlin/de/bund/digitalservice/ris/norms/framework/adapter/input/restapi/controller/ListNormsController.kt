@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
 class ListNormsController(private val listNormsService: ListNormsUseCase) {
 
-    @GetMapping
+    @GetMapping(path = ["/norms", "/open/norms"])
     fun listNorms(@RequestParam q: String?): Mono<ResponseEntity<PaginatedNormListResponseSchema>> {
         val query = ListNormsUseCase.Query(searchTerm = q)
 

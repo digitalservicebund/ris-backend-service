@@ -19,7 +19,7 @@ import reactor.core.publisher.Mono
 import java.util.UUID
 
 @RestController
-@RequestMapping(ApiConfiguration.API_BASE_PATH)
+@RequestMapping(ApiConfiguration.API_NORMS_PATH)
 class LoadNormController(private val loadNormService: LoadNormUseCase) {
 
     @GetMapping(path = ["/{guid}"])

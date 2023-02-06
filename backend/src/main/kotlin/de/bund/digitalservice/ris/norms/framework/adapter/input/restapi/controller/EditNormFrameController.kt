@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping(ApiConfiguration.API_BASE_PATH)
+@RequestMapping(ApiConfiguration.API_NORMS_PATH)
 class EditNormFrameController(private val editNormFrameService: EditNormFrameUseCase) {
 
     @PutMapping(path = ["/{guid}"])

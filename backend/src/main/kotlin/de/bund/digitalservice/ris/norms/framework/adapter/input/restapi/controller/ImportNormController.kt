@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 import java.net.URI
 
 @RestController
-@RequestMapping(ApiConfiguration.API_BASE_PATH)
+@RequestMapping(ApiConfiguration.API_NORMS_PATH)
 class ImportNormController(private val importNormService: ImportNormUseCase) {
     @PostMapping
     fun createNorm(@RequestBody resource: NormRequestSchema): Mono<ResponseEntity<Void>> {
@@ -23,7 +23,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         return importNormService
             .importNorm(command)
             .map { guid -> encodeGuid(guid) }
-            .map { encodedGuid -> URI("${ApiConfiguration.API_BASE_PATH}/$encodedGuid") }
+            .map { encodedGuid -> URI("${ApiConfiguration.API_NORMS_PATH}/$encodedGuid") }
             .map { uri -> ResponseEntity.created(uri).build<Void>() }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
