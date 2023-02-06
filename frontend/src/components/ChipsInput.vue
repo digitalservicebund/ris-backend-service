@@ -188,6 +188,7 @@ const handleOnBlur = () => {
     align-items: center;
     border-radius: 10px;
     margin: 0 8px 8px 0;
+    word-break: break-word;
 
     .icon-wrapper {
       display: flex;
