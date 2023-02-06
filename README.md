@@ -61,13 +61,13 @@ E.g. for ZSH add this to `~/.zshrc`
 eval "$(direnv hook zsh)"
 ```
 
-Create .env file (repeat whenever values in gopass change)
+Create .env file
 
 ```bash
 ./run.sh env
 ```
 
-Note: This needs to be repeated every time the secrets change
+**Note:** This needs to be repeated every time the secrets change
 
 ## Development
 
@@ -77,7 +77,7 @@ Note: This needs to be repeated every time the secrets change
 
 The Application is available at http://127.0.0.1
 
-This will start the backend with a Postgres database and [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
+This will start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
 
 Read the component individual documentation to figure out how to run them individually:
 

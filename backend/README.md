@@ -8,19 +8,6 @@ Java service built with the [Spring WebFlux reactive stack](https://docs.spring.
 
 ## Development
 
-### Setup Secrets
-
-The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-env).
-
-### Database Setup & Migration with Flyway
-
-The application uses Flyway for maintaining and versioning database migrations. In order to create a change in the database, you should create a new sql file on the directory `src\main\resources\db\migration`.
-
-The file should be named in the following format: `Vx.x__teamname_create_table_xyz.sql` where `x.x` is your migration version (make sure to pull first from the repository and see what is the latest version otherwise migrations wouldn't work properly).
-The `teamname` can be replaced with: whether `caselaw` or `norms` and is normally followed by a descriptive name for the migration.
-
-Flyway automatically detects new files and run migrations accordingly on sprint boot start.
-
 ### Run Service
 
 Requires the all but backend to be running in docker:
@@ -29,21 +16,21 @@ Requires the all but backend to be running in docker:
 ../run.sh dev --no-backend
 ```
 
-Start the backend
+**Start backend with IntelliJ:**
+
+- Use the checked in run config in `../.idea/runConfigurations/`. If you open just this `backend` folder with IntelliJ, you will need to copy and adjust it.
+
+**Start backend with VS Code:**
+
+- The launch config in `.vscode/launch.json` should be used automatically
+
+**Start backend from CLI**:
 
 ```bash
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
-**If you use IntelliJ:**
-
-- The run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
-- Install the [EnvFile plugin](https://plugins.jetbrains.com/plugin/7861-envfile/)
-- Use the checked in run config in `../.idea/runConfigurations/` (if you open just the backend folder with IntelliJ, you will need to create your own)
-
-**If you use VS Code:**
-
-- The launch config in `.vscode/launch.json` should be used automatically
+**Note:** The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-env).
 
 ### Lookup tables
 
@@ -58,6 +45,15 @@ These are the endpoints and the respective XML files (find those in our wiki) th
 | `http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland`      | `buland.xml`             |
 
 In all cases you need to do a `PUT` call: in _Postman_ go to _Body_, set it to _raw_, change from _Text_ to _XML_ on the blue dropdown to the right and paste the entire XML content in.
+
+### Database Setup & Migration with Flyway
+
+The application uses Flyway for maintaining and versioning database migrations. In order to create a change in the database, you should create a new sql file on the directory `src\main\resources\db\migration`.
+
+The file should be named in the following format: `Vx.x__teamname_create_table_xyz.sql` where `x.x` is your migration version (make sure to pull first from the repository and see what is the latest version otherwise migrations wouldn't work properly).
+The `teamname` can be replaced with: whether `caselaw` or `norms` and is normally followed by a descriptive name for the migration.
+
+Flyway automatically detects new files and run migrations accordingly on sprint boot start.
 
 ## Tests
 
@@ -87,9 +83,7 @@ running any integration tests.
 
 Denoting an integration test is accomplished by using a JUnit 5 tag annotation: `@Tag("integration")`.
 
-Furthermore, there is another type of test worth mentioning. We're
-using [ArchUnit](https://www.archunit.org/getting-started)
-for ensuring certain architectural characteristics, for instance making sure that there are no cyclic dependencies.
+Furthermore, there is another type of test worth mentioning. We're using [ArchUnit](https://www.archunit.org/getting-started) for ensuring certain architectural characteristics, for instance making sure that there are no cyclic dependencies.
 
 ## Formatting & Styleguide
 
@@ -181,7 +175,7 @@ from unit and integration test sets.
 **To run the journey tests:**
 
 ```bash
-STAGING_URL=[staging-url] ./gradlew journeyTest
+APPLICATION_STAGING_URL=https://ris.dev.ds4g.net/ ./gradlew journeyTest
 ```
 
 When omitting the `STAGING_URL` env variable journey tests run against the local spring application.
