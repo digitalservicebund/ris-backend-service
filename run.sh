@@ -88,7 +88,7 @@ _dev() {
     _fail "Dev requires docker, please install first"
     exit 1
   fi
-  docker build ./frontend -f frontend/Dockerfile -t neuris/frontend --no-cache
+  docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
   
   if [ $# -gt 0 ] && [ "${1#}" == "--no-backend" ]; then
     docker-compose up traefik redis db frontend
