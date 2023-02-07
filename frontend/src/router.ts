@@ -3,7 +3,7 @@ import {
   createWebHistory,
   RouteLocationNormalized,
 } from "vue-router"
-import authService from "./services/authService"
+import { isAuthenticated, loginEndpoint } from "./services/authService"
 import routes from "~pages"
 
 const router = createRouter({
@@ -11,14 +11,34 @@ const router = createRouter({
   routes,
 })
 
-router.beforeEach((to, from) => beforeEach(to, from))
+router.beforeEach((to) => beforeEach(to))
 
-export async function beforeEach(
-  _to: RouteLocationNormalized,
-  from?: RouteLocationNormalized
-) {
-  if (from?.name || (await authService.isAuthenticated())) return true
-  else return false
+function redirectToLogin() {
+  location.href = loginEndpoint
+}
+
+function setLocationCookie(path?: string) {
+  document.cookie = `location=${path ?? window.location.pathname}; path=/`
+}
+
+function followLocationCookie() {
+  if (document.cookie.includes("location=")) {
+    const destination = document.cookie.split("location=")[1].split(";")[0]
+    document.cookie =
+      "location=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+    location.href = destination
+  }
+}
+
+export async function beforeEach(to: RouteLocationNormalized) {
+  if (await isAuthenticated()) {
+    followLocationCookie()
+    return true
+  } else {
+    setLocationCookie(to.path)
+    redirectToLogin()
+    return false
+  }
 }
 
 export default router

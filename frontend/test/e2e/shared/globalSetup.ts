@@ -11,7 +11,9 @@ export default async function globalSetup() {
     .getByLabel("Passwort")
     .fill(process.env.E2E_TEST_PASSWORD as string)
   await page.locator("input#kc-login").click()
-  expect(await page.getByText("Anmelden bei ").count()).toBeFalsy()
+
+  await page.goto(process.env.E2E_BASE_URL ?? "http://127.0.0.1")
+  await expect(page.getByText("Dokumentnummer")).toBeVisible()
 
   await page
     .context()
