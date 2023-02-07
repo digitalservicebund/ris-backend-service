@@ -59,11 +59,12 @@ Some dropdown menus in the frontend get populated via calls to the backend that 
 
 These are the endpoints and the respective XML files (find those in our wiki) that need to be uploaded to them:
 
-| Endpoint                                                               | XML file                 |
-| ---------------------------------------------------------------------- | ------------------------ |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/doktyp`      | `doktyp.xml`             |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/gerichtdata` | `gerichtdata_gesamt.xml` |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/buland`      | `buland.xml`             |
+| Endpoint                                                                | XML file                 |
+| ----------------------------------------------------------------------- | ------------------------ |
+| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/doktyp`       | `doktyp.xml`             |
+| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/gerichtdata`  | `gerichtdata_gesamt.xml` |
+| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/buland`       | `buland.xml`             |
+| `http://127.0.0.1:8080/api/v1/caselaw/lookuptableimporter/subjectField` | `sachneudata_gesamt.xml` |
 
 In all cases you need to do a `PUT` call: in _Postman_ go to _Body_, set it to _raw_, change from _Text_ to _XML_ on the blue dropdown to the right and paste the entire XML content in.
 
