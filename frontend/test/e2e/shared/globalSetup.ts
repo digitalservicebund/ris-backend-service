@@ -11,7 +11,7 @@ export default async function globalSetup() {
     .getByLabel("Passwort")
     .fill(process.env.E2E_TEST_PASSWORD as string)
   await page.locator("input#kc-login").click()
-  await expect(page.getByText("Anmelden bei ")).toBeHidden()
+  expect(await page.getByText("Anmelden bei ").count()).toBeFalsy()
 
   await page
     .context()
