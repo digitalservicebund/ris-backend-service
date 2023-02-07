@@ -36,11 +36,12 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 
 Some dropdown menus in the frontend get populated via calls to the backend that query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables. Furthermore, some e2e tests are testing this behaviour. Those will fail locally if your lookup tables are not populated.
 
-To import the tables, follow these steps:
+To import the XML files, follow these steps:
 
 - Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml` (Link in the Engineering Onboarding WIki)
 - Start the application (see [root README](../README.md)), open it in your browser and log in
 - Copy the `SESSION` cookie value from the Browser Developer Tools --> Application Tab --> Cookies
+  (If you prefer using Postman, it also supports [importing cookies](https://github.com/digitalservicebund/ris-backend-service/commit/69684a3872ce9875484761fcb18f3367d0143bce#commitcomment-99597762) from your browser.)
 
 Fill these variables with your values:
 
