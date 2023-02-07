@@ -36,15 +36,26 @@ SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 
 Some dropdown menus in the frontend get populated via calls to the backend that query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables. Furthermore, some e2e tests are testing this behaviour. Those will fail locally if your lookup tables are not populated.
 
-These are the endpoints and the respective XML files (find those in our wiki) that need to be uploaded to them:
+To import the tables, follow these steps:
 
-| Endpoint                                                          | XML file                 |
-| ----------------------------------------------------------------- | ------------------------ |
-| `http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp`      | `doktyp.xml`             |
-| `http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata` | `gerichtdata_gesamt.xml` |
-| `http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland`      | `buland.xml`             |
+- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml` (Link in the Engineering Onboarding WIki)
+- Start the application (see [root README](../README.md)), open it in your browser and log in
+- Copy the `SESSION` cookie value from the Browser Developer Tools --> Application Tab --> Cookies
 
-In all cases you need to do a `PUT` call: in _Postman_ go to _Body_, set it to _raw_, change from _Text_ to _XML_ on the blue dropdown to the right and paste the entire XML content in.
+Fill these variables with your values:
+
+```bash
+export DOWNLOAD_PATH="/Users/your-username/Downloads"
+export SESSION_VALUE="your-session-cookie-value" # copied from Browser Developer Tools
+```
+
+Then do the requests with curl:
+
+```bash
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$DOWNLOAD_FOLDER/doktyp.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$DOWNLOAD_FOLDER/gerichtdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$DOWNLOAD_FOLDER/buland.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland
+```
 
 ### Database Setup & Migration with Flyway
 
