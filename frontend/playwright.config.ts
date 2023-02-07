@@ -11,10 +11,6 @@ const config: PlaywrightTestConfig = {
     acceptDownloads: true,
     baseURL: process.env.E2E_BASE_URL || "http://127.0.0.1",
     screenshot: "only-on-failure",
-    httpCredentials: {
-      username: process.env.STAGING_USER ?? "",
-      password: process.env.STAGING_PASSWORD ?? "",
-    },
     storageState: "test/e2e/shared/storageState.json",
   },
   projects: [

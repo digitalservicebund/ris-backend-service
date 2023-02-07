@@ -43,7 +43,7 @@ testWithImportedNorm(
     )
     expect(response.ok()).toBeTruthy()
     const norms = await response.json()
-    await expect(norms.data.length).toBe(0)
+    expect(norms.data.length).toBe(0)
   }
 )
 
