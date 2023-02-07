@@ -132,9 +132,12 @@ public class LookupTableService {
 
   public Flux<Norm> getSubjectFieldNorms(long subjectFieldId) {
     return normRepository
-        .findAllBySubjectFieldIdOrderByShortcutAscEnbezAsc(subjectFieldId)
+        .findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(subjectFieldId)
         .map(
             normDTO ->
-                Norm.builder().shortcut(normDTO.getShortcut()).enbez(normDTO.getEnbez()).build());
+                Norm.builder()
+                    .abbreviation(normDTO.getAbbreviation())
+                    .singleNormDescription(normDTO.getSingleNormDescription())
+                    .build());
   }
 }

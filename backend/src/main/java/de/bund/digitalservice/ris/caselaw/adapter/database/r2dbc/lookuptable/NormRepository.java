@@ -7,7 +7,8 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface NormRepository extends R2dbcRepository<NormDTO, Long> {
 
-  Flux<NormDTO> findAllByOrderBySubjectFieldIdAscShortcutAsc();
+  Flux<NormDTO> findAllByOrderBySubjectFieldIdAscAbbreviationAsc();
 
-  Flux<NormDTO> findAllBySubjectFieldIdOrderByShortcutAscEnbezAsc(long subjectFieldId);
+  Flux<NormDTO> findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(
+      long subjectFieldId);
 }

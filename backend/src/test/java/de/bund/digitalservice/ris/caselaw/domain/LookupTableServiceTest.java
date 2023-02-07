@@ -182,20 +182,26 @@ class LookupTableServiceTest {
   @Test
   void testGetSubjectFieldNorms() {
     NormDTO normDTO =
-        NormDTO.builder().subjectFieldId(2L).shortcut("normabk 2.1").enbez("§ 2.1").build();
+        NormDTO.builder()
+            .subjectFieldId(2L)
+            .abbreviation("normabk 2.1")
+            .singleNormDescription("§ 2.1")
+            .build();
 
-    when(normRepository.findAllBySubjectFieldIdOrderByShortcutAscEnbezAsc(2L))
+    when(normRepository.findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(2L))
         .thenReturn(Flux.just(normDTO));
 
     StepVerifier.create(service.getSubjectFieldNorms(2L))
         .consumeNextWith(
             norm -> {
               assertThat(norm).isInstanceOf(Norm.class);
-              assertThat(norm.shortcut()).isEqualTo(normDTO.getShortcut());
-              assertThat(norm.enbez()).isEqualTo(normDTO.getEnbez());
+              assertThat(norm.abbreviation()).isEqualTo(normDTO.getAbbreviation());
+              assertThat(norm.singleNormDescription())
+                  .isEqualTo(normDTO.getSingleNormDescription());
             })
         .verifyComplete();
 
-    verify(normRepository).findAllBySubjectFieldIdOrderByShortcutAscEnbezAsc(2L);
+    verify(normRepository)
+        .findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(2L);
   }
 }

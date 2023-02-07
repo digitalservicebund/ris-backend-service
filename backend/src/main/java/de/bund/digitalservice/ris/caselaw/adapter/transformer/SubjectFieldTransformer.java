@@ -46,8 +46,8 @@ public class SubjectFieldTransformer {
         normXml ->
             jpaNormDTOs.add(
                 JPANormDTO.builder()
-                    .shortcut(normXml.getShortcut())
-                    .enbez(normXml.getEnbez())
+                    .abbreviation(normXml.getAbbreviation())
+                    .singleNormDescription(normXml.getSingleNormDescription())
                     .build()));
     return jpaNormDTOs;
   }

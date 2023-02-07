@@ -27,8 +27,8 @@ CREATE TABLE
   IF NOT EXISTS lookuptable_subject_field_norm (
     id BIGSERIAL,
     subject_field_id BIGINT,
-    shortcut VARCHAR(255),
-    enbez VARCHAR(255),
+    abbreviation VARCHAR(255),
+    single_norm_description VARCHAR(255),
     PRIMARY KEY (id),
     FOREIGN KEY (subject_field_id) REFERENCES lookuptable_subject_field (id) ON DELETE CASCADE ON UPDATE CASCADE
   );

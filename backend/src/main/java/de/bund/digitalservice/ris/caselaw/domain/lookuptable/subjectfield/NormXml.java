@@ -6,8 +6,8 @@ import lombok.Data;
 @Data
 public class NormXml {
   @JsonProperty(value = "normabk")
-  String shortcut;
+  String abbreviation;
 
   @JsonProperty(value = "enbez")
-  String enbez;
+  String singleNormDescription;
 }

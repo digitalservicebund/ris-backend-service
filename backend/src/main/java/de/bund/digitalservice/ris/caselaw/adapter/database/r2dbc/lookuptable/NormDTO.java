@@ -18,6 +18,6 @@ public class NormDTO {
 
   @Id Long id;
   Long subjectFieldId;
-  String shortcut;
-  String enbez;
+  String abbreviation;
+  String singleNormDescription;
 }

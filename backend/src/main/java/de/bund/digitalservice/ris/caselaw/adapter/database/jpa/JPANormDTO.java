@@ -26,8 +26,9 @@ public class JPANormDTO { // TODO change to JPASubjectFieldNormDTO?
   @JoinColumn(name = "subject_field_id")
   JPASubjectFieldDTO jpaSubjectFieldDTO;
 
-  @Column(name = "shortcut")
-  String shortcut;
+  @Column(name = "abbreviation")
+  String abbreviation;
 
-  String enbez; // TODO übersetzen
+  @Column(name = "single_norm_description")
+  String singleNormDescription;
 }

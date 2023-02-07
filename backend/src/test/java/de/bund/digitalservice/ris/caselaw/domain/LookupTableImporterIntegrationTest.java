@@ -217,8 +217,13 @@ class LookupTableImporterIntegrationTest {
             "navbez 2",
             false);
     NormDTO expectedNorm1 =
-        NormDTO.builder().subjectFieldId(2L).shortcut("normabk 2.1").enbez("§ 2.1").build();
-    NormDTO expectedNorm2 = NormDTO.builder().subjectFieldId(2L).shortcut("normabk 2.2").build();
+        NormDTO.builder()
+            .subjectFieldId(2L)
+            .abbreviation("normabk 2.1")
+            .singleNormDescription("§ 2.1")
+            .build();
+    NormDTO expectedNorm2 =
+        NormDTO.builder().subjectFieldId(2L).abbreviation("normabk 2.2").build();
     KeywordDTO expectedKeyword1 =
         KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
     KeywordDTO expectedKeyword2 =
@@ -270,7 +275,7 @@ class LookupTableImporterIntegrationTest {
     List<KeywordDTO> keywordDTOs =
         keywordRepository.findAllByOrderBySubjectFieldIdAscValueAsc().collectList().block();
     List<NormDTO> normDTOs =
-        normRepository.findAllByOrderBySubjectFieldIdAscShortcutAsc().collectList().block();
+        normRepository.findAllByOrderBySubjectFieldIdAscAbbreviationAsc().collectList().block();
 
     assertThat(subjectFieldDTOs).hasSize(2);
     assertThat(keywordDTOs).hasSize(2);

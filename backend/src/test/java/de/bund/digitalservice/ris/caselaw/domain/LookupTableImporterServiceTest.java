@@ -184,11 +184,11 @@ class LookupTableImporterServiceTest {
     JPANormDTO childNorm1 =
         JPANormDTO.builder()
             .jpaSubjectFieldDTO(null)
-            .shortcut("normabk 2.1")
-            .enbez("§ 2.1")
+            .abbreviation("normabk 2.1")
+            .singleNormDescription("§ 2.1")
             .build();
     JPANormDTO childNorm2 =
-        JPANormDTO.builder().jpaSubjectFieldDTO(null).shortcut("normabk 2.2").build();
+        JPANormDTO.builder().jpaSubjectFieldDTO(null).abbreviation("normabk 2.2").build();
     Set<JPANormDTO> childNorms = Set.of(childNorm1, childNorm2);
 
     JPAKeywordDTO childKeyword1 =
