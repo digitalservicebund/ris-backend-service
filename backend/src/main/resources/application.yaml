@@ -28,6 +28,10 @@ sentry:
   dsn: ${SENTRY_DSN:}
 server:
   shutdown: graceful
+  reactive:
+    session:
+      cookie:
+        max-age: 43200 # 12*60*60
 logging:
   level:
     org.springframework: DEBUG
