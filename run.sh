@@ -91,10 +91,15 @@ _dev() {
   docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
   
   if [ $# -gt 0 ] && [ "${1#}" == "--no-backend" ]; then
-    docker compose up traefik redis db frontend
+    docker-compose up --wait traefik redis db frontend
   else
-    docker compose up
+    docker-compose up --wait 
   fi
+  echo "The application is available at http://127.0.0.1"
+}
+
+_down() {
+  docker compose stop
 }
 
 _commit_message_template() {
@@ -138,6 +143,7 @@ _help() {
   echo "env                   Provide shell env build/test tooling"
   echo "dev                   Start full-stack development environment"
   echo "                      Add '--no-backend' to start backend separately"
+  echo "down                  Stop development environment"
   echo "clean-staging         Deletes all existing documentunits on staging"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
@@ -150,6 +156,7 @@ case "$cmd" in
   "dev") 
     shift 
     _dev "$@";;
+  "down") _down ;;
   "clean-staging") _clean_staging ;;
   "_start") _start ;;
   "cm")
