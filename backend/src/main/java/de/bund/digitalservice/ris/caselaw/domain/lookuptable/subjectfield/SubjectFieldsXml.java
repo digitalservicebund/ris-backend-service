@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @JacksonXmlRootElement(localName = "juris-table")
 public class SubjectFieldsXml {
-  @JacksonXmlElementWrapper(useWrapping = false)
   @JsonProperty(value = "juris-sachg")
+  @JacksonXmlElementWrapper(useWrapping = false)
   List<SubjectFieldXml> list;
 }
