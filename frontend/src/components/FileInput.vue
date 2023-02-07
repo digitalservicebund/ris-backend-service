@@ -24,7 +24,7 @@ const { inputValue, emitInputEvent } = useInputModel<FileList, Props, Emits>(
 )
 
 function onEnter() {
-  document.getElementById(props.id)?.click()
+  fileInput.value?.click()
 }
 </script>
 
