@@ -148,9 +148,7 @@ jar { // We have no need for the plain archive, thus skip creation for build spe
 compileKotlin { kotlinOptions.jvmTarget = "17" }
 compileTestKotlin { kotlinOptions.jvmTarget = "17" }
 
-test {
-  useJUnitPlatform { excludeTags "integration", "journey" }
-}
+test { useJUnitPlatform { excludeTags "integration"} }
 
 task integrationTest(type: Test) {
   description = "Runs the integration tests."
@@ -164,12 +162,6 @@ task integrationTest(type: Test) {
   finalizedBy jacocoTestReport
 }
 check.dependsOn integrationTest
-
-task journeyTest(type: Test) {
-  description = "Runs the journey tests."
-  group = "verification"
-  useJUnitPlatform { includeTags "journey" }
-}
 
 jacocoTestReport {
   // Jacoco hooks into all tasks of type: Test automatically, but results for each of these

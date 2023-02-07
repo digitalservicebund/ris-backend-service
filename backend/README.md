@@ -175,22 +175,6 @@ docker push "ghcr.io/digitalservicebund/ris-backend-service:$(git log -1 --forma
 
 **Note:** Make sure you're using a GitHub token with the necessary `write:packages` scope for this to work.
 
-## Deployment
-
-Changes in trunk are continuously deployed in the pipeline. After the staging deployment, the pipeline runs a verification step
-in form of journey tests against staging, to ensure we can safely proceed with deploying to production.
-
-Denoting a journey test is accomplished by using a JUnit 5 tag annotation: `@Tag("journey")`. Journey tests are excluded
-from unit and integration test sets.
-
-**To run the journey tests:**
-
-```bash
-APPLICATION_STAGING_URL=https://ris.dev.ds4g.net/ ./gradlew journeyTest
-```
-
-When omitting the `STAGING_URL` env variable journey tests run against the local spring application.
-
 ## Vulnerability Scanning
 
 Scanning container images for vulnerabilities is performed with [Trivy](https://github.com/aquasecurity/trivy)
