@@ -20,6 +20,7 @@ management:
       enabled: true
     readinessState:
       enabled: true
+      include: readinessState,db,redis
 otc:
   obs:
     endpoint: https://obs.eu-de.otc.t-systems.com
