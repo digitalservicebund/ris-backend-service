@@ -105,3 +105,25 @@ export async function editNormFrame(
     }
   }
 }
+
+export async function importNorm(file: File): Promise<ServiceResponse<string>> {
+  const { status, error, data } = await httpClient.post<unknown, string>(
+    "norms",
+    { headers: { "Content-Type": "application/zip" } },
+    file
+  )
+
+  if (status >= 400 || error) {
+    return {
+      status,
+      error: {
+        title: "Datei konnte nicht importiert werden.",
+      },
+    }
+  } else {
+    return {
+      status,
+      data,
+    }
+  }
+}
