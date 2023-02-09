@@ -695,7 +695,7 @@ jobs:
   deploy-github-pages:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: build-github-pages
+    needs: deploy-production
     permissions:
       pages: write
       id-token: write
