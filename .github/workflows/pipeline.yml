@@ -180,26 +180,6 @@ jobs:
         with:
           path: _site
 
-  deploy-github-pages:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: build-github-pages
-
-    permissions:
-      pages: write
-      id-token: write
-
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v1.2.3
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
   vulnerability-scan-backend:
     runs-on: ubuntu-latest
     permissions:
@@ -659,6 +639,7 @@ jobs:
     needs:
       - build-and-push-frontend-image
       - build-and-push-backend-image
+      - build-github-pages
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
       - deploy-staging-verify-a11y-chrome
@@ -710,3 +691,20 @@ jobs:
           commit: true
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-github-pages:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: build-github-pages
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v1.2.3
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
