@@ -107,11 +107,10 @@ export async function editNormFrame(
 }
 
 export async function importNorm(file: File): Promise<ServiceResponse<string>> {
-  const { status, error, data } = await httpClient.post<unknown, string>(
-    "norms",
-    { headers: { "Content-Type": "application/zip" } },
-    file
-  )
+  const { status, error, data } = await httpClient.post<
+    unknown,
+    { guid: string }
+  >("norms", { headers: { "Content-Type": "application/zip" } }, file)
 
   if (status >= 400 || error) {
     return {
@@ -123,7 +122,7 @@ export async function importNorm(file: File): Promise<ServiceResponse<string>> {
   } else {
     return {
       status,
-      data,
+      data: data?.guid,
     }
   }
 }

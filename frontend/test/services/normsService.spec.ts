@@ -317,7 +317,7 @@ describe("normsService", () => {
       const file = new File([new Blob(["zip content"])], "test.zip")
       vi.mocked(httpClient).post.mockResolvedValueOnce({
         status: 201,
-        data: "test-fake-guid",
+        data: { guid: "test-fake-guid" },
       })
 
       const response = await importNorm(file)
