@@ -554,7 +554,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     concurrency: deploy-staging
     environment: staging
-    needs: [build-and-push-frontend-image, build-and-push-backend-image]
+    needs: [build-and-push-frontend-image, build-and-push-backend-image, build-github-pages]
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:

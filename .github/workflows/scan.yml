@@ -12,8 +12,33 @@ env:
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
 
 jobs:
+  reset-trivy-cache:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove all caches and database of the trivy scanner
+        uses: aquasecurity/trivy-action@cff3e9a7f62c41dd51975266d0ae235709e39c41
+        env:
+          TRIVY_RESET: true
+          TRIVY_DEBUG: true
+        with:
+          scan-type: "image"
+      - name: Download trivy vulnerabilities DB
+        uses: aquasecurity/trivy-action@cff3e9a7f62c41dd51975266d0ae235709e39c41
+        env:
+          TRIVY_DEBUG: true
+          TRIVY_DOWNLOAD_DB_ONLY: true
+        with:
+          scan-type: "image"
+      - name: Download trivy Java index DB
+        uses: aquasecurity/trivy-action@cff3e9a7f62c41dd51975266d0ae235709e39c41
+        env:
+          TRIVY_DEBUG: true
+          TRIVY_DOWNLOAD_JAVA_DB_ONLY: true
+        with:
+          scan-type: "image"
   vulnerability-scan-backend:
     runs-on: ubuntu-latest
+    needs: reset-trivy-cache
     permissions:
       contents: read
       id-token: write # for cosign w/ keyless signing
@@ -21,15 +46,6 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v3
-      - name: Remove all caches and database of the trivy scanner
-        uses: aquasecurity/trivy-action@cff3e9a7f62c41dd51975266d0ae235709e39c41
-        env:
-          TRIVY_USERNAME: ${{ github.actor }}
-          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
-          TRIVY_RESET: true
-          TRIVY_DEBUG: true
-        with:
-          image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -95,6 +111,7 @@ jobs:
 
   vulnerability-scan-frontend:
     runs-on: ubuntu-latest
+    needs: reset-trivy-cache
     permissions:
       contents: read
       id-token: write # for cosign w/ keyless signing

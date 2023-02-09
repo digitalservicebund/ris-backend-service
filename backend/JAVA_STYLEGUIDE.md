@@ -55,19 +55,16 @@ Integration tests(WebTestClient and database):
 @Testcontainers(disabledWithoutDocker = true)
 
 // ✅ Good
-@WebFluxTest(controllers = {DocumentUnitController.class})
-@Import({
-    DocumentUnitService.class,
-    DatabaseDocumentNumberService.class,
-    PostgresDocumentUnitRepositoryImpl.class,
-    FlywayConfig.class,
-    PostgresConfig.class
-})
-@WithMockUser
-@AutoConfigureDataR2dbc
-@Tag("integration")
-@Testcontainers(disabledWithoutDocker = true)
+@RISIntegrationTest(controllers={...}, imports={...}, timeout="...")
 ```
 
 The second way only use the bean definition for the imported classes.
 The application context contains only needed resources.
+
+Ṕarameters:
+
+- controllers - the used controllers in the web test client
+- imports - the needed imports for the application context
+- timeout - max time to wait for a response (good for debuggging)
+
+The import parameter is the only mandatory parameter.

@@ -18,14 +18,17 @@ function redirectToLogin() {
 }
 
 function setLocationCookie(path?: string) {
-  document.cookie = `location=${path ?? window.location.pathname}; path=/`
+  document.cookie = `location=${path ?? window.location.pathname}; path=/;`
+}
+
+function deleteCookie(name: string) {
+  document.cookie = `${name}=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;`
 }
 
 function followLocationCookie() {
   if (document.cookie.includes("location=")) {
     const destination = document.cookie.split("location=")[1].split(";")[0]
-    document.cookie =
-      "location=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;"
+    deleteCookie("location")
     location.href = destination
   }
 }
@@ -36,6 +39,7 @@ export async function beforeEach(to: RouteLocationNormalized) {
     return true
   } else {
     setLocationCookie(to.path)
+    deleteCookie("SESSION")
     redirectToLogin()
     return false
   }
