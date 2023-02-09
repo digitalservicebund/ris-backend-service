@@ -4,7 +4,7 @@ export const loginEndpoint = "/oauth2/authorization/oidcclient"
 
 export async function isAuthenticated(): Promise<boolean> {
   const response = await httpClient.get("auth/me")
-  if (response.status === 401 || response.status === 403) {
+  if (response.status > 400) {
     return false
   }
   return true
