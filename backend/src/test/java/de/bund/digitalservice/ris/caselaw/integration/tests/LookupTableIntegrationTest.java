@@ -98,7 +98,7 @@ class LookupTableIntegrationTest {
       {"Verwaltungsgericht der Landeskirche", "Frankfurt"},
       {"England", "Court"},
       {"Landgericht", "Amberg"},
-      {"Jugendgericht des Landes", "München"},
+      {"Jugendgericht des Haupt-Landes", "München"},
     };
 
     for (String[] court : courtData) {
@@ -112,7 +112,7 @@ class LookupTableIntegrationTest {
         Arrays.asList(
             "Landgericht Amberg", // [1]
             "Landsitzungskammer Hamburg", // [1]
-            "Jugendgericht des Landes München", // [2]
+            "Jugendgericht des Haupt-Landes München", // [2]
             "Verwaltungsgericht der Landeskirche Frankfurt", // [2]
             "England Court", // [3]
             "Kammer für Baulandsachen Ulm" // [3]
