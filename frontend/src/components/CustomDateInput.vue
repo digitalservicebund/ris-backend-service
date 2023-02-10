@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/domain"
 
@@ -11,17 +12,49 @@ interface Props {
   validationError?: ValidationError
 }
 
+interface Emits {
+  (event: "update:modelValue", value?: string): void
+  (event: "update:validationError", value?: ValidationError): void
+}
+
 const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
 
 const dayValue = ref<string>()
 const monthValue = ref<string>()
 const yearValue = ref<string>()
 
+const fullDate = computed(
+  () => yearValue.value && monthValue.value && dayValue.value
+)
+const dateValue = computed(() =>
+  fullDate.value
+    ? yearValue.value + "-" + monthValue.value + "-" + dayValue.value
+    : null
+)
+const ariaLabelDay = computed(() => props.ariaLabel + " Tag")
+const ariaLabelMonth = computed(() => props.ariaLabel + " Monat")
+const ariaLabelYear = computed(() => props.ariaLabel + " Jahr")
+
+const isInPast = computed(() => {
+  if (!fullDate.value) return
+  if (dateValue.value) {
+    const date = new Date(dateValue.value)
+    const today = new Date()
+    return date < today
+  } else return true
+})
+
+const conditionalClasses = computed(() => ({
+  input__error: props.validationError,
+}))
+
 watch(
   props,
   () => {
     if (props.modelValue) {
-      const splitDate = props.modelValue.split("-")
+      const formattedModelValue = dayjs(props.modelValue).format("YYYY-MM-DD")
+      const splitDate = formattedModelValue.split("-")
       dayValue.value = splitDate[2]
       monthValue.value = splitDate[1]
       yearValue.value = splitDate[0]
@@ -32,13 +65,7 @@ watch(
   }
 )
 
-const ariaLabelDay = computed(() => props.ariaLabel + " Tag")
-
-const ariaLabelMonth = computed(() => props.ariaLabel + " Monat")
-
-const ariaLabelYear = computed(() => props.ariaLabel + " Jahr")
-
-function updateValue(event: Event) {
+function handleInput(event: Event) {
   //check for allowed length of value
   const target = event.target as HTMLInputElement
   if (target.value.length >= target.maxLength) {
@@ -54,6 +81,29 @@ function updateValue(event: Event) {
   }
 }
 
+function checkDate() {
+  console.log(dateValue.value, isInPast.value)
+  if (!isInPast.value && !props.isFutureDate) {
+    emit("update:validationError", {
+      defaultMessage:
+        "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
+      field: props.id,
+    })
+  }
+  // emit("update:modelValue", dayjs(dateValue.value).toISOString())
+}
+
+function resetValues() {
+  dayValue.value = undefined
+  monthValue.value = undefined
+  yearValue.value = undefined
+}
+
+function backspaceDelete() {
+  resetValues()
+  emit("update:modelValue", undefined)
+}
+
 function selectAll(event: Event) {
   ;(event.target as HTMLInputElement).select()
 }
@@ -61,19 +111,27 @@ function selectAll(event: Event) {
 
 <template>
   <div
-    :aria-label="ariaLabel"
+    :ariaLabel="ariaLabel"
     class="bg-white border-2 border-blue-800 flex flex-row focus:outline-2 h-[3.75rem] hover:outline-2 input items-center outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
-    @input="updateValue"
+    :class="conditionalClasses"
+    @input="handleInput"
   >
     <input
       :id="id"
       v-model="dayValue"
       :aria-label="ariaLabelDay"
       class="focus:outline-none w-20"
+      max="31"
       maxLength="2"
+      min="0"
+      minLength="2"
+      name="day"
+      pattern="[0-9]*"
       placeholder="TT"
-      type="number"
-      @focus="selectAll($event)"
+      type="text"
+      @blur="checkDate"
+      @focus="selectAll"
+      @keydown.delete="backspaceDelete"
     />
     <span class="mr-2">.</span>
     <input
@@ -82,9 +140,12 @@ function selectAll(event: Event) {
       :aria-label="ariaLabelMonth"
       class="focus:outline-none w-20"
       maxLength="2"
+      minLength="2"
       placeholder="MM"
-      type="number"
+      type="text"
+      @blur="checkDate"
       @focus="selectAll($event)"
+      @keydown.delete="backspaceDelete"
     />
     <span class="mr-2">.</span>
     <input
@@ -94,17 +155,15 @@ function selectAll(event: Event) {
       class="focus:outline-none w-40"
       maxLength="4"
       placeholder="JJJJ"
-      type="number"
+      type="text"
+      @blur="checkDate"
       @focus="selectAll($event)"
+      @keydown.delete="backspaceDelete"
     />
   </div>
 </template>
 
 <style lang="scss" scoped>
-input[type="number"] {
-  appearance: textfield;
-}
-
 input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   appearance: none;
@@ -117,6 +176,20 @@ input::-webkit-inner-spin-button {
 
   &:autofill:focus {
     @apply shadow-white text-inherit;
+  }
+
+  &__error {
+    width: 100%;
+    padding: 17px 24px;
+    @apply border-red-800 bg-red-200;
+
+    &:autofill {
+      @apply shadow-error text-inherit;
+    }
+
+    &:autofill:focus {
+      @apply shadow-error text-inherit;
+    }
   }
 }
 </style>
