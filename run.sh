@@ -110,21 +110,20 @@ EOF
 }
 
 _clean_staging() {
-  [ -z ${STAGING_URL+x} ] && _user "Staging url? " && read -r STAGING_URL
-  [ -z ${STAGING_USER+x} ] && _user "Staging user? " && read -r STAGING_USER
-  [ -z ${STAGING_PASSWORD+x} ] && _user "Staging password? " && read -r STAGING_PASSWORD
+  _user "Application url? " && read -r APP_URL
+  _user "Session ID? " && read -r SESSION_ID
 
-  endpoint="https://${STAGING_URL#"https://"}/api/v1/caselaw/documentunits/"
+  endpoint="https://${APP_URL#"https://"}/api/v1/caselaw/documentunits"
   regex="\"uuid\":\"[a-z0-9-]\{36\}\""
 
-  documentunits=$(curl -s "$endpoint" -u "$STAGING_USER":"$STAGING_PASSWORD" \
+  documentUnits=$(curl -s -H "cookie: SESSION=$SESSION_ID" "$endpoint" \
     | grep -o "$regex" \
     | sed "s/\"uuid\":\"//g" \
     | sed "s/\"//g")
 
   n_deleted=0
-  for documentUnit in $documentunits; do
-    curl -X DELETE "$endpoint""$documentUnit" -u "$STAGING_USER":"$STAGING_PASSWORD"
+  for documentUnit in $documentUnits; do
+    curl -X DELETE -H "cookie: SESSION=$SESSION_ID" "$endpoint"/"$documentUnit"
     n_deleted=$((n_deleted + 1))
   done
 

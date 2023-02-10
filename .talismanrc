@@ -3,8 +3,6 @@ fileignoreconfig:
     ignore_detectors: [filecontent]
   - filename: run.sh
     checksum: 19dede0d2737b9e8cc548da7e595b847c2f4e0caf1c6775ce04e149d5ffc4c79
-  - filename: .github/workflows/clean-staging.yml
-    checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
     checksum: c366bddec5d17f29485bdf3b105802032c2dd5b2e715d8a1ef9459d07bf758ea
   - filename: .github/workflows/playwright-test.yml
