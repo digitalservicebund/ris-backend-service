@@ -1,8 +1,20 @@
 <script lang="ts" setup>
+import { ref } from "vue"
+import { SubjectNode } from "@/domain/SubjectTree"
+import SubjectsService from "@/services/subjectsService"
+
+const nodes = ref<SubjectNode[]>()
+
 function expand() {
-  console.log("expand")
+  SubjectsService.getAllNodes().then((response) => {
+    nodes.value = response.data
+  })
 }
-// TODO: service call to fetch tree data
+
+function buildNodeText(node: SubjectNode | undefined) {
+  if (!node || node.depth === undefined) return ""
+  return Array(node.depth + 1).join("-") + " " + node.id + ": " + node.stext
+}
 </script>
 
 <template>
@@ -15,4 +27,7 @@ function expand() {
     >
   </button>
   Alle Sachgebiete anzeigen
+  <div v-for="node in nodes" :key="node.id">
+    {{ buildNodeText(node) }}
+  </div>
 </template>
