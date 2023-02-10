@@ -26,12 +26,10 @@ public interface CourtRepository extends R2dbcRepository<CourtDTO, Long> {
   Within a priority class, ordering is alphabetical.
   */
   @Query(
-      "WITH label_added AS (SELECT courttype, "
-          + "                            courtlocation, "
+      "WITH label_added AS (SELECT *, "
           + "                            UPPER(CONCAT(courttype, ' ', courtlocation)) AS label "
           + "                     from lookuptable_court) "
-          + "SELECT courttype, "
-          + "       courtlocation, "
+          + "SELECT *,"
           + "       label, "
           + "       CASE "
           + "           WHEN label LIKE UPPER(:searchStr||'%') THEN 1 "
