@@ -46,16 +46,16 @@ To import the XML files, follow these steps:
 Fill these variables with your values:
 
 ```bash
-export DOWNLOAD_PATH="/Users/your-username/Downloads"
+export PATH_TO_XML_FILES="/path/to/xml/files"    # where you placed the xml files
 export SESSION_VALUE="your-session-cookie-value" # copied from Browser Developer Tools
 ```
 
 Then do the requests with curl:
 
 ```bash
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$DOWNLOAD_FOLDER/doktyp.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$DOWNLOAD_FOLDER/gerichtdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$DOWNLOAD_FOLDER/buland.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/doktyp.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/gerichtdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/buland.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland
 ```
 
 ### Database Setup & Migration with Flyway
