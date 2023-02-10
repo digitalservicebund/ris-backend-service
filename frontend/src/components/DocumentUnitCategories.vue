@@ -43,7 +43,7 @@ const handleUpdateDocumentUnit = async () => {
     updatedDocumentUnit.value = response.data as DocumentUnit
   }
   hasDataChange.value = false
-  lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit) // <-- updatedDocumentUnit?
+  lastUpdatedDocumentUnit.value = JSON.stringify(updatedDocumentUnit.value)
   updateStatus.value = response.status
 }
 const router = useRouter()
@@ -139,7 +139,8 @@ const handleUpdateDocumentUnitWithShortCut = (event: KeyboardEvent) => {
 const autoUpdate = () => {
   automaticUpload.value = setInterval(() => {
     hasDataChange.value =
-      JSON.stringify(props.documentUnit) !== lastUpdatedDocumentUnit.value
+      JSON.stringify(updatedDocumentUnit.value) !==
+      lastUpdatedDocumentUnit.value
     if (
       isOnline.value &&
       hasDataChange.value &&
@@ -147,7 +148,6 @@ const autoUpdate = () => {
     ) {
       handleUpdateDocumentUnit()
     }
-    lastUpdatedDocumentUnit.value = JSON.stringify(props.documentUnit)
     // Offline mode
     if (isOnline.value && !navigator.onLine) {
       isOnline.value = false

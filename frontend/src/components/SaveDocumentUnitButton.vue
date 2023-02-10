@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { onMounted, watch, ref } from "vue"
 import TextButton from "./TextButton.vue"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
@@ -15,12 +16,6 @@ const onUpload = ref(false)
 const updateSucceed = ref(true)
 const hasUpdateError = ref(false)
 const lastUpdatedTime = ref("")
-const getCurrentTime = () => {
-  const uploadTime = new Date()
-  const fullHour = ("0" + uploadTime.getHours()).slice(-2)
-  const fullMinute = ("0" + uploadTime.getMinutes()).slice(-2)
-  return `${fullHour}:${fullMinute}`
-}
 
 const setDefaultStatus = () => {
   isFristTimeLoad.value = false
@@ -43,7 +38,7 @@ const setStatus = () => {
     case UpdateStatus.SUCCEED: {
       isFristTimeLoad.value = false
       updateSucceed.value = true
-      lastUpdatedTime.value = getCurrentTime()
+      lastUpdatedTime.value = dayjs().format("HH:mm:ss")
       return
     }
     default:

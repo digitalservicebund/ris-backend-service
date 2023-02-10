@@ -379,4 +379,57 @@ test.describe("save changes in core data and texts and verify it persists", () =
     )
     expect(parseInt(largeEditorHeight)).toBeGreaterThanOrEqual(320)
   })
+
+  test("change Spruchkörper two times with autosave after each change", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
+    await page.keyboard.press("Tab")
+
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").nth(0)
+    ).toBeVisible({ timeout: 11 * 1000 })
+    const firstSaveText = await page
+      .locator("text=Zuletzt gespeichert um")
+      .nth(0)
+      .textContent()
+
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
+    await page.keyboard.press("Tab")
+
+    await expect(page.locator(`text=${firstSaveText}`).nth(0)).toBeHidden({
+      timeout: 11 * 1000,
+    })
+    await expect(page.getByText("Zuletzt gespeichert um").nth(0)).toBeVisible({
+      timeout: 11 * 1000,
+    })
+
+    await page.reload()
+
+    expect(await page.inputValue("[aria-label='Spruchkörper']")).toBe("VG-002")
+  })
+
+  test("change Spruchkörper two times with save with button after each change", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
+    await page.keyboard.press("Tab")
+
+    await clickSaveButton(page)
+
+    await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
+    await page.keyboard.press("Tab")
+
+    await clickSaveButton(page)
+
+    await page.reload()
+
+    expect(await page.inputValue("[aria-label='Spruchkörper']")).toBe("VG-002")
+  })
 })
