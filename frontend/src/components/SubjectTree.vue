@@ -1,33 +1,42 @@
 <script lang="ts" setup>
-import { ref } from "vue"
-import { SubjectNode } from "@/domain/SubjectTree"
+import { onMounted, ref } from "vue"
+import SubjectTree from "@/domain/SubjectTree"
 import SubjectsService from "@/services/subjectsService"
 
-const nodes = ref<SubjectNode[]>()
+const tree = ref<SubjectTree>()
 
-function expand() {
+function fetchTree() {
   SubjectsService.getAllNodes().then((response) => {
-    nodes.value = response.data
+    if (!response.data) return
+    tree.value = new SubjectTree(response.data)
   })
 }
 
-function buildNodeText(node: SubjectNode | undefined) {
-  if (!node || node.depth === undefined) return ""
-  return Array(node.depth + 1).join("-") + " " + node.id + ": " + node.stext
+function handleNodeClick(nodeId: string) {
+  console.log(nodeId)
 }
+
+onMounted(fetchTree)
 </script>
 
 <template>
   <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
-  <button class="align-middle pr-4 text-white" @click="expand">
-    <span
-      aria-label="Sachgebietsbaum aufklappen"
-      class="bg-blue-800 material-icons rounded-full w-icon"
-      >add</span
+  <div
+    v-for="node in tree?.getOrderedNodes()"
+    :key="node.id"
+    :style="{ 'padding-left': `${node.depth * 40}px` }"
+  >
+    <button
+      class="align-middle pr-4 text-blue-800"
+      @click="handleNodeClick(node.id)"
     >
-  </button>
-  Alle Sachgebiete anzeigen
-  <div v-for="node in nodes" :key="node.id">
-    {{ buildNodeText(node) }}
+      <span
+        aria-label="Sachgebietsbaum aufklappen"
+        class="bg-blue-200 material-icons rounded-full w-icon"
+        >add</span
+      >
+    </button>
+    <span v-if="node.id !== 'root'" class="pl-6">{{ node.id }}</span>
+    <span class="pl-6 text-blue-800 text-sm">{{ node.stext }}</span>
   </div>
 </template>

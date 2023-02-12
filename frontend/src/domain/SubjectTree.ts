@@ -1,4 +1,4 @@
-/*interface NodesMap {
+interface NodesMap {
   [key: string]: SubjectNode
 }
 
@@ -11,7 +11,21 @@ export default class SubjectTree {
     nodes.forEach((node) => (this.nodes[node.id] = node))
     this.root = this.nodes["root"]
   }
-}*/
+
+  private traverse(node: SubjectNode, orderedNodes: SubjectNode[]) {
+    orderedNodes.push(node)
+    if (!node.children) return
+    for (const childId of node.children) {
+      this.traverse(this.nodes[childId], orderedNodes)
+    }
+  }
+
+  public getOrderedNodes() {
+    const orderedNodes: SubjectNode[] = []
+    this.traverse(this.root, orderedNodes)
+    return orderedNodes
+  }
+}
 
 export type SubjectNode = {
   id: string
@@ -25,7 +39,7 @@ export type SubjectNode = {
 export const mockSubjectNodes: SubjectNode[] = [
   {
     id: "root",
-    stext: "RootNode",
+    stext: "Alle Sachgebiete anzeigen",
     parent: undefined,
     children: ["01-01", "01-02"],
     depth: 0,
