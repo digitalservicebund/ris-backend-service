@@ -13,7 +13,7 @@ function fetchTree() {
 }
 
 function handleNodeClick(nodeId: string) {
-  console.log(nodeId)
+  tree.value?.toggleNode(nodeId)
 }
 
 onMounted(fetchTree)
@@ -33,7 +33,7 @@ onMounted(fetchTree)
       <span
         aria-label="Sachgebietsbaum aufklappen"
         class="bg-blue-200 material-icons rounded-full w-icon"
-        >add</span
+        >{{ node.isExpanded ? "remove" : "add" }}</span
       >
     </button>
     <span v-if="node.id !== 'root'" class="pl-6">{{ node.id }}</span>

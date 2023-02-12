@@ -14,7 +14,7 @@ export default class SubjectTree {
 
   private traverse(node: SubjectNode, orderedNodes: SubjectNode[]) {
     orderedNodes.push(node)
-    if (!node.children) return
+    if (!node.children || !node.isExpanded) return
     for (const childId of node.children) {
       this.traverse(this.nodes[childId], orderedNodes)
     }
@@ -24,6 +24,10 @@ export default class SubjectTree {
     const orderedNodes: SubjectNode[] = []
     this.traverse(this.root, orderedNodes)
     return orderedNodes
+  }
+
+  public toggleNode(nodeId: string) {
+    this.nodes[nodeId].isExpanded = !this.nodes[nodeId].isExpanded
   }
 }
 
