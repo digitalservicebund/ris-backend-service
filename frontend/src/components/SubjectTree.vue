@@ -4,6 +4,8 @@ import SubjectNode from "@/components/SubjectNode.vue"
 import SubjectTree from "@/domain/SubjectTree"
 import SubjectsService from "@/services/subjectsService"
 
+type Subject = { id: string; text: string }
+
 const props = defineProps<{
   selectedSubjects: Subject[]
 }>()
