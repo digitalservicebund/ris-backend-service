@@ -22,8 +22,8 @@ function fetchTree() {
   })
 }
 
-function handleNodeClick(nodeId: string) {
-  tree.value?.toggleNode(nodeId)
+function handleNodeClick(node: SubjectNode) {
+  tree.value?.toggleNode(node)
   // console.log(toRaw(tree.value))
 }
 function handleAdd(node: SubjectNode) {

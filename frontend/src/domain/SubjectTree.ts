@@ -18,8 +18,8 @@ export default class SubjectTree {
   private traverse(node: SubjectNode, orderedNodes: SubjectNode[]) {
     orderedNodes.push(node)
     if (!node.children || !node.isExpanded) return
-    for (const childId of node.children) {
-      this.traverse(this.nodes[childId], orderedNodes)
+    for (const child of node.children) {
+      this.traverse(child, orderedNodes)
     }
   }
 
@@ -29,16 +29,15 @@ export default class SubjectTree {
     return orderedNodes
   }
 
-  public toggleNode(nodeId: string) {
-    const node = this.nodes[nodeId]
+  public toggleNode(node: SubjectNode) {
     if (!node.isLeaf && !node.children) {
-      SubjectsService.getChildrenOf(nodeId).then((response) => {
+      SubjectsService.getChildrenOf(node.id).then((response) => {
         if (!response.data) return
-        response.data.forEach((node) => (this.nodes[node.id] = node))
-        node.children = response.data.map((node) => node.id)
+        node.children = response.data
+        node.children.forEach((node) => (this.nodes[node.id] = node))
       })
     }
-    this.nodes[nodeId].isExpanded = !this.nodes[nodeId].isExpanded
+    node.isExpanded = !node.isExpanded
   }
 }
 
@@ -46,7 +45,7 @@ export type SubjectNode = {
   id: string
   stext: string
   // parent?: string
-  children?: string[]
+  children?: SubjectNode[]
   depth: number
   isExpanded: boolean
   isLeaf: boolean

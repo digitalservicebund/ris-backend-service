@@ -9,7 +9,7 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (e: "node:toggle", nodeId: string): void
+  (e: "node:toggle", node: SubjectNode): void
   (e: "node:add", node: SubjectNode): void
   (e: "node:delete", nodeId: string): void
 }>()
@@ -19,7 +19,7 @@ const emit = defineEmits<{
   <div :style="{ 'padding-left': `${props.node.depth * 40}px` }">
     <button
       class="align-middle pr-4 text-blue-800"
-      @click="emit('node:toggle', node.id)"
+      @click="emit('node:toggle', node)"
     >
       <span
         aria-label="Sachgebietsbaum aufklappen"
