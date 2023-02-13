@@ -24,8 +24,8 @@ const dayValue = ref<string>()
 const monthValue = ref<string>()
 const yearValue = ref<string>()
 
-const fullDate = computed(
-  () => yearValue.value && monthValue.value && dayValue.value
+const fullDate = computed(() =>
+  yearValue.value && monthValue.value && dayValue.value ? true : false
 )
 const dateValue = computed(() =>
   fullDate.value
@@ -37,16 +37,19 @@ const ariaLabelMonth = computed(() => props.ariaLabel + " Monat")
 const ariaLabelYear = computed(() => props.ariaLabel + " Jahr")
 
 const isInPast = computed(() => {
-  if (!fullDate.value) return
-  if (dateValue.value) {
+  if (fullDate.value && dateValue.value) {
     const date = new Date(dateValue.value)
     const today = new Date()
     return date < today
   } else return true
 })
 
+const hasError = computed(
+  () => props.validationError || (!isInPast.value && !props.isFutureDate)
+)
+
 const conditionalClasses = computed(() => ({
-  input__error: props.validationError,
+  input__error: props.validationError || hasError.value,
 }))
 
 watch(
@@ -79,33 +82,35 @@ function handleInput(event: Event) {
       }
     }
   }
-}
 
-function checkDate() {
-  console.log(dateValue.value, isInPast.value)
-  if (!isInPast.value && !props.isFutureDate) {
+  if (fullDate.value && !isInPast.value && !props.isFutureDate) {
     emit("update:validationError", {
       defaultMessage:
         "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
       field: props.id,
     })
-  }
-  // emit("update:modelValue", dayjs(dateValue.value).toISOString())
+  } else emit("update:validationError", undefined)
 }
-
-function resetValues() {
+function deleteDay() {
   dayValue.value = undefined
-  monthValue.value = undefined
-  yearValue.value = undefined
 }
 
-function backspaceDelete() {
-  resetValues()
-  emit("update:modelValue", undefined)
+function deleteMonth() {
+  monthValue.value = undefined
+}
+
+function deleteYear() {
+  yearValue.value = undefined
 }
 
 function selectAll(event: Event) {
   ;(event.target as HTMLInputElement).select()
+}
+
+function handleOnBlur() {
+  if (!hasError.value && dateValue.value) {
+    emit("update:modelValue", dayjs(dateValue.value).toISOString())
+  }
 }
 </script>
 
@@ -114,6 +119,7 @@ function selectAll(event: Event) {
     :ariaLabel="ariaLabel"
     class="bg-white border-2 border-blue-800 flex flex-row focus:outline-2 h-[3.75rem] hover:outline-2 input items-center outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
+    tabindex="0"
     @input="handleInput"
   >
     <input
@@ -129,9 +135,9 @@ function selectAll(event: Event) {
       pattern="[0-9]*"
       placeholder="TT"
       type="text"
-      @blur="checkDate"
+      @blur="handleOnBlur"
       @focus="selectAll"
-      @keydown.delete="backspaceDelete"
+      @keydown.delete="deleteDay"
     />
     <span class="mr-2">.</span>
     <input
@@ -143,9 +149,9 @@ function selectAll(event: Event) {
       minLength="2"
       placeholder="MM"
       type="text"
-      @blur="checkDate"
+      @blur="handleOnBlur"
       @focus="selectAll($event)"
-      @keydown.delete="backspaceDelete"
+      @keydown.delete="deleteMonth"
     />
     <span class="mr-2">.</span>
     <input
@@ -156,9 +162,9 @@ function selectAll(event: Event) {
       maxLength="4"
       placeholder="JJJJ"
       type="text"
-      @blur="checkDate"
+      @blur="handleOnBlur"
       @focus="selectAll($event)"
-      @keydown.delete="backspaceDelete"
+      @keydown.delete="deleteYear"
     />
   </div>
 </template>
@@ -180,7 +186,6 @@ input::-webkit-inner-spin-button {
 
   &__error {
     width: 100%;
-    padding: 17px 24px;
     @apply border-red-800 bg-red-200;
 
     &:autofill {
@@ -189,6 +194,10 @@ input::-webkit-inner-spin-button {
 
     &:autofill:focus {
       @apply shadow-error text-inherit;
+    }
+
+    input {
+      @apply bg-red-200;
     }
   }
 }

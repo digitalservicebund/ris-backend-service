@@ -97,30 +97,29 @@ describe("CustomDateInput", () => {
     expect(month).toHaveValue("04")
     expect(year).toHaveValue("2021")
     expect(emitted()["update:modelValue"]).toEqual([
+      ["2022-02-04T00:00:00.000Z"],
+      ["2022-04-04T00:00:00.000Z"],
       ["2021-04-04T00:00:00.000Z"],
     ])
   })
 
-  it("emits undefined on backspace delete", async () => {
-    const { emitted } = renderComponent({
-      ariaLabel: "Test",
-      modelValue: "2022-02-03",
-    })
-    const day = screen.queryByLabelText("Test Tag") as HTMLInputElement
-
-    await userEvent.type(day, "{backspace}")
-    await nextTick()
-
-    expect(day).toHaveValue("")
-    expect(emitted()["update:modelValue"]).toBeTruthy()
-    expect(emitted().day).toEqual(undefined)
-  })
-
   it("does not allow dates in the future", async () => {
     const { emitted } = renderComponent({
-      ariaLabel: "Datum",
-      modelValue: "2024-02-03",
+      ariaLabel: "Testdatum",
     })
+    const day = screen.queryByLabelText("Testdatum Tag") as HTMLInputElement
+    const month = screen.queryByLabelText("Testdatum Monat") as HTMLInputElement
+    const year = screen.queryByLabelText("Testdatum Jahr") as HTMLInputElement
+
+    await userEvent.clear(day)
+    await userEvent.type(day, "04")
+    await userEvent.clear(month)
+    await userEvent.type(month, "04")
+    await userEvent.clear(year)
+    await userEvent.type(year, "2040")
+    await userEvent.tab()
+
+    await nextTick()
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
 
@@ -130,6 +129,6 @@ describe("CustomDateInput", () => {
 
     expect(
       array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
-    ).toBe("Das Datum darf nicht in der Zukunft liegen")
+    ).toBe("Das Testdatum darf nicht in der Zukunft liegen")
   })
 })
