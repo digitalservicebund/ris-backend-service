@@ -23,7 +23,9 @@ const emits = defineEmits<{
       <span
         aria-label="Sachgebietsbaum aufklappen"
         class="bg-blue-200 material-icons rounded-full w-icon"
-        >{{ props.node.isExpanded ? "remove" : "add" }}</span
+        >{{
+          props.node.isLeaf ? "eco" : props.node.isExpanded ? "remove" : "add"
+        }}</span
       >
     </button>
     <span v-if="props.node.id !== 'root'" class="node-id pl-6">{{

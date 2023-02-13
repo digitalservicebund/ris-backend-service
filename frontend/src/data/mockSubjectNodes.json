@@ -3,44 +3,44 @@
     {
       "id": "root",
       "stext": "Alle Sachgebiete anzeigen",
-      "children": ["01-01", "02-01"],
       "depth": 0,
-      "isExpanded": false
+      "isExpanded": false,
+      "isLeaf": false
     },
     {
       "id": "01-01",
       "stext": "Text123",
-      "children": ["01-02"],
       "depth": 1,
-      "isExpanded": false
+      "isExpanded": false,
+      "isLeaf": false
     },
     {
       "id": "01-02",
       "stext": "Text456",
-      "children": [],
       "depth": 2,
-      "isExpanded": false
+      "isExpanded": false,
+      "isLeaf": true
     },
     {
       "id": "02-01",
       "stext": "Text789",
-      "children": ["02-02", "02-03"],
       "depth": 1,
-      "isExpanded": false
+      "isExpanded": false,
+      "isLeaf": false
     },
     {
       "id": "02-02",
       "stext": "Text012",
-      "children": [],
       "depth": 2,
-      "isExpanded": false
+      "isExpanded": false,
+      "isLeaf": true
     },
     {
       "id": "02-03",
       "stext": "Text345",
-      "children": [],
       "depth": 2,
-      "isExpanded": false
+      "isExpanded": false,
+      "isLeaf": true
     }
   ]
 }

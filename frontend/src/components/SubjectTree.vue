@@ -11,7 +11,7 @@ const emit = defineEmits<{
 const tree = ref<SubjectTree>()
 
 function fetchTree() {
-  SubjectsService.getAllNodes().then((response) => {
+  SubjectsService.getRootNode().then((response) => {
     if (!response.data) return
     tree.value = new SubjectTree(response.data)
   })
@@ -19,6 +19,7 @@ function fetchTree() {
 
 function handleNodeClick(nodeId: string) {
   tree.value?.toggleNode(nodeId)
+  // console.log(toRaw(tree.value))
 }
 function handleAdd(nodeId: string) {
   console.log("Added node " + nodeId) // TODO
