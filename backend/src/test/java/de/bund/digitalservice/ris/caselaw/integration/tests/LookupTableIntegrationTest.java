@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
+import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +52,7 @@ class LookupTableIntegrationTest {
   @Autowired private CourtRepository courtRepository;
   @Autowired private DocumentTypeRepository documentTypeRepository;
 
+  @MockBean private SubjectFieldRepository subjectFieldRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
 

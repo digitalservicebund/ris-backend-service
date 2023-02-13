@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.LookupTableService;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,5 +31,16 @@ public class LookupTableController {
   @GetMapping(value = "courts")
   public Flux<Court> getCourts(@RequestParam Optional<String> searchStr) {
     return service.getCourts(searchStr);
+  }
+
+  @GetMapping(value = "subjectFields")
+  public Flux<SubjectField> getSubjectFields(@RequestParam Optional<String> q) {
+    return service.getSubjectFields(q);
+  }
+
+  @GetMapping(value = "subjectFieldChildren")
+  public Flux<SubjectField> getSubjectFieldChildren(
+      @RequestParam(required = false) Long subjectFieldId) { // TODO required vs Optional
+    return service.getSubjectFieldChildren(subjectFieldId);
   }
 }

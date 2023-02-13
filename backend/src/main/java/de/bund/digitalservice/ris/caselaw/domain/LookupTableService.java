@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,11 +19,15 @@ public class LookupTableService {
 
   private final DocumentTypeRepository documentTypeRepository;
   private final CourtRepository courtRepository;
+  private final SubjectFieldRepository subjectFieldRepository;
 
   public LookupTableService(
-      DocumentTypeRepository documentTypeRepository, CourtRepository courtRepository) {
+      DocumentTypeRepository documentTypeRepository,
+      CourtRepository courtRepository,
+      SubjectFieldRepository subjectFieldRepository) {
     this.documentTypeRepository = documentTypeRepository;
     this.courtRepository = courtRepository;
+    this.subjectFieldRepository = subjectFieldRepository;
   }
 
   public Flux<DocumentType> getCaselawDocumentTypes(Optional<String> searchStr) {
@@ -80,5 +85,17 @@ public class LookupTableService {
         courtDTO.getCourtlocation(),
         courtDTO.getCourttype() + " " + courtDTO.getCourtlocation(),
         revoked);
+  }
+
+  public Flux<SubjectField> getSubjectFields(Optional<String> searchStr) {
+    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
+      return subjectFieldRepository.findBySearchStr(searchStr.get().trim());
+    }
+    // TODO will this case actually get triggered?
+    return subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(null);
+  }
+
+  public Flux<SubjectField> getSubjectFieldChildren(Long id) {
+    return subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(id);
   }
 }

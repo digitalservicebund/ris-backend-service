@@ -73,4 +73,20 @@ class LookupTableImporterControllerTest {
 
     verify(service, times(1)).importStateLookupTable(any(ByteBuffer.class));
   }
+
+  @Test
+  void testImportSubjectFieldLookupTable() {
+    when(service.importSubjectFieldLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/lookuptableimporter/subjectField")
+        .bodyValue(BodyInserters.fromValue(new byte[] {}))
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service, times(1)).importSubjectFieldLookupTable(any(ByteBuffer.class));
+  }
 }

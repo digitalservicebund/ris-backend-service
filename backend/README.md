@@ -38,7 +38,7 @@ Some dropdown menus in the frontend get populated via calls to the backend that 
 
 To import the XML files, follow these steps:
 
-- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml` (Link in the Engineering Onboarding WIki)
+- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml`, `sachneudata_gesamt.xml` (Link in the Engineering Onboarding WIki)
 - Start the application (see [root README](../README.md)), open it in your browser and log in
 - Copy the `SESSION` cookie value from the Browser Developer Tools --> Application Tab --> Cookies
   (If you prefer using Postman, it also supports [importing cookies](https://github.com/digitalservicebund/ris-backend-service/commit/69684a3872ce9875484761fcb18f3367d0143bce#commitcomment-99597762) from your browser.)

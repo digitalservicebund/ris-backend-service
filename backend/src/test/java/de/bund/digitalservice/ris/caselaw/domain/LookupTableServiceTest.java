@@ -8,8 +8,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -29,6 +34,9 @@ class LookupTableServiceTest {
 
   @MockBean private DocumentTypeRepository documentTypeRepository;
   @MockBean private CourtRepository courtRepository;
+  @MockBean private SubjectFieldRepository subjectFieldRepository;
+  @MockBean private NormRepository normRepository;
+  @MockBean private KeywordRepository keywordRepository;
 
   @Test
   void testGetDocumentTypes() {
@@ -75,5 +83,69 @@ class LookupTableServiceTest {
         .verifyComplete();
 
     verify(courtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();
+  }
+
+  @Test
+  void testGetSubjectFields_withoutSearchString() {
+    SubjectField expectedSubjectField =
+        new SubjectField(
+            2L,
+            "TS-01-01",
+            "stext 2",
+            "navbez 2",
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")));
+
+    when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(null))
+        .thenReturn(Flux.just(expectedSubjectField));
+
+    StepVerifier.create(service.getSubjectFields(Optional.empty()))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
+        .verifyComplete();
+
+    verify(subjectFieldRepository).findAllByParentIdOrderBySubjectFieldNumberAsc(null);
+  }
+
+  @Test
+  void testGetSubjectFields_withSearchString() {
+    String searchString = "stext";
+    SubjectField expectedSubjectField =
+        new SubjectField(
+            2L,
+            "TS-01-01",
+            "stext 2",
+            "navbez 2",
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")));
+
+    when(subjectFieldRepository.findBySearchStr(searchString))
+        .thenReturn(Flux.just(expectedSubjectField));
+
+    StepVerifier.create(service.getSubjectFields(Optional.of(searchString)))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
+        .verifyComplete();
+
+    verify(subjectFieldRepository).findBySearchStr(searchString);
+  }
+
+  @Test
+  void testGetSubjectFieldChildren() {
+    SubjectField expectedSubjectField =
+        new SubjectField(
+            2L,
+            "TS-01-01",
+            "stext 2",
+            "navbez 2",
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")));
+
+    when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(1L))
+        .thenReturn(Flux.just(expectedSubjectField));
+
+    StepVerifier.create(service.getSubjectFieldChildren(1L))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
+        .verifyComplete();
+
+    verify(subjectFieldRepository).findAllByParentIdOrderBySubjectFieldNumberAsc(1L);
   }
 }
