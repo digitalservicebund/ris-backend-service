@@ -11,6 +11,7 @@ plugins {
   id "com.gorylenko.gradle-git-properties" version "2.4.1"
   id "com.adarshr.test-logger" version "3.2.0"
   id "com.github.ben-manes.versions" version "0.45.0"
+  id "org.jetbrains.dokka" version "1.7.20"
 }
 
 group = "de.bund.digitalservice"
@@ -23,6 +24,13 @@ repositories {
   mavenCentral()
   maven {
     url = uri("https://maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export")
+    credentials {
+      username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
+      password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
+    }
+  }
+  maven {
+    url = uri("https://maven.pkg.github.com/digitalservicebund/ris-norms-juris-importer")
     credentials {
       username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
       password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
@@ -101,6 +109,8 @@ dependencies {
   }
   // for local development:
   // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
+
+  implementation("de.bund.digitalservice:ris-norms-juris-importer:0.0.1-alpha")
 
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2"
 
