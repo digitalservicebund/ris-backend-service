@@ -34,7 +34,7 @@ export default class SubjectTree {
 export type SubjectNode = {
   id: string
   stext: string
-  parent?: string
+  // parent?: string
   children?: string[]
   depth: number
   isExpanded: boolean
@@ -44,7 +44,6 @@ export const mockSubjectNodes: SubjectNode[] = [
   {
     id: "root",
     stext: "Alle Sachgebiete anzeigen",
-    parent: undefined,
     children: ["01-01", "01-02"],
     depth: 0,
     isExpanded: false,
@@ -52,7 +51,6 @@ export const mockSubjectNodes: SubjectNode[] = [
   {
     id: "01-01",
     stext: "Text123",
-    parent: "root",
     children: [],
     depth: 1,
     isExpanded: false,
@@ -60,7 +58,6 @@ export const mockSubjectNodes: SubjectNode[] = [
   {
     id: "01-02",
     stext: "Text456",
-    parent: "root",
     children: ["02-01"],
     depth: 1,
     isExpanded: false,
@@ -68,7 +65,6 @@ export const mockSubjectNodes: SubjectNode[] = [
   {
     id: "02-01",
     stext: "Text789",
-    parent: "01-02",
     children: [],
     depth: 2,
     isExpanded: false,
