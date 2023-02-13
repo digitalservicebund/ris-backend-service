@@ -24,9 +24,19 @@ const emits = defineEmits<{
         >{{ props.node.isExpanded ? "remove" : "add" }}</span
       >
     </button>
-    <span v-if="props.node.id !== 'root'" class="pl-6">{{
+    <span v-if="props.node.id !== 'root'" class="node-id pl-6">{{
       props.node.id
     }}</span>
-    <span class="pl-6 text-blue-800 text-sm">{{ props.node.stext }}</span>
+    <span class="node-stext pl-6 text-blue-800">{{ props.node.stext }}</span>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.node-id {
+  font-size: 16px;
+}
+
+.node-stext {
+  font-size: 14px;
+}
+</style>
