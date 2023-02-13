@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-type Subject = { id: string; text: string }
+import { SubjectNode } from "@/domain/SubjectTree"
 
-const props = defineProps<{ subject: Subject }>()
+const props = defineProps<{ subject: SubjectNode }>()
 const emit = defineEmits<{
   (event: "remove-from-list"): void
 }>()
@@ -22,7 +22,7 @@ function handleRemoveFromList() {
       }}</span
       ><br />
       <span class="leading-{18px} text-blue-800 text-{14px}">
-        {{ props.subject.text }}
+        {{ props.subject.stext }}
       </span>
     </div>
     <div>

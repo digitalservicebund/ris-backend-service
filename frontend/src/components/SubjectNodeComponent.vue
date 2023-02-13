@@ -8,9 +8,9 @@ interface Props {
 
 const props = defineProps<Props>()
 
-const emits = defineEmits<{
+const emit = defineEmits<{
   (e: "node:toggle", nodeId: string): void
-  (e: "node:add", nodeId: string): void
+  (e: "node:add", node: SubjectNode): void
   (e: "node:delete", nodeId: string): void
 }>()
 </script>
@@ -19,7 +19,7 @@ const emits = defineEmits<{
   <div :style="{ 'padding-left': `${props.node.depth * 40}px` }">
     <button
       class="align-middle pr-4 text-blue-800"
-      @click="emits('node:toggle', node.id)"
+      @click="emit('node:toggle', node.id)"
     >
       <span
         aria-label="Sachgebietsbaum aufklappen"
@@ -29,11 +29,10 @@ const emits = defineEmits<{
         }}</span
       >
     </button>
-    <!--TODO toggle button visibility-->
     <button
       v-if="!selected"
       class="align-middle pr-4 text-blue-800"
-      @click="$emit('node:add', node.id)"
+      @click="emit('node:add', node)"
     >
       <span
         aria-label="Sachgebiet hinzufügen"
@@ -44,7 +43,7 @@ const emits = defineEmits<{
     <button
       v-if="selected"
       class="align-middle pr-4 text-blue-800"
-      @click="$emit('node:delete', node.id)"
+      @click="emit('node:delete', node.id)"
     >
       <span
         aria-label="Sachgebiet entfernen"

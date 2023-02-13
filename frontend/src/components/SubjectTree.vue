@@ -1,17 +1,15 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue"
-import SubjectNode from "@/components/SubjectNode.vue"
-import SubjectTree from "@/domain/SubjectTree"
+import SubjectNodeComponent from "./SubjectNodeComponent.vue"
+import SubjectTree, { SubjectNode } from "@/domain/SubjectTree"
 import SubjectsService from "@/services/subjectsService"
 
-type Subject = { id: string; text: string }
-
 const props = defineProps<{
-  selectedSubjects: Subject[]
+  selectedSubjects: SubjectNode[]
 }>()
 
 const emit = defineEmits<{
-  (event: "add-to-list", id: string): void
+  (event: "add-to-list", node: SubjectNode): void
   (event: "delete-from-list", id: string): void
 }>()
 
@@ -28,8 +26,8 @@ function handleNodeClick(nodeId: string) {
   tree.value?.toggleNode(nodeId)
   // console.log(toRaw(tree.value))
 }
-function handleAdd(nodeId: string) {
-  emit("add-to-list", nodeId)
+function handleAdd(node: SubjectNode) {
+  emit("add-to-list", node)
 }
 function handleDelete(nodeId: string) {
   emit("delete-from-list", nodeId)
@@ -40,7 +38,7 @@ onMounted(fetchTree)
 
 <template>
   <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
-  <SubjectNode
+  <SubjectNodeComponent
     v-for="node in tree?.getOrderedNodes()"
     :key="node.id"
     :node="node"

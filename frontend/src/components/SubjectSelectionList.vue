@@ -1,10 +1,9 @@
 <script lang="ts" setup>
 import SubjectSelectionListEntry from "./SubjectSelectionListEntry.vue"
-
-type Subject = { id: string; text: string }
+import { SubjectNode } from "@/domain/SubjectTree"
 
 const props = defineProps<{
-  selectedSubjects: Subject[]
+  selectedSubjects: SubjectNode[]
 }>()
 const emit = defineEmits<{
   (event: "remove-from-list", index: number): void

@@ -2,30 +2,15 @@
 import { ref } from "vue"
 import SubjectSelectionList from "./SubjectSelectionList.vue"
 import SubjectTree from "./SubjectTree.vue"
+import { SubjectNode } from "@/domain/SubjectTree"
 
-type Subject = { id: string; text: string }
-
-const selectedSubjects = ref<Subject[]>([
-  {
-    id: "ST-09-01",
-    text: "Allgemeines (Steuersystem, Steuerreform, Harmonisierung, Geltungsbereich, Inland, Gemeinschaftsgebiet u.a.)",
-  },
-  {
-    id: "ST-09-04-04",
-    text: "Lieferung Sonderfälle (u.a. Kommissionsgeschäft, Tausch, Lieferung mittels elektronsicher Schnittstelle)",
-  },
-  {
-    id: "GB-04-08-02",
-    text: "Mitwirkungspflichten der Beteiligten",
-  },
-])
+const selectedSubjects = ref<SubjectNode[]>([])
 
 const getSubjectIndex = (subjParam: string) =>
   selectedSubjects.value.findIndex(({ id }) => id == subjParam)
 
-function handleAddToList(id: string) {
-  if (getSubjectIndex(id) == -1)
-    selectedSubjects.value.push({ id: id, text: id })
+function handleAddToList(node: SubjectNode) {
+  if (getSubjectIndex(node.id) == -1) selectedSubjects.value.push(node)
 }
 
 function handleDeleteIdFromList(id: string) {
