@@ -9,8 +9,7 @@ type MyFixtures = {
 export const testWithImportedNorm = test.extend<MyFixtures>({
   normToImport: normCleanCars,
   createdGuid: async ({ normToImport, request }, use) => {
-    const backendHost = process.env.E2E_BASE_URL ?? "http://127.0.0.1"
-    const response = await request.post(`${backendHost}/api/v1/norms`, {
+    const response = await request.post(`/api/v1/norms`, {
       data: normToImport,
     })
     const body = await response.text()
@@ -648,7 +647,7 @@ export function getNormBySections(norm) {
             {
               type: "text",
               name: "documentStatusDate",
-              label: "Datum des Änderungsvorschrift",
+              label: "Datum der Änderungsvorschrift",
               value: norm.documentStatusDate,
             },
             {

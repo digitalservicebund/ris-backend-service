@@ -14,11 +14,16 @@ import reactor.core.publisher.Mono
 @RequestMapping(ApiConfiguration.API_BASE_PATH)
 class LoadNormAsXmlController(private val loadNormAsXmlService: LoadNormAsXmlUseCase) {
 
-    @GetMapping(path = ["/xml/eli/{printAnnouncementGazette}/{announcementYear}/s{printAnnouncementPage}"])
+    @GetMapping(
+        path = [
+            "/norms/xml/eli/{printAnnouncementGazette}/{announcementYear}/s{printAnnouncementPage}",
+            "/open/norms/xml/eli/{printAnnouncementGazette}/{announcementYear}/s{printAnnouncementPage}",
+        ],
+    )
     fun loadNormAsXml(
         @PathVariable printAnnouncementGazette: String,
         @PathVariable announcementYear: String,
-        @PathVariable printAnnouncementPage: String
+        @PathVariable printAnnouncementPage: String,
     ): Mono<ResponseEntity<String>> {
         val query = LoadNormAsXmlUseCase.Query(printAnnouncementGazette, announcementYear, printAnnouncementPage)
 

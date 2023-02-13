@@ -52,11 +52,13 @@ test.describe("test the different layout options", () => {
     await page
       .locator("span:text-is('Originaldokument öffnen') + button")
       .click()
+    await expect(page).toHaveURL(/showDocPanel=true/)
 
     await page.locator("span:text-is('Navigation schließen') + button").click()
     await expect(page).toHaveURL(/showNavBar=false/)
 
     await page.locator("a >> text=Zum Upload").click()
+    await expect(page.getByText("Datei in diesen Bereich ziehen")).toBeVisible()
     await expect(page).toHaveURL(/showDocPanel=true/)
     await expect(page).toHaveURL(/showNavBar=false/)
   })

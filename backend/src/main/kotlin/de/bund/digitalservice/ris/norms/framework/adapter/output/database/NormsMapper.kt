@@ -44,7 +44,7 @@ interface NormsMapper {
             normDto.footnoteStateLaw, normDto.footnoteEuLaw, normDto.validityRule, normDto.digitalEvidenceLink,
             normDto.digitalEvidenceRelatedData, normDto.digitalEvidenceExternalDataNote, normDto.digitalEvidenceAppendix,
             normDto.referenceNumber, normDto.celexNumber, normDto.ageIndicationStart, normDto.ageIndicationEnd,
-            normDto.definition, normDto.ageOfMajorityIndication, normDto.text
+            normDto.definition, normDto.ageOfMajorityIndication, normDto.text,
         )
     }
 
@@ -91,7 +91,7 @@ interface NormsMapper {
             norm.footnoteStateLaw, norm.footnoteEuLaw, norm.validityRule, norm.digitalEvidenceLink,
             norm.digitalEvidenceRelatedData, norm.digitalEvidenceExternalDataNote, norm.digitalEvidenceAppendix,
             norm.referenceNumber, norm.celexNumber, norm.ageIndicationStart, norm.ageIndicationEnd,
-            norm.definition, norm.ageOfMajorityIndication, norm.text
+            norm.definition, norm.ageOfMajorityIndication, norm.text,
         )
     }
 

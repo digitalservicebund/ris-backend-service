@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
 
 @RestController
-@RequestMapping(ApiConfiguration.API_BASE_PATH)
+@RequestMapping(ApiConfiguration.API_NORMS_PATH)
 class EditNormFrameController(private val editNormFrameService: EditNormFrameUseCase) {
 
     @PutMapping(path = ["/{guid}"])
     fun editNormFrame(
         @PathVariable guid: String,
-        @RequestBody request: NormFramePropertiesRequestSchema
+        @RequestBody request: NormFramePropertiesRequestSchema,
     ): Mono<ResponseEntity<Void>> {
         val properties = request.toUseCaseData()
         val command = EditNormFrameUseCase.Command(decodeGuid(guid), properties)
@@ -289,7 +289,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.ageIndicationEnd,
                 this.definition,
                 this.ageOfMajorityIndication,
-                this.text
+                this.text,
             )
         }
     }

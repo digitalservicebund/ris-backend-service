@@ -24,7 +24,7 @@ private val SEARCH_TERM_QUERY_FIELDS = listOf(
     SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE,
     SearchNormsOutputPort.QueryFields.OFFICIAL_SHORT_TITLE,
     SearchNormsOutputPort.QueryFields.UNOFFICIAL_LONG_TITLE,
-    SearchNormsOutputPort.QueryFields.UNOFFICIAL_SHORT_TITLE
+    SearchNormsOutputPort.QueryFields.UNOFFICIAL_SHORT_TITLE,
 )
 
 private fun createSearchTermQuery(term: String): SearchNormsOutputPort.Query {
@@ -38,5 +38,5 @@ private fun createSearchTermQuery(term: String): SearchNormsOutputPort.Query {
 private fun mapToNormData(norm: Norm) = ListNormsUseCase.NormData(
     norm.guid,
     norm.officialLongTitle,
-    norm.eli
+    norm.eli,
 )

@@ -16,14 +16,14 @@ class NormsCriteriaBuilder : NormsMapper {
         return Criteria.from(
             Criteria.where(gazetteColumn).`is`(Eli.parseGazette(gazette))
                 .and(
-                    Criteria.where(pageColumn).`is`(page)
+                    Criteria.where(pageColumn).`is`(page),
                 )
                 .and(
                     Criteria.where(announcementDateColumn).isNull.and(getYearInDateCriteria(citationDateColumn, year))
                         .or(
-                            getYearInDateCriteria(announcementDateColumn, year)
-                        )
-                )
+                            getYearInDateCriteria(announcementDateColumn, year),
+                        ),
+                ),
         )
     }
 
@@ -50,7 +50,7 @@ class NormsCriteriaBuilder : NormsMapper {
         return Criteria.where(dbColumn)
             .between(
                 LocalDate.of(value.toInt(), 1, 1),
-                LocalDate.of(value.toInt() + 1, 1, 1)
+                LocalDate.of(value.toInt() + 1, 1, 1),
             )
     }
 }

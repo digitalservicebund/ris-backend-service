@@ -2,6 +2,7 @@
 import { computed } from "vue"
 import type { risComponent } from "@/kitchensink/types/types"
 import ButtonView from "@/kitchensink/views/ButtonView.vue"
+import ChipsView from "@/kitchensink/views/ChipsView.vue"
 import CodeSnippetView from "@/kitchensink/views/CodeSnippetView.vue"
 import DocumentUnitInfoPanelView from "@/kitchensink/views/DocumentUnitInfoPanelView.vue"
 import DropdownView from "@/kitchensink/views/DropdownView.vue"
@@ -38,6 +39,8 @@ const component = computed(() => {
       return FileViewerView
     case "InputView":
       return InputView
+    case "ChipsView":
+      return ChipsView
     case "DropdownView":
       return DropdownView
     case "NavbarView":

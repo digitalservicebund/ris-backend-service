@@ -2,13 +2,13 @@
 import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
 import Logo from "../assets/neuRIS-logo.svg"
-import authService from "@/services/authService"
+import { getName } from "@/services/authService"
 
 const route = useRoute()
 const userName = ref<string>()
 
 onMounted(async () => {
-  const nameResponse = await authService.getName()
+  const nameResponse = await getName()
   if (nameResponse.data) userName.value = nameResponse.data
 })
 </script>

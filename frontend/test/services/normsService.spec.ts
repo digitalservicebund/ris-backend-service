@@ -3,6 +3,7 @@ import {
   editNormFrame,
   getAllNorms,
   getNormByGuid,
+  importNorm,
 } from "@/services/normsService"
 
 vi.mock("@/services/httpClient")
@@ -291,6 +292,52 @@ describe("normsService", () => {
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden."
       )
+    })
+  })
+
+  describe("importNorm", () => {
+    it("sends file to API endpoint as body with correct header", async () => {
+      const file = new File([new Blob(["zip content"])], "test.zip")
+      vi.mocked(httpClient).post.mockResolvedValueOnce({
+        status: 201,
+        data: undefined,
+      })
+
+      await importNorm(file)
+
+      expect(httpClient.post).toHaveBeenCalledOnce()
+      expect(httpClient.post).toHaveBeenLastCalledWith(
+        "norms",
+        { headers: { "Content-Type": "application/zip" } },
+        file
+      )
+    })
+
+    it("response with GUID of newly created norm on successful import", async () => {
+      const file = new File([new Blob(["zip content"])], "test.zip")
+      vi.mocked(httpClient).post.mockResolvedValueOnce({
+        status: 201,
+        data: { guid: "test-fake-guid" },
+      })
+
+      const response = await importNorm(file)
+
+      expect(response.data).toBe("test-fake-guid")
+    })
+
+    it("response with error if import failed", async () => {
+      const file = new File([new Blob(["zip content"])], "test.zip")
+      vi.mocked(httpClient).post.mockResolvedValueOnce({
+        status: 400,
+        data: undefined,
+      })
+
+      const response = await importNorm(file)
+
+      expect(response.error).toBeDefined()
+      expect(response.error).toMatchObject({
+        title: "Datei konnte nicht importiert werden.",
+      })
     })
   })
 })

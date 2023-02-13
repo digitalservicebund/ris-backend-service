@@ -13,5 +13,5 @@ data class ArticleDto(
     var title: String? = null,
     val marker: String,
     @Column("norm_id")
-    val normId: Int
+    val normId: Int,
 )

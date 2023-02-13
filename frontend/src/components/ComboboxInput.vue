@@ -30,6 +30,15 @@ const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
 const selectedValue = ref<ComboboxInputModelType>()
 const inputText = ref<string>()
 const currentlyDisplayedItems = ref<ComboboxItem[]>()
+const showDropdown = ref(false)
+const filter = ref<string>()
+const dropdownContainerRef = ref<HTMLElement>()
+const dropdownItemsRef = ref<HTMLElement>()
+const inputFieldRef = ref<HTMLInputElement>()
+const focusedItemIndex = ref<number>(0)
+const ariaLabelDropdownIcon = computed(() =>
+  showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
+)
 
 const getLabelFromSelectedValue = (): string | undefined => {
   if (
@@ -65,17 +74,6 @@ function isCourt(input?: ComboboxInputModelType): input is Court {
 function updateInputText() {
   inputText.value = getLabelFromSelectedValue()
 }
-
-const showDropdown = ref(false)
-
-const filter = ref<string>()
-const dropdownContainerRef = ref<HTMLElement>()
-const dropdownItemsRef = ref<HTMLElement>()
-const inputFieldRef = ref<HTMLInputElement>()
-const focusedItemIndex = ref<number>(0)
-const ariaLabelDropdownIcon = computed(() =>
-  showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
-)
 
 const toggleDropdown = () => {
   showDropdown.value = !showDropdown.value
@@ -212,7 +210,11 @@ onBeforeUnmount(() => {
     class="dropdown-container"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
-    <div class="dropdown-container__open-dropdown" @keydown.enter="onEnter">
+    <div
+      class="dropdown-container__open-dropdown"
+      @keydown.enter="onEnter"
+      @keydown.tab="closeDropdownAndRevertToLastSavedValue"
+    >
       <div class="bg-white input-container">
         <input
           :id="id"
@@ -272,10 +274,12 @@ onBeforeUnmount(() => {
             candidateForSelection === item,
           'dropdown-container__dropdown-item__currently-selected':
             getLabelFromSelectedValue() === item.label,
-          'no-matching-entry': item.label === NO_MATCHING_ENTRY,
+          'dropdown-container__dropdown-item__no-matching-entry':
+            item.label === NO_MATCHING_ENTRY,
         }"
         tabindex="0"
         @click="setChosenItem(item)"
+        @keydown.tab="closeDropdownAndRevertToLastSavedValue"
         @keypress.enter="setChosenItem(item)"
         @keyup.down="keydown"
         @keyup.up="keyup"
@@ -349,14 +353,18 @@ onBeforeUnmount(() => {
       @apply border-b-0;
     }
 
-    &:not(.no-matching-entry):hover {
+    &:not(&__no-matching-entry):hover {
       @apply bg-gray-400;
     }
 
-    &:not(.no-matching-entry):focus {
+    &:not(&__no-matching-entry):focus {
       @apply bg-blue-200;
 
       outline: none;
+    }
+
+    &__no-matching-entry {
+      cursor: default !important;
     }
 
     &__with-additional-info {

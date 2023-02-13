@@ -12,5 +12,5 @@ class NormDto(
     var printAnnouncementGazette: String?,
     var printAnnouncementPage: String?,
     var eli: String?,
-    var articles: List<ArticleDto> = listOf()
+    var articles: List<ArticleDto> = listOf(),
 )

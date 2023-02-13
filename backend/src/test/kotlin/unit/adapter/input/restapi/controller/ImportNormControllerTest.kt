@@ -69,9 +69,9 @@ class ImportNormControllerTest {
                         .isEqualTo(importNormRequestSchema.articles[0].paragraphs[0].text)
                     assertNormDataAndImportNormRequestSchemaWithoutArticles(
                         it.data,
-                        importNormRequestSchema
+                        importNormRequestSchema,
                     )
-                }
+                },
             )
         }
     }

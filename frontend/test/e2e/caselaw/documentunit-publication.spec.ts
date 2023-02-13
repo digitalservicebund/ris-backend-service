@@ -120,9 +120,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await page.keyboard.press("Tab")
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
-    await page.locator("text=AG Aalen").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+    await page.locator("[aria-label='Gericht']").fill("vgh mannheim")
+    await page.locator("text=VGH Mannheim").click()
+    expect(await page.inputValue("[aria-label='Gericht']")).toBe("VGH Mannheim")
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
     await page.locator("[aria-label='Dokumenttyp']").fill("AnU")

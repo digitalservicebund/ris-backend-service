@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 import java.net.URI
 
 @RestController
-@RequestMapping(ApiConfiguration.API_BASE_PATH)
+@RequestMapping(ApiConfiguration.API_NORMS_PATH)
 class ImportNormController(private val importNormService: ImportNormUseCase) {
     @PostMapping
     fun createNorm(@RequestBody resource: NormRequestSchema): Mono<ResponseEntity<Void>> {
@@ -23,7 +23,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
         return importNormService
             .importNorm(command)
             .map { guid -> encodeGuid(guid) }
-            .map { encodedGuid -> URI("${ApiConfiguration.API_BASE_PATH}/$encodedGuid") }
+            .map { encodedGuid -> URI("${ApiConfiguration.API_NORMS_PATH}/$encodedGuid") }
             .map { uri -> ResponseEntity.created(uri).build<Void>() }
             .onErrorReturn(ResponseEntity.internalServerError().build())
     }
@@ -167,7 +167,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
                 principleEntryIntoForceDateState = decodeUndefinedDate(this.principleEntryIntoForceDateState),
                 entryIntoForceNormCategory = this.entryIntoForceNormCategory,
                 entryIntoForceDateState = decodeUndefinedDate(this.entryIntoForceDateState),
-                expirationDateState = decodeUndefinedDate(this.expirationDateState)
+                expirationDateState = decodeUndefinedDate(this.expirationDateState),
             )
         }
     }
@@ -181,7 +181,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
             return ImportNormUseCase.ArticleData(
                 title,
                 marker,
-                paragraphs.map { it.toUseCaseData() }
+                paragraphs.map { it.toUseCaseData() },
             )
         }
     }

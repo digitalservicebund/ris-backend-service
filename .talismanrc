@@ -3,20 +3,18 @@ fileignoreconfig:
     ignore_detectors: [filecontent]
   - filename: run.sh
     checksum: 19dede0d2737b9e8cc548da7e595b847c2f4e0caf1c6775ce04e149d5ffc4c79
-  - filename: .github/workflows/clean-staging.yml
-    checksum: 32b17a987aa7ec21004a790b625fc760a0f174754f59edba69eef4c502f0e673
   - filename: .github/workflows/pipeline.yml
-    checksum: 0745bfb0220861706ba96b4e7a431495e3dc3c0251f85ee950333064c552f5d4
+    checksum: c366bddec5d17f29485bdf3b105802032c2dd5b2e715d8a1ef9459d07bf758ea
   - filename: .github/workflows/playwright-test.yml
-    checksum: 18ce292910ec2d9b28ede7e9ba97bcadb4905a735f882e29efe19ab31461cbf9
+    checksum: 80f91e4841a0ddd0596fd4ca6046e7dd69cafb92a5f4776aeb486c66b6e75cbb
   - filename: .github/workflows/playwright.yml
     checksum: 0e6014cd2ebebafbc428ac09a3759202e91c99e748ac0b70e191f56caeb5c187
   - filename: .github/workflows/scan.yml
-    checksum: f6f5463f9e709099ba78ef3969943b1e6b46cfca542650046457569c138329fb
+    checksum: 1e5d50769efced0acefcd9f75506280d141c63c869a8e75bb60a32a843a5977a
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: f3b6fb8dcdbf1fd20614701e1f4c5a8c8fae0bcf47a3de74221acc20c2a3874c
+    checksum: 364385121be50410139882b43cf708567c43adf9a3ff75134c180c55631b6d72
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/adapter/SendInBlueHttpMailSender.java
     checksum: 5ac01c3b6a5d2909ffbc054ac98d43962047e762b86654207591aeaecdf7a434
   - filename: backend/src/main/java/de/bund/digitalservice/ris/caselaw/config/MailConfig.java
@@ -207,6 +205,8 @@ fileignoreconfig:
     checksum: c26464b0ae1a3f87f7eeb7345ce4e375a0ade3a8a76927723d72a09ff61f2e2b
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/HealthEndpointIntegrationTest.java
     checksum: 219d97511f52a87d3a85622899ab170267a96bc791ce32fee11bcd204f505a97
+  - filename: frontend/FRONTEND_STYLEGUIDE.md
+    checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
 
 scopeconfig:
   - scope: node

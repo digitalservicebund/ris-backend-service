@@ -42,6 +42,7 @@ import org.docx4j.model.listnumbering.AbstractListNumberingDefinition;
 import org.docx4j.model.listnumbering.ListLevel;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.wml.BooleanDefaultTrue;
+import org.docx4j.wml.CTFramePr;
 import org.docx4j.wml.CTVerticalAlignRun;
 import org.docx4j.wml.Drawing;
 import org.docx4j.wml.HpsMeasure;
@@ -109,6 +110,40 @@ class DocumentUnitDocxBuilderTest {
 
     var htmlString = borderNumberElement.toHtmlString();
     assertEquals("<border-number><number>1</number></border-number>", htmlString);
+  }
+
+  @Test
+  void testBuild_withListParagraphBorderNumber_shouldSucceed() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    PPrBase.PStyle pStyle = new PPrBase.PStyle();
+    pStyle.setVal("ListParagraph");
+    pPr.setPStyle(pStyle);
+    paragraph.setPPr(pPr);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof BorderNumber);
+    // it won't have a number assigned because postprocessing is not done, see the
+    // DocumentUnitDocxListUtilsTest for testing the postprocessing of border numbers
+  }
+
+  @Test
+  void testBuild_withListenabsatzBorderNumber_shouldSucceed() {
+    DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
+    P paragraph = new P();
+    PPr pPr = new PPr();
+    PPrBase.PStyle pStyle = new PPrBase.PStyle();
+    pStyle.setVal("Listenabsatz");
+    pPr.setPStyle(pStyle);
+    paragraph.setPPr(pPr);
+    CTFramePr framePr = new CTFramePr();
+    pPr.setFramePr(framePr);
+
+    var result = builder.setParagraph(paragraph).build();
+
+    assertTrue(result instanceof BorderNumber);
   }
 
   @Test

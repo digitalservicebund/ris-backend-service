@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -20,38 +20,28 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sub
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
+import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.r2dbc.AutoConfigureDataR2dbc;
-import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
-@WebFluxTest(controllers = {LookupTableImporterController.class})
-@Import({
-  LookupTableImporterService.class,
-  FlywayConfig.class,
-  PostgresConfig.class,
-  PostgresJPAConfig.class
-})
-@Tag("integration")
-@Testcontainers(disabledWithoutDocker = true)
-@WithMockUser
-@AutoConfigureDataR2dbc
-@AutoConfigureWebTestClient(timeout = "100000000000") // TODO set to infinite?
+@RISIntegrationTest(
+    imports = {
+      LookupTableImporterService.class,
+      FlywayConfig.class,
+      PostgresConfig.class,
+      PostgresJPAConfig.class
+    },
+    controllers = {LookupTableImporterController.class})
 class LookupTableImporterIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");

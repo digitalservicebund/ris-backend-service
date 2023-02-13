@@ -42,8 +42,6 @@ interface HttpClient {
   ): Promise<ServiceResponse<TResponse>>
 }
 
-const backendHost = process.env.BACKEND_HOST ?? ""
-
 async function baseHttp<T>(
   url: string,
   method: string,
@@ -53,7 +51,7 @@ async function baseHttp<T>(
   try {
     const response = await axiosInstance.request({
       method: method,
-      url: `${backendHost}/api/v1/${url}`,
+      url: `/api/v1/${url}`,
       validateStatus: () => true,
       data,
       ...options,

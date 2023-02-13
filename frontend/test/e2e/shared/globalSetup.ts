@@ -1,9 +1,10 @@
-import { chromium, expect } from "@playwright/test"
+import { chromium, expect, FullConfig } from "@playwright/test"
 
-export default async function globalSetup() {
+export default async function globalSetup(config: FullConfig) {
+  const baseURL = config.projects[0].use.baseURL as string
   const browser = await chromium.launch()
   const page = await browser.newPage()
-  await page.goto(process.env.E2E_BASE_URL ?? "http://127.0.0.1")
+  await page.goto(baseURL)
   await page
     .getByLabel("E-Mailadresse")
     .fill(process.env.E2E_TEST_USER as string)
@@ -11,7 +12,9 @@ export default async function globalSetup() {
     .getByLabel("Passwort")
     .fill(process.env.E2E_TEST_PASSWORD as string)
   await page.locator("input#kc-login").click()
-  await expect(page.getByText("Anmelden bei ")).toBeHidden()
+
+  await page.goto(process.env.E2E_BASE_URL ?? "http://127.0.0.1")
+  await expect(page.getByText("Übersicht Rechtsprechung")).toBeVisible()
 
   await page
     .context()

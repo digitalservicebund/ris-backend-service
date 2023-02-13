@@ -2,7 +2,7 @@
 .lefthook-local
 lefthook-local.yml
 
-### OS
+### OS ###
 **/.DS_Store
 
 ### IntelliJ IDEA ###
@@ -12,8 +12,12 @@ lefthook-local.yml
 *.ipr
 
 ### VS Code ###
+**/.vscode/*.code-workspace
 .vscode/
 
-## local ##
+### local ###
 .config/
 .local-storage/
+.env
+Brewfile.lock.json
+

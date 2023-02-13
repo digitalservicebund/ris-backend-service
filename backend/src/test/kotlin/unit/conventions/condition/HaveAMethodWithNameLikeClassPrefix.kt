@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.norms.conventions.predicate.HaveAMethodWithNam
 
 class HaveAMethodWithNameLikeClassPrefix(private val classPostfix: String) :
     ArchCondition<JavaClass>(
-        "have a method named like class prefix where prefix is '$classPostfix'"
+        "have a method named like class prefix where prefix is '$classPostfix'",
     ) {
     override fun check(item: JavaClass, events: ConditionEvents) {
         val predicate = HaveAMethodWithNameLikeClassPrefix(this.classPostfix)

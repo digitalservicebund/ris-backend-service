@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw;
+package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
@@ -7,11 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
 
 @SpringBootTest(
     webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
@@ -23,14 +21,10 @@ import org.testcontainers.utility.DockerImageName;
     })
 @Tag("integration")
 @Testcontainers(disabledWithoutDocker = true)
-class HealthEndpointIntegrationTest {
+class SecurityIntegrationTest {
 
   @Container
   static PostgreSQLContainer postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
-
-  @Container
-  static GenericContainer redis =
-      new GenericContainer(DockerImageName.parse("redis:7.0")).withExposedPorts(6379);
 
   @DynamicPropertySource
   static void registerDynamicProperties(DynamicPropertyRegistry registry) {
@@ -39,14 +33,19 @@ class HealthEndpointIntegrationTest {
     registry.add("database.host", () -> postgreSQLContainer.getHost());
     registry.add("database.port", () -> postgreSQLContainer.getFirstMappedPort());
     registry.add("database.database", () -> postgreSQLContainer.getDatabaseName());
-    registry.add("spring.data.redis.host", () -> redis.getHost());
-    registry.add("spring.data.redis.port", () -> redis.getFirstMappedPort());
   }
 
   @Autowired WebTestClient webTestClient;
 
   @Test
-  void shouldExposeHealthEndpoint() {
-    webTestClient.get().uri("/actuator/health").exchange().expectStatus().isOk();
+  void shouldHaveEnabledCSPHeader() {
+    webTestClient
+        .get()
+        .uri("/")
+        .exchange()
+        .expectHeader()
+        .valueEquals(
+            "Content-Security-Policy",
+            "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'");
   }
 }

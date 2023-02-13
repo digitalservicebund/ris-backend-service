@@ -59,15 +59,15 @@ class ListNormsServiceTest {
                             SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE,
                             SearchNormsOutputPort.QueryFields.OFFICIAL_SHORT_TITLE,
                             SearchNormsOutputPort.QueryFields.UNOFFICIAL_LONG_TITLE,
-                            SearchNormsOutputPort.QueryFields.UNOFFICIAL_SHORT_TITLE
-                        )
+                            SearchNormsOutputPort.QueryFields.UNOFFICIAL_SHORT_TITLE,
+                        ),
                     )
 
                     it.parameters.forEach {
                         assertThat(it.value).isEqualTo("test")
                         assertThat(it.isFuzzyMatch).isTrue()
                     }
-                }
+                },
             )
         }
     }
@@ -90,7 +90,7 @@ class ListNormsServiceTest {
         val norm =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-                officialLongTitle = "title"
+                officialLongTitle = "title",
             )
         val query = ListNormsUseCase.Query()
 
@@ -112,17 +112,17 @@ class ListNormsServiceTest {
         val normOne =
             Norm(
                 UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
-                officialLongTitle = "title one"
+                officialLongTitle = "title one",
             )
         val normTwo =
             Norm(
                 UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"),
-                officialLongTitle = "title two"
+                officialLongTitle = "title two",
             )
         val normThree =
             Norm(
                 UUID.fromString("2c7da53b-1d57-46b4-90b2-96bd746c268a"),
-                officialLongTitle = "title three"
+                officialLongTitle = "title three",
             )
         val query = ListNormsUseCase.Query()
 

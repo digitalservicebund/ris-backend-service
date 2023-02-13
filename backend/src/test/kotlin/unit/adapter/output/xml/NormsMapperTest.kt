@@ -14,7 +14,7 @@ class MapParagraphToDto {
             Paragraph(
                 guid = UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"),
                 marker = "1",
-                text = "test text"
+                text = "test text",
             )
 
         val data = mapParagraphToDto(paragraph, articleMarker = "2")
@@ -60,7 +60,7 @@ class MapArticleToDto {
                 guid = UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"),
                 title = "test title",
                 marker = "1",
-                paragraphs = listOf(paragraph)
+                paragraphs = listOf(paragraph),
             )
 
         val data = mapArticleToDto(article)
@@ -147,7 +147,7 @@ class ParseMarkerFromMarkerTextTest {
                 "                            </LA>\n" +
                 "                        </DD>\n" +
                 "                    </DL>\n" +
-                "                "
+                "                ",
         )
         assertThat(content).isNotNull
 
@@ -159,7 +159,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = "list intro text:",
             isText = false,
             text = null,
-            pointsSize = 2
+            pointsSize = 2,
         )
         validateListContent(
             content.points[0],
@@ -169,7 +169,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = null,
             isText = true,
             text = "1. text",
-            pointsSize = 0
+            pointsSize = 0,
         )
         validateListContent(
             content.points[1],
@@ -179,7 +179,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = null,
             isText = true,
             text = "2. text",
-            pointsSize = 0
+            pointsSize = 0,
         )
     }
 
@@ -217,7 +217,7 @@ class ParseMarkerFromMarkerTextTest {
                 "                                </DL>\n" +
                 "                            </LA>\n" +
                 "                        </DD>\n" +
-                "                    </DL>"
+                "                    </DL>",
         )
         assertThat(content).isNotNull
 
@@ -229,7 +229,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = "list intro text:",
             isText = false,
             text = null,
-            pointsSize = 1
+            pointsSize = 1,
         )
 
         val firstPointFirstLevel = content.points[0]
@@ -241,7 +241,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = "1. point text",
             isText = false,
             text = null,
-            pointsSize = 2
+            pointsSize = 2,
         )
 
         val firstPointSecondLevel = firstPointFirstLevel.points[0]
@@ -253,7 +253,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = null,
             isText = true,
             text = "a) point text",
-            pointsSize = 0
+            pointsSize = 0,
         )
 
         val secondPointSecondLevel = firstPointFirstLevel.points[1]
@@ -265,7 +265,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = "b) point text",
             isText = false,
             text = null,
-            pointsSize = 2
+            pointsSize = 2,
         )
 
         val firstPointThirdLevel = secondPointSecondLevel.points[0]
@@ -277,7 +277,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = null,
             isText = true,
             text = "aa) point text",
-            pointsSize = 0
+            pointsSize = 0,
         )
 
         val secondPointThirdLevel = secondPointSecondLevel.points[1]
@@ -289,7 +289,7 @@ class ParseMarkerFromMarkerTextTest {
             listIntro = null,
             isText = true,
             text = "bb) point text",
-            pointsSize = 0
+            pointsSize = 0,
         )
     }
 
@@ -302,7 +302,7 @@ class ParseMarkerFromMarkerTextTest {
         listIntro: String?,
         isText: Boolean,
         text: String?,
-        pointsSize: Int
+        pointsSize: Int,
     ) {
         assertThat(content.guid).isNotNull
         assertThat(content.paragraphMarker).isEqualTo(paragraphMarker)

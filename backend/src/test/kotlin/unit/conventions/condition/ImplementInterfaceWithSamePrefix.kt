@@ -8,11 +8,11 @@ import de.bund.digitalservice.ris.norms.conventions.predicate.ImplementInterface
 
 class ImplementInterfaceWithSamePrefix(
     private val classPostfix: String,
-    private val interfacePostfix: String
+    private val interfacePostfix: String,
 ) :
     ArchCondition<JavaClass>(
         "have the same prefix as the interface it implements for the class postfix '$classPostfix'" +
-            " and interface postfix '$interfacePostfix'"
+            " and interface postfix '$interfacePostfix'",
     ) {
     override fun check(item: JavaClass, events: ConditionEvents) {
         val predicate = ImplementInterfaceWithSamePrefix(this.classPostfix, this.interfacePostfix)

@@ -4,12 +4,6 @@ Built with Vue
 
 ## Prerequisites
 
-**Node.js 16.14.2**
-
-```bash
-brew install node
-```
-
 The repository contains a `.node-version` file to set up the required Node.js version automatically with [nodenv](https://github.com/nodenv/nodenv).
 
 Install dependencies:
@@ -18,23 +12,30 @@ Install dependencies:
 npm install
 ```
 
-For E2E and a11y testing with [Playwright](https://playwright.dev/docs/intro) you will need to install the supported browsers:
+For E2E and a11y testing with [Playwright](https://playwright.dev/docs/intro) you will need to install the supported browsers, if you don't have them already:
 
 ```bash
-npx playwright install
+npx playwright install chrome firefox
 ```
 
 ## Development
 
 ### Dev server
 
-The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://localhost:3000/).
+The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-less [dev server](http://127.0.0.1/).
 
-**Start server**:
+You have two options:
 
-```bash
-npm run dev
-```
+1. Run all services together
+
+   ```bash
+   ../run.sh dev
+   ```
+
+2. Start the frontend dev server in isolation
+   ```bash
+   npm run dev
+   ```
 
 ### Testing
 
@@ -64,6 +65,8 @@ npm run coverage
 
 **To run the E2E tests:**
 
+Requires the application to run locally
+
 ```bash
 # run all
 npm run test:e2e
@@ -84,6 +87,8 @@ npm run test:a11y
 ```
 
 ### Style (linting & formatting)
+
+Check our [Frontend Styleguide](FRONTEND_STYLEGUIDE.md) document.
 
 Linting is done via [ESLint](https://eslint.org/docs/user-guide/getting-started); consistent formatting for a variety of source code files is being enforced using [Prettier](https://prettier.io/docs/en/index.html). ESLint and Prettier work in conjunction.
 

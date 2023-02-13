@@ -64,22 +64,25 @@ paths:
           description: ""
 
     post:
-      summary: Import data to create a new norm
+      summary: Import a norm using a ZIP
       operationId: importNorm
       requestBody:
         required: true
         content:
-          application/json:
+          application/zip:
             schema:
-              $ref: "#/components/schemas/ImportableNorm"
+              type: string
+              format: binary
       responses:
         "201":
-          description: Norm got successfully created
-          headers:
-            Location:
-              description: URI reference for the new norm
+          description: Norm was successfully imported
+          content:
+            application/json:
               schema:
-                type: string
+                type: object
+                properties:
+                  guid:
+                    $ref: "#/components/schemas/Guid"
         "400":
           description: Invalid norm
 
@@ -187,11 +190,14 @@ components:
       type: string
       enum: [UNDEFINED_UNKNOWN, UNDEFINED_FUTURE, UNDEFINED_NOT_PRESENT]
 
-    ParagraphWithoutGuid:
+    Paragraph:
       type: object
       required:
+        - guid
         - text
       properties:
+        guid:
+          $ref: "#/components/schemas/Guid"
         marker:
           type: string
           example: "(1)"
@@ -199,12 +205,15 @@ components:
           type: string
           example: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
 
-    ArticleWithoutGuid:
+    Article:
       type: object
       required:
+        - guid
         - marker
         - paragraphs
       properties:
+        guid:
+          $ref: "#/components/schemas/Guid"
         marker:
           type: string
           example: "§ 1"
@@ -214,44 +223,7 @@ components:
         paragraphs:
           type: array
           items:
-            $ref: "#/components/schemas/ParagraphWithoutGuid"
-
-    ImportableNorm:
-      allOf:
-        - $ref: "#/components/schemas/ImportableNormFrame"
-        - type: object
-          required:
-            - officialLongTitle
-            - articles
-          properties:
-            articles:
-              type: array
-              items:
-                $ref: "#/components/schemas/ArticleWithoutGuid"
-
-    Paragraph:
-      allOf:
-        - $ref: "#/components/schemas/ParagraphWithoutGuid"
-        - type: object
-          required:
-            - guid
-          properties:
-            guid:
-              $ref: "#/components/schemas/Guid"
-
-    Article:
-      allOf:
-        - $ref: "#/components/schemas/ArticleWithoutGuid"
-        - type: object
-          required:
-            - guid
-          properties:
-            guid:
-              $ref: "#/components/schemas/Guid"
-            paragraphs:
-              type: array
-              items:
-                $ref: "#/components/schemas/Paragraph"
+            $ref: "#/components/schemas/Paragraph"
 
     Norm:
       allOf:
@@ -268,7 +240,7 @@ components:
               items:
                 $ref: "#/components/schemas/Article"
 
-    ImportableNormFrame:
+    NormFrame:
       type: object
       properties:
         officialLongTitle:
@@ -463,219 +435,131 @@ components:
         entryIntoForceNormCategory:
           type: string
           example: ""
-
-    NormFrame:
-      allOf:
-        - $ref: "#/components/schemas/ImportableNormFrame"
-        - type: object
-          properties:
-            publicationDate:
-              $ref: "#/components/schemas/Date"
-            documentTypeName:
-              type: string
-              example: "RV"
-            documentNormCategory:
-              type: string
-              example: "XX"
-            documentTemplateName:
-              type: string
-              example: "Template"
-            subjectPreviousFna:
-              type: string
-              example: "FNA 703-11"
-            subjectBgb3:
-              type: string
-              example: "BGB III 234"
-            printAnnouncementGazette:
-              type: string
-              example: ""
-            printAnnouncementYear:
-              type: string
-              example: ""
-            printAnnouncementNumber:
-              type: string
-              example: ""
-            printAnnouncementPage:
-              type: string
-              example: ""
-            printAnnouncementInfo:
-              type: string
-              example: ""
-            printAnnouncementExplanations:
-              type: string
-              example: ""
-            digitalAnnouncementMedium:
-              type: string
-              example: ""
-            digitalAnnouncementDate:
-              $ref: "#/components/schemas/Date"
-            digitalAnnouncementEdition:
-              type: string
-              example: ""
-            digitalAnnouncementYear:
-              type: string
-              example: ""
-            digitalAnnouncementPage:
-              type: string
-              example: ""
-            digitalAnnouncementArea:
-              type: string
-              example: ""
-            digitalAnnouncementAreaNumber:
-              type: string
-              example: ""
-            digitalAnnouncementInfo:
-              type: string
-              example: ""
-            digitalAnnouncementExplanations:
-              type: string
-              example: ""
-            euAnnouncementGazette:
-              type: string
-              example: ""
-            euAnnouncementYear:
-              type: string
-              example: ""
-            euAnnouncementSeries:
-              type: string
-              example: ""
-            euAnnouncementNumber:
-              type: string
-              example: ""
-            euAnnouncementPage:
-              type: string
-              example: ""
-            euAnnouncementInfo:
-              type: string
-              example: ""
-            euAnnouncementExplanations:
-              type: string
-              example: ""
-            otherOfficialAnnouncement:
-              type: string
-              example: ""
-            statusNote:
-              type: string
-              example: ""
-            statusDescription:
-              type: string
-              example: ""
-            statusDate:
-              $ref: "#/components/schemas/Date"
-            statusReference:
-              type: string
-              example: ""
-            repealNote:
-              type: string
-              example: ""
-            repealArticle:
-              type: string
-              example: ""
-            repealDate:
-              $ref: "#/components/schemas/Date"
-            repealReferences:
-              type: string
-              example: ""
-            reissueNote:
-              type: string
-              example: ""
-            reissueArticle:
-              type: string
-              example: ""
-            reissueDate:
-              $ref: "#/components/schemas/Date"
-            reissueReference:
-              type: string
-              example: ""
-            otherStatusNote:
-              type: string
-              example: ""
-            documentStatusWorkNote:
-              type: string
-              example: ""
-            documentStatusDescription:
-              type: string
-              example: ""
-            documentStatusDate:
-              $ref: "#/components/schemas/Date"
-            documentStatusReference:
-              type: string
-              example: ""
-            documentStatusEntryIntoForceDate:
-              $ref: "#/components/schemas/Date"
-            documentStatusProof:
-              type: string
-              example: ""
-            documentTextProof:
-              type: string
-              example: ""
-            otherDocumentNote:
-              type: string
-              example: ""
-            ageIndicationStart:
-              type: string
-              example: ""
-            ageIndicationEnd:
-              type: string
-              example: ""
-            text:
-              type: string
-              example: ""
-            eli:
-              $ref: "#/components/schemas/ELI"
-            completeCitation:
-              type: string
-              example: ""
-            divergentDocumentNumber:
-              type: string
-              example: ""
-            digitalEvidenceLink:
-              type: string
-              example: ""
-            digitalEvidenceRelatedData:
-              type: string
-              example: ""
-            digitalEvidenceExternalDataNote:
-              type: string
-              example: ""
-            digitalEvidenceAppendix:
-              type: string
-              example: ""
-            ageOfMajorityIndication:
-              type: string
-              example: ""
-            divergentExpirationDate:
-              $ref: "#/components/schemas/Date"
-            divergentExpirationDateState:
-              type: string
-              example: ""
-            principleExpirationDate:
-              $ref: "#/components/schemas/Date"
-            isExpirationDateTemp:
-              type: boolean
-              example: false
-            principleExpirationDateState:
-              type: string
-              example: ""
-            expirationDateState:
-              type: string
-              example: ""
-            expirationNormCategory:
-              type: string
-              example: ""
-            divergentEntryIntoForceDate:
-              $ref: "#/components/schemas/Date"
-            principleEntryIntoForceDate:
-              $ref: "#/components/schemas/Date"
-            principleEntryIntoForceDateState:
-              type: string
-              example: ""
-            entryIntoForceDateState:
-              type: string
-              example: ""
-            entryIntoForceNormCategory:
-              type: string
-              example: ""
+        publicationDate:
+          $ref: "#/components/schemas/Date"
+        documentTypeName:
+          type: string
+          example: "RV"
+        documentNormCategory:
+          type: string
+          example: "XX"
+        documentTemplateName:
+          type: string
+          example: "Template"
+        subjectPreviousFna:
+          type: string
+          example: "FNA 703-11"
+        subjectBgb3:
+          type: string
+          example: "BGB III 234"
+        printAnnouncementNumber:
+          type: string
+          example: ""
+        printAnnouncementInfo:
+          type: string
+          example: ""
+        printAnnouncementExplanations:
+          type: string
+          example: ""
+        digitalAnnouncementMedium:
+          type: string
+          example: ""
+        digitalAnnouncementDate:
+          $ref: "#/components/schemas/Date"
+        digitalAnnouncementEdition:
+          type: string
+          example: ""
+        digitalAnnouncementYear:
+          type: string
+          example: ""
+        digitalAnnouncementPage:
+          type: string
+          example: ""
+        digitalAnnouncementArea:
+          type: string
+          example: ""
+        digitalAnnouncementAreaNumber:
+          type: string
+          example: ""
+        digitalAnnouncementInfo:
+          type: string
+          example: ""
+        digitalAnnouncementExplanations:
+          type: string
+          example: ""
+        euAnnouncementGazette:
+          type: string
+          example: ""
+        euAnnouncementYear:
+          type: string
+          example: ""
+        euAnnouncementSeries:
+          type: string
+          example: ""
+        euAnnouncementNumber:
+          type: string
+          example: ""
+        euAnnouncementPage:
+          type: string
+          example: ""
+        euAnnouncementInfo:
+          type: string
+          example: ""
+        euAnnouncementExplanations:
+          type: string
+          example: ""
+        otherOfficialAnnouncement:
+          type: string
+          example: ""
+        documentStatusReference:
+          type: string
+          example: ""
+        documentStatusEntryIntoForceDate:
+          $ref: "#/components/schemas/Date"
+        documentStatusProof:
+          type: string
+          example: ""
+        documentTextProof:
+          type: string
+          example: ""
+        otherDocumentNote:
+          type: string
+          example: ""
+        ageIndicationStart:
+          type: string
+          example: ""
+        ageIndicationEnd:
+          type: string
+          example: ""
+        eli:
+          $ref: "#/components/schemas/ELI"
+        completeCitation:
+          type: string
+          example: ""
+        divergentDocumentNumber:
+          type: string
+          example: ""
+        digitalEvidenceLink:
+          type: string
+          example: ""
+        digitalEvidenceRelatedData:
+          type: string
+          example: ""
+        digitalEvidenceExternalDataNote:
+          type: string
+          example: ""
+        digitalEvidenceAppendix:
+          type: string
+          example: ""
+        isExpirationDateTemp:
+          type: boolean
+          example: false
+        expirationDateState:
+          type: string
+          example: ""
+        entryIntoForceDateState:
+          type: string
+          example: ""
 
     LegalDocML:
       type: object

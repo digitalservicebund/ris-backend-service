@@ -20,9 +20,9 @@ export const documentStatus: InputField[] = [
   {
     name: "documentStatusDate",
     type: InputType.DATE,
-    label: "Datum des Änderungsvorschrift",
+    label: "Datum der Änderungsvorschrift",
     inputAttributes: {
-      ariaLabel: "Datum des Änderungsvorschrift",
+      ariaLabel: "Datum der Änderungsvorschrift",
       isFutureDate: true,
     },
   },

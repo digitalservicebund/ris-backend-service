@@ -58,10 +58,10 @@ class ArchitectureFitnessTest {
                             resideInAnyPackage(
                                 "reactor.core..",
                                 "org.springframework.stereotype..",
-                                "org.reactivestreams.."
-                            )
-                        )
-                )
+                                "org.reactivestreams..",
+                            ),
+                        ),
+                ),
             )
             .check(sourceClasses)
     }

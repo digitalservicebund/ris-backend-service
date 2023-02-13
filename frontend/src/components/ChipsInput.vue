@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onMounted } from "vue"
+import { ref } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { ValidationError } from "@/domain"
 
@@ -113,14 +113,6 @@ const setFocusedItemIndex = (index: number) => {
 const handleOnBlur = () => {
   currentInput.value = ""
 }
-
-onMounted(() => {
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-      e.preventDefault()
-    }
-  })
-})
 </script>
 
 <template>
@@ -196,14 +188,18 @@ onMounted(() => {
     align-items: center;
     border-radius: 10px;
     margin: 0 8px 8px 0;
+    word-break: break-word;
 
     .icon-wrapper {
       display: flex;
+      height: 100%;
+      align-items: center;
       padding: 4px 3px;
       border-radius: 0 10px 10px 0;
 
       em {
         cursor: pointer;
+        text-align: center;
       }
     }
 

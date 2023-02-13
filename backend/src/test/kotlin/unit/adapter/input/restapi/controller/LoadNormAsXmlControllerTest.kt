@@ -39,7 +39,7 @@ class LoadNormAsXmlControllerTest {
                         .isEqualTo("2022")
                     assertThat(it.printAnnouncementPage)
                         .isEqualTo("1125")
-                }
+                },
             )
         }
     }

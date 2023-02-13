@@ -77,3 +77,31 @@ export async function fillPreviousDecisionInputs(
   await fillInput("Datum Rechtszug", values?.date)
   await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
 }
+
+export async function deleteDocumentUnit(page: Page, documentNumber: string) {
+  await page.goto("/")
+  await expect(
+    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+  ).toBeVisible()
+  await page
+    .locator(".table-row", {
+      hasText: documentNumber,
+    })
+    .locator("[aria-label='Dokumentationseinheit löschen']")
+    .click()
+  await page.locator('button:has-text("Löschen")').click()
+  await expect(
+    page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+  ).toBeHidden()
+}
+
+export async function documentUnitExists(
+  page: Page,
+  documentNumber: string
+): Promise<boolean> {
+  return (
+    await (
+      await page.request.get(`/api/v1/caselaw/documentunits/${documentNumber}`)
+    ).text()
+  ).includes("uuid")
+}

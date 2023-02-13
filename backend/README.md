@@ -4,35 +4,61 @@
 [![Scan](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml)
 [![Secrets Check](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml)
 
-Java service built with
-the [Spring WebFlux reactive stack](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#spring-webflux).
-
-## Prerequisites
-
-Java 17, Docker for building + running the containerized application:
-
-```bash
-brew install openjdk@17
-brew install --cask docker # or just `brew install docker` if you don't want the Desktop app
-```
-
-For the provided Git hooks you will need:
-
-```bash
-brew install lefthook node talisman
-```
+Java service built with the [Spring WebFlux reactive stack](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#spring-webflux).
 
 ## Development
 
-### Gradle Secrets
+### Run Service
 
-The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your shell env:
+Requires the all but backend to be running in docker:
 
 ```bash
-eval "$(../run.sh gradle-env)"
+../run.sh dev --no-backend
 ```
 
-### Flyway
+**Start backend with IntelliJ:**
+
+- Use the checked in run config in `../.idea/runConfigurations/`. If you open just this `backend` folder with IntelliJ, you will need to copy and adjust it.
+
+**Start backend with VS Code:**
+
+- The launch config in `.vscode/launch.json` should be used automatically
+
+**Start backend from CLI**:
+
+```bash
+SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
+```
+
+**Note:** The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-env).
+
+### Lookup tables
+
+Some dropdown menus in the frontend get populated via calls to the backend that query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables. Furthermore, some e2e tests are testing this behaviour. Those will fail locally if your lookup tables are not populated.
+
+To import the XML files, follow these steps:
+
+- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml`, `sachneudata_gesamt.xml` (Link in the Engineering Onboarding WIki)
+- Start the application (see [root README](../README.md)), open it in your browser and log in
+- Copy the `SESSION` cookie value from the Browser Developer Tools --> Application Tab --> Cookies
+  (If you prefer using Postman, it also supports [importing cookies](https://github.com/digitalservicebund/ris-backend-service/commit/69684a3872ce9875484761fcb18f3367d0143bce#commitcomment-99597762) from your browser.)
+
+Fill these variables with your values:
+
+```bash
+export PATH_TO_XML_FILES="/path/to/xml/files"    # where you placed the xml files
+export SESSION_VALUE="your-session-cookie-value" # copied from Browser Developer Tools
+```
+
+Then do the requests with curl:
+
+```bash
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/doktyp.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/gerichtdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/buland.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland
+```
+
+### Database Setup & Migration with Flyway
 
 The application uses Flyway for maintaining and versioning database migrations. In order to create a change in the database, you should create a new sql file on the directory `src\main\resources\db\migration`.
 
@@ -40,33 +66,6 @@ The file should be named in the following format: `Vx.x__teamname_create_table_x
 The `teamname` can be replaced with: whether `caselaw` or `norms` and is normally followed by a descriptive name for the migration.
 
 Flyway automatically detects new files and run migrations accordingly on sprint boot start.
-
-The configuration is made to use `localhost` as a database host. However, if you're running from the container, you may need to use `db` instead to be recognized by the application (no need to take care of that as in the docker compose file profiles are defined and in those profiles the config is overwritten)
-
-#### Run Service
-
-Requires the Postgres database to be running: `docker-compose up db`
-
-```bash
-SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
-```
-
-If you use IntelliJ: the run configuration _Application_ should be created automatically. Add `local` to _Active profiles_.
-
-### Lookup tables
-
-Some dropdown menus in the frontend get populated via calls to the backend that query the respective database tables. If you are developing locally and want to see values in those dropdown menus you need to do this one-time step: trigger the import of XML files to these database tables. Furthermore, some e2e tests are testing this behaviour. Those will fail locally if your lookup tables are not populated.
-
-These are the endpoints and the respective XML files (find those in our wiki) that need to be uploaded to them:
-
-| Endpoint                                                                | XML file                 |
-| ----------------------------------------------------------------------- | ------------------------ |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/doktyp`       | `doktyp.xml`             |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/gerichtdata`  | `gerichtdata_gesamt.xml` |
-| `http://localhost:8080/api/v1/caselaw/lookuptableimporter/buland`       | `buland.xml`             |
-| `http://127.0.0.1:8080/api/v1/caselaw/lookuptableimporter/subjectField` | `sachneudata_gesamt.xml` |
-
-In all cases you need to do a `PUT` call: in _Postman_ go to _Body_, set it to _raw_, change from _Text_ to _XML_ on the blue dropdown to the right and paste the entire XML content in.
 
 ## Tests
 
@@ -96,15 +95,11 @@ running any integration tests.
 
 Denoting an integration test is accomplished by using a JUnit 5 tag annotation: `@Tag("integration")`.
 
-Furthermore, there is another type of test worth mentioning. We're
-using [ArchUnit](https://www.archunit.org/getting-started)
-for ensuring certain architectural characteristics, for instance making sure that there are no cyclic dependencies.
+Furthermore, there is another type of test worth mentioning. We're using [ArchUnit](https://www.archunit.org/getting-started) for ensuring certain architectural characteristics, for instance making sure that there are no cyclic dependencies.
 
-## Formatting
+## Formatting & Styleguide
 
-Java source code formatting must conform to the [Google Java Style](https://google.github.io/styleguide/javaguide.html).
-Consistent formatting, for Java as well as various other types of source code, is being enforced
-via [Spotless](https://github.com/diffplug/spotless).
+Check our [Java Styleguides](JAVA_STYLEGUIDES.md) document. To set up IntelliJ IDEA follow [these instructions](https://github.com/google/google-java-format#intellij-android-studio-and-other-jetbrains-ides). Consistent formatting, for Java as well as various other types of source code, is being enforced via [Spotless](https://github.com/diffplug/spotless).
 
 **Check formatting:**
 
@@ -129,8 +124,7 @@ token provided as `SONAR_TOKEN` repository secret that needs to be obtained from
 SONAR_TOKEN=[sonar-token] ./gradlew sonarqube
 ```
 
-Go to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service)
-for the analysis results.
+Go to [https://sonarcloud.io](https://sonarcloud.io/dashboard?id=digitalservicebund_ris-backend-service) for the analysis results.
 
 ## Container image
 
@@ -182,35 +176,13 @@ docker push "ghcr.io/digitalservicebund/ris-backend-service:$(git log -1 --forma
 
 **Note:** Make sure you're using a GitHub token with the necessary `write:packages` scope for this to work.
 
-## Deployment
-
-Changes in trunk are continuously deployed in the pipeline. After the staging deployment, the pipeline runs a verification step
-in form of journey tests against staging, to ensure we can safely proceed with deploying to production.
-
-Denoting a journey test is accomplished by using a JUnit 5 tag annotation: `@Tag("journey")`. Journey tests are excluded
-from unit and integration test sets.
-
-**To run the journey tests:**
-
-```bash
-STAGING_URL=[staging-url] ./gradlew journeyTest
-```
-
-When omitting the `STAGING_URL` env variable journey tests run against the local spring application.
-
 ## Vulnerability Scanning
 
 Scanning container images for vulnerabilities is performed with [Trivy](https://github.com/aquasecurity/trivy)
 as part of the pipeline's `build` job, as well as each night for the latest published image in the container
 repository.
 
-**To run a scan locally:**
-
-Install Trivy:
-
-```bash
-brew install aquasecurity/trivy/trivy
-```
+To run a scan locally:
 
 ```bash
 ./gradlew bootBuildImage

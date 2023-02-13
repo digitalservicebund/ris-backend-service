@@ -78,7 +78,7 @@ interface ImportNormUseCase {
         val principleEntryIntoForceDateState: UndefinedDate? = null,
         var entryIntoForceNormCategory: String? = null,
         val entryIntoForceDateState: UndefinedDate? = null,
-        val expirationDateState: UndefinedDate? = null
+        val expirationDateState: UndefinedDate? = null,
     ) {
         init {
             require(officialLongTitle.isNotBlank())
@@ -88,7 +88,7 @@ interface ImportNormUseCase {
     data class ArticleData(
         val title: String? = null,
         val marker: String,
-        val paragraphs: List<ParagraphData>
+        val paragraphs: List<ParagraphData>,
     ) {
         init {
             require(marker.isNotBlank())

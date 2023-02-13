@@ -11,6 +11,9 @@ management:
       probes:
         enabled: true
       show-details: always
+      group:
+        readiness:
+          include: readinessState,redis,db
   endpoints:
     web:
       exposure:
@@ -20,6 +23,7 @@ management:
       enabled: true
     readinessState:
       enabled: true
+
 otc:
   obs:
     endpoint: https://obs.eu-de.otc.t-systems.com
@@ -27,9 +31,14 @@ sentry:
   dsn: ${SENTRY_DSN:}
 server:
   shutdown: graceful
+  reactive:
+    session:
+      cookie:
+        max-age: 43200 # 12*60*60
+        http-only: false
 logging:
   level:
-    org.springframework: TRACE
+    org.springframework: DEBUG
 spring:
   codec:
     max-in-memory-size: 100MB

@@ -44,7 +44,7 @@ class NormTest {
                 officialAbbreviation = "ABC",
                 frameKeywords = "keywords",
                 unofficialLongTitle = "unofficial long title",
-                risAbbreviation = "ABC"
+                risAbbreviation = "ABC",
             )
 
         assertThat(norm.guid).isEqualTo(guid)
@@ -81,7 +81,7 @@ class NormTest {
                 categorizedReference = "categorized reference",
                 digitalEvidenceExternalDataNote = "digital evidence external data note",
                 ageIndicationStart = "age indication start",
-                text = "text"
+                text = "text",
             )
 
         assertThat(norm.guid).isEqualTo(guid)

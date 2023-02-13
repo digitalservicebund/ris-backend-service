@@ -35,7 +35,7 @@ open class PostgresTestcontainerIntegrationTest {
                 "r2dbc:postgresql://%s:%s/%s",
                 postgresql.host,
                 postgresql.getMappedPort(PostgreSQLContainer.POSTGRESQL_PORT),
-                postgresql.databaseName
+                postgresql.databaseName,
             )
 
             registry.add("spring.r2dbc.url") { r2dbcUrl }

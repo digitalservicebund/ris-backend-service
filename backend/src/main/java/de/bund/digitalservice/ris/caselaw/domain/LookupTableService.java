@@ -74,7 +74,9 @@ public class LookupTableService {
 
   private Court buildCort(CourtDTO courtDTO) {
     String revoked = extractRevoked(courtDTO.getAdditional());
-    if (courtDTO.getSuperiorcourt().equalsIgnoreCase("ja")
+    if (courtDTO.getSuperiorcourt() != null
+        && courtDTO.getForeigncountry() != null
+        && courtDTO.getSuperiorcourt().equalsIgnoreCase("ja")
         && courtDTO.getForeigncountry().equalsIgnoreCase("nein")) {
       return new Court(courtDTO.getCourttype(), null, courtDTO.getCourttype(), revoked);
     }

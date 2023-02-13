@@ -12,6 +12,6 @@ interface ListNormsUseCase {
     data class NormData(
         val guid: UUID,
         val officialLongTitle: String,
-        val eli: Eli
+        val eli: Eli,
     )
 }
