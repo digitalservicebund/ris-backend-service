@@ -84,38 +84,4 @@ class LookupTableControllerTest {
 
     verify(service, times(1)).getSubjectFieldChildren(null);
   }
-
-  @Test
-  void testGetSubjectFieldKeywords() {
-    long subjectFieldId = 123L;
-
-    when(service.getSubjectFieldKeywords(subjectFieldId)).thenReturn(Flux.empty());
-
-    webClient
-        .mutateWith(csrf())
-        .get()
-        .uri("/api/v1/caselaw/lookuptable/subjectFieldKeywords/" + subjectFieldId)
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getSubjectFieldKeywords(subjectFieldId);
-  }
-
-  @Test
-  void testGetSubjectFieldNorms() {
-    long subjectFieldId = 123L;
-
-    when(service.getSubjectFieldNorms(subjectFieldId)).thenReturn(Flux.empty());
-
-    webClient
-        .mutateWith(csrf())
-        .get()
-        .uri("/api/v1/caselaw/lookuptable/subjectFieldNorms/" + subjectFieldId)
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getSubjectFieldNorms(subjectFieldId);
-  }
 }

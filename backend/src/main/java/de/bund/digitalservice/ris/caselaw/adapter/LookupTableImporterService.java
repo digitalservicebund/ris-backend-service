@@ -230,7 +230,7 @@ public class LookupTableImporterService {
 
     List<JPASubjectFieldDTO> jpaSubjectFieldDTOs =
         subjectFieldsXml.getList().stream()
-            .map(SubjectFieldTransformer::transformToDTO)
+            .map(SubjectFieldTransformer::transformToJPADTO)
             .sorted(Comparator.comparing(JPASubjectFieldDTO::getSubjectFieldNumber))
             .toList();
 

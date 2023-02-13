@@ -9,5 +9,5 @@ public interface KeywordRepository extends R2dbcRepository<KeywordDTO, Long> {
 
   Flux<KeywordDTO> findAllByOrderBySubjectFieldIdAscValueAsc();
 
-  Flux<KeywordDTO> findAllBySubjectFieldIdOrderByValueAsc(long subjectFieldId);
+  Flux<KeywordDTO> findAllBySubjectFieldIdOrderByValueAsc(Long subjectFieldId);
 }

@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,9 @@ public class SubjectFieldDTO implements Persistable<Long> {
   String subjectFieldNumber;
   String subjectFieldText;
   String navigationTerm;
+  @Transient List<KeywordDTO> keywords;
+  @Transient List<NormDTO> norms;
+
   @Transient private boolean isNew;
 
   @Override

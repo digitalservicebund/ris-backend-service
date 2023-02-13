@@ -8,12 +8,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
@@ -90,118 +86,66 @@ class LookupTableServiceTest {
   }
 
   @Test
-  void testGetSubjectFields() {
-    SubjectFieldDTO subjectFieldDTO =
-        new SubjectFieldDTO(
+  void testGetSubjectFields_withoutSearchString() {
+    SubjectField expectedSubjectField =
+        new SubjectField(
             2L,
-            1L,
-            false,
-            "2022-12-22",
-            "2022-12-24",
-            'J',
-            "1.0",
             "TS-01-01",
             "stext 2",
             "navbez 2",
-            false);
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")));
 
     when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(null))
-        .thenReturn(Flux.just(subjectFieldDTO));
+        .thenReturn(Flux.just(expectedSubjectField));
 
     StepVerifier.create(service.getSubjectFields(Optional.empty()))
-        .consumeNextWith(
-            subjectField -> {
-              assertThat(subjectField).isInstanceOf(SubjectField.class);
-              assertThat(subjectField.id()).isEqualTo(subjectFieldDTO.getId());
-              assertThat(subjectField.subjectFieldNumber())
-                  .isEqualTo(subjectFieldDTO.getSubjectFieldNumber());
-              assertThat(subjectField.subjectFieldText())
-                  .isEqualTo(subjectFieldDTO.getSubjectFieldText());
-              assertThat(subjectField.navigationTerm())
-                  .isEqualTo(subjectFieldDTO.getNavigationTerm());
-            })
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
         .verifyComplete();
 
     verify(subjectFieldRepository).findAllByParentIdOrderBySubjectFieldNumberAsc(null);
   }
 
   @Test
-  void testGetSubjectFieldChildren() {
-    SubjectFieldDTO subjectFieldDTO =
-        new SubjectFieldDTO(
+  void testGetSubjectFields_withSearchString() {
+    String searchString = "stext";
+    SubjectField expectedSubjectField =
+        new SubjectField(
             2L,
-            1L,
-            false,
-            "2022-12-22",
-            "2022-12-24",
-            'J',
-            "1.0",
             "TS-01-01",
             "stext 2",
             "navbez 2",
-            false);
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")));
+
+    when(subjectFieldRepository.findBySearchStr(searchString))
+        .thenReturn(Flux.just(expectedSubjectField));
+
+    StepVerifier.create(service.getSubjectFields(Optional.of(searchString)))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
+        .verifyComplete();
+
+    verify(subjectFieldRepository).findBySearchStr(searchString);
+  }
+
+  @Test
+  void testGetSubjectFieldChildren() {
+    SubjectField expectedSubjectField =
+        new SubjectField(
+            2L,
+            "TS-01-01",
+            "stext 2",
+            "navbez 2",
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")));
 
     when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(1L))
-        .thenReturn(Flux.just(subjectFieldDTO));
+        .thenReturn(Flux.just(expectedSubjectField));
 
     StepVerifier.create(service.getSubjectFieldChildren(1L))
-        .consumeNextWith(
-            subjectField -> {
-              assertThat(subjectField).isInstanceOf(SubjectField.class);
-              assertThat(subjectField.id()).isEqualTo(subjectFieldDTO.getId());
-              assertThat(subjectField.subjectFieldNumber())
-                  .isEqualTo(subjectFieldDTO.getSubjectFieldNumber());
-              assertThat(subjectField.subjectFieldText())
-                  .isEqualTo(subjectFieldDTO.getSubjectFieldText());
-              assertThat(subjectField.navigationTerm())
-                  .isEqualTo(subjectFieldDTO.getNavigationTerm());
-            })
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
         .verifyComplete();
 
     verify(subjectFieldRepository).findAllByParentIdOrderBySubjectFieldNumberAsc(1L);
-  }
-
-  @Test
-  void testGetSubjectFieldKeywords() {
-    KeywordDTO keywordDTO = KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
-
-    when(keywordRepository.findAllBySubjectFieldIdOrderByValueAsc(2L))
-        .thenReturn(Flux.just(keywordDTO));
-
-    StepVerifier.create(service.getSubjectFieldKeywords(2L))
-        .consumeNextWith(
-            keyword -> {
-              assertThat(keyword).isInstanceOf(Keyword.class);
-              assertThat(keyword.value()).isEqualTo(keywordDTO.getValue());
-            })
-        .verifyComplete();
-
-    verify(keywordRepository).findAllBySubjectFieldIdOrderByValueAsc(2L);
-  }
-
-  @Test
-  void testGetSubjectFieldNorms() {
-    NormDTO normDTO =
-        NormDTO.builder()
-            .subjectFieldId(2L)
-            .abbreviation("normabk 2.1")
-            .singleNormDescription("§ 2.1")
-            .build();
-
-    when(normRepository.findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(2L))
-        .thenReturn(Flux.just(normDTO));
-
-    StepVerifier.create(service.getSubjectFieldNorms(2L))
-        .consumeNextWith(
-            norm -> {
-              assertThat(norm).isInstanceOf(Norm.class);
-              assertThat(norm.abbreviation()).isEqualTo(normDTO.getAbbreviation());
-              assertThat(norm.singleNormDescription())
-                  .isEqualTo(normDTO.getSingleNormDescription());
-            })
-        .verifyComplete();
-
-    verify(normRepository)
-        .findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(2L);
   }
 }

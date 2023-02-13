@@ -18,10 +18,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldRepository;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Set;
@@ -51,7 +51,7 @@ class LookupTableImporterServiceTest {
 
   @MockBean private StateRepository stateRepository;
 
-  @MockBean private SubjectFieldRepository subjectFieldRepository;
+  @MockBean private DatabaseSubjectFieldRepository subjectFieldRepository;
 
   @MockBean private JPASubjectFieldRepository jpaSubjectFieldRepository;
 

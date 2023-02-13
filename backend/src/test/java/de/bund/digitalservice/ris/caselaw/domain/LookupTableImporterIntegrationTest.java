@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
@@ -16,10 +17,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Nor
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Tag;
@@ -68,7 +69,7 @@ class LookupTableImporterIntegrationTest {
   @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
-  @Autowired private SubjectFieldRepository subjectFieldRepository;
+  @Autowired private DatabaseSubjectFieldRepository subjectFieldRepository;
   @Autowired private KeywordRepository keywordRepository;
   @Autowired private NormRepository normRepository;
 
@@ -195,6 +196,20 @@ class LookupTableImporterIntegrationTest {
 
   @Test
   void shouldImportSubjectFieldLookupTableCorrectly() {
+    NormDTO expectedNorm1 =
+        NormDTO.builder()
+            .subjectFieldId(2L)
+            .abbreviation("normabk 2.1")
+            .singleNormDescription("§ 2.1")
+            .build();
+    NormDTO expectedNorm2 =
+        NormDTO.builder().subjectFieldId(2L).abbreviation("normabk 2.2").build();
+
+    KeywordDTO expectedKeyword1 =
+        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
+    KeywordDTO expectedKeyword2 =
+        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
+
     SubjectFieldDTO expectedParent =
         SubjectFieldDTO.builder()
             .id(1L)
@@ -202,7 +217,7 @@ class LookupTableImporterIntegrationTest {
             .subjectFieldNumber("TS-01")
             .changeIndicator('N')
             .build();
-    // TODO clean Code: allArgs vs Builder
+
     SubjectFieldDTO expectedChild =
         new SubjectFieldDTO(
             2L,
@@ -215,19 +230,9 @@ class LookupTableImporterIntegrationTest {
             "TS-01-01",
             "stext 2",
             "navbez 2",
+            Arrays.asList(expectedKeyword1, expectedKeyword2),
+            Arrays.asList(expectedNorm1, expectedNorm2),
             false);
-    NormDTO expectedNorm1 =
-        NormDTO.builder()
-            .subjectFieldId(2L)
-            .abbreviation("normabk 2.1")
-            .singleNormDescription("§ 2.1")
-            .build();
-    NormDTO expectedNorm2 =
-        NormDTO.builder().subjectFieldId(2L).abbreviation("normabk 2.2").build();
-    KeywordDTO expectedKeyword1 =
-        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
-    KeywordDTO expectedKeyword2 =
-        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
 
     String subjectFieldXml =
         """
@@ -283,24 +288,14 @@ class LookupTableImporterIntegrationTest {
 
     SubjectFieldDTO parent = subjectFieldDTOs.get(0);
     SubjectFieldDTO child = subjectFieldDTOs.get(1);
-    KeywordDTO keyword1 = keywordDTOs.get(0);
-    KeywordDTO keyword2 = keywordDTOs.get(1);
-    NormDTO norm1 = normDTOs.get(0);
-    NormDTO norm2 = normDTOs.get(1);
+
+    child.setKeywords(keywordDTOs);
+    child.setNorms(normDTOs);
 
     assertThat(parent).usingRecursiveComparison().isEqualTo(expectedParent);
-    assertThat(child).usingRecursiveComparison().isEqualTo(expectedChild);
-
-    assertThat(keyword1)
+    assertThat(child)
         .usingRecursiveComparison()
-        .ignoringFields("id")
-        .isEqualTo(expectedKeyword1);
-    assertThat(keyword2)
-        .usingRecursiveComparison()
-        .ignoringFields("id")
-        .isEqualTo(expectedKeyword2);
-
-    assertThat(norm1).usingRecursiveComparison().ignoringFields("id").isEqualTo(expectedNorm1);
-    assertThat(norm2).usingRecursiveComparison().ignoringFields("id").isEqualTo(expectedNorm2);
+        .ignoringFields("norms.id", "keywords.id")
+        .isEqualTo(expectedChild);
   }
 }
