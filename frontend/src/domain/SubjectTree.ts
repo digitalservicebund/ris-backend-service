@@ -36,7 +36,7 @@ export type SubjectNode = {
   stext: string
   parent?: string
   children?: string[]
-  depth?: number
+  depth: number
   isExpanded: boolean
 }
 
