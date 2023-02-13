@@ -60,11 +60,11 @@ const buttonClasses = computed(() => ({
   }
 
   &:active {
-    @apply bg-blue-500 text-blue-800 border-0;
+    @apply bg-blue-500 text-blue-800 border-blue-500;
   }
 
   &:disabled {
-    @apply bg-gray-400 text-gray-600 border-0;
+    @apply bg-gray-400 text-gray-600 border-gray-400;
   }
 }
 
@@ -80,7 +80,11 @@ const buttonClasses = computed(() => ({
   }
 
   &:active {
-    @apply bg-yellow-400;
+    @apply bg-yellow-400 border-blue-800 border-2;
+  }
+
+  &:disabled {
+    @apply bg-gray-400 text-gray-600 border-gray-400;
   }
 }
 
