@@ -4,8 +4,13 @@ import SubjectNode from "@/components/SubjectNode.vue"
 import SubjectTree from "@/domain/SubjectTree"
 import SubjectsService from "@/services/subjectsService"
 
+const props = defineProps<{
+  selectedSubjects: Subject[]
+}>()
+
 const emit = defineEmits<{
   (event: "add-to-list", id: string): void
+  (event: "delete-from-list", id: string): void
 }>()
 
 const tree = ref<SubjectTree>()
@@ -22,8 +27,10 @@ function handleNodeClick(nodeId: string) {
   // console.log(toRaw(tree.value))
 }
 function handleAdd(nodeId: string) {
-  console.log("Added node " + nodeId) // TODO
   emit("add-to-list", nodeId)
+}
+function handleDelete(nodeId: string) {
+  emit("delete-from-list", nodeId)
 }
 
 onMounted(fetchTree)
@@ -35,7 +42,9 @@ onMounted(fetchTree)
     v-for="node in tree?.getOrderedNodes()"
     :key="node.id"
     :node="node"
+    :selected="props.selectedSubjects.some(({ id }) => id == node.id)"
     @node:add="handleAdd"
+    @node:delete="handleDelete"
     @node:toggle="handleNodeClick"
   />
 </template>

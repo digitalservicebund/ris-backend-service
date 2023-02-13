@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import TextButton from "./TextButton.vue"
 import { SubjectNode } from "@/domain/SubjectTree"
 
 interface Props {
   node: SubjectNode
+  selected: boolean
 }
 
 const props = defineProps<Props>()
@@ -11,6 +11,7 @@ const props = defineProps<Props>()
 const emits = defineEmits<{
   (e: "node:toggle", nodeId: string): void
   (e: "node:add", nodeId: string): void
+  (e: "node:delete", nodeId: string): void
 }>()
 </script>
 
@@ -28,16 +29,33 @@ const emits = defineEmits<{
         }}</span
       >
     </button>
+    <!--TODO toggle button visibility-->
+    <button
+      v-if="!selected"
+      class="align-middle pr-4 text-blue-800"
+      @click="$emit('node:add', node.id)"
+    >
+      <span
+        aria-label="Sachgebiet hinzufügen"
+        class="material-icons rounded-full w-icon"
+        >check_box_outline_blank</span
+      >
+    </button>
+    <button
+      v-if="selected"
+      class="align-middle pr-4 text-blue-800"
+      @click="$emit('node:delete', node.id)"
+    >
+      <span
+        aria-label="Sachgebiet entfernen"
+        class="material-icons rounded-full w-icon"
+        >check_box</span
+      >
+    </button>
     <span v-if="props.node.id !== 'root'" class="node-id pl-6">{{
       props.node.id
     }}</span>
     <span class="node-stext pl-6 text-blue-800">{{ props.node.stext }}</span>
-    <TextButton
-      aria-label="Übernehmen"
-      button-type="tertiary"
-      label="Übernehmen"
-      @click="$emit('node:add', node.id)"
-    ></TextButton>
   </div>
 </template>
 

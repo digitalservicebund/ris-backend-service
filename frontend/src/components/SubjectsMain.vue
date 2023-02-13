@@ -20,12 +20,20 @@ const selectedSubjects = ref<Subject[]>([
   },
 ])
 
-function handleRemoveFromList(index: number) {
-  selectedSubjects.value.splice(index, 1)
-}
+const getSubjectIndex = (subjParam: string) =>
+  selectedSubjects.value.findIndex(({ id }) => id == subjParam)
 
 function handleAddToList(id: string) {
-  selectedSubjects.value.push({ id, text: id })
+  if (getSubjectIndex(id) == -1)
+    selectedSubjects.value.push({ id: id, text: id })
+}
+
+function handleDeleteIdFromList(id: string) {
+  if (getSubjectIndex(id) != -1) handleRemoveFromList(getSubjectIndex(id))
+}
+
+function handleRemoveFromList(index: number) {
+  selectedSubjects.value.splice(index, 1)
 }
 </script>
 
@@ -40,7 +48,11 @@ function handleAddToList(id: string) {
         ></SubjectSelectionList>
       </div>
       <div class="bg-white flex-1 p-20">
-        <SubjectTree @add-to-list="handleAddToList($event)"></SubjectTree>
+        <SubjectTree
+          :selected-subjects="selectedSubjects"
+          @add-to-list="handleAddToList($event)"
+          @delete-from-list="handleDeleteIdFromList($event)"
+        ></SubjectTree>
       </div>
     </div>
   </div>
