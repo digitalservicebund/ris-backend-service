@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/domain"
 
@@ -20,9 +21,14 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
+dayjs.extend(customParseFormat)
 const dayValue = ref<string>()
 const monthValue = ref<string>()
 const yearValue = ref<string>()
+
+const ariaLabelDay = computed(() => props.ariaLabel + " Tag")
+const ariaLabelMonth = computed(() => props.ariaLabel + " Monat")
+const ariaLabelYear = computed(() => props.ariaLabel + " Jahr")
 
 const fullDate = computed(() =>
   yearValue.value && monthValue.value && dayValue.value ? true : false
@@ -32,20 +38,25 @@ const dateValue = computed(() =>
     ? yearValue.value + "-" + monthValue.value + "-" + dayValue.value
     : null
 )
-const ariaLabelDay = computed(() => props.ariaLabel + " Tag")
-const ariaLabelMonth = computed(() => props.ariaLabel + " Monat")
-const ariaLabelYear = computed(() => props.ariaLabel + " Jahr")
 
 const isInPast = computed(() => {
-  if (fullDate.value && dateValue.value) {
+  if (dateValue.value && isValidDate.value) {
+    console.log(dateValue.value)
     const date = new Date(dateValue.value)
     const today = new Date()
     return date < today
   } else return true
 })
 
+const isValidDate = computed(() => {
+  return dayjs(dateValue.value, "YYYY-MM-DD", true).isValid()
+})
+
 const hasError = computed(
-  () => props.validationError || (!isInPast.value && !props.isFutureDate)
+  () =>
+    props.validationError ||
+    (!isInPast.value && !props.isFutureDate) ||
+    !isValidDate.value
 )
 
 const conditionalClasses = computed(() => ({
@@ -82,15 +93,8 @@ function handleInput(event: Event) {
       }
     }
   }
-
-  if (fullDate.value && !isInPast.value && !props.isFutureDate) {
-    emit("update:validationError", {
-      defaultMessage:
-        "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
-      field: props.id,
-    })
-  } else emit("update:validationError", undefined)
 }
+
 function deleteDay() {
   dayValue.value = undefined
 }
@@ -106,6 +110,35 @@ function deleteYear() {
 function selectAll(event: Event) {
   ;(event.target as HTMLInputElement).select()
 }
+
+watch(
+  isValidDate,
+  () => {
+    if (hasError.value) {
+      emit("update:validationError", {
+        defaultMessage: "Kein valides Datum",
+        field: props.id,
+      })
+    } else {
+      emit("update:validationError", undefined)
+    }
+  },
+  { immediate: true }
+)
+
+watch(
+  isInPast,
+  () => {
+    if (!isInPast.value && !props.isFutureDate) {
+      emit("update:validationError", {
+        defaultMessage:
+          "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
+        field: props.id,
+      })
+    } else emit("update:validationError", undefined)
+  },
+  { immediate: true }
+)
 
 function handleOnBlur() {
   if (!hasError.value && dateValue.value) {
