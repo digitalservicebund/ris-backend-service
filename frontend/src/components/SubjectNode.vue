@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import TextButton from "./TextButton.vue"
 import { SubjectNode } from "@/domain/SubjectTree"
 
 interface Props {
@@ -9,6 +10,7 @@ const props = defineProps<Props>()
 
 const emits = defineEmits<{
   (e: "node:toggle", nodeId: string): void
+  (e: "node:add", nodeId: string): void
 }>()
 </script>
 
@@ -28,6 +30,12 @@ const emits = defineEmits<{
       props.node.id
     }}</span>
     <span class="node-stext pl-6 text-blue-800">{{ props.node.stext }}</span>
+    <TextButton
+      aria-label="Übernehmen"
+      button-type="tertiary"
+      label="Übernehmen"
+      @click="$emit('node:add', node.id)"
+    ></TextButton>
   </div>
 </template>
 

@@ -4,6 +4,10 @@ import SubjectNode from "@/components/SubjectNode.vue"
 import SubjectTree from "@/domain/SubjectTree"
 import SubjectsService from "@/services/subjectsService"
 
+const emit = defineEmits<{
+  (event: "add-to-list", id: string): void
+}>()
+
 const tree = ref<SubjectTree>()
 
 function fetchTree() {
@@ -16,6 +20,10 @@ function fetchTree() {
 function handleNodeClick(nodeId: string) {
   tree.value?.toggleNode(nodeId)
 }
+function handleAdd(nodeId: string) {
+  console.log("Added node " + nodeId) // TODO
+  emit("add-to-list", nodeId)
+}
 
 onMounted(fetchTree)
 </script>
@@ -26,6 +34,7 @@ onMounted(fetchTree)
     v-for="node in tree?.getOrderedNodes()"
     :key="node.id"
     :node="node"
+    @node:add="handleAdd"
     @node:toggle="handleNodeClick"
   />
 </template>

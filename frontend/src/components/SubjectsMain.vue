@@ -23,6 +23,10 @@ const selectedSubjects = ref<Subject[]>([
 function handleRemoveFromList(index: number) {
   selectedSubjects.value.splice(index, 1)
 }
+
+function handleAddToList(id: string) {
+  selectedSubjects.value.push({ id, text: id })
+}
 </script>
 
 <template>
@@ -36,7 +40,7 @@ function handleRemoveFromList(index: number) {
         ></SubjectSelectionList>
       </div>
       <div class="bg-white flex-1 p-20">
-        <SubjectTree></SubjectTree>
+        <SubjectTree @add-to-list="handleAddToList($event)"></SubjectTree>
       </div>
     </div>
   </div>
