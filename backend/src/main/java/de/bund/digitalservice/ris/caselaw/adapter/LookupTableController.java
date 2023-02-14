@@ -33,6 +33,7 @@ public class LookupTableController {
     return service.getCourts(searchStr);
   }
 
+  // TODO replace q variable with searchStr and but use q as parameter name
   @GetMapping(value = "subjectFields")
   public Flux<SubjectField> getSubjectFields(@RequestParam Optional<String> q) {
     return service.getSubjectFields(q);

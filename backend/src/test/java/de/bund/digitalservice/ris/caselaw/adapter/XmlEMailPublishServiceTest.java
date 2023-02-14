@@ -41,7 +41,7 @@ import reactor.test.StepVerifier;
 @Import({XmlEMailPublishService.class})
 @TestPropertySource(properties = "mail.exporter.senderAddress=export@neuris")
 class XmlEMailPublishServiceTest {
-  private static final String RECEIVER_ADDRESS = "test-to@mail.com"; // TODO
+  private static final String RECEIVER_ADDRESS = "test-to@mail.com";
   private static final String SENDER_ADDRESS = "export@neuris";
   private static final Instant PUBLISH_DATE = Instant.parse("2020-05-05T10:21:35.00Z");
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
