@@ -28,9 +28,11 @@ function handleSelectNode() {
       </button>
     </div>
     <div class="flex-1 flex-col pt-8">
-      <div class="label-02-reg text-blue-800">{{ props.subject.id }}</div>
+      <div class="label-02-reg text-blue-800">
+        {{ props.subject.subjectFieldNumber }}
+      </div>
       <div class="label-03-reg text-blue-800">
-        {{ props.subject.stext }}
+        {{ props.subject.subjectFieldText }}
       </div>
     </div>
     <div>

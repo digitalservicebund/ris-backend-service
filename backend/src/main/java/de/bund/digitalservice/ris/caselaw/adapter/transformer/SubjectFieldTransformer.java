@@ -41,6 +41,8 @@ public class SubjectFieldTransformer {
 
     return SubjectField.builder()
         .id(subjectFieldDTO.getId())
+        .depth(subjectFieldDTO.getDepthInTree())
+        .isLeaf(subjectFieldDTO.isLeafInTree())
         .subjectFieldNumber(subjectFieldDTO.getSubjectFieldNumber())
         .subjectFieldText(subjectFieldDTO.getSubjectFieldText())
         .navigationTerm(subjectFieldDTO.getNavigationTerm())

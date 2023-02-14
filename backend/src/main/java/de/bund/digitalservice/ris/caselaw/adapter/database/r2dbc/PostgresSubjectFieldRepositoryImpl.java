@@ -56,9 +56,19 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<SubjectField> findAllByParentIdOrderBySubjectFieldNumberAsc(Long id) {
+  public Flux<SubjectField> getTopLevelNodes() {
     return databaseSubjectFieldRepository
-        .findAllByParentIdOrderBySubjectFieldNumberAsc(id)
+        .findAllByParentIdOrderBySubjectFieldNumberAsc(null)
+        .flatMap(this::injectKeywords)
+        .flatMap(this::injectNorms)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Flux<SubjectField> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
+      String subjectFieldNumber) {
+    return databaseSubjectFieldRepository
+        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(subjectFieldNumber)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
         .map(SubjectFieldTransformer::transformToDomain);

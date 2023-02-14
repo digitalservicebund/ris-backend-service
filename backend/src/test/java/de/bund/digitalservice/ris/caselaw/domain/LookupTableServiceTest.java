@@ -87,33 +87,13 @@ class LookupTableServiceTest {
   }
 
   @Test
-  void testGetSubjectFields_withoutSearchString() {
-    SubjectField expectedSubjectField =
-        new SubjectField(
-            2L,
-            "TS-01-01",
-            "stext 2",
-            "navbez 2",
-            List.of(new Keyword("keyword")),
-            List.of(new Norm("abbr1", "description")),
-            new ArrayList<>());
-
-    when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(null))
-        .thenReturn(Flux.just(expectedSubjectField));
-
-    StepVerifier.create(service.getSubjectFields(Optional.empty()))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
-        .verifyComplete();
-
-    verify(subjectFieldRepository).findAllByParentIdOrderBySubjectFieldNumberAsc(null);
-  }
-
-  @Test
   void testGetSubjectFields_withSearchString() {
     String searchString = "stext";
     SubjectField expectedSubjectField =
         new SubjectField(
             2L,
+            3,
+            true,
             "TS-01-01",
             "stext 2",
             "navbez 2",
@@ -136,6 +116,8 @@ class LookupTableServiceTest {
     SubjectField expectedSubjectField =
         new SubjectField(
             2L,
+            3,
+            false,
             "TS-01-01",
             "stext 2",
             "navbez 2",
@@ -143,13 +125,15 @@ class LookupTableServiceTest {
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>());
 
-    when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(1L))
+    when(subjectFieldRepository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
+            "TS-01-01"))
         .thenReturn(Flux.just(expectedSubjectField));
 
-    StepVerifier.create(service.getSubjectFieldChildren(1L))
+    StepVerifier.create(service.getSubjectFieldChildren("TS-01-01"))
         .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
         .verifyComplete();
 
-    verify(subjectFieldRepository).findAllByParentIdOrderBySubjectFieldNumberAsc(1L);
+    verify(subjectFieldRepository)
+        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01");
   }
 }

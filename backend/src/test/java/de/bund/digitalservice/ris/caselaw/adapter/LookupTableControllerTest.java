@@ -72,16 +72,16 @@ class LookupTableControllerTest {
 
   @Test
   void testGetChildrenOfSubjectField() {
-    when(service.getSubjectFieldChildren(null)).thenReturn(Flux.empty());
+    when(service.getSubjectFieldChildren("root")).thenReturn(Flux.empty());
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/lookuptable/subjectFieldChildren")
+        .uri("/api/v1/caselaw/lookuptable/subjectFieldChildren/root")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getSubjectFieldChildren(null);
+    verify(service, times(1)).getSubjectFieldChildren("root");
   }
 }

@@ -19,29 +19,15 @@ function renderComponent(
 
 describe("SubjectTree", () => {
   const fetchSpy = vi
-    .spyOn(SubjectService, "getRootNode")
-    .mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: {
-          id: "root",
-          stext: "Alle Sachgebiete anzeigen",
-          depth: 0,
-          isExpanded: false,
-          isLeaf: false,
-        },
-      })
-    )
-
-  const fetchSpy2 = vi
     .spyOn(SubjectService, "getChildrenOf")
     .mockImplementation(() =>
       Promise.resolve({
         status: 200,
         data: [
           {
-            id: "branch",
-            stext: "Alle Sachgebiete",
+            subjectFieldNumber: "branch",
+            subjectFieldText: "Alle Sachgebiete",
+            children: [],
             depth: 1,
             isExpanded: false,
             isLeaf: true,
@@ -52,8 +38,7 @@ describe("SubjectTree", () => {
 
   it("Is closed", async () => {
     renderComponent()
-    expect(fetchSpy).toBeCalledTimes(1)
-    expect(fetchSpy2).toBeCalledTimes(0)
+    expect(fetchSpy).toBeCalledTimes(0)
     // expect(screen.queryByText("Alle Sachgebiete anzeigen")).toBeInTheDocument()
     // expect(screen.queryByText("TE-Subject")).not.toBeInTheDocument()
     // expect(screen.queryByText("TE-Subject-01")).not.toBeInTheDocument()

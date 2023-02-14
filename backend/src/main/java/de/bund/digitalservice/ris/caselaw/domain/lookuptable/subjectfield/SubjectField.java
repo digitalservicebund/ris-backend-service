@@ -6,6 +6,8 @@ import lombok.Builder;
 @Builder
 public record SubjectField(
     Long id,
+    Integer depth,
+    Boolean isLeaf,
     String subjectFieldNumber,
     String subjectFieldText,
     String navigationTerm,

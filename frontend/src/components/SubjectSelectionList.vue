@@ -26,7 +26,7 @@ function handleSelectNode(node: SubjectNode | undefined) {
   <div v-else>
     <SubjectSelectionListEntry
       v-for="(subject, index) in props.selectedSubjects"
-      :key="subject.id"
+      :key="subject.subjectFieldNumber"
       :subject="subject"
       @remove-from-list="handleRemoveFromList(index)"
       @select-node="handleSelectNode(subject)"

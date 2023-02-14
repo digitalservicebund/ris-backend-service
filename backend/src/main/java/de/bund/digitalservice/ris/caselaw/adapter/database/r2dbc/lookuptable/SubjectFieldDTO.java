@@ -18,6 +18,8 @@ import org.springframework.data.relational.core.mapping.Table;
 public class SubjectFieldDTO implements Persistable<Long> {
   public static final SubjectFieldDTO EMPTY = new SubjectFieldDTO();
   @Id Long id;
+  Integer depthInTree;
+  boolean isLeafInTree;
   Long parentId;
   boolean parent;
   String changeDateMail;

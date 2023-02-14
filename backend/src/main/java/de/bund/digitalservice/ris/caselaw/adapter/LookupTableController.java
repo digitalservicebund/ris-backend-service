@@ -41,10 +41,9 @@ public class LookupTableController {
     return service.getSubjectFields(q);
   }
 
-  @GetMapping(value = "subjectFieldChildren")
-  public Flux<SubjectField> getSubjectFieldChildren(
-      @RequestParam(required = false) Long subjectFieldId) { // TODO required vs Optional
-    return service.getSubjectFieldChildren(subjectFieldId);
+  @GetMapping(value = "subjectFieldChildren/{subjectFieldNumber}")
+  public Flux<SubjectField> getSubjectFieldChildren(@PathVariable String subjectFieldNumber) {
+    return service.getSubjectFieldChildren(subjectFieldNumber);
   }
 
   @GetMapping(value = "subjectFields/{subjectFieldNumber}/tree")

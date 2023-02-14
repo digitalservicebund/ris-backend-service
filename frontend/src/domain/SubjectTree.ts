@@ -23,22 +23,46 @@ export default class SubjectTree {
   }
 
   public toggleNode(node: SubjectNode) {
-    if (!node.isLeaf && !node.children) {
-      SubjectsService.getChildrenOf(node.id).then((response) => {
-        if (!response.data) return
-        node.children = response.data
-      })
+    if (!node.isLeaf && node.children.length === 0) {
+      SubjectsService.getChildrenOf(node.subjectFieldNumber).then(
+        (response) => {
+          if (!response.data) return
+          node.children = response.data
+        }
+      )
     }
     node.isExpanded = !node.isExpanded
+  }
+
+  private expandTraversal(node: SubjectNode) {
+    node.isExpanded = true
+    for (const child of node.children) {
+      this.expandTraversal(child)
+    }
+  }
+
+  public expandAll() {
+    this.expandTraversal(this.root)
   }
 }
 
 export type SubjectNode = {
-  id: string
-  stext: string
+  subjectFieldNumber: string
+  subjectFieldText: string
   // parent?: string
-  children?: SubjectNode[]
+  children: SubjectNode[]
   depth: number
   isExpanded: boolean
   isLeaf: boolean
+}
+
+export function buildRoot(children: SubjectNode[] = []): SubjectNode {
+  return {
+    subjectFieldNumber: "root",
+    subjectFieldText: "Alle Sachgebiete anzeigen",
+    children: children,
+    depth: 0,
+    isExpanded: false,
+    isLeaf: false,
+  }
 }

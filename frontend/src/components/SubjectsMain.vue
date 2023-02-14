@@ -8,10 +8,13 @@ const selectedSubjects = ref<SubjectNode[]>([])
 const selectedNode = ref<SubjectNode>()
 
 const getSubjectIndex = (subjParam: string) =>
-  selectedSubjects.value.findIndex(({ id }) => id == subjParam)
+  selectedSubjects.value.findIndex(
+    ({ subjectFieldNumber }) => subjectFieldNumber == subjParam
+  )
 
 function handleAddToList(node: SubjectNode) {
-  if (getSubjectIndex(node.id) == -1) selectedSubjects.value.push(node)
+  if (getSubjectIndex(node.subjectFieldNumber) == -1)
+    selectedSubjects.value.push(node)
 }
 
 function handleDeleteIdFromList(id: string) {

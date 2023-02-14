@@ -43,7 +43,7 @@ const emit = defineEmits<{
     <button
       v-if="selected"
       class="align-middle pr-4 text-blue-800"
-      @click="emit('node:delete', node.id)"
+      @click="emit('node:delete', node.subjectFieldNumber)"
     >
       <span
         aria-label="Sachgebiet entfernen"
@@ -51,19 +51,23 @@ const emit = defineEmits<{
         >check_box</span
       >
     </button>
-    <span v-if="props.node.id !== 'root'" class="node-id pl-6">{{
-      props.node.id
+    <span
+      v-if="props.node.subjectFieldNumber !== 'root'"
+      class="pl-6 subject-field-number"
+      >{{ props.node.subjectFieldNumber }}
+    </span>
+    <span class="pl-6 subject-field-text text-blue-800">{{
+      props.node.subjectFieldText
     }}</span>
-    <span class="node-stext pl-6 text-blue-800">{{ props.node.stext }}</span>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.node-id {
+.subject-field-number {
   font-size: 16px;
 }
 
-.node-stext {
+.subject-field-text {
   font-size: 14px;
 }
 </style>

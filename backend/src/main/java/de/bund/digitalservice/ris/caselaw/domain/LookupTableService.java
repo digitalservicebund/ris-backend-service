@@ -92,12 +92,15 @@ public class LookupTableService {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       return subjectFieldRepository.findBySearchStr(searchStr.get().trim());
     }
-    // TODO will this case actually get triggered?
-    return subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(null);
+    return Flux.empty();
   }
 
-  public Flux<SubjectField> getSubjectFieldChildren(Long id) {
-    return subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(id);
+  public Flux<SubjectField> getSubjectFieldChildren(String subjectFieldNumber) {
+    if (subjectFieldNumber.equalsIgnoreCase("root")) {
+      return subjectFieldRepository.getTopLevelNodes();
+    }
+    return subjectFieldRepository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
+        subjectFieldNumber);
   }
 
   public Mono<SubjectField> getTreeForSubjectFieldNumber(String subjectFieldId) {

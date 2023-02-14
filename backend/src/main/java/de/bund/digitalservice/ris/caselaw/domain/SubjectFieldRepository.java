@@ -7,7 +7,10 @@ import reactor.core.publisher.Mono;
 
 @NoRepositoryBean
 public interface SubjectFieldRepository {
-  Flux<SubjectField> findAllByParentIdOrderBySubjectFieldNumberAsc(Long id);
+  Flux<SubjectField> getTopLevelNodes();
+
+  Flux<SubjectField> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
+      String subjectFieldNumber);
 
   Flux<SubjectField> findBySearchStr(String searchStr);
 

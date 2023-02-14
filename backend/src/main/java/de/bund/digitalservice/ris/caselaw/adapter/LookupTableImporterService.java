@@ -235,7 +235,7 @@ public class LookupTableImporterService {
             .toList();
 
     setSubjectFieldParentIds(jpaSubjectFieldDTOs);
-    setSubjectFieldParent(jpaSubjectFieldDTOs);
+    setSubjectFieldParent(jpaSubjectFieldDTOs); // is the parent boolean necessary?
 
     jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
   }
@@ -247,6 +247,17 @@ public class LookupTableImporterService {
                 Collectors.toMap(JPASubjectFieldDTO::getSubjectFieldNumber, Function.identity()));
     jpaSubjectFieldDTOs.forEach(
         jpaSubjectFieldDTO -> {
+          // leaves
+          String thisSubjectFieldNumber = jpaSubjectFieldDTO.getSubjectFieldNumber();
+          jpaSubjectFieldDTO.setLeafInTree(
+              subjectFieldNumberToSubjectFieldDTO.keySet().stream()
+                  .noneMatch(
+                      otherSubjectFieldNumber ->
+                          otherSubjectFieldNumber.startsWith(thisSubjectFieldNumber)
+                              && !otherSubjectFieldNumber.equals(thisSubjectFieldNumber)));
+          // depth
+          jpaSubjectFieldDTO.setDepthInTree(
+              jpaSubjectFieldDTO.getSubjectFieldNumber().split("-").length);
           JPASubjectFieldDTO parentDTO =
               subjectFieldNumberToSubjectFieldDTO.get(
                   jpaSubjectFieldDTO.getSubjectFieldNumberOfParent());
