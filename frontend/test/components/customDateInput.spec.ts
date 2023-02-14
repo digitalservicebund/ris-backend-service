@@ -38,7 +38,7 @@ describe("CustomDateInput", () => {
     expect(year).toBeInTheDocument()
   })
 
-  it("renders an input with modelValue", async () => {
+  it("splits up modelvalue in 3 inputs", async () => {
     renderComponent({ ariaLabel: "Test", modelValue: "2022-02-03" })
     const day = screen.queryByLabelText("Test Tag") as HTMLInputElement
     const month = screen.queryByLabelText("Test Monat") as HTMLInputElement
@@ -103,6 +103,25 @@ describe("CustomDateInput", () => {
     ])
   })
 
+  it("deletes value on backspace delete", async () => {
+    const { emitted } = renderComponent({
+      ariaLabel: "Test",
+      modelValue: "2022-02-03",
+    })
+    const day = screen.queryByLabelText("Test Tag") as HTMLInputElement
+    const month = screen.queryByLabelText("Test Monat") as HTMLInputElement
+    const year = screen.queryByLabelText("Test Jahr") as HTMLInputElement
+    await userEvent.type(day, "{backspace}")
+    await userEvent.type(month, "{backspace}")
+    await userEvent.type(year, "{backspace}")
+    await nextTick()
+
+    expect(day).toHaveValue("")
+    expect(month).toHaveValue("")
+    expect(year).toHaveValue("")
+    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+  })
+
   it("does not allow dates in the future", async () => {
     const { emitted } = renderComponent({
       ariaLabel: "Testdatum",
@@ -130,5 +149,62 @@ describe("CustomDateInput", () => {
     expect(
       array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
     ).toBe("Das Testdatum darf nicht in der Zukunft liegen")
+  })
+
+  it("it allows dates in the future if flag is set", async () => {
+    const { props, emitted } = renderComponent({
+      ariaLabel: "Testdatum",
+      isFutureDate: true,
+    })
+    const day = screen.queryByLabelText("Testdatum Tag") as HTMLInputElement
+    const month = screen.queryByLabelText("Testdatum Monat") as HTMLInputElement
+    const year = screen.queryByLabelText("Testdatum Jahr") as HTMLInputElement
+
+    await userEvent.clear(day)
+    await userEvent.type(day, "04")
+    await userEvent.clear(month)
+    await userEvent.type(month, "04")
+    await userEvent.clear(year)
+    await userEvent.type(year, "2040")
+    await userEvent.tab()
+
+    await nextTick()
+
+    expect(props.validationError).toBe(undefined)
+    expect(day).toHaveValue("04")
+    expect(month).toHaveValue("04")
+    expect(year).toHaveValue("2040")
+    expect(emitted()["update:modelValue"]).toEqual([
+      ["2040-04-04T00:00:00.000Z"],
+    ])
+  })
+
+  it("does not allow invalid dates", async () => {
+    const { emitted } = renderComponent({
+      ariaLabel: "Testdatum",
+    })
+    const day = screen.queryByLabelText("Testdatum Tag") as HTMLInputElement
+    const month = screen.queryByLabelText("Testdatum Monat") as HTMLInputElement
+    const year = screen.queryByLabelText("Testdatum Jahr") as HTMLInputElement
+
+    await userEvent.clear(day)
+    await userEvent.type(day, "29")
+    await userEvent.clear(month)
+    await userEvent.type(month, "02")
+    await userEvent.clear(year)
+    await userEvent.type(year, "2021")
+    await userEvent.tab()
+
+    await nextTick()
+
+    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+
+    expect(emitted()["update:validationError"]).toBeTruthy()
+
+    const array = emitted()["update:validationError"] as ValidationError[][]
+
+    expect(
+      array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
+    ).toBe("Kein valides Datum")
   })
 })

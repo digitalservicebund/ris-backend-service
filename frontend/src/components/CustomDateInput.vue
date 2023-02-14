@@ -39,18 +39,21 @@ const dateValue = computed(() =>
     : null
 )
 
-const isInPast = computed(() => {
+const isInPast = ref(true)
+const isValidDate = ref(true)
+
+function checkValidDate() {
+  if (dateValue.value)
+    isValidDate.value = dayjs(dateValue.value, "YYYY-MM-DD", true).isValid()
+}
+
+function checkIsInPast() {
   if (dateValue.value && isValidDate.value) {
-    console.log(dateValue.value)
     const date = new Date(dateValue.value)
     const today = new Date()
-    return date < today
-  } else return true
-})
-
-const isValidDate = computed(() => {
-  return dayjs(dateValue.value, "YYYY-MM-DD", true).isValid()
-})
+    isInPast.value = date < today
+  } else isInPast.value = true
+}
 
 const hasError = computed(
   () =>
@@ -66,7 +69,7 @@ const conditionalClasses = computed(() => ({
 watch(
   props,
   () => {
-    if (props.modelValue) {
+    if (props.modelValue && !dateValue.value) {
       const formattedModelValue = dayjs(props.modelValue).format("YYYY-MM-DD")
       const splitDate = formattedModelValue.split("-")
       dayValue.value = splitDate[2]
@@ -80,7 +83,6 @@ watch(
 )
 
 function handleInput(event: Event) {
-  //check for allowed length of value
   const target = event.target as HTMLInputElement
   if (target.value.length >= target.maxLength) {
     if (!target) return
@@ -141,6 +143,8 @@ watch(
 )
 
 function handleOnBlur() {
+  checkValidDate()
+  checkIsInPast()
   if (!hasError.value && dateValue.value) {
     emit("update:modelValue", dayjs(dateValue.value).toISOString())
   }
@@ -180,6 +184,8 @@ function handleOnBlur() {
       class="focus:outline-none w-20"
       maxLength="2"
       minLength="2"
+      name="month"
+      pattern="[0-9]*"
       placeholder="MM"
       type="text"
       @blur="handleOnBlur"
@@ -193,6 +199,8 @@ function handleOnBlur() {
       :aria-label="ariaLabelYear"
       class="focus:outline-none w-40"
       maxLength="4"
+      minLength="0"
+      pattern="[0-9]*"
       placeholder="JJJJ"
       type="text"
       @blur="handleOnBlur"
