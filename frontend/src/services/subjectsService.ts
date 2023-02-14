@@ -36,6 +36,9 @@ const service: SubjectsService = {
       case "02-01":
         children = ["02-02", "02-03"]
         break
+      case "02-03":
+        children = ["03-01"]
+        break
     }
     const response = {
       status: 200,

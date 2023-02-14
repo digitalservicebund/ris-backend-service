@@ -40,6 +40,13 @@
       "stext": "Mitwirkungspflichten der Beteiligten 2",
       "depth": 2,
       "isExpanded": false,
+      "isLeaf": false
+    },
+    {
+      "id": "03-01",
+      "stext": "Mitwirkungspflichten der Beteiligten 3",
+      "depth": 3,
+      "isExpanded": false,
       "isLeaf": true
     }
   ]

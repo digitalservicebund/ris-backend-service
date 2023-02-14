@@ -1,17 +1,10 @@
 import SubjectsService from "@/services/subjectsService"
 
-interface NodesMap {
-  [key: string]: SubjectNode
-}
-
 export default class SubjectTree {
   public root: SubjectNode
-  public nodes: NodesMap
 
   constructor(root: SubjectNode) {
-    this.nodes = {}
-    this.nodes["root"] = root
-    this.root = this.nodes["root"]
+    this.root = root
   }
 
   // Depth-first search (recursion) fits exactly to the tree structure we want to display
@@ -34,7 +27,6 @@ export default class SubjectTree {
       SubjectsService.getChildrenOf(node.id).then((response) => {
         if (!response.data) return
         node.children = response.data
-        node.children.forEach((node) => (this.nodes[node.id] = node))
       })
     }
     node.isExpanded = !node.isExpanded

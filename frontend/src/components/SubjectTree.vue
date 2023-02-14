@@ -42,7 +42,7 @@ onMounted(fetchTree)
     v-for="node in tree?.getOrderedNodes()"
     :key="node.id"
     :node="node"
-    :selected="props.selectedSubjects.some(({ id }) => id == node.id)"
+    :selected="props.selectedSubjects.some(({ id }) => id === node.id)"
     @node:add="handleAdd"
     @node:delete="handleDelete"
     @node:toggle="handleNodeClick"
