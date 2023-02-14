@@ -16,7 +16,10 @@ const emit = defineEmits<{
 </script>
 
 <template>
-  <div :style="{ 'padding-left': `${props.node.depth * 40}px` }">
+  <div
+    class="node-row"
+    :style="{ 'padding-left': `${props.node.depth * 40}px` }"
+  >
     <span v-if="props.node.isLeaf" class="pl-28"></span>
     <button
       v-else
@@ -51,18 +54,24 @@ const emit = defineEmits<{
         >check_box</span
       >
     </button>
-    <span
+    <div
       v-if="props.node.subjectFieldNumber !== 'root'"
       class="pl-6 subject-field-number"
-      >{{ props.node.subjectFieldNumber }}
-    </span>
-    <span class="pl-6 subject-field-text text-blue-800">{{
-      props.node.subjectFieldText
-    }}</span>
+    >
+      {{ props.node.subjectFieldNumber }}
+    </div>
+    <div class="pl-6 pt-2 subject-field-text text-blue-800">
+      {{ props.node.subjectFieldText }}
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.node-row {
+  display: flex;
+  align-items: flex-start;
+}
+
 .subject-field-number {
   font-size: 16px;
 }
