@@ -17,16 +17,16 @@ const emit = defineEmits<{
 
 <template>
   <div :style="{ 'padding-left': `${props.node.depth * 40}px` }">
+    <span v-if="props.node.isLeaf" class="pl-28"></span>
     <button
+      v-else
       class="align-middle pr-4 text-blue-800"
       @click="emit('node:toggle', node)"
     >
       <span
         aria-label="Sachgebietsbaum aufklappen"
         class="bg-blue-200 material-icons rounded-full w-icon"
-        >{{
-          props.node.isLeaf ? "eco" : props.node.isExpanded ? "remove" : "add"
-        }}</span
+        >{{ props.node.isExpanded ? "remove" : "add" }}</span
       >
     </button>
     <button
