@@ -12,7 +12,7 @@ function handleRemoveFromList() {
 }
 
 function handleSelectNode() {
-  console.log("list entry: select node")
+  // console.log("list entry: select node")
   emit("select-node")
 }
 </script>

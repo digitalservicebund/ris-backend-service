@@ -19,7 +19,7 @@ const tree = ref<SubjectTree>()
 watch(
   () => props.selectedNode,
   () => {
-    console.log("change in selected node")
+    // console.log("change in selected node")
     fetchTree()
   }
 )
@@ -33,7 +33,7 @@ function fetchTree() {
       tree.value.root.children = []
       SubjectsService.getTreeForSubjectFieldNumber(props.selectedNode.id).then(
         (response) => {
-          console.log("loaded tree", response.data)
+          // console.log("loaded tree", response.data)
           if (!response.data || !tree.value) return
 
           expandAllChilds(response.data, 1)
@@ -47,7 +47,7 @@ function fetchTree() {
 }
 
 function expandAllChilds(node: SubjectNode, depth: number) {
-  console.log("expand", node.id)
+  // console.log("expand", node.id)
   // node.id = node.subjectFieldNumber
   // node.stext = node.subjectFieldText
   node.depth = depth

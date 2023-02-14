@@ -23,7 +23,7 @@ function handleRemoveFromList(index: number) {
 }
 
 function handleSelectNode(node: SubjectNode | undefined) {
-  console.log("main: select node:", node)
+  // console.log("main: select node:", node)
   selectedNode.value = node
 }
 </script>

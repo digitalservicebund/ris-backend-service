@@ -15,7 +15,7 @@ function handleRemoveFromList(index: number) {
 }
 
 function handleSelectNode(node: SubjectNode | undefined) {
-  console.log("list: select node: ", node)
+  // console.log("list: select node: ", node)
   emit("select-node", node)
 }
 </script>
