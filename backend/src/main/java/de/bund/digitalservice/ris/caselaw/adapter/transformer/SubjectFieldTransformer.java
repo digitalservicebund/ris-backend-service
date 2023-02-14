@@ -9,26 +9,36 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.NormXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectFieldXml;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class SubjectFieldTransformer {
+  private SubjectFieldTransformer() {}
 
   public static SubjectField transformToDomain(SubjectFieldDTO subjectFieldDTO) {
-    List<Keyword> keywords =
-        subjectFieldDTO.getKeywords().stream()
-            .map(keywordDTO -> Keyword.builder().value(keywordDTO.getValue()).build())
-            .toList();
-    List<Norm> norms =
-        subjectFieldDTO.getNorms().stream()
-            .map(
-                normDTO ->
-                    Norm.builder()
-                        .abbreviation(normDTO.getAbbreviation())
-                        .singleNormDescription(normDTO.getSingleNormDescription())
-                        .build())
-            .toList();
+    List<Keyword> keywords = null;
+    if (subjectFieldDTO.getKeywords() != null) {
+      keywords =
+          subjectFieldDTO.getKeywords().stream()
+              .map(keywordDTO -> Keyword.builder().value(keywordDTO.getValue()).build())
+              .toList();
+    }
+
+    List<Norm> norms = null;
+    if (subjectFieldDTO.getNorms() != null) {
+      norms =
+          subjectFieldDTO.getNorms().stream()
+              .map(
+                  normDTO ->
+                      Norm.builder()
+                          .abbreviation(normDTO.getAbbreviation())
+                          .singleNormDescription(normDTO.getSingleNormDescription())
+                          .build())
+              .toList();
+    }
+
     return SubjectField.builder()
         .id(subjectFieldDTO.getId())
         .subjectFieldNumber(subjectFieldDTO.getSubjectFieldNumber())
@@ -36,6 +46,7 @@ public class SubjectFieldTransformer {
         .navigationTerm(subjectFieldDTO.getNavigationTerm())
         .keywords(keywords)
         .norms(norms)
+        .children(new ArrayList<>())
         .build();
   }
 

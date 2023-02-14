@@ -5,6 +5,7 @@ import SubjectTree from "./SubjectTree.vue"
 import { SubjectNode } from "@/domain/SubjectTree"
 
 const selectedSubjects = ref<SubjectNode[]>([])
+const selectedNode = ref<SubjectNode>()
 
 const getSubjectIndex = (subjParam: string) =>
   selectedSubjects.value.findIndex(({ id }) => id == subjParam)
@@ -20,6 +21,11 @@ function handleDeleteIdFromList(id: string) {
 function handleRemoveFromList(index: number) {
   selectedSubjects.value.splice(index, 1)
 }
+
+function handleSelectNode(node: SubjectNode | undefined) {
+  console.log("main: select node:", node)
+  selectedNode.value = node
+}
 </script>
 
 <template>
@@ -30,10 +36,12 @@ function handleRemoveFromList(index: number) {
         <SubjectSelectionList
           :selected-subjects="selectedSubjects"
           @remove-from-list="handleRemoveFromList($event)"
+          @select-node="handleSelectNode($event)"
         ></SubjectSelectionList>
       </div>
       <div class="bg-white flex-1 p-20">
         <SubjectTree
+          :selected-node="selectedNode"
           :selected-subjects="selectedSubjects"
           @add-to-list="handleAddToList($event)"
           @delete-from-list="handleDeleteIdFromList($event)"

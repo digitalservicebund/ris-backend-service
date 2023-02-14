@@ -1,4 +1,4 @@
-import { ServiceResponse } from "./httpClient"
+import httpClient, { ServiceResponse } from "./httpClient"
 import mockSubjectNodes from "@/data/mockSubjectNodes.json"
 import { SubjectNode } from "@/domain/SubjectTree"
 
@@ -6,6 +6,9 @@ interface SubjectsService {
   // getAllNodes(): Promise<ServiceResponse<SubjectNode[]>>
   getRootNode(): Promise<ServiceResponse<SubjectNode>>
   getChildrenOf(nodeId: string): Promise<ServiceResponse<SubjectNode[]>>
+  getTreeForSubjectFieldNumber(
+    nodeId: string
+  ): Promise<ServiceResponse<SubjectNode>>
 }
 
 const service: SubjectsService = {
@@ -34,7 +37,7 @@ const service: SubjectsService = {
         children = ["01-02"]
         break
       case "02-01":
-        children = ["02-02", "02-03"]
+        children = ["ST-02-02", "02-03"]
         break
       case "02-03":
         children = ["03-01"]
@@ -46,6 +49,20 @@ const service: SubjectsService = {
         (childId) =>
           mockSubjectNodes.items.filter((node) => node.id === childId)[0]
       ),
+    }
+    return response
+  },
+  async getTreeForSubjectFieldNumber(nodeId: string) {
+    const response = await httpClient.get<SubjectNode>(
+      `caselaw/lookuptable/subjectFields/${nodeId}/tree`
+    )
+    if (response.data) {
+      console.log("service - load tree:", response.data)
+    }
+    if (response.status >= 300) {
+      response.error = {
+        title: "Ausgewähltes Sachgebiet konnten nicht geladen werden.",
+      }
     }
     return response
   },

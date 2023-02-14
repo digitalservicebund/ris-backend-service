@@ -7,10 +7,12 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Subjec
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("api/v1/caselaw/lookuptable")
@@ -43,5 +45,10 @@ public class LookupTableController {
   public Flux<SubjectField> getSubjectFieldChildren(
       @RequestParam(required = false) Long subjectFieldId) { // TODO required vs Optional
     return service.getSubjectFieldChildren(subjectFieldId);
+  }
+
+  @GetMapping(value = "subjectFields/{subjectFieldNumber}/tree")
+  public Mono<SubjectField> getTreeForSubjectField(@PathVariable String subjectFieldNumber) {
+    return service.getTreeForSubjectFieldNumber(subjectFieldNumber);
   }
 }

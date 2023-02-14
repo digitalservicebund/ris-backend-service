@@ -28,6 +28,34 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
+  public Mono<SubjectField> findById(Long id) {
+    return databaseSubjectFieldRepository
+        .findById(id)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Mono<SubjectField> findBySubjectFieldNumber(String subjectFieldNumber) {
+    return databaseSubjectFieldRepository
+        .findBySubjectFieldNumber(subjectFieldNumber)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Mono<SubjectField> findParentByChild(SubjectField child) {
+    return databaseSubjectFieldRepository
+        .findBySubjectFieldNumber(child.subjectFieldNumber())
+        .flatMap(
+            childDTO -> {
+              if (childDTO.getParentId() != null) {
+                return databaseSubjectFieldRepository.findById(childDTO.getParentId());
+              }
+              return Mono.just(childDTO);
+            })
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
   public Flux<SubjectField> findAllByParentIdOrderBySubjectFieldNumberAsc(Long id) {
     return databaseSubjectFieldRepository
         .findAllByParentIdOrderBySubjectFieldNumberAsc(id)

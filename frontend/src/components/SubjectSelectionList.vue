@@ -7,10 +7,16 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   (event: "remove-from-list", index: number): void
+  (event: "select-node", node: SubjectNode | undefined): void
 }>()
 
 function handleRemoveFromList(index: number) {
   emit("remove-from-list", index)
+}
+
+function handleSelectNode(node: SubjectNode | undefined) {
+  console.log("list: select node: ", node)
+  emit("select-node", node)
 }
 </script>
 
@@ -23,6 +29,7 @@ function handleRemoveFromList(index: number) {
       :key="subject.id"
       :subject="subject"
       @remove-from-list="handleRemoveFromList(index)"
+      @select-node="handleSelectNode(subject)"
     />
   </div>
 </template>

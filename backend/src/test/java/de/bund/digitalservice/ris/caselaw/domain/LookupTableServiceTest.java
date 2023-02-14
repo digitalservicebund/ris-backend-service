@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -94,7 +95,8 @@ class LookupTableServiceTest {
             "stext 2",
             "navbez 2",
             List.of(new Keyword("keyword")),
-            List.of(new Norm("abbr1", "description")));
+            List.of(new Norm("abbr1", "description")),
+            new ArrayList<>());
 
     when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(null))
         .thenReturn(Flux.just(expectedSubjectField));
@@ -116,7 +118,8 @@ class LookupTableServiceTest {
             "stext 2",
             "navbez 2",
             List.of(new Keyword("keyword")),
-            List.of(new Norm("abbr1", "description")));
+            List.of(new Norm("abbr1", "description")),
+            new ArrayList<>());
 
     when(subjectFieldRepository.findBySearchStr(searchString))
         .thenReturn(Flux.just(expectedSubjectField));
@@ -137,7 +140,8 @@ class LookupTableServiceTest {
             "stext 2",
             "navbez 2",
             List.of(new Keyword("keyword")),
-            List.of(new Norm("abbr1", "description")));
+            List.of(new Norm("abbr1", "description")),
+            new ArrayList<>());
 
     when(subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(1L))
         .thenReturn(Flux.just(expectedSubjectField));

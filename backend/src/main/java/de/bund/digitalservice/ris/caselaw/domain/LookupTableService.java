@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -97,5 +98,25 @@ public class LookupTableService {
 
   public Flux<SubjectField> getSubjectFieldChildren(Long id) {
     return subjectFieldRepository.findAllByParentIdOrderBySubjectFieldNumberAsc(id);
+  }
+
+  public Mono<SubjectField> getTreeForSubjectFieldNumber(String subjectFieldId) {
+    return subjectFieldRepository
+        .findBySubjectFieldNumber(subjectFieldId)
+        .flatMap(this::findParent);
+  }
+
+  private Mono<SubjectField> findParent(SubjectField child) {
+
+    return subjectFieldRepository
+        .findParentByChild(child)
+        .flatMap(
+            parent -> {
+              if (child.subjectFieldNumber().equals(parent.subjectFieldNumber())) {
+                return Mono.just(child);
+              }
+              parent.children().add(child);
+              return findParent(parent);
+            });
   }
 }

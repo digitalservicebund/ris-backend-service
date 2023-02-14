@@ -10,4 +10,5 @@ public record SubjectField(
     String subjectFieldText,
     String navigationTerm,
     List<Keyword> keywords,
-    List<Norm> norms) {}
+    List<Norm> norms,
+    List<SubjectField> children) {}
