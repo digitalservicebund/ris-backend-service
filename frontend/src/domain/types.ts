@@ -11,6 +11,7 @@ export enum InputType {
   DATECHIPS = "datechips",
   NESTED = "nested",
   COMBOBOX = "combobox",
+  CUSTOMDATE = "customdate",
 }
 
 //BASE

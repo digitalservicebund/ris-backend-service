@@ -3,7 +3,6 @@ import { ref } from "vue"
 import CheckboxInput from "@/components/CheckboxInput.vue"
 import ChipsDateInput from "@/components/ChipsDateInput.vue"
 import ChipsInput from "@/components/ChipsInput.vue"
-import DateInput from "@/components/DateInput.vue"
 import Dropdown from "@/components/DropdownInput.vue"
 import InputElement from "@/components/InputElement.vue"
 import InputField, { LabelPosition } from "@/components/InputField.vue"
@@ -11,7 +10,6 @@ import NestedInput from "@/components/NestedInput.vue"
 import TextInput from "@/components/TextInput.vue"
 import {
   defineDateField,
-  DateInputModelType,
   ValidationError,
   NestedInputAttributes,
   BaseInputAttributes,
@@ -19,7 +17,6 @@ import {
 } from "@/domain"
 import type { ChipsInputModelType } from "@/domain/types"
 
-const dateModelValue = ref<DateInputModelType>()
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])
 const mockValidationError: ValidationError = {
@@ -47,6 +44,10 @@ const dropdownItems = [
 const checkboxInputAttributes: BaseInputAttributes = {
   ariaLabel: "test",
   labelPosition: LabelPosition.RIGHT,
+}
+
+const dateInputAttributes: BaseInputAttributes = {
+  ariaLabel: "Testdatum",
 }
 </script>
 
@@ -99,12 +100,23 @@ const checkboxInputAttributes: BaseInputAttributes = {
     />
 
     <h1 class="font-bold text-24">Date Input</h1>
-    <DateInput
-      id="dateInput"
-      aria-label="date input"
-      :model-value="dateModelValue"
-      :value="dateModelValue"
-    ></DateInput>
+    <InputField id="customDateInputField">
+      <InputElement
+        id="dateInput"
+        :attributes="dateInputAttributes"
+        :type="InputType.DATE"
+      />
+    </InputField>
+
+    <h1 class="font-bold text-24">Custom Date Input</h1>
+    <InputField id="customDateInputField">
+      <InputElement
+        id="customDateInput"
+        :attributes="dateInputAttributes"
+        :type="InputType.CUSTOMDATE"
+      />
+    </InputField>
+
     <h1 class="font-bold text-24">Chips Input</h1>
     <ChipsInput
       id="ChipsInput"
