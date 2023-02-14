@@ -60,8 +60,8 @@ _init() {
 _start() {
   cd ./backend/
   gradle --stop
-  gradle compileJava --continuous --quiet &
-  gradle bootRun
+  gradle compileJava --build-cache --quiet
+  gradle bootRun --build-cache
 }
 
 _env() {

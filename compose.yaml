@@ -18,6 +18,7 @@ services:
       - localhost:host-gateway
     volumes:
       - ./:/app
+      - gradle-cache:/root/.gradle/caches
     working_dir: /app
     environment:
       - SPRING_PROFILES_ACTIVE=local,compose
@@ -78,3 +79,4 @@ services:
 
 volumes:
   db-data:
+  gradle-cache:
