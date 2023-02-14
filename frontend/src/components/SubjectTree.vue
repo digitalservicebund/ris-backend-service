@@ -48,8 +48,8 @@ function fetchTree() {
 
 function expandAllChilds(node: SubjectNode, depth: number) {
   console.log("expand", node.id)
-  node.id = node.subjectFieldNumber
-  node.stext = node.subjectFieldText
+  // node.id = node.subjectFieldNumber
+  // node.stext = node.subjectFieldText
   node.depth = depth
   node.isExpanded = true
   node.children?.forEach((child) => {
