@@ -2,30 +2,25 @@
 import { ref } from "vue"
 import FileInput from "@/components/FileInput.vue"
 import InfoModal from "@/components/InfoModal.vue"
-import { ResponseError } from "@/services/httpClient"
 
-const props = defineProps<{ error?: ResponseError }>()
-const emits = defineEmits<{
-  (e: "file-selected", file: File): void
+const props = defineProps<{
+  error?: { title: string; description: string }
+  isLoading?: boolean
 }>()
-
-enum UploadStatus {
-  UNKNOWN,
-  UPLOADING,
-}
+const emits = defineEmits<{
+  (e: "fileSelected", file: File): void
+}>()
 
 interface Status {
   file: File | null
   inDrag: boolean
   inDragError: string
-  uploadStatus: UploadStatus
 }
 
 const emptyStatus: Status = {
   file: null,
   inDrag: false,
   inDragError: "",
-  uploadStatus: UploadStatus.UNKNOWN,
 }
 
 const status = ref(emptyStatus)
@@ -47,7 +42,7 @@ function drop(e: DragEvent) {
   e.preventDefault()
   reset()
   if (e.dataTransfer) {
-    emits("file-selected", e.dataTransfer.files[0])
+    emits("fileSelected", e.dataTransfer.files[0])
   }
 }
 
@@ -56,7 +51,7 @@ function onFileSelect(event: Event) {
 
   if (files) {
     reset()
-    emits("file-selected", files[0])
+    emits("fileSelected", files[0])
   }
 }
 </script>
@@ -72,7 +67,7 @@ function onFileSelect(event: Event) {
     @dragover="dragover"
     @drop="drop"
   >
-    <span v-if="status.uploadStatus === UploadStatus.UPLOADING">
+    <span v-if="isLoading">
       <span class="material-icons text-72 text-blue-800"> refresh </span>
       <div class="heading-03-regular mt-[0.5rem]">Upload läuft</div>
       <div>{{ status.file ? status.file.name : "" }}</div>

@@ -13,6 +13,7 @@ const emit = defineEmits<{
   (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit): void
 }>()
 const error = ref<ResponseError>()
+const isUploading = ref(false)
 
 async function handleDeleteFile() {
   if ((await fileService.delete(props.documentUnit.uuid)).status < 300) {
@@ -28,11 +29,17 @@ async function handleDeleteFile() {
 }
 
 async function upload(file: File) {
-  const response = await fileService.upload(props.documentUnit.uuid, file)
-  if (response.status === 201 && response.data) {
-    emit("updateDocumentUnit", response.data)
-  } else {
-    error.value = response.error
+  isUploading.value = true
+
+  try {
+    const response = await fileService.upload(props.documentUnit.uuid, file)
+    if (response.status === 201 && response.data) {
+      emit("updateDocumentUnit", response.data)
+    } else {
+      error.value = response.error
+    }
+  } finally {
+    isUploading.value = false
   }
 }
 </script>
@@ -57,7 +64,11 @@ async function upload(file: File) {
           Originaldokumentes aus
         </div>
 
-        <FileUpload :error="error" @file-selected="(file) => upload(file)" />
+        <FileUpload
+          :error="error"
+          :is-loading="isUploading"
+          @file-selected="(file) => upload(file)"
+        />
       </div>
     </div>
   </DocumentUnitWrapper>
