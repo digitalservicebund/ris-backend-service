@@ -39,26 +39,20 @@ const emit = defineEmits<{
     <span v-if="node.subjectFieldNumber !== ROOT_ID">
       <button
         v-if="selected"
-        class="align-middle pr-4 text-blue-800"
+        class="border-2 h-24 ml-2 rounded-sm text-blue-800 w-24"
         @click="emit('node:delete', node.subjectFieldNumber)"
       >
         <span
           aria-label="Sachgebiet entfernen"
-          class="material-icons rounded-full w-icon"
-          >check_box</span
+          class="material-icons selected-icon"
+          >done</span
         >
       </button>
       <button
         v-else
-        class="align-middle pr-4 text-blue-800"
+        class="border-2 h-24 ml-2 rounded-sm text-blue-800 w-24"
         @click="emit('node:add', node)"
-      >
-        <span
-          aria-label="Sachgebiet hinzufügen"
-          class="material-icons rounded-full w-icon"
-          >check_box_outline_blank</span
-        >
-      </button>
+      ></button>
     </span>
     <div
       v-if="props.node.subjectFieldNumber !== ROOT_ID"
@@ -83,6 +77,10 @@ const emit = defineEmits<{
 }
 
 .subject-field-text {
+  font-size: 14px;
+}
+
+.selected-icon {
   font-size: 14px;
 }
 </style>
