@@ -10,7 +10,7 @@ fileignoreconfig:
   - filename: .github/workflows/secrets-check.yml
     checksum: 335f81e88f030498a8c4480c0be3fccc7347ae9ce2808d8580f656b80d982774
   - filename: backend/build.gradle
-    checksum: 364385121be50410139882b43cf708567c43adf9a3ff75134c180c55631b6d72
+    checksum: f32c0195c71acfd3f846691e21005fdcf5688714e3a3821cba7e657251553bd2
   - filename: frontend/test/test-helper/dataGenerators.ts
     checksum: 19ca4c7e1fcc29fcbe16235e4fd543854563ba32e8eae67e321ef1de39b90b93
   - filename: frontend/FRONTEND_STYLEGUIDE.md
