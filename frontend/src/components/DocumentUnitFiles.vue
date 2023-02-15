@@ -1,15 +1,18 @@
 <script lang="ts" setup>
+import { ref } from "vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import FileUpload from "@/components/FileUpload.vue"
 import FileViewer from "@/components/FileViewer.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
+import { ResponseError } from "@/services/httpClient"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
 const emit = defineEmits<{
   (e: "updateDocumentUnit", updatedDocumentUnit: DocumentUnit): void
 }>()
+const error = ref<ResponseError>()
 
 async function handleDeleteFile() {
   if ((await fileService.delete(props.documentUnit.uuid)).status < 300) {
@@ -21,6 +24,15 @@ async function handleDeleteFile() {
     } else {
       emit("updateDocumentUnit", updateResponse.data)
     }
+  }
+}
+
+async function upload(file: File) {
+  const response = await fileService.upload(props.documentUnit.uuid, file)
+  if (response.status === 201 && response.data) {
+    emit("updateDocumentUnit", response.data)
+  } else {
+    error.value = response.error
   }
 }
 </script>
@@ -39,11 +51,14 @@ async function handleDeleteFile() {
         @delete-file="handleDeleteFile"
       />
 
-      <FileUpload
-        v-else
-        :document-unit-uuid="documentUnit.uuid"
-        @update-document-unit="emit('updateDocumentUnit', $event)"
-      />
+      <div v-else class="flex flex-col items-start w-[40rem]">
+        <div class="mb-14">
+          Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
+          Originaldokumentes aus
+        </div>
+
+        <FileUpload :error="error" @file-selected="(file) => upload(file)" />
+      </div>
     </div>
   </DocumentUnitWrapper>
 </template>
