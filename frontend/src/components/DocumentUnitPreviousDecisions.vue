@@ -12,8 +12,12 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const defaultModel: PreviousDecision = {
-  courtType: "",
-  courtPlace: "",
+  court: {
+    type: "",
+    location: "",
+    label: "",
+    revoked: "",
+  },
   date: "",
   fileNumber: "",
 }

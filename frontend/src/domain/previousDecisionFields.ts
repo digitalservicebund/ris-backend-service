@@ -1,21 +1,17 @@
 import { InputType } from "./types"
 import type { InputField } from "./types"
+import comboboxItemService from "@/services/comboboxItemService"
 
 export const previousDecisionFields: InputField[] = [
   {
-    name: "courtType",
-    type: InputType.TEXT,
-    label: "Gerichtstyp",
+    name: "court",
+    type: InputType.COMBOBOX,
+    label: "Gericht",
+    required: true,
     inputAttributes: {
-      ariaLabel: "Gerichtstyp Rechtszug",
-    },
-  },
-  {
-    name: "courtPlace",
-    type: InputType.TEXT,
-    label: "Gerichtsort",
-    inputAttributes: {
-      ariaLabel: "Gerichtsort Rechtszug",
+      ariaLabel: "Gericht Rechtszug",
+      placeholder: "Gerichtstyp Gerichtsort",
+      itemService: comboboxItemService.getCourts,
     },
   },
   {

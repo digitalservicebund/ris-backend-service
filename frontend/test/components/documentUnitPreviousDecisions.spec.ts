@@ -15,50 +15,61 @@ describe("DocumentUnitPreviousDecisions", async () => {
   it("shows all necessary input fields with their value", () => {
     const modelValue = [
       {
-        courtType: "type one",
-        courtPlace: "location one",
-        date: "",
-        fileNumber: "identifier one",
+        court: {
+          type: "BGH",
+          location: "Karlsruhe",
+          label: "BGH Karlsruhe",
+        },
+        date: "2022-02-03",
+        fileNumber: "fileNumber",
       },
       {
-        courtType: "type two",
-        courtPlace: "location two",
-        date: "",
-        fileNumber: "identifier two",
+        court: undefined,
+        date: undefined,
+        fileNumber: undefined,
       },
     ]
     renderComponent({ modelValue })
 
-    expect(screen.getByDisplayValue("type one")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("location one")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("identifier one")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("type two")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("location two")).toBeInTheDocument()
-    expect(screen.getByDisplayValue("identifier two")).toBeInTheDocument()
+    const courts = screen.getAllByLabelText(
+      "Gericht Rechtszug"
+    ) as HTMLInputElement[]
+
+    const dates = screen.getAllByLabelText(
+      "Datum Rechtszug"
+    ) as HTMLInputElement[]
+
+    const fileNumbers = screen.getAllByLabelText(
+      "Aktenzeichen Rechtszug"
+    ) as HTMLInputElement[]
+
+    expect(courts).toHaveLength(2)
+    expect(dates).toHaveLength(2)
+    expect(fileNumbers).toHaveLength(2)
+
+    expect(courts[0]).toHaveDisplayValue("BGH Karlsruhe")
+    expect(dates[0]).toHaveDisplayValue("2022-02-03")
+    expect(fileNumbers[0]).toHaveDisplayValue("fileNumber")
   })
 
   it("emits update model value event when input value changes", async () => {
-    const modelValue = [
-      {
-        courtType: "ab",
-        courtPlace: "test location",
-        date: "test date",
-        fileNumber: "test identifier",
-      },
-    ]
-    const { emitted, user } = renderComponent({ modelValue })
-    const input = screen.getByDisplayValue("ab")
-    await user.type(input, "c")
+    const { emitted, user } = renderComponent()
+    const input = screen.getByLabelText("fileNumber")
+    await user.type(input, "abc")
     await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"][0]).toEqual([
       [
         {
-          courtType: "abc",
-          courtPlace: "test location",
-          date: "test date",
-          fileNumber: "test identifier",
+          court: {
+            type: "",
+            location: "",
+            label: "",
+            revoked: "",
+          },
+          date: "",
+          fileNumber: "abc",
         },
       ],
     ])
@@ -68,7 +79,7 @@ describe("DocumentUnitPreviousDecisions", async () => {
     const { emitted, user } = renderComponent({
       modelValue: undefined,
     })
-    const input = screen.getByLabelText("Gerichtstyp Rechtszug")
+    const input = screen.getByLabelText("fileNumber")
 
     // Do anything without changing the inputs.
     await user.click(input)
@@ -79,15 +90,18 @@ describe("DocumentUnitPreviousDecisions", async () => {
   it("always shows at least one input group despite empty model list", () => {
     renderComponent({ modelValue: [] })
 
-    const typeInput = screen.queryByLabelText("Gerichtstyp Rechtszug")
-    const locationInput = screen.queryByLabelText("Gerichtsort Rechtszug")
-    const dateInput = screen.queryByLabelText("Datum Rechtszug")
-    const identifierInput = screen.queryByLabelText("Aktenzeichen Rechtszug")
+    const courtInput = screen.queryByLabelText(
+      "Gericht Rechtszug"
+    ) as HTMLInputElement
+    const dateInput = screen.queryByLabelText(
+      "Datum Rechtszug"
+    ) as HTMLInputElement
+    const identifierInput = screen.queryByLabelText(
+      "Aktenzeichen Rechtszug"
+    ) as HTMLInputElement
 
-    expect(typeInput).toBeInTheDocument()
-    expect(typeInput).toHaveDisplayValue("")
-    expect(locationInput).toBeInTheDocument()
-    expect(locationInput).toHaveDisplayValue("")
+    expect(courtInput).toBeInTheDocument()
+    expect(courtInput).toHaveDisplayValue("")
     expect(dateInput).toBeInTheDocument()
     expect(dateInput).toHaveDisplayValue("")
     expect(identifierInput).toBeInTheDocument()

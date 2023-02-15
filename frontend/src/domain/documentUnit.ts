@@ -38,8 +38,7 @@ export type Texts = {
 }
 
 export type PreviousDecision = {
-  courtType?: string
-  courtPlace?: string
+  court?: Court
   date?: string
   fileNumber?: string
 }
@@ -100,9 +99,7 @@ export default class DocumentUnit {
       (requiredfieldName) => requiredfieldName === fieldName
     )
   }
-  public isEmpty(
-    value: CoreData[(typeof DocumentUnit.requiredFields)[number]]
-  ) {
+  public isEmpty(value: CoreData[typeof DocumentUnit.requiredFields[number]]) {
     if (value === undefined || !value) {
       return true
     }
