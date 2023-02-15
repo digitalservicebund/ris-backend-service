@@ -7,17 +7,8 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   (event: "remove-from-list", index: number): void
-  (event: "select-node", node: SubjectNode | undefined): void
+  (event: "node-clicked", node: SubjectNode): void
 }>()
-
-function handleRemoveFromList(index: number) {
-  emit("remove-from-list", index)
-}
-
-function handleSelectNode(node: SubjectNode | undefined) {
-  // console.log("list: select node: ", node)
-  emit("select-node", node)
-}
 </script>
 
 <template>
@@ -28,8 +19,8 @@ function handleSelectNode(node: SubjectNode | undefined) {
       v-for="(subject, index) in props.selectedSubjects"
       :key="subject.subjectFieldNumber"
       :subject="subject"
-      @remove-from-list="handleRemoveFromList(index)"
-      @select-node="handleSelectNode(subject)"
+      @node-clicked="emit('node-clicked', subject)"
+      @remove-from-list="emit('remove-from-list', index)"
     />
   </div>
 </template>

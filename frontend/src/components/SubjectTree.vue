@@ -11,7 +11,8 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: "add-to-list", node: SubjectNode): void
-  (event: "delete-from-list", id: string): void
+  (event: "delete-from-list", subjectFieldNumber: string): void
+  (event: "reset-selected-node"): void
 }>()
 
 const tree = ref<SubjectTree>(new SubjectTree(buildRoot()))
@@ -31,19 +32,21 @@ function buildDirectPathTree() {
     // console.log("loaded tree", response.data)
     if (!response.data) return
     tree.value = new SubjectTree(buildRoot([response.data]))
-    tree.value.expandAll()
+    tree.value.expandAll(true)
   })
+  emit("reset-selected-node")
 }
 
 function handleNodeClick(node: SubjectNode) {
   tree.value.toggleNode(node)
-  // console.log(toRaw(tree.value))
 }
+
 function handleAdd(node: SubjectNode) {
   emit("add-to-list", node)
 }
-function handleDelete(nodeId: string) {
-  emit("delete-from-list", nodeId)
+
+function handleDelete(subjectFieldNumber: string) {
+  emit("delete-from-list", subjectFieldNumber)
 }
 </script>
 

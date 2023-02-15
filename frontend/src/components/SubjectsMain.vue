@@ -7,27 +7,33 @@ import { SubjectNode } from "@/domain/SubjectTree"
 const selectedSubjects = ref<SubjectNode[]>([])
 const selectedNode = ref<SubjectNode>()
 
-const getSubjectIndex = (subjParam: string) =>
+const getSubjectIndex = (_subjectFieldNumber: string) =>
   selectedSubjects.value.findIndex(
-    ({ subjectFieldNumber }) => subjectFieldNumber == subjParam
+    ({ subjectFieldNumber }) => subjectFieldNumber == _subjectFieldNumber
   )
 
 function handleAddToList(node: SubjectNode) {
-  if (getSubjectIndex(node.subjectFieldNumber) == -1)
+  if (getSubjectIndex(node.subjectFieldNumber) == -1) {
     selectedSubjects.value.push(node)
+  }
 }
 
-function handleDeleteIdFromList(id: string) {
-  if (getSubjectIndex(id) != -1) handleRemoveFromList(getSubjectIndex(id))
+function handleDeleteIdFromList(subjectFieldNumber: string) {
+  if (getSubjectIndex(subjectFieldNumber) != -1) {
+    handleRemoveFromList(getSubjectIndex(subjectFieldNumber))
+  }
 }
 
 function handleRemoveFromList(index: number) {
   selectedSubjects.value.splice(index, 1)
 }
 
-function handleSelectNode(node: SubjectNode | undefined) {
-  // console.log("main: select node:", node)
+function handleNodeClicked(node: SubjectNode) {
   selectedNode.value = node
+}
+
+function handleResetSelectedNode() {
+  selectedNode.value = undefined
 }
 </script>
 
@@ -38,16 +44,17 @@ function handleSelectNode(node: SubjectNode | undefined) {
       <div class="bg-white flex-1 p-20">
         <SubjectSelectionList
           :selected-subjects="selectedSubjects"
-          @remove-from-list="handleRemoveFromList($event)"
-          @select-node="handleSelectNode($event)"
+          @node-clicked="handleNodeClicked"
+          @remove-from-list="handleRemoveFromList"
         ></SubjectSelectionList>
       </div>
       <div class="bg-white flex-1 p-20">
         <SubjectTree
           :selected-node="selectedNode"
           :selected-subjects="selectedSubjects"
-          @add-to-list="handleAddToList($event)"
-          @delete-from-list="handleDeleteIdFromList($event)"
+          @add-to-list="handleAddToList"
+          @delete-from-list="handleDeleteIdFromList"
+          @reset-selected-node="handleResetSelectedNode"
         ></SubjectTree>
       </div>
     </div>

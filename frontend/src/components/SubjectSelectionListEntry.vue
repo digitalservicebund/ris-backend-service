@@ -4,17 +4,8 @@ import { SubjectNode } from "@/domain/SubjectTree"
 const props = defineProps<{ subject: SubjectNode }>()
 const emit = defineEmits<{
   (event: "remove-from-list"): void
-  (event: "select-node"): void
+  (event: "node-clicked"): void
 }>()
-
-function handleRemoveFromList() {
-  emit("remove-from-list")
-}
-
-function handleSelectNode() {
-  // console.log("list entry: select node")
-  emit("select-node")
-}
 </script>
 
 <template>
@@ -22,7 +13,7 @@ function handleSelectNode() {
     <div>
       <button
         class="material-icons p-6 text-blue-800"
-        @click="handleSelectNode"
+        @click="emit('node-clicked')"
       >
         open_in_new
       </button>
@@ -38,7 +29,7 @@ function handleSelectNode() {
     <div>
       <button
         class="material-icons text-blue-800"
-        @click="handleRemoveFromList"
+        @click="emit('remove-from-list')"
       >
         delete_outline
       </button>

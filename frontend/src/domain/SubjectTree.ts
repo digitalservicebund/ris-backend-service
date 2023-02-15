@@ -23,7 +23,7 @@ export default class SubjectTree {
   }
 
   public toggleNode(node: SubjectNode) {
-    if (!node.isLeaf && node.children.length === 0) {
+    if (!node.isLeaf && (node.children.length === 0 || node.inDirectPathMode)) {
       SubjectsService.getChildrenOf(node.subjectFieldNumber).then(
         (response) => {
           if (!response.data) return
@@ -31,18 +31,23 @@ export default class SubjectTree {
         }
       )
     }
-    node.isExpanded = !node.isExpanded
-  }
-
-  private expandTraversal(node: SubjectNode) {
-    node.isExpanded = true
-    for (const child of node.children) {
-      this.expandTraversal(child)
+    if (node.inDirectPathMode) {
+      node.inDirectPathMode = false
+    } else {
+      node.isExpanded = !node.isExpanded
     }
   }
 
-  public expandAll() {
-    this.expandTraversal(this.root)
+  private expandTraversal(node: SubjectNode, directPathMode: boolean) {
+    node.isExpanded = true
+    node.inDirectPathMode = directPathMode
+    for (const child of node.children) {
+      this.expandTraversal(child, directPathMode)
+    }
+  }
+
+  public expandAll(directPathMode = false) {
+    this.expandTraversal(this.root, directPathMode)
   }
 }
 
@@ -53,7 +58,9 @@ export type SubjectNode = {
   children: SubjectNode[]
   depth: number
   isExpanded: boolean
+  inDirectPathMode?: boolean
   isLeaf: boolean
+  clickCounter?: number
 }
 
 export const ROOT_ID = "root"
