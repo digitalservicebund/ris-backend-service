@@ -4,7 +4,7 @@ import FileInput from "@/components/FileInput.vue"
 import InfoModal from "@/components/InfoModal.vue"
 
 const props = defineProps<{
-  error?: { title: string; description: string }
+  error?: { title: string; description?: string }
   isLoading?: boolean
 }>()
 const emits = defineEmits<{
