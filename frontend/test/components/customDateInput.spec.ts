@@ -207,4 +207,24 @@ describe("CustomDateInput", () => {
       array.filter((element) => element[0] !== undefined)[0][0].defaultMessage
     ).toBe("Kein valides Datum")
   })
+
+  it("does not allow letters", async () => {
+    const { emitted } = renderComponent({
+      ariaLabel: "Testdatum",
+    })
+    const day = screen.queryByLabelText("Testdatum Tag") as HTMLInputElement
+    const month = screen.queryByLabelText("Testdatum Monat") as HTMLInputElement
+    const year = screen.queryByLabelText("Testdatum Jahr") as HTMLInputElement
+
+    await userEvent.clear(day)
+    await userEvent.type(day, "29")
+    await userEvent.clear(month)
+    await userEvent.type(month, "02")
+    await userEvent.clear(year)
+    await userEvent.type(year, "FOOO")
+    await userEvent.tab()
+    await nextTick()
+
+    expect(emitted()["update:modelValue"]).not.toBeTruthy()
+  })
 })
