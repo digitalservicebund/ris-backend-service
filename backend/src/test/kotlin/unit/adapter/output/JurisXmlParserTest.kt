@@ -14,6 +14,7 @@ import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.util.UUID
+import de.bund.digitalservice.ris.norms.juris.importer.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.importer.model.Norm as NormData
 
 class JurisXmlParserTest {
@@ -200,5 +201,20 @@ class JurisXmlParserTest {
         assertThat(norm?.definition).isEqualTo("test definition")
         assertThat(norm?.ageOfMajorityIndication).isEqualTo("test age of majority indication")
         assertThat(norm?.text).isEqualTo("test text")
+    }
+
+    @Test
+    fun `it does not parse any articles`() {
+        val parser = JurisXmlParser()
+        val guid = UUID.randomUUID()
+        val command = ParseJurisXmlOutputPort.Command(guid, anyZipFile)
+        val articleData = ArticleData("title", "marker")
+        val data = NormData().apply { articles = listOf(articleData) }
+
+        every { importData(any()) } returns data
+
+        val norm = parser.parseJurisXml(command).block()
+
+        assertThat(norm?.articles).hasSize(0)
     }
 }
