@@ -44,9 +44,9 @@ describe("CustomDateInput", () => {
     const month = screen.queryByLabelText("Test Monat") as HTMLInputElement
     const year = screen.queryByLabelText("Test Jahr") as HTMLInputElement
 
-    expect(day).toHaveValue("03")
-    expect(month).toHaveValue("02")
-    expect(year).toHaveValue("2022")
+    expect(day).toHaveValue(3)
+    expect(month).toHaveValue(2)
+    expect(year).toHaveValue(2022)
   })
 
   it("allows to type date inside inputs", async () => {
@@ -55,9 +55,9 @@ describe("CustomDateInput", () => {
     const month = screen.queryByLabelText("Test Monat") as HTMLInputElement
     const year = screen.queryByLabelText("Test Jahr") as HTMLInputElement
 
-    expect(day).toHaveValue("03")
-    expect(month).toHaveValue("02")
-    expect(year).toHaveValue("2022")
+    expect(day).toHaveValue(3)
+    expect(month).toHaveValue(2)
+    expect(year).toHaveValue(2022)
 
     await userEvent.clear(day)
     await userEvent.type(day, "04")
@@ -69,9 +69,9 @@ describe("CustomDateInput", () => {
     await userEvent.type(year, "2021")
     await userEvent.tab()
 
-    expect(day).toHaveValue("04")
-    expect(month).toHaveValue("04")
-    expect(year).toHaveValue("2021")
+    expect(day).toHaveValue(4)
+    expect(month).toHaveValue(4)
+    expect(year).toHaveValue(2021)
   })
 
   it("emits model update event when input changes", async () => {
@@ -93,9 +93,9 @@ describe("CustomDateInput", () => {
 
     await nextTick()
 
-    expect(day).toHaveValue("04")
-    expect(month).toHaveValue("04")
-    expect(year).toHaveValue("2021")
+    expect(day).toHaveValue(4)
+    expect(month).toHaveValue(4)
+    expect(year).toHaveValue(2021)
     expect(emitted()["update:modelValue"]).toEqual([
       ["2022-02-04T00:00:00.000Z"],
       ["2022-04-04T00:00:00.000Z"],
@@ -116,9 +116,9 @@ describe("CustomDateInput", () => {
     await userEvent.type(year, "{backspace}")
     await nextTick()
 
-    expect(day).toHaveValue("")
-    expect(month).toHaveValue("")
-    expect(year).toHaveValue("")
+    expect(day).toHaveValue(null)
+    expect(month).toHaveValue(null)
+    expect(year).toHaveValue(null)
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
   })
 
@@ -171,9 +171,9 @@ describe("CustomDateInput", () => {
     await nextTick()
 
     expect(props.validationError).toBe(undefined)
-    expect(day).toHaveValue("04")
-    expect(month).toHaveValue("04")
-    expect(year).toHaveValue("2040")
+    expect(day).toHaveValue(4)
+    expect(month).toHaveValue(4)
+    expect(year).toHaveValue(2040)
     expect(emitted()["update:modelValue"]).toEqual([
       ["2040-04-04T00:00:00.000Z"],
     ])

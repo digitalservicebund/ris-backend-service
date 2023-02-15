@@ -67,7 +67,6 @@ watch(
   () => {
     if (props.modelValue && !dateValue.value) {
       const formattedModelValue = dayjs(props.modelValue).format("YYYY-MM-DD")
-      console.log(formattedModelValue, props.modelValue)
       const splitDate = formattedModelValue.split("-")
       dayValue.value = splitDate[2]
       monthValue.value = splitDate[1]
@@ -123,13 +122,14 @@ function checkIsInPast() {
 
 function handleInput(event: Event) {
   const target = event.target as HTMLInputElement
+  //automatically jump to next input
   if (target.value.length >= target.maxLength) {
     if (!target) return
-
     let current = target
     while (current.nextElementSibling) {
       if (current.nextElementSibling.tagName.toLowerCase() == "input") {
         const next = current.nextElementSibling as HTMLInputElement
+        addLeadingZero(target)
         next.focus()
         break
       }
@@ -156,7 +156,27 @@ function selectAll(event: Event) {
   ;(event.target as HTMLInputElement).select()
 }
 
-function handleOnBlur() {
+function addLeadingZero(target: HTMLInputElement) {
+  //explicit formatting to handle one digit inputs
+  switch (target.name) {
+    case "day":
+      if (target.value.length === 1) dayValue.value = "0" + target.value
+      else dayValue.value = target.value
+      break
+    case "month":
+      if (target.value.length === 1) monthValue.value = "0" + target.value
+      else monthValue.value = target.value
+      break
+    case "year":
+      if (target.value.length === 1) yearValue.value = "0" + target.value
+      else yearValue.value = target.value
+      break
+  }
+}
+
+function handleOnBlur(event: Event) {
+  const target = event.target as HTMLInputElement
+  addLeadingZero(target)
   checkValidDate()
   checkIsInPast()
   if (!hasError.value && dateValue.value) {
@@ -182,10 +202,10 @@ function handleOnBlur() {
       max="31"
       maxLength="2"
       min="1"
-      pattern="^[0-9]*$"
+      name="day"
       placeholder="DD"
       size="2"
-      type="text"
+      type="number"
       @blur="handleOnBlur"
       @focus="selectAll"
       @keydown.delete="deleteDay"
@@ -200,15 +220,15 @@ function handleOnBlur() {
       max="12"
       maxLength="2"
       min="1"
-      pattern="^[0-9]*$"
+      name="month"
       placeholder="MM"
       size="2"
-      type="text"
+      type="number"
       @blur="handleOnBlur"
       @focus="selectAll"
       @keydown.delete="deleteMonth"
     />
-    <span class="mr-2">.</span>
+    <span>.</span>
     <input
       :id="id"
       v-model="yearValue"
@@ -218,10 +238,10 @@ function handleOnBlur() {
       max="9999"
       maxLength="4"
       min="1000"
-      pattern="^[0-9]*$"
+      name="year"
       placeholder="JJJJ"
       size="4"
-      type="text"
+      type="number"
       @blur="handleOnBlur"
       @focus="selectAll"
       @keydown.delete="deleteYear"

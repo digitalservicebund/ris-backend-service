@@ -122,7 +122,6 @@ function backspaceDelete() {
 
   &__error {
     width: 100%;
-    padding: 17px 24px;
     @apply border-red-800 bg-red-200;
 
     &:autofill {
