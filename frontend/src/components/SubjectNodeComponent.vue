@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { SubjectNode } from "@/domain/SubjectTree"
+import { ROOT_ID, SubjectNode } from "@/domain/SubjectTree"
 
 interface Props {
   node: SubjectNode
@@ -32,30 +32,32 @@ const emit = defineEmits<{
         >{{ props.node.isExpanded ? "remove" : "add" }}</span
       >
     </button>
-    <button
-      v-if="!selected"
-      class="align-middle pr-4 text-blue-800"
-      @click="emit('node:add', node)"
-    >
-      <span
-        aria-label="Sachgebiet hinzufügen"
-        class="material-icons rounded-full w-icon"
-        >check_box_outline_blank</span
+    <span v-if="node.subjectFieldNumber !== ROOT_ID">
+      <button
+        v-if="selected"
+        class="align-middle pr-4 text-blue-800"
+        @click="emit('node:delete', node.subjectFieldNumber)"
       >
-    </button>
-    <button
-      v-if="selected"
-      class="align-middle pr-4 text-blue-800"
-      @click="emit('node:delete', node.subjectFieldNumber)"
-    >
-      <span
-        aria-label="Sachgebiet entfernen"
-        class="material-icons rounded-full w-icon"
-        >check_box</span
+        <span
+          aria-label="Sachgebiet entfernen"
+          class="material-icons rounded-full w-icon"
+          >check_box</span
+        >
+      </button>
+      <button
+        v-else
+        class="align-middle pr-4 text-blue-800"
+        @click="emit('node:add', node)"
       >
-    </button>
+        <span
+          aria-label="Sachgebiet hinzufügen"
+          class="material-icons rounded-full w-icon"
+          >check_box_outline_blank</span
+        >
+      </button>
+    </span>
     <div
-      v-if="props.node.subjectFieldNumber !== 'root'"
+      v-if="props.node.subjectFieldNumber !== ROOT_ID"
       class="pl-6 subject-field-number"
     >
       {{ props.node.subjectFieldNumber }}

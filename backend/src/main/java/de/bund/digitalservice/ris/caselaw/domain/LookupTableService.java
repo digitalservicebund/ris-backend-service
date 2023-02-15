@@ -21,6 +21,8 @@ public class LookupTableService {
   private final DocumentTypeRepository documentTypeRepository;
   private final CourtRepository courtRepository;
   private final SubjectFieldRepository subjectFieldRepository;
+  // id of the subject tree root node that only exists in the frontend
+  private static final String ROOT_ID = "root";
 
   public LookupTableService(
       DocumentTypeRepository documentTypeRepository,
@@ -96,7 +98,7 @@ public class LookupTableService {
   }
 
   public Flux<SubjectField> getSubjectFieldChildren(String subjectFieldNumber) {
-    if (subjectFieldNumber.equalsIgnoreCase("root")) {
+    if (subjectFieldNumber.equalsIgnoreCase(ROOT_ID)) {
       return subjectFieldRepository.getTopLevelNodes();
     }
     return subjectFieldRepository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(

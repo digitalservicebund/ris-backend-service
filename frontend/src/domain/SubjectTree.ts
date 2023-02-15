@@ -56,9 +56,11 @@ export type SubjectNode = {
   isLeaf: boolean
 }
 
+export const ROOT_ID = "root"
+
 export function buildRoot(children: SubjectNode[] = []): SubjectNode {
   return {
-    subjectFieldNumber: "root",
+    subjectFieldNumber: ROOT_ID,
     subjectFieldText: "Alle Sachgebiete anzeigen",
     children: children,
     depth: 0,
