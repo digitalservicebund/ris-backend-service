@@ -7,6 +7,11 @@ fileignoreconfig:
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml
     checksum: d2bd91936de92caf6bc575303218078cf0ad60a380d3f6acd1801c22f8cf2a4b
+  - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
+    checksum: fcde08900f71cbc2b4addf56beecf0512ae93a74510fb5a65301dccb32ea3d11
+  - filename: backend/build.gradle
+    checksum: 4469eb956b28dee67d619cbf4e53813e1ee4b4b897dad07c894ac8dbb028ae09
+
 scopeconfig:
   - scope: node
 allowed_patterns:

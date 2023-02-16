@@ -21,6 +21,15 @@ public class DocumentUnitBuilder {
 
   private DocumentUnitBuilder() {}
 
+  private Court getCourtObject(String courtType, String courtLocation) {
+    Court court = null;
+    if (courtType != null) {
+      String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
+      court = new Court(courtType, courtLocation, label, null);
+    }
+    return court;
+  }
+
   public static DocumentUnitBuilder newInstance() {
     return new DocumentUnitBuilder();
   }
@@ -33,14 +42,6 @@ public class DocumentUnitBuilder {
   public DocumentUnit build() {
     if (documentUnitDTO == null) {
       return DocumentUnit.EMPTY;
-    }
-
-    Court court = null;
-    String courtType = documentUnitDTO.getCourtType();
-    String courtLocation = documentUnitDTO.getCourtLocation();
-    if (courtType != null) {
-      String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
-      court = new Court(courtType, courtLocation, label, null);
     }
 
     DocumentType documentType = null;
@@ -58,8 +59,10 @@ public class DocumentUnitBuilder {
                   previousDecisionDTO ->
                       PreviousDecision.builder()
                           .id(previousDecisionDTO.getId())
-                          .courtType(previousDecisionDTO.getCourtType())
-                          .courtPlace(previousDecisionDTO.getCourtLocation())
+                          .court(
+                              getCourtObject(
+                                  previousDecisionDTO.getCourtType(),
+                                  previousDecisionDTO.getCourtLocation()))
                           .fileNumber(previousDecisionDTO.getFileNumber())
                           .date(previousDecisionDTO.getDecisionDateTimestamp())
                           .build())
@@ -111,7 +114,7 @@ public class DocumentUnitBuilder {
         new CoreData(
             fileNumbers,
             deviatingFileNumbers,
-            court,
+            getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()),
             incorrectCourts,
             documentType,
             documentUnitDTO.getProcedure(),

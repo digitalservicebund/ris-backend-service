@@ -62,8 +62,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
     List<PreviousDecision> previousDecisions =
         List.of(
             PreviousDecision.builder()
-                .courtType("courtType")
-                .courtPlace("courtPlace")
+                .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-05-06T00:00:00Z"))
                 .fileNumber("fileNumber")
                 .build());
@@ -143,8 +142,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
         List.of(
             PreviousDecision.builder()
                 .id(1L)
-                .courtType("courtType")
-                .courtPlace("courtPlace")
+                .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
                 .fileNumber("fileNumber")
                 .build());

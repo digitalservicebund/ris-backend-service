@@ -7,6 +7,22 @@ import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 public class PreviousDecisionTransformer {
   private PreviousDecisionTransformer() {}
 
+  private static String getCourtLocation(PreviousDecision previousDecision) {
+    String courtLocation = null;
+    if (previousDecision.court() != null) {
+      courtLocation = previousDecision.court().location();
+    }
+    return courtLocation;
+  }
+
+  private static String getCourtType(PreviousDecision previousDecision) {
+    String courtType = null;
+    if (previousDecision.court() != null) {
+      courtType = previousDecision.court().type();
+    }
+    return courtType;
+  }
+
   public static PreviousDecisionDTO generateDTO(
       PreviousDecision previousDecision, Long documentUnitId) {
     return fillData(PreviousDecisionDTO.builder(), previousDecision, documentUnitId);
@@ -25,8 +41,8 @@ public class PreviousDecisionTransformer {
 
     return PreviousDecisionDTO.builder()
         .id(previousDecision.id())
-        .courtLocation(previousDecision.courtPlace())
-        .courtType(previousDecision.courtType())
+        .courtLocation(getCourtLocation(previousDecision))
+        .courtType(getCourtType(previousDecision))
         .fileNumber(previousDecision.fileNumber())
         .documentUnitId(documentUnitId)
         .decisionDateTimestamp(previousDecision.date())
