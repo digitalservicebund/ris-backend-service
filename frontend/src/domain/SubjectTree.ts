@@ -16,7 +16,7 @@ export default class SubjectTree {
     }
   }
 
-  public getOrderedNodes() {
+  public getNodesOrderedByDepthFirstSearch() {
     const orderedNodes: SubjectNode[] = []
     this.traverse(this.root, orderedNodes)
     return orderedNodes

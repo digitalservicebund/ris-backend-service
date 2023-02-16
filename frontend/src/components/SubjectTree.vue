@@ -53,7 +53,7 @@ function handleDelete(subjectFieldNumber: string) {
 <template>
   <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
   <SubjectNodeComponent
-    v-for="node in tree?.getOrderedNodes()"
+    v-for="node in tree?.getNodesOrderedByDepthFirstSearch()"
     :key="node.subjectFieldNumber"
     :node="node"
     :selected="
