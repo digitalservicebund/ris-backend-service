@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test"
+import { test } from "@playwright/test"
 import normCleanCars from "./testdata/norm_clean_cars.json"
 
 type MyFixtures = {
@@ -13,12 +13,9 @@ export const testWithImportedNorm = test.extend<MyFixtures>({
       data: normToImport,
     })
     const body = await response.text()
-    console.log(body)
-    expect(response.ok()).toBeTruthy()
-    const location = response.headers()["location"]
-    const normsGuid = location.slice(location.lastIndexOf("/") + 1)
+    const { guid } = JSON.parse(body)
 
-    await use(normsGuid)
+    await use(guid)
   },
 })
 
