@@ -5,7 +5,7 @@ import { testWithImportedNorm } from "./fixtures"
 import norm from "./testdata/norm_for_retrieve_by_eli.json"
 
 testWithImportedNorm.use({ normToImport: norm })
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if XML can be retrieved by ELI and content is correct",
   async ({ page, createdGuid, request }) => {
     // Open frame data

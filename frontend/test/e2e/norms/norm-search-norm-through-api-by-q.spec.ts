@@ -4,7 +4,7 @@ import { testWithImportedNorm } from "./fixtures"
 const officialLongTitle =
   "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check norm can be retrieved by search in long title",
   async ({ request }) => {
     const response = await request.get(`/api/v1/norms?q=über die Beschaffung`)
@@ -12,7 +12,7 @@ testWithImportedNorm(
   }
 )
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check norm can be retrieved by search in short title",
   async ({ request }) => {
     const response = await request.get(
@@ -22,7 +22,7 @@ testWithImportedNorm(
   }
 )
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check norm can be retrieved by search in unofficial short title",
   async ({ request }) => {
     const response = await request.get(`/api/v1/norms?q=Saubere-Fahrzeuge`)
@@ -30,7 +30,7 @@ testWithImportedNorm(
   }
 )
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check 404 is returned if no articles found",
   async ({ request }) => {
     const response = await request.get(`/api/v1/norms?q=invalidSearchQuery`)

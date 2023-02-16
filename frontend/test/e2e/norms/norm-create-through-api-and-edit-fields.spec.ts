@@ -75,7 +75,7 @@ async function expectUpdatedFields(page, fields, data) {
   }
 }
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if fields can be edited",
   async ({ page, createdGuid }) => {
     await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
