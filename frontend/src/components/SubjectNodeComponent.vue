@@ -74,6 +74,7 @@ const emit = defineEmits<{
 
 .subject-field-number {
   font-size: 16px;
+  white-space: nowrap;
 }
 
 .subject-field-text {
