@@ -171,8 +171,16 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .previousDecisions(
                 List.of(
-                    PreviousDecision.builder().fileNumber("prev1").build(),
-                    PreviousDecision.builder().fileNumber("prev2").build()))
+                    PreviousDecision.builder()
+                        .court(new Court("courtType", "courtPlace", "courtLabel", null))
+                        .date(Instant.parse("2020-05-06T00:00:00Z"))
+                        .fileNumber("prev1")
+                        .build(),
+                    PreviousDecision.builder()
+                        .court(new Court("courtType", "courtPlace", "courtLabel", null))
+                        .date(Instant.parse("2020-05-06T00:00:00Z"))
+                        .fileNumber("prev2")
+                        .build()))
             .build();
 
     webClient
@@ -216,8 +224,12 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .previousDecisions(
                 List.of(
-                    PreviousDecision.builder().id(1L).fileNumber("prev1").build(),
-                    PreviousDecision.builder().fileNumber("prev2").build()))
+                    PreviousDecision.builder()
+                        .id(1L)
+                        .court(new Court("courtType", "courtPlace", "courtLabel", null))
+                        .date(Instant.parse("2020-05-06T00:00:00Z"))
+                        .fileNumber("prev1")
+                        .build()))
             .build();
 
     webClient
@@ -233,10 +245,10 @@ class DocumentUnitIntegrationTest {
     assertThat(documentUnitDTOs).hasSize(1);
 
     previousDecisionDTOs = previousDecisionRepository.findAll().collectList().block();
-    assertThat(previousDecisionDTOs).hasSize(2);
+    assertThat(previousDecisionDTOs).hasSize(1);
     assertThat(previousDecisionDTOs)
         .extracting("id", "fileNumber")
-        .containsExactly(tuple(1L, "prev1"), tuple(3L, "prev2"));
+        .containsExactly(tuple(1L, "prev1"));
   }
 
   @Test
