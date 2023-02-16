@@ -30,7 +30,7 @@ repositories {
     }
   }
   maven {
-    url = uri("https://maven.pkg.github.com/digitalservicebund/ris-norms-juris-importer")
+    url = uri("https://maven.pkg.github.com/digitalservicebund/ris-norms-juris-extractor")
     credentials {
       username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
       password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
@@ -110,7 +110,7 @@ dependencies {
   // for local development:
   // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 
-  implementation("de.bund.digitalservice:ris-norms-juris-importer:0.0.1-alpha")
+  implementation("de.bund.digitalservice:ris-norms-juris-extractor:0.1.0")
 
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2"
 

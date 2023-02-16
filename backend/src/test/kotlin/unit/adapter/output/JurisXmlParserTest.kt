@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output
 
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
-import de.bund.digitalservice.ris.norms.juris.importer.importData
+import de.bund.digitalservice.ris.norms.juris.extractor.extractData
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.util.UUID
-import de.bund.digitalservice.ris.norms.juris.importer.model.Article as ArticleData
-import de.bund.digitalservice.ris.norms.juris.importer.model.Norm as NormData
+import de.bund.digitalservice.ris.norms.juris.extractor.model.Article as ArticleData
+import de.bund.digitalservice.ris.norms.juris.extractor.model.Norm as NormData
 
 class JurisXmlParserTest {
     val anyGuid = UUID.randomUUID()
@@ -24,8 +24,8 @@ class JurisXmlParserTest {
     @BeforeEach
     internal fun beforeEach() {
         val data = NormData()
-        mockkStatic(::importData)
-        every { importData(any()) } returns data
+        mockkStatic(::extractData)
+        every { extractData(any()) } returns data
     }
 
     @AfterEach
@@ -52,7 +52,7 @@ class JurisXmlParserTest {
 
         parser.parseJurisXml(command).block()
 
-        verify(exactly = 1) { importData(zipFile) }
+        verify(exactly = 1) { extractData(zipFile) }
     }
 
     @Test
@@ -129,7 +129,7 @@ class JurisXmlParserTest {
                 text = "test text"
             }
         val command = ParseJurisXmlOutputPort.Command(anyGuid, anyZipFile)
-        every { importData(any()) } returns data
+        every { extractData(any()) } returns data
 
         val norm = parser.parseJurisXml(command).block()
 
@@ -211,7 +211,7 @@ class JurisXmlParserTest {
         val articleData = ArticleData("title", "marker")
         val data = NormData().apply { articles = listOf(articleData) }
 
-        every { importData(any()) } returns data
+        every { extractData(any()) } returns data
 
         val norm = parser.parseJurisXml(command).block()
 

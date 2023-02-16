@@ -3,15 +3,15 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
-import de.bund.digitalservice.ris.norms.juris.importer.importData
+import de.bund.digitalservice.ris.norms.juris.extractor.extractData
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.UUID
-import de.bund.digitalservice.ris.norms.juris.importer.model.Norm as NormData
+import de.bund.digitalservice.ris.norms.juris.extractor.model.Norm as NormData
 
 class JurisXmlParser() : ParseJurisXmlOutputPort {
     override fun parseJurisXml(command: ParseJurisXmlOutputPort.Command): Mono<Norm> {
-        val data = importData(command.zipFile)
+        val data = extractData(command.zipFile)
         val norm = mapDataToDomain(command.newGuid, data)
         return Mono.just(norm)
     }
