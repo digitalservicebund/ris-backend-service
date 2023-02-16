@@ -89,7 +89,7 @@
     "eslint-plugin-vue-scoped-css": "^2.4.0",
     "eslint-plugin-vuejs-accessibility": "^2.0.0",
     "jest-fail-on-console": "^3.0.2",
-    "jsdom": "^20.0.3",
+    "jsdom": "^21.1.0",
     "license-checker": "^25.0.1",
     "playwright": "^1.30.0",
     "postcss": "^8.4.21",
