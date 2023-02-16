@@ -237,8 +237,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await navigateToCategories(page, documentNumber)
     await togglePreviousDecisionsSection(page)
     await fillPreviousDecisionInputs(page, {
-      courtType: "Test Court",
-      courtLocation: "Test City",
+      court: "AG Aalen",
       date: "2004-12-03",
       fileNumber: "1a2b3c",
     })
@@ -247,11 +246,8 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.reload()
     await togglePreviousDecisionsSection(page)
 
-    expect(await page.inputValue("[aria-label='Gerichtstyp Rechtszug']")).toBe(
-      "Test Court"
-    )
-    expect(await page.inputValue("[aria-label='Gerichtsort Rechtszug']")).toBe(
-      "Test City"
+    expect(await page.inputValue("[aria-label='Gericht Rechtszug']")).toBe(
+      "AG Aalen"
     )
     expect(await page.inputValue("[aria-label='Datum Rechtszug']")).toBe(
       "2004-12-03"
@@ -272,23 +268,11 @@ test.describe("save changes in core data and texts and verify it persists", () =
     })
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
 
-    await expect(
-      page.locator("[aria-label='Gerichtstyp Rechtszug']")
-    ).toHaveCount(2)
+    await expect(page.locator("[aria-label='Gericht Rechtszug']")).toHaveCount(
+      2
+    )
     expect(
-      await page
-        .locator("[aria-label='Gerichtstyp Rechtszug']")
-        .nth(1)
-        .inputValue()
-    ).toBe("")
-    await expect(
-      page.locator("[aria-label='Gerichtsort Rechtszug']")
-    ).toHaveCount(2)
-    expect(
-      await page
-        .locator("[aria-label='Gerichtsort Rechtszug']")
-        .nth(1)
-        .inputValue()
+      await page.locator("[aria-label='Gericht Rechtszug']").nth(1).inputValue()
     ).toBe("")
     await expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
     expect(
@@ -313,43 +297,34 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await togglePreviousDecisionsSection(page)
     await fillPreviousDecisionInputs(
       page,
-      { courtType: "Type One", date: "2004-12-03" },
+      { court: "AG Aalen", date: "2004-12-03" },
       0
     )
     await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
     await fillPreviousDecisionInputs(
       page,
-      { courtType: "Type Two", date: "2004-12-03" },
+      { court: "AG Aalen", date: "2004-12-03" },
       1
     )
 
-    await expect(
-      page.locator("[aria-label='Gerichtstyp Rechtszug']")
-    ).toHaveCount(2)
+    await expect(page.locator("[aria-label='Gericht Rechtszug']")).toHaveCount(
+      2
+    )
     expect(
-      await page
-        .locator("[aria-label='Gerichtstyp Rechtszug']")
-        .nth(0)
-        .inputValue()
-    ).toBe("Type One")
+      await page.locator("[aria-label='Gericht Rechtszug']").nth(0).inputValue()
+    ).toBe("AG Aalen")
     expect(
-      await page
-        .locator("[aria-label='Gerichtstyp Rechtszug']")
-        .nth(1)
-        .inputValue()
-    ).toBe("Type Two")
+      await page.locator("[aria-label='Gericht Rechtszug']").nth(1).inputValue()
+    ).toBe("AG Aalen")
 
     await page.locator("[aria-label='Entscheidung Entfernen']").click()
 
-    await expect(
-      page.locator("[aria-label='Gerichtstyp Rechtszug']")
-    ).toHaveCount(1)
+    await expect(page.locator("[aria-label='Gericht Rechtszug']")).toHaveCount(
+      1
+    )
     expect(
-      await page
-        .locator("[aria-label='Gerichtstyp Rechtszug']")
-        .nth(0)
-        .inputValue()
-    ).toBe("Type Two")
+      await page.locator("[aria-label='Gericht Rechtszug']").nth(0).inputValue()
+    ).toBe("AG Aalen")
   })
 
   test("text editor fields should have predefined height", async ({

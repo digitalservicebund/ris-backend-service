@@ -58,8 +58,7 @@ export async function togglePreviousDecisionsSection(
 export async function fillPreviousDecisionInputs(
   page: Page,
   values?: {
-    courtType?: string
-    courtLocation?: string
+    court?: string
     date?: string
     fileNumber?: string
   },
@@ -72,8 +71,8 @@ export async function fillPreviousDecisionInputs(
       .fill(value ?? generateString())
   }
 
-  await fillInput("Gerichtstyp Rechtszug", values?.courtType)
-  await fillInput("Gerichtsort Rechtszug", values?.courtLocation)
+  await fillInput("Gericht Rechtszug", values?.court)
+  if (values?.court) await page.locator(`text=${values?.court}`).click()
   await fillInput("Datum Rechtszug", values?.date)
   await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
 }
