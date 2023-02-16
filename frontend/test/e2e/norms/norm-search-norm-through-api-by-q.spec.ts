@@ -4,6 +4,7 @@ import { testWithImportedNorm } from "./fixtures"
 const officialLongTitle =
   "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check norm can be retrieved by search in long title",
   async ({ request }) => {
@@ -12,6 +13,7 @@ testWithImportedNorm.skip(
   }
 )
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check norm can be retrieved by search in short title",
   async ({ request }) => {
@@ -22,6 +24,7 @@ testWithImportedNorm.skip(
   }
 )
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check norm can be retrieved by search in unofficial short title",
   async ({ request }) => {
@@ -30,6 +33,7 @@ testWithImportedNorm.skip(
   }
 )
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check 404 is returned if no articles found",
   async ({ request }) => {

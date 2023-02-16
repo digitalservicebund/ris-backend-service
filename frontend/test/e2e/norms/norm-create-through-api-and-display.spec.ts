@@ -34,6 +34,7 @@ async function expectHeadingAppearAfterScroll(page, heading) {
   )
 }
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check display of norm complex",
   async ({ page, createdGuid }) => {
@@ -58,6 +59,7 @@ testWithImportedNorm.skip(
   }
 )
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check if frame fields are correctly displayed",
   async ({ page, createdGuid }) => {
@@ -100,6 +102,7 @@ testWithImportedNorm.skip(
   }
 )
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check if switching frame sections affects sections being inside or outside viewport",
   async ({ page, createdGuid }) => {

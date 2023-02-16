@@ -5,6 +5,8 @@ import { testWithImportedNorm } from "./fixtures"
 import norm from "./testdata/norm_for_retrieve_by_eli.json"
 
 testWithImportedNorm.use({ normToImport: norm })
+
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check if XML can be retrieved by ELI and content is correct",
   async ({ page, createdGuid, request }) => {

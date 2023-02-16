@@ -75,6 +75,7 @@ async function expectUpdatedFields(page, fields, data) {
   }
 }
 
+// eslint-disable-next-line playwright/no-skipped-test
 testWithImportedNorm.skip(
   "Check if fields can be edited",
   async ({ page, createdGuid }) => {
