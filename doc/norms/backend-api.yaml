@@ -3,19 +3,21 @@ info:
   version: 0.0.1
   title: NeuRIS Normen Service API
   description: Interface for the normen service of the legal information system
+  contact:
+    name: 'DigitalService GmbH des Bundes'
+    url: 'https://digitalservice.bund.de/'
+    email: 'hallo@digitalservice.bund.de'
   license:
     name: MIT
-    url: https://mit-license.org
-
+    url: 'https://mit-license.org'
 servers:
-  - url: https://ris.prod.ds4g.net/api/v1
+  - url: 'https://ris.prod.ds4g.net/api/v1'
     description: Public production server
-
 paths:
   /norms:
     get:
       summary: Get a list of norms filtered by a query
-      description: If no query is provided, all available norms are listed.
+      description: 'If no query is provided, all available norms are listed.'
       operationId: listNorms
       parameters:
         - in: query
@@ -29,13 +31,11 @@ paths:
               - unofficialShortTitle
 
             The search term is used as is without any postprocessing and is case sensitive.
-
           schema:
             type: string
-            example: "Koordinierung der Systeme"
-
+            example: Koordinierung der Systeme
       responses:
-        "200":
+        '200':
           description: Successful response with list of norms
           content:
             application/json:
@@ -48,23 +48,24 @@ paths:
                       type: object
                       properties:
                         guid:
-                          $ref: "#/components/schemas/Guid"
+                          $ref: '#/components/schemas/Guid'
                         eli:
-                          $ref: "#/components/schemas/ELI"
+                          $ref: '#/components/schemas/ELI'
                         officialLongTitle:
                           type: string
                 example:
-                  - guid: "86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919"
-                    eli: "eli/bgbl-1/1976/s3341/rechtsetzungsdokument-1"
-                    officialLongTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
-                  - guid: "07eb4f72-79cb-4070-93b5-62bfb44d3753"
-                    eli: "eli/bgbl-1/2004/s1673/rechtsetzungsdokument-1"
-                    officialLongTitle: "Übereinkommen über das umweltgerechte Recycling von Schiffen"
-        "400":
-          description: ""
-
+                  data:
+                    - guid: 86ee3aa7-b8ec-4f32-a6c7-2c7e13fc7919
+                      eli: eli/bgbl-1/1976/s3341/rechtsetzungsdokument-1
+                      officialLongTitle: Gesetz über die Beschaffung sauberer Straßenfahrzeuge
+                    - guid: 07eb4f72-79cb-4070-93b5-62bfb44d3753
+                      eli: eli/bgbl-1/2004/s1673/rechtsetzungsdokument-1
+                      officialLongTitle: Übereinkommen über das umweltgerechte Recycling von Schiffen
+        '400':
+          description: ''
     post:
       summary: Import a norm using a ZIP
+      description: Importing all xml files of a norm in juris format in a compressed ZIP file
       operationId: importNorm
       requestBody:
         required: true
@@ -74,7 +75,7 @@ paths:
               type: string
               format: binary
       responses:
-        "201":
+        '201':
           description: Norm was successfully imported
           content:
             application/json:
@@ -82,114 +83,163 @@ paths:
                 type: object
                 properties:
                   guid:
-                    $ref: "#/components/schemas/Guid"
-        "400":
+                    $ref: '#/components/schemas/Guid'
+        '400':
           description: Invalid norm
-
-  /norms/{guid}:
+  '/norms/{guid}':
     get:
       summary: Load a single norm
+      description: Retrieves a single norm given its guid
       operationId: loadNorm
       parameters:
         - name: guid
+          description: the unique guid identifier of a norm
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/Guid"
+            $ref: '#/components/schemas/Guid'
       responses:
-        "200":
+        '200':
           description: Norm was found
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Norm"
-        "404":
+                $ref: '#/components/schemas/Norm'
+        '404':
           description: No norm found for this query
-
     put:
       summary: Edit the frame data of a norm
+      description: Edits a norm given its unique guid identifier
       operationId: editNormFrame
       parameters:
         - name: guid
+          description: the unique guid identifier of a norm
           in: path
           required: true
           schema:
-            $ref: "#/components/schemas/Guid"
+            $ref: '#/components/schemas/Guid'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/NormFrame"
+              $ref: '#/components/schemas/NormFrame'
       responses:
-        "204":
+        '204':
           description: Norm was updated
-        "400":
-          description: ""
-
-  /norms/xml/eli/{printAnnouncementGazette}/{publicationYear}/s{printAnnouncementPage}:
+        '400':
+          description: ''
+  '/norms/xml/eli/{printAnnouncementGazette}/{publicationYear}/s{printAnnouncementPage}':
     get:
-      summary: Load a single as XML in LegalDocML format by eli
+      summary: Load a single as XML in LegalDocML.de format by eli
+      description: Retrieves a single norm in LegalDocML.de xml format using its ELI
       operationId: loadNormAsXML
       parameters:
         - name: printAnnouncementGazette
+          description: First part of the ELI, the gazette of the print announcement version
           in: path
           required: true
           schema:
             type: string
-            example: "bgbl-1"
+            example: bgbl-1
         - name: publicationYear
+          description: Second part of the ELI, the publication year
           in: path
           required: true
           schema:
             type: string
-            example: "1976"
+            example: '1976'
         - name: printAnnouncementPage
+          description: Third part of the ELI, the page of the print announcement version
           in: path
           required: true
           schema:
             type: string
-            example: "3341"
+            example: '3341'
       responses:
-        "200":
+        '200':
           description: Norm was found
           content:
             application/xml:
               schema:
-                $ref: "#/components/schemas/LegalDocML"
-
-        "404":
+                $ref: '#/components/schemas/LegalDocML'
+        '404':
           description: No norm found for this query
-
+  '/norms/{guid}/files/{hash}':
+    get:
+      summary: Download the exported ZIP file of a norm
+      description: Downloads a norm in a compressed ZIP file containing all juris xml files
+      operationId: downloadNormZipFile
+      parameters:
+        - name: guid
+          description: the unique guid identifier of a norm
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Guid'
+        - name: hash
+          description: the hast of the file
+          in: path
+          required: true
+          schema:
+            type: string
+            example: 867d0a6301f1276bac069e00c7cc196bb15eea3f962ce5a86c256616ef0773fe
+      responses:
+        '200':
+          description: Download ZIP file
+          headers:
+            Content-Disposition:
+              schema:
+                type: string
+                example: attachment; filename="SaubFahrzeugBeschG-2.0.zip"
+          content:
+            application/zip:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Norm with the given guid or given hash file name not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NormOrFileNotFound'
 components:
   securitySchemes:
     BasicAuth:
       type: http
       scheme: basic
-
   schemas:
+    NormOrFileNotFound:
+      description: An error object containing an error type and an error message
+      type: object
+      properties:
+        type:
+          type: string
+          example: FileNotFound
+        message:
+          type: string
+          example: File with the given hash not found
     Guid:
       description: The globally unique identifier of the norm (format in UUID)
       type: string
       format: uuid
-      example: "6a18380f-5c65-4f4d-902d-d49694f25de2"
-
+      example: 6a18380f-5c65-4f4d-902d-d49694f25de2
     ELI:
       description: A european legislation identifier
       type: string
       example: eli/bgbl-1/1976/s3341/rechtsetzungsdokument-1
-
     Date:
       description: The date format in XML files
       type: string
       pattern: '^[1-2]\d{3}-[0-1]\d-[0-3]\d$'
-      example: "2020-10-21"
-
+      example: '2020-10-21'
     UndefinedDate:
       description: A field that takes one of three values
       type: string
-      enum: [UNDEFINED_UNKNOWN, UNDEFINED_FUTURE, UNDEFINED_NOT_PRESENT]
-
+      enum:
+        - UNDEFINED_UNKNOWN
+        - UNDEFINED_FUTURE
+        - UNDEFINED_NOT_PRESENT
     Paragraph:
       type: object
       required:
@@ -197,14 +247,13 @@ components:
         - text
       properties:
         guid:
-          $ref: "#/components/schemas/Guid"
+          $ref: '#/components/schemas/Guid'
         marker:
           type: string
-          example: "(1)"
+          example: (1)
         text:
           type: string
-          example: "Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber."
-
+          example: 'Dieses Gesetz regelt Mindestziele und deren Sicherstellung bei der Beschaffung bestimmter Straßenfahrzeuge und Dienstleistungen, für die diese Straßenfahrzeuge eingesetzt werden, durch öffentliche Auftraggeber und Sektorenauftraggeber.'
     Article:
       type: object
       required:
@@ -213,360 +262,356 @@ components:
         - paragraphs
       properties:
         guid:
-          $ref: "#/components/schemas/Guid"
+          $ref: '#/components/schemas/Guid'
         marker:
           type: string
-          example: "§ 1"
+          example: § 1
         title:
           type: string
-          example: "Allgemeiner Anwendungsbereich"
+          example: Allgemeiner Anwendungsbereich
         paragraphs:
           type: array
           items:
-            $ref: "#/components/schemas/Paragraph"
-
+            $ref: '#/components/schemas/Paragraph'
     Norm:
       allOf:
-        - $ref: "#/components/schemas/NormFrame"
+        - $ref: '#/components/schemas/NormFrame'
         - type: object
           required:
             - guid
             - officialLongTitle
           properties:
             guid:
-              $ref: "#/components/schemas/Guid"
+              $ref: '#/components/schemas/Guid'
             articles:
               type: array
               items:
-                $ref: "#/components/schemas/Article"
-
+                $ref: '#/components/schemas/Article'
     NormFrame:
       type: object
       properties:
         officialLongTitle:
           type: string
-          example: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge"
+          example: Gesetz über die Beschaffung sauberer Straßenfahrzeuge
         officialShortTitle:
           type: string
-          example: "Saubere-Fahrzeuge-Beschaffungs-Gesetz"
+          example: Saubere-Fahrzeuge-Beschaffungs-Gesetz
         officialAbbreviation:
           type: string
-          example: "SaubFahrzeugBeschG"
+          example: SaubFahrzeugBeschG
         referenceNumber:
           type: string
-          example: "1 BvR 2011/94"
+          example: 1 BvR 2011/94
         announcementDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         citationDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         frameKeywords:
           type: string
-          example: "BGBl I 2021, Nr 031;geltendes Bundesrecht;Umsetzung EG-Recht;Umsetzung EURL 2019/1161;Beschaffung;sauber;Straßenfahrzeug"
+          example: 'BGBl I 2021, Nr 031;geltendes Bundesrecht;Umsetzung EG-Recht;Umsetzung EURL 2019/1161;Beschaffung;sauber;Straßenfahrzeug'
         providerEntity:
           type: string
-          example: "DEU"
+          example: DEU
         providerDecidingBody:
           type: string
-          example: "BT"
+          example: BT
         providerIsResolutionMajority:
           type: boolean
           example: true
         leadJurisdiction:
           type: string
-          example: "BMVI"
+          example: BMVI
         leadUnit:
           type: string
-          example: "G 22"
+          example: G 22
         participationType:
           type: string
-          example: "EZ"
+          example: EZ
         participationInstitution:
           type: string
-          example: "BR"
+          example: BR
         subjectFna:
           type: string
-          example: "FNA 703-12"
+          example: FNA 703-12
         subjectGesta:
           type: string
-          example: "GESTA J040"
+          example: GESTA J040
         documentNumber:
           type: string
-          example: ""
+          example: ''
         documentCategory:
           type: string
-          example: ""
+          example: ''
         risAbbreviationInternationalLaw:
           type: string
-          example: ""
+          example: ''
         unofficialReference:
           type: string
-          example: ""
+          example: ''
         applicationScopeArea:
           type: string
-          example: ""
+          example: ''
         applicationScopeStartDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         applicationScopeEndDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         validityRule:
           type: string
-          example: ""
+          example: ''
         celexNumber:
           type: string
-          example: ""
+          example: ''
         definition:
           type: string
-          example: ""
+          example: ''
         categorizedReference:
           type: string
-          example: ""
+          example: ''
         otherFootnote:
           type: string
-          example: "Das G wurde vom Bundestag beschlossen und ist am 1.1.1998 in Kraft getreten."
+          example: Das G wurde vom Bundestag beschlossen und ist am 1.1.1998 in Kraft getreten.
         footnoteChange:
           type: string
-          example: ""
+          example: ''
         footnoteComment:
           type: string
-          example: ""
+          example: ''
         footnoteDecision:
           type: string
-          example: ""
+          example: ''
         footnoteStateLaw:
           type: string
-          example: ""
+          example: ''
         footnoteEuLaw:
           type: string
-          example: ""
+          example: ''
         expirationDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         entryIntoForceDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         unofficialLongTitle:
           type: string
-          example: ""
+          example: ''
         unofficialShortTitle:
           type: string
-          example: "Nichtamtliche Kurzüberschrift"
+          example: Nichtamtliche Kurzüberschrift
         unofficialAbbreviation:
           type: string
-          example: "Nichtamtliche Buchstabenabkürzung"
+          example: Nichtamtliche Buchstabenabkürzung
         risAbbreviation:
           type: string
-          example: "SaubFahrzeugBeschG"
+          example: SaubFahrzeugBeschG
         printAnnouncementGazette:
           type: string
-          example: ""
+          example: ''
         printAnnouncementYear:
           type: string
-          example: "1996"
+          example: '1996'
         printAnnouncementPage:
           type: string
-          example: "1102"
+          example: '1102'
         documentStatusWorkNote:
           type: string
-          example: ""
+          example: ''
         documentStatusDescription:
           type: string
-          example: ""
+          example: ''
         documentStatusDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         statusNote:
           type: string
-          example: ""
+          example: ''
         statusDescription:
           type: string
-          example: ""
+          example: ''
         statusDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         statusReference:
           type: string
-          example: ""
+          example: ''
         repealNote:
           type: string
-          example: ""
+          example: ''
         repealArticle:
           type: string
-          example: ""
+          example: ''
         repealDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         repealReferences:
           type: string
-          example: ""
+          example: ''
         reissueNote:
           type: string
-          example: ""
+          example: ''
         reissueArticle:
           type: string
-          example: ""
+          example: ''
         reissueDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         reissueReference:
           type: string
-          example: ""
+          example: ''
         otherStatusNote:
           type: string
-          example: ""
+          example: ''
         text:
           type: string
-          example: "text"
+          example: text
         ageOfMajorityIndication:
           type: string
-          example: ""
+          example: ''
         divergentExpirationDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         divergentExpirationDateState:
-          $ref: "#/components/schemas/UndefinedDate"
+          $ref: '#/components/schemas/UndefinedDate'
         principleExpirationDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         principleExpirationDateState:
-          $ref: "#/components/schemas/UndefinedDate"
+          $ref: '#/components/schemas/UndefinedDate'
         expirationNormCategory:
           type: string
-          example: ""
+          example: ''
         divergentEntryIntoForceDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         divergentEntryIntoForceDateState:
-          $ref: "#/components/schemas/UndefinedDate"
+          $ref: '#/components/schemas/UndefinedDate'
         principleEntryIntoForceDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         principleEntryIntoForceDateState:
-          $ref: "#/components/schemas/UndefinedDate"
+          $ref: '#/components/schemas/UndefinedDate'
         entryIntoForceNormCategory:
           type: string
-          example: ""
+          example: ''
         publicationDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         documentTypeName:
           type: string
-          example: "RV"
+          example: RV
         documentNormCategory:
           type: string
-          example: "XX"
+          example: XX
         documentTemplateName:
           type: string
-          example: "Template"
+          example: Template
         subjectPreviousFna:
           type: string
-          example: "FNA 703-11"
+          example: FNA 703-11
         subjectBgb3:
           type: string
-          example: "BGB III 234"
+          example: BGB III 234
         printAnnouncementNumber:
           type: string
-          example: ""
+          example: ''
         printAnnouncementInfo:
           type: string
-          example: ""
+          example: ''
         printAnnouncementExplanations:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementMedium:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         digitalAnnouncementEdition:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementYear:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementPage:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementArea:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementAreaNumber:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementInfo:
           type: string
-          example: ""
+          example: ''
         digitalAnnouncementExplanations:
           type: string
-          example: ""
+          example: ''
         euAnnouncementGazette:
           type: string
-          example: ""
+          example: ''
         euAnnouncementYear:
           type: string
-          example: ""
+          example: ''
         euAnnouncementSeries:
           type: string
-          example: ""
+          example: ''
         euAnnouncementNumber:
           type: string
-          example: ""
+          example: ''
         euAnnouncementPage:
           type: string
-          example: ""
+          example: ''
         euAnnouncementInfo:
           type: string
-          example: ""
+          example: ''
         euAnnouncementExplanations:
           type: string
-          example: ""
+          example: ''
         otherOfficialAnnouncement:
           type: string
-          example: ""
+          example: ''
         documentStatusReference:
           type: string
-          example: ""
+          example: ''
         documentStatusEntryIntoForceDate:
-          $ref: "#/components/schemas/Date"
+          $ref: '#/components/schemas/Date'
         documentStatusProof:
           type: string
-          example: ""
+          example: ''
         documentTextProof:
           type: string
-          example: ""
+          example: ''
         otherDocumentNote:
           type: string
-          example: ""
+          example: ''
         ageIndicationStart:
           type: string
-          example: ""
+          example: ''
         ageIndicationEnd:
           type: string
-          example: ""
+          example: ''
         eli:
-          $ref: "#/components/schemas/ELI"
+          $ref: '#/components/schemas/ELI'
         completeCitation:
           type: string
-          example: ""
+          example: ''
         divergentDocumentNumber:
           type: string
-          example: ""
+          example: ''
         digitalEvidenceLink:
           type: string
-          example: ""
+          example: ''
         digitalEvidenceRelatedData:
           type: string
-          example: ""
+          example: ''
         digitalEvidenceExternalDataNote:
           type: string
-          example: ""
+          example: ''
         digitalEvidenceAppendix:
           type: string
-          example: ""
+          example: ''
         isExpirationDateTemp:
           type: boolean
           example: false
         expirationDateState:
           type: string
-          example: ""
+          example: ''
         entryIntoForceDateState:
           type: string
-          example: ""
-
+          example: ''
     LegalDocML:
       type: object
       xml:
         name: akomaNtoso
-        namespace: http://Inhaltsdaten.LegalDocML.de/1.4
+        namespace: 'http://Inhaltsdaten.LegalDocML.de/1.4'
         prefix: akn
-
 security:
   - BasicAuth: []

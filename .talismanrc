@@ -5,6 +5,8 @@ fileignoreconfig:
     checksum: 19ca4c7e1fcc29fcbe16235e4fd543854563ba32e8eae67e321ef1de39b90b93
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
+  - filename: doc/norms/backend-api.yaml
+    checksum: d2bd91936de92caf6bc575303218078cf0ad60a380d3f6acd1801c22f8cf2a4b
 scopeconfig:
   - scope: node
 allowed_patterns:
