@@ -2,7 +2,7 @@ import { ref } from "vue"
 import type { RouteLocationNormalizedLoaded } from "vue-router"
 import { useNormMenuItems } from "@/composables/useNormMenuItems"
 
-describe("useCaseLawMenuItems", () => {
+describe("useNormMenuItems", () => {
   it("adds norm GUID as route parameter to each menu item", () => {
     const guid = ref("fake-guid")
     const route = {} as unknown as RouteLocationNormalizedLoaded
@@ -37,5 +37,6 @@ describe("useCaseLawMenuItems", () => {
     expect(topLebelNames).toContain("Rahmen")
     expect(topLebelNames).toContain("Bestand")
     expect(topLebelNames).toContain("Abgabe")
+    expect(topLebelNames).toContain("Export")
   })
 })

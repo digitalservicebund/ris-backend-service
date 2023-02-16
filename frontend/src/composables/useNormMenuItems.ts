@@ -90,5 +90,13 @@ export function useNormMenuItems(
       },
       isDisabled: true,
     },
+    {
+      label: "Export",
+      route: {
+        ...baseRoute,
+        name: "norms",
+      },
+      isDisabled: true,
+    },
   ])
 }
