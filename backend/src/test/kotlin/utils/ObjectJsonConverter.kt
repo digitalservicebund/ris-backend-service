@@ -7,7 +7,6 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.ImportNormController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.LoadNormController
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import java.lang.reflect.Type
@@ -17,12 +16,6 @@ fun convertEditNormRequestSchemaToJson(
     editNormRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema,
 ): String {
     return Gson().toJson(editNormRequestSchema)
-}
-
-fun convertImportormRequestSchemaToJson(
-    importNormRequestSchema: ImportNormController.NormRequestSchema,
-): String {
-    return Gson().toJson(importNormRequestSchema)
 }
 
 fun convertNormToJson(norm: LoadNormController.NormResponseSchema): String {

@@ -9,16 +9,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
-import utils.assertNormDataAndImportNormRequestSchemaWithoutArticles
-import utils.convertImportormRequestSchemaToJson
-import utils.createRandomImportNormRequestSchema
+import java.nio.ByteBuffer
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -30,69 +27,24 @@ class ImportNormControllerTest {
     @MockkBean lateinit var importNormService: ImportNormUseCase
 
     @Test
-    fun `it correctly maps the data to the command to call the import norm service`() {
-        val importNormRequestSchema = createRandomImportNormRequestSchema()
-
-        val article = ImportNormController.ArticleRequestSchema()
-        val paragraph = ImportNormController.ParagraphRequestSchema()
-        paragraph.text = "Test Paragraph"
-        paragraph.marker = "(1)"
-        article.marker = "1"
-        article.title = "Test Title"
-        article.paragraphs = listOf(paragraph)
-        importNormRequestSchema.articles = listOf(article)
-
-        val importJson = convertImportormRequestSchemaToJson(importNormRequestSchema)
-
-        every { importNormService.importNorm(any()) } returns Mono.just(UUID.randomUUID())
+    fun `it calls the import norm service with the content of the body as ZIP file`() {
+        val zipFile = ByteBuffer.allocate(0)
+        every { importNormService.importNorm(any()) } returns Mono.empty()
 
         webClient
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue(importJson))
+            .body(BodyInserters.fromValue(zipFile))
             .exchange()
 
         verify(exactly = 1) {
-            importNormService.importNorm(
-                withArg {
-                    assertThat(it.data.articles).hasSize(1)
-                    assertThat(it.data.articles[0].title)
-                        .isEqualTo(importNormRequestSchema.articles[0].title)
-                    assertThat(it.data.articles[0].marker)
-                        .isEqualTo(importNormRequestSchema.articles[0].marker)
-                    assertThat(it.data.articles[0].paragraphs).hasSize(1)
-                    assertThat(it.data.articles[0].paragraphs[0].marker)
-                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[0].marker)
-                    assertThat(it.data.articles[0].paragraphs[0].text)
-                        .isEqualTo(importNormRequestSchema.articles[0].paragraphs[0].text)
-                    assertNormDataAndImportNormRequestSchemaWithoutArticles(
-                        it.data,
-                        importNormRequestSchema,
-                    )
-                },
-            )
+            importNormService.importNorm(withArg { assertThat(it.zipFile).isEqualTo(zipFile) })
         }
     }
 
     @Test
     fun `it responds with created status when norm was imported`() {
-        every { importNormService.importNorm(any()) } returns Mono.just(UUID.randomUUID())
-
-        webClient
-            .mutateWith(csrf())
-            .post()
-            .uri("/api/v1/norms")
-            .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
-            .exchange()
-            .expectStatus()
-            .isCreated()
-    }
-
-    @Test
-    fun `it uses the new GUID from the service an creates a location header for the imported norm`() {
         every { importNormService.importNorm(any()) } returns
             Mono.just(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
 
@@ -100,11 +52,28 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
+            .body(BodyInserters.fromValue(ByteBuffer.allocate(0)))
             .exchange()
-            .expectHeader()
-            .location("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
+            .expectStatus()
+            .isCreated()
+    }
+
+    @Test
+    fun `it sends the GUID of the new norm in the response object as property`() {
+        every { importNormService.importNorm(any()) } returns
+            Mono.just(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"))
+
+        webClient
+            .mutateWith(csrf())
+            .post()
+            .uri("/api/v1/norms")
+            .body(BodyInserters.fromValue(ByteBuffer.allocate(0)))
+            .exchange()
+            .expectBody()
+            .jsonPath("guid")
+            .exists()
+            .jsonPath("guid")
+            .isEqualTo("761b5537-5aa5-4901-81f7-fbf7e040a7c8")
     }
 
     @Test
@@ -115,8 +84,7 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "officialLongTitle": "long title" }"""))
+            .body(BodyInserters.fromValue(ByteBuffer.allocate(0)))
             .exchange()
             .expectStatus()
             .is5xxServerError()

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
+import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import io.mockk.every
 import io.mockk.mockk
@@ -9,117 +10,82 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
-import utils.assertNormAndNormDataWithoutArticles
-import utils.createRandomImportNormData
+import utils.createRandomNorm
+import java.nio.ByteBuffer
 
 class ImportNormServiceTest {
-    @Test
-    fun `it saves norm to output port with data from command without optional fields`() {
-        val port = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(port)
-        val paragraph = ImportNormUseCase.ParagraphData("marker", "text")
-        val article = ImportNormUseCase.ArticleData("title", "marker", listOf(paragraph))
-        val normData = ImportNormUseCase.NormData("long title", listOf(article))
-        val command = ImportNormUseCase.Command(normData)
 
-        every { port.saveNorm(any()) } returns Mono.just(true)
+    @Test
+    fun `it should forward the ZIP file to the juris parser`() {
+        val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
+        val saveNormAdapter = mockk<SaveNormOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
+        val zipFile = ByteBuffer.allocate(0)
+        val command = ImportNormUseCase.Command(zipFile)
+
+        every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.empty()
 
         service.importNorm(command).block()
 
         verify(exactly = 1) {
-            port.saveNorm(
-                withArg {
-                    assertThat(it.norm.articles).hasSize(1)
-                    assertThat(it.norm.articles[0].title).isEqualTo("title")
-                    assertThat(it.norm.articles[0].marker).isEqualTo("marker")
-                    assertThat(it.norm.articles[0].paragraphs).hasSize(1)
-                    assertThat(it.norm.articles[0].paragraphs[0].marker).isEqualTo("marker")
-                    assertThat(it.norm.articles[0].paragraphs[0].text).isEqualTo("text")
-                    assertNormAndNormDataWithoutArticles(it.norm, normData)
-                },
+            parseJurisXmlAdapter.parseJurisXml(
+                withArg { assertThat(it.zipFile).isEqualTo(zipFile) },
             )
         }
     }
 
     @Test
-    fun `it saves norm to output port with data from command including optional fields`() {
-        val port = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(port)
-        val normData = createRandomImportNormData()
-        val command = ImportNormUseCase.Command(normData)
+    fun `it forwards the parsed norm to the save norm adapter`() {
+        val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
+        val saveNormAdapter = mockk<SaveNormOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
+        val parsedNorm = createRandomNorm()
+        val command = ImportNormUseCase.Command(ByteBuffer.allocate(0))
 
-        every { port.saveNorm(any()) } returns Mono.just(true)
+        every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(parsedNorm)
+        every { saveNormAdapter.saveNorm(any()) } returns Mono.empty()
 
         service.importNorm(command).block()
 
         verify(exactly = 1) {
-            port.saveNorm(
-                withArg {
-                    assertThat(it.norm.articles.size).isEqualTo(2)
-                    assertThat(it.norm.articles[0].title).isEqualTo(normData.articles[0].title)
-                    assertThat(it.norm.articles[0].marker).isEqualTo(normData.articles[0].marker)
-                    assertThat(it.norm.articles[0].paragraphs).hasSize(2)
-                    assertThat(it.norm.articles[0].paragraphs[0].marker)
-                        .isEqualTo(normData.articles[0].paragraphs[0].marker)
-                    assertThat(it.norm.articles[0].paragraphs[0].text)
-                        .isEqualTo(normData.articles[0].paragraphs[0].text)
-                    assertThat(it.norm.articles[0].paragraphs[1].marker)
-                        .isEqualTo(normData.articles[0].paragraphs[1].marker)
-                    assertThat(it.norm.articles[0].paragraphs[1].text)
-                        .isEqualTo(normData.articles[0].paragraphs[1].text)
-                    assertThat(it.norm.articles[1].title).isEqualTo(normData.articles[1].title)
-                    assertThat(it.norm.articles[1].marker).isEqualTo(normData.articles[1].marker)
-                    assertThat(it.norm.articles[1].paragraphs).hasSize(2)
-                    assertThat(it.norm.articles[1].paragraphs[0].marker)
-                        .isEqualTo(normData.articles[1].paragraphs[0].marker)
-                    assertThat(it.norm.articles[1].paragraphs[0].text)
-                        .isEqualTo(normData.articles[1].paragraphs[0].text)
-                    assertThat(it.norm.articles[1].paragraphs[1].marker)
-                        .isEqualTo(normData.articles[1].paragraphs[1].marker)
-                    assertThat(it.norm.articles[1].paragraphs[1].text)
-                        .isEqualTo(normData.articles[1].paragraphs[1].text)
-                    assertNormAndNormDataWithoutArticles(it.norm, normData)
-                },
-            )
+            saveNormAdapter.saveNorm(withArg { assertThat(it.norm).isEqualTo(parsedNorm) })
         }
     }
 
     @Test
     fun `it generates a new GUID for every norm`() {
-        val port = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(port)
-        val normOne = ImportNormUseCase.NormData("long title one", listOf())
-        val normTwo = ImportNormUseCase.NormData("long title two", listOf())
-        val normThree = ImportNormUseCase.NormData("long title three", listOf())
-        val commandOne = ImportNormUseCase.Command(normOne)
-        val commandTwo = ImportNormUseCase.Command(normTwo)
-        val commandThree = ImportNormUseCase.Command(normThree)
+        val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
+        val saveNormAdapter = mockk<SaveNormOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
+        val commandOne = ImportNormUseCase.Command(ByteBuffer.allocate(0))
+        val commandTwo = ImportNormUseCase.Command(ByteBuffer.allocate(0))
+        val commandThree = ImportNormUseCase.Command(ByteBuffer.allocate(0))
 
-        every { port.saveNorm(any()) } returns Mono.just(true)
+        every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
+        every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
 
-        service.importNorm(commandOne).block()
-        service.importNorm(commandTwo).block()
-        service.importNorm(commandThree).block()
+        val guidOne = service.importNorm(commandOne).block()
+        val guidTwo = service.importNorm(commandTwo).block()
+        val guidThree = service.importNorm(commandThree).block()
 
-        val saveCommands = mutableListOf<SaveNormOutputPort.Command>()
-        verify(exactly = 3) { port.saveNorm(capture(saveCommands)) }
-        val usedGuids = saveCommands.map { it.norm.guid }
-        assertThat(usedGuids.toSet().size).isEqualTo(usedGuids.size)
+        val guidList = listOf(guidOne, guidTwo, guidThree)
+        assertThat(guidList.toSet().size).isEqualTo(guidList.size)
     }
 
     @Test
-    fun `it returns the new GUID under which the norm is saved`() {
-        val port = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(port)
-        val norm = ImportNormUseCase.NormData("long title", listOf())
-        val command = ImportNormUseCase.Command(norm)
+    fun `it uses the same GUID for the whole process`() {
+        val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
+        val saveNormAdapter = mockk<SaveNormOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
+        val command = ImportNormUseCase.Command(ByteBuffer.allocate(0))
 
-        val saveCommand = slot<SaveNormOutputPort.Command>()
-        every { port.saveNorm(capture(saveCommand)) } returns Mono.just(true)
+        every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
+        every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
 
-        StepVerifier.create(service.importNorm(command))
-            .expectNextMatches { it == saveCommand.captured.norm.guid }
-            .verifyComplete()
+        val guid = service.importNorm(command).block()
+        val parseCommand = slot<ParseJurisXmlOutputPort.Command>()
+        verify { parseJurisXmlAdapter.parseJurisXml(capture(parseCommand)) }
+
+        assertThat(guid).isEqualTo(parseCommand.captured.newGuid)
     }
 }
