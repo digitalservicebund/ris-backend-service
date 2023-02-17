@@ -54,6 +54,7 @@ export default class SubjectTree {
 export type SubjectNode = {
   subjectFieldNumber: string
   subjectFieldText: string
+  linkedFields?: string[]
   // parent?: string
   children: SubjectNode[]
   depth: number

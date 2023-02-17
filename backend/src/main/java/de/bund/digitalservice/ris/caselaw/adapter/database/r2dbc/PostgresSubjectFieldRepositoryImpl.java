@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
@@ -17,14 +19,17 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   DatabaseSubjectFieldRepository databaseSubjectFieldRepository;
   KeywordRepository keywordRepository;
   NormRepository normRepository;
+  FieldOfLawLinkRepository fieldOfLawLinkRepository;
 
   public PostgresSubjectFieldRepositoryImpl(
       DatabaseSubjectFieldRepository databaseSubjectFieldRepository,
       KeywordRepository keywordRepository,
-      NormRepository normRepository) {
+      NormRepository normRepository,
+      FieldOfLawLinkRepository fieldOfLawLinkRepository) {
     this.databaseSubjectFieldRepository = databaseSubjectFieldRepository;
     this.keywordRepository = keywordRepository;
     this.normRepository = normRepository;
+    this.fieldOfLawLinkRepository = fieldOfLawLinkRepository;
   }
 
   @Override
@@ -61,6 +66,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
         .findAllByParentIdOrderBySubjectFieldNumberAsc(null)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
@@ -71,6 +77,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
         .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(subjectFieldNumber)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
@@ -102,6 +109,19 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
         .map(
             norms -> {
               subjectFieldDTO.setNorms(norms);
+              return subjectFieldDTO;
+            });
+  }
+
+  private Mono<SubjectFieldDTO> injectLinkedFields(SubjectFieldDTO subjectFieldDTO) {
+    return fieldOfLawLinkRepository
+        .findAllByFieldId(subjectFieldDTO.getId())
+        .map(FieldOfLawLinkDTO::getLinkedFieldId)
+        .flatMap(linkedFieldId -> databaseSubjectFieldRepository.findById(linkedFieldId))
+        .collectList()
+        .map(
+            subjectFieldDTOS -> {
+              subjectFieldDTO.setLinkedFields(subjectFieldDTOS);
               return subjectFieldDTO;
             });
   }

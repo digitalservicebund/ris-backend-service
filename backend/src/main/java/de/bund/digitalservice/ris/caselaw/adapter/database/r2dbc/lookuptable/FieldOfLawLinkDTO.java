@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,24 +13,12 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("lookuptable_subject_field")
-public class SubjectFieldDTO implements Persistable<Long> {
-  public static final SubjectFieldDTO EMPTY = new SubjectFieldDTO();
+@Table("field_of_law_link")
+public class FieldOfLawLinkDTO implements Persistable<Long> {
+  public static final FieldOfLawLinkDTO EMPTY = new FieldOfLawLinkDTO();
   @Id Long id;
-  Integer depthInTree;
-  boolean isLeafInTree;
-  Long parentId;
-  boolean parent;
-  String changeDateMail;
-  String changeDateClient;
-  char changeIndicator;
-  String version;
-  String subjectFieldNumber;
-  String subjectFieldText;
-  String navigationTerm;
-  @Transient List<SubjectFieldDTO> linkedFields;
-  @Transient List<KeywordDTO> keywords;
-  @Transient List<NormDTO> norms;
+  Long fieldId;
+  Long linkedFieldId;
 
   @Transient private boolean isNew;
 

@@ -11,6 +11,7 @@ public record SubjectField(
     String subjectFieldNumber,
     String subjectFieldText,
     String navigationTerm,
+    List<String> linkedFields,
     List<Keyword> keywords,
     List<Norm> norms,
     List<SubjectField> children) {}

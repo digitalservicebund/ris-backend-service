@@ -39,12 +39,21 @@ public class SubjectFieldTransformer {
               .toList();
     }
 
+    List<String> linkedFields = null;
+    if (subjectFieldDTO.getLinkedFields() != null) {
+      linkedFields =
+          subjectFieldDTO.getLinkedFields().stream()
+              .map(SubjectFieldDTO::getSubjectFieldNumber)
+              .toList();
+    }
+
     return SubjectField.builder()
         .id(subjectFieldDTO.getId())
         .depth(subjectFieldDTO.getDepthInTree())
         .isLeaf(subjectFieldDTO.isLeafInTree())
         .subjectFieldNumber(subjectFieldDTO.getSubjectFieldNumber())
         .subjectFieldText(subjectFieldDTO.getSubjectFieldText())
+        .linkedFields(linkedFields)
         .navigationTerm(subjectFieldDTO.getNavigationTerm())
         .keywords(keywords)
         .norms(norms)
