@@ -1,5 +1,5 @@
+import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
-import { checkA11y, injectAxe } from "axe-playwright"
 import {
   navigateToCategories,
   navigateToFiles,
@@ -15,8 +15,8 @@ test.describe("a11y of start page (/caselaw)", () => {
   test("documentUnit list", async ({ page }) => {
     await page.goto("/")
     await expect(page.locator("text=Neue Dokumentationseinheit")).toBeVisible()
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
   test("delete documentUnit popup", async ({ page, documentNumber }) => {
@@ -31,21 +31,22 @@ test.describe("a11y of start page (/caselaw)", () => {
       })
       .locator("[aria-label='Dokumentationseinheit löschen']")
       .click()
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 })
 
 test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/categories)", () => {
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("first load", async ({ page, documentNumber }) => {
+  test("first load", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    await injectAxe(page)
-    await checkA11y(page)
+    //TODO: we make the assumption, that the field id in the configs always matches the domain model. Input field IDs need to have the same value like the model name, e.g. the court input fields in coreData and previousDecision both need to have the ID "court", because the model is named so. This results in a "duplicate-id-aria" violation, we need some decoupling here, so we are able to use different ids in the frontend. Also the ModelComponentRepeater creates components with the same id, we will need some kind of indexing in the ids here. That's why we disable the "duplicate-id-aria" rule for now.
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("gericht", async ({ page, documentNumber }) => {
+  test("gericht", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await page
       .locator("[aria-label='Gericht'] + button.input-expand-icon")
@@ -59,12 +60,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.locator("[aria-label='Gericht']").fill("bayern")
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("aktenzeichen", async ({ page, documentNumber }) => {
+  test("aktenzeichen", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Aktenzeichen']").fill("testone")
@@ -83,12 +85,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await page.keyboard.press("Enter")
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("entscheidungsdatum", async ({ page, documentNumber }) => {
+  test("entscheidungsdatum", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
@@ -106,12 +109,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .fill("2022-02-01")
     await page.keyboard.press("Enter")
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("dokumenttyp", async ({ page, documentNumber }) => {
+  test("dokumenttyp", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page
@@ -124,12 +128,13 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("zwischen")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("ecli", async ({ page, documentNumber }) => {
+  test("ecli", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='ECLI']").fill("one")
@@ -141,23 +146,25 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.locator("[aria-label='Abweichender ECLI']").fill("three")
     await page.keyboard.press("Enter")
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("rechtskraft", async ({ page, documentNumber }) => {
+  test("rechtskraft", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await page
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("previous decision", async ({ page, documentNumber }) => {
+  test("previous decision", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await togglePreviousDecisionsSection(page)
     await fillPreviousDecisionInputs(page, {
@@ -173,19 +180,22 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       date: "2004-12-03",
     })
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("text editor", async ({ page, documentNumber }) => {
+  test("text editor", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     const editorField = page.locator("[data-testid='Entscheidungsname'] >> div")
     await editorField.click()
     await editorField.type("this is text")
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page })
+      .disableRules(["duplicate-id-aria"])
+      .analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 })
 
@@ -202,8 +212,8 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await uploadTestfile(page, "sample.docx")
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
   test("delete document", async ({ page, documentNumber }) => {
@@ -213,8 +223,8 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
     await page.locator("text=Datei löschen").click()
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
   test("upload non-docx file per file chooser", async ({
@@ -227,16 +237,16 @@ test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/fil
       page.locator("text=Das ausgewählte Dateiformat ist nicht korrekt.")
     ).toBeVisible()
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 })
 
 test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/publication)", () => {
   test("publication", async ({ page, documentNumber }) => {
     await navigateToPublication(page, documentNumber)
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 
   test("publication not possible", async ({ page, documentNumber }) => {
@@ -257,7 +267,7 @@ test.describe("a11y of publication page (/caselaw/documentunit/{documentNumber}/
       .click()
     await expect(page.locator("text=E-Mail-Adresse ungültig")).toBeVisible()
 
-    await injectAxe(page)
-    await checkA11y(page)
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
   })
 })
