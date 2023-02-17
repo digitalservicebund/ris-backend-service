@@ -5,6 +5,11 @@ interface Norm {
 }
 
 defineProps<{ norms: Norm[] }>()
+
+function formatTitle(title?: string): string {
+  const titleIsMissing = title === undefined || title.length <= 0
+  return titleIsMissing ? "Kein Titel" : title
+}
 </script>
 <template>
   <div v-if="norms.length" class="pl-64">
@@ -17,7 +22,7 @@ defineProps<{ norms: Norm[] }>()
             params: { normGuid: norm.guid },
           }"
         >
-          {{ norm.officialLongTitle }}
+          {{ formatTitle(norm.officialLongTitle) }}
         </router-link>
       </div>
     </div>
