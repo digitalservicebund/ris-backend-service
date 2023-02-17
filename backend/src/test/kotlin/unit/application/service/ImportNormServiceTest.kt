@@ -83,9 +83,9 @@ class ImportNormServiceTest {
         every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
 
         val guid = service.importNorm(command).block()
-        val parseCommand = slot<ParseJurisXmlOutputPort.Command>()
-        verify { parseJurisXmlAdapter.parseJurisXml(capture(parseCommand)) }
+        val parseQuery = slot<ParseJurisXmlOutputPort.Query>()
+        verify { parseJurisXmlAdapter.parseJurisXml(capture(parseQuery)) }
 
-        assertThat(guid).isEqualTo(parseCommand.captured.newGuid)
+        assertThat(guid).isEqualTo(parseQuery.captured.newGuid)
     }
 }

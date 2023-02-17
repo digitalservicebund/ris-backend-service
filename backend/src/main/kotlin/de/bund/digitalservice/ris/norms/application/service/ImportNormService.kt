@@ -15,10 +15,10 @@ class ImportNormService(
 
     override fun importNorm(command: ImportNormUseCase.Command): Mono<UUID> {
         val guid = UUID.randomUUID()
-        val parseCommand = ParseJurisXmlOutputPort.Command(guid, command.zipFile)
+        val parseQuery = ParseJurisXmlOutputPort.Query(guid, command.zipFile)
 
         return parseJurisXmlAdapter
-            .parseJurisXml(parseCommand)
+            .parseJurisXml(parseQuery)
             .map { parsedNorm -> SaveNormOutputPort.Command(parsedNorm) }
             .flatMap { saveCommand -> saveNormAdapter.saveNorm(saveCommand) }
             .map { guid }

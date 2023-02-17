@@ -6,6 +6,7 @@ import java.nio.ByteBuffer
 import java.util.UUID
 
 interface ParseJurisXmlOutputPort {
-    fun parseJurisXml(command: Command): Mono<Norm>
-    data class Command(val newGuid: UUID, val zipFile: ByteBuffer)
+    fun parseJurisXml(query: Query): Mono<Norm>
+
+    data class Query(val newGuid: UUID, val zipFile: ByteBuffer)
 }

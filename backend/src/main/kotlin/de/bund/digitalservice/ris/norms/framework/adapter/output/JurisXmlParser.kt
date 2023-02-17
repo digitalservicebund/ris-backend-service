@@ -12,9 +12,9 @@ import de.bund.digitalservice.ris.norms.juris.extractor.model.Norm as NormData
 
 @Component
 class JurisXmlParser() : ParseJurisXmlOutputPort {
-    override fun parseJurisXml(command: ParseJurisXmlOutputPort.Command): Mono<Norm> {
-        val data = extractData(command.zipFile)
-        val norm = mapDataToDomain(command.newGuid, data)
+    override fun parseJurisXml(query: ParseJurisXmlOutputPort.Query): Mono<Norm> {
+        val data = extractData(query.zipFile)
+        val norm = mapDataToDomain(query.newGuid, data)
         return Mono.just(norm)
     }
 }

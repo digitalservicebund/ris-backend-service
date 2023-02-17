@@ -37,9 +37,9 @@ class JurisXmlParserTest {
     fun `it uses the given GUID for the norm`() {
         val parser = JurisXmlParser()
         val guid = UUID.randomUUID()
-        val command = ParseJurisXmlOutputPort.Command(guid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile)
 
-        val norm = parser.parseJurisXml(command).block()
+        val norm = parser.parseJurisXml(query).block()
 
         assertThat(norm?.guid).isEqualTo(guid)
     }
@@ -48,9 +48,9 @@ class JurisXmlParserTest {
     fun `it calls the external library to parse the given ZIP file`() {
         val parser = JurisXmlParser()
         val zipFile = ByteBuffer.allocate(0)
-        val command = ParseJurisXmlOutputPort.Command(anyGuid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile)
 
-        parser.parseJurisXml(command).block()
+        parser.parseJurisXml(query).block()
 
         verify(exactly = 1) { extractData(zipFile) }
     }
@@ -128,10 +128,10 @@ class JurisXmlParserTest {
                 ageOfMajorityIndication = "test age of majority indication"
                 text = "test text"
             }
-        val command = ParseJurisXmlOutputPort.Command(anyGuid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile)
         every { extractData(any()) } returns data
 
-        val norm = parser.parseJurisXml(command).block()
+        val norm = parser.parseJurisXml(query).block()
 
         assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
         assertThat(norm?.risAbbreviation).isEqualTo("test ris abbreviation")
@@ -207,13 +207,13 @@ class JurisXmlParserTest {
     fun `it does not parse any articles`() {
         val parser = JurisXmlParser()
         val guid = UUID.randomUUID()
-        val command = ParseJurisXmlOutputPort.Command(guid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile)
         val articleData = ArticleData("title", "marker")
         val data = NormData().apply { articles = listOf(articleData) }
 
         every { extractData(any()) } returns data
 
-        val norm = parser.parseJurisXml(command).block()
+        val norm = parser.parseJurisXml(query).block()
 
         assertThat(norm?.articles).hasSize(0)
     }
