@@ -36,9 +36,9 @@ server:
       cookie:
         max-age: 43200 # 12*60*60
         http-only: false
-logging:
-  level:
-    org.springframework: DEBUG
+#logging:
+#  level:
+#    org.springframework: DEBUG
 spring:
   codec:
     max-in-memory-size: 100MB

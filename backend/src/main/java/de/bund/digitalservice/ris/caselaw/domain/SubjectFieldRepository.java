@@ -16,7 +16,7 @@ public interface SubjectFieldRepository {
 
   Mono<SubjectField> findBySubjectFieldNumber(String subjectFieldId);
 
-  Mono<SubjectField> findById(Long id);
-
   Mono<SubjectField> findParentByChild(SubjectField child);
+
+  Flux<SubjectField> findAllByOrderBySubjectFieldNumberAsc();
 }

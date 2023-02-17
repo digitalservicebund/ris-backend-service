@@ -12,10 +12,10 @@ const emit = defineEmits<{
   <div class="flex">
     <div>
       <button
-        class="material-icons p-6 text-blue-800"
+        aria-label="Auswahl im Sachgebietsbaum"
+        class="deeplink p-6 text-blue-800"
         @click="emit('node-clicked')"
       >
-        open_in_new
       </button>
     </div>
     <div class="flex-1 flex-col pt-8">
@@ -28,6 +28,7 @@ const emit = defineEmits<{
     </div>
     <div>
       <button
+        aria-label="Löschen"
         class="material-icons text-blue-800"
         @click="emit('remove-from-list')"
       >

@@ -35,6 +35,13 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
+  public Flux<SubjectField> findAllByOrderBySubjectFieldNumberAsc() {
+    return databaseSubjectFieldRepository
+        .findAllByOrderBySubjectFieldNumberAsc()
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
   public Mono<SubjectField> findBySubjectFieldNumber(String subjectFieldNumber) {
     return databaseSubjectFieldRepository
         .findBySubjectFieldNumber(subjectFieldNumber)
@@ -59,8 +66,8 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   public Flux<SubjectField> getTopLevelNodes() {
     return databaseSubjectFieldRepository
         .findAllByParentIdOrderBySubjectFieldNumberAsc(null)
-        .flatMap(this::injectKeywords)
-        .flatMap(this::injectNorms)
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
@@ -69,8 +76,8 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
       String subjectFieldNumber) {
     return databaseSubjectFieldRepository
         .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(subjectFieldNumber)
-        .flatMap(this::injectKeywords)
-        .flatMap(this::injectNorms)
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
@@ -78,8 +85,8 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   public Flux<SubjectField> findBySearchStr(String searchStr) {
     return databaseSubjectFieldRepository
         .findBySearchStr(searchStr)
-        .flatMap(this::injectKeywords)
-        .flatMap(this::injectNorms)
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
