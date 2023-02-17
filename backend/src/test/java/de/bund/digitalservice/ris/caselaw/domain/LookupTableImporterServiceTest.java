@@ -12,6 +12,7 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
@@ -54,6 +55,8 @@ class LookupTableImporterServiceTest {
   @MockBean private DatabaseSubjectFieldRepository subjectFieldRepository;
 
   @MockBean private JPASubjectFieldRepository jpaSubjectFieldRepository;
+
+  @MockBean private JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
 
   @Test
   void testImportDocumentTypeLookupTable() {
