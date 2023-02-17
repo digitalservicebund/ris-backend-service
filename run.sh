@@ -93,7 +93,7 @@ _dev() {
   if [ $# -gt 0 ] && [ "${1#}" == "--no-backend" ]; then
     docker compose up traefik redis db frontend
   else
-    docker compose up
+    MY_UID="$(id -u)" MY_GID="$(id -g)" docker compose up
   fi
 }
 
