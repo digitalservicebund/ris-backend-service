@@ -54,34 +54,4 @@ class LookupTableControllerTest {
 
     verify(service, times(1)).getCourts(Optional.empty());
   }
-
-  @Test
-  void testGetSubjectFieldsByFulltext() {
-    when(service.getSubjectFields(Optional.empty())).thenReturn(Flux.empty());
-
-    webClient
-        .mutateWith(csrf())
-        .get()
-        .uri("/api/v1/caselaw/lookuptable/subjectFields")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getSubjectFields(Optional.empty());
-  }
-
-  @Test
-  void testGetChildrenOfSubjectField() {
-    when(service.getSubjectFieldChildren("root")).thenReturn(Flux.empty());
-
-    webClient
-        .mutateWith(csrf())
-        .get()
-        .uri("/api/v1/caselaw/lookuptable/subjectFieldChildren/root")
-        .exchange()
-        .expectStatus()
-        .isOk();
-
-    verify(service, times(1)).getSubjectFieldChildren("root");
-  }
 }

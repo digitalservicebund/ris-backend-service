@@ -13,7 +13,7 @@ interface SubjectsService {
 const service: SubjectsService = {
   async getChildrenOf(subjectFieldNumber: string) {
     const response = await httpClient.get<SubjectNode[]>(
-      `caselaw/lookuptable/subjectFieldChildren/${subjectFieldNumber}`
+      `caselaw/fieldsoflaw/${subjectFieldNumber}/children`
     )
     if (response.status >= 300) {
       response.error = {
@@ -27,7 +27,7 @@ const service: SubjectsService = {
   },
   async getTreeForSubjectFieldNumber(subjectFieldNumber: string) {
     const response = await httpClient.get<SubjectNode>(
-      `caselaw/lookuptable/subjectFields/${subjectFieldNumber}/tree`
+      `caselaw/fieldsoflaw/${subjectFieldNumber}/tree`
     )
     // if (response.data) console.log("service - load tree:", response.data)
     if (response.status >= 300) {
