@@ -1,5 +1,6 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
+import { checkA11y, injectAxe } from "axe-playwright"
 import {
   navigateToCategories,
   navigateToFiles,
