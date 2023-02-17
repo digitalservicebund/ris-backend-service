@@ -36,3 +36,9 @@ const emit = defineEmits<{
     </div>
   </div>
 </template>
+
+<style lang="scss" scoped>
+button.deeplink {
+  background-image: url("@/assets/icons/deeplink_regular.svg");
+}
+</style>
