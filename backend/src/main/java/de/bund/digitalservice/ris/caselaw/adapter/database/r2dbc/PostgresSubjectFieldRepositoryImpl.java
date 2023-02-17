@@ -28,13 +28,6 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Mono<SubjectField> findById(Long id) {
-    return databaseSubjectFieldRepository
-        .findById(id)
-        .map(SubjectFieldTransformer::transformToDomain);
-  }
-
-  @Override
   public Flux<SubjectField> findAllByOrderBySubjectFieldNumberAsc() {
     return databaseSubjectFieldRepository
         .findAllByOrderBySubjectFieldNumberAsc()

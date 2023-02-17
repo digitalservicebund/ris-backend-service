@@ -15,8 +15,7 @@ const emit = defineEmits<{
         aria-label="Auswahl im Sachgebietsbaum"
         class="deeplink p-6 text-blue-800"
         @click="emit('node-clicked')"
-      >
-      </button>
+      ></button>
     </div>
     <div class="flex-1 flex-col pt-8">
       <div class="label-02-reg text-blue-800">
