@@ -44,6 +44,6 @@ describe("SubjectSelectionListEntry", () => {
 
     await fireEvent.click(screen.getByLabelText("Auswahl im Sachgebietsbaum"))
 
-    expect(emitted()["select-node"]).toBeTruthy()
+    expect(emitted()["node-clicked"]).toBeTruthy()
   })
 })
