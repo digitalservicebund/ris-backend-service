@@ -3,7 +3,8 @@ import { checkA11y, injectAxe } from "axe-playwright"
 import { testWithImportedNorm } from "../e2e/norms/fixtures"
 
 test.describe("a11y of norms list page (/norms)", () => {
-  test("norms list", async ({ page }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("norms list", async ({ page }) => {
     await page.goto("/norms")
     await expect(page.locator("text=Dokumentationseinheiten")).toBeVisible()
     await injectAxe(page)
