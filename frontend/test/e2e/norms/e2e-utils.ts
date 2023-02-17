@@ -26,6 +26,18 @@ async function downloadJurisTestFile(
 ): Promise<void> {
   const username = process.env.GH_READ_JURIS_TEST_FILES_USER
   const password = process.env.GH_READ_JURIS_TEST_FILES_TOKEN
+  console.warn(
+    `username is defined? `,
+    username !== undefined,
+    username!.length > 0,
+    username!.substring(0, 5)
+  )
+  console.warn(
+    `password is defined? `,
+    password !== undefined,
+    password!.length > 0,
+    password!.substring(0, 5)
+  )
   const remoteUrl = `https://${username}:${password}@${REMOTE_JURIS_TEST_FILE_FOLDER_URL}/${fileName}`
   console.warn(remoteUrl)
   const response = await request.get(remoteUrl)
