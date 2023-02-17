@@ -24,30 +24,15 @@ async function downloadJurisTestFile(
   fileName: string,
   localPath: string
 ): Promise<void> {
-  const username = process.env.GH_READ_JURIS_TEST_FILES_USER
-  const password = process.env.GH_READ_JURIS_TEST_FILES_TOKEN
-  console.warn(
-    `process.envusername is defined? `,
-    process.env.GH_READ_JURIS_TEST_FILES_USER !== undefined
-  )
-  console.warn(`username is defined? `, username !== undefined)
-  console.warn(`username is: `, username?.substring(0, 5))
-  console.warn(
-    `process.env.password is defined? `,
-    process.env.GH_READ_JURIS_TEST_FILES_TOKEN !== undefined
-  )
-  console.warn(`password is defined? `, password !== undefined)
-  console.warn(`password is: `, password?.substring(0, 5))
-  const remoteUrl = `https://${process.env.GH_READ_JURIS_TEST_FILES_USER}:${process.env.GH_READ_JURIS_TEST_FILES_TOKEN}@${REMOTE_JURIS_TEST_FILE_FOLDER_URL}/${fileName}`
-  console.warn(remoteUrl)
+  const username = process.env.GH_PACKAGES_REPOSITORY_USER
+  const password = process.env.GH_PACKAGES_REPOSITORY_TOKEN
+  const remoteUrl = `https://${username}:${password}@${REMOTE_JURIS_TEST_FILE_FOLDER_URL}/${fileName}`
   const response = await request.get(remoteUrl)
 
   if (!response.ok()) {
-    const text = await response.text()
     console.error(`Download of the following Juris file failed: ${fileName}`, {
       status: response.status(),
-      text,
-      headers: response.headers(),
+      text: await response.text(),
     })
   }
 
