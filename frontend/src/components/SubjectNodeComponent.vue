@@ -9,10 +9,31 @@ interface Props {
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (e: "node:toggle", node: SubjectNode): void
-  (e: "node:select", node: SubjectNode): void
-  (e: "node:unselect", nodeId: string): void
+  (event: "node:toggle", node: SubjectNode): void
+  (event: "node:select", node: SubjectNode): void
+  (event: "node:unselect", subjectFieldNumber: string): void
+  (event: "linkedField:clicked", subjectFieldNumber: string): void
 }>()
+
+type Token = {
+  content: string
+  isLink: boolean
+}
+
+function tokenizeText(): Token[] {
+  const stext = props.node.subjectFieldText
+  const keywords = props.node.linkedFields
+  if (!keywords) return [{ content: stext, isLink: false }]
+  return stext.split(new RegExp(`(${keywords.join("|")})`)).map((part) => ({
+    content: part,
+    isLink: keywords.includes(part),
+  }))
+}
+
+function handleTokenClick(token: Token) {
+  if (!token.isLink) return
+  emit("linkedField:clicked", token.content)
+}
 </script>
 
 <template>
@@ -61,7 +82,15 @@ const emit = defineEmits<{
       {{ props.node.subjectFieldNumber }}
     </div>
     <div class="pl-6 pt-2 subject-field-text text-blue-800">
-      {{ props.node.subjectFieldText }}
+      <span
+        v-for="(token, idx) in tokenizeText()"
+        :key="idx"
+        :class="token.isLink && 'linked-field'"
+        @click="handleTokenClick(token)"
+        @keyup.enter="handleTokenClick(token)"
+      >
+        {{ token.content }}
+      </span>
     </div>
   </div>
 </template>
@@ -83,5 +112,10 @@ const emit = defineEmits<{
 
 .selected-icon {
   font-size: 20px;
+}
+
+.linked-field {
+  cursor: pointer;
+  text-decoration: underline;
 }
 </style>

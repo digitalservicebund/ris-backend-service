@@ -13,6 +13,7 @@ const emit = defineEmits<{
   (event: "add-to-list", node: SubjectNode): void
   (event: "remove-from-list", subjectFieldNumber: string): void
   (event: "reset-selected-node"): void
+  (event: "linkedField:clicked", subjectFieldNumber: string): void
 }>()
 
 const tree = ref<SubjectTree>(new SubjectTree(buildRoot()))
@@ -48,6 +49,10 @@ function handleSelect(node: SubjectNode) {
 function handleUnselect(subjectFieldNumber: string) {
   emit("remove-from-list", subjectFieldNumber)
 }
+
+function handleLinkedFieldClicked(subjectFieldNumber: string) {
+  emit("linkedField:clicked", subjectFieldNumber)
+}
 </script>
 
 <template>
@@ -62,6 +67,7 @@ function handleUnselect(subjectFieldNumber: string) {
           subjectFieldNumber === node.subjectFieldNumber
       )
     "
+    @linked-field:clicked="handleLinkedFieldClicked"
     @node:select="handleSelect"
     @node:toggle="handleNodeClick"
     @node:unselect="handleUnselect"

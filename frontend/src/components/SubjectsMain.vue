@@ -35,6 +35,11 @@ function handleNodeClicked(node: SubjectNode) {
 function handleResetSelectedNode() {
   selectedNode.value = undefined
 }
+
+function handleLinkedFieldClicked(subjectFieldNumber: string) {
+  console.log("SubjectsMain.handleLinkedFieldClicked()", subjectFieldNumber)
+  // TODO
+}
 </script>
 
 <template>
@@ -53,6 +58,7 @@ function handleResetSelectedNode() {
           :selected-node="selectedNode"
           :selected-subjects="selectedSubjects"
           @add-to-list="handleAdd"
+          @linked-field:clicked="handleLinkedFieldClicked"
           @remove-from-list="handleRemoveBySubjectFieldNumber"
           @reset-selected-node="handleResetSelectedNode"
         ></SubjectTree>
