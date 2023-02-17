@@ -7,24 +7,24 @@ import { SubjectNode } from "@/domain/SubjectTree"
 const selectedSubjects = ref<SubjectNode[]>([])
 const selectedNode = ref<SubjectNode>()
 
-const getSubjectIndex = (_subjectFieldNumber: string) =>
+const getIndex = (_subjectFieldNumber: string) =>
   selectedSubjects.value.findIndex(
     ({ subjectFieldNumber }) => subjectFieldNumber == _subjectFieldNumber
   )
 
-function handleAddToList(node: SubjectNode) {
-  if (getSubjectIndex(node.subjectFieldNumber) == -1) {
+function handleAdd(node: SubjectNode) {
+  if (getIndex(node.subjectFieldNumber) == -1) {
     selectedSubjects.value.push(node)
   }
 }
 
-function handleDeleteIdFromList(subjectFieldNumber: string) {
-  if (getSubjectIndex(subjectFieldNumber) != -1) {
-    handleRemoveFromList(getSubjectIndex(subjectFieldNumber))
+function handleRemoveBySubjectFieldNumber(subjectFieldNumber: string) {
+  if (getIndex(subjectFieldNumber) != -1) {
+    handleRemoveByIndex(getIndex(subjectFieldNumber))
   }
 }
 
-function handleRemoveFromList(index: number) {
+function handleRemoveByIndex(index: number) {
   selectedSubjects.value.splice(index, 1)
 }
 
@@ -45,15 +45,15 @@ function handleResetSelectedNode() {
         <SubjectSelectionList
           :selected-subjects="selectedSubjects"
           @node-clicked="handleNodeClicked"
-          @remove-from-list="handleRemoveFromList"
+          @remove-from-list="handleRemoveByIndex"
         ></SubjectSelectionList>
       </div>
       <div class="bg-white flex-1 p-20">
         <SubjectTree
           :selected-node="selectedNode"
           :selected-subjects="selectedSubjects"
-          @add-to-list="handleAddToList"
-          @delete-from-list="handleDeleteIdFromList"
+          @add-to-list="handleAdd"
+          @remove-from-list="handleRemoveBySubjectFieldNumber"
           @reset-selected-node="handleResetSelectedNode"
         ></SubjectTree>
       </div>

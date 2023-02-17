@@ -10,8 +10,8 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   (e: "node:toggle", node: SubjectNode): void
-  (e: "node:add", node: SubjectNode): void
-  (e: "node:delete", nodeId: string): void
+  (e: "node:select", node: SubjectNode): void
+  (e: "node:unselect", nodeId: string): void
 }>()
 </script>
 
@@ -40,7 +40,7 @@ const emit = defineEmits<{
       <button
         v-if="selected"
         class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-4 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
-        @click="emit('node:delete', node.subjectFieldNumber)"
+        @click="emit('node:unselect', node.subjectFieldNumber)"
       >
         <span
           aria-label="Sachgebiet entfernen"
@@ -51,7 +51,7 @@ const emit = defineEmits<{
       <button
         v-else
         class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-4 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
-        @click="emit('node:add', node)"
+        @click="emit('node:select', node)"
       ></button>
     </span>
     <div

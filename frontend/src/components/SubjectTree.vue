@@ -11,7 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (event: "add-to-list", node: SubjectNode): void
-  (event: "delete-from-list", subjectFieldNumber: string): void
+  (event: "remove-from-list", subjectFieldNumber: string): void
   (event: "reset-selected-node"): void
 }>()
 
@@ -41,12 +41,12 @@ function handleNodeClick(node: SubjectNode) {
   tree.value.toggleNode(node)
 }
 
-function handleAdd(node: SubjectNode) {
+function handleSelect(node: SubjectNode) {
   emit("add-to-list", node)
 }
 
-function handleDelete(subjectFieldNumber: string) {
-  emit("delete-from-list", subjectFieldNumber)
+function handleUnselect(subjectFieldNumber: string) {
+  emit("remove-from-list", subjectFieldNumber)
 }
 </script>
 
@@ -62,8 +62,8 @@ function handleDelete(subjectFieldNumber: string) {
           subjectFieldNumber === node.subjectFieldNumber
       )
     "
-    @node:add="handleAdd"
-    @node:delete="handleDelete"
+    @node:select="handleSelect"
     @node:toggle="handleNodeClick"
+    @node:unselect="handleUnselect"
   />
 </template>
