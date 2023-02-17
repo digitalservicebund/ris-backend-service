@@ -2,16 +2,13 @@ import { expect } from "@playwright/test"
 import jsdom from "jsdom"
 import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
-import norm from "./testdata/norm_for_retrieve_by_eli.json"
+import norm from "./testdata/norm_basic.json"
 
-testWithImportedNorm.use({ normToImport: norm })
-
-// eslint-disable-next-line playwright/no-skipped-test
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
-  async ({ page, createdGuid, request }) => {
+  async ({ page, normData, guid, request }) => {
     // Open frame data
-    await openNorm(page, norm.officialLongTitle, createdGuid)
+    await openNorm(page, normData["officialLongTitle"], guid)
     await page.locator("a:has-text('Rahmen')").click()
 
     const eliInputValue = await page.inputValue("input#eli")
@@ -53,7 +50,7 @@ testWithImportedNorm.skip(
       xmlDOM.window.document
         .querySelector("akn\\:FRBRname")
         .getAttribute("value")
-    ).toBe("bgbl-2")
+    ).toBe("bgbl-1")
 
     const proprietary =
       xmlDOM.window.document.querySelector("akn\\:proprietary")
@@ -71,7 +68,7 @@ testWithImportedNorm.skip(
     )
     expect(
       proprietary.querySelector("meta\\:initiant").textContent.trim()
-    ).toBe("nicht-vorhanden")
+    ).toBe("bundestag")
     expect(
       proprietary
         .querySelector("meta\\:bearbeitendeInstitution")

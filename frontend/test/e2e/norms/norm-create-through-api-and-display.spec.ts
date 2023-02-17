@@ -2,9 +2,6 @@ import { expect } from "@playwright/test"
 
 import { openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
-import normCleanCars from "./testdata/norm_clean_cars.json"
-
-const sections = getNormBySections(normCleanCars)
 
 async function expectInputFields(page, fields) {
   for (const field of fields) {
@@ -34,36 +31,21 @@ async function expectHeadingAppearAfterScroll(page, heading) {
   )
 }
 
-// eslint-disable-next-line playwright/no-skipped-test
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check display of norm complex",
-  async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
+  async ({ page, normData, guid }) => {
+    await openNorm(page, normData["officialLongTitle"], guid)
 
-    await expect(page).toHaveURL(`/norms/norm/${createdGuid}`)
-    await expect(page.getByText(normCleanCars.officialLongTitle)).toBeVisible()
-    await expect(page.getByText(normCleanCars.articles[0].marker)).toBeVisible()
-    await expect(page.getByText(normCleanCars.articles[0].title)).toBeVisible()
-    await expect(
-      page.getByText(normCleanCars.articles[0].paragraphs[0].marker)
-    ).toBeVisible()
-    await expect(
-      page.getByText(normCleanCars.articles[0].paragraphs[0].text)
-    ).toBeVisible()
-    await expect(
-      page.getByText(normCleanCars.articles[0].paragraphs[1].marker)
-    ).toBeVisible()
-    await expect(
-      page.getByText(normCleanCars.articles[0].paragraphs[1].text)
-    ).toBeVisible()
+    await expect(page).toHaveURL(`/norms/norm/${guid}`)
+    await expect(page.getByText(normData["officialLongTitle"])).toBeVisible()
+    // We do no more import the "Regelungstext". No further tests required.
   }
 )
 
-// eslint-disable-next-line playwright/no-skipped-test
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if frame fields are correctly displayed",
-  async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
+  async ({ page, normData, guid }) => {
+    await openNorm(page, normData["officialLongTitle"], guid)
 
     // Outer menu
     await expect(page.locator("a:has-text('Normenkomplex')")).toBeVisible()
@@ -73,12 +55,14 @@ testWithImportedNorm.skip(
     await expect(locatorFrameButton).toBeVisible()
 
     await locatorFrameButton.click()
-    await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
+    await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
     const locatorHeadingsButton = page.locator(
       "#headingsAndAbbreviationsUnofficial"
     )
     await expect(locatorHeadingsButton).toBeVisible()
     await locatorHeadingsButton.click()
+
+    const sections = getNormBySections(normData)
 
     for (const section of sections) {
       await expect(
@@ -102,19 +86,20 @@ testWithImportedNorm.skip(
   }
 )
 
-// eslint-disable-next-line playwright/no-skipped-test
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if switching frame sections affects sections being inside or outside viewport",
-  async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
+  async ({ page, normData, guid }) => {
+    await openNorm(page, normData["officialLongTitle"], guid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
-    await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
+    await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
     await expect(page).toHaveInsideViewport(
       'legend:text-is("Allgemeine Angaben")'
     )
+
+    const sections = getNormBySections(normData)
 
     for (const section of sections) {
       await expectHeadingAppearAfterScroll(page, section.heading)

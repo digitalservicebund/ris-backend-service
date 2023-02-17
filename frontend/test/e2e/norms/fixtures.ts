@@ -1,19 +1,21 @@
-import { test } from "@playwright/test"
-import normCleanCars from "./testdata/norm_clean_cars.json"
+import { expect, test } from "@playwright/test"
+import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
+import normData from "./testdata/norm_basic.json"
 
 type MyFixtures = {
-  normToImport: object
-  createdGuid: string
+  normData: object
+  guid: string
 }
 
 export const testWithImportedNorm = test.extend<MyFixtures>({
-  normToImport: normCleanCars,
-  createdGuid: async ({ normToImport, request }, use) => {
-    const response = await request.post(`/api/v1/norms`, {
-      data: normToImport,
-    })
-    const body = await response.text()
-    const { guid } = JSON.parse(body)
+  normData,
+  guid: async ({ normData, request }, use) => {
+    const fileName = normData["jurisZipFileName"]
+
+    expect(fileName).toBeTruthy()
+
+    const { fileContent } = await loadJurisTestFile(request, fileName)
+    const { guid } = await importNormViaApi(request, fileContent)
 
     await use(guid)
   },

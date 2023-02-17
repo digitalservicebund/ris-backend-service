@@ -2,10 +2,7 @@ import { expect } from "@playwright/test"
 
 import { openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
-import normCleanCars from "./testdata/norm_clean_cars.json"
 import newNorm from "./testdata/norm_edited_fields.json"
-
-const sections = getNormBySections(normCleanCars)
 
 async function fillCheckbox(page, field, value) {
   const selector = `role=checkbox[name="${field.label}"]`
@@ -75,22 +72,22 @@ async function expectUpdatedFields(page, fields, data) {
   }
 }
 
-// eslint-disable-next-line playwright/no-skipped-test
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if fields can be edited",
-  async ({ page, createdGuid }) => {
-    await openNorm(page, normCleanCars.officialLongTitle, createdGuid)
+  async ({ page, normData, guid }) => {
+    await openNorm(page, normData["officialLongTitle"], guid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
-    await expect(page).toHaveURL(`/norms/norm/${createdGuid}/frame`)
+    await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
     const locatorHeadingsButton = page.locator(
       "#headingsAndAbbreviationsUnofficial"
     )
     await expect(locatorHeadingsButton).toBeVisible()
     await locatorHeadingsButton.click()
 
+    const sections = getNormBySections(normData)
     // Update all norm fields
     for (const section of sections) {
       await editFields(page, section.fields ?? [], newNorm)
