@@ -27,6 +27,7 @@ async function downloadJurisTestFile(
   const username = process.env.GH_READ_JURIS_TEST_FILES_USER
   const password = process.env.GH_READ_JURIS_TEST_FILES_TOKEN
   const remoteUrl = `https://${username}:${password}@${REMOTE_JURIS_TEST_FILE_FOLDER_URL}/${fileName}`
+  console.warn(remoteUrl)
   const response = await request.get(remoteUrl)
 
   if (!response.ok()) {
@@ -34,6 +35,7 @@ async function downloadJurisTestFile(
     console.error(`Download of the following Juris file failed: ${fileName}`, {
       status: response.status(),
       text,
+      headers: response.headers(),
     })
   }
 
