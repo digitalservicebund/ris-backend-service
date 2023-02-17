@@ -29,6 +29,14 @@ async function downloadJurisTestFile(
   const remoteUrl = `https://${username}:${password}@${REMOTE_JURIS_TEST_FILE_FOLDER_URL}/${fileName}`
   const response = await request.get(remoteUrl)
 
+  if (!response.ok()) {
+    const text = await response.text()
+    console.error(`Download of the following Juris file failed: ${fileName}`, {
+      status: response.status,
+      text,
+    })
+  }
+
   expect(response.ok()).toBeTruthy()
 
   const body = await response.body()
