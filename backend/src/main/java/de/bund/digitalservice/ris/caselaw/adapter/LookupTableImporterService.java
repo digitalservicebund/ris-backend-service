@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Subjec
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -278,6 +279,9 @@ public class LookupTableImporterService {
 
   private List<Long> extractLinkedFieldsOfLaw(
       String fieldOfLawText, Map<String, Long> allFieldOfLawNumbers) {
+    if (fieldOfLawText == null || fieldOfLawText.isBlank()) {
+      return Collections.emptyList();
+    }
     List<Long> linkedFieldIds = new ArrayList<>();
     Matcher matcher = FIELD_OF_LAW_NUMBER_PATTERN.matcher(fieldOfLawText);
     while (matcher.find()) {
