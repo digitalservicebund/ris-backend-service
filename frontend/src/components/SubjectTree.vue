@@ -6,7 +6,7 @@ import SubjectsService from "@/services/subjectsService"
 
 const props = defineProps<{
   selectedSubjects: SubjectNode[]
-  selectedNode: SubjectNode | undefined
+  selectedSubjectFieldNumber: string
 }>()
 
 const emit = defineEmits<{
@@ -19,16 +19,16 @@ const emit = defineEmits<{
 const tree = ref<SubjectTree>(new SubjectTree(buildRoot()))
 
 watch(
-  () => props.selectedNode,
+  () => props.selectedSubjectFieldNumber,
   () => {
     buildDirectPathTree()
   }
 )
 
 function buildDirectPathTree() {
-  if (!props.selectedNode) return
+  if (!props.selectedSubjectFieldNumber) return
   SubjectsService.getTreeForSubjectFieldNumber(
-    props.selectedNode.subjectFieldNumber
+    props.selectedSubjectFieldNumber
   ).then((response) => {
     // console.log("loaded tree", response.data)
     if (!response.data) return

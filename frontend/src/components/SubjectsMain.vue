@@ -5,7 +5,7 @@ import SubjectTree from "./SubjectTree.vue"
 import { SubjectNode } from "@/domain/SubjectTree"
 
 const selectedSubjects = ref<SubjectNode[]>([])
-const selectedNode = ref<SubjectNode>()
+const selectedSubjectFieldNumber = ref<string>("")
 
 const getIndex = (_subjectFieldNumber: string) =>
   selectedSubjects.value.findIndex(
@@ -29,16 +29,15 @@ function handleRemoveByIndex(index: number) {
 }
 
 function handleNodeClicked(node: SubjectNode) {
-  selectedNode.value = node
+  selectedSubjectFieldNumber.value = node.subjectFieldNumber
 }
 
 function handleResetSelectedNode() {
-  selectedNode.value = undefined
+  selectedSubjectFieldNumber.value = ""
 }
 
 function handleLinkedFieldClicked(subjectFieldNumber: string) {
-  console.log("SubjectsMain.handleLinkedFieldClicked()", subjectFieldNumber)
-  // TODO
+  selectedSubjectFieldNumber.value = subjectFieldNumber
 }
 </script>
 
@@ -55,7 +54,7 @@ function handleLinkedFieldClicked(subjectFieldNumber: string) {
       </div>
       <div class="bg-white flex-1 p-20">
         <SubjectTree
-          :selected-node="selectedNode"
+          :selected-subject-field-number="selectedSubjectFieldNumber"
           :selected-subjects="selectedSubjects"
           @add-to-list="handleAdd"
           @linked-field:clicked="handleLinkedFieldClicked"
