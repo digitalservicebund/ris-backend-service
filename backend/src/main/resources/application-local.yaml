@@ -22,3 +22,6 @@ spring:
         provider:
           keycloak:
             issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
+#logging:
+#  level:
+#    org.hibernate.SQL: DEBUG

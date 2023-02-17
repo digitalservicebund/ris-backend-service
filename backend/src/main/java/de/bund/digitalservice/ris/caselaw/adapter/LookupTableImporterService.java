@@ -5,6 +5,8 @@ import static de.bund.digitalservice.ris.caselaw.utils.ServiceUtils.byteBufferTo
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
@@ -16,14 +18,18 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransf
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectFieldXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectFieldsXml;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -41,18 +47,23 @@ public class LookupTableImporterService {
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
   private final JPASubjectFieldRepository jpaSubjectFieldRepository;
+  private final JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
+
+  private static final Pattern FIELD_OF_LAW_NUMBER_PATTERN = Pattern.compile("[A-Z]{2}(-\\d{2})+");
 
   public LookupTableImporterService(
       DocumentTypeRepository documentTypeRepository,
       JPADocumentTypeRepository jpaDocumentTypeRepository,
       CourtRepository courtRepository,
       StateRepository stateRepository,
-      JPASubjectFieldRepository jpaSubjectFieldRepository) {
+      JPASubjectFieldRepository jpaSubjectFieldRepository,
+      JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
     this.documentTypeRepository = documentTypeRepository;
     this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
     this.jpaSubjectFieldRepository = jpaSubjectFieldRepository;
+    this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
@@ -238,6 +249,48 @@ public class LookupTableImporterService {
     setSubjectFieldParent(jpaSubjectFieldDTOs); // is the parent boolean necessary?
 
     jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
+
+    // this could be collected in the previous loop, worth it?
+    Map<String, Long> allFieldOfLawNumbers =
+        subjectFieldsXml.getList().stream()
+            .collect(
+                Collectors.toMap(SubjectFieldXml::getSubjectFieldNumber, SubjectFieldXml::getId));
+
+    List<JPAFieldOfLawLinkDTO> jpaFieldOfLawLinkDTOs = new ArrayList<>();
+    subjectFieldsXml
+        .getList()
+        .forEach(
+            subjectFieldXml -> {
+              for (Long linkedFieldId :
+                  extractLinkedFieldsOfLaw(
+                      subjectFieldXml.getSubjectFieldText(), allFieldOfLawNumbers)) {
+                jpaFieldOfLawLinkDTOs.add(
+                    // do I have to use a Transformer here?
+                    JPAFieldOfLawLinkDTO.builder()
+                        .fieldId(subjectFieldXml.getId())
+                        .linkedFieldId(linkedFieldId)
+                        .build());
+              }
+            });
+
+    jpaFieldOfLawLinkRepository.saveAll(jpaFieldOfLawLinkDTOs);
+  }
+
+  private List<Long> extractLinkedFieldsOfLaw(
+      String fieldOfLawText, Map<String, Long> allFieldOfLawNumbers) {
+    List<Long> linkedFieldIds = new ArrayList<>();
+    Matcher matcher = FIELD_OF_LAW_NUMBER_PATTERN.matcher(fieldOfLawText);
+    while (matcher.find()) {
+      String candidateFieldOfLawNumber = matcher.group();
+      if (allFieldOfLawNumbers.containsKey(candidateFieldOfLawNumber)) {
+        linkedFieldIds.add(allFieldOfLawNumbers.get(candidateFieldOfLawNumber));
+      } else {
+        log.warn(
+            "Found a fieldOfLawNumber in a fieldOfLawText that does not exist in the lookup table: {}",
+            candidateFieldOfLawNumber);
+      }
+    }
+    return linkedFieldIds;
   }
 
   private void setSubjectFieldParentIds(List<JPASubjectFieldDTO> jpaSubjectFieldDTOs) {
