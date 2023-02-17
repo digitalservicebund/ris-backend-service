@@ -39,7 +39,7 @@ const emit = defineEmits<{
     <span v-if="node.subjectFieldNumber !== ROOT_ID">
       <button
         v-if="selected"
-        class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-2 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
+        class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-4 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
         @click="emit('node:delete', node.subjectFieldNumber)"
       >
         <span
@@ -50,13 +50,13 @@ const emit = defineEmits<{
       </button>
       <button
         v-else
-        class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-2 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
+        class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-4 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
         @click="emit('node:add', node)"
       ></button>
     </span>
     <div
       v-if="props.node.subjectFieldNumber !== ROOT_ID"
-      class="pl-6 subject-field-number"
+      class="pl-8 subject-field-number"
     >
       {{ props.node.subjectFieldNumber }}
     </div>
@@ -82,6 +82,6 @@ const emit = defineEmits<{
 }
 
 .selected-icon {
-  font-size: 14px;
+  font-size: 20px;
 }
 </style>
