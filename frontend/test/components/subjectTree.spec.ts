@@ -12,7 +12,7 @@ function renderComponent(
   return render(SubjectTree, {
     props: {
       selectedSubjects: options.selectedSubjects ?? [],
-      selectedNode: undefined,
+      selectedSubjectFieldNumber: "",
     },
   })
 }
