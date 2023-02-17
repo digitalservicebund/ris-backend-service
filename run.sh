@@ -91,9 +91,9 @@ _dev() {
   docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
   
   if [ $# -gt 0 ] && [ "${1#}" == "--no-backend" ]; then
-    docker-compose up traefik redis db frontend
+    docker compose up traefik redis db frontend
   else
-    docker-compose up
+    docker compose up
   fi
 }
 
