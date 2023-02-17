@@ -36,6 +36,8 @@ jobs:
           E2E_BASE_URL: ${{ secrets.STAGING_URL }}
           E2E_TEST_USER: ${{ secrets.E2E_TEST_USER }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          GH_READ_JURIS_TEST_FILES_USER: ${{ secrets.GH_READ_JURIS_TEST_FILES_USER }}
+          GH_READ_JURIS_TEST_FILES_TOKEN: ${{ secrets.GH_READ_JURIS_TEST_FILES_TOKEN }}
         run: npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
         working-directory: ./frontend
       - name: Upload screenshots of failed tests
