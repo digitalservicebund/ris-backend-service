@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keywor
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -97,6 +98,7 @@ class LookupTableServiceTest {
             "TS-01-01",
             "stext 2",
             "navbez 2",
+            Collections.emptyList(),
             List.of(new Keyword("keyword")),
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>());
@@ -121,6 +123,7 @@ class LookupTableServiceTest {
             "TS-01-01",
             "stext 2",
             "navbez 2",
+            Collections.emptyList(),
             List.of(new Keyword("keyword")),
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>());

@@ -22,6 +22,7 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -222,6 +223,7 @@ class LookupTableImporterIntegrationTest {
             "TS-01-01",
             "stext 2",
             "navbez 2",
+            Collections.emptyList(),
             Arrays.asList(expectedKeyword1, expectedKeyword2),
             Arrays.asList(expectedNorm1, expectedNorm2),
             false);
