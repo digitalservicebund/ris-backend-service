@@ -158,3 +158,7 @@ export async function importNorm(file: File): Promise<ServiceResponse<string>> {
     }
   }
 }
+
+export function exportNorm(guid: string, hash: string): string {
+  return `api/v1/norms/${guid}/files/${hash}`
+}

@@ -1,6 +1,7 @@
 import httpClient from "@/services/httpClient"
 import {
   editNormFrame,
+  exportNorm,
   getAllNorms,
   getNormByGuid,
   importNorm,
@@ -338,6 +339,14 @@ describe("normsService", () => {
       expect(response.error).toMatchObject({
         title: "Datei konnte nicht importiert werden.",
       })
+    })
+  })
+
+  describe("export norm", () => {
+    it("builds the url for downloading the file", async () => {
+      const url = exportNorm("fake-guid", "fake-hash")
+
+      expect(url).toBe("api/v1/norms/fake-guid/files/fake-hash")
     })
   })
 })
