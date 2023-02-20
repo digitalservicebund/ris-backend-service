@@ -36,6 +36,9 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   public Flux<SubjectField> findAllByOrderBySubjectFieldNumberAsc() {
     return databaseSubjectFieldRepository
         .findAllByOrderBySubjectFieldNumberAsc()
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
@@ -43,6 +46,9 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   public Mono<SubjectField> findBySubjectFieldNumber(String subjectFieldNumber) {
     return databaseSubjectFieldRepository
         .findBySubjectFieldNumber(subjectFieldNumber)
+        .flatMap(this::injectKeywords)
+        .flatMap(this::injectNorms)
+        .flatMap(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
@@ -57,6 +63,9 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
               }
               return Mono.just(childDTO);
             })
+        .flatMap(this::injectKeywords)
+        .flatMap(this::injectNorms)
+        .flatMap(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
@@ -87,6 +96,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
         .findBySearchStr(searchStr)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
