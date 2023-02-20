@@ -55,13 +55,11 @@ export type SubjectNode = {
   subjectFieldNumber: string
   subjectFieldText: string
   linkedFields?: string[]
-  // parent?: string
   children: SubjectNode[]
   depth: number
   isExpanded: boolean
   inDirectPathMode?: boolean
   isLeaf: boolean
-  clickCounter?: number
 }
 
 export const ROOT_ID = "root"
