@@ -10,18 +10,20 @@ const emit = defineEmits<{
 
 <template>
   <div class="flex">
-    <div>
-      <button
-        aria-label="Auswahl im Sachgebietsbaum"
-        class="deeplink p-6 text-blue-800"
-        @click="emit('node-clicked')"
-      ></button>
-    </div>
-    <div class="flex-1 flex-col pt-8">
-      <div class="label-02-reg text-blue-800">
-        {{ props.subject.subjectFieldNumber }}
+    <div class="flex flex-col grow">
+      <div class="flex">
+        <div>
+          <button
+            aria-label="Auswahl im Sachgebietsbaum"
+            class="deeplink p-12 pr-16 text-blue-800"
+            @click="emit('node-clicked')"
+          ></button>
+        </div>
+        <div class="label-02-reg pt-8 text-blue-800">
+          {{ props.subject.subjectFieldNumber }}
+        </div>
       </div>
-      <div class="label-03-reg text-blue-800">
+      <div class="grow label-03-reg pb-16 pt-4 text-blue-800">
         {{ props.subject.subjectFieldText }}
       </div>
     </div>
@@ -40,5 +42,6 @@ const emit = defineEmits<{
 <style lang="scss" scoped>
 button.deeplink {
   background-image: url("@/assets/icons/deeplink_regular.svg");
+  background-repeat: no-repeat;
 }
 </style>
