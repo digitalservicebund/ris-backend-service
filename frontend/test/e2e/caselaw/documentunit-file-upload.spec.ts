@@ -1,5 +1,6 @@
 import fs from "fs"
 import { expect } from "@playwright/test"
+import { createDataTransfer } from "../shared/e2e-utils"
 import { navigateToFiles, uploadTestfile } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
@@ -46,17 +47,14 @@ test.describe("upload an original document to a doc unit", () => {
 
   test("drag over docx file in upload area", async ({ page }) => {
     const docx = await fs.promises.readFile(
-      "./test/e2e/caselaw/testfiles/sample.docx",
-      "utf-8"
+      "./test/e2e/caselaw/testfiles/sample.docx"
     )
-    const dataTransfer = await page.evaluateHandle((docx) => {
-      const data = new DataTransfer()
-      const file = new File([`${docx}`], "sample.docx", {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      })
-      data.items.add(file)
-      return data
-    }, docx)
+    const dataTransfer = await createDataTransfer(
+      page,
+      docx,
+      "sample.docx",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
 
     await page.dispatchEvent(".upload-drop-area", "dragover", { dataTransfer })
     await expect(
@@ -66,34 +64,28 @@ test.describe("upload an original document to a doc unit", () => {
 
   test("drop docx file in upload area", async ({ page }) => {
     const docx = await fs.promises.readFile(
-      "./test/e2e/caselaw/testfiles/sample.docx",
-      "utf-8"
+      "./test/e2e/caselaw/testfiles/sample.docx"
     )
-    const dataTransfer = await page.evaluateHandle((docx) => {
-      const data = new DataTransfer()
-      const file = new File([`${docx}`], "sample.docx", {
-        type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-      })
-      data.items.add(file)
-      return data
-    }, docx)
+    const dataTransfer = await createDataTransfer(
+      page,
+      docx,
+      "sample.docx",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    )
 
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
   })
 
   test("drop non-docx file in upload area", async ({ page }) => {
     const png = await fs.promises.readFile(
-      "./test/e2e/caselaw/testfiles/sample.png",
-      "utf-8"
+      "./test/e2e/caselaw/testfiles/sample.png"
     )
-    const dataTransfer = await page.evaluateHandle((png) => {
-      const data = new DataTransfer()
-      const file = new File([`${png}`], "sample.png", {
-        type: "image/png",
-      })
-      data.items.add(file)
-      return data
-    }, png)
+    const dataTransfer = await createDataTransfer(
+      page,
+      png,
+      "sample.png",
+      "image/png"
+    )
 
     await page.dispatchEvent("#upload-drop-area", "drop", { dataTransfer })
     await expect(
