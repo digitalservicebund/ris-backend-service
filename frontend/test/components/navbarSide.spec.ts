@@ -67,7 +67,7 @@ describe("NavbarSide", () => {
     await renderComponent({ menuItems })
     const disabledItem = screen.queryByText("disabled item")
 
-    expect(disabledItem?.getAttribute("disabled")).toBeDefined()
+    expect(disabledItem).not.toBeInTheDocument()
   })
 
   describe("highlighting of the currently active menu item", () => {

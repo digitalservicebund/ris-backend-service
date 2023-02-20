@@ -36,7 +36,6 @@ describe("useNormMenuItems", () => {
     expect(topLebelNames).toContain("Normenkomplex")
     expect(topLebelNames).toContain("Rahmen")
     expect(topLebelNames).toContain("Bestand")
-    expect(topLebelNames).toContain("Abgabe")
     expect(topLebelNames).toContain("Export")
   })
 })

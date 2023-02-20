@@ -34,7 +34,6 @@ export function useNormMenuItems(
         ...baseRoute,
         name: "norms-norm-:normGuid-frame",
       },
-      isDisabled: true,
       children: [
         getChildItem("Allgemeine Angaben", "generalDataFields"),
         getChildItem("Dokumenttyp", "documentTypeFields"),
@@ -80,15 +79,6 @@ export function useNormMenuItems(
         ...baseRoute,
         name: "norms",
       },
-      isDisabled: true,
-    },
-    {
-      label: "Abgabe",
-      route: {
-        ...baseRoute,
-        name: "norms",
-      },
-      isDisabled: true,
     },
     {
       label: "Export",

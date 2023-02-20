@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import { useRoute } from "vue-router"
 import type { RouteLocationRaw, RouteRecordName } from "vue-router"
+import { useRoute } from "vue-router"
 
 interface Props {
   menuItems: LevelOneMenuItem[]
@@ -12,16 +12,20 @@ interface Props {
 const props = defineProps<Props>()
 const activeRoute = useRoute()
 
-const enhencedMenuItems = computed(() =>
-  props.menuItems.map((levelOneItem) => ({
-    ...levelOneItem,
-    classes: getClassesForMenuItem(levelOneItem),
-    isExpanded: checkIfLevelOneItemIsExpanded(levelOneItem),
-    children: levelOneItem.children?.map((levelTwoItem) => ({
-      ...levelTwoItem,
-      classes: getClassesForMenuItem(levelTwoItem),
-    })),
-  }))
+const enhancedActiveMenuItems = computed(() =>
+  props.menuItems
+    .filter((item) => !item.isDisabled)
+    .map((levelOneItem) => ({
+      ...levelOneItem,
+      classes: getClassesForMenuItem(levelOneItem),
+      isExpanded: checkIfLevelOneItemIsExpanded(levelOneItem),
+      children: levelOneItem.children
+        ?.filter((item) => !item.isDisabled)
+        .map((levelTwoItem) => ({
+          ...levelTwoItem,
+          classes: getClassesForMenuItem(levelTwoItem),
+        })),
+    }))
 )
 
 function getClassesForMenuItem(
@@ -139,7 +143,7 @@ export interface LevelTwoMenuItem {
     </router-link>
 
     <div
-      v-for="(levelOneItem, levelOneIndex) in enhencedMenuItems"
+      v-for="(levelOneItem, levelOneIndex) in enhancedActiveMenuItems"
       :key="levelOneItem.label"
       class="border-b-1 border-gray-400"
     >
