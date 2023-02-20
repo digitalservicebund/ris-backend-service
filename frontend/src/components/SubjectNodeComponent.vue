@@ -59,21 +59,20 @@ function handleTokenClick(token: Token) {
     </button>
     <span v-if="node.subjectFieldNumber !== ROOT_ID">
       <button
-        v-if="selected"
         class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-4 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
-        @click="emit('node:unselect', node.subjectFieldNumber)"
+        @click="
+          selected
+            ? emit('node:unselect', node.subjectFieldNumber)
+            : emit('node:select', node)
+        "
       >
         <span
+          v-if="selected"
           aria-label="Sachgebiet entfernen"
           class="material-icons selected-icon"
           >done</span
         >
       </button>
-      <button
-        v-else
-        class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-4 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
-        @click="emit('node:select', node)"
-      ></button>
     </span>
     <div
       v-if="props.node.subjectFieldNumber !== ROOT_ID"
