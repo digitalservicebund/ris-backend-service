@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import SubjectSelectionListEntry from "./SubjectSelectionListEntry.vue"
-import { SubjectNode } from "@/domain/SubjectTree"
+import FieldOfLawSelectionListEntry from "./FieldOfLawSelectionListEntry.vue"
+import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
 
 const props = defineProps<{
-  selectedSubjects: SubjectNode[]
+  selectedSubjects: FieldOfLawNode[]
 }>()
 const emit = defineEmits<{
   (event: "remove-from-list", index: number): void
-  (event: "node-clicked", node: SubjectNode): void
+  (event: "node-clicked", node: FieldOfLawNode): void
 }>()
 </script>
 
@@ -15,7 +15,7 @@ const emit = defineEmits<{
   <h1 class="heading-03-regular pb-8">Auswahl</h1>
   <div v-if="!props.selectedSubjects.length">Die Liste ist aktuell leer</div>
   <div v-else>
-    <SubjectSelectionListEntry
+    <FieldOfLawSelectionListEntry
       v-for="(subject, index) in props.selectedSubjects"
       :key="subject.subjectFieldNumber"
       :subject="subject"

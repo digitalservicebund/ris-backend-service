@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import SubjectsComponent from "@/components/SubjectsMain.vue"
+import FieldOfLawMain from "@/components/FieldOfLawMain.vue"
 </script>
 
 <template>
-  <SubjectsComponent></SubjectsComponent>
+  <FieldOfLawMain></FieldOfLawMain>
 </template>

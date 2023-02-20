@@ -1,15 +1,15 @@
 /* eslint-disable jest-dom/prefer-in-document */
 import { render } from "@testing-library/vue"
-import SubjectTree from "@/components/SubjectTree.vue"
-import { SubjectNode } from "@/domain/SubjectTree"
-import SubjectService from "@/services/subjectsService"
+import FieldOfLawTreeVue from "@/components/FieldOfLawTree.vue"
+import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import FieldOfLawService from "@/services/fieldOfLawService"
 
 function renderComponent(
   options: {
-    selectedSubjects?: SubjectNode[]
+    selectedSubjects?: FieldOfLawNode[]
   } = {}
 ) {
-  return render(SubjectTree, {
+  return render(FieldOfLawTreeVue, {
     props: {
       selectedSubjects: options.selectedSubjects ?? [],
       clickedSubjectFieldNumber: "",
@@ -19,7 +19,7 @@ function renderComponent(
 
 describe("SubjectTree", () => {
   const fetchSpy = vi
-    .spyOn(SubjectService, "getChildrenOf")
+    .spyOn(FieldOfLawService, "getChildrenOf")
     .mockImplementation(() =>
       Promise.resolve({
         status: 200,

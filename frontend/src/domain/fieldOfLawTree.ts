@@ -1,14 +1,14 @@
-import SubjectsService from "@/services/subjectsService"
+import FieldOfLawService from "@/services/fieldOfLawService"
 
-export default class SubjectTree {
-  public root: SubjectNode
+export default class FieldOfLawTree {
+  public root: FieldOfLawNode
 
-  constructor(root: SubjectNode) {
+  constructor(root: FieldOfLawNode) {
     this.root = root
   }
 
   // Depth-first search (recursion) fits exactly to the tree structure we want to display
-  private traverse(node: SubjectNode, orderedNodes: SubjectNode[]) {
+  private traverse(node: FieldOfLawNode, orderedNodes: FieldOfLawNode[]) {
     orderedNodes.push(node)
     if (!node.children || !node.isExpanded) return
     for (const child of node.children) {
@@ -17,14 +17,14 @@ export default class SubjectTree {
   }
 
   public getNodesOrderedByDepthFirstSearch() {
-    const orderedNodes: SubjectNode[] = []
+    const orderedNodes: FieldOfLawNode[] = []
     this.traverse(this.root, orderedNodes)
     return orderedNodes
   }
 
-  public toggleNode(node: SubjectNode) {
+  public toggleNode(node: FieldOfLawNode) {
     if (!node.isLeaf && (node.children.length === 0 || node.inDirectPathMode)) {
-      SubjectsService.getChildrenOf(node.subjectFieldNumber).then(
+      FieldOfLawService.getChildrenOf(node.subjectFieldNumber).then(
         (response) => {
           if (!response.data) return
           node.children = response.data
@@ -38,7 +38,7 @@ export default class SubjectTree {
     }
   }
 
-  private expandTraversal(node: SubjectNode, directPathMode: boolean) {
+  private expandTraversal(node: FieldOfLawNode, directPathMode: boolean) {
     node.isExpanded = true
     node.inDirectPathMode = directPathMode
     for (const child of node.children) {
@@ -51,11 +51,11 @@ export default class SubjectTree {
   }
 }
 
-export type SubjectNode = {
+export type FieldOfLawNode = {
   subjectFieldNumber: string
   subjectFieldText: string
   linkedFields?: string[]
-  children: SubjectNode[]
+  children: FieldOfLawNode[]
   depth: number
   isExpanded: boolean
   inDirectPathMode?: boolean
@@ -64,7 +64,7 @@ export type SubjectNode = {
 
 export const ROOT_ID = "root"
 
-export function buildRoot(children: SubjectNode[] = []): SubjectNode {
+export function buildRoot(children: FieldOfLawNode[] = []): FieldOfLawNode {
   return {
     subjectFieldNumber: ROOT_ID,
     subjectFieldText: "Alle Sachgebiete anzeigen",

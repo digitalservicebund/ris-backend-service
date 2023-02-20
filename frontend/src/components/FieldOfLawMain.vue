@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import SubjectSelectionList from "./SubjectSelectionList.vue"
-import SubjectTree from "./SubjectTree.vue"
-import { SubjectNode } from "@/domain/SubjectTree"
+import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
+import FieldOfLawTree from "./FieldOfLawTree.vue"
+import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
 
-const selectedSubjects = ref<SubjectNode[]>([])
+const selectedSubjects = ref<FieldOfLawNode[]>([])
 const clickedSubjectFieldNumber = ref<string>("")
 
 const getIndex = (_subjectFieldNumber: string) =>
@@ -12,7 +12,7 @@ const getIndex = (_subjectFieldNumber: string) =>
     ({ subjectFieldNumber }) => subjectFieldNumber == _subjectFieldNumber
   )
 
-function handleAdd(node: SubjectNode) {
+function handleAdd(node: FieldOfLawNode) {
   if (getIndex(node.subjectFieldNumber) == -1) {
     selectedSubjects.value.push(node)
   }
@@ -28,7 +28,7 @@ function handleRemoveByIndex(index: number) {
   selectedSubjects.value.splice(index, 1)
 }
 
-function handleNodeClicked(node: SubjectNode) {
+function handleNodeClicked(node: FieldOfLawNode) {
   clickedSubjectFieldNumber.value = node.subjectFieldNumber
 }
 
@@ -46,21 +46,21 @@ function handleLinkedFieldClicked(subjectFieldNumber: string) {
     <h1 class="heading-02-regular mb-[1rem]">Sachgebiete</h1>
     <div class="flex flex-row">
       <div class="bg-white flex-1 p-20">
-        <SubjectSelectionList
+        <FieldOfLawSelectionList
           :selected-subjects="selectedSubjects"
           @node-clicked="handleNodeClicked"
           @remove-from-list="handleRemoveByIndex"
-        ></SubjectSelectionList>
+        ></FieldOfLawSelectionList>
       </div>
       <div class="bg-white flex-1 p-20">
-        <SubjectTree
+        <FieldOfLawTree
           :clicked-subject-field-number="clickedSubjectFieldNumber"
           :selected-subjects="selectedSubjects"
           @add-to-list="handleAdd"
           @linked-field:clicked="handleLinkedFieldClicked"
           @remove-from-list="handleRemoveBySubjectFieldNumber"
           @reset-clicked-node="handleResetClickedNode"
-        ></SubjectTree>
+        ></FieldOfLawTree>
       </div>
     </div>
   </div>

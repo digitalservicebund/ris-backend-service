@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { SubjectNode } from "@/domain/SubjectTree"
+import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
 
-const props = defineProps<{ subject: SubjectNode }>()
+const props = defineProps<{ subject: FieldOfLawNode }>()
 const emit = defineEmits<{
   (event: "remove-from-list"): void
   (event: "node-clicked"): void

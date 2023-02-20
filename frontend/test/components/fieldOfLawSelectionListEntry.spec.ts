@@ -1,13 +1,13 @@
 import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
-import SubjectSelectionListEntry from "@/components/SubjectSelectionListEntry.vue"
-import { SubjectNode } from "@/domain/SubjectTree"
+import FieldOfLawSelectionListEntry from "@/components/FieldOfLawSelectionListEntry.vue"
+import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
 
-function renderComponent(subject: Partial<SubjectNode>): RenderResult {
+function renderComponent(subject: Partial<FieldOfLawNode>): RenderResult {
   const props = {
     subject,
   }
 
-  return render(SubjectSelectionListEntry, { props })
+  return render(FieldOfLawSelectionListEntry, { props })
 }
 
 describe("SubjectSelectionListEntry", () => {

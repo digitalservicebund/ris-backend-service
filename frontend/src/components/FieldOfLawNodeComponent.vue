@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { ROOT_ID, SubjectNode } from "@/domain/SubjectTree"
+import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLawTree"
 
 interface Props {
-  node: SubjectNode
+  node: FieldOfLawNode
   selected: boolean
 }
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<{
-  (event: "node:toggle", node: SubjectNode): void
-  (event: "node:select", node: SubjectNode): void
+  (event: "node:toggle", node: FieldOfLawNode): void
+  (event: "node:select", node: FieldOfLawNode): void
   (event: "node:unselect", subjectFieldNumber: string): void
   (event: "linkedField:clicked", subjectFieldNumber: string): void
 }>()

@@ -1,22 +1,25 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import SubjectNodeComponent from "./SubjectNodeComponent.vue"
-import SubjectTree, { buildRoot, SubjectNode } from "@/domain/SubjectTree"
-import SubjectsService from "@/services/subjectsService"
+import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
+import FieldOfLawTree, {
+  buildRoot,
+  FieldOfLawNode,
+} from "@/domain/fieldOfLawTree"
+import FieldOfLawService from "@/services/fieldOfLawService"
 
 const props = defineProps<{
-  selectedSubjects: SubjectNode[]
+  selectedSubjects: FieldOfLawNode[]
   clickedSubjectFieldNumber: string
 }>()
 
 const emit = defineEmits<{
-  (event: "add-to-list", node: SubjectNode): void
+  (event: "add-to-list", node: FieldOfLawNode): void
   (event: "remove-from-list", subjectFieldNumber: string): void
   (event: "reset-clicked-node"): void
   (event: "linkedField:clicked", subjectFieldNumber: string): void
 }>()
 
-const tree = ref<SubjectTree>(new SubjectTree(buildRoot()))
+const tree = ref<FieldOfLawTree>(new FieldOfLawTree(buildRoot()))
 
 watch(
   () => props.clickedSubjectFieldNumber,
@@ -27,22 +30,23 @@ watch(
 
 function buildDirectPathTree() {
   if (!props.clickedSubjectFieldNumber) return
-  SubjectsService.getTreeForSubjectFieldNumber(
-    props.clickedSubjectFieldNumber
-  ).then((response) => {
-    // console.log("loaded tree", response.data)
-    if (!response.data) return
-    tree.value = new SubjectTree(buildRoot([response.data]))
-    tree.value.expandAll(true)
-  })
+  FieldOfLawService.getTreeForNumber(props.clickedSubjectFieldNumber).then(
+    (response) => {
+      // console.log("loaded tree", response.data)
+      if (!response.data) return
+
+      tree.value = new FieldOfLawTree(buildRoot([response.data]))
+      tree.value.expandAll(true)
+    }
+  )
   emit("reset-clicked-node")
 }
 
-function handleNodeClick(node: SubjectNode) {
+function handleNodeClick(node: FieldOfLawNode) {
   tree.value.toggleNode(node)
 }
 
-function handleSelect(node: SubjectNode) {
+function handleSelect(node: FieldOfLawNode) {
   emit("add-to-list", node)
 }
 
@@ -57,7 +61,7 @@ function handleLinkedFieldClicked(subjectFieldNumber: string) {
 
 <template>
   <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
-  <SubjectNodeComponent
+  <FieldOfLawNodeComponent
     v-for="node in tree?.getNodesOrderedByDepthFirstSearch()"
     :key="node.subjectFieldNumber"
     :node="node"
