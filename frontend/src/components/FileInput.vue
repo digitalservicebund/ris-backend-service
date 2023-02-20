@@ -7,6 +7,7 @@ interface Props {
   value?: FileList
   modelValue?: FileList
   ariaLabel: string
+  accept?: string
 }
 
 interface Emits {
@@ -37,6 +38,7 @@ function onEnter() {
         :id="id"
         v-bind="inputValue"
         ref="fileInput"
+        :accept="accept"
         class=""
         hidden="true"
         tabindex="-1"

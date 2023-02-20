@@ -21,6 +21,30 @@ function encodeBoolean(data: NullableBoolean): NullableBoolean {
   return data ?? null
 }
 
+const errorMessages = {
+  FILE_TOO_BIG: {
+    title: "Die Datei überschreitet die maximale Dateigröße von 20 MB.",
+  },
+  NO_INTERNET_CONNECTION: {
+    title: "Der Upload ist fehlgeschlagen.",
+    description:
+      "Bitte prüfen Sie Ihre Internetverbindung und versuchen Sie es erneut.",
+  },
+  WRONG_FILE_FORMAT: {
+    title: "Das Dateiformat wird nicht unterstützt.",
+    description: "Bitte verwenden Sie eine Zip-Datei.",
+  },
+  IMPORT_ERROR: {
+    title: "Datei konnte nicht importiert werden.",
+  },
+  LOADING_ERROR: {
+    title: "Dokumentationseinheit konnte nicht geladen werden.",
+  },
+  EDIT_ERROR: {
+    title: "Dokumentationseinheit konnte nicht bearbeitet werden.",
+  },
+}
+
 // Makes the assumption that we currently get a date string in the following
 // format: `2022-11-14T23:00:00.000Z`. To comply with the expected date format
 // of the API, we only take the first 10 characters.
@@ -63,9 +87,7 @@ export async function getNormByGuid(
   if (status >= 300 || error) {
     return {
       status: status,
-      error: {
-        title: "Dokumentationseinheit konnte nicht geladen werden.",
-      },
+      error: errorMessages.LOADING_ERROR,
     }
   } else {
     return {
@@ -94,9 +116,7 @@ export async function editNormFrame(
   if (status >= 300 || error) {
     return {
       status: status,
-      error: {
-        title: "Dokumentationseinheit konnte nicht bearbeitet werden.",
-      },
+      error: errorMessages.EDIT_ERROR,
     }
   } else {
     return {
@@ -107,17 +127,29 @@ export async function editNormFrame(
 }
 
 export async function importNorm(file: File): Promise<ServiceResponse<string>> {
+  const isOnLine = navigator.onLine
+  if (!isOnLine) {
+    return {
+      status: 503,
+      error: errorMessages.NO_INTERNET_CONNECTION,
+    }
+  }
+
   const { status, error, data } = await httpClient.post<
     unknown,
     { guid: string }
   >("norms", { headers: { "Content-Type": "application/zip" } }, file)
-
   if (status >= 400 || error) {
-    return {
-      status,
-      error: {
-        title: "Datei konnte nicht importiert werden.",
-      },
+    if (status === 413) {
+      return {
+        status,
+        error: errorMessages.FILE_TOO_BIG,
+      }
+    } else {
+      return {
+        status,
+        error: errorMessages.IMPORT_ERROR,
+      }
     }
   } else {
     return {

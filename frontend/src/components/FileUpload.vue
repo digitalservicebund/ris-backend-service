@@ -6,6 +6,7 @@ import InfoModal from "@/components/InfoModal.vue"
 const props = defineProps<{
   error?: { title: string; description?: string }
   isLoading?: boolean
+  accept?: string
 }>()
 const emits = defineEmits<{
   (e: "fileSelected", file: File): void
@@ -80,6 +81,7 @@ function onFileSelect(event: Event) {
       </div>
       <FileInput
         id="file-upload"
+        :accept="accept"
         aria-label="Upload File"
         @input="onFileSelect"
       >

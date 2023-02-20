@@ -7,8 +7,8 @@ import { importNorm } from "@/services/normsService"
 
 const error = ref<ResponseError>()
 const isUploading = ref(false)
-
 const router = useRouter()
+const accept = "application/zip"
 
 async function upload(file: File) {
   isUploading.value = true
@@ -40,6 +40,7 @@ async function upload(file: File) {
         </p>
       </div>
       <FileUpload
+        :accept="accept"
         :error="error"
         :is-loading="isUploading"
         @file-selected="(file) => upload(file)"
