@@ -36,6 +36,8 @@ jobs:
           E2E_BASE_URL: ${{ secrets.STAGING_URL }}
           E2E_TEST_USER: ${{ secrets.E2E_TEST_USER }}
           E2E_TEST_PASSWORD: ${{ secrets.E2E_TEST_PASSWORD }}
+          E2E_TEST_BASIC_AUTH_USER: ${{ secrets.E2E_TEST_BASIC_AUTH_USER }}
+          E2E_TEST_BASIC_AUTH_PASSWORD: ${{ secrets.E2E_TEST_BASIC_AUTH_PASSWORD }}
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
