@@ -6,36 +6,36 @@ import SubjectsService from "@/services/subjectsService"
 
 const props = defineProps<{
   selectedSubjects: SubjectNode[]
-  selectedSubjectFieldNumber: string
+  clickedSubjectFieldNumber: string
 }>()
 
 const emit = defineEmits<{
   (event: "add-to-list", node: SubjectNode): void
   (event: "remove-from-list", subjectFieldNumber: string): void
-  (event: "reset-selected-node"): void
+  (event: "reset-clicked-node"): void
   (event: "linkedField:clicked", subjectFieldNumber: string): void
 }>()
 
 const tree = ref<SubjectTree>(new SubjectTree(buildRoot()))
 
 watch(
-  () => props.selectedSubjectFieldNumber,
+  () => props.clickedSubjectFieldNumber,
   () => {
     buildDirectPathTree()
   }
 )
 
 function buildDirectPathTree() {
-  if (!props.selectedSubjectFieldNumber) return
+  if (!props.clickedSubjectFieldNumber) return
   SubjectsService.getTreeForSubjectFieldNumber(
-    props.selectedSubjectFieldNumber
+    props.clickedSubjectFieldNumber
   ).then((response) => {
     // console.log("loaded tree", response.data)
     if (!response.data) return
     tree.value = new SubjectTree(buildRoot([response.data]))
     tree.value.expandAll(true)
   })
-  emit("reset-selected-node")
+  emit("reset-clicked-node")
 }
 
 function handleNodeClick(node: SubjectNode) {
