@@ -50,7 +50,8 @@ public class LookupTableImporterService {
   private final JPASubjectFieldRepository jpaSubjectFieldRepository;
   private final JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
 
-  private static final Pattern FIELD_OF_LAW_NUMBER_PATTERN = Pattern.compile("[A-Z]{2}(-\\d{2})+");
+  private static final Pattern FIELD_OF_LAW_NUMBER_PATTERN =
+      Pattern.compile("\\p{Lu}{2}(-\\d{2})+(?![\\p{L}\\d-])");
 
   public LookupTableImporterService(
       DocumentTypeRepository documentTypeRepository,
