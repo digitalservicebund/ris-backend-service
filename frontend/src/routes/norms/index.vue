@@ -15,7 +15,7 @@ const router = useRouter()
       <h1 class="heading-02-regular">Dokumentationseinheiten</h1>
       <TextButton
         label="Neue Dokumentationseinheit"
-        @click="router.push({ name: 'norms-norm-import' })"
+        @click="router.push({ name: 'norms-import' })"
       />
     </div>
     <NormsList
