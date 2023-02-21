@@ -15,12 +15,18 @@ const emit = defineEmits<{
         <div>
           <button
             aria-label="Auswahl im Sachgebietsbaum"
-            class="deeplink p-12 pr-16 text-blue-800"
+            class="deeplink p-12 text-blue-800"
             @click="emit('node-clicked')"
           ></button>
         </div>
         <div class="label-02-reg pt-8 text-blue-800">
-          {{ props.subject.subjectFieldNumber }}
+          <span
+            class="link"
+            @click="emit('node-clicked')"
+            @keypress="emit('node-clicked')"
+          >
+            {{ props.subject.subjectFieldNumber }}
+          </span>
         </div>
       </div>
       <div class="grow label-03-reg pb-16 pt-4 text-blue-800">
@@ -43,5 +49,25 @@ const emit = defineEmits<{
 button.deeplink {
   background-image: url("@/assets/icons/deeplink_regular.svg");
   background-repeat: no-repeat;
+  background-size: 18px;
+}
+
+.link {
+  &:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  &:active {
+    cursor: pointer;
+    text-decoration: underline;
+    text-decoration-thickness: 4px;
+  }
+
+  &:focus {
+    border: 4px solid #004b76;
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
 </style>
