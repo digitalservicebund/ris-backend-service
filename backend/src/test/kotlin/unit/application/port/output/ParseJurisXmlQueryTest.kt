@@ -11,9 +11,9 @@ class ParseJurisXmlQueryTest {
     fun `can create query with a new GUID and a Zip file`() {
         val newGuid = UUID.randomUUID()
         val zipFile = File.createTempFile("Temp", ".zip")
-        val query = ParseJurisXmlOutputPort.Query(newGuid, zipFile)
+        val query = ParseJurisXmlOutputPort.Query(newGuid, zipFile.readBytes(), zipFile.name)
 
         assertThat(query.newGuid).isEqualTo(newGuid)
-        assertThat(query.zipFile).isEqualTo(zipFile)
+        assertThat(query.zipFile).isEqualTo(zipFile.readBytes())
     }
 }

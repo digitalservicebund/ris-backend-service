@@ -19,10 +19,10 @@ import de.bund.digitalservice.ris.norms.juris.extractor.model.Paragraph as Parag
 @Component
 class JurisXmlParser() : ParseJurisXmlOutputPort {
     override fun parseJurisXml(query: ParseJurisXmlOutputPort.Query): Mono<Norm> {
-        val data = extractData(ByteBuffer.wrap(query.zipFile.readBytes()))
+        val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
         norm.files = listOf(
-            FileReference.fromFile(query.zipFile),
+            FileReference.fromFile(query.zipFile, query.filename),
         )
         return Mono.just(norm)
     }

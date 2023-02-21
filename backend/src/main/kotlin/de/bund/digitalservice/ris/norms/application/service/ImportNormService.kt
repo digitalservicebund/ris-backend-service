@@ -23,12 +23,12 @@ class ImportNormService(
 
     override fun importNorm(command: ImportNormUseCase.Command): Mono<UUID> {
         val guid = UUID.randomUUID()
-        val parseQuery = ParseJurisXmlOutputPort.Query(guid, command.zipFile)
+        val parseQuery = ParseJurisXmlOutputPort.Query(guid, command.zipFile, command.filename)
 
         return parseJurisXmlAdapter
             .parseJurisXml(parseQuery)
             .flatMap { norm -> saveNormAdapter.saveNorm(SaveNormOutputPort.Command(norm)) }
-            .flatMap { saveFileAdapter.saveFile(SaveFileOutputPort.Command(command.zipFile)) }
+            .flatMap { saveFileAdapter.saveFile(SaveFileOutputPort.Command(command.zipFile, command.filename)) }
             .doOnError { exception -> logger.error("Error occurred while saving the file to bucket:", exception) }
             .map { guid }
     }

@@ -9,8 +9,8 @@ class ImportNormCommandTest {
     @Test
     fun `can create command with ZIP file`() {
         val zipFile = File.createTempFile("Temp", ".zip")
-        val command = ImportNormUseCase.Command(zipFile)
+        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
 
-        assertThat(command.zipFile).isEqualTo(zipFile)
+        assertThat(command.zipFile).isEqualTo(zipFile.readBytes())
     }
 }

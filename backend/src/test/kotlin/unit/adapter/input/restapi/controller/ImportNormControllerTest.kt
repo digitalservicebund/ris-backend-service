@@ -15,7 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
-import java.io.File
 import java.nio.ByteBuffer
 import java.util.UUID
 
@@ -45,9 +44,7 @@ class ImportNormControllerTest {
         verify(exactly = 1) {
             importNormService.importNorm(
                 withArg {
-                    assertThat(it.zipFile).isEqualTo(
-                        File(filename).also { it.writeBytes(file.array()) },
-                    )
+                    assertThat(it.zipFile).isEqualTo(file.array())
                 },
             )
         }

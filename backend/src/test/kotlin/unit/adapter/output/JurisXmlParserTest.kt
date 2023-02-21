@@ -38,7 +38,7 @@ class JurisXmlParserTest {
     fun `it uses the given GUID for the norm`() {
         val parser = JurisXmlParser()
         val guid = UUID.randomUUID()
-        val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile.readBytes(), anyZipFile.name)
 
         val norm = parser.parseJurisXml(query).block()
 
@@ -49,7 +49,7 @@ class JurisXmlParserTest {
     fun `it calls the external library to parse the given ZIP file`() {
         val parser = JurisXmlParser()
         val zipFile = File.createTempFile("Temp", ".zip")
-        val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
 
         parser.parseJurisXml(query).block()
 
@@ -129,7 +129,7 @@ class JurisXmlParserTest {
                 ageOfMajorityIndication = "test age of majority indication"
                 text = "test text"
             }
-        val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
         every { extractData(any()) } returns data
 
         val norm = parser.parseJurisXml(query).block()
@@ -208,7 +208,7 @@ class JurisXmlParserTest {
     fun `it parses articles`() {
         val parser = JurisXmlParser()
         val guid = UUID.randomUUID()
-        val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile)
+        val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile.readBytes(), anyZipFile.name)
         val articleData = ArticleData("title", "marker")
         val data = NormData().apply { articles = listOf(articleData) }
 
