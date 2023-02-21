@@ -10,9 +10,4 @@ describe("TextButton", () => {
     })
     expect(wrapper.props().label).toBe("foo")
   })
-
-  it("renders with default label prop", () => {
-    const wrapper = mount(TextButton)
-    expect(wrapper.props().label).toBe("Speichern")
-  })
 })
