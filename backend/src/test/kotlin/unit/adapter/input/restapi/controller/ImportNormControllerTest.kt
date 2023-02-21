@@ -16,6 +16,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
 import java.io.File
+import java.nio.ByteBuffer
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -26,20 +27,29 @@ class ImportNormControllerTest {
 
     @MockkBean lateinit var importNormService: ImportNormUseCase
 
+    private val file: ByteBuffer = ByteBuffer.allocate(0)
+    private val filename: String = "file.zip"
+
     @Test
     fun `it calls the import norm service with the content of the body as ZIP file`() {
-        val zipFile = File.createTempFile("Temp", ".zip")
         every { importNormService.importNorm(any()) } returns Mono.empty()
 
         webClient
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .body(BodyInserters.fromValue(zipFile))
+            .header("X-Filename", filename)
+            .body(BodyInserters.fromValue(file))
             .exchange()
 
         verify(exactly = 1) {
-            importNormService.importNorm(withArg { assertThat(it.zipFile).isEqualTo(zipFile) })
+            importNormService.importNorm(
+                withArg {
+                    assertThat(it.zipFile).isEqualTo(
+                        File(filename).also { it.writeBytes(file.array()) },
+                    )
+                },
+            )
         }
     }
 
@@ -52,10 +62,11 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .body(BodyInserters.fromValue(File.createTempFile("Temp", ".zip")))
+            .header("X-Filename", filename)
+            .body(BodyInserters.fromValue(file))
             .exchange()
             .expectStatus()
-            .isCreated()
+            .isCreated
     }
 
     @Test
@@ -67,7 +78,8 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .body(BodyInserters.fromValue(File.createTempFile("Temp", ".zip")))
+            .header("X-Filename", filename)
+            .body(BodyInserters.fromValue(file))
             .exchange()
             .expectBody()
             .jsonPath("guid")
@@ -84,9 +96,10 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .body(BodyInserters.fromValue(File.createTempFile("Temp", ".zip")))
+            .header("X-Filename", filename)
+            .body(BodyInserters.fromValue(file))
             .exchange()
             .expectStatus()
-            .is5xxServerError()
+            .is5xxServerError
     }
 }

@@ -138,7 +138,11 @@ export async function importNorm(file: File): Promise<ServiceResponse<string>> {
   const { status, error, data } = await httpClient.post<
     unknown,
     { guid: string }
-  >("norms", { headers: { "Content-Type": "application/zip" } }, file)
+  >(
+    "norms",
+    { headers: { "Content-Type": "application/zip", "X-Filename": file.name } },
+    file
+  )
   if (status >= 400 || error) {
     if (status === 413) {
       return {

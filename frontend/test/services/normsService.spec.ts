@@ -309,7 +309,12 @@ describe("normsService", () => {
       expect(httpClient.post).toHaveBeenCalledOnce()
       expect(httpClient.post).toHaveBeenLastCalledWith(
         "norms",
-        { headers: { "Content-Type": "application/zip" } },
+        {
+          headers: {
+            "Content-Type": "application/zip",
+            "X-Filename": "test.zip",
+          },
+        },
         file
       )
     })

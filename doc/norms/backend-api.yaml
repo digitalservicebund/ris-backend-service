@@ -67,6 +67,12 @@ paths:
       summary: Import a norm using a ZIP
       description: Importing all xml files of a norm in juris format in a compressed ZIP file
       operationId: importNorm
+      parameters:
+        - name: X-Filename
+          in: header
+          description: Filename used for storing the zip in the system
+          required: true
+          example: "norm.zip"
       requestBody:
         required: true
         content:
