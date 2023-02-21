@@ -25,7 +25,11 @@ onUnmounted(() => {
 
 <template>
   <div class="flex flex-row items-end justify-start space-x-[10px]">
-    <TextButton :aria-label="ariaLabel" @click="triggerSave" />
+    <TextButton
+      :aria-label="ariaLabel"
+      label="Speichern"
+      @click="triggerSave"
+    />
     <div class="flex flex-row items-end justify-start">
       <div v-if="saveIsInProgress">
         <div class="flex flex-wrap h-[25px] items-center w-[30px]">

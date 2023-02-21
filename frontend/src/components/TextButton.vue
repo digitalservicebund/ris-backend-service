@@ -10,7 +10,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  label: "Speichern", // TODO: Why?! Just why?
+  label: undefined,
   icon: undefined,
   ariaLabel: undefined,
   buttonType: "primary",

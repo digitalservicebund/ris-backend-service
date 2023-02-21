@@ -64,7 +64,11 @@ onMounted(() => {
 
 <template>
   <div class="save-button-container">
-    <TextButton :aria-label="ariaLabel" @click="handleUpdateDocumentUnit" />
+    <TextButton
+      :aria-label="ariaLabel"
+      label="Speichern"
+      @click="handleUpdateDocumentUnit"
+    />
     <div v-if="!isFristTimeLoad" class="save-status">
       <div v-if="onUpload">
         <div class="icon">

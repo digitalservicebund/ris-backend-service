@@ -20,7 +20,7 @@ const updateStatus = ref(UpdateStatus)
         label="Button Primary With Icon"
       />
 
-      <TextButton button-type="primary" icon="close" label="" />
+      <TextButton button-type="primary" icon="close" />
 
       <TextButton button-type="primary" disabled label="Disabled" />
     </div>
@@ -34,7 +34,7 @@ const updateStatus = ref(UpdateStatus)
         label="Button Secondary With Icon"
       />
 
-      <TextButton button-type="secondary" icon="close" label="" />
+      <TextButton button-type="secondary" icon="close" />
 
       <TextButton button-type="secondary" disabled label="Disabled" />
     </div>
@@ -48,7 +48,7 @@ const updateStatus = ref(UpdateStatus)
         label="Button Tertiary With Icon"
       />
 
-      <TextButton button-type="tertiary" icon="close" label="" />
+      <TextButton button-type="tertiary" icon="close" />
 
       <TextButton button-type="tertiary" disabled label="Disabled" />
     </div>
@@ -62,7 +62,7 @@ const updateStatus = ref(UpdateStatus)
         label="Button Ghost With Icon"
       />
 
-      <TextButton button-type="ghost" icon="close" label="" />
+      <TextButton button-type="ghost" icon="close" />
 
       <TextButton button-type="ghost" disabled label="Disabled" />
     </div>
