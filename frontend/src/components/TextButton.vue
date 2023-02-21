@@ -1,18 +1,20 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, h } from "vue"
 
 interface Props {
   label?: string
   icon?: string
   ariaLabel?: string
   buttonType?: string
+  href?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  label: "Speichern",
+  label: "Speichern", // TODO: Why?! Just why?
   icon: undefined,
   ariaLabel: undefined,
   buttonType: "primary",
+  href: undefined,
 })
 
 const buttonClasses = computed(() => ({
@@ -21,25 +23,38 @@ const buttonClasses = computed(() => ({
   "btn-ghost": props.buttonType == "ghost",
   "btn-tertiary": props.buttonType == "tertiary",
 }))
+
+const isLink = computed(() => !!props.href)
+
+const renderIcon = () =>
+  props.icon ? h("span", { class: "material-icons" }, props.icon) : undefined
+
+const renderLabel = () =>
+  props.label ? h("span", { class: "label-02-bold" }, props.label) : undefined
+
+const render = () => {
+  const tag = isLink.value ? "a" : "button"
+
+  return h(
+    tag,
+    {
+      class: ["ris-btn", "flex", "gap-12", buttonClasses.value],
+      href: props.href,
+      "aria-label": props.ariaLabel,
+    },
+    [renderIcon(), renderLabel()]
+  )
+}
 </script>
 
 <template>
-  <button
-    :aria-label="ariaLabel"
-    class="flex gap-12 ris-btn"
-    :class="buttonClasses"
-    flat
-    :ripple="false"
-    :rounded="0"
-  >
-    <slot>
-      <span v-if="icon" class="material-icons"> {{ icon }} </span>
-      <span v-if="label" class="label-02-bold">{{ label }} </span>
-    </slot>
-  </button>
+  <render />
 </template>
 
 <style lang="scss" scoped>
+// The ignoring of the rule is necessary because we use manual render functions
+// instead of a rich template.
+// eslint-disable vue-scoped-css/no-unused-selector
 .ris-btn {
   @apply align-middle bg-blue-800 text-white inline-flex items-center
   justify-center max-w-full
