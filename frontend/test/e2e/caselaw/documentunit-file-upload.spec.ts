@@ -21,6 +21,7 @@ test.describe("upload an original document to a doc unit", () => {
     // delete file
     await page.locator("text=Datei löschen").click()
     await page.locator("[role='dialog'] >> button:has-text('Löschen')").click()
+
     await expect(
       page.locator(
         "text=Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus"
@@ -30,12 +31,16 @@ test.describe("upload an original document to a doc unit", () => {
     await expect(
       page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
     ).toBeVisible()
-    await page.locator(".table-row", {
-      hasText: documentNumber,
-    })
-    await page.locator(".table-row", {
-      hasText: "sample.docx",
-    })
+    await expect(
+      page.locator(".table-row", {
+        hasText: documentNumber,
+      })
+    ).toBeVisible()
+    await expect(
+      page.locator(".table-row", {
+        hasText: "sample.docx",
+      })
+    ).toBeHidden()
   })
 
   test("upload non-docx file per file chooser", async ({ page }) => {
@@ -74,6 +79,7 @@ test.describe("upload an original document to a doc unit", () => {
     )
 
     await page.dispatchEvent(".upload-drop-area", "drop", { dataTransfer })
+    await expect(page.getByText("Die ist ein Test")).toBeVisible()
   })
 
   test("drop non-docx file in upload area", async ({ page }) => {
