@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.norms.application.port.output
 
 import reactor.core.publisher.Mono
-import java.nio.ByteBuffer
+import java.io.File
 
 interface SaveFileOutputPort {
     fun saveFile(command: Command): Mono<Boolean>
 
-    data class Command(val file: ByteBuffer)
+    data class Command(val file: File)
 }

@@ -11,6 +11,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.io.File
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.util.UUID
@@ -19,7 +20,7 @@ import de.bund.digitalservice.ris.norms.juris.extractor.model.Norm as NormData
 
 class JurisXmlParserTest {
     val anyGuid = UUID.randomUUID()
-    val anyZipFile = ByteBuffer.allocate(0)
+    val anyZipFile = File.createTempFile("Temp", ".zip")
 
     @BeforeEach
     internal fun beforeEach() {
@@ -47,12 +48,12 @@ class JurisXmlParserTest {
     @Test
     fun `it calls the external library to parse the given ZIP file`() {
         val parser = JurisXmlParser()
-        val zipFile = ByteBuffer.allocate(0)
+        val zipFile = File.createTempFile("Temp", ".zip")
         val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile)
 
         parser.parseJurisXml(query).block()
 
-        verify(exactly = 1) { extractData(zipFile) }
+        verify(exactly = 1) { extractData(ByteBuffer.wrap(zipFile.readBytes())) }
     }
 
     @Test
@@ -204,7 +205,7 @@ class JurisXmlParserTest {
     }
 
     @Test
-    fun `it does not parse any articles`() {
+    fun `it parses articles`() {
         val parser = JurisXmlParser()
         val guid = UUID.randomUUID()
         val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile)
@@ -215,6 +216,6 @@ class JurisXmlParserTest {
 
         val norm = parser.parseJurisXml(query).block()
 
-        assertThat(norm?.articles).hasSize(0)
+        assertThat(norm?.articles).hasSize(1)
     }
 }

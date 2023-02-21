@@ -8,9 +8,11 @@ import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutpu
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticlesRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FilesRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
 import org.springframework.context.annotation.Primary
@@ -28,6 +30,7 @@ class NormsService(
     val normsRepository: NormsRepository,
     val articlesRepository: ArticlesRepository,
     val paragraphsRepository: ParagraphsRepository,
+    val filesRepository: FilesRepository,
     client: DatabaseClient,
 ) : NormsMapper,
     GetNormByGuidOutputPort,
@@ -65,8 +68,10 @@ class NormsService(
         return normsRepository
             .save(normToDto(command.norm))
             .flatMap { normDto ->
-                saveNormArticles(command.norm, normDto)
-                    .then(Mono.just(true))
+                saveNormFiles(command.norm, normDto).then(
+                    saveNormArticles(command.norm, normDto)
+                        .then(Mono.just(true)),
+                )
             }
     }
 
@@ -84,6 +89,11 @@ class NormsService(
         return articlesRepository
             .saveAll(articlesToDto(norm.articles, normDto.id))
             .flatMap { article -> saveArticleParagraphs(norm, article) }
+    }
+
+    private fun saveNormFiles(norm: Norm, normDto: NormDto): Flux<FileReferenceDto> {
+        return filesRepository
+            .saveAll(filesToDto(norm.files, normDto.id))
     }
 
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {

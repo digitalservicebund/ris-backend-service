@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import java.nio.ByteBuffer
+import java.io.File
 import java.util.UUID
 
 @RestController
@@ -17,7 +17,7 @@ import java.util.UUID
 class ImportNormController(private val importNormService: ImportNormUseCase) {
 
     @PostMapping
-    fun createNorm(@RequestBody zipFile: ByteBuffer): Mono<ResponseEntity<ResponseSchema>> {
+    fun createNorm(@RequestBody zipFile: File): Mono<ResponseEntity<ResponseSchema>> {
         val command = ImportNormUseCase.Command(zipFile)
 
         return importNormService

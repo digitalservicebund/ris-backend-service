@@ -15,7 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Mono
-import java.nio.ByteBuffer
+import java.io.File
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -28,7 +28,7 @@ class ImportNormControllerTest {
 
     @Test
     fun `it calls the import norm service with the content of the body as ZIP file`() {
-        val zipFile = ByteBuffer.allocate(0)
+        val zipFile = File.createTempFile("Temp", ".zip")
         every { importNormService.importNorm(any()) } returns Mono.empty()
 
         webClient
@@ -52,7 +52,7 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .body(BodyInserters.fromValue(ByteBuffer.allocate(0)))
+            .body(BodyInserters.fromValue(File.createTempFile("Temp", ".zip")))
             .exchange()
             .expectStatus()
             .isCreated()
@@ -67,7 +67,7 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .body(BodyInserters.fromValue(ByteBuffer.allocate(0)))
+            .body(BodyInserters.fromValue(File.createTempFile("Temp", ".zip")))
             .exchange()
             .expectBody()
             .jsonPath("guid")
@@ -84,7 +84,7 @@ class ImportNormControllerTest {
             .mutateWith(csrf())
             .post()
             .uri("/api/v1/norms")
-            .body(BodyInserters.fromValue(ByteBuffer.allocate(0)))
+            .body(BodyInserters.fromValue(File.createTempFile("Temp", ".zip")))
             .exchange()
             .expectStatus()
             .is5xxServerError()

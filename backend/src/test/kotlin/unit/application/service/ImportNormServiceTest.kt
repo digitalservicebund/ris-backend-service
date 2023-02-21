@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.ImportNormUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SaveFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import io.mockk.every
 import io.mockk.mockk
@@ -11,7 +12,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import utils.createRandomNorm
-import java.nio.ByteBuffer
+import java.io.File
 
 class ImportNormServiceTest {
 
@@ -19,8 +20,9 @@ class ImportNormServiceTest {
     fun `it should forward the ZIP file to the juris parser`() {
         val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
         val saveNormAdapter = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
-        val zipFile = ByteBuffer.allocate(0)
+        val saveFileAdapter = mockk<SaveFileOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
+        val zipFile = File.createTempFile("Temp", ".zip")
         val command = ImportNormUseCase.Command(zipFile)
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.empty()
@@ -38,9 +40,10 @@ class ImportNormServiceTest {
     fun `it forwards the parsed norm to the save norm adapter`() {
         val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
         val saveNormAdapter = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
+        val saveFileAdapter = mockk<SaveFileOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
         val parsedNorm = createRandomNorm()
-        val command = ImportNormUseCase.Command(ByteBuffer.allocate(0))
+        val command = ImportNormUseCase.Command(File.createTempFile("Temp", ".zip"))
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(parsedNorm)
         every { saveNormAdapter.saveNorm(any()) } returns Mono.empty()
@@ -56,13 +59,15 @@ class ImportNormServiceTest {
     fun `it generates a new GUID for every norm`() {
         val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
         val saveNormAdapter = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
-        val commandOne = ImportNormUseCase.Command(ByteBuffer.allocate(0))
-        val commandTwo = ImportNormUseCase.Command(ByteBuffer.allocate(0))
-        val commandThree = ImportNormUseCase.Command(ByteBuffer.allocate(0))
+        val saveFileAdapter = mockk<SaveFileOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
+        val commandOne = ImportNormUseCase.Command(File.createTempFile("Temp", ".zip"))
+        val commandTwo = ImportNormUseCase.Command(File.createTempFile("Temp1", ".zip"))
+        val commandThree = ImportNormUseCase.Command(File.createTempFile("Temp2", ".zip"))
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
         every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
+        every { saveFileAdapter.saveFile(any()) } returns Mono.just(true)
 
         val guidOne = service.importNorm(commandOne).block()
         val guidTwo = service.importNorm(commandTwo).block()
@@ -76,16 +81,37 @@ class ImportNormServiceTest {
     fun `it uses the same GUID for the whole process`() {
         val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
         val saveNormAdapter = mockk<SaveNormOutputPort>()
-        val service = ImportNormService(parseJurisXmlAdapter, saveNormAdapter)
-        val command = ImportNormUseCase.Command(ByteBuffer.allocate(0))
+        val saveFileAdapter = mockk<SaveFileOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
+        val command = ImportNormUseCase.Command(File.createTempFile("Temp", ".zip"))
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
         every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
+        every { saveFileAdapter.saveFile(any()) } returns Mono.just(true)
 
         val guid = service.importNorm(command).block()
         val parseQuery = slot<ParseJurisXmlOutputPort.Query>()
         verify { parseJurisXmlAdapter.parseJurisXml(capture(parseQuery)) }
 
         assertThat(guid).isEqualTo(parseQuery.captured.newGuid)
+    }
+
+    @Test
+    fun `it throws an error if file can not be uploaded to bucket`() {
+        val parseJurisXmlAdapter = mockk<ParseJurisXmlOutputPort>()
+        val saveNormAdapter = mockk<SaveNormOutputPort>()
+        val saveFileAdapter = mockk<SaveFileOutputPort>()
+        val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
+        val command = ImportNormUseCase.Command(File.createTempFile("Temp", ".zip"))
+
+        every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
+        every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
+        every { saveFileAdapter.saveFile(any()) } throws Exception("Error occurred")
+
+        try {
+            service.importNorm(command).block()
+        } catch (exception: Exception) {
+            assertThat(exception.message).contains("Error occurred")
+        }
     }
 }

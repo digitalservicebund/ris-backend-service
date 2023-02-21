@@ -2,9 +2,11 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 
@@ -101,6 +103,10 @@ interface NormsMapper {
 
     fun paragraphsToDto(paragraphs: List<Paragraph>, articleId: Int, id: Int = 0): List<ParagraphDto> {
         return paragraphs.map { ParagraphDto(id, it.guid, it.marker, it.text, articleId) }
+    }
+
+    fun filesToDto(files: List<FileReference>, normId: Int, id: Int = 0): List<FileReferenceDto> {
+        return files.map { FileReferenceDto(id, it.name, it.hash, normId) }
     }
 
     fun queryFieldToDbColumn(field: QueryFields): String {

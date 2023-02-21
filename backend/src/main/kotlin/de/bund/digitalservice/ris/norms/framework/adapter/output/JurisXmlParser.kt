@@ -1,20 +1,29 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output
 
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
+import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.juris.extractor.extractData
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
+import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.util.UUID
+import de.bund.digitalservice.ris.norms.juris.extractor.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.extractor.model.Norm as NormData
+import de.bund.digitalservice.ris.norms.juris.extractor.model.Paragraph as ParagraphData
 
 @Component
 class JurisXmlParser() : ParseJurisXmlOutputPort {
     override fun parseJurisXml(query: ParseJurisXmlOutputPort.Query): Mono<Norm> {
-        val data = extractData(query.zipFile)
+        val data = extractData(ByteBuffer.wrap(query.zipFile.readBytes()))
         val norm = mapDataToDomain(query.newGuid, data)
+        norm.files = listOf(
+            FileReference.fromFile(query.zipFile),
+        )
         return Mono.just(norm)
     }
 }
@@ -22,7 +31,7 @@ class JurisXmlParser() : ParseJurisXmlOutputPort {
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     return Norm(
         guid = guid,
-        articles = emptyList(),
+        articles = mapArticlesToDomain(data.articles),
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         risAbbreviationInternationalLaw = data.risAbbreviationInternationalLaw,
@@ -93,6 +102,27 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         ageOfMajorityIndication = data.ageOfMajorityIndication,
         text = data.text,
     )
+}
+
+fun mapArticlesToDomain(articles: List<ArticleData>): List<Article> {
+    return articles.map { article ->
+        Article(
+            guid = UUID.randomUUID(),
+            title = article.title,
+            marker = article.marker,
+            paragraphs = mapParagraphsToDomain(article.paragraphs),
+        )
+    }
+}
+
+fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
+    return paragraphs.map { paragraph ->
+        Paragraph(
+            guid = UUID.randomUUID(),
+            marker = paragraph.marker,
+            text = paragraph.text,
+        )
+    }
 }
 
 fun parseDateString(value: String?): LocalDate? = value?.let { LocalDate.parse(value) }

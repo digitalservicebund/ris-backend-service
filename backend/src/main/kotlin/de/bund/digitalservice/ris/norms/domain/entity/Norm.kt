@@ -147,7 +147,7 @@ data class Norm(
     var ageOfMajorityIndication: String? = null,
 
     var text: String? = null,
-    var files: List<File> = listOf(),
+    var files: List<FileReference> = listOf(),
 
 ) {
     val eli: Eli

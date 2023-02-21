@@ -66,6 +66,7 @@ class NamingConventionTest {
         classes()
             .that(areFromTheServicePackage())
             .should(haveSimpleNameEndingWith("Service"))
+            .orShould(haveSimpleNameEndingWith("Companion"))
             .check(sourceClasses)
     }
 

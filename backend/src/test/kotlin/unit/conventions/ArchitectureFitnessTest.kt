@@ -59,6 +59,7 @@ class ArchitectureFitnessTest {
                                 "reactor.core..",
                                 "org.springframework.stereotype..",
                                 "org.reactivestreams..",
+                                "org.slf4j..",
                             ),
                         ),
                 ),
