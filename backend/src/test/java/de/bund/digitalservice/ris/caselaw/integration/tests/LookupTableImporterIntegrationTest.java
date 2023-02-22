@@ -22,7 +22,6 @@ import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -202,13 +201,18 @@ class LookupTableImporterIntegrationTest {
         KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
 
     SubjectFieldDTO expectedParent =
-        SubjectFieldDTO.builder().id(1L).subjectFieldNumber("TS-01").changeIndicator('N').build();
+        SubjectFieldDTO.builder()
+            .id(1L)
+            .depthInTree(2)
+            .subjectFieldNumber("TS-01")
+            .changeIndicator('N')
+            .build();
 
     SubjectFieldDTO expectedChild =
         new SubjectFieldDTO(
             2L,
-            1,
-            false,
+            3,
+            true,
             1L,
             "2022-12-22",
             "2022-12-24",
@@ -217,7 +221,7 @@ class LookupTableImporterIntegrationTest {
             "TS-01-01",
             "stext 2",
             "navbez 2",
-            Collections.emptyList(),
+            null,
             Arrays.asList(expectedKeyword1, expectedKeyword2),
             Arrays.asList(expectedNorm1, expectedNorm2),
             false);
@@ -280,11 +284,10 @@ class LookupTableImporterIntegrationTest {
     child.setKeywords(keywordDTOs);
     child.setNorms(normDTOs);
 
-    // TODO restore this:
-    /*assertThat(parent).usingRecursiveComparison().isEqualTo(expectedParent);
+    assertThat(parent).usingRecursiveComparison().isEqualTo(expectedParent);
     assertThat(child)
         .usingRecursiveComparison()
         .ignoringFields("norms.id", "keywords.id")
-        .isEqualTo(expectedChild);*/
+        .isEqualTo(expectedChild);
   }
 }
