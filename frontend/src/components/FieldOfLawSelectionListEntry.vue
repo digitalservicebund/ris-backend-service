@@ -23,7 +23,7 @@ const emit = defineEmits<{
           <span
             class="link"
             @click="emit('node-clicked')"
-            @keypress="emit('node-clicked')"
+            @keyup.enter="emit('node-clicked')"
           >
             {{ props.subject.subjectFieldNumber }}
           </span>

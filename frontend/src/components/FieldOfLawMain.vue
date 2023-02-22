@@ -5,7 +5,7 @@ import FieldOfLawTree from "./FieldOfLawTree.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
 
 const selectedSubjects = ref<FieldOfLawNode[]>([])
-const clickedSubjectFieldNumber = ref<string>("")
+const clickedSubjectFieldNumber = ref("")
 
 const getIndex = (_subjectFieldNumber: string) =>
   selectedSubjects.value.findIndex(

@@ -1,10 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { computed, watch, ref } from "vue"
 import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
-import FieldOfLawTree, {
-  buildRoot,
-  FieldOfLawNode,
-} from "@/domain/fieldOfLawTree"
+import { buildRoot, FieldOfLawNode } from "@/domain/fieldOfLawTree"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 const props = defineProps<{
@@ -19,32 +16,10 @@ const emit = defineEmits<{
   (event: "linkedField:clicked", subjectFieldNumber: string): void
 }>()
 
-const tree = ref<FieldOfLawTree>(new FieldOfLawTree(buildRoot()))
+const root = ref(buildRoot())
 
-watch(
-  () => props.clickedSubjectFieldNumber,
-  () => {
-    buildDirectPathTree()
-  }
-)
-
-function buildDirectPathTree() {
-  if (!props.clickedSubjectFieldNumber) return
-  FieldOfLawService.getTreeForNumber(props.clickedSubjectFieldNumber).then(
-    (response) => {
-      // console.log("loaded tree", response.data)
-      if (!response.data) return
-
-      tree.value = new FieldOfLawTree(buildRoot([response.data]))
-      tree.value.expandAll(true)
-    }
-  )
-  emit("reset-clicked-node")
-}
-
-function handleNodeClick(node: FieldOfLawNode) {
-  tree.value.toggleNode(node)
-}
+const clicked = computed(() => props.clickedSubjectFieldNumber)
+watch(clicked, () => loadedClickedFieldOfLaw(clicked.value))
 
 function handleSelect(node: FieldOfLawNode) {
   emit("add-to-list", node)
@@ -57,23 +32,49 @@ function handleUnselect(subjectFieldNumber: string) {
 function handleLinkedFieldClicked(subjectFieldNumber: string) {
   emit("linkedField:clicked", subjectFieldNumber)
 }
+
+const loadedClickedFieldOfLaw = async (clickedSubjectFieldNumber: string) => {
+  if (!clickedSubjectFieldNumber) return
+
+  console.log("identifier", clickedSubjectFieldNumber)
+
+  const response = await FieldOfLawService.getTreeForNumber(
+    clickedSubjectFieldNumber
+  )
+  if (!response.data) return
+
+  root.value.isExpanded = true
+  root.value.children = [response.data]
+  expandAllChilds(root.value.children)
+
+  emit("reset-clicked-node")
+}
+
+function expandAllChilds(children: FieldOfLawNode[]) {
+  if (!children || !children.length) return
+
+  children.forEach((child) => {
+    console.log("expand", child.subjectFieldNumber)
+    child.isExpanded = true
+    expandAllChilds(child.children)
+  })
+}
 </script>
 
 <template>
   <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
   <FieldOfLawNodeComponent
-    v-for="node in tree?.getNodesOrderedByDepthFirstSearch()"
-    :key="node.subjectFieldNumber"
-    :node="node"
+    :key="root.subjectFieldNumber"
+    :node="root"
     :selected="
       props.selectedSubjects.some(
         ({ subjectFieldNumber }) =>
-          subjectFieldNumber === node.subjectFieldNumber
+          subjectFieldNumber === root.subjectFieldNumber
       )
     "
+    :selected-subjects="selectedSubjects"
     @linked-field:clicked="handleLinkedFieldClicked"
     @node:select="handleSelect"
-    @node:toggle="handleNodeClick"
     @node:unselect="handleUnselect"
   />
 </template>
