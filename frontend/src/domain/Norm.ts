@@ -136,4 +136,10 @@ export type FrameData = {
 export interface Norm extends FrameData {
   readonly guid: string
   readonly articles: Article[]
+  readonly files?: FileReference[]
+}
+
+export interface FileReference {
+  readonly name: string
+  readonly hash: string
 }
