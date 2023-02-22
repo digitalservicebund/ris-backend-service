@@ -252,6 +252,10 @@ public class LookupTableImporterService {
 
     jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
 
+    extractAndStoreAllLinkedFieldsOfLaw(subjectFieldsXml);
+  }
+
+  private void extractAndStoreAllLinkedFieldsOfLaw(SubjectFieldsXml subjectFieldsXml) {
     Map<String, Long> allFieldOfLawNumbers =
         subjectFieldsXml.getList().stream()
             .collect(
