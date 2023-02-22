@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
+import TokenizeText from "@/components/TokenizeText.vue"
 import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLawTree"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
@@ -18,26 +19,10 @@ const emit = defineEmits<{
   (event: "linkedField:clicked", subjectFieldNumber: string): void
 }>()
 
-type Token = {
-  content: string
-  isLink: boolean
-}
-
 const node = computed(() => props.node)
 
-function tokenizeText(): Token[] {
-  const stext = props.node.subjectFieldText
-  const keywords = props.node.linkedFields
-  if (!keywords) return [{ content: stext, isLink: false }]
-  return stext.split(new RegExp(`(${keywords.join("|")})`)).map((part) => ({
-    content: part,
-    isLink: keywords.includes(part),
-  }))
-}
-
-function handleTokenClick(token: Token) {
-  if (!token.isLink) return
-  emit("linkedField:clicked", token.content)
+function handleTokenClick(tokenContent: string) {
+  emit("linkedField:clicked", tokenContent)
 }
 
 function handleToggle() {
@@ -102,15 +87,11 @@ function handleToggle() {
         {{ node.subjectFieldNumber }}
       </div>
       <div class="pl-6 pt-2 subject-field-text text-blue-800">
-        <span
-          v-for="(token, idx) in tokenizeText()"
-          :key="idx"
-          :class="token.isLink && 'linked-field'"
-          @click="handleTokenClick(token)"
-          @keyup.enter="handleTokenClick(token)"
-        >
-          {{ token.content }}
-        </span>
+        <TokenizeText
+          :keywords="props.node.linkedFields ?? []"
+          :text="props.node.subjectFieldText"
+          @link-token:clicked="handleTokenClick"
+        />
       </div>
     </div>
     <div v-if="node.isExpanded && node.children.length">
@@ -145,10 +126,5 @@ function handleToggle() {
 
 .selected-icon {
   font-size: 20px;
-}
-
-.linked-field {
-  cursor: pointer;
-  text-decoration: underline;
 }
 </style>
