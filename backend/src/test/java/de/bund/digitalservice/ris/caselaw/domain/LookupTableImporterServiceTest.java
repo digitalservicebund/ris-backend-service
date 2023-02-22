@@ -204,14 +204,12 @@ class LookupTableImporterServiceTest {
         JPASubjectFieldDTO.builder()
             .id(1L)
             .parentSubjectField(null)
-            .parent(true)
             .subjectFieldNumber("TS-01")
             .build();
     JPASubjectFieldDTO child =
         JPASubjectFieldDTO.builder()
             .id(2L)
             .parentSubjectField(parent)
-            .parent(false)
             .changeDateMail("2022-12-22")
             .changeDateClient("2022-12-24")
             .changeIndicator('N')

@@ -202,12 +202,7 @@ class LookupTableImporterIntegrationTest {
         KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
 
     SubjectFieldDTO expectedParent =
-        SubjectFieldDTO.builder()
-            .id(1L)
-            .parent(true)
-            .subjectFieldNumber("TS-01")
-            .changeIndicator('N')
-            .build();
+        SubjectFieldDTO.builder().id(1L).subjectFieldNumber("TS-01").changeIndicator('N').build();
 
     SubjectFieldDTO expectedChild =
         new SubjectFieldDTO(
@@ -215,7 +210,6 @@ class LookupTableImporterIntegrationTest {
             1,
             false,
             1L,
-            false,
             "2022-12-22",
             "2022-12-24",
             'J',
