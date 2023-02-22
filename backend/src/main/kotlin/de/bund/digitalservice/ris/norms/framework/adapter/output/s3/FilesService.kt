@@ -32,10 +32,7 @@ class FilesService(
             .contentType(mediaType.toString())
             .build()
 
-        return Mono.fromCallable {
-            Mono.fromFuture(
-                s3AsyncClient.putObject(putObjectRequest, asyncRequestBody),
-            )
-        }.flatMap { Mono.just(true) }
+        return Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody))
+            .flatMap { Mono.just(true) }
     }
 }
