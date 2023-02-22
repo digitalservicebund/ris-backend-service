@@ -305,14 +305,7 @@ public class LookupTableImporterService {
                 Collectors.toMap(JPASubjectFieldDTO::getSubjectFieldNumber, Function.identity()));
     jpaSubjectFieldDTOs.forEach(
         jpaSubjectFieldDTO -> {
-          // leaves
-          String thisSubjectFieldNumber = jpaSubjectFieldDTO.getSubjectFieldNumber();
-          jpaSubjectFieldDTO.setLeafInTree(
-              subjectFieldNumberToSubjectFieldDTO.keySet().stream()
-                  .noneMatch(
-                      otherSubjectFieldNumber ->
-                          otherSubjectFieldNumber.startsWith(thisSubjectFieldNumber)
-                              && !otherSubjectFieldNumber.equals(thisSubjectFieldNumber)));
+          determineLeafStatus(jpaSubjectFieldDTO, subjectFieldNumberToSubjectFieldDTO);
           // depth
           jpaSubjectFieldDTO.setDepthInTree(
               jpaSubjectFieldDTO.getSubjectFieldNumber().split("-").length);
@@ -323,5 +316,17 @@ public class LookupTableImporterService {
             jpaSubjectFieldDTO.setParentSubjectField(parentDTO);
           }
         });
+  }
+
+  private void determineLeafStatus(
+      JPASubjectFieldDTO jpaSubjectFieldDTO,
+      Map<String, JPASubjectFieldDTO> subjectFieldNumberToSubjectFieldDTO) {
+    String thisSubjectFieldNumber = jpaSubjectFieldDTO.getSubjectFieldNumber();
+    jpaSubjectFieldDTO.setLeafInTree(
+        subjectFieldNumberToSubjectFieldDTO.keySet().stream()
+            .noneMatch(
+                otherSubjectFieldNumber ->
+                    otherSubjectFieldNumber.startsWith(thisSubjectFieldNumber)
+                        && !otherSubjectFieldNumber.equals(thisSubjectFieldNumber)));
   }
 }
