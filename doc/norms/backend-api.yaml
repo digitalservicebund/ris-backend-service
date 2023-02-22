@@ -279,6 +279,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Paragraph'
+    FileReference:
+      type: object
+      required:
+        - name
+        - hash
+      properties:
+        name:
+          type: string
+          example: Finanzdisziplin.2-0.zip
+          description: Human readble representative name of the file
+        hash:
+          type: string
+          description: SHA-256 hash of the file content
     Norm:
       allOf:
         - $ref: '#/components/schemas/NormFrame'
@@ -286,6 +299,7 @@ components:
           required:
             - guid
             - officialLongTitle
+            - files
           properties:
             guid:
               $ref: '#/components/schemas/Guid'
@@ -293,6 +307,10 @@ components:
               type: array
               items:
                 $ref: '#/components/schemas/Article'
+            files:
+              type: array
+              items:
+                $ref: '#/components/schemas/FileReference'
     NormFrame:
       type: object
       properties:
