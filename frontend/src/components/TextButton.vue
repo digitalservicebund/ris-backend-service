@@ -7,6 +7,8 @@ interface Props {
   ariaLabel?: string
   buttonType?: string
   href?: string
+  download?: boolean | string
+  target?: "_self" | "_blank" | "_parent" | "_top"
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,6 +17,8 @@ const props = withDefaults(defineProps<Props>(), {
   ariaLabel: undefined,
   buttonType: "primary",
   href: undefined,
+  download: undefined,
+  target: "_self",
 })
 
 const buttonClasses = computed(() => ({
@@ -34,13 +38,16 @@ const renderLabel = () =>
 
 const render = () => {
   const tag = isLink.value ? "a" : "button"
+  const { href, download, target } = props
 
   return h(
     tag,
     {
       class: ["ris-btn", "flex", "gap-12", buttonClasses.value],
-      href: props.href,
       "aria-label": props.ariaLabel,
+      href,
+      download,
+      target,
     },
     [renderIcon(), renderLabel()]
   )
