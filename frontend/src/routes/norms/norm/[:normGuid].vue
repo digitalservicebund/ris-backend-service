@@ -15,7 +15,6 @@ const props = defineProps<{ normGuid: string }>()
 const route = useRoute()
 const router = useRouter()
 const { normGuid } = toRefs(props)
-const menuItems = useNormMenuItems(normGuid, route)
 const goBackRoute = { name: "norms" }
 const navigationIsOpen = useToggleStateInRouteQuery(
   "showNavBar",
@@ -24,6 +23,11 @@ const navigationIsOpen = useToggleStateInRouteQuery(
 )
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
+
+const normIsExportable = computed(
+  () => (loadedNorm.value?.files ?? []).length > 0
+)
+const menuItems = useNormMenuItems(normGuid, route, normIsExportable)
 
 const ENTRY_INTO_FORCE_DATE_MAP: Record<string, string> = {
   UNDEFINED_UNKNOWN: "unbestimmt (unbekannt)",

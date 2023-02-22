@@ -4,7 +4,8 @@ import type { RouteLocationNormalizedLoaded } from "vue-router"
 
 export function useNormMenuItems(
   normGuid: Ref<string>,
-  route: RouteLocationNormalizedLoaded
+  route: RouteLocationNormalizedLoaded,
+  exportIsEnabled?: Ref<boolean>
 ) {
   const baseRoute = {
     params: { guid: normGuid.value },
@@ -84,9 +85,9 @@ export function useNormMenuItems(
       label: "Export",
       route: {
         ...baseRoute,
-        name: "norms",
+        name: "norms-norm-:normGuid-export",
       },
-      isDisabled: true,
+      isDisabled: !(exportIsEnabled?.value ?? false),
     },
   ])
 }

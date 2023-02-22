@@ -38,4 +38,34 @@ describe("useNormMenuItems", () => {
     expect(topLebelNames).toContain("Bestand")
     expect(topLebelNames).toContain("Export")
   })
+
+  it("disables the export item per default", () => {
+    const menuItems = useNormMenuItems(
+      ref(""),
+      {} as unknown as RouteLocationNormalizedLoaded
+    )
+
+    const exportMenuItem = menuItems.value.find(
+      (item) => item.label == "Export"
+    )
+
+    expect(exportMenuItem).toBeDefined()
+    expect(exportMenuItem?.isDisabled).toBeTruthy()
+  })
+
+  it("enables the export item based on optional input reference", async () => {
+    const exportIsEnabled = ref(true)
+    const menuItems = useNormMenuItems(
+      ref(""),
+      {} as unknown as RouteLocationNormalizedLoaded,
+      exportIsEnabled
+    )
+
+    const exportMenuItem = menuItems.value.find(
+      (item) => item.label == "Export"
+    )
+
+    expect(exportMenuItem).toBeDefined()
+    expect(exportMenuItem?.isDisabled).toBeFalsy()
+  })
 })
