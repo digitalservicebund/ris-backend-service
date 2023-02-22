@@ -18,7 +18,7 @@ const props = withDefaults(defineProps<Props>(), {
   buttonType: "primary",
   href: undefined,
   download: undefined,
-  target: "_self",
+  target: undefined,
 })
 
 const buttonClasses = computed(() => ({

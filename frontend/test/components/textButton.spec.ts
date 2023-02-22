@@ -53,13 +53,13 @@ describe("TextButton", () => {
     expect(anchor.attributes("download")).toBe("file-name.ext")
   })
 
-  it("it sets per default the anchor target to current tab", () => {
+  it("it sets per default no anchor target attribute to use the browser default", () => {
     const wrapper = mount(TextButton, {
       props: { target: undefined, href: "https://test.org" },
     })
     const anchor = wrapper.get("a")
 
-    expect(anchor.attributes("target")).toBe("_self")
+    expect(anchor.attributes("target")).toBeUndefined()
   })
 
   it.each(["_self", "_blank", "_parent", "_top"])(
