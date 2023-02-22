@@ -26,9 +26,6 @@ public class JPASubjectFieldDTO {
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
   JPASubjectFieldDTO parentSubjectField;
 
-  @Column(name = "parent")
-  boolean parent;
-
   @Column(name = "change_date_mail")
   String changeDateMail;
 

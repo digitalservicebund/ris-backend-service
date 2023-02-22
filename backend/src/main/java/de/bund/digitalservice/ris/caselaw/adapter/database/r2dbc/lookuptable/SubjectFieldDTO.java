@@ -21,7 +21,6 @@ public class SubjectFieldDTO implements Persistable<Long> {
   Integer depthInTree;
   boolean isLeafInTree;
   Long parentId;
-  boolean parent;
   String changeDateMail;
   String changeDateClient;
   char changeIndicator;

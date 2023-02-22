@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -248,7 +247,6 @@ public class LookupTableImporterService {
             .toList();
 
     setSubjectFieldParentIds(jpaSubjectFieldDTOs);
-    setSubjectFieldParent(jpaSubjectFieldDTOs); // is the parent boolean necessary?
 
     jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
 
@@ -325,19 +323,5 @@ public class LookupTableImporterService {
             jpaSubjectFieldDTO.setParentSubjectField(parentDTO);
           }
         });
-  }
-
-  private void setSubjectFieldParent(List<JPASubjectFieldDTO> jpaSubjectFieldDTOs) {
-    Set<Long> parentIds = getSubjectFieldParentIds(jpaSubjectFieldDTOs);
-    jpaSubjectFieldDTOs.stream()
-        .filter(jpaSubjectFieldDTO -> parentIds.contains(jpaSubjectFieldDTO.getId()))
-        .forEach(jpaSubjectFieldDTO -> jpaSubjectFieldDTO.setParent(true));
-  }
-
-  private Set<Long> getSubjectFieldParentIds(List<JPASubjectFieldDTO> jpaSubjectFieldDTOs) {
-    return jpaSubjectFieldDTOs.stream()
-        .filter(jpaSubjectFieldDTO -> jpaSubjectFieldDTO.getParentSubjectField() != null)
-        .map(jpaSubjectFieldDTO -> jpaSubjectFieldDTO.getParentSubjectField().getId())
-        .collect(Collectors.toSet());
   }
 }
