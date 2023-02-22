@@ -64,7 +64,7 @@ function handleToggle() {
       <div v-if="node.subjectFieldNumber !== ROOT_ID">
         <button
           aria-label="Sachgebiet entfernen"
-          class="appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
+          class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
           @click="
             selected
               ? emit('node:unselect', node.subjectFieldNumber)
