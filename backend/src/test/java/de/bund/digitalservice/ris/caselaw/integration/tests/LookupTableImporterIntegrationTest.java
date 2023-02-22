@@ -10,6 +10,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRe
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
@@ -62,6 +64,7 @@ class LookupTableImporterIntegrationTest {
   @Autowired private DatabaseSubjectFieldRepository subjectFieldRepository;
   @Autowired private KeywordRepository keywordRepository;
   @Autowired private NormRepository normRepository;
+  @Autowired private FieldOfLawLinkRepository fieldOfLawLinkRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -71,6 +74,7 @@ class LookupTableImporterIntegrationTest {
     jpaDocumentTypeRepository.deleteAll();
     courtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
+    subjectFieldRepository.deleteAll().block(); // will cascade delete the other 3 repo-contents
   }
 
   @Test
@@ -200,11 +204,29 @@ class LookupTableImporterIntegrationTest {
     KeywordDTO expectedKeyword2 =
         KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
 
+    SubjectFieldDTO expectedLinkedField1 =
+        SubjectFieldDTO.builder()
+            .id(3L)
+            .changeIndicator('N')
+            .depthInTree(3)
+            .subjectFieldNumber("ÄB-01-02")
+            .isLeafInTree(true)
+            .build();
+    SubjectFieldDTO expectedLinkedField2 =
+        SubjectFieldDTO.builder()
+            .id(4L)
+            .changeIndicator('N')
+            .depthInTree(2)
+            .subjectFieldNumber("CD-01")
+            .isLeafInTree(true)
+            .build();
+
     SubjectFieldDTO expectedParent =
         SubjectFieldDTO.builder()
             .id(1L)
             .depthInTree(2)
             .subjectFieldNumber("TS-01")
+            .subjectFieldText("stext 1")
             .changeIndicator('N')
             .build();
 
@@ -219,9 +241,9 @@ class LookupTableImporterIntegrationTest {
             'J',
             "1.0",
             "TS-01-01",
-            "stext 2",
+            "Linked fields, valid: ÄB-01-02, CD-01, invalid: EF01, Gh-01, IJ-01-023, KL-01a",
             "navbez 2",
-            null,
+            List.of(expectedLinkedField1, expectedLinkedField2),
             Arrays.asList(expectedKeyword1, expectedKeyword2),
             Arrays.asList(expectedNorm1, expectedNorm2),
             false);
@@ -233,7 +255,7 @@ class LookupTableImporterIntegrationTest {
 
                 <juris-sachg id="2" aenddatum_mail="2022-12-22" aenddatum_client="2022-12-24" aendkz="J" version="1.0">
                     <sachgebiet>TS-01-01</sachgebiet>
-                    <stext>stext 2</stext>
+                    <stext>Linked fields, valid: ÄB-01-02, CD-01, invalid: EF01, Gh-01, IJ-01-023, KL-01a</stext>
                     <navbez>navbez 2</navbez>
                     <norm>
                         <normabk>normabk 2.1</normabk>
@@ -248,6 +270,23 @@ class LookupTableImporterIntegrationTest {
 
                 <juris-sachg id="1" aendkz="N">
                     <sachgebiet>TS-01-</sachgebiet>
+                    <stext>stext 1</stext>
+                </juris-sachg>
+
+                <juris-sachg id="3" aendkz="N">
+                    <sachgebiet>ÄB-01-02</sachgebiet>
+                </juris-sachg>
+
+                <juris-sachg id="4" aendkz="N">
+                    <sachgebiet>CD-01</sachgebiet>
+                </juris-sachg>
+
+                <juris-sachg id="5" aendkz="N">
+                    <sachgebiet>IJ-01-02</sachgebiet>
+                </juris-sachg>
+
+                <juris-sachg id="6" aendkz="N">
+                    <sachgebiet>KL-01</sachgebiet>
                 </juris-sachg>
 
             </juris-table>
@@ -274,15 +313,25 @@ class LookupTableImporterIntegrationTest {
     List<NormDTO> normDTOs =
         normRepository.findAllByOrderBySubjectFieldIdAscAbbreviationAsc().collectList().block();
 
-    assertThat(subjectFieldDTOs).hasSize(2);
+    assertThat(subjectFieldDTOs).hasSize(6);
     assertThat(keywordDTOs).hasSize(2);
     assertThat(normDTOs).hasSize(2);
 
-    SubjectFieldDTO parent = subjectFieldDTOs.get(0);
-    SubjectFieldDTO child = subjectFieldDTOs.get(1);
+    SubjectFieldDTO parent = subjectFieldDTOs.get(4); // index due to alphabetical sorting
+    SubjectFieldDTO child = subjectFieldDTOs.get(5);
+
+    List<FieldOfLawLinkDTO> linksRaw =
+        fieldOfLawLinkRepository.findAllByFieldId(child.getId()).collectList().block();
+    List<SubjectFieldDTO> linkedFields =
+        linksRaw.stream()
+            .map(
+                fieldOfLawLinkDTO ->
+                    subjectFieldRepository.findById(fieldOfLawLinkDTO.getLinkedFieldId()).block())
+            .toList();
 
     child.setKeywords(keywordDTOs);
     child.setNorms(normDTOs);
+    child.setLinkedFields(linkedFields);
 
     assertThat(parent).usingRecursiveComparison().isEqualTo(expectedParent);
     assertThat(child)
