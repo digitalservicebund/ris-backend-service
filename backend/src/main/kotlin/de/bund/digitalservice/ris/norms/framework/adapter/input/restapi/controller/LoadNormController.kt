@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -151,10 +152,13 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var definition: String?,
         var ageOfMajorityIndication: String?,
         var text: String?,
+        var files: List<FileReferenceResponseSchema>,
     ) {
         companion object {
             fun fromUseCaseData(data: Norm): NormResponseSchema {
                 val articles = data.articles.map { ArticleResponseSchema.fromUseCaseData(it) }
+                val files = data.files.map { FileReferenceResponseSchema.fromUseCaseData(it) }
+
                 return NormResponseSchema(
                     encodeGuid(data.guid),
                     articles,
@@ -271,6 +275,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.definition,
                     data.ageOfMajorityIndication,
                     data.text,
+                    files = files,
                 )
             }
         }
@@ -302,6 +307,12 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
             fun fromUseCaseData(data: Paragraph): ParagraphResponseSchema {
                 return ParagraphResponseSchema(encodeGuid(data.guid), data.marker, data.text)
             }
+        }
+    }
+
+    data class FileReferenceResponseSchema private constructor(val name: String, val hash: String) {
+        companion object {
+            fun fromUseCaseData(data: FileReference) = FileReferenceResponseSchema(data.name, data.hash)
         }
     }
 }
