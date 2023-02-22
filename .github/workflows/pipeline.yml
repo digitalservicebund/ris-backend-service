@@ -188,7 +188,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Validate gradle wrapper
-        uses: gradle/wrapper-validation-action@53b638a5c27e94bcf712085bd6c07f4161f02de8
+        uses: gradle/wrapper-validation-action@9c75b4d3d1e1ab9cf779938de55702cde22cd29f
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
