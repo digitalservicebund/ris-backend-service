@@ -16,7 +16,9 @@ type Token = {
 }
 
 function tokenizeText(): Token[] {
-  if (!props.keywords) return [{ content: props.text, isLink: false }]
+  if (props.keywords.length === 0) {
+    return [{ content: props.text, isLink: false }]
+  }
   return props.text
     .split(new RegExp(`(${props.keywords.join("|")})`))
     .map((part) => ({
