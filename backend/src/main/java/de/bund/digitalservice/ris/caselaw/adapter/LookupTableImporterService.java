@@ -252,7 +252,6 @@ public class LookupTableImporterService {
 
     jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
 
-    // this could be collected in the previous loop, worth it?
     Map<String, Long> allFieldOfLawNumbers =
         subjectFieldsXml.getList().stream()
             .collect(
@@ -267,7 +266,6 @@ public class LookupTableImporterService {
                   extractLinkedFieldsOfLaw(
                       subjectFieldXml.getSubjectFieldText(), allFieldOfLawNumbers)) {
                 jpaFieldOfLawLinkDTOs.add(
-                    // do I have to use a Transformer here?
                     JPAFieldOfLawLinkDTO.builder()
                         .fieldId(subjectFieldXml.getId())
                         .linkedFieldId(linkedFieldId)
