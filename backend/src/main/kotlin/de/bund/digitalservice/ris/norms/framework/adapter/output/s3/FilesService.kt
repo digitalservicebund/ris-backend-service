@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.s3
 
 import de.bund.digitalservice.ris.norms.application.port.output.SaveFileOutputPort
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -28,7 +28,7 @@ class FilesService(
         )
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
-            .key(folder + FileReference.fromFile(command.file, command.filename).hash)
+            .key(folder + getHashFromContent(command.file))
             .contentType(mediaType.toString())
             .build()
 

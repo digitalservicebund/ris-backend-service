@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.juris.extractor.extractData
 import org.springframework.stereotype.Component
@@ -22,7 +23,7 @@ class JurisXmlParser() : ParseJurisXmlOutputPort {
         val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
         norm.files = listOf(
-            FileReference.fromFile(query.zipFile, query.filename),
+            FileReference(query.filename, getHashFromContent(query.zipFile)),
         )
         return Mono.just(norm)
     }
