@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, watch, ref } from "vue"
 import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
-import { buildRoot, FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { buildRoot, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 const props = defineProps<{

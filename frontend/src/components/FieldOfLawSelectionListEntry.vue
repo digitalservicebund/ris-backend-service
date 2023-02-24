@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{ subject: FieldOfLawNode }>()
 const emit = defineEmits<{

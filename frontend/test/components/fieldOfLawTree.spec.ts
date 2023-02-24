@@ -2,7 +2,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import FieldOfLawTreeVue from "@/components/FieldOfLawTree.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 function renderComponent(

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import TokenizeText from "@/components/TokenizeText.vue"
-import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 interface Props {

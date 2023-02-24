@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 const selectedSubjects = ref<FieldOfLawNode[]>([])
 const clickedIdentifier = ref("")

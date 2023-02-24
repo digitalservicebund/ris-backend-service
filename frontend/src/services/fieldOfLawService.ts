@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 interface FieldOfLawService {
   getChildrenOf(identifier: string): Promise<ServiceResponse<FieldOfLawNode[]>>

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import FieldOfLawSelectionListEntry from "./FieldOfLawSelectionListEntry.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
   selectedSubjects: FieldOfLawNode[]

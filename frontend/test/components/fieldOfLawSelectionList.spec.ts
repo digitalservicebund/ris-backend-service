@@ -1,6 +1,6 @@
 import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
 import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 function renderComponent(
   selectedSubjects: Partial<FieldOfLawNode>[]
