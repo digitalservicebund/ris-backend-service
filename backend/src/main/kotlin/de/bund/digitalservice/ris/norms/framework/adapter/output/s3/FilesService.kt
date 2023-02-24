@@ -21,7 +21,7 @@ class FilesService(
     val bucketName: String? = null,
 ) : SaveFileOutputPort, GetFileOutputPort {
 
-    private val folder: String = ""
+    private val folder: String = "norms/"
 
     override fun saveFile(command: SaveFileOutputPort.Command): Mono<Boolean> {
         val mediaType = MediaType.APPLICATION_OCTET_STREAM
