@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.s3
 import de.bund.digitalservice.ris.norms.application.port.output.GetFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveFileOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.MediaType
 import org.springframework.stereotype.Component
@@ -23,6 +25,10 @@ class FilesService(
 
     private val folder: String = "norms/"
 
+    companion object {
+        var logger: Logger = LoggerFactory.getLogger(FilesService::class.java)
+    }
+
     override fun saveFile(command: SaveFileOutputPort.Command): Mono<Boolean> {
         val mediaType = MediaType.APPLICATION_OCTET_STREAM
 
@@ -35,9 +41,12 @@ class FilesService(
             .contentType(mediaType.toString())
             .build()
 
+        logger.info("saveFile - PutObjectRequest: $putObjectRequest")
+
         return Mono.fromCallable {
-            Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody))
-        }.flatMap { Mono.just(true) }
+            Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody)).doOnNext{logger.info("saveFile responseObject: $it.toString()")}
+        }.flatMap {
+            Mono.just(true) }
     }
 
     override fun getFile(query: GetFileOutputPort.Query): Mono<ByteArray> {
@@ -45,6 +54,8 @@ class FilesService(
             .bucket(bucketName)
             .key(folder + query.hash)
             .build()
+
+        logger.info("getFile - GetObjectRequest: $getObjectRequest")
 
         return Mono.fromCallable {
             Mono.fromFuture(s3AsyncClient.getObject(getObjectRequest, AsyncResponseTransformer.toBytes()))
