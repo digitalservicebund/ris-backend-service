@@ -36,8 +36,6 @@ function handleLinkedFieldClicked(identifier: string) {
 const loadedClickedFieldOfLaw = async (clickedIdentifier: string) => {
   if (!clickedIdentifier) return
 
-  console.log("identifier", clickedIdentifier)
-
   const response = await FieldOfLawService.getTreeForIdentifier(
     clickedIdentifier
   )
@@ -45,18 +43,17 @@ const loadedClickedFieldOfLaw = async (clickedIdentifier: string) => {
 
   root.value.isExpanded = true
   root.value.children = [response.data]
-  expandAllChilds(root.value.children)
+  expandAllChildren(root.value.children)
 
   emit("reset-clicked-node")
 }
 
-function expandAllChilds(children: FieldOfLawNode[]) {
+function expandAllChildren(children: FieldOfLawNode[]) {
   if (!children || !children.length) return
 
   children.forEach((child) => {
-    console.log("expand", child.identifier)
     child.isExpanded = true
-    expandAllChilds(child.children)
+    expandAllChildren(child.children)
   })
 }
 </script>
