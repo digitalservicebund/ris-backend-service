@@ -44,8 +44,8 @@ class FilesService(
         logger.info("saveFile - PutObjectRequest: $putObjectRequest")
 
         return Mono.fromCallable {
-            Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody)).doOnNext { logger.info("saveFile responseObject: $it.toString()") }
-        }.flatMap {
+            Mono.fromFuture(s3AsyncClient.putObject(putObjectRequest, asyncRequestBody))
+        }.flatMap { it }.doOnNext { logger.info("saveFile responseObject: $it.toString()") }.flatMap {
             Mono.just(true)
         }
     }
