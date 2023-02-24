@@ -91,6 +91,11 @@ const render = () => {
   &:disabled {
     @apply bg-gray-400 text-gray-600 border-gray-400;
   }
+
+  /* focus-visible with support for older browsers */
+  &:focus:not(:focus-visible) {
+    @apply outline-transparent;
+  }
 }
 
 .btn-secondary {
@@ -101,7 +106,7 @@ const render = () => {
   }
 
   &:focus {
-    @apply border-yellow-500;
+    @apply border-blue-800;
   }
 
   &:active {
