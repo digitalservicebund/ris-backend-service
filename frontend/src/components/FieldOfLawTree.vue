@@ -19,7 +19,7 @@ const emit = defineEmits<{
 const root = ref(buildRoot())
 
 const clicked = computed(() => props.clickedIdentifier)
-watch(clicked, () => loadedClickedFieldOfLaw(clicked.value))
+watch(clicked, () => buildDirectPathTreeTo(clicked.value))
 
 function handleSelect(node: FieldOfLawNode) {
   emit("add-to-list", node)
@@ -33,7 +33,7 @@ function handleLinkedFieldClicked(identifier: string) {
   emit("linkedField:clicked", identifier)
 }
 
-const loadedClickedFieldOfLaw = async (clickedIdentifier: string) => {
+const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
   if (!clickedIdentifier) return
 
   const response = await FieldOfLawService.getTreeForIdentifier(
