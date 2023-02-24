@@ -193,11 +193,6 @@ paths:
       responses:
         '200':
           description: Download ZIP file
-          headers:
-            Content-Disposition:
-              schema:
-                type: string
-                example: attachment; filename="SaubFahrzeugBeschG-2.0.zip"
           content:
             application/zip:
               schema:
