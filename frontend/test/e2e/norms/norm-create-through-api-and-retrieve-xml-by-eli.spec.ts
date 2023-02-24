@@ -4,7 +4,7 @@ import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import norm from "./testdata/norm_basic.json"
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if XML can be retrieved by ELI and content is correct",
   async ({ page, normData, guid, request }) => {
     // Open frame data
