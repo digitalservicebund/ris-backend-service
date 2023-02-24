@@ -11,7 +11,7 @@ CREATE TABLE
     subject_field_text VARCHAR(1023),
     navigation_term VARCHAR(255),
     PRIMARY KEY (id),
-    FOREIGN KEY (parent_id) REFERENCES lookuptable_subject_field (id)
+    FOREIGN KEY (parent_id) REFERENCES lookuptable_subject_field(id)
   );
 
 CREATE TABLE
