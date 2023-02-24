@@ -5,22 +5,22 @@ import FieldOfLawTree from "./FieldOfLawTree.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLawTree"
 
 const selectedSubjects = ref<FieldOfLawNode[]>([])
-const clickedSubjectFieldNumber = ref("")
+const clickedIdentifier = ref("")
 
-const getIndex = (_subjectFieldNumber: string) =>
+const getIndex = (_identifier: string) =>
   selectedSubjects.value.findIndex(
-    ({ subjectFieldNumber }) => subjectFieldNumber == _subjectFieldNumber
+    ({ identifier }) => identifier == _identifier
   )
 
 function handleAdd(node: FieldOfLawNode) {
-  if (getIndex(node.subjectFieldNumber) == -1) {
+  if (getIndex(node.identifier) == -1) {
     selectedSubjects.value.push(node)
   }
 }
 
-function handleRemoveBySubjectFieldNumber(subjectFieldNumber: string) {
-  if (getIndex(subjectFieldNumber) != -1) {
-    handleRemoveByIndex(getIndex(subjectFieldNumber))
+function handleRemoveByIdentifier(identifier: string) {
+  if (getIndex(identifier) != -1) {
+    handleRemoveByIndex(getIndex(identifier))
   }
 }
 
@@ -29,15 +29,15 @@ function handleRemoveByIndex(index: number) {
 }
 
 function handleNodeClicked(node: FieldOfLawNode) {
-  clickedSubjectFieldNumber.value = node.subjectFieldNumber
+  clickedIdentifier.value = node.identifier
 }
 
 function handleResetClickedNode() {
-  clickedSubjectFieldNumber.value = ""
+  clickedIdentifier.value = ""
 }
 
-function handleLinkedFieldClicked(subjectFieldNumber: string) {
-  clickedSubjectFieldNumber.value = subjectFieldNumber
+function handleLinkedFieldClicked(identifier: string) {
+  clickedIdentifier.value = identifier
 }
 </script>
 
@@ -54,11 +54,11 @@ function handleLinkedFieldClicked(subjectFieldNumber: string) {
       </div>
       <div class="bg-white flex-1 p-20">
         <FieldOfLawTree
-          :clicked-subject-field-number="clickedSubjectFieldNumber"
+          :clicked-identifier="clickedIdentifier"
           :selected-subjects="selectedSubjects"
           @add-to-list="handleAdd"
           @linked-field:clicked="handleLinkedFieldClicked"
-          @remove-from-list="handleRemoveBySubjectFieldNumber"
+          @remove-from-list="handleRemoveByIdentifier"
           @reset-clicked-node="handleResetClickedNode"
         ></FieldOfLawTree>
       </div>

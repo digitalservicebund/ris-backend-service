@@ -64,7 +64,7 @@ class FieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04", "FO"));
   }
 
@@ -83,7 +83,7 @@ class FieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("FL", "FL-01", "FL-01-01", "FL-02", "FL-03", "FL-04"));
   }
 
@@ -102,7 +102,7 @@ class FieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("FL-01", "FL-02", "FL-03", "FL-04"));
   }
 
@@ -122,13 +122,13 @@ class FieldOfLawIntegrationTest {
             response -> {
               FieldOfLaw field = response.getResponseBody();
               assertThat(field).isNotNull();
-              assertThat(field.subjectFieldNumber()).isEqualTo("FL");
+              assertThat(field.identifier()).isEqualTo("FL");
               assertThat(field.children()).hasSize(1);
               FieldOfLaw child = field.children().get(0);
-              assertThat(child.subjectFieldNumber()).isEqualTo("FL-01");
+              assertThat(child.identifier()).isEqualTo("FL-01");
               assertThat(child.children()).hasSize(1);
               child = child.children().get(0);
-              assertThat(child.subjectFieldNumber()).isEqualTo("FL-01-01");
+              assertThat(child.identifier()).isEqualTo("FL-01-01");
               assertThat(child.children()).isEmpty();
             });
   }

@@ -13,7 +13,7 @@ function renderComponent(subject: Partial<FieldOfLawNode>): RenderResult {
 describe("SubjectSelectionListEntry", () => {
   it("render entry", () => {
     renderComponent({
-      subjectFieldNumber: "ST-01-02-03",
+      identifier: "ST-01-02-03",
       subjectFieldText: "Steuerrecht 1-2-3",
     })
 
@@ -27,7 +27,7 @@ describe("SubjectSelectionListEntry", () => {
 
   it("click on 'Löschen' emit 'remove-from-list'", async () => {
     const { emitted } = renderComponent({
-      subjectFieldNumber: "ST-01-02-03",
+      identifier: "ST-01-02-03",
       subjectFieldText: "Steuerrecht 1-2-3",
     })
 
@@ -38,7 +38,7 @@ describe("SubjectSelectionListEntry", () => {
 
   it("click on 'Auswahl im Sachgebietsbaum' emit 'select-node", async () => {
     const { emitted } = renderComponent({
-      subjectFieldNumber: "ST-01-02-03",
+      identifier: "ST-01-02-03",
       subjectFieldText: "Steuerrecht 1-2-3",
     })
 

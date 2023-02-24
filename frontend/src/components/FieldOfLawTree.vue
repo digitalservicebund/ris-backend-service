@@ -6,40 +6,40 @@ import FieldOfLawService from "@/services/fieldOfLawService"
 
 const props = defineProps<{
   selectedSubjects: FieldOfLawNode[]
-  clickedSubjectFieldNumber: string
+  clickedIdentifier: string
 }>()
 
 const emit = defineEmits<{
   (event: "add-to-list", node: FieldOfLawNode): void
-  (event: "remove-from-list", subjectFieldNumber: string): void
+  (event: "remove-from-list", identifier: string): void
   (event: "reset-clicked-node"): void
-  (event: "linkedField:clicked", subjectFieldNumber: string): void
+  (event: "linkedField:clicked", identifier: string): void
 }>()
 
 const root = ref(buildRoot())
 
-const clicked = computed(() => props.clickedSubjectFieldNumber)
+const clicked = computed(() => props.clickedIdentifier)
 watch(clicked, () => loadedClickedFieldOfLaw(clicked.value))
 
 function handleSelect(node: FieldOfLawNode) {
   emit("add-to-list", node)
 }
 
-function handleUnselect(subjectFieldNumber: string) {
-  emit("remove-from-list", subjectFieldNumber)
+function handleUnselect(identifier: string) {
+  emit("remove-from-list", identifier)
 }
 
-function handleLinkedFieldClicked(subjectFieldNumber: string) {
-  emit("linkedField:clicked", subjectFieldNumber)
+function handleLinkedFieldClicked(identifier: string) {
+  emit("linkedField:clicked", identifier)
 }
 
-const loadedClickedFieldOfLaw = async (clickedSubjectFieldNumber: string) => {
-  if (!clickedSubjectFieldNumber) return
+const loadedClickedFieldOfLaw = async (clickedIdentifier: string) => {
+  if (!clickedIdentifier) return
 
-  console.log("identifier", clickedSubjectFieldNumber)
+  console.log("identifier", clickedIdentifier)
 
-  const response = await FieldOfLawService.getTreeForNumber(
-    clickedSubjectFieldNumber
+  const response = await FieldOfLawService.getTreeForIdentifier(
+    clickedIdentifier
   )
   if (!response.data) return
 
@@ -54,7 +54,7 @@ function expandAllChilds(children: FieldOfLawNode[]) {
   if (!children || !children.length) return
 
   children.forEach((child) => {
-    console.log("expand", child.subjectFieldNumber)
+    console.log("expand", child.identifier)
     child.isExpanded = true
     expandAllChilds(child.children)
   })
@@ -64,12 +64,11 @@ function expandAllChilds(children: FieldOfLawNode[]) {
 <template>
   <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
   <FieldOfLawNodeComponent
-    :key="root.subjectFieldNumber"
+    :key="root.identifier"
     :node="root"
     :selected="
       props.selectedSubjects.some(
-        ({ subjectFieldNumber }) =>
-          subjectFieldNumber === root.subjectFieldNumber
+        ({ identifier }) => identifier === root.identifier
       )
     "
     :selected-subjects="selectedSubjects"

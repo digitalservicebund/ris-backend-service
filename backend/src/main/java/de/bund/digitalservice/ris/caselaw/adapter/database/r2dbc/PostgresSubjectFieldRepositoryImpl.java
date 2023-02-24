@@ -55,7 +55,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   @Override
   public Mono<FieldOfLaw> findParentByChild(FieldOfLaw child) {
     return databaseSubjectFieldRepository
-        .findBySubjectFieldNumber(child.subjectFieldNumber())
+        .findBySubjectFieldNumber(child.identifier())
         .flatMap(
             childDTO -> {
               if (childDTO.getParentId() != null) {

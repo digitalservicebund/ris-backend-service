@@ -25,7 +25,7 @@ const emit = defineEmits<{
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"
           >
-            {{ props.subject.subjectFieldNumber }}
+            {{ props.subject.identifier }}
           </span>
         </div>
       </div>

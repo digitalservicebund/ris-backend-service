@@ -17,7 +17,7 @@ const emit = defineEmits<{
   <div v-else>
     <FieldOfLawSelectionListEntry
       v-for="(subject, index) in props.selectedSubjects"
-      :key="subject.subjectFieldNumber"
+      :key="subject.identifier"
       :subject="subject"
       @node-clicked="emit('node-clicked', subject)"
       @remove-from-list="emit('remove-from-list', index)"

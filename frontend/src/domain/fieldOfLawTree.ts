@@ -24,12 +24,10 @@ export default class FieldOfLawTree {
 
   public toggleNode(node: FieldOfLawNode) {
     if (!node.isLeaf && (node.children.length === 0 || node.inDirectPathMode)) {
-      FieldOfLawService.getChildrenOf(node.subjectFieldNumber).then(
-        (response) => {
-          if (!response.data) return
-          node.children = response.data
-        }
-      )
+      FieldOfLawService.getChildrenOf(node.identifier).then((response) => {
+        if (!response.data) return
+        node.children = response.data
+      })
     }
     if (node.inDirectPathMode) {
       node.inDirectPathMode = false
@@ -52,7 +50,7 @@ export default class FieldOfLawTree {
 }
 
 export type FieldOfLawNode = {
-  subjectFieldNumber: string
+  identifier: string
   subjectFieldText: string
   linkedFields?: string[]
   children: FieldOfLawNode[]
@@ -66,7 +64,7 @@ export const ROOT_ID = "root"
 
 export function buildRoot(children: FieldOfLawNode[] = []): FieldOfLawNode {
   return {
-    subjectFieldNumber: ROOT_ID,
+    identifier: ROOT_ID,
     subjectFieldText: "Alle Sachgebiete anzeigen",
     children: children,
     depth: 0,

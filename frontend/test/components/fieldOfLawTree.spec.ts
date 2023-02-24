@@ -13,7 +13,7 @@ function renderComponent(
   return render(FieldOfLawTreeVue, {
     props: {
       selectedSubjects: options.selectedSubjects ?? [],
-      clickedSubjectFieldNumber: "",
+      clickedIdentifier: "",
     },
   })
 }
@@ -28,7 +28,7 @@ describe("SubjectTree", () => {
         status: 200,
         data: [
           {
-            subjectFieldNumber: "AB-01",
+            identifier: "AB-01",
             subjectFieldText: "Text for AB",
             children: [],
             depth: 1,
@@ -36,7 +36,7 @@ describe("SubjectTree", () => {
             isLeaf: false,
           },
           {
-            subjectFieldNumber: "CD-02",
+            identifier: "CD-02",
             subjectFieldText: "And text for CD with link to AB-01",
             children: [],
             linkedFields: ["AB-01"],

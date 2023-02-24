@@ -15,8 +15,8 @@ const props = defineProps<Props>()
 const emit = defineEmits<{
   (event: "node:toggle", node: FieldOfLawNode): void
   (event: "node:select", node: FieldOfLawNode): void
-  (event: "node:unselect", subjectFieldNumber: string): void
-  (event: "linkedField:clicked", subjectFieldNumber: string): void
+  (event: "node:unselect", identifier: string): void
+  (event: "linkedField:clicked", identifier: string): void
 }>()
 
 const node = computed(() => props.node)
@@ -35,12 +35,10 @@ function handleToggle() {
     !node.value.isLeaf &&
     node.value.children.length < 2
   ) {
-    FieldOfLawService.getChildrenOf(node.value.subjectFieldNumber).then(
-      (response) => {
-        if (!response.data) return
-        node.value.children = response.data
-      }
-    )
+    FieldOfLawService.getChildrenOf(node.value.identifier).then((response) => {
+      if (!response.data) return
+      node.value.children = response.data
+    })
   }
 }
 </script>
@@ -48,7 +46,7 @@ function handleToggle() {
 <template>
   <div
     class="flex flex-col"
-    :class="node.subjectFieldNumber !== ROOT_ID ? 'pl-36' : ''"
+    :class="node.identifier !== ROOT_ID ? 'pl-36' : ''"
   >
     <div class="flex flex-row">
       <div v-if="node.isLeaf" class="pl-24"></div>
@@ -61,13 +59,13 @@ function handleToggle() {
           {{ node.isExpanded ? "remove" : "add" }}
         </button>
       </div>
-      <div v-if="node.subjectFieldNumber !== ROOT_ID">
+      <div v-if="node.identifier !== ROOT_ID">
         <button
           aria-label="Sachgebiet entfernen"
           class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
           @click="
             selected
-              ? emit('node:unselect', node.subjectFieldNumber)
+              ? emit('node:unselect', node.identifier)
               : emit('node:select', node)
           "
         >
@@ -80,11 +78,8 @@ function handleToggle() {
           </span>
         </button>
       </div>
-      <div
-        v-if="node.subjectFieldNumber !== ROOT_ID"
-        class="pl-8 subject-field-number"
-      >
-        {{ node.subjectFieldNumber }}
+      <div v-if="node.identifier !== ROOT_ID" class="identifier pl-8">
+        {{ node.identifier }}
       </div>
       <div class="pl-6 pt-2 subject-field-text text-blue-800">
         <TokenizeText
@@ -97,12 +92,11 @@ function handleToggle() {
     <div v-if="node.isExpanded && node.children.length">
       <FieldOfLawNodeComponent
         v-for="child in node.children"
-        :key="child.subjectFieldNumber"
+        :key="child.identifier"
         :node="child"
         :selected="
           props.selectedSubjects.some(
-            ({ subjectFieldNumber }) =>
-              subjectFieldNumber === child.subjectFieldNumber
+            ({ identifier }) => identifier === child.identifier
           )
         "
         :selected-subjects="selectedSubjects"
@@ -115,7 +109,7 @@ function handleToggle() {
 </template>
 
 <style lang="scss" scoped>
-.subject-field-number {
+.identifier {
   font-size: 16px;
   white-space: nowrap;
 }

@@ -117,7 +117,7 @@ public class LookupTableService {
         .findParentByChild(child)
         .flatMap(
             parent -> {
-              if (child.subjectFieldNumber().equals(parent.subjectFieldNumber())) {
+              if (child.identifier().equals(parent.identifier())) {
                 return Mono.just(child);
               }
               parent.children().add(child);

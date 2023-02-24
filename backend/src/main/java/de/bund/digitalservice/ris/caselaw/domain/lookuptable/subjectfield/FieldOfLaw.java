@@ -8,7 +8,7 @@ public record FieldOfLaw(
     Long id,
     Integer depth,
     Boolean isLeaf,
-    String subjectFieldNumber,
+    String identifier,
     String subjectFieldText,
     String navigationTerm,
     List<String> linkedFields,
