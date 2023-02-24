@@ -1,14 +1,12 @@
--- required for to_timestamp to correctly parse the date strings as UTC-timezoned
+ -- required for to_timestamp to correctly parse the date strings as UTC-timezoned
 SET
   timezone = 'UTC';
 
 -- doc_unit.entscheidungsdatum (string) -> doc_unit.decision_date (timestamp)
 ALTER TABLE
   doc_unit
-ADD
-  COLUMN IF NOT EXISTS decision_date TIMESTAMP
-WITH
-  TIME ZONE;
+ADD COLUMN IF NOT EXISTS
+  decision_date TIMESTAMP WITH TIME ZONE;
 
 UPDATE
   doc_unit
@@ -21,10 +19,8 @@ SET
 -- previous_decision.decision_date (string) -> previous_decision.decision_date_timestamp (timestamp)
 ALTER TABLE
   previous_decision
-ADD
-  COLUMN IF NOT EXISTS decision_date_timestamp TIMESTAMP
-WITH
-  TIME ZONE;
+ADD COLUMN IF NOT EXISTS
+  decision_date_timestamp TIMESTAMP WITH TIME ZONE;
 
 UPDATE
   previous_decision

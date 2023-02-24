@@ -1,8 +1,8 @@
-DROP TABLE
-  IF EXISTS deviating_decisiondate;
+DROP TABLE IF EXISTS
+  deviating_decisiondate;
 
-CREATE TABLE
-  IF NOT EXISTS deviating_decision_date (
+CREATE TABLE IF NOT EXISTS
+  deviating_decision_date (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     document_unit_id BIGINT NOT NULL,
     decision_date TIMESTAMP,

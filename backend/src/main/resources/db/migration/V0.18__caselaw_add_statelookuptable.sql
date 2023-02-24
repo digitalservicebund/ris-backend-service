@@ -1,5 +1,5 @@
-CREATE TABLE
-  IF NOT EXISTS lookuptable_state (
+CREATE TABLE IF NOT EXISTS
+  lookuptable_state (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     changeindicator CHAR(1),
     version VARCHAR(255),

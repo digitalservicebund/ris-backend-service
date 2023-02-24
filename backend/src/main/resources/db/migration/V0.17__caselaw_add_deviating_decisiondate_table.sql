@@ -1,5 +1,5 @@
-CREATE TABLE
-  IF NOT EXISTS deviating_decisiondate (
+CREATE TABLE IF NOT EXISTS
+  deviating_decisiondate (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     document_unit_id BIGINT NOT NULL,
     decisiondate VARCHAR(255),
