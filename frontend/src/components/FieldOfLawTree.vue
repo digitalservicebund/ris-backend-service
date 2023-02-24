@@ -41,20 +41,15 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
   )
   if (!response.data) return
 
-  root.value.isExpanded = true
   root.value.children = [response.data]
-  expandAllChildren(root.value.children)
+  expandAll(root.value)
 
   emit("reset-clicked-node")
 }
 
-function expandAllChildren(children: FieldOfLawNode[]) {
-  if (!children || !children.length) return
-
-  children.forEach((child) => {
-    child.isExpanded = true
-    expandAllChildren(child.children)
-  })
+function expandAll(node: FieldOfLawNode) {
+  node.isExpanded = true
+  node.children.forEach((child) => expandAll(child))
 }
 </script>
 
