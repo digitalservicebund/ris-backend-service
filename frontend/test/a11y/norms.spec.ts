@@ -32,3 +32,16 @@ test.describe("a11y of a norm frame data (/norms/norm/{guid}/frame)", () => {
     await checkA11y(page)
   })
 })
+
+test.describe("a11y of a norm export (/norms/norm/{guid}/export)", () => {
+  testWithImportedNorm("norm export", async ({ page, guid }) => {
+    await page.goto(`/norms/norm/${guid}/export`)
+    await expect(
+      page.locator(
+        "text=Exportieren Sie die Dokumentationseinheit zur Abgabe an die jDV."
+      )
+    ).toBeVisible()
+    await injectAxe(page)
+    await checkA11y(page)
+  })
+})
