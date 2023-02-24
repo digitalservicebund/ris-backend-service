@@ -4,7 +4,7 @@ import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import norm from "./testdata/norm_basic.json"
 
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
   async ({ page, normData, guid, request }) => {
     // Open frame data
@@ -86,24 +86,34 @@ testWithImportedNorm.skip(
 
     xmlDOM.window.document
       .querySelectorAll("akn\\:article")
-      .forEach((article, index) => {
+      .forEach((article, articleIndex) => {
         expect(article.querySelector("akn\\:marker").textContent.trim()).toBe(
-          norm.articles[index].marker
+          norm.articles[articleIndex].marker
         )
         expect(article.querySelector("akn\\:heading").textContent.trim()).toBe(
-          norm.articles[index].title
+          norm.articles[articleIndex].title
         )
-      })
 
-    xmlDOM.window.document
-      .querySelectorAll("akn\\:paragraph")
-      .forEach((paragraph, index) => {
-        expect(paragraph.querySelector("akn\\:marker").textContent.trim()).toBe(
-          norm.articles[0].paragraphs[index].marker
-        )
-        expect(paragraph.querySelector("akn\\:p").textContent.trim()).toBe(
-          norm.articles[0].paragraphs[index].text
-        )
+        article
+          .querySelectorAll("akn\\:paragraph")
+          .forEach((paragraph, paragraphIndex) => {
+            if (
+              norm.articles[articleIndex].paragraphs[paragraphIndex].marker !==
+              undefined
+            ) {
+              expect(
+                paragraph.querySelector("akn\\:marker").textContent.trim()
+              ).toBe(
+                norm.articles[articleIndex].paragraphs[paragraphIndex].marker
+              )
+            }
+            expect(
+              paragraph
+                .querySelector("akn\\:p")
+                .textContent.trim()
+                .replace(/\n/, "")
+            ).toBe(norm.articles[articleIndex].paragraphs[paragraphIndex].text)
+          })
       })
   }
 )

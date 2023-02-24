@@ -26,9 +26,10 @@ fun mapNormToDto(norm: Norm): NormDto {
         printAnnouncementGazette = norm.eli.gazette,
         printAnnouncementPage = norm.printAnnouncementPage,
         eli = norm.eli.toString(),
-        articles = norm.articles.sortedBy { it.marker.substring(2).toInt() }.mapIndexed { index, article ->
-            mapArticleToDto(article, index)
-        },
+        articles = norm.articles.sortedBy { if (it.marker.contains("§")) it.marker.substring(2).toInt() else it.marker.substring(4).toInt() }
+            .mapIndexed { index, article ->
+                mapArticleToDto(article, index)
+            },
     )
 }
 
