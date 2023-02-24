@@ -26,19 +26,19 @@ function handleTokenClick(tokenContent: string) {
 }
 
 function handleToggle() {
-  if (node.value.children.length > 1 || !node.value.isExpanded) {
-    node.value.isExpanded = !node.value.isExpanded
-  }
-
   if (
-    node.value.isExpanded &&
     !node.value.isLeaf &&
-    node.value.children.length < 2
+    (node.value.children.length === 0 || node.value.inDirectPathMode)
   ) {
     FieldOfLawService.getChildrenOf(node.value.identifier).then((response) => {
       if (!response.data) return
       node.value.children = response.data
     })
+  }
+  if (node.value.inDirectPathMode) {
+    node.value.inDirectPathMode = false
+  } else {
+    node.value.isExpanded = !node.value.isExpanded
   }
 }
 </script>
@@ -56,7 +56,11 @@ function handleToggle() {
           class="bg-blue-200 material-icons rounded-full text-blue-800 w-icon"
           @click="handleToggle"
         >
-          {{ node.isExpanded ? "remove" : "add" }}
+          {{
+            props.node.isExpanded && !props.node.inDirectPathMode
+              ? "remove"
+              : "add"
+          }}
         </button>
       </div>
       <div v-if="node.identifier !== ROOT_ID">

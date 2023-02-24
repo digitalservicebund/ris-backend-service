@@ -49,6 +49,7 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
 
 function expandAll(node: FieldOfLawNode) {
   node.isExpanded = true
+  node.inDirectPathMode = true
   node.children.forEach((child) => expandAll(child))
 }
 </script>
