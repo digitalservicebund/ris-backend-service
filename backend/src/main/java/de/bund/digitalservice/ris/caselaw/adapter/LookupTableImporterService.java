@@ -18,8 +18,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransf
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectFieldXml;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectFieldsXml;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLawXml;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldsOfLawXml;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -224,24 +224,24 @@ public class LookupTableImporterService {
   @Transactional(transactionManager = "jpaTransactionManager")
   public Mono<String> importSubjectFieldLookupTable(ByteBuffer byteBuffer) {
     XmlMapper mapper = new XmlMapper();
-    SubjectFieldsXml subjectFieldsXml;
+    FieldsOfLawXml fieldsOfLawXml;
     try {
-      subjectFieldsXml = mapper.readValue(byteBufferToArray(byteBuffer), SubjectFieldsXml.class);
+      fieldsOfLawXml = mapper.readValue(byteBufferToArray(byteBuffer), FieldsOfLawXml.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
           HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to SubjectFieldXml", e);
     }
 
-    importSubjectFieldJPA(subjectFieldsXml);
+    importSubjectFieldJPA(fieldsOfLawXml);
 
     return Mono.just("Successfully imported the subject field lookup table");
   }
 
-  private void importSubjectFieldJPA(SubjectFieldsXml subjectFieldsXml) {
+  private void importSubjectFieldJPA(FieldsOfLawXml fieldsOfLawXml) {
     jpaSubjectFieldRepository.deleteAllInBatch();
 
     List<JPASubjectFieldDTO> jpaSubjectFieldDTOs =
-        subjectFieldsXml.getList().stream()
+        fieldsOfLawXml.getList().stream()
             .map(SubjectFieldTransformer::transformToJPADTO)
             .sorted(Comparator.comparing(JPASubjectFieldDTO::getSubjectFieldNumber))
             .toList();
@@ -250,26 +250,25 @@ public class LookupTableImporterService {
 
     jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
 
-    extractAndStoreAllLinkedFieldsOfLaw(subjectFieldsXml);
+    extractAndStoreAllLinkedFieldsOfLaw(fieldsOfLawXml);
   }
 
-  private void extractAndStoreAllLinkedFieldsOfLaw(SubjectFieldsXml subjectFieldsXml) {
+  private void extractAndStoreAllLinkedFieldsOfLaw(FieldsOfLawXml fieldsOfLawXml) {
     Map<String, Long> allFieldOfLawNumbers =
-        subjectFieldsXml.getList().stream()
-            .collect(
-                Collectors.toMap(SubjectFieldXml::getSubjectFieldNumber, SubjectFieldXml::getId));
+        fieldsOfLawXml.getList().stream()
+            .collect(Collectors.toMap(FieldOfLawXml::getSubjectFieldNumber, FieldOfLawXml::getId));
 
     List<JPAFieldOfLawLinkDTO> jpaFieldOfLawLinkDTOs = new ArrayList<>();
-    subjectFieldsXml
+    fieldsOfLawXml
         .getList()
         .forEach(
-            subjectFieldXml -> {
+            fieldOfLawXml -> {
               for (Long linkedFieldId :
                   extractLinkedFieldsOfLaw(
-                      subjectFieldXml.getSubjectFieldText(), allFieldOfLawNumbers)) {
+                      fieldOfLawXml.getSubjectFieldText(), allFieldOfLawNumbers)) {
                 jpaFieldOfLawLinkDTOs.add(
                     JPAFieldOfLawLinkDTO.builder()
-                        .fieldId(subjectFieldXml.getId())
+                        .fieldId(fieldOfLawXml.getId())
                         .linkedFieldId(linkedFieldId)
                         .build());
               }

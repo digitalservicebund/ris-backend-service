@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class FieldOfLawService {
     this.repository = repository;
   }
 
-  public Flux<SubjectField> getFieldsOfLawBySearchQuery(Optional<String> searchStr) {
+  public Flux<FieldOfLaw> getFieldsOfLawBySearchQuery(Optional<String> searchStr) {
     if (searchStr.isEmpty() || searchStr.get().isBlank()) {
       return repository.findAllByOrderBySubjectFieldNumberAsc();
     }
@@ -27,7 +27,7 @@ public class FieldOfLawService {
     return repository.findBySearchStr(searchStr.get().trim());
   }
 
-  public Flux<SubjectField> getChildrenOfFieldOfLaw(String subjectFieldNumber) {
+  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String subjectFieldNumber) {
     if (subjectFieldNumber.equalsIgnoreCase(ROOT_ID)) {
       return repository.getTopLevelNodes();
     }
@@ -36,11 +36,11 @@ public class FieldOfLawService {
         subjectFieldNumber);
   }
 
-  public Mono<SubjectField> getTreeForFieldOfLaw(String subjectFieldId) {
+  public Mono<FieldOfLaw> getTreeForFieldOfLaw(String subjectFieldId) {
     return repository.findBySubjectFieldNumber(subjectFieldId).flatMap(this::findParent);
   }
 
-  private Mono<SubjectField> findParent(SubjectField child) {
+  private Mono<FieldOfLaw> findParent(FieldOfLaw child) {
 
     return repository
         .findParentByChild(child)

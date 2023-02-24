@@ -12,9 +12,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Key
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -90,8 +90,8 @@ class LookupTableServiceTest {
   @Test
   void testGetSubjectFields_withSearchString() {
     String searchString = "stext";
-    SubjectField expectedSubjectField =
-        new SubjectField(
+    FieldOfLaw expectedFieldOfLaw =
+        new FieldOfLaw(
             2L,
             3,
             true,
@@ -104,10 +104,10 @@ class LookupTableServiceTest {
             new ArrayList<>());
 
     when(subjectFieldRepository.findBySearchStr(searchString))
-        .thenReturn(Flux.just(expectedSubjectField));
+        .thenReturn(Flux.just(expectedFieldOfLaw));
 
     StepVerifier.create(service.getSubjectFields(Optional.of(searchString)))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
         .verifyComplete();
 
     verify(subjectFieldRepository).findBySearchStr(searchString);
@@ -115,8 +115,8 @@ class LookupTableServiceTest {
 
   @Test
   void testGetSubjectFieldChildren() {
-    SubjectField expectedSubjectField =
-        new SubjectField(
+    FieldOfLaw expectedFieldOfLaw =
+        new FieldOfLaw(
             2L,
             3,
             false,
@@ -130,10 +130,10 @@ class LookupTableServiceTest {
 
     when(subjectFieldRepository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
             "TS-01-01"))
-        .thenReturn(Flux.just(expectedSubjectField));
+        .thenReturn(Flux.just(expectedFieldOfLaw));
 
     StepVerifier.create(service.getSubjectFieldChildren("TS-01-01"))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedSubjectField))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
         .verifyComplete();
 
     verify(subjectFieldRepository)

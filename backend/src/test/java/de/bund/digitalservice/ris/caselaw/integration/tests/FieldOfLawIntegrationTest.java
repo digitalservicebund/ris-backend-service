@@ -10,7 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +60,7 @@ class FieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(SubjectField[].class)
+        .expectBody(FieldOfLaw[].class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -79,7 +79,7 @@ class FieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(SubjectField[].class)
+        .expectBody(FieldOfLaw[].class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -98,7 +98,7 @@ class FieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(SubjectField[].class)
+        .expectBody(FieldOfLaw[].class)
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
@@ -117,14 +117,14 @@ class FieldOfLawIntegrationTest {
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(SubjectField.class)
+        .expectBody(FieldOfLaw.class)
         .consumeWith(
             response -> {
-              SubjectField field = response.getResponseBody();
+              FieldOfLaw field = response.getResponseBody();
               assertThat(field).isNotNull();
               assertThat(field.subjectFieldNumber()).isEqualTo("FL");
               assertThat(field.children()).hasSize(1);
-              SubjectField child = field.children().get(0);
+              FieldOfLaw child = field.children().get(0);
               assertThat(child.subjectFieldNumber()).isEqualTo("FL-01");
               assertThat(child.children()).hasSize(1);
               child = child.children().get(0);

@@ -4,11 +4,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.NormXml;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectFieldXml;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -17,7 +17,7 @@ import java.util.Set;
 public class SubjectFieldTransformer {
   private SubjectFieldTransformer() {}
 
-  public static SubjectField transformToDomain(SubjectFieldDTO subjectFieldDTO) {
+  public static FieldOfLaw transformToDomain(SubjectFieldDTO subjectFieldDTO) {
     List<Keyword> keywords = null;
     if (subjectFieldDTO.getKeywords() != null) {
       keywords =
@@ -47,7 +47,7 @@ public class SubjectFieldTransformer {
               .toList();
     }
 
-    return SubjectField.builder()
+    return FieldOfLaw.builder()
         .id(subjectFieldDTO.getId())
         .depth(subjectFieldDTO.getDepthInTree())
         .isLeaf(subjectFieldDTO.isLeafInTree())
@@ -61,18 +61,18 @@ public class SubjectFieldTransformer {
         .build();
   }
 
-  public static JPASubjectFieldDTO transformToJPADTO(SubjectFieldXml subjectFieldXml) {
+  public static JPASubjectFieldDTO transformToJPADTO(FieldOfLawXml fieldOfLawXml) {
     return JPASubjectFieldDTO.builder()
-        .id(subjectFieldXml.getId())
-        .changeDateMail(subjectFieldXml.getChangeDateMail())
-        .changeDateClient(subjectFieldXml.getChangeDateClient())
-        .changeIndicator(subjectFieldXml.getChangeIndicator())
-        .version(subjectFieldXml.getVersion())
-        .subjectFieldNumber(subjectFieldXml.getSubjectFieldNumber())
-        .subjectFieldText(subjectFieldXml.getSubjectFieldText())
-        .navigationTerm(subjectFieldXml.getNavigationTerm())
-        .keywords(transformKeywordsToJPADTOs(subjectFieldXml.getKeywords()))
-        .norms(transformNormsToJPADTOs(subjectFieldXml.getNorms()))
+        .id(fieldOfLawXml.getId())
+        .changeDateMail(fieldOfLawXml.getChangeDateMail())
+        .changeDateClient(fieldOfLawXml.getChangeDateClient())
+        .changeIndicator(fieldOfLawXml.getChangeIndicator())
+        .version(fieldOfLawXml.getVersion())
+        .subjectFieldNumber(fieldOfLawXml.getSubjectFieldNumber())
+        .subjectFieldText(fieldOfLawXml.getSubjectFieldText())
+        .navigationTerm(fieldOfLawXml.getNavigationTerm())
+        .keywords(transformKeywordsToJPADTOs(fieldOfLawXml.getKeywords()))
+        .norms(transformNormsToJPADTOs(fieldOfLawXml.getNorms()))
         .build();
   }
 

@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Nor
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -33,7 +33,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<SubjectField> findAllByOrderBySubjectFieldNumberAsc() {
+  public Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc() {
     return databaseSubjectFieldRepository
         .findAllByOrderBySubjectFieldNumberAsc()
         .flatMapSequential(this::injectKeywords)
@@ -43,7 +43,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Mono<SubjectField> findBySubjectFieldNumber(String subjectFieldNumber) {
+  public Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldNumber) {
     return databaseSubjectFieldRepository
         .findBySubjectFieldNumber(subjectFieldNumber)
         .flatMap(this::injectKeywords)
@@ -53,7 +53,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Mono<SubjectField> findParentByChild(SubjectField child) {
+  public Mono<FieldOfLaw> findParentByChild(FieldOfLaw child) {
     return databaseSubjectFieldRepository
         .findBySubjectFieldNumber(child.subjectFieldNumber())
         .flatMap(
@@ -70,7 +70,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<SubjectField> getTopLevelNodes() {
+  public Flux<FieldOfLaw> getTopLevelNodes() {
     return databaseSubjectFieldRepository
         .findAllByParentIdOrderBySubjectFieldNumberAsc(null)
         .flatMapSequential(this::injectKeywords)
@@ -80,7 +80,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<SubjectField> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
+  public Flux<FieldOfLaw> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber) {
     return databaseSubjectFieldRepository
         .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(subjectFieldNumber)
@@ -91,7 +91,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<SubjectField> findBySearchStr(String searchStr) {
+  public Flux<FieldOfLaw> findBySearchStr(String searchStr) {
     return databaseSubjectFieldRepository
         .findBySearchStr(searchStr)
         .flatMapSequential(this::injectKeywords)

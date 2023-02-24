@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.ArrayList;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -112,12 +112,12 @@ class FieldOfLawServiceTest {
     StepVerifier.create(service.getTreeForFieldOfLaw("test")).verifyComplete();
 
     verify(repository, times(1)).findBySubjectFieldNumber("test");
-    verify(repository, never()).findParentByChild(any(SubjectField.class));
+    verify(repository, never()).findParentByChild(any(FieldOfLaw.class));
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtTopLevel() {
-    SubjectField child = SubjectField.builder().subjectFieldNumber("test").build();
+    FieldOfLaw child = FieldOfLaw.builder().subjectFieldNumber("test").build();
     when(repository.findBySubjectFieldNumber("test")).thenReturn(Mono.just(child));
     when(repository.findParentByChild(child)).thenReturn(Mono.empty());
 
@@ -129,10 +129,10 @@ class FieldOfLawServiceTest {
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtSecondLevel() {
-    SubjectField child = SubjectField.builder().subjectFieldNumber("child").build();
+    FieldOfLaw child = FieldOfLaw.builder().subjectFieldNumber("child").build();
     when(repository.findBySubjectFieldNumber("child")).thenReturn(Mono.just(child));
-    SubjectField parent =
-        SubjectField.builder().subjectFieldNumber("parent").children(new ArrayList<>()).build();
+    FieldOfLaw parent =
+        FieldOfLaw.builder().subjectFieldNumber("parent").children(new ArrayList<>()).build();
     when(repository.findParentByChild(child)).thenReturn(Mono.just(parent));
     when(repository.findParentByChild(parent)).thenReturn(Mono.just(parent));
 

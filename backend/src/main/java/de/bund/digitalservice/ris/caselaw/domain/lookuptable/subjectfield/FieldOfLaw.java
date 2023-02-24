@@ -4,7 +4,7 @@ import java.util.List;
 import lombok.Builder;
 
 @Builder
-public record SubjectField(
+public record FieldOfLaw(
     Long id,
     Integer depth,
     Boolean isLeaf,
@@ -14,4 +14,4 @@ public record SubjectField(
     List<String> linkedFields,
     List<Keyword> keywords,
     List<Norm> norms,
-    List<SubjectField> children) {}
+    List<FieldOfLaw> children) {}

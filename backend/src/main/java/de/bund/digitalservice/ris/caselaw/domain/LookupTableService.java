@@ -5,7 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -90,14 +90,14 @@ public class LookupTableService {
         revoked);
   }
 
-  public Flux<SubjectField> getSubjectFields(Optional<String> searchStr) {
+  public Flux<FieldOfLaw> getSubjectFields(Optional<String> searchStr) {
     if (searchStr.isPresent() && !searchStr.get().isBlank()) {
       return subjectFieldRepository.findBySearchStr(searchStr.get().trim());
     }
     return Flux.empty();
   }
 
-  public Flux<SubjectField> getSubjectFieldChildren(String subjectFieldNumber) {
+  public Flux<FieldOfLaw> getSubjectFieldChildren(String subjectFieldNumber) {
     if (subjectFieldNumber.equalsIgnoreCase(ROOT_ID)) {
       return subjectFieldRepository.getTopLevelNodes();
     }
@@ -105,13 +105,13 @@ public class LookupTableService {
         subjectFieldNumber);
   }
 
-  public Mono<SubjectField> getTreeForSubjectFieldNumber(String subjectFieldId) {
+  public Mono<FieldOfLaw> getTreeForSubjectFieldNumber(String subjectFieldId) {
     return subjectFieldRepository
         .findBySubjectFieldNumber(subjectFieldId)
         .flatMap(this::findParent);
   }
 
-  private Mono<SubjectField> findParent(SubjectField child) {
+  private Mono<FieldOfLaw> findParent(FieldOfLaw child) {
 
     return subjectFieldRepository
         .findParentByChild(child)

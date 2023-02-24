@@ -7,7 +7,7 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 @Data
-public class SubjectFieldXml {
+public class FieldOfLawXml {
   @JsonProperty(value = "id")
   long id;
 

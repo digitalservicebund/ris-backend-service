@@ -1,22 +1,22 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.SubjectField;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @NoRepositoryBean
 public interface SubjectFieldRepository {
-  Flux<SubjectField> getTopLevelNodes();
+  Flux<FieldOfLaw> getTopLevelNodes();
 
-  Flux<SubjectField> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
+  Flux<FieldOfLaw> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber);
 
-  Flux<SubjectField> findBySearchStr(String searchStr);
+  Flux<FieldOfLaw> findBySearchStr(String searchStr);
 
-  Mono<SubjectField> findBySubjectFieldNumber(String subjectFieldId);
+  Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldId);
 
-  Mono<SubjectField> findParentByChild(SubjectField child);
+  Mono<FieldOfLaw> findParentByChild(FieldOfLaw child);
 
-  Flux<SubjectField> findAllByOrderBySubjectFieldNumberAsc();
+  Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc();
 }
