@@ -351,7 +351,7 @@ describe("normsService", () => {
     it("builds the url for downloading the file", async () => {
       const url = exportNorm("fake-guid", "fake-hash")
 
-      expect(url).toBe("api/v1/norms/fake-guid/files/fake-hash")
+      expect(url).toBe("/api/v1/norms/fake-guid/files/fake-hash")
     })
   })
 })

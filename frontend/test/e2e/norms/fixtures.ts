@@ -15,7 +15,7 @@ export const testWithImportedNorm = test.extend<MyFixtures>({
     expect(fileName).toBeTruthy()
 
     const { fileContent } = await loadJurisTestFile(request, fileName)
-    const { guid } = await importNormViaApi(request, fileContent)
+    const { guid } = await importNormViaApi(request, fileContent, fileName)
 
     await use(guid)
   },

@@ -59,10 +59,11 @@ export async function loadJurisTestFile(
 
 export async function importNormViaApi(
   request: APIRequestContext,
-  fileContent: Buffer
+  fileContent: Buffer,
+  fileName: string
 ): Promise<{ guid: string }> {
   const response = await request.post(`/api/v1/norms`, {
-    headers: { "Content-Type": "application/zip" },
+    headers: { "Content-Type": "application/zip", "X-Filename": fileName },
     data: fileContent,
   })
 

@@ -50,12 +50,22 @@ interface NormsMapper {
         )
     }
 
+    fun normWithFilesToEntity(normDto: NormDto, articles: List<Article>, filesDto: List<FileReferenceDto>): Norm {
+        val norm = normToEntity(normDto, articles)
+        norm.files = filesDto.map { fileReferenceToEntity(it) }
+        return norm
+    }
+
     fun paragraphToEntity(paragraphDto: ParagraphDto): Paragraph {
         return Paragraph(paragraphDto.guid, paragraphDto.marker, paragraphDto.text)
     }
 
     fun articleToEntity(articleDto: ArticleDto, paragraphs: List<Paragraph>): Article {
         return Article(articleDto.guid, articleDto.title, articleDto.marker, paragraphs)
+    }
+
+    fun fileReferenceToEntity(fileReferenceDto: FileReferenceDto): FileReference {
+        return FileReference(fileReferenceDto.name, fileReferenceDto.hash)
     }
 
     fun normToDto(norm: Norm, id: Int = 0): NormDto {

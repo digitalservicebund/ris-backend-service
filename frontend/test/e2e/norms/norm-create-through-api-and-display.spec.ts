@@ -50,7 +50,7 @@ testWithImportedNorm(
     // Outer menu
     await expect(page.locator("a:has-text('Normenkomplex')")).toBeVisible()
     await expect(page.locator("a:has-text('Bestand')")).toBeVisible()
-    await expect(page.locator("a:has-text('Export')")).toBeHidden()
+    await expect(page.locator("a:has-text('Export')")).toBeVisible()
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()
 

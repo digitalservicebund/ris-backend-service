@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOut
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -43,6 +44,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         private val PARAGRAPH2: Paragraph = Paragraph(UUID.randomUUID(), "(2)", "Text2")
         private val PARAGRAPH3: Paragraph = Paragraph(UUID.randomUUID(), "(1)", "Text3")
         private val PARAGRAPH4: Paragraph = Paragraph(UUID.randomUUID(), "(2)", "Text4")
+        private val FILE1: FileReference = FileReference("test.zip", "123456789")
     }
 
     @Autowired
@@ -251,6 +253,26 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 assertThat(it.completeCitation == updatedNorm.completeCitation, `is`(true))
                 assertThat(it.unofficialAbbreviation == updatedNorm.unofficialAbbreviation, `is`(true))
                 assertThat(it.celexNumber == updatedNorm.celexNumber, `is`(true))
+            }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save a norm with 1 file and retrieve it by guid`() {
+        val norm = NORM.copy(files = listOf(FILE1))
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val guidQuery = GetNormByGuidOutputPort.Query(NORM.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .assertNext {
+                assertThat(it.files.size == 1, `is`(true))
+                assertThat(it.files[0].name == FILE1.name, `is`(true))
+                assertThat(it.files[0].hash == FILE1.hash, `is`(true))
             }
             .verifyComplete()
     }

@@ -59,9 +59,20 @@ class NormsService(
     }
 
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
-        return normsRepository
-            .findByGuid(query.guid)
-            .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
+        return normsRepository.findByGuid(query.guid)
+            .flatMap { normDto ->
+                articlesRepository.findByNormId(normDto.id)
+                    .flatMap { articleDto: ArticleDto ->
+                        getArticleWithParagraphs(articleDto)
+                    }
+                    .collectList()
+                    .flatMap { articlesDto ->
+                        filesRepository.findByNormId(normDto.id).collectList()
+                            .map { filesDto ->
+                                normWithFilesToEntity(normDto, articlesDto, filesDto)
+                            }
+                    }
+            }
     }
 
     override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
