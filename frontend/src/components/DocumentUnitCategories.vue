@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
+import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
 import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
@@ -214,6 +215,8 @@ onUnmounted(() => {
           @update-document-unit="handleUpdateDocumentUnit"
           @update-value="handleUpdateValueDocumentUnitTexts"
         />
+
+        <DocumentUnitContentRelatedIndexing id="contentRelatedIndexing" />
       </div>
 
       <div

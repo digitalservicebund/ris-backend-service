@@ -43,6 +43,14 @@ export function useCaseLawMenuItems(
             hash: "#texts",
           },
         },
+        {
+          label: "Inhaltliche Erschließung",
+          route: {
+            ...baseRoute,
+            name: "caselaw-documentUnit-:documentNumber-categories",
+            hash: "#contentRelatedIndexing",
+          },
+        },
       ],
     },
     {
