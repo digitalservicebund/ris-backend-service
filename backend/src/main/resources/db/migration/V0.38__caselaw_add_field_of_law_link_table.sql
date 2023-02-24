@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS
-  field_of_law_link (
+CREATE TABLE
+  IF NOT EXISTS field_of_law_link (
     id BIGSERIAL,
     field_id BIGINT,
     linked_field_id BIGINT,

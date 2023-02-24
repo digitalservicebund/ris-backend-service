@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS
-  deviating_ecli (
+CREATE TABLE
+  IF NOT EXISTS deviating_ecli (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     document_unit_id BIGINT NOT NULL,
     ecli VARCHAR(255),

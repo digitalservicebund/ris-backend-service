@@ -39,6 +39,7 @@ class FilesService(
             .bucket(bucketName)
             .key(folder + getHashFromContent(command.file))
             .contentType(mediaType.toString())
+            .contentLength(command.contentLength)
             .build()
 
         logger.info("saveFile - PutObjectRequest: $putObjectRequest")

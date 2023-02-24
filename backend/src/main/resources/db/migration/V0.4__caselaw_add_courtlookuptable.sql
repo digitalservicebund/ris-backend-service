@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS
-  lookuptable_court (
+CREATE TABLE
+  IF NOT EXISTS lookuptable_court (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     changedatemail VARCHAR(255),
     changedateclient VARCHAR(255),

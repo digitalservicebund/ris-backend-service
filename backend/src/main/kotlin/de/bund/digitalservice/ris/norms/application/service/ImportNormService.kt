@@ -28,7 +28,7 @@ class ImportNormService(
         return parseJurisXmlAdapter
             .parseJurisXml(parseQuery)
             .flatMap { norm -> saveNormAdapter.saveNorm(SaveNormOutputPort.Command(norm)) }
-            .flatMap { saveFileAdapter.saveFile(SaveFileOutputPort.Command(command.zipFile, command.filename)) }
+            .flatMap { saveFileAdapter.saveFile(SaveFileOutputPort.Command(command.zipFile, command.filename, command.contentLength)) }
             .doOnError { exception -> logger.error("Error occurred while saving the file to bucket:", exception) }
             .map { guid }
     }

@@ -1,5 +1,5 @@
-CREATE TABLE IF NOT EXISTS
-  incorrect_court (
+CREATE TABLE
+  IF NOT EXISTS incorrect_court (
     id BIGSERIAL not null primary key,
     document_unit_id BIGINT NOT NULL,
     court VARCHAR(256),

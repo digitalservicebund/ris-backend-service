@@ -5,5 +5,5 @@ import reactor.core.publisher.Mono
 interface SaveFileOutputPort {
     fun saveFile(command: Command): Mono<Boolean>
 
-    data class Command(val file: ByteArray, val filename: String)
+    data class Command(val file: ByteArray, val filename: String, val contentLength: Long)
 }

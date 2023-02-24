@@ -20,7 +20,7 @@ class ImportNormController(private val importNormService: ImportNormUseCase) {
     @PostMapping
     fun createNorm(@RequestBody zipFile: ByteArray, @RequestHeader headers: HttpHeaders): Mono<ResponseEntity<ResponseSchema>> {
         val filename = headers.getFirst("X-Filename") ?: "norm.zip"
-        val command = ImportNormUseCase.Command(zipFile, filename)
+        val command = ImportNormUseCase.Command(zipFile, filename, headers.contentLength)
 
         return importNormService
             .importNorm(command)

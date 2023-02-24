@@ -24,7 +24,7 @@ class ImportNormServiceTest {
         val saveNormAdapter = mockk<SaveNormOutputPort>()
         val saveFileAdapter = mockk<SaveFileOutputPort>()
         val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
-        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
+        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name, zipFile.length())
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.empty()
 
@@ -44,7 +44,7 @@ class ImportNormServiceTest {
         val saveFileAdapter = mockk<SaveFileOutputPort>()
         val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
         val parsedNorm = createRandomNorm()
-        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
+        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name, zipFile.length())
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(parsedNorm)
         every { saveNormAdapter.saveNorm(any()) } returns Mono.empty()
@@ -62,9 +62,9 @@ class ImportNormServiceTest {
         val saveNormAdapter = mockk<SaveNormOutputPort>()
         val saveFileAdapter = mockk<SaveFileOutputPort>()
         val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
-        val commandOne = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
-        val commandTwo = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
-        val commandThree = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
+        val commandOne = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name, zipFile.length())
+        val commandTwo = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name, zipFile.length())
+        val commandThree = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name, zipFile.length())
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
         every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
@@ -84,7 +84,7 @@ class ImportNormServiceTest {
         val saveNormAdapter = mockk<SaveNormOutputPort>()
         val saveFileAdapter = mockk<SaveFileOutputPort>()
         val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
-        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
+        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name, zipFile.length())
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
         every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
@@ -103,7 +103,7 @@ class ImportNormServiceTest {
         val saveNormAdapter = mockk<SaveNormOutputPort>()
         val saveFileAdapter = mockk<SaveFileOutputPort>()
         val service = ImportNormService(parseJurisXmlAdapter, saveFileAdapter, saveNormAdapter)
-        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name)
+        val command = ImportNormUseCase.Command(zipFile.readBytes(), zipFile.name, zipFile.length())
 
         every { parseJurisXmlAdapter.parseJurisXml(any()) } returns Mono.just(createRandomNorm())
         every { saveNormAdapter.saveNorm(any()) } returns Mono.just(true)
