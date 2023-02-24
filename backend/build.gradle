@@ -12,6 +12,7 @@ plugins {
   id "com.adarshr.test-logger" version "3.2.0"
   id "com.github.ben-manes.versions" version "0.46.0"
   id "org.jetbrains.dokka" version "1.7.20"
+  id "io.franzbecker.gradle-lombok" version "5.0.0"
 }
 
 group = "de.bund.digitalservice"
@@ -268,4 +269,24 @@ licenseReport {
   renderers = [
     new CsvReportRenderer("backend-licence-report.csv")
   ]
+}
+
+import io.franzbecker.gradle.lombok.task.DelombokTask
+
+task delombok(type: DelombokTask, dependsOn: compileJava) {
+  ext.outputDir = file("$buildDir/delombok")
+  outputs.dir(outputDir)
+  sourceSets.main.java.srcDirs.each {
+    inputs.dir(it)
+    args(it, "-d", outputDir)
+  }
+  doFirst { outputDir.deleteDir() }
+}
+
+lombok { version = "1.18.26" }
+
+javadoc {
+  dependsOn delombok
+  source = delombok.outputDir
+  failOnError = false
 }
