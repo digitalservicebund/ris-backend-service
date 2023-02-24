@@ -117,7 +117,7 @@ class FieldOfLawServiceTest {
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtTopLevel() {
-    FieldOfLaw child = FieldOfLaw.builder().subjectFieldNumber("test").build();
+    FieldOfLaw child = FieldOfLaw.builder().identifier("test").build();
     when(repository.findBySubjectFieldNumber("test")).thenReturn(Mono.just(child));
     when(repository.findParentByChild(child)).thenReturn(Mono.empty());
 
@@ -129,10 +129,10 @@ class FieldOfLawServiceTest {
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtSecondLevel() {
-    FieldOfLaw child = FieldOfLaw.builder().subjectFieldNumber("child").build();
+    FieldOfLaw child = FieldOfLaw.builder().identifier("child").build();
     when(repository.findBySubjectFieldNumber("child")).thenReturn(Mono.just(child));
     FieldOfLaw parent =
-        FieldOfLaw.builder().subjectFieldNumber("parent").children(new ArrayList<>()).build();
+        FieldOfLaw.builder().identifier("parent").children(new ArrayList<>()).build();
     when(repository.findParentByChild(child)).thenReturn(Mono.just(parent));
     when(repository.findParentByChild(parent)).thenReturn(Mono.just(parent));
 
