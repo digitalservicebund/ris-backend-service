@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, watch, ref } from "vue"
 import FieldOfLawNodeComponent from "./FieldOfLawNodeComponent.vue"
-import { buildRoot, FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { buildRoot, getDescendants, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 const props = defineProps<{
@@ -42,15 +42,12 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
   if (!response.data) return
 
   root.value.children = [response.data]
-  expandAll(root.value)
+  getDescendants(root.value).forEach((node) => {
+    node.isExpanded = true
+    node.inDirectPathMode = true
+  })
 
   emit("reset-clicked-node")
-}
-
-function expandAll(node: FieldOfLawNode) {
-  node.isExpanded = true
-  node.inDirectPathMode = true
-  node.children.forEach((child) => expandAll(child))
 }
 </script>
 

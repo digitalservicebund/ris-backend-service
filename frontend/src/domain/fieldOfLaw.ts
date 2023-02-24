@@ -21,3 +21,16 @@ export function buildRoot(children: FieldOfLawNode[] = []): FieldOfLawNode {
     isLeaf: false,
   }
 }
+
+export function getDescendants(node: FieldOfLawNode) {
+  const collect: FieldOfLawNode[] = []
+  const collectRecursively = (
+    node: FieldOfLawNode,
+    collect: FieldOfLawNode[]
+  ) => {
+    collect.push(node)
+    node.children.forEach((child) => collectRecursively(child, collect))
+  }
+  collectRecursively(node, collect)
+  return collect
+}
