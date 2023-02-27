@@ -204,6 +204,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NormOrFileNotFound'
+  '/norms/{guid}/files':
+    post:
+      summary: Generate a new juris zip export for the norm
+      description: Generate a new compressed ZIP file containing all juris xml files for the latest edits of a norm
+      operationId: generateNormFile
+      parameters:
+        - name: guid
+          description: the unique guid identifier of a norm
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/Guid'
+      responses:
+        '201':
+          description: Zip File Created
+
 components:
   securitySchemes:
     BasicAuth:
@@ -279,6 +295,7 @@ components:
       required:
         - name
         - hash
+        - createdAt
       properties:
         name:
           type: string
