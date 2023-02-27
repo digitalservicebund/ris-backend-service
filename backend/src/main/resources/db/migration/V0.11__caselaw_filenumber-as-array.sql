@@ -1,5 +1,5 @@
-CREATE TABLE
-  IF NOT EXISTS file_number (
+CREATE TABLE IF NOT EXISTS
+  file_number (
     id BIGSERIAL NOT NULL PRIMARY KEY,
     document_unit_id BIGINT NOT NULL,
     file_number VARCHAR(255),
@@ -21,4 +21,6 @@ WHERE
   AND aktenzeichen != '';
 
 ALTER TABLE
-  doc_unit DROP COLUMN aktenzeichen
+  doc_unit
+DROP COLUMN
+  aktenzeichen

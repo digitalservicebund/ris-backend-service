@@ -1,4 +1,6 @@
 ALTER TABLE
   norms
 ALTER COLUMN
-  other_footnote TYPE VARCHAR(511);
+  other_footnote
+TYPE
+  VARCHAR(511);

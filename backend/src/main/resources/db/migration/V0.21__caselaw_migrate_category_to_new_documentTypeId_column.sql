@@ -1,7 +1,7 @@
 ALTER TABLE
   doc_unit
-ADD
-  COLUMN IF NOT EXISTS document_type_id BIGINT;
+ADD COLUMN IF NOT EXISTS
+  document_type_id BIGINT;
 
 UPDATE
   doc_unit

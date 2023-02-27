@@ -10,7 +10,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: fcde08900f71cbc2b4addf56beecf0512ae93a74510fb5a65301dccb32ea3d11
   - filename: backend/build.gradle
-    checksum: d4fb0ee0146620513e545eeac856ba9873bd9d55dccb4bff1ab9bfabb241cc6f
+    checksum: 5e23f3359c2330163c8d10aad2b58403fae9debfd55b5018ae2de14d04e12d70
   - filename: backend/src/test/kotlin/unit/application/service/ExportNormServiceTest.kt
     checksum: 195fd6fc34a52689c163ba3e36f8038eb4d890bfe3533799563c94485adb25ce
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/ExportNormControllerTest.kt

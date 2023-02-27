@@ -1,2 +1,4 @@
 ALTER TABLE
-  doc_unit DROP COLUMN dokumenttyp;
+  doc_unit
+DROP COLUMN
+  dokumenttyp;
