@@ -143,7 +143,8 @@ classDiagram
 
     String ageOfMajorityIndication
 
-    Stirng text
+    String text
+    List~FileReference~ files
   }
 
   class Article {
@@ -167,6 +168,13 @@ classDiagram
     UNDEFINED_NOT_PRESENT
   }
 
+  class FileReference {
+    +String name
+    +String hash
+    +Timestamp createdAt
+  }
+
   Norm "1" --> "*" Article
   Article "1" --> "*" Paragraph
+  Norm "1" --> "*" FileReference
 ```

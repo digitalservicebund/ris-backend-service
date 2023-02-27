@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.UUID
 import de.bund.digitalservice.ris.norms.juris.extractor.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.extractor.model.Norm as NormData
@@ -23,7 +24,7 @@ class JurisXmlParser() : ParseJurisXmlOutputPort {
         val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
         norm.files = listOf(
-            FileReference(query.filename, getHashFromContent(query.zipFile)),
+            FileReference(query.filename, getHashFromContent(query.zipFile), LocalDateTime.now()),
         )
         return Mono.just(norm)
     }

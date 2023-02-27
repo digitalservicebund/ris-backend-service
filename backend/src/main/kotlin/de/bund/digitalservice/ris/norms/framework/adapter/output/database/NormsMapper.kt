@@ -65,7 +65,7 @@ interface NormsMapper {
     }
 
     fun fileReferenceToEntity(fileReferenceDto: FileReferenceDto): FileReference {
-        return FileReference(fileReferenceDto.name, fileReferenceDto.hash)
+        return FileReference(fileReferenceDto.name, fileReferenceDto.hash, fileReferenceDto.createdAt)
     }
 
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
@@ -116,7 +116,7 @@ interface NormsMapper {
     }
 
     fun filesToDto(files: List<FileReference>, normId: Int, id: Int = 0): List<FileReferenceDto> {
-        return files.map { FileReferenceDto(id, it.name, it.hash, normId) }
+        return files.map { FileReferenceDto(id, it.name, it.hash, normId, it.createdAt) }
     }
 
     fun queryFieldToDbColumn(field: QueryFields): String {

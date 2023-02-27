@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfi
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -310,9 +311,13 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         }
     }
 
-    data class FileReferenceResponseSchema private constructor(val name: String, val hash: String) {
+    data class FileReferenceResponseSchema private constructor(val name: String, val hash: String, val createdAt: String) {
         companion object {
-            fun fromUseCaseData(data: FileReference) = FileReferenceResponseSchema(data.name, data.hash)
+            fun fromUseCaseData(data: FileReference) = FileReferenceResponseSchema(
+                data.name,
+                data.hash,
+                encodeLocalDateTime(data.createdAt),
+            )
         }
     }
 }

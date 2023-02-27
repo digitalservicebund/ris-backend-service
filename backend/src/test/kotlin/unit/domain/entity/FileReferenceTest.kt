@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.domain.entity
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.security.MessageDigest
+import java.time.LocalDateTime
 import java.util.*
 
 class FileReferenceTest {
@@ -15,9 +16,11 @@ class FileReferenceTest {
                 .digest(bytes),
         )
         val name = "test.zip"
+        val time = LocalDateTime.now()
 
-        val fileReference = FileReference(name, getHashFromContent(bytes))
+        val fileReference = FileReference(name, getHashFromContent(bytes), time)
         assertThat(fileReference.name).isEqualTo(name)
         assertThat(fileReference.hash).isEqualTo(hash)
+        assertThat(fileReference.createdAt).isEqualTo(time)
     }
 }

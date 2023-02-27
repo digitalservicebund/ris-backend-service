@@ -29,6 +29,7 @@ import utils.assertNormsWithoutArticles
 import utils.createRandomNorm
 import java.time.Duration
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.util.*
 
 @DataR2dbcTest
@@ -44,7 +45,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         private val PARAGRAPH2: Paragraph = Paragraph(UUID.randomUUID(), "(2)", "Text2")
         private val PARAGRAPH3: Paragraph = Paragraph(UUID.randomUUID(), "(1)", "Text3")
         private val PARAGRAPH4: Paragraph = Paragraph(UUID.randomUUID(), "(2)", "Text4")
-        private val FILE1: FileReference = FileReference("test.zip", "123456789")
+        private val FILE1: FileReference = FileReference("test.zip", "123456789", LocalDateTime.now())
     }
 
     @Autowired

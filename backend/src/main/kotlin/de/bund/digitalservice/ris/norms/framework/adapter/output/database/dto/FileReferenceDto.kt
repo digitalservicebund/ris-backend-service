@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto
 import org.springframework.data.annotation.Id
 import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.Table
+import java.time.LocalDateTime
 
 @Table(name = "files")
 data class FileReferenceDto(
@@ -12,4 +13,6 @@ data class FileReferenceDto(
     var hash: String,
     @Column("norm_id")
     val normId: Int,
+    @Column("created_at")
+    val createdAt: LocalDateTime,
 )
