@@ -38,11 +38,8 @@ public class FlywayConfig {
   }
 
   @Bean
-  public FlywayMigrationStrategy cleanMigrateStrategy() {
-    return flyway -> {
-      flyway.repair();
-      flyway.migrate();
-    };
+  public FlywayMigrationStrategy defaultMigrationStrategy() {
+    return Flyway::migrate;
   }
 
   @Bean
