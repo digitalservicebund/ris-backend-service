@@ -49,8 +49,7 @@ public class SubjectFieldTransformer {
 
     return FieldOfLaw.builder()
         .id(subjectFieldDTO.getId())
-        .depth(subjectFieldDTO.getDepthInTree())
-        .isLeaf(subjectFieldDTO.isLeafInTree())
+        .childrenCount(subjectFieldDTO.getChildrenCount())
         .identifier(subjectFieldDTO.getSubjectFieldNumber())
         .text(subjectFieldDTO.getSubjectFieldText())
         .linkedFields(linkedFields)

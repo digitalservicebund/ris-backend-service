@@ -9,23 +9,21 @@ export type FieldOfLawNode = {
   linkedFields?: string[]
   norms: Norm[]
   children: FieldOfLawNode[]
-  depth: number
+  childrenCount: number
   isExpanded: boolean
   inDirectPathMode?: boolean
-  isLeaf: boolean
 }
 
 export const ROOT_ID = "root"
 
-export function buildRoot(children: FieldOfLawNode[] = []): FieldOfLawNode {
+export function buildRoot(): FieldOfLawNode {
   return {
     identifier: ROOT_ID,
     text: "Alle Sachgebiete anzeigen",
-    children: children,
+    children: [],
+    childrenCount: 17,
     norms: [],
-    depth: 0,
     isExpanded: false,
-    isLeaf: false,
   }
 }
 

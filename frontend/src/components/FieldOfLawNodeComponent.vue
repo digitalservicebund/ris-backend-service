@@ -28,7 +28,7 @@ function handleTokenClick(tokenContent: string) {
 
 function handleToggle() {
   if (
-    !node.value.isLeaf &&
+    node.value.childrenCount > 0 &&
     (node.value.children.length === 0 || node.value.inDirectPathMode)
   ) {
     let childToReattach: FieldOfLawNode
@@ -63,7 +63,7 @@ function handleToggle() {
     :class="node.identifier !== ROOT_ID ? 'pl-36' : ''"
   >
     <div class="flex flex-row">
-      <div v-if="node.isLeaf" class="pl-24"></div>
+      <div v-if="node.childrenCount === 0" class="pl-24"></div>
       <div v-else>
         <button
           aria-label="Sachgebietsbaum aufklappen"

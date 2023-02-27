@@ -158,8 +158,7 @@ class FieldOfLawServiceTest {
     FieldOfLaw expectedFieldOfLaw =
         new FieldOfLaw(
             2L,
-            3,
-            true,
+            0,
             "TS-01-01",
             "stext 2",
             Collections.emptyList(),
@@ -181,8 +180,7 @@ class FieldOfLawServiceTest {
     FieldOfLaw expectedFieldOfLaw =
         new FieldOfLaw(
             2L,
-            3,
-            false,
+            1,
             "TS-01-01",
             "stext 2",
             Collections.emptyList(),

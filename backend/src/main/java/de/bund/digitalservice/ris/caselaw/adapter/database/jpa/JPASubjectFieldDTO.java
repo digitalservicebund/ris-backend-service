@@ -54,11 +54,8 @@ public class JPASubjectFieldDTO {
   @JoinColumn(name = "subject_field_id")
   Set<JPANormDTO> norms;
 
-  @Column(name = "is_leaf_in_tree")
-  boolean isLeafInTree;
-
-  @Column(name = "depth_in_tree")
-  Integer depthInTree;
+  @Column(name = "children_count")
+  Integer childrenCount;
 
   public String getSubjectFieldNumberOfParent() {
     int lastIndexOf = subjectFieldNumber.lastIndexOf('-');

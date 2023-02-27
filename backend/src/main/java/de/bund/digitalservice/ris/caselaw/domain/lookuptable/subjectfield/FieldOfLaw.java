@@ -6,8 +6,7 @@ import lombok.Builder;
 @Builder
 public record FieldOfLaw(
     Long id,
-    Integer depth,
-    Boolean isLeaf,
+    Integer childrenCount,
     String identifier,
     String text,
     List<String> linkedFields,

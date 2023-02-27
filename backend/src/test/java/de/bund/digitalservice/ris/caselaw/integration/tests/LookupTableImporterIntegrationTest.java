@@ -207,24 +207,22 @@ class LookupTableImporterIntegrationTest {
     SubjectFieldDTO expectedLinkedField1 =
         SubjectFieldDTO.builder()
             .id(3L)
+            .childrenCount(0)
             .changeIndicator('N')
-            .depthInTree(3)
             .subjectFieldNumber("ÄB-01-02")
-            .isLeafInTree(true)
             .build();
     SubjectFieldDTO expectedLinkedField2 =
         SubjectFieldDTO.builder()
             .id(4L)
+            .childrenCount(0)
             .changeIndicator('N')
-            .depthInTree(2)
             .subjectFieldNumber("CD-01")
-            .isLeafInTree(true)
             .build();
 
     SubjectFieldDTO expectedParent =
         SubjectFieldDTO.builder()
             .id(1L)
-            .depthInTree(2)
+            .childrenCount(1)
             .subjectFieldNumber("TS-01")
             .subjectFieldText("stext 1")
             .changeIndicator('N')
@@ -233,8 +231,7 @@ class LookupTableImporterIntegrationTest {
     SubjectFieldDTO expectedChild =
         new SubjectFieldDTO(
             2L,
-            3,
-            true,
+            0,
             1L,
             "2022-12-22",
             "2022-12-24",
