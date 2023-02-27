@@ -26,11 +26,12 @@ function handleTokenClick(tokenContent: string) {
   emit("linkedField:clicked", tokenContent)
 }
 
+function canLoadMoreChildren() {
+  return node.value.childrenCount > node.value.children.length
+}
+
 function handleToggle() {
-  if (
-    node.value.childrenCount > 0 &&
-    (node.value.children.length === 0 || node.value.inDirectPathMode)
-  ) {
+  if (canLoadMoreChildren()) {
     let childToReattach: FieldOfLawNode
     if (node.value.children.length > 0) {
       // can only happen if inDirectPathMode
@@ -70,11 +71,7 @@ function handleToggle() {
           class="bg-blue-200 material-icons rounded-full text-blue-800 w-icon"
           @click="handleToggle"
         >
-          {{
-            props.node.isExpanded && !props.node.inDirectPathMode
-              ? "remove"
-              : "add"
-          }}
+          {{ canLoadMoreChildren() ? "add" : "remove" }}
         </button>
       </div>
       <div v-if="node.identifier !== ROOT_ID">
