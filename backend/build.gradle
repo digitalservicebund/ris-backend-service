@@ -1,5 +1,5 @@
 plugins {
-  id "org.springframework.boot" version "3.0.2"
+  id "org.springframework.boot" version "3.0.3"
   id "io.spring.dependency-management" version "1.1.0"
   id "java"
   id "org.jetbrains.kotlin.jvm" version "1.7.0"
@@ -50,7 +50,7 @@ dependencies {
   implementation "org.springframework.boot:spring-boot-starter-security"
   // => CVE-2022-31692
   implementation "org.springframework.security:spring-security-core:6.0.2"
-  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:3.0.2"
+  implementation "org.springframework.boot:spring-boot-starter-oauth2-client:3.0.3"
   implementation("org.springframework.boot:spring-boot-starter-webflux") {
     exclude group: "io.netty", module: "netty-tcnative-classes"
     because("CVE-2021-43797, not using Tomcat")
@@ -61,7 +61,7 @@ dependencies {
   implementation "org.springframework.session:spring-session-data-redis"
 
   // CVE-2022-3171
-  implementation "com.google.protobuf:protobuf-java:3.21.12"
+  implementation "com.google.protobuf:protobuf-java:3.22.0"
 
   // => CVE-2021-37136, CVE-2021-37137, CVE-2021-43797
   implementation("io.netty:netty-all:4.1.86.Final") {
@@ -84,7 +84,7 @@ dependencies {
 
   implementation "com.sendinblue:sib-api-v3-sdk:6.0.0"
 
-  implementation platform("software.amazon.awssdk:bom:2.20.10")
+  implementation platform("software.amazon.awssdk:bom:2.20.12")
   implementation "software.amazon.awssdk:netty-nio-client"
   implementation "software.amazon.awssdk:s3"
   implementation "org.springdoc:springdoc-openapi-webflux-ui:1.6.14"
