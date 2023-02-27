@@ -5,14 +5,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 @Service
 @Slf4j
@@ -20,17 +18,11 @@ public class LookupTableService {
 
   private final DocumentTypeRepository documentTypeRepository;
   private final CourtRepository courtRepository;
-  private final SubjectFieldRepository subjectFieldRepository;
-  // id of the subject tree root node that only exists in the frontend
-  private static final String ROOT_ID = "root";
 
   public LookupTableService(
-      DocumentTypeRepository documentTypeRepository,
-      CourtRepository courtRepository,
-      SubjectFieldRepository subjectFieldRepository) {
+      DocumentTypeRepository documentTypeRepository, CourtRepository courtRepository) {
     this.documentTypeRepository = documentTypeRepository;
     this.courtRepository = courtRepository;
-    this.subjectFieldRepository = subjectFieldRepository;
   }
 
   public Flux<DocumentType> getCaselawDocumentTypes(Optional<String> searchStr) {
@@ -88,40 +80,5 @@ public class LookupTableService {
         courtDTO.getCourtlocation(),
         courtDTO.getCourttype() + " " + courtDTO.getCourtlocation(),
         revoked);
-  }
-
-  public Flux<FieldOfLaw> getSubjectFields(Optional<String> searchStr) {
-    if (searchStr.isPresent() && !searchStr.get().isBlank()) {
-      return subjectFieldRepository.findBySearchStr(searchStr.get().trim());
-    }
-    return Flux.empty();
-  }
-
-  public Flux<FieldOfLaw> getSubjectFieldChildren(String subjectFieldNumber) {
-    if (subjectFieldNumber.equalsIgnoreCase(ROOT_ID)) {
-      return subjectFieldRepository.getTopLevelNodes();
-    }
-    return subjectFieldRepository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
-        subjectFieldNumber);
-  }
-
-  public Mono<FieldOfLaw> getTreeForSubjectFieldNumber(String subjectFieldId) {
-    return subjectFieldRepository
-        .findBySubjectFieldNumber(subjectFieldId)
-        .flatMap(this::findParent);
-  }
-
-  private Mono<FieldOfLaw> findParent(FieldOfLaw child) {
-
-    return subjectFieldRepository
-        .findParentByChild(child)
-        .flatMap(
-            parent -> {
-              if (child.identifier().equals(parent.identifier())) {
-                return Mono.just(child);
-              }
-              parent.children().add(child);
-              return findParent(parent);
-            });
   }
 }

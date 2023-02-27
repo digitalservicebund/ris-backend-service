@@ -10,7 +10,11 @@ import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -146,5 +150,53 @@ class FieldOfLawServiceTest {
 
     verify(repository, times(1)).findBySubjectFieldNumber("child");
     verify(repository, times(1)).findParentByChild(child);
+  }
+
+  @Test
+  void testGetSubjectFields_withSearchString() {
+    String searchString = "stext";
+    FieldOfLaw expectedFieldOfLaw =
+        new FieldOfLaw(
+            2L,
+            3,
+            true,
+            "TS-01-01",
+            "stext 2",
+            Collections.emptyList(),
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")),
+            new ArrayList<>());
+
+    when(repository.findBySearchStr(searchString)).thenReturn(Flux.just(expectedFieldOfLaw));
+
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(searchString)))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
+        .verifyComplete();
+
+    verify(repository).findBySearchStr(searchString);
+  }
+
+  @Test
+  void testGetSubjectFieldChildren() {
+    FieldOfLaw expectedFieldOfLaw =
+        new FieldOfLaw(
+            2L,
+            3,
+            false,
+            "TS-01-01",
+            "stext 2",
+            Collections.emptyList(),
+            List.of(new Keyword("keyword")),
+            List.of(new Norm("abbr1", "description")),
+            new ArrayList<>());
+
+    when(repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01"))
+        .thenReturn(Flux.just(expectedFieldOfLaw));
+
+    StepVerifier.create(service.getChildrenOfFieldOfLaw("TS-01-01"))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
+        .verifyComplete();
+
+    verify(repository).findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01");
   }
 }

@@ -12,11 +12,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Key
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -85,56 +80,5 @@ class LookupTableServiceTest {
         .verifyComplete();
 
     verify(courtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();
-  }
-
-  @Test
-  void testGetSubjectFields_withSearchString() {
-    String searchString = "stext";
-    FieldOfLaw expectedFieldOfLaw =
-        new FieldOfLaw(
-            2L,
-            3,
-            true,
-            "TS-01-01",
-            "stext 2",
-            Collections.emptyList(),
-            List.of(new Keyword("keyword")),
-            List.of(new Norm("abbr1", "description")),
-            new ArrayList<>());
-
-    when(subjectFieldRepository.findBySearchStr(searchString))
-        .thenReturn(Flux.just(expectedFieldOfLaw));
-
-    StepVerifier.create(service.getSubjectFields(Optional.of(searchString)))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
-        .verifyComplete();
-
-    verify(subjectFieldRepository).findBySearchStr(searchString);
-  }
-
-  @Test
-  void testGetSubjectFieldChildren() {
-    FieldOfLaw expectedFieldOfLaw =
-        new FieldOfLaw(
-            2L,
-            3,
-            false,
-            "TS-01-01",
-            "stext 2",
-            Collections.emptyList(),
-            List.of(new Keyword("keyword")),
-            List.of(new Norm("abbr1", "description")),
-            new ArrayList<>());
-
-    when(subjectFieldRepository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
-            "TS-01-01"))
-        .thenReturn(Flux.just(expectedFieldOfLaw));
-
-    StepVerifier.create(service.getSubjectFieldChildren("TS-01-01"))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
-        .verifyComplete();
-
-    verify(subjectFieldRepository)
-        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01");
   }
 }
