@@ -39,7 +39,7 @@ describe("SubjectTree", () => {
             identifier: "CD-02",
             text: "And text for CD with link to AB-01",
             children: [],
-            childrenCount: 0,
+            childrenCount: 1,
             norms: [],
             linkedFields: ["AB-01"],
             isExpanded: false,
@@ -68,7 +68,8 @@ describe("SubjectTree", () => {
     const expandIcons = screen.getAllByLabelText("Sachgebietsbaum aufklappen")
 
     expect(fetchSpy).toBeCalledTimes(1)
-    expect(expandIcons).toHaveLength(3)
+    // root and CD-02 have children, so two expand icons
+    expect(expandIcons).toHaveLength(2)
     expect(screen.getByText("Text for AB")).toBeInTheDocument()
     expect(screen.getByText("And text for CD with link to")).toBeInTheDocument()
     expect(screen.getByText("Alle Sachgebiete anzeigen")).toBeInTheDocument()
