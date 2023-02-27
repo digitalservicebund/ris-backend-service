@@ -99,7 +99,7 @@ function handleToggle() {
             <div v-if="node.identifier !== ROOT_ID" class="identifier pl-8">
               {{ node.identifier }}
             </div>
-            <div class="pl-6 pt-2 subject-field-text text-blue-800">
+            <div class="font-size-14px pl-6 pt-2 text-blue-800">
               <TokenizeText
                 :keywords="props.node.linkedFields ?? []"
                 :text="props.node.text"
@@ -109,7 +109,7 @@ function handleToggle() {
           </div>
         </div>
         <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
-          <div class="flex flex-row flex-wrap">
+          <div class="flex flex-row flex-wrap font-size-14px">
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.abbreviation }}</strong>
               {{ norm.singleNormDescription
@@ -145,7 +145,8 @@ function handleToggle() {
   white-space: nowrap;
 }
 
-.subject-field-text {
+// TODO use tailwind instead
+.font-size-14px {
   font-size: 14px;
 }
 
