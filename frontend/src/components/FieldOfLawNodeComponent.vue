@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, toRaw } from "vue"
 import TokenizeText from "@/components/TokenizeText.vue"
 import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
@@ -30,9 +30,22 @@ function handleToggle() {
     !node.value.isLeaf &&
     (node.value.children.length === 0 || node.value.inDirectPathMode)
   ) {
+    let childToReattach: FieldOfLawNode
+    if (node.value.children.length > 0) {
+      // can only happen if inDirectPathMode
+      childToReattach = toRaw(node.value.children[0])
+    }
     FieldOfLawService.getChildrenOf(node.value.identifier).then((response) => {
       if (!response.data) return
       node.value.children = response.data
+      if (!childToReattach) return
+      const parentToReattachTo = node.value.children.find(
+        (node) => node.identifier === childToReattach.identifier
+      )
+      if (!parentToReattachTo) return
+      parentToReattachTo.children = childToReattach.children
+      parentToReattachTo.isExpanded = true
+      parentToReattachTo.inDirectPathMode = true
     })
   }
   if (node.value.inDirectPathMode) {
