@@ -54,7 +54,6 @@ public class SubjectFieldTransformer {
         .identifier(subjectFieldDTO.getSubjectFieldNumber())
         .text(subjectFieldDTO.getSubjectFieldText())
         .linkedFields(linkedFields)
-        .navigationTerm(subjectFieldDTO.getNavigationTerm())
         .keywords(keywords)
         .norms(norms)
         .children(new ArrayList<>())

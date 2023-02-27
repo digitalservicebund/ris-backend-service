@@ -10,7 +10,6 @@ public record FieldOfLaw(
     Boolean isLeaf,
     String identifier,
     String text,
-    String navigationTerm,
     List<String> linkedFields,
     List<Keyword> keywords,
     List<Norm> norms,
