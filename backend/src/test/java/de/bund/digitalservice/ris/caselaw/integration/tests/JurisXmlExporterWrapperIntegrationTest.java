@@ -6,12 +6,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -146,6 +148,12 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
                 .fileNumber("fileNumber")
                 .build());
+
+    ContentRelatedIndexing indexing =
+        new ContentRelatedIndexing(
+            List.of(
+                FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()));
+
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
@@ -158,6 +166,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .coreData(coreData)
             .previousDecisions(previousDecisions)
             .texts(texts)
+            .contentRelatedIndexing(indexing)
             .build();
 
     assertThat(documentUnit).hasNoNullFieldsOrProperties();

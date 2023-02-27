@@ -131,7 +131,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("SF-01"));
   }
 
@@ -190,7 +190,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("SF-01", "SF-02"));
   }
 
@@ -232,7 +232,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("SF-01"));
   }
 
@@ -292,7 +292,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("SF-01"));
   }
 
@@ -371,7 +371,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("SF-01"));
   }
 
@@ -411,7 +411,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .extracting("subjectFieldNumber")
+                    .extracting("identifier")
                     .containsExactly("SF-01"));
   }
 
