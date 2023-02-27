@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
@@ -38,6 +39,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
   private final DocumentTypeRepository documentTypeRepository;
+  private final DatabaseSubjectFieldRepository subjectFieldRepository;
+  private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -48,7 +51,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
       CourtRepository courtRepository,
       StateRepository stateRepository,
-      DocumentTypeRepository documentTypeRepository) {
+      DocumentTypeRepository documentTypeRepository,
+      DatabaseSubjectFieldRepository subjectFieldRepository,
+      DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository) {
 
     this.repository = repository;
     this.previousDecisionRepository = previousDecisionRepository;
@@ -59,18 +64,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
     this.documentTypeRepository = documentTypeRepository;
+    this.subjectFieldRepository = subjectFieldRepository;
+    this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
   }
 
   @Override
   public Mono<DocumentUnit> findByDocumentNumber(String documentNumber) {
     return repository
         .findByDocumentnumber(documentNumber)
-        .flatMap(this::injectPreviousDecisions)
-        .flatMap(this::injectFileNumbers)
-        .flatMap(this::injectDeviatingEclis)
-        .flatMap(this::injectDeviatingDecisionDates)
-        .flatMap(this::injectIncorrectCourt)
-        .flatMap(this::injectDocumentType)
+        .flatMap(this::injectAdditionalInformation)
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
@@ -80,12 +82,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> findByUuid(UUID uuid) {
     return repository
         .findByUuid(uuid)
-        .flatMap(this::injectPreviousDecisions)
-        .flatMap(this::injectFileNumbers)
-        .flatMap(this::injectDeviatingEclis)
-        .flatMap(this::injectDeviatingDecisionDates)
-        .flatMap(this::injectIncorrectCourt)
-        .flatMap(this::injectDocumentType)
+        .flatMap(this::injectAdditionalInformation)
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
@@ -592,6 +589,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> repository.deleteById(documentUnitDTO.getId()));
   }
 
+  private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
+    return injectPreviousDecisions(documentUnitDTO)
+        .flatMap(this::injectFileNumbers)
+        .flatMap(this::injectDeviatingEclis)
+        .flatMap(this::injectDeviatingDecisionDates)
+        .flatMap(this::injectIncorrectCourt)
+        .flatMap(this::injectDocumentType)
+        .flatMap(this::injectFieldsOfLaw);
+  }
+
   private Mono<DocumentUnitDTO> injectPreviousDecisions(DocumentUnitDTO documentUnitDTO) {
     return previousDecisionRepository
         .findAllByDocumentUnitId(documentUnitDTO.getId())
@@ -665,5 +672,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               documentUnitDTO.setIncorrectCourts(incorrectCourtDTOs);
               return Mono.just(documentUnitDTO);
             });
+  }
+
+  private Mono<DocumentUnitDTO> injectFieldsOfLaw(DocumentUnitDTO documentUnitDTO) {
+    return documentUnitFieldsOfLawRepository
+        .findAllByDocumentUnitId(documentUnitDTO.id)
+        .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
+        .collectList()
+        .flatMapMany(subjectFieldRepository::findAllById)
+        .collectList()
+        .map(fieldsOfLaw -> documentUnitDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
   }
 }

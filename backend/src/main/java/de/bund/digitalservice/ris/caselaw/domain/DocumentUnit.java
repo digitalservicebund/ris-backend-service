@@ -20,7 +20,8 @@ public record DocumentUnit(
     String filename,
     @Valid CoreData coreData,
     List<PreviousDecision> previousDecisions,
-    Texts texts) {
+    Texts texts,
+    ContentRelatedIndexing contentRelatedIndexing) {
   public static final DocumentUnit EMPTY =
-      new DocumentUnit(null, null, null, null, null, null, null, null, null, null);
+      new DocumentUnit(null, null, null, null, null, null, null, null, null, null, null);
 }

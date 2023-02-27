@@ -6,12 +6,15 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.time.Instant;
 import java.util.List;
 
@@ -103,6 +106,14 @@ public class DocumentUnitBuilder {
           documentUnitDTO.getIncorrectCourts().stream().map(IncorrectCourtDTO::court).toList();
     }
 
+    List<FieldOfLaw> fieldsOfLaw = null;
+    if (documentUnitDTO.getFieldsOfLaw() != null) {
+      fieldsOfLaw =
+          documentUnitDTO.getFieldsOfLaw().stream()
+              .map(SubjectFieldTransformer::transformToDomain)
+              .toList();
+    }
+
     return new DocumentUnit(
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
@@ -136,6 +147,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getTenor(),
             documentUnitDTO.getReasons(),
             documentUnitDTO.getCaseFacts(),
-            documentUnitDTO.getDecisionReasons()));
+            documentUnitDTO.getDecisionReasons()),
+        new ContentRelatedIndexing(fieldsOfLaw));
   }
 }

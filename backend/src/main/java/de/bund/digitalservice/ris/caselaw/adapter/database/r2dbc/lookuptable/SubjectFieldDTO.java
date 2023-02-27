@@ -22,7 +22,7 @@ public class SubjectFieldDTO implements Persistable<Long> {
   Long parentId;
   String changeDateMail;
   String changeDateClient;
-  char changeIndicator;
+  Character changeIndicator;
   String version;
   String subjectFieldNumber;
   String subjectFieldText;

@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -54,5 +55,17 @@ public class FieldOfLawService {
 
               return findParent(parent);
             });
+  }
+
+  public Flux<FieldOfLaw> getFieldsOfLawForDocumentUnit(UUID documentUnitUuid) {
+    return repository.findAllForDocumentUnit(documentUnitUuid);
+  }
+
+  public Flux<FieldOfLaw> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+    return repository.addFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
+  }
+
+  public Flux<FieldOfLaw> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+    return repository.removeFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
   }
 }

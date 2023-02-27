@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sub
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import java.util.UUID;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,16 +21,23 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   KeywordRepository keywordRepository;
   NormRepository normRepository;
   FieldOfLawLinkRepository fieldOfLawLinkRepository;
+  DatabaseDocumentUnitRepository databaseDocumentUnitRepository;
+  DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository;
 
   public PostgresSubjectFieldRepositoryImpl(
       DatabaseSubjectFieldRepository databaseSubjectFieldRepository,
       KeywordRepository keywordRepository,
       NormRepository normRepository,
-      FieldOfLawLinkRepository fieldOfLawLinkRepository) {
+      FieldOfLawLinkRepository fieldOfLawLinkRepository,
+      DatabaseDocumentUnitRepository databaseDocumentUnitRepository,
+      DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository) {
+
     this.databaseSubjectFieldRepository = databaseSubjectFieldRepository;
     this.keywordRepository = keywordRepository;
     this.normRepository = normRepository;
     this.fieldOfLawLinkRepository = fieldOfLawLinkRepository;
+    this.databaseDocumentUnitRepository = databaseDocumentUnitRepository;
+    this.databaseDocumentUnitFieldsOfLawRepository = databaseDocumentUnitFieldsOfLawRepository;
   }
 
   @Override
@@ -134,5 +142,83 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
               subjectFieldDTO.setLinkedFields(subjectFieldDTOS);
               return subjectFieldDTO;
             });
+  }
+
+  @Override
+  public Flux<FieldOfLaw> findAllForDocumentUnit(UUID documentUnitUuid) {
+    return databaseDocumentUnitRepository
+        .findByUuid(documentUnitUuid)
+        .map(DocumentUnitDTO::getId)
+        .flatMapMany(databaseDocumentUnitFieldsOfLawRepository::findAllByDocumentUnitId)
+        .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
+        .flatMap(databaseSubjectFieldRepository::findById)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Flux<FieldOfLaw> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+    Mono<Long> documentUnitDTOId =
+        databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
+
+    Mono<Long> fieldOfLawDTOId =
+        databaseSubjectFieldRepository
+            .findBySubjectFieldNumber(identifier)
+            .mapNotNull(SubjectFieldDTO::getId)
+            .defaultIfEmpty(-1L);
+
+    return documentUnitDTOId
+        .zipWith(fieldOfLawDTOId)
+        .flatMapMany(
+            t -> {
+              if (t.getT2() == -1L) {
+                return getLinkedFieldsOfLaw(t.getT1());
+              }
+
+              return databaseDocumentUnitFieldsOfLawRepository
+                  .findByDocumentUnitIdAndFieldOfLawId(t.getT1(), t.getT2())
+                  .switchIfEmpty(linkFieldOfLawToDocumentUnit(t.getT1(), t.getT2()))
+                  .map(DocumentUnitFieldsOfLawDTO::documentUnitId)
+                  .thenMany(getLinkedFieldsOfLaw(t.getT1()));
+            });
+  }
+
+  private Flux<FieldOfLaw> getLinkedFieldsOfLaw(Long documentUnitId) {
+    return databaseDocumentUnitFieldsOfLawRepository
+        .findAllByDocumentUnitId(documentUnitId)
+        .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
+        .flatMap(databaseSubjectFieldRepository::findById)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  private Mono<DocumentUnitFieldsOfLawDTO> linkFieldOfLawToDocumentUnit(
+      Long documentUnitId, Long fieldOfLawId) {
+
+    DocumentUnitFieldsOfLawDTO documentUnitFieldOfLaw =
+        DocumentUnitFieldsOfLawDTO.builder()
+            .documentUnitId(documentUnitId)
+            .fieldOfLawId(fieldOfLawId)
+            .build();
+    return databaseDocumentUnitFieldsOfLawRepository.save(documentUnitFieldOfLaw);
+  }
+
+  @Override
+  public Flux<FieldOfLaw> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+    Mono<Long> documentUnitDTOId =
+        databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
+
+    Mono<Long> fieldOfLawDTOId =
+        databaseSubjectFieldRepository
+            .findBySubjectFieldNumber(identifier)
+            .mapNotNull(SubjectFieldDTO::getId)
+            .defaultIfEmpty(-1L);
+
+    return documentUnitDTOId
+        .zipWith(fieldOfLawDTOId)
+        .flatMapMany(
+            t ->
+                databaseDocumentUnitFieldsOfLawRepository
+                    .findByDocumentUnitIdAndFieldOfLawId(t.getT1(), t.getT2())
+                    .flatMap(dto -> databaseDocumentUnitFieldsOfLawRepository.delete(dto))
+                    .thenMany(getLinkedFieldsOfLaw(t.getT1())));
   }
 }
