@@ -29,7 +29,7 @@ describe("SubjectTree", () => {
         data: [
           {
             identifier: "AB-01",
-            subjectFieldText: "Text for AB",
+            text: "Text for AB",
             children: [],
             norms: [],
             depth: 1,
@@ -38,7 +38,7 @@ describe("SubjectTree", () => {
           },
           {
             identifier: "CD-02",
-            subjectFieldText: "And text for CD with link to AB-01",
+            text: "And text for CD with link to AB-01",
             children: [],
             norms: [],
             linkedFields: ["AB-01"],

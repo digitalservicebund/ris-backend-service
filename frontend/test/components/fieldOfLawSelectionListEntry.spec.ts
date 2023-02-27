@@ -14,7 +14,7 @@ describe("SubjectSelectionListEntry", () => {
   it("render entry", () => {
     renderComponent({
       identifier: "ST-01-02-03",
-      subjectFieldText: "Steuerrecht 1-2-3",
+      text: "Steuerrecht 1-2-3",
     })
 
     expect(screen.getByText("ST-01-02-03")).toBeInTheDocument()
@@ -28,7 +28,7 @@ describe("SubjectSelectionListEntry", () => {
   it("click on 'Löschen' emit 'remove-from-list'", async () => {
     const { emitted } = renderComponent({
       identifier: "ST-01-02-03",
-      subjectFieldText: "Steuerrecht 1-2-3",
+      text: "Steuerrecht 1-2-3",
     })
 
     await fireEvent.click(screen.getByLabelText("Löschen"))
@@ -39,7 +39,7 @@ describe("SubjectSelectionListEntry", () => {
   it("click on 'Auswahl im Sachgebietsbaum' emit 'select-node", async () => {
     const { emitted } = renderComponent({
       identifier: "ST-01-02-03",
-      subjectFieldText: "Steuerrecht 1-2-3",
+      text: "Steuerrecht 1-2-3",
     })
 
     await fireEvent.click(screen.getByLabelText("Auswahl im Sachgebietsbaum"))

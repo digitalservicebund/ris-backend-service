@@ -105,7 +105,7 @@ function handleToggle() {
             <div class="pl-6 pt-2 subject-field-text text-blue-800">
               <TokenizeText
                 :keywords="props.node.linkedFields ?? []"
-                :text="props.node.subjectFieldText"
+                :text="props.node.text"
                 @link-token:clicked="handleTokenClick"
               />
             </div>

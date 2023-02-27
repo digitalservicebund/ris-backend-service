@@ -30,7 +30,7 @@ const emit = defineEmits<{
         </div>
       </div>
       <div class="grow label-03-reg pb-16 pt-4 text-blue-800">
-        {{ props.subject.subjectFieldText }}
+        {{ props.subject.text }}
       </div>
     </div>
     <div>

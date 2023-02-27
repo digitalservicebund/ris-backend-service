@@ -52,7 +52,7 @@ public class SubjectFieldTransformer {
         .depth(subjectFieldDTO.getDepthInTree())
         .isLeaf(subjectFieldDTO.isLeafInTree())
         .identifier(subjectFieldDTO.getSubjectFieldNumber())
-        .subjectFieldText(subjectFieldDTO.getSubjectFieldText())
+        .text(subjectFieldDTO.getSubjectFieldText())
         .linkedFields(linkedFields)
         .navigationTerm(subjectFieldDTO.getNavigationTerm())
         .keywords(keywords)

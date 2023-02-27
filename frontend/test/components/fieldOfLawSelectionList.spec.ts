@@ -29,7 +29,7 @@ describe("SubjectSelectionList", () => {
     renderComponent([
       {
         identifier: "ST-01-02-03",
-        subjectFieldText: "Steuerrecht 1-2-3",
+        text: "Steuerrecht 1-2-3",
       },
     ])
 
@@ -48,7 +48,7 @@ describe("SubjectSelectionList", () => {
     const { emitted } = renderComponent([
       {
         identifier: "ST-01-02-03",
-        subjectFieldText: "Steuerrecht 1-2-3",
+        text: "Steuerrecht 1-2-3",
       },
     ])
 
@@ -61,7 +61,7 @@ describe("SubjectSelectionList", () => {
     const { emitted } = renderComponent([
       {
         identifier: "ST-01-02-03",
-        subjectFieldText: "Steuerrecht 1-2-3",
+        text: "Steuerrecht 1-2-3",
       },
     ])
 
