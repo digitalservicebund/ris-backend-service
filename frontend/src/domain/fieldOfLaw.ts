@@ -1,7 +1,13 @@
+export type Norm = {
+  abbreviation: string
+  singleNormDescription: string
+}
+
 export type FieldOfLawNode = {
   identifier: string
   subjectFieldText: string
   linkedFields?: string[]
+  norms: Norm[]
   children: FieldOfLawNode[]
   depth: number
   isExpanded: boolean
@@ -16,6 +22,7 @@ export function buildRoot(children: FieldOfLawNode[] = []): FieldOfLawNode {
     identifier: ROOT_ID,
     subjectFieldText: "Alle Sachgebiete anzeigen",
     children: children,
+    norms: [],
     depth: 0,
     isExpanded: false,
     isLeaf: false,

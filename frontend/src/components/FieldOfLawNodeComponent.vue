@@ -8,6 +8,7 @@ interface Props {
   selectedSubjects: FieldOfLawNode[]
   node: FieldOfLawNode
   selected: boolean
+  showNorms: boolean
 }
 
 const props = defineProps<Props>()
@@ -95,15 +96,30 @@ function handleToggle() {
           </span>
         </button>
       </div>
-      <div v-if="node.identifier !== ROOT_ID" class="identifier pl-8">
-        {{ node.identifier }}
-      </div>
-      <div class="pl-6 pt-2 subject-field-text text-blue-800">
-        <TokenizeText
-          :keywords="props.node.linkedFields ?? []"
-          :text="props.node.subjectFieldText"
-          @link-token:clicked="handleTokenClick"
-        />
+      <div>
+        <div class="flex flex-col">
+          <div class="flex flex-row">
+            <div v-if="node.identifier !== ROOT_ID" class="identifier pl-8">
+              {{ node.identifier }}
+            </div>
+            <div class="pl-6 pt-2 subject-field-text text-blue-800">
+              <TokenizeText
+                :keywords="props.node.linkedFields ?? []"
+                :text="props.node.subjectFieldText"
+                @link-token:clicked="handleTokenClick"
+              />
+            </div>
+          </div>
+        </div>
+        <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
+          <div class="flex flex-row flex-wrap">
+            <span v-for="(norm, idx) in node.norms" :key="idx">
+              <strong>{{ norm.abbreviation }}</strong>
+              {{ norm.singleNormDescription
+              }}{{ idx < node.norms.length - 1 ? ",&nbsp;" : "" }}
+            </span>
+          </div>
+        </div>
       </div>
     </div>
     <div v-if="node.isExpanded && node.children.length">
@@ -117,6 +133,7 @@ function handleToggle() {
           )
         "
         :selected-subjects="selectedSubjects"
+        :show-norms="showNorms"
         @linked-field:clicked="emit('linkedField:clicked', $event)"
         @node:select="emit('node:select', $event)"
         @node:unselect="emit('node:unselect', $event)"

@@ -17,6 +17,7 @@ const emit = defineEmits<{
 }>()
 
 const root = ref(buildRoot())
+const showNorms = ref(false)
 
 const clicked = computed(() => props.clickedIdentifier)
 watch(clicked, () => buildDirectPathTreeTo(clicked.value))
@@ -49,9 +50,27 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
 
   emit("reset-clicked-node")
 }
+
+function handleShowNormsToggle() {
+  showNorms.value = !showNorms.value
+}
 </script>
 
 <template>
+  <button
+    aria-label="Normen anzeigen"
+    class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 mb-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
+    @click="handleShowNormsToggle"
+  >
+    <span
+      v-if="showNorms"
+      aria-label="Sachgebiet entfernen"
+      class="material-icons selected-icon"
+    >
+      done
+    </span>
+  </button>
+  <span class="pl-8">Normen anzeigen</span>
   <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
   <FieldOfLawNodeComponent
     :key="root.identifier"
@@ -62,8 +81,15 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
       )
     "
     :selected-subjects="selectedSubjects"
+    :show-norms="showNorms"
     @linked-field:clicked="handleLinkedFieldClicked"
     @node:select="handleSelect"
     @node:unselect="handleUnselect"
   />
 </template>
+
+<style lang="scss" scoped>
+.selected-icon {
+  font-size: 20px;
+}
+</style>
