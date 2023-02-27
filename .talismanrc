@@ -15,6 +15,8 @@ fileignoreconfig:
     checksum: 195fd6fc34a52689c163ba3e36f8038eb4d890bfe3533799563c94485adb25ce
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/ExportNormControllerTest.kt
     checksum: 97d34a8d5f7c383fa7b08f398885fe949ca2ccfd85a877839cac30920f955336
+  - filename: '*.sql'
+    ignore_detectors: [filename]
 
 scopeconfig:
   - scope: node
