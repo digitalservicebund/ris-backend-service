@@ -13,7 +13,21 @@ public interface DocumentTypeRepository extends R2dbcRepository<DocumentTypeDTO,
 
   Flux<DocumentTypeDTO> findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc(char documentType);
 
+  // see query explanation in CourtRepository, it's almost the same
   @Query(
-      "SELECT * FROM lookuptable_documenttype WHERE UPPER(CONCAT(juris_shortcut, ' ', label)) LIKE UPPER('%'||:searchStr||'%') AND document_type = 'R' ORDER BY juris_shortcut, label")
+      "WITH label_added AS (SELECT *, "
+          + "                            UPPER(CONCAT(juris_shortcut, ' ', label)) AS concat"
+          + "                     from lookuptable_documenttype) "
+          + "SELECT *,"
+          + "       concat, "
+          + "       CASE "
+          + "           WHEN concat LIKE UPPER(:searchStr||'%') THEN 1 "
+          + "           WHEN concat LIKE UPPER('% '||:searchStr||'%') THEN 2 "
+          + "           WHEN concat LIKE UPPER('%-'||:searchStr||'%') THEN 2 "
+          + "           ELSE 3 "
+          + "           END AS weight "
+          + "FROM label_added "
+          + "WHERE concat LIKE UPPER('%'||:searchStr||'%') AND document_type = 'R' "
+          + "ORDER BY weight, concat")
   Flux<DocumentTypeDTO> findCaselawBySearchStr(String searchStr);
 }
