@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { ValidationError } from "@/domain"
 
@@ -7,6 +7,7 @@ interface Props {
   id: string
   value?: string[]
   modelValue?: string[]
+  asBottomList?: boolean
   ariaLabel: string
   placeholder?: string
   validationError?: ValidationError
@@ -26,6 +27,12 @@ const currentInput = ref<string>("")
 const currentInputField = ref<HTMLInputElement>()
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
+const inputWrapper = computed(() => ({
+  "input flex-row-reverse": !props.asBottomList,
+}))
+const inputField = computed(() => ({
+  "input mb-[0.5rem]": props.asBottomList,
+}))
 
 function updateModelValue() {
   emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
@@ -116,8 +123,26 @@ const handleOnBlur = () => {
 </script>
 
 <template>
-  <div class="bg-white input">
-    <div ref="containerRef" class="flex flex-row flex-wrap" tabindex="-1">
+  <div :class="inputWrapper">
+    <input
+      :id="id"
+      ref="currentInputField"
+      v-model="currentInput"
+      :aria-label="ariaLabel"
+      :class="inputField"
+      type="text"
+      @blur="handleOnBlur"
+      @input="emitInputEvent"
+      @keydown.delete="backspaceDelete"
+      @keypress.enter="saveChip"
+      @keyup.left="focusPrevious"
+      @keyup.right="focusNext"
+    />
+    <div
+      ref="containerRef"
+      class="flex flex-row flex-wrap items-center"
+      tabindex="-1"
+    >
       <div
         v-for="(chip, i) in chips"
         :key="i"
@@ -144,20 +169,6 @@ const handleOnBlur = () => {
         </div>
       </div>
     </div>
-
-    <input
-      :id="id"
-      ref="currentInputField"
-      v-model="currentInput"
-      :aria-label="ariaLabel"
-      type="text"
-      @blur="handleOnBlur"
-      @input="emitInputEvent"
-      @keydown.delete="backspaceDelete"
-      @keypress.enter="saveChip"
-      @keyup.left="focusPrevious"
-      @keyup.right="focusNext"
-    />
   </div>
 </template>
 
@@ -168,7 +179,8 @@ const handleOnBlur = () => {
   min-height: 3.75rem;
   flex-wrap: wrap;
   align-content: space-between;
-  padding: 12px 16px 4px;
+  padding: 8px 16px;
+  background-color: white;
   @apply border-2 border-solid border-blue-800;
 
   &:focus {
@@ -183,51 +195,51 @@ const handleOnBlur = () => {
     @apply shadow-white text-inherit;
   }
 
-  .chip {
-    display: flex;
-    align-items: center;
-    border-radius: 10px;
-    margin: 0 8px 8px 0;
-    word-break: break-word;
-
-    .icon-wrapper {
-      display: flex;
-      height: 100%;
-      align-items: center;
-      padding: 4px 3px;
-      border-radius: 0 10px 10px 0;
-
-      em {
-        cursor: pointer;
-        text-align: center;
-      }
-    }
-
-    .label-wrapper {
-      display: flex;
-      padding: 3px 0 3px 8px;
-      margin-right: 8px;
-    }
-
-    &:focus {
-      outline: none;
-
-      .icon-wrapper {
-        @apply bg-blue-900;
-
-        em {
-          color: white;
-        }
-      }
-    }
-  }
-
   input {
     width: 30px;
     flex: 1 1 auto;
+    padding: 4px;
     border: none;
-    margin-bottom: 8px;
     outline: none;
+  }
+}
+
+.chip {
+  display: flex;
+  align-items: center;
+  border-radius: 10px;
+  margin: 4px;
+  word-break: break-word;
+
+  .icon-wrapper {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    padding: 4px 3px;
+    border-radius: 0 10px 10px 0;
+
+    em {
+      cursor: pointer;
+      text-align: center;
+    }
+  }
+
+  .label-wrapper {
+    display: flex;
+    padding: 3px 0 3px 8px;
+    margin-right: 8px;
+  }
+
+  &:focus {
+    outline: none;
+
+    .icon-wrapper {
+      @apply bg-blue-900;
+
+      em {
+        color: white;
+      }
+    }
   }
 }
 </style>
