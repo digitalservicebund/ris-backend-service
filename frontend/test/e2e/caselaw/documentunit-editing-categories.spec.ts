@@ -309,8 +309,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
       await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
     ).toBe("2022-02-03")
 
-    //when using the .fill() method, we need 4 tabs to leave the field for firefox
-    await page.keyboard.press("Tab")
+    //when using the .fill() method, we need 3 tabs to leave the field
     await page.keyboard.press("Tab")
     await page.keyboard.press("Tab")
     await page.keyboard.press("Tab")
@@ -329,7 +328,6 @@ test.describe("ensuring the editing experience in categories is as expected", ()
       await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
     ).toBe("2022-02-03")
 
-    await page.keyboard.press("Tab")
     await page.keyboard.press("Tab")
     await page.keyboard.press("Tab")
     await page.keyboard.press("Tab")
