@@ -2,6 +2,7 @@
 import { ref } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
+import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
@@ -59,13 +60,18 @@ function handleLinkedFieldClicked(identifier: string) {
   <div class="bg-gray-100 flex flex-col p-20">
     <h1 class="heading-03-regular mb-[1rem]">Sachgebiete</h1>
     <div class="flex flex-row">
-      <div class="bg-white flex-1 p-20">
-        <FieldOfLawSelectionList
-          :selected-fields-of-law="selectedFieldsOfLaw"
-          @linked-field:clicked="handleLinkedFieldClicked"
-          @node-clicked="handleNodeClicked"
-          @remove-from-list="handleRemoveByIdentifier"
-        ></FieldOfLawSelectionList>
+      <div class="bg-white flex flex-1 flex-col p-20">
+        <div class="p-20">
+          <FieldOfLawSelectionList
+            :selected-fields-of-law="selectedFieldsOfLaw"
+            @linked-field:clicked="handleLinkedFieldClicked"
+            @node-clicked="handleNodeClicked"
+            @remove-from-list="handleRemoveByIdentifier"
+          ></FieldOfLawSelectionList>
+        </div>
+        <div class="p-20">
+          <FieldOfLawSearch />
+        </div>
       </div>
       <div class="bg-white flex-1 p-20">
         <FieldOfLawTree
