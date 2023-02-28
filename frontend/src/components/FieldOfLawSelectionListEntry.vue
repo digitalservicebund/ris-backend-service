@@ -1,11 +1,17 @@
 <script lang="ts" setup>
+import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{ node: FieldOfLawNode }>()
 const emit = defineEmits<{
   (event: "remove-from-list"): void
   (event: "node-clicked"): void
+  (event: "linkedField:clicked", identifier: string): void
 }>()
+
+function handleTokenClick(tokenContent: string) {
+  emit("linkedField:clicked", tokenContent)
+}
 </script>
 
 <template>
@@ -23,7 +29,11 @@ const emit = defineEmits<{
         </div>
       </div>
       <div class="grow label-03-reg pb-16 pt-4 text-blue-800">
-        {{ props.node.text }}
+        <TokenizeText
+          :keywords="props.node.linkedFields ?? []"
+          :text="props.node.text"
+          @link-token:clicked="handleTokenClick"
+        />
       </div>
     </div>
     <div>

@@ -8,7 +8,12 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: "remove-from-list", index: number): void
   (event: "node-clicked", node: FieldOfLawNode): void
+  (event: "linkedField:clicked", identifier: string): void
 }>()
+
+function handleLinkedFieldClicked(identifier: string) {
+  emit("linkedField:clicked", identifier)
+}
 </script>
 
 <template>
@@ -19,6 +24,7 @@ const emit = defineEmits<{
       v-for="(node, index) in props.selectedNodes"
       :key="node.identifier"
       :node="node"
+      @linked-field:clicked="handleLinkedFieldClicked"
       @node-clicked="emit('node-clicked', node)"
       @remove-from-list="emit('remove-from-list', index)"
     />

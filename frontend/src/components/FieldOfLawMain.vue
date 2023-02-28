@@ -46,6 +46,7 @@ function handleLinkedFieldClicked(identifier: string) {
       <div class="bg-white flex-1 p-20">
         <FieldOfLawSelectionList
           :selected-nodes="selectedNodes"
+          @linked-field:clicked="handleLinkedFieldClicked"
           @node-clicked="handleNodeClicked"
           @remove-from-list="handleRemoveByIndex"
         ></FieldOfLawSelectionList>
