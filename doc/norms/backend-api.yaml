@@ -313,6 +313,8 @@ components:
           type: string
           example: 867d0a6301f1276bac069e00c7cc196bb15eea3f962ce5a86c256616ef0773fe
           description: SHA-256 hash of the file content
+        createdAt:
+          $ref: '#/components/schemas/Date'
     Norm:
       allOf:
         - $ref: '#/components/schemas/NormFrame'

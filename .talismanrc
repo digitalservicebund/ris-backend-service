@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml
-    checksum: 904315e13b09256d4c2b62c7de9a0efe53fd1963b241fb8879fab443c84aa072
+    checksum: d382fce7f32a211c625ee5b5a709a6635cbf136f522a4d5a3bc6198db7f43b7b
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: fe981dfd7bc8d7d9bdce66029383faf687de89c919048f8e0919954b33a50ea4
   - filename: backend/build.gradle
