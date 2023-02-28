@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
 import com.ninjasquad.springmockk.MockkBean
-import de.bund.digitalservice.ris.norms.application.port.input.ExportNormUseCase
+import de.bund.digitalservice.ris.norms.application.port.input.GetFileUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.GetFileOutputPort
 import io.mockk.every
 import io.mockk.slot
@@ -20,12 +20,12 @@ import java.nio.ByteBuffer
 import java.util.*
 
 @ExtendWith(SpringExtension::class)
-@WebFluxTest(controllers = [ExportNormController::class])
+@WebFluxTest(controllers = [GetFileController::class])
 @WithMockUser
-class ExportNormControllerTest {
+class GetFileControllerTest {
     @Autowired lateinit var webClient: WebTestClient
 
-    @MockkBean lateinit var exportNormService: ExportNormUseCase
+    @MockkBean lateinit var getFileService: GetFileUseCase
 
     @MockkBean lateinit var getFileOutputPort: GetFileOutputPort
 
@@ -37,7 +37,7 @@ class ExportNormControllerTest {
 
     @Test
     fun `it calls the export norm service with the correct command`() {
-        every { exportNormService.exportNorm(any()) } returns Mono.empty()
+        every { getFileService.getFile(any()) } returns Mono.empty()
 
         webClient
             .mutateWith(csrf())
@@ -45,15 +45,15 @@ class ExportNormControllerTest {
             .uri(uriExample)
             .exchange()
 
-        val query = slot<ExportNormUseCase.Command>()
-        verify(exactly = 1) { exportNormService.exportNorm(capture(query)) }
+        val query = slot<GetFileUseCase.Command>()
+        verify(exactly = 1) { getFileService.getFile(capture(query)) }
         assertThat(query.captured.guid.toString()).isEqualTo(guidExample)
         assertThat(query.captured.hash).isEqualTo(hashExample)
     }
 
     @Test
     fun `it responds with file`() {
-        every { exportNormService.exportNorm(any()) } returns Mono.just(file.array())
+        every { getFileService.getFile(any()) } returns Mono.just(file.array())
 
         webClient
             .mutateWith(csrf())
@@ -68,7 +68,7 @@ class ExportNormControllerTest {
 
     @Test
     fun `it sends an internal error response if the export norm service throws an exception`() {
-        every { exportNormService.exportNorm(any()) } throws Error()
+        every { getFileService.getFile(any()) } throws Error()
 
         webClient
             .mutateWith(csrf())

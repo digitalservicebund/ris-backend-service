@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia"
 import { computed } from "vue"
 import TextButton from "@/components/TextButton.vue"
-import { exportNorm } from "@/services/normsService"
+import { getFileUrl } from "@/services/normsService"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const store = useLoadedNormStore()
@@ -17,7 +17,7 @@ const fileName = computed(() => fileReference.value?.name)
 
 const downloadUrl = computed(() =>
   loadedNorm.value && fileReference.value
-    ? exportNorm(loadedNorm.value.guid, fileReference.value.hash)
+    ? getFileUrl(loadedNorm.value.guid, fileReference.value.hash)
     : undefined
 )
 

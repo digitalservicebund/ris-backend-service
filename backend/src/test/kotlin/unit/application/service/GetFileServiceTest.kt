@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.service
 
-import de.bund.digitalservice.ris.norms.application.port.input.ExportNormUseCase
+import de.bund.digitalservice.ris.norms.application.port.input.GetFileUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.GetFileOutputPort
 import io.mockk.every
 import io.mockk.mockk
@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
 import java.util.*
 
-class ExportNormServiceTest {
+class GetFileServiceTest {
 
     private val file: ByteBuffer = ByteBuffer.allocate(0)
 
@@ -21,12 +21,12 @@ class ExportNormServiceTest {
     @Test
     fun `it should call the get file outport port with the correct parameter`() {
         val getFileAdapter = mockk<GetFileOutputPort>()
-        val service = ExportNormService(getFileAdapter)
-        val command = ExportNormUseCase.Command(UUID.fromString(guidExample), hashExample)
+        val service = GetFileService(getFileAdapter)
+        val command = GetFileUseCase.Command(UUID.fromString(guidExample), hashExample)
 
         every { getFileAdapter.getFile(any()) } returns Mono.just(file.array())
 
-        service.exportNorm(command).block()
+        service.getFile(command).block()
 
         verify(exactly = 1) {
             getFileAdapter.getFile(withArg { assertThat(it.hash).isEqualTo(hashExample) })
@@ -36,12 +36,12 @@ class ExportNormServiceTest {
     @Test
     fun `it should retrieve the file from the bucket`() {
         val getFileAdapter = mockk<GetFileOutputPort>()
-        val service = ExportNormService(getFileAdapter)
-        val command = ExportNormUseCase.Command(UUID.fromString(guidExample), hashExample)
+        val service = GetFileService(getFileAdapter)
+        val command = GetFileUseCase.Command(UUID.fromString(guidExample), hashExample)
 
         every { getFileAdapter.getFile(any()) } returns Mono.just(file.array())
 
-        val file = service.exportNorm(command).block()
+        val file = service.getFile(command).block()
 
         assertThat(file).isEqualTo(file)
     }
@@ -49,13 +49,13 @@ class ExportNormServiceTest {
     @Test
     fun `it throws an error if file can not be downloaded from bucket`() {
         val getFileAdapter = mockk<GetFileOutputPort>()
-        val service = ExportNormService(getFileAdapter)
-        val command = ExportNormUseCase.Command(UUID.fromString(guidExample), hashExample)
+        val service = GetFileService(getFileAdapter)
+        val command = GetFileUseCase.Command(UUID.fromString(guidExample), hashExample)
 
         every { getFileAdapter.getFile(any()) } throws Exception("Error occurred")
 
         try {
-            service.exportNorm(command).block()
+            service.getFile(command).block()
         } catch (exception: Exception) {
             assertThat(exception.message).contains("Error occurred")
         }

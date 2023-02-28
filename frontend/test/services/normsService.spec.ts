@@ -1,7 +1,7 @@
 import httpClient from "@/services/httpClient"
 import {
   editNormFrame,
-  exportNorm,
+  getFileUrl,
   getAllNorms,
   getNormByGuid,
   importNorm,
@@ -349,7 +349,7 @@ describe("normsService", () => {
 
   describe("export norm", () => {
     it("builds the url for downloading the file", async () => {
-      const url = exportNorm("fake-guid", "fake-hash")
+      const url = getFileUrl("fake-guid", "fake-hash")
 
       expect(url).toBe("/api/v1/norms/fake-guid/files/fake-hash")
     })
