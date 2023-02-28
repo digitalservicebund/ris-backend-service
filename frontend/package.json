@@ -63,7 +63,7 @@
     "@babel/core": "^7.21.0",
     "@namics/stylelint-bem": "^8.1.0",
     "@playwright/test": "^1.31.1",
-    "@testing-library/dom": "^8.20.0",
+    "@testing-library/dom": "^9.0.0",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/user-event": "^14.4.3",
     "@testing-library/vue": "^6.6.1",
