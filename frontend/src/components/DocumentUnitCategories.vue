@@ -216,7 +216,10 @@ onUnmounted(() => {
           @update-value="handleUpdateValueDocumentUnitTexts"
         />
 
-        <DocumentUnitContentRelatedIndexing id="contentRelatedIndexing" />
+        <DocumentUnitContentRelatedIndexing
+          id="contentRelatedIndexing"
+          :document-unit="props.documentUnit"
+        />
       </div>
 
       <div

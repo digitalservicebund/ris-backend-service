@@ -3,10 +3,10 @@ import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 function renderComponent(
-  selectedNodes: Partial<FieldOfLawNode>[]
+  selectedFieldsOfLaw: Partial<FieldOfLawNode>[]
 ): RenderResult {
   const props = {
-    selectedNodes: selectedNodes,
+    selectedFieldsOfLaw,
   }
 
   return render(FieldOfLawSelectionList, { props })

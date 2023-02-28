@@ -2,9 +2,9 @@ import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
 import FieldOfLawSelectionListEntry from "@/components/FieldOfLawSelectionListEntry.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-function renderComponent(node: Partial<FieldOfLawNode>): RenderResult {
+function renderComponent(fieldOfLaw: Partial<FieldOfLawNode>): RenderResult {
   const props = {
-    node: node,
+    fieldOfLaw,
   }
 
   return render(FieldOfLawSelectionListEntry, { props })
