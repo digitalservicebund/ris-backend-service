@@ -20,6 +20,7 @@ function handleTokenClick(tokenContent: string) {
       <div class="flex">
         <div class="label-02-reg pt-8 text-blue-800">
           <span
+            aria-label="Auswahl im Sachgebietsbaum"
             class="link"
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"

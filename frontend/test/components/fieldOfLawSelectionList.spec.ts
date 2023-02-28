@@ -3,16 +3,16 @@ import FieldOfLawSelectionList from "@/components/FieldOfLawSelectionList.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 function renderComponent(
-  selectedSubjects: Partial<FieldOfLawNode>[]
+  selectedNodes: Partial<FieldOfLawNode>[]
 ): RenderResult {
   const props = {
-    selectedSubjects,
+    selectedNodes: selectedNodes,
   }
 
   return render(FieldOfLawSelectionList, { props })
 }
 
-describe("SubjectSelectionList", () => {
+describe("FieldOfLawSelectionList", () => {
   it("check headline", () => {
     renderComponent([])
 

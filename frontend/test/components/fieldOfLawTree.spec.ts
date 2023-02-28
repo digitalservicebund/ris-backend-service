@@ -7,18 +7,18 @@ import FieldOfLawService from "@/services/fieldOfLawService"
 
 function renderComponent(
   options: {
-    selectedSubjects?: FieldOfLawNode[]
+    selectedNodes?: FieldOfLawNode[]
   } = {}
 ) {
   return render(FieldOfLawTreeVue, {
     props: {
-      selectedSubjects: options.selectedSubjects ?? [],
+      selectedNodes: options.selectedNodes ?? [],
       clickedIdentifier: "",
     },
   })
 }
 
-describe("SubjectTree", () => {
+describe("FieldOfLawTree", () => {
   const user = userEvent.setup()
 
   const fetchSpy = vi
