@@ -11,10 +11,6 @@ fileignoreconfig:
     checksum: fe981dfd7bc8d7d9bdce66029383faf687de89c919048f8e0919954b33a50ea4
   - filename: backend/build.gradle
     checksum: a248070f2d05ba2e2b13ca75e41aa3ec6567023890f96dcd6c5bb50d2bf95c67
-  - filename: backend/src/test/kotlin/unit/application/service/ExportNormServiceTest.kt
-    checksum: 195fd6fc34a52689c163ba3e36f8038eb4d890bfe3533799563c94485adb25ce
-  - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/ExportNormControllerTest.kt
-    checksum: 97d34a8d5f7c383fa7b08f398885fe949ca2ccfd85a877839cac30920f955336
   - filename: '*.sql'
     ignore_detectors: [filename]
 
