@@ -72,6 +72,8 @@ paths:
           in: header
           description: Filename used for storing the zip in the system
           required: true
+          schema:
+            type: string
           example: "norm.zip"
       requestBody:
         required: true
