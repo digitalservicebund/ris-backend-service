@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-const props = defineProps<{ subject: FieldOfLawNode }>()
+const props = defineProps<{ node: FieldOfLawNode }>()
 const emit = defineEmits<{
   (event: "remove-from-list"): void
   (event: "node-clicked"): void
@@ -18,12 +18,12 @@ const emit = defineEmits<{
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"
           >
-            {{ props.subject.identifier }}
+            {{ props.node.identifier }}
           </span>
         </div>
       </div>
       <div class="grow label-03-reg pb-16 pt-4 text-blue-800">
-        {{ props.subject.text }}
+        {{ props.node.text }}
       </div>
     </div>
     <div>

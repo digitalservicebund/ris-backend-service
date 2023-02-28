@@ -4,17 +4,15 @@ import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-const selectedSubjects = ref<FieldOfLawNode[]>([])
+const selectedNodes = ref<FieldOfLawNode[]>([])
 const clickedIdentifier = ref("")
 
 const getIndex = (_identifier: string) =>
-  selectedSubjects.value.findIndex(
-    ({ identifier }) => identifier == _identifier
-  )
+  selectedNodes.value.findIndex(({ identifier }) => identifier == _identifier)
 
 function handleAdd(node: FieldOfLawNode) {
   if (getIndex(node.identifier) == -1) {
-    selectedSubjects.value.push(node)
+    selectedNodes.value.push(node)
   }
 }
 
@@ -25,7 +23,7 @@ function handleRemoveByIdentifier(identifier: string) {
 }
 
 function handleRemoveByIndex(index: number) {
-  selectedSubjects.value.splice(index, 1)
+  selectedNodes.value.splice(index, 1)
 }
 
 function handleNodeClicked(node: FieldOfLawNode) {
@@ -47,7 +45,7 @@ function handleLinkedFieldClicked(identifier: string) {
     <div class="flex flex-row">
       <div class="bg-white flex-1 p-20">
         <FieldOfLawSelectionList
-          :selected-subjects="selectedSubjects"
+          :selected-nodes="selectedNodes"
           @node-clicked="handleNodeClicked"
           @remove-from-list="handleRemoveByIndex"
         ></FieldOfLawSelectionList>
@@ -55,7 +53,7 @@ function handleLinkedFieldClicked(identifier: string) {
       <div class="bg-white flex-1 p-20">
         <FieldOfLawTree
           :clicked-identifier="clickedIdentifier"
-          :selected-subjects="selectedSubjects"
+          :selected-nodes="selectedNodes"
           @add-to-list="handleAdd"
           @linked-field:clicked="handleLinkedFieldClicked"
           @remove-from-list="handleRemoveByIdentifier"

@@ -5,7 +5,7 @@ import { buildRoot, getDescendants, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 const props = defineProps<{
-  selectedSubjects: FieldOfLawNode[]
+  selectedNodes: FieldOfLawNode[]
   clickedIdentifier: string
 }>()
 
@@ -76,11 +76,11 @@ function handleShowNormsToggle() {
     :key="root.identifier"
     :node="root"
     :selected="
-      props.selectedSubjects.some(
+      props.selectedNodes.some(
         ({ identifier }) => identifier === root.identifier
       )
     "
-    :selected-subjects="selectedSubjects"
+    :selected-nodes="selectedNodes"
     :show-norms="showNorms"
     @linked-field:clicked="handleLinkedFieldClicked"
     @node:select="handleSelect"

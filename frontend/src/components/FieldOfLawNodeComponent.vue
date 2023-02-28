@@ -5,7 +5,7 @@ import { ROOT_ID, FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 interface Props {
-  selectedSubjects: FieldOfLawNode[]
+  selectedNodes: FieldOfLawNode[]
   node: FieldOfLawNode
   selected: boolean
   showNorms: boolean
@@ -125,11 +125,11 @@ function handleToggle() {
         :key="child.identifier"
         :node="child"
         :selected="
-          props.selectedSubjects.some(
+          props.selectedNodes.some(
             ({ identifier }) => identifier === child.identifier
           )
         "
-        :selected-subjects="selectedSubjects"
+        :selected-nodes="selectedNodes"
         :show-norms="showNorms"
         @linked-field:clicked="emit('linkedField:clicked', $event)"
         @node:select="emit('node:select', $event)"
