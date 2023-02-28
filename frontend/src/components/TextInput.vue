@@ -11,11 +11,13 @@ interface Props {
   placeholder?: string
   validationError?: ValidationError
   readOnly?: boolean
+  fullHeight?: boolean
 }
 
 interface Emits {
   (event: "update:modelValue", value: string | undefined): void
   (event: "input", value: Event): void
+  (event: "enter-released"): void
 }
 
 const props = defineProps<Props>()
@@ -29,6 +31,7 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 const conditionalClasses = computed(() => ({
   input__error: props.validationError,
   input__readonly: props.readOnly,
+  input__fullheight: props.fullHeight,
 }))
 
 const tabindex = computed(() => (props.readOnly ? -1 : 0))
@@ -46,6 +49,7 @@ const tabindex = computed(() => (props.readOnly ? -1 : 0))
     :tabindex="tabindex"
     type="text"
     @input="emitInputEvent"
+    @keyup.enter="emit('enter-released')"
   />
 </template>
 
@@ -78,6 +82,10 @@ const tabindex = computed(() => (props.readOnly ? -1 : 0))
     &:focus {
       @apply outline-none;
     }
+  }
+
+  &__fullheight {
+    @apply h-full;
   }
 }
 
