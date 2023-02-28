@@ -60,7 +60,7 @@
     "webfontloader": "^1.6.28"
   },
   "devDependencies": {
-    "@babel/core": "^7.20.12",
+    "@babel/core": "^7.21.0",
     "@namics/stylelint-bem": "^8.0.0",
     "@playwright/test": "^1.30.0",
     "@testing-library/dom": "^8.20.0",
