@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",
-    "@namics/stylelint-bem": "^8.0.0",
+    "@namics/stylelint-bem": "^8.1.0",
     "@playwright/test": "^1.30.0",
     "@testing-library/dom": "^8.20.0",
     "@testing-library/jest-dom": "^5.16.5",
