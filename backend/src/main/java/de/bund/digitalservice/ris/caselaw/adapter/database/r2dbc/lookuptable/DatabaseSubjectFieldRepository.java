@@ -18,8 +18,8 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
   Flux<SubjectFieldDTO> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber);
 
-  @Query( // TODO  schlagworte und normen mit durchsuchen?
-      "SELECT * FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_text, ' ', subject_field_number, ' ', navigation_term)) LIKE UPPER('%'||:searchStr||'%') ORDER BY subject_field_number")
+  @Query( // Schlagworte und Normen mit durchsuchen?
+      "SELECT * FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%') ORDER BY subject_field_number OFFSET 0 LIMIT 10")
   Flux<SubjectFieldDTO> findBySearchStr(String searchStr);
 
   Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc();

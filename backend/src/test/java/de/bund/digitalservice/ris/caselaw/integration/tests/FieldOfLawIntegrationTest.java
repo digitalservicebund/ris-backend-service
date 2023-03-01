@@ -75,7 +75,7 @@ class FieldOfLawIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/fieldsoflaw?q=FL")
+        .uri("/api/v1/caselaw/fieldsoflaw?searchStr=FL")
         .exchange()
         .expectStatus()
         .isOk()

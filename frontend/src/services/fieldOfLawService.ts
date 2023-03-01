@@ -17,6 +17,9 @@ interface FieldOfLawService {
   getTreeForIdentifier(
     identifier: string
   ): Promise<ServiceResponse<FieldOfLawNode>>
+  searchForFieldsOfLaw(
+    searchStr: string
+  ): Promise<ServiceResponse<FieldOfLawNode[]>>
 }
 
 const service: FieldOfLawService = {
@@ -77,6 +80,18 @@ const service: FieldOfLawService = {
     if (response.status >= 300) {
       response.error = {
         title: "Pfad zu ausgewähltem Sachgebiet konnte nicht geladen werden.",
+      }
+    }
+    return response
+  },
+  async searchForFieldsOfLaw(searchStr: string) {
+    const response = await httpClient.get<FieldOfLawNode[]>(
+      `caselaw/fieldsoflaw`,
+      { params: { searchStr: searchStr } }
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: "Die Suche nach Sachgebieten konnte nicht ausgeführt werden.",
       }
     }
     return response

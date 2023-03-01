@@ -47,7 +47,7 @@ class FieldOfLawControllerTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/fieldsoflaw?q=root")
+        .uri("/api/v1/caselaw/fieldsoflaw?searchStr=root")
         .exchange()
         .expectStatus()
         .isOk();

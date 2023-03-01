@@ -20,8 +20,8 @@ public class FieldOfLawController {
   }
 
   @GetMapping
-  public Flux<FieldOfLaw> getFieldsOfLawBySearchQuery(@RequestParam Optional<String> q) {
-    return service.getFieldsOfLawBySearchQuery(q);
+  public Flux<FieldOfLaw> getFieldsOfLawBySearchQuery(@RequestParam Optional<String> searchStr) {
+    return service.getFieldsOfLawBySearchQuery(searchStr);
   }
 
   @GetMapping(value = "{subjectFieldNumber}/children")
