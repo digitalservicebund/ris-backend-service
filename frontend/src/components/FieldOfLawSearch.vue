@@ -10,12 +10,14 @@ const searchStr = ref("")
 const results = ref<FieldOfLawNode[]>([])
 
 function submitSearch() {
-  console.log(searchStr.value)
-
   FieldOfLawService.searchForFieldsOfLaw(searchStr.value).then((response) => {
     if (!response.data) return
     results.value = response.data
   })
+}
+
+function handlePagination(backwards: boolean) {
+  console.log(backwards)
 }
 </script>
 
@@ -52,10 +54,31 @@ function submitSearch() {
         <TokenizeText :keywords="node.linkedFields ?? []" :text="node.text" />
       </div>
     </div>
+    <div class="flex flex-row justify-center">
+      <div
+        class="link pr-6"
+        @click="handlePagination(true)"
+        @keyup.enter="handlePagination(true)"
+      >
+        zurück
+      </div>
+      <div
+        class="link pl-6"
+        @click="handlePagination(false)"
+        @keyup.enter="handlePagination(false)"
+      >
+        vor
+      </div>
+    </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.link {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .identifier {
   font-size: 16px;
   white-space: nowrap;
