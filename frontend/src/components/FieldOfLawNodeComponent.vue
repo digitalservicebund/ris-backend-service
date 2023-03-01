@@ -71,7 +71,9 @@ function handleToggle() {
           class="bg-blue-200 material-icons rounded-full text-blue-800 w-icon"
           @click="handleToggle"
         >
-          {{ canLoadMoreChildren() ? "add" : "remove" }}
+          {{
+            canLoadMoreChildren() || !props.node.isExpanded ? "add" : "remove"
+          }}
         </button>
       </div>
       <div v-if="node.identifier !== ROOT_ID">
