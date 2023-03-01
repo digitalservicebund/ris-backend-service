@@ -113,6 +113,9 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(page.getByText("abc").first()).toBeVisible()
     await page.locator("[aria-label='Stammdaten Speichern Button']").click()
 
+    // somehow this test is flaky and we need to add a small timeout (<=50ms)
+    // before filling the date field
+    await page.waitForTimeout(50) // eslint-disable-line playwright/no-wait-for-timeout
     await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
     expect(
       await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
@@ -140,7 +143,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       page.locator("text=Zuletzt gespeichert um").first()
     ).toBeVisible()
     await navigateToPublication(page, documentNumber)
-
     await expect(
       page.locator("text=Alle Pflichtfelder sind korrekt ausgefüllt")
     ).toBeVisible()
