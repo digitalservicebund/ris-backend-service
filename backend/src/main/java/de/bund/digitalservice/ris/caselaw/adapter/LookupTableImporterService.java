@@ -135,7 +135,7 @@ public class LookupTableImporterService {
       courtsXML = mapper.readValue(byteBufferToArray(byteBuffer), CourtsXML.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
-          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to DocumentTypesXML", e);
+          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to CourtsXML", e);
     }
 
     List<CourtDTO> courtsDTO =
