@@ -40,7 +40,7 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Sachgebiet ${identifier} konnte nicht zu 
+        title: `Sachgebiet ${identifier} konnte nicht zu
           Dokumentationseinheit ${uuid} hinzugefügt werden`,
       }
     }
@@ -52,7 +52,7 @@ const service: FieldOfLawService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Sachgebiet ${identifier} konnte nicht von der 
+        title: `Sachgebiet ${identifier} konnte nicht von der
         Dokumentationseinheit ${uuid} entfernt werden`,
       }
     }
