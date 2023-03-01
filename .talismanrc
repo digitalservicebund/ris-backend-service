@@ -10,7 +10,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: fe981dfd7bc8d7d9bdce66029383faf687de89c919048f8e0919954b33a50ea4
   - filename: backend/build.gradle
-    checksum: a248070f2d05ba2e2b13ca75e41aa3ec6567023890f96dcd6c5bb50d2bf95c67
+    checksum: ebf0a04210aa4458d3f4d37dffa03de8cb29f85acfa41173cd7983eac1f6304c
   - filename: '*.sql'
     ignore_detectors: [filename]
 

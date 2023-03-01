@@ -4,7 +4,7 @@ plugins {
   id "java"
   id "org.jetbrains.kotlin.jvm" version "1.7.0"
   id "org.jetbrains.kotlin.plugin.spring" version "1.7.0"
-  id "com.diffplug.spotless" version "6.15.0"
+  id "com.diffplug.spotless" version "6.16.0"
   id "jacoco"
   id "org.sonarqube" version "4.0.0.2929"
   id "com.github.jk1.dependency-license-report" version "2.1"
@@ -215,7 +215,7 @@ spotless {
     targetExclude "frontend/**", // Has its own prettier setup!
         "**/dist/**", "**/static/**"
     // spotless:off
-    prettier(["prettier": "2.8.3", "prettier-plugin-properties": "0.2.0", "prettier-plugin-sh": "0.12.8", "prettier-plugin-sql": "0.12.1"])   .config([
+    prettier(["prettier": "2.8.4", "prettier-plugin-properties": "0.2.0", "prettier-plugin-sh": "0.12.8", "prettier-plugin-sql": "0.13.0"])   .config([
           "keySeparator": "=", // for prettier-plugin-properties
           "language": "postgresql", // for prettier-plugin-sql
         ])

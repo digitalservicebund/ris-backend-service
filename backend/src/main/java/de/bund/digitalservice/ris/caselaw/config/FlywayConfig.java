@@ -39,7 +39,10 @@ public class FlywayConfig {
 
   @Bean
   public FlywayMigrationStrategy defaultMigrationStrategy() {
-    return Flyway::migrate;
+    return flyway -> {
+      flyway.repair();
+      flyway.migrate();
+    };
   }
 
   @Bean

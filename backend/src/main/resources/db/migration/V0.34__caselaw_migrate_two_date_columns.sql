@@ -1,4 +1,4 @@
- -- required for to_timestamp to correctly parse the date strings as UTC-timezoned
+-- required for to_timestamp to correctly parse the date strings as UTC-timezoned
 SET
   timezone = 'UTC';
 
