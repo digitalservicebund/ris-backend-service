@@ -111,7 +111,7 @@ function handleToggle() {
           </div>
         </div>
         <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
-          <div class="flex flex-row flex-wrap font-size-14px">
+          <div class="flex flex-row flex-wrap font-size-14px norms-font-color">
             <span v-for="(norm, idx) in node.norms" :key="idx">
               <strong>{{ norm.abbreviation }}</strong>
               {{ norm.singleNormDescription
@@ -154,5 +154,10 @@ function handleToggle() {
 
 .selected-icon {
   font-size: 20px;
+}
+
+// will be integrated into the styleguide
+.norms-font-color {
+  color: #66522e;
 }
 </style>
