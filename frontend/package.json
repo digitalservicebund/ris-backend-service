@@ -77,7 +77,7 @@
     "@vue/eslint-config-typescript": "^11.0.2",
     "@vue/test-utils": "^2.3.0",
     "autoprefixer": "^10.4.13",
-    "axe-playwright": "^1.1.12",
+    "axe-playwright": "^1.2.3",
     "axios-mock-adapter": "^1.21.2",
     "babel-loader": "^9.1.2",
     "eslint": "^8.35.0",
