@@ -15,11 +15,9 @@ public class DocumentUnitTransformer {
   public static DocumentUnitDTO enrichDTO(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
-    DataSourceDTO dataSourceDTO = null;
+    DataSourceDTO dataSourceDTO = DataSourceDTO.NEURIS;
     if (documentUnit.dataSource() == DataSource.MIGRATION) {
       dataSourceDTO = DataSourceDTO.MIGRATION;
-    } else if (documentUnit.dataSource() == DataSource.NEURIS) {
-      dataSourceDTO = DataSourceDTO.NEURIS;
     }
 
     DocumentUnitDTO.DocumentUnitDTOBuilder builder =

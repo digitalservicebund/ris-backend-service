@@ -116,11 +116,9 @@ public class DocumentUnitBuilder {
               .toList();
     }
 
-    DataSource dataSource = null;
+    DataSource dataSource = DataSource.NEURIS;
     if (documentUnitDTO.getDataSource() == DataSourceDTO.MIGRATION) {
       dataSource = DataSource.MIGRATION;
-    } else if (documentUnitDTO.getDataSource() == DataSourceDTO.NEURIS) {
-      dataSource = DataSource.NEURIS;
     }
 
     return new DocumentUnit(
