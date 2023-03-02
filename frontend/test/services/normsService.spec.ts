@@ -5,6 +5,7 @@ import {
   getAllNorms,
   getNormByGuid,
   importNorm,
+  triggerFileGeneration,
 } from "@/services/normsService"
 
 vi.mock("@/services/httpClient")
@@ -352,6 +353,30 @@ describe("normsService", () => {
       const url = getFileUrl("fake-guid", "fake-hash")
 
       expect(url).toBe("/api/v1/norms/fake-guid/files/fake-hash")
+    })
+  })
+
+  describe("trigger file generation", () => {
+    it("responds with success message when generation was succesfull", async () => {
+      vi.mocked(httpClient).post.mockResolvedValueOnce({
+        status: 201,
+        data: {},
+      })
+
+      const response = await triggerFileGeneration("test-fake-guid")
+      expect(response.data).toBe("Datei wurde erstellt")
+    })
+
+    it("responds with error message when generation was not succesfull", async () => {
+      vi.mocked(httpClient).post.mockResolvedValueOnce({
+        status: 401,
+        data: {},
+      })
+
+      const response = await triggerFileGeneration("test-fake-guid")
+      expect(response.error).toMatchObject({
+        title: "Datei konnte nicht erstellt werden.",
+      })
     })
   })
 })

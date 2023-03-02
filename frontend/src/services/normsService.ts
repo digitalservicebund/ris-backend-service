@@ -37,6 +37,9 @@ const errorMessages = {
   IMPORT_ERROR: {
     title: "Datei konnte nicht importiert werden.",
   },
+  GENERATION_ERROR: {
+    title: "Datei konnte nicht erstellt werden.",
+  },
   LOADING_ERROR: {
     title: "Dokumentationseinheit konnte nicht geladen werden.",
   },
@@ -165,4 +168,21 @@ export async function importNorm(file: File): Promise<ServiceResponse<string>> {
 
 export function getFileUrl(guid: string, hash: string): string {
   return `/api/v1/norms/${guid}/files/${hash}`
+}
+
+export async function triggerFileGeneration(
+  guid: string
+): Promise<ServiceResponse<string>> {
+  const { status, error } = await httpClient.post(`norms/${guid}`)
+  if (status >= 400 || error) {
+    return {
+      status,
+      error: errorMessages.GENERATION_ERROR,
+    }
+  } else {
+    return {
+      status,
+      data: "Datei wurde erstellt",
+    }
+  }
 }
