@@ -160,7 +160,7 @@ public class DocumentUnitService {
   }
 
   public Flux<DocumentUnitListEntry> getAll() {
-    return listEntryRepository.findAll(Sort.by(Order.desc("documentnumber")));
+    return listEntryRepository.findAll(Sort.by(Order.desc("documentNumber")));
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {

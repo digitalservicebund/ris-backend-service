@@ -189,12 +189,12 @@ class DocumentUnitServiceTest {
   void testGetAll() {
     List<DocumentUnitListEntry> entries =
         Arrays.asList(new DocumentUnitListEntry(), new DocumentUnitListEntry());
-    when(listEntryRepository.findAll(Sort.by(Order.desc("documentnumber"))))
+    when(listEntryRepository.findAll(Sort.by(Order.desc("documentNumber"))))
         .thenReturn(Flux.fromIterable(entries));
 
     StepVerifier.create(service.getAll()).expectNextSequence(entries).verifyComplete();
 
-    verify(listEntryRepository).findAll(Sort.by(Order.desc("documentnumber")));
+    verify(listEntryRepository).findAll(Sort.by(Order.desc("documentNumber")));
   }
 
   @Test

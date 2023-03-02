@@ -20,6 +20,8 @@ public class DocumentUnitListEntry {
   @Column("creationtimestamp")
   Instant creationTimestamp;
 
+  String dataSource;
+
   @Column("filename")
   String fileName;
 

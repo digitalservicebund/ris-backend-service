@@ -5,6 +5,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DataSourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitListEntryRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -69,21 +70,41 @@ public class DocumentUnitListEntryIntegrationTest {
 
   @Test
   void testForCorrectResponseWhenRequestingAll() {
-    DocumentUnitDTO savedDto =
+    DocumentUnitDTO neurisDto =
         repository
             .save(
                 DocumentUnitDTO.builder()
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
                     .documentnumber("1234567890123")
+                    .dataSource(DataSourceDTO.NEURIS)
+                    .build())
+            .block();
+    DocumentUnitDTO migrationDto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("MIGRATION")
+                    .dataSource(DataSourceDTO.MIGRATION)
                     .build())
             .block();
 
     fileNumberRepository
         .save(
             FileNumberDTO.builder()
-                .documentUnitId(savedDto.getId())
+                .documentUnitId(neurisDto.getId())
                 .fileNumber("AkteX")
+                .isDeviating(false)
+                .build())
+        .block();
+
+    fileNumberRepository
+        .save(
+            FileNumberDTO.builder()
+                .documentUnitId(migrationDto.getId())
+                .fileNumber("AkteM")
                 .isDeviating(false)
                 .build())
         .block();
@@ -102,7 +123,7 @@ public class DocumentUnitListEntryIntegrationTest {
               assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody()[0].getDocumentNumber())
                   .isEqualTo("1234567890123");
-              assertThat(response.getResponseBody()[0].getUuid()).isEqualTo(savedDto.getUuid());
+              assertThat(response.getResponseBody()[0].getUuid()).isEqualTo(neurisDto.getUuid());
               assertThat(response.getResponseBody()[0].getFileNumber()).isEqualTo("AkteX");
             });
   }

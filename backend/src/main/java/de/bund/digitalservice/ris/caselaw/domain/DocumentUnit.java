@@ -15,6 +15,7 @@ public record DocumentUnit(
         String documentNumber,
     @PastOrPresent Instant creationtimestamp,
     @PastOrPresent Instant fileuploadtimestamp,
+    DataSource dataSource,
     String s3path,
     String filetype,
     String filename,
@@ -23,5 +24,5 @@ public record DocumentUnit(
     Texts texts,
     ContentRelatedIndexing contentRelatedIndexing) {
   public static final DocumentUnit EMPTY =
-      new DocumentUnit(null, null, null, null, null, null, null, null, null, null, null);
+      new DocumentUnit(null, null, null, null, null, null, null, null, null, null, null, null);
 }

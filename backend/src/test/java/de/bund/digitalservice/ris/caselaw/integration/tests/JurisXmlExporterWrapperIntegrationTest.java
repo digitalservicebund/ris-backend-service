@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
@@ -160,6 +161,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .documentNumber(documentNr)
             .creationtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
             .fileuploadtimestamp(Instant.parse("2021-01-01T00:00:00Z"))
+            .dataSource(DataSource.NEURIS)
             .s3path("s3path")
             .filetype("filetype")
             .filename("filename")

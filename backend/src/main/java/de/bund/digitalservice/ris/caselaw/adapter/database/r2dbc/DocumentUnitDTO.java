@@ -26,6 +26,7 @@ public class DocumentUnitDTO {
   UUID uuid;
   String documentnumber;
   Instant creationtimestamp;
+  DataSourceDTO dataSource;
 
   // Original file
   Instant fileuploadtimestamp;

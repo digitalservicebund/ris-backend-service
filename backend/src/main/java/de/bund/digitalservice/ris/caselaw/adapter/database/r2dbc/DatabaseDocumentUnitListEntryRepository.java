@@ -10,5 +10,5 @@ import reactor.core.publisher.Flux;
 public interface DatabaseDocumentUnitListEntryRepository
     extends R2dbcRepository<DocumentUnitListEntry, Long> {
 
-  Flux<DocumentUnitListEntry> findAll(Sort sort);
+  Flux<DocumentUnitListEntry> findAllByDataSourceLike(Sort sort, String dataSource);
 }

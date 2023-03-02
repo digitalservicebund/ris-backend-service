@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntryRepository;
 import org.springframework.data.domain.Sort;
@@ -23,7 +24,7 @@ public class PostgresDocumentUnitListEntryRepositoryImpl
   @Override
   public Flux<DocumentUnitListEntry> findAll(Sort sort) {
     return repository
-        .findAll(sort)
+        .findAllByDataSourceLike(sort, DataSource.NEURIS.name())
         .flatMap(
             documentUnitListEntry ->
                 fileNumberRepository

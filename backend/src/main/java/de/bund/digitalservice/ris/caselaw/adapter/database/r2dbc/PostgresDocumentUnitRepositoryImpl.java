@@ -96,6 +96,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 .uuid(UUID.randomUUID())
                 .creationtimestamp(Instant.now())
                 .documentnumber(documentNumber)
+                .dataSource(DataSourceDTO.NEURIS)
                 .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                 .build())
         .map(

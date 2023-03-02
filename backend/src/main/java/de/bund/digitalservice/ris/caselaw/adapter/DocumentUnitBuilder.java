@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DataSourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -9,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Doc
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
@@ -114,11 +116,19 @@ public class DocumentUnitBuilder {
               .toList();
     }
 
+    DataSource dataSource = null;
+    if (documentUnitDTO.getDataSource() == DataSourceDTO.MIGRATION) {
+      dataSource = DataSource.MIGRATION;
+    } else if (documentUnitDTO.getDataSource() == DataSourceDTO.NEURIS) {
+      dataSource = DataSource.NEURIS;
+    }
+
     return new DocumentUnit(
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
         documentUnitDTO.getCreationtimestamp(),
         documentUnitDTO.getFileuploadtimestamp(),
+        dataSource,
         documentUnitDTO.getS3path(),
         documentUnitDTO.getFiletype(),
         documentUnitDTO.getFilename(),
