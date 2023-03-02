@@ -5,7 +5,7 @@ import { APIRequestContext, expect } from "@playwright/test"
 import { Page } from "playwright"
 
 const REMOTE_JURIS_TEST_FILE_FOLDER_URL =
-  "raw.githubusercontent.com/digitalservicebund/ris-norms-juris-convertor/main/src/test/resources/juris"
+  "raw.githubusercontent.com/digitalservicebund/ris-norms-juris-converter/main/src/test/resources/juris"
 
 async function getLocalJurisTestFileFolderPath(): Promise<string> {
   const folderPath = path.join(tmpdir(), "ris-norms_juris-test-files")
