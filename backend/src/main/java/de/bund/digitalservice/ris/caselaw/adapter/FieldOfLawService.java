@@ -5,6 +5,9 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldO
 import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -20,12 +23,22 @@ public class FieldOfLawService {
     this.repository = repository;
   }
 
-  public Flux<FieldOfLaw> getFieldsOfLawBySearchQuery(Optional<String> searchStr) {
+  public Mono<Page<FieldOfLaw>> getFieldsOfLawBySearchQuery(
+      Optional<String> searchStr, Pageable pageable) {
     if (searchStr.isEmpty() || searchStr.get().isBlank()) {
-      return repository.findAllByOrderBySubjectFieldNumberAsc();
+      return repository
+          .findAllByOrderBySubjectFieldNumberAsc(pageable)
+          .collectList()
+          .zipWith(repository.count())
+          .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
 
-    return repository.findBySearchStr(searchStr.get().trim());
+    String str = searchStr.get().trim();
+    return this.repository
+        .findBySearchStr(str, pageable)
+        .collectList()
+        .zipWith(repository.countBySearchStr(str))
+        .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
   }
 
   public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String subjectFieldNumber) {

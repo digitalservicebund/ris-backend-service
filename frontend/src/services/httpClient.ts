@@ -58,7 +58,10 @@ async function baseHttp<T>(
     })
     return {
       status: response.status,
-      data: response.data.content ? response.data.content : response.data,
+      data:
+        response.data.content && !response.data.pageable
+          ? response.data.content
+          : response.data,
     }
   } catch (error) {
     return {

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -13,17 +14,21 @@ public interface SubjectFieldRepository {
   Flux<FieldOfLaw> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber);
 
-  Flux<FieldOfLaw> findBySearchStr(String searchStr);
+  Flux<FieldOfLaw> findBySearchStr(String searchStr, Pageable pageable);
+
+  Mono<Long> countBySearchStr(String searchStr);
 
   Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldId);
 
   Mono<FieldOfLaw> findParentByChild(FieldOfLaw child);
 
-  Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc();
+  Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
 
   Flux<FieldOfLaw> findAllForDocumentUnit(UUID documentUnitUuid);
 
   Flux<FieldOfLaw> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
 
   Flux<FieldOfLaw> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
+
+  Mono<Long> count();
 }
