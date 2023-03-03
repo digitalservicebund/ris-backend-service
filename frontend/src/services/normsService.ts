@@ -173,7 +173,7 @@ export function getFileUrl(guid: string, hash: string): string {
 export async function triggerFileGeneration(
   guid: string
 ): Promise<ServiceResponse<string>> {
-  const { status, error } = await httpClient.post(`/norms/${guid}/files`)
+  const { status, error } = await httpClient.post(`norms/${guid}/files`)
   if (status >= 400 || error) {
     return {
       status,
