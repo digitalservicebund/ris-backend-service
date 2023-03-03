@@ -34,7 +34,7 @@ public class FieldOfLawService {
     }
 
     String str = searchStr.get().trim();
-    return this.repository
+    return repository
         .findBySearchStr(str, pageable)
         .collectList()
         .zipWith(repository.countBySearchStr(str))

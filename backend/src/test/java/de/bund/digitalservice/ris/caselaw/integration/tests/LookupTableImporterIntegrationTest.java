@@ -29,6 +29,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -304,7 +305,10 @@ class LookupTableImporterIntegrationTest {
                     .isEqualTo("Successfully imported the subject field lookup table"));
 
     List<SubjectFieldDTO> subjectFieldDTOs =
-        subjectFieldRepository.findAllByOrderBySubjectFieldNumberAsc().collectList().block();
+        subjectFieldRepository
+            .findAllByOrderBySubjectFieldNumberAsc(Pageable.unpaged())
+            .collectList()
+            .block();
     List<KeywordDTO> keywordDTOs =
         keywordRepository.findAllByOrderBySubjectFieldIdAscValueAsc().collectList().block();
     List<NormDTO> normDTOs =

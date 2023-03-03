@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -27,32 +29,35 @@ class FieldOfLawControllerTest {
 
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldCallServiceWithoutValue() {
-    when(service.getFieldsOfLawBySearchQuery(Optional.empty())).thenReturn(Flux.empty());
+    Pageable pageable = PageRequest.of(0, 10);
+    when(service.getFieldsOfLawBySearchQuery(Optional.empty(), pageable)).thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/fieldsoflaw")
+        .uri("/api/v1/caselaw/fieldsoflaw?pg=0&sz=10")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getFieldsOfLawBySearchQuery(Optional.empty());
+    verify(service, times(1)).getFieldsOfLawBySearchQuery(Optional.empty(), pageable);
   }
 
   @Test
   void testGetFieldsOfLaw_withQuery_shouldCallServiceWithValue() {
-    when(service.getFieldsOfLawBySearchQuery(Optional.of("root"))).thenReturn(Flux.empty());
+    Pageable pageable = PageRequest.of(0, 10);
+    when(service.getFieldsOfLawBySearchQuery(Optional.of("root"), pageable))
+        .thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/fieldsoflaw?searchStr=root")
+        .uri("/api/v1/caselaw/fieldsoflaw?q=root&pg=0&sz=10")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).getFieldsOfLawBySearchQuery(Optional.of("root"));
+    verify(service, times(1)).getFieldsOfLawBySearchQuery(Optional.of("root"), pageable);
   }
 
   @Test
