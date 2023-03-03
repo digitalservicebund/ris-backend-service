@@ -67,7 +67,7 @@ function handleToggle() {
       <div v-if="node.childrenCount === 0" class="pl-24"></div>
       <div v-else>
         <button
-          aria-label="Sachgebietsbaum aufklappen"
+          :aria-label="node.identifier + ' ' + node.text + ' aufklappen'"
           class="bg-blue-200 material-icons rounded-full text-blue-800 w-icon"
           @click="handleToggle"
         >
@@ -78,7 +78,12 @@ function handleToggle() {
       </div>
       <div v-if="node.identifier !== ROOT_ID">
         <button
-          aria-label="Sachgebiet entfernen"
+          :aria-label="
+            node.identifier +
+            ' ' +
+            node.text +
+            (selected ? ' entfernen' : ' hinzufügen')
+          "
           class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 ml-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
           @click="
             selected

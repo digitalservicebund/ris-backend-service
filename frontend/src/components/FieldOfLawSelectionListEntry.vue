@@ -20,7 +20,12 @@ function handleTokenClick(tokenContent: string) {
       <div class="flex">
         <div class="label-02-reg pt-8 text-blue-800">
           <span
-            aria-label="Auswahl im Sachgebietsbaum"
+            :aria-label="
+              fieldOfLaw.identifier +
+              ' ' +
+              fieldOfLaw.text +
+              ' im Sachgebietsbaum anzeigen'
+            "
             class="link"
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"
@@ -39,7 +44,9 @@ function handleTokenClick(tokenContent: string) {
     </div>
     <div>
       <button
-        aria-label="Löschen"
+        :aria-label="
+          fieldOfLaw.identifier + ' ' + fieldOfLaw.text + ' entfernen'
+        "
         class="material-icons text-blue-800"
         @click="emit('remove-from-list')"
       >

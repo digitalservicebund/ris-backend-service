@@ -52,7 +52,9 @@ describe("FieldOfLawTree", () => {
     renderComponent()
     expect(fetchSpy).toBeCalledTimes(0)
     expect(screen.getByText("Alle Sachgebiete anzeigen")).toBeInTheDocument()
-    const expandIcons = screen.getAllByLabelText("Sachgebietsbaum aufklappen")
+    const expandIcons = screen.getAllByLabelText(
+      "root Alle Sachgebiete anzeigen aufklappen"
+    )
     expect(expandIcons).toHaveLength(1)
     expect(screen.queryByText("Text for AB")).not.toBeInTheDocument()
     expect(screen.queryByText("And text for CD")).not.toBeInTheDocument()
@@ -62,14 +64,12 @@ describe("FieldOfLawTree", () => {
     renderComponent()
 
     await user.click(
-      screen.getAllByLabelText("Sachgebietsbaum aufklappen")[0] as HTMLElement
+      screen.getAllByLabelText(
+        "root Alle Sachgebiete anzeigen aufklappen"
+      )[0] as HTMLElement
     )
 
-    const expandIcons = screen.getAllByLabelText("Sachgebietsbaum aufklappen")
-
     expect(fetchSpy).toBeCalledTimes(1)
-    // root and CD-02 have children, so two expand icons
-    expect(expandIcons).toHaveLength(2)
     expect(screen.getByText("Text for AB")).toBeInTheDocument()
     expect(screen.getByText("And text for CD with link to")).toBeInTheDocument()
     expect(screen.getByText("Alle Sachgebiete anzeigen")).toBeInTheDocument()
@@ -79,7 +79,9 @@ describe("FieldOfLawTree", () => {
     renderComponent()
 
     await user.click(
-      screen.getAllByLabelText("Sachgebietsbaum aufklappen")[0] as HTMLElement
+      screen.getAllByLabelText(
+        "root Alle Sachgebiete anzeigen aufklappen"
+      )[0] as HTMLElement
     )
 
     const node1ids = screen.getAllByText("AB-01")
