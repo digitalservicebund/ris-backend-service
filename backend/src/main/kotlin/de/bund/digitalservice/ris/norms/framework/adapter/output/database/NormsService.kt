@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenceOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
@@ -12,7 +13,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Fi
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticlesRepository
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FilesRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FileReferenceRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
 import org.springframework.context.annotation.Primary
@@ -30,14 +31,15 @@ class NormsService(
     val normsRepository: NormsRepository,
     val articlesRepository: ArticlesRepository,
     val paragraphsRepository: ParagraphsRepository,
-    val filesRepository: FilesRepository,
+    val fileReferenceRepository: FileReferenceRepository,
     client: DatabaseClient,
 ) : NormsMapper,
     GetNormByGuidOutputPort,
     SaveNormOutputPort,
     EditNormOutputPort,
     SearchNormsOutputPort,
-    GetNormByEliOutputPort {
+    GetNormByEliOutputPort,
+    SaveFileReferenceOutputPort {
 
     private val template: R2dbcEntityTemplate = R2dbcEntityTemplate(client, PostgresDialect.INSTANCE)
     private val criteria: NormsCriteriaBuilder = NormsCriteriaBuilder()
@@ -67,7 +69,7 @@ class NormsService(
                     }
                     .collectList()
                     .flatMap { articlesDto ->
-                        filesRepository.findByNormId(normDto.id).collectList()
+                        fileReferenceRepository.findByNormId(normDto.id).collectList()
                             .map { filesDto ->
                                 normWithFilesToEntity(normDto, articlesDto, filesDto)
                             }
@@ -96,6 +98,14 @@ class NormsService(
             }
     }
 
+    override fun saveFileReference(command: SaveFileReferenceOutputPort.Command): Mono<Boolean> {
+        return normsRepository.findByGuid(command.norm.guid)
+            .flatMap { normDto ->
+                fileReferenceRepository.save(fileReferenceToDto(command.fileReference, normDto.id))
+                    .flatMap { Mono.just(true) }
+            }
+    }
+
     private fun saveNormArticles(norm: Norm, normDto: NormDto): Flux<ParagraphDto> {
         return articlesRepository
             .saveAll(articlesToDto(norm.articles, normDto.id))
@@ -103,8 +113,8 @@ class NormsService(
     }
 
     private fun saveNormFiles(norm: Norm, normDto: NormDto): Flux<FileReferenceDto> {
-        return filesRepository
-            .saveAll(filesToDto(norm.files, normDto.id))
+        return fileReferenceRepository
+            .saveAll(fileReferencesToDto(norm.files, normDto.id))
     }
 
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {

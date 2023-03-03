@@ -115,8 +115,11 @@ interface NormsMapper {
         return paragraphs.map { ParagraphDto(id, it.guid, it.marker, it.text, articleId) }
     }
 
-    fun filesToDto(files: List<FileReference>, normId: Int, id: Int = 0): List<FileReferenceDto> {
-        return files.map { FileReferenceDto(id, it.name, it.hash, normId, it.createdAt) }
+    fun fileReferencesToDto(fileReferences: List<FileReference>, normId: Int, id: Int = 0): List<FileReferenceDto> {
+        return fileReferences.map { fileReferenceToDto(it, normId) }
+    }
+    fun fileReferenceToDto(fileReference: FileReference, normId: Int, id: Int = 0): FileReferenceDto {
+        return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, fileReference.createdAt)
     }
 
     fun queryFieldToDbColumn(field: QueryFields): String {

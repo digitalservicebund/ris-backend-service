@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 
 @Repository
-interface FilesRepository : ReactiveCrudRepository<FileReferenceDto, Int> {
+interface FileReferenceRepository : ReactiveCrudRepository<FileReferenceDto, Int> {
 
     fun findByNormId(norm: Int): Flux<FileReferenceDto>
 }
