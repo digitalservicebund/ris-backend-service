@@ -82,6 +82,9 @@ function handlePagination(backwards: boolean) {
         >
           zurück
         </div>
+        <div class="page-count">
+          {{ currentPage + 1 }} von {{ results.totalPages }}
+        </div>
         <div
           class="link pl-6"
           :class="results.last ? 'disabled-link' : ''"
@@ -113,5 +116,9 @@ function handlePagination(backwards: boolean) {
 
 .font-size-14px {
   font-size: 14px;
+}
+
+.page-count {
+  color: gray;
 }
 </style>
