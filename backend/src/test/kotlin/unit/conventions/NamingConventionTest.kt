@@ -65,6 +65,8 @@ class NamingConventionTest {
     fun `application services are named as service`() {
         classes()
             .that(areFromTheServicePackage())
+            .and()
+            .areNotInnerClasses()
             .should(haveSimpleNameEndingWith("Service"))
             .orShould(haveSimpleNameEndingWith("Companion"))
             .check(sourceClasses)

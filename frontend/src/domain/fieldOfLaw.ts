@@ -1,3 +1,14 @@
+export type Page<T> = {
+  content: T[]
+  size: number
+  totalElements: number
+  totalPages: number
+  number: number
+  numberOfElements: number
+  first: boolean
+  last: boolean
+}
+
 export type Norm = {
   abbreviation: string
   singleNormDescription: string

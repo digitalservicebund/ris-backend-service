@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.r2dbc.repository.Query;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
@@ -18,11 +19,15 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
   Flux<SubjectFieldDTO> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber);
 
-  @Query( // Schlagworte und Normen mit durchsuchen?
-      "SELECT * FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%') ORDER BY subject_field_number OFFSET 0 LIMIT 10")
-  Flux<SubjectFieldDTO> findBySearchStr(String searchStr);
+  @Query(
+      "SELECT * FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%') ORDER BY subject_field_number LIMIT :limit OFFSET :offset")
+  Flux<SubjectFieldDTO> findBySearchStr(String searchStr, long offset, int limit);
 
-  Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc();
+  Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
 
   Mono<SubjectFieldDTO> findBySubjectFieldNumber(String subjectFieldNumber);
+
+  @Query(
+      "SELECT COUNT(*) FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%')")
+  Mono<Long> countBySearchStr(String searchStr);
 }

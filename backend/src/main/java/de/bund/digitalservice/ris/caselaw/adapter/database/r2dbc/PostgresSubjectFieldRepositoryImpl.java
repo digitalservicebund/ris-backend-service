@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransf
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.UUID;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -41,9 +42,9 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc() {
+  public Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable) {
     return databaseSubjectFieldRepository
-        .findAllByOrderBySubjectFieldNumberAsc()
+        .findAllByOrderBySubjectFieldNumberAsc(pageable)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
@@ -99,13 +100,18 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<FieldOfLaw> findBySearchStr(String searchStr) {
+  public Flux<FieldOfLaw> findBySearchStr(String searchStr, Pageable pageable) {
     return databaseSubjectFieldRepository
-        .findBySearchStr(searchStr)
+        .findBySearchStr(searchStr, pageable.getOffset(), pageable.getPageSize())
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Mono<Long> countBySearchStr(String searchStr) {
+    return databaseSubjectFieldRepository.countBySearchStr(searchStr);
   }
 
   private Mono<SubjectFieldDTO> injectKeywords(SubjectFieldDTO subjectFieldDTO) {
@@ -220,5 +226,10 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
                     .findByDocumentUnitIdAndFieldOfLawId(t.getT1(), t.getT2())
                     .flatMap(dto -> databaseDocumentUnitFieldsOfLawRepository.delete(dto))
                     .thenMany(getLinkedFieldsOfLaw(t.getT1())));
+  }
+
+  @Override
+  public Mono<Long> count() {
+    return databaseSubjectFieldRepository.count();
   }
 }

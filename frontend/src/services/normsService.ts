@@ -38,7 +38,7 @@ const errorMessages = {
     title: "Datei konnte nicht importiert werden.",
   },
   GENERATION_ERROR: {
-    title: "Datei konnte nicht erstellt werden.",
+    title: "Zip-Datei konnte nicht generiert werden.",
   },
   LOADING_ERROR: {
     title: "Dokumentationseinheit konnte nicht geladen werden.",
@@ -173,7 +173,7 @@ export function getFileUrl(guid: string, hash: string): string {
 export async function triggerFileGeneration(
   guid: string
 ): Promise<ServiceResponse<string>> {
-  const { status, error } = await httpClient.post(`norms/${guid}`)
+  const { status, error } = await httpClient.post(`norms/${guid}/files`)
   if (status >= 400 || error) {
     return {
       status,
@@ -182,7 +182,7 @@ export async function triggerFileGeneration(
   } else {
     return {
       status,
-      data: "Datei wurde erstellt",
+      data: "Datei wurde erstellt.",
     }
   }
 }

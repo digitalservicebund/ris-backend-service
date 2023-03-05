@@ -39,9 +39,13 @@ describe("FieldOfLawSelectionList", () => {
     expect(screen.getByText("ST-01-02-03")).toBeInTheDocument()
     expect(screen.getByText("Steuerrecht 1-2-3")).toBeInTheDocument()
     expect(
-      screen.getByLabelText("Auswahl im Sachgebietsbaum")
+      screen.getByLabelText(
+        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen"
+      )
     ).toBeInTheDocument()
-    expect(screen.getByLabelText("Löschen")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen")
+    ).toBeInTheDocument()
   })
 
   it("click on 'Löschen' emit 'remove-from-list'", async () => {
@@ -52,7 +56,9 @@ describe("FieldOfLawSelectionList", () => {
       },
     ])
 
-    await fireEvent.click(screen.getByLabelText("Löschen"))
+    await fireEvent.click(
+      screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen")
+    )
 
     expect(emitted()["remove-from-list"]).toBeTruthy()
   })
@@ -65,7 +71,11 @@ describe("FieldOfLawSelectionList", () => {
       },
     ])
 
-    await fireEvent.click(screen.getByLabelText("Auswahl im Sachgebietsbaum"))
+    await fireEvent.click(
+      screen.getByLabelText(
+        "ST-01-02-03 Steuerrecht 1-2-3 im Sachgebietsbaum anzeigen"
+      )
+    )
 
     expect(emitted()["node-clicked"]).toBeTruthy()
   })

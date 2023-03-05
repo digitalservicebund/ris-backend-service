@@ -364,7 +364,7 @@ describe("normsService", () => {
       })
 
       const response = await triggerFileGeneration("test-fake-guid")
-      expect(response.data).toBe("Datei wurde erstellt")
+      expect(response.data).toBe("Datei wurde erstellt.")
     })
 
     it("responds with error message when generation was not succesfull", async () => {
@@ -375,7 +375,7 @@ describe("normsService", () => {
 
       const response = await triggerFileGeneration("test-fake-guid")
       expect(response.error).toMatchObject({
-        title: "Datei konnte nicht erstellt werden.",
+        title: "Zip-Datei konnte nicht generiert werden.",
       })
     })
   })

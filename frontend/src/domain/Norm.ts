@@ -142,4 +142,5 @@ export interface Norm extends FrameData {
 export interface FileReference {
   readonly name: string
   readonly hash: string
+  readonly createdAt: string
 }

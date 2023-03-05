@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output
 
+import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
@@ -7,19 +8,21 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
-import de.bund.digitalservice.ris.norms.juris.extractor.extractData
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
+import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
+import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.UUID
-import de.bund.digitalservice.ris.norms.juris.extractor.model.Article as ArticleData
-import de.bund.digitalservice.ris.norms.juris.extractor.model.Norm as NormData
-import de.bund.digitalservice.ris.norms.juris.extractor.model.Paragraph as ParagraphData
+import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
+import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
+import de.bund.digitalservice.ris.norms.juris.converter.model.Paragraph as ParagraphData
 
 @Component
-class JurisXmlParser() : ParseJurisXmlOutputPort {
+class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
     override fun parseJurisXml(query: ParseJurisXmlOutputPort.Query): Mono<Norm> {
         val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
@@ -28,6 +31,31 @@ class JurisXmlParser() : ParseJurisXmlOutputPort {
         )
         return Mono.just(norm)
     }
+
+    override fun generateNormFile(command: GenerateNormFileOutputPort.Command): Mono<ByteArray> {
+        return Mono.just(generateZip(mapDomainToData(command.norm), ByteBuffer.wrap(command.previousFile)))
+    }
+}
+
+fun mapDomainToData(norm: Norm): NormData {
+    val normData = NormData()
+    normData.announcementDate = encodeLocalDate(norm.announcementDate)
+    normData.citationDate = encodeLocalDate(norm.citationDate)
+    normData.documentCategory = norm.documentCategory
+    normData.documentNumber = norm.documentNumber
+    normData.entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate)
+    normData.expirationDate = encodeLocalDate(norm.expirationDate)
+    normData.frameKeywords = norm.frameKeywords
+    normData.officialAbbreviation = norm.officialAbbreviation
+    normData.officialLongTitle = norm.officialLongTitle
+    normData.officialShortTitle = norm.officialShortTitle
+    normData.participationInstitution = norm.participationInstitution
+    normData.participationType = norm.participationType
+    normData.printAnnouncementGazette = norm.printAnnouncementGazette
+    normData.printAnnouncementYear = norm.printAnnouncementYear
+    normData.printAnnouncementNumber = norm.printAnnouncementNumber
+    normData.risAbbreviation = norm.risAbbreviation
+    return normData
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {

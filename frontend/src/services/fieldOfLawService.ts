@@ -1,5 +1,5 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 
 interface FieldOfLawService {
   getSelectedFieldsOfLaw(
@@ -18,8 +18,10 @@ interface FieldOfLawService {
     identifier: string
   ): Promise<ServiceResponse<FieldOfLawNode>>
   searchForFieldsOfLaw(
-    searchStr: string
-  ): Promise<ServiceResponse<FieldOfLawNode[]>>
+    searchStr: string,
+    page: number,
+    size: number
+  ): Promise<ServiceResponse<Page<FieldOfLawNode>>>
 }
 
 const service: FieldOfLawService = {
@@ -84,10 +86,10 @@ const service: FieldOfLawService = {
     }
     return response
   },
-  async searchForFieldsOfLaw(searchStr: string) {
-    const response = await httpClient.get<FieldOfLawNode[]>(
-      `caselaw/fieldsoflaw`,
-      { params: { searchStr: searchStr } }
+  async searchForFieldsOfLaw(searchStr: string, page: number, size: number) {
+    const response = await httpClient.get<Page<FieldOfLawNode>>(
+      `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
+      { params: { q: searchStr } }
     )
     if (response.status >= 300) {
       response.error = {

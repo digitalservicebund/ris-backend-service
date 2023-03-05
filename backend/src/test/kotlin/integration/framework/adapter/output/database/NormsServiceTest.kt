@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByEliOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenceOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
@@ -268,6 +269,32 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .assertNext {
+                assertThat(it.files.size == 1, `is`(true))
+                assertThat(it.files[0].name == FILE1.name, `is`(true))
+                assertThat(it.files[0].hash == FILE1.hash, `is`(true))
+            }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save a file reference to a norm and retrieve norm by guid`() {
+        val saveNormCommand = SaveNormOutputPort.Command(NORM.copy(files = listOf()))
+        val saveFileReferenceCommand = SaveFileReferenceOutputPort.Command(FILE1, NORM)
+        val guidQuery = GetNormByGuidOutputPort.Query(NORM.guid)
+
+        normsService.saveNorm(saveNormCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.saveFileReference(saveFileReferenceCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .assertNext {

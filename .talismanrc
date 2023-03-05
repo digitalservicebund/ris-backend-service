@@ -10,7 +10,9 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: e91c1986c9d5510a83c7d3ef056b6f3cb688d055631945208845148e57e2fda8
   - filename: backend/build.gradle
-    checksum: d33aa90804f14cbcc4fe3d91418024d733bde616178a243ab15aac8c290bff51
+    checksum: c9780879dad7c91835e8a3c9ae5d2164b5e3b4ecfc0d5d9d642d1dd1194389e6
+  - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
+    checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
   - filename: '*.sql'
     ignore_detectors: [filename]
 

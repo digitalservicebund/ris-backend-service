@@ -3,21 +3,32 @@ import { ref } from "vue"
 import TextButton from "@/components/TextButton.vue"
 import TextInput from "@/components/TextInput.vue"
 import TokenizeText from "@/components/TokenizeText.vue"
-import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
 const searchStr = ref("")
-const results = ref<FieldOfLawNode[]>([])
+const results = ref<Page<FieldOfLawNode>>()
+const currentPage = ref(0)
+const RESULTS_PER_PAGE = 10
 
-function submitSearch() {
-  FieldOfLawService.searchForFieldsOfLaw(searchStr.value).then((response) => {
+function submitSearch(resetPage = true) {
+  if (resetPage) currentPage.value = 0
+  FieldOfLawService.searchForFieldsOfLaw(
+    searchStr.value,
+    currentPage.value,
+    RESULTS_PER_PAGE
+  ).then((response) => {
     if (!response.data) return
     results.value = response.data
   })
 }
 
 function handlePagination(backwards: boolean) {
-  console.log(backwards)
+  if (backwards && results.value?.first) return
+  if (!backwards && results.value?.last) return
+
+  currentPage.value += backwards ? -1 : 1
+  submitSearch(false)
 }
 </script>
 
@@ -46,28 +57,42 @@ function handlePagination(backwards: boolean) {
         </div>
       </div>
     </div>
-    <div v-for="(node, idx) in results" :key="idx" class="flex flex-row">
-      <div class="identifier">
-        {{ node.identifier }}
-      </div>
-      <div class="font-size-14px pl-6 pt-2 text-blue-800">
-        <TokenizeText :keywords="node.linkedFields ?? []" :text="node.text" />
-      </div>
-    </div>
-    <div class="flex flex-row justify-center">
+    <div v-if="results">
       <div
-        class="link pr-6"
-        @click="handlePagination(true)"
-        @keyup.enter="handlePagination(true)"
+        v-for="(node, idx) in results.content"
+        :key="idx"
+        class="flex flex-row"
       >
-        zurück
+        <div class="identifier">
+          {{ node.identifier }}
+        </div>
+        <div class="font-size-14px pl-6 pt-2 text-blue-800">
+          <TokenizeText :keywords="node.linkedFields ?? []" :text="node.text" />
+        </div>
       </div>
       <div
-        class="link pl-6"
-        @click="handlePagination(false)"
-        @keyup.enter="handlePagination(false)"
+        v-if="results.numberOfElements < results.totalElements"
+        class="flex flex-row justify-center"
       >
-        vor
+        <div
+          class="link pr-6"
+          :class="results.first ? 'disabled-link' : ''"
+          @click="handlePagination(true)"
+          @keyup.enter="handlePagination(true)"
+        >
+          zurück
+        </div>
+        <div class="page-count">
+          {{ currentPage + 1 }} von {{ results.totalPages }}
+        </div>
+        <div
+          class="link pl-6"
+          :class="results.last ? 'disabled-link' : ''"
+          @click="handlePagination(false)"
+          @keyup.enter="handlePagination(false)"
+        >
+          vor
+        </div>
       </div>
     </div>
   </div>
@@ -79,6 +104,11 @@ function handlePagination(backwards: boolean) {
   text-decoration: underline;
 }
 
+.disabled-link {
+  color: gray;
+  cursor: default;
+}
+
 .identifier {
   font-size: 16px;
   white-space: nowrap;
@@ -86,5 +116,9 @@ function handlePagination(backwards: boolean) {
 
 .font-size-14px {
   font-size: 14px;
+}
+
+.page-count {
+  color: gray;
 }
 </style>

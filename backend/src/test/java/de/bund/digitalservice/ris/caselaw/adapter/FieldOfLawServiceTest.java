@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -21,6 +22,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -35,44 +38,77 @@ class FieldOfLawServiceTest {
 
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldntCallRepository() {
-    when(repository.findAllByOrderBySubjectFieldNumberAsc()).thenReturn(Flux.empty());
+    Pageable pageable = Pageable.unpaged();
+    when(repository.findAllByOrderBySubjectFieldNumberAsc(pageable)).thenReturn(Flux.empty());
+    when(repository.count()).thenReturn(Mono.just(0L));
 
-    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.empty())).verifyComplete();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.empty(), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.getTotalElements()).isZero();
+            })
+        .verifyComplete();
 
-    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc();
-    verify(repository, never()).findBySearchStr(anyString());
+    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).count();
+    verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
 
   @Test
   void testGetFieldsOfLaw_withEmptyQuery_shouldntCallRepository() {
-    when(repository.findAllByOrderBySubjectFieldNumberAsc()).thenReturn(Flux.empty());
+    Pageable pageable = Pageable.unpaged();
+    when(repository.findAllByOrderBySubjectFieldNumberAsc(pageable)).thenReturn(Flux.empty());
+    when(repository.count()).thenReturn(Mono.just(0L));
 
-    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(""))).verifyComplete();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(""), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.getTotalElements()).isZero();
+            })
+        .verifyComplete();
 
-    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc();
-    verify(repository, never()).findBySearchStr(anyString());
+    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).count();
+    verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
 
   @Test
   void testGetFieldsOfLaw_withQuery_shouldCallRepository() {
-    when(repository.findBySearchStr("test")).thenReturn(Flux.empty());
+    Pageable pageable = Pageable.unpaged();
+    when(repository.findBySearchStr("test", pageable)).thenReturn(Flux.empty());
+    when(repository.countBySearchStr("test")).thenReturn(Mono.just(0L));
 
-    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of("test"))).verifyComplete();
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of("test"), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.getTotalElements()).isZero();
+            })
+        .verifyComplete();
 
-    verify(repository, times(1)).findBySearchStr("test");
-    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc();
+    verify(repository, times(1)).findBySearchStr("test", pageable);
+    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc(pageable);
   }
 
   @Test
   void
       testGetFieldsOfLaw_withQueryWithWhitespaceAtTheStartAndTheEnd_shouldCallRepositoryWithTrimmedSearchString() {
-    when(repository.findBySearchStr("test")).thenReturn(Flux.empty());
+    Pageable pageable = Pageable.unpaged();
+    when(repository.findBySearchStr("test", pageable)).thenReturn(Flux.empty());
+    when(repository.countBySearchStr("test")).thenReturn(Mono.just(0L));
 
-    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(" test  \t")))
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(" test  \t"), pageable))
+        .consumeNextWith(
+            page -> {
+              assertThat(page.getContent()).isEmpty();
+              assertThat(page.getTotalElements()).isZero();
+            })
         .verifyComplete();
 
-    verify(repository, times(1)).findBySearchStr("test");
-    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc();
+    verify(repository, times(1)).findBySearchStr("test", pageable);
+    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc(pageable);
   }
 
   @Test
@@ -166,13 +202,19 @@ class FieldOfLawServiceTest {
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>());
 
-    when(repository.findBySearchStr(searchString)).thenReturn(Flux.just(expectedFieldOfLaw));
+    Pageable pageable = Pageable.unpaged();
+    PageImpl<FieldOfLaw> page = new PageImpl<>(List.of(expectedFieldOfLaw), pageable, 1);
 
-    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(searchString)))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
+    when(repository.findBySearchStr(searchString, pageable))
+        .thenReturn(Flux.just(expectedFieldOfLaw));
+    when(repository.countBySearchStr(searchString)).thenReturn(Mono.just(1L));
+
+    StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(searchString), pageable))
+        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(page))
         .verifyComplete();
 
-    verify(repository).findBySearchStr(searchString);
+    verify(repository).findBySearchStr(searchString, pageable);
+    verify(repository).countBySearchStr(searchString);
   }
 
   @Test

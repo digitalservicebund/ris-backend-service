@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,8 +22,11 @@ public class FieldOfLawController {
   }
 
   @GetMapping
-  public Flux<FieldOfLaw> getFieldsOfLawBySearchQuery(@RequestParam Optional<String> searchStr) {
-    return service.getFieldsOfLawBySearchQuery(searchStr);
+  public Mono<Page<FieldOfLaw>> getFieldsOfLawBySearchQuery(
+      @RequestParam("q") Optional<String> searchStr,
+      @RequestParam("pg") int page,
+      @RequestParam("sz") int size) {
+    return service.getFieldsOfLawBySearchQuery(searchStr, PageRequest.of(page, size));
   }
 
   @GetMapping(value = "{subjectFieldNumber}/children")
