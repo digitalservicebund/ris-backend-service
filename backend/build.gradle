@@ -118,7 +118,7 @@ dependencies {
   implementation "io.micrometer:micrometer-registry-prometheus:1.10.4"
   implementation "io.micrometer:micrometer-core:1.10.4"
 
-  implementation "io.sentry:sentry-spring-boot-starter:6.14.0"
+  implementation "io.sentry:sentry-spring-boot-starter:6.15.0"
   implementation "org.springframework.boot:spring-boot-starter-validation"
 
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
