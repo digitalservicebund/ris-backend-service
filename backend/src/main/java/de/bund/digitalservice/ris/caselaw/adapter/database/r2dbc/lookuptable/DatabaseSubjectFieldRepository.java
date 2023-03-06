@@ -20,7 +20,9 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
       String subjectFieldNumber);
 
   @Query(
-      "SELECT * FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%') ORDER BY subject_field_number LIMIT :limit OFFSET :offset")
+      "SELECT * FROM lookuptable_subject_field "
+          + "WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%') "
+          + "ORDER BY subject_field_number LIMIT :limit OFFSET :offset")
   Flux<SubjectFieldDTO> findBySearchStr(String searchStr, long offset, int limit);
 
   Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
@@ -28,7 +30,8 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
   Mono<SubjectFieldDTO> findBySubjectFieldNumber(String subjectFieldNumber);
 
   @Query(
-      "SELECT COUNT(*) FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%')")
+      "SELECT COUNT(*) FROM lookuptable_subject_field "
+          + "WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%')")
   Mono<Long> countBySearchStr(String searchStr);
 
   @Query(
