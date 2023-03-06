@@ -70,7 +70,7 @@ function handleLinkedFieldClicked(identifier: string) {
           ></FieldOfLawSelectionList>
         </div>
         <div class="p-20">
-          <FieldOfLawSearch />
+          <FieldOfLawSearch @node-clicked="handleNodeClicked" />
         </div>
       </div>
       <div class="bg-white flex-1 p-20">

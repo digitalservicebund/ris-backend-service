@@ -6,13 +6,17 @@ import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
+const emit = defineEmits<{
+  (event: "node-clicked", node: FieldOfLawNode): void
+}>()
+
 const searchStr = ref("")
 const results = ref<Page<FieldOfLawNode>>()
 const currentPage = ref(0)
 const RESULTS_PER_PAGE = 10
 
-function submitSearch(resetPage = true) {
-  if (resetPage) currentPage.value = 0
+function submitSearch(viaPagination = false) {
+  if (viaPagination) currentPage.value = 0
   FieldOfLawService.searchForFieldsOfLaw(
     searchStr.value,
     currentPage.value,
@@ -28,7 +32,7 @@ function handlePagination(backwards: boolean) {
   if (!backwards && results.value?.last) return
 
   currentPage.value += backwards ? -1 : 1
-  submitSearch(false)
+  submitSearch(true)
 }
 </script>
 
@@ -63,8 +67,17 @@ function handlePagination(backwards: boolean) {
         :key="idx"
         class="flex flex-row"
       >
-        <div class="identifier">
-          {{ node.identifier }}
+        <div class="label-02-reg text-blue-800">
+          <span
+            :aria-label="
+              node.identifier + ' ' + node.text + ' im Sachgebietsbaum anzeigen'
+            "
+            class="link"
+            @click="emit('node-clicked', node)"
+            @keyup.enter="emit('node-clicked', node)"
+          >
+            {{ node.identifier }}
+          </span>
         </div>
         <div class="font-size-14px pl-6 pt-2 text-blue-800">
           <TokenizeText :keywords="node.linkedFields ?? []" :text="node.text" />
@@ -72,7 +85,7 @@ function handlePagination(backwards: boolean) {
       </div>
       <div
         v-if="results.numberOfElements < results.totalElements"
-        class="flex flex-row justify-center"
+        class="flex flex-row justify-center pt-16"
       >
         <div
           class="link pr-6"
@@ -102,16 +115,19 @@ function handlePagination(backwards: boolean) {
 .link {
   cursor: pointer;
   text-decoration: underline;
+
+  &:active {
+    text-decoration-thickness: 4px;
+  }
+
+  &:focus {
+    border: 4px solid #004b76;
+  }
 }
 
 .disabled-link {
   color: gray;
   cursor: default;
-}
-
-.identifier {
-  font-size: 16px;
-  white-space: nowrap;
 }
 
 .font-size-14px {
