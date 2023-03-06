@@ -20,7 +20,7 @@ const error = reactive({ title: "", description: "" })
 
 const fileReference = computed(() => {
   const files = loadedNorm.value?.files ?? []
-  return files.length > 0 ? files[0] : undefined
+  return files.length > 0 ? files[files.length - 1] : undefined
 })
 
 const fileName = computed(() => fileReference.value?.name)
@@ -49,7 +49,8 @@ async function getFileLink() {
   const guid = loadedNorm.value?.guid || ""
   try {
     const response = await triggerFileGeneration(guid)
-    if (response.status === 201 && response.data) {
+    if (response.status === 200 && response.data) {
+      await store.load(guid)
     } else {
       Object.assign(error, response.error)
       hasError.value = true
