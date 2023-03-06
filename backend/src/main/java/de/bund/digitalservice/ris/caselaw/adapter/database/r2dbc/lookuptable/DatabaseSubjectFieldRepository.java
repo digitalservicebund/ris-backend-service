@@ -20,9 +20,19 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
       String subjectFieldNumber);
 
   @Query(
-      "SELECT * FROM lookuptable_subject_field "
-          + "WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%') "
-          + "ORDER BY subject_field_number LIMIT :limit OFFSET :offset")
+      "WITH content_added AS (SELECT *, "
+          + "     UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) AS content "
+          + "   FROM lookuptable_subject_field) "
+          + "SELECT *, content, "
+          + "       CASE "
+          + "           WHEN content LIKE UPPER(:searchStr||'%') THEN 1 "
+          + "           WHEN content LIKE UPPER('% '||:searchStr||'%') THEN 2 "
+          + "           WHEN content LIKE UPPER('%-'||:searchStr||'%') THEN 2 "
+          + "           ELSE 3 "
+          + "           END AS weight "
+          + "FROM content_added "
+          + "WHERE content LIKE UPPER('%'||:searchStr||'%') "
+          + "ORDER BY weight, content LIMIT :limit OFFSET :offset")
   Flux<SubjectFieldDTO> findBySearchStr(String searchStr, long offset, int limit);
 
   Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
@@ -48,11 +58,22 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
   Mono<Long> countByNormsStr(String normsStr);
 
   @Query(
-      "SELECT sf.* FROM lookuptable_subject_field sf WHERE sf.id IN ( "
-          + "SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
-          + "WHERE UPPER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE UPPER('%'||:normsStr||'%')) "
-          + "AND UPPER(CONCAT(sf.subject_field_number, ' ', sf.subject_field_text)) LIKE UPPER('%'||:searchStr||'%') "
-          + "ORDER BY subject_field_number LIMIT :limit OFFSET :offset")
+      "WITH sf_content_added AS (SELECT *, "
+          + "     UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) AS content "
+          + "   FROM lookuptable_subject_field) "
+          + "SELECT sf.*, content, "
+          + "       CASE "
+          + "           WHEN content LIKE UPPER(:searchStr||'%') THEN 1 "
+          + "           WHEN content LIKE UPPER('% '||:searchStr||'%') THEN 2 "
+          + "           WHEN content LIKE UPPER('%-'||:searchStr||'%') THEN 2 "
+          + "           ELSE 3 "
+          + "           END AS weight "
+          + "FROM sf_content_added sf WHERE sf.id IN ( "
+          + "           SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
+          + "           WHERE UPPER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE UPPER('%'||:normsStr||'%')"
+          + "        ) "
+          + "        AND content LIKE UPPER('%'||:searchStr||'%') "
+          + "        ORDER BY weight, content LIMIT :limit OFFSET :offset;")
   Flux<SubjectFieldDTO> findByNormsAndSearchStr(
       String normsStr, String searchStr, long offset, int limit);
 
