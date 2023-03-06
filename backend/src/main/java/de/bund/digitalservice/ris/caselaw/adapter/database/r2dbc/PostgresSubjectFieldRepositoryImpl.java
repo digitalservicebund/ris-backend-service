@@ -114,6 +114,37 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
     return databaseSubjectFieldRepository.countBySearchStr(searchStr);
   }
 
+  @Override
+  public Flux<FieldOfLaw> findByNormsStr(String normsStr, Pageable pageable) {
+    return databaseSubjectFieldRepository
+        .findByNormsStr(normsStr, pageable.getOffset(), pageable.getPageSize())
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Mono<Long> countByNormsStr(String normsStr) {
+    return databaseSubjectFieldRepository.countByNormsStr(normsStr);
+  }
+
+  @Override
+  public Flux<FieldOfLaw> findByNormsAndSearchStr(
+      String normsStr, String searchStr, Pageable pageable) {
+    return databaseSubjectFieldRepository
+        .findByNormsAndSearchStr(normsStr, searchStr, pageable.getOffset(), pageable.getPageSize())
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Mono<Long> countByNormsAndSearchStr(String normsStr, String searchStr) {
+    return databaseSubjectFieldRepository.countByNormsAndSearchStr(normsStr, searchStr);
+  }
+
   private Mono<SubjectFieldDTO> injectKeywords(SubjectFieldDTO subjectFieldDTO) {
     return keywordRepository
         .findAllBySubjectFieldIdOrderByValueAsc(subjectFieldDTO.getId())

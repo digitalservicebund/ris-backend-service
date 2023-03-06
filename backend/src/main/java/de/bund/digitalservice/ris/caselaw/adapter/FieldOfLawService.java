@@ -4,6 +4,8 @@ import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,6 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class FieldOfLawService {
   private static final String ROOT_ID = "root";
+  private static final Pattern NORMS_PATTERN = Pattern.compile("norm\\s?:\\s?\"([^\"]*)\"(.*)");
 
   private final SubjectFieldRepository repository;
 
@@ -24,8 +27,8 @@ public class FieldOfLawService {
   }
 
   public Mono<Page<FieldOfLaw>> getFieldsOfLawBySearchQuery(
-      Optional<String> searchStr, Pageable pageable) {
-    if (searchStr.isEmpty() || searchStr.get().isBlank()) {
+      Optional<String> optionalSearchStr, Pageable pageable) {
+    if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
       return repository
           .findAllByOrderBySubjectFieldNumberAsc(pageable)
           .collectList()
@@ -33,11 +36,32 @@ public class FieldOfLawService {
           .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
 
-    String str = searchStr.get().trim();
+    String searchStr = optionalSearchStr.get().trim();
+    Matcher matcher = NORMS_PATTERN.matcher(searchStr);
+
+    if (matcher.find()) {
+      String normsStr = matcher.group(1).trim();
+      String afterNormsSearchStr = matcher.group(2).trim();
+
+      if (afterNormsSearchStr.isEmpty()) {
+        return repository
+            .findByNormsStr(normsStr, pageable)
+            .collectList()
+            .zipWith(repository.countByNormsStr(normsStr))
+            .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+      }
+
+      return repository
+          .findByNormsAndSearchStr(normsStr, afterNormsSearchStr, pageable)
+          .collectList()
+          .zipWith(repository.countByNormsAndSearchStr(normsStr, afterNormsSearchStr))
+          .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+    }
+
     return repository
-        .findBySearchStr(str, pageable)
+        .findBySearchStr(searchStr, pageable)
         .collectList()
-        .zipWith(repository.countBySearchStr(str))
+        .zipWith(repository.countBySearchStr(searchStr))
         .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
   }
 

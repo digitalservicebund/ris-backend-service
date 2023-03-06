@@ -30,4 +30,33 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
   @Query(
       "SELECT COUNT(*) FROM lookuptable_subject_field WHERE UPPER(CONCAT(subject_field_number, ' ', subject_field_text)) LIKE UPPER('%'||:searchStr||'%')")
   Mono<Long> countBySearchStr(String searchStr);
+
+  @Query(
+      "SELECT sf.* FROM lookuptable_subject_field sf WHERE sf.id IN ( "
+          + "SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
+          + "WHERE UPPER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE UPPER('%'||:normsStr||'%')) "
+          + "ORDER BY subject_field_number LIMIT :limit OFFSET :offset")
+  Flux<SubjectFieldDTO> findByNormsStr(String normsStr, long offset, int limit);
+
+  @Query(
+      "SELECT COUNT(*) FROM lookuptable_subject_field sf WHERE sf.id IN ( "
+          + "SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
+          + "WHERE UPPER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE UPPER('%'||:normsStr||'%'))")
+  Mono<Long> countByNormsStr(String normsStr);
+
+  @Query(
+      "SELECT sf.* FROM lookuptable_subject_field sf WHERE sf.id IN ( "
+          + "SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
+          + "WHERE UPPER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE UPPER('%'||:normsStr||'%')) "
+          + "AND UPPER(CONCAT(sf.subject_field_number, ' ', sf.subject_field_text)) LIKE UPPER('%'||:searchStr||'%') "
+          + "ORDER BY subject_field_number LIMIT :limit OFFSET :offset")
+  Flux<SubjectFieldDTO> findByNormsAndSearchStr(
+      String normsStr, String searchStr, long offset, int limit);
+
+  @Query(
+      "SELECT COUNT(*) FROM lookuptable_subject_field sf WHERE sf.id IN ( "
+          + "SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
+          + "WHERE UPPER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE UPPER('%'||:normsStr||'%')) "
+          + "AND UPPER(CONCAT(sf.subject_field_number, ' ', sf.subject_field_text)) LIKE UPPER('%'||:searchStr||'%')")
+  Mono<Long> countByNormsAndSearchStr(String normsStr, String searchStr);
 }

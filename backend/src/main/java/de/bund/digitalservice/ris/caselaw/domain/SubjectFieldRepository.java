@@ -18,6 +18,14 @@ public interface SubjectFieldRepository {
 
   Mono<Long> countBySearchStr(String searchStr);
 
+  Flux<FieldOfLaw> findByNormsStr(String normsStr, Pageable pageable);
+
+  Mono<Long> countByNormsStr(String normsStr);
+
+  Flux<FieldOfLaw> findByNormsAndSearchStr(String normsStr, String searchStr, Pageable pageable);
+
+  Mono<Long> countByNormsAndSearchStr(String normsStr, String searchStr);
+
   Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldId);
 
   Mono<FieldOfLaw> findParentByChild(FieldOfLaw child);
