@@ -24,6 +24,9 @@ function submitSearch(viaPagination = false) {
   ).then((response) => {
     if (!response.data) return
     results.value = response.data
+    if (results.value.content.length > 0 && !viaPagination) {
+      emit("node-clicked", results.value.content[0])
+    }
   })
 }
 
