@@ -9,7 +9,6 @@ export const useLoadedNormStore = defineStore("loaded-norm", () => {
   const loadedNorm = ref<Norm | undefined>(undefined)
 
   async function load(guid: string): Promise<void> {
-    loadedNorm.value = undefined
     const response = await getNormByGuid(guid)
     loadedNorm.value = response.data
   }

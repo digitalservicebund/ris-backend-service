@@ -41,8 +41,8 @@ async function getFileLink() {
   const guid = loadedNorm.value?.guid || ""
   try {
     const response = await triggerFileGeneration(guid)
+    await new Promise((res) => setTimeout(res, 300))
     if (response.status === 200 && response.data) {
-      await new Promise((res) => setTimeout(res, 500))
       await store.load(guid)
     } else {
       Object.assign(error, response.error)
