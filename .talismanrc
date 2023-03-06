@@ -8,12 +8,12 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: d382fce7f32a211c625ee5b5a709a6635cbf136f522a4d5a3bc6198db7f43b7b
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-    checksum: e91c1986c9d5510a83c7d3ef056b6f3cb688d055631945208845148e57e2fda8
+    checksum: 5d4e32686a4524193b6959f9423d4463f8228de0362ddadf44cee18b3559a2a5
   - filename: backend/build.gradle
     checksum: e0c177d442020fefc97f8f3aee2a5dd42e071ff24daf50c9e1ed4cf52dcb9dec
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
-  - filename: '*.sql'
+  - filename: "*.sql"
     ignore_detectors: [filename]
 
 scopeconfig:

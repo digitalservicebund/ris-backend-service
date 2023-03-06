@@ -150,8 +150,10 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .fileNumber("fileNumber")
                 .build());
 
+    // TODO
     ContentRelatedIndexing indexing =
         new ContentRelatedIndexing(
+            null,
             List.of(
                 FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()));
 

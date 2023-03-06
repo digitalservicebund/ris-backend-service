@@ -36,13 +36,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
-
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
   private final DocumentTypeRepository documentTypeRepository;
   private final DatabaseSubjectFieldRepository subjectFieldRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
+  private final DatabaseKeywordRepository keywordRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -55,7 +55,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       StateRepository stateRepository,
       DocumentTypeRepository documentTypeRepository,
       DatabaseSubjectFieldRepository subjectFieldRepository,
-      DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository) {
+      DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
+      DatabaseKeywordRepository keywordRepository) {
 
     this.repository = repository;
     this.previousDecisionRepository = previousDecisionRepository;
@@ -68,6 +69,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.documentTypeRepository = documentTypeRepository;
     this.subjectFieldRepository = subjectFieldRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
+    this.keywordRepository = keywordRepository;
   }
 
   @Override
@@ -599,7 +601,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)
         .flatMap(this::injectDocumentType)
-        .flatMap(this::injectFieldsOfLaw);
+        .flatMap(this::injectFieldsOfLaw)
+        .flatMap(this::injectKeywords);
   }
 
   private Mono<DocumentUnitDTO> injectPreviousDecisions(DocumentUnitDTO documentUnitDTO) {
@@ -685,5 +688,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMapMany(subjectFieldRepository::findAllById)
         .collectList()
         .map(fieldsOfLaw -> documentUnitDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
+  }
+
+  private Mono<DocumentUnitDTO> injectKeywords(DocumentUnitDTO documentUnitDTO) {
+    return keywordRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            keywordDTO -> {
+              documentUnitDTO.setKeywords(keywordDTO);
+              return Mono.just(documentUnitDTO);
+            });
   }
 }

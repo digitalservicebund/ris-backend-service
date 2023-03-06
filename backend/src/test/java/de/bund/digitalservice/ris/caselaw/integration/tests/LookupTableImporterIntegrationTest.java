@@ -10,10 +10,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRe
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
@@ -63,7 +63,7 @@ class LookupTableImporterIntegrationTest {
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
   @Autowired private DatabaseSubjectFieldRepository subjectFieldRepository;
-  @Autowired private KeywordRepository keywordRepository;
+  @Autowired private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
   @Autowired private NormRepository normRepository;
   @Autowired private FieldOfLawLinkRepository fieldOfLawLinkRepository;
 
@@ -200,10 +200,10 @@ class LookupTableImporterIntegrationTest {
     NormDTO expectedNorm2 =
         NormDTO.builder().subjectFieldId(2L).abbreviation("normabk 2.2").build();
 
-    KeywordDTO expectedKeyword1 =
-        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
-    KeywordDTO expectedKeyword2 =
-        KeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
+    FieldOfLawKeywordDTO expectedKeyword1 =
+        FieldOfLawKeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
+    FieldOfLawKeywordDTO expectedKeyword2 =
+        FieldOfLawKeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
 
     SubjectFieldDTO expectedLinkedField1 =
         SubjectFieldDTO.builder()
@@ -309,8 +309,11 @@ class LookupTableImporterIntegrationTest {
             .findAllByOrderBySubjectFieldNumberAsc(Pageable.unpaged())
             .collectList()
             .block();
-    List<KeywordDTO> keywordDTOs =
-        keywordRepository.findAllByOrderBySubjectFieldIdAscValueAsc().collectList().block();
+    List<FieldOfLawKeywordDTO> keywordDTOs =
+        fieldOfLawKeywordRepository
+            .findAllByOrderBySubjectFieldIdAscValueAsc()
+            .collectList()
+            .block();
     List<NormDTO> normDTOs =
         normRepository.findAllByOrderBySubjectFieldIdAscAbbreviationAsc().collectList().block();
 

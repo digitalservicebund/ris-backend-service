@@ -102,5 +102,6 @@ public class DocumentUnitDTO {
   @Transient List<IncorrectCourtDTO> incorrectCourts;
   @Transient List<DeviatingEcliDTO> deviatingEclis;
   @Transient List<DeviatingDecisionDateDTO> deviatingDecisionDates;
+  @Transient List<KeywordDTO> keywords;
   @Transient List<SubjectFieldDTO> fieldsOfLaw;
 }

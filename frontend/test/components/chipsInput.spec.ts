@@ -326,4 +326,6 @@ describe("ChipsInput", () => {
 
     expect(emitted()["update:modelValue"]).toEqual([[["ab"]]])
   })
+
+  //TODO test emit add and delete chips events
 })

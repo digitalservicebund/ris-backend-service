@@ -1,9 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepository {
 
   DatabaseSubjectFieldRepository databaseSubjectFieldRepository;
-  KeywordRepository keywordRepository;
+  FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
   NormRepository normRepository;
   FieldOfLawLinkRepository fieldOfLawLinkRepository;
   DatabaseDocumentUnitRepository databaseDocumentUnitRepository;
@@ -29,14 +29,14 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
 
   public PostgresSubjectFieldRepositoryImpl(
       DatabaseSubjectFieldRepository databaseSubjectFieldRepository,
-      KeywordRepository keywordRepository,
+      FieldOfLawKeywordRepository fieldOfLawKeywordRepository,
       NormRepository normRepository,
       FieldOfLawLinkRepository fieldOfLawLinkRepository,
       DatabaseDocumentUnitRepository databaseDocumentUnitRepository,
       DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository) {
 
     this.databaseSubjectFieldRepository = databaseSubjectFieldRepository;
-    this.keywordRepository = keywordRepository;
+    this.fieldOfLawKeywordRepository = fieldOfLawKeywordRepository;
     this.normRepository = normRepository;
     this.fieldOfLawLinkRepository = fieldOfLawLinkRepository;
     this.databaseDocumentUnitRepository = databaseDocumentUnitRepository;
@@ -148,7 +148,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   private Mono<SubjectFieldDTO> injectKeywords(SubjectFieldDTO subjectFieldDTO) {
-    return keywordRepository
+    return fieldOfLawKeywordRepository
         .findAllBySubjectFieldIdOrderByValueAsc(subjectFieldDTO.getId())
         .collectList()
         .map(

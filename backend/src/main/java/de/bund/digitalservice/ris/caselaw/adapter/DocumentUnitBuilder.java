@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -121,6 +122,11 @@ public class DocumentUnitBuilder {
       dataSource = DataSource.MIGRATION;
     }
 
+    List<String> keywords = null;
+    if (documentUnitDTO.getKeywords() != null) {
+      keywords = documentUnitDTO.getKeywords().stream().map(KeywordDTO::keyword).toList();
+    }
+
     return new DocumentUnit(
         documentUnitDTO.getUuid(),
         documentUnitDTO.getDocumentnumber(),
@@ -156,6 +162,6 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getReasons(),
             documentUnitDTO.getCaseFacts(),
             documentUnitDTO.getDecisionReasons()),
-        new ContentRelatedIndexing(fieldsOfLaw));
+        new ContentRelatedIndexing(keywords, fieldsOfLaw));
   }
 }

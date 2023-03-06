@@ -28,7 +28,7 @@ public class SubjectFieldDTO implements Persistable<Long> {
   String subjectFieldText;
   String navigationTerm;
   @Transient List<SubjectFieldDTO> linkedFields;
-  @Transient List<KeywordDTO> keywords;
+  @Transient List<FieldOfLawKeywordDTO> keywords;
   @Transient List<NormDTO> norms;
 
   @Transient private boolean isNew;
