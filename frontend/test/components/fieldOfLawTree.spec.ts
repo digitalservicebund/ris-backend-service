@@ -14,6 +14,7 @@ function renderComponent(
     props: {
       selectedNodes: options.selectedNodes ?? [],
       clickedIdentifier: "",
+      showNormsSignal: false,
     },
   })
 }
