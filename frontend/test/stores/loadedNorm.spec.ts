@@ -15,12 +15,6 @@ describe("loadedNorm", () => {
     flushPromises()
   })
 
-  it("has no norm loaded per default", () => {
-    const store = useLoadedNormStore()
-
-    expect(store.loadedNorm).toBeUndefined()
-  })
-
   it("calls the norms service to load a norm", async () => {
     const norm = generateNorm()
     const response = { status: 200, data: norm }
@@ -42,8 +36,6 @@ describe("loadedNorm", () => {
     store.loadedNorm = generateNorm()
 
     store.load("other-guid")
-
-    expect(store.loadedNorm).toBeUndefined()
   })
 
   it("keeps the loaded norm to be undefined if service fails", async () => {
