@@ -12,6 +12,7 @@ const props = defineProps<{
 
 const selectedFieldsOfLaw = ref<FieldOfLawNode[]>([])
 const clickedIdentifier = ref("")
+const showNormsSignal = ref(false)
 
 const response = await FieldOfLawService.getSelectedFieldsOfLaw(
   props.documentUnitUuid
@@ -70,17 +71,22 @@ function handleLinkedFieldClicked(identifier: string) {
           ></FieldOfLawSelectionList>
         </div>
         <div class="p-20">
-          <FieldOfLawSearch @node-clicked="handleNodeClicked" />
+          <FieldOfLawSearch
+            @node-clicked="handleNodeClicked"
+            @show-norms-signal="showNormsSignal = true"
+          />
         </div>
       </div>
       <div class="bg-white flex-1 p-20">
         <FieldOfLawTree
           :clicked-identifier="clickedIdentifier"
           :selected-nodes="selectedFieldsOfLaw"
+          :show-norms-signal="showNormsSignal"
           @add-to-list="handleAdd"
           @linked-field:clicked="handleLinkedFieldClicked"
           @remove-from-list="handleRemoveByIdentifier"
           @reset-clicked-node="handleResetClickedNode"
+          @reset-show-norms-signal="showNormsSignal = false"
         ></FieldOfLawTree>
       </div>
     </div>

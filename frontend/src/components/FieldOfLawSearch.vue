@@ -8,6 +8,7 @@ import FieldOfLawService from "@/services/fieldOfLawService"
 
 const emit = defineEmits<{
   (event: "node-clicked", node: FieldOfLawNode): void
+  (event: "show-norms-signal"): void
 }>()
 
 const searchStr = ref("")
@@ -26,6 +27,9 @@ function submitSearch(viaPagination = false) {
     results.value = response.data
     if (results.value.content.length > 0 && !viaPagination) {
       emit("node-clicked", results.value.content[0])
+      if (searchStr.value.includes("norm:")) {
+        emit("show-norms-signal")
+      }
     }
   })
 }

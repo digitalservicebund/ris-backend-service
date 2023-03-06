@@ -7,12 +7,14 @@ import FieldOfLawService from "@/services/fieldOfLawService"
 const props = defineProps<{
   selectedNodes: FieldOfLawNode[]
   clickedIdentifier: string
+  showNormsSignal: boolean
 }>()
 
 const emit = defineEmits<{
   (event: "add-to-list", node: FieldOfLawNode): void
   (event: "remove-from-list", identifier: string): void
   (event: "reset-clicked-node"): void
+  (event: "reset-show-norms-signal"): void
   (event: "linkedField:clicked", identifier: string): void
 }>()
 
@@ -21,6 +23,12 @@ const showNorms = ref(false)
 
 const clicked = computed(() => props.clickedIdentifier)
 watch(clicked, () => buildDirectPathTreeTo(clicked.value))
+
+const showNormsSignal = computed(() => props.showNormsSignal)
+watch(showNormsSignal, () => {
+  showNorms.value = true
+  emit("reset-show-norms-signal")
+})
 
 function handleSelect(node: FieldOfLawNode) {
   emit("add-to-list", node)
