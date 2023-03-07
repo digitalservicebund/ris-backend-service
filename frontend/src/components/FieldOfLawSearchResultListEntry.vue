@@ -19,7 +19,7 @@ const emit = defineEmits<{
           props.node.text +
           ' im Sachgebietsbaum anzeigen'
         "
-        class="link"
+        class="identifier link"
         @click="emit('node-clicked')"
         @keyup.enter="emit('node-clicked')"
       >
@@ -36,6 +36,11 @@ const emit = defineEmits<{
 </template>
 
 <style lang="scss" scoped>
+.identifier {
+  font-size: 16px;
+  white-space: nowrap;
+}
+
 .link {
   cursor: pointer;
   text-decoration: underline;
