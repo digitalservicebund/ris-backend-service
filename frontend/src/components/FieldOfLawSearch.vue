@@ -16,8 +16,8 @@ const results = ref<Page<FieldOfLawNode>>()
 const currentPage = ref(0)
 const RESULTS_PER_PAGE = 10
 
-function submitSearch(viaPagination = false) {
-  if (viaPagination) currentPage.value = 0
+function submitSearch(isNewSearch = true) {
+  if (isNewSearch) currentPage.value = 0
   FieldOfLawService.searchForFieldsOfLaw(
     searchStr.value,
     currentPage.value,
@@ -25,7 +25,7 @@ function submitSearch(viaPagination = false) {
   ).then((response) => {
     if (!response.data) return
     results.value = response.data
-    if (results.value.content.length > 0 && !viaPagination) {
+    if (results.value.content.length > 0 && isNewSearch) {
       emit("node-clicked", results.value.content[0])
       if (searchStr.value.includes("norm:")) {
         emit("show-norms-signal")
@@ -39,7 +39,7 @@ function handlePagination(backwards: boolean) {
   if (!backwards && results.value?.last) return
 
   currentPage.value += backwards ? -1 : 1
-  submitSearch(true)
+  submitSearch(false)
 }
 </script>
 
