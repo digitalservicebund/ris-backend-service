@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -25,19 +24,19 @@ public class ContentRelatedIndexingController {
   }
 
   @GetMapping("fieldsoflaw")
-  public Flux<FieldOfLaw> getFieldsOfLaw(@PathVariable("uuid") UUID documentUnitUuid) {
+  public Mono<List<FieldOfLaw>> getFieldsOfLaw(@PathVariable("uuid") UUID documentUnitUuid) {
     return fieldOfLawService.getFieldsOfLawForDocumentUnit(documentUnitUuid);
   }
 
   @PutMapping("fieldsoflaw/{identifier}")
-  public Flux<FieldOfLaw> addFieldOfLaw(
+  public Mono<List<FieldOfLaw>> addFieldOfLaw(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
 
     return fieldOfLawService.addFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
   }
 
   @DeleteMapping("fieldsoflaw/{identifier}")
-  public Flux<FieldOfLaw> removeFieldOfLaw(
+  public Mono<List<FieldOfLaw>> removeFieldOfLaw(
       @PathVariable("uuid") UUID documentUnitUuid, @PathVariable("identifier") String identifier) {
 
     return fieldOfLawService.removeFieldOfLawToDocumentUnit(documentUnitUuid, identifier);

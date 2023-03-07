@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -94,15 +95,17 @@ public class FieldOfLawService {
             });
   }
 
-  public Flux<FieldOfLaw> getFieldsOfLawForDocumentUnit(UUID documentUnitUuid) {
+  public Mono<List<FieldOfLaw>> getFieldsOfLawForDocumentUnit(UUID documentUnitUuid) {
     return repository.findAllForDocumentUnit(documentUnitUuid);
   }
 
-  public Flux<FieldOfLaw> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+  public Mono<List<FieldOfLaw>> addFieldOfLawToDocumentUnit(
+      UUID documentUnitUuid, String identifier) {
     return repository.addFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
   }
 
-  public Flux<FieldOfLaw> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+  public Mono<List<FieldOfLaw>> removeFieldOfLawToDocumentUnit(
+      UUID documentUnitUuid, String identifier) {
     return repository.removeFieldOfLawToDocumentUnit(documentUnitUuid, identifier);
   }
 }

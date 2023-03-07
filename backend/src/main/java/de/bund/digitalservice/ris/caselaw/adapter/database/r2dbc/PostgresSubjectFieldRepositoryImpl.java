@@ -9,10 +9,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sub
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -184,21 +184,27 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<FieldOfLaw> findAllForDocumentUnit(UUID documentUnitUuid) {
+  public Mono<List<FieldOfLaw>> findAllForDocumentUnit(UUID documentUnitUuid) {
     return databaseDocumentUnitRepository
         .findByUuid(documentUnitUuid)
         .map(DocumentUnitDTO::getId)
         .flatMapMany(
             documentUnitId ->
-                databaseDocumentUnitFieldsOfLawRepository.findAllByDocumentUnitId(
-                    documentUnitId, Sort.by(Direction.ASC, "fieldOfLawId")))
+                databaseDocumentUnitFieldsOfLawRepository.findAllByDocumentUnitId(documentUnitId))
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .flatMap(databaseSubjectFieldRepository::findById)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(SubjectFieldTransformer::transformToDomain)
+        .collectList()
+        .map(
+            fieldOfLawList ->
+                fieldOfLawList.stream()
+                    .sorted(Comparator.comparing(FieldOfLaw::identifier))
+                    .toList());
   }
 
   @Override
-  public Flux<FieldOfLaw> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+  public Mono<List<FieldOfLaw>> addFieldOfLawToDocumentUnit(
+      UUID documentUnitUuid, String identifier) {
     Mono<Long> documentUnitDTOId =
         databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
 
@@ -210,7 +216,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
 
     return documentUnitDTOId
         .zipWith(fieldOfLawDTOId)
-        .flatMapMany(
+        .flatMap(
             t -> {
               if (t.getT2() == -1L) {
                 return getLinkedFieldsOfLaw(t.getT1());
@@ -220,16 +226,22 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
                   .findByDocumentUnitIdAndFieldOfLawId(t.getT1(), t.getT2())
                   .switchIfEmpty(linkFieldOfLawToDocumentUnit(t.getT1(), t.getT2()))
                   .map(DocumentUnitFieldsOfLawDTO::documentUnitId)
-                  .thenMany(getLinkedFieldsOfLaw(t.getT1()));
+                  .then(getLinkedFieldsOfLaw(t.getT1()));
             });
   }
 
-  private Flux<FieldOfLaw> getLinkedFieldsOfLaw(Long documentUnitId) {
+  private Mono<List<FieldOfLaw>> getLinkedFieldsOfLaw(Long documentUnitId) {
     return databaseDocumentUnitFieldsOfLawRepository
-        .findAllByDocumentUnitId(documentUnitId, Sort.by(Direction.ASC, "fieldOfLawId"))
+        .findAllByDocumentUnitId(documentUnitId)
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .flatMapSequential(databaseSubjectFieldRepository::findById)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(SubjectFieldTransformer::transformToDomain)
+        .collectList()
+        .map(
+            fieldOfLawList ->
+                fieldOfLawList.stream()
+                    .sorted(Comparator.comparing(FieldOfLaw::identifier))
+                    .toList());
   }
 
   private Mono<DocumentUnitFieldsOfLawDTO> linkFieldOfLawToDocumentUnit(
@@ -244,7 +256,8 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<FieldOfLaw> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier) {
+  public Mono<List<FieldOfLaw>> removeFieldOfLawToDocumentUnit(
+      UUID documentUnitUuid, String identifier) {
     Mono<Long> documentUnitDTOId =
         databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
 
@@ -256,12 +269,12 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
 
     return documentUnitDTOId
         .zipWith(fieldOfLawDTOId)
-        .flatMapMany(
+        .flatMap(
             t ->
                 databaseDocumentUnitFieldsOfLawRepository
                     .findByDocumentUnitIdAndFieldOfLawId(t.getT1(), t.getT2())
                     .flatMap(dto -> databaseDocumentUnitFieldsOfLawRepository.delete(dto))
-                    .thenMany(getLinkedFieldsOfLaw(t.getT1())));
+                    .then(getLinkedFieldsOfLaw(t.getT1())));
   }
 
   @Override

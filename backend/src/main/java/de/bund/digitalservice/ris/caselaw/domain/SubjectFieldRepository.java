@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -32,11 +33,11 @@ public interface SubjectFieldRepository {
 
   Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
 
-  Flux<FieldOfLaw> findAllForDocumentUnit(UUID documentUnitUuid);
+  Mono<List<FieldOfLaw>> findAllForDocumentUnit(UUID documentUnitUuid);
 
-  Flux<FieldOfLaw> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
+  Mono<List<FieldOfLaw>> addFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
 
-  Flux<FieldOfLaw> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
+  Mono<List<FieldOfLaw>> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
 
   Mono<Long> count();
 }
