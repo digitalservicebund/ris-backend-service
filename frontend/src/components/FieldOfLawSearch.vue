@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import FieldOfLawSearchResultListEntry from "@/components/FieldOfLawSearchResultListEntry.vue"
 import TextButton from "@/components/TextButton.vue"
 import TextInput from "@/components/TextInput.vue"
-import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
@@ -69,27 +69,12 @@ function handlePagination(backwards: boolean) {
       </div>
     </div>
     <div v-if="results">
-      <div
+      <FieldOfLawSearchResultListEntry
         v-for="(node, idx) in results.content"
         :key="idx"
-        class="flex flex-row"
-      >
-        <div class="label-02-reg text-blue-800">
-          <span
-            :aria-label="
-              node.identifier + ' ' + node.text + ' im Sachgebietsbaum anzeigen'
-            "
-            class="link"
-            @click="emit('node-clicked', node)"
-            @keyup.enter="emit('node-clicked', node)"
-          >
-            {{ node.identifier }}
-          </span>
-        </div>
-        <div class="font-size-14px pl-6 pt-2 text-blue-800">
-          <TokenizeText :keywords="node.linkedFields ?? []" :text="node.text" />
-        </div>
-      </div>
+        :node="node"
+        @node-clicked="emit('node-clicked', node)"
+      />
       <div
         v-if="results.numberOfElements < results.totalElements"
         class="flex flex-row justify-center pt-16"
@@ -135,10 +120,6 @@ function handlePagination(backwards: boolean) {
 .disabled-link {
   color: gray;
   cursor: default;
-}
-
-.font-size-14px {
-  font-size: 14px;
 }
 
 .page-count {
