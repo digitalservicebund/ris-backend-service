@@ -10,7 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -62,9 +62,9 @@ public class JurisXmlExporterWrapperIntegrationTest {
 
     Texts texts = Texts.builder().decisionName("decisionName").build();
 
-    List<PreviousDecision> previousDecisions =
+    List<LinkedDocumentUnit> linkedDocumentUnits =
         List.of(
-            PreviousDecision.builder()
+            LinkedDocumentUnit.builder()
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-05-06T00:00:00Z"))
                 .fileNumber("fileNumber")
@@ -75,7 +75,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
             .coreData(coreData)
-            .previousDecisions(previousDecisions)
+            .previousDecisions(linkedDocumentUnits)
             .texts(texts)
             .build();
 
@@ -141,9 +141,9 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .decisionReasons("decisionReasons")
             .build();
 
-    List<PreviousDecision> previousDecisions =
+    List<LinkedDocumentUnit> linkedDocumentUnits =
         List.of(
-            PreviousDecision.builder()
+            LinkedDocumentUnit.builder()
                 .id(1L)
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
@@ -166,7 +166,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .filetype("filetype")
             .filename("filename")
             .coreData(coreData)
-            .previousDecisions(previousDecisions)
+            .previousDecisions(linkedDocumentUnits)
             .texts(texts)
             .contentRelatedIndexing(indexing)
             .build();
@@ -178,10 +178,10 @@ public class JurisXmlExporterWrapperIntegrationTest {
         assertThat(field).hasNoNullFieldsOrProperties();
       if (field.getType().equals(List.class)) {
         field.setAccessible(true);
-        List<PreviousDecision> previousDecisionsList =
-            (List<PreviousDecision>) field.get(documentUnit);
-        for (PreviousDecision previousDecision : previousDecisionsList) {
-          assertThat(previousDecision).hasNoNullFieldsOrProperties();
+        List<LinkedDocumentUnit> previousDecisionsList =
+            (List<LinkedDocumentUnit>) field.get(documentUnit);
+        for (LinkedDocumentUnit linkedDocumentUnit : previousDecisionsList) {
+          assertThat(linkedDocumentUnit).hasNoNullFieldsOrProperties();
         }
       }
     }

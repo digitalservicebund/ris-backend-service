@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DataSourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -63,20 +63,20 @@ public class DocumentUnitTransformer {
     }
 
     if (documentUnitDTO.getId() == null
-        && documentUnit.previousDecisions() != null
-        && !documentUnit.previousDecisions().isEmpty()) {
+        && documentUnit.linkedDocumentUnits() != null
+        && !documentUnit.linkedDocumentUnits().isEmpty()) {
 
       throw new DocumentUnitTransformerException(
           "Transformation of a document unit with previous decisions only allowed by update. "
               + "Document unit must have a database id!");
     }
 
-    if (documentUnit.previousDecisions() != null) {
+    if (documentUnit.linkedDocumentUnits() != null) {
       builder.previousDecisions(
-          documentUnit.previousDecisions().stream()
+          documentUnit.linkedDocumentUnits().stream()
               .map(
                   previousDecision ->
-                      PreviousDecisionDTO.builder()
+                      LinkedDocumentUnitDTO.builder()
                           .id(previousDecision.id())
                           .documentUnitId(documentUnitDTO.getId())
                           .courtLocation(previousDecision.court().location())

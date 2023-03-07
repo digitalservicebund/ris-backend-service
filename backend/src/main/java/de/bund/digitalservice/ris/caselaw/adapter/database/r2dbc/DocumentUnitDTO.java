@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import java.time.Instant;
@@ -96,7 +97,7 @@ public class DocumentUnitDTO {
   @Column("entscheidungsgruende")
   String decisionReasons;
 
-  @Transient List<PreviousDecisionDTO> previousDecisions;
+  @Transient List<LinkedDocumentUnitDTO> previousDecisions;
   @Transient List<FileNumberDTO> fileNumbers;
   @Transient List<FileNumberDTO> deviatingFileNumbers;
   @Transient List<IncorrectCourtDTO> incorrectCourts;

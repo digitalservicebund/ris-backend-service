@@ -12,7 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -56,13 +56,13 @@ public class DocumentUnitBuilder {
           new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
     }
 
-    List<PreviousDecision> previousDecisions = null;
+    List<LinkedDocumentUnit> linkedDocumentUnits = null;
     if (documentUnitDTO.getPreviousDecisions() != null) {
-      previousDecisions =
+      linkedDocumentUnits =
           documentUnitDTO.getPreviousDecisions().stream()
               .map(
                   previousDecisionDTO ->
-                      PreviousDecision.builder()
+                      LinkedDocumentUnit.builder()
                           .id(previousDecisionDTO.getId())
                           .court(
                               getCourtObject(
@@ -146,7 +146,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),
             documentUnitDTO.getRegion()),
-        previousDecisions,
+        linkedDocumentUnits,
         new Texts(
             documentUnitDTO.getDecisionName(),
             documentUnitDTO.getHeadline(),

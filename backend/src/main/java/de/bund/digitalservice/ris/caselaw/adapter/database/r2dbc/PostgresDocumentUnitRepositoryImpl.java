@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.DatabaseLinkedDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
@@ -15,7 +17,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTran
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.PreviousDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +32,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
   private final DatabaseDocumentUnitRepository repository;
-  private final DatabasePreviousDecisionRepository previousDecisionRepository;
+  private final DatabaseLinkedDocumentUnitRepository previousDecisionRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
@@ -46,7 +48,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitRepository repository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      DatabasePreviousDecisionRepository previousDecisionRepository,
+      DatabaseLinkedDocumentUnitRepository previousDecisionRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
       CourtRepository courtRepository,
@@ -207,33 +209,33 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(
             previousDecisionDTOs -> {
               List<Long> toDeleteIds = new ArrayList<>();
-              List<PreviousDecisionDTO> toUpdate = new ArrayList<>();
-              List<PreviousDecisionDTO> toInsert = new ArrayList<>();
+              List<LinkedDocumentUnitDTO> toUpdate = new ArrayList<>();
+              List<LinkedDocumentUnitDTO> toInsert = new ArrayList<>();
 
               List<Long> updateIds = new ArrayList<>();
 
-              if (documentUnit.previousDecisions() == null
-                  || documentUnit.previousDecisions().isEmpty()) {
+              if (documentUnit.linkedDocumentUnits() == null
+                  || documentUnit.linkedDocumentUnits().isEmpty()) {
                 toDeleteIds.addAll(
-                    previousDecisionDTOs.stream().map(PreviousDecisionDTO::getId).toList());
+                    previousDecisionDTOs.stream().map(LinkedDocumentUnitDTO::getId).toList());
               } else {
                 toInsert.addAll(
-                    documentUnit.previousDecisions().stream()
+                    documentUnit.linkedDocumentUnits().stream()
                         .filter(previousDecision -> previousDecision.id() == null)
                         .map(
                             previousDecision ->
                                 PreviousDecisionTransformer.generateDTO(
                                     previousDecision, documentUnitDTO.getId()))
                         .toList());
-                List<PreviousDecision> toUpdateOrToDelete =
+                List<LinkedDocumentUnit> toUpdateOrToDelete =
                     new ArrayList<>(
-                        documentUnit.previousDecisions().stream()
+                        documentUnit.linkedDocumentUnits().stream()
                             .filter(previousDecision -> previousDecision.id() != null)
                             .toList());
 
                 previousDecisionDTOs.forEach(
                     previousDecisionDTO -> {
-                      Optional<PreviousDecision> previousDecisionOptional =
+                      Optional<LinkedDocumentUnit> previousDecisionOptional =
                           toUpdateOrToDelete.stream()
                               .filter(
                                   previousDecision ->
@@ -252,10 +254,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                       }
                     });
 
-                updateIds.addAll(toUpdateOrToDelete.stream().map(PreviousDecision::id).toList());
+                updateIds.addAll(toUpdateOrToDelete.stream().map(LinkedDocumentUnit::id).toList());
               }
 
-              List<PreviousDecisionDTO> savedPreviousDecisions = new ArrayList<>();
+              List<LinkedDocumentUnitDTO> savedPreviousDecisions = new ArrayList<>();
 
               return previousDecisionRepository
                   .findAllById(updateIds)

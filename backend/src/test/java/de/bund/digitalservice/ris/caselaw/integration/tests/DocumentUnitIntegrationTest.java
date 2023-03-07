@@ -9,7 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePreviousDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.DatabaseLinkedDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
@@ -17,9 +17,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
@@ -34,7 +34,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -77,7 +77,7 @@ class DocumentUnitIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
-  @Autowired private DatabasePreviousDecisionRepository previousDecisionRepository;
+  @Autowired private DatabaseLinkedDocumentUnitRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
   @Autowired private CourtRepository courtRepository;
@@ -112,11 +112,11 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
-    List<PreviousDecisionDTO> previousDecisionDTOs =
+    List<LinkedDocumentUnitDTO> linkedDocumentUnitDTOS =
         List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+    previousDecisionRepository.saveAll(linkedDocumentUnitDTOS).collectList().block();
 
     UUID documentUnitUuid2 = UUID.randomUUID();
     documentUnitDTO =
@@ -126,11 +126,11 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     savedDocumentUnit = repository.save(documentUnitDTO).block();
-    previousDecisionDTOs =
+    linkedDocumentUnitDTOS =
         List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+    previousDecisionRepository.saveAll(linkedDocumentUnitDTOS).collectList().block();
 
     webClient
         .mutateWith(csrf())
@@ -144,7 +144,7 @@ class DocumentUnitIntegrationTest {
             response -> {
               DocumentUnit responseBody = response.getResponseBody();
               assertThat(responseBody.uuid()).isEqualTo(documentUnitUuid1);
-              assertThat(responseBody.previousDecisions()).hasSize(2);
+              assertThat(responseBody.linkedDocumentUnits()).hasSize(2);
             });
   }
 
@@ -158,11 +158,11 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
-    List<PreviousDecisionDTO> previousDecisionDTOs =
+    List<LinkedDocumentUnitDTO> linkedDocumentUnitDTOS =
         List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+    previousDecisionRepository.saveAll(linkedDocumentUnitDTOS).collectList().block();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -171,12 +171,12 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .previousDecisions(
                 List.of(
-                    PreviousDecision.builder()
+                    LinkedDocumentUnit.builder()
                         .court(new Court("courtType", "courtPlace", "courtLabel", null))
                         .date(Instant.parse("2020-05-06T00:00:00Z"))
                         .fileNumber("prev1")
                         .build(),
-                    PreviousDecision.builder()
+                    LinkedDocumentUnit.builder()
                         .court(new Court("courtType", "courtPlace", "courtLabel", null))
                         .date(Instant.parse("2020-05-06T00:00:00Z"))
                         .fileNumber("prev2")
@@ -197,7 +197,7 @@ class DocumentUnitIntegrationTest {
               DocumentUnit responseBody = response.getResponseBody();
               assertThat(responseBody).isNotNull();
               assertThat(responseBody.uuid()).isEqualTo(documentUnitUuid1);
-              assertThat(responseBody.previousDecisions()).hasSize(2);
+              assertThat(responseBody.linkedDocumentUnits()).hasSize(2);
             });
   }
 
@@ -211,11 +211,11 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
-    List<PreviousDecisionDTO> previousDecisionDTOs =
+    List<LinkedDocumentUnitDTO> linkedDocumentUnitDTOS =
         List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+    previousDecisionRepository.saveAll(linkedDocumentUnitDTOS).collectList().block();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -224,7 +224,7 @@ class DocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .previousDecisions(
                 List.of(
-                    PreviousDecision.builder()
+                    LinkedDocumentUnit.builder()
                         .id(1L)
                         .court(new Court("courtType", "courtPlace", "courtLabel", null))
                         .date(Instant.parse("2020-05-06T00:00:00Z"))
@@ -244,9 +244,9 @@ class DocumentUnitIntegrationTest {
     List<DocumentUnitDTO> documentUnitDTOs = repository.findAll().collectList().block();
     assertThat(documentUnitDTOs).hasSize(1);
 
-    previousDecisionDTOs = previousDecisionRepository.findAll().collectList().block();
-    assertThat(previousDecisionDTOs).hasSize(1);
-    assertThat(previousDecisionDTOs)
+    linkedDocumentUnitDTOS = previousDecisionRepository.findAll().collectList().block();
+    assertThat(linkedDocumentUnitDTOS).hasSize(1);
+    assertThat(linkedDocumentUnitDTOS)
         .extracting("id", "fileNumber")
         .containsExactly(tuple(1L, "prev1"));
   }

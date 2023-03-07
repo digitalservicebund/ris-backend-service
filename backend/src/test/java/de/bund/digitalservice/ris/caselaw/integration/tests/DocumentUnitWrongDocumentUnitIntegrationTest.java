@@ -6,19 +6,19 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabasePreviousDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.DatabaseLinkedDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -58,7 +58,7 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
-  @Autowired private DatabasePreviousDecisionRepository previousDecisionRepository;
+  @Autowired private DatabaseLinkedDocumentUnitRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
 
@@ -83,11 +83,11 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
-    List<PreviousDecisionDTO> previousDecisionDTOs =
+    List<LinkedDocumentUnitDTO> linkedDocumentUnitDTOS =
         List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+    previousDecisionRepository.saveAll(linkedDocumentUnitDTOS).collectList().block();
 
     documentUnitDTO =
         DocumentUnitDTO.builder()
@@ -96,11 +96,11 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     savedDocumentUnit = repository.save(documentUnitDTO).block();
-    previousDecisionDTOs =
+    linkedDocumentUnitDTOS =
         List.of(
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            PreviousDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
-    previousDecisionRepository.saveAll(previousDecisionDTOs).collectList().block();
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
+            LinkedDocumentUnitDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+    previousDecisionRepository.saveAll(linkedDocumentUnitDTOS).collectList().block();
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -109,8 +109,8 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .previousDecisions(
                 List.of(
-                    PreviousDecision.builder().id(3L).fileNumber("prev1").build(),
-                    PreviousDecision.builder().id(4L).fileNumber("prev2").build()))
+                    LinkedDocumentUnit.builder().id(3L).fileNumber("prev1").build(),
+                    LinkedDocumentUnit.builder().id(4L).fileNumber("prev2").build()))
             .build();
 
     webClient
@@ -128,9 +128,9 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
         .extracting("documentnumber")
         .containsExactly("docnr12345678", "docnr23456789");
 
-    previousDecisionDTOs = previousDecisionRepository.findAll().collectList().block();
-    assertThat(previousDecisionDTOs).hasSize(4);
-    assertThat(previousDecisionDTOs)
+    linkedDocumentUnitDTOS = previousDecisionRepository.findAll().collectList().block();
+    assertThat(linkedDocumentUnitDTOS).hasSize(4);
+    assertThat(linkedDocumentUnitDTOS)
         .extracting("fileNumber")
         .containsExactly(null, null, null, null);
   }

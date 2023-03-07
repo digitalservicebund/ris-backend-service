@@ -1,51 +1,53 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO.PreviousDecisionDTOBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO.PreviousDecisionDTOBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
 
 public class PreviousDecisionTransformer {
   private PreviousDecisionTransformer() {}
 
-  private static String getCourtLocation(PreviousDecision previousDecision) {
+  private static String getCourtLocation(LinkedDocumentUnit linkedDocumentUnit) {
     String courtLocation = null;
-    if (previousDecision.court() != null) {
-      courtLocation = previousDecision.court().location();
+    if (linkedDocumentUnit.court() != null) {
+      courtLocation = linkedDocumentUnit.court().location();
     }
     return courtLocation;
   }
 
-  private static String getCourtType(PreviousDecision previousDecision) {
+  private static String getCourtType(LinkedDocumentUnit linkedDocumentUnit) {
     String courtType = null;
-    if (previousDecision.court() != null) {
-      courtType = previousDecision.court().type();
+    if (linkedDocumentUnit.court() != null) {
+      courtType = linkedDocumentUnit.court().type();
     }
     return courtType;
   }
 
-  public static PreviousDecisionDTO generateDTO(
-      PreviousDecision previousDecision, Long documentUnitId) {
-    return fillData(PreviousDecisionDTO.builder(), previousDecision, documentUnitId);
+  public static LinkedDocumentUnitDTO generateDTO(
+      LinkedDocumentUnit linkedDocumentUnit, Long documentUnitId) {
+    return fillData(LinkedDocumentUnitDTO.builder(), linkedDocumentUnit, documentUnitId);
   }
 
-  public static PreviousDecisionDTO enrichDTO(
-      PreviousDecisionDTO previousDecisionDTO, PreviousDecision previousDecision) {
+  public static LinkedDocumentUnitDTO enrichDTO(
+      LinkedDocumentUnitDTO linkedDocumentUnitDTO, LinkedDocumentUnit linkedDocumentUnit) {
     return fillData(
-        previousDecisionDTO.toBuilder(), previousDecision, previousDecisionDTO.getDocumentUnitId());
+        linkedDocumentUnitDTO.toBuilder(),
+        linkedDocumentUnit,
+        linkedDocumentUnitDTO.getDocumentUnitId());
   }
 
-  private static PreviousDecisionDTO fillData(
+  private static LinkedDocumentUnitDTO fillData(
       PreviousDecisionDTOBuilder toBuilder,
-      PreviousDecision previousDecision,
+      LinkedDocumentUnit linkedDocumentUnit,
       Long documentUnitId) {
 
-    return PreviousDecisionDTO.builder()
-        .id(previousDecision.id())
-        .courtLocation(getCourtLocation(previousDecision))
-        .courtType(getCourtType(previousDecision))
-        .fileNumber(previousDecision.fileNumber())
+    return LinkedDocumentUnitDTO.builder()
+        .id(linkedDocumentUnit.id())
+        .courtLocation(getCourtLocation(linkedDocumentUnit))
+        .courtType(getCourtType(linkedDocumentUnit))
+        .fileNumber(linkedDocumentUnit.fileNumber())
         .documentUnitId(documentUnitId)
-        .decisionDateTimestamp(previousDecision.date())
+        .decisionDateTimestamp(linkedDocumentUnit.date())
         .build();
   }
 }

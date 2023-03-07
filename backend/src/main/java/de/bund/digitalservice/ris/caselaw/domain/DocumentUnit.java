@@ -20,7 +20,7 @@ public record DocumentUnit(
     String filetype,
     String filename,
     @Valid CoreData coreData,
-    List<PreviousDecision> previousDecisions,
+    List<LinkedDocumentUnit> linkedDocumentUnits,
     Texts texts,
     ContentRelatedIndexing contentRelatedIndexing) {
   public static final DocumentUnit EMPTY =
