@@ -15,8 +15,6 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
 import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneId
 import java.util.UUID
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
@@ -27,9 +25,7 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
     override fun parseJurisXml(query: ParseJurisXmlOutputPort.Query): Mono<Norm> {
         val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
-        norm.files = listOf(
-            FileReference(query.filename, getHashFromContent(query.zipFile), LocalDateTime.now(ZoneId.of("Europe/Berlin"))),
-        )
+        norm.files = listOf(FileReference(query.filename, getHashFromContent(query.zipFile)))
         return Mono.just(norm)
     }
 
