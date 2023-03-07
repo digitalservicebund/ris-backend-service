@@ -12,6 +12,10 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
 
   Flux<SubjectFieldDTO> findAllByParentIdOrderBySubjectFieldNumberAsc(Long id);
 
+  Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
+
+  Mono<SubjectFieldDTO> findBySubjectFieldNumber(String subjectFieldNumber);
+
   @Query(
       "SELECT * FROM lookuptable_subject_field WHERE parent_id = ( "
           + "    SELECT id FROM lookuptable_subject_field WHERE subject_field_number = :subjectFieldNumber "
@@ -34,10 +38,6 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
           + "WHERE content LIKE UPPER('%'||:searchStr||'%') "
           + "ORDER BY weight, content LIMIT :limit OFFSET :offset")
   Flux<SubjectFieldDTO> findBySearchStr(String searchStr, long offset, int limit);
-
-  Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
-
-  Mono<SubjectFieldDTO> findBySubjectFieldNumber(String subjectFieldNumber);
 
   @Query(
       "SELECT COUNT(*) FROM lookuptable_subject_field "
