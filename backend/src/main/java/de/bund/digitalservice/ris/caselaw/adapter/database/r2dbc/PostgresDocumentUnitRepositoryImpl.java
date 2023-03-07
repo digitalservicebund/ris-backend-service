@@ -23,6 +23,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
@@ -677,7 +679,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> injectFieldsOfLaw(DocumentUnitDTO documentUnitDTO) {
     return documentUnitFieldsOfLawRepository
-        .findAllByDocumentUnitId(documentUnitDTO.id)
+        .findAllByDocumentUnitId(documentUnitDTO.id, Sort.by(Direction.ASC, "fieldOfLawId"))
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .collectList()
         .flatMapMany(subjectFieldRepository::findAllById)

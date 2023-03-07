@@ -11,6 +11,8 @@ import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.UUID;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -186,7 +188,10 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
     return databaseDocumentUnitRepository
         .findByUuid(documentUnitUuid)
         .map(DocumentUnitDTO::getId)
-        .flatMapMany(databaseDocumentUnitFieldsOfLawRepository::findAllByDocumentUnitId)
+        .flatMapMany(
+            documentUnitId ->
+                databaseDocumentUnitFieldsOfLawRepository.findAllByDocumentUnitId(
+                    documentUnitId, Sort.by(Direction.ASC, "fieldOfLawId")))
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .flatMap(databaseSubjectFieldRepository::findById)
         .map(SubjectFieldTransformer::transformToDomain);
@@ -221,9 +226,9 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
 
   private Flux<FieldOfLaw> getLinkedFieldsOfLaw(Long documentUnitId) {
     return databaseDocumentUnitFieldsOfLawRepository
-        .findAllByDocumentUnitId(documentUnitId)
+        .findAllByDocumentUnitId(documentUnitId, Sort.by(Direction.ASC, "fieldOfLawId"))
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
-        .flatMap(databaseSubjectFieldRepository::findById)
+        .flatMapSequential(databaseSubjectFieldRepository::findById)
         .map(SubjectFieldTransformer::transformToDomain);
   }
 
