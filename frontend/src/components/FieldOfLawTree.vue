@@ -7,28 +7,21 @@ import FieldOfLawService from "@/services/fieldOfLawService"
 const props = defineProps<{
   selectedNodes: FieldOfLawNode[]
   clickedIdentifier: string
-  showNormsSignal: boolean
+  showNorms: boolean
 }>()
 
 const emit = defineEmits<{
   (event: "add-to-list", node: FieldOfLawNode): void
   (event: "remove-from-list", identifier: string): void
   (event: "reset-clicked-node"): void
-  (event: "reset-show-norms-signal"): void
+  (event: "toggle-show-norms"): void
   (event: "linkedField:clicked", identifier: string): void
 }>()
 
 const root = ref(buildRoot())
-const showNorms = ref(false)
 
 const clicked = computed(() => props.clickedIdentifier)
 watch(clicked, () => buildDirectPathTreeTo(clicked.value))
-
-const showNormsSignal = computed(() => props.showNormsSignal)
-watch(showNormsSignal, () => {
-  showNorms.value = true
-  emit("reset-show-norms-signal")
-})
 
 function handleSelect(node: FieldOfLawNode) {
   emit("add-to-list", node)
@@ -58,17 +51,13 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
 
   emit("reset-clicked-node")
 }
-
-function handleShowNormsToggle() {
-  showNorms.value = !showNorms.value
-}
 </script>
 
 <template>
   <button
     aria-label="Normen anzeigen"
     class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 mb-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
-    @click="handleShowNormsToggle"
+    @click="emit('toggle-show-norms')"
   >
     <span
       v-if="showNorms"

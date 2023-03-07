@@ -6,9 +6,13 @@ import TextInput from "@/components/TextInput.vue"
 import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
+const props = defineProps<{
+  showNorms: boolean
+}>()
+
 const emit = defineEmits<{
   (event: "node-clicked", node: FieldOfLawNode): void
-  (event: "show-norms-signal"): void
+  (event: "do-show-norms"): void
 }>()
 
 const searchStr = ref("")
@@ -28,7 +32,7 @@ function submitSearch(isNewSearch = true) {
     if (results.value.content.length > 0 && isNewSearch) {
       emit("node-clicked", results.value.content[0])
       if (searchStr.value.includes("norm:")) {
-        emit("show-norms-signal")
+        emit("do-show-norms")
       }
     }
   })
@@ -73,6 +77,7 @@ function handlePagination(backwards: boolean) {
         v-for="(node, idx) in results.content"
         :key="idx"
         :node="node"
+        :show-norms="props.showNorms"
         @node-clicked="emit('node-clicked', node)"
       />
       <div

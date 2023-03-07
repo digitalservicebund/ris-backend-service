@@ -2,7 +2,10 @@
 import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-const props = defineProps<{ node: FieldOfLawNode }>()
+const props = defineProps<{
+  node: FieldOfLawNode
+  showNorms: boolean
+}>()
 
 const emit = defineEmits<{
   (event: "node-clicked"): void
