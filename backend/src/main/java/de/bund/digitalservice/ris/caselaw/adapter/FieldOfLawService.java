@@ -38,6 +38,18 @@ public class FieldOfLawService {
     }
 
     String searchStr = optionalSearchStr.get().trim();
+
+    if (searchStr.startsWith("1")) {
+      searchStr = searchStr.substring(1).trim();
+    }
+    if (searchStr.startsWith("2")) {
+      return approachScores(searchStr.substring(1).trim(), pageable);
+    }
+
+    return approachSQLPrioClasses(searchStr, pageable);
+  }
+
+  public Mono<Page<FieldOfLaw>> approachSQLPrioClasses(String searchStr, Pageable pageable) {
     Matcher matcher = NORMS_PATTERN.matcher(searchStr);
 
     if (matcher.find()) {
@@ -64,6 +76,10 @@ public class FieldOfLawService {
         .collectList()
         .zipWith(repository.countBySearchStr(searchStr))
         .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+  }
+
+  public Mono<Page<FieldOfLaw>> approachScores(String searchStr, Pageable pageable) {
+    return null;
   }
 
   public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String subjectFieldNumber) {
