@@ -16,6 +16,7 @@ import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.UUID
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
@@ -27,7 +28,7 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
         val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
         norm.files = listOf(
-            FileReference(query.filename, getHashFromContent(query.zipFile), LocalDateTime.now()),
+            FileReference(query.filename, getHashFromContent(query.zipFile), LocalDateTime.now(ZoneId.of("Europe/Berlin"))),
         )
         return Mono.just(norm)
     }

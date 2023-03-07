@@ -18,6 +18,8 @@ import utils.createRandomNorm
 import java.io.File
 import java.nio.ByteBuffer
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.UUID
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
@@ -39,6 +41,19 @@ class JurisConverterTest {
         @AfterEach
         internal fun afterEach() {
             clearAllMocks()
+        }
+
+        @Test
+        fun `it saves the date correctly with the right timezone`() {
+            System.setProperty("user.timezone", "Australia/Sydney")
+            val converter = JurisConverter()
+            val guid = UUID.randomUUID()
+            val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile.readBytes(), anyZipFile.name)
+
+            val norm = converter.parseJurisXml(query).block()
+            val fileCreatedAt = norm?.files?.first()?.createdAt?.hour
+
+            assertThat(fileCreatedAt).isEqualTo(LocalDateTime.now(ZoneId.of("Europe/Berlin")).hour)
         }
 
         @Test
