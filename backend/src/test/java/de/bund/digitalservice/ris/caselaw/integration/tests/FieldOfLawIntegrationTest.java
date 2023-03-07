@@ -46,10 +46,12 @@ class FieldOfLawIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseSubjectFieldRepository repository;
+  // @Autowired private NormRepository normRepository;
 
   @AfterEach
   void cleanUp() {
     repository.deleteAll().block();
+    // normRepository.deleteAll().block();
   }
 
   @Test
@@ -157,6 +159,20 @@ class FieldOfLawIntegrationTest {
     assertThat(identifiers).isEmpty();
   }
 
+  /*@Test
+  void testGetFieldsOfLawByNormsQuery() {
+    prepareDatabase();
+
+    // TODO
+  }
+
+  @Test
+  void testGetFieldsOfLawByNormsAndSearchQuery() {
+    prepareDatabase();
+
+    // TODO
+  }*/
+
   @Test
   void testGetChildrenForFieldOfLawNumber() {
     prepareDatabase();
@@ -213,6 +229,16 @@ class FieldOfLawIntegrationTest {
             .changeIndicator('N')
             .build();
     repository.save(subjectFieldDTO).block();
+
+    /*NormDTO normDTO =
+        NormDTO.builder()
+            .id(1L)
+            .subjectFieldId(1L)
+            .abbreviation("ABC")
+            .singleNormDescription("§ 1234")
+            .build();
+    normRepository.save(normDTO).block();
+    // TODO: add more norms*/
 
     // child of the first root child
     subjectFieldDTO =
