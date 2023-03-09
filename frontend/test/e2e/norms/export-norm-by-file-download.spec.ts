@@ -1,6 +1,10 @@
 import { expect } from "@playwright/test"
 
-import { getJurisFileContent, loadJurisTestFile, openNorm } from "./e2e-utils"
+import {
+  getDownloadedFileContent,
+  loadJurisTestFile,
+  openNorm,
+} from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 
 testWithImportedNorm(
@@ -26,7 +30,7 @@ testWithImportedNorm(
     expect(
       Buffer.compare(
         fileContent,
-        Buffer.concat(await getJurisFileContent(page, fileName))
+        await getDownloadedFileContent(page, fileName)
       )
     ).toBe(0)
   }

@@ -2,6 +2,7 @@ import fs from "fs"
 import { tmpdir } from "os"
 import path from "path"
 import { APIRequestContext, expect } from "@playwright/test"
+import jsZip from "jszip"
 import { Page } from "playwright"
 
 const REMOTE_JURIS_TEST_FILE_FOLDER_URL =
@@ -93,7 +94,7 @@ export async function fillTextInput(page, field, value) {
   await locator.fill(value)
 }
 
-export async function getJurisFileContent(page, filename) {
+export async function getDownloadedFileContent(page, filename) {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     page.locator('a:has-text("Zip Datei speichern")').click(),
@@ -109,5 +110,20 @@ export async function getJurisFileContent(page, filename) {
     chunks.push(chunk)
   }
 
-  return chunks
+  return Buffer.concat(chunks)
+}
+
+export async function getMetaDataFileAsString(
+  content: Buffer
+): Promise<string> {
+  return jsZip.loadAsync(content).then(function (zip) {
+    const metadataFileName = Object.keys(zip.files)
+      .filter(
+        (filename) => filename.endsWith(".xml") && !filename.includes("BJNE")
+      )
+      .pop()
+    return zip.files[metadataFileName]
+      .async("string")
+      .then((xmlContent) => xmlContent.replace(/ {2}|\r\n|\n|\r/gm, ""))
+  })
 }

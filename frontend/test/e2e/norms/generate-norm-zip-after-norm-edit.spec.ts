@@ -2,15 +2,15 @@ import { expect } from "@playwright/test"
 
 import {
   fillTextInput,
-  getJurisFileContent,
-  loadJurisTestFile,
+  getDownloadedFileContent,
+  getMetaDataFileAsString,
   openNorm,
 } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 
 testWithImportedNorm(
   "Check if norm zip can be generated properly after an edit",
-  async ({ page, normData, guid, request }) => {
+  async ({ page, normData, guid }) => {
     await openNorm(page, normData["officialLongTitle"], guid)
     const fileName = normData["jurisZipFileName"]
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
@@ -49,13 +49,12 @@ testWithImportedNorm(
     )
     await expect(locatorExportButton).toBeVisible()
 
-    const { fileContent } = await loadJurisTestFile(request, fileName)
+    const downloadFileContent = await getDownloadedFileContent(page, fileName)
 
-    expect(
-      Buffer.compare(
-        fileContent,
-        Buffer.concat(await getJurisFileContent(page, fileName))
-      ) != 0
-    ).toBeTruthy()
+    const metadataFileDownloaded = await getMetaDataFileAsString(
+      downloadFileContent
+    )
+
+    expect(metadataFileDownloaded.includes(newValue)).toBeTruthy()
   }
 )
