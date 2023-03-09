@@ -8,9 +8,9 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: 5ad76a14d5cb55137117300b87c5aa82768df2f0cbc149c5c33235541ebca5ea
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-    checksum: 5d4e32686a4524193b6959f9423d4463f8228de0362ddadf44cee18b3559a2a5
+    checksum: 9226b0aa187c14af2133aa9e552ea6db6bc19a156dcb23f8d15a9ae0b11a01fb
   - filename: backend/build.gradle
-    checksum: e0c177d442020fefc97f8f3aee2a5dd42e071ff24daf50c9e1ed4cf52dcb9dec
+    checksum: 152000f155b0c622e1da8030d86d006d33b4f531823c1b1a7c00e0883cff1783
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
   - filename: "*.sql"
