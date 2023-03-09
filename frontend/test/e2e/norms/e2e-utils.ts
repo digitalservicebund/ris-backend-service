@@ -84,3 +84,30 @@ export const openNorm = async (
   await expect(locatorA).toBeVisible()
   await locatorA.click()
 }
+
+export async function fillTextInput(page, field, value) {
+  const selector = `input#${field.name}`
+  expect(await page.inputValue(selector)).toBe(field.value ?? "")
+  const locator = page.locator(selector)
+  await expect(locator).toBeEditable()
+  await locator.fill(value)
+}
+
+export async function getJurisFileContent(page, filename) {
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.locator('a:has-text("Zip Datei speichern")').click(),
+  ])
+
+  expect(download.suggestedFilename()).toBe(filename)
+  expect(
+    (await fs.promises.stat((await download.path()) as string)).size
+  ).toBeGreaterThan(0)
+  const readable = await download.createReadStream()
+  const chunks = []
+  for await (const chunk of readable) {
+    chunks.push(chunk)
+  }
+
+  return chunks
+}

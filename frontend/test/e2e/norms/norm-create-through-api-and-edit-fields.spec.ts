@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import { openNorm } from "./e2e-utils"
+import { fillTextInput, openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
 import newNorm from "./testdata/norm_edited_fields.json"
 
@@ -8,14 +8,6 @@ async function fillCheckbox(page, field, value) {
   const selector = `role=checkbox[name="${field.label}"]`
   expect(await page.isChecked(selector)).toBe(field.value ?? false)
   await page.setChecked(selector, value)
-}
-
-async function fillTextInput(page, field, value) {
-  const selector = `input#${field.name}`
-  expect(await page.inputValue(selector)).toBe(field.value ?? "")
-  const locator = page.locator(selector)
-  await expect(locator).toBeEditable()
-  await locator.fill(value)
 }
 
 async function fillDropdown(page, field, value) {
