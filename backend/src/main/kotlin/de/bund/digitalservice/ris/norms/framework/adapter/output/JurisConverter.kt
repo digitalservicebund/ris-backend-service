@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
 import java.time.LocalDate
+import java.time.format.DateTimeParseException
 import java.util.UUID
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
@@ -97,6 +98,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         expirationNormCategory = data.expirationNormCategory,
         announcementDate = parseDateString(data.announcementDate),
         citationDate = parseDateString(data.citationDate),
+        citationYear = if (data.citationDate?.length == 4 && data.citationDate?.toIntOrNull() != null) data.citationDate else null,
         printAnnouncementGazette = data.printAnnouncementGazette,
         printAnnouncementYear = data.printAnnouncementYear,
         printAnnouncementPage = data.printAnnouncementPage,
@@ -152,7 +154,7 @@ fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
     }
 }
 
-fun parseDateString(value: String?): LocalDate? = value?.let { LocalDate.parse(value) }
+fun parseDateString(value: String?): LocalDate? = value?.let { try { LocalDate.parse(value) } catch (e: DateTimeParseException) { null } }
 
 fun parseDateStateString(value: String?): UndefinedDate? =
     if (value.isNullOrEmpty()) null else UndefinedDate.valueOf(value)

@@ -193,6 +193,7 @@ class JurisConverterTest {
             assertThat(norm?.expirationNormCategory).isEqualTo("test expiration norm category")
             assertThat(norm?.announcementDate).isEqualTo(LocalDate.parse("2022-01-07"))
             assertThat(norm?.citationDate).isEqualTo(LocalDate.parse("2022-01-08"))
+            assertThat(norm?.citationYear).isNull()
             assertThat(norm?.printAnnouncementGazette).isEqualTo("test print announcement gazette")
             assertThat(norm?.printAnnouncementYear).isEqualTo("test print announcement year")
             assertThat(norm?.printAnnouncementPage).isEqualTo("test print announcement page")
@@ -224,6 +225,60 @@ class JurisConverterTest {
             assertThat(norm?.definition).isEqualTo("test definition")
             assertThat(norm?.ageOfMajorityIndication).isEqualTo("test age of majority indication")
             assertThat(norm?.text).isEqualTo("test text")
+        }
+
+        @Test
+        fun `it correctly maps the citation date containing only year to the norm properties`() {
+            val converter = JurisConverter()
+            val data =
+                NormData().apply {
+                    officialLongTitle = "test official long title"
+                    citationDate = "2022"
+                }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.citationDate).isNull()
+            assertThat(norm?.citationYear).isEqualTo("2022")
+        }
+
+        @Test
+        fun `it returns null citation date and year if date value invalid`() {
+            val converter = JurisConverter()
+            val data =
+                NormData().apply {
+                    officialLongTitle = "test official long title"
+                    citationDate = "20112-2-1"
+                }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.citationDate).isNull()
+            assertThat(norm?.citationYear).isNull()
+        }
+
+        @Test
+        fun `it returns null citation date and year if date year with letters`() {
+            val converter = JurisConverter()
+            val data =
+                NormData().apply {
+                    officialLongTitle = "test official long title"
+                    citationDate = "201c"
+                }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.citationDate).isNull()
+            assertThat(norm?.citationYear).isNull()
         }
 
         @Test
