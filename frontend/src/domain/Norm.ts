@@ -32,6 +32,7 @@ export type FrameData = {
   categorizedReference?: string
   celexNumber?: string
   citationDate?: string
+  citationYear?: string
   completeCitation?: string
   definition?: string
   digitalAnnouncementDate?: string

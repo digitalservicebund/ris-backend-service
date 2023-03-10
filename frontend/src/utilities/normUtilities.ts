@@ -35,6 +35,7 @@ export function applyToFrameData(
     categorizedReference: stringCallback(frameData?.categorizedReference),
     celexNumber: stringCallback(frameData?.celexNumber),
     citationDate: dateCallback(frameData?.citationDate),
+    citationYear: stringCallback(frameData?.citationYear),
     completeCitation: stringCallback(frameData?.completeCitation),
     definition: stringCallback(frameData?.definition),
     digitalAnnouncementDate: dateCallback(frameData?.digitalAnnouncementDate),
