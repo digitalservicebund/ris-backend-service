@@ -37,7 +37,7 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
 fun mapDomainToData(norm: Norm): NormData {
     val normData = NormData()
     normData.announcementDate = encodeLocalDate(norm.announcementDate)
-    normData.citationDate = encodeLocalDate(norm.citationDate)
+    normData.citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear
     normData.documentCategory = norm.documentCategory
     normData.documentNumber = norm.documentNumber
     normData.entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate)

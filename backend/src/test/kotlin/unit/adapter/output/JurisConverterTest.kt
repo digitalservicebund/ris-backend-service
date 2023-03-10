@@ -244,7 +244,7 @@ class JurisConverterTest {
 
     @Nested
     inner class GenerateNormFile {
-        val norm = createRandomNorm()
+        val norm = createRandomNorm().apply { citationDate = null }
         val normData = mapDomainToData(norm)
         val generatedZipFile = File.createTempFile("Temp", ".zip")
 
@@ -281,6 +281,14 @@ class JurisConverterTest {
             val newFile = converter.generateNormFile(command).block()
 
             assertThat(newFile).isEqualTo(generatedZipFile.readBytes())
+        }
+
+        @Test
+        fun `it takes the value of the citation year for the citation date in the external norm entity`() {
+            assertThat(norm.citationDate).isNull()
+            assertThat(norm.citationYear).isNotNull
+            assertThat(normData.citationDate).isNotNull
+            assertThat(normData.citationDate).isEqualTo(norm.citationYear)
         }
     }
 }
