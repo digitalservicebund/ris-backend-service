@@ -10,12 +10,14 @@ import java.time.LocalDate
  * @property printAnnouncementGazette the printed gazette on which the norm was announced.
  * @property announcementDate the date on which the norm was announced.
  * @property citationDate the date on which the norm was citated.
+ * @property citationYear the year on which the norm was citated.
  * @property printAnnouncementPage the printed page number on which the norm was announced.
  */
 data class Eli(
     val printAnnouncementGazette: String?,
     val announcementDate: LocalDate?,
     val citationDate: LocalDate?,
+    val citationYear: String?,
     val printAnnouncementPage: String?,
 ) {
     companion object {
@@ -26,7 +28,7 @@ data class Eli(
             else -> gazette
         }
     }
-    private val year: Int? = announcementDate?.year ?: citationDate?.year
+    private val year: Int? = announcementDate?.year ?: (citationDate?.year ?: citationYear?.toInt())
     val gazette: String? = when (printAnnouncementGazette) {
         "BGBl I" -> "bgbl-1"
         "BGBl II" -> "bgbl-2"

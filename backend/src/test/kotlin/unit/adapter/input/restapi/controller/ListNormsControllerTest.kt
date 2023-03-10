@@ -58,7 +58,7 @@ class ListNormsControllerTest {
 
     @Test
     fun `it reponds with a data property that holds the list of norms`() {
-        val norm = NormData(UUID.randomUUID(), "long title", Eli(null, null, null, null))
+        val norm = NormData(UUID.randomUUID(), "long title", Eli(null, null, null, null, null))
         every { listNormsService.listNorms(any()) } returns Flux.fromArray(arrayOf(norm))
 
         webClient
@@ -75,8 +75,8 @@ class ListNormsControllerTest {
 
     @Test
     fun `it maps the norm entity to the expected data schema`() {
-        val eliOne = Eli("bgbl-1", LocalDate.of(2022, 1, 1), null, "1")
-        val eliTwo = Eli("bgbl-2", LocalDate.of(2022, 1, 2), null, "2")
+        val eliOne = Eli("bgbl-1", LocalDate.of(2022, 1, 1), null, null, "1")
+        val eliTwo = Eli("bgbl-2", LocalDate.of(2022, 1, 2), null, null, "2")
         val normOne = NormData(UUID.fromString("761b5537-5aa5-4901-81f7-fbf7e040a7c8"), "first title", eliOne)
         val normTwo = NormData(UUID.fromString("53d29ef7-377c-4d14-864b-eb3a85769359"), "second title", eliTwo)
         every { listNormsService.listNorms(any()) } returns Flux.fromArray(arrayOf(normOne, normTwo))

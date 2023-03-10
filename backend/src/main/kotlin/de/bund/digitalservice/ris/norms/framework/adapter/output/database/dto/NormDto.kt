@@ -111,6 +111,8 @@ data class NormDto(
 
     @Column("citation_date")
     var citationDate: LocalDate? = null,
+    @Column("citation_year")
+    var citationYear: String? = null,
 
     @Column("print_announcement_gazette")
     var printAnnouncementGazette: String? = null,

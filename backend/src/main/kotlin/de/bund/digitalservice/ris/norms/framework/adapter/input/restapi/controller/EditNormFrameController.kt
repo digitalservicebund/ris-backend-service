@@ -89,6 +89,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var publicationDate: String? = null
 
         var citationDate: String? = null
+        var citationYear: String? = null
 
         var printAnnouncementGazette: String? = null
         var printAnnouncementYear: String? = null
@@ -222,6 +223,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 decodeLocalDate(this.announcementDate),
                 decodeLocalDate(this.publicationDate),
                 decodeLocalDate(this.citationDate),
+                this.citationYear,
                 this.printAnnouncementGazette,
                 this.printAnnouncementYear,
                 this.printAnnouncementNumber,

@@ -33,6 +33,7 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     properties.expirationDate, properties.expirationDateState, properties.isExpirationDateTemp, properties.principleExpirationDate,
     properties.principleExpirationDateState, properties.divergentExpirationDate, properties.divergentExpirationDateState,
     properties.expirationNormCategory, properties.announcementDate, properties.publicationDate, properties.citationDate,
+    properties.citationYear,
     properties.printAnnouncementGazette, properties.printAnnouncementYear, properties.printAnnouncementNumber,
     properties.printAnnouncementPage, properties.printAnnouncementInfo, properties.printAnnouncementExplanations,
     properties.digitalAnnouncementMedium, properties.digitalAnnouncementDate, properties.digitalAnnouncementEdition,

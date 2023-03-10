@@ -65,6 +65,7 @@ interface EditNormFrameUseCase {
         var publicationDate: LocalDate? = null,
 
         var citationDate: LocalDate? = null,
+        var citationYear: String? = null,
 
         var printAnnouncementGazette: String? = null,
         var printAnnouncementYear: String? = null,

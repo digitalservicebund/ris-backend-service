@@ -18,6 +18,7 @@ interface SearchNormsOutputPort {
         PRINT_ANNOUNCEMENT_GAZETTE,
         ANNOUNCEMENT_DATE,
         CITATION_DATE,
+        CITATION_YEAR,
         PRINT_ANNOUNCEMENT_PAGE,
         OFFICIAL_LONG_TITLE,
         OFFICIAL_SHORT_TITLE,

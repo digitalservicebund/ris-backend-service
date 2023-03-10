@@ -12,6 +12,7 @@ class EliTest {
             LocalDate.now(),
             LocalDate.now(),
             null,
+            null,
         )
         assertThat(eli.toString()).isEqualTo("")
     }
@@ -22,6 +23,7 @@ class EliTest {
             "BAnz",
             LocalDate.now(),
             LocalDate.now(),
+            null,
             "111",
         )
         assertThat(eli.toString()).isEqualTo("eli/banz-at/${LocalDate.now().year}/s111")
@@ -33,6 +35,7 @@ class EliTest {
             "",
             LocalDate.now(),
             LocalDate.now(),
+            null,
             "111",
         )
         assertThat(eli.toString()).isEqualTo("")
@@ -42,5 +45,65 @@ class EliTest {
     fun `gazette value can be mapped back to its original juris value`() {
         val gazette = Eli.parseGazette("banz-at")
         assertThat(gazette).isEqualTo("BAnz")
+    }
+
+    @Test
+    fun `returns an eli with the year of the announcement date having all dates filled`() {
+        val eli = Eli(
+            "BGBl I",
+            LocalDate.of(1989, 12, 29),
+            LocalDate.of(1988, 6, 9),
+            "2001",
+            "1234",
+        )
+        assertThat(eli.toString()).isEqualTo("eli/bgbl-1/1989/s1234")
+    }
+
+    @Test
+    fun `returns an eli with the year of the announcement date having also only the citation date`() {
+        val eli = Eli(
+            "BGBl I",
+            LocalDate.of(1989, 12, 29),
+            LocalDate.of(1988, 6, 9),
+            null,
+            "1234",
+        )
+        assertThat(eli.toString()).isEqualTo("eli/bgbl-1/1989/s1234")
+    }
+
+    @Test
+    fun `returns an eli with the year of the announcement date having also only the citation year`() {
+        val eli = Eli(
+            "BGBl I",
+            LocalDate.of(1989, 12, 29),
+            null,
+            "2001",
+            "1234",
+        )
+        assertThat(eli.toString()).isEqualTo("eli/bgbl-1/1989/s1234")
+    }
+
+    @Test
+    fun `returns an eli with the year of the citation date`() {
+        val eli = Eli(
+            "BGBl I",
+            null,
+            LocalDate.of(1988, 6, 9),
+            "2001",
+            "1234",
+        )
+        assertThat(eli.toString()).isEqualTo("eli/bgbl-1/1988/s1234")
+    }
+
+    @Test
+    fun `returns an eli with the year of the citation year`() {
+        val eli = Eli(
+            "BGBl I",
+            null,
+            null,
+            "2001",
+            "1234",
+        )
+        assertThat(eli.toString()).isEqualTo("eli/bgbl-1/2001/s1234")
     }
 }

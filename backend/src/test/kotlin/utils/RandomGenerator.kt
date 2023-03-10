@@ -32,6 +32,8 @@ fun createRandomNorm(): Norm {
             "§ " + Random().nextInt(1, 50).toString()
         }.randomize(named("marker").and(inClass(Paragraph::class.java))) {
             "(" + Random().nextInt(1, 50).toString() + ")"
+        }.randomize(named("citationYear")) {
+            EasyRandom(EasyRandomParameters().stringLengthRange(4, 4)).nextObject(String::class.java)
         }
     return EasyRandom(parameters).nextObject(Norm::class.java)
 }

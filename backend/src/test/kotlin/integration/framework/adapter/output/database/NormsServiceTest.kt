@@ -162,6 +162,30 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
+    fun `save simple norm and retrieved by eli with citation year`() {
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            officialLongTitle = "Test Title",
+            citationYear = "2001",
+            printAnnouncementPage = "1125",
+            printAnnouncementGazette = "bg-1",
+        )
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2001", "1125")
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
     fun `save simple norm and retrieved by guid`() {
         val saveCommand = SaveNormOutputPort.Command(NORM)
         val guidQuery = GetNormByGuidOutputPort.Query(NORM.guid)

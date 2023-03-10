@@ -27,6 +27,7 @@ interface NormsMapper {
             normDto.expirationDate, normDto.expirationDateState, normDto.isExpirationDateTemp, normDto.principleExpirationDate,
             normDto.principleExpirationDateState, normDto.divergentExpirationDate, normDto.divergentExpirationDateState,
             normDto.expirationNormCategory, normDto.announcementDate, normDto.publicationDate, normDto.citationDate,
+            normDto.citationYear,
             normDto.printAnnouncementGazette, normDto.printAnnouncementYear, normDto.printAnnouncementNumber,
             normDto.printAnnouncementPage, normDto.printAnnouncementInfo, normDto.printAnnouncementExplanations,
             normDto.digitalAnnouncementMedium, normDto.digitalAnnouncementDate, normDto.digitalAnnouncementEdition,
@@ -84,6 +85,7 @@ interface NormsMapper {
             norm.expirationDate, norm.expirationDateState, norm.isExpirationDateTemp, norm.principleExpirationDate,
             norm.principleExpirationDateState, norm.divergentExpirationDate, norm.divergentExpirationDateState,
             norm.expirationNormCategory, norm.announcementDate, norm.publicationDate, norm.citationDate,
+            norm.citationYear,
             norm.printAnnouncementGazette, norm.printAnnouncementYear, norm.printAnnouncementNumber,
             norm.printAnnouncementPage, norm.printAnnouncementInfo, norm.printAnnouncementExplanations,
             norm.digitalAnnouncementMedium, norm.digitalAnnouncementDate, norm.digitalAnnouncementEdition,
@@ -128,6 +130,7 @@ interface NormsMapper {
             QueryFields.ANNOUNCEMENT_DATE -> "announcement_date"
             QueryFields.PRINT_ANNOUNCEMENT_GAZETTE -> "print_announcement_gazette"
             QueryFields.CITATION_DATE -> "citation_date"
+            QueryFields.CITATION_YEAR -> "citation_year"
             QueryFields.OFFICIAL_LONG_TITLE -> "official_long_title"
             QueryFields.OFFICIAL_SHORT_TITLE -> "official_short_title"
             QueryFields.UNOFFICIAL_LONG_TITLE -> "unofficial_long_title"
