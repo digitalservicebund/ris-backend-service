@@ -3,9 +3,12 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.extern.slf4j.Slf4j;
@@ -83,13 +86,49 @@ public class FieldOfLawService {
     String[] searchTerms =
         Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
 
-    // TODO via Java code: scoring logic and limit/offset
+    // TODO limit/offset
+
+    AtomicInteger totalElements = new AtomicInteger();
 
     return repository
         .findAllBySearchTerms(searchTerms)
         .collectList()
-        .zipWith(Mono.just(10L))
+        .flatMap(
+            list -> {
+              totalElements.set(list.size());
+              Map<FieldOfLaw, Integer> scores = new HashMap<>();
+              for (FieldOfLaw fieldOfLaw : list) {
+                int score = 0;
+                for (String searchTerm : searchTerms) {
+                  score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
+                }
+                scores.put(fieldOfLaw, score);
+              }
+              list.sort((f1, f2) -> scores.get(f2).compareTo(scores.get(f1)));
+              return Mono.just(list);
+            })
+        .zipWith(Mono.just(totalElements.get()))
         .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+  }
+
+  private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
+    int score = 0;
+    String term = searchTerm.toLowerCase();
+    String identifier = fieldOfLaw.identifier().toLowerCase();
+    String text = fieldOfLaw.text().toLowerCase();
+
+    if (identifier.equals(term)) score += 8;
+    if (identifier.startsWith(term)) score += 5;
+    if (identifier.contains(term)) score += 2;
+
+    if (text.startsWith(term)) score += 5;
+    // split by whitespace and hyphen to get words
+    for (String textPart : text.split("[\\s-]+")) {
+      if (textPart.equals(term)) score += 4;
+      if (textPart.startsWith(term)) score += 3;
+      if (textPart.contains(term)) score += 1;
+    }
+    return score;
   }
 
   public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String subjectFieldNumber) {
