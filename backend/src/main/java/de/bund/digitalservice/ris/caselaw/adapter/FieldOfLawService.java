@@ -85,9 +85,6 @@ public class FieldOfLawService {
   public Mono<Page<FieldOfLaw>> approachScores(String searchStr, Pageable pageable) {
     String[] searchTerms =
         Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
-
-    // TODO limit/offset
-
     AtomicInteger totalElements = new AtomicInteger();
 
     return repository
@@ -105,28 +102,30 @@ public class FieldOfLawService {
                 scores.put(fieldOfLaw, score);
               }
               list.sort((f1, f2) -> scores.get(f2).compareTo(scores.get(f1)));
-              return Mono.just(list);
+              int fromIdx = (int) pageable.getOffset();
+              int toIdx =
+                  (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
+              return Mono.just(list.subList(fromIdx, toIdx));
             })
-        .zipWith(Mono.just(totalElements.get()))
-        .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+        .map(list -> new PageImpl<>(list, pageable, totalElements.get()));
   }
 
   private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
     int score = 0;
-    String term = searchTerm.toLowerCase();
+    searchTerm = searchTerm.toLowerCase();
     String identifier = fieldOfLaw.identifier().toLowerCase();
     String text = fieldOfLaw.text().toLowerCase();
 
-    if (identifier.equals(term)) score += 8;
-    if (identifier.startsWith(term)) score += 5;
-    if (identifier.contains(term)) score += 2;
+    if (identifier.equals(searchTerm)) score += 8;
+    if (identifier.startsWith(searchTerm)) score += 5;
+    if (identifier.contains(searchTerm)) score += 2;
 
-    if (text.startsWith(term)) score += 5;
+    if (text.startsWith(searchTerm)) score += 5;
     // split by whitespace and hyphen to get words
     for (String textPart : text.split("[\\s-]+")) {
-      if (textPart.equals(term)) score += 4;
-      if (textPart.startsWith(term)) score += 3;
-      if (textPart.contains(term)) score += 1;
+      if (textPart.equals(searchTerm)) score += 4;
+      if (textPart.startsWith(searchTerm)) score += 3;
+      if (textPart.contains(searchTerm)) score += 1;
     }
     return score;
   }
