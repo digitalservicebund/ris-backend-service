@@ -13,7 +13,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Pa
 interface NormsMapper {
     fun normToEntity(normDto: NormDto, articles: List<Article>): Norm {
         return Norm(
-            normDto.guid, articles, normDto.officialLongTitle, normDto.risAbbreviation, normDto.risAbbreviationInternationalLaw,
+            normDto.guid, articles, emptyList(), normDto.officialLongTitle, normDto.risAbbreviation, normDto.risAbbreviationInternationalLaw,
             normDto.documentNumber, normDto.divergentDocumentNumber, normDto.documentCategory, normDto.frameKeywords,
             normDto.documentTypeName, normDto.documentNormCategory, normDto.documentTemplateName, normDto.providerEntity,
             normDto.providerDecidingBody, normDto.providerIsResolutionMajority, normDto.participationType,

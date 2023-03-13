@@ -19,7 +19,7 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
 }
 
 private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFrameProperties) = Norm(
-    guid, listOf(), properties.officialLongTitle, properties.risAbbreviation, properties.risAbbreviationInternationalLaw,
+    guid, emptyList(), emptyList(), properties.officialLongTitle, properties.risAbbreviation, properties.risAbbreviationInternationalLaw,
     properties.documentNumber, properties.divergentDocumentNumber, properties.documentCategory, properties.frameKeywords,
     properties.documentTypeName, properties.documentNormCategory, properties.documentTemplateName, properties.providerEntity,
     properties.providerDecidingBody, properties.providerIsResolutionMajority, properties.participationType,

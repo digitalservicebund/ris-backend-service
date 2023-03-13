@@ -7,7 +7,8 @@ import java.util.UUID
 
 data class Norm(
     val guid: UUID,
-    val articles: List<Article> = listOf(),
+    val articles: List<Article> = emptyList(),
+    val metadata: List<Metadatum<*>> = emptyList(),
 
     val officialLongTitle: String,
     var risAbbreviation: String? = null,
