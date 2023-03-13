@@ -40,4 +40,6 @@ public interface SubjectFieldRepository {
   Mono<List<FieldOfLaw>> removeFieldOfLawToDocumentUnit(UUID documentUnitUuid, String identifier);
 
   Mono<Long> count();
+
+  Flux<FieldOfLaw> findAllBySearchTerms(String[] searchTerms);
 }

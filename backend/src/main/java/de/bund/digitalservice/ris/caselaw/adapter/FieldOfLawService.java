@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -79,7 +80,16 @@ public class FieldOfLawService {
   }
 
   public Mono<Page<FieldOfLaw>> approachScores(String searchStr, Pageable pageable) {
-    return null;
+    String[] searchTerms =
+        Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
+
+    // TODO via Java code: scoring logic and limit/offset
+
+    return repository
+        .findAllBySearchTerms(searchTerms)
+        .collectList()
+        .zipWith(Mono.just(10L))
+        .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
   }
 
   public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String subjectFieldNumber) {

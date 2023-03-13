@@ -281,4 +281,14 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   public Mono<Long> count() {
     return databaseSubjectFieldRepository.count();
   }
+
+  @Override
+  public Flux<FieldOfLaw> findAllBySearchTerms(String[] searchTerms) {
+    return databaseSubjectFieldRepository
+        .findBySearchTerms(searchTerms)
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
 }

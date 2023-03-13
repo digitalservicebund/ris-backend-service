@@ -83,4 +83,26 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
           + "WHERE UPPER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE UPPER('%'||:normsStr||'%')) "
           + "AND UPPER(CONCAT(sf.subject_field_number, ' ', sf.subject_field_text)) LIKE UPPER('%'||:searchStr||'%')")
   Mono<Long> countByNormsAndSearchStr(String normsStr, String searchStr);
+
+  @Query(
+      "WITH param_arrays(KEY, value) AS ( "
+          + "    VALUES ('search', :searchTerms)), "
+          + "     match_counts(id, contained_matches) AS "
+          + "         (SELECT id, COUNT(id) AS contained_matches "
+          + "          FROM "
+          + "              (SELECT DISTINCT id, "
+          + "                               lower(array_to_string(regexp_matches(CONCAT(subject_field_number, ' ', subject_field_text), array_to_string( "
+          + "                                       (SELECT value "
+          + "                                        FROM param_arrays "
+          + "                                        WHERE KEY = 'search'), '|'), 'gi'), '')) "
+          + "               FROM lookuptable_subject_field) AS t "
+          + "          GROUP BY id) "
+          + "SELECT t.* "
+          + "FROM lookuptable_subject_field t "
+          + "         JOIN match_counts mc ON t.id = mc.id "
+          + "WHERE mc.contained_matches = array_length( "
+          + "        (SELECT value "
+          + "         FROM param_arrays "
+          + "         WHERE KEY = 'search'), 1);")
+  Flux<SubjectFieldDTO> findBySearchTerms(String[] searchTerms);
 }
