@@ -92,6 +92,10 @@ public class FieldOfLawService {
               int fromIdx = (int) pageable.getOffset();
               int toIdx =
                   (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
+              if (fromIdx > toIdx) {
+                list.clear();
+                return Mono.just(list);
+              }
               return Mono.just(list.subList(fromIdx, toIdx));
             })
         .map(list -> new PageImpl<>(list, pageable, totalElements.get()));
@@ -101,7 +105,7 @@ public class FieldOfLawService {
     int score = 0;
     searchTerm = searchTerm.toLowerCase();
     String identifier = fieldOfLaw.identifier().toLowerCase();
-    String text = fieldOfLaw.text().toLowerCase();
+    String text = fieldOfLaw.text() == null ? "" : fieldOfLaw.text().toLowerCase();
 
     if (identifier.equals(searchTerm)) score += 8;
     if (identifier.startsWith(searchTerm)) score += 5;
