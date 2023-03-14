@@ -15,17 +15,9 @@ public interface SubjectFieldRepository {
   Flux<FieldOfLaw> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber);
 
-  Flux<FieldOfLaw> findBySearchStr(String searchStr, Pageable pageable);
+  Flux<FieldOfLaw> findBySearchStr(String searchStr, Pageable pageable); // TODO remove
 
-  Mono<Long> countBySearchStr(String searchStr);
-
-  Flux<FieldOfLaw> findByNormsStr(String normsStr, Pageable pageable);
-
-  Mono<Long> countByNormsStr(String normsStr);
-
-  Flux<FieldOfLaw> findByNormsAndSearchStr(String normsStr, String searchStr, Pageable pageable);
-
-  Mono<Long> countByNormsAndSearchStr(String normsStr, String searchStr);
+  Mono<Long> countBySearchStr(String searchStr); // TODO remove
 
   Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldId);
 

@@ -41,53 +41,14 @@ public class FieldOfLawService {
           .zipWith(repository.count())
           .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
     }
-
-    String searchStr = optionalSearchStr.get().trim();
-
-    if (searchStr.startsWith("1")) {
-      searchStr = searchStr.substring(1).trim();
-    }
-    if (searchStr.startsWith("2")) {
-      return approachScores(searchStr.substring(1).trim(), pageable);
-    }
-
-    return approachSQLPrioClasses(searchStr, pageable);
-  }
-
-  public Mono<Page<FieldOfLaw>> approachSQLPrioClasses(String searchStr, Pageable pageable) {
-    Matcher matcher = NORMS_PATTERN.matcher(searchStr);
-
-    if (matcher.find()) {
-      String normsStr = matcher.group(1).trim();
-      String afterNormsSearchStr = matcher.group(2).trim();
-
-      if (afterNormsSearchStr.isEmpty()) {
-        return repository
-            .findByNormsStr(normsStr, pageable)
-            .collectList()
-            .zipWith(repository.countByNormsStr(normsStr))
-            .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
-      }
-
-      return repository
-          .findByNormsAndSearchStr(normsStr, afterNormsSearchStr, pageable)
-          .collectList()
-          .zipWith(repository.countByNormsAndSearchStr(normsStr, afterNormsSearchStr))
-          .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
-    }
-
-    return repository
-        .findBySearchStr(searchStr, pageable)
-        .collectList()
-        .zipWith(repository.countBySearchStr(searchStr))
-        .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
+    return searchAndOrderByScore(optionalSearchStr.get().trim(), pageable);
   }
 
   private String[] splitSearchTerms(String searchStr) {
     return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
   }
 
-  public Mono<Page<FieldOfLaw>> approachScores(String searchStr, Pageable pageable) {
+  public Mono<Page<FieldOfLaw>> searchAndOrderByScore(String searchStr, Pageable pageable) {
     Matcher matcher = NORMS_PATTERN.matcher(searchStr);
     AtomicInteger totalElements = new AtomicInteger();
     String[] searchTerms;
