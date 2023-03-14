@@ -252,7 +252,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<FieldOfLaw> findAllBySearchTerms(String[] searchTerms) {
+  public Flux<FieldOfLaw> findBySearchTerms(String[] searchTerms) {
     return databaseSubjectFieldRepository
         .findBySearchTerms(searchTerms)
         .flatMapSequential(this::injectKeywords)
@@ -262,7 +262,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<FieldOfLaw> findAllByNormStr(String normStr) {
+  public Flux<FieldOfLaw> findByNormStr(String normStr) {
     return databaseSubjectFieldRepository
         .findByNormStr(normStr)
         .flatMapSequential(this::injectKeywords)
@@ -272,7 +272,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   }
 
   @Override
-  public Flux<FieldOfLaw> findAllByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
+  public Flux<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
     return databaseSubjectFieldRepository
         .findByNormStrAndSearchTerms(normStr, searchTerms)
         .flatMapSequential(this::injectKeywords)

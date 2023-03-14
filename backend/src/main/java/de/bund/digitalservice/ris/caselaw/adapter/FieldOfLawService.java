@@ -60,16 +60,15 @@ public class FieldOfLawService {
       String afterNormSearchStr = matcher.group(2).trim();
       if (afterNormSearchStr.isEmpty()) {
         searchTerms = null;
-        unorderedList = repository.findAllByNormStr(normStr).collectList();
+        unorderedList = repository.findByNormStr(normStr).collectList();
       } else {
         searchTerms = splitSearchTerms(afterNormSearchStr);
-        unorderedList =
-            repository.findAllByNormStrAndSearchTerms(normStr, searchTerms).collectList();
+        unorderedList = repository.findByNormStrAndSearchTerms(normStr, searchTerms).collectList();
       }
     } else {
       normStr = null;
       searchTerms = splitSearchTerms(searchStr);
-      unorderedList = repository.findAllBySearchTerms(searchTerms).collectList();
+      unorderedList = repository.findBySearchTerms(searchTerms).collectList();
     }
 
     return unorderedList
