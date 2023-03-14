@@ -42,4 +42,8 @@ public interface SubjectFieldRepository {
   Mono<Long> count();
 
   Flux<FieldOfLaw> findAllBySearchTerms(String[] searchTerms);
+
+  Flux<FieldOfLaw> findAllByNormStr(String normStr);
+
+  Flux<FieldOfLaw> findAllByNormStrAndSearchTerms(String normStr, String[] searchTerms);
 }

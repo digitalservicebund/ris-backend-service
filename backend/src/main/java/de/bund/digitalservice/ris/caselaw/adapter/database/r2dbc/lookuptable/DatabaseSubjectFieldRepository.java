@@ -91,7 +91,7 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
           + "         (SELECT id, COUNT(id) AS contained_matches "
           + "          FROM "
           + "              (SELECT DISTINCT id, "
-          + "                               lower(array_to_string(regexp_matches(CONCAT(subject_field_number, ' ', subject_field_text), array_to_string( "
+          + "                               LOWER(array_to_string(regexp_matches(CONCAT(subject_field_number, ' ', subject_field_text), array_to_string( "
           + "                                       (SELECT value "
           + "                                        FROM param_arrays "
           + "                                        WHERE KEY = 'search'), '|'), 'gi'), '')) "
@@ -105,4 +105,34 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
           + "         FROM param_arrays "
           + "         WHERE KEY = 'search'), 1);")
   Flux<SubjectFieldDTO> findBySearchTerms(String[] searchTerms);
+
+  @Query(
+      "SELECT sf.* FROM lookuptable_subject_field sf WHERE sf.id IN ( "
+          + "SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
+          + "WHERE LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%'));")
+  Flux<SubjectFieldDTO> findByNormStr(String normStr);
+
+  @Query(
+      "WITH param_arrays(KEY, value) AS ( "
+          + "    VALUES ('search', :searchTerms)), "
+          + "     match_counts(id, contained_matches) AS "
+          + "         (SELECT id, COUNT(id) AS contained_matches "
+          + "          FROM "
+          + "              (SELECT DISTINCT id, "
+          + "                               LOWER(array_to_string(regexp_matches(CONCAT(subject_field_number, ' ', subject_field_text), array_to_string( "
+          + "                                       (SELECT value "
+          + "                                        FROM param_arrays "
+          + "                                        WHERE KEY = 'search'), '|'), 'gi'), '')) "
+          + "               FROM lookuptable_subject_field) AS t "
+          + "          GROUP BY id) "
+          + "SELECT DISTINCT t.* "
+          + "FROM lookuptable_subject_field t "
+          + "         JOIN match_counts mc ON t.id = mc.id "
+          + "         JOIN lookuptable_subject_field_norm n ON t.id = n.subject_field_id "
+          + "WHERE mc.contained_matches = array_length( "
+          + "        (SELECT value "
+          + "         FROM param_arrays "
+          + "         WHERE KEY = 'search'), 1)"
+          + "  AND LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%');")
+  Flux<SubjectFieldDTO> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
 }

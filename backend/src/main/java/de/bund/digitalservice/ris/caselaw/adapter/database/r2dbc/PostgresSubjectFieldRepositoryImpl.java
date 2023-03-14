@@ -291,4 +291,24 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
         .flatMapSequential(this::injectLinkedFields)
         .map(SubjectFieldTransformer::transformToDomain);
   }
+
+  @Override
+  public Flux<FieldOfLaw> findAllByNormStr(String normStr) {
+    return databaseSubjectFieldRepository
+        .findByNormStr(normStr)
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
+
+  @Override
+  public Flux<FieldOfLaw> findAllByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
+    return databaseSubjectFieldRepository
+        .findByNormStrAndSearchTerms(normStr, searchTerms)
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
+        .map(SubjectFieldTransformer::transformToDomain);
+  }
 }

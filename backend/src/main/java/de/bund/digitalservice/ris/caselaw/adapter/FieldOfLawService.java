@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -82,22 +83,48 @@ public class FieldOfLawService {
         .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
   }
 
-  public Mono<Page<FieldOfLaw>> approachScores(String searchStr, Pageable pageable) {
-    String[] searchTerms =
-        Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
-    AtomicInteger totalElements = new AtomicInteger();
+  private String[] splitSearchTerms(String searchStr) {
+    return Arrays.stream(searchStr.split("\\s+")).map(String::trim).toArray(String[]::new);
+  }
 
-    return repository
-        .findAllBySearchTerms(searchTerms)
-        .collectList()
+  public Mono<Page<FieldOfLaw>> approachScores(String searchStr, Pageable pageable) {
+    Matcher matcher = NORMS_PATTERN.matcher(searchStr);
+    AtomicInteger totalElements = new AtomicInteger();
+    String[] searchTerms;
+    String normStr;
+
+    Mono<List<FieldOfLaw>> unorderedList;
+    if (matcher.find()) {
+      normStr = matcher.group(1).trim();
+      String afterNormSearchStr = matcher.group(2).trim();
+      if (afterNormSearchStr.isEmpty()) {
+        searchTerms = null;
+        unorderedList = repository.findAllByNormStr(normStr).collectList();
+      } else {
+        searchTerms = splitSearchTerms(afterNormSearchStr);
+        unorderedList =
+            repository.findAllByNormStrAndSearchTerms(normStr, searchTerms).collectList();
+      }
+    } else {
+      normStr = null;
+      searchTerms = splitSearchTerms(searchStr);
+      unorderedList = repository.findAllBySearchTerms(searchTerms).collectList();
+    }
+
+    return unorderedList
         .flatMap(
             list -> {
               totalElements.set(list.size());
               Map<FieldOfLaw, Integer> scores = new HashMap<>();
               for (FieldOfLaw fieldOfLaw : list) {
                 int score = 0;
-                for (String searchTerm : searchTerms) {
-                  score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
+                if (searchTerms != null) {
+                  for (String searchTerm : searchTerms) {
+                    score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
+                  }
+                }
+                if (normStr != null) {
+                  score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
                 }
                 scores.put(fieldOfLaw, score);
               }
@@ -126,6 +153,22 @@ public class FieldOfLawService {
       if (textPart.equals(searchTerm)) score += 4;
       if (textPart.startsWith(searchTerm)) score += 3;
       if (textPart.contains(searchTerm)) score += 1;
+    }
+    return score;
+  }
+
+  private int getScoreContributionFromNormStr(FieldOfLaw fieldOfLaw, String normStr) {
+    int score = 0;
+    normStr = normStr.toLowerCase();
+    for (Norm norm : fieldOfLaw.norms()) {
+      String abbreviation = norm.abbreviation().toLowerCase();
+      String normText = abbreviation;
+      if (norm.singleNormDescription() != null) {
+        normText += " " + norm.singleNormDescription().toLowerCase();
+      }
+      if (abbreviation.equals(normStr)) score += 8;
+      if (abbreviation.startsWith(normStr)) score += 5;
+      if (normText.contains(normStr)) score += 5;
     }
     return score;
   }
