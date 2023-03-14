@@ -4,6 +4,7 @@
 classDiagram
   class Norm {
     +UUID guid
+    +List~Metadata~ metadata
     +List~Article~ articles
 
     +String officialLongTitle
@@ -147,6 +148,12 @@ classDiagram
     List~FileReference~ files
   }
 
+  class Metadata {
+      +String value
+      +MetadatumType type
+      +Integer order
+  }
+
   class Article {
     +UUID guid
     +String marker
@@ -168,12 +175,18 @@ classDiagram
     UNDEFINED_NOT_PRESENT
   }
 
+  class MetadatumType  {
+      <<enumeration>>
+      KEYWORD
+  }
+
   class FileReference {
     +String name
     +String hash
     +Timestamp createdAt
   }
 
+  Norm "1" --> "*" Metadata
   Norm "1" --> "*" Article
   Article "1" --> "*" Paragraph
   Norm "1" --> "*" FileReference

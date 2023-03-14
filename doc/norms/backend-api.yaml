@@ -270,6 +270,20 @@ components:
         - UNDEFINED_UNKNOWN
         - UNDEFINED_FUTURE
         - UNDEFINED_NOT_PRESENT
+    MetadatumType:
+      description: A field that indicates the type of the metadatum
+      type: string
+      enum:
+        - KEYWORD
+    Metadatum:
+      type: object
+      properties:
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/MetadatumType'
+        order:
+          type: integer
     Paragraph:
       type: object
       required:
@@ -328,9 +342,14 @@ components:
             - guid
             - officialLongTitle
             - files
+            - metadata
           properties:
             guid:
               $ref: '#/components/schemas/Guid'
+            metadata:
+              type: array
+              items:
+                $ref: '#/components/schemas/Metadatum'
             articles:
               type: array
               items:
@@ -360,9 +379,6 @@ components:
           $ref: '#/components/schemas/Date'
         citationYear:
           $ref: '#/components/schemas/Year'
-        frameKeywords:
-          type: string
-          example: 'BGBl I 2021, Nr 031;geltendes Bundesrecht;Umsetzung EG-Recht;Umsetzung EURL 2019/1161;Beschaffung;sauber;Straßenfahrzeug'
         providerEntity:
           type: string
           example: DEU
