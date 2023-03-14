@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.DatabaseProceedingDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.PostgresProceedingDecisionRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
@@ -28,7 +29,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
   private final DatabaseDocumentUnitRepository repository;
-  private final DatabaseProceedingDecisionRepository proceedingDecisionRepository;
+  private final PostgresProceedingDecisionRepositoryImpl proceedingDecisionRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
@@ -44,7 +45,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitRepository repository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      DatabaseProceedingDecisionRepository proceedingDecisionRepository,
+      PostgresProceedingDecisionRepositoryImpl proceedingDecisionRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
       CourtRepository courtRepository,
@@ -200,6 +201,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<DocumentUnitDTO> saveProceedingDecisions(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
       List<Long> proceedingDecisionIds = new ArrayList<>();
+      List<Long> proceedingDecisionDTOIds = new ArrayList<>();
 
       if (documentUnit.proceedingDecisions() != null) {
           documentUnit.proceedingDecisions().stream().forEach(
@@ -211,10 +213,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               .findAllByDocumentUnitId(documentUnitDTO.getId())
               .collectList()
               .flatMap(proceedingDecisionDTOs -> {
-                  List<Long> proceedingDecisionDTOIds = new ArrayList<>();
+
                   proceedingDecisionDTOs.forEach(
                           proceedingDecisionDTO -> {
-                              {proceedingDecisionDTOIds.add(proceedingDecisionDTO.getId());}
+                              {proceedingDecisionDTOIds.add(proceedingDecisionDTO.id());}
                           });
 
                   List<Long> toSaveIds = proceedingDecisionIds;

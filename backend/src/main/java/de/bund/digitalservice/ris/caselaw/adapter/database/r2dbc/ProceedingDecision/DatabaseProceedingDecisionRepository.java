@@ -9,8 +9,5 @@ import reactor.core.publisher.Mono;
 @Repository
 public interface DatabaseProceedingDecisionRepository
     extends R2dbcRepository<ProceedingDecisionDTO, Long> {
-  Flux<ProceedingDecisionDTO> findAllByDocumentUnitId(Long Id);
-  Flux<ProceedingDecisionDTO> saveAll(List<ProceedingDecisionDTO> previousDecisions);
-  Flux<ProceedingDecisionDTO> deleteAll(List<ProceedingDecisionDTO> previousDecisions);
 
 }

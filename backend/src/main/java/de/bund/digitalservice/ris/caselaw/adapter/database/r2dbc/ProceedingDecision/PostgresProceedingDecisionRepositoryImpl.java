@@ -2,22 +2,23 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDeci
 
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.*;
-import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecisionRepository;
 import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
 import java.util.List;
 
 @Repository
-public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecisionRepository {
+public class PostgresProceedingDecisionRepositoryImpl {
 
     private final DatabaseProceedingDecisionRepository repository;
     private final DatabaseProceedingDecisionLinkRepository linkRepository;
     private final PostgresDocumentUnitRepositoryImpl documentUnitRepository;
+
+    private final DatabaseDocumentUnitRepository databaseDocumentUnitRepository;
 
     public PostgresProceedingDecisionRepositoryImpl(
             DatabaseProceedingDecisionRepository repository, DatabaseProceedingDecisionLinkRepository linkRepository, PostgresDocumentUnitRepositoryImpl documentUnitRepository) {
@@ -40,16 +41,12 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
                         .build());
     }
 
+    //TODO make it better
     @Override
     public Flux<ProceedingDecisionDTO> saveAll(List<ProceedingDecisionDTO> proceedingDecisionDTOs, Long parentDocumentUnitId) {
 
-        List<ProceedingDecisionLinkDTO> proceedingDecisionLinkDTOs = proceedingDecisionDTOs.stream().map(decisionDTO -> {
-            return ProceedingDecisionLinkDTO.builder().parentDocumentUnitId(parentDocumentUnitId).childDocumentUnitId(decisionDTO.getId()).build();
-        }).toList();
-
-        linkRepository.saveAll(proceedingDecisionLinkDTOs);
-        proceedingDecisionDTOs.stream().map(decisionDTO -> {
-            return documentUnitRepository.save(DocumentUnitBuilder.newInstance().setDocumentUnitDTO(
+        return Flux.fromStream(proceedingDecisionDTOs.stream().map(decisionDTO -> {
+            Mono<DocumentUnit> savedDocumentUnit = documentUnitRepository.save(DocumentUnitBuilder.newInstance().setDocumentUnitDTO(
                     DocumentUnitDTO.builder()
                             .dataSource(DataSourceDTO.PROCEEDING_DECISION)
                             .courtLocation(decisionDTO.getCourtLocation())
@@ -57,12 +54,26 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
                             .decisionDate(decisionDTO.getDecisionDate())
                             .fileNumbers(Arrays.asList(FileNumberDTO.builder().fileNumber(decisionDTO.getFileNumber()).build()))
                             .build()).build());
-        });
 
-        //TODO Domain Respository anpassen, so dass nur mit domain objekten gearbeitet wird
-        //TODO Transformer nutzen?
 
-        return proceedingDecisionDTOs;
+            linkRepository.save(ProceedingDecisionLinkDTO.builder()
+                    .parentDocumentUnitId(parentDocumentUnitId)
+                    .childDocumentUnitId(databaseDocumentUnitRepository
+                            .findByUuid(savedDocumentUnit.block().uuid())
+                            .block().getId())
+                    .build());
+
+            return databaseDocumentUnitRepository
+                    .findByUuid(savedDocumentUnit.block().uuid()).map(documentUnitDTO -> {
+                        return ProceedingDecisionDTO.builder()
+                                .uuid(documentUnitDTO.getUuid())
+                                .id(documentUnitDTO.getId())
+                                .courtType(documentUnitDTO.getCourtType())
+                                .courtLocation(documentUnitDTO.getCourtLocation())
+                                .fileNumber(documentUnitDTO.getFileNumbers().stream().findAny().get().getFileNumber())
+                                .build();
+                    }).block();
+        }));
     }
 
 }
