@@ -45,65 +45,62 @@ class NormsService(
     private val criteria: NormsCriteriaBuilder = NormsCriteriaBuilder()
 
     override fun getNormByEli(query: GetNormByEliOutputPort.Query): Mono<Norm> {
+        val selectQuery = Query.query(criteria.getEliCriteria(query.gazette, query.year, query.page))
         return template.select(NormDto::class.java)
-            .matching(Query.query(criteria.getEliCriteria(query.gazette, query.year, query.page)))
+            .matching(selectQuery)
             .first()
-            .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
+            .flatMap(::getNormWithArticles)
     }
 
     override fun searchNorms(
         query: SearchNormsOutputPort.Query,
     ): Flux<Norm> {
+        val selectQuery = Query.query(criteria.getSearchCriteria(query))
         return template.select(NormDto::class.java)
-            .matching(Query.query(criteria.getSearchCriteria(query)))
+            .matching(selectQuery)
             .all()
-            .flatMap { normDto: NormDto -> getNormWithArticles(normDto) }
+            .flatMap(::getNormWithArticles)
     }
 
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
-        return normsRepository.findByGuid(query.guid)
-            .flatMap { normDto ->
-                articlesRepository.findByNormId(normDto.id)
-                    .flatMap { articleDto: ArticleDto ->
-                        getArticleWithParagraphs(articleDto)
-                    }
-                    .collectList()
-                    .flatMap { articlesDto ->
-                        fileReferenceRepository.findByNormId(normDto.id).collectList()
-                            .map { filesDto ->
-                                normWithFilesToEntity(normDto, articlesDto, filesDto)
-                            }
-                    }
-            }
+        val findNormRequest = normsRepository.findByGuid(query.guid).cache()
+        val buildArticlesRequest = findNormRequest.flatMap { normDto ->
+            articlesRepository.findByNormId(normDto.id)
+                .flatMap(::getArticleWithParagraphs)
+                .collectList()
+        }
+
+        val findFileReferencesRequest = findNormRequest.flatMap { normDto ->
+            fileReferenceRepository.findByNormId(normDto.id).collectList()
+        }
+
+        return Mono.zip(findNormRequest, buildArticlesRequest, findFileReferencesRequest).map {
+            normWithFilesToEntity(it.t1, it.t2, it.t3)
+        }
     }
 
     override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
-        return normsRepository
-            .save(normToDto(command.norm))
-            .flatMap { normDto ->
-                saveNormFiles(command.norm, normDto).then(
-                    saveNormArticles(command.norm, normDto)
-                        .then(Mono.just(true)),
-                )
-            }
+        val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
+        val saveArticlesRequest = saveNormRequest.flatMap { saveNormArticles(command.norm, it).then() }
+        val saveFileReferencesRequest = saveNormRequest.flatMap { saveNormFiles(command.norm, it).then() }
+
+        return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest).thenReturn(true)
     }
 
     override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
         return normsRepository
             .findByGuid(command.norm.guid)
-            .flatMap { normDto ->
-                normsRepository
-                    .save(normToDto(command.norm, normDto.id))
-                    .flatMap { Mono.just(true) }
-            }
+            .map { normDto -> normToDto(command.norm, normDto.id) }
+            .flatMap(normsRepository::save)
+            .map { true }
     }
 
     override fun saveFileReference(command: SaveFileReferenceOutputPort.Command): Mono<Boolean> {
-        return normsRepository.findByGuid(command.norm.guid)
-            .flatMap { normDto ->
-                fileReferenceRepository.save(fileReferenceToDto(command.fileReference, normDto.id))
-                    .flatMap { Mono.just(true) }
-            }
+        return normsRepository
+            .findByGuid(command.norm.guid)
+            .map { normDto -> fileReferenceToDto(command.fileReference, normDto.id) }
+            .flatMap(fileReferenceRepository::save)
+            .map { true }
     }
 
     private fun saveNormArticles(norm: Norm, normDto: NormDto): Flux<ParagraphDto> {
@@ -113,8 +110,7 @@ class NormsService(
     }
 
     private fun saveNormFiles(norm: Norm, normDto: NormDto): Flux<FileReferenceDto> {
-        return fileReferenceRepository
-            .saveAll(fileReferencesToDto(norm.files, normDto.id))
+        return fileReferenceRepository.saveAll(fileReferencesToDto(norm.files, normDto.id))
     }
 
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {
@@ -129,23 +125,16 @@ class NormsService(
     }
 
     private fun getNormWithArticles(normDto: NormDto): Mono<Norm> {
-        return articlesRepository
-            .findByNormId(normDto.id)
-            .flatMap { articleDto: ArticleDto ->
-                getArticleWithParagraphs(articleDto)
-            }
+        return articlesRepository.findByNormId(normDto.id)
+            .flatMap(::getArticleWithParagraphs)
             .collectList()
-            .flatMap { articles: List<Article> ->
-                Mono.just(normToEntity(normDto, articles))
-            }
+            .map { articles -> normToEntity(normDto, articles) }
     }
 
     private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {
-        return paragraphsRepository
-            .findByArticleId(articleDto.id)
+        return paragraphsRepository.findByArticleId(articleDto.id)
+            .map(::paragraphToEntity)
             .collectList()
-            .map { paragraphs: List<ParagraphDto> ->
-                articleToEntity(articleDto, paragraphs.map { paragraphToEntity(it) })
-            }
+            .map { paragraphs -> articleToEntity(articleDto, paragraphs) }
     }
 }
