@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink;
+package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import java.time.Instant;
@@ -17,7 +17,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("doc_unit")
-public class LinkedDocumentUnitDTO {
+public class ProceedingDecisionDTO {
   @Id Long id;
 
   @Column("gerichtstyp")
@@ -29,8 +29,5 @@ public class LinkedDocumentUnitDTO {
   @Column("decision_date")
   Instant decisionDate;
 
-  @Transient List<FileNumberDTO> fileNumbers;
-
-  String documentnumber;
-  Long documentUnitId;
+  @Transient String fileNumber;
 }

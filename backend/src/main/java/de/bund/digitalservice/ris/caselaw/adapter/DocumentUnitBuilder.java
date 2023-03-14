@@ -12,7 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -26,7 +26,7 @@ public class DocumentUnitBuilder {
 
   private DocumentUnitBuilder() {}
 
-  private Court getCourtObject(String courtType, String courtLocation) {
+  public Court getCourtObject(String courtType, String courtLocation) {
     Court court = null;
     if (courtType != null) {
       String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
@@ -56,13 +56,13 @@ public class DocumentUnitBuilder {
           new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
     }
 
-    List<LinkedDocumentUnit> linkedDocumentUnits = null;
-    if (documentUnitDTO.getPreviousDecisions() != null) {
-      linkedDocumentUnits =
-          documentUnitDTO.getPreviousDecisions().stream()
+    List<ProceedingDecision> proceedingDecisions = null;
+    if (documentUnitDTO.getProceedingDecisions() != null) {
+      proceedingDecisions =
+          documentUnitDTO.getProceedingDecisions().stream()
               .map(
                   previousDecisionDTO ->
-                      LinkedDocumentUnit.builder()
+                      ProceedingDecision.builder()
                           .id(previousDecisionDTO.getId())
                           .court(
                               getCourtObject(
@@ -146,7 +146,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),
             documentUnitDTO.getRegion()),
-        linkedDocumentUnits,
+            proceedingDecisions,
         new Texts(
             documentUnitDTO.getDecisionName(),
             documentUnitDTO.getHeadline(),

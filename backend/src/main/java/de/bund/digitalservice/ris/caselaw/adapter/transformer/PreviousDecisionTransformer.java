@@ -1,53 +1,53 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink.LinkedDocumentUnitDTO.PreviousDecisionDTOBuilder;
-import de.bund.digitalservice.ris.caselaw.domain.LinkedDocumentUnit;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.ProceedingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.ProceedingDecisionDTO.PreviousDecisionDTOBuilder;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 
 public class PreviousDecisionTransformer {
   private PreviousDecisionTransformer() {}
 
-  private static String getCourtLocation(LinkedDocumentUnit linkedDocumentUnit) {
+  private static String getCourtLocation(ProceedingDecision proceedingDecision) {
     String courtLocation = null;
-    if (linkedDocumentUnit.court() != null) {
-      courtLocation = linkedDocumentUnit.court().location();
+    if (proceedingDecision.court() != null) {
+      courtLocation = proceedingDecision.court().location();
     }
     return courtLocation;
   }
 
-  private static String getCourtType(LinkedDocumentUnit linkedDocumentUnit) {
+  private static String getCourtType(ProceedingDecision proceedingDecision) {
     String courtType = null;
-    if (linkedDocumentUnit.court() != null) {
-      courtType = linkedDocumentUnit.court().type();
+    if (proceedingDecision.court() != null) {
+      courtType = proceedingDecision.court().type();
     }
     return courtType;
   }
 
-  public static LinkedDocumentUnitDTO generateDTO(
-      LinkedDocumentUnit linkedDocumentUnit, Long documentUnitId) {
-    return fillData(LinkedDocumentUnitDTO.builder(), linkedDocumentUnit, documentUnitId);
+  public static ProceedingDecisionDTO generateDTO(
+          ProceedingDecision proceedingDecision, Long documentUnitId) {
+    return fillData(ProceedingDecisionDTO.builder(), proceedingDecision, documentUnitId);
   }
 
-  public static LinkedDocumentUnitDTO enrichDTO(
-      LinkedDocumentUnitDTO linkedDocumentUnitDTO, LinkedDocumentUnit linkedDocumentUnit) {
+  public static ProceedingDecisionDTO enrichDTO(
+          ProceedingDecisionDTO proceedingDecisionDTO, ProceedingDecision proceedingDecision) {
     return fillData(
-        linkedDocumentUnitDTO.toBuilder(),
-        linkedDocumentUnit,
-        linkedDocumentUnitDTO.getDocumentUnitId());
+        proceedingDecisionDTO.toBuilder(),
+            proceedingDecision,
+        proceedingDecisionDTO.getDocumentUnitId());
   }
 
-  private static LinkedDocumentUnitDTO fillData(
+  private static ProceedingDecisionDTO fillData(
       PreviousDecisionDTOBuilder toBuilder,
-      LinkedDocumentUnit linkedDocumentUnit,
+      ProceedingDecision proceedingDecision,
       Long documentUnitId) {
 
-    return LinkedDocumentUnitDTO.builder()
-        .id(linkedDocumentUnit.id())
-        .courtLocation(getCourtLocation(linkedDocumentUnit))
-        .courtType(getCourtType(linkedDocumentUnit))
-        .fileNumber(linkedDocumentUnit.fileNumber())
+    return ProceedingDecisionDTO.builder()
+        .id(proceedingDecision.id())
+        .courtLocation(getCourtLocation(proceedingDecision))
+        .courtType(getCourtType(proceedingDecision))
+        .fileNumber(proceedingDecision.fileNumber())
         .documentUnitId(documentUnitId)
-        .decisionDateTimestamp(linkedDocumentUnit.date())
+        .decisionDateTimestamp(proceedingDecision.date())
         .build();
   }
 }

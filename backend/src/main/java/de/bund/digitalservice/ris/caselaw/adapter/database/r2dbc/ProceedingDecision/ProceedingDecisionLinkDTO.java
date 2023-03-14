@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitLink;
+package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision;
 
-import java.math.BigInteger;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +11,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("document_unit_link")
-public class DocumentUnitLinkDTO {
-  BigInteger parentDocumentUnitId;
-  BigInteger childDocumentUnitId;
+public class ProceedingDecisionLinkDTO {
+  Long parentDocumentUnitId;
+  Long childDocumentUnitId;
 }
