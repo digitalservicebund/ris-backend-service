@@ -1,11 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
@@ -116,39 +116,39 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     return databaseSubjectFieldRepository.countBySearchStr(searchStr);
   }
 
-  private Mono<SubjectFieldDTO> injectKeywords(SubjectFieldDTO subjectFieldDTO) {
+  private Mono<FieldOfLawDTO> injectKeywords(FieldOfLawDTO fieldOfLawDTO) {
     return fieldOfLawKeywordRepository
-        .findAllBySubjectFieldIdOrderByValueAsc(subjectFieldDTO.getId())
+        .findAllBySubjectFieldIdOrderByValueAsc(fieldOfLawDTO.getId())
         .collectList()
         .map(
             keywords -> {
-              subjectFieldDTO.setKeywords(keywords);
-              return subjectFieldDTO;
+              fieldOfLawDTO.setKeywords(keywords);
+              return fieldOfLawDTO;
             });
   }
 
-  private Mono<SubjectFieldDTO> injectNorms(SubjectFieldDTO subjectFieldDTO) {
+  private Mono<FieldOfLawDTO> injectNorms(FieldOfLawDTO fieldOfLawDTO) {
     return normRepository
         .findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(
-            subjectFieldDTO.getId())
+            fieldOfLawDTO.getId())
         .collectList()
         .map(
             norms -> {
-              subjectFieldDTO.setNorms(norms);
-              return subjectFieldDTO;
+              fieldOfLawDTO.setNorms(norms);
+              return fieldOfLawDTO;
             });
   }
 
-  private Mono<SubjectFieldDTO> injectLinkedFields(SubjectFieldDTO subjectFieldDTO) {
+  private Mono<FieldOfLawDTO> injectLinkedFields(FieldOfLawDTO fieldOfLawDTO) {
     return fieldOfLawLinkRepository
-        .findAllByFieldId(subjectFieldDTO.getId())
+        .findAllByFieldId(fieldOfLawDTO.getId())
         .map(FieldOfLawLinkDTO::getLinkedFieldId)
         .flatMap(linkedFieldId -> databaseSubjectFieldRepository.findById(linkedFieldId))
         .collectList()
         .map(
             subjectFieldDTOS -> {
-              subjectFieldDTO.setLinkedFields(subjectFieldDTOS);
-              return subjectFieldDTO;
+              fieldOfLawDTO.setLinkedFields(subjectFieldDTOS);
+              return fieldOfLawDTO;
             });
   }
 
@@ -180,7 +180,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     Mono<Long> fieldOfLawDTOId =
         databaseSubjectFieldRepository
             .findBySubjectFieldNumber(identifier)
-            .mapNotNull(SubjectFieldDTO::getId)
+            .mapNotNull(FieldOfLawDTO::getId)
             .defaultIfEmpty(-1L);
 
     return documentUnitDTOId
@@ -233,7 +233,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     Mono<Long> fieldOfLawDTOId =
         databaseSubjectFieldRepository
             .findBySubjectFieldNumber(identifier)
-            .mapNotNull(SubjectFieldDTO::getId)
+            .mapNotNull(FieldOfLawDTO::getId)
             .defaultIfEmpty(-1L);
 
     return documentUnitDTOId

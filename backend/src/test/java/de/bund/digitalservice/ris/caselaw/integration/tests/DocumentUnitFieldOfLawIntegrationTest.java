@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
@@ -431,8 +431,8 @@ class DocumentUnitFieldOfLawIntegrationTest {
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
 
-    SubjectFieldDTO fieldOfLawDTO = SubjectFieldDTO.builder().subjectFieldNumber("SF-01").build();
-    SubjectFieldDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
+    FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().subjectFieldNumber("SF-01").build();
+    FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
 
     DocumentUnitFieldsOfLawDTO link =
         DocumentUnitFieldsOfLawDTO.builder()
@@ -468,8 +468,8 @@ class DocumentUnitFieldOfLawIntegrationTest {
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
 
-    SubjectFieldDTO fieldOfLawDTO = SubjectFieldDTO.builder().subjectFieldNumber("SF-01").build();
-    SubjectFieldDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
+    FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().subjectFieldNumber("SF-01").build();
+    FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
 
     DocumentUnitFieldsOfLawDTO link =
         DocumentUnitFieldsOfLawDTO.builder()
@@ -496,7 +496,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
 
   private void generateAndAddFieldsOfLaw(Long documentUnitId, String... fieldsOfLawIdentifier) {
     for (String identifier : fieldsOfLawIdentifier) {
-      SubjectFieldDTO fieldOfLawDTO = generateFieldOfLaw(identifier);
+      FieldOfLawDTO fieldOfLawDTO = generateFieldOfLaw(identifier);
 
       DocumentUnitFieldsOfLawDTO link =
           DocumentUnitFieldsOfLawDTO.builder()
@@ -513,9 +513,9 @@ class DocumentUnitFieldOfLawIntegrationTest {
     }
   }
 
-  private SubjectFieldDTO generateFieldOfLaw(String fieldOfLawIdentifier) {
-    SubjectFieldDTO fieldOfLawDTO1 =
-        SubjectFieldDTO.builder().subjectFieldNumber(fieldOfLawIdentifier).build();
+  private FieldOfLawDTO generateFieldOfLaw(String fieldOfLawIdentifier) {
+    FieldOfLawDTO fieldOfLawDTO1 =
+        FieldOfLawDTO.builder().subjectFieldNumber(fieldOfLawIdentifier).build();
     return fieldOfLawRepository.save(fieldOfLawDTO1).block();
   }
 }

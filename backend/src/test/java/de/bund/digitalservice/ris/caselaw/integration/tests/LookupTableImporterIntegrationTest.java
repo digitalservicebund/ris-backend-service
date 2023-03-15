@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRe
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
@@ -18,7 +19,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Nor
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -205,23 +205,23 @@ class LookupTableImporterIntegrationTest {
     FieldOfLawKeywordDTO expectedKeyword2 =
         FieldOfLawKeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
 
-    SubjectFieldDTO expectedLinkedField1 =
-        SubjectFieldDTO.builder()
+    FieldOfLawDTO expectedLinkedField1 =
+        FieldOfLawDTO.builder()
             .id(3L)
             .childrenCount(0)
             .changeIndicator('N')
             .subjectFieldNumber("ÄB-01-02")
             .build();
-    SubjectFieldDTO expectedLinkedField2 =
-        SubjectFieldDTO.builder()
+    FieldOfLawDTO expectedLinkedField2 =
+        FieldOfLawDTO.builder()
             .id(4L)
             .childrenCount(0)
             .changeIndicator('N')
             .subjectFieldNumber("CD-01")
             .build();
 
-    SubjectFieldDTO expectedParent =
-        SubjectFieldDTO.builder()
+    FieldOfLawDTO expectedParent =
+        FieldOfLawDTO.builder()
             .id(1L)
             .childrenCount(1)
             .subjectFieldNumber("TS-01")
@@ -229,8 +229,8 @@ class LookupTableImporterIntegrationTest {
             .changeIndicator('N')
             .build();
 
-    SubjectFieldDTO expectedChild =
-        new SubjectFieldDTO(
+    FieldOfLawDTO expectedChild =
+        new FieldOfLawDTO(
             2L,
             0,
             1L,
@@ -304,7 +304,7 @@ class LookupTableImporterIntegrationTest {
                 assertThat(response.getResponseBody())
                     .isEqualTo("Successfully imported the subject field lookup table"));
 
-    List<SubjectFieldDTO> subjectFieldDTOs =
+    List<FieldOfLawDTO> fieldOfLawDTOS =
         subjectFieldRepository
             .findAllByOrderBySubjectFieldNumberAsc(Pageable.unpaged())
             .collectList()
@@ -317,16 +317,16 @@ class LookupTableImporterIntegrationTest {
     List<NormDTO> normDTOs =
         normRepository.findAllByOrderBySubjectFieldIdAscAbbreviationAsc().collectList().block();
 
-    assertThat(subjectFieldDTOs).hasSize(6);
+    assertThat(fieldOfLawDTOS).hasSize(6);
     assertThat(keywordDTOs).hasSize(2);
     assertThat(normDTOs).hasSize(2);
 
-    SubjectFieldDTO parent = subjectFieldDTOs.get(4); // index due to alphabetical sorting
-    SubjectFieldDTO child = subjectFieldDTOs.get(5);
+    FieldOfLawDTO parent = fieldOfLawDTOS.get(4); // index due to alphabetical sorting
+    FieldOfLawDTO child = fieldOfLawDTOS.get(5);
 
     List<FieldOfLawLinkDTO> linksRaw =
         fieldOfLawLinkRepository.findAllByFieldId(child.getId()).collectList().block();
-    List<SubjectFieldDTO> linkedFields =
+    List<FieldOfLawDTO> linkedFields =
         linksRaw.stream()
             .map(
                 fieldOfLawLinkDTO ->

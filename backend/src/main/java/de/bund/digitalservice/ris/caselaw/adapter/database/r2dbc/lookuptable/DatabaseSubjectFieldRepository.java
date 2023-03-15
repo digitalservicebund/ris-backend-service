@@ -8,19 +8,19 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectFieldDTO, Long> {
+public interface DatabaseSubjectFieldRepository extends R2dbcRepository<FieldOfLawDTO, Long> {
 
-  Flux<SubjectFieldDTO> findAllByParentIdOrderBySubjectFieldNumberAsc(Long id);
+  Flux<FieldOfLawDTO> findAllByParentIdOrderBySubjectFieldNumberAsc(Long id);
 
-  Flux<SubjectFieldDTO> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
+  Flux<FieldOfLawDTO> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
 
-  Mono<SubjectFieldDTO> findBySubjectFieldNumber(String subjectFieldNumber);
+  Mono<FieldOfLawDTO> findBySubjectFieldNumber(String subjectFieldNumber);
 
   @Query(
       "SELECT * FROM lookuptable_subject_field WHERE parent_id = ( "
           + "    SELECT id FROM lookuptable_subject_field WHERE subject_field_number = :subjectFieldNumber "
           + ") ORDER BY subject_field_number")
-  Flux<SubjectFieldDTO> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
+  Flux<FieldOfLawDTO> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber);
 
   @Query(
@@ -37,7 +37,7 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
           + "FROM content_added "
           + "WHERE content LIKE UPPER('%'||:searchStr||'%') "
           + "ORDER BY weight, content LIMIT :limit OFFSET :offset")
-  Flux<SubjectFieldDTO> findBySearchStr(String searchStr, long offset, int limit);
+  Flux<FieldOfLawDTO> findBySearchStr(String searchStr, long offset, int limit);
 
   @Query(
       "SELECT COUNT(*) FROM lookuptable_subject_field "
@@ -64,13 +64,13 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
           + "        (SELECT value "
           + "         FROM param_arrays "
           + "         WHERE KEY = 'search'), 1);")
-  Flux<SubjectFieldDTO> findBySearchTerms(String[] searchTerms);
+  Flux<FieldOfLawDTO> findBySearchTerms(String[] searchTerms);
 
   @Query(
       "SELECT sf.* FROM lookuptable_subject_field sf WHERE sf.id IN ( "
           + "SELECT n.subject_field_id FROM lookuptable_subject_field_norm n "
           + "WHERE LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%'));")
-  Flux<SubjectFieldDTO> findByNormStr(String normStr);
+  Flux<FieldOfLawDTO> findByNormStr(String normStr);
 
   @Query(
       "WITH param_arrays(KEY, value) AS ( "
@@ -94,5 +94,5 @@ public interface DatabaseSubjectFieldRepository extends R2dbcRepository<SubjectF
           + "         FROM param_arrays "
           + "         WHERE KEY = 'search'), 1)"
           + "  AND LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%');")
-  Flux<SubjectFieldDTO> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
+  Flux<FieldOfLawDTO> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
 }

@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
@@ -221,14 +221,14 @@ class FieldOfLawIntegrationTest {
 
   private void prepareDatabase() {
     // first root child
-    SubjectFieldDTO subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    FieldOfLawDTO fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(1L)
             .subjectFieldNumber("FL")
             .isNew(true)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     /*NormDTO normDTO =
         NormDTO.builder()
@@ -241,68 +241,68 @@ class FieldOfLawIntegrationTest {
     // TODO: add more norms*/
 
     // child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(2L)
             .isNew(true)
             .subjectFieldNumber("FL-01")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // sub child of the child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(3L)
             .isNew(true)
             .subjectFieldNumber("FL-01-01")
             .parentId(2L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // second root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(4L)
             .isNew(true)
             .subjectFieldNumber("FO")
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // second child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(5L)
             .isNew(true)
             .subjectFieldNumber("FL-02")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // third child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(6L)
             .isNew(true)
             .subjectFieldNumber("FL-03")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // fourth child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(7L)
             .isNew(true)
             .subjectFieldNumber("FL-04")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
   }
 }

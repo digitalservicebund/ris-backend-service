@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
@@ -17,19 +17,19 @@ import java.util.Set;
 public class SubjectFieldTransformer {
   private SubjectFieldTransformer() {}
 
-  public static FieldOfLaw transformToDomain(SubjectFieldDTO subjectFieldDTO) {
+  public static FieldOfLaw transformToDomain(FieldOfLawDTO fieldOfLawDTO) {
     List<Keyword> keywords = null;
-    if (subjectFieldDTO.getKeywords() != null) {
+    if (fieldOfLawDTO.getKeywords() != null) {
       keywords =
-          subjectFieldDTO.getKeywords().stream()
+          fieldOfLawDTO.getKeywords().stream()
               .map(keywordDTO -> Keyword.builder().value(keywordDTO.getValue()).build())
               .toList();
     }
 
     List<Norm> norms = null;
-    if (subjectFieldDTO.getNorms() != null) {
+    if (fieldOfLawDTO.getNorms() != null) {
       norms =
-          subjectFieldDTO.getNorms().stream()
+          fieldOfLawDTO.getNorms().stream()
               .map(
                   normDTO ->
                       Norm.builder()
@@ -40,18 +40,18 @@ public class SubjectFieldTransformer {
     }
 
     List<String> linkedFields = null;
-    if (subjectFieldDTO.getLinkedFields() != null) {
+    if (fieldOfLawDTO.getLinkedFields() != null) {
       linkedFields =
-          subjectFieldDTO.getLinkedFields().stream()
-              .map(SubjectFieldDTO::getSubjectFieldNumber)
+          fieldOfLawDTO.getLinkedFields().stream()
+              .map(FieldOfLawDTO::getSubjectFieldNumber)
               .toList();
     }
 
     return FieldOfLaw.builder()
-        .id(subjectFieldDTO.getId())
-        .childrenCount(subjectFieldDTO.getChildrenCount())
-        .identifier(subjectFieldDTO.getSubjectFieldNumber())
-        .text(subjectFieldDTO.getSubjectFieldText())
+        .id(fieldOfLawDTO.getId())
+        .childrenCount(fieldOfLawDTO.getChildrenCount())
+        .identifier(fieldOfLawDTO.getSubjectFieldNumber())
+        .text(fieldOfLawDTO.getSubjectFieldText())
         .linkedFields(linkedFields)
         .keywords(keywords)
         .norms(norms)
