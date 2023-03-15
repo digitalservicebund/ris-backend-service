@@ -15,14 +15,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "lookuptable_subject_field_keyword")
+@Entity(name = "lookuptable_field_of_law_keyword")
 public class JPAKeywordDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Long id;
 
   @ManyToOne
-  @JoinColumn(name = "subject_field_id")
+  @JoinColumn(name = "field_of_law_id")
   JPAFieldOfLawDTO jpaFieldOfLawDTO;
 
   String value;

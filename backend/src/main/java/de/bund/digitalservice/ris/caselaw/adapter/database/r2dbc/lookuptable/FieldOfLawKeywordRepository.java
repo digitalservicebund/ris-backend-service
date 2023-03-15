@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface FieldOfLawKeywordRepository extends R2dbcRepository<FieldOfLawKeywordDTO, Long> {
 
-  Flux<FieldOfLawKeywordDTO> findAllByOrderBySubjectFieldIdAscValueAsc();
+  Flux<FieldOfLawKeywordDTO> findAllByOrderByFieldOfLawIdAscValueAsc();
 
-  Flux<FieldOfLawKeywordDTO> findAllBySubjectFieldIdOrderByValueAsc(Long subjectFieldId);
+  Flux<FieldOfLawKeywordDTO> findAllByFieldOfLawIdOrderByValueAsc(Long fieldOfLawId);
 }

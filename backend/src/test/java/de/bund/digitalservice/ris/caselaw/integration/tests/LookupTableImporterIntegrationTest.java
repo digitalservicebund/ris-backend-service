@@ -193,39 +193,38 @@ class LookupTableImporterIntegrationTest {
   void shouldImportSubjectFieldLookupTableCorrectly() {
     NormDTO expectedNorm1 =
         NormDTO.builder()
-            .subjectFieldId(2L)
+            .fieldOfLawId(2L)
             .abbreviation("normabk 2.1")
             .singleNormDescription("§ 2.1")
             .build();
-    NormDTO expectedNorm2 =
-        NormDTO.builder().subjectFieldId(2L).abbreviation("normabk 2.2").build();
+    NormDTO expectedNorm2 = NormDTO.builder().fieldOfLawId(2L).abbreviation("normabk 2.2").build();
 
     FieldOfLawKeywordDTO expectedKeyword1 =
-        FieldOfLawKeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.1").build();
+        FieldOfLawKeywordDTO.builder().fieldOfLawId(2L).value("schlagwort 2.1").build();
     FieldOfLawKeywordDTO expectedKeyword2 =
-        FieldOfLawKeywordDTO.builder().subjectFieldId(2L).value("schlagwort 2.2").build();
+        FieldOfLawKeywordDTO.builder().fieldOfLawId(2L).value("schlagwort 2.2").build();
 
     FieldOfLawDTO expectedLinkedField1 =
         FieldOfLawDTO.builder()
             .id(3L)
             .childrenCount(0)
             .changeIndicator('N')
-            .subjectFieldNumber("ÄB-01-02")
+            .identifier("ÄB-01-02")
             .build();
     FieldOfLawDTO expectedLinkedField2 =
         FieldOfLawDTO.builder()
             .id(4L)
             .childrenCount(0)
             .changeIndicator('N')
-            .subjectFieldNumber("CD-01")
+            .identifier("CD-01")
             .build();
 
     FieldOfLawDTO expectedParent =
         FieldOfLawDTO.builder()
             .id(1L)
             .childrenCount(1)
-            .subjectFieldNumber("TS-01")
-            .subjectFieldText("stext 1")
+            .identifier("TS-01")
+            .text("stext 1")
             .changeIndicator('N')
             .build();
 
@@ -306,16 +305,13 @@ class LookupTableImporterIntegrationTest {
 
     List<FieldOfLawDTO> fieldOfLawDTOS =
         subjectFieldRepository
-            .findAllByOrderBySubjectFieldNumberAsc(Pageable.unpaged())
+            .findAllByOrderByIdentifierAsc(Pageable.unpaged())
             .collectList()
             .block();
     List<FieldOfLawKeywordDTO> keywordDTOs =
-        fieldOfLawKeywordRepository
-            .findAllByOrderBySubjectFieldIdAscValueAsc()
-            .collectList()
-            .block();
+        fieldOfLawKeywordRepository.findAllByOrderByFieldOfLawIdAscValueAsc().collectList().block();
     List<NormDTO> normDTOs =
-        normRepository.findAllByOrderBySubjectFieldIdAscAbbreviationAsc().collectList().block();
+        normRepository.findAllByOrderByFieldOfLawIdAscAbbreviationAsc().collectList().block();
 
     assertThat(fieldOfLawDTOS).hasSize(6);
     assertThat(keywordDTOs).hasSize(2);
@@ -325,17 +321,19 @@ class LookupTableImporterIntegrationTest {
     FieldOfLawDTO child = fieldOfLawDTOS.get(5);
 
     List<FieldOfLawLinkDTO> linksRaw =
-        fieldOfLawLinkRepository.findAllByFieldId(child.getId()).collectList().block();
+        fieldOfLawLinkRepository.findAllByFieldOfLawId(child.getId()).collectList().block();
     List<FieldOfLawDTO> linkedFields =
         linksRaw.stream()
             .map(
                 fieldOfLawLinkDTO ->
-                    subjectFieldRepository.findById(fieldOfLawLinkDTO.getLinkedFieldId()).block())
+                    subjectFieldRepository
+                        .findById(fieldOfLawLinkDTO.getLinkedFieldOfLawId())
+                        .block())
             .toList();
 
     child.setKeywords(keywordDTOs);
     child.setNorms(normDTOs);
-    child.setLinkedFields(linkedFields);
+    child.setLinkedFieldsOfLaw(linkedFields);
 
     assertThat(parent).usingRecursiveComparison().isEqualTo(expectedParent);
     assertThat(child)

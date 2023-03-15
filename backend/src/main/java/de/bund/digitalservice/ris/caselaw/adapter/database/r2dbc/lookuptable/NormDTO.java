@@ -11,13 +11,13 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("lookuptable_subject_field_norm")
+@Table("lookuptable_field_of_law_norm")
 public class NormDTO {
 
   public static final NormDTO EMPTY = new NormDTO();
 
   @Id Long id;
-  Long subjectFieldId;
+  Long fieldOfLawId;
   String abbreviation;
   String singleNormDescription;
 }

@@ -13,12 +13,12 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("field_of_law_link")
+@Table("lookuptable_field_of_law_link")
 public class FieldOfLawLinkDTO implements Persistable<Long> {
   public static final FieldOfLawLinkDTO EMPTY = new FieldOfLawLinkDTO();
   @Id Long id;
-  Long fieldId;
-  Long linkedFieldId;
+  Long fieldOfLawId;
+  Long linkedFieldOfLawId;
 
   @Transient private boolean isNew;
 

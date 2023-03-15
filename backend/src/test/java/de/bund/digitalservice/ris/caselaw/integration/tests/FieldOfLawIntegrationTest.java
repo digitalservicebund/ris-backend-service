@@ -222,12 +222,7 @@ class FieldOfLawIntegrationTest {
   private void prepareDatabase() {
     // first root child
     FieldOfLawDTO fieldOfLawDTO =
-        FieldOfLawDTO.builder()
-            .id(1L)
-            .subjectFieldNumber("FL")
-            .isNew(true)
-            .changeIndicator('N')
-            .build();
+        FieldOfLawDTO.builder().id(1L).identifier("FL").isNew(true).changeIndicator('N').build();
     repository.save(fieldOfLawDTO).block();
 
     /*NormDTO normDTO =
@@ -245,7 +240,7 @@ class FieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(2L)
             .isNew(true)
-            .subjectFieldNumber("FL-01")
+            .identifier("FL-01")
             .parentId(1L)
             .changeIndicator('N')
             .build();
@@ -256,7 +251,7 @@ class FieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(3L)
             .isNew(true)
-            .subjectFieldNumber("FL-01-01")
+            .identifier("FL-01-01")
             .parentId(2L)
             .changeIndicator('N')
             .build();
@@ -264,12 +259,7 @@ class FieldOfLawIntegrationTest {
 
     // second root child
     fieldOfLawDTO =
-        FieldOfLawDTO.builder()
-            .id(4L)
-            .isNew(true)
-            .subjectFieldNumber("FO")
-            .changeIndicator('N')
-            .build();
+        FieldOfLawDTO.builder().id(4L).isNew(true).identifier("FO").changeIndicator('N').build();
     repository.save(fieldOfLawDTO).block();
 
     // second child of the first root child
@@ -277,7 +267,7 @@ class FieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(5L)
             .isNew(true)
-            .subjectFieldNumber("FL-02")
+            .identifier("FL-02")
             .parentId(1L)
             .changeIndicator('N')
             .build();
@@ -288,7 +278,7 @@ class FieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(6L)
             .isNew(true)
-            .subjectFieldNumber("FL-03")
+            .identifier("FL-03")
             .parentId(1L)
             .changeIndicator('N')
             .build();
@@ -299,7 +289,7 @@ class FieldOfLawIntegrationTest {
         FieldOfLawDTO.builder()
             .id(7L)
             .isNew(true)
-            .subjectFieldNumber("FL-04")
+            .identifier("FL-04")
             .parentId(1L)
             .changeIndicator('N')
             .build();

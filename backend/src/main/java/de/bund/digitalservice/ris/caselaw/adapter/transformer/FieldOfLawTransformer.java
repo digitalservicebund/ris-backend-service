@@ -40,18 +40,16 @@ public class FieldOfLawTransformer {
     }
 
     List<String> linkedFields = null;
-    if (fieldOfLawDTO.getLinkedFields() != null) {
+    if (fieldOfLawDTO.getLinkedFieldsOfLaw() != null) {
       linkedFields =
-          fieldOfLawDTO.getLinkedFields().stream()
-              .map(FieldOfLawDTO::getSubjectFieldNumber)
-              .toList();
+          fieldOfLawDTO.getLinkedFieldsOfLaw().stream().map(FieldOfLawDTO::getIdentifier).toList();
     }
 
     return FieldOfLaw.builder()
         .id(fieldOfLawDTO.getId())
         .childrenCount(fieldOfLawDTO.getChildrenCount())
-        .identifier(fieldOfLawDTO.getSubjectFieldNumber())
-        .text(fieldOfLawDTO.getSubjectFieldText())
+        .identifier(fieldOfLawDTO.getIdentifier())
+        .text(fieldOfLawDTO.getText())
         .linkedFields(linkedFields)
         .keywords(keywords)
         .norms(norms)
@@ -66,8 +64,8 @@ public class FieldOfLawTransformer {
         .changeDateClient(fieldOfLawXml.getChangeDateClient())
         .changeIndicator(fieldOfLawXml.getChangeIndicator())
         .version(fieldOfLawXml.getVersion())
-        .subjectFieldNumber(fieldOfLawXml.getSubjectFieldNumber())
-        .subjectFieldText(fieldOfLawXml.getSubjectFieldText())
+        .identifier(fieldOfLawXml.getIdentifier())
+        .text(fieldOfLawXml.getText())
         .navigationTerm(fieldOfLawXml.getNavigationTerm())
         .keywords(transformKeywordsToJPADTOs(fieldOfLawXml.getKeywords()))
         .norms(transformNormsToJPADTOs(fieldOfLawXml.getNorms()))

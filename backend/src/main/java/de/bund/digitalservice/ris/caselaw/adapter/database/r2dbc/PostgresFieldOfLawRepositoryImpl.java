@@ -44,9 +44,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  public Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable) {
+  public Flux<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
     return databaseFieldOfLawRepository
-        .findAllByOrderBySubjectFieldNumberAsc(pageable)
+        .findAllByOrderByIdentifierAsc(pageable)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
@@ -54,9 +54,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  public Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldNumber) {
+  public Mono<FieldOfLaw> findByIdentifier(String identifier) {
     return databaseFieldOfLawRepository
-        .findBySubjectFieldNumber(subjectFieldNumber)
+        .findByIdentifier(identifier)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
         .flatMap(this::injectLinkedFields)
@@ -66,7 +66,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   public Mono<FieldOfLaw> findParentByChild(FieldOfLaw child) {
     return databaseFieldOfLawRepository
-        .findBySubjectFieldNumber(child.identifier())
+        .findByIdentifier(child.identifier())
         .flatMap(
             childDTO -> {
               if (childDTO.getParentId() != null) {
@@ -83,7 +83,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   public Flux<FieldOfLaw> getTopLevelNodes() {
     return databaseFieldOfLawRepository
-        .findAllByParentIdOrderBySubjectFieldNumberAsc(null)
+        .findAllByParentIdOrderByIdentifierAsc(null)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
@@ -91,10 +91,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   }
 
   @Override
-  public Flux<FieldOfLaw> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
-      String subjectFieldNumber) {
+  public Flux<FieldOfLaw> findAllByParentIdentifierOrderByIdentifierAsc(String identifier) {
     return databaseFieldOfLawRepository
-        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(subjectFieldNumber)
+        .findAllByParentIdentifierOrderByIdentifierAsc(identifier)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
@@ -118,7 +117,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   private Mono<FieldOfLawDTO> injectKeywords(FieldOfLawDTO fieldOfLawDTO) {
     return fieldOfLawKeywordRepository
-        .findAllBySubjectFieldIdOrderByValueAsc(fieldOfLawDTO.getId())
+        .findAllByFieldOfLawIdOrderByValueAsc(fieldOfLawDTO.getId())
         .collectList()
         .map(
             keywords -> {
@@ -129,8 +128,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   private Mono<FieldOfLawDTO> injectNorms(FieldOfLawDTO fieldOfLawDTO) {
     return normRepository
-        .findAllBySubjectFieldIdOrderByAbbreviationAscSingleNormDescriptionAsc(
-            fieldOfLawDTO.getId())
+        .findAllByFieldOfLawIdOrderByAbbreviationAscSingleNormDescriptionAsc(fieldOfLawDTO.getId())
         .collectList()
         .map(
             norms -> {
@@ -141,13 +139,13 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   private Mono<FieldOfLawDTO> injectLinkedFields(FieldOfLawDTO fieldOfLawDTO) {
     return fieldOfLawLinkRepository
-        .findAllByFieldId(fieldOfLawDTO.getId())
-        .map(FieldOfLawLinkDTO::getLinkedFieldId)
-        .flatMap(linkedFieldId -> databaseFieldOfLawRepository.findById(linkedFieldId))
+        .findAllByFieldOfLawId(fieldOfLawDTO.getId())
+        .map(FieldOfLawLinkDTO::getLinkedFieldOfLawId)
+        .flatMap(linkedFieldOfLawId -> databaseFieldOfLawRepository.findById(linkedFieldOfLawId))
         .collectList()
         .map(
             subjectFieldDTOS -> {
-              fieldOfLawDTO.setLinkedFields(subjectFieldDTOS);
+              fieldOfLawDTO.setLinkedFieldsOfLaw(subjectFieldDTOS);
               return fieldOfLawDTO;
             });
   }
@@ -179,7 +177,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
     Mono<Long> fieldOfLawDTOId =
         databaseFieldOfLawRepository
-            .findBySubjectFieldNumber(identifier)
+            .findByIdentifier(identifier)
             .mapNotNull(FieldOfLawDTO::getId)
             .defaultIfEmpty(-1L);
 
@@ -232,7 +230,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
     Mono<Long> fieldOfLawDTOId =
         databaseFieldOfLawRepository
-            .findBySubjectFieldNumber(identifier)
+            .findByIdentifier(identifier)
             .mapNotNull(FieldOfLawDTO::getId)
             .defaultIfEmpty(-1L);
 

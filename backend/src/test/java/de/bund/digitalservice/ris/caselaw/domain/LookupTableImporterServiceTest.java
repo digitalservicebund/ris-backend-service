@@ -201,11 +201,7 @@ class LookupTableImporterServiceTest {
     Set<JPAKeywordDTO> childKeywords = Set.of(childKeyword1, childKeyword2);
 
     JPAFieldOfLawDTO parent =
-        JPAFieldOfLawDTO.builder()
-            .id(1L)
-            .parentSubjectField(null)
-            .subjectFieldNumber("TS-01")
-            .build();
+        JPAFieldOfLawDTO.builder().id(1L).parentSubjectField(null).identifier("TS-01").build();
     JPAFieldOfLawDTO child =
         JPAFieldOfLawDTO.builder()
             .id(2L)
@@ -214,8 +210,8 @@ class LookupTableImporterServiceTest {
             .changeDateClient("2022-12-24")
             .changeIndicator('N')
             .version("1.0")
-            .subjectFieldNumber("TS-01-01")
-            .subjectFieldText("stext 2")
+            .identifier("TS-01-01")
+            .text("stext 2")
             .navigationTerm("navbez 2")
             .keywords(childKeywords)
             .norms(childNorms)

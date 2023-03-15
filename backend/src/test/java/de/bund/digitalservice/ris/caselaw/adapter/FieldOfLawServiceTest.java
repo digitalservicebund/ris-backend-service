@@ -40,7 +40,7 @@ class FieldOfLawServiceTest {
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldntCallRepository() {
     Pageable pageable = Pageable.unpaged();
-    when(repository.findAllByOrderBySubjectFieldNumberAsc(pageable)).thenReturn(Flux.empty());
+    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Flux.empty());
     when(repository.count()).thenReturn(Mono.just(0L));
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.empty(), pageable))
@@ -51,7 +51,7 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
     verify(repository, times(1)).count();
     verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
@@ -59,7 +59,7 @@ class FieldOfLawServiceTest {
   @Test
   void testGetFieldsOfLaw_withEmptyQuery_shouldntCallRepository() {
     Pageable pageable = Pageable.unpaged();
-    when(repository.findAllByOrderBySubjectFieldNumberAsc(pageable)).thenReturn(Flux.empty());
+    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Flux.empty());
     when(repository.count()).thenReturn(Mono.just(0L));
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(""), pageable))
@@ -70,7 +70,7 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
     verify(repository, times(1)).count();
     verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
@@ -90,7 +90,7 @@ class FieldOfLawServiceTest {
         .verifyComplete();
 
     verify(repository, times(1)).findBySearchTerms(searchTerms);
-    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
   }
 
   @Test
@@ -109,17 +109,16 @@ class FieldOfLawServiceTest {
         .verifyComplete();
 
     verify(repository, times(1)).findBySearchTerms(searchTerms);
-    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
   }
 
   @Test
   void testGetChildrenOfFieldOfLaw_withNumberIsEmpty_shouldCallRepository() {
-    when(repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(""))
-        .thenReturn(Flux.empty());
+    when(repository.findAllByParentIdentifierOrderByIdentifierAsc("")).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getChildrenOfFieldOfLaw("")).verifyComplete();
 
-    verify(repository, times(1)).findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("");
+    verify(repository, times(1)).findAllByParentIdentifierOrderByIdentifierAsc("");
     verify(repository, never()).getTopLevelNodes();
   }
 
@@ -130,48 +129,45 @@ class FieldOfLawServiceTest {
     StepVerifier.create(service.getChildrenOfFieldOfLaw("root")).verifyComplete();
 
     verify(repository, times(1)).getTopLevelNodes();
-    verify(repository, never())
-        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(anyString());
+    verify(repository, never()).findAllByParentIdentifierOrderByIdentifierAsc(anyString());
   }
 
   @Test
   void testGetChildrenOfFieldOfLaw_withNumber_shouldCallRepository() {
-    when(repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("test"))
-        .thenReturn(Flux.empty());
+    when(repository.findAllByParentIdentifierOrderByIdentifierAsc("test")).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getChildrenOfFieldOfLaw("test")).verifyComplete();
 
-    verify(repository, times(1))
-        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("test");
+    verify(repository, times(1)).findAllByParentIdentifierOrderByIdentifierAsc("test");
     verify(repository, never()).getTopLevelNodes();
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberDoesntExist() {
-    when(repository.findBySubjectFieldNumber("test")).thenReturn(Mono.empty());
+    when(repository.findByIdentifier("test")).thenReturn(Mono.empty());
 
     StepVerifier.create(service.getTreeForFieldOfLaw("test")).verifyComplete();
 
-    verify(repository, times(1)).findBySubjectFieldNumber("test");
+    verify(repository, times(1)).findByIdentifier("test");
     verify(repository, never()).findParentByChild(any(FieldOfLaw.class));
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtTopLevel() {
     FieldOfLaw child = FieldOfLaw.builder().identifier("test").build();
-    when(repository.findBySubjectFieldNumber("test")).thenReturn(Mono.just(child));
+    when(repository.findByIdentifier("test")).thenReturn(Mono.just(child));
     when(repository.findParentByChild(child)).thenReturn(Mono.empty());
 
     StepVerifier.create(service.getTreeForFieldOfLaw("test")).verifyComplete();
 
-    verify(repository, times(1)).findBySubjectFieldNumber("test");
+    verify(repository, times(1)).findByIdentifier("test");
     verify(repository, times(1)).findParentByChild(child);
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtSecondLevel() {
     FieldOfLaw child = FieldOfLaw.builder().identifier("child").build();
-    when(repository.findBySubjectFieldNumber("child")).thenReturn(Mono.just(child));
+    when(repository.findByIdentifier("child")).thenReturn(Mono.just(child));
     FieldOfLaw parent =
         FieldOfLaw.builder().identifier("parent").children(new ArrayList<>()).build();
     when(repository.findParentByChild(child)).thenReturn(Mono.just(parent));
@@ -185,7 +181,7 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findBySubjectFieldNumber("child");
+    verify(repository, times(1)).findByIdentifier("child");
     verify(repository, times(1)).findParentByChild(child);
   }
 
@@ -229,13 +225,13 @@ class FieldOfLawServiceTest {
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>());
 
-    when(repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01"))
+    when(repository.findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01"))
         .thenReturn(Flux.just(expectedFieldOfLaw));
 
     StepVerifier.create(service.getChildrenOfFieldOfLaw("TS-01-01"))
         .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
         .verifyComplete();
 
-    verify(repository).findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01");
+    verify(repository).findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01");
   }
 }

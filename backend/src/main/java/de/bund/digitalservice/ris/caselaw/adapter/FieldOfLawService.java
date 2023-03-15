@@ -37,7 +37,7 @@ public class FieldOfLawService {
       Optional<String> optionalSearchStr, Pageable pageable) {
     if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
       return repository
-          .findAllByOrderBySubjectFieldNumberAsc(pageable)
+          .findAllByOrderByIdentifierAsc(pageable)
           .collectList()
           .zipWith(repository.count())
           .map(t -> new PageImpl<>(t.getT1(), pageable, t.getT2()));
@@ -150,12 +150,11 @@ public class FieldOfLawService {
       return repository.getTopLevelNodes();
     }
 
-    return repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
-        subjectFieldNumber);
+    return repository.findAllByParentIdentifierOrderByIdentifierAsc(subjectFieldNumber);
   }
 
   public Mono<FieldOfLaw> getTreeForFieldOfLaw(String subjectFieldId) {
-    return repository.findBySubjectFieldNumber(subjectFieldId).flatMap(this::findParent);
+    return repository.findByIdentifier(subjectFieldId).flatMap(this::findParent);
   }
 
   private Mono<FieldOfLaw> findParent(FieldOfLaw child) {

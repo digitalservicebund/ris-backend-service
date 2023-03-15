@@ -431,7 +431,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
 
-    FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().subjectFieldNumber("SF-01").build();
+    FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().identifier("SF-01").build();
     FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
 
     DocumentUnitFieldsOfLawDTO link =
@@ -468,7 +468,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
 
-    FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().subjectFieldNumber("SF-01").build();
+    FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().identifier("SF-01").build();
     FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
 
     DocumentUnitFieldsOfLawDTO link =
@@ -514,8 +514,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
   }
 
   private FieldOfLawDTO generateFieldOfLaw(String fieldOfLawIdentifier) {
-    FieldOfLawDTO fieldOfLawDTO1 =
-        FieldOfLawDTO.builder().subjectFieldNumber(fieldOfLawIdentifier).build();
+    FieldOfLawDTO fieldOfLawDTO1 = FieldOfLawDTO.builder().identifier(fieldOfLawIdentifier).build();
     return fieldOfLawRepository.save(fieldOfLawDTO1).block();
   }
 }

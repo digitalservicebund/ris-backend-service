@@ -12,18 +12,17 @@ import reactor.core.publisher.Mono;
 public interface FieldOfLawRepository {
   Flux<FieldOfLaw> getTopLevelNodes();
 
-  Flux<FieldOfLaw> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
-      String subjectFieldNumber);
+  Flux<FieldOfLaw> findAllByParentIdentifierOrderByIdentifierAsc(String identifier);
 
   Flux<FieldOfLaw> findBySearchStr(String searchStr, Pageable pageable); // TODO remove
 
   Mono<Long> countBySearchStr(String searchStr); // TODO remove
 
-  Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldId);
+  Mono<FieldOfLaw> findByIdentifier(String identifier);
 
   Mono<FieldOfLaw> findParentByChild(FieldOfLaw child);
 
-  Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable);
+  Flux<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable);
 
   Mono<List<FieldOfLaw>> findAllForDocumentUnit(UUID documentUnitUuid);
 

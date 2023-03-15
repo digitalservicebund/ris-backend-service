@@ -11,14 +11,14 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("lookuptable_subject_field_keyword")
+@Table("lookuptable_field_of_law_keyword")
 public class FieldOfLawKeywordDTO {
 
   public static final FieldOfLawKeywordDTO EMPTY = new FieldOfLawKeywordDTO();
 
   @Id Long id;
 
-  Long subjectFieldId;
+  Long fieldOfLawId;
 
   String value;
 }
