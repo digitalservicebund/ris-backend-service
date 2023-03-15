@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRe
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
@@ -46,7 +46,7 @@ public class LookupTableImporterService {
   private final JPADocumentTypeRepository jpaDocumentTypeRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
-  private final JPASubjectFieldRepository jpaSubjectFieldRepository;
+  private final JPAFieldOfLawRepository jpaFieldOfLawRepository;
   private final JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
 
   private static final Pattern FIELD_OF_LAW_NUMBER_PATTERN =
@@ -57,13 +57,13 @@ public class LookupTableImporterService {
       JPADocumentTypeRepository jpaDocumentTypeRepository,
       CourtRepository courtRepository,
       StateRepository stateRepository,
-      JPASubjectFieldRepository jpaSubjectFieldRepository,
+      JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
     this.documentTypeRepository = documentTypeRepository;
     this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
-    this.jpaSubjectFieldRepository = jpaSubjectFieldRepository;
+    this.jpaFieldOfLawRepository = jpaFieldOfLawRepository;
     this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
   }
 
@@ -238,7 +238,7 @@ public class LookupTableImporterService {
   }
 
   private void importSubjectFieldJPA(FieldsOfLawXml fieldsOfLawXml) {
-    jpaSubjectFieldRepository.deleteAllInBatch();
+    jpaFieldOfLawRepository.deleteAllInBatch();
 
     List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS =
         fieldsOfLawXml.getList().stream()
@@ -248,7 +248,7 @@ public class LookupTableImporterService {
 
     setSubjectFieldParentIds(jpaFieldOfLawDTOS);
 
-    jpaSubjectFieldRepository.saveAll(jpaFieldOfLawDTOS);
+    jpaFieldOfLawRepository.saveAll(jpaFieldOfLawDTOS);
 
     extractAndStoreAllLinkedFieldsOfLaw(fieldsOfLawXml);
   }

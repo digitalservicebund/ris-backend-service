@@ -14,9 +14,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
@@ -54,7 +54,7 @@ class LookupTableImporterServiceTest {
 
   @MockBean private DatabaseSubjectFieldRepository subjectFieldRepository;
 
-  @MockBean private JPASubjectFieldRepository jpaSubjectFieldRepository;
+  @MockBean private JPAFieldOfLawRepository jpaFieldOfLawRepository;
 
   @MockBean private JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
 
@@ -256,8 +256,8 @@ class LookupTableImporterServiceTest {
                 assertEquals("Successfully imported the subject field lookup table", resultString))
         .verifyComplete();
 
-    verify(jpaSubjectFieldRepository, atMostOnce()).deleteAll();
-    verify(jpaSubjectFieldRepository, atMostOnce()).saveAll(jpaFieldOfLawDTOS);
+    verify(jpaFieldOfLawRepository, atMostOnce()).deleteAll();
+    verify(jpaFieldOfLawRepository, atMostOnce()).saveAll(jpaFieldOfLawDTOS);
     verify(subjectFieldRepository, never()).deleteAll();
     verify(subjectFieldRepository, never()).saveAll(anyCollection());
   }
