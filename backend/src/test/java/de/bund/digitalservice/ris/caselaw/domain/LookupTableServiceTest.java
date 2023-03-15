@@ -31,7 +31,7 @@ class LookupTableServiceTest {
 
   @MockBean private DocumentTypeRepository documentTypeRepository;
   @MockBean private CourtRepository courtRepository;
-  @MockBean private SubjectFieldRepository subjectFieldRepository;
+  @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private NormRepository normRepository;
   @MockBean private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
 

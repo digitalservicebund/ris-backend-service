@@ -11,8 +11,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseKeyword
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresSubjectFieldRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import java.time.Instant;
@@ -34,7 +34,7 @@ import org.testcontainers.junit.jupiter.Container;
       PostgresConfig.class,
       PostgresDocumentUnitRepositoryImpl.class,
       PostgresKeywordRepositoryImpl.class,
-      PostgresSubjectFieldRepositoryImpl.class
+      PostgresFieldOfLawRepositoryImpl.class
     },
     controllers = {ContentRelatedIndexingController.class})
 class DocumentUnitKeywordIntegrationTest {

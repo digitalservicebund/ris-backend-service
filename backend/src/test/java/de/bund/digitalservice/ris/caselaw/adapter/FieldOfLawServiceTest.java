@@ -9,7 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
@@ -35,7 +35,7 @@ import reactor.test.StepVerifier;
 class FieldOfLawServiceTest {
   @Autowired FieldOfLawService service;
 
-  @MockBean SubjectFieldRepository repository;
+  @MockBean FieldOfLawRepository repository;
 
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldntCallRepository() {

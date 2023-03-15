@@ -6,7 +6,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresSubjectFieldRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -28,7 +28,7 @@ import org.testcontainers.junit.jupiter.Container;
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      PostgresSubjectFieldRepositoryImpl.class
+      PostgresFieldOfLawRepositoryImpl.class
     },
     controllers = {FieldOfLawController.class})
 class FieldOfLawIntegrationTest {

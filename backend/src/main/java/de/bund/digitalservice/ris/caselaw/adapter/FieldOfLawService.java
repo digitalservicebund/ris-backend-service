@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
 import java.util.Arrays;
@@ -27,9 +27,9 @@ public class FieldOfLawService {
   private static final Pattern NORMS_PATTERN = Pattern.compile("norm\\s?:\\s?\"([^\"]*)\"(.*)");
   private static final int MAX_TREE_DEPTH = 7;
 
-  private final SubjectFieldRepository repository;
+  private final FieldOfLawRepository repository;
 
-  public FieldOfLawService(SubjectFieldRepository repository) {
+  public FieldOfLawService(FieldOfLawRepository repository) {
     this.repository = repository;
   }
 

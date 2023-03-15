@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Fie
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
-import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Comparator;
 import java.util.List;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepository {
+public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   DatabaseSubjectFieldRepository databaseSubjectFieldRepository;
   FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
@@ -27,7 +27,7 @@ public class PostgresSubjectFieldRepositoryImpl implements SubjectFieldRepositor
   DatabaseDocumentUnitRepository databaseDocumentUnitRepository;
   DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository;
 
-  public PostgresSubjectFieldRepositoryImpl(
+  public PostgresFieldOfLawRepositoryImpl(
       DatabaseSubjectFieldRepository databaseSubjectFieldRepository,
       FieldOfLawKeywordRepository fieldOfLawKeywordRepository,
       NormRepository normRepository,
