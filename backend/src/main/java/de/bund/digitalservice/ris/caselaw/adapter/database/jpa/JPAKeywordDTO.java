@@ -23,7 +23,7 @@ public class JPAKeywordDTO {
 
   @ManyToOne
   @JoinColumn(name = "subject_field_id")
-  JPASubjectFieldDTO jpaSubjectFieldDTO;
+  JPAFieldOfLawDTO jpaFieldOfLawDTO;
 
   String value;
 }

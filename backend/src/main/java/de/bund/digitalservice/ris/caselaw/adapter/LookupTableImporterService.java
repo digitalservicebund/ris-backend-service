@@ -5,9 +5,9 @@ import static de.bund.digitalservice.ris.caselaw.utils.ServiceUtils.byteBufferTo
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
@@ -240,15 +240,15 @@ public class LookupTableImporterService {
   private void importSubjectFieldJPA(FieldsOfLawXml fieldsOfLawXml) {
     jpaSubjectFieldRepository.deleteAllInBatch();
 
-    List<JPASubjectFieldDTO> jpaSubjectFieldDTOs =
+    List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS =
         fieldsOfLawXml.getList().stream()
             .map(SubjectFieldTransformer::transformToJPADTO)
-            .sorted(Comparator.comparing(JPASubjectFieldDTO::getSubjectFieldNumber))
+            .sorted(Comparator.comparing(JPAFieldOfLawDTO::getSubjectFieldNumber))
             .toList();
 
-    setSubjectFieldParentIds(jpaSubjectFieldDTOs);
+    setSubjectFieldParentIds(jpaFieldOfLawDTOS);
 
-    jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
+    jpaSubjectFieldRepository.saveAll(jpaFieldOfLawDTOS);
 
     extractAndStoreAllLinkedFieldsOfLaw(fieldsOfLawXml);
   }
@@ -297,15 +297,15 @@ public class LookupTableImporterService {
     return linkedFieldIds;
   }
 
-  private void setSubjectFieldParentIds(List<JPASubjectFieldDTO> jpaSubjectFieldDTOs) {
-    Map<String, JPASubjectFieldDTO> subjectFieldNumberToSubjectFieldDTO =
-        jpaSubjectFieldDTOs.stream()
+  private void setSubjectFieldParentIds(List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS) {
+    Map<String, JPAFieldOfLawDTO> subjectFieldNumberToSubjectFieldDTO =
+        jpaFieldOfLawDTOS.stream()
             .collect(
-                Collectors.toMap(JPASubjectFieldDTO::getSubjectFieldNumber, Function.identity()));
-    jpaSubjectFieldDTOs.forEach(
+                Collectors.toMap(JPAFieldOfLawDTO::getSubjectFieldNumber, Function.identity()));
+    jpaFieldOfLawDTOS.forEach(
         jpaSubjectFieldDTO -> {
           countChildren(jpaSubjectFieldDTO, subjectFieldNumberToSubjectFieldDTO);
-          JPASubjectFieldDTO parentDTO =
+          JPAFieldOfLawDTO parentDTO =
               subjectFieldNumberToSubjectFieldDTO.get(
                   jpaSubjectFieldDTO.getSubjectFieldNumberOfParent());
           if (parentDTO != null) {
@@ -315,10 +315,10 @@ public class LookupTableImporterService {
   }
 
   private void countChildren(
-      JPASubjectFieldDTO jpaSubjectFieldDTO,
-      Map<String, JPASubjectFieldDTO> subjectFieldNumberToSubjectFieldDTO) {
-    String thisSubjectFieldNumber = jpaSubjectFieldDTO.getSubjectFieldNumber();
-    jpaSubjectFieldDTO.setChildrenCount(
+      JPAFieldOfLawDTO jpaFieldOfLawDTO,
+      Map<String, JPAFieldOfLawDTO> subjectFieldNumberToSubjectFieldDTO) {
+    String thisSubjectFieldNumber = jpaFieldOfLawDTO.getSubjectFieldNumber();
+    jpaFieldOfLawDTO.setChildrenCount(
         (int)
             subjectFieldNumberToSubjectFieldDTO.keySet().stream()
                 .filter(

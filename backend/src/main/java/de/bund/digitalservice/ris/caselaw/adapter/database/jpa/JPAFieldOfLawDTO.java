@@ -18,13 +18,13 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "lookuptable_subject_field")
-public class JPASubjectFieldDTO {
+public class JPAFieldOfLawDTO {
 
   @Id Long id;
 
   @ManyToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
-  JPASubjectFieldDTO parentSubjectField;
+  JPAFieldOfLawDTO parentSubjectField;
 
   @Column(name = "change_date_mail")
   String changeDateMail;

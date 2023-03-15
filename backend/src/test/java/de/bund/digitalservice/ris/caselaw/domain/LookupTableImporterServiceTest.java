@@ -12,10 +12,10 @@ import static org.mockito.Mockito.when;
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
@@ -186,28 +186,28 @@ class LookupTableImporterServiceTest {
   void testImportSubjectFieldLookupTable() {
     JPANormDTO childNorm1 =
         JPANormDTO.builder()
-            .jpaSubjectFieldDTO(null)
+            .jpaFieldOfLawDTO(null)
             .abbreviation("normabk 2.1")
             .singleNormDescription("§ 2.1")
             .build();
     JPANormDTO childNorm2 =
-        JPANormDTO.builder().jpaSubjectFieldDTO(null).abbreviation("normabk 2.2").build();
+        JPANormDTO.builder().jpaFieldOfLawDTO(null).abbreviation("normabk 2.2").build();
     Set<JPANormDTO> childNorms = Set.of(childNorm1, childNorm2);
 
     JPAKeywordDTO childKeyword1 =
-        JPAKeywordDTO.builder().jpaSubjectFieldDTO(null).value("schlagwort 2.1").build();
+        JPAKeywordDTO.builder().jpaFieldOfLawDTO(null).value("schlagwort 2.1").build();
     JPAKeywordDTO childKeyword2 =
-        JPAKeywordDTO.builder().jpaSubjectFieldDTO(null).value("schlagwort 2.3").build();
+        JPAKeywordDTO.builder().jpaFieldOfLawDTO(null).value("schlagwort 2.3").build();
     Set<JPAKeywordDTO> childKeywords = Set.of(childKeyword1, childKeyword2);
 
-    JPASubjectFieldDTO parent =
-        JPASubjectFieldDTO.builder()
+    JPAFieldOfLawDTO parent =
+        JPAFieldOfLawDTO.builder()
             .id(1L)
             .parentSubjectField(null)
             .subjectFieldNumber("TS-01")
             .build();
-    JPASubjectFieldDTO child =
-        JPASubjectFieldDTO.builder()
+    JPAFieldOfLawDTO child =
+        JPAFieldOfLawDTO.builder()
             .id(2L)
             .parentSubjectField(parent)
             .changeDateMail("2022-12-22")
@@ -220,7 +220,7 @@ class LookupTableImporterServiceTest {
             .keywords(childKeywords)
             .norms(childNorms)
             .build();
-    List<JPASubjectFieldDTO> jpaSubjectFieldDTOs = List.of(parent, child);
+    List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS = List.of(parent, child);
 
     String subjectFieldXml =
         """
@@ -257,7 +257,7 @@ class LookupTableImporterServiceTest {
         .verifyComplete();
 
     verify(jpaSubjectFieldRepository, atMostOnce()).deleteAll();
-    verify(jpaSubjectFieldRepository, atMostOnce()).saveAll(jpaSubjectFieldDTOs);
+    verify(jpaSubjectFieldRepository, atMostOnce()).saveAll(jpaFieldOfLawDTOS);
     verify(subjectFieldRepository, never()).deleteAll();
     verify(subjectFieldRepository, never()).saveAll(anyCollection());
   }

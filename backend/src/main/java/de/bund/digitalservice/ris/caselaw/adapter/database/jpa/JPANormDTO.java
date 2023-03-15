@@ -24,7 +24,7 @@ public class JPANormDTO { // TODO change to JPASubjectFieldNormDTO?
 
   @ManyToOne
   @JoinColumn(name = "subject_field_id")
-  JPASubjectFieldDTO jpaSubjectFieldDTO;
+  JPAFieldOfLawDTO jpaFieldOfLawDTO;
 
   @Column(name = "abbreviation")
   String abbreviation;

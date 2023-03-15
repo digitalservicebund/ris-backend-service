@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLawXml;
@@ -59,8 +59,8 @@ public class SubjectFieldTransformer {
         .build();
   }
 
-  public static JPASubjectFieldDTO transformToJPADTO(FieldOfLawXml fieldOfLawXml) {
-    return JPASubjectFieldDTO.builder()
+  public static JPAFieldOfLawDTO transformToJPADTO(FieldOfLawXml fieldOfLawXml) {
+    return JPAFieldOfLawDTO.builder()
         .id(fieldOfLawXml.getId())
         .changeDateMail(fieldOfLawXml.getChangeDateMail())
         .changeDateClient(fieldOfLawXml.getChangeDateClient())
