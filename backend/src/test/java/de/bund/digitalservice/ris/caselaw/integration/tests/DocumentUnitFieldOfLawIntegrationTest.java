@@ -13,7 +13,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitFie
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
@@ -56,7 +56,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
 
   @Autowired private WebTestClient webClient;
 
-  @Autowired private DatabaseSubjectFieldRepository fieldOfLawRepository;
+  @Autowired private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
   @Autowired private DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
 

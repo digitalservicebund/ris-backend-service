@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
@@ -38,7 +38,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
   private final DocumentTypeRepository documentTypeRepository;
-  private final DatabaseSubjectFieldRepository subjectFieldRepository;
+  private final DatabaseFieldOfLawRepository subjectFieldRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
 
@@ -52,7 +52,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       CourtRepository courtRepository,
       StateRepository stateRepository,
       DocumentTypeRepository documentTypeRepository,
-      DatabaseSubjectFieldRepository subjectFieldRepository,
+      DatabaseFieldOfLawRepository subjectFieldRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository) {
 

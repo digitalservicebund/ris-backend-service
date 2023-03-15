@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface DatabaseSubjectFieldRepository extends R2dbcRepository<FieldOfLawDTO, Long> {
+public interface DatabaseFieldOfLawRepository extends R2dbcRepository<FieldOfLawDTO, Long> {
 
   Flux<FieldOfLawDTO> findAllByParentIdOrderBySubjectFieldNumberAsc(Long id);
 

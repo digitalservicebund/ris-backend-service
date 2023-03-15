@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @Repository
 public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
-  DatabaseSubjectFieldRepository databaseSubjectFieldRepository;
+  DatabaseFieldOfLawRepository databaseFieldOfLawRepository;
   FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
   NormRepository normRepository;
   FieldOfLawLinkRepository fieldOfLawLinkRepository;
@@ -28,14 +28,14 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository;
 
   public PostgresFieldOfLawRepositoryImpl(
-      DatabaseSubjectFieldRepository databaseSubjectFieldRepository,
+      DatabaseFieldOfLawRepository databaseFieldOfLawRepository,
       FieldOfLawKeywordRepository fieldOfLawKeywordRepository,
       NormRepository normRepository,
       FieldOfLawLinkRepository fieldOfLawLinkRepository,
       DatabaseDocumentUnitRepository databaseDocumentUnitRepository,
       DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository) {
 
-    this.databaseSubjectFieldRepository = databaseSubjectFieldRepository;
+    this.databaseFieldOfLawRepository = databaseFieldOfLawRepository;
     this.fieldOfLawKeywordRepository = fieldOfLawKeywordRepository;
     this.normRepository = normRepository;
     this.fieldOfLawLinkRepository = fieldOfLawLinkRepository;
@@ -45,7 +45,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Flux<FieldOfLaw> findAllByOrderBySubjectFieldNumberAsc(Pageable pageable) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findAllByOrderBySubjectFieldNumberAsc(pageable)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
@@ -55,7 +55,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Mono<FieldOfLaw> findBySubjectFieldNumber(String subjectFieldNumber) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findBySubjectFieldNumber(subjectFieldNumber)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
@@ -65,12 +65,12 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Mono<FieldOfLaw> findParentByChild(FieldOfLaw child) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findBySubjectFieldNumber(child.identifier())
         .flatMap(
             childDTO -> {
               if (childDTO.getParentId() != null) {
-                return databaseSubjectFieldRepository.findById(childDTO.getParentId());
+                return databaseFieldOfLawRepository.findById(childDTO.getParentId());
               }
               return Mono.just(childDTO);
             })
@@ -82,7 +82,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Flux<FieldOfLaw> getTopLevelNodes() {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findAllByParentIdOrderBySubjectFieldNumberAsc(null)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
@@ -93,7 +93,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   public Flux<FieldOfLaw> findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(
       String subjectFieldNumber) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(subjectFieldNumber)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
@@ -103,7 +103,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Flux<FieldOfLaw> findBySearchStr(String searchStr, Pageable pageable) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findBySearchStr(searchStr, pageable.getOffset(), pageable.getPageSize())
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
@@ -113,7 +113,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Mono<Long> countBySearchStr(String searchStr) {
-    return databaseSubjectFieldRepository.countBySearchStr(searchStr);
+    return databaseFieldOfLawRepository.countBySearchStr(searchStr);
   }
 
   private Mono<FieldOfLawDTO> injectKeywords(FieldOfLawDTO fieldOfLawDTO) {
@@ -143,7 +143,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     return fieldOfLawLinkRepository
         .findAllByFieldId(fieldOfLawDTO.getId())
         .map(FieldOfLawLinkDTO::getLinkedFieldId)
-        .flatMap(linkedFieldId -> databaseSubjectFieldRepository.findById(linkedFieldId))
+        .flatMap(linkedFieldId -> databaseFieldOfLawRepository.findById(linkedFieldId))
         .collectList()
         .map(
             subjectFieldDTOS -> {
@@ -161,7 +161,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
             documentUnitId ->
                 databaseDocumentUnitFieldsOfLawRepository.findAllByDocumentUnitId(documentUnitId))
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
-        .flatMap(databaseSubjectFieldRepository::findById)
+        .flatMap(databaseFieldOfLawRepository::findById)
         .map(SubjectFieldTransformer::transformToDomain)
         .collectList()
         .map(
@@ -178,7 +178,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
 
     Mono<Long> fieldOfLawDTOId =
-        databaseSubjectFieldRepository
+        databaseFieldOfLawRepository
             .findBySubjectFieldNumber(identifier)
             .mapNotNull(FieldOfLawDTO::getId)
             .defaultIfEmpty(-1L);
@@ -203,7 +203,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
     return databaseDocumentUnitFieldsOfLawRepository
         .findAllByDocumentUnitId(documentUnitId)
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
-        .flatMapSequential(databaseSubjectFieldRepository::findById)
+        .flatMapSequential(databaseFieldOfLawRepository::findById)
         .map(SubjectFieldTransformer::transformToDomain)
         .collectList()
         .map(
@@ -231,7 +231,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
 
     Mono<Long> fieldOfLawDTOId =
-        databaseSubjectFieldRepository
+        databaseFieldOfLawRepository
             .findBySubjectFieldNumber(identifier)
             .mapNotNull(FieldOfLawDTO::getId)
             .defaultIfEmpty(-1L);
@@ -248,12 +248,12 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Mono<Long> count() {
-    return databaseSubjectFieldRepository.count();
+    return databaseFieldOfLawRepository.count();
   }
 
   @Override
   public Flux<FieldOfLaw> findBySearchTerms(String[] searchTerms) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findBySearchTerms(searchTerms)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
@@ -263,7 +263,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Flux<FieldOfLaw> findByNormStr(String normStr) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findByNormStr(normStr)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
@@ -273,7 +273,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Flux<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
-    return databaseSubjectFieldRepository
+    return databaseFieldOfLawRepository
         .findByNormStrAndSearchTerms(normStr, searchTerms)
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)

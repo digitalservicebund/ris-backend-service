@@ -9,7 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
@@ -62,7 +62,7 @@ class LookupTableImporterIntegrationTest {
   @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
-  @Autowired private DatabaseSubjectFieldRepository subjectFieldRepository;
+  @Autowired private DatabaseFieldOfLawRepository subjectFieldRepository;
   @Autowired private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
   @Autowired private NormRepository normRepository;
   @Autowired private FieldOfLawLinkRepository fieldOfLawLinkRepository;
