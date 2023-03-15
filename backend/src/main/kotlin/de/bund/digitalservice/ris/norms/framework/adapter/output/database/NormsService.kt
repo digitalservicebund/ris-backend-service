@@ -64,15 +64,13 @@ class NormsService(
 
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
         val findNormRequest = normsRepository.findByGuid(query.guid).cache()
-        val buildArticlesRequest = findNormRequest.flatMap { normDto ->
-            articlesRepository.findByNormId(normDto.id)
-                .flatMap(::getArticleWithParagraphs)
-                .collectList()
-        }
+        val buildArticlesRequest = findNormRequest.flatMapMany { articlesRepository.findByNormId(it.id) }
+            .flatMap(::getArticleWithParagraphs)
+            .collectList()
 
-        val findFileReferencesRequest = findNormRequest.flatMap { normDto ->
-            fileReferenceRepository.findByNormId(normDto.id).collectList()
-        }
+        val findFileReferencesRequest = findNormRequest.flatMapMany { fileReferenceRepository.findByNormId(it.id) }
+            .map(::fileReferenceToEntity)
+            .collectList()
 
         return Mono.zip(findNormRequest, buildArticlesRequest, findFileReferencesRequest).map {
             normWithFilesToEntity(it.t1, it.t2, it.t3)
@@ -81,8 +79,8 @@ class NormsService(
 
     override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
         val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
-        val saveArticlesRequest = saveNormRequest.flatMap { saveNormArticles(command.norm, it).then() }
-        val saveFileReferencesRequest = saveNormRequest.flatMap { saveNormFiles(command.norm, it).then() }
+        val saveArticlesRequest = saveNormRequest.flatMapMany { saveNormArticles(command.norm, it) }
+        val saveFileReferencesRequest = saveNormRequest.flatMapMany { saveNormFiles(command.norm, it) }
 
         return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest).thenReturn(true)
     }
