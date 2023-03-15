@@ -117,7 +117,7 @@ class FieldOfLawIntegrationTest {
     assertThat((Boolean) JsonPath.read(str, "$.first")).isTrue();
     assertThat((Boolean) JsonPath.read(str, "$.last")).isFalse();
     List<String> identifiers = JsonPath.read(str, "$.content[*].identifier");
-    assertThat(identifiers).containsExactly("FL-01-01", "FL-04", "FL-02");
+    assertThat(identifiers).containsExactly("FL-04", "FL-02", "FL-01");
 
     result =
         webClient
@@ -139,7 +139,7 @@ class FieldOfLawIntegrationTest {
     assertThat((Boolean) JsonPath.read(str, "$.first")).isFalse();
     assertThat((Boolean) JsonPath.read(str, "$.last")).isTrue();
     identifiers = JsonPath.read(str, "$.content[*].identifier");
-    assertThat(identifiers).containsExactly("FL-01", "FL-03");
+    assertThat(identifiers).containsExactly("FL-03", "FL-01-01");
 
     result =
         webClient

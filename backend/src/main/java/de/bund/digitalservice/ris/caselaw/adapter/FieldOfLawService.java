@@ -25,6 +25,7 @@ import reactor.core.publisher.Mono;
 public class FieldOfLawService {
   private static final String ROOT_ID = "root";
   private static final Pattern NORMS_PATTERN = Pattern.compile("norm\\s?:\\s?\"([^\"]*)\"(.*)");
+  private static final int MAX_TREE_DEPTH = 7;
 
   private final SubjectFieldRepository repository;
 
@@ -108,7 +109,14 @@ public class FieldOfLawService {
     String text = fieldOfLaw.text() == null ? "" : fieldOfLaw.text().toLowerCase();
 
     if (identifier.equals(searchTerm)) score += 8;
-    if (identifier.startsWith(searchTerm)) score += 5;
+    if (identifier.startsWith(searchTerm)) {
+      score += 5;
+      int treeDepthOfSearchTerm = searchTerm.split("-").length;
+      int treeDepthOfIdentifier = identifier.split("-").length;
+      int depthDiff = treeDepthOfIdentifier - treeDepthOfSearchTerm;
+      score += MAX_TREE_DEPTH - depthDiff;
+    }
+
     if (identifier.contains(searchTerm)) score += 2;
 
     if (text.startsWith(searchTerm)) score += 5;
