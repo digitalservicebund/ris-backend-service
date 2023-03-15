@@ -54,20 +54,23 @@ fun assertNormAndEditNormFrameProperties(
     }
 }
 
-fun assertNormsWithoutArticles(
-    norm1: Norm,
-    norm2: Norm,
-) {
-    val normMembers = Norm::class.memberProperties
-    normMembers.filter { it.name !in listOf("articles", "files") }.forEach { normMember ->
-        val normMemberValue1 = normMember.get(norm1)
-        val normMemberValue2 = normMember.get(norm2)
-        when (normMemberValue1) {
+fun assertNormsAreEqual(norm1: Norm, norm2: Norm) {
+    val members = Norm::class.memberProperties
+    val supportedMembers = members.filter { it.name != "files" }
+
+    supportedMembers.forEach { member ->
+        val norm1Value = member(norm1)
+        val norm2Value = member(norm2)
+
+        when (norm1Value) {
+            is Iterable<*> ->
+                assertThat(norm1Value.toSet()).isEqualTo((norm2Value as Iterable<*>).toSet())
+
             is LocalDate ->
-                assertThat(normMemberValue1).isEqualTo(decodeLocalDate(normMemberValue2.toString()))
-            else -> {
-                assertThat(normMemberValue1).isEqualTo(normMemberValue2)
-            }
+                assertThat(norm1Value).isEqualTo(decodeLocalDate(norm2Value.toString()))
+
+            else ->
+                assertThat(norm1Value).isEqualTo(norm2Value)
         }
     }
 }

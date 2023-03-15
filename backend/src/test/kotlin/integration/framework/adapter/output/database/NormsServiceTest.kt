@@ -28,7 +28,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
-import utils.assertNormsWithoutArticles
+import utils.assertNormsAreEqual
 import utils.createRandomNorm
 import java.time.Duration
 import java.time.LocalDate
@@ -159,7 +159,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByEli(eliQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(secondNorm, it) }
+            .assertNext { assertNormsAreEqual(secondNorm, it) }
             .verifyComplete()
     }
 
@@ -217,7 +217,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(norm, it) }
+            .assertNext { assertNormsAreEqual(norm, it) }
             .verifyComplete()
     }
 
@@ -235,7 +235,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(norm, it) }
+            .assertNext { assertNormsAreEqual(norm, it) }
             .verifyComplete()
     }
 
@@ -254,7 +254,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(norm, it) }
+            .assertNext { assertNormsAreEqual(norm, it) }
             .verifyComplete()
     }
 
@@ -328,7 +328,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(updatedNorm, it) }
+            .assertNext { assertNormsAreEqual(updatedNorm, it) }
             .verifyComplete()
     }
 
@@ -376,15 +376,5 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 assertThat(it.files[0].hash == FILE1.hash, `is`(true))
             }
             .verifyComplete()
-    }
-
-    private fun validateNorm(normBeforePersist: Norm, normAfterPersist: Norm) {
-        assertNormsWithoutArticles(normBeforePersist, normAfterPersist)
-
-        assertThat(
-            normBeforePersist.articles.size == normAfterPersist.articles.size &&
-                normBeforePersist.articles.toSet() == normAfterPersist.articles.toSet(),
-            `is`(true),
-        )
     }
 }
