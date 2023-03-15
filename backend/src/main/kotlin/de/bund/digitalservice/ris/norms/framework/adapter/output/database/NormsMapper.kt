@@ -3,17 +3,25 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 
 interface NormsMapper {
-    fun normToEntity(normDto: NormDto, articles: List<Article>): Norm {
+    fun normToEntity(
+        normDto: NormDto,
+        articles: List<Article>,
+        fileReferences: List<FileReference>,
+        metadata: List<Metadatum<*>>,
+    ): Norm {
         return Norm(
-            normDto.guid, articles, emptyList(), normDto.officialLongTitle, normDto.risAbbreviation, normDto.risAbbreviationInternationalLaw,
+            normDto.guid, articles, metadata, normDto.officialLongTitle, normDto.risAbbreviation, normDto.risAbbreviationInternationalLaw,
             normDto.documentNumber, normDto.divergentDocumentNumber, normDto.documentCategory, normDto.frameKeywords,
             normDto.documentTypeName, normDto.documentNormCategory, normDto.documentTemplateName, normDto.providerEntity,
             normDto.providerDecidingBody, normDto.providerIsResolutionMajority, normDto.participationType,
@@ -47,14 +55,8 @@ interface NormsMapper {
             normDto.footnoteStateLaw, normDto.footnoteEuLaw, normDto.validityRule, normDto.digitalEvidenceLink,
             normDto.digitalEvidenceRelatedData, normDto.digitalEvidenceExternalDataNote, normDto.digitalEvidenceAppendix,
             normDto.referenceNumber, normDto.celexNumber, normDto.ageIndicationStart, normDto.ageIndicationEnd,
-            normDto.definition, normDto.ageOfMajorityIndication, normDto.text,
+            normDto.definition, normDto.ageOfMajorityIndication, normDto.text, fileReferences,
         )
-    }
-
-    fun normWithFilesToEntity(normDto: NormDto, articles: List<Article>, filesDto: List<FileReferenceDto>): Norm {
-        val norm = normToEntity(normDto, articles)
-        norm.files = filesDto.map { fileReferenceToEntity(it) }
-        return norm
     }
 
     fun paragraphToEntity(paragraphDto: ParagraphDto): Paragraph {
@@ -67,6 +69,14 @@ interface NormsMapper {
 
     fun fileReferenceToEntity(fileReferenceDto: FileReferenceDto): FileReference {
         return FileReference(fileReferenceDto.name, fileReferenceDto.hash, fileReferenceDto.createdAt)
+    }
+
+    fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
+        val value = when (metadatumDto.type) {
+            KEYWORD -> metadatumDto.value
+        }
+
+        return Metadatum(value, metadatumDto.type, metadatumDto.order)
     }
 
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
@@ -122,6 +132,10 @@ interface NormsMapper {
     }
     fun fileReferenceToDto(fileReference: FileReference, normId: Int, id: Int = 0): FileReferenceDto {
         return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, fileReference.createdAt)
+    }
+
+    fun metadatumToDto(metadatum: Metadatum<*>, normId: Int, id: Int = 0): MetadatumDto {
+        return MetadatumDto(id, metadatum.value.toString(), metadatum.type, metadatum.order, normId)
     }
 
     fun queryFieldToDbColumn(field: QueryFields): String {

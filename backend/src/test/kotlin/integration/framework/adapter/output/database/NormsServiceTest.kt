@@ -9,6 +9,8 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPo
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -197,6 +199,25 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save norm with metadata and retrieve it by its GUID`() {
+        val keyword = Metadatum("foo", KEYWORD, 0)
+        val other_keyword = Metadatum("bar", KEYWORD, 1)
+        val norm = NORM.copy(metadata = listOf(keyword, other_keyword))
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .assertNext { validateNorm(norm, it) }
             .verifyComplete()
     }
 

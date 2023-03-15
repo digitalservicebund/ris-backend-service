@@ -10,10 +10,12 @@ import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticlesRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FileReferenceRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
 import org.springframework.context.annotation.Primary
@@ -32,6 +34,7 @@ class NormsService(
     val articlesRepository: ArticlesRepository,
     val paragraphsRepository: ParagraphsRepository,
     val fileReferenceRepository: FileReferenceRepository,
+    val metadataRepository: MetadataRepository,
     client: DatabaseClient,
 ) : NormsMapper,
     GetNormByGuidOutputPort,
@@ -72,8 +75,17 @@ class NormsService(
             .map(::fileReferenceToEntity)
             .collectList()
 
-        return Mono.zip(findNormRequest, buildArticlesRequest, findFileReferencesRequest).map {
-            normWithFilesToEntity(it.t1, it.t2, it.t3)
+        val findMetadataRequest = findNormRequest.flatMapMany { metadataRepository.findByNormId(it.id) }
+            .map(::metadatumToEntity)
+            .collectList()
+
+        return Mono.zip(
+            findNormRequest,
+            buildArticlesRequest,
+            findFileReferencesRequest,
+            findMetadataRequest,
+        ).map {
+            normToEntity(it.t1, it.t2, it.t3, it.t4)
         }
     }
 
@@ -81,8 +93,9 @@ class NormsService(
         val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
         val saveArticlesRequest = saveNormRequest.flatMapMany { saveNormArticles(command.norm, it) }
         val saveFileReferencesRequest = saveNormRequest.flatMapMany { saveNormFiles(command.norm, it) }
+        val saveMetadataRequest = saveNormRequest.flatMapMany { saveNormMetadata(command.norm, it) }
 
-        return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest).thenReturn(true)
+        return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest, saveMetadataRequest).thenReturn(true)
     }
 
     override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
@@ -111,6 +124,13 @@ class NormsService(
         return fileReferenceRepository.saveAll(fileReferencesToDto(norm.files, normDto.id))
     }
 
+    private fun saveNormMetadata(norm: Norm, normDto: NormDto): Flux<MetadatumDto> {
+        return metadataRepository.deleteByNormId(normDto.id)
+            .thenMany(Flux.fromIterable(norm.metadata))
+            .map { metadatumToDto(it, normDto.id) }
+            .flatMap(metadataRepository::save)
+    }
+
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {
         return paragraphsRepository.saveAll(
             paragraphsToDto(
@@ -126,7 +146,7 @@ class NormsService(
         return articlesRepository.findByNormId(normDto.id)
             .flatMap(::getArticleWithParagraphs)
             .collectList()
-            .map { articles -> normToEntity(normDto, articles) }
+            .map { articles -> normToEntity(normDto, articles, emptyList(), emptyList()) }
     }
 
     private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {
