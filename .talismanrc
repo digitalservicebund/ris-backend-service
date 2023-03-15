@@ -8,7 +8,7 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: f102d51d60e9cee1592442f3dc52bf5262742774044d23cddb9c24fad3d522c0
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-    checksum: 9226b0aa187c14af2133aa9e552ea6db6bc19a156dcb23f8d15a9ae0b11a01fb
+    checksum: 6a0079228a0ca65304be969c5d5c2ad28186f3af5851fda87ab2159a519622ed
   - filename: backend/build.gradle
     checksum: 152000f155b0c622e1da8030d86d006d33b4f531823c1b1a7c00e0883cff1783
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
