@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
@@ -242,7 +242,7 @@ public class LookupTableImporterService {
 
     List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS =
         fieldsOfLawXml.getList().stream()
-            .map(SubjectFieldTransformer::transformToJPADTO)
+            .map(FieldOfLawTransformer::transformToJPADTO)
             .sorted(Comparator.comparing(JPAFieldOfLawDTO::getSubjectFieldNumber))
             .toList();
 

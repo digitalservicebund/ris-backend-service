@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -113,7 +113,7 @@ public class DocumentUnitBuilder {
     if (documentUnitDTO.getFieldsOfLaw() != null) {
       fieldsOfLaw =
           documentUnitDTO.getFieldsOfLaw().stream()
-              .map(SubjectFieldTransformer::transformToDomain)
+              .map(FieldOfLawTransformer::transformToDomain)
               .toList();
     }
 

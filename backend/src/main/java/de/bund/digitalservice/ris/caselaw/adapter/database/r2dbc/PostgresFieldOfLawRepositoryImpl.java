@@ -6,7 +6,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Fie
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
 import java.util.Comparator;
@@ -50,7 +50,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -60,7 +60,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
         .flatMap(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
         .flatMap(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -87,7 +87,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -98,7 +98,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -108,7 +108,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -162,7 +162,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
                 databaseDocumentUnitFieldsOfLawRepository.findAllByDocumentUnitId(documentUnitId))
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .flatMap(databaseFieldOfLawRepository::findById)
-        .map(SubjectFieldTransformer::transformToDomain)
+        .map(FieldOfLawTransformer::transformToDomain)
         .collectList()
         .map(
             fieldOfLawList ->
@@ -204,7 +204,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .findAllByDocumentUnitId(documentUnitId)
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .flatMapSequential(databaseFieldOfLawRepository::findById)
-        .map(SubjectFieldTransformer::transformToDomain)
+        .map(FieldOfLawTransformer::transformToDomain)
         .collectList()
         .map(
             fieldOfLawList ->
@@ -258,7 +258,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -268,7 +268,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 
   @Override
@@ -278,6 +278,6 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectKeywords)
         .flatMapSequential(this::injectNorms)
         .flatMapSequential(this::injectLinkedFields)
-        .map(SubjectFieldTransformer::transformToDomain);
+        .map(FieldOfLawTransformer::transformToDomain);
   }
 }

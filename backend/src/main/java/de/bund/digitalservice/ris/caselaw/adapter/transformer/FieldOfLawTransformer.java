@@ -14,8 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class SubjectFieldTransformer {
-  private SubjectFieldTransformer() {}
+public class FieldOfLawTransformer {
+  private FieldOfLawTransformer() {}
 
   public static FieldOfLaw transformToDomain(FieldOfLawDTO fieldOfLawDTO) {
     List<Keyword> keywords = null;
