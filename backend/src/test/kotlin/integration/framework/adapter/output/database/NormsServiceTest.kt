@@ -305,6 +305,34 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
+    fun `it replaces the metadata when editing a norm`() {
+        val keyword = Metadatum("foo", KEYWORD, 0)
+        val otherKeyword = Metadatum("bar", KEYWORD, 1)
+        val initialNorm = NORM.copy(metadata = listOf(keyword, otherKeyword))
+        val saveCommand = SaveNormOutputPort.Command(initialNorm)
+        val guidQuery = GetNormByGuidOutputPort.Query(initialNorm.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        val newKeyword = Metadatum("baz", KEYWORD, 0)
+        val updatedNorm = initialNorm.copy(metadata = listOf(newKeyword))
+        val editCommand = EditNormOutputPort.Command(updatedNorm)
+
+        normsService.editNorm(editCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .assertNext { validateNorm(updatedNorm, it) }
+            .verifyComplete()
+    }
+
+    @Test
     fun `save a norm with 1 file and retrieve it by guid`() {
         val norm = NORM.copy(files = listOf(FILE1))
         val saveCommand = SaveNormOutputPort.Command(norm)

@@ -99,11 +99,14 @@ class NormsService(
     }
 
     override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
-        return normsRepository
-            .findByGuid(command.norm.guid)
+        val findNormRequest = normsRepository.findByGuid(command.norm.guid).cache()
+        val saveNormRequest = findNormRequest
             .map { normDto -> normToDto(command.norm, normDto.id) }
-            .flatMap(normsRepository::save)
-            .map { true }
+            .flatMap(normsRepository::save).cache()
+
+        val updateMetadataRequest = saveNormRequest.flatMapMany { normDto -> saveNormMetadata(command.norm, normDto) }
+
+        return Mono.`when`(saveNormRequest, updateMetadataRequest).thenReturn(true)
     }
 
     override fun saveFileReference(command: SaveFileReferenceOutputPort.Command): Mono<Boolean> {
