@@ -17,9 +17,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLawXml;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldsOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLawXml;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldsOfLawXml;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

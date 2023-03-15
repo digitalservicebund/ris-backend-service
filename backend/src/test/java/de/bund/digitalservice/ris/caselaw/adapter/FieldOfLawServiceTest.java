@@ -10,9 +10,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Keyword;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;

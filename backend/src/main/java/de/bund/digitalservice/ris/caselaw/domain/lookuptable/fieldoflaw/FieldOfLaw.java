@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield;
+package de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw;
 
 import java.util.List;
 import lombok.Builder;
