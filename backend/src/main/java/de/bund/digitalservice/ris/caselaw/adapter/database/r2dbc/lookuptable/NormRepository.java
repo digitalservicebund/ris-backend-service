@@ -10,5 +10,5 @@ public interface NormRepository extends R2dbcRepository<NormDTO, Long> {
   Flux<NormDTO> findAllByOrderByFieldOfLawIdAscAbbreviationAsc();
 
   Flux<NormDTO> findAllByFieldOfLawIdOrderByAbbreviationAscSingleNormDescriptionAsc(
-      Long subjectFieldId);
+      Long fieldOfLawId);
 }

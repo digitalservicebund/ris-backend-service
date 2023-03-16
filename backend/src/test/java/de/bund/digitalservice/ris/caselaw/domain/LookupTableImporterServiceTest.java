@@ -52,7 +52,7 @@ class LookupTableImporterServiceTest {
 
   @MockBean private StateRepository stateRepository;
 
-  @MockBean private DatabaseFieldOfLawRepository subjectFieldRepository;
+  @MockBean private DatabaseFieldOfLawRepository fieldOfLawRepository;
 
   @MockBean private JPAFieldOfLawRepository jpaFieldOfLawRepository;
 
@@ -183,7 +183,7 @@ class LookupTableImporterServiceTest {
   }
 
   @Test
-  void testImportSubjectFieldLookupTable() {
+  void testImportFieldOfLawLookupTable() {
     JPANormDTO childNorm1 =
         JPANormDTO.builder()
             .jpaFieldOfLawDTO(null)
@@ -201,11 +201,11 @@ class LookupTableImporterServiceTest {
     Set<JPAKeywordDTO> childKeywords = Set.of(childKeyword1, childKeyword2);
 
     JPAFieldOfLawDTO parent =
-        JPAFieldOfLawDTO.builder().id(1L).parentSubjectField(null).identifier("TS-01").build();
+        JPAFieldOfLawDTO.builder().id(1L).parentFieldOfLaw(null).identifier("TS-01").build();
     JPAFieldOfLawDTO child =
         JPAFieldOfLawDTO.builder()
             .id(2L)
-            .parentSubjectField(parent)
+            .parentFieldOfLaw(parent)
             .changeDateMail("2022-12-22")
             .changeDateClient("2022-12-24")
             .changeIndicator('N')
@@ -218,7 +218,7 @@ class LookupTableImporterServiceTest {
             .build();
     List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS = List.of(parent, child);
 
-    String subjectFieldXml =
+    String fieldOfLawXml =
         """
             <?xml version="1.0"?>
             <juris-table>
@@ -244,17 +244,17 @@ class LookupTableImporterServiceTest {
 
             </juris-table>
             """;
-    ByteBuffer byteBuffer = ByteBuffer.wrap(subjectFieldXml.getBytes());
+    ByteBuffer byteBuffer = ByteBuffer.wrap(fieldOfLawXml.getBytes());
 
-    StepVerifier.create(service.importSubjectFieldLookupTable(byteBuffer))
+    StepVerifier.create(service.importFieldOfLawLookupTable(byteBuffer))
         .consumeNextWith(
             resultString ->
-                assertEquals("Successfully imported the subject field lookup table", resultString))
+                assertEquals("Successfully imported the fieldOfLaw lookup table", resultString))
         .verifyComplete();
 
     verify(jpaFieldOfLawRepository, atMostOnce()).deleteAll();
     verify(jpaFieldOfLawRepository, atMostOnce()).saveAll(jpaFieldOfLawDTOS);
-    verify(subjectFieldRepository, never()).deleteAll();
-    verify(subjectFieldRepository, never()).saveAll(anyCollection());
+    verify(fieldOfLawRepository, never()).deleteAll();
+    verify(fieldOfLawRepository, never()).saveAll(anyCollection());
   }
 }

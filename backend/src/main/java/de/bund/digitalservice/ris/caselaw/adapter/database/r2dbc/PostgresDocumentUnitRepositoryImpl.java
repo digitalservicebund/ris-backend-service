@@ -38,7 +38,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
   private final DocumentTypeRepository documentTypeRepository;
-  private final DatabaseFieldOfLawRepository subjectFieldRepository;
+  private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
 
@@ -52,7 +52,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       CourtRepository courtRepository,
       StateRepository stateRepository,
       DocumentTypeRepository documentTypeRepository,
-      DatabaseFieldOfLawRepository subjectFieldRepository,
+      DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository) {
 
@@ -65,7 +65,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
     this.documentTypeRepository = documentTypeRepository;
-    this.subjectFieldRepository = subjectFieldRepository;
+    this.fieldOfLawRepository = fieldOfLawRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
   }
@@ -683,7 +683,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findAllByDocumentUnitId(documentUnitDTO.id)
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .collectList()
-        .flatMapMany(subjectFieldRepository::findAllById)
+        .flatMapMany(fieldOfLawRepository::findAllById)
         .collectList()
         .map(fieldsOfLaw -> documentUnitDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
   }

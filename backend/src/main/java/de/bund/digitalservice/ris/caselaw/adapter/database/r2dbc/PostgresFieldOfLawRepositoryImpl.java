@@ -144,8 +144,8 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMap(linkedFieldOfLawId -> databaseFieldOfLawRepository.findById(linkedFieldOfLawId))
         .collectList()
         .map(
-            subjectFieldDTOS -> {
-              fieldOfLawDTO.setLinkedFieldsOfLaw(subjectFieldDTOS);
+            fieldOfLawDTOS -> {
+              fieldOfLawDTO.setLinkedFieldsOfLaw(fieldOfLawDTOS);
               return fieldOfLawDTO;
             });
   }

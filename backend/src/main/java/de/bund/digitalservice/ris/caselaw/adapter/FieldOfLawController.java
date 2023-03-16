@@ -29,13 +29,13 @@ public class FieldOfLawController {
     return service.getFieldsOfLawBySearchQuery(searchStr, PageRequest.of(page, size));
   }
 
-  @GetMapping(value = "{subjectFieldNumber}/children")
-  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String subjectFieldNumber) {
-    return service.getChildrenOfFieldOfLaw(subjectFieldNumber);
+  @GetMapping(value = "{identifier}/children")
+  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
+    return service.getChildrenOfFieldOfLaw(identifier);
   }
 
-  @GetMapping(value = "{subjectFieldNumber}/tree")
-  public Mono<FieldOfLaw> getTreeForFieldOfLaw(@PathVariable String subjectFieldNumber) {
-    return service.getTreeForFieldOfLaw(subjectFieldNumber);
+  @GetMapping(value = "{identifier}/tree")
+  public Mono<FieldOfLaw> getTreeForFieldOfLaw(@PathVariable String identifier) {
+    return service.getTreeForFieldOfLaw(identifier);
   }
 }

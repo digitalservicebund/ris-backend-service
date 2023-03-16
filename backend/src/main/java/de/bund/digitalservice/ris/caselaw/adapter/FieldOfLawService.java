@@ -145,16 +145,16 @@ public class FieldOfLawService {
     return score;
   }
 
-  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String subjectFieldNumber) {
-    if (subjectFieldNumber.equalsIgnoreCase(ROOT_ID)) {
+  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String identifier) {
+    if (identifier.equalsIgnoreCase(ROOT_ID)) {
       return repository.getTopLevelNodes();
     }
 
-    return repository.findAllByParentIdentifierOrderByIdentifierAsc(subjectFieldNumber);
+    return repository.findAllByParentIdentifierOrderByIdentifierAsc(identifier);
   }
 
-  public Mono<FieldOfLaw> getTreeForFieldOfLaw(String subjectFieldId) {
-    return repository.findByIdentifier(subjectFieldId).flatMap(this::findParent);
+  public Mono<FieldOfLaw> getTreeForFieldOfLaw(String identifier) {
+    return repository.findByIdentifier(identifier).flatMap(this::findParent);
   }
 
   private Mono<FieldOfLaw> findParent(FieldOfLaw child) {

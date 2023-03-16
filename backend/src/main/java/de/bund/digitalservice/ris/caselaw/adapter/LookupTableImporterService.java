@@ -222,22 +222,22 @@ public class LookupTableImporterService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<String> importSubjectFieldLookupTable(ByteBuffer byteBuffer) {
+  public Mono<String> importFieldOfLawLookupTable(ByteBuffer byteBuffer) {
     XmlMapper mapper = new XmlMapper();
     FieldsOfLawXml fieldsOfLawXml;
     try {
       fieldsOfLawXml = mapper.readValue(byteBufferToArray(byteBuffer), FieldsOfLawXml.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
-          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to SubjectFieldXml", e);
+          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to FieldsOfLawXml", e);
     }
 
-    importSubjectFieldJPA(fieldsOfLawXml);
+    importFieldOfLawJPA(fieldsOfLawXml);
 
-    return Mono.just("Successfully imported the subject field lookup table");
+    return Mono.just("Successfully imported the fieldOfLaw lookup table");
   }
 
-  private void importSubjectFieldJPA(FieldsOfLawXml fieldsOfLawXml) {
+  private void importFieldOfLawJPA(FieldsOfLawXml fieldsOfLawXml) {
     jpaFieldOfLawRepository.deleteAllInBatch();
 
     List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS =
@@ -246,7 +246,7 @@ public class LookupTableImporterService {
             .sorted(Comparator.comparing(JPAFieldOfLawDTO::getIdentifier))
             .toList();
 
-    setSubjectFieldParentIds(jpaFieldOfLawDTOS);
+    setFieldOfLawParentIds(jpaFieldOfLawDTOS);
 
     jpaFieldOfLawRepository.saveAll(jpaFieldOfLawDTOS);
 
@@ -296,34 +296,31 @@ public class LookupTableImporterService {
     return linkedFieldIds;
   }
 
-  private void setSubjectFieldParentIds(List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS) {
-    Map<String, JPAFieldOfLawDTO> subjectFieldNumberToSubjectFieldDTO =
+  private void setFieldOfLawParentIds(List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS) {
+    Map<String, JPAFieldOfLawDTO> identifierToFieldOfLawDTO =
         jpaFieldOfLawDTOS.stream()
             .collect(Collectors.toMap(JPAFieldOfLawDTO::getIdentifier, Function.identity()));
     jpaFieldOfLawDTOS.forEach(
-        jpaSubjectFieldDTO -> {
-          countChildren(jpaSubjectFieldDTO, subjectFieldNumberToSubjectFieldDTO);
+        jpaFieldOfLawDTO -> {
+          countChildren(jpaFieldOfLawDTO, identifierToFieldOfLawDTO);
           JPAFieldOfLawDTO parentDTO =
-              subjectFieldNumberToSubjectFieldDTO.get(
-                  jpaSubjectFieldDTO.getSubjectFieldNumberOfParent());
+              identifierToFieldOfLawDTO.get(jpaFieldOfLawDTO.getIdentifierOfParent());
           if (parentDTO != null) {
-            jpaSubjectFieldDTO.setParentSubjectField(parentDTO);
+            jpaFieldOfLawDTO.setParentFieldOfLaw(parentDTO);
           }
         });
   }
 
   private void countChildren(
-      JPAFieldOfLawDTO jpaFieldOfLawDTO,
-      Map<String, JPAFieldOfLawDTO> subjectFieldNumberToSubjectFieldDTO) {
-    String thisSubjectFieldNumber = jpaFieldOfLawDTO.getIdentifier();
+      JPAFieldOfLawDTO jpaFieldOfLawDTO, Map<String, JPAFieldOfLawDTO> identifierToFieldOfLawDTO) {
+    String thisIdentifier = jpaFieldOfLawDTO.getIdentifier();
     jpaFieldOfLawDTO.setChildrenCount(
         (int)
-            subjectFieldNumberToSubjectFieldDTO.keySet().stream()
+            identifierToFieldOfLawDTO.keySet().stream()
                 .filter(
-                    otherSubjectFieldNumber ->
-                        otherSubjectFieldNumber.startsWith(thisSubjectFieldNumber)
-                            && otherSubjectFieldNumber.length()
-                                == thisSubjectFieldNumber.length() + 3)
+                    otherIdentifier ->
+                        otherIdentifier.startsWith(thisIdentifier)
+                            && otherIdentifier.length() == thisIdentifier.length() + 3)
                 .count());
   }
 }

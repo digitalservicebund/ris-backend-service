@@ -186,7 +186,7 @@ class FieldOfLawServiceTest {
   }
 
   @Test
-  void testGetSubjectFields_withSearchString() {
+  void testGetFieldsOfLaw_withSearchString() {
     String searchString = "stext";
     String[] searchTerms = new String[] {searchString};
     FieldOfLaw expectedFieldOfLaw =
@@ -213,7 +213,7 @@ class FieldOfLawServiceTest {
   }
 
   @Test
-  void testGetSubjectFieldChildren() {
+  void testGetFieldOfLawChildren() {
     FieldOfLaw expectedFieldOfLaw =
         new FieldOfLaw(
             2L,
@@ -229,7 +229,7 @@ class FieldOfLawServiceTest {
         .thenReturn(Flux.just(expectedFieldOfLaw));
 
     StepVerifier.create(service.getChildrenOfFieldOfLaw("TS-01-01"))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
+        .consumeNextWith(fieldOfLaw -> assertThat(fieldOfLaw).isEqualTo(expectedFieldOfLaw))
         .verifyComplete();
 
     verify(repository).findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01");

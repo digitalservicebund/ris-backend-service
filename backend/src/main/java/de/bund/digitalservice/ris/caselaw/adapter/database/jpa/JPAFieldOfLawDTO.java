@@ -24,7 +24,7 @@ public class JPAFieldOfLawDTO {
 
   @ManyToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
-  JPAFieldOfLawDTO parentSubjectField;
+  JPAFieldOfLawDTO parentFieldOfLaw;
 
   @Column(name = "change_date_mail")
   String changeDateMail;
@@ -57,7 +57,7 @@ public class JPAFieldOfLawDTO {
   @Column(name = "children_count")
   Integer childrenCount;
 
-  public String getSubjectFieldNumberOfParent() {
+  public String getIdentifierOfParent() {
     int lastIndexOf = identifier.lastIndexOf('-');
 
     if (lastIndexOf == -1) {

@@ -62,7 +62,7 @@ class LookupTableImporterIntegrationTest {
   @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
   @Autowired private CourtRepository courtRepository;
   @Autowired private StateRepository stateRepository;
-  @Autowired private DatabaseFieldOfLawRepository subjectFieldRepository;
+  @Autowired private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @Autowired private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
   @Autowired private NormRepository normRepository;
   @Autowired private FieldOfLawLinkRepository fieldOfLawLinkRepository;
@@ -75,7 +75,7 @@ class LookupTableImporterIntegrationTest {
     jpaDocumentTypeRepository.deleteAll();
     courtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
-    subjectFieldRepository.deleteAll().block(); // will cascade delete the other 3 repo-contents
+    fieldOfLawRepository.deleteAll().block(); // will cascade delete the other 3 repo-contents
   }
 
   @Test
@@ -190,7 +190,7 @@ class LookupTableImporterIntegrationTest {
   }
 
   @Test
-  void shouldImportSubjectFieldLookupTableCorrectly() {
+  void shouldImportFieldOfLawLookupTableCorrectly() {
     NormDTO expectedNorm1 =
         NormDTO.builder()
             .fieldOfLawId(2L)
@@ -245,7 +245,7 @@ class LookupTableImporterIntegrationTest {
             Arrays.asList(expectedNorm1, expectedNorm2),
             false);
 
-    String subjectFieldXml =
+    String fieldOfLawXml =
         """
             <?xml version="1.0"?>
             <juris-table>
@@ -293,7 +293,7 @@ class LookupTableImporterIntegrationTest {
         .mutateWith(csrf())
         .put()
         .uri("/api/v1/caselaw/lookuptableimporter/subjectField")
-        .bodyValue(subjectFieldXml)
+        .bodyValue(fieldOfLawXml)
         .exchange()
         .expectStatus()
         .isOk()
@@ -301,10 +301,10 @@ class LookupTableImporterIntegrationTest {
         .consumeWith(
             response ->
                 assertThat(response.getResponseBody())
-                    .isEqualTo("Successfully imported the subject field lookup table"));
+                    .isEqualTo("Successfully imported the fieldOfLaw lookup table"));
 
     List<FieldOfLawDTO> fieldOfLawDTOS =
-        subjectFieldRepository
+        fieldOfLawRepository
             .findAllByOrderByIdentifierAsc(Pageable.unpaged())
             .collectList()
             .block();
@@ -326,7 +326,7 @@ class LookupTableImporterIntegrationTest {
         linksRaw.stream()
             .map(
                 fieldOfLawLinkDTO ->
-                    subjectFieldRepository
+                    fieldOfLawRepository
                         .findById(fieldOfLawLinkDTO.getLinkedFieldOfLawId())
                         .block())
             .toList();

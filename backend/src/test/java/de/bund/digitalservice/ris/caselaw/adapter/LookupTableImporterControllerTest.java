@@ -75,8 +75,8 @@ class LookupTableImporterControllerTest {
   }
 
   @Test
-  void testImportSubjectFieldLookupTable() {
-    when(service.importSubjectFieldLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
+  void testImportFieldOfLawLookupTable() {
+    when(service.importFieldOfLawLookupTable(any(ByteBuffer.class))).thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
@@ -87,6 +87,6 @@ class LookupTableImporterControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service, times(1)).importSubjectFieldLookupTable(any(ByteBuffer.class));
+    verify(service, times(1)).importFieldOfLawLookupTable(any(ByteBuffer.class));
   }
 }

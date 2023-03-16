@@ -228,7 +228,7 @@ class FieldOfLawIntegrationTest {
     /*NormDTO normDTO =
         NormDTO.builder()
             .id(1L)
-            .subjectFieldId(1L)
+            .fieldOfLawId(1L)
             .abbreviation("ABC")
             .singleNormDescription("§ 1234")
             .build();
