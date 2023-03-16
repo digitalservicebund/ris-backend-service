@@ -346,10 +346,6 @@ components:
           properties:
             guid:
               $ref: '#/components/schemas/Guid'
-            metadata:
-              type: array
-              items:
-                $ref: '#/components/schemas/Metadatum'
             articles:
               type: array
               items:
@@ -677,6 +673,10 @@ components:
         entryIntoForceDateState:
           type: string
           example: ''
+        metadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/Metadatum'
     LegalDocML:
       type: object
       xml:
