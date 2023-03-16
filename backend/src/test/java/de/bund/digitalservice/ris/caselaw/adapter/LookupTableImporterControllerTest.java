@@ -81,7 +81,7 @@ class LookupTableImporterControllerTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/lookuptableimporter/subjectField")
+        .uri("/api/v1/caselaw/lookuptableimporter/fieldOfLaw")
         .bodyValue(BodyInserters.fromValue(new byte[] {}))
         .exchange()
         .expectStatus()
