@@ -2,6 +2,7 @@
 import { ref } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
+import FieldOfLawDirectInputSearch from "@/components/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
@@ -76,6 +77,9 @@ function handleLinkedFieldClicked(identifier: string) {
             @do-show-norms="showNorms = true"
             @node-clicked="handleNodeClicked"
           />
+        </div>
+        <div class="p-20">
+          <FieldOfLawDirectInputSearch />
         </div>
       </div>
       <div class="bg-white flex-1 p-20">
