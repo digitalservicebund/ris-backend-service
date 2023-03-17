@@ -8,8 +8,8 @@ const emit = defineEmits<{
   (event: "add-to-list", identifier: string): void
 }>()
 
-function handleUpdateModelValue(value: ComboboxInputModelType) {
-  emit("add-to-list", value.toString())
+function handleUpdateModelValue(value: ComboboxInputModelType | undefined) {
+  if (value) emit("add-to-list", value.toString())
 }
 </script>
 
