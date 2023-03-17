@@ -4,6 +4,8 @@ import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFile
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
@@ -36,6 +38,14 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
 }
 
 fun mapDomainToData(norm: Norm): NormData {
+    @Suppress("UNCHECKED_CAST")
+    val keywords = norm.metadata.toMutableSet()
+        .filter { it.type == KEYWORD }
+        .sortedBy { it.order }
+        .map { it.value } as MutableList<String>
+
+    norm.frameKeywords?.let { keywords.add(it) }
+
     val normData = NormData()
     normData.announcementDate = encodeLocalDate(norm.announcementDate)
     normData.citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear
@@ -43,7 +53,7 @@ fun mapDomainToData(norm: Norm): NormData {
     normData.documentNumber = norm.documentNumber
     normData.entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate)
     normData.expirationDate = encodeLocalDate(norm.expirationDate)
-    normData.frameKeywords = norm.frameKeywords
+    normData.frameKeywords = keywords
     normData.officialAbbreviation = norm.officialAbbreviation
     normData.officialLongTitle = norm.officialLongTitle
     normData.officialShortTitle = norm.officialShortTitle
@@ -57,15 +67,19 @@ fun mapDomainToData(norm: Norm): NormData {
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
+    val metadata = data.frameKeywords.mapIndexed { index, value -> Metadatum(value, KEYWORD, index) }
+    val combinedKeywords = data.frameKeywords.joinToString(separator = "; ")
+
     return Norm(
         guid = guid,
         articles = mapArticlesToDomain(data.articles),
+        metadata = metadata,
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         risAbbreviationInternationalLaw = data.risAbbreviationInternationalLaw,
         documentNumber = data.documentNumber,
         documentCategory = data.documentCategory,
-        frameKeywords = data.frameKeywords,
+        frameKeywords = combinedKeywords,
         providerEntity = data.providerEntity,
         providerDecidingBody = data.providerDecidingBody,
         providerIsResolutionMajority = data.providerIsResolutionMajority,

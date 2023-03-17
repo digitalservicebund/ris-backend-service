@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output
 
 import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
@@ -88,7 +90,6 @@ class JurisConverterTest {
                     risAbbreviationInternationalLaw = "test ris abbreviation international law"
                     documentNumber = "test document number"
                     documentCategory = "test document category"
-                    frameKeywords = "test frame keywords"
                     providerEntity = "test provider entity"
                     providerDecidingBody = "test provider deciding body"
                     providerIsResolutionMajority = true
@@ -162,7 +163,6 @@ class JurisConverterTest {
                 .isEqualTo("test ris abbreviation international law")
             assertThat(norm?.documentNumber).isEqualTo("test document number")
             assertThat(norm?.documentCategory).isEqualTo("test document category")
-            assertThat(norm?.frameKeywords).isEqualTo("test frame keywords")
             assertThat(norm?.providerEntity).isEqualTo("test provider entity")
             assertThat(norm?.providerDecidingBody).isEqualTo("test provider deciding body")
             assertThat(norm?.providerIsResolutionMajority).isEqualTo(true)
@@ -225,6 +225,20 @@ class JurisConverterTest {
             assertThat(norm?.definition).isEqualTo("test definition")
             assertThat(norm?.ageOfMajorityIndication).isEqualTo("test age of majority indication")
             assertThat(norm?.text).isEqualTo("test text")
+        }
+
+        @Test
+        fun `it correctly maps the parsed data to metdata using the index order`() {
+            val data = NormData().apply { frameKeywords = listOf("foo", "bar") }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            val converter = JurisConverter()
+
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.metadata).contains(Metadatum("foo", KEYWORD, 0))
+            assertThat(norm?.metadata).contains(Metadatum("bar", KEYWORD, 1))
         }
 
         @Test
@@ -308,7 +322,6 @@ class JurisConverterTest {
             mockkStatic(::generateZip)
             mockkStatic(::mapDomainToData)
             every { generateZip(any(), any()) } returns generatedZipFile.readBytes()
-            every { mapDomainToData(any()) } returns normData
         }
 
         @AfterEach
@@ -344,6 +357,25 @@ class JurisConverterTest {
             assertThat(norm.citationYear).isNotNull
             assertThat(normData.citationDate).isNotNull
             assertThat(normData.citationDate).isEqualTo(norm.citationYear)
+        }
+
+        @Test
+        fun `it correctly maps the norm metadata values including the order`() {
+            val metadata = listOf(Metadatum("foo", KEYWORD, 1), Metadatum("bar", KEYWORD, 0))
+            val normWithMetadata = norm.copy(metadata = metadata, frameKeywords = "baz")
+            val command = GenerateNormFileOutputPort.Command(normWithMetadata, generatedZipFile.readBytes())
+            val converter = JurisConverter()
+
+            converter.generateNormFile(command).block()
+
+            verify(exactly = 1) {
+                generateZip(
+                    withArg {
+                        assertThat(it.frameKeywords).isEqualTo(listOf("bar", "foo", "baz"))
+                    },
+                    any(),
+                )
+            }
         }
     }
 }
