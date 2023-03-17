@@ -13,6 +13,7 @@ import ComboboxItemService from "@/services/comboboxItemService"
           <ComboboxInput
             id="directInputCombobox"
             aria-label="Direkteingabe-Sachgebietssuche eingeben"
+            clear-on-choosing-item
             :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
           >
           </ComboboxInput>

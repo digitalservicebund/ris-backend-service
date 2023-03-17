@@ -14,6 +14,7 @@ interface Props {
   modelValue?: ComboboxInputModelType
   ariaLabel: string
   placeholder?: string
+  clearOnChoosingItem?: boolean
 }
 
 interface Emits {
@@ -102,7 +103,12 @@ const setChosenItem = (item: ComboboxItem) => {
   if (item.label === NO_MATCHING_ENTRY) return
   showDropdown.value = false
   emit("update:modelValue", item.value)
-  filter.value = item.label
+  if (props.clearOnChoosingItem) {
+    filter.value = ""
+    inputText.value = ""
+  } else {
+    filter.value = item.label
+  }
   candidateForSelection.value = undefined
 }
 
