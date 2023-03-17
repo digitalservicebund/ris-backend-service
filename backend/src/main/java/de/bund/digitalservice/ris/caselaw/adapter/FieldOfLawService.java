@@ -145,6 +145,13 @@ public class FieldOfLawService {
     return score;
   }
 
+  public Flux<FieldOfLaw> getFieldsOfLawByIdentifierSearch(Optional<String> optionalSearchStr) {
+    if (optionalSearchStr.isEmpty() || optionalSearchStr.get().isBlank()) {
+      return repository.getAllLimitedOrderByIdentifierLength();
+    }
+    return repository.findByIdentifierSearch(optionalSearchStr.get().trim());
+  }
+
   public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(String identifier) {
     if (identifier.equalsIgnoreCase(ROOT_ID)) {
       return repository.getTopLevelNodes();

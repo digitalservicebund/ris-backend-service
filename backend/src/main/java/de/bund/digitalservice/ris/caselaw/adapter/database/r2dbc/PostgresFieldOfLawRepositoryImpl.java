@@ -263,4 +263,24 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .flatMapSequential(this::injectLinkedFields)
         .map(FieldOfLawTransformer::transformToDomain);
   }
+
+  @Override
+  public Flux<FieldOfLaw> getAllLimitedOrderByIdentifierLength() {
+    return databaseFieldOfLawRepository
+        .getAllLimitedOrderByIdentifierLength()
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
+        .map(FieldOfLawTransformer::transformToDomain);
+  }
+
+  @Override
+  public Flux<FieldOfLaw> findByIdentifierSearch(String searchStr) {
+    return databaseFieldOfLawRepository
+        .findByIdentifierSearch(searchStr)
+        .flatMapSequential(this::injectKeywords)
+        .flatMapSequential(this::injectNorms)
+        .flatMapSequential(this::injectLinkedFields)
+        .map(FieldOfLawTransformer::transformToDomain);
+  }
 }

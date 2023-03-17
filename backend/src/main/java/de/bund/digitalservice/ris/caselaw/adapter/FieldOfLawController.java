@@ -29,6 +29,12 @@ public class FieldOfLawController {
     return service.getFieldsOfLawBySearchQuery(searchStr, PageRequest.of(page, size));
   }
 
+  @GetMapping(value = "/search-by-identifier")
+  public Flux<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
+      @RequestParam Optional<String> searchStr) {
+    return service.getFieldsOfLawByIdentifierSearch(searchStr);
+  }
+
   @GetMapping(value = "{identifier}/children")
   public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
     return service.getChildrenOfFieldOfLaw(identifier);

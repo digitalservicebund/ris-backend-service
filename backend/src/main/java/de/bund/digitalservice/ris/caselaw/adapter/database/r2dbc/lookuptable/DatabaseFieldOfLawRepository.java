@@ -73,4 +73,20 @@ public interface DatabaseFieldOfLawRepository extends R2dbcRepository<FieldOfLaw
           + "         WHERE KEY = 'search'), 1)"
           + "  AND LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%');")
   Flux<FieldOfLawDTO> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
+
+  @Query(
+      "SELECT * FROM lookuptable_field_of_law "
+          + "ORDER BY LENGTH(identifier), identifier LIMIT 50;")
+  Flux<FieldOfLawDTO> getAllLimitedOrderByIdentifierLength();
+
+  @Query(
+      "SELECT *, "
+          + "     CASE "
+          + "         WHEN UPPER(identifier) LIKE UPPER(:searchStr||'%') THEN 1 "
+          + "         ELSE 2 "
+          + "         END AS weight "
+          + "FROM lookuptable_field_of_law "
+          + "WHERE UPPER(identifier) LIKE UPPER('%'||:searchStr||'%') "
+          + "ORDER BY weight, LENGTH(identifier), identifier LIMIT 50;")
+  Flux<FieldOfLawDTO> findByIdentifierSearch(String searchStr);
 }

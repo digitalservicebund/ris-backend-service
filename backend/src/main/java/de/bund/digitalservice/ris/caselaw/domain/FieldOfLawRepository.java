@@ -33,4 +33,8 @@ public interface FieldOfLawRepository {
   Flux<FieldOfLaw> findByNormStr(String normStr);
 
   Flux<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
+
+  Flux<FieldOfLaw> getAllLimitedOrderByIdentifierLength();
+
+  Flux<FieldOfLaw> findByIdentifierSearch(String searchStr);
 }

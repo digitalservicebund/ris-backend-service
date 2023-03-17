@@ -1,5 +1,7 @@
 <script lang="ts" setup>
+import ComboboxInput from "@/components/ComboboxInput.vue"
 import TextButton from "@/components/TextButton.vue"
+import ComboboxItemService from "@/services/comboboxItemService"
 </script>
 
 <template>
@@ -7,7 +9,14 @@ import TextButton from "@/components/TextButton.vue"
   <div class="flex flex-col">
     <div class="pb-28">
       <div class="flex flex-row items-stretch">
-        <div class="grow">TODO: Combobox</div>
+        <div class="grow">
+          <ComboboxInput
+            id="directInputCombobox"
+            aria-label="Direkteingabe-Sachgebietssuche eingeben"
+            :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+          >
+          </ComboboxInput>
+        </div>
         <div class="pl-8">
           <TextButton
             aria-label="Direkteingabe-Sachgebietssuche ausführen"
