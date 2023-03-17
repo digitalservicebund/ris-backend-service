@@ -2,7 +2,7 @@ import { InputType } from "./types"
 import type { InputField } from "./types"
 import comboboxItemService from "@/services/comboboxItemService"
 
-export const previousDecisionFields: InputField[] = [
+export const proceedingDecisionFields: InputField[] = [
   {
     name: "court",
     type: InputType.COMBOBOX,

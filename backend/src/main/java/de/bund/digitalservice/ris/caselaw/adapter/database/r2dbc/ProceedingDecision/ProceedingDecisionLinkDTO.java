@@ -10,7 +10,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("document_unit_link")
+@Table("proceeding_decision_link")
 public class ProceedingDecisionLinkDTO {
   Long parentDocumentUnitId;
   Long childDocumentUnitId;

@@ -37,10 +37,10 @@ export type Texts = {
   decisionReasons?: string
 }
 
-export type PreviousDecision = {
+export type ProceedingDecision = {
   court?: Court
   date?: string
-  fileNumber?: string
+  fileNumbers?: string[]
 }
 
 export default class DocumentUnit {
@@ -56,7 +56,7 @@ export default class DocumentUnit {
 
   public coreData: CoreData = {}
   public texts: Texts = {}
-  public previousDecisions?: PreviousDecision[]
+  public proceedingDecisions?: ProceedingDecision[]
 
   static requiredFields = [
     "fileNumbers",

@@ -1,10 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -21,6 +18,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @Table("doc_unit")
 public class ProceedingDecisionDTO {
   @Id Long id;
+
   UUID uuid;
 
   @Column("gerichtstyp")

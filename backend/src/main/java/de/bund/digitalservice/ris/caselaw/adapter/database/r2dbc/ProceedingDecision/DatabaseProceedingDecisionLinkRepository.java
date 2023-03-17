@@ -6,7 +6,11 @@ import org.springframework.stereotype.Repository;
 import reactor.core.publisher.Flux;
 
 @Repository
-public interface DatabaseProceedingDecisionLinkRepository extends R2dbcRepository<ProceedingDecisionLinkDTO, Long> {
+public interface DatabaseProceedingDecisionLinkRepository
+    extends R2dbcRepository<ProceedingDecisionLinkDTO, Long> {
   Flux<ProceedingDecisionLinkDTO> findAllByParentDocumentUnitId(Long Id);
+
+  Flux<ProceedingDecisionLinkDTO> findAllByChildDocumentUnitId(Long Id);
+
   Flux<ProceedingDecisionLinkDTO> saveAll(List<ProceedingDecisionLinkDTO> links);
 }

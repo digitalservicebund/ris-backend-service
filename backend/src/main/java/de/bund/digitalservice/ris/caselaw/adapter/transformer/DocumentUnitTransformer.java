@@ -72,21 +72,20 @@ public class DocumentUnitTransformer {
     }
 
     if (documentUnit.proceedingDecisions() != null) {
-      builder.previousDecisions(
+      builder.proceedingDecisions(
           documentUnit.proceedingDecisions().stream()
               .map(
-                  previousDecision ->
+                  proceedingDecision ->
                       ProceedingDecisionDTO.builder()
-                          .id(previousDecision.id())
-                          .documentUnitId(documentUnitDTO.getId())
-                          .courtLocation(previousDecision.court().location())
-                          .courtType(previousDecision.court().type())
-                          .fileNumber(previousDecision.fileNumber())
-                          .decisionDateTimestamp(previousDecision.date())
+//                          .id(proceedingDecision.id())
+//                          .courtLocation(proceedingDecision.court().location())
+//                          .courtType(proceedingDecision.court().type())
+                          .fileNumber(proceedingDecision.fileNumber())
+                          .decisionDate(proceedingDecision.date())
                           .build())
               .toList());
     } else {
-      builder.previousDecisions(Collections.emptyList());
+      builder.proceedingDecisions(Collections.emptyList());
     }
 
     if (documentUnit.texts() != null) {

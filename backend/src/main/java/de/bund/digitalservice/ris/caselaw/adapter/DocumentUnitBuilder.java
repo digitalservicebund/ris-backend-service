@@ -63,13 +63,13 @@ public class DocumentUnitBuilder {
               .map(
                   previousDecisionDTO ->
                       ProceedingDecision.builder()
-                          .id(previousDecisionDTO.getId())
+//                          .id(previousDecisionDTO.getId())
                           .court(
                               getCourtObject(
                                   previousDecisionDTO.getCourtType(),
                                   previousDecisionDTO.getCourtLocation()))
                           .fileNumber(previousDecisionDTO.getFileNumber())
-                          .date(previousDecisionDTO.getDecisionDateTimestamp())
+                          .date(previousDecisionDTO.getDecisionDate())
                           .build())
               .toList();
     }
@@ -146,7 +146,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),
             documentUnitDTO.getRegion()),
-            proceedingDecisions,
+        proceedingDecisions,
         new Texts(
             documentUnitDTO.getDecisionName(),
             documentUnitDTO.getHeadline(),

@@ -1,6 +1,6 @@
--- DROP TABLE IF EXISTS previous_decision;
+DROP TABLE IF EXISTS previous_decision;
 CREATE TABLE IF NOT EXISTS
-  document_unit_link (
+  proceeding_decision_link (
     parent_document_unit_id INT NOT NULL,
     child_document_unit_id INT NOT NULL,
     UNIQUE (parent_document_unit_id, child_document_unit_id),

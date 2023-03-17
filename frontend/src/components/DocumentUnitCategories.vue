@@ -91,9 +91,9 @@ const coreData = computed({
   },
 })
 
-const previousDecisions = computed({
-  get: () => props.documentUnit.previousDecisions,
-  set: (newValue) => (updatedDocumentUnit.value.previousDecisions = newValue),
+const proceedingDecisions = computed({
+  get: () => props.documentUnit.proceedingDecisions,
+  set: (newValue) => (updatedDocumentUnit.value.proceedingDecisions = newValue),
 })
 
 const { hash: routeHash } = toRefs(route)
@@ -202,8 +202,8 @@ onUnmounted(() => {
 
         <!-- TODO add validationErrors -->
         <DocumentUnitPreviousDecisions
-          id="previousDecisions"
-          v-model="previousDecisions"
+          id="proceedingDecisions"
+          v-model="proceedingDecisions"
           class="my-16"
         />
 

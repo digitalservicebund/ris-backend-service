@@ -1,9 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.DatabaseProceedingDecisionLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.DatabaseProceedingDecisionRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.PostgresProceedingDecisionRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
@@ -15,12 +14,14 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Sta
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.PreviousDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecisionRepository;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,11 +30,12 @@ import reactor.core.publisher.Mono;
 @Repository
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
   private final DatabaseDocumentUnitRepository repository;
-  private final PostgresProceedingDecisionRepositoryImpl proceedingDecisionRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
-
+  private final ProceedingDecisionRepository proceedingDecisionRepository;
+  private final DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository;
+  private final DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
@@ -45,7 +47,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitRepository repository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      PostgresProceedingDecisionRepositoryImpl proceedingDecisionRepository,
+      DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository,
+      ProceedingDecisionRepository proceedingDecisionRepository,
+      DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
       CourtRepository courtRepository,
@@ -55,7 +59,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository) {
 
     this.repository = repository;
+    this.databaseProceedingDecisionRepository = databaseProceedingDecisionRepository;
     this.proceedingDecisionRepository = proceedingDecisionRepository;
+    this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
     this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
@@ -113,7 +119,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
-        .flatMap(documentUnitDTO -> saveProceedingDecisions((documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> saveProceedingDecisions(documentUnitDTO, documentUnit))
+//        .flatMap(documentUnitDTO -> saveProceedingDecisionsLink(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingEcli(documentUnitDTO, documentUnit))
@@ -200,66 +207,212 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> saveProceedingDecisions(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-      List<Long> proceedingDecisionIds = new ArrayList<>();
-      List<Long> proceedingDecisionDTOIds = new ArrayList<>();
 
-      if (documentUnit.proceedingDecisions() != null) {
-          documentUnit.proceedingDecisions().stream().forEach(
-                  proceedingDecision -> {proceedingDecisionIds.add(proceedingDecision.id());}
-          );
-      }
 
-      return proceedingDecisionRepository
-              .findAllByDocumentUnitId(documentUnitDTO.getId())
-              .collectList()
-              .flatMap(proceedingDecisionDTOs -> {
+      // super minimalistic -> just get anything into db
+       documentUnit.proceedingDecisions()
+        .forEach(proceedingDecision ->
+            repository.save(
+              DocumentUnitDTO
+              .builder()
+              .uuid(UUID.randomUUID())
+              .creationtimestamp(Instant.now())
+              .documentnumber("test")
+              .dataSource(DataSourceDTO.PROCEEDING_DECISION)
+              .fileNumbers(List.of(FileNumberDTO.builder().fileNumber(proceedingDecision.fileNumber()).build()))
+//              .courtType(proceedingDecision.court().type())
+//              .courtLocation(proceedingDecision.court().location())
+              .decisionDate(proceedingDecision.date())
+              .build())
+        );
 
-                  proceedingDecisionDTOs.forEach(
-                          proceedingDecisionDTO -> {
-                              {proceedingDecisionDTOIds.add(proceedingDecisionDTO.id());}
-                          });
 
-                  List<Long> toSaveIds = proceedingDecisionIds;
-                  proceedingDecisionDTOIds.forEach((id)->toSaveIds.remove(id));
+       return Mono.just(documentUnitDTO);
 
-                  List<ProceedingDecisionDTO> toSave = toSaveIds.stream().map(toSaveId -> {
-                      ProceedingDecision currentProceedingDecision = documentUnit.proceedingDecisions().stream()
-                              .filter(decision -> toSaveId == decision.id())
-                              .findAny()
-                              .orElse(null);
 
-                      return ProceedingDecisionDTO.builder()
-                              .id(currentProceedingDecision.id())
-                              .decisionDate(currentProceedingDecision.date())
-                              .courtLocation(currentProceedingDecision.court().location())
-                              .courtType(currentProceedingDecision.court().type())
-                              .fileNumber(currentProceedingDecision.fileNumber())
-                              .build();
+//    approach 2 -> analogue to fileNumbers
 
-                  }).toList();
+//    return proceedingDecisionLinkRepository
+//        .findAllByParentDocumentUnitId(documentUnitDTO.getId())
+//        .flatMap(linkDTO -> databaseProceedingDecisionRepository.findById(linkDTO.getChildDocumentUnitId()))
+//        .collectList()
+//        .flatMap(
+//            proceedingDecisionDTOS -> {
+//              List<ProceedingDecision> proceedingDecisions = new ArrayList<>();
+//
+//              if (documentUnit.proceedingDecisions() != null) {
+//                proceedingDecisions.addAll(documentUnit.proceedingDecisions());
+//              }
+//
+//              AtomicInteger proceedingDecisionIndex = new AtomicInteger(0);
+//              List<ProceedingDecisionDTO> toSave = new ArrayList<>();
+//              List<ProceedingDecisionDTO> toDelete = new ArrayList<>();
+//
+//              proceedingDecisionDTOS.forEach(
+//                  proceedingDecisionDTO -> {
+//                    if (proceedingDecisionIndex.get() < proceedingDecisions.size()) {
+//                      toSave.add(proceedingDecisions.get(proceedingDecisionIndex.getAndIncrement())); // need DTO (transformer)
+//                    } else {
+//                      toDelete.add(fileNumberDTO);
+//                    }
+//                  });
+//
+//              // save.stream().
+//              // this.save(
+//              //
+//              proceedingDecisionRepository.addlink(
+//            }
+//
+//
+//        )
 
-                  List<Long> toDeleteIds = proceedingDecisionDTOIds;
-                  proceedingDecisionIds.forEach((id)->toDeleteIds.remove(id));
 
-                  List<ProceedingDecisionDTO> toDelete = toDeleteIds.stream().map(toDeleteId -> {
-                      ProceedingDecisionDTO currentProceedingDecisionDTO = documentUnitDTO.getProceedingDecisions().stream()
-                              .filter(decisionDTO -> toDeleteId == decisionDTO.getId())
-                              .findAny()
-                              .orElse(null);
 
-                      return currentProceedingDecisionDTO;
-                  }).toList();
+    // todo issue: ids of documentUnits not set yet
+    // if docUnit has no uuid -> add
+    // if docUnit has valid uuid -> update/ do Nothing
+    // uuid in docUnitDTO that does not exist in docUnitUUID -> delete
 
-                  return proceedingDecisionRepository
-                          .deleteAll(toDelete)
-                          .then(proceedingDecisionRepository.saveAll(toSave).collectList())
-                          .map(
-                                  savedProceedingDeicsionList -> {
-                                      documentUnitDTO.setProceedingDecisions(savedProceedingDeicsionList);
-                                      return documentUnitDTO;
-                                  });
-              });
-
+    // build list of proceedingDecisionIds
+//    List<Long> proceedingDecisionIds = new ArrayList<>();
+//    if (documentUnit.proceedingDecisions() != null) {
+//      // todo return documentUnitDTO without proceedingDecisions
+//      documentUnit
+//          .proceedingDecisions()
+//          .forEach(
+//              proceedingDecision -> {
+//                proceedingDecisionIds.add(proceedingDecision.id());
+//              });
+//    }
+//
+//    // build list of proceedingDecisionDTOIds = already saved in db
+//    List<Long> proceedingDecisionDTOIds = new ArrayList<>();
+//    return proceedingDecisionLinkRepository
+//        .findAllByParentDocumentUnitId(documentUnitDTO.getId())
+//        .flatMap(linkDTO -> databaseProceedingDecisionRepository.findById(linkDTO.getChildDocumentUnitId()))
+//        .collectList()
+//        .flatMap(
+//            proceedingDecisionDTOs -> {
+//              proceedingDecisionDTOs.forEach(
+//                  proceedingDecisionDTO -> {
+//                    {
+//                      proceedingDecisionDTOIds.add(proceedingDecisionDTO.getId());
+//                    }
+//                  });
+//
+//              // Ids - DTOIds = new decisions
+//              // todo this cannot work, needs to happen outside of map
+//              List<Long> toSaveIds = proceedingDecisionIds.stream().toList();
+//              proceedingDecisionDTOIds.forEach(toSaveIds::remove);
+//
+//              // get DTOs from Ids
+//              // todo should we work with DocumentUnitDTOs here?
+//              List<ProceedingDecisionDTO> toSave =
+//                  toSaveIds.stream()
+//                      .map(
+//                          toSaveId -> {
+//                            ProceedingDecision currentProceedingDecision =
+//                                documentUnit.proceedingDecisions().stream()
+//                                    .filter(decision -> Objects.equals(toSaveId, decision.id()))
+//                                    .findAny()
+//                                    .orElse(null);
+//                            return ProceedingDecisionDTO.builder()
+//                                .id(currentProceedingDecision.id()) // has no id yet ?
+//                                //.decisionDate(currentProceedingDecision.date())
+//                                //.courtLocation(currentProceedingDecision.court().location())
+//                                //.courtType(currentProceedingDecision.court().type())
+//                                .fileNumber(currentProceedingDecision.fileNumber())
+//                                .build();
+//                          })
+//                      .toList();
+//
+//              // DTOIds - IDs = all decisions that can be deleted
+//              // todo can this also be docunitDTOs? Does is matter?
+//              List<Long> toDeleteIds = proceedingDecisionDTOIds.stream().toList();
+//              if (!proceedingDecisionIds.isEmpty() && !proceedingDecisionDTOIds.isEmpty()) {
+//                proceedingDecisionIds.forEach(toDeleteIds::remove);
+//              }
+//
+//              // convert back to DTOs
+//              List<ProceedingDecisionDTO> toDelete =
+//                  toDeleteIds.stream()
+//                      .map(
+//                          toDeleteId ->
+//                              documentUnitDTO.getProceedingDecisions().stream()
+//                                  .filter(
+//                                      decisionDTO ->
+//                                          Objects.equals(toDeleteId, decisionDTO.getId()))
+//                                  .findAny()
+//                                  .orElse(null))
+//                      .toList();
+//
+//              return databaseProceedingDecisionRepository
+//                  .deleteAll(toDelete) // todo we don't want to delete if other links exist
+//                  .then(
+//                      // save new preceding decisions as documentUnits
+//                      Flux.fromStream(
+//                              toSave.stream()
+//                                  .map(
+//                                      decisionDTO -> {
+//                                        // need to save in order to get id & uuid
+//                                        Mono<DocumentUnit> savedDocumentUnit =
+//                                            this.save(
+//                                                DocumentUnitBuilder.newInstance()
+//                                                    .setDocumentUnitDTO(
+//                                                        DocumentUnitDTO.builder()
+//                                                            .dataSource(
+//                                                                DataSourceDTO.PROCEEDING_DECISION)
+//                                                            .courtLocation(
+//                                                                decisionDTO.getCourtLocation())
+//                                                            .courtType(decisionDTO.getCourtType())
+//                                                            .decisionDate(
+//                                                                decisionDTO.getDecisionDate())
+//                                                            .fileNumbers(
+//                                                                List.of(
+//                                                                    FileNumberDTO.builder()
+//                                                                        .fileNumber(
+//                                                                            decisionDTO
+//                                                                                .getFileNumber())
+//                                                                        .build()))
+//                                                            .build())
+//                                                    .build())
+//                                            ;
+//
+//                                        // todo come back to this, once the link repo takes domain objects
+//                                        // todo can be combined with ^
+//                                        savedDocumentUnit.flatMap(unpackedSavedDocumentUnit ->
+//                                          proceedingDecisionRepository.addProceedingDecision(documentUnit.uuid(), unpackedSavedDocumentUnit.uuid())
+//                                        );
+//
+//                                        // still need to return the proceedingDecisionDTO ?
+//                                        return repository
+//                                            .findByUuid(savedDocumentUnit.block().uuid())
+//                                            .map(
+//                                                savedDocumentUnitDTO ->
+//                                                    ProceedingDecisionDTO.builder()
+//                                                        .uuid(savedDocumentUnitDTO.getUuid())
+//                                                        .id(savedDocumentUnitDTO.getId())
+//                                                        .courtType(
+//                                                            savedDocumentUnitDTO.getCourtType())
+//                                                        .courtLocation(
+//                                                            savedDocumentUnitDTO.getCourtLocation())
+//                                                        .fileNumber(
+//                                                            savedDocumentUnitDTO
+//                                                                .getFileNumbers()
+//                                                                .stream()
+//                                                                .findAny()
+//                                                                .get()
+//                                                                .getFileNumber())
+//                                                        .build())
+//                                            .block();
+//                                      }))
+//                          .collectList())
+//                  .map(
+//                      savedProceedingDecisionList -> {
+//                        documentUnitDTO.setProceedingDecisions(savedProceedingDecisionList);
+//                        return documentUnitDTO;
+//                      });
+//            });
   }
 
   public Mono<DocumentUnitDTO> saveFileNumbers(
@@ -560,7 +713,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
-    return injectPreviousDecisions(documentUnitDTO)
+    return injectProceedingDecisions(documentUnitDTO)
         .flatMap(this::injectFileNumbers)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
@@ -569,13 +722,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectFieldsOfLaw);
   }
 
-  private Mono<DocumentUnitDTO> injectPreviousDecisions(DocumentUnitDTO documentUnitDTO) {
-    return proceedingDecisionRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+  private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
+    return databaseProceedingDecisionRepository
+        .findAllById(documentUnitDTO.getId())
         .collectList()
         .map(
             list -> {
-              documentUnitDTO.setPreviousDecisions(list);
+              documentUnitDTO.setProceedingDecisions(list);
               return documentUnitDTO;
             })
         .map(v -> documentUnitDTO);

@@ -4,14 +4,14 @@ import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import ModelComponentRepeater from "@/components/ModelComponentRepeater.vue"
 import TextButton from "@/components/TextButton.vue"
-import { previousDecisionFields } from "@/domain"
-import type { PreviousDecision } from "@/domain/documentUnit"
+import { proceedingDecisionFields } from "@/domain"
+import type { ProceedingDecision } from "@/domain/documentUnit"
 
 const props = defineProps<Props>()
 
 const emit = defineEmits<Emits>()
 
-const defaultModel: PreviousDecision = {
+const defaultModel: ProceedingDecision = {
   court: {
     type: "",
     location: "",
@@ -19,15 +19,15 @@ const defaultModel: PreviousDecision = {
     revoked: "",
   },
   date: "",
-  fileNumber: "",
+  fileNumbers: [],
 }
 
 interface Props {
-  modelValue?: PreviousDecision[]
+  modelValue?: ProceedingDecision[]
 }
 
 interface Emits {
-  (event: "update:modelValue", value: PreviousDecision[]): void
+  (event: "update:modelValue", value: ProceedingDecision[]): void
 }
 
 const values = computed({
@@ -57,7 +57,7 @@ const values = computed({
       :column-count="2"
       :component="InputGroup"
       :default-value="defaultModel"
-      :fields="previousDecisionFields"
+      :fields="proceedingDecisionFields"
     >
       <template #removeButton="{ onClick }">
         <TextButton
