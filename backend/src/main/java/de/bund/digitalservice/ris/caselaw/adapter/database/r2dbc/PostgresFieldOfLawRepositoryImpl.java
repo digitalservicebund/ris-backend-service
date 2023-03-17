@@ -100,21 +100,6 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
-  @Override
-  public Flux<FieldOfLaw> findBySearchStr(String searchStr, Pageable pageable) {
-    return databaseFieldOfLawRepository
-        .findBySearchStr(searchStr, pageable.getOffset(), pageable.getPageSize())
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
-        .map(FieldOfLawTransformer::transformToDomain);
-  }
-
-  @Override
-  public Mono<Long> countBySearchStr(String searchStr) {
-    return databaseFieldOfLawRepository.countBySearchStr(searchStr);
-  }
-
   private Mono<FieldOfLawDTO> injectKeywords(FieldOfLawDTO fieldOfLawDTO) {
     return fieldOfLawKeywordRepository
         .findAllByFieldOfLawIdOrderByValueAsc(fieldOfLawDTO.getId())

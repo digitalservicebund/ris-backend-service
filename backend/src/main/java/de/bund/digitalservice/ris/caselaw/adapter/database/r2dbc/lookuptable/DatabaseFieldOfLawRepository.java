@@ -23,27 +23,6 @@ public interface DatabaseFieldOfLawRepository extends R2dbcRepository<FieldOfLaw
   Flux<FieldOfLawDTO> findAllByParentIdentifierOrderByIdentifierAsc(String identifier);
 
   @Query(
-      "WITH content_added AS (SELECT *, "
-          + "     UPPER(CONCAT(identifier, ' ', text)) AS content "
-          + "   FROM lookuptable_field_of_law) "
-          + "SELECT *, content, "
-          + "       CASE "
-          + "           WHEN content LIKE UPPER(:searchStr||'%') THEN 1 "
-          + "           WHEN content LIKE UPPER('% '||:searchStr||'%') THEN 2 "
-          + "           WHEN content LIKE UPPER('%-'||:searchStr||'%') THEN 2 "
-          + "           ELSE 3 "
-          + "           END AS weight "
-          + "FROM content_added "
-          + "WHERE content LIKE UPPER('%'||:searchStr||'%') "
-          + "ORDER BY weight, content LIMIT :limit OFFSET :offset")
-  Flux<FieldOfLawDTO> findBySearchStr(String searchStr, long offset, int limit);
-
-  @Query(
-      "SELECT COUNT(*) FROM lookuptable_field_of_law "
-          + "WHERE UPPER(CONCAT(identifier, ' ', text)) LIKE UPPER('%'||:searchStr||'%')")
-  Mono<Long> countBySearchStr(String searchStr);
-
-  @Query(
       "WITH param_arrays(KEY, value) AS ( "
           + "    VALUES ('search', :searchTerms)), "
           + "     match_counts(id, contained_matches) AS "

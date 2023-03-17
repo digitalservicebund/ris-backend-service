@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,7 +52,6 @@ class FieldOfLawServiceTest {
 
     verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
     verify(repository, times(1)).count();
-    verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
 
   @Test
@@ -72,7 +70,6 @@ class FieldOfLawServiceTest {
 
     verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
     verify(repository, times(1)).count();
-    verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
 
   @Test
