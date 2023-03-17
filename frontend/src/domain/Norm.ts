@@ -135,9 +135,7 @@ export type NormBase = {
   validityRule?: string
 }
 
-export interface FrameData extends NormBase {
-  frameKeywords?: string[]
-}
+export type FrameData = NormBase & { frameKeywords?: string[] }
 
 export interface Norm extends FrameData {
   readonly guid: string
