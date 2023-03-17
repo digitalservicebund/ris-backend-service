@@ -2,6 +2,9 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
@@ -34,6 +37,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
     class NormFramePropertiesRequestSchema {
         lateinit var officialLongTitle: String
+        var metadata: List<MetadatumRequestSchema> = emptyList()
         var risAbbreviation: String? = null
         var risAbbreviationInternationalLaw: String? = null
         var documentNumber: String? = null
@@ -178,8 +182,11 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var text: String? = null
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
+            val metadata = this.metadata.map { it.toUseCaseData() }
+
             return EditNormFrameUseCase.NormFrameProperties(
                 this.officialLongTitle,
+                metadata,
                 this.risAbbreviation,
                 this.risAbbreviationInternationalLaw,
                 this.documentNumber,
@@ -293,6 +300,20 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.ageOfMajorityIndication,
                 this.text,
             )
+        }
+    }
+
+    class MetadatumRequestSchema {
+        lateinit var value: String
+        lateinit var type: MetadatumType
+        var order: Int = 0
+
+        fun toUseCaseData(): Metadatum<*> {
+            val value = when (this.type) {
+                KEYWORD -> this.value
+            }
+
+            return Metadatum(value = value, type = this.type, order = this.order)
         }
     }
 }
