@@ -19,7 +19,6 @@ class NormTest {
         assertThat(norm.articles).isEqualTo(listOf(article))
         assertThat(norm.officialShortTitle).isNull()
         assertThat(norm.officialAbbreviation).isNull()
-        assertThat(norm.frameKeywords).isNull()
         assertThat(norm.unofficialLongTitle).isNull()
         assertThat(norm.risAbbreviation).isNull()
         assertThat(norm.documentStatusDescription).isNull()
@@ -58,7 +57,6 @@ class NormTest {
                 officialLongTitle = "long title",
                 officialShortTitle = "short title",
                 officialAbbreviation = "ABC",
-                frameKeywords = "keywords",
                 unofficialLongTitle = "unofficial long title",
                 risAbbreviation = "ABC",
             )
@@ -68,7 +66,6 @@ class NormTest {
         assertThat(norm.articles).isEqualTo(listOf(article))
         assertThat(norm.officialShortTitle).isEqualTo("short title")
         assertThat(norm.officialAbbreviation).isEqualTo("ABC")
-        assertThat(norm.frameKeywords).isEqualTo("keywords")
         assertThat(norm.unofficialLongTitle).isEqualTo("unofficial long title")
         assertThat(norm.risAbbreviation).isEqualTo("ABC")
     }

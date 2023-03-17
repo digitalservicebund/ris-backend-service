@@ -16,7 +16,6 @@ data class Norm(
     var documentNumber: String? = null,
     var divergentDocumentNumber: String? = null,
     var documentCategory: String? = null,
-    var frameKeywords: String? = null,
 
     var documentTypeName: String? = null,
     var documentNormCategory: String? = null,

@@ -362,7 +362,7 @@ class JurisConverterTest {
         @Test
         fun `it correctly maps the norm metadata values including the order`() {
             val metadata = listOf(Metadatum("foo", KEYWORD, 1), Metadatum("bar", KEYWORD, 0))
-            val normWithMetadata = norm.copy(metadata = metadata, frameKeywords = "baz")
+            val normWithMetadata = norm.copy(metadata = metadata)
             val command = GenerateNormFileOutputPort.Command(normWithMetadata, generatedZipFile.readBytes())
             val converter = JurisConverter()
 

@@ -43,7 +43,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var documentNumber: String? = null
         var divergentDocumentNumber: String? = null
         var documentCategory: String? = null
-        var frameKeywords: String? = null
 
         var documentTypeName: String? = null
         var documentNormCategory: String? = null
@@ -192,7 +191,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.documentNumber,
                 this.divergentDocumentNumber,
                 this.documentCategory,
-                this.frameKeywords,
                 this.documentTypeName,
                 this.documentNormCategory,
                 this.documentTemplateName,

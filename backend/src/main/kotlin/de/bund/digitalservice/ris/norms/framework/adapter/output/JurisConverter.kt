@@ -44,8 +44,6 @@ fun mapDomainToData(norm: Norm): NormData {
         .sortedBy { it.order }
         .map { it.value } as MutableList<String>
 
-    norm.frameKeywords?.let { keywords.add(it) }
-
     val normData = NormData()
     normData.announcementDate = encodeLocalDate(norm.announcementDate)
     normData.citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear
@@ -68,7 +66,6 @@ fun mapDomainToData(norm: Norm): NormData {
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val metadata = data.frameKeywords.mapIndexed { index, value -> Metadatum(value, KEYWORD, index) }
-    val combinedKeywords = data.frameKeywords.joinToString(separator = "; ")
 
     return Norm(
         guid = guid,
@@ -79,7 +76,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         risAbbreviationInternationalLaw = data.risAbbreviationInternationalLaw,
         documentNumber = data.documentNumber,
         documentCategory = data.documentCategory,
-        frameKeywords = combinedKeywords,
         providerEntity = data.providerEntity,
         providerDecidingBody = data.providerDecidingBody,
         providerIsResolutionMajority = data.providerIsResolutionMajority,

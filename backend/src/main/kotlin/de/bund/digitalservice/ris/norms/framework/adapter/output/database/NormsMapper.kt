@@ -22,7 +22,7 @@ interface NormsMapper {
     ): Norm {
         return Norm(
             normDto.guid, articles, metadata, normDto.officialLongTitle, normDto.risAbbreviation, normDto.risAbbreviationInternationalLaw,
-            normDto.documentNumber, normDto.divergentDocumentNumber, normDto.documentCategory, normDto.frameKeywords,
+            normDto.documentNumber, normDto.divergentDocumentNumber, normDto.documentCategory,
             normDto.documentTypeName, normDto.documentNormCategory, normDto.documentTemplateName, normDto.providerEntity,
             normDto.providerDecidingBody, normDto.providerIsResolutionMajority, normDto.participationType,
             normDto.participationInstitution, normDto.leadJurisdiction, normDto.leadUnit, normDto.subjectFna,
@@ -82,7 +82,7 @@ interface NormsMapper {
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
         return NormDto(
             id, norm.guid, norm.officialLongTitle, norm.risAbbreviation, norm.risAbbreviationInternationalLaw,
-            norm.documentNumber, norm.divergentDocumentNumber, norm.documentCategory, norm.frameKeywords,
+            norm.documentNumber, norm.divergentDocumentNumber, norm.documentCategory,
             norm.documentTypeName, norm.documentNormCategory, norm.documentTemplateName, norm.providerEntity,
             norm.providerDecidingBody, norm.providerIsResolutionMajority, norm.participationType,
             norm.participationInstitution, norm.leadJurisdiction, norm.leadUnit, norm.subjectFna,
