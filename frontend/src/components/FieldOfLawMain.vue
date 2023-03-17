@@ -23,10 +23,10 @@ if (response.data) {
   selectedFieldsOfLaw.value = response.data
 }
 
-const handleAdd = async (node: FieldOfLawNode) => {
+const handleAdd = async (identifier: string) => {
   const response = await FieldOfLawService.addFieldOfLaw(
     props.documentUnitUuid,
-    node.identifier
+    identifier
   )
 
   if (response.data) {

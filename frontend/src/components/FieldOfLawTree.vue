@@ -11,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (event: "add-to-list", node: FieldOfLawNode): void
+  (event: "add-to-list", identifier: string): void
   (event: "remove-from-list", identifier: string): void
   (event: "reset-clicked-node"): void
   (event: "toggle-show-norms"): void
@@ -24,7 +24,7 @@ const clicked = computed(() => props.clickedIdentifier)
 watch(clicked, () => buildDirectPathTreeTo(clicked.value))
 
 function handleSelect(node: FieldOfLawNode) {
-  emit("add-to-list", node)
+  emit("add-to-list", node.identifier)
 }
 
 function handleUnselect(identifier: string) {
