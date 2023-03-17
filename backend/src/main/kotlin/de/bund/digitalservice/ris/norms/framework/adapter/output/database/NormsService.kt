@@ -24,6 +24,7 @@ import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.data.relational.core.query.Query
 import org.springframework.r2dbc.core.DatabaseClient
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
@@ -89,6 +90,7 @@ class NormsService(
         }
     }
 
+    @Transactional(transactionManager = "connectionFactoryTransactionManager")
     override fun saveNorm(command: SaveNormOutputPort.Command): Mono<Boolean> {
         val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
         val saveArticlesRequest = saveNormRequest.flatMapMany { saveNormArticles(command.norm, it) }
@@ -98,6 +100,7 @@ class NormsService(
         return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest, saveMetadataRequest).thenReturn(true)
     }
 
+    @Transactional(transactionManager = "connectionFactoryTransactionManager")
     override fun editNorm(command: EditNormOutputPort.Command): Mono<Boolean> {
         val findNormRequest = normsRepository.findByGuid(command.norm.guid).cache()
         val saveNormRequest = findNormRequest
@@ -109,6 +112,7 @@ class NormsService(
         return Mono.`when`(saveNormRequest, updateMetadataRequest).thenReturn(true)
     }
 
+    @Transactional(transactionManager = "connectionFactoryTransactionManager")
     override fun saveFileReference(command: SaveFileReferenceOutputPort.Command): Mono<Boolean> {
         return normsRepository
             .findByGuid(command.norm.guid)
