@@ -17,7 +17,9 @@ export type Paragraph = {
 
 export type NullableFrameData = NullableType<FrameData>
 
-export type FrameData = {
+export type NullableNormEditRequest = NullableType<NormEditRequest>
+
+export type NormBase = {
   documentTemplateName?: string
   leadUnit?: string
   participationInstitution?: string
@@ -78,7 +80,6 @@ export type FrameData = {
   expirationDate?: string
   expirationDateState?: string
   expirationNormCategory?: string
-  frameKeywords?: string
   isExpirationDateTemp?: boolean
   leadJurisdiction?: string
   officialAbbreviation?: string
@@ -134,14 +135,39 @@ export type FrameData = {
   validityRule?: string
 }
 
+export interface FrameData extends NormBase {
+  frameKeywords?: string[]
+}
+
 export interface Norm extends FrameData {
   readonly guid: string
   readonly articles: Article[]
   readonly files?: FileReference[]
 }
 
+export interface NormResponse extends NormBase {
+  readonly guid: string
+  readonly articles: Article[]
+  readonly files?: FileReference[]
+  metadata?: MetaDatum[]
+}
+
+export interface NormEditRequest extends NormBase {
+  metadata?: MetaDatum[]
+}
+
 export interface FileReference {
   readonly name: string
   readonly hash: string
   readonly createdAt: string
+}
+
+export interface MetaDatum {
+  readonly value: string
+  readonly type: MetaDatumType
+  readonly order: number
+}
+
+export enum MetaDatumType {
+  KEYWORD,
 }

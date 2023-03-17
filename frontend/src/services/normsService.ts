@@ -2,9 +2,10 @@ import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import httpClient, { ServiceResponse } from "./httpClient"
-import { FrameData, Norm } from "@/domain/Norm"
+import { FrameData, NormResponse } from "@/domain/Norm"
 import {
   applyToFrameData,
+  getNormEditRequestFromFrameData,
   NullableBoolean,
   NullableString,
 } from "@/utilities/normUtilities"
@@ -85,8 +86,10 @@ export async function getAllNorms(): Promise<ServiceResponse<NormList>> {
 
 export async function getNormByGuid(
   guid: string
-): Promise<ServiceResponse<Norm>> {
-  const { status, data, error } = await httpClient.get<Norm>(`norms/${guid}`)
+): Promise<ServiceResponse<NormResponse>> {
+  const { status, data, error } = await httpClient.get<NormResponse>(
+    `norms/${guid}`
+  )
   if (status >= 300 || error) {
     return {
       status: status,
@@ -104,7 +107,7 @@ export async function editNormFrame(
   guid: string,
   frameData: FrameData
 ): Promise<ServiceResponse<void>> {
-  const body = encodeFrameData(frameData)
+  const body = getNormEditRequestFromFrameData(encodeFrameData(frameData))
   const { status, error } = await httpClient.put(
     `norms/${guid}`,
     {

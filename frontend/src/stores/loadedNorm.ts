@@ -3,14 +3,20 @@ import { ref } from "vue"
 import { Norm } from "@/domain/Norm"
 import { ServiceResponse } from "@/services/httpClient"
 import { editNormFrame, getNormByGuid } from "@/services/normsService"
-import { getFrameDataFromNorm } from "@/utilities/normUtilities"
+import {
+  getFrameDataFromNorm,
+  getNormFromNormResponse,
+} from "@/utilities/normUtilities"
 
 export const useLoadedNormStore = defineStore("loaded-norm", () => {
   const loadedNorm = ref<Norm | undefined>(undefined)
 
   async function load(guid: string): Promise<void> {
     const response = await getNormByGuid(guid)
-    loadedNorm.value = response.data
+    loadedNorm.value =
+      response.data != undefined
+        ? getNormFromNormResponse(response.data)
+        : undefined
   }
 
   async function update(): Promise<ServiceResponse<void>> {

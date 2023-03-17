@@ -1,3 +1,4 @@
+import { MetaDatumType } from "@/domain/Norm"
 import httpClient from "@/services/httpClient"
 import {
   editNormFrame,
@@ -130,7 +131,7 @@ describe("normsService", () => {
         announcementDate: "",
         citationDate: undefined,
         citationYear: "2011",
-        frameKeywords: "",
+        frameKeywords: ["Keyword1"],
         providerEntity: "new provider entity",
         providerDecidingBody: undefined,
         providerIsResolutionMajority: undefined,
@@ -154,7 +155,6 @@ describe("normsService", () => {
           documentTemplateName: null,
           citationDate: null,
           citationYear: "2011",
-          frameKeywords: null,
           officialAbbreviation: null,
           officialLongTitle: "new title",
           participationType: null,
@@ -264,6 +264,13 @@ describe("normsService", () => {
           unofficialReference: null,
           unofficialShortTitle: null,
           validityRule: null,
+          metadata: [
+            {
+              value: "Keyword1",
+              type: MetaDatumType.KEYWORD,
+              order: 1,
+            },
+          ],
         }
       )
     })

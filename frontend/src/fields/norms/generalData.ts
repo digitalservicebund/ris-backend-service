@@ -1,4 +1,4 @@
-import { InputField, InputType } from "@/domain"
+import { defineChipsField, InputField, InputType } from "@/domain"
 
 export const generalData: InputField[] = [
   {
@@ -49,12 +49,9 @@ export const generalData: InputField[] = [
       ariaLabel: "Dokumentart",
     },
   },
-  {
-    name: "frameKeywords",
-    type: InputType.TEXT,
-    label: "Schlagwörter im Rahmenelement",
-    inputAttributes: {
-      ariaLabel: "Schlagwörter im Rahmenelement",
-    },
-  },
+  defineChipsField(
+    "frameKeywords",
+    "Schlagwörter im Rahmenelement",
+    "Schlagwörter im Rahmenelement"
+  ),
 ]

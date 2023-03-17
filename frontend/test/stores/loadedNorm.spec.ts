@@ -1,5 +1,6 @@
 import { flushPromises } from "@vue/test-utils"
 import { setActivePinia, createPinia } from "pinia"
+import { MetaDatum, MetaDatumType, NormResponse } from "@/domain/Norm"
 import { editNormFrame, getNormByGuid } from "@/services/normsService"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 import { generateNorm } from "~/test-helper/dataGenerators"
@@ -17,7 +18,22 @@ describe("loadedNorm", () => {
 
   it("calls the norms service to load a norm", async () => {
     const norm = generateNorm()
-    const response = { status: 200, data: norm }
+    const { guid, articles, files, frameKeywords, ...frameData } = norm
+    const normResponse: NormResponse = {
+      guid: guid,
+      articles: articles,
+      files: files,
+      ...frameData,
+      metadata: frameKeywords?.map((value, index): MetaDatum => {
+        return {
+          value: value,
+          type: MetaDatumType.KEYWORD,
+          order: index + 1,
+        }
+      }),
+    }
+
+    const response = { status: 200, data: normResponse }
     vi.mocked(getNormByGuid).mockResolvedValue(response)
     const store = useLoadedNormStore()
 
@@ -67,7 +83,7 @@ describe("loadedNorm", () => {
       publicationDate: "test publication date",
       announcementDate: "test announcement date",
       citationDate: "test citation date",
-      frameKeywords: "test frame keywords",
+      frameKeywords: ["keyword1", "keyword2"],
       providerEntity: "test author entity",
       providerDecidingBody: "test author deciding body",
       providerIsResolutionMajority: true,
@@ -89,7 +105,7 @@ describe("loadedNorm", () => {
     await store.update()
 
     expect(editNormFrame).toHaveBeenCalledOnce()
-    const { guid, articles, ...frameData } = norm
+    const { guid, articles, files, ...frameData } = norm
     expect(editNormFrame).toHaveBeenLastCalledWith(guid, frameData)
   })
 })
