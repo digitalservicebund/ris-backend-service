@@ -79,7 +79,7 @@ function handleLinkedFieldClicked(identifier: string) {
           />
         </div>
         <div class="p-20">
-          <FieldOfLawDirectInputSearch />
+          <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
         </div>
       </div>
       <div class="bg-white flex-1 p-20">

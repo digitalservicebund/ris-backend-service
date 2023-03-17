@@ -1,7 +1,16 @@
 <script lang="ts" setup>
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import TextButton from "@/components/TextButton.vue"
+import { ComboboxInputModelType } from "@/domain"
 import ComboboxItemService from "@/services/comboboxItemService"
+
+const emit = defineEmits<{
+  (event: "add-to-list", identifier: string): void
+}>()
+
+function handleUpdateModelValue(value: ComboboxInputModelType) {
+  emit("add-to-list", value.toString())
+}
 </script>
 
 <template>
@@ -15,6 +24,7 @@ import ComboboxItemService from "@/services/comboboxItemService"
             aria-label="Direkteingabe-Sachgebietssuche eingeben"
             clear-on-choosing-item
             :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+            @update:model-value="handleUpdateModelValue"
           >
           </ComboboxInput>
         </div>
