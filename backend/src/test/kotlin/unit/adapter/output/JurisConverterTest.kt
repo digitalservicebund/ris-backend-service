@@ -371,7 +371,7 @@ class JurisConverterTest {
             verify(exactly = 1) {
                 generateZip(
                     withArg {
-                        assertThat(it.frameKeywords).isEqualTo(listOf("bar", "foo", "baz"))
+                        assertThat(it.frameKeywords).isEqualTo(listOf("bar", "foo"))
                     },
                     any(),
                 )
