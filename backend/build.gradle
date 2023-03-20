@@ -144,7 +144,7 @@ dependencies {
   // this is to force transitive dependencies to use 1.0.24 instead of
   // 1.0.23 as that is affected by CVE-2022-31684
   implementation "io.projectreactor.netty:reactor-netty-http:1.1.3"
-  implementation "org.flywaydb:flyway-core:9.15.1"
+  implementation "org.flywaydb:flyway-core:9.16.1"
   implementation "org.jetbrains.kotlin:kotlin-reflect"
 
   implementation "org.jsoup:jsoup:1.15.4"
