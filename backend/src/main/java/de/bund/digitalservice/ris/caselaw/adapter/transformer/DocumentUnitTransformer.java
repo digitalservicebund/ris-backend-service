@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DataSourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.ProceedingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
@@ -77,9 +77,10 @@ public class DocumentUnitTransformer {
               .map(
                   proceedingDecision ->
                       ProceedingDecisionDTO.builder()
-//                          .id(proceedingDecision.id())
-//                          .courtLocation(proceedingDecision.court().location())
-//                          .courtType(proceedingDecision.court().type())
+                          //                          .id(proceedingDecision.id())
+                          //
+                          // .courtLocation(proceedingDecision.court().location())
+                          //                          .courtType(proceedingDecision.court().type())
                           .fileNumber(proceedingDecision.fileNumber())
                           .decisionDate(proceedingDecision.date())
                           .build())

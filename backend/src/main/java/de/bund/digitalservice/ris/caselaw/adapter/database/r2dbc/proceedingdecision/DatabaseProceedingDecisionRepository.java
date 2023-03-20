@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision;
+package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision;
 
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;

@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision;
+package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;

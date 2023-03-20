@@ -1,5 +1,6 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision;
+package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision;
 
+import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,6 +13,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("proceeding_decision_link")
 public class ProceedingDecisionLinkDTO {
+  @Id Long id;
   Long parentDocumentUnitId;
   Long childDocumentUnitId;
 }

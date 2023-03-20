@@ -18,8 +18,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepos
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.DatabaseProceedingDecisionRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.ProceedingDecision.ProceedingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
@@ -114,8 +114,8 @@ class DocumentUnitIntegrationTest {
     DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
     List<ProceedingDecisionDTO> proceedingDecisionDTOS =
         List.of(
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build(),
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build());
     previousDecisionRepository.saveAll(proceedingDecisionDTOS).collectList().block();
 
     UUID documentUnitUuid2 = UUID.randomUUID();
@@ -128,8 +128,8 @@ class DocumentUnitIntegrationTest {
     savedDocumentUnit = repository.save(documentUnitDTO).block();
     proceedingDecisionDTOS =
         List.of(
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build(),
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build());
     previousDecisionRepository.saveAll(proceedingDecisionDTOS).collectList().block();
 
     webClient
@@ -160,8 +160,8 @@ class DocumentUnitIntegrationTest {
     DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
     List<ProceedingDecisionDTO> proceedingDecisionDTOS =
         List.of(
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build(),
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build());
     previousDecisionRepository.saveAll(proceedingDecisionDTOS).collectList().block();
 
     DocumentUnit documentUnit =
@@ -169,7 +169,7 @@ class DocumentUnitIntegrationTest {
             .uuid(documentUnitUuid1)
             .documentNumber("newdocnumber12")
             .creationtimestamp(Instant.now())
-            .previousDecisions(
+            .proceedingDecisions(
                 List.of(
                     ProceedingDecision.builder()
                         .court(new Court("courtType", "courtPlace", "courtLabel", null))
@@ -213,8 +213,8 @@ class DocumentUnitIntegrationTest {
     DocumentUnitDTO savedDocumentUnit = repository.save(documentUnitDTO).block();
     List<ProceedingDecisionDTO> proceedingDecisionDTOS =
         List.of(
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build(),
-            ProceedingDecisionDTO.builder().documentUnitId(savedDocumentUnit.getId()).build());
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build(),
+            ProceedingDecisionDTO.builder().id(savedDocumentUnit.getId()).build());
     previousDecisionRepository.saveAll(proceedingDecisionDTOS).collectList().block();
 
     DocumentUnit documentUnit =
@@ -222,7 +222,7 @@ class DocumentUnitIntegrationTest {
             .uuid(documentUnitUuid1)
             .documentNumber("docnr12345678")
             .creationtimestamp(Instant.now())
-            .previousDecisions(
+            .proceedingDecisions(
                 List.of(
                     ProceedingDecision.builder()
                         .id(1L)

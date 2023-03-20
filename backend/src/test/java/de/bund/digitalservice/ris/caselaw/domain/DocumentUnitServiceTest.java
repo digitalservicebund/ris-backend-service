@@ -566,7 +566,7 @@ class DocumentUnitServiceTest {
             .documentNumber("ABCDE20220001")
             .creationtimestamp(Instant.now())
             .fileuploadtimestamp(Instant.now())
-            .previousDecisions(null)
+            .proceedingDecisions(null)
             .build();
     when(repository.save(documentUnit)).thenReturn(Mono.just(documentUnit));
     StepVerifier.create(service.updateDocumentUnit(documentUnit))

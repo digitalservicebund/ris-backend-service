@@ -41,6 +41,7 @@ export type ProceedingDecision = {
   court?: Court
   date?: string
   fileNumbers?: string[]
+  documentType?: DocumentType
 }
 
 export default class DocumentUnit {
