@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdeci
 
 import java.time.Instant;
 import java.util.UUID;
+
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,24 +13,24 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
-@Data
 @Builder(toBuilder = true)
-@NoArgsConstructor
-@AllArgsConstructor
 @Table("doc_unit")
-public class ProceedingDecisionDTO {
-  @Id Long id;
+public record ProceedingDecisionDTO (
+  @Id Long id,
 
-  UUID uuid;
+  UUID uuid,
 
   @Column("gerichtstyp")
-  String courtType;
+  String courtType,
 
   @Column("gerichtssitz")
-  String courtLocation;
+  String courtLocation,
 
   @Column("decision_date")
-  Instant decisionDate;
+  Instant decisionDate,
 
-  @Transient String fileNumber;
-}
+  @Transient String fileNumber,
+
+  @Column("document_type_id") Long documentTypeId, // points to lookup table row id
+  @Transient DocumentTypeDTO documentTypeDTO
+){}
