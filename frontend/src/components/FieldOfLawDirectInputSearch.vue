@@ -1,15 +1,15 @@
 <script lang="ts" setup>
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import TextButton from "@/components/TextButton.vue"
-import { ComboboxInputModelType } from "@/domain"
+import { FieldOfLawComboboxItem } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
 
 const emit = defineEmits<{
   (event: "add-to-list", identifier: string): void
 }>()
 
-function handleUpdateModelValue(value: ComboboxInputModelType | undefined) {
-  if (value) emit("add-to-list", value.toString())
+function handleUpdateModelValue(item: FieldOfLawComboboxItem | undefined) {
+  if (item) emit("add-to-list", item.label)
 }
 </script>
 

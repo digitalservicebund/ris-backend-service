@@ -78,7 +78,7 @@ function handleLinkedFieldClicked(identifier: string) {
             @node-clicked="handleNodeClicked"
           />
         </div>
-        <div class="p-20">
+        <div class="mb-128 p-20">
           <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
         </div>
       </div>

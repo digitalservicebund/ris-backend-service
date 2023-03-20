@@ -25,6 +25,11 @@ export type FieldOfLawNode = {
   inDirectPathMode?: boolean
 }
 
+export type FieldOfLawComboboxItem = {
+  label: string
+  text: string
+}
+
 export const ROOT_ID = "root"
 
 export function buildRoot(): FieldOfLawNode {

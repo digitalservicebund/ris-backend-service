@@ -37,7 +37,10 @@ function formatDropdownItems(
     case Endpoint.fieldOfLawSearchByIdentifier: {
       return (responseData as FieldOfLawNode[]).map((item) => ({
         label: item.identifier,
-        value: item.identifier,
+        value: {
+          label: item.identifier,
+          text: item.text,
+        },
       }))
     }
   }
