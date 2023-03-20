@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import {computed, ref, watch} from "vue"
+import { computed, ref, watch } from "vue"
 import DateInput from "@/components/DateInput.vue"
 import TextInput from "@/components/TextInput.vue"
-import {useInputModel} from "@/composables/useInputModel"
+import { useInputModel } from "@/composables/useInputModel"
 
 type CitationDate = { date?: string; year?: string }
 
@@ -30,7 +30,7 @@ const YearPlaceHolder = "JJJJ"
 
 const selectedInputType = ref<InputType | undefined>(undefined)
 
-const {inputValue} = useInputModel<CitationDate, Props, Emits>(props, emit)
+const { inputValue } = useInputModel<CitationDate, Props, Emits>(props, emit)
 
 function onlyAllowNumbers(event: KeyboardEvent) {
   const isNumber = /^[0-9]+$/.test(event.key)
@@ -46,54 +46,47 @@ function onlyAllowNumbers(event: KeyboardEvent) {
 }
 
 const handlePaste = async (event: KeyboardEvent) => {
-  event.preventDefault();
-  const pastedText = await navigator.clipboard.readText();
+  event.preventDefault()
+  const pastedText = await navigator.clipboard.readText()
   if (/^\d+$/.test(pastedText)) {
     return
   }
-};
+}
 
 watch(
-    inputValue,
-    () => {
-      selectedInputType.value = inputValue.value?.year
-          ? InputType.YEAR
-          : InputType.DATE
-    },
-    {
-      immediate: true,
+  inputValue,
+  () => {
+    if (inputValue.value) {
+      switch (selectedInputType.value) {
+        case InputType.DATE:
+          inputValue.value.year = undefined
+          break
+        case InputType.YEAR:
+          // this if needed because of behaviour in DateInput component
+          if (inputValue.value.date !== "") {
+            inputValue.value.date = undefined
+          }
+          break
+      }
     }
-)
-watch(selectedInputType, () => {
-  if (inputValue.value) {
-    switch (selectedInputType.value) {
-      case InputType.DATE:
-        inputValue.value.year = undefined
-        break
-      case InputType.YEAR:
-        inputValue.value.date = undefined
-        break
-    }
+    selectedInputType.value = inputValue.value?.year
+      ? InputType.YEAR
+      : InputType.DATE
+  },
+  {
+    immediate: true,
   }
-})
+)
 
 const dateValue = computed({
   get: () => inputValue.value?.date,
-  set: (value) => (inputValue.value = {...inputValue.value, date: value}),
+  set: (value) => (inputValue.value = { ...inputValue.value, date: value }),
 })
 
 const yearValue = computed({
   get: () => inputValue.value?.year,
-  set: (value) => (inputValue.value = {...inputValue.value, year: value}),
+  set: (value) => (inputValue.value = { ...inputValue.value, year: value }),
 })
-
-const yearInput = ref<HTMLInputElement>()
-
-function focusYearInput() {
-  console.log("Test")
-  // yearInput.value?.
-}
-
 </script>
 
 <template>
@@ -101,53 +94,48 @@ function focusYearInput() {
     <div class="radio-group">
       <label class="form-control">
         <input
-            v-model="selectedInputType"
-            name="inputType"
-            type="radio"
-            :value="InputType.DATE"
-            aria-label="Citation Date"
+          v-model="selectedInputType"
+          aria-label="Citation Date"
+          name="inputType"
+          type="radio"
+          :value="InputType.DATE"
         />
         Datum
       </label>
-      <label class="form-control" @click="focusYearInput">
+      <label class="form-control">
         <input
-            v-model="selectedInputType"
-            name="inputType"
-            type="radio"
-            :value="InputType.YEAR"
-            aria-label="Citation Year"
-
+          v-model="selectedInputType"
+          aria-label="Citation Year"
+          name="inputType"
+          type="radio"
+          :value="InputType.YEAR"
         />
         Jahresangabe
       </label>
     </div>
     <label class="flex gap-4 items-center label-03-reg mb-2 text-gray-900"
-    >Zitierdatum</label
+      >Zitierdatum</label
     >
     <DateInput
-        v-if="selectedInputType === InputType.DATE"
-        id="citationDateInput"
-        v-model="dateValue"
-        aria-label=""
-        alt-text="Citadation Date Input Field"
+      v-if="selectedInputType === InputType.DATE"
+      id="citationDateInput"
+      v-model="dateValue"
+      alt-text="Citadation Date Input Field"
+      aria-label=""
     />
-    <div ref="yearInput">
+    <div>
       <TextInput
-          v-if="selectedInputType === InputType.YEAR"
-          id="citationYearInput"
-          v-model="yearValue"
-          aria-label=""
-          alt-text="Citation Year Input Field"
-          maxlength="4"
-          :placeholder="YearPlaceHolder"
-          @keypress="onlyAllowNumbers"
-          @paste="handlePaste"
-
+        v-if="selectedInputType === InputType.YEAR"
+        id="citationYearInput"
+        v-model="yearValue"
+        alt-text="Citation Year Input Field"
+        aria-label=""
+        maxlength="4"
+        :placeholder="YearPlaceHolder"
+        @keypress="onlyAllowNumbers"
+        @paste="handlePaste"
       />
-
     </div>
-
-
   </div>
 </template>
 

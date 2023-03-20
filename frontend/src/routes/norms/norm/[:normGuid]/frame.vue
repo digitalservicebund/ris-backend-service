@@ -352,7 +352,10 @@ const citationData = computed({
       <legend id="citationDateFields" class="heading-02-regular mb-[2rem]">
         Zitierdatum
       </legend>
-      <CitationDateInput v-model="citationData" aria-label="Citation Date Input" />
+      <CitationDateInput
+        v-model="citationData"
+        aria-label="Citation Date Input"
+      />
     </fieldset>
 
     <h2 id="officialAnnouncementFields" class="heading-02-regular mb-[1rem]">
