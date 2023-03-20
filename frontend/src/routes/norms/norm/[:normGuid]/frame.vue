@@ -2,6 +2,7 @@
 import { storeToRefs } from "pinia"
 import { computed, toRefs } from "vue"
 import { useRoute } from "vue-router"
+import CitationDateInput from "@/components/CitationDateInput.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import SaveButton from "@/components/SaveButton.vue"
@@ -12,7 +13,6 @@ import { ageOfMajorityIndication } from "@/fields/norms/ageOfMajorityIndication"
 import { announcementDate } from "@/fields/norms/announcementDate"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { celexNumber } from "@/fields/norms/celexNumber"
-import { citationDate } from "@/fields/norms/citationDate"
 import { completeCitation } from "@/fields/norms/completeCitation"
 import { definition } from "@/fields/norms/definition"
 import { digitalAnnouncement } from "@/fields/norms/digitalAnnouncement"
@@ -212,6 +212,19 @@ const frameData = computed({
     }
   },
 })
+
+const citationData = computed({
+  get: () => ({
+    date: loadedNorm.value?.citationDate,
+    year: loadedNorm.value?.citationYear,
+  }),
+  set(value) {
+    if (loadedNorm.value) {
+      loadedNorm.value.citationDate = value.date
+      loadedNorm.value.citationYear = value.year
+    }
+  },
+})
 </script>
 
 <template>
@@ -336,14 +349,10 @@ const frameData = computed({
     </fieldset>
 
     <fieldset>
-      <legend id="citationDateFields" class="heading-02-regular mb-[1rem]">
+      <legend id="citationDateFields" class="heading-02-regular mb-[2rem]">
         Zitierdatum
       </legend>
-      <InputGroup
-        v-model="frameData"
-        :column-count="1"
-        :fields="citationDate"
-      />
+      <CitationDateInput v-model="citationData" aria-label="Citation Date Input" />
     </fieldset>
 
     <h2 id="officialAnnouncementFields" class="heading-02-regular mb-[1rem]">
@@ -359,6 +368,7 @@ const frameData = computed({
         :fields="printAnnouncement"
       />
     </fieldset>
+
     <fieldset>
       <legend
         id="digitalAnnouncementFields"
@@ -372,6 +382,7 @@ const frameData = computed({
         :fields="digitalAnnouncement"
       />
     </fieldset>
+
     <fieldset>
       <legend id="euAnnouncementFields" class="heading-03-regular mb-[1rem]">
         Amtsblatt der EU
