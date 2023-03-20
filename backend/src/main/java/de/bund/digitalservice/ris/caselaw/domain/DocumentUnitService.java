@@ -167,6 +167,10 @@ public class DocumentUnitService {
     return repository.findByDocumentNumber(documentNumber);
   }
 
+  public Mono<DocumentUnit> getByUuid(UUID documentUnitUuid) {
+    return repository.findByUuid(documentUnitUuid);
+  }
+
   public Mono<String> deleteByUuid(UUID documentUnitId) {
     return repository
         .findByUuid(documentUnitId)

@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecisionService;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -18,12 +19,11 @@ public class ProceedingDecisionController {
 
   @GetMapping
   public Flux<ProceedingDecision> getProceedingDecisions(@PathVariable UUID documentUnitUuid) {
-    return proceedingDecisionService.getProceedingDecisionForDocumentUnit(documentUnitUuid);
+    return proceedingDecisionService.getProceedingDecisionsForDocumentUnit(documentUnitUuid);
   }
 
   @PutMapping
   public Flux<ProceedingDecision> addProceedingDecision(@PathVariable UUID documentUnitUuid, @RequestBody ProceedingDecision proceedingDecision) {
-
     return proceedingDecisionService.addProceedingDecision(documentUnitUuid, proceedingDecision);
   }
 }

@@ -8,7 +8,7 @@ import java.time.Instant;
 import java.util.List;
 import lombok.Builder;
 
-@Builder
+@Builder(toBuilder = true)
 public record CoreData(
     List<String> fileNumbers,
     List<String> deviatingFileNumbers,

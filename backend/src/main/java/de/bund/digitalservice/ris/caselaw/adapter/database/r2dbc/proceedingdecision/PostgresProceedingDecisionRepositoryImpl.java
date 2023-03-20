@@ -1,41 +1,49 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecisionTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecisionRepository;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecisionRepository {
 
   private final DatabaseProceedingDecisionLinkRepository linkRepository;
-  private final DatabaseDocumentUnitRepository documentUnitRepository;
+  private final DatabaseProceedingDecisionRepository repository;
 
   PostgresProceedingDecisionRepositoryImpl(
-      DatabaseProceedingDecisionLinkRepository linkRepository,
-      DatabaseDocumentUnitRepository documentUnitRepository) {
+          DatabaseProceedingDecisionRepository repository,
+      DatabaseProceedingDecisionLinkRepository linkRepository) {
     this.linkRepository = linkRepository;
-    this.documentUnitRepository = documentUnitRepository;
+    this.repository = repository;
   }
 
-  public Mono<Void> addProceedingDecision(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
-    Mono<DocumentUnitDTO> parentDocumentUnit =
-        documentUnitRepository.findByUuid(parentDocumentUnitUuid);
-    Mono<DocumentUnitDTO> childDocumentUnit =
-        documentUnitRepository.findByUuid(childDocumentUnitUuid);
+  public Flux<ProceedingDecision> findAllForDocumentUnit(UUID parentDocumentUnitUuid){
+    return repository.findAllById(
+            repository.findByUuid(parentDocumentUnitUuid)
+                    .map(ProceedingDecisionDTO::id)
+                    .flatMapMany(linkRepository::findAllByParentDocumentUnitId)
+                    .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
+            .map(ProceedingDecisionTransformer::transformToDomain);
+    };
 
-    return Mono.zip(parentDocumentUnit, childDocumentUnit)
+    public Mono<ProceedingDecisionLinkDTO> linkProceedingDecisions(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
+    Mono<Long> parentDocumentUnitId =
+            repository.findByUuid(parentDocumentUnitUuid).map(ProceedingDecisionDTO::id);
+    Mono<Long> childDocumentUnitId =
+            repository.findByUuid(childDocumentUnitUuid).map(ProceedingDecisionDTO::id);
+
+    return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
         .flatMap(
             tuple ->
-                Mono.fromRunnable(
-                    () -> {
-                      linkRepository.save(
+               linkRepository.save(
                           ProceedingDecisionLinkDTO.builder()
-                              .parentDocumentUnitId(tuple.getT1().getId())
-                              .childDocumentUnitId(tuple.getT2().getId())
-                              .build());
-                    }));
+                              .parentDocumentUnitId(tuple.getT1())
+                              .childDocumentUnitId(tuple.getT2())
+                              .build()));
+
   }
 }
