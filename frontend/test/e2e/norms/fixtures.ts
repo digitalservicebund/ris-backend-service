@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test"
+import { MetaDatumType } from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import normData from "./testdata/norm_basic.json"
 
@@ -63,10 +64,12 @@ export function getNormBySections(norm) {
           value: norm.documentCategory,
         },
         {
-          type: "text",
+          type: "repeated",
           name: "frameKeywords",
           label: "Schlagwörter im Rahmenelement",
-          value: norm.frameKeywords,
+          value: norm.metadata
+            .filter((metaDatum) => (metaDatum.type = MetaDatumType.KEYWORD))
+            .map((metaDatum) => metaDatum.value),
         },
       ],
     },

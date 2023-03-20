@@ -167,5 +167,5 @@ export interface MetaDatum {
 }
 
 export enum MetaDatumType {
-  KEYWORD,
+  KEYWORD = "KEYWORD",
 }

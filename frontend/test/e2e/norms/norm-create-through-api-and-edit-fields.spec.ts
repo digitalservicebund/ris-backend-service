@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 
-import { fillTextInput, openNorm } from "./e2e-utils"
+import { fillRepeatedInput, fillTextInput, openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
 import newNorm from "./testdata/norm_edited_fields.json"
 
@@ -41,6 +41,15 @@ async function editFields(page, fields, data) {
     }
     if (field.type === "dropdown") {
       await fillDropdown(page, field, data[field.name])
+    }
+    if (field.type === "repeated") {
+      await fillRepeatedInput(
+        page,
+        field,
+        data["metadata"].filter(
+          (metaDatum) => metaDatum.type === field.selector
+        )
+      )
     }
   }
 }

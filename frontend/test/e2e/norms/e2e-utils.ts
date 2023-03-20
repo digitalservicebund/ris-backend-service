@@ -94,6 +94,15 @@ export async function fillTextInput(page, field, value) {
   await locator.fill(value)
 }
 
+export async function fillRepeatedInput(page, field, value) {
+  const locator = page.locator(`input#${field.name}`)
+  await expect(locator).toBeEditable()
+  for (const inputValue of value) {
+    await locator.fill(inputValue.value)
+    await page.keyboard.press("Enter")
+  }
+}
+
 export async function getDownloadedFileContent(page, filename) {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
