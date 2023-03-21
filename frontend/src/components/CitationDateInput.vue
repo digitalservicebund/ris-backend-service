@@ -33,7 +33,7 @@ const selectedInputType = ref<InputType | undefined>(undefined)
 const { inputValue } = useInputModel<CitationDate, Props, Emits>(props, emit)
 
 function onlyAllowNumbers(event: KeyboardEvent) {
-  const isNumber = /^[0-9]+$/.test(event.key)
+  const isNumber = /^\d+$/.test(event.key)
   const isControlKey = [
     "Backspace",
     "Delete",
@@ -45,11 +45,15 @@ function onlyAllowNumbers(event: KeyboardEvent) {
   }
 }
 
-const handlePaste = async (event: KeyboardEvent) => {
-  event.preventDefault()
-  const pastedText = await navigator.clipboard.readText()
-  if (/^\d+$/.test(pastedText)) {
-    return
+const handlePaste = async (event: ClipboardEvent) => {
+  const clipboardData = event.clipboardData
+  if (clipboardData !== null) {
+    const pastedText = clipboardData.getData("text/plain")
+    if (/^\d+$/.test(pastedText.substring(0, 3))) {
+      return
+    } else {
+      event.preventDefault()
+    }
   }
 }
 
@@ -113,12 +117,16 @@ const yearValue = computed({
         Jahresangabe
       </label>
     </div>
-    <label class="flex gap-4 items-center label-03-reg mb-2 text-gray-900"
+    <label
+      class="flex gap-4 items-center label-03-reg mb-2 text-gray-900"
+      :for="
+        selectedInputType === InputType.DATE ? 'citationDate' : 'citationYear'
+      "
       >Zitierdatum</label
     >
     <DateInput
       v-if="selectedInputType === InputType.DATE"
-      id="citationDateInput"
+      id="citationDate"
       v-model="dateValue"
       alt-text="Citadation Date Input Field"
       aria-label=""
@@ -126,7 +134,7 @@ const yearValue = computed({
     <div>
       <TextInput
         v-if="selectedInputType === InputType.YEAR"
-        id="citationYearInput"
+        id="citationYear"
         v-model="yearValue"
         alt-text="Citation Year Input Field"
         aria-label=""
