@@ -15,6 +15,16 @@ export const proceedingDecisionFields: InputField[] = [
     },
   },
   {
+    name: "documentType",
+    type: InputType.COMBOBOX,
+    label: "Dokumenttyp",
+    inputAttributes: {
+      ariaLabel: "Dokumenttyp",
+      placeholder: "Bitte auswählen",
+      itemService: comboboxItemService.getDocumentTypes,
+    },
+  },
+  {
     name: "date",
     type: InputType.DATE,
     label: "Datum",
@@ -28,16 +38,6 @@ export const proceedingDecisionFields: InputField[] = [
     label: "Aktenzeichen",
     inputAttributes: {
       ariaLabel: "Aktenzeichen Rechtszug",
-    },
-  },
-  {
-    name: "documentType",
-    type: InputType.COMBOBOX,
-    label: "Dokumenttyp",
-    inputAttributes: {
-      ariaLabel: "Dokumenttyp",
-      placeholder: "Bitte auswählen",
-      itemService: comboboxItemService.getDocumentTypes,
     },
   },
 ]
