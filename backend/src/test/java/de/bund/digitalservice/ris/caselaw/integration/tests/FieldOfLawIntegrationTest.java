@@ -200,6 +200,25 @@ class FieldOfLawIntegrationTest {
   }
 
   @Test
+  void testGetFieldsOfLawByIdentifierSearch() {
+    prepareDatabase();
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?searchStr=FL-01")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
+    assertThat(identifiers).containsExactly("FL-01", "FL-01-01");
+  }
+
+  @Test
   void testGetChildrenForFieldOfLawNumber() {
     prepareDatabase();
 
