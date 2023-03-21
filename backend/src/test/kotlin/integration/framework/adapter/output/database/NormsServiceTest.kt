@@ -9,6 +9,8 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPo
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -26,7 +28,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
-import utils.assertNormsWithoutArticles
+import utils.assertNormsAreEqual
 import utils.createRandomNorm
 import java.time.Duration
 import java.time.LocalDate
@@ -157,7 +159,31 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByEli(eliQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(secondNorm, it) }
+            .assertNext { assertNormsAreEqual(secondNorm, it) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save simple norm and retrieved by eli with citation year`() {
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            officialLongTitle = "Test Title",
+            citationYear = "2001",
+            printAnnouncementPage = "1125",
+            printAnnouncementGazette = "bg-1",
+        )
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2001", "1125")
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
             .verifyComplete()
     }
 
@@ -177,6 +203,25 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
+    fun `save norm with metadata and retrieve it by its GUID`() {
+        val keyword = Metadatum("foo", KEYWORD, 0)
+        val other_keyword = Metadatum("bar", KEYWORD, 1)
+        val norm = NORM.copy(metadata = listOf(keyword, other_keyword))
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .assertNext { assertNormsAreEqual(norm, it) }
+            .verifyComplete()
+    }
+
+    @Test
     fun `save norm with 1 article and 2 paragraphs and retrieved by guid`() {
         val article = ARTICLE1.copy(paragraphs = listOf(PARAGRAPH1, PARAGRAPH2))
         val norm = NORM.copy(articles = listOf(article))
@@ -190,7 +235,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(norm, it) }
+            .assertNext { assertNormsAreEqual(norm, it) }
             .verifyComplete()
     }
 
@@ -209,7 +254,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
-            .assertNext { validateNorm(norm, it) }
+            .assertNext { assertNormsAreEqual(norm, it) }
             .verifyComplete()
     }
 
@@ -260,6 +305,34 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
+    fun `it replaces the metadata when editing a norm`() {
+        val keyword = Metadatum("foo", KEYWORD, 0)
+        val otherKeyword = Metadatum("bar", KEYWORD, 1)
+        val initialNorm = NORM.copy(metadata = listOf(keyword, otherKeyword))
+        val saveCommand = SaveNormOutputPort.Command(initialNorm)
+        val guidQuery = GetNormByGuidOutputPort.Query(initialNorm.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        val newKeyword = Metadatum("baz", KEYWORD, 0)
+        val updatedNorm = initialNorm.copy(metadata = listOf(newKeyword))
+        val editCommand = EditNormOutputPort.Command(updatedNorm)
+
+        normsService.editNorm(editCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .assertNext { assertNormsAreEqual(updatedNorm, it) }
+            .verifyComplete()
+    }
+
+    @Test
     fun `save a norm with 1 file and retrieve it by guid`() {
         val norm = NORM.copy(files = listOf(FILE1))
         val saveCommand = SaveNormOutputPort.Command(norm)
@@ -303,15 +376,5 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 assertThat(it.files[0].hash == FILE1.hash, `is`(true))
             }
             .verifyComplete()
-    }
-
-    private fun validateNorm(normBeforePersist: Norm, normAfterPersist: Norm) {
-        assertNormsWithoutArticles(normBeforePersist, normAfterPersist)
-
-        assertThat(
-            normBeforePersist.articles.size == normAfterPersist.articles.size &&
-                normBeforePersist.articles.toSet() == normAfterPersist.articles.toSet(),
-            `is`(true),
-        )
     }
 }

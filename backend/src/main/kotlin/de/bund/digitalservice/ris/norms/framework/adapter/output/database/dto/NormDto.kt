@@ -25,8 +25,6 @@ data class NormDto(
     var divergentDocumentNumber: String? = null,
     @Column("document_category")
     var documentCategory: String? = null,
-    @Column("frame_keywords")
-    var frameKeywords: String? = null,
 
     @Column("document_type_name")
     var documentTypeName: String? = null,
@@ -111,6 +109,8 @@ data class NormDto(
 
     @Column("citation_date")
     var citationDate: LocalDate? = null,
+    @Column("citation_year")
+    var citationYear: String? = null,
 
     @Column("print_announcement_gazette")
     var printAnnouncementGazette: String? = null,

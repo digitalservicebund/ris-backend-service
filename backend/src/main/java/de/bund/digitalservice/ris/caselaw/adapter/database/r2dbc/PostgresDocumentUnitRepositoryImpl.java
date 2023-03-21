@@ -5,7 +5,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecis
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
@@ -16,10 +16,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecis
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecisionRepository;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,34 +34,33 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
-  private final ProceedingDecisionRepository proceedingDecisionRepository;
   private final DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository;
   private final DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
   private final DocumentTypeRepository documentTypeRepository;
-  private final DatabaseSubjectFieldRepository subjectFieldRepository;
+  private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
+  private final DatabaseKeywordRepository keywordRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
       DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository,
-      ProceedingDecisionRepository proceedingDecisionRepository,
       DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
       CourtRepository courtRepository,
       StateRepository stateRepository,
       DocumentTypeRepository documentTypeRepository,
-      DatabaseSubjectFieldRepository subjectFieldRepository,
-      DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository) {
+      DatabaseFieldOfLawRepository fieldOfLawRepository,
+      DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
+      DatabaseKeywordRepository keywordRepository) {
 
     this.repository = repository;
     this.databaseProceedingDecisionRepository = databaseProceedingDecisionRepository;
-    this.proceedingDecisionRepository = proceedingDecisionRepository;
     this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
@@ -72,8 +69,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
     this.documentTypeRepository = documentTypeRepository;
-    this.subjectFieldRepository = subjectFieldRepository;
+    this.fieldOfLawRepository = fieldOfLawRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
+    this.keywordRepository = keywordRepository;
   }
 
   @Override
@@ -82,8 +80,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findByDocumentnumber(documentNumber)
         .flatMap(this::injectAdditionalInformation)
         .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+            documentUnitDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 
   @Override
@@ -92,8 +89,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findByUuid(uuid)
         .flatMap(this::injectAdditionalInformation)
         .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+            documentUnitDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 
   @Override
@@ -108,8 +104,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                 .build())
         .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+            documentUnitDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 
   @Override
@@ -128,8 +123,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+            documentUnitDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 
   private Mono<DocumentUnitDTO> enrichDocumentType(
@@ -235,12 +229,11 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   });
 
               while (fileNumberIndex.get() < fileNumbers.size()) {
-                FileNumberDTO fileNumberDTO =
-                    FileNumberDTO.builder()
-                        .fileNumber(fileNumbers.get(fileNumberIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
-                        .isDeviating(false)
-                        .build();
+                FileNumberDTO fileNumberDTO = FileNumberDTO.builder()
+                    .fileNumber(fileNumbers.get(fileNumberIndex.getAndIncrement()))
+                    .documentUnitId(documentUnitDTO.getId())
+                    .isDeviating(false)
+                    .build();
                 toSave.add(fileNumberDTO);
               }
 
@@ -275,8 +268,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               deviatingFileNumberDTOs.forEach(
                   fileNumberDTO -> {
                     if (deviatingFileNumberIndex.get() < deviatingFileNumbers.size()) {
-                      fileNumberDTO.fileNumber =
-                          deviatingFileNumbers.get(deviatingFileNumberIndex.getAndIncrement());
+                      fileNumberDTO.fileNumber = deviatingFileNumbers.get(deviatingFileNumberIndex.getAndIncrement());
                       fileNumberDTO.isDeviating = true;
                       toSave.add(fileNumberDTO);
                     } else {
@@ -285,13 +277,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   });
 
               while (deviatingFileNumberIndex.get() < deviatingFileNumbers.size()) {
-                FileNumberDTO fileNumberDTO =
-                    FileNumberDTO.builder()
-                        .fileNumber(
-                            deviatingFileNumbers.get(deviatingFileNumberIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
-                        .isDeviating(true)
-                        .build();
+                FileNumberDTO fileNumberDTO = FileNumberDTO.builder()
+                    .fileNumber(
+                        deviatingFileNumbers.get(deviatingFileNumberIndex.getAndIncrement()))
+                    .documentUnitId(documentUnitDTO.getId())
+                    .isDeviating(true)
+                    .build();
                 toSave.add(fileNumberDTO);
               }
 
@@ -326,8 +317,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               deviatingEcliDTOs.forEach(
                   deviatingEcliDTO -> {
                     if (deviatingEcliIndex.get() < deviatingEclis.size()) {
-                      deviatingEcliDTO.ecli =
-                          deviatingEclis.get(deviatingEcliIndex.getAndIncrement());
+                      deviatingEcliDTO.ecli = deviatingEclis.get(deviatingEcliIndex.getAndIncrement());
                       toSave.add(deviatingEcliDTO);
                     } else {
                       toDelete.add(deviatingEcliDTO);
@@ -335,11 +325,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   });
 
               while (deviatingEcliIndex.get() < deviatingEclis.size()) {
-                DeviatingEcliDTO deviatingEcliDTO =
-                    DeviatingEcliDTO.builder()
-                        .ecli(deviatingEclis.get(deviatingEcliIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
-                        .build();
+                DeviatingEcliDTO deviatingEcliDTO = DeviatingEcliDTO.builder()
+                    .ecli(deviatingEclis.get(deviatingEcliIndex.getAndIncrement()))
+                    .documentUnitId(documentUnitDTO.getId())
+                    .build();
                 toSave.add(deviatingEcliDTO);
               }
 
@@ -374,11 +363,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               deviatingDecisionDateDTOs.forEach(
                   deviatingDecisionDateDTO -> {
                     if (deviatingDecisionDateIndex.get() < deviatingDecisionDates.size()) {
-                      deviatingDecisionDateDTO =
-                          DeviatingDecisionDateTransformer.enrichDTO(
-                              deviatingDecisionDateDTO,
-                              deviatingDecisionDates.get(
-                                  deviatingDecisionDateIndex.getAndIncrement()));
+                      deviatingDecisionDateDTO = DeviatingDecisionDateTransformer.enrichDTO(
+                          deviatingDecisionDateDTO,
+                          deviatingDecisionDates.get(
+                              deviatingDecisionDateIndex.getAndIncrement()));
                       toSave.add(deviatingDecisionDateDTO);
                     } else {
                       toDelete.add(deviatingDecisionDateDTO);
@@ -386,13 +374,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   });
 
               while (deviatingDecisionDateIndex.get() < deviatingDecisionDates.size()) {
-                DeviatingDecisionDateDTO deviatingDecisionDateDTO =
-                    DeviatingDecisionDateDTO.builder()
-                        .decisionDate(
-                            deviatingDecisionDates.get(
-                                deviatingDecisionDateIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
-                        .build();
+                DeviatingDecisionDateDTO deviatingDecisionDateDTO = DeviatingDecisionDateDTO.builder()
+                    .decisionDate(
+                        deviatingDecisionDates.get(
+                            deviatingDecisionDateIndex.getAndIncrement()))
+                    .documentUnitId(documentUnitDTO.getId())
+                    .build();
                 toSave.add(deviatingDecisionDateDTO);
               }
 
@@ -427,10 +414,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               incorrectCourtDTOs.forEach(
                   incorrectCourtDTO -> {
                     if (incorrectCourtIndex.get() < incorrectCourts.size()) {
-                      incorrectCourtDTO =
-                          IncorrectCourtTransformer.enrichDTO(
-                              incorrectCourtDTO,
-                              incorrectCourts.get(incorrectCourtIndex.getAndIncrement()));
+                      incorrectCourtDTO = IncorrectCourtTransformer.enrichDTO(
+                          incorrectCourtDTO,
+                          incorrectCourts.get(incorrectCourtIndex.getAndIncrement()));
                       toSave.add(incorrectCourtDTO);
                     } else {
                       toDelete.add(incorrectCourtDTO);
@@ -438,11 +424,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   });
 
               while (incorrectCourtIndex.get() < incorrectCourts.size()) {
-                IncorrectCourtDTO incorrectCourtDTO =
-                    IncorrectCourtDTO.builder()
-                        .court(incorrectCourts.get(incorrectCourtIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
-                        .build();
+                IncorrectCourtDTO incorrectCourtDTO = IncorrectCourtDTO.builder()
+                    .court(incorrectCourts.get(incorrectCourtIndex.getAndIncrement()))
+                    .documentUnitId(documentUnitDTO.getId())
+                    .build();
                 toSave.add(incorrectCourtDTO);
               }
 
@@ -473,8 +458,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             })
         .flatMap(repository::save)
         .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+            documentUnitDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 
   @Override
@@ -492,8 +476,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             })
         .flatMap(repository::save)
         .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+            documentUnitDTO -> DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 
   @Override
@@ -509,20 +492,21 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)
         .flatMap(this::injectDocumentType)
-        .flatMap(this::injectFieldsOfLaw);
+        .flatMap(this::injectFieldsOfLaw)
+        .flatMap(this::injectKeywords);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
-      return databaseProceedingDecisionRepository.findAllById(
-                      databaseProceedingDecisionRepository.findByUuid(documentUnitDTO.uuid)
-                              .map(ProceedingDecisionDTO::id)
-                              .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
-                              .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
-              .collectList()
-              .map(proceedingDecisionDTOS -> {
-                  documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOS);
-                  return documentUnitDTO;
-              });
+    return databaseProceedingDecisionRepository.findAllById(
+        databaseProceedingDecisionRepository.findByUuid(documentUnitDTO.uuid)
+            .map(ProceedingDecisionDTO::id)
+            .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
+            .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
+        .collectList()
+        .map(proceedingDecisionDTOS -> {
+          documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOS);
+          return documentUnitDTO;
+        });
   }
 
   private Mono<DocumentUnitDTO> injectFileNumbers(DocumentUnitDTO documentUnitDTO) {
@@ -593,8 +577,19 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findAllByDocumentUnitId(documentUnitDTO.id)
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .collectList()
-        .flatMapMany(subjectFieldRepository::findAllById)
+        .flatMapMany(fieldOfLawRepository::findAllById)
         .collectList()
         .map(fieldsOfLaw -> documentUnitDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
+  }
+
+  private Mono<DocumentUnitDTO> injectKeywords(DocumentUnitDTO documentUnitDTO) {
+    return keywordRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            keywordDTO -> {
+              documentUnitDTO.setKeywords(keywordDTO);
+              return Mono.just(documentUnitDTO);
+            });
   }
 }

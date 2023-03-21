@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,13 +29,19 @@ public class FieldOfLawController {
     return service.getFieldsOfLawBySearchQuery(searchStr, PageRequest.of(page, size));
   }
 
-  @GetMapping(value = "{subjectFieldNumber}/children")
-  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String subjectFieldNumber) {
-    return service.getChildrenOfFieldOfLaw(subjectFieldNumber);
+  @GetMapping(value = "/search-by-identifier")
+  public Flux<FieldOfLaw> getFieldsOfLawByIdentifierSearch(
+      @RequestParam Optional<String> searchStr) {
+    return service.getFieldsOfLawByIdentifierSearch(searchStr);
   }
 
-  @GetMapping(value = "{subjectFieldNumber}/tree")
-  public Mono<FieldOfLaw> getTreeForFieldOfLaw(@PathVariable String subjectFieldNumber) {
-    return service.getTreeForFieldOfLaw(subjectFieldNumber);
+  @GetMapping(value = "{identifier}/children")
+  public Flux<FieldOfLaw> getChildrenOfFieldOfLaw(@PathVariable String identifier) {
+    return service.getChildrenOfFieldOfLaw(identifier);
+  }
+
+  @GetMapping(value = "{identifier}/tree")
+  public Mono<FieldOfLaw> getTreeForFieldOfLaw(@PathVariable String identifier) {
+    return service.getTreeForFieldOfLaw(identifier);
   }
 }

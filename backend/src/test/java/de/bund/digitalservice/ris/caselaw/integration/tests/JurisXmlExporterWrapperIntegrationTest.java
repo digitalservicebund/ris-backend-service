@@ -14,7 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.domain.export.juris.JurisXmlExporter;
 import java.lang.reflect.Field;
 import java.time.Instant;
@@ -157,6 +157,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
 
     ContentRelatedIndexing indexing =
         new ContentRelatedIndexing(
+            List.of("keyword1", "keyword2"),
             List.of(
                 FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()));
 

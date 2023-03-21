@@ -14,15 +14,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "field_of_law_link")
+@Entity(name = "lookuptable_field_of_law_link")
 public class JPAFieldOfLawLinkDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Long id;
 
-  @Column(name = "field_id")
-  Long fieldId;
+  @Column(name = "field_of_law_id")
+  Long fieldOfLawId;
 
-  @Column(name = "linked_field_id")
-  Long linkedFieldId;
+  @Column(name = "linked_field_of_law_id")
+  Long linkedFieldOfLawId;
 }

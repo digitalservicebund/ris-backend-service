@@ -1,4 +1,12 @@
-import { FrameData, Norm, NullableFrameData } from "@/domain/Norm"
+import {
+  FrameData,
+  MetaDatum,
+  MetaDatumType,
+  Norm,
+  NormResponse,
+  NullableFrameData,
+  NullableNormEditRequest,
+} from "@/domain/Norm"
 
 type StringCallback = (value: NullableString) => NullableString
 type BooleanCallback = (value: NullableBoolean) => NullableBoolean
@@ -6,8 +14,45 @@ export type NullableString = string | undefined | null
 export type NullableBoolean = boolean | undefined | null
 
 export function getFrameDataFromNorm(norm: Norm): FrameData {
-  const { guid, articles, ...frameData } = norm
+  const { guid, articles, files, ...frameData } = norm
   return frameData
+}
+
+export function getNormFromNormResponse(norm: NormResponse): Norm {
+  const { metadata, ...data } = norm
+  return {
+    ...data,
+    frameKeywords: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.KEYWORD
+    ),
+  }
+}
+
+export function getNormEditRequestFromFrameData(
+  frameData: NullableFrameData
+): NullableNormEditRequest {
+  const { frameKeywords, ...data } = frameData
+  return {
+    ...data,
+    metadata:
+      frameKeywords?.map((value, index) => {
+        return {
+          value: value,
+          type: MetaDatumType.KEYWORD,
+          order: index + 1,
+        }
+      }) ?? [],
+  }
+}
+
+export function getMetadatumFromMetadata(
+  metadata: MetaDatum[],
+  type: MetaDatumType
+): string[] {
+  return metadata
+    ?.filter((metaDatum) => metaDatum.type === type)
+    ?.map((metaDatum) => metaDatum.value)
 }
 
 export function applyToFrameData(
@@ -35,6 +80,7 @@ export function applyToFrameData(
     categorizedReference: stringCallback(frameData?.categorizedReference),
     celexNumber: stringCallback(frameData?.celexNumber),
     citationDate: dateCallback(frameData?.citationDate),
+    citationYear: stringCallback(frameData?.citationYear),
     completeCitation: stringCallback(frameData?.completeCitation),
     definition: stringCallback(frameData?.definition),
     digitalAnnouncementDate: dateCallback(frameData?.digitalAnnouncementDate),
@@ -106,7 +152,7 @@ export function applyToFrameData(
     expirationDate: dateCallback(frameData?.expirationDate),
     expirationDateState: stringCallback(frameData?.expirationDateState),
     expirationNormCategory: stringCallback(frameData?.expirationNormCategory),
-    frameKeywords: stringCallback(frameData?.frameKeywords),
+    frameKeywords: frameData?.frameKeywords,
     isExpirationDateTemp: booleanCallback(frameData?.isExpirationDateTemp),
     leadJurisdiction: stringCallback(frameData?.leadJurisdiction),
     officialAbbreviation: stringCallback(frameData?.officialAbbreviation),

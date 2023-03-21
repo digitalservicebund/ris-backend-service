@@ -1,10 +1,12 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { ComboboxItem } from "@/domain"
 import { Court } from "@/domain/documentUnit"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
   courts = "lookuptable/courts",
+  fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
 }
 
 type DocumentType = {
@@ -13,7 +15,7 @@ type DocumentType = {
   label: string
 }
 
-type DropdownType = DocumentType[] | Court[]
+type DropdownType = DocumentType[] | Court[] | FieldOfLawNode[]
 
 function formatDropdownItems(
   responseData: DropdownType,
@@ -30,6 +32,15 @@ function formatDropdownItems(
       return (responseData as Court[]).map((item) => ({
         label: item.label,
         value: item,
+      }))
+    }
+    case Endpoint.fieldOfLawSearchByIdentifier: {
+      return (responseData as FieldOfLawNode[]).map((item) => ({
+        label: item.identifier,
+        value: {
+          label: item.identifier,
+          text: item.text,
+        },
       }))
     }
   }
@@ -76,6 +87,8 @@ const service: ComboboxItemService = {
   getCourts: (filter?: string) => fetchFromEndpoint(Endpoint.courts, filter),
   getDocumentTypes: (filter?: string) =>
     fetchFromEndpoint(Endpoint.documentTypes, filter),
+  getFieldOfLawSearchByIdentifier: (filter?: string) =>
+    fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
 }
 
 export default service

@@ -56,7 +56,7 @@ Then do the requests with curl:
 curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/doktyp.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/doktyp
 curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/gerichtdata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/gerichtdata
 curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/buland.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/buland
-curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/sachneudata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/subjectField
+curl -v -X PUT -H 'Content-Type: application/xml' -H "cookie: SESSION=$SESSION_VALUE" --data "@$PATH_TO_XML_FILES/sachneudata_gesamt.xml" http://127.0.0.1/api/v1/caselaw/lookuptableimporter/fieldOfLaw
 ```
 
 ### Database Setup & Migration with Flyway

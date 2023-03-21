@@ -3,18 +3,26 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 
 interface NormsMapper {
-    fun normToEntity(normDto: NormDto, articles: List<Article>): Norm {
+    fun normToEntity(
+        normDto: NormDto,
+        articles: List<Article>,
+        fileReferences: List<FileReference>,
+        metadata: List<Metadatum<*>>,
+    ): Norm {
         return Norm(
-            normDto.guid, articles, normDto.officialLongTitle, normDto.risAbbreviation, normDto.risAbbreviationInternationalLaw,
-            normDto.documentNumber, normDto.divergentDocumentNumber, normDto.documentCategory, normDto.frameKeywords,
+            normDto.guid, articles, metadata, normDto.officialLongTitle, normDto.risAbbreviation, normDto.risAbbreviationInternationalLaw,
+            normDto.documentNumber, normDto.divergentDocumentNumber, normDto.documentCategory,
             normDto.documentTypeName, normDto.documentNormCategory, normDto.documentTemplateName, normDto.providerEntity,
             normDto.providerDecidingBody, normDto.providerIsResolutionMajority, normDto.participationType,
             normDto.participationInstitution, normDto.leadJurisdiction, normDto.leadUnit, normDto.subjectFna,
@@ -27,6 +35,7 @@ interface NormsMapper {
             normDto.expirationDate, normDto.expirationDateState, normDto.isExpirationDateTemp, normDto.principleExpirationDate,
             normDto.principleExpirationDateState, normDto.divergentExpirationDate, normDto.divergentExpirationDateState,
             normDto.expirationNormCategory, normDto.announcementDate, normDto.publicationDate, normDto.citationDate,
+            normDto.citationYear,
             normDto.printAnnouncementGazette, normDto.printAnnouncementYear, normDto.printAnnouncementNumber,
             normDto.printAnnouncementPage, normDto.printAnnouncementInfo, normDto.printAnnouncementExplanations,
             normDto.digitalAnnouncementMedium, normDto.digitalAnnouncementDate, normDto.digitalAnnouncementEdition,
@@ -46,14 +55,8 @@ interface NormsMapper {
             normDto.footnoteStateLaw, normDto.footnoteEuLaw, normDto.validityRule, normDto.digitalEvidenceLink,
             normDto.digitalEvidenceRelatedData, normDto.digitalEvidenceExternalDataNote, normDto.digitalEvidenceAppendix,
             normDto.referenceNumber, normDto.celexNumber, normDto.ageIndicationStart, normDto.ageIndicationEnd,
-            normDto.definition, normDto.ageOfMajorityIndication, normDto.text,
+            normDto.definition, normDto.ageOfMajorityIndication, normDto.text, fileReferences,
         )
-    }
-
-    fun normWithFilesToEntity(normDto: NormDto, articles: List<Article>, filesDto: List<FileReferenceDto>): Norm {
-        val norm = normToEntity(normDto, articles)
-        norm.files = filesDto.map { fileReferenceToEntity(it) }
-        return norm
     }
 
     fun paragraphToEntity(paragraphDto: ParagraphDto): Paragraph {
@@ -68,10 +71,18 @@ interface NormsMapper {
         return FileReference(fileReferenceDto.name, fileReferenceDto.hash, fileReferenceDto.createdAt)
     }
 
+    fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
+        val value = when (metadatumDto.type) {
+            KEYWORD -> metadatumDto.value
+        }
+
+        return Metadatum(value, metadatumDto.type, metadatumDto.order)
+    }
+
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
         return NormDto(
             id, norm.guid, norm.officialLongTitle, norm.risAbbreviation, norm.risAbbreviationInternationalLaw,
-            norm.documentNumber, norm.divergentDocumentNumber, norm.documentCategory, norm.frameKeywords,
+            norm.documentNumber, norm.divergentDocumentNumber, norm.documentCategory,
             norm.documentTypeName, norm.documentNormCategory, norm.documentTemplateName, norm.providerEntity,
             norm.providerDecidingBody, norm.providerIsResolutionMajority, norm.participationType,
             norm.participationInstitution, norm.leadJurisdiction, norm.leadUnit, norm.subjectFna,
@@ -84,6 +95,7 @@ interface NormsMapper {
             norm.expirationDate, norm.expirationDateState, norm.isExpirationDateTemp, norm.principleExpirationDate,
             norm.principleExpirationDateState, norm.divergentExpirationDate, norm.divergentExpirationDateState,
             norm.expirationNormCategory, norm.announcementDate, norm.publicationDate, norm.citationDate,
+            norm.citationYear,
             norm.printAnnouncementGazette, norm.printAnnouncementYear, norm.printAnnouncementNumber,
             norm.printAnnouncementPage, norm.printAnnouncementInfo, norm.printAnnouncementExplanations,
             norm.digitalAnnouncementMedium, norm.digitalAnnouncementDate, norm.digitalAnnouncementEdition,
@@ -122,12 +134,17 @@ interface NormsMapper {
         return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, fileReference.createdAt)
     }
 
+    fun metadatumToDto(metadatum: Metadatum<*>, normId: Int, id: Int = 0): MetadatumDto {
+        return MetadatumDto(id, metadatum.value.toString(), metadatum.type, metadatum.order, normId)
+    }
+
     fun queryFieldToDbColumn(field: QueryFields): String {
         return when (field) {
             QueryFields.PRINT_ANNOUNCEMENT_PAGE -> "print_announcement_page"
             QueryFields.ANNOUNCEMENT_DATE -> "announcement_date"
             QueryFields.PRINT_ANNOUNCEMENT_GAZETTE -> "print_announcement_gazette"
             QueryFields.CITATION_DATE -> "citation_date"
+            QueryFields.CITATION_YEAR -> "citation_year"
             QueryFields.OFFICIAL_LONG_TITLE -> "official_long_title"
             QueryFields.OFFICIAL_SHORT_TITLE -> "official_short_title"
             QueryFields.UNOFFICIAL_LONG_TITLE -> "unofficial_long_title"

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
 import { Court } from "@/domain/documentUnit"
+import { FieldOfLawComboboxItem } from "@/domain/fieldOfLaw"
 import {
   ComboboxItem,
   ComboboxInputModelType,
@@ -14,6 +15,7 @@ interface Props {
   modelValue?: ComboboxInputModelType
   ariaLabel: string
   placeholder?: string
+  clearOnChoosingItem?: boolean
 }
 
 interface Emits {
@@ -102,7 +104,12 @@ const setChosenItem = (item: ComboboxItem) => {
   if (item.label === NO_MATCHING_ENTRY) return
   showDropdown.value = false
   emit("update:modelValue", item.value)
-  filter.value = item.label
+  if (props.clearOnChoosingItem) {
+    filter.value = ""
+    inputText.value = ""
+  } else {
+    filter.value = item.label
+  }
   candidateForSelection.value = undefined
 }
 
@@ -191,8 +198,38 @@ const isRevokedCourt = (item: ComboboxItem) => {
   return !!(isCourt(item.value) && item.value.revoked)
 }
 
+function isFieldOfLawComboboxItem(
+  input?: ComboboxInputModelType
+): input is FieldOfLawComboboxItem {
+  return typeof input === "object" && "text" in input
+}
+
+const hasAdditionalInfo = (item: ComboboxItem) => {
+  return isRevokedCourt(item) || isFieldOfLawComboboxItem(item.value)
+}
+
 const getRevokedCourtString = (item: ComboboxItem) => {
   return (item.value as Court).revoked
+}
+
+const getAdditionalInfo = (item: ComboboxItem) => {
+  if (isRevokedCourt(item)) {
+    return getRevokedCourtString(item)
+  }
+  if (isFieldOfLawComboboxItem(item.value)) {
+    return item.value.text
+  }
+  return null
+}
+
+const getAdditionalInfoStyle = (item: ComboboxItem) => {
+  if (isRevokedCourt(item)) {
+    return "dropdown-container__dropdown-item__additional-info-chip"
+  }
+  if (isFieldOfLawComboboxItem(item.value)) {
+    return "dropdown-container__dropdown-item__additional-info-newline"
+  }
+  return ""
 }
 
 onMounted(() => {
@@ -286,12 +323,14 @@ onBeforeUnmount(() => {
       >
         <span>
           {{ item.label }}
-          <span
-            v-if="isRevokedCourt(item)"
+          <div
+            v-if="hasAdditionalInfo(item)"
             aria-label="additional-dropdown-info"
-            class="body-02-reg dropdown-container__dropdown-item__additional-info"
-            >{{ getRevokedCourtString(item) }}</span
-          ></span
+            class="body-02-reg"
+            :class="getAdditionalInfoStyle(item)"
+          >
+            {{ getAdditionalInfo(item) }}
+          </div></span
         >
       </div>
     </div>
@@ -373,13 +412,20 @@ onBeforeUnmount(() => {
       font-style: italic;
     }
 
-    &__additional-info {
+    &__additional-info-chip {
       @apply text-neutral-700;
       @apply bg-neutral-20;
 
       padding: 6px 22px;
       border-radius: 100px;
       float: right;
+      font-size: 14px;
+      font-style: normal;
+    }
+
+    &__additional-info-newline {
+      @apply text-neutral-700;
+
       font-size: 14px;
       font-style: normal;
     }

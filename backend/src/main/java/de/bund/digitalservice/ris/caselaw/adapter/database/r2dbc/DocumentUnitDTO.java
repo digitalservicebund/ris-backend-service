@@ -2,7 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -103,5 +103,6 @@ public class DocumentUnitDTO {
   @Transient List<IncorrectCourtDTO> incorrectCourts;
   @Transient List<DeviatingEcliDTO> deviatingEclis;
   @Transient List<DeviatingDecisionDateDTO> deviatingDecisionDates;
-  @Transient List<SubjectFieldDTO> fieldsOfLaw;
+  @Transient List<KeywordDTO> keywords;
+  @Transient List<FieldOfLawDTO> fieldsOfLaw;
 }

@@ -14,9 +14,9 @@ import org.springframework.data.relational.core.mapping.Table;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("lookuptable_subject_field")
-public class SubjectFieldDTO implements Persistable<Long> {
-  public static final SubjectFieldDTO EMPTY = new SubjectFieldDTO();
+@Table("lookuptable_field_of_law")
+public class FieldOfLawDTO implements Persistable<Long> {
+  public static final FieldOfLawDTO EMPTY = new FieldOfLawDTO();
   @Id Long id;
   Integer childrenCount;
   Long parentId;
@@ -24,11 +24,11 @@ public class SubjectFieldDTO implements Persistable<Long> {
   String changeDateClient;
   Character changeIndicator;
   String version;
-  String subjectFieldNumber;
-  String subjectFieldText;
+  String identifier;
+  String text;
   String navigationTerm;
-  @Transient List<SubjectFieldDTO> linkedFields;
-  @Transient List<KeywordDTO> keywords;
+  @Transient List<FieldOfLawDTO> linkedFieldsOfLaw;
+  @Transient List<FieldOfLawKeywordDTO> keywords;
   @Transient List<NormDTO> norms;
 
   @Transient private boolean isNew;

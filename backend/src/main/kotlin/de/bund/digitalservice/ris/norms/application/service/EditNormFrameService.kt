@@ -19,8 +19,8 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
 }
 
 private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFrameProperties) = Norm(
-    guid, listOf(), properties.officialLongTitle, properties.risAbbreviation, properties.risAbbreviationInternationalLaw,
-    properties.documentNumber, properties.divergentDocumentNumber, properties.documentCategory, properties.frameKeywords,
+    guid = guid, articles = emptyList(), metadata = properties.metadata, properties.officialLongTitle, properties.risAbbreviation, properties.risAbbreviationInternationalLaw,
+    properties.documentNumber, properties.divergentDocumentNumber, properties.documentCategory,
     properties.documentTypeName, properties.documentNormCategory, properties.documentTemplateName, properties.providerEntity,
     properties.providerDecidingBody, properties.providerIsResolutionMajority, properties.participationType,
     properties.participationInstitution, properties.leadJurisdiction, properties.leadUnit, properties.subjectFna,
@@ -33,6 +33,7 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     properties.expirationDate, properties.expirationDateState, properties.isExpirationDateTemp, properties.principleExpirationDate,
     properties.principleExpirationDateState, properties.divergentExpirationDate, properties.divergentExpirationDateState,
     properties.expirationNormCategory, properties.announcementDate, properties.publicationDate, properties.citationDate,
+    properties.citationYear,
     properties.printAnnouncementGazette, properties.printAnnouncementYear, properties.printAnnouncementNumber,
     properties.printAnnouncementPage, properties.printAnnouncementInfo, properties.printAnnouncementExplanations,
     properties.digitalAnnouncementMedium, properties.digitalAnnouncementDate, properties.digitalAnnouncementEdition,

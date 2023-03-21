@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, computed, watch } from "vue"
 import { useInputModel } from "@/composables/useInputModel"
 import { ValidationError } from "@/domain"
 
@@ -15,6 +15,8 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value?: string[]): void
+  (event: "addChip", value?: string): Promise<void>
+  (event: "deleteChip", value?: string): Promise<void>
   (event: "input", value: Event): void
 }
 
@@ -43,11 +45,13 @@ function saveChip() {
   if (trimmed.length > 0) {
     chips.value.push(trimmed)
     updateModelValue()
+    emits("addChip", trimmed)
     currentInput.value = ""
   }
 }
 
 function deleteChip(index: number) {
+  emits("deleteChip", chips.value[index])
   currentInput.value = ""
   chips.value.splice(index, 1)
   updateModelValue()
@@ -61,6 +65,7 @@ function resetFocus() {
 
 function backspaceDelete() {
   if (currentInput.value === "") {
+    emits("deleteChip", chips.value[chips.value.length - 1])
     chips.value.splice(chips.value.length - 1)
     updateModelValue()
     resetFocus()
@@ -69,6 +74,7 @@ function backspaceDelete() {
 
 function enterDelete() {
   if (focusedItemIndex.value !== undefined) {
+    emits("deleteChip", chips.value[focusedItemIndex.value])
     currentInput.value = ""
     chips.value.splice(focusedItemIndex.value, 1)
     // bring focus on second last item if last item was deleted
@@ -79,7 +85,6 @@ function enterDelete() {
       resetFocus()
     }
   }
-
   updateModelValue()
 }
 
@@ -120,6 +125,10 @@ const setFocusedItemIndex = (index: number) => {
 const handleOnBlur = () => {
   currentInput.value = ""
 }
+
+watch(props, () => {
+  if (props.modelValue) chips.value = props.modelValue
+})
 </script>
 
 <template>

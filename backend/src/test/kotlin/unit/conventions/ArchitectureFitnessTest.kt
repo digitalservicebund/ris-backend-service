@@ -42,6 +42,7 @@ class ArchitectureFitnessTest {
             .that(areFromTheDomain())
             .should(beInsideTheEntityPackage())
             .orShould(beInsideTheObjectValuePackage())
+            .orShould(beInsideTheSpecificationPackage())
             .check(sourceClasses)
     }
 

@@ -12,6 +12,7 @@ class NormsCriteriaBuilder : NormsMapper {
         val gazetteColumn = queryFieldToDbColumn(QueryFields.PRINT_ANNOUNCEMENT_GAZETTE)
         val pageColumn = queryFieldToDbColumn(QueryFields.PRINT_ANNOUNCEMENT_PAGE)
         val citationDateColumn = queryFieldToDbColumn(QueryFields.CITATION_DATE)
+        val citationYearColumn = queryFieldToDbColumn(QueryFields.CITATION_YEAR)
         val announcementDateColumn = queryFieldToDbColumn(QueryFields.ANNOUNCEMENT_DATE)
         return Criteria.from(
             Criteria.where(gazetteColumn).`is`(Eli.parseGazette(gazette))
@@ -22,6 +23,13 @@ class NormsCriteriaBuilder : NormsMapper {
                     Criteria.where(announcementDateColumn).isNull.and(getYearInDateCriteria(citationDateColumn, year))
                         .or(
                             getYearInDateCriteria(announcementDateColumn, year),
+                        )
+                        .or(
+                            Criteria.where(announcementDateColumn).isNull
+                                .and(
+                                    Criteria.where(citationDateColumn).isNull
+                                        .and(Criteria.where(citationYearColumn).`is`(year)),
+                                ),
                         ),
                 ),
         )

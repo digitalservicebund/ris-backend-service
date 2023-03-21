@@ -1,13 +1,18 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import FieldOfLawSearchResultListEntry from "@/components/FieldOfLawSearchResultListEntry.vue"
 import TextButton from "@/components/TextButton.vue"
 import TextInput from "@/components/TextInput.vue"
-import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 
+const props = defineProps<{
+  showNorms: boolean
+}>()
+
 const emit = defineEmits<{
   (event: "node-clicked", node: FieldOfLawNode): void
+  (event: "do-show-norms"): void
 }>()
 
 const searchStr = ref("")
@@ -15,8 +20,8 @@ const results = ref<Page<FieldOfLawNode>>()
 const currentPage = ref(0)
 const RESULTS_PER_PAGE = 10
 
-function submitSearch(viaPagination = false) {
-  if (viaPagination) currentPage.value = 0
+function submitSearch(isNewSearch = true) {
+  if (isNewSearch) currentPage.value = 0
   FieldOfLawService.searchForFieldsOfLaw(
     searchStr.value,
     currentPage.value,
@@ -24,8 +29,11 @@ function submitSearch(viaPagination = false) {
   ).then((response) => {
     if (!response.data) return
     results.value = response.data
-    if (results.value.content.length > 0 && !viaPagination) {
+    if (results.value.content.length > 0 && isNewSearch) {
       emit("node-clicked", results.value.content[0])
+      if (searchStr.value.includes("norm:")) {
+        emit("do-show-norms")
+      }
     }
   })
 }
@@ -35,7 +43,7 @@ function handlePagination(backwards: boolean) {
   if (!backwards && results.value?.last) return
 
   currentPage.value += backwards ? -1 : 1
-  submitSearch(true)
+  submitSearch(false)
 }
 </script>
 
@@ -65,27 +73,13 @@ function handlePagination(backwards: boolean) {
       </div>
     </div>
     <div v-if="results">
-      <div
+      <FieldOfLawSearchResultListEntry
         v-for="(node, idx) in results.content"
         :key="idx"
-        class="flex flex-row"
-      >
-        <div class="label-02-reg text-blue-800">
-          <span
-            :aria-label="
-              node.identifier + ' ' + node.text + ' im Sachgebietsbaum anzeigen'
-            "
-            class="link"
-            @click="emit('node-clicked', node)"
-            @keyup.enter="emit('node-clicked', node)"
-          >
-            {{ node.identifier }}
-          </span>
-        </div>
-        <div class="font-size-14px pl-6 pt-2 text-blue-800">
-          <TokenizeText :keywords="node.linkedFields ?? []" :text="node.text" />
-        </div>
-      </div>
+        :node="node"
+        :show-norms="props.showNorms"
+        @node-clicked="emit('node-clicked', node)"
+      />
       <div
         v-if="results.numberOfElements < results.totalElements"
         class="flex flex-row justify-center pt-16"
@@ -131,10 +125,6 @@ function handlePagination(backwards: boolean) {
 .disabled-link {
   color: gray;
   cursor: default;
-}
-
-.font-size-14px {
-  font-size: 14px;
 }
 
 .page-count {

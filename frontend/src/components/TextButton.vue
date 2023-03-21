@@ -154,4 +154,10 @@ const render = () => {
     @apply underline;
   }
 }
+
+a[disabled="true"] {
+  @apply bg-gray-400 text-gray-600 border-gray-400;
+
+  pointer-events: none;
+}
 </style>

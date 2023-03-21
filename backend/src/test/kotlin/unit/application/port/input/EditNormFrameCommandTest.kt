@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.assertEditNormFrameProperties
@@ -20,12 +22,12 @@ class EditNormFrameCommandTest {
 
     @Test
     fun `can create command with optional fields`() {
-        val normFrameProperties = createRandomNormFameProperties()
-
         val guid = UUID.randomUUID()
-        val command = EditNormFrameUseCase.Command(guid, normFrameProperties)
+        val metadata = listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1))
+        val properties = createRandomNormFameProperties().copy(metadata = metadata)
+        val command = EditNormFrameUseCase.Command(guid, properties)
 
         assertThat(command.guid).isEqualTo(guid)
-        assertEditNormFrameProperties(command.properties, normFrameProperties)
+        assertEditNormFrameProperties(command.properties, properties)
     }
 }

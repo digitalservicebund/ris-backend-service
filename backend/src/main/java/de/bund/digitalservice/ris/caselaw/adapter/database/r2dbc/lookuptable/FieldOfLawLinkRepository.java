@@ -7,5 +7,5 @@ import reactor.core.publisher.Flux;
 @Repository
 public interface FieldOfLawLinkRepository extends R2dbcRepository<FieldOfLawLinkDTO, Long> {
 
-  Flux<FieldOfLawLinkDTO> findAllByFieldId(Long fieldId);
+  Flux<FieldOfLawLinkDTO> findAllByFieldOfLawId(Long fieldId);
 }

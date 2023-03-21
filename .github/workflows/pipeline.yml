@@ -576,7 +576,7 @@ jobs:
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-staging
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
-          argocd_server: ${{ secrets.ARGOCD_SERVER }}
+          argocd_server: ${{ secrets.ARGOCD_SERVER_STAGING }}
       - name: Deploy new frontend image
         uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
@@ -587,7 +587,7 @@ jobs:
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-staging
           argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
-          argocd_server: ${{ secrets.ARGOCD_SERVER }}
+          argocd_server: ${{ secrets.ARGOCD_SERVER_STAGING }}
       - name: Track deploy
         uses: digitalservicebund/github-actions/track-deployment@b51920b9fdeeb0c8721c210853aee955bd7cefc0
         with:

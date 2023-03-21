@@ -4,6 +4,8 @@ import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFile
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
@@ -15,7 +17,7 @@ import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
 import java.time.LocalDate
-import java.time.LocalDateTime
+import java.time.format.DateTimeParseException
 import java.util.UUID
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
@@ -26,9 +28,7 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
     override fun parseJurisXml(query: ParseJurisXmlOutputPort.Query): Mono<Norm> {
         val data = extractData(ByteBuffer.wrap(query.zipFile))
         val norm = mapDataToDomain(query.newGuid, data)
-        norm.files = listOf(
-            FileReference(query.filename, getHashFromContent(query.zipFile), LocalDateTime.now()),
-        )
+        norm.files = listOf(FileReference(query.filename, getHashFromContent(query.zipFile)))
         return Mono.just(norm)
     }
 
@@ -38,14 +38,20 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
 }
 
 fun mapDomainToData(norm: Norm): NormData {
+    @Suppress("UNCHECKED_CAST")
+    val keywords = norm.metadata.toMutableSet()
+        .filter { it.type == KEYWORD }
+        .sortedBy { it.order }
+        .map { it.value } as MutableList<String>
+
     val normData = NormData()
     normData.announcementDate = encodeLocalDate(norm.announcementDate)
-    normData.citationDate = encodeLocalDate(norm.citationDate)
+    normData.citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear
     normData.documentCategory = norm.documentCategory
     normData.documentNumber = norm.documentNumber
     normData.entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate)
     normData.expirationDate = encodeLocalDate(norm.expirationDate)
-    normData.frameKeywords = norm.frameKeywords
+    normData.frameKeywords = keywords
     normData.officialAbbreviation = norm.officialAbbreviation
     normData.officialLongTitle = norm.officialLongTitle
     normData.officialShortTitle = norm.officialShortTitle
@@ -59,15 +65,17 @@ fun mapDomainToData(norm: Norm): NormData {
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
+    val metadata = data.frameKeywords.mapIndexed { index, value -> Metadatum(value, KEYWORD, index) }
+
     return Norm(
         guid = guid,
         articles = mapArticlesToDomain(data.articles),
+        metadata = metadata,
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         risAbbreviationInternationalLaw = data.risAbbreviationInternationalLaw,
         documentNumber = data.documentNumber,
         documentCategory = data.documentCategory,
-        frameKeywords = data.frameKeywords,
         providerEntity = data.providerEntity,
         providerDecidingBody = data.providerDecidingBody,
         providerIsResolutionMajority = data.providerIsResolutionMajority,
@@ -100,6 +108,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         expirationNormCategory = data.expirationNormCategory,
         announcementDate = parseDateString(data.announcementDate),
         citationDate = parseDateString(data.citationDate),
+        citationYear = if (data.citationDate?.length == 4 && data.citationDate?.toIntOrNull() != null) data.citationDate else null,
         printAnnouncementGazette = data.printAnnouncementGazette,
         printAnnouncementYear = data.printAnnouncementYear,
         printAnnouncementPage = data.printAnnouncementPage,
@@ -155,7 +164,7 @@ fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
     }
 }
 
-fun parseDateString(value: String?): LocalDate? = value?.let { LocalDate.parse(value) }
+fun parseDateString(value: String?): LocalDate? = value?.let { try { LocalDate.parse(value) } catch (e: DateTimeParseException) { null } }
 
 fun parseDateStateString(value: String?): UndefinedDate? =
     if (value.isNullOrEmpty()) null else UndefinedDate.valueOf(value)

@@ -21,7 +21,6 @@
   "referenceNumber": "referenceNumber",
   "announcementDate": "2022-11-01",
   "citationDate": "2022-11-01",
-  "frameKeywords": "frameKeywords",
   "providerEntity": "providerEntity",
   "providerDecidingBody": "providerDecidingBody",
   "providerIsResolutionMajority": false,
@@ -123,5 +122,12 @@
   "subjectPreviousFna": "subjectPreviousFna",
   "text": "text",
   "unofficialReference": "unofficialReference",
-  "validityRule": "validityRule"
+  "validityRule": "validityRule",
+  "metadata": [
+    {
+      "value": "frameKeywords",
+      "type": "KEYWORD",
+      "order": 1
+    }
+  ]
 }

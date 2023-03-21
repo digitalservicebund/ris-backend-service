@@ -4,6 +4,7 @@
 classDiagram
   class Norm {
     +UUID guid
+    +List~Metadatum~ metadata
     +List~Article~ articles
 
     +String officialLongTitle
@@ -12,7 +13,6 @@ classDiagram
     String documentNumber
     String divergentDocumentNumber
     String documentCategory
-    String frameKeywords
 
     String documentTypeName
     String documentNormCategory
@@ -147,6 +147,12 @@ classDiagram
     List~FileReference~ files
   }
 
+  class Metadatum {
+      +String value
+      +MetadatumType type
+      +Integer order
+  }
+
   class Article {
     +UUID guid
     +String marker
@@ -168,12 +174,18 @@ classDiagram
     UNDEFINED_NOT_PRESENT
   }
 
+  class MetadatumType  {
+      <<enumeration>>
+      KEYWORD
+  }
+
   class FileReference {
     +String name
     +String hash
     +Timestamp createdAt
   }
 
+  Norm "1" --> "*" Metadatum
   Norm "1" --> "*" Article
   Article "1" --> "*" Paragraph
   Norm "1" --> "*" FileReference

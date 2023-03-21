@@ -16,15 +16,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "lookuptable_subject_field_norm")
-public class JPANormDTO { // TODO change to JPASubjectFieldNormDTO?
+@Entity(name = "lookuptable_field_of_law_norm")
+public class JPANormDTO {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   Long id;
 
   @ManyToOne
-  @JoinColumn(name = "subject_field_id")
-  JPASubjectFieldDTO jpaSubjectFieldDTO;
+  @JoinColumn(name = "field_of_law_id")
+  JPAFieldOfLawDTO jpaFieldOfLawDTO;
 
   @Column(name = "abbreviation")
   String abbreviation;

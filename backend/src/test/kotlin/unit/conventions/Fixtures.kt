@@ -15,9 +15,7 @@ import de.bund.digitalservice.ris.norms.conventions.predicate.Predicates.aKotlin
 const val BASE_PACKAGE_PATH = "de.bund.digitalservice.ris.norms"
 
 val allClasses =
-    ClassFileImporter()
-        .importPackages("$BASE_PACKAGE_PATH..")
-        .that(are(not(aKotlinStaticClass())))
+    ClassFileImporter().importPackages("$BASE_PACKAGE_PATH..").that(are(not(aKotlinStaticClass())))
 
 val sourceClasses =
     ClassFileImporter()
@@ -37,6 +35,9 @@ fun beInsideTheEntityPackage() = ArchConditions.resideInAPackage("$BASE_PACKAGE_
 
 fun beInsideTheObjectValuePackage() =
     ArchConditions.resideInAPackage("$BASE_PACKAGE_PATH.domain.value")
+
+fun beInsideTheSpecificationPackage() =
+    ArchConditions.resideInAPackage("$BASE_PACKAGE_PATH.domain.specification..")
 
 fun areFromTheApplication() = resideInAPackage("$BASE_PACKAGE_PATH.application..")
 

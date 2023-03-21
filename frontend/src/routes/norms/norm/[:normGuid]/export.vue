@@ -33,15 +33,7 @@ const downloadUrl = computed(() =>
 const downloadIsPossible = computed(() => downloadUrl.value != undefined)
 
 const formatDateTime = function (date: string): string {
-  return dayjs.utc(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
-}
-
-const downloadFile = function () {
-  const url = downloadUrl.value || ""
-  const link = document.createElement("a")
-  link.href = url
-  link.download = fileName.value || ""
-  link.click()
+  return dayjs(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
 }
 
 async function getFileLink() {
@@ -49,6 +41,7 @@ async function getFileLink() {
   const guid = loadedNorm.value?.guid || ""
   try {
     const response = await triggerFileGeneration(guid)
+    await new Promise((res) => setTimeout(res, 300))
     if (response.status === 200 && response.data) {
       await store.load(guid)
     } else {
@@ -78,8 +71,10 @@ async function getFileLink() {
 
       <TextButton
         :disabled="!downloadIsPossible || isLoading"
+        :download="fileName"
+        :href="downloadUrl"
         label="Zip Datei speichern"
-        @click="downloadFile"
+        target="_blank"
       />
 
       <div class="mt-[1rem]">

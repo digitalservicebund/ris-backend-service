@@ -95,7 +95,6 @@
   "documentNumber": "BJNR0020A0023",
   "divergentDocumentNumber": null,
   "documentCategory": "N",
-  "frameKeywords": "BGBl I 2023, Nr 002; Finanzdisziplin",
   "documentTypeName": null,
   "documentNormCategory": null,
   "documentTemplateName": null,
@@ -201,5 +200,17 @@
   "definition": null,
   "ageOfMajorityIndication": null,
   "text": null,
-  "isExpirationDateTemp": null
+  "isExpirationDateTemp": null,
+  "metadata": [
+    {
+      "value": "BGBl I 2023, Nr 002",
+      "type": "KEYWORD",
+      "order": 1
+    },
+    {
+      "value": "Finanzdisziplin",
+      "type": "KEYWORD",
+      "order": 2
+    }
+  ]
 }

@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output
 
 import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
@@ -18,6 +20,8 @@ import utils.createRandomNorm
 import java.io.File
 import java.nio.ByteBuffer
 import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.UUID
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
@@ -39,6 +43,19 @@ class JurisConverterTest {
         @AfterEach
         internal fun afterEach() {
             clearAllMocks()
+        }
+
+        @Test
+        fun `it saves the date correctly with the right timezone`() {
+            System.setProperty("user.timezone", "Australia/Sydney")
+            val converter = JurisConverter()
+            val guid = UUID.randomUUID()
+            val query = ParseJurisXmlOutputPort.Query(guid, anyZipFile.readBytes(), anyZipFile.name)
+
+            val norm = converter.parseJurisXml(query).block()
+            val fileCreatedAt = norm?.files?.first()?.createdAt?.hour
+
+            assertThat(fileCreatedAt).isEqualTo(LocalDateTime.now(ZoneId.of("Europe/Berlin")).hour)
         }
 
         @Test
@@ -73,7 +90,6 @@ class JurisConverterTest {
                     risAbbreviationInternationalLaw = "test ris abbreviation international law"
                     documentNumber = "test document number"
                     documentCategory = "test document category"
-                    frameKeywords = "test frame keywords"
                     providerEntity = "test provider entity"
                     providerDecidingBody = "test provider deciding body"
                     providerIsResolutionMajority = true
@@ -147,7 +163,6 @@ class JurisConverterTest {
                 .isEqualTo("test ris abbreviation international law")
             assertThat(norm?.documentNumber).isEqualTo("test document number")
             assertThat(norm?.documentCategory).isEqualTo("test document category")
-            assertThat(norm?.frameKeywords).isEqualTo("test frame keywords")
             assertThat(norm?.providerEntity).isEqualTo("test provider entity")
             assertThat(norm?.providerDecidingBody).isEqualTo("test provider deciding body")
             assertThat(norm?.providerIsResolutionMajority).isEqualTo(true)
@@ -178,6 +193,7 @@ class JurisConverterTest {
             assertThat(norm?.expirationNormCategory).isEqualTo("test expiration norm category")
             assertThat(norm?.announcementDate).isEqualTo(LocalDate.parse("2022-01-07"))
             assertThat(norm?.citationDate).isEqualTo(LocalDate.parse("2022-01-08"))
+            assertThat(norm?.citationYear).isNull()
             assertThat(norm?.printAnnouncementGazette).isEqualTo("test print announcement gazette")
             assertThat(norm?.printAnnouncementYear).isEqualTo("test print announcement year")
             assertThat(norm?.printAnnouncementPage).isEqualTo("test print announcement page")
@@ -212,6 +228,74 @@ class JurisConverterTest {
         }
 
         @Test
+        fun `it correctly maps the parsed data to metdata using the index order`() {
+            val data = NormData().apply { frameKeywords = listOf("foo", "bar") }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            val converter = JurisConverter()
+
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.metadata).contains(Metadatum("foo", KEYWORD, 0))
+            assertThat(norm?.metadata).contains(Metadatum("bar", KEYWORD, 1))
+        }
+
+        @Test
+        fun `it correctly maps the citation date containing only year to the norm properties`() {
+            val converter = JurisConverter()
+            val data =
+                NormData().apply {
+                    officialLongTitle = "test official long title"
+                    citationDate = "2022"
+                }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.citationDate).isNull()
+            assertThat(norm?.citationYear).isEqualTo("2022")
+        }
+
+        @Test
+        fun `it returns null citation date and year if date value invalid`() {
+            val converter = JurisConverter()
+            val data =
+                NormData().apply {
+                    officialLongTitle = "test official long title"
+                    citationDate = "20112-2-1"
+                }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.citationDate).isNull()
+            assertThat(norm?.citationYear).isNull()
+        }
+
+        @Test
+        fun `it returns null citation date and year if date year with letters`() {
+            val converter = JurisConverter()
+            val data =
+                NormData().apply {
+                    officialLongTitle = "test official long title"
+                    citationDate = "201c"
+                }
+            val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
+            every { extractData(any()) } returns data
+
+            val norm = converter.parseJurisXml(query).block()
+
+            assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
+            assertThat(norm?.citationDate).isNull()
+            assertThat(norm?.citationYear).isNull()
+        }
+
+        @Test
         fun `it parses articles`() {
             val converter = JurisConverter()
             val guid = UUID.randomUUID()
@@ -229,7 +313,7 @@ class JurisConverterTest {
 
     @Nested
     inner class GenerateNormFile {
-        val norm = createRandomNorm()
+        val norm = createRandomNorm().apply { citationDate = null }
         val normData = mapDomainToData(norm)
         val generatedZipFile = File.createTempFile("Temp", ".zip")
 
@@ -238,7 +322,6 @@ class JurisConverterTest {
             mockkStatic(::generateZip)
             mockkStatic(::mapDomainToData)
             every { generateZip(any(), any()) } returns generatedZipFile.readBytes()
-            every { mapDomainToData(any()) } returns normData
         }
 
         @AfterEach
@@ -266,6 +349,33 @@ class JurisConverterTest {
             val newFile = converter.generateNormFile(command).block()
 
             assertThat(newFile).isEqualTo(generatedZipFile.readBytes())
+        }
+
+        @Test
+        fun `it takes the value of the citation year for the citation date in the external norm entity`() {
+            assertThat(norm.citationDate).isNull()
+            assertThat(norm.citationYear).isNotNull
+            assertThat(normData.citationDate).isNotNull
+            assertThat(normData.citationDate).isEqualTo(norm.citationYear)
+        }
+
+        @Test
+        fun `it correctly maps the norm metadata values including the order`() {
+            val metadata = listOf(Metadatum("foo", KEYWORD, 1), Metadatum("bar", KEYWORD, 0))
+            val normWithMetadata = norm.copy(metadata = metadata)
+            val command = GenerateNormFileOutputPort.Command(normWithMetadata, generatedZipFile.readBytes())
+            val converter = JurisConverter()
+
+            converter.generateNormFile(command).block()
+
+            verify(exactly = 1) {
+                generateZip(
+                    withArg {
+                        assertThat(it.frameKeywords).isEqualTo(listOf("bar", "foo"))
+                    },
+                    any(),
+                )
+            }
         }
     }
 }

@@ -6,8 +6,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDT
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -16,7 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.time.Instant;
 import java.util.List;
 
@@ -112,13 +113,18 @@ public class DocumentUnitBuilder {
     if (documentUnitDTO.getFieldsOfLaw() != null) {
       fieldsOfLaw =
           documentUnitDTO.getFieldsOfLaw().stream()
-              .map(SubjectFieldTransformer::transformToDomain)
+              .map(FieldOfLawTransformer::transformToDomain)
               .toList();
     }
 
     DataSource dataSource = DataSource.NEURIS;
     if (documentUnitDTO.getDataSource() == DataSourceDTO.MIGRATION) {
       dataSource = DataSource.MIGRATION;
+    }
+
+    List<String> keywords = null;
+    if (documentUnitDTO.getKeywords() != null) {
+      keywords = documentUnitDTO.getKeywords().stream().map(KeywordDTO::keyword).toList();
     }
 
     return new DocumentUnit(
@@ -156,6 +162,6 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getReasons(),
             documentUnitDTO.getCaseFacts(),
             documentUnitDTO.getDecisionReasons()),
-        new ContentRelatedIndexing(fieldsOfLaw));
+        new ContentRelatedIndexing(keywords, fieldsOfLaw));
   }
 }

@@ -2,18 +2,18 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 19ca4c7e1fcc29fcbe16235e4fd543854563ba32e8eae67e321ef1de39b90b93
+    checksum: 7887c4c28894c5b882edf414cde018fe1e0ca0220c15d7f3e735af7c7f7f4a8d
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml
-    checksum: d382fce7f32a211c625ee5b5a709a6635cbf136f522a4d5a3bc6198db7f43b7b
+    checksum: 3dd58db4af0c2aefbc149f3d7cf0f898fea1207d33ddb849cf2e23672f1eeb9d
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-    checksum: e91c1986c9d5510a83c7d3ef056b6f3cb688d055631945208845148e57e2fda8
+    checksum: 6a0079228a0ca65304be969c5d5c2ad28186f3af5851fda87ab2159a519622ed
   - filename: backend/build.gradle
-    checksum: e0c177d442020fefc97f8f3aee2a5dd42e071ff24daf50c9e1ed4cf52dcb9dec
+    checksum: f15ad55ad489aeb5acc8499fd4f18a427165e384ea3a0f2468bd3b027e12d958
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
-  - filename: '*.sql'
+  - filename: "*.sql"
     ignore_detectors: [filename]
 
 scopeconfig:

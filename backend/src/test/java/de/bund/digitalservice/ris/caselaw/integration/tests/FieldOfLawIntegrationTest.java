@@ -6,12 +6,14 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresSubjectFieldRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseSubjectFieldRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.SubjectFieldDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -28,7 +30,7 @@ import org.testcontainers.junit.jupiter.Container;
       FieldOfLawService.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      PostgresSubjectFieldRepositoryImpl.class
+      PostgresFieldOfLawRepositoryImpl.class
     },
     controllers = {FieldOfLawController.class})
 class FieldOfLawIntegrationTest {
@@ -45,11 +47,13 @@ class FieldOfLawIntegrationTest {
   }
 
   @Autowired private WebTestClient webClient;
-  @Autowired private DatabaseSubjectFieldRepository repository;
+  @Autowired private DatabaseFieldOfLawRepository repository;
+  @Autowired private NormRepository normRepository;
 
   @AfterEach
   void cleanUp() {
     repository.deleteAll().block();
+    normRepository.deleteAll().block();
   }
 
   @Test
@@ -115,7 +119,7 @@ class FieldOfLawIntegrationTest {
     assertThat((Boolean) JsonPath.read(str, "$.first")).isTrue();
     assertThat((Boolean) JsonPath.read(str, "$.last")).isFalse();
     List<String> identifiers = JsonPath.read(str, "$.content[*].identifier");
-    assertThat(identifiers).containsExactly("FL-01", "FL-01-01", "FL-02");
+    assertThat(identifiers).containsExactly("FL-01-01", "FL-04", "FL-02");
 
     result =
         webClient
@@ -137,7 +141,7 @@ class FieldOfLawIntegrationTest {
     assertThat((Boolean) JsonPath.read(str, "$.first")).isFalse();
     assertThat((Boolean) JsonPath.read(str, "$.last")).isTrue();
     identifiers = JsonPath.read(str, "$.content[*].identifier");
-    assertThat(identifiers).containsExactly("FL-03", "FL-04");
+    assertThat(identifiers).containsExactly("FL-01", "FL-03");
 
     result =
         webClient
@@ -155,6 +159,63 @@ class FieldOfLawIntegrationTest {
     assertThat((Integer) JsonPath.read(str, "$.numberOfElements")).isZero();
     identifiers = JsonPath.read(str, "$.content[*].identifier");
     assertThat(identifiers).isEmpty();
+  }
+
+  @Test
+  void testGetFieldsOfLawByNormsQuery() {
+    prepareDatabase();
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"abc\"&pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    assertThat(identifiers).containsExactly("FL");
+  }
+
+  @Test
+  void testGetFieldsOfLawByNormsAndSearchQuery() {
+    prepareDatabase();
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"def\" some here&pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    assertThat(identifiers).containsExactly("FL-01");
+  }
+
+  @Test
+  void testGetFieldsOfLawByIdentifierSearch() {
+    prepareDatabase();
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?searchStr=FL-01")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
+    assertThat(identifiers).containsExactly("FL-01", "FL-01-01");
   }
 
   @Test
@@ -205,78 +266,87 @@ class FieldOfLawIntegrationTest {
 
   private void prepareDatabase() {
     // first root child
-    SubjectFieldDTO subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    FieldOfLawDTO fieldOfLawDTO =
+        FieldOfLawDTO.builder().id(1L).identifier("FL").isNew(true).changeIndicator('N').build();
+    repository.save(fieldOfLawDTO).block();
+
+    NormDTO normDTO =
+        NormDTO.builder()
             .id(1L)
-            .subjectFieldNumber("FL")
-            .isNew(true)
-            .changeIndicator('N')
+            .fieldOfLawId(1L)
+            .abbreviation("ABC")
+            .singleNormDescription("§ 123")
             .build();
-    repository.save(subjectFieldDTO).block();
+    normRepository.save(normDTO).block();
 
     // child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(2L)
             .isNew(true)
-            .subjectFieldNumber("FL-01")
+            .identifier("FL-01")
+            .text("some text here")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
+
+    normDTO =
+        NormDTO.builder()
+            .id(2L)
+            .fieldOfLawId(2L)
+            .abbreviation("DEF")
+            .singleNormDescription("§ 456")
+            .build();
+    normRepository.save(normDTO).block();
 
     // sub child of the child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(3L)
             .isNew(true)
-            .subjectFieldNumber("FL-01-01")
+            .identifier("FL-01-01")
             .parentId(2L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // second root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
-            .id(4L)
-            .isNew(true)
-            .subjectFieldNumber("FO")
-            .changeIndicator('N')
-            .build();
-    repository.save(subjectFieldDTO).block();
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder().id(4L).isNew(true).identifier("FO").changeIndicator('N').build();
+    repository.save(fieldOfLawDTO).block();
 
     // second child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(5L)
             .isNew(true)
-            .subjectFieldNumber("FL-02")
+            .identifier("FL-02")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // third child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(6L)
             .isNew(true)
-            .subjectFieldNumber("FL-03")
+            .identifier("FL-03")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
 
     // fourth child of the first root child
-    subjectFieldDTO =
-        SubjectFieldDTO.builder()
+    fieldOfLawDTO =
+        FieldOfLawDTO.builder()
             .id(7L)
             .isNew(true)
-            .subjectFieldNumber("FL-04")
+            .identifier("FL-04")
             .parentId(1L)
             .changeIndicator('N')
             .build();
-    repository.save(subjectFieldDTO).block();
+    repository.save(fieldOfLawDTO).block();
   }
 }

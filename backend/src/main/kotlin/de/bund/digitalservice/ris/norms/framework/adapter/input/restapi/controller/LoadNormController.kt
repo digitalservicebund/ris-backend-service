@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -40,13 +42,13 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     private constructor(
         val guid: String,
         val articles: List<ArticleResponseSchema>,
+        val metadata: List<MetadatumResponseSchema>,
         val officialLongTitle: String,
         var risAbbreviation: String?,
         var risAbbreviationInternationalLaw: String?,
         var documentNumber: String?,
         var divergentDocumentNumber: String?,
         var documentCategory: String?,
-        var frameKeywords: String?,
         var documentTypeName: String?,
         var documentNormCategory: String?,
         var documentTemplateName: String?,
@@ -84,6 +86,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var announcementDate: String?,
         var publicationDate: String?,
         var citationDate: String?,
+        var citationYear: String?,
         var printAnnouncementGazette: String?,
         var printAnnouncementYear: String?,
         var printAnnouncementNumber: String?,
@@ -157,19 +160,20 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     ) {
         companion object {
             fun fromUseCaseData(data: Norm): NormResponseSchema {
-                val articles = data.articles.map { ArticleResponseSchema.fromUseCaseData(it) }
-                val files = data.files.map { FileReferenceResponseSchema.fromUseCaseData(it) }
+                val articles = data.articles.map(ArticleResponseSchema::fromUseCaseData)
+                val files = data.files.map(FileReferenceResponseSchema::fromUseCaseData)
+                val metadata = data.metadata.map(MetadatumResponseSchema::fromUseCaseData)
 
                 return NormResponseSchema(
                     encodeGuid(data.guid),
                     articles,
+                    metadata,
                     data.officialLongTitle,
                     data.risAbbreviation,
                     data.risAbbreviationInternationalLaw,
                     data.documentNumber,
                     data.divergentDocumentNumber,
                     data.documentCategory,
-                    data.frameKeywords,
                     data.documentTypeName,
                     data.documentNormCategory,
                     data.documentTemplateName,
@@ -207,6 +211,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     encodeLocalDate(data.announcementDate),
                     encodeLocalDate(data.publicationDate),
                     encodeLocalDate(data.citationDate),
+                    data.citationYear,
                     data.printAnnouncementGazette,
                     data.printAnnouncementYear,
                     data.printAnnouncementNumber,
@@ -318,6 +323,22 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                 data.hash,
                 encodeLocalDateTime(data.createdAt),
             )
+        }
+    }
+
+    data class MetadatumResponseSchema private constructor(val value: String, val type: String, val order: Int) {
+        companion object {
+            fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseSchema {
+                val value: String = when (metadatum.type) {
+                    KEYWORD -> metadatum.value as String
+                }
+
+                val type = when (metadatum.type) {
+                    KEYWORD -> "KEYWORD"
+                }
+
+                return MetadatumResponseSchema(value = value, type = type, order = metadatum.order)
+            }
         }
     }
 }

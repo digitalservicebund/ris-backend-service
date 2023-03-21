@@ -5,21 +5,21 @@ import static de.bund.digitalservice.ris.caselaw.utils.ServiceUtils.byteBufferTo
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPASubjectFieldRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.SubjectFieldTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.CourtsXML;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentTypesXML;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLawXml;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldsOfLawXml;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.state.StatesXML;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLawXml;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldsOfLawXml;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class LookupTableImporterService {
   private final JPADocumentTypeRepository jpaDocumentTypeRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
-  private final JPASubjectFieldRepository jpaSubjectFieldRepository;
+  private final JPAFieldOfLawRepository jpaFieldOfLawRepository;
   private final JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
 
   private static final Pattern FIELD_OF_LAW_NUMBER_PATTERN =
@@ -57,13 +57,13 @@ public class LookupTableImporterService {
       JPADocumentTypeRepository jpaDocumentTypeRepository,
       CourtRepository courtRepository,
       StateRepository stateRepository,
-      JPASubjectFieldRepository jpaSubjectFieldRepository,
+      JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
     this.documentTypeRepository = documentTypeRepository;
     this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
     this.courtRepository = courtRepository;
     this.stateRepository = stateRepository;
-    this.jpaSubjectFieldRepository = jpaSubjectFieldRepository;
+    this.jpaFieldOfLawRepository = jpaFieldOfLawRepository;
     this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
   }
 
@@ -222,33 +222,33 @@ public class LookupTableImporterService {
   }
 
   @Transactional(transactionManager = "jpaTransactionManager")
-  public Mono<String> importSubjectFieldLookupTable(ByteBuffer byteBuffer) {
+  public Mono<String> importFieldOfLawLookupTable(ByteBuffer byteBuffer) {
     XmlMapper mapper = new XmlMapper();
     FieldsOfLawXml fieldsOfLawXml;
     try {
       fieldsOfLawXml = mapper.readValue(byteBufferToArray(byteBuffer), FieldsOfLawXml.class);
     } catch (IOException e) {
       throw new ResponseStatusException(
-          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to SubjectFieldXml", e);
+          HttpStatus.NOT_ACCEPTABLE, "Could not map ByteBuffer-content to FieldsOfLawXml", e);
     }
 
-    importSubjectFieldJPA(fieldsOfLawXml);
+    importFieldOfLawJPA(fieldsOfLawXml);
 
-    return Mono.just("Successfully imported the subject field lookup table");
+    return Mono.just("Successfully imported the fieldOfLaw lookup table");
   }
 
-  private void importSubjectFieldJPA(FieldsOfLawXml fieldsOfLawXml) {
-    jpaSubjectFieldRepository.deleteAllInBatch();
+  private void importFieldOfLawJPA(FieldsOfLawXml fieldsOfLawXml) {
+    jpaFieldOfLawRepository.deleteAllInBatch();
 
-    List<JPASubjectFieldDTO> jpaSubjectFieldDTOs =
+    List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS =
         fieldsOfLawXml.getList().stream()
-            .map(SubjectFieldTransformer::transformToJPADTO)
-            .sorted(Comparator.comparing(JPASubjectFieldDTO::getSubjectFieldNumber))
+            .map(FieldOfLawTransformer::transformToJPADTO)
+            .sorted(Comparator.comparing(JPAFieldOfLawDTO::getIdentifier))
             .toList();
 
-    setSubjectFieldParentIds(jpaSubjectFieldDTOs);
+    setFieldOfLawParentIds(jpaFieldOfLawDTOS);
 
-    jpaSubjectFieldRepository.saveAll(jpaSubjectFieldDTOs);
+    jpaFieldOfLawRepository.saveAll(jpaFieldOfLawDTOS);
 
     extractAndStoreAllLinkedFieldsOfLaw(fieldsOfLawXml);
   }
@@ -256,20 +256,19 @@ public class LookupTableImporterService {
   private void extractAndStoreAllLinkedFieldsOfLaw(FieldsOfLawXml fieldsOfLawXml) {
     Map<String, Long> allFieldOfLawNumbers =
         fieldsOfLawXml.getList().stream()
-            .collect(Collectors.toMap(FieldOfLawXml::getSubjectFieldNumber, FieldOfLawXml::getId));
+            .collect(Collectors.toMap(FieldOfLawXml::getIdentifier, FieldOfLawXml::getId));
 
     List<JPAFieldOfLawLinkDTO> jpaFieldOfLawLinkDTOs = new ArrayList<>();
     fieldsOfLawXml
         .getList()
         .forEach(
             fieldOfLawXml -> {
-              for (Long linkedFieldId :
-                  extractLinkedFieldsOfLaw(
-                      fieldOfLawXml.getSubjectFieldText(), allFieldOfLawNumbers)) {
+              for (Long linkedFieldOfLawId :
+                  extractLinkedFieldsOfLaw(fieldOfLawXml.getText(), allFieldOfLawNumbers)) {
                 jpaFieldOfLawLinkDTOs.add(
                     JPAFieldOfLawLinkDTO.builder()
-                        .fieldId(fieldOfLawXml.getId())
-                        .linkedFieldId(linkedFieldId)
+                        .fieldOfLawId(fieldOfLawXml.getId())
+                        .linkedFieldOfLawId(linkedFieldOfLawId)
                         .build());
               }
             });
@@ -297,35 +296,31 @@ public class LookupTableImporterService {
     return linkedFieldIds;
   }
 
-  private void setSubjectFieldParentIds(List<JPASubjectFieldDTO> jpaSubjectFieldDTOs) {
-    Map<String, JPASubjectFieldDTO> subjectFieldNumberToSubjectFieldDTO =
-        jpaSubjectFieldDTOs.stream()
-            .collect(
-                Collectors.toMap(JPASubjectFieldDTO::getSubjectFieldNumber, Function.identity()));
-    jpaSubjectFieldDTOs.forEach(
-        jpaSubjectFieldDTO -> {
-          countChildren(jpaSubjectFieldDTO, subjectFieldNumberToSubjectFieldDTO);
-          JPASubjectFieldDTO parentDTO =
-              subjectFieldNumberToSubjectFieldDTO.get(
-                  jpaSubjectFieldDTO.getSubjectFieldNumberOfParent());
+  private void setFieldOfLawParentIds(List<JPAFieldOfLawDTO> jpaFieldOfLawDTOS) {
+    Map<String, JPAFieldOfLawDTO> identifierToFieldOfLawDTO =
+        jpaFieldOfLawDTOS.stream()
+            .collect(Collectors.toMap(JPAFieldOfLawDTO::getIdentifier, Function.identity()));
+    jpaFieldOfLawDTOS.forEach(
+        jpaFieldOfLawDTO -> {
+          countChildren(jpaFieldOfLawDTO, identifierToFieldOfLawDTO);
+          JPAFieldOfLawDTO parentDTO =
+              identifierToFieldOfLawDTO.get(jpaFieldOfLawDTO.getIdentifierOfParent());
           if (parentDTO != null) {
-            jpaSubjectFieldDTO.setParentSubjectField(parentDTO);
+            jpaFieldOfLawDTO.setParentFieldOfLaw(parentDTO);
           }
         });
   }
 
   private void countChildren(
-      JPASubjectFieldDTO jpaSubjectFieldDTO,
-      Map<String, JPASubjectFieldDTO> subjectFieldNumberToSubjectFieldDTO) {
-    String thisSubjectFieldNumber = jpaSubjectFieldDTO.getSubjectFieldNumber();
-    jpaSubjectFieldDTO.setChildrenCount(
+      JPAFieldOfLawDTO jpaFieldOfLawDTO, Map<String, JPAFieldOfLawDTO> identifierToFieldOfLawDTO) {
+    String thisIdentifier = jpaFieldOfLawDTO.getIdentifier();
+    jpaFieldOfLawDTO.setChildrenCount(
         (int)
-            subjectFieldNumberToSubjectFieldDTO.keySet().stream()
+            identifierToFieldOfLawDTO.keySet().stream()
                 .filter(
-                    otherSubjectFieldNumber ->
-                        otherSubjectFieldNumber.startsWith(thisSubjectFieldNumber)
-                            && otherSubjectFieldNumber.length()
-                                == thisSubjectFieldNumber.length() + 3)
+                    otherIdentifier ->
+                        otherIdentifier.startsWith(thisIdentifier)
+                            && otherIdentifier.length() == thisIdentifier.length() + 3)
                 .count());
   }
 }

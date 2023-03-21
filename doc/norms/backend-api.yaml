@@ -258,6 +258,11 @@ components:
       type: string
       pattern: '^[1-2]\d{3}-[0-1]\d-[0-3]\d$'
       example: '2020-10-21'
+    Year:
+      description: The year format in XML files
+      type: string
+      pattern: '^[1-2]\d{3}$'
+      example: '2020'
     UndefinedDate:
       description: A field that takes one of three values
       type: string
@@ -265,6 +270,20 @@ components:
         - UNDEFINED_UNKNOWN
         - UNDEFINED_FUTURE
         - UNDEFINED_NOT_PRESENT
+    MetadatumType:
+      description: A field that indicates the type of the metadatum
+      type: string
+      enum:
+        - KEYWORD
+    Metadatum:
+      type: object
+      properties:
+        value:
+          type: string
+        type:
+          $ref: '#/components/schemas/MetadatumType'
+        order:
+          type: integer
     Paragraph:
       type: object
       required:
@@ -323,6 +342,7 @@ components:
             - guid
             - officialLongTitle
             - files
+            - metadata
           properties:
             guid:
               $ref: '#/components/schemas/Guid'
@@ -353,9 +373,8 @@ components:
           $ref: '#/components/schemas/Date'
         citationDate:
           $ref: '#/components/schemas/Date'
-        frameKeywords:
-          type: string
-          example: 'BGBl I 2021, Nr 031;geltendes Bundesrecht;Umsetzung EG-Recht;Umsetzung EURL 2019/1161;Beschaffung;sauber;Straßenfahrzeug'
+        citationYear:
+          $ref: '#/components/schemas/Year'
         providerEntity:
           type: string
           example: DEU
@@ -654,6 +673,10 @@ components:
         entryIntoForceDateState:
           type: string
           example: ''
+        metadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/Metadatum'
     LegalDocML:
       type: object
       xml:

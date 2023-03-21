@@ -173,7 +173,7 @@ export function generateNorm(partialNorm?: Partial<Norm>): Norm {
     expirationDate: generateString(),
     expirationDateState: generateString(),
     expirationNormCategory: generateString(),
-    frameKeywords: generateString(),
+    frameKeywords: [generateString(), generateString()],
     isExpirationDateTemp: false,
     leadJurisdiction: generateString(),
     officialAbbreviation: generateString(),

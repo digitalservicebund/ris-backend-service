@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Cou
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.KeywordRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -31,9 +31,9 @@ class LookupTableServiceTest {
 
   @MockBean private DocumentTypeRepository documentTypeRepository;
   @MockBean private CourtRepository courtRepository;
-  @MockBean private SubjectFieldRepository subjectFieldRepository;
+  @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private NormRepository normRepository;
-  @MockBean private KeywordRepository keywordRepository;
+  @MockBean private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
 
   @Test
   void testGetDocumentTypes() {

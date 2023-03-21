@@ -3,16 +3,15 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.bund.digitalservice.ris.caselaw.domain.SubjectFieldRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.FieldOfLaw;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Keyword;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield.Norm;
+import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Keyword;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -34,12 +34,12 @@ import reactor.test.StepVerifier;
 class FieldOfLawServiceTest {
   @Autowired FieldOfLawService service;
 
-  @MockBean SubjectFieldRepository repository;
+  @MockBean FieldOfLawRepository repository;
 
   @Test
   void testGetFieldsOfLaw_withoutQuery_shouldntCallRepository() {
     Pageable pageable = Pageable.unpaged();
-    when(repository.findAllByOrderBySubjectFieldNumberAsc(pageable)).thenReturn(Flux.empty());
+    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Flux.empty());
     when(repository.count()).thenReturn(Mono.just(0L));
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.empty(), pageable))
@@ -50,15 +50,14 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
     verify(repository, times(1)).count();
-    verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
 
   @Test
   void testGetFieldsOfLaw_withEmptyQuery_shouldntCallRepository() {
     Pageable pageable = Pageable.unpaged();
-    when(repository.findAllByOrderBySubjectFieldNumberAsc(pageable)).thenReturn(Flux.empty());
+    when(repository.findAllByOrderByIdentifierAsc(pageable)).thenReturn(Flux.empty());
     when(repository.count()).thenReturn(Mono.just(0L));
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(""), pageable))
@@ -69,16 +68,15 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).findAllByOrderByIdentifierAsc(pageable);
     verify(repository, times(1)).count();
-    verify(repository, never()).findBySearchStr(anyString(), eq(pageable));
   }
 
   @Test
   void testGetFieldsOfLaw_withQuery_shouldCallRepository() {
-    Pageable pageable = Pageable.unpaged();
-    when(repository.findBySearchStr("test", pageable)).thenReturn(Flux.empty());
-    when(repository.countBySearchStr("test")).thenReturn(Mono.just(0L));
+    Pageable pageable = PageRequest.of(0, 10);
+    String[] searchTerms = new String[] {"test"};
+    when(repository.findBySearchTerms(searchTerms)).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of("test"), pageable))
         .consumeNextWith(
@@ -88,16 +86,16 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findBySearchStr("test", pageable);
-    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).findBySearchTerms(searchTerms);
+    verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
   }
 
   @Test
   void
       testGetFieldsOfLaw_withQueryWithWhitespaceAtTheStartAndTheEnd_shouldCallRepositoryWithTrimmedSearchString() {
-    Pageable pageable = Pageable.unpaged();
-    when(repository.findBySearchStr("test", pageable)).thenReturn(Flux.empty());
-    when(repository.countBySearchStr("test")).thenReturn(Mono.just(0L));
+    Pageable pageable = PageRequest.of(0, 10);
+    String[] searchTerms = new String[] {"test"};
+    when(repository.findBySearchTerms(searchTerms)).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(" test  \t"), pageable))
         .consumeNextWith(
@@ -107,18 +105,17 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findBySearchStr("test", pageable);
-    verify(repository, never()).findAllByOrderBySubjectFieldNumberAsc(pageable);
+    verify(repository, times(1)).findBySearchTerms(searchTerms);
+    verify(repository, never()).findAllByOrderByIdentifierAsc(pageable);
   }
 
   @Test
   void testGetChildrenOfFieldOfLaw_withNumberIsEmpty_shouldCallRepository() {
-    when(repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(""))
-        .thenReturn(Flux.empty());
+    when(repository.findAllByParentIdentifierOrderByIdentifierAsc("")).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getChildrenOfFieldOfLaw("")).verifyComplete();
 
-    verify(repository, times(1)).findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("");
+    verify(repository, times(1)).findAllByParentIdentifierOrderByIdentifierAsc("");
     verify(repository, never()).getTopLevelNodes();
   }
 
@@ -129,48 +126,45 @@ class FieldOfLawServiceTest {
     StepVerifier.create(service.getChildrenOfFieldOfLaw("root")).verifyComplete();
 
     verify(repository, times(1)).getTopLevelNodes();
-    verify(repository, never())
-        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc(anyString());
+    verify(repository, never()).findAllByParentIdentifierOrderByIdentifierAsc(anyString());
   }
 
   @Test
   void testGetChildrenOfFieldOfLaw_withNumber_shouldCallRepository() {
-    when(repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("test"))
-        .thenReturn(Flux.empty());
+    when(repository.findAllByParentIdentifierOrderByIdentifierAsc("test")).thenReturn(Flux.empty());
 
     StepVerifier.create(service.getChildrenOfFieldOfLaw("test")).verifyComplete();
 
-    verify(repository, times(1))
-        .findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("test");
+    verify(repository, times(1)).findAllByParentIdentifierOrderByIdentifierAsc("test");
     verify(repository, never()).getTopLevelNodes();
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberDoesntExist() {
-    when(repository.findBySubjectFieldNumber("test")).thenReturn(Mono.empty());
+    when(repository.findByIdentifier("test")).thenReturn(Mono.empty());
 
     StepVerifier.create(service.getTreeForFieldOfLaw("test")).verifyComplete();
 
-    verify(repository, times(1)).findBySubjectFieldNumber("test");
+    verify(repository, times(1)).findByIdentifier("test");
     verify(repository, never()).findParentByChild(any(FieldOfLaw.class));
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtTopLevel() {
     FieldOfLaw child = FieldOfLaw.builder().identifier("test").build();
-    when(repository.findBySubjectFieldNumber("test")).thenReturn(Mono.just(child));
+    when(repository.findByIdentifier("test")).thenReturn(Mono.just(child));
     when(repository.findParentByChild(child)).thenReturn(Mono.empty());
 
     StepVerifier.create(service.getTreeForFieldOfLaw("test")).verifyComplete();
 
-    verify(repository, times(1)).findBySubjectFieldNumber("test");
+    verify(repository, times(1)).findByIdentifier("test");
     verify(repository, times(1)).findParentByChild(child);
   }
 
   @Test
   void testGetTreeForFieldOfLaw_withFieldNumberAtSecondLevel() {
     FieldOfLaw child = FieldOfLaw.builder().identifier("child").build();
-    when(repository.findBySubjectFieldNumber("child")).thenReturn(Mono.just(child));
+    when(repository.findByIdentifier("child")).thenReturn(Mono.just(child));
     FieldOfLaw parent =
         FieldOfLaw.builder().identifier("parent").children(new ArrayList<>()).build();
     when(repository.findParentByChild(child)).thenReturn(Mono.just(parent));
@@ -184,13 +178,14 @@ class FieldOfLawServiceTest {
             })
         .verifyComplete();
 
-    verify(repository, times(1)).findBySubjectFieldNumber("child");
+    verify(repository, times(1)).findByIdentifier("child");
     verify(repository, times(1)).findParentByChild(child);
   }
 
   @Test
-  void testGetSubjectFields_withSearchString() {
+  void testGetFieldsOfLaw_withSearchString() {
     String searchString = "stext";
+    String[] searchTerms = new String[] {searchString};
     FieldOfLaw expectedFieldOfLaw =
         new FieldOfLaw(
             2L,
@@ -202,23 +197,20 @@ class FieldOfLawServiceTest {
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>());
 
-    Pageable pageable = Pageable.unpaged();
+    Pageable pageable = PageRequest.of(0, 10);
     PageImpl<FieldOfLaw> page = new PageImpl<>(List.of(expectedFieldOfLaw), pageable, 1);
 
-    when(repository.findBySearchStr(searchString, pageable))
-        .thenReturn(Flux.just(expectedFieldOfLaw));
-    when(repository.countBySearchStr(searchString)).thenReturn(Mono.just(1L));
+    when(repository.findBySearchTerms(searchTerms)).thenReturn(Flux.just(expectedFieldOfLaw));
 
     StepVerifier.create(service.getFieldsOfLawBySearchQuery(Optional.of(searchString), pageable))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(page))
+        .consumeNextWith(fieldOfLawPage -> assertThat(fieldOfLawPage).isEqualTo(page))
         .verifyComplete();
 
-    verify(repository).findBySearchStr(searchString, pageable);
-    verify(repository).countBySearchStr(searchString);
+    verify(repository).findBySearchTerms(searchTerms);
   }
 
   @Test
-  void testGetSubjectFieldChildren() {
+  void testGetFieldOfLawChildren() {
     FieldOfLaw expectedFieldOfLaw =
         new FieldOfLaw(
             2L,
@@ -230,13 +222,13 @@ class FieldOfLawServiceTest {
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>());
 
-    when(repository.findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01"))
+    when(repository.findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01"))
         .thenReturn(Flux.just(expectedFieldOfLaw));
 
     StepVerifier.create(service.getChildrenOfFieldOfLaw("TS-01-01"))
-        .consumeNextWith(subjectField -> assertThat(subjectField).isEqualTo(expectedFieldOfLaw))
+        .consumeNextWith(fieldOfLaw -> assertThat(fieldOfLaw).isEqualTo(expectedFieldOfLaw))
         .verifyComplete();
 
-    verify(repository).findAllByParentSubjectFieldNumberOrderBySubjectFieldNumberAsc("TS-01-01");
+    verify(repository).findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01");
   }
 }

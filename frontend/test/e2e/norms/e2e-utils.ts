@@ -2,6 +2,7 @@ import fs from "fs"
 import { tmpdir } from "os"
 import path from "path"
 import { APIRequestContext, expect } from "@playwright/test"
+import jsZip from "jszip"
 import { Page } from "playwright"
 
 const REMOTE_JURIS_TEST_FILE_FOLDER_URL =
@@ -83,4 +84,55 @@ export const openNorm = async (
   const locatorA = page.locator(`a[href*="/norms/norm/${guid}"]`)
   await expect(locatorA).toBeVisible()
   await locatorA.click()
+}
+
+export async function fillTextInput(page, field, value) {
+  const selector = `input#${field.name}`
+  expect(await page.inputValue(selector)).toBe(field.value ?? "")
+  const locator = page.locator(selector)
+  await expect(locator).toBeEditable()
+  await locator.fill(value)
+}
+
+export async function fillRepeatedInput(page, field, value) {
+  const locator = page.locator(`input#${field.name}`)
+  await expect(locator).toBeEditable()
+  for (const inputValue of value) {
+    await locator.fill(inputValue.value)
+    await page.keyboard.press("Enter")
+  }
+}
+
+export async function getDownloadedFileContent(page, filename) {
+  const [download] = await Promise.all([
+    page.waitForEvent("download"),
+    page.locator('a:has-text("Zip Datei speichern")').click(),
+  ])
+
+  expect(download.suggestedFilename()).toBe(filename)
+  expect(
+    (await fs.promises.stat((await download.path()) as string)).size
+  ).toBeGreaterThan(0)
+  const readable = await download.createReadStream()
+  const chunks = []
+  for await (const chunk of readable) {
+    chunks.push(chunk)
+  }
+
+  return Buffer.concat(chunks)
+}
+
+export async function getMetaDataFileAsString(
+  content: Buffer
+): Promise<string> {
+  return jsZip.loadAsync(content).then(function (zip) {
+    const metadataFileName = Object.keys(zip.files)
+      .filter(
+        (filename) => filename.endsWith(".xml") && !filename.includes("BJNE")
+      )
+      .pop()
+    return zip.files[metadataFileName]
+      .async("string")
+      .then((xmlContent) => xmlContent.replace(/ {2}|\r\n|\n|\r/gm, ""))
+  })
 }

@@ -18,6 +18,14 @@ async function expectInputFields(page, fields) {
         field.value ?? ""
       )
     }
+    if (field.type === "repeated") {
+      for (const value of field.value) {
+        await expect(
+          await page.locator(`div.label-wrapper:text-is("${value}")`)
+        ).toBeVisible()
+      }
+    }
+
     // TODO Check the dropdown data
   }
 }

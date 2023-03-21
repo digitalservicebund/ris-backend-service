@@ -17,14 +17,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Entity(name = "lookuptable_subject_field")
-public class JPASubjectFieldDTO {
+@Entity(name = "lookuptable_field_of_law")
+public class JPAFieldOfLawDTO {
 
   @Id Long id;
 
   @ManyToOne
   @JoinColumn(name = "parent_id", referencedColumnName = "id")
-  JPASubjectFieldDTO parentSubjectField;
+  JPAFieldOfLawDTO parentFieldOfLaw;
 
   @Column(name = "change_date_mail")
   String changeDateMail;
@@ -37,33 +37,33 @@ public class JPASubjectFieldDTO {
 
   String version;
 
-  @Column(name = "subject_field_number")
-  String subjectFieldNumber;
+  @Column(name = "identifier")
+  String identifier;
 
-  @Column(name = "subject_field_text")
-  String subjectFieldText;
+  @Column(name = "text")
+  String text;
 
   @Column(name = "navigation_term")
   String navigationTerm;
 
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "subject_field_id")
+  @JoinColumn(name = "field_of_law_id")
   Set<JPAKeywordDTO> keywords;
 
   @OneToMany(cascade = CascadeType.ALL)
-  @JoinColumn(name = "subject_field_id")
+  @JoinColumn(name = "field_of_law_id")
   Set<JPANormDTO> norms;
 
   @Column(name = "children_count")
   Integer childrenCount;
 
-  public String getSubjectFieldNumberOfParent() {
-    int lastIndexOf = subjectFieldNumber.lastIndexOf('-');
+  public String getIdentifierOfParent() {
+    int lastIndexOf = identifier.lastIndexOf('-');
 
     if (lastIndexOf == -1) {
       return null;
     }
 
-    return subjectFieldNumber.substring(0, lastIndexOf);
+    return identifier.substring(0, lastIndexOf);
   }
 }

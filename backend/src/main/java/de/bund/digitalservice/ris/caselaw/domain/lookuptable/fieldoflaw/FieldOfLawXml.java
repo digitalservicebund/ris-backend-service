@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.domain.lookuptable.subjectfield;
+package de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper;
@@ -23,10 +23,10 @@ public class FieldOfLawXml {
   @JsonProperty String version;
 
   @JsonProperty(value = "sachgebiet")
-  String subjectFieldNumber;
+  String identifier;
 
   @JsonProperty(value = "stext")
-  String subjectFieldText;
+  String text;
 
   @JsonProperty(value = "navbez")
   String navigationTerm;
@@ -39,11 +39,11 @@ public class FieldOfLawXml {
   @JacksonXmlElementWrapper(useWrapping = false)
   Set<NormXml> norms;
 
-  public String getSubjectFieldNumber() {
-    if (subjectFieldNumber.endsWith("-")) {
-      return StringUtils.chop(subjectFieldNumber);
+  public String getIdentifier() {
+    if (identifier.endsWith("-")) {
+      return StringUtils.chop(identifier);
     } else {
-      return subjectFieldNumber;
+      return identifier;
     }
   }
 }
