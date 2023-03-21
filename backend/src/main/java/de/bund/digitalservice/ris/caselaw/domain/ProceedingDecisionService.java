@@ -27,24 +27,22 @@ public class ProceedingDecisionService {
   public Flux<ProceedingDecision> getProceedingDecisionsForDocumentUnit(UUID documentUnitUuid) {
     return repository.findAllForDocumentUnit(documentUnitUuid);
   }
-
-  //TODO naming
+  
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Flux<ProceedingDecision> addProceedingDecision(UUID documentUnitUuid, ProceedingDecision proceedingDecision) {
 
-    return documentUnitService.getByUuid(proceedingDecision.uuid())
-            .switchIfEmpty(documentUnitService.generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE")))
+    return documentUnitService.generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
             .flatMap(documentUnit -> repository.linkProceedingDecisions(documentUnitUuid, documentUnit.uuid()).map(v -> documentUnit)
             )
             .map(documentUnit ->
-                    documentUnitService.updateDocumentUnit(enrichDocumentUnit(documentUnit, proceedingDecision))
+                    documentUnitService.updateDocumentUnit(enrichNewDocumentUnitWithData(documentUnit, proceedingDecision))
             )
             .flatMapMany(documentUnit ->
                     repository.findAllForDocumentUnit(documentUnitUuid)
             );
     }
 
-  private DocumentUnit enrichDocumentUnit(DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
+  private DocumentUnit enrichNewDocumentUnitWithData(DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
     CoreData coreData = documentUnit.coreData().toBuilder()
             .fileNumbers(List.of(proceedingDecision.fileNumber()))
             .documentType(proceedingDecision.documentType())
