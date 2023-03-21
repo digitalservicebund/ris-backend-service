@@ -61,15 +61,15 @@ public class DocumentUnitBuilder {
       proceedingDecisions =
           documentUnitDTO.getProceedingDecisions().stream()
               .map(
-                  previousDecisionDTO ->
+                  proceedingDecisionDTO ->
                       ProceedingDecision.builder()
-//                          .id(previousDecisionDTO.getId())
+                          .uuid(proceedingDecisionDTO.uuid())
                           .court(
                               getCourtObject(
-                                  previousDecisionDTO.getCourtType(),
-                                  previousDecisionDTO.getCourtLocation()))
-                          .fileNumber(previousDecisionDTO.getFileNumber())
-                          .date(previousDecisionDTO.getDecisionDate())
+                                  proceedingDecisionDTO.courtType(),
+                                  proceedingDecisionDTO.courtLocation()))
+                          .fileNumber(proceedingDecisionDTO.fileNumber())
+                          .date(proceedingDecisionDTO.decisionDate())
                           .build())
               .toList();
     }
