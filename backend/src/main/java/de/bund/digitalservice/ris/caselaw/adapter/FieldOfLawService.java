@@ -23,7 +23,6 @@ import reactor.core.publisher.Mono;
 public class FieldOfLawService {
   private static final String ROOT_ID = "root";
   private static final Pattern NORMS_PATTERN = Pattern.compile("norm\\s?:\\s?\"([^\"]*)\"(.*)");
-  private static final int MAX_TREE_DEPTH = 7;
 
   private final FieldOfLawRepository repository;
 
