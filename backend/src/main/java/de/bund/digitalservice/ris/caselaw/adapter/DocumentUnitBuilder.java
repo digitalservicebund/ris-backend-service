@@ -64,13 +64,13 @@ public class DocumentUnitBuilder {
               .map(
                   proceedingDecisionDTO ->
                       ProceedingDecision.builder()
-                          .uuid(proceedingDecisionDTO.uuid())
+                          .uuid(proceedingDecisionDTO.getUuid())
                           .court(
                               getCourtObject(
-                                  proceedingDecisionDTO.courtType(),
-                                  proceedingDecisionDTO.courtLocation()))
-                          .fileNumber(proceedingDecisionDTO.fileNumbers().get(0).getFileNumber())
-                          .date(proceedingDecisionDTO.decisionDate())
+                                  proceedingDecisionDTO.getCourtType(),
+                                  proceedingDecisionDTO.getCourtLocation()))
+                          .fileNumber(proceedingDecisionDTO.getFileNumbers().get(0).getFileNumber())
+                          .date(proceedingDecisionDTO.getDecisionDate())
                           .build())
               .toList();
     }

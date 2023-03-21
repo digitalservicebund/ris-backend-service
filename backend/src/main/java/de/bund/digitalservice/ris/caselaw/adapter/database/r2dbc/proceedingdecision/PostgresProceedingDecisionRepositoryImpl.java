@@ -37,7 +37,7 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
     return repository.findAllById(
             repository
                     .findByUuid(parentDocumentUnitUuid)
-                    .map(ProceedingDecisionDTO::id)
+                    .map(ProceedingDecisionDTO::getId)
                     .flatMapMany(linkRepository::findAllByParentDocumentUnitId)
                     .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId)
             )
@@ -52,7 +52,7 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
 
   private Mono<ProceedingDecisionDTO> injectFileNumbers(ProceedingDecisionDTO proceedingDecisionDTO) {
     return fileNumberRepository
-            .findAllByDocumentUnitId(proceedingDecisionDTO.id())
+            .findAllByDocumentUnitId(proceedingDecisionDTO.getId())
             .collectList()
             .map(
                     fileNumbers -> {
@@ -65,11 +65,11 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
   }
 
   private Mono<ProceedingDecisionDTO> injectDocumentType(ProceedingDecisionDTO proceedingDecisionDTO) {
-    if (proceedingDecisionDTO.documentTypeId() == null) {
+    if (proceedingDecisionDTO.getDocumentTypeId() == null) {
       return Mono.just(proceedingDecisionDTO);
     }
     return documentTypeRepository
-            .findById(proceedingDecisionDTO.documentTypeId())
+            .findById(proceedingDecisionDTO.getDocumentTypeId())
             .defaultIfEmpty(DocumentTypeDTO.builder().build())
             .map(
                     documentTypeDTO -> {
@@ -80,9 +80,9 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
 
     public Mono<ProceedingDecisionLinkDTO> linkProceedingDecisions(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
     Mono<Long> parentDocumentUnitId =
-            repository.findByUuid(parentDocumentUnitUuid).map(ProceedingDecisionDTO::id);
+            repository.findByUuid(parentDocumentUnitUuid).map(ProceedingDecisionDTO::getId);
     Mono<Long> childDocumentUnitId =
-            repository.findByUuid(childDocumentUnitUuid).map(ProceedingDecisionDTO::id);
+            repository.findByUuid(childDocumentUnitUuid).map(ProceedingDecisionDTO::getId);
 
     return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
         .flatMap(

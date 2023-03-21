@@ -499,7 +499,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
     return databaseProceedingDecisionRepository.findAllById(
         databaseProceedingDecisionRepository.findByUuid(documentUnitDTO.uuid)
-            .map(ProceedingDecisionDTO::id)
+            .map(ProceedingDecisionDTO::getId)
             .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
             .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
         .collectList()

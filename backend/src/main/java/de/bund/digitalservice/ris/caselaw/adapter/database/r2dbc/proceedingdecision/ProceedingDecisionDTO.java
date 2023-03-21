@@ -15,24 +15,27 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+@Data
 @Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
 @Table("doc_unit")
-public record ProceedingDecisionDTO (
-  @Id Long id,
+public class ProceedingDecisionDTO {
+  @Id Long id;
 
-  UUID uuid,
+  UUID uuid;
 
   @Column("gerichtstyp")
-  String courtType,
+  String courtType;
 
   @Column("gerichtssitz")
-  String courtLocation,
+  String courtLocation;
 
   @Column("decision_date")
-  Instant decisionDate,
+  Instant decisionDate;
 
-  @Transient List<FileNumberDTO> fileNumbers,
+  @Transient List<FileNumberDTO> fileNumbers;
 
-  @Column("document_type_id") Long documentTypeId, // points to lookup table row id
-  @Transient DocumentTypeDTO documentTypeDTO
-){}
+  @Column("document_type_id") Long documentTypeId; // points to lookup table row id
+  @Transient DocumentTypeDTO documentTypeDTO;
+}
