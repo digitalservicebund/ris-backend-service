@@ -4,9 +4,7 @@ import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -76,7 +74,6 @@ public class FieldOfLawService {
         .flatMap(
             list -> {
               totalElements.set(list.size());
-              Map<FieldOfLaw, Integer> scores = new HashMap<>();
               for (FieldOfLaw fieldOfLaw : list) {
                 int score = 0;
                 if (searchTerms != null) {
@@ -87,9 +84,9 @@ public class FieldOfLawService {
                 if (normStr != null) {
                   score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
                 }
-                scores.put(fieldOfLaw, score);
+                fieldOfLaw.setScore(score);
               }
-              list.sort((f1, f2) -> scores.get(f2).compareTo(scores.get(f1)));
+              list.sort((f1, f2) -> f2.getScore().compareTo(f1.getScore()));
               int fromIdx = (int) pageable.getOffset();
               int toIdx =
                   (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
@@ -105,8 +102,8 @@ public class FieldOfLawService {
   private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
     int score = 0;
     searchTerm = searchTerm.toLowerCase();
-    String identifier = fieldOfLaw.identifier().toLowerCase();
-    String text = fieldOfLaw.text() == null ? "" : fieldOfLaw.text().toLowerCase();
+    String identifier = fieldOfLaw.getIdentifier().toLowerCase();
+    String text = fieldOfLaw.getText() == null ? "" : fieldOfLaw.getText().toLowerCase();
 
     if (identifier.equals(searchTerm)) score += 8;
     if (identifier.startsWith(searchTerm)) score += 5;
@@ -125,7 +122,7 @@ public class FieldOfLawService {
   private int getScoreContributionFromNormStr(FieldOfLaw fieldOfLaw, String normStr) {
     int score = 0;
     normStr = normStr.toLowerCase();
-    for (Norm norm : fieldOfLaw.norms()) {
+    for (Norm norm : fieldOfLaw.getNorms()) {
       String abbreviation = norm.abbreviation().toLowerCase();
       String normText = abbreviation;
       if (norm.singleNormDescription() != null) {
@@ -163,11 +160,11 @@ public class FieldOfLawService {
         .findParentByChild(child)
         .flatMap(
             parent -> {
-              if (child.identifier().equals(parent.identifier())) {
+              if (child.getIdentifier().equals(parent.getIdentifier())) {
                 return Mono.just(child);
               }
 
-              parent.children().add(child);
+              parent.getChildren().add(child);
 
               return findParent(parent);
             });
