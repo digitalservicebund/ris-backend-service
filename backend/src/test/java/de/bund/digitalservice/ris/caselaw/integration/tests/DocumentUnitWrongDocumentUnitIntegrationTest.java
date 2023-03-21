@@ -76,6 +76,8 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
   @Test
   void testUpdateDocumentUnit_withPreviousDecisionIdsForOtherDocumentUnit() {
     UUID documentUnitUuid1 = UUID.randomUUID();
+    UUID proceedingDecisionUuid1 = UUID.randomUUID();
+    UUID proceedingDecisionUuid2 = UUID.randomUUID();
     DocumentUnitDTO documentUnitDTO =
         DocumentUnitDTO.builder()
             .uuid(documentUnitUuid1)
@@ -109,8 +111,8 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .proceedingDecisions(
                 List.of(
-                    ProceedingDecision.builder().id(3L).fileNumber("prev1").build(),
-                    ProceedingDecision.builder().id(4L).fileNumber("prev2").build()))
+                    ProceedingDecision.builder().uuid(proceedingDecisionUuid1).fileNumber("prev1").build(),
+                    ProceedingDecision.builder().uuid(proceedingDecisionUuid2).fileNumber("prev2").build()))
             .build();
 
     webClient

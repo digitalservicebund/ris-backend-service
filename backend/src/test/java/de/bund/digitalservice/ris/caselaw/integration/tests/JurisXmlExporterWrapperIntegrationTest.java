@@ -65,17 +65,20 @@ public class JurisXmlExporterWrapperIntegrationTest {
     List<ProceedingDecision> proceedingDecisions =
         List.of(
             ProceedingDecision.builder()
-                .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                .date(Instant.parse("2020-05-06T00:00:00Z"))
-                .fileNumber("fileNumber")
-                .build());
+                    .uuid(UUID.randomUUID())
+                    .court(new Court("courtType", "courtPlace", "courtLabel", null))
+                    .date(Instant.parse("2020-05-06T00:00:00Z"))
+                    .fileNumber("fileNumber")
+                    .documentType(
+                            DocumentType.builder().jurisShortcut("category").label("category123").build())
+                    .build());
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
             .documentNumber(documentNr)
             .coreData(coreData)
-            .previousDecisions(proceedingDecisions)
+            .proceedingDecisions(proceedingDecisions)
             .texts(texts)
             .build();
 
@@ -144,10 +147,12 @@ public class JurisXmlExporterWrapperIntegrationTest {
     List<ProceedingDecision> proceedingDecisions =
         List.of(
             ProceedingDecision.builder()
-                .id(1L)
+                .uuid(UUID.randomUUID())
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
                 .fileNumber("fileNumber")
+                    .documentType(
+                            DocumentType.builder().jurisShortcut("category").label("category123").build())
                 .build());
 
     ContentRelatedIndexing indexing =
@@ -166,7 +171,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .filetype("filetype")
             .filename("filename")
             .coreData(coreData)
-            .previousDecisions(proceedingDecisions)
+            .proceedingDecisions(proceedingDecisions)
             .texts(texts)
             .contentRelatedIndexing(indexing)
             .build();

@@ -225,10 +225,12 @@ class DocumentUnitIntegrationTest {
             .proceedingDecisions(
                 List.of(
                     ProceedingDecision.builder()
-                        .id(1L)
-                        .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                        .date(Instant.parse("2020-05-06T00:00:00Z"))
-                        .fileNumber("prev1")
+                            .uuid(UUID.randomUUID())
+                            .court(new Court("courtType", "courtPlace", "courtLabel", null))
+                            .date(Instant.parse("2020-05-06T00:00:00Z"))
+                            .fileNumber("prev1")
+                            .documentType(
+                                    DocumentType.builder().jurisShortcut("category").label("category123").build())
                         .build()))
             .build();
 
