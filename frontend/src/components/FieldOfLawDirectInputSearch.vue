@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import TextButton from "@/components/TextButton.vue"
 import { ComboboxInputModelType } from "@/domain"
 import { FieldOfLawComboboxItem } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -29,14 +28,6 @@ function handleUpdateModelValue(item: ComboboxInputModelType | undefined) {
             @update:model-value="handleUpdateModelValue"
           >
           </ComboboxInput>
-        </div>
-        <div class="pl-8">
-          <TextButton
-            aria-label="Direkteingabe-Sachgebietssuche ausführen"
-            button-type="secondary"
-            class="w-fit"
-            label="Hinzufügen"
-          />
         </div>
       </div>
     </div>
