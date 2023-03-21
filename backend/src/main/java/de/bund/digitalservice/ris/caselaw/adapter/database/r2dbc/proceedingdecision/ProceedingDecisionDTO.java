@@ -1,8 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,7 +31,7 @@ public record ProceedingDecisionDTO (
   @Column("decision_date")
   Instant decisionDate,
 
-  @Transient String fileNumber,
+  @Transient List<FileNumberDTO> fileNumbers,
 
   @Column("document_type_id") Long documentTypeId, // points to lookup table row id
   @Transient DocumentTypeDTO documentTypeDTO

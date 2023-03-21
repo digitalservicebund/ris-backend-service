@@ -11,9 +11,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Doc
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecisionRepository;
@@ -501,8 +504,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
-    return injectProceedingDecisions(documentUnitDTO)
-        .flatMap(this::injectFileNumbers)
+    return injectFileNumbers(documentUnitDTO)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)
@@ -511,15 +513,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
-    return databaseProceedingDecisionRepository
-        .findAllById(documentUnitDTO.getId())
-        .collectList()
-        .map(
-            list -> {
-              documentUnitDTO.setProceedingDecisions(list);
-              return documentUnitDTO;
-            })
-        .map(v -> documentUnitDTO);
+      return databaseProceedingDecisionRepository.findAllById(
+                      databaseProceedingDecisionRepository.findByUuid(documentUnitDTO.uuid)
+                              .map(ProceedingDecisionDTO::id)
+                              .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
+                              .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
+              .collectList()
+              .map(proceedingDecisionDTOS -> {
+                  documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOS);
+                  return documentUnitDTO;
+              });
   }
 
   private Mono<DocumentUnitDTO> injectFileNumbers(DocumentUnitDTO documentUnitDTO) {

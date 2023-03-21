@@ -24,7 +24,7 @@ public class ProceedingDecisionTransformer {
             return ProceedingDecision.builder()
                     .court(court)
                     .uuid(proceedingDecisionDTO.uuid())
-                    .fileNumber(proceedingDecisionDTO.fileNumber())
+                    .fileNumber(proceedingDecisionDTO.fileNumbers().get(0).getFileNumber())
                     .documentType(getDocumentTypeByDTO(proceedingDecisionDTO.documentTypeDTO()))
                     .date(proceedingDecisionDTO.decisionDate())
                     .build();

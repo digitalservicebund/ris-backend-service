@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import java.util.Collections;
+import java.util.List;
 
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
@@ -69,24 +70,6 @@ public class DocumentUnitTransformer {
       throw new DocumentUnitTransformerException(
           "Transformation of a document unit with previous decisions only allowed by update. "
               + "Document unit must have a database id!");
-    }
-
-    if (documentUnit.proceedingDecisions() != null) {
-      builder.proceedingDecisions(
-          documentUnit.proceedingDecisions().stream()
-              .map(
-                  proceedingDecision ->
-                      ProceedingDecisionDTO.builder()
-                          //                          .id(proceedingDecision.id())
-                          //
-                          // .courtLocation(proceedingDecision.court().location())
-                          //                          .courtType(proceedingDecision.court().type())
-                          .fileNumber(proceedingDecision.fileNumber())
-                          .decisionDate(proceedingDecision.date())
-                          .build())
-              .toList());
-    } else {
-      builder.proceedingDecisions(Collections.emptyList());
     }
 
     if (documentUnit.texts() != null) {

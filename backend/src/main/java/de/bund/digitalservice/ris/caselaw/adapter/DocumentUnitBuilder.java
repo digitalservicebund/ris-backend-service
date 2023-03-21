@@ -68,7 +68,7 @@ public class DocumentUnitBuilder {
                               getCourtObject(
                                   proceedingDecisionDTO.courtType(),
                                   proceedingDecisionDTO.courtLocation()))
-                          .fileNumber(proceedingDecisionDTO.fileNumber())
+                          .fileNumber(proceedingDecisionDTO.fileNumbers().get(0).getFileNumber())
                           .date(proceedingDecisionDTO.decisionDate())
                           .build())
               .toList();

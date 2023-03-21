@@ -30,4 +30,14 @@ export const proceedingDecisionFields: InputField[] = [
       ariaLabel: "Aktenzeichen Rechtszug",
     },
   },
+  {
+    name: "documentType",
+    type: InputType.COMBOBOX,
+    label: "Dokumenttyp",
+    inputAttributes: {
+      ariaLabel: "Dokumenttyp",
+      placeholder: "Bitte auswählen",
+      itemService: comboboxItemService.getDocumentTypes,
+    },
+  },
 ]

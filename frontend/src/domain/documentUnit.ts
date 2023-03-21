@@ -38,9 +38,10 @@ export type Texts = {
 }
 
 export type ProceedingDecision = {
+  uuid?: string
   court?: Court
   date?: string
-  fileNumbers?: string[]
+  fileNumber?: string
   documentType?: DocumentType
 }
 
