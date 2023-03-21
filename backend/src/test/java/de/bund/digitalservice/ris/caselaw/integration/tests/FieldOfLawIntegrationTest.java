@@ -9,6 +9,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
@@ -46,12 +48,12 @@ class FieldOfLawIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseFieldOfLawRepository repository;
-  // @Autowired private NormRepository normRepository;
+  @Autowired private NormRepository normRepository;
 
   @AfterEach
   void cleanUp() {
     repository.deleteAll().block();
-    // normRepository.deleteAll().block();
+    normRepository.deleteAll().block();
   }
 
   @Test
@@ -159,19 +161,43 @@ class FieldOfLawIntegrationTest {
     assertThat(identifiers).isEmpty();
   }
 
-  /*@Test
+  @Test
   void testGetFieldsOfLawByNormsQuery() {
     prepareDatabase();
 
-    // TODO
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"abc\"&pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    assertThat(identifiers).containsExactly("FL");
   }
 
   @Test
   void testGetFieldsOfLawByNormsAndSearchQuery() {
     prepareDatabase();
 
-    // TODO
-  }*/
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"def\" some here&pg=0&sz=3")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> identifiers = JsonPath.read(result.getResponseBody(), "$.content[*].identifier");
+    assertThat(identifiers).containsExactly("FL-01");
+  }
 
   @Test
   void testGetChildrenForFieldOfLawNumber() {
@@ -225,15 +251,14 @@ class FieldOfLawIntegrationTest {
         FieldOfLawDTO.builder().id(1L).identifier("FL").isNew(true).changeIndicator('N').build();
     repository.save(fieldOfLawDTO).block();
 
-    /*NormDTO normDTO =
+    NormDTO normDTO =
         NormDTO.builder()
             .id(1L)
             .fieldOfLawId(1L)
             .abbreviation("ABC")
-            .singleNormDescription("§ 1234")
+            .singleNormDescription("§ 123")
             .build();
     normRepository.save(normDTO).block();
-    // TODO: add more norms*/
 
     // child of the first root child
     fieldOfLawDTO =
@@ -241,10 +266,20 @@ class FieldOfLawIntegrationTest {
             .id(2L)
             .isNew(true)
             .identifier("FL-01")
+            .text("some text here")
             .parentId(1L)
             .changeIndicator('N')
             .build();
     repository.save(fieldOfLawDTO).block();
+
+    normDTO =
+        NormDTO.builder()
+            .id(2L)
+            .fieldOfLawId(2L)
+            .abbreviation("DEF")
+            .singleNormDescription("§ 456")
+            .build();
+    normRepository.save(normDTO).block();
 
     // sub child of the child of the first root child
     fieldOfLawDTO =
