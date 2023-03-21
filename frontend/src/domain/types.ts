@@ -7,6 +7,7 @@ export enum InputType {
   DROPDOWN = "dropdown",
   DATE = "date",
   CHECKBOX = "checkbox",
+  RADIO = "radio",
   CHIPS = "chips",
   DATECHIPS = "datechips",
   NESTED = "nested",
@@ -35,6 +36,8 @@ export type TextInputModelType = string
 export interface TextInputAttributes extends BaseInputAttributes {
   placeholder?: string
   readOnly?: boolean
+  maxlength?: string
+  autofocus?: boolean
 }
 
 export interface TextInputField extends BaseInputField {
