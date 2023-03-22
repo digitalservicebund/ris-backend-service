@@ -31,7 +31,7 @@ public class ProceedingDecisionService {
     return documentUnitService.generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
             .flatMap(documentUnit -> repository.linkProceedingDecisions(documentUnitUuid, documentUnit.uuid()).map(v -> documentUnit)
             )
-            .map(documentUnit ->
+            .flatMap(documentUnit ->
                     documentUnitService.updateDocumentUnit(enrichNewDocumentUnitWithData(documentUnit, proceedingDecision))
             )
             .flatMapMany(documentUnit ->
