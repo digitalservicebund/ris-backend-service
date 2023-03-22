@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Nor
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -348,5 +349,86 @@ class FieldOfLawIntegrationTest {
             .changeIndicator('N')
             .build();
     repository.save(fieldOfLawDTO).block();
+  }
+
+  @Test
+  void testOrderingOfGetFieldsOfLawByNormsAndSearchQuery() {
+    String[][] fieldOfLawData = {
+      {"AB-01", "Some text here", "abc", "§ 123"},
+      {"AB-01-01", "More text also here", "cab", "§ 456"},
+      {"CD", "Other text without more", null, null},
+      {"CD-01", "Text means writing here", "dab", "§ 012"},
+      {"CD-02", "Aber a word starting with ab and text + here", "abx", "§ 345"}
+    };
+
+    String searchStr = "norm:\"ab\" AB here text";
+
+    List<String> expectedIdentifiers = Arrays.asList("CD-02", "AB-01", "AB-01-01");
+    List<Integer> expectedScores = Arrays.asList(43, 33, 28);
+
+    int normCount = 0;
+    for (int i = 0; i < fieldOfLawData.length; i++) {
+      String[] fol = fieldOfLawData[i];
+      long folId = (long) i + 1;
+      FieldOfLawDTO fieldOfLawDTO =
+          FieldOfLawDTO.builder().id(folId).isNew(true).identifier(fol[0]).text(fol[1]).build();
+      repository.save(fieldOfLawDTO).block();
+      if (fol[2] == null) continue;
+      NormDTO normDTO =
+          NormDTO.builder()
+              .id((long) normCount++)
+              .fieldOfLawId(folId)
+              .abbreviation(fol[2])
+              .singleNormDescription(fol[3])
+              .build();
+      normRepository.save(normDTO).block();
+    }
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw?q=" + searchStr + "&pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    String str = result.getResponseBody();
+    List<String> actualIdentifiers = JsonPath.read(str, "$.content[*].identifier");
+    List<Integer> actualScores = JsonPath.read(str, "$.content[*].score");
+
+    assertThat(actualIdentifiers).isEqualTo(expectedIdentifiers);
+    assertThat(actualScores).isEqualTo(expectedScores);
+  }
+
+  @Test
+  void testOrderingOfGetFieldsOfLawByIdentifierSearch() {
+    String[] identifier = {"AB-01", "AB-01-01", "CD", "CD-01", "CD-02"};
+
+    String searchStr = "01";
+
+    List<String> expectedIdentifiers = Arrays.asList("AB-01", "CD-01", "AB-01-01");
+
+    for (int i = 0; i < identifier.length; i++) {
+      FieldOfLawDTO fieldOfLawDTO =
+          FieldOfLawDTO.builder().id((long) i + 1).isNew(true).identifier(identifier[i]).build();
+      repository.save(fieldOfLawDTO).block();
+    }
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?searchStr=" + searchStr)
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> actualIdentifiers = JsonPath.read(result.getResponseBody(), "$[*].identifier");
+    assertThat(actualIdentifiers).isEqualTo(expectedIdentifiers);
   }
 }

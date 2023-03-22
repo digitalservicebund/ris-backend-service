@@ -195,7 +195,8 @@ class FieldOfLawServiceTest {
             Collections.emptyList(),
             List.of(new Keyword("keyword")),
             List.of(new Norm("abbr1", "description")),
-            new ArrayList<>());
+            new ArrayList<>(),
+            13);
 
     Pageable pageable = PageRequest.of(0, 10);
     PageImpl<FieldOfLaw> page = new PageImpl<>(List.of(expectedFieldOfLaw), pageable, 1);
@@ -220,7 +221,8 @@ class FieldOfLawServiceTest {
             Collections.emptyList(),
             List.of(new Keyword("keyword")),
             List.of(new Norm("abbr1", "description")),
-            new ArrayList<>());
+            new ArrayList<>(),
+            null);
 
     when(repository.findAllByParentIdentifierOrderByIdentifierAsc("TS-01-01"))
         .thenReturn(Flux.just(expectedFieldOfLaw));

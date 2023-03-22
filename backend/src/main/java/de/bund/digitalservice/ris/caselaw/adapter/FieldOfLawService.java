@@ -3,10 +3,9 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,7 +24,6 @@ import reactor.core.publisher.Mono;
 public class FieldOfLawService {
   private static final String ROOT_ID = "root";
   private static final Pattern NORMS_PATTERN = Pattern.compile("norm\\s?:\\s?\"([^\"]*)\"(.*)");
-  private static final int MAX_TREE_DEPTH = 7;
 
   private final FieldOfLawRepository repository;
 
@@ -73,39 +71,43 @@ public class FieldOfLawService {
     }
 
     return unorderedList
-        .flatMap(
+        .map(
             list -> {
               totalElements.set(list.size());
-              Map<FieldOfLaw, Integer> scores = new HashMap<>();
-              for (FieldOfLaw fieldOfLaw : list) {
-                int score = 0;
-                if (searchTerms != null) {
-                  for (String searchTerm : searchTerms) {
-                    score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
-                  }
-                }
-                if (normStr != null) {
-                  score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
-                }
-                scores.put(fieldOfLaw, score);
-              }
-              list.sort((f1, f2) -> scores.get(f2).compareTo(scores.get(f1)));
+              list =
+                  list.stream()
+                      .map(fieldOfLaw -> calculateScore(searchTerms, normStr, fieldOfLaw))
+                      .sorted((f1, f2) -> f2.score().compareTo(f1.score()))
+                      .toList();
               int fromIdx = (int) pageable.getOffset();
               int toIdx =
                   (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
               if (fromIdx > toIdx) {
-                list.clear();
-                return Mono.just(list);
+                return new ArrayList<FieldOfLaw>();
               }
-              return Mono.just(list.subList(fromIdx, toIdx));
+              return list.subList(fromIdx, toIdx);
             })
         .map(list -> new PageImpl<>(list, pageable, totalElements.get()));
+  }
+
+  private FieldOfLaw calculateScore(String[] searchTerms, String normStr, FieldOfLaw fieldOfLaw) {
+    int score = 0;
+    if (searchTerms != null) {
+      for (String searchTerm : searchTerms) {
+        score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
+      }
+    }
+    if (normStr != null) {
+      score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
+    }
+    return fieldOfLaw.toBuilder().score(score).build();
   }
 
   private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
     int score = 0;
     searchTerm = searchTerm.toLowerCase();
-    String identifier = fieldOfLaw.identifier().toLowerCase();
+    String identifier =
+        fieldOfLaw.identifier() == null ? "" : fieldOfLaw.identifier().toLowerCase();
     String text = fieldOfLaw.text() == null ? "" : fieldOfLaw.text().toLowerCase();
 
     if (identifier.equals(searchTerm)) score += 8;
@@ -126,7 +128,7 @@ public class FieldOfLawService {
     int score = 0;
     normStr = normStr.toLowerCase();
     for (Norm norm : fieldOfLaw.norms()) {
-      String abbreviation = norm.abbreviation().toLowerCase();
+      String abbreviation = norm.abbreviation() == null ? "" : norm.abbreviation().toLowerCase();
       String normText = abbreviation;
       if (norm.singleNormDescription() != null) {
         normText += " " + norm.singleNormDescription().toLowerCase();

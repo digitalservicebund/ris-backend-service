@@ -47,9 +47,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> findAllByOrderByIdentifierAsc(Pageable pageable) {
     return databaseFieldOfLawRepository
         .findAllByOrderByIdentifierAsc(pageable)
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -57,9 +55,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Mono<FieldOfLaw> findByIdentifier(String identifier) {
     return databaseFieldOfLawRepository
         .findByIdentifier(identifier)
-        .flatMap(this::injectKeywords)
-        .flatMap(this::injectNorms)
-        .flatMap(this::injectLinkedFields)
+        .flatMap(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -74,9 +70,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
               }
               return Mono.just(childDTO);
             })
-        .flatMap(this::injectKeywords)
-        .flatMap(this::injectNorms)
-        .flatMap(this::injectLinkedFields)
+        .flatMap(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -84,9 +78,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> getTopLevelNodes() {
     return databaseFieldOfLawRepository
         .findAllByParentIdOrderByIdentifierAsc(null)
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -94,9 +86,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> findAllByParentIdentifierOrderByIdentifierAsc(String identifier) {
     return databaseFieldOfLawRepository
         .findAllByParentIdentifierOrderByIdentifierAsc(identifier)
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -238,9 +228,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> findBySearchTerms(String[] searchTerms) {
     return databaseFieldOfLawRepository
         .findBySearchTerms(searchTerms)
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -248,9 +236,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> findByNormStr(String normStr) {
     return databaseFieldOfLawRepository
         .findByNormStr(normStr)
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -258,9 +244,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> findByNormStrAndSearchTerms(String normStr, String[] searchTerms) {
     return databaseFieldOfLawRepository
         .findByNormStrAndSearchTerms(normStr, searchTerms)
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -268,9 +252,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> getAllLimitedOrderByIdentifierLength() {
     return databaseFieldOfLawRepository
         .getAllLimitedOrderByIdentifierLength()
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
   }
 
@@ -278,9 +260,13 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Flux<FieldOfLaw> findByIdentifierSearch(String searchStr) {
     return databaseFieldOfLawRepository
         .findByIdentifierSearch(searchStr)
-        .flatMapSequential(this::injectKeywords)
-        .flatMapSequential(this::injectNorms)
-        .flatMapSequential(this::injectLinkedFields)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain);
+  }
+
+  private Mono<FieldOfLawDTO> injectAdditionalInformation(FieldOfLawDTO fieldOfLawDTO) {
+    return injectKeywords(fieldOfLawDTO)
+        .flatMap(this::injectNorms)
+        .flatMap(this::injectLinkedFields);
   }
 }

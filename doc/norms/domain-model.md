@@ -9,9 +9,7 @@ classDiagram
 
     +String officialLongTitle
     String risAbbreviation
-    String risAbbreviationInternationalLaw
     String documentNumber
-    String divergentDocumentNumber
     String documentCategory
 
     String documentTypeName
@@ -35,9 +33,6 @@ classDiagram
 
     String officialShortTitle
     String officialAbbreviation
-    String unofficialLongTitle
-    String unofficialShortTitle
-    String unofficialAbbreviation
 
     Date entryIntoForceDate
     UndefinedDate entryIntoForceDateState
@@ -85,8 +80,6 @@ classDiagram
     String euAnnouncementExplanations
     String otherOfficialAnnouncement
 
-    String unofficialReference
-
     String completeCitation
 
     String statusNote
@@ -125,23 +118,15 @@ classDiagram
     String footnoteStateLaw
     String footnoteEuLaw
 
-    String validityRule
-
     String digitalEvidenceLink
     String digitalEvidenceRelatedData
     String digitalEvidenceExternalDataNote
     String digitalEvidenceAppendix
 
-    String referenceNumber
-
     String celexNumber
 
     String ageIndicationStart
     String ageIndicationEnd
-
-    String definition
-
-    String ageOfMajorityIndication
 
     String text
     List~FileReference~ files
@@ -176,7 +161,17 @@ classDiagram
 
   class MetadatumType  {
       <<enumeration>>
-      KEYWORD
+      KEYWORD,
+      UNOFFICIAL_LONG_TITLE,
+      UNOFFICIAL_SHORT_TITLE,
+      UNOFFICIAL_ABBREVIATION,
+      UNOFFICIAL_REFERENCE,
+      DIVERGENT_DOCUMENT_NUMBER,
+      REFERENCE_NUMBER,
+      DEFINITION,
+      RIS_ABBREVIATION_INTERNATIONAL_LAW,
+      AGE_OF_MAJORITY_INDICATION,
+      VALIDITY_RULE
   }
 
   class FileReference {

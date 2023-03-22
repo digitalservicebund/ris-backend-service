@@ -55,8 +55,8 @@ fun mapDomainToData(norm: Norm): NormData {
     normData.officialAbbreviation = norm.officialAbbreviation
     normData.officialLongTitle = norm.officialLongTitle
     normData.officialShortTitle = norm.officialShortTitle
-    normData.participationInstitution = norm.participationInstitution
-    normData.participationType = norm.participationType
+    normData.providerEntity = norm.providerEntity
+    normData.providerDecidingBody = norm.providerDecidingBody
     normData.printAnnouncementGazette = norm.printAnnouncementGazette
     normData.printAnnouncementYear = norm.printAnnouncementYear
     normData.printAnnouncementNumber = norm.printAnnouncementNumber
