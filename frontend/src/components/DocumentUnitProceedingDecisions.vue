@@ -19,7 +19,8 @@ const defaultModel: ProceedingDecision = {
   fileNumber: undefined,
 }
 
-const values = ref<ProceedingDecision>(defaultModel)
+const proceedingDecisionList = ref<ProceedingDecision[]>()
+const proceedingDecisionInput = ref<ProceedingDecision>(defaultModel)
 
 const addProceedingDecision = async (
   proceedingDecision: ProceedingDecision
@@ -31,6 +32,7 @@ const addProceedingDecision = async (
     )
     if (response.data) {
       console.log(response.data)
+      proceedingDecisionList.value = response.data
     }
   }
 }
@@ -39,7 +41,7 @@ watch(
   props,
   () => {
     console.log(props.proceedingDecisions)
-    // proceedingDecisions.value = props.proceedingDecisions
+    proceedingDecisionList.value = props.proceedingDecisions
   },
   {
     immediate: true,
@@ -53,17 +55,20 @@ watch(
       <h1 class="heading-02-regular mb-[1rem]">Vorgehende Entscheidungen</h1>
     </template>
 
+    <p v-for="decision in proceedingDecisionList" :key="decision.uuid">
+      {{ decision.court?.type }} {{ decision.court?.location }}
+      {{ decision.documentType }} {{ decision.date }}
+    </p>
     <InputGroup
-      v-model="values"
+      v-model="proceedingDecisionInput"
       :column-count="2"
       :fields="proceedingDecisionFields"
     ></InputGroup>
 
     <TextButton
       aria-label="Entscheidung manuell hinzufügen"
-      class="mt-44"
       label="Manuell Hinzufügen"
-      @click="addProceedingDecision(values)"
+      @click="addProceedingDecision(proceedingDecisionInput)"
     />
   </ExpandableContent>
 </template>
