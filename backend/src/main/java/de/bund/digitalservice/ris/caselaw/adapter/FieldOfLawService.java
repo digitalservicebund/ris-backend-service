@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.FieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.FieldOfLaw;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.fieldoflaw.Norm;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -94,7 +95,7 @@ public class FieldOfLawService {
               int toIdx =
                   (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
               if (fromIdx > toIdx) {
-                return Mono.empty();
+                return Mono.just(new ArrayList<FieldOfLaw>());
               }
               return Mono.just(list.subList(fromIdx, toIdx));
             })

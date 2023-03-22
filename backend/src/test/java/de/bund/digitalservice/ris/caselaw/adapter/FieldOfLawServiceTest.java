@@ -196,7 +196,7 @@ class FieldOfLawServiceTest {
             List.of(new Keyword("keyword")),
             List.of(new Norm("abbr1", "description")),
             new ArrayList<>(),
-            null);
+            13);
 
     Pageable pageable = PageRequest.of(0, 10);
     PageImpl<FieldOfLaw> page = new PageImpl<>(List.of(expectedFieldOfLaw), pageable, 1);
