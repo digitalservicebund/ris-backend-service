@@ -254,14 +254,14 @@ class FieldOfLawIntegrationTest {
             response -> {
               FieldOfLaw field = response.getResponseBody();
               assertThat(field).isNotNull();
-              assertThat(field.getIdentifier()).isEqualTo("FL");
-              assertThat(field.getChildren()).hasSize(1);
-              FieldOfLaw child = field.getChildren().get(0);
-              assertThat(child.getIdentifier()).isEqualTo("FL-01");
-              assertThat(child.getChildren()).hasSize(1);
-              child = child.getChildren().get(0);
-              assertThat(child.getIdentifier()).isEqualTo("FL-01-01");
-              assertThat(child.getChildren()).isEmpty();
+              assertThat(field.identifier()).isEqualTo("FL");
+              assertThat(field.children()).hasSize(1);
+              FieldOfLaw child = field.children().get(0);
+              assertThat(child.identifier()).isEqualTo("FL-01");
+              assertThat(child.children()).hasSize(1);
+              child = child.children().get(0);
+              assertThat(child.identifier()).isEqualTo("FL-01-01");
+              assertThat(child.children()).isEmpty();
             });
   }
 

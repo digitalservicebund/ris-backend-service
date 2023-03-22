@@ -62,7 +62,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   @Override
   public Mono<FieldOfLaw> findParentByChild(FieldOfLaw child) {
     return databaseFieldOfLawRepository
-        .findByIdentifier(child.getIdentifier())
+        .findByIdentifier(child.identifier())
         .flatMap(
             childDTO -> {
               if (childDTO.getParentId() != null) {
@@ -140,7 +140,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .map(
             fieldOfLawList ->
                 fieldOfLawList.stream()
-                    .sorted(Comparator.comparing(FieldOfLaw::getIdentifier))
+                    .sorted(Comparator.comparing(FieldOfLaw::identifier))
                     .toList());
   }
 
@@ -182,7 +182,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
         .map(
             fieldOfLawList ->
                 fieldOfLawList.stream()
-                    .sorted(Comparator.comparing(FieldOfLaw::getIdentifier))
+                    .sorted(Comparator.comparing(FieldOfLaw::identifier))
                     .toList());
   }
 

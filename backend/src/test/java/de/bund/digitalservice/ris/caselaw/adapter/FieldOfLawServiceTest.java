@@ -173,8 +173,8 @@ class FieldOfLawServiceTest {
     StepVerifier.create(service.getTreeForFieldOfLaw("child"))
         .consumeNextWith(
             result -> {
-              assertThat(result.getIdentifier()).isEqualTo("parent");
-              assertThat(result.getChildren()).extracting("identifier").containsExactly("child");
+              assertThat(result.identifier()).isEqualTo("parent");
+              assertThat(result.children()).extracting("identifier").containsExactly("child");
             })
         .verifyComplete();
 

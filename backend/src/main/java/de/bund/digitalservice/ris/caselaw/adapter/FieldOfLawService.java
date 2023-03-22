@@ -73,25 +73,28 @@ public class FieldOfLawService {
         .flatMap(
             list -> {
               totalElements.set(list.size());
-              for (FieldOfLaw fieldOfLaw : list) {
-                int score = 0;
-                if (searchTerms != null) {
-                  for (String searchTerm : searchTerms) {
-                    score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
-                  }
-                }
-                if (normStr != null) {
-                  score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
-                }
-                fieldOfLaw.setScore(score);
-              }
-              list.sort((f1, f2) -> f2.getScore().compareTo(f1.getScore()));
+              list =
+                  list.stream()
+                      .map(
+                          fieldOfLaw -> {
+                            int score = 0;
+                            if (searchTerms != null) {
+                              for (String searchTerm : searchTerms) {
+                                score += getScoreContributionFromSearchTerm(fieldOfLaw, searchTerm);
+                              }
+                            }
+                            if (normStr != null) {
+                              score += getScoreContributionFromNormStr(fieldOfLaw, normStr);
+                            }
+                            return fieldOfLaw.toBuilder().score(score).build();
+                          })
+                      .sorted((f1, f2) -> f2.score().compareTo(f1.score()))
+                      .toList();
               int fromIdx = (int) pageable.getOffset();
               int toIdx =
                   (int) Math.min(pageable.getOffset() + pageable.getPageSize(), list.size());
               if (fromIdx > toIdx) {
-                list.clear();
-                return Mono.just(list);
+                return Mono.empty();
               }
               return Mono.just(list.subList(fromIdx, toIdx));
             })
@@ -101,8 +104,8 @@ public class FieldOfLawService {
   private int getScoreContributionFromSearchTerm(FieldOfLaw fieldOfLaw, String searchTerm) {
     int score = 0;
     searchTerm = searchTerm.toLowerCase();
-    String identifier = fieldOfLaw.getIdentifier().toLowerCase();
-    String text = fieldOfLaw.getText() == null ? "" : fieldOfLaw.getText().toLowerCase();
+    String identifier = fieldOfLaw.identifier().toLowerCase();
+    String text = fieldOfLaw.text() == null ? "" : fieldOfLaw.text().toLowerCase();
 
     if (identifier.equals(searchTerm)) score += 8;
     if (identifier.startsWith(searchTerm)) score += 5;
@@ -121,7 +124,7 @@ public class FieldOfLawService {
   private int getScoreContributionFromNormStr(FieldOfLaw fieldOfLaw, String normStr) {
     int score = 0;
     normStr = normStr.toLowerCase();
-    for (Norm norm : fieldOfLaw.getNorms()) {
+    for (Norm norm : fieldOfLaw.norms()) {
       String abbreviation = norm.abbreviation().toLowerCase();
       String normText = abbreviation;
       if (norm.singleNormDescription() != null) {
@@ -159,11 +162,11 @@ public class FieldOfLawService {
         .findParentByChild(child)
         .flatMap(
             parent -> {
-              if (child.getIdentifier().equals(parent.getIdentifier())) {
+              if (child.identifier().equals(parent.identifier())) {
                 return Mono.just(child);
               }
 
-              parent.getChildren().add(child);
+              parent.children().add(child);
 
               return findParent(parent);
             });
