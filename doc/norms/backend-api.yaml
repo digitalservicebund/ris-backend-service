@@ -275,6 +275,16 @@ components:
       type: string
       enum:
         - KEYWORD
+        - UNOFFICIAL_LONG_TITLE
+        - UNOFFICIAL_SHORT_TITLE
+        - UNOFFICIAL_ABBREVIATION
+        - UNOFFICIAL_REFERENCE
+        - DIVERGENT_DOCUMENT_NUMBER
+        - REFERENCE_NUMBER
+        - DEFINITION
+        - RIS_ABBREVIATION_INTERNATIONAL_LAW
+        - AGE_OF_MAJORITY_INDICATION
+        - VALIDITY_RULE
     Metadatum:
       type: object
       properties:
@@ -366,9 +376,6 @@ components:
         officialAbbreviation:
           type: string
           example: SaubFahrzeugBeschG
-        referenceNumber:
-          type: string
-          example: 1 BvR 2011/94
         announcementDate:
           $ref: '#/components/schemas/Date'
         citationDate:
@@ -408,12 +415,6 @@ components:
         documentCategory:
           type: string
           example: ''
-        risAbbreviationInternationalLaw:
-          type: string
-          example: ''
-        unofficialReference:
-          type: string
-          example: ''
         applicationScopeArea:
           type: string
           example: ''
@@ -421,13 +422,7 @@ components:
           $ref: '#/components/schemas/Date'
         applicationScopeEndDate:
           $ref: '#/components/schemas/Date'
-        validityRule:
-          type: string
-          example: ''
         celexNumber:
-          type: string
-          example: ''
-        definition:
           type: string
           example: ''
         categorizedReference:
@@ -455,15 +450,6 @@ components:
           $ref: '#/components/schemas/Date'
         entryIntoForceDate:
           $ref: '#/components/schemas/Date'
-        unofficialLongTitle:
-          type: string
-          example: ''
-        unofficialShortTitle:
-          type: string
-          example: Nichtamtliche Kurzüberschrift
-        unofficialAbbreviation:
-          type: string
-          example: Nichtamtliche Buchstabenabkürzung
         risAbbreviation:
           type: string
           example: SaubFahrzeugBeschG
@@ -523,9 +509,6 @@ components:
         text:
           type: string
           example: text
-        ageOfMajorityIndication:
-          type: string
-          example: ''
         divergentExpirationDate:
           $ref: '#/components/schemas/Date'
         divergentExpirationDateState:
@@ -647,9 +630,6 @@ components:
         eli:
           $ref: '#/components/schemas/ELI'
         completeCitation:
-          type: string
-          example: ''
-        divergentDocumentNumber:
           type: string
           example: ''
         digitalEvidenceLink:
