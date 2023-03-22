@@ -9,7 +9,6 @@ type CitationDate = { date?: string; year?: string }
 interface Props {
   value?: CitationDate
   modelValue?: CitationDate
-  ariaLabel: string
 }
 
 interface Emits {
@@ -129,7 +128,8 @@ const yearValue = computed({
       id="citationDate"
       v-model="dateValue"
       alt-text="Citadation Date Input Field"
-      aria-label=""
+      aria-label="Zitierdatum Datum"
+      is-future-date
     />
     <div>
       <TextInput
@@ -137,7 +137,7 @@ const yearValue = computed({
         id="citationYear"
         v-model="yearValue"
         alt-text="Citation Year Input Field"
-        aria-label=""
+        aria-label="Zitierdatum Jahresangabe"
         maxlength="4"
         :placeholder="YearPlaceHolder"
         @keypress="onlyAllowNumbers"
