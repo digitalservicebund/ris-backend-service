@@ -1,5 +1,6 @@
 <script lang="ts" setup>
-import { watch, ref, computed } from "vue"
+import dayjs from "dayjs"
+import { watch, ref } from "vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import TextButton from "@/components/TextButton.vue"
@@ -55,9 +56,15 @@ watch(
       <h1 class="heading-02-regular mb-[1rem]">Vorgehende Entscheidungen</h1>
     </template>
 
-    <p v-for="decision in proceedingDecisionList" :key="decision.uuid">
+    <p
+      v-for="decision in proceedingDecisionList"
+      :key="decision.uuid"
+      class="link-01-bold mb-24 mt-12"
+    >
       {{ decision.court?.type }} {{ decision.court?.location }}
-      {{ decision.documentType }} {{ decision.date }}
+      {{ decision.documentType?.label }}
+      {{ dayjs(decision.date).format("DD.MM.YYYY") }}
+      {{ decision.fileNumber }}
     </p>
     <InputGroup
       v-model="proceedingDecisionInput"

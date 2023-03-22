@@ -56,7 +56,7 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
             .collectList()
             .map(
                     fileNumbers -> {
-                      proceedingDecisionDTO.toBuilder().fileNumbers(
+                      proceedingDecisionDTO.setFileNumbers(
                               fileNumbers.stream()
                                       .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
                                       .toList());
@@ -73,7 +73,7 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
             .defaultIfEmpty(DocumentTypeDTO.builder().build())
             .map(
                     documentTypeDTO -> {
-                      proceedingDecisionDTO.toBuilder().documentTypeDTO(documentTypeDTO);
+                      proceedingDecisionDTO.setDocumentTypeDTO(documentTypeDTO);
                       return proceedingDecisionDTO;
                     });
   }
