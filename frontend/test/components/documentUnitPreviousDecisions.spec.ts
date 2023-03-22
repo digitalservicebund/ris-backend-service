@@ -1,9 +1,9 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
-import type { PreviousDecision } from "@/domain/documentUnit"
+import DocumentUnitPreviousDecisions from "@/components/DocumentUnitProceedingDecisions.vue"
+import type { ProceedingDecision } from "@/domain/documentUnit"
 
-function renderComponent(options?: { modelValue?: PreviousDecision[] }) {
+function renderComponent(options?: { modelValue?: ProceedingDecision[] }) {
   const props = { modelValue: options?.modelValue }
   const utils = render(DocumentUnitPreviousDecisions, { props })
   const user = userEvent.setup()

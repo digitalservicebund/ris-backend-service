@@ -3,7 +3,7 @@ import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
+import DocumentUnitProceedingDecision from "@/components/DocumentUnitProceedingDecisions.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
@@ -200,11 +200,9 @@ onUnmounted(() => {
           @update-document-unit="handleUpdateDocumentUnit"
         />
 
-        <!-- TODO add validationErrors -->
-        <DocumentUnitPreviousDecisions
+        <DocumentUnitProceedingDecision
           id="proceedingDecisions"
           v-model="proceedingDecisions"
-          class="my-16"
         />
 
         <!-- TODO add validationErrors -->

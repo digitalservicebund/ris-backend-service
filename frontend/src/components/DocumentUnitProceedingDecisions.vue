@@ -1,49 +1,43 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { watch, ref } from "vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
-import ModelComponentRepeater from "@/components/ModelComponentRepeater.vue"
 import TextButton from "@/components/TextButton.vue"
 import { proceedingDecisionFields } from "@/domain"
-import type { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/documentUnit"
+import ProceedingDecisionService from "@/services/proceedingDecisionService"
 
-const props = defineProps<Props>()
+const props = defineProps<{
+  documentUnitUuid: string
+  proceedingDecisions: ProceedingDecision[]
+}>()
 
-const emit = defineEmits<Emits>()
+const proceedingDecisions = ref<ProceedingDecision[]>([])
 
-const defaultModel: ProceedingDecision = {
-  court: {
-    type: "",
-    location: "",
-    label: "",
-    revoked: "",
-  },
-  date: "",
-  fileNumbers: [],
-}
-
-interface Props {
-  modelValue?: ProceedingDecision[]
-}
-
-interface Emits {
-  (event: "update:modelValue", value: ProceedingDecision[]): void
-}
-
-const values = computed({
-  get: () => {
-    if (props.modelValue?.length) {
-      return props.modelValue
-    } else {
-      return [{ ...defaultModel }]
+const addProceedingDecision = async (
+  proceedingDecision: ProceedingDecision
+) => {
+  if (proceedingDecision !== undefined) {
+    const response = await ProceedingDecisionService.addProceedingDecision(
+      props.documentUnitUuid,
+      proceedingDecision
+    )
+    if (response.data) {
+      console.log(response.data)
     }
+  }
+}
+
+watch(
+  props,
+  () => {
+    console.log(props.proceedingDecisions)
+    proceedingDecisions.value = props.proceedingDecisions
   },
-  set: (newValues) => {
-    if (newValues[0] !== defaultModel) {
-      emit("update:modelValue", newValues)
-    }
-  },
-})
+  {
+    immediate: true,
+  }
+)
 </script>
 
 <template>
@@ -51,6 +45,18 @@ const values = computed({
     <template #header>
       <h1 class="heading-02-regular mb-[1rem]">Vorgehende Entscheidungen</h1>
     </template>
+
+    <InputGroup
+      :column-count="2"
+      :fields="proceedingDecisionFields"
+    ></InputGroup>
+
+    <TextButton
+      aria-label="Entscheidung manuell hinzufügen"
+      class="mt-44"
+      label="Manuell Hinzufügen"
+      @click="addProceedingDecision()"
+    />
 
     <ModelComponentRepeater
       v-model="values"

@@ -9,7 +9,7 @@ type InputValues = { [fieldName: string]: ModelType }
 
 interface Props {
   fields: InputField[]
-  modelValue: InputValues
+  modelValue?: InputValues
   columnCount?: number
   validationErrors?: ValidationError[]
 }
@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   columnCount: 1,
   validationErrors: undefined,
 })
+
 const emit = defineEmits<Emits>()
 
 /*
@@ -58,7 +59,7 @@ const inputValues = ref<InputValues>({})
 
 watch(
   () => props.modelValue,
-  () => (inputValues.value = props.modelValue),
+  () => (inputValues.value = props.modelValue ? props.modelValue : {}),
   { immediate: true, deep: true }
 )
 
