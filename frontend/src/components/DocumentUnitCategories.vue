@@ -91,11 +91,6 @@ const coreData = computed({
   },
 })
 
-const proceedingDecisions = computed({
-  get: () => props.documentUnit.proceedingDecisions,
-  set: (newValue) => (updatedDocumentUnit.value.proceedingDecisions = newValue),
-})
-
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
 
@@ -201,8 +196,8 @@ onUnmounted(() => {
         />
 
         <DocumentUnitProceedingDecision
-          id="proceedingDecisions"
-          v-model="proceedingDecisions"
+          :document-unit-uuid="updatedDocumentUnit.uuid"
+          :proceeding-decisions="props.documentUnit.proceedingDecisions"
         />
 
         <!-- TODO add validationErrors -->

@@ -2,16 +2,18 @@ import { ProceedingDecision } from "./../domain/documentUnit"
 import httpClient, { ServiceResponse } from "./httpClient"
 
 interface ProceedingDecisionService {
-  getProceedingDecisions(uuid: string): Promise<ServiceResponse<{}>>
+  getProceedingDecisions(
+    uuid: string
+  ): Promise<ServiceResponse<ProceedingDecision[]>>
   addProceedingDecision(
     uuid: string,
     proceedingDecision: ProceedingDecision
-  ): Promise<ServiceResponse<{}>>
+  ): Promise<ServiceResponse<ProceedingDecision[]>>
 }
 
 const service: ProceedingDecisionService = {
   async getProceedingDecisions(uuid: string) {
-    const response = await httpClient.get<{}>(
+    const response = await httpClient.get<ProceedingDecision[]>(
       `caselaw/documentunits/${uuid}/proceedingdecisions`
     )
     if (response.status >= 300) {
@@ -25,7 +27,10 @@ const service: ProceedingDecisionService = {
     uuid: string,
     proceedingDecision: ProceedingDecision
   ) {
-    const response = await httpClient.put<{}, {}>(
+    const response = await httpClient.put<
+      ProceedingDecision,
+      ProceedingDecision[]
+    >(
       `caselaw/documentunits/${uuid}/proceedingdecisions`,
       {
         headers: {
@@ -33,7 +38,7 @@ const service: ProceedingDecisionService = {
           "Content-Type": "application/json",
         },
       },
-      JSON.stringify(proceedingDecision)
+      proceedingDecision
     )
     if (response.status >= 300) {
       response.error = {

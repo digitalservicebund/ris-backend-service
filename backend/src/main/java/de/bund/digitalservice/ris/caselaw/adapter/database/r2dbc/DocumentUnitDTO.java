@@ -6,6 +6,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Fie
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -27,7 +29,7 @@ public class DocumentUnitDTO {
   UUID uuid;
   String documentnumber;
   Instant creationtimestamp;
-  DataSourceDTO dataSource;
+  DataSource dataSource;
 
   // Original file
   Instant fileuploadtimestamp;

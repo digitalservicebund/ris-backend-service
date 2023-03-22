@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DataSourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -118,9 +117,10 @@ public class DocumentUnitBuilder {
     }
 
     DataSource dataSource = DataSource.NEURIS;
-    if (documentUnitDTO.getDataSource() == DataSourceDTO.MIGRATION) {
-      dataSource = DataSource.MIGRATION;
+    if(documentUnitDTO.getDataSource() != null) {
+      dataSource = documentUnitDTO.getDataSource();
     }
+
 
     List<String> keywords = null;
     if (documentUnitDTO.getKeywords() != null) {

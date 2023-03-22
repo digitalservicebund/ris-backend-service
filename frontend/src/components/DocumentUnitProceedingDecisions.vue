@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { watch, ref } from "vue"
+import { watch, ref, computed } from "vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import TextButton from "@/components/TextButton.vue"
@@ -9,10 +9,17 @@ import ProceedingDecisionService from "@/services/proceedingDecisionService"
 
 const props = defineProps<{
   documentUnitUuid: string
-  proceedingDecisions: ProceedingDecision[]
+  proceedingDecisions: ProceedingDecision[] | undefined
 }>()
 
-const proceedingDecisions = ref<ProceedingDecision[]>([])
+const defaultModel: ProceedingDecision = {
+  court: undefined,
+  documentType: undefined,
+  date: undefined,
+  fileNumber: undefined,
+}
+
+const values = ref<ProceedingDecision>(defaultModel)
 
 const addProceedingDecision = async (
   proceedingDecision: ProceedingDecision
@@ -32,7 +39,7 @@ watch(
   props,
   () => {
     console.log(props.proceedingDecisions)
-    proceedingDecisions.value = props.proceedingDecisions
+    // proceedingDecisions.value = props.proceedingDecisions
   },
   {
     immediate: true,
@@ -47,6 +54,7 @@ watch(
     </template>
 
     <InputGroup
+      v-model="values"
       :column-count="2"
       :fields="proceedingDecisionFields"
     ></InputGroup>
@@ -55,34 +63,7 @@ watch(
       aria-label="Entscheidung manuell hinzufügen"
       class="mt-44"
       label="Manuell Hinzufügen"
-      @click="addProceedingDecision()"
+      @click="addProceedingDecision(values)"
     />
-
-    <ModelComponentRepeater
-      v-model="values"
-      :column-count="2"
-      :component="InputGroup"
-      :default-value="defaultModel"
-      :fields="proceedingDecisionFields"
-    >
-      <template #removeButton="{ onClick }">
-        <TextButton
-          aria-label="Entscheidung Entfernen"
-          button-type="ghost"
-          class="mb-44 mt-6"
-          label="Entfernen"
-          @click="onClick"
-        />
-      </template>
-
-      <template #addButton="{ onClick }">
-        <TextButton
-          aria-label="weitere Entscheidung hinzufügen"
-          class="mt-44"
-          label="weitere Entscheidung hinzufügen"
-          @click="onClick"
-        />
-      </template>
-    </ModelComponentRepeater>
   </ExpandableContent>
 </template>

@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecis
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import java.time.Instant;
@@ -100,7 +101,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 .uuid(UUID.randomUUID())
                 .creationtimestamp(Instant.now())
                 .documentnumber(documentNumber)
-                .dataSource(DataSourceDTO.NEURIS)
+                .dataSource(DataSource.NEURIS)
                 .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                 .build())
         .map(
@@ -488,6 +489,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
     return injectFileNumbers(documentUnitDTO)
+            .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)

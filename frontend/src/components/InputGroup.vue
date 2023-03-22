@@ -9,7 +9,7 @@ type InputValues = { [fieldName: string]: ModelType }
 
 interface Props {
   fields: InputField[]
-  modelValue?: InputValues
+  modelValue: InputValues
   columnCount?: number
   validationErrors?: ValidationError[]
 }
@@ -63,9 +63,16 @@ watch(
   { immediate: true, deep: true }
 )
 
-watch(inputValues, () => emit("update:modelValue", inputValues.value), {
-  deep: true,
-})
+watch(
+  inputValues,
+  () => {
+    console.log(inputValues.value)
+    emit("update:modelValue", inputValues.value)
+  },
+  {
+    deep: true,
+  }
+)
 </script>
 
 <template>

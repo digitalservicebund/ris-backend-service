@@ -18,12 +18,13 @@ public class ProceedingDecisionController {
   }
 
   @GetMapping
-  public Flux<ProceedingDecision> getProceedingDecisions(@PathVariable UUID documentUnitUuid) {
+  public Flux<ProceedingDecision> getProceedingDecisions(@PathVariable("uuid") UUID documentUnitUuid) {
     return proceedingDecisionService.getProceedingDecisionsForDocumentUnit(documentUnitUuid);
   }
 
   @PutMapping
-  public Flux<ProceedingDecision> addProceedingDecision(@PathVariable UUID documentUnitUuid, @RequestBody ProceedingDecision proceedingDecision) {
+  public Flux<ProceedingDecision> addProceedingDecision(@PathVariable("uuid") UUID documentUnitUuid,
+      @RequestBody ProceedingDecision proceedingDecision) {
     return proceedingDecisionService.addProceedingDecision(documentUnitUuid, proceedingDecision);
   }
 }

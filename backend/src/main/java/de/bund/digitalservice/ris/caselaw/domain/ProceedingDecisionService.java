@@ -1,14 +1,11 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecisionRepository;
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
-import javax.swing.text.Document;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,7 +24,7 @@ public class ProceedingDecisionService {
   public Flux<ProceedingDecision> getProceedingDecisionsForDocumentUnit(UUID documentUnitUuid) {
     return repository.findAllForDocumentUnit(documentUnitUuid);
   }
-  
+
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Flux<ProceedingDecision> addProceedingDecision(UUID documentUnitUuid, ProceedingDecision proceedingDecision) {
 
@@ -43,14 +40,21 @@ public class ProceedingDecisionService {
     }
 
   private DocumentUnit enrichNewDocumentUnitWithData(DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
+    List<String> fileNumbers = null;
+    if(!StringUtils.isBlank(proceedingDecision.fileNumber())) {
+      fileNumbers = List.of(proceedingDecision.fileNumber());
+    }
+
     CoreData coreData = documentUnit.coreData().toBuilder()
-            .fileNumbers(List.of(proceedingDecision.fileNumber()))
+            .fileNumbers(fileNumbers)
             .documentType(proceedingDecision.documentType())
             .decisionDate(proceedingDecision.date())
             .court(proceedingDecision.court())
             .build();
 
-    return documentUnit.toBuilder().coreData(coreData).build();
+    return documentUnit.toBuilder()
+            .dataSource(DataSource.PROCEEDING_DECISION)
+            .coreData(coreData).build();
   }
 
 }
