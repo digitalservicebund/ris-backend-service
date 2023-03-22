@@ -205,6 +205,8 @@ function isFieldOfLawComboboxItem(
 }
 
 const hasAdditionalInfo = (item: ComboboxItem) => {
+  // this needs to happen in the service, the component should not deal with specific types
+  // the service needs to provide all required info TODO
   return isRevokedCourt(item) || isFieldOfLawComboboxItem(item.value)
 }
 
