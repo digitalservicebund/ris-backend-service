@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -68,7 +69,7 @@ public class DocumentUnitBuilder {
                               getCourtObject(
                                   proceedingDecisionDTO.getCourtType(),
                                   proceedingDecisionDTO.getCourtLocation()))
-                          .fileNumber(proceedingDecisionDTO.getFileNumbers().get(0).getFileNumber())
+                          .fileNumber(getFileNumber(proceedingDecisionDTO))
                           .date(proceedingDecisionDTO.getDecisionDate())
                           .build())
               .toList();
@@ -163,5 +164,13 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getCaseFacts(),
             documentUnitDTO.getDecisionReasons()),
         new ContentRelatedIndexing(keywords, fieldsOfLaw));
+  }
+
+  private String getFileNumber(ProceedingDecisionDTO proceedingDecisionDTO) {
+    String fileNumber = null;
+    if(proceedingDecisionDTO.getFileNumbers() != null && !proceedingDecisionDTO.getFileNumbers().isEmpty()) {
+      fileNumber = proceedingDecisionDTO.getFileNumbers().get(0).getFileNumber();
+    }
+    return fileNumber;
   }
 }
