@@ -18,8 +18,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepos
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
@@ -27,6 +25,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Doc
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -225,12 +225,15 @@ class DocumentUnitIntegrationTest {
             .proceedingDecisions(
                 List.of(
                     ProceedingDecision.builder()
-                            .uuid(UUID.randomUUID())
-                            .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                            .date(Instant.parse("2020-05-06T00:00:00Z"))
-                            .fileNumber("prev1")
-                            .documentType(
-                                    DocumentType.builder().jurisShortcut("category").label("category123").build())
+                        .uuid(UUID.randomUUID())
+                        .court(new Court("courtType", "courtPlace", "courtLabel", null))
+                        .date(Instant.parse("2020-05-06T00:00:00Z"))
+                        .fileNumber("prev1")
+                        .documentType(
+                            DocumentType.builder()
+                                .jurisShortcut("category")
+                                .label("category123")
+                                .build())
                         .build()))
             .build();
 

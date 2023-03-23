@@ -1,13 +1,12 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-
-import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

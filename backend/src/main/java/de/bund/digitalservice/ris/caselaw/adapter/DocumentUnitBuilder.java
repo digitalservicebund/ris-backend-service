@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
@@ -62,8 +61,8 @@ public class DocumentUnitBuilder {
     if (documentUnitDTO.getProceedingDecisions() != null) {
       proceedingDecisions =
           documentUnitDTO.getProceedingDecisions().stream()
-                  .map(ProceedingDecisionTransformer::transformToDomain)
-                  .toList();
+              .map(ProceedingDecisionTransformer::transformToDomain)
+              .toList();
     }
 
     List<String> fileNumbers = null;
@@ -109,10 +108,9 @@ public class DocumentUnitBuilder {
     }
 
     DataSource dataSource = DataSource.NEURIS;
-    if(documentUnitDTO.getDataSource() != null) {
+    if (documentUnitDTO.getDataSource() != null) {
       dataSource = documentUnitDTO.getDataSource();
     }
-
 
     List<String> keywords = null;
     if (documentUnitDTO.getKeywords() != null) {

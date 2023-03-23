@@ -111,8 +111,14 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .proceedingDecisions(
                 List.of(
-                    ProceedingDecision.builder().uuid(proceedingDecisionUuid1).fileNumber("prev1").build(),
-                    ProceedingDecision.builder().uuid(proceedingDecisionUuid2).fileNumber("prev2").build()))
+                    ProceedingDecision.builder()
+                        .uuid(proceedingDecisionUuid1)
+                        .fileNumber("prev1")
+                        .build(),
+                    ProceedingDecision.builder()
+                        .uuid(proceedingDecisionUuid2)
+                        .fileNumber("prev2")
+                        .build()))
             .build();
 
     webClient

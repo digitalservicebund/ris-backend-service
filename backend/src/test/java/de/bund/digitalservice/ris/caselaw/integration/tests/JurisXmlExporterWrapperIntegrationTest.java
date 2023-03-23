@@ -65,13 +65,13 @@ public class JurisXmlExporterWrapperIntegrationTest {
     List<ProceedingDecision> proceedingDecisions =
         List.of(
             ProceedingDecision.builder()
-                    .uuid(UUID.randomUUID())
-                    .court(new Court("courtType", "courtPlace", "courtLabel", null))
-                    .date(Instant.parse("2020-05-06T00:00:00Z"))
-                    .fileNumber("fileNumber")
-                    .documentType(
-                            DocumentType.builder().jurisShortcut("category").label("category123").build())
-                    .build());
+                .uuid(UUID.randomUUID())
+                .court(new Court("courtType", "courtPlace", "courtLabel", null))
+                .date(Instant.parse("2020-05-06T00:00:00Z"))
+                .fileNumber("fileNumber")
+                .documentType(
+                    DocumentType.builder().jurisShortcut("category").label("category123").build())
+                .build());
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()
@@ -151,8 +151,8 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
                 .fileNumber("fileNumber")
-                    .documentType(
-                            DocumentType.builder().jurisShortcut("category").label("category123").build())
+                .documentType(
+                    DocumentType.builder().jurisShortcut("category").label("category123").build())
                 .build());
 
     ContentRelatedIndexing indexing =
