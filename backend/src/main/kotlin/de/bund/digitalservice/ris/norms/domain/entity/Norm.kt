@@ -12,9 +12,7 @@ data class Norm(
 
     val officialLongTitle: String,
     var risAbbreviation: String? = null,
-    var risAbbreviationInternationalLaw: String? = null,
     var documentNumber: String? = null,
-    var divergentDocumentNumber: String? = null,
     var documentCategory: String? = null,
 
     var documentTypeName: String? = null,
@@ -38,9 +36,6 @@ data class Norm(
 
     var officialShortTitle: String? = null,
     var officialAbbreviation: String? = null,
-    var unofficialLongTitle: String? = null,
-    var unofficialShortTitle: String? = null,
-    var unofficialAbbreviation: String? = null,
 
     var entryIntoForceDate: LocalDate? = null,
     var entryIntoForceDateState: UndefinedDate? = null,
@@ -89,8 +84,6 @@ data class Norm(
     var euAnnouncementExplanations: String? = null,
     var otherOfficialAnnouncement: String? = null,
 
-    var unofficialReference: String? = null,
-
     var completeCitation: String? = null,
 
     var statusNote: String? = null,
@@ -129,23 +122,15 @@ data class Norm(
     var footnoteStateLaw: String? = null,
     var footnoteEuLaw: String? = null,
 
-    var validityRule: String? = null,
-
     var digitalEvidenceLink: String? = null,
     var digitalEvidenceRelatedData: String? = null,
     var digitalEvidenceExternalDataNote: String? = null,
     var digitalEvidenceAppendix: String? = null,
 
-    var referenceNumber: String? = null,
-
     var celexNumber: String? = null,
 
     var ageIndicationStart: String? = null,
     var ageIndicationEnd: String? = null,
-
-    var definition: String? = null,
-
-    var ageOfMajorityIndication: String? = null,
 
     var text: String? = null,
     var files: List<FileReference> = listOf(),

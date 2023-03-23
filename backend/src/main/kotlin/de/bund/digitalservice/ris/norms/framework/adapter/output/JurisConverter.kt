@@ -65,6 +65,10 @@ fun mapDomainToData(norm: Norm): NormData {
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
+    // TODO Add here other metadata from converter namely:
+    // risAbbreviationInternationalLaw
+    // unofficialShortTitle, unofficialAbbreviation, unofficialReference
+    // validityRule, referenceNumber, definition, ageOfMajorityIndication
     val metadata = data.frameKeywords.mapIndexed { index, value -> Metadatum(value, KEYWORD, index) }
 
     return Norm(
@@ -73,7 +77,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         metadata = metadata,
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
-        risAbbreviationInternationalLaw = data.risAbbreviationInternationalLaw,
         documentNumber = data.documentNumber,
         documentCategory = data.documentCategory,
         providerEntity = data.providerEntity,
@@ -87,9 +90,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         subjectGesta = data.subjectGesta,
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
-        unofficialLongTitle = data.unofficialLongTitle,
-        unofficialShortTitle = data.unofficialShortTitle,
-        unofficialAbbreviation = data.unofficialAbbreviation,
         entryIntoForceDate = parseDateString(data.entryIntoForceDate),
         entryIntoForceDateState = parseDateStateString(data.entryIntoForceDateState ?: ""),
         principleEntryIntoForceDate = parseDateString(data.principleEntryIntoForceDate),
@@ -112,7 +112,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         printAnnouncementGazette = data.printAnnouncementGazette,
         printAnnouncementYear = data.printAnnouncementYear,
         printAnnouncementPage = data.printAnnouncementPage,
-        unofficialReference = data.unofficialReference,
         statusNote = data.statusNote,
         statusDescription = data.statusDescription,
         statusDate = parseDateString(data.statusDate),
@@ -134,11 +133,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         applicationScopeEndDate = parseDateString(data.applicationScopeEndDate),
         categorizedReference = data.categorizedReference,
         otherFootnote = data.otherFootnote,
-        validityRule = data.validityRule,
-        referenceNumber = data.referenceNumber,
         celexNumber = data.celexNumber,
-        definition = data.definition,
-        ageOfMajorityIndication = data.ageOfMajorityIndication,
         text = data.text,
     )
 }

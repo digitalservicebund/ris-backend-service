@@ -11,13 +11,12 @@ interface EditNormFrameUseCase {
 
     data class Command(val guid: UUID, val properties: NormFrameProperties)
 
-    data class NormFrameProperties(
+    data class
+    NormFrameProperties(
         val officialLongTitle: String,
         val metadata: List<Metadatum<*>> = emptyList(),
         var risAbbreviation: String? = null,
-        var risAbbreviationInternationalLaw: String? = null,
         var documentNumber: String? = null,
-        var divergentDocumentNumber: String? = null,
         var documentCategory: String? = null,
 
         var documentTypeName: String? = null,
@@ -41,9 +40,6 @@ interface EditNormFrameUseCase {
 
         var officialShortTitle: String? = null,
         var officialAbbreviation: String? = null,
-        var unofficialLongTitle: String? = null,
-        var unofficialShortTitle: String? = null,
-        var unofficialAbbreviation: String? = null,
 
         var entryIntoForceDate: LocalDate? = null,
         var entryIntoForceDateState: UndefinedDate? = null,
@@ -92,8 +88,6 @@ interface EditNormFrameUseCase {
         var euAnnouncementExplanations: String? = null,
         var otherOfficialAnnouncement: String? = null,
 
-        var unofficialReference: String? = null,
-
         var completeCitation: String? = null,
 
         var statusNote: String? = null,
@@ -132,23 +126,15 @@ interface EditNormFrameUseCase {
         var footnoteStateLaw: String? = null,
         var footnoteEuLaw: String? = null,
 
-        var validityRule: String? = null,
-
         var digitalEvidenceLink: String? = null,
         var digitalEvidenceRelatedData: String? = null,
         var digitalEvidenceExternalDataNote: String? = null,
         var digitalEvidenceAppendix: String? = null,
 
-        var referenceNumber: String? = null,
-
         var celexNumber: String? = null,
 
         var ageIndicationStart: String? = null,
         var ageIndicationEnd: String? = null,
-
-        var definition: String? = null,
-
-        var ageOfMajorityIndication: String? = null,
 
         var text: String? = null,
     )

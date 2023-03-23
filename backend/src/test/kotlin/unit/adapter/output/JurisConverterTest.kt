@@ -159,8 +159,6 @@ class JurisConverterTest {
 
             assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
             assertThat(norm?.risAbbreviation).isEqualTo("test ris abbreviation")
-            assertThat(norm?.risAbbreviationInternationalLaw)
-                .isEqualTo("test ris abbreviation international law")
             assertThat(norm?.documentNumber).isEqualTo("test document number")
             assertThat(norm?.documentCategory).isEqualTo("test document category")
             assertThat(norm?.providerEntity).isEqualTo("test provider entity")
@@ -174,9 +172,6 @@ class JurisConverterTest {
             assertThat(norm?.subjectGesta).isEqualTo("test subject Gesta")
             assertThat(norm?.officialShortTitle).isEqualTo("test official short title")
             assertThat(norm?.officialAbbreviation).isEqualTo("test official abbreviation")
-            assertThat(norm?.unofficialLongTitle).isEqualTo("test unofficial long title")
-            assertThat(norm?.unofficialShortTitle).isEqualTo("test unofficial short title")
-            assertThat(norm?.unofficialAbbreviation).isEqualTo("test unofficial abbreviation")
             assertThat(norm?.entryIntoForceDate).isEqualTo(LocalDate.parse("2022-01-01"))
             assertThat(norm?.entryIntoForceDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
             assertThat(norm?.principleEntryIntoForceDate).isEqualTo(LocalDate.parse("2022-01-02"))
@@ -197,7 +192,6 @@ class JurisConverterTest {
             assertThat(norm?.printAnnouncementGazette).isEqualTo("test print announcement gazette")
             assertThat(norm?.printAnnouncementYear).isEqualTo("test print announcement year")
             assertThat(norm?.printAnnouncementPage).isEqualTo("test print announcement page")
-            assertThat(norm?.unofficialReference).isEqualTo("test unofficial reference")
             assertThat(norm?.statusNote).isEqualTo("test status note")
             assertThat(norm?.statusDescription).isEqualTo("test status description")
             assertThat(norm?.statusDate).isEqualTo(LocalDate.parse("2022-01-09"))
@@ -219,11 +213,7 @@ class JurisConverterTest {
             assertThat(norm?.applicationScopeEndDate).isEqualTo(LocalDate.parse("2022-01-14"))
             assertThat(norm?.categorizedReference).isEqualTo("test categorized reference")
             assertThat(norm?.otherFootnote).isEqualTo("test other footnote")
-            assertThat(norm?.validityRule).isEqualTo("test validity rule")
-            assertThat(norm?.referenceNumber).isEqualTo("test reference number")
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
-            assertThat(norm?.definition).isEqualTo("test definition")
-            assertThat(norm?.ageOfMajorityIndication).isEqualTo("test age of majority indication")
             assertThat(norm?.text).isEqualTo("test text")
         }
 

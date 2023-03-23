@@ -23,8 +23,6 @@ class SearchNormsQueryTest {
         parameters.add(QueryParameter(QueryFields.PRINT_ANNOUNCEMENT_PAGE, "test value"))
         parameters.add(QueryParameter(QueryFields.OFFICIAL_LONG_TITLE, "test value"))
         parameters.add(QueryParameter(QueryFields.OFFICIAL_SHORT_TITLE, "test value"))
-        parameters.add(QueryParameter(QueryFields.UNOFFICIAL_LONG_TITLE, "test value"))
-        parameters.add(QueryParameter(QueryFields.UNOFFICIAL_SHORT_TITLE, "test value"))
 
         val query = SearchNormsOutputPort.Query(parameters)
 

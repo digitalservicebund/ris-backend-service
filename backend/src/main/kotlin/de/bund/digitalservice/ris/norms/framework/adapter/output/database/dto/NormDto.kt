@@ -17,12 +17,8 @@ data class NormDto(
     val officialLongTitle: String,
     @Column("ris_abbreviation")
     var risAbbreviation: String? = null,
-    @Column("ris_abbreviation_international_law")
-    var risAbbreviationInternationalLaw: String? = null,
     @Column("document_number")
     var documentNumber: String? = null,
-    @Column("divergent_document_number")
-    var divergentDocumentNumber: String? = null,
     @Column("document_category")
     var documentCategory: String? = null,
 
@@ -63,12 +59,6 @@ data class NormDto(
     var officialShortTitle: String? = null,
     @Column("official_abbreviation")
     var officialAbbreviation: String? = null,
-    @Column("unofficial_long_title")
-    var unofficialLongTitle: String? = null,
-    @Column("unofficial_short_title")
-    var unofficialShortTitle: String? = null,
-    @Column("unofficial_abbreviation")
-    var unofficialAbbreviation: String? = null,
 
     @Column("entry_into_force_date")
     var entryIntoForceDate: LocalDate? = null,
@@ -159,9 +149,6 @@ data class NormDto(
     @Column("other_official_announcement")
     var otherOfficialAnnouncement: String? = null,
 
-    @Column("unofficial_reference")
-    var unofficialReference: String? = null,
-
     @Column("complete_citation")
     var completeCitation: String? = null,
 
@@ -232,9 +219,6 @@ data class NormDto(
     @Column("footnote_eu_law")
     var footnoteEuLaw: String? = null,
 
-    @Column("validity_rule")
-    var validityRule: String? = null,
-
     @Column("digital_evidence_link")
     var digitalEvidenceLink: String? = null,
     @Column("digital_evidence_related_data")
@@ -244,9 +228,6 @@ data class NormDto(
     @Column("digital_evidence_appendix")
     var digitalEvidenceAppendix: String? = null,
 
-    @Column("reference_number")
-    var referenceNumber: String? = null,
-
     @Column("celex_number")
     var celexNumber: String? = null,
 
@@ -254,12 +235,6 @@ data class NormDto(
     var ageIndicationStart: String? = null,
     @Column("age_indication_end")
     var ageIndicationEnd: String? = null,
-
-    @Column("definition")
-    var definition: String? = null,
-
-    @Column("age_of_majority_indication")
-    var ageOfMajorityIndication: String? = null,
 
     @Column("text")
     var text: String? = null,

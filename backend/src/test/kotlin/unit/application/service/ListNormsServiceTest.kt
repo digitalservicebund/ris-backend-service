@@ -52,14 +52,12 @@ class ListNormsServiceTest {
         verify(exactly = 1) {
             searchNormsAdapter.searchNorms(
                 withArg {
-                    assertThat(it.parameters).hasSize(4)
+                    assertThat(it.parameters).hasSize(2)
 
                     assertThat(it.parameters.map { it.field }).isEqualTo(
                         listOf(
                             SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE,
                             SearchNormsOutputPort.QueryFields.OFFICIAL_SHORT_TITLE,
-                            SearchNormsOutputPort.QueryFields.UNOFFICIAL_LONG_TITLE,
-                            SearchNormsOutputPort.QueryFields.UNOFFICIAL_SHORT_TITLE,
                         ),
                     )
 

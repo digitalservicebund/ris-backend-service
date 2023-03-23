@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeGuid
@@ -39,9 +38,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         lateinit var officialLongTitle: String
         var metadata: List<MetadatumRequestSchema> = emptyList()
         var risAbbreviation: String? = null
-        var risAbbreviationInternationalLaw: String? = null
         var documentNumber: String? = null
-        var divergentDocumentNumber: String? = null
         var documentCategory: String? = null
 
         var documentTypeName: String? = null
@@ -65,9 +62,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
-        var unofficialLongTitle: String? = null
-        var unofficialShortTitle: String? = null
-        var unofficialAbbreviation: String? = null
 
         var entryIntoForceDate: String? = null
         var entryIntoForceDateState: UndefinedDate? = null
@@ -118,8 +112,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var euAnnouncementExplanations: String? = null
         var otherOfficialAnnouncement: String? = null
 
-        var unofficialReference: String? = null
-
         var completeCitation: String? = null
 
         var statusNote: String? = null
@@ -158,14 +150,10 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var footnoteStateLaw: String? = null
         var footnoteEuLaw: String? = null
 
-        var validityRule: String? = null
-
         var digitalEvidenceLink: String? = null
         var digitalEvidenceRelatedData: String? = null
         var digitalEvidenceExternalDataNote: String? = null
         var digitalEvidenceAppendix: String? = null
-
-        var referenceNumber: String? = null
 
         var eli: String? = null
 
@@ -173,10 +161,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         var ageIndicationStart: String? = null
         var ageIndicationEnd: String? = null
-
-        var definition: String? = null
-
-        var ageOfMajorityIndication: String? = null
 
         var text: String? = null
 
@@ -187,9 +171,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.officialLongTitle,
                 metadata,
                 this.risAbbreviation,
-                this.risAbbreviationInternationalLaw,
                 this.documentNumber,
-                this.divergentDocumentNumber,
                 this.documentCategory,
                 this.documentTypeName,
                 this.documentNormCategory,
@@ -207,9 +189,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.subjectBgb3,
                 this.officialShortTitle,
                 this.officialAbbreviation,
-                this.unofficialLongTitle,
-                this.unofficialShortTitle,
-                this.unofficialAbbreviation,
                 decodeLocalDate(this.entryIntoForceDate),
                 this.entryIntoForceDateState,
                 decodeLocalDate(this.principleEntryIntoForceDate),
@@ -252,7 +231,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.euAnnouncementInfo,
                 this.euAnnouncementExplanations,
                 this.otherOfficialAnnouncement,
-                this.unofficialReference,
                 this.completeCitation,
                 this.statusNote,
                 this.statusDescription,
@@ -285,17 +263,13 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.footnoteDecision,
                 this.footnoteStateLaw,
                 this.footnoteEuLaw,
-                this.validityRule,
                 this.digitalEvidenceLink,
                 this.digitalEvidenceRelatedData,
                 this.digitalEvidenceExternalDataNote,
                 this.digitalEvidenceAppendix,
-                this.referenceNumber,
                 this.celexNumber,
                 this.ageIndicationStart,
                 this.ageIndicationEnd,
-                this.definition,
-                this.ageOfMajorityIndication,
                 this.text,
             )
         }
@@ -306,12 +280,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         lateinit var type: MetadatumType
         var order: Int = 0
 
-        fun toUseCaseData(): Metadatum<*> {
-            val value = when (this.type) {
-                KEYWORD -> this.value
-            }
-
-            return Metadatum(value = value, type = this.type, order = this.order)
-        }
+        fun toUseCaseData(): Metadatum<*> = Metadatum(value = this.value, type = this.type, order = this.order)
     }
 }

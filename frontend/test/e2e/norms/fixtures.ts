@@ -39,24 +39,24 @@ export function getNormBySections(norm) {
           label: "Juris-Abkürzung",
           value: norm.risAbbreviation,
         },
-        {
-          type: "text",
-          name: "risAbbreviationInternationalLaw",
-          label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
-          value: norm.risAbbreviationInternationalLaw,
-        },
+        // {
+        //   type: "text",
+        //   name: "risAbbreviationInternationalLaw",
+        //   label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
+        //   value: norm.risAbbreviationInternationalLaw,
+        // },
         {
           type: "text",
           name: "documentNumber",
           label: "Dokumentnummer",
           value: norm.documentNumber,
         },
-        {
-          type: "text",
-          name: "divergentDocumentNumber",
-          label: "Abweichende Dokumentnummer",
-          value: norm.divergentDocumentNumber,
-        },
+        // {
+        //   type: "text",
+        //   name: "divergentDocumentNumber",
+        //   label: "Abweichende Dokumentnummer",
+        //   value: norm.divergentDocumentNumber,
+        // },
         {
           type: "text",
           name: "documentCategory",
@@ -197,24 +197,24 @@ export function getNormBySections(norm) {
           label: "Amtliche Buchstabenabkürzung",
           value: norm.officialAbbreviation,
         },
-        {
-          type: "text",
-          name: "unofficialLongTitle",
-          label: "Nichtamtliche Langüberschrift",
-          value: norm.unofficialLongTitle,
-        },
-        {
-          type: "text",
-          name: "unofficialShortTitle",
-          label: "Nichtamtliche Kurzüberschrift",
-          value: norm.unofficialShortTitle,
-        },
-        {
-          type: "text",
-          name: "unofficialAbbreviation",
-          label: "Nichtamtliche Buchstabenabkürzung",
-          value: norm.unofficialAbbreviation,
-        },
+        // {
+        //   type: "text",
+        //   name: "unofficialLongTitle",
+        //   label: "Nichtamtliche Langüberschrift",
+        //   value: norm.unofficialLongTitle,
+        // },
+        // {
+        //   type: "text",
+        //   name: "unofficialShortTitle",
+        //   label: "Nichtamtliche Kurzüberschrift",
+        //   value: norm.unofficialShortTitle,
+        // },
+        // {
+        //   type: "text",
+        //   name: "unofficialAbbreviation",
+        //   label: "Nichtamtliche Buchstabenabkürzung",
+        //   value: norm.unofficialAbbreviation,
+        // },
       ],
     },
     {
@@ -506,12 +506,12 @@ export function getNormBySections(norm) {
     {
       heading: "Nichtamtliche Fundstelle",
       fields: [
-        {
-          type: "text",
-          name: "unofficialReference",
-          label: "Nichtamtliche Fundstelle",
-          value: norm.unofficialReference,
-        },
+        // {
+        //   type: "text",
+        //   name: "unofficialReference",
+        //   label: "Nichtamtliche Fundstelle",
+        //   value: norm.unofficialReference,
+        // },
       ],
     },
     {
@@ -752,12 +752,12 @@ export function getNormBySections(norm) {
     {
       heading: "Gültigkeitsregelung",
       fields: [
-        {
-          type: "text",
-          name: "validityRule",
-          label: "Gültigkeitsregelung",
-          value: norm.validityRule,
-        },
+        // {
+        //   type: "text",
+        //   name: "validityRule",
+        //   label: "Gültigkeitsregelung",
+        //   value: norm.validityRule,
+        // },
       ],
     },
     {
@@ -792,12 +792,12 @@ export function getNormBySections(norm) {
     {
       heading: "Aktenzeichen",
       fields: [
-        {
-          type: "text",
-          name: "referenceNumber",
-          label: "Aktenzeichen",
-          value: norm.referenceNumber,
-        },
+        // {
+        //   type: "text",
+        //   name: "referenceNumber",
+        //   label: "Aktenzeichen",
+        //   value: norm.referenceNumber,
+        // },
       ],
     },
     {
@@ -831,23 +831,23 @@ export function getNormBySections(norm) {
     {
       heading: "Definition",
       fields: [
-        {
-          type: "text",
-          name: "definition",
-          label: "Definition",
-          value: norm.definition,
-        },
+        // {
+        //   type: "text",
+        //   name: "definition",
+        //   label: "Definition",
+        //   value: norm.definition,
+        // },
       ],
     },
     {
       heading: "Angaben zur Volljährigkeit",
       fields: [
-        {
-          type: "text",
-          name: "ageOfMajorityIndication",
-          label: "Angaben zur Volljährigkeit",
-          value: norm.ageOfMajorityIndication,
-        },
+        // {
+        //   type: "text",
+        //   name: "ageOfMajorityIndication",
+        //   label: "Angaben zur Volljährigkeit",
+        //   value: norm.ageOfMajorityIndication,
+        // },
       ],
     },
     {

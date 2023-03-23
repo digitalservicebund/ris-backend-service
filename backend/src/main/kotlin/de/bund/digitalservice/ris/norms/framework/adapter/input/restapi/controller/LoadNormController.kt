@@ -5,7 +5,6 @@ import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -45,9 +44,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         val metadata: List<MetadatumResponseSchema>,
         val officialLongTitle: String,
         var risAbbreviation: String?,
-        var risAbbreviationInternationalLaw: String?,
         var documentNumber: String?,
-        var divergentDocumentNumber: String?,
         var documentCategory: String?,
         var documentTypeName: String?,
         var documentNormCategory: String?,
@@ -65,9 +62,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var subjectBgb3: String?,
         var officialShortTitle: String?,
         var officialAbbreviation: String?,
-        var unofficialLongTitle: String?,
-        var unofficialShortTitle: String?,
-        var unofficialAbbreviation: String?,
         var entryIntoForceDate: String?,
         var entryIntoForceDateState: UndefinedDate?,
         var principleEntryIntoForceDate: String?,
@@ -110,7 +104,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var euAnnouncementInfo: String?,
         var euAnnouncementExplanations: String?,
         var otherOfficialAnnouncement: String?,
-        var unofficialReference: String?,
         var completeCitation: String?,
         var statusNote: String?,
         var statusDescription: String?,
@@ -143,18 +136,14 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var footnoteDecision: String?,
         var footnoteStateLaw: String?,
         var footnoteEuLaw: String?,
-        var validityRule: String?,
         var digitalEvidenceLink: String?,
         var digitalEvidenceRelatedData: String?,
         var digitalEvidenceExternalDataNote: String?,
         var digitalEvidenceAppendix: String?,
-        var referenceNumber: String?,
         var eli: String,
         var celexNumber: String?,
         var ageIndicationStart: String?,
         var ageIndicationEnd: String?,
-        var definition: String?,
-        var ageOfMajorityIndication: String?,
         var text: String?,
         var files: List<FileReferenceResponseSchema>,
     ) {
@@ -170,9 +159,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     metadata,
                     data.officialLongTitle,
                     data.risAbbreviation,
-                    data.risAbbreviationInternationalLaw,
                     data.documentNumber,
-                    data.divergentDocumentNumber,
                     data.documentCategory,
                     data.documentTypeName,
                     data.documentNormCategory,
@@ -190,9 +177,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.subjectBgb3,
                     data.officialShortTitle,
                     data.officialAbbreviation,
-                    data.unofficialLongTitle,
-                    data.unofficialShortTitle,
-                    data.unofficialAbbreviation,
                     encodeLocalDate(data.entryIntoForceDate),
                     data.entryIntoForceDateState,
                     encodeLocalDate(data.principleEntryIntoForceDate),
@@ -235,7 +219,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.euAnnouncementInfo,
                     data.euAnnouncementExplanations,
                     data.otherOfficialAnnouncement,
-                    data.unofficialReference,
                     data.completeCitation,
                     data.statusNote,
                     data.statusDescription,
@@ -268,18 +251,14 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.footnoteDecision,
                     data.footnoteStateLaw,
                     data.footnoteEuLaw,
-                    data.validityRule,
                     data.digitalEvidenceLink,
                     data.digitalEvidenceRelatedData,
                     data.digitalEvidenceExternalDataNote,
                     data.digitalEvidenceAppendix,
-                    data.referenceNumber,
                     encodeEli(data.eli),
                     data.celexNumber,
                     data.ageIndicationStart,
                     data.ageIndicationEnd,
-                    data.definition,
-                    data.ageOfMajorityIndication,
                     data.text,
                     files = files,
                 )
@@ -329,13 +308,8 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     data class MetadatumResponseSchema private constructor(val value: String, val type: String, val order: Int) {
         companion object {
             fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseSchema {
-                val value: String = when (metadatum.type) {
-                    KEYWORD -> metadatum.value as String
-                }
-
-                val type = when (metadatum.type) {
-                    KEYWORD -> "KEYWORD"
-                }
+                val value: String = metadatum.value as String
+                val type = metadatum.type.name
 
                 return MetadatumResponseSchema(value = value, type = type, order = metadatum.order)
             }
