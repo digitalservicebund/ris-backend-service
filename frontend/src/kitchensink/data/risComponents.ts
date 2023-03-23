@@ -9,6 +9,7 @@ export const risComponents: risComponent[] = [
   { name: "Code Snippet", view: "CodeSnippetView" },
   { name: "Popup Modal", view: "PopupModalView" },
   { name: "Expandable Content", view: "ExpandableContentView" },
+  { name: "Expandable FieldSet", view: "ExpandableFieldSetView" },
   { name: "Original File Side Panel", view: "OriginalFileSidePanelView" },
   { name: "Navbar", view: "NavbarView" },
   { name: "File Viewer", view: "FileViewerView" },
