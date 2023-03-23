@@ -38,7 +38,15 @@ const addProceedingDecision = async (
 }
 
 const search = async () => {
-  console.log(proceedingDecisionInput.value)
+  console.log("Searching with input:", proceedingDecisionInput.value)
+  const response = await ProceedingDecisionService.searchForProceedingDecisions(
+    props.documentUnitUuid,
+    proceedingDecisionInput.value
+  )
+  if (response.data) {
+    console.log("response:", response.data)
+    // TODO
+  }
 }
 
 watch(

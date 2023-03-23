@@ -9,6 +9,10 @@ interface ProceedingDecisionService {
     uuid: string,
     proceedingDecision: ProceedingDecision
   ): Promise<ServiceResponse<ProceedingDecision[]>>
+  searchForProceedingDecisions(
+    uuid: string,
+    proceedingDecision: ProceedingDecision
+  ): Promise<ServiceResponse<ProceedingDecision[]>>
 }
 
 const service: ProceedingDecisionService = {
@@ -42,8 +46,32 @@ const service: ProceedingDecisionService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Vorgehende Entscheidung konnte nicht zu 
+        title: `Vorgehende Entscheidung konnte nicht zu
           Dokumentationseinheit ${uuid} hinzugefügt werden`,
+      }
+    }
+    return response
+  },
+  async searchForProceedingDecisions(
+    uuid: string,
+    proceedingDecision: ProceedingDecision
+  ) {
+    const response = await httpClient.put<
+      ProceedingDecision,
+      ProceedingDecision[]
+    >(
+      `caselaw/documentunits/${uuid}/proceedingdecisions/search`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      proceedingDecision
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
       }
     }
     return response
