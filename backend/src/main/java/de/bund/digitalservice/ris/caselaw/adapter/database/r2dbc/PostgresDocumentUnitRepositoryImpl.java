@@ -504,6 +504,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             .map(ProceedingDecisionDTO::getId)
             .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
             .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
+        .flatMap(proceedingDecisionDTO -> injectAdditionalProceedingDecisionInformation(proceedingDecisionDTO))
         .collectList()
         .map(proceedingDecisionDTOS -> {
           documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOS);
@@ -594,4 +595,37 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               return Mono.just(documentUnitDTO);
             });
   }
+
+    private Mono<ProceedingDecisionDTO> injectAdditionalProceedingDecisionInformation(ProceedingDecisionDTO proceedingDecisionDTO) {
+        return injectProceedingDecisionFileNumbers(proceedingDecisionDTO)
+                .flatMap(this::injectProceedingDecisionDocumentType);
+    }
+
+    private Mono<ProceedingDecisionDTO> injectProceedingDecisionFileNumbers(ProceedingDecisionDTO proceedingDecisionDTO) {
+        return fileNumberRepository
+                .findAllByDocumentUnitId(proceedingDecisionDTO.getId())
+                .collectList()
+                .map(
+                        fileNumbers -> {
+                            proceedingDecisionDTO.setFileNumbers(
+                                    fileNumbers.stream()
+                                            .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
+                                            .toList());
+                            return proceedingDecisionDTO;
+                        });
+    }
+
+    private Mono<ProceedingDecisionDTO> injectProceedingDecisionDocumentType(ProceedingDecisionDTO proceedingDecisionDTO) {
+        if (proceedingDecisionDTO.getDocumentTypeId() == null) {
+            return Mono.just(proceedingDecisionDTO);
+        }
+        return documentTypeRepository
+                .findById(proceedingDecisionDTO.getDocumentTypeId())
+                .defaultIfEmpty(DocumentTypeDTO.builder().build())
+                .map(
+                        documentTypeDTO -> {
+                            proceedingDecisionDTO.setDocumentTypeDTO(documentTypeDTO);
+                            return proceedingDecisionDTO;
+                        });
+    }
 }

@@ -66,7 +66,6 @@ watch(
 watch(
   inputValues,
   () => {
-    console.log(inputValues.value)
     emit("update:modelValue", inputValues.value)
   },
   {

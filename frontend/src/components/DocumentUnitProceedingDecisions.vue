@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { watch, ref } from "vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
@@ -45,7 +44,7 @@ const search = async () => {
 watch(
   props,
   () => {
-    console.log(props.proceedingDecisions)
+    // console.log(props.proceedingDecisions)
     proceedingDecisionList.value = props.proceedingDecisions
   },
   {
@@ -67,7 +66,7 @@ watch(
     >
       {{ decision.court?.type }} {{ decision.court?.location }}
       {{ decision.documentType?.label }}
-      {{ dayjs(decision.date).format("DD.MM.YYYY") }}
+      {{ decision.date }}
       {{ decision.fileNumber }}
     </p>
     <InputGroup
