@@ -41,8 +41,7 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
                 .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
         .flatMap(this::injectAdditionalInformation)
         .map(ProceedingDecisionTransformer::transformToDomain);
-  }
-  ;
+  };
 
   private Mono<ProceedingDecisionDTO> injectAdditionalInformation(
       ProceedingDecisionDTO proceedingDecisionDTO) {
@@ -81,19 +80,16 @@ public class PostgresProceedingDecisionRepositoryImpl implements ProceedingDecis
 
   public Mono<ProceedingDecisionLinkDTO> linkProceedingDecisions(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
-    Mono<Long> parentDocumentUnitId =
-        repository.findByUuid(parentDocumentUnitUuid).map(ProceedingDecisionDTO::getId);
-    Mono<Long> childDocumentUnitId =
-        repository.findByUuid(childDocumentUnitUuid).map(ProceedingDecisionDTO::getId);
+    Mono<Long> parentDocumentUnitId = repository.findByUuid(parentDocumentUnitUuid).map(ProceedingDecisionDTO::getId);
+    Mono<Long> childDocumentUnitId = repository.findByUuid(childDocumentUnitUuid).map(ProceedingDecisionDTO::getId);
 
     return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
         .flatMap(
-            tuple ->
-                linkRepository.save(
-                    ProceedingDecisionLinkDTO.builder()
-                        .parentDocumentUnitId(tuple.getT1())
-                        .childDocumentUnitId(tuple.getT2())
-                        .build()));
+            tuple -> linkRepository.save(
+                ProceedingDecisionLinkDTO.builder()
+                    .parentDocumentUnitId(tuple.getT1())
+                    .childDocumentUnitId(tuple.getT2())
+                    .build()));
   }
 
   public Flux<ProceedingDecision> searchForProceedingDecisions(
