@@ -242,7 +242,7 @@ bootBuildImage {
   def containerImageVersion = System.getenv("CONTAINER_IMAGE_VERSION") ?: "latest"
 
   imageName = "${containerRegistry}/${containerImageName}:${containerImageVersion}"
-  builder = "paketobuildpacks/builder@sha256:8c317e17e87583e0ea8bfc2ffd2952b684d1028be2a40317af8f791f72b85f4e" // pin to version 0.1.313-tiny
+  builder = "paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66" // pin to version 0.1.341-tiny
   publish = false
   docker {
     publishRegistry {
