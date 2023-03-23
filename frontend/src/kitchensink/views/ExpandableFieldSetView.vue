@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import ExpandableFieldset from "@/components/ExpandableFieldset.vue"
+import ExpandableFieldSet from "@/components/ExpandableFieldSet.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import { participatingInstitutions } from "@/fields/norms/participatingInstitutions"
 
@@ -11,7 +11,7 @@ const frameData = {
 </script>
 
 <template>
-  <ExpandableFieldset header-id="generalDataFields">
+  <ExpandableFieldSet header-id="generalDataFields">
     <template #header>
       <h2 id="generalDataFields" class="link-01-bold">Mitwirkende Organe</h2>
     </template>
@@ -20,5 +20,5 @@ const frameData = {
       :column-count="1"
       :fields="participatingInstitutions"
     />
-  </ExpandableFieldset>
+  </ExpandableFieldSet>
 </template>
