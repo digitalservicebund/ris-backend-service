@@ -19,7 +19,7 @@ export const proceedingDecisionFields: InputField[] = [
     type: InputType.COMBOBOX,
     label: "Dokumenttyp",
     inputAttributes: {
-      ariaLabel: "Dokumenttyp",
+      ariaLabel: "Dokumenttyp Rechtszug",
       placeholder: "Bitte auswählen",
       itemService: comboboxItemService.getDocumentTypes,
     },

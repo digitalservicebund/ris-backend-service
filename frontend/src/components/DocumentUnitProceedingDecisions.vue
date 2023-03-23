@@ -9,7 +9,7 @@ import ProceedingDecisionService from "@/services/proceedingDecisionService"
 
 const props = defineProps<{
   documentUnitUuid: string
-  proceedingDecisions: ProceedingDecision[] | undefined
+  proceedingDecisions?: ProceedingDecision[]
 }>()
 
 const defaultModel: ProceedingDecision = {
@@ -31,20 +31,20 @@ const addProceedingDecision = async (
       proceedingDecision
     )
     if (response.data) {
-      console.log(response.data)
+      // console.log(response.data)
       proceedingDecisionList.value = response.data
     }
   }
 }
 
 const search = async () => {
-  console.log("Searching with input:", proceedingDecisionInput.value)
+  // console.log("Searching with input:", proceedingDecisionInput.value)
   const response = await ProceedingDecisionService.searchForProceedingDecisions(
     props.documentUnitUuid,
     proceedingDecisionInput.value
   )
   if (response.data) {
-    console.log("response:", response.data)
+    // console.log("response:", response.data)
     // TODO
   }
 }

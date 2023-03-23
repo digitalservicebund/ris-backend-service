@@ -2,9 +2,18 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitPreviousDecisions from "@/components/DocumentUnitProceedingDecisions.vue"
 import type { ProceedingDecision } from "@/domain/documentUnit"
+import service from "@/services/proceedingDecisionService"
 
-function renderComponent(options?: { modelValue?: ProceedingDecision[] }) {
-  const props = { modelValue: options?.modelValue }
+function renderComponent(options?: {
+  documentUnitUuid?: string
+  proceedingDecisions?: ProceedingDecision[] | undefined
+}) {
+  const props = {
+    documentUnitUuid: options?.documentUnitUuid
+      ? options?.documentUnitUuid
+      : "",
+    proceedingDecisions: options?.proceedingDecisions,
+  }
   const utils = render(DocumentUnitPreviousDecisions, { props })
   const user = userEvent.setup()
   return { user, ...utils }
@@ -12,99 +21,103 @@ function renderComponent(options?: { modelValue?: ProceedingDecision[] }) {
 
 describe("DocumentUnitPreviousDecisions", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")
-  it("shows all necessary input fields with their value", () => {
-    const modelValue = [
-      {
-        court: {
-          type: "BGH",
-          location: "Karlsruhe",
-          label: "BGH Karlsruhe",
-        },
-        date: "2022-02-03",
-        fileNumber: "fileNumber",
-      },
-      {
-        court: undefined,
-        date: undefined,
-        fileNumber: undefined,
-      },
-    ]
-    renderComponent({ modelValue })
-
-    const courts = screen.getAllByLabelText(
-      "Gericht Rechtszug"
-    ) as HTMLInputElement[]
-
-    const dates = screen.getAllByLabelText(
-      "Datum Rechtszug"
-    ) as HTMLInputElement[]
-
-    const fileNumbers = screen.getAllByLabelText(
-      "Aktenzeichen Rechtszug"
-    ) as HTMLInputElement[]
-
-    expect(courts).toHaveLength(2)
-    expect(dates).toHaveLength(2)
-    expect(fileNumbers).toHaveLength(2)
-
-    expect(courts[0]).toHaveDisplayValue("BGH Karlsruhe")
-    expect(dates[0]).toHaveDisplayValue("2022-02-03")
-    expect(fileNumbers[0]).toHaveDisplayValue("fileNumber")
-  })
-
-  it("emits update model value event when input value changes", async () => {
-    const { emitted, user } = renderComponent()
-    const input = screen.getByLabelText("fileNumber")
-    await user.type(input, "abc")
-    await userEvent.tab()
-
-    expect(emitted()["update:modelValue"]).toHaveLength(1)
-    expect(emitted()["update:modelValue"][0]).toEqual([
-      [
-        {
-          court: {
-            type: "",
-            location: "",
-            label: "",
-            revoked: "",
+  const fetchSpy = vi
+    .spyOn(service, "addProceedingDecision")
+    .mockImplementation(() =>
+      Promise.resolve({
+        status: 200,
+        data: [
+          {
+            court: { type: "type1", location: "location1", label: "label1" },
+            date: "2022-02-01",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "documentType1",
+            },
+            fileNumber: "test1",
           },
-          date: "",
-          fileNumber: "abc",
-        },
-      ],
-    ])
-  })
+          {
+            court: { type: "type2", location: "location2", label: "label2" },
+            date: "2022-02-02",
+            documentType: {
+              jurisShortcut: "ca",
+              label: "documentType2",
+            },
+            fileNumber: "test2",
+          },
+        ],
+      })
+    )
 
-  it("does not emit update model event when inputs are empty and model is empty too", async () => {
-    const { emitted, user } = renderComponent({
-      modelValue: undefined,
-    })
-    const input = screen.getByLabelText("fileNumber")
+  it("shows all proceeding decision input fields", () => {
+    renderComponent()
 
-    // Do anything without changing the inputs.
-    await user.click(input)
+    const court = screen.getByLabelText("Gericht Rechtszug") as HTMLInputElement
 
-    expect(emitted()["update:modelValue"]).toBeUndefined()
-  })
+    const date = screen.getByLabelText("Datum Rechtszug") as HTMLInputElement
 
-  it("always shows at least one input group despite empty model list", () => {
-    renderComponent({ modelValue: [] })
-
-    const courtInput = screen.queryByLabelText(
-      "Gericht Rechtszug"
-    ) as HTMLInputElement
-    const dateInput = screen.queryByLabelText(
-      "Datum Rechtszug"
-    ) as HTMLInputElement
-    const identifierInput = screen.queryByLabelText(
+    const fileNumber = screen.getByLabelText(
       "Aktenzeichen Rechtszug"
     ) as HTMLInputElement
 
-    expect(courtInput).toBeInTheDocument()
-    expect(courtInput).toHaveDisplayValue("")
-    expect(dateInput).toBeInTheDocument()
-    expect(dateInput).toHaveDisplayValue("")
-    expect(identifierInput).toBeInTheDocument()
-    expect(identifierInput).toHaveDisplayValue("")
+    const documentType = screen.getByLabelText(
+      "Dokumenttyp Rechtszug"
+    ) as HTMLInputElement
+
+    expect(court).toBeInTheDocument()
+    expect(date).toBeInTheDocument()
+    expect(fileNumber).toBeInTheDocument()
+    expect(documentType).toBeInTheDocument()
   })
+
+  it("adds proceeding decision and returns list of existing ones", async () => {
+    const { user } = renderComponent()
+
+    await user.click(
+      screen.getAllByLabelText(
+        "Entscheidung manuell hinzufügen"
+      )[0] as HTMLElement
+    )
+
+    expect(fetchSpy).toBeCalledTimes(1)
+    expect(
+      screen.getByText("type1 location1 documentType1 2022-02-01 test1")
+    ).toBeInTheDocument()
+    expect(
+      screen.getByText("type2 location2 documentType2 2022-02-02 test2")
+    ).toBeInTheDocument()
+  })
+
+  // it("does not emit update model event when inputs are empty and model is empty too", async () => {
+  //   const { emitted, user } = renderComponent({
+  //     modelValue: undefined,
+  //   })
+  //   const input = screen.getByLabelText("fileNumber")
+
+  //   // Do anything without changing the inputs.
+  //   await user.click(input)
+
+  //   expect(emitted()["update:modelValue"]).toBeUndefined()
+  // })
+
+  // it("always shows at least one input group despite empty model list", () => {
+  //   renderComponent({ modelValue: [] })
+
+  //   const courtInput = screen.queryByLabelText(
+  //     "Gericht Rechtszug"
+  //   ) as HTMLInputElement
+  //   const dateInput = screen.queryByLabelText(
+  //     "Datum Rechtszug"
+  //   ) as HTMLInputElement
+  //   const identifierInput = screen.queryByLabelText(
+  //     "Aktenzeichen Rechtszug"
+  //   ) as HTMLInputElement
+
+  //   expect(courtInput).toBeInTheDocument()
+  //   expect(courtInput).toHaveDisplayValue("")
+  //   expect(dateInput).toBeInTheDocument()
+  //   expect(dateInput).toHaveDisplayValue("")
+  //   expect(identifierInput).toBeInTheDocument()
+  //   expect(identifierInput).toHaveDisplayValue("")
+  // })
 })
