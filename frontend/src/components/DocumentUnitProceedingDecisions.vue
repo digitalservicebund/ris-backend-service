@@ -38,6 +38,10 @@ const addProceedingDecision = async (
   }
 }
 
+const search = async () => {
+  console.log(proceedingDecisionInput.value)
+}
+
 watch(
   props,
   () => {
@@ -72,6 +76,12 @@ watch(
       :fields="proceedingDecisionFields"
     ></InputGroup>
 
+    <TextButton
+      aria-label="Nach Entscheidungen suchen"
+      class="mr-28"
+      label="Suchen"
+      @click="search"
+    />
     <TextButton
       aria-label="Entscheidung manuell hinzufügen"
       label="Manuell Hinzufügen"

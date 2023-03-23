@@ -1,4 +1,3 @@
-import { ProceedingDecision } from "./documentUnit"
 import { LabelPosition } from "@/components/InputField.vue"
 import { ServiceResponse } from "@/services/httpClient"
 
