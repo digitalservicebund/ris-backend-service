@@ -26,7 +26,6 @@ export type NormBase = {
   subjectBgb3?: string
   ageIndicationEnd?: string
   ageIndicationStart?: string
-  ageOfMajorityIndication?: string
   announcementDate?: string
   applicationScopeArea?: string
   applicationScopeEndDate?: string
@@ -36,7 +35,6 @@ export type NormBase = {
   citationDate?: string
   citationYear?: string
   completeCitation?: string
-  definition?: string
   digitalAnnouncementDate?: string
   digitalAnnouncementArea?: string
   digitalAnnouncementAreaNumber?: string
@@ -50,7 +48,6 @@ export type NormBase = {
   digitalEvidenceExternalDataNote?: string
   digitalEvidenceLink?: string
   digitalEvidenceRelatedData?: string
-  divergentDocumentNumber?: string
   divergentEntryIntoForceDate?: string
   divergentEntryIntoForceDateState?: string
   divergentExpirationDate?: string
@@ -109,7 +106,6 @@ export type NormBase = {
   providerDecidingBody?: string
   providerIsResolutionMajority?: boolean
   publicationDate?: string
-  referenceNumber?: string
   reissueArticle?: string
   reissueDate?: string
   reissueNote?: string
@@ -119,7 +115,6 @@ export type NormBase = {
   repealNote?: string
   repealReferences?: string
   risAbbreviation?: string
-  risAbbreviationInternationalLaw?: string
   statusDate?: string
   statusDescription?: string
   statusNote?: string
@@ -128,14 +123,21 @@ export type NormBase = {
   subjectGesta?: string
   subjectPreviousFna?: string
   text?: string
-  unofficialAbbreviation?: string
-  unofficialLongTitle?: string
-  unofficialReference?: string
-  unofficialShortTitle?: string
-  validityRule?: string
 }
 
-export type FrameData = NormBase & { frameKeywords?: string[] }
+export type FrameData = NormBase & {
+  frameKeywords?: string[]
+  validityRule?: string[]
+  unofficialShortTitle?: string[]
+  unofficialReference?: string[]
+  unofficialLongTitle?: string[]
+  unofficialAbbreviation?: string[]
+  risAbbreviationInternationalLaw?: string[]
+  referenceNumber?: string[]
+  definition?: string[]
+  ageOfMajorityIndication?: string[]
+  divergentDocumentNumber?: string[]
+}
 
 export interface Norm extends FrameData {
   readonly guid: string
@@ -168,4 +170,14 @@ export interface MetaDatum {
 
 export enum MetaDatumType {
   KEYWORD = "KEYWORD",
+  UNOFFICIAL_LONG_TITLE = "UNOFFICIAL_LONG_TITLE",
+  UNOFFICIAL_SHORT_TITLE = "UNOFFICIAL_SHORT_TITLE",
+  UNOFFICIAL_ABBREVIATION = "UNOFFICIAL_ABBREVIATION",
+  UNOFFICIAL_REFERENCE = "UNOFFICIAL_REFERENCE",
+  DIVERGENT_DOCUMENT_NUMBER = "DIVERGENT_DOCUMENT_NUMBER",
+  REFERENCE_NUMBER = "REFERENCE_NUMBER",
+  DEFINITION = "DEFINITION",
+  RIS_ABBREVIATION_INTERNATIONAL_LAW = "RIS_ABBREVIATION_INTERNATIONAL_LAW",
+  AGE_OF_MAJORITY_INDICATION = "AGE_OF_MAJORITY_INDICATION",
+  VALIDITY_RULE = "VALIDITY_RULE",
 }

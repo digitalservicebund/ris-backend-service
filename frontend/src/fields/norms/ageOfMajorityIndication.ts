@@ -1,12 +1,9 @@
-import { InputField, InputType } from "@/domain"
+import { defineChipsField, InputField } from "@/domain"
 
 export const ageOfMajorityIndication: InputField[] = [
-  {
-    name: "ageOfMajorityIndication",
-    type: InputType.TEXT,
-    label: "Angaben zur Volljährigkeit",
-    inputAttributes: {
-      ariaLabel: "Angaben zur Volljährigkeit",
-    },
-  },
+  defineChipsField(
+    "ageOfMajorityIndication",
+    "Angaben zur Volljährigkeit",
+    "Angaben zur Volljährigkeit"
+  ),
 ]

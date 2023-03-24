@@ -3,7 +3,6 @@ import { isInViewport } from "./test/e2e/shared/e2e-utils"
 
 const config: PlaywrightTestConfig = {
   testDir: "./test/e2e",
-  testIgnore: "**/norms/**",
   retries: process.env.CI ? 1 : 0,
   workers: process.env.CI ? 2 : undefined,
   globalSetup: "test/e2e/shared/globalSetup.ts",

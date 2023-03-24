@@ -3,7 +3,17 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output
 import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.DEFINITION
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.REFERENCE_NUMBER
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_ABBREVIATION
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_LONG_TITLE
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_SHORT_TITLE
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
@@ -87,8 +97,8 @@ class JurisConverterTest {
                 NormData().apply {
                     officialLongTitle = "test official long title"
                     risAbbreviation = "test ris abbreviation"
-                    risAbbreviationInternationalLaw = "test ris abbreviation international law"
-                    documentNumber = "test document number"
+                    risAbbreviationInternationalLaw = listOf("test ris abbreviation international law")
+                    divergentDocumentNumber = "test document number"
                     documentCategory = "test document category"
                     providerEntity = "test provider entity"
                     providerDecidingBody = "test provider deciding body"
@@ -101,9 +111,9 @@ class JurisConverterTest {
                     subjectGesta = "test subject Gesta"
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
-                    unofficialLongTitle = "test unofficial long title"
-                    unofficialShortTitle = "test unofficial short title"
-                    unofficialAbbreviation = "test unofficial abbreviation"
+                    unofficialLongTitle = listOf("test unofficial long title")
+                    unofficialShortTitle = listOf("test unofficial short title")
+                    unofficialAbbreviation = listOf("test unofficial abbreviation")
                     entryIntoForceDate = "2022-01-01"
                     entryIntoForceDateState = "UNDEFINED_UNKNOWN"
                     principleEntryIntoForceDate = "2022-01-02"
@@ -123,7 +133,7 @@ class JurisConverterTest {
                     printAnnouncementGazette = "test print announcement gazette"
                     printAnnouncementYear = "test print announcement year"
                     printAnnouncementPage = "test print announcement page"
-                    unofficialReference = "test unofficial reference"
+                    unofficialReference = listOf("test unofficial reference")
                     statusNote = "test status note"
                     statusDescription = "test status description"
                     statusDate = "2022-01-09"
@@ -145,11 +155,11 @@ class JurisConverterTest {
                     applicationScopeEndDate = "2022-01-14"
                     categorizedReference = "test categorized reference"
                     otherFootnote = "test other footnote"
-                    validityRule = "test validity rule"
-                    referenceNumber = "test reference number"
+                    validityRule = listOf("test validity rule")
+                    referenceNumber = listOf("test reference number")
                     celexNumber = "test celex number"
-                    definition = "test definition"
-                    ageOfMajorityIndication = "test age of majority indication"
+                    definition = listOf("test definition")
+                    ageOfMajorityIndication = listOf("test age of majority indication")
                     text = "test text"
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
@@ -159,7 +169,6 @@ class JurisConverterTest {
 
             assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
             assertThat(norm?.risAbbreviation).isEqualTo("test ris abbreviation")
-            assertThat(norm?.documentNumber).isEqualTo("test document number")
             assertThat(norm?.documentCategory).isEqualTo("test document category")
             assertThat(norm?.providerEntity).isEqualTo("test provider entity")
             assertThat(norm?.providerDecidingBody).isEqualTo("test provider deciding body")
@@ -215,6 +224,17 @@ class JurisConverterTest {
             assertThat(norm?.otherFootnote).isEqualTo("test other footnote")
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
+
+            assertThat(norm?.metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test unofficial short title", UNOFFICIAL_SHORT_TITLE, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test unofficial abbreviation", UNOFFICIAL_ABBREVIATION, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test unofficial reference", UNOFFICIAL_REFERENCE, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test validity rule", VALIDITY_RULE, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test reference number", REFERENCE_NUMBER, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test definition", DEFINITION, 0))
+            assertThat(norm?.metadata).contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 0))
         }
 
         @Test
