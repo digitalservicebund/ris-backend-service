@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
@@ -76,7 +77,7 @@ public class DocumentUnitListEntryIntegrationTest {
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
                     .documentnumber("1234567890123")
-                    .dataSource(DataSourceDTO.NEURIS)
+                    .dataSource(DataSource.NEURIS)
                     .build())
             .block();
     DocumentUnitDTO migrationDto =
@@ -86,7 +87,7 @@ public class DocumentUnitListEntryIntegrationTest {
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
                     .documentnumber("MIGRATION")
-                    .dataSource(DataSourceDTO.MIGRATION)
+                    .dataSource(DataSource.MIGRATION)
                     .build())
             .block();
 
