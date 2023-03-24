@@ -196,6 +196,7 @@ onUnmounted(() => {
         />
 
         <DocumentUnitProceedingDecision
+          id="previousDecisions"
           :document-unit-uuid="updatedDocumentUnit.uuid"
           :proceeding-decisions="props.documentUnit.proceedingDecisions"
         />
