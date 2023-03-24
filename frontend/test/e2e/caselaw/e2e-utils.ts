@@ -1,3 +1,4 @@
+import { documentType } from "./../../../src/fields/norms/documentType"
 import { expect } from "@playwright/test"
 import { Page } from "playwright"
 import { generateString } from "../../test-helper/dataGenerators"
@@ -61,6 +62,7 @@ export async function fillPreviousDecisionInputs(
     court?: string
     date?: string
     fileNumber?: string
+    documentType?: string
   },
   decisionIndex = 0
 ): Promise<void> {
@@ -75,6 +77,9 @@ export async function fillPreviousDecisionInputs(
   if (values?.court) await page.locator(`text=${values?.court}`).click()
   await fillInput("Datum Rechtszug", values?.date)
   await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
+  await fillInput("Dokumenttyp Rechtszug", values?.documentType)
+  if (values?.documentType)
+    await page.locator("[aria-label='dropdown-option']").first().click()
 }
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
