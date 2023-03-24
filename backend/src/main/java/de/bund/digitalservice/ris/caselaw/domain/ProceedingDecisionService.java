@@ -31,12 +31,14 @@ public class ProceedingDecisionService {
     return documentUnitService
         .generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
         .flatMap(
-            documentUnit -> repository
-                .linkProceedingDecisions(documentUnitUuid, documentUnit.uuid())
-                .map(v -> documentUnit))
+            documentUnit ->
+                repository
+                    .linkProceedingDecisions(documentUnitUuid, documentUnit.uuid())
+                    .map(v -> documentUnit))
         .flatMap(
-            documentUnit -> documentUnitService.updateDocumentUnit(
-                enrichNewDocumentUnitWithData(documentUnit, proceedingDecision)))
+            documentUnit ->
+                documentUnitService.updateDocumentUnit(
+                    enrichNewDocumentUnitWithData(documentUnit, proceedingDecision)))
         .flatMapMany(documentUnit -> repository.findAllForDocumentUnit(documentUnitUuid));
   }
 
@@ -52,12 +54,13 @@ public class ProceedingDecisionService {
       fileNumbers = List.of(proceedingDecision.fileNumber());
     }
 
-    CoreData coreData = documentUnit.coreData().toBuilder()
-        .fileNumbers(fileNumbers)
-        .documentType(proceedingDecision.documentType())
-        .decisionDate(proceedingDecision.date())
-        .court(proceedingDecision.court())
-        .build();
+    CoreData coreData =
+        documentUnit.coreData().toBuilder()
+            .fileNumbers(fileNumbers)
+            .documentType(proceedingDecision.documentType())
+            .decisionDate(proceedingDecision.date())
+            .court(proceedingDecision.court())
+            .build();
 
     return documentUnit.toBuilder()
         .dataSource(DataSource.PROCEEDING_DECISION)

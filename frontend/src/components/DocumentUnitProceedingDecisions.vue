@@ -44,7 +44,7 @@ const search = async () => {
     proceedingDecisionInput.value
   )
   if (response.data) {
-    // console.log("response:", response.data)
+    console.log("response:", response.data)
     // TODO
   }
 }

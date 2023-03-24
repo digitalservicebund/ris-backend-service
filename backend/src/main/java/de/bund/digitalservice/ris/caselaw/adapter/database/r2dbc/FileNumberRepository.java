@@ -15,4 +15,6 @@ public interface FileNumberRepository extends R2dbcRepository<FileNumberDTO, Lon
 
   Flux<FileNumberDTO> findAllByDocumentUnitIdAndIsDeviating(
       Long documentUnitId, boolean isDeviating);
+
+  Flux<FileNumberDTO> findByFileNumber(String fileNumber);
 }
