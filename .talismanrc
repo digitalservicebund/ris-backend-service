@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 7887c4c28894c5b882edf414cde018fe1e0ca0220c15d7f3e735af7c7f7f4a8d
+    checksum: 4e4e3d4e6ba64ebc01825243cec700af35cf2ad5fb21fc54972505a95e0134b5
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml
@@ -10,7 +10,7 @@ fileignoreconfig:
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: 6a0079228a0ca65304be969c5d5c2ad28186f3af5851fda87ab2159a519622ed
   - filename: backend/build.gradle
-    checksum: 9011adf90ab8127f5782ab53a8012aac5dc0802e2bb785d1cefd719201c94bff
+    checksum: 28af03b927df65fb441568ff06a2ba4d81da7fd1dfb223195c7b810648974e5f
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
   - filename: "*.sql"
