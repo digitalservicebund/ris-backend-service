@@ -73,7 +73,7 @@ const resizeObserver = new ResizeObserver((entries) => {
         <slot />
         <TextButton
           button-type="primary"
-          label="fertig"
+          label="Fertig"
           @click="toggleContentVisibility"
         ></TextButton>
       </div>
@@ -96,7 +96,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 
 .expand-enter-active {
   overflow: hidden;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 
 .expand-leave-from {
@@ -109,7 +109,7 @@ const resizeObserver = new ResizeObserver((entries) => {
 
 .expand-leave-active {
   overflow: hidden;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 
 .expandable-content {
