@@ -72,7 +72,7 @@ const resizeObserver = new ResizeObserver((entries) => {
       <div v-show="isExpanded" class="my-24 px-24">
         <slot />
         <TextButton
-          button-type="tertiary"
+          button-type="primary"
           label="fertig"
           @click="toggleContentVisibility"
         ></TextButton>
