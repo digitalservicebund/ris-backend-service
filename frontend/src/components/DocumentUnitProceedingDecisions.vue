@@ -5,6 +5,7 @@ import InputGroup from "@/components/InputGroup.vue"
 import TextButton from "@/components/TextButton.vue"
 import { proceedingDecisionFields } from "@/domain"
 import { ProceedingDecision } from "@/domain/documentUnit"
+import DocumentUnitService from "@/services/documentUnitService"
 import ProceedingDecisionService from "@/services/proceedingDecisionService"
 
 const props = defineProps<{
@@ -39,9 +40,10 @@ const addProceedingDecision = async (
 
 const search = async () => {
   // console.log("Searching with input:", proceedingDecisionInput.value)
-  const response = await ProceedingDecisionService.searchForProceedingDecisions(
-    proceedingDecisionInput.value
-  )
+  const response =
+    await DocumentUnitService.searchForDocumentUnityByProceedingDecisionInput(
+      proceedingDecisionInput.value
+    )
   if (response.data) {
     console.log("response:", response.data)
     // TODO
