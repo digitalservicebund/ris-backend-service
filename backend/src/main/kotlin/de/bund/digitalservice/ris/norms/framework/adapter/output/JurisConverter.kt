@@ -5,7 +5,18 @@ import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOut
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.DEFINITION
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.REFERENCE_NUMBER
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_ABBREVIATION
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_LONG_TITLE
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.UNOFFICIAL_SHORT_TITLE
+import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
@@ -48,7 +59,7 @@ fun mapDomainToData(norm: Norm): NormData {
     normData.announcementDate = encodeLocalDate(norm.announcementDate)
     normData.citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear
     normData.documentCategory = norm.documentCategory
-    normData.documentNumber = norm.documentNumber
+    normData.divergentDocumentNumber = norm.metadata.filter { it.type == DIVERGENT_DOCUMENT_NUMBER }.minByOrNull { it.order }?.value.toString()
     normData.entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate)
     normData.expirationDate = encodeLocalDate(norm.expirationDate)
     normData.frameKeywords = keywords
@@ -65,7 +76,20 @@ fun mapDomainToData(norm: Norm): NormData {
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
-    val metadata = data.frameKeywords.mapIndexed { index, value -> Metadatum(value, KEYWORD, index) }
+    val metadata: MutableList<Metadatum<*>> = mutableListOf()
+    if (data.divergentDocumentNumber !== null) {
+        metadata.add(Metadatum(data.divergentDocumentNumber, DIVERGENT_DOCUMENT_NUMBER, 0))
+    }
+    metadata.addAll(createMetadataForType(data.frameKeywords, KEYWORD))
+    metadata.addAll(createMetadataForType(data.risAbbreviationInternationalLaw, RIS_ABBREVIATION_INTERNATIONAL_LAW))
+    metadata.addAll(createMetadataForType(data.unofficialLongTitle, UNOFFICIAL_LONG_TITLE))
+    metadata.addAll(createMetadataForType(data.unofficialShortTitle, UNOFFICIAL_SHORT_TITLE))
+    metadata.addAll(createMetadataForType(data.unofficialAbbreviation, UNOFFICIAL_ABBREVIATION))
+    metadata.addAll(createMetadataForType(data.unofficialReference, UNOFFICIAL_REFERENCE))
+    metadata.addAll(createMetadataForType(data.referenceNumber, REFERENCE_NUMBER))
+    metadata.addAll(createMetadataForType(data.definition, DEFINITION))
+    metadata.addAll(createMetadataForType(data.ageOfMajorityIndication, AGE_OF_MAJORITY_INDICATION))
+    metadata.addAll(createMetadataForType(data.validityRule, VALIDITY_RULE))
 
     return Norm(
         guid = guid,
@@ -73,8 +97,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         metadata = metadata,
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
-        risAbbreviationInternationalLaw = data.risAbbreviationInternationalLaw,
-        documentNumber = data.documentNumber,
         documentCategory = data.documentCategory,
         providerEntity = data.providerEntity,
         providerDecidingBody = data.providerDecidingBody,
@@ -87,9 +109,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         subjectGesta = data.subjectGesta,
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
-        unofficialLongTitle = data.unofficialLongTitle,
-        unofficialShortTitle = data.unofficialShortTitle,
-        unofficialAbbreviation = data.unofficialAbbreviation,
         entryIntoForceDate = parseDateString(data.entryIntoForceDate),
         entryIntoForceDateState = parseDateStateString(data.entryIntoForceDateState ?: ""),
         principleEntryIntoForceDate = parseDateString(data.principleEntryIntoForceDate),
@@ -112,7 +131,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         printAnnouncementGazette = data.printAnnouncementGazette,
         printAnnouncementYear = data.printAnnouncementYear,
         printAnnouncementPage = data.printAnnouncementPage,
-        unofficialReference = data.unofficialReference,
         statusNote = data.statusNote,
         statusDescription = data.statusDescription,
         statusDate = parseDateString(data.statusDate),
@@ -134,13 +152,13 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         applicationScopeEndDate = parseDateString(data.applicationScopeEndDate),
         categorizedReference = data.categorizedReference,
         otherFootnote = data.otherFootnote,
-        validityRule = data.validityRule,
-        referenceNumber = data.referenceNumber,
         celexNumber = data.celexNumber,
-        definition = data.definition,
-        ageOfMajorityIndication = data.ageOfMajorityIndication,
         text = data.text,
     )
+}
+
+private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> {
+    return data.mapIndexed { index, value -> Metadatum(value, type, index) }
 }
 
 fun mapArticlesToDomain(articles: List<ArticleData>): List<Article> {

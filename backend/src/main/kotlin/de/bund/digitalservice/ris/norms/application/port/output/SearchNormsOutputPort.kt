@@ -14,6 +14,7 @@ interface SearchNormsOutputPort {
         val isFuzzyMatch: Boolean = false,
     )
 
+    // TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
     enum class QueryFields {
         PRINT_ANNOUNCEMENT_GAZETTE,
         ANNOUNCEMENT_DATE,
@@ -22,7 +23,5 @@ interface SearchNormsOutputPort {
         PRINT_ANNOUNCEMENT_PAGE,
         OFFICIAL_LONG_TITLE,
         OFFICIAL_SHORT_TITLE,
-        UNOFFICIAL_LONG_TITLE,
-        UNOFFICIAL_SHORT_TITLE,
     }
 }

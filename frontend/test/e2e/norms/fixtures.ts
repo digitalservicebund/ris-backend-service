@@ -40,10 +40,16 @@ export function getNormBySections(norm) {
           value: norm.risAbbreviation,
         },
         {
-          type: "text",
+          type: "repeated",
           name: "risAbbreviationInternationalLaw",
           label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
-          value: norm.risAbbreviationInternationalLaw,
+          value: norm.metadata
+            .filter(
+              (metaDatum) =>
+                (metaDatum.type =
+                  MetaDatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
         {
           type: "text",
@@ -52,10 +58,15 @@ export function getNormBySections(norm) {
           value: norm.documentNumber,
         },
         {
-          type: "text",
+          type: "repeated",
           name: "divergentDocumentNumber",
           label: "Abweichende Dokumentnummer",
-          value: norm.divergentDocumentNumber,
+          value: norm.metadata
+            .filter(
+              (metaDatum) =>
+                (metaDatum.type = MetaDatumType.DIVERGENT_DOCUMENT_NUMBER)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
         {
           type: "text",
@@ -198,22 +209,37 @@ export function getNormBySections(norm) {
           value: norm.officialAbbreviation,
         },
         {
-          type: "text",
+          type: "repeated",
           name: "unofficialLongTitle",
           label: "Nichtamtliche Langüberschrift",
-          value: norm.unofficialLongTitle,
+          value: norm.metadata
+            .filter(
+              (metaDatum) =>
+                (metaDatum.type = MetaDatumType.UNOFFICIAL_LONG_TITLE)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
         {
-          type: "text",
+          type: "repeated",
           name: "unofficialShortTitle",
           label: "Nichtamtliche Kurzüberschrift",
-          value: norm.unofficialShortTitle,
+          value: norm.metadata
+            .filter(
+              (metaDatum) =>
+                (metaDatum.type = MetaDatumType.UNOFFICIAL_SHORT_TITLE)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
         {
-          type: "text",
+          type: "repeated",
           name: "unofficialAbbreviation",
           label: "Nichtamtliche Buchstabenabkürzung",
-          value: norm.unofficialAbbreviation,
+          value: norm.metadata
+            .filter(
+              (metaDatum) =>
+                (metaDatum.type = MetaDatumType.UNOFFICIAL_ABBREVIATION)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
       ],
     },
@@ -505,12 +531,18 @@ export function getNormBySections(norm) {
 
     {
       heading: "Nichtamtliche Fundstelle",
+
       fields: [
         {
-          type: "text",
+          type: "repeated",
           name: "unofficialReference",
           label: "Nichtamtliche Fundstelle",
-          value: norm.unofficialReference,
+          value: norm.metadata
+            .filter(
+              (metaDatum) =>
+                (metaDatum.type = MetaDatumType.UNOFFICIAL_REFERENCE)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
       ],
     },
@@ -753,10 +785,14 @@ export function getNormBySections(norm) {
       heading: "Gültigkeitsregelung",
       fields: [
         {
-          type: "text",
+          type: "repeated",
           name: "validityRule",
           label: "Gültigkeitsregelung",
-          value: norm.validityRule,
+          value: norm.metadata
+            .filter(
+              (metaDatum) => (metaDatum.type = MetaDatumType.VALIDITY_RULE)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
       ],
     },
@@ -793,10 +829,14 @@ export function getNormBySections(norm) {
       heading: "Aktenzeichen",
       fields: [
         {
-          type: "text",
+          type: "repeated",
           name: "referenceNumber",
           label: "Aktenzeichen",
-          value: norm.referenceNumber,
+          value: norm.metadata
+            .filter(
+              (metaDatum) => (metaDatum.type = MetaDatumType.REFERENCE_NUMBER)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
       ],
     },
@@ -832,10 +872,12 @@ export function getNormBySections(norm) {
       heading: "Definition",
       fields: [
         {
-          type: "text",
+          type: "repeated",
           name: "definition",
           label: "Definition",
-          value: norm.definition,
+          value: norm.metadata
+            .filter((metaDatum) => (metaDatum.type = MetaDatumType.DEFINITION))
+            .map((metaDatum) => metaDatum.value),
         },
       ],
     },
@@ -843,10 +885,15 @@ export function getNormBySections(norm) {
       heading: "Angaben zur Volljährigkeit",
       fields: [
         {
-          type: "text",
+          type: "repeated",
           name: "ageOfMajorityIndication",
           label: "Angaben zur Volljährigkeit",
-          value: norm.ageOfMajorityIndication,
+          value: norm.metadata
+            .filter(
+              (metaDatum) =>
+                (metaDatum.type = MetaDatumType.AGE_OF_MAJORITY_INDICATION)
+            )
+            .map((metaDatum) => metaDatum.value),
         },
       ],
     },

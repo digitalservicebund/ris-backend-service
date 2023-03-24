@@ -1,12 +1,9 @@
-import { InputField, InputType } from "@/domain"
+import { defineChipsField, InputField } from "@/domain"
 
 export const unofficialReference: InputField[] = [
-  {
-    name: "unofficialReference",
-    type: InputType.TEXT,
-    label: "Nichtamtliche Fundstelle",
-    inputAttributes: {
-      ariaLabel: "Nichtamtliche Fundstelle",
-    },
-  },
+  defineChipsField(
+    "unofficialReference",
+    "Nichtamtliche Fundstelle",
+    "Nichtamtliche Fundstelle"
+  ),
 ]

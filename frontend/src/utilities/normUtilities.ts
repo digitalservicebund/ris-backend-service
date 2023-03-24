@@ -26,26 +26,119 @@ export function getNormFromNormResponse(norm: NormResponse): Norm {
       norm.metadata ?? [],
       MetaDatumType.KEYWORD
     ),
+    validityRule: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.VALIDITY_RULE
+    ),
+    unofficialShortTitle: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.UNOFFICIAL_SHORT_TITLE
+    ),
+    unofficialReference: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.UNOFFICIAL_REFERENCE
+    ),
+    unofficialLongTitle: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.UNOFFICIAL_LONG_TITLE
+    ),
+    unofficialAbbreviation: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.UNOFFICIAL_ABBREVIATION
+    ),
+    risAbbreviationInternationalLaw: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
+    ),
+    referenceNumber: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.REFERENCE_NUMBER
+    ),
+    definition: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.DEFINITION
+    ),
+    ageOfMajorityIndication: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.AGE_OF_MAJORITY_INDICATION
+    ),
+    divergentDocumentNumber: getMetadatumFromMetadata(
+      norm.metadata ?? [],
+      MetaDatumType.DIVERGENT_DOCUMENT_NUMBER
+    ),
   }
 }
-
 export function getNormEditRequestFromFrameData(
   frameData: NullableFrameData
 ): NullableNormEditRequest {
-  const { frameKeywords, ...data } = frameData
+  const {
+    frameKeywords,
+    validityRule,
+    unofficialShortTitle,
+    unofficialReference,
+    unofficialLongTitle,
+    unofficialAbbreviation,
+    risAbbreviationInternationalLaw,
+    referenceNumber,
+    definition,
+    ageOfMajorityIndication,
+    divergentDocumentNumber,
+    ...data
+  } = frameData
+  const metadata: MetaDatum[] = []
+  addMetadata(metadata, MetaDatumType.KEYWORD, frameKeywords)
+  addMetadata(metadata, MetaDatumType.VALIDITY_RULE, validityRule)
+  addMetadata(
+    metadata,
+    MetaDatumType.UNOFFICIAL_SHORT_TITLE,
+    unofficialShortTitle
+  )
+  addMetadata(metadata, MetaDatumType.UNOFFICIAL_REFERENCE, unofficialReference)
+  addMetadata(
+    metadata,
+    MetaDatumType.UNOFFICIAL_LONG_TITLE,
+    unofficialLongTitle
+  )
+  addMetadata(
+    metadata,
+    MetaDatumType.UNOFFICIAL_ABBREVIATION,
+    unofficialAbbreviation
+  )
+  addMetadata(
+    metadata,
+    MetaDatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW,
+    risAbbreviationInternationalLaw
+  )
+  addMetadata(metadata, MetaDatumType.REFERENCE_NUMBER, referenceNumber)
+  addMetadata(metadata, MetaDatumType.DEFINITION, definition)
+  addMetadata(
+    metadata,
+    MetaDatumType.AGE_OF_MAJORITY_INDICATION,
+    ageOfMajorityIndication
+  )
+  addMetadata(
+    metadata,
+    MetaDatumType.DIVERGENT_DOCUMENT_NUMBER,
+    divergentDocumentNumber
+  )
   return {
     ...data,
-    metadata:
-      frameKeywords?.map((value, index) => {
-        return {
-          value: value,
-          type: MetaDatumType.KEYWORD,
-          order: index + 1,
-        }
-      }) ?? [],
+    metadata: metadata,
   }
 }
-
+export function addMetadata(
+  metadata: MetaDatum[],
+  type: MetaDatumType,
+  data?: string[] | null
+) {
+  data?.forEach((value, index) => {
+    metadata.push({
+      value: value,
+      type: type,
+      order: index + 1,
+    })
+  })
+}
 export function getMetadatumFromMetadata(
   metadata: MetaDatum[],
   type: MetaDatumType
@@ -70,7 +163,7 @@ export function applyToFrameData(
     subjectBgb3: stringCallback(frameData?.subjectBgb3),
     ageIndicationEnd: stringCallback(frameData?.ageIndicationEnd),
     ageIndicationStart: stringCallback(frameData?.ageIndicationStart),
-    ageOfMajorityIndication: stringCallback(frameData?.ageOfMajorityIndication),
+    ageOfMajorityIndication: frameData?.ageOfMajorityIndication,
     announcementDate: dateCallback(frameData?.announcementDate),
     applicationScopeArea: stringCallback(frameData?.applicationScopeArea),
     applicationScopeEndDate: dateCallback(frameData?.applicationScopeEndDate),
@@ -82,7 +175,7 @@ export function applyToFrameData(
     citationDate: dateCallback(frameData?.citationDate),
     citationYear: stringCallback(frameData?.citationYear),
     completeCitation: stringCallback(frameData?.completeCitation),
-    definition: stringCallback(frameData?.definition),
+    definition: frameData?.definition,
     digitalAnnouncementDate: dateCallback(frameData?.digitalAnnouncementDate),
     digitalAnnouncementArea: stringCallback(frameData?.digitalAnnouncementArea),
     digitalAnnouncementAreaNumber: stringCallback(
@@ -108,7 +201,7 @@ export function applyToFrameData(
     digitalEvidenceRelatedData: stringCallback(
       frameData?.digitalEvidenceRelatedData
     ),
-    divergentDocumentNumber: stringCallback(frameData?.divergentDocumentNumber),
+    divergentDocumentNumber: frameData?.divergentDocumentNumber,
     divergentEntryIntoForceDate: dateCallback(
       frameData?.divergentEntryIntoForceDate
     ),
@@ -196,7 +289,7 @@ export function applyToFrameData(
       frameData?.providerIsResolutionMajority
     ),
     publicationDate: dateCallback(frameData?.publicationDate),
-    referenceNumber: stringCallback(frameData?.referenceNumber),
+    referenceNumber: frameData?.referenceNumber,
     reissueArticle: stringCallback(frameData?.reissueArticle),
     reissueDate: dateCallback(frameData?.reissueDate),
     reissueNote: stringCallback(frameData?.reissueNote),
@@ -206,9 +299,7 @@ export function applyToFrameData(
     repealNote: stringCallback(frameData?.repealNote),
     repealReferences: stringCallback(frameData?.repealReferences),
     risAbbreviation: stringCallback(frameData?.risAbbreviation),
-    risAbbreviationInternationalLaw: stringCallback(
-      frameData?.risAbbreviationInternationalLaw
-    ),
+    risAbbreviationInternationalLaw: frameData?.risAbbreviationInternationalLaw,
     statusDate: dateCallback(frameData?.statusDate),
     statusDescription: stringCallback(frameData?.statusDescription),
     statusNote: stringCallback(frameData?.statusNote),
@@ -217,10 +308,10 @@ export function applyToFrameData(
     subjectGesta: stringCallback(frameData?.subjectGesta),
     subjectPreviousFna: stringCallback(frameData?.subjectPreviousFna),
     text: stringCallback(frameData?.text),
-    unofficialAbbreviation: stringCallback(frameData?.unofficialAbbreviation),
-    unofficialLongTitle: stringCallback(frameData?.unofficialLongTitle),
-    unofficialReference: stringCallback(frameData?.unofficialReference),
-    unofficialShortTitle: stringCallback(frameData?.unofficialShortTitle),
-    validityRule: stringCallback(frameData?.validityRule),
+    unofficialAbbreviation: frameData?.unofficialAbbreviation,
+    unofficialLongTitle: frameData?.unofficialLongTitle,
+    unofficialReference: frameData?.unofficialReference,
+    unofficialShortTitle: frameData?.unofficialShortTitle,
+    validityRule: frameData?.validityRule,
   }
 }

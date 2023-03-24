@@ -1,12 +1,5 @@
-import { InputField, InputType } from "@/domain"
+import { defineChipsField, InputField } from "@/domain"
 
 export const definition: InputField[] = [
-  {
-    name: "definition",
-    type: InputType.TEXT,
-    label: "Definition",
-    inputAttributes: {
-      ariaLabel: "Definition",
-    },
-  },
+  defineChipsField("definition", "Definition", "Definition"),
 ]

@@ -3,6 +3,7 @@ import { setActivePinia, createPinia } from "pinia"
 import { MetaDatum, MetaDatumType, NormResponse } from "@/domain/Norm"
 import { editNormFrame, getNormByGuid } from "@/services/normsService"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
+import { addMetadata } from "@/utilities/normUtilities"
 import { generateNorm } from "~/test-helper/dataGenerators"
 
 vi.mock("@/services/normsService")
@@ -18,19 +19,69 @@ describe("loadedNorm", () => {
 
   it("calls the norms service to load a norm", async () => {
     const norm = generateNorm()
-    const { guid, articles, files, frameKeywords, ...frameData } = norm
+    const {
+      guid,
+      articles,
+      files,
+      frameKeywords,
+      validityRule,
+      unofficialShortTitle,
+      unofficialReference,
+      unofficialLongTitle,
+      unofficialAbbreviation,
+      risAbbreviationInternationalLaw,
+      referenceNumber,
+      definition,
+      ageOfMajorityIndication,
+      divergentDocumentNumber,
+      ...frameData
+    } = norm
+    const metadata: MetaDatum[] = []
+    addMetadata(metadata, MetaDatumType.KEYWORD, frameKeywords)
+    addMetadata(metadata, MetaDatumType.VALIDITY_RULE, validityRule)
+    addMetadata(
+      metadata,
+      MetaDatumType.UNOFFICIAL_SHORT_TITLE,
+      unofficialShortTitle
+    )
+    addMetadata(
+      metadata,
+      MetaDatumType.UNOFFICIAL_REFERENCE,
+      unofficialReference
+    )
+    addMetadata(
+      metadata,
+      MetaDatumType.UNOFFICIAL_LONG_TITLE,
+      unofficialLongTitle
+    )
+    addMetadata(
+      metadata,
+      MetaDatumType.UNOFFICIAL_ABBREVIATION,
+      unofficialAbbreviation
+    )
+    addMetadata(
+      metadata,
+      MetaDatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW,
+      risAbbreviationInternationalLaw
+    )
+    addMetadata(metadata, MetaDatumType.REFERENCE_NUMBER, referenceNumber)
+    addMetadata(metadata, MetaDatumType.DEFINITION, definition)
+    addMetadata(
+      metadata,
+      MetaDatumType.AGE_OF_MAJORITY_INDICATION,
+      ageOfMajorityIndication
+    )
+    addMetadata(
+      metadata,
+      MetaDatumType.DIVERGENT_DOCUMENT_NUMBER,
+      divergentDocumentNumber
+    )
     const normResponse: NormResponse = {
       guid: guid,
       articles: articles,
       files: files,
       ...frameData,
-      metadata: frameKeywords?.map((value, index): MetaDatum => {
-        return {
-          value: value,
-          type: MetaDatumType.KEYWORD,
-          order: index + 1,
-        }
-      }),
+      metadata: metadata,
     }
 
     const response = { status: 200, data: normResponse }
@@ -79,7 +130,7 @@ describe("loadedNorm", () => {
       officialLongTitle: "test long title",
       officialShortTitle: "test official short title",
       officialAbbreviation: "test official abbreviation",
-      referenceNumber: "test reference number",
+      referenceNumber: ["test reference number"],
       publicationDate: "test publication date",
       announcementDate: "test announcement date",
       citationDate: "test citation date",

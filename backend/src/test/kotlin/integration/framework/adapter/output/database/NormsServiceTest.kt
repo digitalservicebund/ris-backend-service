@@ -274,10 +274,13 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .verifyComplete()
 
         val updatedNorm = NORM.copy(
-            officialLongTitle = "new title", documentNumber = "document number",
-            providerEntity = "provider entity", entryIntoForceDate = LocalDate.now(),
-            expirationDateState = UndefinedDate.UNDEFINED_FUTURE, printAnnouncementGazette = "print gazette",
-            completeCitation = "complete citation", unofficialAbbreviation = "unofficial abbreviation",
+            officialLongTitle = "new title",
+            documentNumber = "document number",
+            providerEntity = "provider entity",
+            entryIntoForceDate = LocalDate.now(),
+            expirationDateState = UndefinedDate.UNDEFINED_FUTURE,
+            printAnnouncementGazette = "print gazette",
+            completeCitation = "complete citation",
             celexNumber = "celex number",
         )
 
@@ -298,7 +301,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 assertThat(it.expirationDateState == updatedNorm.expirationDateState, `is`(true))
                 assertThat(it.printAnnouncementGazette == updatedNorm.printAnnouncementGazette, `is`(true))
                 assertThat(it.completeCitation == updatedNorm.completeCitation, `is`(true))
-                assertThat(it.unofficialAbbreviation == updatedNorm.unofficialAbbreviation, `is`(true))
                 assertThat(it.celexNumber == updatedNorm.celexNumber, `is`(true))
             }
             .verifyComplete()

@@ -17,14 +17,11 @@ export const generalData: InputField[] = [
       ariaLabel: "Juris-Abkürzung",
     },
   },
-  {
-    name: "risAbbreviationInternationalLaw",
-    type: InputType.TEXT,
-    label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
-    inputAttributes: {
-      ariaLabel: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
-    },
-  },
+  defineChipsField(
+    "risAbbreviationInternationalLaw",
+    "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
+    "Juris-Abkürzung für völkerrechtliche Vereinbarungen"
+  ),
   {
     name: "documentNumber",
     type: InputType.TEXT,
@@ -33,14 +30,11 @@ export const generalData: InputField[] = [
       ariaLabel: "Dokumentnummer",
     },
   },
-  {
-    name: "divergentDocumentNumber",
-    type: InputType.TEXT,
-    label: "Abweichende Dokumentnummer",
-    inputAttributes: {
-      ariaLabel: "Abweichende Dokumentnummer",
-    },
-  },
+  defineChipsField(
+    "divergentDocumentNumber",
+    "Abweichende Dokumentnummer",
+    "Abweichende Dokumentnummer"
+  ),
   {
     name: "documentCategory",
     type: InputType.TEXT,

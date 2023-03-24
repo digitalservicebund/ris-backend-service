@@ -19,7 +19,6 @@ class NormTest {
         assertThat(norm.articles).isEqualTo(listOf(article))
         assertThat(norm.officialShortTitle).isNull()
         assertThat(norm.officialAbbreviation).isNull()
-        assertThat(norm.unofficialLongTitle).isNull()
         assertThat(norm.risAbbreviation).isNull()
         assertThat(norm.documentStatusDescription).isNull()
         assertThat(norm.applicationScopeStartDate).isNull()
@@ -57,7 +56,6 @@ class NormTest {
                 officialLongTitle = "long title",
                 officialShortTitle = "short title",
                 officialAbbreviation = "ABC",
-                unofficialLongTitle = "unofficial long title",
                 risAbbreviation = "ABC",
             )
 
@@ -66,7 +64,6 @@ class NormTest {
         assertThat(norm.articles).isEqualTo(listOf(article))
         assertThat(norm.officialShortTitle).isEqualTo("short title")
         assertThat(norm.officialAbbreviation).isEqualTo("ABC")
-        assertThat(norm.unofficialLongTitle).isEqualTo("unofficial long title")
         assertThat(norm.risAbbreviation).isEqualTo("ABC")
     }
 
@@ -87,7 +84,6 @@ class NormTest {
                 announcementDate = announcementDate,
                 citationDate = citationDate,
                 providerIsResolutionMajority = true,
-                unofficialLongTitle = "unofficial long title",
                 risAbbreviation = "ABC",
                 documentStatusDescription = "document status description",
                 applicationScopeStartDate = LocalDate.of(2022, 11, 18),
@@ -104,7 +100,6 @@ class NormTest {
         assertThat(norm.announcementDate).isEqualTo(announcementDate)
         assertThat(norm.citationDate).isEqualTo(citationDate)
         assertThat(norm.providerIsResolutionMajority).isTrue()
-        assertThat(norm.unofficialLongTitle).isEqualTo("unofficial long title")
         assertThat(norm.risAbbreviation).isEqualTo("ABC")
         assertThat(norm.documentStatusDescription).isEqualTo("document status description")
         assertThat(norm.applicationScopeStartDate).isEqualTo(LocalDate.of(2022, 11, 18))

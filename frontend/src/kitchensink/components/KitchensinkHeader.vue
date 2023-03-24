@@ -28,7 +28,7 @@ const isSelectedComponent = (component: risComponent) => {
       <h1 class="font-bold text-64">Kitchensink</h1>
       <!-- Navbar -->
       <div
-        class="flex flex-nowrap flex-row gap-x-20 justify-start navbar overflow-x-scroll overflow-y-hidden"
+        class="flex flex-row flex-wrap gap-x-20 gap-y-20 justify-start navbar overflow-x-scroll overflow-y-hidden"
       >
         <TextButton
           v-for="(component, index) in components"
