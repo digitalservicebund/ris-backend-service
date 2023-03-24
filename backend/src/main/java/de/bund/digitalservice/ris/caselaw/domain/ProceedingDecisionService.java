@@ -42,11 +42,6 @@ public class ProceedingDecisionService {
         .flatMapMany(documentUnit -> repository.findAllForDocumentUnit(documentUnitUuid));
   }
 
-  public Flux<ProceedingDecision> searchForProceedingDecisions(
-      ProceedingDecision proceedingDecision) {
-    return repository.searchForProceedingDecisions(proceedingDecision);
-  }
-
   private DocumentUnit enrichNewDocumentUnitWithData(
       DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
     List<String> fileNumbers = null;

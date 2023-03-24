@@ -32,11 +32,4 @@ public class ProceedingDecisionController {
       @RequestBody ProceedingDecision proceedingDecision) {
     return proceedingDecisionService.addProceedingDecision(documentUnitUuid, proceedingDecision);
   }
-
-  @PutMapping(value = "/search")
-  public Flux<ProceedingDecision> searchForProceedingDecisions(
-      @PathVariable("uuid") UUID documentUnitUuid,
-      @RequestBody ProceedingDecision proceedingDecision) {
-    return proceedingDecisionService.searchForProceedingDecisions(proceedingDecision);
-  }
 }

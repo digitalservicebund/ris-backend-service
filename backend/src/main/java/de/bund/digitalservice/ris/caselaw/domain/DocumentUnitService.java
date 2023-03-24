@@ -205,4 +205,9 @@ public class DocumentUnitService {
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
     return publishService.getLastPublishedXml(documentUuid);
   }
+
+  public Flux<DocumentUnit> searchForDocumentUnitsByProceedingDecisionInput(
+      ProceedingDecision proceedingDecision) {
+    return repository.searchForDocumentUnityByProceedingDecisionInput(proceedingDecision);
+  }
 }

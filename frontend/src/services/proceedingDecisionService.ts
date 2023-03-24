@@ -10,7 +10,6 @@ interface ProceedingDecisionService {
     proceedingDecision: ProceedingDecision
   ): Promise<ServiceResponse<ProceedingDecision[]>>
   searchForProceedingDecisions(
-    uuid: string,
     proceedingDecision: ProceedingDecision
   ): Promise<ServiceResponse<ProceedingDecision[]>>
 }
@@ -52,15 +51,12 @@ const service: ProceedingDecisionService = {
     }
     return response
   },
-  async searchForProceedingDecisions(
-    uuid: string,
-    proceedingDecision: ProceedingDecision
-  ) {
+  async searchForProceedingDecisions(proceedingDecision: ProceedingDecision) {
     const response = await httpClient.put<
       ProceedingDecision,
       ProceedingDecision[]
     >(
-      `caselaw/documentunits/${uuid}/proceedingdecisions/search`,
+      `caselaw/documentunits/search`,
       {
         headers: {
           Accept: "application/json",

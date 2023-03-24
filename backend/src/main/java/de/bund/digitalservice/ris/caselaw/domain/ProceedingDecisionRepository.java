@@ -12,6 +12,4 @@ public interface ProceedingDecisionRepository {
 
   Mono<ProceedingDecisionLinkDTO> linkProceedingDecisions(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
-
-  Flux<ProceedingDecision> searchForProceedingDecisions(ProceedingDecision proceedingDecision);
 }

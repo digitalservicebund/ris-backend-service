@@ -19,18 +19,27 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTran
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
+
   private final DatabaseDocumentUnitRepository repository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
@@ -650,5 +659,61 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               proceedingDecisionDTO.setDocumentTypeDTO(documentTypeDTO);
               return proceedingDecisionDTO;
             });
+  }
+
+  public Flux<DocumentUnit> searchForDocumentUnityByProceedingDecisionInput(
+      ProceedingDecision proceedingDecision) {
+    String courtType;
+    String courtLocation;
+    Court court = proceedingDecision.court();
+    courtType = (court == null || court.type() == null) ? null : court.type();
+    courtLocation = (court == null || court.location() == null) ? null : court.location();
+    Instant decisionDate = proceedingDecision.date();
+    DocumentType docType = proceedingDecision.documentType();
+
+    Mono<List<Long>> documentUnitDTOIdsViaFileNumber =
+        fileNumberRepository
+            .findByFileNumber(proceedingDecision.fileNumber())
+            .map(FileNumberDTO::getDocumentUnitId)
+            .collectList();
+    Mono<Long> documentTypeDTOId =
+        (docType == null || docType.jurisShortcut() == null)
+            ? Mono.just(-1L)
+            : documentTypeRepository
+                .findByJurisShortcut(proceedingDecision.documentType().jurisShortcut())
+                .mapNotNull(DocumentTypeDTO::getId);
+
+    return Mono.zip(documentUnitDTOIdsViaFileNumber, documentTypeDTOId)
+        .flatMapMany(
+            tuple -> {
+              Long[] docUnitIds;
+              if (tuple.getT1().isEmpty()) {
+                if (proceedingDecision.fileNumber() == null
+                    || proceedingDecision.fileNumber().isBlank()) {
+                  // @Query needs null and not empty list to ignore it
+                  docUnitIds = null;
+                } else {
+                  // search string exists, but no matching file number found
+                  // --> no chance for a search result
+                  return Flux.empty();
+                }
+              } else {
+                docUnitIds = tuple.getT1().toArray(Long[]::new);
+              }
+              Long docTypeId = tuple.getT2() == -1L ? null : tuple.getT2();
+              LOGGER.debug(
+                  "searchForProceedingDecisions params: {}, {}, {}, {}, {}",
+                  courtType,
+                  courtLocation,
+                  decisionDate,
+                  docUnitIds,
+                  docTypeId);
+              return repository.findByCourtDateFileNumberAndDocumentType(
+                  courtType, courtLocation, decisionDate, docUnitIds, docTypeId);
+            })
+        .flatMap(this::injectAdditionalInformation)
+        .map(
+            documentUnitDTO ->
+                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 }
