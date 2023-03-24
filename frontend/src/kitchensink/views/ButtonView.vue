@@ -68,6 +68,11 @@ const updateStatus = ref(UpdateStatus)
     </div>
 
     <div class="flex flex-col gap-y-20 items-start">
+      <h2 class="heading-02-regular">Rounded Text Button</h2>
+      <TextButton button-type="primary" label="Rounded" rounded />
+    </div>
+
+    <div class="flex flex-col gap-y-20 items-start">
       <h2 class="heading-02-regular">Save Docunit Button</h2>
       <p class="text-20">Status: Before update</p>
       <SaveDocumentUnitButton

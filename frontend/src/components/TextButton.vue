@@ -10,6 +10,7 @@ interface Props {
   href?: string
   download?: boolean | string
   target?: "_self" | "_blank" | "_parent" | "_top"
+  rounded?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -28,6 +29,7 @@ const buttonClasses = computed(() => ({
   "btn-secondary": props.buttonType == "secondary",
   "btn-ghost": props.buttonType == "ghost",
   "btn-tertiary": props.buttonType == "tertiary",
+  "btn-rounded": props.rounded,
 }))
 
 const isLink = computed(() => !!props.href)
@@ -152,6 +154,17 @@ const render = () => {
 
   .label-02-bold {
     @apply underline;
+  }
+}
+
+.btn-rounded {
+  border-radius: 50rem;
+  font-size: 1rem;
+  @apply bg-blue-300 border-blue-300 text-blue-800 px-[0.5rem] py-[0.25rem];
+
+  &:active,
+  &:hover {
+    @apply text-white;
   }
 }
 
