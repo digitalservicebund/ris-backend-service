@@ -1,13 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DataSourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PreviousDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
-import java.util.Collections;
 
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
@@ -15,9 +12,9 @@ public class DocumentUnitTransformer {
   public static DocumentUnitDTO enrichDTO(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
 
-    DataSourceDTO dataSourceDTO = DataSourceDTO.NEURIS;
-    if (documentUnit.dataSource() == DataSource.MIGRATION) {
-      dataSourceDTO = DataSourceDTO.MIGRATION;
+    DataSource dataSource = DataSource.NEURIS;
+    if (documentUnit.dataSource() != null) {
+      dataSource = documentUnit.dataSource();
     }
 
     DocumentUnitDTO.DocumentUnitDTOBuilder builder =
@@ -26,7 +23,7 @@ public class DocumentUnitTransformer {
             .documentnumber(documentUnit.documentNumber())
             .creationtimestamp(documentUnit.creationtimestamp())
             .fileuploadtimestamp(documentUnit.fileuploadtimestamp())
-            .dataSource(dataSourceDTO)
+            .dataSource(dataSource)
             .s3path(documentUnit.s3path())
             .filetype(documentUnit.filetype())
             .filename(documentUnit.filename());
@@ -63,30 +60,12 @@ public class DocumentUnitTransformer {
     }
 
     if (documentUnitDTO.getId() == null
-        && documentUnit.previousDecisions() != null
-        && !documentUnit.previousDecisions().isEmpty()) {
+        && documentUnit.proceedingDecisions() != null
+        && !documentUnit.proceedingDecisions().isEmpty()) {
 
       throw new DocumentUnitTransformerException(
           "Transformation of a document unit with previous decisions only allowed by update. "
               + "Document unit must have a database id!");
-    }
-
-    if (documentUnit.previousDecisions() != null) {
-      builder.previousDecisions(
-          documentUnit.previousDecisions().stream()
-              .map(
-                  previousDecision ->
-                      PreviousDecisionDTO.builder()
-                          .id(previousDecision.id())
-                          .documentUnitId(documentUnitDTO.getId())
-                          .courtLocation(previousDecision.court().location())
-                          .courtType(previousDecision.court().type())
-                          .fileNumber(previousDecision.fileNumber())
-                          .decisionDateTimestamp(previousDecision.date())
-                          .build())
-              .toList());
-    } else {
-      builder.previousDecisions(Collections.emptyList());
     }
 
     if (documentUnit.texts() != null) {

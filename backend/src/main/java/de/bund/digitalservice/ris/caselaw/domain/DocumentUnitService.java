@@ -167,6 +167,10 @@ public class DocumentUnitService {
     return repository.findByDocumentNumber(documentNumber);
   }
 
+  public Mono<DocumentUnit> getByUuid(UUID documentUnitUuid) {
+    return repository.findByUuid(documentUnitUuid);
+  }
+
   public Mono<String> deleteByUuid(UUID documentUnitId) {
     return repository
         .findByUuid(documentUnitId)
@@ -200,5 +204,10 @@ public class DocumentUnitService {
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
     return publishService.getLastPublishedXml(documentUuid);
+  }
+
+  public Flux<DocumentUnit> searchForDocumentUnitsByProceedingDecisionInput(
+      ProceedingDecision proceedingDecision) {
+    return repository.searchForDocumentUnityByProceedingDecisionInput(proceedingDecision);
   }
 }

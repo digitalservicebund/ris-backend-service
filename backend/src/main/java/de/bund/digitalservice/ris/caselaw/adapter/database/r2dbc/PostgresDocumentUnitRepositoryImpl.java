@@ -9,31 +9,43 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Doc
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.PreviousDecisionTransformer;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
+
   private final DatabaseDocumentUnitRepository repository;
-  private final DatabasePreviousDecisionRepository previousDecisionRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
+  private final DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository;
+  private final DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final CourtRepository courtRepository;
   private final StateRepository stateRepository;
@@ -46,7 +58,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitRepository repository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      DatabasePreviousDecisionRepository previousDecisionRepository,
+      DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository,
+      DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
       CourtRepository courtRepository,
@@ -57,7 +70,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseKeywordRepository keywordRepository) {
 
     this.repository = repository;
-    this.previousDecisionRepository = previousDecisionRepository;
+    this.databaseProceedingDecisionRepository = databaseProceedingDecisionRepository;
+    this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
     this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
@@ -98,7 +112,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 .uuid(UUID.randomUUID())
                 .creationtimestamp(Instant.now())
                 .documentnumber(documentNumber)
-                .dataSource(DataSourceDTO.NEURIS)
+                .dataSource(DataSource.NEURIS)
                 .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                 .build())
         .map(
@@ -116,7 +130,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
         .flatMap(repository::save)
-        .flatMap(documentUnitDTO -> savePreviousDecisions(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingEcli(documentUnitDTO, documentUnit))
@@ -201,101 +214,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .defaultIfEmpty(CourtDTO.builder().build());
   }
 
-  private Mono<DocumentUnitDTO> savePreviousDecisions(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    return previousDecisionRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
-        .collectList()
-        .flatMap(
-            previousDecisionDTOs -> {
-              List<Long> toDeleteIds = new ArrayList<>();
-              List<PreviousDecisionDTO> toUpdate = new ArrayList<>();
-              List<PreviousDecisionDTO> toInsert = new ArrayList<>();
-
-              List<Long> updateIds = new ArrayList<>();
-
-              if (documentUnit.previousDecisions() == null
-                  || documentUnit.previousDecisions().isEmpty()) {
-                toDeleteIds.addAll(
-                    previousDecisionDTOs.stream().map(PreviousDecisionDTO::getId).toList());
-              } else {
-                toInsert.addAll(
-                    documentUnit.previousDecisions().stream()
-                        .filter(previousDecision -> previousDecision.id() == null)
-                        .map(
-                            previousDecision ->
-                                PreviousDecisionTransformer.generateDTO(
-                                    previousDecision, documentUnitDTO.getId()))
-                        .toList());
-                List<PreviousDecision> toUpdateOrToDelete =
-                    new ArrayList<>(
-                        documentUnit.previousDecisions().stream()
-                            .filter(previousDecision -> previousDecision.id() != null)
-                            .toList());
-
-                previousDecisionDTOs.forEach(
-                    previousDecisionDTO -> {
-                      Optional<PreviousDecision> previousDecisionOptional =
-                          toUpdateOrToDelete.stream()
-                              .filter(
-                                  previousDecision ->
-                                      previousDecisionDTO.getId().equals(previousDecision.id()))
-                              .findFirst();
-                      if (previousDecisionOptional.isPresent()) {
-                        toUpdate.add(
-                            PreviousDecisionTransformer.enrichDTO(
-                                previousDecisionDTO, previousDecisionOptional.get()));
-                        updateIds.add(previousDecisionDTO.getId());
-                        toUpdateOrToDelete.removeIf(
-                            previousDecision ->
-                                previousDecision.id().equals(previousDecisionDTO.getId()));
-                      } else {
-                        toDeleteIds.add(previousDecisionDTO.getId());
-                      }
-                    });
-
-                updateIds.addAll(toUpdateOrToDelete.stream().map(PreviousDecision::id).toList());
-              }
-
-              List<PreviousDecisionDTO> savedPreviousDecisions = new ArrayList<>();
-
-              return previousDecisionRepository
-                  .findAllById(updateIds)
-                  .collectList()
-                  .map(
-                      updateList -> {
-                        updateList.forEach(
-                            previousDecisionDTO -> {
-                              if (!Objects.equals(
-                                  previousDecisionDTO.documentUnitId, documentUnitDTO.getId())) {
-                                throw new DocumentUnitException(
-                                    "previous decision not for the right document unit");
-                              }
-                            });
-                        return updateList;
-                      })
-                  .flatMap(list -> previousDecisionRepository.deleteAllById(toDeleteIds))
-                  .then(previousDecisionRepository.saveAll(toUpdate).collectList())
-                  .map(
-                      updatedPreviousDecisions -> {
-                        savedPreviousDecisions.addAll(updatedPreviousDecisions);
-                        return documentUnitDTO;
-                      })
-                  .flatMap(v -> previousDecisionRepository.saveAll(toInsert).collectList())
-                  .map(
-                      insertedPreviousDecisions -> {
-                        savedPreviousDecisions.addAll(insertedPreviousDecisions);
-                        return documentUnitDTO;
-                      })
-                  .map(
-                      oldDocumentUnitDTO -> {
-                        oldDocumentUnitDTO.setPreviousDecisions(savedPreviousDecisions);
-                        return oldDocumentUnitDTO;
-                      });
-            });
-  }
-
-  private Mono<DocumentUnitDTO> saveFileNumbers(
+  public Mono<DocumentUnitDTO> saveFileNumbers(
       DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
     return fileNumberRepository
         .findAllByDocumentUnitIdAndIsDeviating(documentUnitDTO.getId(), false)
@@ -593,8 +512,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
-    return injectPreviousDecisions(documentUnitDTO)
-        .flatMap(this::injectFileNumbers)
+    return injectFileNumbers(documentUnitDTO)
+        .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)
@@ -603,16 +522,23 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectKeywords);
   }
 
-  private Mono<DocumentUnitDTO> injectPreviousDecisions(DocumentUnitDTO documentUnitDTO) {
-    return previousDecisionRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+  private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
+    return databaseProceedingDecisionRepository
+        .findAllById(
+            databaseProceedingDecisionRepository
+                .findByUuid(documentUnitDTO.uuid)
+                .map(ProceedingDecisionDTO::getId)
+                .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
+                .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
+        .flatMap(
+            proceedingDecisionDTO ->
+                injectAdditionalProceedingDecisionInformation(proceedingDecisionDTO))
         .collectList()
         .map(
-            list -> {
-              documentUnitDTO.setPreviousDecisions(list);
+            proceedingDecisionDTOS -> {
+              documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOS);
               return documentUnitDTO;
-            })
-        .map(v -> documentUnitDTO);
+            });
   }
 
   private Mono<DocumentUnitDTO> injectFileNumbers(DocumentUnitDTO documentUnitDTO) {
@@ -697,5 +623,97 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               documentUnitDTO.setKeywords(keywordDTO);
               return Mono.just(documentUnitDTO);
             });
+  }
+
+  private Mono<ProceedingDecisionDTO> injectAdditionalProceedingDecisionInformation(
+      ProceedingDecisionDTO proceedingDecisionDTO) {
+    return injectProceedingDecisionFileNumbers(proceedingDecisionDTO)
+        .flatMap(this::injectProceedingDecisionDocumentType);
+  }
+
+  private Mono<ProceedingDecisionDTO> injectProceedingDecisionFileNumbers(
+      ProceedingDecisionDTO proceedingDecisionDTO) {
+    return fileNumberRepository
+        .findAllByDocumentUnitId(proceedingDecisionDTO.getId())
+        .collectList()
+        .map(
+            fileNumbers -> {
+              proceedingDecisionDTO.setFileNumbers(
+                  fileNumbers.stream()
+                      .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
+                      .toList());
+              return proceedingDecisionDTO;
+            });
+  }
+
+  private Mono<ProceedingDecisionDTO> injectProceedingDecisionDocumentType(
+      ProceedingDecisionDTO proceedingDecisionDTO) {
+    if (proceedingDecisionDTO.getDocumentTypeId() == null) {
+      return Mono.just(proceedingDecisionDTO);
+    }
+    return documentTypeRepository
+        .findById(proceedingDecisionDTO.getDocumentTypeId())
+        .defaultIfEmpty(DocumentTypeDTO.builder().build())
+        .map(
+            documentTypeDTO -> {
+              proceedingDecisionDTO.setDocumentTypeDTO(documentTypeDTO);
+              return proceedingDecisionDTO;
+            });
+  }
+
+  public Flux<DocumentUnit> searchForDocumentUnityByProceedingDecisionInput(
+      ProceedingDecision proceedingDecision) {
+    String courtType;
+    String courtLocation;
+    Court court = proceedingDecision.court();
+    courtType = (court == null || court.type() == null) ? null : court.type();
+    courtLocation = (court == null || court.location() == null) ? null : court.location();
+    Instant decisionDate = proceedingDecision.date();
+    DocumentType docType = proceedingDecision.documentType();
+
+    Mono<List<Long>> documentUnitDTOIdsViaFileNumber =
+        fileNumberRepository
+            .findByFileNumber(proceedingDecision.fileNumber())
+            .map(FileNumberDTO::getDocumentUnitId)
+            .collectList();
+    Mono<Long> documentTypeDTOId =
+        (docType == null || docType.jurisShortcut() == null)
+            ? Mono.just(-1L)
+            : documentTypeRepository
+                .findByJurisShortcut(proceedingDecision.documentType().jurisShortcut())
+                .mapNotNull(DocumentTypeDTO::getId);
+
+    return Mono.zip(documentUnitDTOIdsViaFileNumber, documentTypeDTOId)
+        .flatMapMany(
+            tuple -> {
+              Long[] docUnitIds;
+              if (tuple.getT1().isEmpty()) {
+                if (proceedingDecision.fileNumber() == null
+                    || proceedingDecision.fileNumber().isBlank()) {
+                  // @Query needs null and not empty list to ignore it
+                  docUnitIds = null;
+                } else {
+                  // search string exists, but no matching file number found
+                  // --> no chance for a search result
+                  return Flux.empty();
+                }
+              } else {
+                docUnitIds = tuple.getT1().toArray(Long[]::new);
+              }
+              Long docTypeId = tuple.getT2() == -1L ? null : tuple.getT2();
+              LOGGER.debug(
+                  "searchForProceedingDecisions params: {}, {}, {}, {}, {}",
+                  courtType,
+                  courtLocation,
+                  decisionDate,
+                  docUnitIds,
+                  docTypeId);
+              return repository.findByCourtDateFileNumberAndDocumentType(
+                  courtType, courtLocation, decisionDate, docUnitIds, docTypeId);
+            })
+        .flatMap(this::injectAdditionalInformation)
+        .map(
+            documentUnitDTO ->
+                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
   }
 }

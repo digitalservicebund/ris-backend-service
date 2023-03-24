@@ -1,10 +1,5 @@
 import { expect } from "@playwright/test"
-import {
-  navigateToCategories,
-  clickSaveButton,
-  togglePreviousDecisionsSection,
-  fillPreviousDecisionInputs,
-} from "./e2e-utils"
+import { navigateToCategories, clickSaveButton } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
@@ -228,103 +223,6 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.reload()
 
     await expect(page.locator("text=testthree").first()).toBeVisible()
-  })
-
-  test("test previous decision data change", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page, {
-      court: "AG Aalen",
-      date: "2004-12-03",
-      fileNumber: "1a2b3c",
-    })
-
-    await clickSaveButton(page)
-    await page.reload()
-    await togglePreviousDecisionsSection(page)
-
-    expect(await page.inputValue("[aria-label='Gericht Rechtszug']")).toBe(
-      "AG Aalen"
-    )
-    expect(await page.inputValue("[aria-label='Datum Rechtszug']")).toBe(
-      "2004-12-03"
-    )
-    expect(await page.inputValue("[aria-label='Aktenzeichen Rechtszug']")).toBe(
-      "1a2b3c"
-    )
-  })
-
-  test("test add another empty previous decision", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page, {
-      date: "2004-12-03",
-    })
-    await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
-
-    await expect(page.locator("[aria-label='Gericht Rechtszug']")).toHaveCount(
-      2
-    )
-    expect(
-      await page.locator("[aria-label='Gericht Rechtszug']").nth(1).inputValue()
-    ).toBe("")
-    await expect(page.locator("[aria-label='Datum Rechtszug']")).toHaveCount(2)
-    expect(
-      await page.locator("[aria-label='Datum Rechtszug']").nth(1).inputValue()
-    ).toBe("")
-    await expect(
-      page.locator("[aria-label='Aktenzeichen Rechtszug']")
-    ).toHaveCount(2)
-    expect(
-      await page
-        .locator("[aria-label='Aktenzeichen Rechtszug']")
-        .nth(1)
-        .inputValue()
-    ).toBe("")
-  })
-
-  test("test delete first previous decision", async ({
-    page,
-    documentNumber,
-  }) => {
-    await navigateToCategories(page, documentNumber)
-    await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(
-      page,
-      { court: "AG Aalen", date: "2004-12-03" },
-      0
-    )
-    await page.locator("[aria-label='weitere Entscheidung hinzufügen']").click()
-    await fillPreviousDecisionInputs(
-      page,
-      { court: "AG Aalen", date: "2004-12-03" },
-      1
-    )
-
-    await expect(page.locator("[aria-label='Gericht Rechtszug']")).toHaveCount(
-      2
-    )
-    expect(
-      await page.locator("[aria-label='Gericht Rechtszug']").nth(0).inputValue()
-    ).toBe("AG Aalen")
-    expect(
-      await page.locator("[aria-label='Gericht Rechtszug']").nth(1).inputValue()
-    ).toBe("AG Aalen")
-
-    await page.locator("[aria-label='Entscheidung Entfernen']").click()
-
-    await expect(page.locator("[aria-label='Gericht Rechtszug']")).toHaveCount(
-      1
-    )
-    expect(
-      await page.locator("[aria-label='Gericht Rechtszug']").nth(0).inputValue()
-    ).toBe("AG Aalen")
   })
 
   test("text editor fields should have predefined height", async ({

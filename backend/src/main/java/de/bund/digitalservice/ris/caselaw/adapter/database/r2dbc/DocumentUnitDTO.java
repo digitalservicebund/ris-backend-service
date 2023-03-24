@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
+import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -26,7 +28,7 @@ public class DocumentUnitDTO {
   UUID uuid;
   String documentnumber;
   Instant creationtimestamp;
-  DataSourceDTO dataSource;
+  DataSource dataSource;
 
   // Original file
   Instant fileuploadtimestamp;
@@ -96,7 +98,7 @@ public class DocumentUnitDTO {
   @Column("entscheidungsgruende")
   String decisionReasons;
 
-  @Transient List<PreviousDecisionDTO> previousDecisions;
+  @Transient List<ProceedingDecisionDTO> proceedingDecisions;
   @Transient List<FileNumberDTO> fileNumbers;
   @Transient List<FileNumberDTO> deviatingFileNumbers;
   @Transient List<IncorrectCourtDTO> incorrectCourts;

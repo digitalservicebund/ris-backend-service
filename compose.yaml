@@ -3,6 +3,7 @@ services:
     image: traefik:v2.9
     extra_hosts:
       - localhost:host-gateway
+    container_name: traefik
     volumes:
       - ./traefik.yaml:/etc/traefik/config.yml:ro
     command:
@@ -11,11 +12,12 @@ services:
       - "--entryPoints.http.address=:80"
     ports:
       - 80:80
- 
+
   backend:
     image: gradle:7-jdk17
     extra_hosts:
       - localhost:host-gateway
+    container_name: backend
     volumes:
       - ./:/app
       - gradle-cache:/root/.gradle/caches
@@ -35,10 +37,12 @@ services:
       - redis
     ports:
       - 8080:8080
+
   frontend:
     image: neuris/frontend
     extra_hosts:
       - localhost:host-gateway
+    container_name: frontend
     volumes:
       - ./frontend/src/:/usr/src/app/src
     environment:
@@ -54,6 +58,7 @@ services:
     extra_hosts:
       - localhost:host-gateway
     restart: always
+    container_name: db
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
@@ -67,6 +72,7 @@ services:
     image: cgr.dev/chainguard/redis:7.0
     extra_hosts:
       - localhost:host-gateway
+    container_name: redis
     command:
       - "--maxmemory 256mb"
       - "--maxmemory-policy allkeys-lru"

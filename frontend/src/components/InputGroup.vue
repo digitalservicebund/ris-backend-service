@@ -22,6 +22,7 @@ const props = withDefaults(defineProps<Props>(), {
   columnCount: 1,
   validationErrors: undefined,
 })
+
 const emit = defineEmits<Emits>()
 
 /*
@@ -58,13 +59,19 @@ const inputValues = ref<InputValues>({})
 
 watch(
   () => props.modelValue,
-  () => (inputValues.value = props.modelValue),
+  () => (inputValues.value = props.modelValue ? props.modelValue : {}),
   { immediate: true, deep: true }
 )
 
-watch(inputValues, () => emit("update:modelValue", inputValues.value), {
-  deep: true,
-})
+watch(
+  inputValues,
+  () => {
+    emit("update:modelValue", inputValues.value)
+  },
+  {
+    deep: true,
+  }
+)
 </script>
 
 <template>

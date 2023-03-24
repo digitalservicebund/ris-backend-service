@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DataSourceDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
@@ -9,11 +8,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtD
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.PreviousDecision;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -27,7 +27,7 @@ public class DocumentUnitBuilder {
 
   private DocumentUnitBuilder() {}
 
-  private Court getCourtObject(String courtType, String courtLocation) {
+  public Court getCourtObject(String courtType, String courtLocation) {
     Court court = null;
     if (courtType != null) {
       String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
@@ -57,21 +57,11 @@ public class DocumentUnitBuilder {
           new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
     }
 
-    List<PreviousDecision> previousDecisions = null;
-    if (documentUnitDTO.getPreviousDecisions() != null) {
-      previousDecisions =
-          documentUnitDTO.getPreviousDecisions().stream()
-              .map(
-                  previousDecisionDTO ->
-                      PreviousDecision.builder()
-                          .id(previousDecisionDTO.getId())
-                          .court(
-                              getCourtObject(
-                                  previousDecisionDTO.getCourtType(),
-                                  previousDecisionDTO.getCourtLocation()))
-                          .fileNumber(previousDecisionDTO.getFileNumber())
-                          .date(previousDecisionDTO.getDecisionDateTimestamp())
-                          .build())
+    List<ProceedingDecision> proceedingDecisions = null;
+    if (documentUnitDTO.getProceedingDecisions() != null) {
+      proceedingDecisions =
+          documentUnitDTO.getProceedingDecisions().stream()
+              .map(ProceedingDecisionTransformer::transformToDomain)
               .toList();
     }
 
@@ -118,8 +108,8 @@ public class DocumentUnitBuilder {
     }
 
     DataSource dataSource = DataSource.NEURIS;
-    if (documentUnitDTO.getDataSource() == DataSourceDTO.MIGRATION) {
-      dataSource = DataSource.MIGRATION;
+    if (documentUnitDTO.getDataSource() != null) {
+      dataSource = documentUnitDTO.getDataSource();
     }
 
     List<String> keywords = null;
@@ -152,7 +142,7 @@ public class DocumentUnitBuilder {
             documentUnitDTO.getInputType(),
             documentUnitDTO.getCenter(),
             documentUnitDTO.getRegion()),
-        previousDecisions,
+        proceedingDecisions,
         new Texts(
             documentUnitDTO.getDecisionName(),
             documentUnitDTO.getHeadline(),

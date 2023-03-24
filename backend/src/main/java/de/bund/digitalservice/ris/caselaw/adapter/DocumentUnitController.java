@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -129,5 +130,11 @@ public class DocumentUnitController {
         .getLastPublishedXmlMail(uuid)
         .map(ResponseEntity::ok)
         .doOnError(ex -> ResponseEntity.internalServerError().build());
+  }
+
+  @PutMapping(value = "/search")
+  public Flux<DocumentUnit> searchForDocumentUnitsByProceedingDecisionInput(
+      @RequestBody ProceedingDecision proceedingDecision) {
+    return service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
   }
 }

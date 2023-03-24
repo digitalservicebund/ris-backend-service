@@ -1,4 +1,4 @@
-import DocumentUnit from "../domain/documentUnit"
+import DocumentUnit, { ProceedingDecision } from "../domain/documentUnit"
 import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
 import httpClient, {
   ServiceResponse,
@@ -16,6 +16,9 @@ interface DocumentUnitService {
   ): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
+  searchForDocumentUnityByProceedingDecisionInput(
+    proceedingDecision: ProceedingDecision
+  ): Promise<ServiceResponse<DocumentUnit[]>>
 }
 
 const service: DocumentUnitService = {
@@ -102,6 +105,27 @@ const service: DocumentUnitService = {
     if (response.status >= 300) {
       response.error = {
         title: "Dokumentationseinheit konnte nicht gelöscht werden.",
+      }
+    }
+    return response
+  },
+
+  async searchForDocumentUnityByProceedingDecisionInput(
+    proceedingDecision: ProceedingDecision
+  ) {
+    const response = await httpClient.put<ProceedingDecision, DocumentUnit[]>(
+      `caselaw/documentunits/search`,
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      },
+      proceedingDecision
+    )
+    if (response.status >= 300) {
+      response.error = {
+        title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
       }
     }
     return response

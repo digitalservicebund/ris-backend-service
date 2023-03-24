@@ -3,7 +3,7 @@ import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnitPreviousDecisions from "@/components/DocumentUnitPreviousDecisions.vue"
+import DocumentUnitProceedingDecision from "@/components/DocumentUnitProceedingDecisions.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
@@ -89,11 +89,6 @@ const coreData = computed({
       handleUpdateDocumentUnit()
     }
   },
-})
-
-const previousDecisions = computed({
-  get: () => props.documentUnit.previousDecisions,
-  set: (newValue) => (updatedDocumentUnit.value.previousDecisions = newValue),
 })
 
 const { hash: routeHash } = toRefs(route)
@@ -200,11 +195,9 @@ onUnmounted(() => {
           @update-document-unit="handleUpdateDocumentUnit"
         />
 
-        <!-- TODO add validationErrors -->
-        <DocumentUnitPreviousDecisions
-          id="previousDecisions"
-          v-model="previousDecisions"
-          class="my-16"
+        <DocumentUnitProceedingDecision
+          :document-unit-uuid="updatedDocumentUnit.uuid"
+          :proceeding-decisions="props.documentUnit.proceedingDecisions"
         />
 
         <!-- TODO add validationErrors -->

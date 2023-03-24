@@ -2,7 +2,7 @@ import { InputType } from "./types"
 import type { InputField } from "./types"
 import comboboxItemService from "@/services/comboboxItemService"
 
-export const previousDecisionFields: InputField[] = [
+export const proceedingDecisionFields: InputField[] = [
   {
     name: "court",
     type: InputType.COMBOBOX,
@@ -12,6 +12,16 @@ export const previousDecisionFields: InputField[] = [
       ariaLabel: "Gericht Rechtszug",
       placeholder: "Gerichtstyp Gerichtsort",
       itemService: comboboxItemService.getCourts,
+    },
+  },
+  {
+    name: "documentType",
+    type: InputType.COMBOBOX,
+    label: "Dokumenttyp",
+    inputAttributes: {
+      ariaLabel: "Dokumenttyp Rechtszug",
+      placeholder: "Bitte auswählen",
+      itemService: comboboxItemService.getDocumentTypes,
     },
   },
   {
