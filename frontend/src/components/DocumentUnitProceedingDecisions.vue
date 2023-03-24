@@ -51,6 +51,10 @@ const search = async () => {
   }
 }
 
+const addProceedingDecisionViaSearchResults = async () => {
+  // TODO
+}
+
 watch(
   props,
   () => {
@@ -116,12 +120,23 @@ const buildSearchResultRowString = (doc: DocumentUnit) => {
         ergeben</strong
       >
     </div>
-    <p
-      v-for="docUnit in documentUnitSearchResults"
-      :key="docUnit.uuid"
-      class="link-01-bold mb-24 mt-12 underline"
-    >
-      {{ buildSearchResultRowString(docUnit) }}
-    </p>
+    <div class="table">
+      <div
+        v-for="docUnit in documentUnitSearchResults"
+        :key="docUnit.uuid"
+        class="link-01-bold mb-24 mt-12 table-row underline"
+      >
+        <div class="table-cell">
+          {{ buildSearchResultRowString(docUnit) }}
+        </div>
+        <div class="p-8 table-cell">
+          <TextButton
+            aria-label="Treffer übernehmen"
+            label="Übernehmen"
+            @click="addProceedingDecisionViaSearchResults"
+          />
+        </div>
+      </div>
+    </div>
   </ExpandableContent>
 </template>
