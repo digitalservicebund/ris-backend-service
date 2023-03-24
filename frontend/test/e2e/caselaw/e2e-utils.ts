@@ -1,4 +1,3 @@
-import { documentType } from "./../../../src/fields/norms/documentType"
 import { expect } from "@playwright/test"
 import { Page } from "playwright"
 import { generateString } from "../../test-helper/dataGenerators"
