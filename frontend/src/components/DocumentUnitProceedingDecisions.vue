@@ -4,7 +4,7 @@ import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import TextButton from "@/components/TextButton.vue"
 import { proceedingDecisionFields } from "@/domain"
-import { ProceedingDecision } from "@/domain/documentUnit"
+import DocumentUnit, { ProceedingDecision } from "@/domain/documentUnit"
 import DocumentUnitService from "@/services/documentUnitService"
 import ProceedingDecisionService from "@/services/proceedingDecisionService"
 
@@ -21,6 +21,7 @@ const defaultModel: ProceedingDecision = {
 }
 
 const proceedingDecisionList = ref<ProceedingDecision[]>()
+const documentUnitSearchResults = ref<DocumentUnit[]>([])
 const proceedingDecisionInput = ref<ProceedingDecision>(defaultModel)
 
 const addProceedingDecision = async (
@@ -46,7 +47,7 @@ const search = async () => {
     )
   if (response.data) {
     console.log("response:", response.data)
-    // TODO
+    documentUnitSearchResults.value = response.data
   }
 }
 
@@ -60,6 +61,19 @@ watch(
     immediate: true,
   }
 )
+
+const buildSearchResultRowString = (doc: DocumentUnit) => {
+  return [
+    doc.coreData?.court?.type,
+    doc.coreData?.court?.location,
+    doc.coreData?.documentType?.label,
+    doc.coreData?.decisionDate,
+    doc.coreData?.fileNumbers?.[0],
+    doc.documentNumber,
+  ]
+    .filter((v) => v !== undefined && v !== null)
+    .join(", ")
+}
 </script>
 
 <template>
@@ -95,5 +109,19 @@ watch(
       label="Manuell Hinzufügen"
       @click="addProceedingDecision(proceedingDecisionInput)"
     />
+
+    <div v-if="documentUnitSearchResults.length > 0" class="mb-10 mt-20">
+      <strong
+        >Suche hat {{ documentUnitSearchResults.length }} Treffer
+        ergeben</strong
+      >
+    </div>
+    <p
+      v-for="docUnit in documentUnitSearchResults"
+      :key="docUnit.uuid"
+      class="link-01-bold mb-24 mt-12 underline"
+    >
+      {{ buildSearchResultRowString(docUnit) }}
+    </p>
   </ExpandableContent>
 </template>
