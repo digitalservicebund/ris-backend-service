@@ -6,8 +6,10 @@ export type CoreData = {
   documentType?: DocumentType
   procedure?: string
   ecli?: string
+  deviatingEclis?: string[]
   appraisalBody?: string
   decisionDate?: string
+  deviatingDecisionDates?: string[]
   legalEffect?: string
   inputType?: string
   center?: string
