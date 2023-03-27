@@ -31,7 +31,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
             court: { type: "type1", location: "location1", label: "label1" },
             date: "2022-02-01",
             documentType: {
-              jurisShortcut: "ca",
+              jurisShortcut: "documentTypeShortcut1",
               label: "documentType1",
             },
             fileNumber: "test1",
@@ -40,7 +40,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
             court: { type: "type2", location: "location2", label: "label2" },
             date: "2022-02-02",
             documentType: {
-              jurisShortcut: "ca",
+              jurisShortcut: "documentTypeShortcut2",
               label: "documentType2",
             },
             fileNumber: "test2",
@@ -81,10 +81,14 @@ describe("DocumentUnitProceedingDecisions", async () => {
 
     expect(fetchSpy).toBeCalledTimes(1)
     expect(
-      screen.getByText("type1 location1 documentType1 2022-02-01 test1")
+      screen.getByText(
+        "type1 location1, documentTypeShortcut1, 01.02.2022, test1"
+      )
     ).toBeInTheDocument()
     expect(
-      screen.getByText("type2 location2 documentType2 2022-02-02 test2")
+      screen.getByText(
+        "type2 location2, documentTypeShortcut2, 02.02.2022, test2"
+      )
     ).toBeInTheDocument()
   })
 
