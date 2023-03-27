@@ -5,7 +5,7 @@ import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import TextButton from "@/components/TextButton.vue"
 import { proceedingDecisionFields } from "@/domain"
-import DocumentUnit, { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/documentUnit"
 import DocumentUnitService from "@/services/documentUnitService"
 import ProceedingDecisionService from "@/services/proceedingDecisionService"
 
