@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/vue"
-import DecisionList from "@/components/proceedingDecisions/decisionList.vue"
+import DecisionList from "@/components/proceedingDecisions/DecisionList.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
 
 function renderComponent(options?: { decisions: ProceedingDecision[] }) {
