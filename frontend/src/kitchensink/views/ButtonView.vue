@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
+import NestedButton from "@/components/NestedButton.vue"
 import SaveDocumentUnitButton from "@/components/SaveDocumentUnitButton.vue"
 import TextButton from "@/components/TextButton.vue"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
@@ -68,8 +69,9 @@ const updateStatus = ref(UpdateStatus)
     </div>
 
     <div class="flex flex-col gap-y-20 items-start">
-      <h2 class="heading-02-regular">Rounded Text Button</h2>
-      <TextButton button-type="primary" label="Rounded" rounded />
+      <h2 class="heading-02-regular">Nested Button</h2>
+      <NestedButton label="Nested Button" />
+      <NestedButton icon="add" label="Nested Button with icon" />
     </div>
 
     <div class="flex flex-col gap-y-20 items-start">
