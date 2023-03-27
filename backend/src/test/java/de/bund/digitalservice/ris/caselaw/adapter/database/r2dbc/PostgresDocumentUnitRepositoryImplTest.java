@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +26,7 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseDocumentUnitMetadataRepository metadataRepository;
   @MockBean private FileNumberRepository fileNumberRepository;
   @MockBean private DeviatingEcliRepository deviatingEcliRepository;
-  @MockBean private DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository;
+  @MockBean private DatabaseDocumentUnitMetadataRepository databaseDocumentUnitMetadataRepository;
   @MockBean private DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   @MockBean private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @MockBean private DatabaseIncorrectCourtRepository incorrectCourtRepository;
@@ -46,7 +45,7 @@ class PostgresDocumentUnitRepositoryImplTest {
             metadataRepository,
             fileNumberRepository,
             deviatingEcliRepository,
-            databaseProceedingDecisionRepository,
+            databaseDocumentUnitMetadataRepository,
             proceedingDecisionLinkRepository,
             deviatingDecisionDateRepository,
             incorrectCourtRepository,

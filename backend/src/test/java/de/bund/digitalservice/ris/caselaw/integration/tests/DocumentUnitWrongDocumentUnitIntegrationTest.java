@@ -2,11 +2,11 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
@@ -45,7 +45,7 @@ class DocumentUnitWrongDocumentUnitIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
-  @Autowired private DatabaseProceedingDecisionRepository previousDecisionRepository;
+  @Autowired private DatabaseDocumentUnitMetadataRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
 

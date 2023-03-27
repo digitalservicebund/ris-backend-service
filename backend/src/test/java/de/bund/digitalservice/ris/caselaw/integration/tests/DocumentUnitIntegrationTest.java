@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
@@ -23,7 +24,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Doc
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
@@ -72,7 +72,7 @@ class DocumentUnitIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
-  @Autowired private DatabaseProceedingDecisionRepository previousDecisionRepository;
+  @Autowired private DatabaseDocumentUnitMetadataRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
   @Autowired private CourtRepository courtRepository;

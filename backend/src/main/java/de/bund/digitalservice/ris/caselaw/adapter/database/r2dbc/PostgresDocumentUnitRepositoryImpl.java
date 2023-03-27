@@ -10,8 +10,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Leg
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
@@ -43,11 +41,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
 
   private final DatabaseDocumentUnitRepository repository;
-  private final DatabaseDocumentUnitMetadataRepository metadataRepository;
+  private final de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc
+          .DatabaseDocumentUnitMetadataRepository
+      metadataRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
-  private final DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository;
+  private final DatabaseDocumentUnitMetadataRepository databaseDocumentUnitMetadataRepository;
   private final DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final CourtRepository courtRepository;
@@ -59,10 +59,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
-      DatabaseDocumentUnitMetadataRepository metadataRepository,
+      de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc
+              .DatabaseDocumentUnitMetadataRepository
+          metadataRepository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository,
+      DatabaseDocumentUnitMetadataRepository databaseDocumentUnitMetadataRepository,
       DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
@@ -75,7 +77,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
-    this.databaseProceedingDecisionRepository = databaseProceedingDecisionRepository;
+    this.databaseDocumentUnitMetadataRepository = databaseDocumentUnitMetadataRepository;
     this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
@@ -527,16 +529,14 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
-    return databaseProceedingDecisionRepository
+    return databaseDocumentUnitMetadataRepository
         .findAllById(
-            databaseProceedingDecisionRepository
+            databaseDocumentUnitMetadataRepository
                 .findByUuid(documentUnitDTO.uuid)
-                .map(ProceedingDecisionDTO::getId)
+                .map(DocumentUnitMetadataDTO::getId)
                 .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
                 .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
-        .flatMap(
-            proceedingDecisionDTO ->
-                injectAdditionalProceedingDecisionInformation(proceedingDecisionDTO))
+        .flatMap(this::injectAdditionalProceedingDecisionInformation)
         .collectList()
         .map(
             proceedingDecisionDTOS -> {
@@ -639,39 +639,39 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<ProceedingDecisionDTO> injectAdditionalProceedingDecisionInformation(
-      ProceedingDecisionDTO proceedingDecisionDTO) {
-    return injectProceedingDecisionFileNumbers(proceedingDecisionDTO)
+  private Mono<DocumentUnitMetadataDTO> injectAdditionalProceedingDecisionInformation(
+      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+    return injectProceedingDecisionFileNumbers(documentUnitMetadataDTO)
         .flatMap(this::injectProceedingDecisionDocumentType);
   }
 
-  private Mono<ProceedingDecisionDTO> injectProceedingDecisionFileNumbers(
-      ProceedingDecisionDTO proceedingDecisionDTO) {
+  private Mono<DocumentUnitMetadataDTO> injectProceedingDecisionFileNumbers(
+      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
     return fileNumberRepository
-        .findAllByDocumentUnitId(proceedingDecisionDTO.getId())
+        .findAllByDocumentUnitId(documentUnitMetadataDTO.getId())
         .collectList()
         .map(
             fileNumbers -> {
-              proceedingDecisionDTO.setFileNumbers(
+              documentUnitMetadataDTO.setFileNumbers(
                   fileNumbers.stream()
                       .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
                       .toList());
-              return proceedingDecisionDTO;
+              return documentUnitMetadataDTO;
             });
   }
 
-  private Mono<ProceedingDecisionDTO> injectProceedingDecisionDocumentType(
-      ProceedingDecisionDTO proceedingDecisionDTO) {
-    if (proceedingDecisionDTO.getDocumentTypeId() == null) {
-      return Mono.just(proceedingDecisionDTO);
+  private Mono<DocumentUnitMetadataDTO> injectProceedingDecisionDocumentType(
+      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+    if (documentUnitMetadataDTO.getDocumentTypeId() == null) {
+      return Mono.just(documentUnitMetadataDTO);
     }
     return documentTypeRepository
-        .findById(proceedingDecisionDTO.getDocumentTypeId())
+        .findById(documentUnitMetadataDTO.getDocumentTypeId())
         .defaultIfEmpty(DocumentTypeDTO.builder().build())
         .map(
             documentTypeDTO -> {
-              proceedingDecisionDTO.setDocumentTypeDTO(documentTypeDTO);
-              return proceedingDecisionDTO;
+              documentUnitMetadataDTO.setDocumentTypeDTO(documentTypeDTO);
+              return documentUnitMetadataDTO;
             });
   }
 

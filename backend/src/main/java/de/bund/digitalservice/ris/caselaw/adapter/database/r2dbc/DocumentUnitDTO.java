@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -45,7 +44,7 @@ public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
   @Column("entscheidungsgruende")
   String decisionReasons;
 
-  @Transient List<ProceedingDecisionDTO> proceedingDecisions;
+  @Transient List<DocumentUnitMetadataDTO> proceedingDecisions;
   @Transient List<FileNumberDTO> deviatingFileNumbers;
   @Transient List<IncorrectCourtDTO> incorrectCourts;
   @Transient List<DeviatingEcliDTO> deviatingEclis;

@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -9,30 +9,33 @@ import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.Docume
 public class ProceedingDecisionTransformer {
   private ProceedingDecisionTransformer() {}
 
-  public static ProceedingDecision transformToDomain(ProceedingDecisionDTO proceedingDecisionDTO) {
+  public static ProceedingDecision transformToDomain(
+      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
     Court court = null;
-    if (proceedingDecisionDTO.getCourtType() != null
-        && proceedingDecisionDTO.getCourtLocation() != null) {
+    if (documentUnitMetadataDTO.getCourtType() != null
+        && documentUnitMetadataDTO.getCourtLocation() != null) {
       court =
           new Court(
-              proceedingDecisionDTO.getCourtType(),
-              proceedingDecisionDTO.getCourtLocation(),
-              proceedingDecisionDTO.getCourtType() + " " + proceedingDecisionDTO.getCourtLocation(),
+              documentUnitMetadataDTO.getCourtType(),
+              documentUnitMetadataDTO.getCourtLocation(),
+              documentUnitMetadataDTO.getCourtType()
+                  + " "
+                  + documentUnitMetadataDTO.getCourtLocation(),
               "");
     }
 
     String fileNumber = null;
-    if (proceedingDecisionDTO.getFileNumbers() != null
-        && !proceedingDecisionDTO.getFileNumbers().isEmpty()) {
-      fileNumber = proceedingDecisionDTO.getFileNumbers().get(0).getFileNumber();
+    if (documentUnitMetadataDTO.getFileNumbers() != null
+        && !documentUnitMetadataDTO.getFileNumbers().isEmpty()) {
+      fileNumber = documentUnitMetadataDTO.getFileNumbers().get(0).getFileNumber();
     }
 
     return ProceedingDecision.builder()
+        .uuid(documentUnitMetadataDTO.getUuid())
         .court(court)
-        .uuid(proceedingDecisionDTO.getUuid())
         .fileNumber(fileNumber)
-        .documentType(getDocumentTypeByDTO(proceedingDecisionDTO.getDocumentTypeDTO()))
-        .date(proceedingDecisionDTO.getDecisionDate())
+        .documentType(getDocumentTypeByDTO(documentUnitMetadataDTO.getDocumentTypeDTO()))
+        .date(documentUnitMetadataDTO.getDecisionDate())
         .build();
   }
 
