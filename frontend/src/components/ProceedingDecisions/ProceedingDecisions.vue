@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { watch, ref } from "vue"
+import DecisionList from "./DecisionList.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import InputGroup from "@/components/InputGroup.vue"
 import TextButton from "@/components/TextButton.vue"
@@ -86,18 +87,11 @@ const buildSearchResultRowString = (doc: DocumentUnit) => {
       <h1 class="heading-02-regular mb-[1rem]">Vorgehende Entscheidungen</h1>
     </template>
 
-    <ul>
-      <li
-        v-for="decision in proceedingDecisionList"
-        :key="decision.uuid"
-        class="link-01-bold mb-24 mt-12"
-      >
-        {{ decision.court?.type }} {{ decision.court?.location }}
-        {{ decision.documentType?.label }}
-        {{ decision.date }}
-        {{ decision.fileNumber }}
-      </li>
-    </ul>
+    <DecisionList
+      v-if="proceedingDecisionList"
+      :decisions="proceedingDecisionList"
+    />
+
     <InputGroup
       v-model="proceedingDecisionInput"
       :column-count="2"

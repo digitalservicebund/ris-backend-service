@@ -3,10 +3,10 @@ import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnitProceedingDecision from "@/components/DocumentUnitProceedingDecisions.vue"
 import DocumentUnitTexts from "@/components/DocumentUnitTexts.vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
 import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
+import DocumentUnitProceedingDecision from "@/components/ProceedingDecisions/ProceedingDecisions.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import { ValidationError } from "@/domain"
@@ -198,7 +198,7 @@ onUnmounted(() => {
         <DocumentUnitProceedingDecision
           id="previousDecisions"
           :document-unit-uuid="updatedDocumentUnit.uuid"
-          :proceeding-decisions="props.documentUnit.proceedingDecisions"
+          :proceeding-decisions="documentUnit.proceedingDecisions"
         />
 
         <!-- TODO add validationErrors -->
