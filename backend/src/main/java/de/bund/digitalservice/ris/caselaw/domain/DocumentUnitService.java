@@ -206,7 +206,7 @@ public class DocumentUnitService {
     return publishService.getLastPublishedXml(documentUuid);
   }
 
-  public Flux<DocumentUnit> searchForDocumentUnitsByProceedingDecisionInput(
+  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
       ProceedingDecision proceedingDecision) {
     return repository.searchForDocumentUnityByProceedingDecisionInput(proceedingDecision);
   }

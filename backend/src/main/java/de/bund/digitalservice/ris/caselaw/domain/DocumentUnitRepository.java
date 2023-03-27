@@ -25,7 +25,7 @@ public interface DocumentUnitRepository {
 
   Mono<Void> delete(DocumentUnit documentUnit);
 
-  Flux<DocumentUnit> searchForDocumentUnityByProceedingDecisionInput(
+  Flux<ProceedingDecision> searchForDocumentUnityByProceedingDecisionInput(
       ProceedingDecision proceedingDecision);
 
   Flux<DocumentUnitListEntry> findAll(Sort sort);

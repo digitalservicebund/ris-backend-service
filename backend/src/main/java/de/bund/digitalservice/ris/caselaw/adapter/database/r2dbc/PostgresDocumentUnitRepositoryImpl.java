@@ -670,7 +670,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  public Flux<DocumentUnit> searchForDocumentUnityByProceedingDecisionInput(
+  public Flux<ProceedingDecision> searchForDocumentUnityByProceedingDecisionInput(
       ProceedingDecision proceedingDecision) {
     String courtType;
     String courtLocation;
@@ -717,13 +717,34 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   decisionDate,
                   docUnitIds,
                   docTypeId);
-              return repository.findByCourtDateFileNumberAndDocumentType(
+              return metadataRepository.findByCourtDateFileNumberAndDocumentType(
                   courtType, courtLocation, decisionDate, docUnitIds, docTypeId);
             })
         .flatMap(this::injectAdditionalInformation)
         .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+            documentUnitMetadataDTO ->
+                ProceedingDecision.builder()
+                    .uuid(documentUnitMetadataDTO.getUuid())
+                    .court(
+                        Court.builder()
+                            .type(documentUnitMetadataDTO.getCourtType())
+                            .location(documentUnitMetadataDTO.getCourtLocation())
+                            .build())
+                    .date(documentUnitMetadataDTO.getDecisionDate())
+                    .fileNumber(
+                        documentUnitMetadataDTO.getFileNumbers() == null
+                                || documentUnitMetadataDTO.getFileNumbers().isEmpty()
+                            ? null
+                            : documentUnitMetadataDTO.getFileNumbers().get(0).getFileNumber())
+                    .documentType(
+                        documentUnitMetadataDTO.getDocumentTypeDTO() == null
+                            ? null
+                            : DocumentType.builder()
+                                .label(documentUnitMetadataDTO.getDocumentTypeDTO().getLabel())
+                                .jurisShortcut(
+                                    documentUnitMetadataDTO.getDocumentTypeDTO().getJurisShortcut())
+                                .build())
+                    .build());
   }
 
   public Flux<DocumentUnitListEntry> findAll(Sort sort) {

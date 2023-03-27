@@ -16,9 +16,9 @@ interface DocumentUnitService {
   ): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
-  searchForDocumentUnityByProceedingDecisionInput(
+  searchByProceedingDecisionInput(
     proceedingDecision: ProceedingDecision
-  ): Promise<ServiceResponse<DocumentUnit[]>>
+  ): Promise<ServiceResponse<ProceedingDecision[]>>
 }
 
 const service: DocumentUnitService = {
@@ -110,10 +110,13 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async searchForDocumentUnityByProceedingDecisionInput(
+  async searchByProceedingDecisionInput(
     proceedingDecision: ProceedingDecision
   ) {
-    const response = await httpClient.put<ProceedingDecision, DocumentUnit[]>(
+    const response = await httpClient.put<
+      ProceedingDecision,
+      ProceedingDecision[]
+    >(
       `caselaw/documentunits/search`,
       {
         headers: {

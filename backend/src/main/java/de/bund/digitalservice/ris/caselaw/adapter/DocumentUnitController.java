@@ -133,7 +133,7 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/search")
-  public Flux<DocumentUnit> searchForDocumentUnitsByProceedingDecisionInput(
+  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
       @RequestBody ProceedingDecision proceedingDecision) {
     return service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
   }

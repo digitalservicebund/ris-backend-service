@@ -22,7 +22,7 @@ const defaultModel: ProceedingDecision = {
 }
 
 const proceedingDecisionList = ref<ProceedingDecision[]>()
-const documentUnitSearchResults = ref<DocumentUnit[]>([])
+const proceedingDecisionSearchResults = ref<ProceedingDecision[]>([])
 const proceedingDecisionInput = ref<ProceedingDecision>(defaultModel)
 
 const addProceedingDecision = async (
@@ -42,13 +42,12 @@ const addProceedingDecision = async (
 
 const search = async () => {
   // console.log("Searching with input:", proceedingDecisionInput.value)
-  const response =
-    await DocumentUnitService.searchForDocumentUnityByProceedingDecisionInput(
-      proceedingDecisionInput.value
-    )
+  const response = await DocumentUnitService.searchByProceedingDecisionInput(
+    proceedingDecisionInput.value
+  )
   if (response.data) {
     console.log("response:", response.data)
-    documentUnitSearchResults.value = response.data
+    proceedingDecisionSearchResults.value = response.data
   }
 }
 
@@ -67,16 +66,16 @@ watch(
   }
 )
 
-const buildSearchResultRowString = (doc: DocumentUnit) => {
+const buildSearchResultRowString = (proceedingDecision: ProceedingDecision) => {
   return [
-    doc.coreData?.court?.type,
-    doc.coreData?.court?.location,
-    doc.coreData?.documentType?.label,
-    doc.coreData?.decisionDate,
-    doc.coreData?.fileNumbers?.[0],
-    doc.documentNumber,
+    proceedingDecision.court?.type,
+    proceedingDecision.court?.location,
+    proceedingDecision.documentType?.label,
+    proceedingDecision.date,
+    proceedingDecision.fileNumber,
+    proceedingDecision.documentNumber,
   ]
-    .filter((v) => v !== undefined && v !== null)
+    .filter((v) => v !== undefined)
     .join(", ")
 }
 </script>
@@ -111,20 +110,20 @@ const buildSearchResultRowString = (doc: DocumentUnit) => {
       @click="addProceedingDecision(proceedingDecisionInput)"
     />
 
-    <div v-if="documentUnitSearchResults.length > 0" class="mb-10 mt-20">
+    <div v-if="proceedingDecisionSearchResults.length > 0" class="mb-10 mt-20">
       <strong
-        >Suche hat {{ documentUnitSearchResults.length }} Treffer
+        >Suche hat {{ proceedingDecisionSearchResults.length }} Treffer
         ergeben</strong
       >
     </div>
     <div class="table">
       <div
-        v-for="docUnit in documentUnitSearchResults"
-        :key="docUnit.uuid"
+        v-for="proceedingDecision in proceedingDecisionSearchResults"
+        :key="proceedingDecision.uuid"
         class="link-01-bold mb-24 mt-12 table-row underline"
       >
         <div class="table-cell">
-          {{ buildSearchResultRowString(docUnit) }}
+          {{ buildSearchResultRowString(proceedingDecision) }}
         </div>
         <div class="p-8 table-cell">
           <TextButton
