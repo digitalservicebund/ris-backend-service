@@ -8,4 +8,9 @@ import lombok.Builder;
 
 @Builder
 public record ProceedingDecision(
-    UUID uuid, Court court, Instant date, String fileNumber, DocumentType documentType) {}
+    UUID uuid,
+    String documentNumber,
+    Court court,
+    Instant date,
+    String fileNumber,
+    DocumentType documentType) {}
