@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransf
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -30,6 +31,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -41,6 +43,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
 
   private final DatabaseDocumentUnitRepository repository;
+  private final DatabaseDocumentUnitMetadataRepository metadataRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
@@ -56,6 +59,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
+      DatabaseDocumentUnitMetadataRepository metadataRepository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
       DatabaseProceedingDecisionRepository databaseProceedingDecisionRepository,
@@ -70,6 +74,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseKeywordRepository keywordRepository) {
 
     this.repository = repository;
+    this.metadataRepository = metadataRepository;
     this.databaseProceedingDecisionRepository = databaseProceedingDecisionRepository;
     this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
@@ -106,18 +111,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<DocumentUnit> createNewDocumentUnit(String documentNumber) {
-    return repository
+    return metadataRepository
         .save(
-            DocumentUnitDTO.builder()
+            DocumentUnitMetadataDTO.builder()
                 .uuid(UUID.randomUUID())
                 .creationtimestamp(Instant.now())
                 .documentnumber(documentNumber)
                 .dataSource(DataSource.NEURIS)
                 .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                 .build())
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+        .map(DocumentUnitTransformer::transformMetadataToDomain);
   }
 
   @Override
@@ -166,9 +169,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return documentUnit == null
         || documentUnit.coreData() == null
         || documentUnit.coreData().court() == null
-        || !Objects.equals(documentUnitDTO.courtType, documentUnit.coreData().court().type())
+        || !Objects.equals(documentUnitDTO.getCourtType(), documentUnit.coreData().court().type())
         || !Objects.equals(
-            documentUnitDTO.courtLocation, documentUnit.coreData().court().location());
+            documentUnitDTO.getCourtLocation(), documentUnit.coreData().court().location());
   }
 
   private Mono<DocumentUnitDTO> enrichLegalEffect(
@@ -513,6 +516,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
     return injectFileNumbers(documentUnitDTO)
+        .flatMap(this::injectDeviatingFileNumbers)
         .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectDeviatingEclis)
         .flatMap(this::injectDeviatingDecisionDates)
@@ -541,16 +545,26 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> injectFileNumbers(DocumentUnitDTO documentUnitDTO) {
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectFileNumbers(T documentUnitMetadataDTO) {
+    return fileNumberRepository
+        .findAllByDocumentUnitId(documentUnitMetadataDTO.getId())
+        .collectList()
+        .flatMap(
+            fileNumbers -> {
+              documentUnitMetadataDTO.setFileNumbers(
+                  fileNumbers.stream()
+                      .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
+                      .toList());
+              return Mono.just(documentUnitMetadataDTO);
+            });
+  }
+
+  private Mono<DocumentUnitDTO> injectDeviatingFileNumbers(DocumentUnitDTO documentUnitDTO) {
     return fileNumberRepository
         .findAllByDocumentUnitId(documentUnitDTO.getId())
         .collectList()
         .flatMap(
             fileNumbers -> {
-              documentUnitDTO.setFileNumbers(
-                  fileNumbers.stream()
-                      .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
-                      .toList());
               documentUnitDTO.setDeviatingFileNumbers(
                   fileNumbers.stream().filter(FileNumberDTO::getIsDeviating).toList());
               return Mono.just(documentUnitDTO);
@@ -606,7 +620,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitDTO> injectFieldsOfLaw(DocumentUnitDTO documentUnitDTO) {
     return documentUnitFieldsOfLawRepository
-        .findAllByDocumentUnitId(documentUnitDTO.id)
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .collectList()
         .flatMapMany(fieldOfLawRepository::findAllById)
@@ -715,5 +729,25 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .map(
             documentUnitDTO ->
                 DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+  }
+
+  public Flux<DocumentUnitListEntry> findAll(Sort sort) {
+    return metadataRepository
+        .findAllByDataSourceLike(sort, DataSource.NEURIS.name())
+        .flatMap(this::injectFileNumbers)
+        .map(
+            documentUnitDTO ->
+                DocumentUnitListEntry.builder()
+                    .uuid(documentUnitDTO.getUuid())
+                    .documentNumber(documentUnitDTO.getDocumentnumber())
+                    .creationTimestamp(documentUnitDTO.getCreationtimestamp())
+                    .dataSource(documentUnitDTO.getDataSource())
+                    .fileName(documentUnitDTO.getFilename())
+                    .fileNumber(
+                        documentUnitDTO.getFileNumbers() == null
+                                || documentUnitDTO.getFileNumbers().isEmpty()
+                            ? null
+                            : documentUnitDTO.getFileNumbers().get(0).getFileNumber())
+                    .build());
   }
 }

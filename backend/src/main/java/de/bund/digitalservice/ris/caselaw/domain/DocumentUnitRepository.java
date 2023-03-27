@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.UUID;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -25,4 +26,6 @@ public interface DocumentUnitRepository {
 
   Flux<DocumentUnit> searchForDocumentUnityByProceedingDecisionInput(
       ProceedingDecision proceedingDecision);
+
+  Flux<DocumentUnitListEntry> findAll(Sort sort);
 }

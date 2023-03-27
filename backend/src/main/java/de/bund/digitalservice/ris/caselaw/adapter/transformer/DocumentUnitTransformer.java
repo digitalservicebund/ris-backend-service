@@ -1,10 +1,16 @@
 package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.util.List;
 
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
@@ -93,5 +99,71 @@ public class DocumentUnitTransformer {
     }
 
     return builder.build();
+  }
+
+  public static Court getCourtObject(String courtType, String courtLocation) {
+    Court court = null;
+    if (courtType != null) {
+      String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
+      court = new Court(courtType, courtLocation, label, null);
+    }
+    return court;
+  }
+
+  public static DocumentUnit transformMetadataToDomain(
+      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+    if (documentUnitMetadataDTO == null) {
+      return DocumentUnit.EMPTY;
+    }
+
+    DocumentType documentType = null;
+    DocumentTypeDTO documentTypeDTO = documentUnitMetadataDTO.getDocumentTypeDTO();
+    if (documentTypeDTO != null) {
+      documentType =
+          new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
+    }
+
+    List<String> fileNumbers = null;
+    if (documentUnitMetadataDTO.getFileNumbers() != null) {
+      fileNumbers =
+          documentUnitMetadataDTO.getFileNumbers().stream()
+              .map(FileNumberDTO::getFileNumber)
+              .toList();
+    }
+
+    DataSource dataSource = DataSource.NEURIS;
+    if (documentUnitMetadataDTO.getDataSource() != null) {
+      dataSource = documentUnitMetadataDTO.getDataSource();
+    }
+
+    return new DocumentUnit(
+        documentUnitMetadataDTO.getUuid(),
+        documentUnitMetadataDTO.getDocumentnumber(),
+        documentUnitMetadataDTO.getCreationtimestamp(),
+        documentUnitMetadataDTO.getFileuploadtimestamp(),
+        dataSource,
+        documentUnitMetadataDTO.getS3path(),
+        documentUnitMetadataDTO.getFiletype(),
+        documentUnitMetadataDTO.getFilename(),
+        new CoreData(
+            fileNumbers,
+            null,
+            getCourtObject(
+                documentUnitMetadataDTO.getCourtType(), documentUnitMetadataDTO.getCourtLocation()),
+            null,
+            documentType,
+            documentUnitMetadataDTO.getProcedure(),
+            documentUnitMetadataDTO.getEcli(),
+            null,
+            documentUnitMetadataDTO.getAppraisalBody(),
+            documentUnitMetadataDTO.getDecisionDate(),
+            null,
+            documentUnitMetadataDTO.getLegalEffect(),
+            documentUnitMetadataDTO.getInputType(),
+            documentUnitMetadataDTO.getCenter(),
+            documentUnitMetadataDTO.getRegion()),
+        null,
+        null,
+        null);
   }
 }

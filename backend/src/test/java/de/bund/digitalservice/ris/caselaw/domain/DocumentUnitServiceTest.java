@@ -54,8 +54,6 @@ class DocumentUnitServiceTest {
 
   @MockBean private DocumentUnitRepository repository;
 
-  @MockBean private DocumentUnitListEntryRepository listEntryRepository;
-
   @MockBean private DocumentNumberService documentNumberService;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -188,13 +186,14 @@ class DocumentUnitServiceTest {
   @Test
   void testGetAll() {
     List<DocumentUnitListEntry> entries =
-        Arrays.asList(new DocumentUnitListEntry(), new DocumentUnitListEntry());
-    when(listEntryRepository.findAll(Sort.by(Order.desc("documentNumber"))))
+        Arrays.asList(
+            DocumentUnitListEntry.builder().build(), DocumentUnitListEntry.builder().build());
+    when(repository.findAll(Sort.by(Order.desc("creationtimestamp"))))
         .thenReturn(Flux.fromIterable(entries));
 
     StepVerifier.create(service.getAll()).expectNextSequence(entries).verifyComplete();
 
-    verify(listEntryRepository).findAll(Sort.by(Order.desc("documentNumber")));
+    verify(repository).findAll(Sort.by(Order.desc("creationtimestamp")));
   }
 
   @Test

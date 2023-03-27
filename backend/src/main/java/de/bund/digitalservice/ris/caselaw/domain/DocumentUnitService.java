@@ -35,7 +35,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @Slf4j
 public class DocumentUnitService {
   private final DocumentUnitRepository repository;
-  private final DocumentUnitListEntryRepository listEntryRepository;
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
@@ -45,13 +44,11 @@ public class DocumentUnitService {
 
   public DocumentUnitService(
       DocumentUnitRepository repository,
-      DocumentUnitListEntryRepository listEntryRepository,
       DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService) {
 
     this.repository = repository;
-    this.listEntryRepository = listEntryRepository;
     this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
@@ -160,7 +157,7 @@ public class DocumentUnitService {
   }
 
   public Flux<DocumentUnitListEntry> getAll() {
-    return listEntryRepository.findAll(Sort.by(Order.desc("documentNumber")));
+    return repository.findAll(Sort.by(Order.desc("creationtimestamp")));
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {

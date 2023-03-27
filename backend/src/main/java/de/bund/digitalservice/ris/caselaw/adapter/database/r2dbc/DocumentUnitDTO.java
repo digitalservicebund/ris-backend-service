@@ -1,78 +1,25 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionDTO;
-import de.bund.digitalservice.ris.caselaw.domain.DataSource;
-import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("doc_unit")
-public class DocumentUnitDTO {
+public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
   public static final DocumentUnitDTO EMPTY = new DocumentUnitDTO();
 
-  @Id Long id;
-  UUID uuid;
-  String documentnumber;
-  Instant creationtimestamp;
-  DataSource dataSource;
-
-  // Original file
-  Instant fileuploadtimestamp;
-  String s3path;
-  String filetype;
-  String filename;
-
   // RUBRIKEN
-  // - Stammdaten
-  @Column("gerichtstyp")
-  String courtType;
-
-  @Column("document_type_id")
-  Long documentTypeId; // points to lookup table row id
-
-  @Transient DocumentTypeDTO documentTypeDTO;
-
-  @Column("vorgang")
-  String procedure;
-
-  @Column("ecli")
-  String ecli;
-
-  @Column("spruchkoerper")
-  String appraisalBody;
-
-  @Column("decision_date")
-  Instant decisionDate;
-
-  @Column("gerichtssitz")
-  String courtLocation;
-
-  @Column("rechtskraft")
-  String legalEffect;
-
-  @Column("eingangsart")
-  String inputType;
-
-  @Column("dokumentationsstelle")
-  String center;
-
-  @Column("region")
-  String region;
-
   // - Kurz- & Langtexte
   @Column("entscheidungsname")
   String decisionName;
@@ -99,7 +46,6 @@ public class DocumentUnitDTO {
   String decisionReasons;
 
   @Transient List<ProceedingDecisionDTO> proceedingDecisions;
-  @Transient List<FileNumberDTO> fileNumbers;
   @Transient List<FileNumberDTO> deviatingFileNumbers;
   @Transient List<IncorrectCourtDTO> incorrectCourts;
   @Transient List<DeviatingEcliDTO> deviatingEclis;

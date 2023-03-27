@@ -5,12 +5,11 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitListEntryRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitListEntryRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
@@ -36,7 +35,6 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentUnitService.class,
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
-      PostgresDocumentUnitListEntryRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class
     },
@@ -59,7 +57,7 @@ public class DocumentUnitListEntryIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
-  @Autowired private DatabaseDocumentUnitListEntryRepository listEntryRepository;
+  @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
 
   @BeforeEach
@@ -121,10 +119,9 @@ public class DocumentUnitListEntryIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody()).hasSize(1);
-              assertThat(response.getResponseBody()[0].getDocumentNumber())
-                  .isEqualTo("1234567890123");
-              assertThat(response.getResponseBody()[0].getUuid()).isEqualTo(neurisDto.getUuid());
-              assertThat(response.getResponseBody()[0].getFileNumber()).isEqualTo("AkteX");
+              assertThat(response.getResponseBody()[0].documentNumber()).isEqualTo("1234567890123");
+              assertThat(response.getResponseBody()[0].uuid()).isEqualTo(neurisDto.getUuid());
+              assertThat(response.getResponseBody()[0].fileNumber()).isEqualTo("AkteX");
             });
   }
 }
