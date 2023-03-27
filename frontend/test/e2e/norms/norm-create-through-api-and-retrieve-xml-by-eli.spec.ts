@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import jsdom from "jsdom"
 import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
-import norm from "./testdata/norm_basic.json"
+import { normData as norm } from "./testdata/norm_basic"
 
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",

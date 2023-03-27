@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
 import { testWithImportedNorm } from "./fixtures"
-import normData from "./testdata/norm_basic.json"
+import { normData } from "./testdata/norm_basic"
 
 testWithImportedNorm(
   "Check norm can be retrieved by search in long title",

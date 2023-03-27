@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test"
 import { MetaDatumType } from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
-import normData from "./testdata/norm_basic.json"
+import { normData } from "./testdata/norm_basic"
 
 type MyFixtures = {
   normData: object

@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 
 import { fillRepeatedInput, fillTextInput, openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
-import newNorm from "./testdata/norm_edited_fields.json"
+import { newNorm } from "./testdata/norm_edited_fields"
 
 async function fillCheckbox(page, field, value) {
   const selector = `role=checkbox[name="${field.label}"]`
