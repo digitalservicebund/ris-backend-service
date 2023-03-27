@@ -20,10 +20,6 @@ public class ProceedingDecisionService {
     this.documentUnitService = documentUnitService;
   }
 
-  public Flux<ProceedingDecision> getProceedingDecisionsForDocumentUnit(UUID documentUnitUuid) {
-    return repository.findAllForDocumentUnit(documentUnitUuid);
-  }
-
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Flux<ProceedingDecision> addProceedingDecision(
       UUID documentUnitUuid, ProceedingDecision proceedingDecision) {

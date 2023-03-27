@@ -20,12 +20,6 @@ public class ProceedingDecisionController {
     this.proceedingDecisionService = proceedingDecisionService;
   }
 
-  @GetMapping
-  public Flux<ProceedingDecision> getProceedingDecisions(
-      @PathVariable("uuid") UUID documentUnitUuid) {
-    return proceedingDecisionService.getProceedingDecisionsForDocumentUnit(documentUnitUuid);
-  }
-
   @PutMapping
   public Flux<ProceedingDecision> addProceedingDecision(
       @PathVariable("uuid") UUID documentUnitUuid,
