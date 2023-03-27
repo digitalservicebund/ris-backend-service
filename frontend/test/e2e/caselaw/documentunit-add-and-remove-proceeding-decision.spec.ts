@@ -41,14 +41,14 @@ test.describe("Add and remove proceeding decisions", () => {
 
     await page.getByText("Manuell Hinzufügen").click()
     await expect(
-      page.getByText("AG Aalen Anerkenntnisurteil 2004-12-03T00:00:00Z 1a2b3c")
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
     ).toBeVisible()
 
     await page.reload()
     await toggleProceedingDecisionsSection(page)
 
     await expect(
-      page.getByText("AG Aalen Anerkenntnisurteil 2004-12-03T00:00:00Z 1a2b3c")
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
     ).toBeVisible()
   })
 
@@ -77,7 +77,7 @@ test.describe("Add and remove proceeding decisions", () => {
     await page.getByText("Manuell Hinzufügen").click()
 
     await expect(
-      page.getByText("AG Aalen Anerkenntnisurteil 2004-12-03T00:00:00Z 1a2b3c")
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
     ).toHaveCount(2)
   })
 
