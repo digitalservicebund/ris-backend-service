@@ -1,4 +1,4 @@
 export * from "./types"
 export * from "./coreDataFields"
 export * from "./textFields"
-export * from "./previousDecisionFields"
+export * from "./proceedingDecisionFields"

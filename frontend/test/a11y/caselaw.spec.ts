@@ -6,8 +6,8 @@ import {
   navigateToFiles,
   navigateToPublication,
   clickSaveButton,
-  togglePreviousDecisionsSection,
-  fillPreviousDecisionInputs,
+  toggleProceedingDecisionsSection,
+  fillProceedingDecisionInputs,
   uploadTestfile,
 } from "../e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "../e2e/caselaw/fixtures"
@@ -40,7 +40,7 @@ test.describe("a11y of start page (/caselaw)", () => {
 test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/categories)", () => {
   test("first load", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    //TODO: we make the assumption, that the field id in the configs always matches the domain model. Input field IDs need to have the same value like the model name, e.g. the court input fields in coreData and previousDecision both need to have the ID "court", because the model is named so. This results in a "duplicate-id-aria" violation, we need some decoupling here, so we are able to use different ids in the frontend. Also the ModelComponentRepeater creates components with the same id, we will need some kind of indexing in the ids here. That's why we disable the "duplicate-id-aria" rule for now.
+    //TODO: we make the assumption, that the field id in the configs always matches the domain model. Input field IDs need to have the same value like the model name, e.g. the court input fields in coreData and proceedingDecision both need to have the ID "court", because the model is named so. This results in a "duplicate-id-aria" violation, we need some decoupling here, so we are able to use different ids in the frontend. Also the ModelComponentRepeater creates components with the same id, we will need some kind of indexing in the ids here. That's why we disable the "duplicate-id-aria" rule for now.
     const accessibilityScanResults = await new AxeBuilder({ page })
       .disableRules(["duplicate-id-aria"])
       .analyze()
@@ -165,10 +165,10 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
-  test("previous decision", async ({ page, documentNumber }) => {
+  test("proceeding decision", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page, {
+    await toggleProceedingDecisionsSection(page)
+    await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
       date: "2004-12-03",
       fileNumber: "1a2b3c",
@@ -176,8 +176,8 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await clickSaveButton(page)
     await page.reload()
-    await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page, {
+    await toggleProceedingDecisionsSection(page)
+    await fillProceedingDecisionInputs(page, {
       date: "2004-12-03",
     })
 

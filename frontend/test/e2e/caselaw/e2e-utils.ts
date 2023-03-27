@@ -49,13 +49,13 @@ export async function clickSaveButton(page: Page): Promise<void> {
   ).toBeVisible()
 }
 
-export async function togglePreviousDecisionsSection(
+export async function toggleProceedingDecisionsSection(
   page: Page
 ): Promise<void> {
   await page.locator("text=Vorgehende Entscheidungen").click()
 }
 
-export async function fillPreviousDecisionInputs(
+export async function fillProceedingDecisionInputs(
   page: Page,
   values?: {
     court?: string

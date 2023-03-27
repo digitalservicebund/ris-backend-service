@@ -1,8 +1,8 @@
 import { expect } from "@playwright/test"
 import {
-  fillPreviousDecisionInputs,
+  fillProceedingDecisionInputs,
   navigateToCategories,
-  togglePreviousDecisionsSection,
+  toggleProceedingDecisionsSection,
 } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
@@ -14,7 +14,7 @@ test.describe("Add and remove proceeding decisions", () => {
       page.getByRole("heading", { name: "Vorgehende Entscheidungen" })
     ).toBeVisible()
 
-    await togglePreviousDecisionsSection(page)
+    await toggleProceedingDecisionsSection(page)
 
     await expect(page.locator("[aria-label='Gericht Rechtszug']")).toBeVisible()
     await expect(
@@ -31,8 +31,8 @@ test.describe("Add and remove proceeding decisions", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page, {
+    await toggleProceedingDecisionsSection(page)
+    await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
       date: "2004-12-03",
       fileNumber: "1a2b3c",
@@ -45,7 +45,7 @@ test.describe("Add and remove proceeding decisions", () => {
     ).toBeVisible()
 
     await page.reload()
-    await togglePreviousDecisionsSection(page)
+    await toggleProceedingDecisionsSection(page)
 
     await expect(
       page.getByText("AG Aalen Anerkenntnisurteil 2004-12-03T00:00:00Z 1a2b3c")
@@ -57,8 +57,8 @@ test.describe("Add and remove proceeding decisions", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await togglePreviousDecisionsSection(page)
-    await fillPreviousDecisionInputs(page, {
+    await toggleProceedingDecisionsSection(page)
+    await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
       date: "2004-12-03",
       fileNumber: "1a2b3c",
@@ -67,7 +67,7 @@ test.describe("Add and remove proceeding decisions", () => {
 
     await page.getByText("Manuell Hinzufügen").click()
 
-    await fillPreviousDecisionInputs(page, {
+    await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
       date: "2004-12-03",
       fileNumber: "1a2b3c",
@@ -85,7 +85,7 @@ test.describe("Add and remove proceeding decisions", () => {
   //   TBD
   // })
 
-  // test("test add previous decision with missing required fields not possible", async ({
+  // test("test add proveeding decision with missing required fields not possible", async ({
   //   page,
   //   documentNumber,
   // }) => {

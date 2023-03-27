@@ -32,7 +32,7 @@ export function useCaseLawMenuItems(
           route: {
             ...baseRoute,
             name: "caselaw-documentUnit-:documentNumber-categories",
-            hash: "#previousDecisions",
+            hash: "#proceedingDecisions",
           },
         },
         {

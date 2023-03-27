@@ -1,6 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import DocumentUnitPreviousDecisions from "@/components/proceedingDecisions/ProceedingDecisions.vue"
+import DocumentUnitProceedingDecisions from "@/components/proceedingDecisions/ProceedingDecisions.vue"
 import type { ProceedingDecision } from "@/domain/documentUnit"
 import service from "@/services/proceedingDecisionService"
 
@@ -14,12 +14,12 @@ function renderComponent(options?: {
       : "",
     proceedingDecisions: options?.proceedingDecisions,
   }
-  const utils = render(DocumentUnitPreviousDecisions, { props })
+  const utils = render(DocumentUnitProceedingDecisions, { props })
   const user = userEvent.setup()
   return { user, ...utils }
 }
 
-describe("DocumentUnitPreviousDecisions", async () => {
+describe("DocumentUnitProceedingDecisions", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")
   const fetchSpy = vi
     .spyOn(service, "addProceedingDecision")
