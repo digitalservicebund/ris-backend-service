@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ListItem from "@/components/proceedingDecisions/ListItem.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
 
 defineProps<{
@@ -13,10 +14,8 @@ defineProps<{
       :key="decision.uuid"
       class="link-01-bold mb-24 mt-12"
     >
-      {{ decision.court?.type }} {{ decision.court?.location }}
-      {{ decision.documentType?.label }}
-      {{ decision.date }}
-      {{ decision.fileNumber }}
+      <ListItem :decision="decision" />
+      <span aria-label="Löschen">Löschen</span>
     </li>
   </ul>
 </template>

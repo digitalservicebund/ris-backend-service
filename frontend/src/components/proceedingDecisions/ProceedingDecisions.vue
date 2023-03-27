@@ -104,6 +104,7 @@ const buildSearchResultRowString = (doc: DocumentUnit) => {
       label="Suchen"
       @click="search"
     />
+
     <TextButton
       aria-label="Entscheidung manuell hinzufügen"
       label="Manuell Hinzufügen"
