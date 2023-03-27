@@ -7,12 +7,14 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
@@ -20,6 +22,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -206,5 +209,42 @@ public class DocumentUnitService {
   public Flux<DocumentUnit> searchForDocumentUnitsByProceedingDecisionInput(
       ProceedingDecision proceedingDecision) {
     return repository.searchForDocumentUnityByProceedingDecisionInput(proceedingDecision);
+  }
+
+  @Transactional(transactionManager = "connectionFactoryTransactionManager")
+  public Flux<ProceedingDecision> addProceedingDecision(
+      UUID documentUnitUuid, ProceedingDecision proceedingDecision) {
+
+    return generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
+        .flatMap(
+            documentUnit ->
+                repository
+                    .linkDocumentUnits(documentUnitUuid, documentUnit.uuid())
+                    .map(v -> documentUnit))
+        .flatMap(
+            documentUnit ->
+                updateDocumentUnit(enrichNewDocumentUnitWithData(documentUnit, proceedingDecision)))
+        .flatMapMany(documentUnit -> repository.findAllLinkedDocumentUnits(documentUnitUuid));
+  }
+
+  private DocumentUnit enrichNewDocumentUnitWithData(
+      DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
+    List<String> fileNumbers = null;
+    if (!StringUtils.isBlank(proceedingDecision.fileNumber())) {
+      fileNumbers = List.of(proceedingDecision.fileNumber());
+    }
+
+    CoreData coreData =
+        documentUnit.coreData().toBuilder()
+            .fileNumbers(fileNumbers)
+            .documentType(proceedingDecision.documentType())
+            .decisionDate(proceedingDecision.date())
+            .court(proceedingDecision.court())
+            .build();
+
+    return documentUnit.toBuilder()
+        .dataSource(DataSource.PROCEEDING_DECISION)
+        .coreData(coreData)
+        .build();
   }
 }

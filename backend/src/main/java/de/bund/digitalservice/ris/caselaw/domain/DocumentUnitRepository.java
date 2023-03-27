@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import java.util.UUID;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.NoRepositoryBean;
@@ -28,4 +29,9 @@ public interface DocumentUnitRepository {
       ProceedingDecision proceedingDecision);
 
   Flux<DocumentUnitListEntry> findAll(Sort sort);
+
+  Flux<ProceedingDecision> findAllLinkedDocumentUnits(UUID parentDocumentUnitUuid);
+
+  Mono<ProceedingDecisionLinkDTO> linkDocumentUnits(
+      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
 }

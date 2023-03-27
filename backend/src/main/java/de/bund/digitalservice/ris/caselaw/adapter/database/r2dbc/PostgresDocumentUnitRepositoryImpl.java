@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecis
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
@@ -586,17 +587,18 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> injectDocumentType(DocumentUnitDTO documentUnitDTO) {
-    if (documentUnitDTO.getDocumentTypeId() == null) {
-      return Mono.just(documentUnitDTO);
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectDocumentType(
+      T documentUnitMetadataDTO) {
+    if (documentUnitMetadataDTO.getDocumentTypeId() == null) {
+      return Mono.just(documentUnitMetadataDTO);
     }
     return documentTypeRepository
-        .findById(documentUnitDTO.getDocumentTypeId())
+        .findById(documentUnitMetadataDTO.getDocumentTypeId())
         .defaultIfEmpty(DocumentTypeDTO.builder().build())
         .map(
             documentTypeDTO -> {
-              documentUnitDTO.setDocumentTypeDTO(documentTypeDTO);
-              return documentUnitDTO;
+              documentUnitMetadataDTO.setDocumentTypeDTO(documentTypeDTO);
+              return documentUnitMetadataDTO;
             });
   }
 
@@ -742,5 +744,41 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             ? null
                             : documentUnitDTO.getFileNumbers().get(0).getFileNumber())
                     .build());
+  }
+
+  @Override
+  public Flux<ProceedingDecision> findAllLinkedDocumentUnits(UUID parentDocumentUnitUuid) {
+    return metadataRepository
+        .findAllById(
+            metadataRepository
+                .findByUuid(parentDocumentUnitUuid)
+                .map(DocumentUnitMetadataDTO::getId)
+                .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
+                .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
+        .flatMap(this::injectAdditionalInformation)
+        .map(ProceedingDecisionTransformer::transformToDomain);
+  }
+
+  private Mono<DocumentUnitMetadataDTO> injectAdditionalInformation(
+      DocumentUnitMetadataDTO documentUnitMetadataDTO) {
+    return injectFileNumbers(documentUnitMetadataDTO).flatMap(this::injectDocumentType);
+  }
+
+  @Override
+  public Mono<ProceedingDecisionLinkDTO> linkDocumentUnits(
+      UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
+    Mono<Long> parentDocumentUnitId =
+        metadataRepository.findByUuid(parentDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
+    Mono<Long> childDocumentUnitId =
+        metadataRepository.findByUuid(childDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
+
+    return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
+        .flatMap(
+            tuple ->
+                proceedingDecisionLinkRepository.save(
+                    ProceedingDecisionLinkDTO.builder()
+                        .parentDocumentUnitId(tuple.getT1())
+                        .childDocumentUnitId(tuple.getT2())
+                        .build()));
   }
 }
