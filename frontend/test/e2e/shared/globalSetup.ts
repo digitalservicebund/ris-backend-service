@@ -1,8 +1,15 @@
-import { chromium, expect, FullConfig } from "@playwright/test"
+import { chromium, firefox, expect, FullConfig } from "@playwright/test"
 
 export default async function globalSetup(config: FullConfig) {
   const baseURL = config.projects[0].use.baseURL as string
-  const browser = await chromium.launch()
+  let browser
+
+  try {
+    browser = await chromium.launch()
+  } catch (e) {
+    browser = await firefox.launch()
+  }
+
   const page = await browser.newPage()
   await page.goto(baseURL)
   await page
