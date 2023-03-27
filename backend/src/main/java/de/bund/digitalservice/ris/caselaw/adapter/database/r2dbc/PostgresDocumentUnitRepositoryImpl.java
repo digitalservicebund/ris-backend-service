@@ -41,13 +41,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
 
   private final DatabaseDocumentUnitRepository repository;
-  private final de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc
-          .DatabaseDocumentUnitMetadataRepository
-      metadataRepository;
+  private final DatabaseDocumentUnitMetadataRepository metadataRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
-  private final DatabaseDocumentUnitMetadataRepository databaseDocumentUnitMetadataRepository;
   private final DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
   private final CourtRepository courtRepository;
@@ -59,12 +56,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
-      de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc
-              .DatabaseDocumentUnitMetadataRepository
-          metadataRepository,
+      DatabaseDocumentUnitMetadataRepository metadataRepository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
-      DatabaseDocumentUnitMetadataRepository databaseDocumentUnitMetadataRepository,
       DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
@@ -77,7 +71,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
-    this.databaseDocumentUnitMetadataRepository = databaseDocumentUnitMetadataRepository;
     this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
     this.deviatingEcliRepository = deviatingEcliRepository;
@@ -529,9 +522,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
-    return databaseDocumentUnitMetadataRepository
+    return metadataRepository
         .findAllById(
-            databaseDocumentUnitMetadataRepository
+            metadataRepository
                 .findByUuid(documentUnitDTO.uuid)
                 .map(DocumentUnitMetadataDTO::getId)
                 .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)

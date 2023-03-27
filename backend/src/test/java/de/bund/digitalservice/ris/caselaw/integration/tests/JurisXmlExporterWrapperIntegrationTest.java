@@ -115,7 +115,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
   // documentUnit. The test documentUnit needs to be updated accordingly to be
   // in sync with the model.
   @Test
-  public void testDocumentUnitIsSyncedWithModel()
+  void testDocumentUnitIsSyncedWithModel()
       throws NoSuchFieldException, SecurityException, IllegalArgumentException,
           IllegalAccessException {
     CoreData coreData =
@@ -148,6 +148,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
         List.of(
             ProceedingDecision.builder()
                 .uuid(UUID.randomUUID())
+                .documentNumber("documentNumber")
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
                 .fileNumber("fileNumber")

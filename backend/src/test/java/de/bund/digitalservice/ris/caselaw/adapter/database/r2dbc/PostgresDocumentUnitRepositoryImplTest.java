@@ -26,7 +26,6 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseDocumentUnitMetadataRepository metadataRepository;
   @MockBean private FileNumberRepository fileNumberRepository;
   @MockBean private DeviatingEcliRepository deviatingEcliRepository;
-  @MockBean private DatabaseDocumentUnitMetadataRepository databaseDocumentUnitMetadataRepository;
   @MockBean private DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   @MockBean private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @MockBean private DatabaseIncorrectCourtRepository incorrectCourtRepository;
@@ -45,7 +44,6 @@ class PostgresDocumentUnitRepositoryImplTest {
             metadataRepository,
             fileNumberRepository,
             deviatingEcliRepository,
-            databaseDocumentUnitMetadataRepository,
             proceedingDecisionLinkRepository,
             deviatingDecisionDateRepository,
             incorrectCourtRepository,
