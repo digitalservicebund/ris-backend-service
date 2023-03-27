@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/vue"
-import ListItem from "@/components/proceedingDecisions/ListItem.vue"
+import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
 import { Court, DocumentType, ProceedingDecision } from "@/domain/documentUnit"
 
 function renderComponent(options?: {
@@ -22,7 +22,7 @@ function renderComponent(options?: {
     },
   }
 
-  return render(ListItem, { props })
+  return render(InlineDecision, { props })
 }
 
 describe("Decision ListItem", () => {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ListItem from "@/components/proceedingDecisions/ListItem.vue"
+import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
 
 defineProps<{
@@ -14,7 +14,7 @@ defineProps<{
       :key="decision.uuid"
       class="link-01-bold mb-24 mt-12"
     >
-      <ListItem :decision="decision" />
+      <InlineDecision :decision="decision" />
       <span aria-label="Löschen">Löschen</span>
     </li>
   </ul>
