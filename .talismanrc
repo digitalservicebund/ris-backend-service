@@ -9,8 +9,6 @@ fileignoreconfig:
     checksum: dfde240bee8233c1212a7b8e459728fb73562c565bbe425e2db9b795b87320b1
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: 6a0079228a0ca65304be969c5d5c2ad28186f3af5851fda87ab2159a519622ed
-  - filename: backend/build.gradle
-    checksum: 28af03b927df65fb441568ff06a2ba4d81da7fd1dfb223195c7b810648974e5f
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
   - filename: "*.sql"
@@ -22,4 +20,5 @@ allowed_patterns:
   - key
   - uses:\ ([A-z0-9\-]+\/)*[A-z0-9\-]+@[a-fA-F0-9]{40}
   - https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
+  - paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66
 threshold: medium
