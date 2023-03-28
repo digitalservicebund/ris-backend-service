@@ -391,13 +391,6 @@ jobs:
           npm run coverage
           sonar-scanner
         working-directory: ./frontend
-      - name: Archive code coverage results
-        uses: actions/upload-artifact@v3
-        with:
-          name: code-coverage-report
-          path: |
-            frontend/coverage/lcov.info
-            frontend/.scannerwork/report-task.txt
       - name: Check SonarQube Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@d304d050d930b02a896b0f85935344f023928496
         with:
@@ -405,6 +398,13 @@ jobs:
         timeout-minutes: 3
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: |
+            frontend/coverage/lcov.info
+            frontend/.scannerwork/report-task.txt
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
