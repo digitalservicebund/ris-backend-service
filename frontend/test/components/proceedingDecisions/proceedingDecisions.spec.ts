@@ -6,17 +6,17 @@ import service from "@/services/proceedingDecisionService"
 
 function renderComponent(options?: {
   documentUnitUuid?: string
-  proceedingDecisions?: ProceedingDecision[] | undefined
+  proceedingDecisions?: ProceedingDecision[]
 }) {
   const props = {
     documentUnitUuid: options?.documentUnitUuid
       ? options?.documentUnitUuid
-      : "",
+      : "fooUuid",
     proceedingDecisions: options?.proceedingDecisions,
   }
-  const utils = render(DocumentUnitProceedingDecisions, { props })
+
   const user = userEvent.setup()
-  return { user, ...utils }
+  return { user, ...render(DocumentUnitProceedingDecisions, { props }) }
 }
 
 describe("DocumentUnitProceedingDecisions", async () => {
@@ -49,25 +49,14 @@ describe("DocumentUnitProceedingDecisions", async () => {
       })
     )
 
-  it("shows all proceeding decision input fields", () => {
-    renderComponent()
+  it("shows all proceeding decision input fields if expanded", async () => {
+    const { user } = renderComponent()
+    await user.click(screen.getByText("Vorgehende Entscheidungen"))
 
-    const court = screen.getByLabelText("Gericht Rechtszug") as HTMLInputElement
-
-    const date = screen.getByLabelText("Datum Rechtszug") as HTMLInputElement
-
-    const fileNumber = screen.getByLabelText(
-      "Aktenzeichen Rechtszug"
-    ) as HTMLInputElement
-
-    const documentType = screen.getByLabelText(
-      "Dokumenttyp Rechtszug"
-    ) as HTMLInputElement
-
-    expect(court).toBeInTheDocument()
-    expect(date).toBeInTheDocument()
-    expect(fileNumber).toBeInTheDocument()
-    expect(documentType).toBeInTheDocument()
+    expect(screen.getByLabelText("Gericht Rechtszug")).toBeVisible()
+    expect(screen.getByLabelText("Datum Rechtszug")).toBeInTheDocument()
+    expect(screen.getByLabelText("Aktenzeichen Rechtszug")).toBeInTheDocument()
+    expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
   })
 
   it("adds proceeding decision and returns list of existing ones", async () => {
