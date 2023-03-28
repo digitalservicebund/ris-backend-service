@@ -82,7 +82,7 @@ describe("DataSetSummary", () => {
   it("summarizes data sets that are not a list as single entry", async () => {
     renderComponent({ data: { foo: "foo", bar: "bar" } })
 
-    const summary = await screen.findByText("foo ar")
+    const summary = await screen.findByText("foo | bar")
 
     expect(summary).toBeInTheDocument()
   })
