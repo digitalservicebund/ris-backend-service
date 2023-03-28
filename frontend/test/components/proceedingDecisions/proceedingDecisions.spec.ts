@@ -19,6 +19,10 @@ function renderComponent(options?: {
   return { user, ...render(DocumentUnitProceedingDecisions, { props }) }
 }
 
+async function openExpandableArea(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(screen.getByText("Vorgehende Entscheidungen"))
+}
+
 describe("DocumentUnitProceedingDecisions", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")
   const fetchSpy = vi
@@ -34,7 +38,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
               jurisShortcut: "documentTypeShortcut1",
               label: "documentType1",
             },
-            fileNumber: "test1",
+            fileNumber: "testFileNumber1",
           },
           {
             court: { type: "type2", location: "location2", label: "label2" },
@@ -43,7 +47,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
               jurisShortcut: "documentTypeShortcut2",
               label: "documentType2",
             },
-            fileNumber: "test2",
+            fileNumber: "testFileNumber2",
           },
         ],
       })
@@ -51,7 +55,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
 
   it("shows all proceeding decision input fields if expanded", async () => {
     const { user } = renderComponent()
-    await user.click(screen.getByText("Vorgehende Entscheidungen"))
+    await openExpandableArea(user)
 
     expect(screen.getByLabelText("Gericht Rechtszug")).toBeVisible()
     expect(screen.getByLabelText("Datum Rechtszug")).toBeInTheDocument()
@@ -59,26 +63,18 @@ describe("DocumentUnitProceedingDecisions", async () => {
     expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
   })
 
-  it("adds proceeding decision and returns list of existing ones", async () => {
+  it("adds proceeding decision and updates list of existing ones", async () => {
     const { user } = renderComponent()
+    await openExpandableArea(user)
 
-    await user.click(
-      screen.getAllByLabelText(
-        "Entscheidung manuell hinzufügen"
-      )[0] as HTMLElement
-    )
+    expect(screen.queryByText(/testFileNumber1/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/testFileNumber2/)).not.toBeInTheDocument()
 
+    await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
     expect(fetchSpy).toBeCalledTimes(1)
-    expect(
-      screen.getByText(
-        "type1 location1, documentTypeShortcut1, 01.02.2022, test1"
-      )
-    ).toBeInTheDocument()
-    expect(
-      screen.getByText(
-        "type2 location2, documentTypeShortcut2, 02.02.2022, test2"
-      )
-    ).toBeInTheDocument()
+
+    expect(screen.getByText(/testFileNumber1/)).toBeVisible()
+    expect(screen.getByText(/testFileNumber2/)).toBeVisible()
   })
 
   // it("does not emit update model event when inputs are empty and model is empty too", async () => {
