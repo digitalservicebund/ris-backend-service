@@ -39,6 +39,7 @@ function saveChip() {
   if (trimmed.length > 0) {
     chips.value.push(trimmed)
     updateModelValue()
+    emits("addChip", trimmed)
     currentInput.value = ""
   }
 }

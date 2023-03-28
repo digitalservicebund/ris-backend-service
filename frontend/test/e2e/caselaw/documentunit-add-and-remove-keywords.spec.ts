@@ -25,8 +25,8 @@ test.describe("Add and remove keywords to content related indexing", () => {
 
     await page.reload()
 
-    await expect(page.locator("text=one").first()).toBeVisible()
     await expect(page.locator("text=two").first()).toBeVisible()
+    await expect(page.locator("text=one").first()).toBeVisible()
   })
 
   test("delete keywords", async ({ page, documentNumber }) => {
