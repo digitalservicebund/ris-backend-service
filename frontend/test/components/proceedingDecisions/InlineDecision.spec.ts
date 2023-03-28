@@ -69,7 +69,7 @@ describe("Decision ListItem", () => {
 
   it("renders date correctly", async () => {
     renderComponent({ date: "2022-03-27" })
-    expect(await screen.findByText(/27.03.2022/))
+    expect(await screen.findByText(/27.03.2022/)).toBeVisible()
   })
 
   it("renders with link if source is not proceedingDecisions", async () => {
