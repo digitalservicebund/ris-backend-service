@@ -25,10 +25,14 @@ const proceedingDecisionList = ref<ProceedingDecision[]>()
 const proceedingDecisionSearchResults = ref<ProceedingDecision[]>([])
 const proceedingDecisionInput = ref<ProceedingDecision>(defaultModel)
 
+function isNotEmpty(decision: ProceedingDecision): boolean {
+  return Object.values(decision).some((value) => value !== undefined)
+}
+
 const addProceedingDecision = async (
   proceedingDecision: ProceedingDecision
 ) => {
-  if (proceedingDecision !== undefined) {
+  if (isNotEmpty(proceedingDecision)) {
     const response = await ProceedingDecisionService.addProceedingDecision(
       props.documentUnitUuid,
       proceedingDecision

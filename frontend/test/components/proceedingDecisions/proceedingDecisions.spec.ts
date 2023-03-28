@@ -25,33 +25,6 @@ async function openExpandableArea(user: ReturnType<typeof userEvent.setup>) {
 
 describe("DocumentUnitProceedingDecisions", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")
-  const fetchSpy = vi
-    .spyOn(service, "addProceedingDecision")
-    .mockImplementation(() =>
-      Promise.resolve({
-        status: 200,
-        data: [
-          {
-            court: { type: "type1", location: "location1", label: "label1" },
-            date: "2022-02-01",
-            documentType: {
-              jurisShortcut: "documentTypeShortcut1",
-              label: "documentType1",
-            },
-            fileNumber: "testFileNumber1",
-          },
-          {
-            court: { type: "type2", location: "location2", label: "label2" },
-            date: "2022-02-02",
-            documentType: {
-              jurisShortcut: "documentTypeShortcut2",
-              label: "documentType2",
-            },
-            fileNumber: "testFileNumber2",
-          },
-        ],
-      })
-    )
 
   it("shows all proceeding decision input fields if expanded", async () => {
     const { user } = renderComponent()
@@ -64,12 +37,43 @@ describe("DocumentUnitProceedingDecisions", async () => {
   })
 
   it("adds proceeding decision and updates list of existing ones", async () => {
+    const fetchSpy = vi
+      .spyOn(service, "addProceedingDecision")
+      .mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: [
+            {
+              court: { type: "type1", location: "location1", label: "label1" },
+              date: "2022-02-01",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut1",
+                label: "documentType1",
+              },
+              fileNumber: "testFileNumber1",
+            },
+            {
+              court: { type: "type2", location: "location2", label: "label2" },
+              date: "2022-02-02",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut2",
+                label: "documentType2",
+              },
+              fileNumber: "testFileNumber2",
+            },
+          ],
+        })
+      )
     const { user } = renderComponent()
     await openExpandableArea(user)
 
     expect(screen.queryByText(/testFileNumber1/)).not.toBeInTheDocument()
     expect(screen.queryByText(/testFileNumber2/)).not.toBeInTheDocument()
 
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen Rechtszug"),
+      "foo FileNumber"
+    )
     await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
     expect(fetchSpy).toBeCalledTimes(1)
 
@@ -77,17 +81,31 @@ describe("DocumentUnitProceedingDecisions", async () => {
     expect(screen.getByText(/testFileNumber2/)).toBeVisible()
   })
 
-  // it("does not emit update model event when inputs are empty and model is empty too", async () => {
-  //   const { emitted, user } = renderComponent({
-  //     modelValue: undefined,
-  //   })
-  //   const input = screen.getByLabelText("fileNumber")
+  it("does not add if decision is undefined", async () => {
+    const fetchSpy = vi
+      .spyOn(service, "addProceedingDecision")
+      .mockImplementation(() =>
+        Promise.resolve({
+          status: 200,
+          data: [
+            {
+              court: { type: "type1", location: "location1", label: "label1" },
+              date: "2022-02-01",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut1",
+                label: "documentType1",
+              },
+              fileNumber: "testFileNumber1",
+            },
+          ],
+        })
+      )
+    const { user } = renderComponent()
+    await openExpandableArea(user)
 
-  //   // Do anything without changing the inputs.
-  //   await user.click(input)
-
-  //   expect(emitted()["update:modelValue"]).toBeUndefined()
-  // })
+    await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
+    expect(fetchSpy).toBeCalledTimes(0)
+  })
 
   // it("always shows at least one input group despite empty model list", () => {
   //   renderComponent({ modelValue: [] })
