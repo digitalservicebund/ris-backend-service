@@ -16,7 +16,15 @@ function renderComponent(options?: {
   }
 
   const user = userEvent.setup()
-  return { user, ...render(DocumentUnitProceedingDecisions, { props }) }
+  return {
+    user,
+    ...render(DocumentUnitProceedingDecisions, {
+      props,
+      global: {
+        stubs: { routerLink: { template: "<a><slot/></a>" } },
+      },
+    }),
+  }
 }
 
 async function openExpandableArea(user: ReturnType<typeof userEvent.setup>) {

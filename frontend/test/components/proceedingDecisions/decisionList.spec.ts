@@ -15,7 +15,12 @@ function renderComponent(options?: { decisions: ProceedingDecision[] }) {
     ],
   }
 
-  return render(DecisionList, { props })
+  return render(DecisionList, {
+    props,
+    global: {
+      stubs: { routerLink: { template: "<a><slot/></a>" } },
+    },
+  })
 }
 
 describe("ProceedingDecision List", () => {

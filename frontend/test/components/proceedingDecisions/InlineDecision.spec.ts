@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/vue"
+import { createRouter, createWebHistory } from "vue-router"
 import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
 import { Court, DocumentType, ProceedingDecision } from "@/domain/documentUnit"
 
@@ -6,6 +7,8 @@ function renderComponent(options?: {
   court?: Court
   documentType?: DocumentType
   date?: string
+  dataSource?: ProceedingDecision["dataSource"]
+  documentNumber?: string
 }) {
   const props: { decision: ProceedingDecision } = {
     decision: {
@@ -19,10 +22,31 @@ function renderComponent(options?: {
         jurisShortcut: "testDocumentTypeShortcut",
       },
       date: options?.date ?? "2004-12-02 12:00:00.000000 +00:00",
+      dataSource: options?.dataSource ?? "PROCEEDING_DECISION",
+      documentNumber: options?.documentNumber ?? "testDocumentNumber",
     },
   }
 
-  return render(InlineDecision, { props })
+  const router = createRouter({
+    history: createWebHistory(),
+    routes: [
+      {
+        path: "",
+        name: "index",
+        component: {},
+      },
+      {
+        path: "/:documentNumber/categories",
+        name: "caselaw-documentUnit-:documentNumber-categories",
+        component: {},
+      },
+    ],
+  })
+
+  return render(InlineDecision, {
+    props,
+    global: { plugins: [router] },
+  })
 }
 
 describe("Decision ListItem", () => {
@@ -46,5 +70,16 @@ describe("Decision ListItem", () => {
   it("renders date correctly", async () => {
     renderComponent({ date: "2022-03-27" })
     expect(await screen.findByText(/27.03.2022/))
+  })
+
+  it("renders with link if source is not proceedingDecisions", async () => {
+    renderComponent({
+      dataSource: "MIGRATION",
+      documentNumber: "fooDocumentNumber",
+    })
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      expect.stringMatching(/fooDocumentNumber/)
+    )
   })
 })

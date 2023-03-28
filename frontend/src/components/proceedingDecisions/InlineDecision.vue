@@ -2,11 +2,12 @@
 import dayjs from "dayjs"
 import { ProceedingDecision } from "@/domain/documentUnit"
 
-defineProps<{
+const props = defineProps<{
   decision: ProceedingDecision
 }>()
 
-function renderDecision(decision: ProceedingDecision) {
+function renderDecision(): string {
+  const decision = props.decision
   return [
     ...(decision.court
       ? [`${decision.court.type} ${decision.court.location}`]
@@ -16,8 +17,24 @@ function renderDecision(decision: ProceedingDecision) {
     ...(decision.fileNumber ? [decision.fileNumber] : []),
   ].join(", ")
 }
+
+function hasLink(): boolean {
+  return props.decision.dataSource !== "PROCEEDING_DECISION"
+}
 </script>
 
 <template>
-  {{ renderDecision(decision) }}
+  <router-link
+    v-if="hasLink()"
+    class="underline"
+    target="_blank"
+    :to="{
+      name: 'caselaw-documentUnit-:documentNumber-categories',
+      params: { documentNumber: decision.documentNumber },
+    }"
+  >
+    {{ renderDecision() }}
+  </router-link>
+
+  <span v-else>{{ renderDecision() }}</span>
 </template>

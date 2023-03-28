@@ -42,7 +42,7 @@ export type Texts = {
 export type ProceedingDecision = {
   uuid?: string
   documentNumber?: string
-  dataSource?: string
+  dataSource?: "NEURIS" | "MIGRATION" | "PROCEEDING_DECISION"
   court?: Court
   date?: string
   fileNumber?: string
