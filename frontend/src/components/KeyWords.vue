@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import ChipsInput from "@/components/ChipsInput.vue"
+import KeywordsInput from "@/components/ChipsInputBottom.vue"
 import KeywordsService from "@/services/keywordsService"
 
 const props = defineProps<{
@@ -53,14 +53,13 @@ watch(
     <h1 class="heading-03-regular mb-[1rem]">Schlagwörter</h1>
     <div class="flex flex-row">
       <div class="flex-1">
-        <ChipsInput
+        <KeywordsInput
           id="keywords"
           aria-label="Schlagwörter"
-          as-bottom-list
           :model-value="keywords"
           @add-chip="addKeyword"
           @delete-chip="deleteKeyword"
-        ></ChipsInput>
+        ></KeywordsInput>
       </div>
     </div>
   </div>

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import ChipsInput from "@/components/ChipsInput.vue"
+import ChipsInputBottom from "@/components/ChipsInputBottom.vue"
 import type { ChipsInputModelType } from "@/domain/types"
 
 const chipsValue1 = ref<ChipsInputModelType>(["one", "two"])
@@ -12,15 +13,14 @@ const chipsValue2 = ref<ChipsInputModelType>(["one", "two"])
     <h1 class="font-bold text-24">Chips Input Variante 1</h1>
     <ChipsInput
       id="ChipsInput"
-      aria-label="chips input"
+      aria-label="chips input 1"
       :model-value="chipsValue1"
     ></ChipsInput>
     <h1 class="font-bold text-24">Chips Input Variante 2</h1>
-    <ChipsInput
+    <ChipsInputBottom
       id="ChipsInput"
-      aria-label="chips input"
-      as-bottom-list
+      aria-label="chips input 2"
       :model-value="chipsValue2"
-    ></ChipsInput>
+    ></ChipsInputBottom>
   </div>
 </template>
