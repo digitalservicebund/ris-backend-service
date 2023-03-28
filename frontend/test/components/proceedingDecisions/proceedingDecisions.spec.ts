@@ -106,25 +106,4 @@ describe("DocumentUnitProceedingDecisions", async () => {
     await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
     expect(fetchSpy).toBeCalledTimes(0)
   })
-
-  // it("always shows at least one input group despite empty model list", () => {
-  //   renderComponent({ modelValue: [] })
-
-  //   const courtInput = screen.queryByLabelText(
-  //     "Gericht Rechtszug"
-  //   ) as HTMLInputElement
-  //   const dateInput = screen.queryByLabelText(
-  //     "Datum Rechtszug"
-  //   ) as HTMLInputElement
-  //   const identifierInput = screen.queryByLabelText(
-  //     "Aktenzeichen Rechtszug"
-  //   ) as HTMLInputElement
-
-  //   expect(courtInput).toBeInTheDocument()
-  //   expect(courtInput).toHaveDisplayValue("")
-  //   expect(dateInput).toBeInTheDocument()
-  //   expect(dateInput).toHaveDisplayValue("")
-  //   expect(identifierInput).toBeInTheDocument()
-  //   expect(identifierInput).toHaveDisplayValue("")
-  // })
 })
