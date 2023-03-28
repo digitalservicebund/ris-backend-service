@@ -4,7 +4,7 @@ plugins {
   id "java"
   id "org.jetbrains.kotlin.jvm" version "1.7.0"
   id "org.jetbrains.kotlin.plugin.spring" version "1.7.0"
-  id "com.diffplug.spotless" version "6.16.0"
+  id "com.diffplug.spotless" version "6.17.0"
   id "jacoco"
   id "org.sonarqube" version "4.0.0.2929"
   id "com.github.jk1.dependency-license-report" version "2.1"
@@ -19,7 +19,11 @@ group = "de.bund.digitalservice"
 version = "0.0.1-SNAPSHOT"
 sourceCompatibility = "17"
 
-configurations { compileOnly { extendsFrom annotationProcessor } }
+configurations {
+  compileOnly {
+    extendsFrom annotationProcessor
+  }
+}
 
 repositories {
   mavenCentral()
@@ -101,7 +105,11 @@ dependencies {
   implementation "org.docx4j:docx4j-JAXB-MOXy:11.4.9"
   implementation "com.sun.mail:jakarta.mail:2.0.1"
   implementation "com.sun.activation:jakarta.activation:2.0.1"
-  implementation("jakarta.xml.bind:jakarta.xml.bind-api") { version { strictly "3.0.1" } }
+  implementation("jakarta.xml.bind:jakarta.xml.bind-api") {
+    version {
+      strictly "3.0.1"
+    }
+  }
   implementation "org.freehep:freehep-graphicsio-emf:2.4"
 
   // package served by private repo, requires authentication:
@@ -153,13 +161,19 @@ dependencies {
   testImplementation "com.google.code.gson:gson:2.10.1"
 }
 
-jar { // We have no need for the plain archive, thus skip creation for build speedup!
-  enabled = false }
+jar {
+  // We have no need for the plain archive, thus skip creation for build speedup!
+  enabled = false
+}
 
 compileKotlin { kotlinOptions.jvmTarget = "17" }
 compileTestKotlin { kotlinOptions.jvmTarget = "17" }
 
-test { useJUnitPlatform { excludeTags "integration"} }
+test {
+  useJUnitPlatform {
+    excludeTags "integration"
+  }
+}
 
 task integrationTest(type: Test) {
   description = "Runs the integration tests."
@@ -206,7 +220,7 @@ spotless {
     }
   }
   groovyGradle {
-    greclipse("4.6.3").configFile("greclipse.properties")
+    greclipse("4.26").configFile("greclipse.properties")
     toggleOffOn()
     replaceRegex("quotes", "(['])(.*)\\1", "\"\$2\"")
   }
