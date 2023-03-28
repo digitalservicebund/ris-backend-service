@@ -33,6 +33,7 @@ public class ProceedingDecisionTransformer {
     return ProceedingDecision.builder()
         .uuid(documentUnitMetadataDTO.getUuid())
         .documentNumber(documentUnitMetadataDTO.getDocumentnumber())
+        .dataSource(documentUnitMetadataDTO.getDataSource())
         .court(court)
         .fileNumber(fileNumber)
         .documentType(getDocumentTypeByDTO(documentUnitMetadataDTO.getDocumentTypeDTO()))

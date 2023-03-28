@@ -149,6 +149,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             ProceedingDecision.builder()
                 .uuid(UUID.randomUUID())
                 .documentNumber("documentNumber")
+                .dataSource(DataSource.NEURIS)
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
                 .fileNumber("fileNumber")

@@ -10,6 +10,7 @@ import lombok.Builder;
 public record ProceedingDecision(
     UUID uuid,
     String documentNumber,
+    DataSource dataSource,
     Court court,
     Instant date,
     String fileNumber,

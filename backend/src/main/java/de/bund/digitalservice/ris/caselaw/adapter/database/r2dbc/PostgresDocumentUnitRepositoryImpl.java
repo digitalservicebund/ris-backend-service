@@ -725,6 +725,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             documentUnitMetadataDTO ->
                 ProceedingDecision.builder()
                     .uuid(documentUnitMetadataDTO.getUuid())
+                    .dataSource(documentUnitMetadataDTO.getDataSource())
                     .court(
                         Court.builder()
                             .type(documentUnitMetadataDTO.getCourtType())
