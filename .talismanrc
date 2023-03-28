@@ -8,7 +8,7 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: dfde240bee8233c1212a7b8e459728fb73562c565bbe425e2db9b795b87320b1
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-    checksum: ef0a59e2fe9b7213f2b5a857a26d93746e42ee5e13c2a8a2b7f9cfb190394668
+    checksum: 476b39d74792e4d7fa2521bae3462c0205852bc7c9aadc98f93200561699cef9
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
   - filename: "*.sql"
