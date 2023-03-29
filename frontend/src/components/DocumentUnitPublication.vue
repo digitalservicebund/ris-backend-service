@@ -83,22 +83,24 @@ onMounted(async () => {
 </script>
 
 <template>
-  <DocumentUnitWrapper v-slot="{ classes }" :document-unit="documentUnit">
-    <div :class="classes">
-      <PublicationDocument
-        v-if="loadDone"
-        :document-unit="documentUnit"
-        :error-message="errorMessage"
-        :last-published-xml-mail="lastPublishedXmlMail"
-        :publish-result="publishResult"
-        :succeed-message="succeedMessage"
-        @publish-a-document="publishADocument($event)"
-      />
+  <DocumentUnitWrapper :document-unit="documentUnit">
+    <template #default="{ classes }">
+      <div :class="classes">
+        <PublicationDocument
+          v-if="loadDone"
+          :document-unit="documentUnit"
+          :error-message="errorMessage"
+          :last-published-xml-mail="lastPublishedXmlMail"
+          :publish-result="publishResult"
+          :succeed-message="succeedMessage"
+          @publish-a-document="publishADocument($event)"
+        />
 
-      <div v-else class="spinner">
-        <h2>Überprüfung der Daten ...</h2>
+        <div v-else class="spinner">
+          <h2>Überprüfung der Daten ...</h2>
+        </div>
       </div>
-    </div>
+    </template>
   </DocumentUnitWrapper>
 </template>
 

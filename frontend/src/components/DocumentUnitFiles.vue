@@ -45,31 +45,33 @@ async function upload(file: File) {
 </script>
 
 <template>
-  <DocumentUnitWrapper v-slot="{ classes }" :document-unit="documentUnit">
-    <div class="flex flex-col" :class="classes">
-      <h1 class="heading-02-regular mb-[1rem]">Dokumente</h1>
+  <DocumentUnitWrapper :document-unit="documentUnit">
+    <template #default="{ classes }">
+      <div class="flex flex-col" :class="classes">
+        <h1 class="heading-02-regular mb-[1rem]">Dokumente</h1>
 
-      <FileViewer
-        v-if="documentUnit.hasFile"
-        :file-name="documentUnit.filename"
-        :file-type="documentUnit.filetype"
-        :s3-path="(documentUnit.s3path as string)"
-        :upload-time-stamp="documentUnit.fileuploadtimestamp"
-        @delete-file="handleDeleteFile"
-      />
-
-      <div v-else class="flex flex-col items-start w-[40rem]">
-        <div class="mb-14">
-          Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
-          Originaldokumentes aus
-        </div>
-
-        <FileUpload
-          :error="error"
-          :is-loading="isUploading"
-          @file-selected="(file) => upload(file)"
+        <FileViewer
+          v-if="documentUnit.hasFile"
+          :file-name="documentUnit.filename"
+          :file-type="documentUnit.filetype"
+          :s3-path="(documentUnit.s3path as string)"
+          :upload-time-stamp="documentUnit.fileuploadtimestamp"
+          @delete-file="handleDeleteFile"
         />
+
+        <div v-else class="flex flex-col items-start w-[40rem]">
+          <div class="mb-14">
+            Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des
+            Originaldokumentes aus
+          </div>
+
+          <FileUpload
+            :error="error"
+            :is-loading="isUploading"
+            @file-selected="(file) => upload(file)"
+          />
+        </div>
       </div>
-    </div>
+    </template>
   </DocumentUnitWrapper>
 </template>

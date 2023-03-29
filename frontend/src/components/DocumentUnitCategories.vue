@@ -177,60 +177,59 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <DocumentUnitWrapper
-    v-slot="{ classes }"
-    :document-unit="updatedDocumentUnit"
-  >
-    <div class="flex w-full">
-      <div :class="classes">
-        <DocumentUnitCoreData
-          id="coreData"
-          v-model="coreData"
-          :update-status="updateStatus"
-          :validation-errors="
-            validationErrors.filter(
-              (err) => err.field.split('\.')[0] === 'coreData'
-            )
-          "
-          @update-document-unit="handleUpdateDocumentUnit"
-        />
+  <DocumentUnitWrapper :document-unit="updatedDocumentUnit">
+    <template #default="{ classes }">
+      <div class="flex w-full">
+        <div :class="classes">
+          <DocumentUnitCoreData
+            id="coreData"
+            v-model="coreData"
+            :update-status="updateStatus"
+            :validation-errors="
+              validationErrors.filter(
+                (err) => err.field.split('\.')[0] === 'coreData'
+              )
+            "
+            @update-document-unit="handleUpdateDocumentUnit"
+          />
 
-        <DocumentUnitProceedingDecision
-          id="proceedingDecisions"
-          :document-unit-uuid="updatedDocumentUnit.uuid"
-          :proceeding-decisions="documentUnit.proceedingDecisions"
-        />
+          <DocumentUnitProceedingDecision
+            id="proceedingDecisions"
+            :document-unit-uuid="updatedDocumentUnit.uuid"
+            :proceeding-decisions="documentUnit.proceedingDecisions"
+          />
 
-        <!-- TODO add validationErrors -->
-        <DocumentUnitTexts
-          id="texts"
-          :texts="documentUnit.texts"
-          :update-status="updateStatus"
-          @update-document-unit="handleUpdateDocumentUnit"
-          @update-value="handleUpdateValueDocumentUnitTexts"
-        />
+          <!-- TODO add validationErrors -->
+          <DocumentUnitTexts
+            id="texts"
+            :texts="documentUnit.texts"
+            :update-status="updateStatus"
+            @update-document-unit="handleUpdateDocumentUnit"
+            @update-value="handleUpdateValueDocumentUnitTexts"
+          />
 
-        <DocumentUnitContentRelatedIndexing
-          id="contentRelatedIndexing"
-          :document-unit="props.documentUnit"
-        />
+          <DocumentUnitContentRelatedIndexing
+            id="contentRelatedIndexing"
+            :document-unit="props.documentUnit"
+          />
+        </div>
+
+        <div
+          class="bg-white border-gray-400 border-l-1 border-solid"
+          :class="{ full: showDocPanel }"
+        >
+          <OriginalFileSidePanel
+            id="odoc-panel-element"
+            v-model:open="showDocPanel"
+            class="bg-white"
+            :class="classes"
+            :file="fileAsHTML"
+            :fixed-panel-position="fixedPanelPosition"
+            :has-file="documentUnit.hasFile"
+          />
+        </div>
       </div>
-
-      <div
-        class="bg-white border-gray-400 border-l-1 border-solid"
-        :class="{ full: showDocPanel }"
-      >
-        <OriginalFileSidePanel
-          id="odoc-panel-element"
-          v-model:open="showDocPanel"
-          class="bg-white"
-          :class="classes"
-          :file="fileAsHTML"
-          :fixed-panel-position="fixedPanelPosition"
-          :has-file="documentUnit.hasFile"
-        />
-      </div>
-    </div>
+    </template>
   </DocumentUnitWrapper>
 </template>
 

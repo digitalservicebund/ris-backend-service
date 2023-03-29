@@ -23,5 +23,9 @@
     }
   },
   "include": ["src", "src/**/*.vue", "test/**/*.ts", "vite.config.ts"],
-  "exclude": ["test/e2e/**/*.ts", "test/a11y/**/*.ts"]
+  "exclude": ["test/e2e/**/*.ts", "test/a11y/**/*.ts"],
+  "vueCompilerOptions": {
+    "htmlAttributes": [],
+    "jsxTemplates": true
+  }
 }
