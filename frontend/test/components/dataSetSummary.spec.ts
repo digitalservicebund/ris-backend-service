@@ -4,9 +4,9 @@ import { h } from "vue"
 
 import DataSetSummary from "@/components/DataSetSummary.vue"
 
-function renderComponent(options?: {
-  data?: unknown | unknown[]
-  summarizer?: (dataEntry: unknown) => string | VNode
+function renderComponent<T>(options?: {
+  data?: T | T[]
+  summarizer?: (dataEntry: T) => string | VNode
 }) {
   const props = {
     data: options?.data ?? ["foo", "bar"],
@@ -88,7 +88,7 @@ describe("DataSetSummary", () => {
   })
 
   it("uses custom string summarizer function if given for custom summaries", async () => {
-    const summarizer = (dataEntry: unknown) => `the value is: ${dataEntry}`
+    const summarizer = (dataEntry: string) => `the value is: ${dataEntry}`
     renderComponent({ data: ["foo"], summarizer })
 
     const summary = await screen.findByText("the value is: foo")
@@ -97,7 +97,7 @@ describe("DataSetSummary", () => {
   })
 
   it("uses custom VNode summarizer function if given for complex summaries", async () => {
-    const summarizer = (dataEntry: unknown) =>
+    const summarizer = (dataEntry: string) =>
       h("div", { "data-testid": "special-identifier" }, dataEntry as string)
 
     renderComponent({ data: ["foo"], summarizer })
