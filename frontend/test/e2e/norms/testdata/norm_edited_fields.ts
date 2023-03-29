@@ -1,4 +1,4 @@
-import { MetaDatumType } from "../../../src/domain/Norm"
+import { MetaDatumType } from "@/domain/Norm"
 
 export const newNorm = {
   officialLongTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge",

@@ -1,4 +1,4 @@
-import { MetaDatumType } from "../../../src/domain/Norm"
+import { MetaDatumType } from "@/domain/Norm"
 
 export const normData = {
   jurisZipFileName: "Finanzdisziplin.2-0.zip",
