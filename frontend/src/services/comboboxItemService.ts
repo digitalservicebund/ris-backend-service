@@ -1,7 +1,7 @@
 import httpClient, { ServiceResponse } from "./httpClient"
-import { ComboboxItem } from "@/domain"
 import { Court } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { ComboboxItem } from "@/shared/components/input/types"
 
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",

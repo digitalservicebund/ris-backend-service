@@ -1,9 +1,12 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import InputElement from "@/components/InputElement.vue"
-import InputFieldComponent from "@/components/InputField.vue"
-import type { InputField, ModelType } from "@/domain"
-import { ValidationError } from "@/domain"
+import InputElement from "@/shared/components/input/InputElement.vue"
+import InputFieldComponent from "@/shared/components/input/InputField.vue"
+import {
+  InputField,
+  ModelType,
+  ValidationError,
+} from "@/shared/components/input/types"
 
 type InputValues = { [fieldName: string]: ModelType }
 

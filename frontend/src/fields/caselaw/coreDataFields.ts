@@ -6,7 +6,7 @@ import {
   InputField,
   DropdownItem,
   ComboboxAttributes,
-} from "./types"
+} from "../../shared/components/input/types"
 import legalEffectTypes from "@/data/legalEffectTypes.json"
 import DocumentUnit from "@/domain/documentUnit"
 import comboboxItemService from "@/services/comboboxItemService"

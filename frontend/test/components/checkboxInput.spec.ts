@@ -1,6 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import CheckboxInput from "@/components/CheckboxInput.vue"
+import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 
 function renderComponent(options?: {
   ariaLabel?: string

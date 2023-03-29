@@ -1,6 +1,8 @@
 <script lang="ts" setup>
-import NavbarSide, { LevelOneMenuItem } from "@/components/NavbarSide.vue"
-import Navbar from "@/components/NavbarTop.vue"
+import NavbarSide, {
+  LevelOneMenuItem,
+} from "@/shared/components/NavbarSide.vue"
+import Navbar from "@/shared/components/NavbarTop.vue"
 
 const goBackRoute = { name: "kitchensink" }
 const menuItems: LevelOneMenuItem[] = [

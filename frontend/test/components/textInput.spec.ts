@@ -1,6 +1,6 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import TextInput from "@/components/TextInput.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
 function renderComponent(options?: {
   ariaLabel?: string

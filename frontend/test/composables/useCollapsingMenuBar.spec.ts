@@ -2,7 +2,7 @@ import { ref } from "vue"
 import {
   MenuButton,
   useCollapsingMenuBar,
-} from "@/composables/useCollapsingMenuBar"
+} from "@/shared/composables/useCollapsingMenuBar"
 import { generateString } from "~/test-helper/dataGenerators"
 
 function generateButton(partialButton?: Partial<MenuButton>) {

@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import FileViewer from "../../src/components/FileViewer.vue"
+import FileViewer from "@/components/FileViewer.vue"
 
 const S3PATH = "47a77c3f-a05d-4362-97ea-d54a35236a67"
 const FILE_NAME = "some-formatting.docx"

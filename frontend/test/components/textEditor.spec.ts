@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/no-node-access */
 import { render, screen, fireEvent } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import TextEditor from "../../src/components/TextEditor.vue"
+import TextEditor from "../../src/shared/components/input/TextEditor.vue"
 
 describe("text editor", async () => {
   global.ResizeObserver = require("resize-observer-polyfill")

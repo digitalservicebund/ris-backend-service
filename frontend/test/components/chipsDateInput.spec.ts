@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
-import ChipsDateInput from "@/components/ChipsDateInput.vue"
+import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
 
 dayjs.extend(utc)
 dayjs.extend(timezone)

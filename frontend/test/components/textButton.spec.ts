@@ -1,5 +1,5 @@
 import { mount } from "@vue/test-utils"
-import TextButton from "@/components/TextButton.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 describe("TextButton", () => {
   it("renders with label prop", () => {

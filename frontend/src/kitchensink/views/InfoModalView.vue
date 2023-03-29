@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import InfoModal from "@/components/InfoModal.vue"
-import { InfoStatus } from "@/enum/enumInfoStatus"
+import { InfoStatus } from "@/shared/components/enumInfoStatus"
+import InfoModal from "@/shared/components/InfoModal.vue"
 </script>
 
 <template>

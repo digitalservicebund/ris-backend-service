@@ -2,12 +2,12 @@
 import { watch, ref } from "vue"
 import DecisionList from "./DecisionList.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import InputGroup from "@/components/InputGroup.vue"
-import TextButton from "@/components/TextButton.vue"
-import { proceedingDecisionFields } from "@/domain"
 import { ProceedingDecision } from "@/domain/documentUnit"
+import { proceedingDecisionFields } from "@/fields/caselaw"
 import DocumentUnitService from "@/services/documentUnitService"
 import ProceedingDecisionService from "@/services/proceedingDecisionService"
+import InputGroup from "@/shared/components/input/InputGroup.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 const props = defineProps<{
   documentUnitUuid: string

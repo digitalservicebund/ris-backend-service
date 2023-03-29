@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { onUnmounted } from "vue"
 import TextButton from "./TextButton.vue"
-import { useSaveToRemote } from "@/composables/useSaveToRemote"
 import { ServiceResponse } from "@/services/httpClient"
+import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
 
 const props = defineProps<{
   ariaLabel: string

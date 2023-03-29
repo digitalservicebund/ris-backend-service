@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { computed, defineComponent, markRaw } from "vue"
-import ModelComponentRepeater from "@/components/ModelComponentRepeater.vue"
+import ModelComponentRepeater from "@/shared/components/ModelComponentRepeater.vue"
 
 const TestModelComponent = defineComponent({
   props: {

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import FileInput from "@/components/FileInput.vue"
-import InfoModal from "@/components/InfoModal.vue"
+import InfoModal from "@/shared/components/InfoModal.vue"
+import FileInput from "@/shared/components/input/FileInput.vue"
 
 const props = defineProps<{
   error?: { title: string; description?: string }

@@ -1,8 +1,8 @@
 /* eslint-disable jest-dom/prefer-in-document */
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import DropdownInput from "@/components/DropdownInput.vue"
-import { DropdownItem } from "@/domain/types"
+import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import { DropdownItem } from "@/shared/components/input/types"
 
 function renderComponent(
   options: {

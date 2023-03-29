@@ -1,4 +1,5 @@
-import { defineChipsField, InputField, InputType } from "@/domain"
+import { defineChipsField } from "@/fields/caselaw"
+import { InputField, InputType } from "@/shared/components/input/types"
 
 export const generalData: InputField[] = [
   {

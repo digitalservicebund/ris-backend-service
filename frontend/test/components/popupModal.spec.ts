@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
-import PopupModal from "../../src/components/PopupModal.vue"
+import PopupModal from "@/shared/components/PopupModal.vue"
 
 const MODAL_HEADER_TEXT = "Dokumentationseinheit löschen"
 const MODAL_CONTENT_TEXT = "Möchten Sie die Datei löschen?"

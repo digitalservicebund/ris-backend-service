@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import { useInputModel } from "@/composables/useInputModel"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string

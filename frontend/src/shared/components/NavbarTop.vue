@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, onMounted } from "vue"
 import { useRoute } from "vue-router"
-import Logo from "../assets/neuRIS-logo.svg"
+import Logo from "@/assets/neuRIS-logo.svg"
 import { getName } from "@/services/authService"
 
 const route = useRoute()

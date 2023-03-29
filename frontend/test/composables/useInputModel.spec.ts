@@ -1,5 +1,5 @@
 import { nextTick, reactive } from "vue"
-import { useInputModel } from "@/composables/useInputModel"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 describe("useInputModel", () => {
   it("sets initial input value based on model value property", () => {

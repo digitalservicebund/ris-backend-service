@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { flushPromises } from "@vue/test-utils"
 import { describe, test } from "vitest"
-import FileUpload from "../../src/components/FileUpload.vue"
+import FileUpload from "@/shared/components/FileUpload.vue"
 
 describe("FileUpload", () => {
   test("renders file upload with default props", async () => {

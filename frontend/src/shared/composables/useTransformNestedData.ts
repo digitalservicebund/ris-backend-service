@@ -4,7 +4,7 @@ import {
   InputField,
   NestedInputField,
   InputType,
-} from "@/domain/types"
+} from "@/shared/components/input/types"
 
 type FieldData = { [fieldName: string]: ModelType }
 

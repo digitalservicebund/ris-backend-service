@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import NestedButton from "@/components/NestedButton.vue"
 import SaveDocumentUnitButton from "@/components/SaveDocumentUnitButton.vue"
-import TextButton from "@/components/TextButton.vue"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
+import NestedButton from "@/shared/components/input/NestedButton.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 const updateStatus = ref(UpdateStatus)
 </script>

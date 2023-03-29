@@ -1,5 +1,5 @@
-import { InputField, InputType } from "@/domain"
 import { dropdown, undefinedDropDownItems } from "@/fields/norms/fieldGenerator"
+import { InputField, InputType } from "@/shared/components/input/types"
 
 export const entryIntoForce: InputField[] = [
   {

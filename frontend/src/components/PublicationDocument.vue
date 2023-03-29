@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue"
 import { RouterLink } from "vue-router"
-import InputField from "./InputField.vue"
-import TextButton from "./TextButton.vue"
-import TextInput from "./TextInput.vue"
+import InputField from "../shared/components/input/InputField.vue"
+import TextButton from "../shared/components/input/TextButton.vue"
+import TextInput from "../shared/components/input/TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
-import InfoModal from "@/components/InfoModal.vue"
-import { fieldLabels } from "@/domain"
 import DocumentUnit from "@/domain/documentUnit"
 import XmlMail from "@/domain/xmlMail"
-import { InfoStatus } from "@/enum/enumInfoStatus"
+import { fieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
+import { InfoStatus } from "@/shared/components/enumInfoStatus"
+import InfoModal from "@/shared/components/InfoModal.vue"
 
 const props = defineProps<{
   documentUnit: DocumentUnit

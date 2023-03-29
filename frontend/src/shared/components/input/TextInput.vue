@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import { useInputModel } from "@/composables/useInputModel"
-import { ValidationError } from "@/domain"
+import { ValidationError } from "@/shared/components/input/types"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string

@@ -1,7 +1,7 @@
 import { Court } from "@/domain/documentUnit"
-import { DropdownItem } from "@/domain/types"
 import service from "@/services/comboboxItemService"
 import httpClient from "@/services/httpClient"
+import { DropdownItem } from "@/shared/components/input/types"
 
 vi.mock("@/services/httpClient")
 

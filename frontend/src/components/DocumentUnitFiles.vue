@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import DocumentUnitWrapper from "@/components/DocumentUnitWrapper.vue"
-import FileUpload from "@/components/FileUpload.vue"
 import FileViewer from "@/components/FileViewer.vue"
 import DocumentUnit from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
 import { ResponseError } from "@/services/httpClient"
+import FileUpload from "@/shared/components/FileUpload.vue"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
 const emit = defineEmits<{

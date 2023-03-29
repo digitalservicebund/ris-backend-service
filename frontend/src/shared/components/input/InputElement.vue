@@ -1,17 +1,21 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue"
-import CheckboxInput from "@/components/CheckboxInput.vue"
-import ChipsDateInput from "@/components/ChipsDateInput.vue"
-import ChipsInput from "@/components/ChipsInput.vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import CustomDateInput from "@/components/CustomDateInput.vue"
-import DateInput from "@/components/DateInput.vue"
-import DropdownInput from "@/components/DropdownInput.vue"
-import FileInput from "@/components/FileInput.vue"
-import NestedInput from "@/components/NestedInput.vue"
-import TextInput from "@/components/TextInput.vue"
-import type { InputAttributes, ModelType } from "@/domain"
-import { InputType, ValidationError } from "@/domain"
+import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
+import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
+import ChipsInput from "@/shared/components/input/ChipsInput.vue"
+import CustomDateInput from "@/shared/components/input/CustomDateInput.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
+import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import FileInput from "@/shared/components/input/FileInput.vue"
+import NestedInput from "@/shared/components/input/NestedInput.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
+import {
+  InputAttributes,
+  ModelType,
+  InputType,
+  ValidationError,
+} from "@/shared/components/input/types"
 
 interface Props {
   id: string

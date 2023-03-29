@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { ref, watch, computed } from "vue"
-import { ValidationError } from "@/domain"
+import { ValidationError } from "@/shared/components/input/types"
 
 const props = defineProps<Props>()
 const emits = defineEmits<Emits>()

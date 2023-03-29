@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import KeywordsInput from "@/components/ChipsInputBottom.vue"
 import KeywordsService from "@/services/keywordsService"
+import KeywordsInput from "@/shared/components/input/ChipsInputBottom.vue"
 
 const props = defineProps<{
   documentUnitUuid: string

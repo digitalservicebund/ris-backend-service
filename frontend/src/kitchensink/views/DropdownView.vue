@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import DropdownInput from "@/components/DropdownInput.vue"
-import type { DropdownItem } from "@/domain/types"
+import DropdownInput from "@/shared/components/input/DropdownInput.vue"
+import type { DropdownItem } from "@/shared/components/input/types"
 
 const comboboxModelValue1 = ref<string>()
 const comboboxModelValue2 = ref<string>("I1")

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted } from "vue"
-import TextButton from "./TextButton.vue"
+import TextButton from "./input/TextButton.vue"
 
 defineProps<{
   ariaLabel?: string

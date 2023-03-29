@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, toRefs } from "vue"
 import { CoreData } from "../domain/documentUnit"
-import InputGroup from "./InputGroup.vue"
+import InputGroup from "../shared/components/input/InputGroup.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
-import { useTransformNestedData } from "@/composables/useTransformNestedData"
-import { courtFields, coreDataFields, ValidationError } from "@/domain"
+import { courtFields, coreDataFields } from "@/fields/caselaw"
+import { ValidationError } from "@/shared/components/input/types"
+import { useTransformNestedData } from "@/shared/composables/useTransformNestedData"
 
 interface Props {
   modelValue: CoreData

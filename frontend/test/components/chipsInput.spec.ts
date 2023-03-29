@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import ChipsInput from "@/components/ChipsInput.vue"
-import ChipsInputBottom from "@/components/ChipsInputBottom.vue"
+import ChipsInput from "@/shared/components/input/ChipsInput.vue"
+import ChipsInputBottom from "@/shared/components/input/ChipsInputBottom.vue"
 
 function renderComponent(options?: {
   ariaLabel?: string

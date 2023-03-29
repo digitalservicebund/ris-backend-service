@@ -1,5 +1,7 @@
 import { render, screen } from "@testing-library/vue"
-import InputField, { LabelPosition } from "@/components/InputField.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
 
 function renderComponent(options?: {
   id?: string

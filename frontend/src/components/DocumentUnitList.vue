@@ -2,7 +2,7 @@
 import dayjs from "dayjs"
 import { ref } from "vue"
 import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
-import PopupModal from "./PopupModal.vue"
+import PopupModal from "@/shared/components/PopupModal.vue"
 
 defineProps<{ documentUnitListEntries: DocumentUnitListEntry[] }>()
 const emit = defineEmits<{

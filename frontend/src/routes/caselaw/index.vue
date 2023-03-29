@@ -2,9 +2,9 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import DocumentUnitList from "@/components/DocumentUnitList.vue"
-import TextButton from "@/components/TextButton.vue"
 import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
 import documentUnitService from "@/services/documentUnitService"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 const router = useRouter()
 

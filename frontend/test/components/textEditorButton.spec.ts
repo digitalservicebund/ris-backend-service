@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, fireEvent, screen } from "@testing-library/vue"
 import { mount } from "@vue/test-utils"
-import TextEditorButton from "../../src/components/TextEditorButton.vue"
+import TextEditorButton from "../../src/shared/components/input/TextEditorButton.vue"
 
 describe("text editor button", async () => {
   it("renders with mandatory props", () => {

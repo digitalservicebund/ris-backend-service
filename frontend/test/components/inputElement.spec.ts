@@ -1,9 +1,8 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import { ValidationError } from "./../../src/domain/types"
-import InputElement from "@/components/InputElement.vue"
-import { InputType } from "@/domain"
-import type { ModelType } from "@/domain"
+import { ValidationError } from "../../src/shared/components/input/types"
+import InputElement from "@/shared/components/input/InputElement.vue"
+import { InputType, ModelType } from "@/shared/components/input/types"
 
 function renderComponent(options?: {
   id?: string

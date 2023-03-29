@@ -1,6 +1,6 @@
 import { mount } from "@vue/test-utils"
-import DocumentUnit from "../../src/domain/documentUnit"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
+import DocumentUnit from "@/domain/documentUnit"
 
 // vitest run --testNamePattern CoreData
 describe("Core Data", () => {

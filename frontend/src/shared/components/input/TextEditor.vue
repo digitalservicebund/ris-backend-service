@@ -19,18 +19,18 @@ import {
   BorderNumber,
   BorderNumberContent,
   BorderNumberNumber,
-} from "../editor/borderNumber"
-import { CustomBulletList } from "../editor/bulletList"
-import { FontSize } from "../editor/fontSize"
-import { CustomImage } from "../editor/image"
-import { CustomListItem } from "../editor/listItem"
-import { CustomOrderedList } from "../editor/orderedList"
-import { CustomParagraph } from "../editor/paragraph"
-import { CustomSuperscript, CustomSubscript } from "../editor/scriptText"
-import { TableStyle } from "../editor/tableStyle"
-import TextEditorButton from "@/components/TextEditorButton.vue"
-import { useCollapsingMenuBar } from "@/composables/useCollapsingMenuBar"
-import { FieldSize } from "@/domain/FieldSize"
+} from "../../editor/borderNumber"
+import { CustomBulletList } from "../../editor/bulletList"
+import { FontSize } from "../../editor/fontSize"
+import { CustomImage } from "../../editor/image"
+import { CustomListItem } from "../../editor/listItem"
+import { CustomOrderedList } from "../../editor/orderedList"
+import { CustomParagraph } from "../../editor/paragraph"
+import { CustomSuperscript, CustomSubscript } from "../../editor/scriptText"
+import { TableStyle } from "../../editor/tableStyle"
+import { FieldSize } from "@/shared/components/input/FieldSize"
+import TextEditorButton from "@/shared/components/input/TextEditorButton.vue"
+import { useCollapsingMenuBar } from "@/shared/composables/useCollapsingMenuBar"
 
 interface Props {
   value?: string

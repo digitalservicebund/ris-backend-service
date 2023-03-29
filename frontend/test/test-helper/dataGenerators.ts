@@ -1,11 +1,11 @@
-import { InputType } from "@/domain"
-import type {
+import { Article, Norm, Paragraph } from "@/domain/Norm"
+import {
+  InputType,
   BaseInputAttributes,
   BaseInputField,
   TextInputAttributes,
   TextInputField,
-} from "@/domain"
-import { Article, Norm, Paragraph } from "@/domain/Norm"
+} from "@/shared/components/input/types"
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
 const HEXADECIMAL_CHARACTERS = "0123456789abcdef"

@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/vue"
-import InfoModal from "@/components/InfoModal.vue"
-import { InfoStatus } from "@/enum/enumInfoStatus"
+import { InfoStatus } from "@/shared/components/enumInfoStatus"
+import InfoModal from "@/shared/components/InfoModal.vue"
 
 describe("InfoModal", () => {
   const SUCCEED_ICON_TEXT = "done"

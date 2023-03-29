@@ -2,7 +2,7 @@
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
 import { computed, ref, watch } from "vue"
-import { ValidationError } from "@/domain"
+import { ValidationError } from "@/shared/components/input/types"
 
 interface Props {
   id: string

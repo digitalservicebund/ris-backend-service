@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import type { Router, RouteRecordRaw, RouteLocationRaw } from "vue-router"
-import NavbarSide from "@/components/NavbarSide.vue"
+import NavbarSide from "@/shared/components/NavbarSide.vue"
 import { generateString } from "~/test-helper/dataGenerators"
 
 describe("NavbarSide", () => {

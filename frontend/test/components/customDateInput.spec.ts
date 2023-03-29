@@ -1,8 +1,8 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import { nextTick } from "vue"
-import CustomDateInput from "@/components/CustomDateInput.vue"
-import { ValidationError } from "@/domain"
+import CustomDateInput from "@/shared/components/input/CustomDateInput.vue"
+import { ValidationError } from "@/shared/components/input/types"
 
 function renderComponent(options?: {
   ariaLabel?: string

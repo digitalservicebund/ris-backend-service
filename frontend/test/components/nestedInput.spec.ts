@@ -1,8 +1,14 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import NestedInput from "@/components/NestedInput.vue"
-import { NestedInputAttributes, NestedInputModelType } from "@/domain"
-import { defineTextField, defineDateField } from "@/domain/coreDataFields"
+import {
+  defineTextField,
+  defineDateField,
+} from "@/fields/caselaw/coreDataFields"
+import NestedInput from "@/shared/components/input/NestedInput.vue"
+import {
+  NestedInputAttributes,
+  NestedInputModelType,
+} from "@/shared/components/input/types"
 
 function renderComponent(options?: {
   ariaLabel?: string

@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
-import SideToggle, { OpeningDirection } from "@/components/SideToggle.vue"
-import TextEditor from "@/components/TextEditor.vue"
+import TextEditor from "@/shared/components/input/TextEditor.vue"
+import SideToggle, {
+  OpeningDirection,
+} from "@/shared/components/SideToggle.vue"
 
 const props = defineProps<{
   open?: boolean

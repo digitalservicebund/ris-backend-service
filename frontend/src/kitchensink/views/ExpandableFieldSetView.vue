@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import ExpandableFieldSet from "@/components/ExpandableFieldSet.vue"
-import InputGroup from "@/components/InputGroup.vue"
 import { participatingInstitutions } from "@/fields/norms/participatingInstitutions"
+import InputGroup from "@/shared/components/input/InputGroup.vue"
 
 const frameData = {
   participationInstitution:

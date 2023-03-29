@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import InputGroup from "@/components/InputGroup.vue"
-import type { InputField } from "@/domain"
+import InputGroup from "@/shared/components/input/InputGroup.vue"
+import { InputField } from "@/shared/components/input/types"
 import { generateTextInputField } from "~/test-helper/dataGenerators"
 
 function renderComponent(options?: {

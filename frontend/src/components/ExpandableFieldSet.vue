@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch, onMounted } from "vue"
-import TextButton from "@/components/TextButton.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 interface Props {
   header?: string

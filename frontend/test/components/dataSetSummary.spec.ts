@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/vue"
 import type { VNode } from "vue"
 import { h } from "vue"
 
-import DataSetSummary from "@/components/DataSetSummary.vue"
+import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 function renderComponent<T>(options?: {
   data?: T | T[]

@@ -1,6 +1,6 @@
-import { LabelPosition } from "@/components/InputField.vue"
-import { InputField, InputType } from "@/domain"
 import { dropdown, undefinedDropDownItems } from "@/fields/norms/fieldGenerator"
+import { LabelPosition } from "@/shared/components/input/InputField.vue"
+import { InputField, InputType } from "@/shared/components/input/types"
 
 export const expiration: InputField[] = [
   {

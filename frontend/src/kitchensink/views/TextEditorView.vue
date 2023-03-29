@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import TextEditor from "@/components/TextEditor.vue"
+import TextEditor from "@/shared/components/input/TextEditor.vue"
 </script>
 
 <template>

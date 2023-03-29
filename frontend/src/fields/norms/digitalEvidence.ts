@@ -1,4 +1,4 @@
-import { InputField, InputType } from "@/domain"
+import { InputField, InputType } from "@/shared/components/input/types"
 
 export const digitalEvidence: InputField[] = [
   {

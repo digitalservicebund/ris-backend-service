@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { onMounted, watch, ref } from "vue"
-import TextButton from "./TextButton.vue"
+import TextButton from "../shared/components/input/TextButton.vue"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 
 const props = defineProps<{

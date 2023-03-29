@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/vue"
-import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
+import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
 
 describe("documentUnit InfoPanel", () => {
   it("renders heading if given", async () => {

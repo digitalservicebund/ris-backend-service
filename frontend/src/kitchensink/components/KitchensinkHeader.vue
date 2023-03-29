@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import TextButton from "@/components/TextButton.vue"
 import type { risComponent } from "@/kitchensink/types/types"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 const props = defineProps<{
   components: risComponent[]

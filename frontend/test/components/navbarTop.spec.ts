@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
-import NavbarTop from "../../src/components/NavbarTop.vue"
+import NavbarTop from "../../src/shared/components/NavbarTop.vue"
 
 describe("navbar top", () => {
   const router = createRouter({

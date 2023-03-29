@@ -1,5 +1,4 @@
-import { LabelPosition } from "@/components/InputField.vue"
-import { ServiceResponse } from "@/services/httpClient"
+import { LabelPosition } from "@/shared/components/input/InputField.vue"
 
 export enum InputType {
   TEXT = "text",
@@ -119,7 +118,15 @@ export type ComboboxItem = {
 }
 
 export interface ComboboxAttributes extends BaseInputAttributes {
-  itemService: (filter?: string) => Promise<ServiceResponse<ComboboxItem[]>>
+  itemService: (filter?: string) => Promise<{
+    status: number
+    data?: ComboboxItem[]
+    error?: {
+      title: string
+      description?: string
+      validationErrors?: ValidationError[]
+    }
+  }>
   placeholder?: string
 }
 

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import { InfoStatus } from "@/enum/enumInfoStatus"
+import { InfoStatus } from "@/shared/components/enumInfoStatus"
 
 const props = withDefaults(
   defineProps<{

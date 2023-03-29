@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import PropertyInfo from "@/components/PropertyInfo.vue"
+import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
 interface PropertyInfo {
   label: string

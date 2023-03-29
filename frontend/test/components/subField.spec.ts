@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
-import SubField from "@/components/SubField.vue"
+import SubField from "@/shared/components/input/SubField.vue"
 
 function renderComponent({
   ariaLabel = "Test Feld",

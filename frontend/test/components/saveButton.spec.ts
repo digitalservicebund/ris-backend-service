@@ -1,10 +1,10 @@
 import { fireEvent, render, screen } from "@testing-library/vue"
 import { ref } from "vue"
-import SaveButton from "@/components/SaveButton.vue"
-import { useSaveToRemote } from "@/composables/useSaveToRemote"
 import { ResponseError } from "@/services/httpClient"
+import SaveButton from "@/shared/components/input/SaveButton.vue"
+import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
 
-vi.mock("@/composables/useSaveToRemote")
+vi.mock("@/shared/composables/useSaveToRemote")
 
 describe("SaveButton", () => {
   it("renders with info message that data is being saved", async () => {

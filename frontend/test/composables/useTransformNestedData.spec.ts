@@ -1,6 +1,6 @@
 import { ref } from "vue"
-import { useTransformNestedData } from "@/composables/useTransformNestedData"
-import { InputField, InputType } from "@/domain"
+import { InputField, InputType } from "@/shared/components/input/types"
+import { useTransformNestedData } from "@/shared/composables/useTransformNestedData"
 
 const data = ref({
   testKey1: "testValue1",

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import FileUpload from "@/components/FileUpload.vue"
+import FileUpload from "@/shared/components/FileUpload.vue"
 </script>
 
 <template>

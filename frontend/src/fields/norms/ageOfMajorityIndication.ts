@@ -1,4 +1,5 @@
-import { defineChipsField, InputField } from "@/domain"
+import { defineChipsField } from "@/fields/caselaw"
+import { InputField } from "@/shared/components/input/types"
 
 export const ageOfMajorityIndication: InputField[] = [
   defineChipsField(

@@ -4,9 +4,9 @@ import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 import { storeToRefs } from "pinia"
 import { computed, ref, reactive } from "vue"
-import InfoModal from "@/components/InfoModal.vue"
-import TextButton from "@/components/TextButton.vue"
 import { getFileUrl, triggerFileGeneration } from "@/services/normsService"
+import InfoModal from "@/shared/components/InfoModal.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 dayjs.extend(utc)

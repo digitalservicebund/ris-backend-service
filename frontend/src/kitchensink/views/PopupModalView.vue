@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import PopupModal from "@/components/PopupModal.vue"
-import TextButton from "@/components/TextButton.vue"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 const showModal = ref(false)
 const toggleModal = () => {

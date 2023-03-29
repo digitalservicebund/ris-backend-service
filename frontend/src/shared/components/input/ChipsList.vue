@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import { useInputModel } from "@/composables/useInputModel"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   focusedItem?: number

@@ -6,7 +6,7 @@ import {
   ComboboxItem,
   ComboboxInputModelType,
   ComboboxAttributes,
-} from "@/domain/types"
+} from "@/shared/components/input/types"
 
 interface Props {
   id: string

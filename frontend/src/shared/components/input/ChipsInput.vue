@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import ChipsList from "@/components/ChipsList.vue"
-import { useInputModel } from "@/composables/useInputModel"
-import { ValidationError } from "@/domain"
+import ChipsList from "@/shared/components/input/ChipsList.vue"
+import { ValidationError } from "@/shared/components/input/types"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string
@@ -15,8 +15,6 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value?: string[]): void
-  (event: "addChip", value?: string): Promise<void>
-  (event: "deleteChip", value?: string): Promise<void>
   (event: "input", value: Event): void
 }
 
@@ -39,7 +37,6 @@ function saveChip() {
   if (trimmed.length > 0) {
     chips.value.push(trimmed)
     updateModelValue()
-    emits("addChip", trimmed)
     currentInput.value = ""
   }
 }
@@ -48,9 +45,9 @@ const handleOnBlur = () => {
   currentInput.value = ""
 }
 
-const focusFirst = () => {
+const focusPrevious = () => {
   if (chipsList.value !== undefined && currentInput.value === "")
-    chipsList.value.focusFirst()
+    chipsList.value.focusPrevious()
 }
 
 const focusInput = () => {
@@ -68,23 +65,22 @@ watch(chips, () => {
 </script>
 
 <template>
-  <div>
+  <div class="input">
+    <ChipsList
+      ref="chipsList"
+      v-model="chips"
+      @next-clicked-on-last="focusInput"
+    />
     <input
       :id="id"
       ref="chipsInput"
       v-model="currentInput"
       :aria-label="ariaLabel"
-      class="input mb-[0.5rem]"
       type="text"
       @blur="handleOnBlur"
       @input="emitInputEvent"
       @keypress.enter="saveChip"
-      @keyup.right="focusFirst"
-    />
-    <ChipsList
-      ref="chipsList"
-      v-model="chips"
-      @previous-clicked-on-first="focusInput"
+      @keyup.left="focusPrevious"
     />
   </div>
 </template>

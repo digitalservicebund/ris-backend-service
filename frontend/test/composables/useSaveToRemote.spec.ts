@@ -1,5 +1,5 @@
 import { flushPromises } from "@vue/test-utils"
-import { useSaveToRemote } from "@/composables/useSaveToRemote"
+import { useSaveToRemote } from "@/shared/composables/useSaveToRemote"
 
 describe("useSaveToRemote", () => {
   beforeEach(() => {

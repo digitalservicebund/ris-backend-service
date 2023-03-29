@@ -2,12 +2,12 @@
 import dayjs from "dayjs"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
-import NavbarSide from "@/components/NavbarSide.vue"
-import SideToggle from "@/components/SideToggle.vue"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
+import NavbarSide from "@/shared/components/NavbarSide.vue"
+import SideToggle from "@/shared/components/SideToggle.vue"
 
 const props = defineProps<{ documentUnit: DocumentUnit }>()
 const route = useRoute()

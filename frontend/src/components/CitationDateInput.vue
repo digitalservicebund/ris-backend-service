@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import DateInput from "@/components/DateInput.vue"
-import TextInput from "@/components/TextInput.vue"
-import { useInputModel } from "@/composables/useInputModel"
+import DateInput from "@/shared/components/input/DateInput.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 type CitationDate = { date?: string; year?: string }
 

@@ -1,4 +1,4 @@
-import { FieldSize } from "./FieldSize"
+import { FieldSize } from "../../shared/components/input/FieldSize"
 
 function defineTextEntry(name: string, label: string, fieldSize: FieldSize) {
   return { name, label, fieldSize }

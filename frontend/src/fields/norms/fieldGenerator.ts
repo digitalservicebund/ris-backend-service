@@ -1,4 +1,8 @@
-import { DropdownInputField, DropdownItem, InputType } from "@/domain"
+import {
+  DropdownInputField,
+  DropdownItem,
+  InputType,
+} from "@/shared/components/input/types"
 
 export const undefinedDropDownItems: DropdownItem[] = [
   {

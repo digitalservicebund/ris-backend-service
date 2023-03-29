@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref, computed } from "vue"
-import { useInputModel } from "@/composables/useInputModel"
-import { DropdownInputModelType, DropdownItem } from "@/domain/types"
+import {
+  DropdownInputModelType,
+  DropdownItem,
+} from "@/shared/components/input/types"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string

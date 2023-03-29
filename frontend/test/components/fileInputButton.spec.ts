@@ -1,5 +1,5 @@
 import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
-import FileInputButton from "@/components/FileInput.vue"
+import FileInputButton from "@/shared/components/input/FileInput.vue"
 
 function renderComponent(options?: { slot?: string }): RenderResult {
   const slots = { default: options?.slot ?? "" }

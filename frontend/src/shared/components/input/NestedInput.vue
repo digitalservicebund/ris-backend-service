@@ -1,14 +1,14 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import InputElement from "@/components/InputElement.vue"
-import InputFieldComponent from "@/components/InputField.vue"
-import SubField from "@/components/SubField.vue"
-import { useInputModel } from "@/composables/useInputModel"
+import InputElement from "@/shared/components/input/InputElement.vue"
+import InputFieldComponent from "@/shared/components/input/InputField.vue"
+import SubField from "@/shared/components/input/SubField.vue"
 import {
   ValidationError,
   NestedInputAttributes,
   NestedInputModelType,
-} from "@/domain"
+} from "@/shared/components/input/types"
+import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   ariaLabel: string

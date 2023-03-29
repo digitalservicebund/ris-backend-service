@@ -5,7 +5,7 @@ import { TableHeader } from "@tiptap/extension-table-header"
 import { TableRow } from "@tiptap/extension-table-row"
 import { Text } from "@tiptap/extension-text"
 import { Editor } from "@tiptap/vue-3"
-import { TableStyle } from "@/editor/tableStyle"
+import { TableStyle } from "@/shared/editor/tableStyle"
 
 describe("TableStyle extension", () => {
   test("should not transform inline styling for table tag", async () => {

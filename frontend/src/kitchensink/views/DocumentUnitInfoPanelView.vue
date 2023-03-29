@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import DocumentUnitInfoPanel from "@/components/DocumentUnitInfoPanel.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
 
 const documentUnit = new DocumentUnit("123", {
   documentNumber: "KORE202200466",

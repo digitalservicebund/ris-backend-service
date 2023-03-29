@@ -1,5 +1,5 @@
-import { InputType } from "./types"
-import type { InputField } from "./types"
+import { InputType } from "../../shared/components/input/types"
+import type { InputField } from "../../shared/components/input/types"
 import comboboxItemService from "@/services/comboboxItemService"
 
 export const proceedingDecisionFields: InputField[] = [

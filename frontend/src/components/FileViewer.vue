@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import { computed, onMounted, ref } from "vue"
-import PopupModal from "./PopupModal.vue"
-import TextButton from "./TextButton.vue"
-import TextEditor from "./TextEditor.vue"
-import PropertyInfo from "@/components/PropertyInfo.vue"
 import fileService from "@/services/fileService"
+import TextButton from "@/shared/components/input/TextButton.vue"
+import TextEditor from "@/shared/components/input/TextEditor.vue"
+import PopupModal from "@/shared/components/PopupModal.vue"
+import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
 const props = defineProps<{
   s3Path: string

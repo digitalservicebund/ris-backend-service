@@ -1,21 +1,23 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import CheckboxInput from "@/components/CheckboxInput.vue"
-import ChipsDateInput from "@/components/ChipsDateInput.vue"
-import ChipsInput from "@/components/ChipsInput.vue"
-import Dropdown from "@/components/DropdownInput.vue"
-import InputElement from "@/components/InputElement.vue"
-import InputField, { LabelPosition } from "@/components/InputField.vue"
-import NestedInput from "@/components/NestedInput.vue"
-import TextInput from "@/components/TextInput.vue"
 import {
   defineDateField,
   ValidationError,
   NestedInputAttributes,
   BaseInputAttributes,
   InputType,
-} from "@/domain"
-import type { ChipsInputModelType } from "@/domain/types"
+} from "@/fields/caselaw"
+import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
+import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
+import ChipsInput from "@/shared/components/input/ChipsInput.vue"
+import Dropdown from "@/shared/components/input/DropdownInput.vue"
+import InputElement from "@/shared/components/input/InputElement.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
+import NestedInput from "@/shared/components/input/NestedInput.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
+import type { ChipsInputModelType } from "@/shared/components/input/types"
 
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])
 const chipsDateModelValue = ref<ChipsInputModelType>(["2022-01-31T23:00:00Z"])

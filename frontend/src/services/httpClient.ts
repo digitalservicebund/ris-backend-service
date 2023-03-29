@@ -1,5 +1,5 @@
 import axios, { AxiosError } from "axios"
-import { ValidationError } from "@/domain"
+import { ValidationError } from "@/shared/components/input/types"
 
 type RequestOptions = {
   headers?: {

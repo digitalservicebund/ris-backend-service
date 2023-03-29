@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import InfoModal from "@/components/InfoModal.vue"
+import InfoModal from "@/shared/components/InfoModal.vue"
 </script>
 
 <template>

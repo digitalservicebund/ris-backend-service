@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import SideToggle from "@/components/SideToggle.vue"
+import SideToggle from "@/shared/components/SideToggle.vue"
 
 const visible = ref(false)
 </script>

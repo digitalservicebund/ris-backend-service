@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import FieldOfLawSearchResultListEntry from "@/components/FieldOfLawSearchResultListEntry.vue"
-import TextButton from "@/components/TextButton.vue"
-import TextInput from "@/components/TextInput.vue"
 import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
+import TextButton from "@/shared/components/input/TextButton.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
 const props = defineProps<{
   showNorms: boolean
