@@ -391,6 +391,11 @@ jobs:
           npm run coverage
           sonar-scanner
         working-directory: ./frontend
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v3
+        with:
+          name: code-coverage-report
+          path: frontend/coverage/lcov.info
       - name: Check SonarQube Quality Gate
         uses: sonarsource/sonarqube-quality-gate-action@d304d050d930b02a896b0f85935344f023928496
         with:
