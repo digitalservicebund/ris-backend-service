@@ -6,93 +6,93 @@ commit-msg:
       run: npx --yes commitlint --edit
 
 pre-commit:
-#   parallel: true
-#   commands:
-#     check-format-backend:
-#       tags: style backend
-#       root: backend/
-#       run: ./gradlew spotlessCheck -DspotlessFiles=$(echo {staged_files} | sed 's/ /,/g')
-#     frontend-prettier:
-#       tags: frontend format
-#       root: frontend/
-#       run: npm run --silent prettier:check {staged_files}
-#     frontend-eslint:
-#       tags: frontend lint
-#       root: frontend/
-#       glob: "*.{vue,ts,js,json}"
-#       run: npm run --silent eslint:check {staged_files}
-#     frontend-stylelint:
-#       tags: frontend lint
-#       root: frontend/
-#       run: npm run --silent stylelint:check {staged_files}
-#     secrets-audit:
-#       tags: security audit
-#       run: >
-#         talisman --githook pre-commit ||
-#         (echo "Verify the content and fix it with: talisman --githook pre-commit --interactive"; exit 1)
+  parallel: true
+  commands:
+    check-format-backend:
+      tags: style backend
+      root: backend/
+      run: ./gradlew spotlessCheck -DspotlessFiles=$(echo {staged_files} | sed 's/ /,/g')
+    frontend-prettier:
+      tags: frontend format
+      root: frontend/
+      run: npm run --silent prettier:check {staged_files}
+    frontend-eslint:
+      tags: frontend lint
+      root: frontend/
+      glob: "*.{vue,ts,js,json}"
+      run: npm run --silent eslint:check {staged_files}
+    frontend-stylelint:
+      tags: frontend lint
+      root: frontend/
+      run: npm run --silent stylelint:check {staged_files}
+    secrets-audit:
+      tags: security audit
+      run: >
+        talisman --githook pre-commit ||
+        (echo "Verify the content and fix it with: talisman --githook pre-commit --interactive"; exit 1)
 
-# post-commit:
-#   commands:
-#     secrets-checkum-test:
-#       tags: security
-#       skip: rebase
-#       fail_text: |
+post-commit:
+  commands:
+    secrets-checkum-test:
+      tags: security
+      skip: rebase
+      fail_text: |
 
-#         This commit has touched files which are known to include false positives of the secret scanner.
-#         It does not mean you have introduced new secrets, but this are "old" reports.
-#         But due to the file content change, the checksum Talisman is using for the verification has changed too.
-#         Please double check the reported file(s) and update their checksums in the `.talismanrc` file.
-#         Afterwards stage the file and amend this commit which was just created with `git commit --amend --no-edit`
+        This commit has touched files which are known to include false positives of the secret scanner.
+        It does not mean you have introduced new secrets, but this are "old" reports.
+        But due to the file content change, the checksum Talisman is using for the verification has changed too.
+        Please double check the reported file(s) and update their checksums in the `.talismanrc` file.
+        Afterwards stage the file and amend this commit which was just created with `git commit --amend --no-edit`
 
-#       run: |
-#         local_reference=$(git rev-parse --symbolic-full-name HEAD)
-#         local_object_name=$(git rev-parse HEAD)
-#         # Strong assumption that we run as `post-commit` hook here!
-#         remote_reference=$(git branch --format="%(upstream)" --list $(git rev-parse --abbrev-ref HEAD))
-#         remote_object_name=$(git rev-parse $remote_reference)
+      run: |
+        local_reference=$(git rev-parse --symbolic-full-name HEAD)
+        local_object_name=$(git rev-parse HEAD)
+        # Strong assumption that we run as `post-commit` hook here!
+        remote_reference=$(git branch --format="%(upstream)" --list $(git rev-parse --abbrev-ref HEAD))
+        remote_object_name=$(git rev-parse $remote_reference)
 
-#         echo $local_reference \
-#           $local_object_name \
-#           ${remote_reference:-0000000000000000000000000000000000000000} \
-#           ${remote_object_name:-0000000000000000000000000000000000000000} \
-#           | talisman --githook pre-push
+        echo $local_reference \
+          $local_object_name \
+          ${remote_reference:-0000000000000000000000000000000000000000} \
+          ${remote_object_name:-0000000000000000000000000000000000000000} \
+          | talisman --githook pre-push
 
-# pre-push:
-#   parallel: true
-#   commands:
-#     licenses-audit-backend:
-#       tags: licenses audit backend
-#       root: backend/
-#       run: ./gradlew checkLicense
-#     licenses-audit-frontend:
-#       tags: licenses audit frontend
-#       root: frontend/
-#       run: npm run audit:licences > /dev/null;
-#     secrets-audit:
-#       # NOTE: there's one caveat with this hook! When pushing, it will only correctly scan the range of
-#       # outgoing commits when pushing to a matching branch on the remote (e.g. `git push`) - pushing to a
-#       # different ref on the remote like `git push origin master:foreign` does not work..
-#       #
-#       # For this to work the following issue will need to be fixed (in short: Lefthook does not pass on stdin
-#       # to the hook script, whereas pre-push is one of the few hooks which retrieves information from there):
-#       # https://github.com/evilmartians/lefthook/issues/1471
-#       #
-#       # The hook configuration would then turn into:
-#       #
-#       # pre-push:
-#       #   scripts:
-#       #     secrets-audit:
-#       #       runner: sh
-#       #
-#       # with a file .lefthook/pre-push/secrets-audit looking something like:
-#       #
-#       # while read -r local_ref local_sha remote_ref remote_sha; do
-#       #   echo "$local_ref $local_sha $remote_ref $remote_sha" | talisman --githook pre-push
-#       # done
-#       #
-#       # exit 0
-#       tags: security audit
-#       run: currentbranch=$(git rev-parse --abbrev-ref HEAD); echo "refs/heads/$currentbranch HEAD refs/heads/$currentbranch $(git log -1 origin/$currentbranch --format='%H')" | talisman --githook pre-push
+pre-push:
+  parallel: true
+  commands:
+    licenses-audit-backend:
+      tags: licenses audit backend
+      root: backend/
+      run: ./gradlew checkLicense
+    licenses-audit-frontend:
+      tags: licenses audit frontend
+      root: frontend/
+      run: npm run audit:licences > /dev/null;
+    secrets-audit:
+      # NOTE: there's one caveat with this hook! When pushing, it will only correctly scan the range of
+      # outgoing commits when pushing to a matching branch on the remote (e.g. `git push`) - pushing to a
+      # different ref on the remote like `git push origin master:foreign` does not work..
+      #
+      # For this to work the following issue will need to be fixed (in short: Lefthook does not pass on stdin
+      # to the hook script, whereas pre-push is one of the few hooks which retrieves information from there):
+      # https://github.com/evilmartians/lefthook/issues/1471
+      #
+      # The hook configuration would then turn into:
+      #
+      # pre-push:
+      #   scripts:
+      #     secrets-audit:
+      #       runner: sh
+      #
+      # with a file .lefthook/pre-push/secrets-audit looking something like:
+      #
+      # while read -r local_ref local_sha remote_ref remote_sha; do
+      #   echo "$local_ref $local_sha $remote_ref $remote_sha" | talisman --githook pre-push
+      # done
+      #
+      # exit 0
+      tags: security audit
+      run: currentbranch=$(git rev-parse --abbrev-ref HEAD); echo "refs/heads/$currentbranch HEAD refs/heads/$currentbranch $(git log -1 origin/$currentbranch --format='%H')" | talisman --githook pre-push
 
 skip_output:
   - meta
