@@ -1,12 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import {
-  defineDateField,
-  ValidationError,
-  NestedInputAttributes,
-  BaseInputAttributes,
-  InputType,
-} from "@/fields/caselaw"
+import { defineDateField } from "@/fields/caselaw"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
@@ -17,6 +11,12 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import {
+  ValidationError,
+  NestedInputAttributes,
+  BaseInputAttributes,
+  InputType,
+} from "@/shared/components/input/types"
 import type { ChipsInputModelType } from "@/shared/components/input/types"
 
 const chipsModelValue = ref<ChipsInputModelType>(["one", "two"])

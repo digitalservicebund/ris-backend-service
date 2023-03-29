@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { FieldOfLawComboboxItem } from "@/domain/fieldOfLaw"
-import { ComboboxInputModelType } from "@/fields/caselaw"
 import ComboboxItemService from "@/services/comboboxItemService"
+import { ComboboxInputModelType } from "@/shared/components/input/types"
 
 const emit = defineEmits<{
   (event: "add-to-list", identifier: string): void

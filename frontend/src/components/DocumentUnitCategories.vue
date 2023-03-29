@@ -11,9 +11,9 @@ import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
-import { ValidationError } from "@/fields/caselaw"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
+import { ValidationError } from "@/shared/components/input/types"
 
 const props = defineProps<{
   documentUnit: DocumentUnit
