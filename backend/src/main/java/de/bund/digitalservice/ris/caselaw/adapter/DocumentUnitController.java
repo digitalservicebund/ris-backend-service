@@ -44,7 +44,7 @@ public class DocumentUnitController {
         .generateNewDocumentUnit(documentUnitCreationInfo)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(
-            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
+            ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
   @PutMapping(value = "/{uuid}/file")
@@ -57,7 +57,7 @@ public class DocumentUnitController {
         .attachFileToDocumentUnit(uuid, byteBuffer, httpHeaders)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(
-            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
+            ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
   @DeleteMapping(value = "/{uuid}/file")
@@ -67,7 +67,7 @@ public class DocumentUnitController {
         .removeFileFromDocumentUnit(uuid)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.OK).body(documentUnit))
         .onErrorReturn(
-            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
+            ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
   @GetMapping(value = "")
@@ -82,7 +82,7 @@ public class DocumentUnitController {
       @NonNull @PathVariable String documentNumber) {
 
     if (documentNumber.length() != 13 && documentNumber.length() != 14) {
-      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.EMPTY));
+      return Mono.just(ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
 
     return service.getByDocumentNumber(documentNumber).map(ResponseEntity::ok);
@@ -103,13 +103,13 @@ public class DocumentUnitController {
       @PathVariable UUID uuid, @Valid @RequestBody DocumentUnit documentUnit) {
     if (!uuid.equals(documentUnit.uuid())) {
       return Mono.just(
-          ResponseEntity.unprocessableEntity().body(DocumentUnitBuilder.newInstance().build()));
+          ResponseEntity.unprocessableEntity().body(DocumentUnit.builder().build()));
     }
     return service
         .updateDocumentUnit(documentUnit)
         .map(du -> ResponseEntity.status(HttpStatus.OK).body(du))
         .onErrorReturn(
-            ResponseEntity.internalServerError().body(DocumentUnitBuilder.newInstance().build()));
+            ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
 
   @PutMapping(

@@ -63,7 +63,7 @@ class DocumentUnitServiceTest {
   @Test
   void testGenerateNewDocumentUnit() {
     when(repository.createNewDocumentUnit("nextDocumentNumber"))
-        .thenReturn(Mono.just(DocumentUnit.EMPTY));
+        .thenReturn(Mono.just(DocumentUnit.builder().build()));
     when(documentNumberService.generateNextDocumentNumber(DocumentUnitCreationInfo.EMPTY))
         .thenReturn(Mono.just("nextDocumentNumber"));
     // Can we use a captor to check if the document number was correctly created?
@@ -199,7 +199,7 @@ class DocumentUnitServiceTest {
   @Test
   void testGetByDocumentnumber() {
     when(repository.findByDocumentNumber("ABCDE20220001"))
-        .thenReturn(Mono.just(DocumentUnit.EMPTY));
+        .thenReturn(Mono.just(DocumentUnit.builder().build()));
     StepVerifier.create(service.getByDocumentNumber("ABCDE20220001"))
         .consumeNextWith(documentUnit -> assertEquals(documentUnit.getClass(), DocumentUnit.class))
         .verifyComplete();
@@ -538,7 +538,7 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
 
@@ -549,8 +549,8 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.EMPTY));
-    doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.EMPTY);
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
+    doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
 
     StepVerifier.create(service.deleteByUuid(TEST_UUID)).expectError().verify();
 
@@ -576,7 +576,7 @@ class DocumentUnitServiceTest {
 
   @Test
   void testPublishByEmail() {
-    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.EMPTY));
+    when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
     XmlMail xmlMail =
         new XmlMail(
             TEST_UUID,
@@ -588,7 +588,7 @@ class DocumentUnitServiceTest {
             "filename",
             null,
             PublishState.UNKNOWN);
-    when(publishService.publish(DocumentUnit.EMPTY, RECEIVER_ADDRESS))
+    when(publishService.publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
         .consumeNextWith(
@@ -598,7 +598,7 @@ class DocumentUnitServiceTest {
                     .isEqualTo(new XmlMailResponse(TEST_UUID, xmlMail)))
         .verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService).publish(DocumentUnit.EMPTY, RECEIVER_ADDRESS);
+    verify(publishService).publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS);
   }
 
   @Test
@@ -607,7 +607,7 @@ class DocumentUnitServiceTest {
 
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS)).verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
-    verify(publishService, never()).publish(DocumentUnit.EMPTY, RECEIVER_ADDRESS);
+    verify(publishService, never()).publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS);
   }
 
   @Test

@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
@@ -53,7 +54,7 @@ class DocumentUnitControllerTest {
   void testGenerateNewDocumentUnit() {
     DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
     when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
-        .thenReturn(Mono.just(DocumentUnitBuilder.newInstance().build()));
+        .thenReturn(Mono.just(DocumentUnit.builder().build()));
 
     webClient
         .mutateWith(csrf())
@@ -197,8 +198,7 @@ class DocumentUnitControllerTest {
     DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
     documentUnitDTO.setDocumentnumber("ABCD202200001");
     documentUnitDTO.setUuid(TEST_UUID);
-    DocumentUnit documentUnit =
-        DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build();
+    DocumentUnit documentUnit = DocumentUnitTransformer.transformDTO(documentUnitDTO);
     when(service.updateDocumentUnit(documentUnit)).thenReturn(Mono.empty());
     webClient
         .mutateWith(csrf())

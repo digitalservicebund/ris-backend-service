@@ -22,7 +22,4 @@ public record DocumentUnit(
     @Valid CoreData coreData,
     List<ProceedingDecision> proceedingDecisions,
     Texts texts,
-    ContentRelatedIndexing contentRelatedIndexing) {
-  public static final DocumentUnit EMPTY =
-      new DocumentUnit(null, null, null, null, null, null, null, null, null, null, null, null);
-}
+    ContentRelatedIndexing contentRelatedIndexing) {}

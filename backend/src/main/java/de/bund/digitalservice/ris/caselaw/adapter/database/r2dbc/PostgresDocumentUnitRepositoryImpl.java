@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
-import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitBuilder;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
@@ -91,9 +90,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return repository
         .findByDocumentnumber(documentNumber)
         .flatMap(this::injectAdditionalInformation)
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+        .map(DocumentUnitTransformer::transformDTO);
   }
 
   @Override
@@ -101,9 +98,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return repository
         .findByUuid(uuid)
         .flatMap(this::injectAdditionalInformation)
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+        .map(DocumentUnitTransformer::transformDTO);
   }
 
   @Override
@@ -135,9 +130,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingEcli(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+        .map(DocumentUnitTransformer::transformDTO);
   }
 
   private Mono<DocumentUnitDTO> enrichDocumentType(
@@ -480,9 +473,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               return documentUnitDTO;
             })
         .flatMap(repository::save)
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+        .map(DocumentUnitTransformer::transformDTO);
   }
 
   @Override
@@ -499,9 +490,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               return documentUnitDTO;
             })
         .flatMap(repository::save)
-        .map(
-            documentUnitDTO ->
-                DocumentUnitBuilder.newInstance().setDocumentUnitDTO(documentUnitDTO).build());
+        .map(DocumentUnitTransformer::transformDTO);
   }
 
   @Override
