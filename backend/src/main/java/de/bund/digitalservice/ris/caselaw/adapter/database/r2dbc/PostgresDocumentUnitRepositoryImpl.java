@@ -38,6 +38,7 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepository {
+
   private static final Logger LOGGER =
       LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
 
@@ -803,5 +804,23 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .parentDocumentUnitId(tuple.getT1())
                         .childDocumentUnitId(tuple.getT2())
                         .build()));
+  }
+
+  @Override
+  public Mono<Void> unlinkDocumentUnits(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
+    Mono<Long> parentDocumentUnitId =
+        metadataRepository.findByUuid(parentDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
+    Mono<Long> childDocumentUnitId =
+        metadataRepository.findByUuid(childDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
+
+    return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
+        .flatMap(
+            tuple ->
+                proceedingDecisionLinkRepository
+                    .findByParentDocumentUnitIdAndChildDocumentUnitId(tuple.getT1(), tuple.getT2())
+                    .flatMap(
+                        proceedingDecisionLinkDTO ->
+                            proceedingDecisionLinkRepository.deleteById(
+                                proceedingDecisionLinkDTO.getId())));
   }
 }

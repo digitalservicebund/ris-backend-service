@@ -227,6 +227,13 @@ public class DocumentUnitService {
         .flatMapMany(documentUnit -> repository.findAllLinkedDocumentUnits(documentUnitUuid));
   }
 
+  public Mono<String> unlinkProceedingDecision(UUID parentUuid, UUID childUuid) {
+    return repository
+        .unlinkDocumentUnits(parentUuid, childUuid)
+        .map(v -> "done")
+        .doOnError(ex -> log.error("Couldn't remove the ProceedingDecision", ex));
+  }
+
   private DocumentUnit enrichNewDocumentUnitWithData(
       DocumentUnit documentUnit, ProceedingDecision proceedingDecision) {
     List<String> fileNumbers = null;

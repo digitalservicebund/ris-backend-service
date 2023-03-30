@@ -1,10 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision;
 
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data

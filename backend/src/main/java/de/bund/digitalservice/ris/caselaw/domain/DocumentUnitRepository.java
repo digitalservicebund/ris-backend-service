@@ -34,4 +34,6 @@ public interface DocumentUnitRepository {
 
   Mono<ProceedingDecisionLinkDTO> linkDocumentUnits(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
+
+  Mono<Void> unlinkDocumentUnits(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
 }

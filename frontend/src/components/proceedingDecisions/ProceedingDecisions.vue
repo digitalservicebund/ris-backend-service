@@ -5,7 +5,7 @@ import ExpandableContent from "@/components/ExpandableContent.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
 import { proceedingDecisionFields } from "@/fields/caselaw"
 import DocumentUnitService from "@/services/documentUnitService"
-import ProceedingDecisionService from "@/services/proceedingDecisionService"
+import proceedingDecisionService from "@/services/proceedingDecisionService"
 import InputGroup from "@/shared/components/input/InputGroup.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
@@ -33,7 +33,7 @@ const addProceedingDecision = async (
   proceedingDecision: ProceedingDecision
 ) => {
   if (isNotEmpty(proceedingDecision)) {
-    const response = await ProceedingDecisionService.addProceedingDecision(
+    const response = await proceedingDecisionService.addProceedingDecision(
       props.documentUnitUuid,
       proceedingDecision
     )
@@ -41,6 +41,20 @@ const addProceedingDecision = async (
       // console.log(response.data)
       proceedingDecisionList.value = response.data
     }
+  }
+}
+
+async function removeProceedingDecision(decision: ProceedingDecision) {
+  const response = await proceedingDecisionService.removeProceedingDecision(
+    props.documentUnitUuid,
+    decision.uuid as string
+  )
+  if (response.data) {
+    proceedingDecisionList.value = proceedingDecisionList.value?.filter(
+      (listItem) => listItem.uuid !== decision.uuid
+    )
+  } else {
+    console.log(response.error)
   }
 }
 
@@ -93,6 +107,7 @@ const buildSearchResultRowString = (proceedingDecision: ProceedingDecision) => {
     <DecisionList
       v-if="proceedingDecisionList"
       :decisions="proceedingDecisionList"
+      @remove-link="removeProceedingDecision"
     />
 
     <InputGroup
