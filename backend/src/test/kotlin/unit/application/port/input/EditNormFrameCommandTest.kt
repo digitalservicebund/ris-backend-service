@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.assertEditNormFrameProperties

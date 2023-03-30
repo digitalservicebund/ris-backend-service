@@ -1,0 +1,14 @@
+package de.bund.digitalservice.ris.norms.domain.value
+
+enum class MetadataSectionName {
+    GENERAL_INFORMATION,
+    HEADINGS_AND_ABBREVIATIONS,
+    UNOFFICIAL_REFERENCE,
+    REFERENCE_NUMBER,
+    DEFINITION,
+    AGE_OF_MAJORITY_INDICATION,
+    VALIDITY_RULE,
+    SUBJECT_AREA,
+    LEAD,
+    PARTICIPATING_INSTITUTIONS,
+}

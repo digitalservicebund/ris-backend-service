@@ -1,7 +1,8 @@
-package de.bund.digitalservice.ris.norms.domain.specification.metadatum
+package de.bund.digitalservice.ris.norms.domain.specification.section
 
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
@@ -21,12 +22,22 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 
-val hasValidValueType =
-    object : Specification<Metadatum<*>> {
-        override fun isSatisfiedBy(instance: Metadatum<*>): Boolean {
-            return when (instance.type) {
-                KEYWORD, UNOFFICIAL_LONG_TITLE, UNOFFICIAL_SHORT_TITLE, UNOFFICIAL_ABBREVIATION, UNOFFICIAL_REFERENCE, DIVERGENT_DOCUMENT_NUMBER, REFERENCE_NUMBER, DEFINITION, RIS_ABBREVIATION_INTERNATIONAL_LAW, AGE_OF_MAJORITY_INDICATION, VALIDITY_RULE, LEAD_JURISDICTION, LEAD_UNIT, PARTICIPATION_TYPE, PARTICIPATION_INSTITUTION, SUBJECT_FNA, SUBJECT_PREVIOUS_FNA, SUBJECT_GESTA, SUBJECT_BGB_3 -> instance.value is String
-            }
+val hasValidMetadata =
+    object : Specification<MetadataSection> {
+        override fun isSatisfiedBy(instance: MetadataSection): Boolean = when (instance.name) {
+            Section.GENERAL_INFORMATION -> hasType(listOf(KEYWORD, DIVERGENT_DOCUMENT_NUMBER, RIS_ABBREVIATION_INTERNATIONAL_LAW), instance)
+            Section.HEADINGS_AND_ABBREVIATIONS -> hasType(listOf(UNOFFICIAL_LONG_TITLE, UNOFFICIAL_SHORT_TITLE, UNOFFICIAL_ABBREVIATION), instance)
+            Section.UNOFFICIAL_REFERENCE -> hasType(listOf(UNOFFICIAL_REFERENCE), instance)
+            Section.REFERENCE_NUMBER -> hasType(listOf(REFERENCE_NUMBER), instance)
+            Section.DEFINITION -> hasType(listOf(DEFINITION), instance)
+            Section.AGE_OF_MAJORITY_INDICATION -> hasType(listOf(AGE_OF_MAJORITY_INDICATION), instance)
+            Section.VALIDITY_RULE -> hasType(listOf(VALIDITY_RULE), instance)
+            Section.SUBJECT_AREA -> hasType(listOf(SUBJECT_FNA, SUBJECT_PREVIOUS_FNA, SUBJECT_GESTA, SUBJECT_BGB_3), instance)
+            Section.LEAD -> hasType(listOf(LEAD_JURISDICTION, LEAD_UNIT), instance)
+            Section.PARTICIPATING_INSTITUTIONS -> hasType(listOf(PARTICIPATION_TYPE, PARTICIPATION_INSTITUTION), instance)
         }
+
+        private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean = instance.metadata.all { types.contains(it.type) }
     }

@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat

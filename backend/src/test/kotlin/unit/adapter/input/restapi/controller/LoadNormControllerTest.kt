@@ -3,8 +3,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify

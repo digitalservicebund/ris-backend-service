@@ -10,9 +10,9 @@ import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutpu
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import org.hamcrest.CoreMatchers.`is`

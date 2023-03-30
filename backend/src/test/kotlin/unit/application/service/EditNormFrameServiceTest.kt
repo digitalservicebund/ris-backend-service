@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.norms.application.service
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify

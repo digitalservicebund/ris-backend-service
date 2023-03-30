@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import java.time.LocalDate
