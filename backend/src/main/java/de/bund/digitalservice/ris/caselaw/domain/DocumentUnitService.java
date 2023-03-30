@@ -171,9 +171,9 @@ public class DocumentUnitService {
     return repository.findByUuid(documentUnitUuid);
   }
 
-  public Mono<String> deleteByUuid(UUID documentUnitId) {
+  public Mono<String> deleteByUuid(UUID documentUnitUuid) {
     return repository
-        .findByUuid(documentUnitId)
+        .findByUuid(documentUnitUuid)
         .flatMap(
             documentUnit -> {
               if (documentUnit.s3path() != null) {
