@@ -813,4 +813,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             proceedingDecisionLinkRepository.deleteById(
                                 proceedingDecisionLinkDTO.getId())));
   }
+
+  @Override
+  public Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid) {
+    return repository
+        .findByUuid(childDocumentUnitUuid)
+        .map(DocumentUnitMetadataDTO::getId)
+        .flatMap(proceedingDecisionLinkRepository::countByChildDocumentUnitId);
+  }
 }

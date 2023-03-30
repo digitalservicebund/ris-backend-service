@@ -37,4 +37,6 @@ public interface DocumentUnitRepository {
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
 
   Mono<Void> unlinkDocumentUnits(UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
+
+  Mono<Long> countLinksByChildDocumentUnitUuid(UUID childDocumentUnitUuid);
 }
