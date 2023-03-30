@@ -90,11 +90,25 @@ _dev() {
   fi
   docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
   
-  if [ $# -gt 0 ] && [ "${1#}" == "--no-backend" ]; then
-    docker compose up traefik redis db frontend
-  else
-    docker compose up
-  fi
+  wait=""
+  services=""
+  while [[ "${1#}" =~ ^- && ! "${1#}" == "--" ]]; do case $1 in
+  -n | --no-backend )
+    shift; services="traefik redis db frontend";
+    ;;
+  -d | --detached )
+    shift; wait="--wait";
+    ;;
+  esac; done
+  if [[ "${1#}" == '--' ]]; then shift; fi
+  
+  docker compose up $wait $services
+
+  echo "The application is available at http://127.0.0.1"
+}
+
+_down() {
+  docker compose stop
 }
 
 _commit_message_template() {
@@ -137,7 +151,9 @@ _help() {
   echo "init                  Set up repository for development"
   echo "env                   Provide shell env build/test tooling"
   echo "dev                   Start full-stack development environment"
-  echo "                      Add '--no-backend' to start backend separately"
+  echo "                      Add '-' or '--no-backend' to start backend separately"
+  echo "                      Add '-d' or '--detached' to check the health of the services in the background instead of showing the log stream"
+  echo "down                  Stop development environment"
   echo "clean-staging         Deletes all existing documentunits on staging"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
@@ -150,6 +166,7 @@ case "$cmd" in
   "dev") 
     shift 
     _dev "$@";;
+  "down") _down ;;
   "clean-staging") _clean_staging ;;
   "_start") _start ;;
   "cm")

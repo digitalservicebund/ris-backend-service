@@ -1,8 +1,4 @@
-# RIS Backend Service
-
-[![Pipeline](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/pipeline.yml)
-[![Scan](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/scan.yml)
-[![Secrets Check](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml/badge.svg)](https://github.com/digitalservicebund/ris-backend-service/actions/workflows/secrets-check.yml)
+# Backend
 
 Java service built with the [Spring WebFlux reactive stack](https://docs.spring.io/spring-framework/docs/current/reference/html/web-reactive.html#spring-webflux).
 
@@ -13,6 +9,7 @@ Java service built with the [Spring WebFlux reactive stack](https://docs.spring.
 Requires the all but backend to be running in docker:
 
 ```bash
+# optionally add -d or --detached for detached mode
 ../run.sh dev --no-backend
 ```
 
