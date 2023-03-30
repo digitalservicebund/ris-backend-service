@@ -185,8 +185,8 @@ public class DocumentUnitService {
               }
               return repository.delete(documentUnit);
             })
-        .doOnNext(v -> log.debug("deleted DocumentUnitDTO"))
-        .map(v -> "done")
+        .doFinally(v -> log.debug("deleted DocumentUnitDTO"))
+        .thenReturn("done")
         .doOnError(ex -> log.error("Couldn't delete the DocumentUnit", ex));
   }
 
