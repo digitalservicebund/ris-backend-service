@@ -16,6 +16,8 @@ public interface DatabaseProceedingDecisionLinkRepository
 
   Flux<ProceedingDecisionLinkDTO> findAllByChildDocumentUnitId(Long Id);
 
+  Mono<Boolean> existsByParentDocumentUnitId(Long Id);
+
   Flux<ProceedingDecisionLinkDTO> saveAll(List<ProceedingDecisionLinkDTO> links);
 
   Mono<Long> countByChildDocumentUnitId(Long Id);

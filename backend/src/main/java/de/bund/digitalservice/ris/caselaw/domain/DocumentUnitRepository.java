@@ -33,6 +33,8 @@ public interface DocumentUnitRepository {
   Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
       UUID parentDocumentUnitUuid);
 
+  Mono<DocumentUnit> filterUnlinkedDocumentUnit(DocumentUnit documentUnit);
+
   Mono<ProceedingDecisionLinkDTO> linkDocumentUnits(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);
 

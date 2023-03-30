@@ -773,6 +773,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .map(ProceedingDecisionTransformer::transformToDomain);
   }
 
+  @Override
+  public Mono<DocumentUnit> filterUnlinkedDocumentUnit(DocumentUnit documentUnit) {
+    return metadataRepository
+        .findByUuid(documentUnit.uuid())
+        .map(DocumentUnitMetadataDTO::getId)
+        .flatMap(proceedingDecisionLinkRepository::existsByParentDocumentUnitId)
+        .filter(isLinked -> !isLinked)
+        .map(isLinked -> documentUnit);
+  }
+
   private Mono<DocumentUnitMetadataDTO> injectAdditionalInformation(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
     return injectFileNumbers(documentUnitMetadataDTO).flatMap(this::injectDocumentType);

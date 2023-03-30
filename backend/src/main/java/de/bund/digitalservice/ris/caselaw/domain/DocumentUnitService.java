@@ -37,6 +37,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 @Service
 @Slf4j
 public class DocumentUnitService {
+
   private final DocumentUnitRepository repository;
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
@@ -232,8 +233,16 @@ public class DocumentUnitService {
   public Mono<String> unlinkProceedingDecision(UUID parentUuid, UUID childUuid) {
     return repository
         .unlinkDocumentUnits(parentUuid, childUuid)
-        .map(v -> "done")
-        .doOnError(ex -> log.error("Couldn't remove the ProceedingDecision", ex));
+        .doOnError(ex -> log.error("Couldn't unlink the ProceedingDecision", ex))
+        .then(
+            repository
+                .findByUuid(childUuid)
+                .filter(
+                    childDocumentUnit ->
+                        DataSource.PROCEEDING_DECISION.equals(childDocumentUnit.dataSource()))
+                .flatMap(repository::filterUnlinkedDocumentUnit)
+                .flatMap(repository::delete))
+        .thenReturn("done");
   }
 
   private DocumentUnit enrichNewDocumentUnitWithData(
