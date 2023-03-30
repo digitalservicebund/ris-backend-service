@@ -14,7 +14,6 @@ You need (or may want) the following CLI tools. For UNIX users, there is a prepa
 - [talisman](https://thoughtworks.github.io/talisman/docs) - scans for secrets before you would commit them
 - [docker](https://docs.docker.com/get-docker/) - our container runtime
 - [gopass](https://www.gopass.pw/#install) - a tool to sync secrets
-- [direnv](https://github.com/direnv/direnv/blob/master/docs/installation.md) - manages our local environment
 - [node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
 - [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js Environment
 
@@ -30,11 +29,18 @@ You need (or may want) the following CLI tools. For UNIX users, there is a prepa
 - [shellcheck](https://github.com/koalaman/shellcheck#installing) - shell script analyzer, that also provides extensions for [VS Code](https://marketplace.visualstudio.com/items?itemName=timonwong.shellcheck)
 - [trivy](https://github.com/aquasecurity/trivy#get-trivy) - our vulnerability scanner
 - [adr-tools](https://github.com/npryce/adr-tools) - a command-line tool to manage our [Architecture Decision Records (ADRs)](#architecture-decision-records)
+- [direnv](https://github.com/direnv/direnv/blob/master/docs/installation.md) - manages our local environment
 
-If you use [homebrew](https://brew.sh/), you can simply execute this to to install all required and optional dependencies
+If you use [**homebrew**](https://brew.sh/), you can simply execute this to to install all required and optional dependencies
 
 ```bash
 brew bundle
+```
+
+If you decided to install **direnv**, you have to hook it onto your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md)., e.g. for ZSH add this to `~/.zshrc`
+
+```bash
+eval "$(direnv hook zsh)"
 ```
 
 ## Getting started
@@ -52,14 +58,6 @@ This will install a couple of Git hooks which are supposed to help you to:
 - not accidentally push [secrets and sensitive information](https://thoughtworks.github.io/talisman/)
 
 ### Setup local env
-
-Add this direnv to your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md).
-
-E.g. for ZSH add this to `~/.zshrc`
-
-```bash
-eval "$(direnv hook zsh)"
-```
 
 Create .env file
 

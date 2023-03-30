@@ -80,7 +80,14 @@ E2E_TEST_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund
 E2E_TEST_PASSWORD=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/password)
 EOF
 
-  direnv allow .
+  if ! command -v direnv > /dev/null 2>&1; then
+    # Direnv is not installed. Source the .env file manually
+    set -o allexport
+    source .env
+    set +o allexport
+  else
+    direnv allow .
+  fi
 }
 
 _dev() {
