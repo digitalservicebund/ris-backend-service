@@ -20,17 +20,6 @@ classDiagram
     String providerDecidingBody
     Boolean providerIsResolutionMajority
 
-    String participationType
-    String participationInstitution
-
-    String leadJurisdiction
-    String leadUnit
-
-    String subjectFna
-    String subjectPreviousFna
-    String subjectGesta
-    String subjectBgb3
-
     String officialShortTitle
     String officialAbbreviation
 
@@ -138,6 +127,13 @@ classDiagram
       +Integer order
   }
 
+  class MetadataSection {
+      +MetadataSectionName name
+      +Integer order
+      List~Metadatum~ metadata
+      List~MetadataSection~ sections
+  }
+
   class Article {
     +UUID guid
     +String marker
@@ -159,6 +155,20 @@ classDiagram
     UNDEFINED_NOT_PRESENT
   }
 
+  class MetadataSectionName  {
+     <<enumeration>>
+     GENERAL_INFORMATION,
+     HEADINGS_AND_ABBREVIATIONS,
+     UNOFFICIAL_REFERENCE,
+     REFERENCE_NUMBER,
+     DEFINITION,
+     AGE_OF_MAJORITY_INDICATION,
+     VALIDITY_RULE,
+     SUBJECT_AREA,
+     LEAD,
+     PARTICIPATING_INSTITUTIONS
+  }
+
   class MetadatumType  {
       <<enumeration>>
       KEYWORD,
@@ -171,7 +181,15 @@ classDiagram
       DEFINITION,
       RIS_ABBREVIATION_INTERNATIONAL_LAW,
       AGE_OF_MAJORITY_INDICATION,
-      VALIDITY_RULE
+      VALIDITY_RULE,
+      LEAD_JURISDICTION,
+      LEAD_UNIT,
+      PARTICIPATION_TYPE,
+      PARTICIPATION_INSTITUTION,
+      SUBJECT_FNA,
+      SUBJECT_PREVIOUS_FNA,
+      SUBJECT_GESTA,
+      SUBJECT_BGB_3
   }
 
   class FileReference {
@@ -180,8 +198,10 @@ classDiagram
     +Timestamp createdAt
   }
 
-  Norm "1" --> "*" Metadatum
+  Norm "1" --> "*" MetadataSection
   Norm "1" --> "*" Article
-  Article "1" --> "*" Paragraph
   Norm "1" --> "*" FileReference
+  Article "1" --> "*" Paragraph
+  MetadataSection "1" --> "*" Metadatum
+  MetadataSection "1" --> "*" MetadataSection
 ```

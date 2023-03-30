@@ -285,6 +285,43 @@ components:
         - RIS_ABBREVIATION_INTERNATIONAL_LAW
         - AGE_OF_MAJORITY_INDICATION
         - VALIDITY_RULE
+        - LEAD_JURISDICTION
+        - LEAD_UNIT
+        - PARTICIPATION_TYPE
+        - PARTICIPATION_INSTITUTION
+        - SUBJECT_FNA
+        - SUBJECT_PREVIOUS_FNA
+        - SUBJECT_GESTA
+        - SUBJECT_BGB_3
+    MetadataSectionName:
+      description: A field that indicates the name of the section
+      type: string
+      enum:
+        - GENERAL_INFORMATION
+        - HEADINGS_AND_ABBREVIATIONS
+        - UNOFFICIAL_REFERENCE
+        - REFERENCE_NUMBER
+        - DEFINITION
+        - AGE_OF_MAJORITY_INDICATION
+        - VALIDITY_RULE
+        - SUBJECT_AREA
+        - LEAD,
+        - PARTICIPATING_INSTITUTIONS
+    MetadataSection:
+      type: object
+      properties:
+        name:
+          $ref: '#/components/schemas/MetadataSectionName'
+        order:
+          type: integer
+        metadata:
+          type: array
+          items:
+            $ref: '#/components/schemas/Metadatum'
+        sections:
+          type: array
+          items:
+            $ref: '#/components/schemas/MetadataSection'
     Metadatum:
       type: object
       properties:
@@ -294,6 +331,8 @@ components:
           $ref: '#/components/schemas/MetadatumType'
         order:
           type: integer
+        section:
+          $ref: '#/components/schemas/MetadataSectionName'
     Paragraph:
       type: object
       required:
@@ -391,24 +430,6 @@ components:
         providerIsResolutionMajority:
           type: boolean
           example: true
-        leadJurisdiction:
-          type: string
-          example: BMVI
-        leadUnit:
-          type: string
-          example: G 22
-        participationType:
-          type: string
-          example: EZ
-        participationInstitution:
-          type: string
-          example: BR
-        subjectFna:
-          type: string
-          example: FNA 703-12
-        subjectGesta:
-          type: string
-          example: GESTA J040
         documentNumber:
           type: string
           example: ''
@@ -542,12 +563,6 @@ components:
         documentTemplateName:
           type: string
           example: Template
-        subjectPreviousFna:
-          type: string
-          example: FNA 703-11
-        subjectBgb3:
-          type: string
-          example: BGB III 234
         printAnnouncementNumber:
           type: string
           example: ''
@@ -656,7 +671,7 @@ components:
         metadata:
           type: array
           items:
-            $ref: '#/components/schemas/Metadatum'
+            $ref: '#/components/schemas/MetadataSection'
     LegalDocML:
       type: object
       xml:

@@ -6,7 +6,7 @@ fileignoreconfig:
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml
-    checksum: dfde240bee8233c1212a7b8e459728fb73562c565bbe425e2db9b795b87320b1
+    checksum: be3071ece3f9a36af0c7e9da8d97abd1a636f46e8f7f17f4d5dee96a3953024b
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: 476b39d74792e4d7fa2521bae3462c0205852bc7c9aadc98f93200561699cef9
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
