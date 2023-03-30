@@ -44,6 +44,10 @@ function saveChip() {
   }
 }
 
+function deleteChip(keyword: string | undefined) {
+  emits("deleteChip", keyword)
+}
+
 const handleOnBlur = () => {
   currentInput.value = ""
 }
@@ -84,6 +88,7 @@ watch(chips, () => {
     <ChipsList
       ref="chipsList"
       v-model="chips"
+      @delete-chip="deleteChip"
       @previous-clicked-on-first="focusInput"
     />
   </div>

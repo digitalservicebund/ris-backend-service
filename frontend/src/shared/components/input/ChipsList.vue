@@ -11,7 +11,6 @@ interface Emits {
   (event: "update:modelValue", value?: string[]): void
   (event: "previousClickedOnFirst"): void
   (event: "nextClickedOnLast"): void
-  (event: "addChip", value?: string): Promise<void>
   (event: "deleteChip", value?: string): Promise<void>
   (event: "input", value: Event): void
 }

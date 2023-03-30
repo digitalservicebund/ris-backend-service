@@ -10,6 +10,7 @@ const props = defineProps<{
 const keywords = ref<string[]>([])
 
 const addKeyword = async (keyword: string | undefined) => {
+  console.log("addKeyword")
   if (keyword !== undefined) {
     const response = await KeywordsService.addKeyword(
       props.documentUnitUuid,
@@ -22,6 +23,7 @@ const addKeyword = async (keyword: string | undefined) => {
 }
 
 const deleteKeyword = async (keyword: string | undefined) => {
+  console.log("deleteKeyword")
   if (keyword !== undefined) {
     const response = await KeywordsService.deleteKeyword(
       props.documentUnitUuid,
