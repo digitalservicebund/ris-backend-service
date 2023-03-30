@@ -84,6 +84,14 @@ Read the component individual documentation to figure out how to run them indivi
 - [backend](./backend/README.md#development)
 - [frontend](./frontend/README.md#development)
 
+## Deployment
+
+The pipeline performs the Deployment through GitOps using [ArgoCD](https://argoproj.github.io/cd/) (see [example pipeline deploy step definition](https://github.com/digitalservicebund/ris-backend-service/blob/main/.github/workflows/pipeline.yml#L657-L667)):
+
+- Build and push the new Docker image (see here)
+- Commit the new tag in the deployment manifest in the neuris-infra repository 
+- Sync the respective ArgoCD App, which will cause ArgoCD to apply all changed Kubernetes manifests on the cluster to create the desired state
+
 ## Working with [Talisman](https://thoughtworks.github.io/talisman/)
 
 Given you already know that a file that was edited, f.ex. `.github/workflows/pipeline.yml`, will require an updated checksum field in `.talismanrc`, execute the following command:
