@@ -224,7 +224,9 @@ public class DocumentUnitService {
         .flatMap(
             documentUnit ->
                 updateDocumentUnit(enrichNewDocumentUnitWithData(documentUnit, proceedingDecision)))
-        .flatMapMany(documentUnit -> repository.findAllLinkedDocumentUnits(documentUnitUuid));
+        .flatMapMany(
+            documentUnit ->
+                repository.findAllLinkedDocumentUnitsByParentDocumentUnitId(documentUnitUuid));
   }
 
   public Mono<String> unlinkProceedingDecision(UUID parentUuid, UUID childUuid) {

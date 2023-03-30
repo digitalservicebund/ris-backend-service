@@ -30,7 +30,8 @@ public interface DocumentUnitRepository {
 
   Flux<DocumentUnitListEntry> findAll(Sort sort);
 
-  Flux<ProceedingDecision> findAllLinkedDocumentUnits(UUID parentDocumentUnitUuid);
+  Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
+      UUID parentDocumentUnitUuid);
 
   Mono<ProceedingDecisionLinkDTO> linkDocumentUnits(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid);

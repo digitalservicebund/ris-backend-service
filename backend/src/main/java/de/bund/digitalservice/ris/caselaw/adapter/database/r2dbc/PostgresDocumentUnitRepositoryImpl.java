@@ -760,7 +760,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Flux<ProceedingDecision> findAllLinkedDocumentUnits(UUID parentDocumentUnitUuid) {
+  public Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
+      UUID parentDocumentUnitUuid) {
     return metadataRepository
         .findAllById(
             metadataRepository
