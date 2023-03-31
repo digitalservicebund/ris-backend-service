@@ -16,7 +16,7 @@ const service: KeywordService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Schlagwort für die Dokumentationseinheit ${uuid} konnten nicht geladen werden.`,
+        title: `Schlagwörter konnten nicht geladen werden.`,
       }
     }
     return response
@@ -27,8 +27,7 @@ const service: KeywordService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Schlagwort ${keyword} konnte nicht zu 
-          Dokumentationseinheit ${uuid} hinzugefügt werden`,
+        title: `Schlagwort ${keyword} konnte nicht hinzugefügt werden`,
       }
     }
     return response
@@ -39,8 +38,7 @@ const service: KeywordService = {
     )
     if (response.status >= 300) {
       response.error = {
-        title: `Schlagwort ${keyword} konnte nicht von der 
-        Dokumentationseinheit ${uuid} entfernt werden`,
+        title: `Schlagwort ${keyword} konnte nicht entfernt werden`,
       }
     }
     return response

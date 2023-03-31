@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
+import { ResponseError } from "@/services/httpClient"
 import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   focusedItem?: number
   modelValue?: string[]
+  error?: ResponseError
 }
 
 interface Emits {
@@ -20,6 +22,7 @@ const emits = defineEmits<Emits>()
 
 const { emitInputEvent } = useInputModel<string[], Props, Emits>(props, emits)
 const chips = ref<string[]>(props.modelValue ?? [])
+const errorMessage = ref<ResponseError>()
 const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
@@ -29,8 +32,10 @@ function updateModelValue() {
 
 function deleteChip(index: number) {
   emits("deleteChip", chips.value[index])
-  chips.value.splice(index, 1)
-  updateModelValue()
+  if (!errorMessage.value) {
+    chips.value.splice(index, 1)
+    updateModelValue()
+  }
   resetFocus()
 }
 
@@ -83,6 +88,7 @@ const setFocusedItemIndex = (index: number) => {
 watch(props, () => {
   if (props.modelValue) chips.value = props.modelValue
   if (props.focusedItem) focusedItemIndex.value = props.focusedItem
+  errorMessage.value = props.error
 })
 
 watch(focusedItemIndex, () => {

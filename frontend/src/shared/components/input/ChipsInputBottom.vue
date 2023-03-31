@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
+import { ResponseError } from "@/services/httpClient"
 import ChipsList from "@/shared/components/input/ChipsList.vue"
 import { ValidationError } from "@/shared/components/input/types"
 import { useInputModel } from "@/shared/composables/useInputModel"
@@ -8,6 +9,7 @@ interface Props {
   id: string
   value?: string[]
   modelValue?: string[]
+  error?: ResponseError
   ariaLabel: string
   placeholder?: string
   validationError?: ValidationError
@@ -25,6 +27,7 @@ const emits = defineEmits<Emits>()
 
 const { emitInputEvent } = useInputModel<string[], Props, Emits>(props, emits)
 const chips = ref<string[]>(props.modelValue ?? [])
+const errorMessage = ref<ResponseError>()
 const currentInput = ref<string>("")
 
 const chipsList = ref<typeof ChipsList>()
@@ -37,9 +40,11 @@ function updateModelValue() {
 function saveChip() {
   const trimmed = currentInput.value.trim()
   if (trimmed.length > 0) {
-    chips.value.push(trimmed)
-    updateModelValue()
     emits("addChip", trimmed)
+    if (!errorMessage.value) {
+      chips.value.push(trimmed)
+      updateModelValue()
+    }
     currentInput.value = ""
   }
 }
@@ -64,6 +69,7 @@ const focusInput = () => {
 
 watch(props, () => {
   if (props.modelValue) chips.value = props.modelValue
+  errorMessage.value = props.error
 })
 
 watch(chips, () => {
@@ -85,9 +91,17 @@ watch(chips, () => {
       @keypress.enter="saveChip"
       @keyup.right="focusFirst"
     />
+    <div v-if="errorMessage" class="flex flex-row items-center">
+      <span class="leading-default material-icons text-gray-900"
+        >error_outline</span
+      >
+      <p class="label-02-reg m-4 text-gray-900">{{ errorMessage?.title }}</p>
+    </div>
+
     <ChipsList
       ref="chipsList"
       v-model="chips"
+      :error="errorMessage"
       @delete-chip="deleteChip"
       @previous-clicked-on-first="focusInput"
     />

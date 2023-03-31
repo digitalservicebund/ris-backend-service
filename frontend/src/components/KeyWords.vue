@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
+import { ResponseError } from "@/services/httpClient"
 import KeywordsService from "@/services/keywordsService"
 import KeywordsInput from "@/shared/components/input/ChipsInputBottom.vue"
 
@@ -8,14 +9,18 @@ const props = defineProps<{
 }>()
 
 const keywords = ref<string[]>([])
+const errorMessage = ref<ResponseError>()
 
 const addKeyword = async (keyword: string | undefined) => {
-  console.log("addKeyword")
   if (keyword !== undefined) {
     const response = await KeywordsService.addKeyword(
       props.documentUnitUuid,
       keyword
     )
+    if (response.error) {
+      errorMessage.value = response.error
+      return
+    }
     if (response.data) {
       keywords.value = response.data
     }
@@ -23,12 +28,15 @@ const addKeyword = async (keyword: string | undefined) => {
 }
 
 const deleteKeyword = async (keyword: string | undefined) => {
-  console.log("deleteKeyword")
   if (keyword !== undefined) {
     const response = await KeywordsService.deleteKeyword(
       props.documentUnitUuid,
       keyword
     )
+    if (response.error) {
+      errorMessage.value = response.error
+      return
+    }
     if (response.data) {
       keywords.value = response.data
     }
@@ -40,6 +48,10 @@ watch(
   props,
   async () => {
     const response = await KeywordsService.getKeywords(props.documentUnitUuid)
+    if (response.error) {
+      errorMessage.value = response.error
+      return
+    }
     if (response.data) {
       keywords.value = response.data
     }
@@ -58,6 +70,7 @@ watch(
         <KeywordsInput
           id="keywords"
           aria-label="Schlagwörter"
+          :error="errorMessage"
           :model-value="keywords"
           @add-chip="addKeyword"
           @delete-chip="deleteKeyword"
