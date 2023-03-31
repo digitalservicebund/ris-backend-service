@@ -10,12 +10,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
@@ -173,22 +175,61 @@ public class DocumentUnitService {
   }
 
   public Mono<String> deleteByUuid(UUID documentUnitUuid) {
+    AtomicInteger documentUnitsThisOneIsAChildOf = new AtomicInteger();
+
     return repository
-        .findByUuid(documentUnitUuid)
+        .countLinksByChildDocumentUnitUuid(documentUnitUuid)
+        .flatMap(
+            count -> {
+              documentUnitsThisOneIsAChildOf.set(count.intValue());
+              return repository.findByUuid(documentUnitUuid);
+            })
         .flatMap(
             documentUnit -> {
-              if (documentUnit.s3path() != null) {
-                var fileUuid = documentUnit.s3path();
-                return deleteObjectFromBucket(fileUuid)
-                    .doOnNext(
-                        deleteObjectResponse -> log.debug("deleted file {} in bucket", fileUuid))
-                    .flatMap(deleteObjectResponse -> repository.delete(documentUnit));
-              }
-              return repository.delete(documentUnit);
+              log.debug("Deleting DocumentUnitDTO " + documentUnitUuid);
+
+              Mono<Void> deleteAttachedFile =
+                  documentUnit.s3path() == null
+                      ? Mono.empty()
+                      : deleteObjectFromBucket(documentUnit.s3path())
+                          .doOnNext(
+                              d -> log.debug("Deleted file {} in bucket", documentUnit.s3path()))
+                          .flatMap(d -> Mono.empty());
+
+              Flux<ProceedingDecision> proceedingDecisions =
+                  Flux.fromIterable(documentUnit.proceedingDecisions());
+
+              String logMsg =
+                  "Deleted the document unit "
+                      + documentUnitUuid
+                      + (documentUnit.proceedingDecisions().isEmpty()
+                          ? ""
+                          : ", and its links to "
+                              + documentUnit.proceedingDecisions().size()
+                              + " proceeding decisions");
+
+              return deleteAttachedFile
+                  .thenMany(
+                      proceedingDecisions.flatMap(
+                          proceedingDecision ->
+                              removeProceedingDecision(
+                                  documentUnitUuid, proceedingDecision.uuid())))
+                  .then(repository.delete(documentUnit))
+                  .thenReturn(logMsg);
             })
-        .doFinally(v -> log.debug("deleted DocumentUnitDTO"))
-        .thenReturn("done")
-        .doOnError(ex -> log.error("Couldn't delete the DocumentUnit", ex));
+        .onErrorResume(
+            ex -> {
+              log.error("Couldn't delete the DocumentUnit");
+              if (ex instanceof DataIntegrityViolationException) {
+                return Mono.error(
+                    new DocumentUnitDeletionException(
+                        "Can't delete document unit because it is a proceeding decision to "
+                            + documentUnitsThisOneIsAChildOf.get()
+                            + " document units"));
+              }
+              return Mono.error(
+                  new DocumentUnitDeletionException("Couldn't delete the DocumentUnit"));
+            });
   }
 
   public Mono<DocumentUnit> updateDocumentUnit(DocumentUnit documentUnit) {

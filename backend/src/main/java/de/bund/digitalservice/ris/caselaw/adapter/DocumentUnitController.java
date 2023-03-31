@@ -91,8 +91,7 @@ public class DocumentUnitController {
     return service
         .deleteByUuid(uuid)
         .map(str -> ResponseEntity.status(HttpStatus.OK).body(str))
-        .onErrorReturn(
-            ResponseEntity.internalServerError().body("Couldn't delete the DocumentUnit"));
+        .onErrorResume(ex -> Mono.just(ResponseEntity.internalServerError().body(ex.getMessage())));
   }
 
   @PutMapping(value = "/{uuid}", consumes = MediaType.APPLICATION_JSON_VALUE)
