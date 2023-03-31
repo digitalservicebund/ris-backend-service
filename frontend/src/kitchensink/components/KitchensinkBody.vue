@@ -8,7 +8,7 @@ import DocumentUnitInfoPanelView from "@/kitchensink/views/DocumentUnitInfoPanel
 import DropdownView from "@/kitchensink/views/DropdownView.vue"
 import ErrorView from "@/kitchensink/views/ErrorView.vue"
 import ExpandableContentView from "@/kitchensink/views/ExpandableContentView.vue"
-import ExpandableFieldSetView from "@/kitchensink/views/ExpandableFieldSetView.vue"
+import ExpandableDataSetView from "@/kitchensink/views/ExpandableDataSetView.vue"
 import FileUploadView from "@/kitchensink/views/FileUploadView.vue"
 import FileViewerView from "@/kitchensink/views/FileViewerView.vue"
 import InfoModalView from "@/kitchensink/views/InfoModalView.vue"
@@ -34,8 +34,8 @@ const component = computed(() => {
       return InfoModalView
     case "ExpandableContentView":
       return ExpandableContentView
-    case "ExpandableFieldSetView":
-      return ExpandableFieldSetView
+    case "ExpandableDataSetView":
+      return ExpandableDataSetView
     case "FileUploadView":
       return FileUploadView
     case "FileViewerView":
