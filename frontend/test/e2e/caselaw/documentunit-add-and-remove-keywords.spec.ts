@@ -29,6 +29,20 @@ test.describe("Add and remove keywords to content related indexing", () => {
     await expect(page.locator("text=one").first()).toBeVisible()
   })
 
+  test("add same keyword not working", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Schlagwörter']").fill("one")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Schlagwörter']").fill("one")
+    await page.keyboard.press("Enter")
+
+    await expect(
+      page.locator("text=Schlagwort bereits vergeben").first()
+    ).toBeVisible()
+  })
+
   test("delete keywords", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 

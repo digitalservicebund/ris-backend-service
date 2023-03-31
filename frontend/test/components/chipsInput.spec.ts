@@ -377,7 +377,7 @@ describe("chips input as bottom list", () => {
     const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
 
-    await user.type(chipList[0], "{enter}")
+    await user.type(chipList[1], "{enter}")
     expect(screen.getAllByLabelText("chip").length).toBe(1)
 
     await user.type(input, "two")
@@ -390,6 +390,22 @@ describe("chips input as bottom list", () => {
 
     await user.type(chipList[0], "{enter}")
     expect(screen.queryByLabelText("chip")).not.toBeInTheDocument()
+  })
+
+  it("returns error when adding chip that already exists", async () => {
+    const { user } = renderComponentWithBottomList()
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+
+    const chipList = screen.getAllByLabelText("chip")
+    expect(chipList.length).toBe(1)
+
+    expect(screen.getByText("Schlagwort bereits vergeben.")).toBeInTheDocument()
   })
 
   it("sets first chip of list active on arrow key 'right'", async () => {

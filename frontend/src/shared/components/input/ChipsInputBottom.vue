@@ -40,6 +40,10 @@ function updateModelValue() {
 function saveChip() {
   const trimmed = currentInput.value.trim()
   if (trimmed.length > 0) {
+    if (chips.value.includes(trimmed)) {
+      errorMessage.value = { title: "Schlagwort bereits vergeben." }
+      return
+    }
     emits("addChip", trimmed)
     if (!errorMessage.value) {
       chips.value.push(trimmed)
