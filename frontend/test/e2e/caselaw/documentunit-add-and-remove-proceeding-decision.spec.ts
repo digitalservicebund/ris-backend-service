@@ -23,7 +23,9 @@ test.describe("Add and remove proceeding decisions", () => {
     await expect(
       page.locator("[aria-label='Aktenzeichen Rechtszug']")
     ).toBeVisible()
-    await expect(page.locator("[aria-label='Datum Rechtszug']")).toBeVisible()
+    await expect(
+      page.locator("[aria-label='Entscheidungsdatum Rechtszug']")
+    ).toBeVisible()
   })
 
   test("add proceeding decision and verify it persists", async ({

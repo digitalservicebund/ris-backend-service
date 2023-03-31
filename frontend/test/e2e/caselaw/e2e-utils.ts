@@ -74,7 +74,7 @@ export async function fillProceedingDecisionInputs(
 
   await fillInput("Gericht Rechtszug", values?.court)
   if (values?.court) await page.locator(`text=${values?.court}`).click()
-  await fillInput("Datum Rechtszug", values?.date)
+  await fillInput("Entscheidungsdatum Rechtszug", values?.date)
   await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
   await fillInput("Dokumenttyp Rechtszug", values?.documentType)
   if (values?.documentType)

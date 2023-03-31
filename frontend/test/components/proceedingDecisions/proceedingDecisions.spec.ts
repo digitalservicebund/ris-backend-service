@@ -39,7 +39,9 @@ describe("DocumentUnitProceedingDecisions", async () => {
     await openExpandableArea(user)
 
     expect(screen.getByLabelText("Gericht Rechtszug")).toBeVisible()
-    expect(screen.getByLabelText("Datum Rechtszug")).toBeInTheDocument()
+    expect(
+      screen.getByLabelText("Entscheidungsdatum Rechtszug")
+    ).toBeInTheDocument()
     expect(screen.getByLabelText("Aktenzeichen Rechtszug")).toBeInTheDocument()
     expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
   })
