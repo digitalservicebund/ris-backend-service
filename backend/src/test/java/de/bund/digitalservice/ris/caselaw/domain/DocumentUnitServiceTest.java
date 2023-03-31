@@ -502,6 +502,7 @@ class DocumentUnitServiceTest {
     // something flaky with the repository mock? Investigate this later
     DocumentUnit documentUnit = DocumentUnit.builder().uuid(TEST_UUID).build();
     // can we also test that the fileUuid from the DocumentUnit is used? with a captor somehow?
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
     when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
 
@@ -509,7 +510,7 @@ class DocumentUnitServiceTest {
         .consumeNextWith(
             string -> {
               assertNotNull(string);
-              assertEquals("done", string);
+              assertEquals("Dokumentationseinheit gelöscht: " + TEST_UUID, string);
             })
         .verifyComplete();
 
@@ -520,6 +521,8 @@ class DocumentUnitServiceTest {
   void testDeleteByUuid_withFileAttached() {
     DocumentUnit documentUnit =
         DocumentUnit.builder().uuid(TEST_UUID).s3path(TEST_UUID.toString()).build();
+
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(documentUnit));
     when(repository.delete(any(DocumentUnit.class))).thenReturn(Mono.just(mock(Void.class)));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
@@ -529,7 +532,7 @@ class DocumentUnitServiceTest {
         .consumeNextWith(
             string -> {
               assertNotNull(string);
-              assertEquals("done", string);
+              assertEquals("Dokumentationseinheit gelöscht: " + TEST_UUID, string);
             })
         .verifyComplete();
 
@@ -538,6 +541,7 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromBucket() {
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
     when(s3AsyncClient.deleteObject(any(DeleteObjectRequest.class)))
         .thenThrow(SdkException.create("exception", null));
@@ -549,6 +553,7 @@ class DocumentUnitServiceTest {
 
   @Test
   void testDeleteByUuid_withoutFileAttached_withExceptionFromRepository() {
+    when(repository.countLinksByChildDocumentUnitUuid(TEST_UUID)).thenReturn(Mono.just(0L));
     when(repository.findByUuid(TEST_UUID)).thenReturn(Mono.just(DocumentUnit.builder().build()));
     doThrow(new IllegalArgumentException()).when(repository).delete(DocumentUnit.builder().build());
 

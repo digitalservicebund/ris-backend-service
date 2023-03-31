@@ -197,12 +197,15 @@ public class DocumentUnitService {
                           .flatMap(d -> Mono.empty());
 
               Flux<ProceedingDecision> proceedingDecisions =
-                  Flux.fromIterable(documentUnit.proceedingDecisions());
+                  documentUnit.proceedingDecisions() == null
+                      ? Flux.empty()
+                      : Flux.fromIterable(documentUnit.proceedingDecisions());
 
               String logMsg =
                   "Dokumentationseinheit gelöscht: "
                       + documentUnitUuid
-                      + (documentUnit.proceedingDecisions().isEmpty()
+                      + (documentUnit.proceedingDecisions() == null
+                              || documentUnit.proceedingDecisions().isEmpty()
                           ? ""
                           : ", zudem die Verknüpfungen mit "
                               + documentUnit.proceedingDecisions().size()
