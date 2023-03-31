@@ -7,12 +7,19 @@ services:
     volumes:
       - ./traefik.yaml:/etc/traefik/config.yml:ro
     command:
+      - "--ping=true"
       - "--api.dashboard=false"
       - "--providers.file.filename=/etc/traefik/config.yml"
       - "--entryPoints.http.address=:80"
     ports:
       - 80:80
-
+    healthcheck:
+      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      interval: 5s
+      retries: 3
+      start_period: 3s
+      timeout: 3s
+ 
   backend:
     image: gradle:7-jdk17
     extra_hosts:
@@ -36,8 +43,14 @@ services:
       - db
       - redis
     ports:
-      - 8080:8080
-
+      - 8081:8080
+    healthcheck:
+      test: curl --silent --fail http://127.0.0.1:8080/actuator/health/readiness | grep UP || exit 1
+      interval: 10s
+      retries: 10
+      start_period: 60s
+      timeout: 3s
+  
   frontend:
     image: neuris/frontend
     extra_hosts:
@@ -52,6 +65,12 @@ services:
       - traefik
     ports:
       - 3000:3000
+    healthcheck:
+      test: curl --silent --fail --request GET http://127.0.0.1:3000 || exit 1
+      interval: 10s
+      retries: 10
+      start_period: 10s
+      timeout: 3s
 
   db:
     image: postgres:12-alpine
@@ -67,6 +86,12 @@ services:
       - POSTGRES_USER=test
     ports:
       - 5432:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U test -d neuris"]
+      interval: 5s
+      retries: 3
+      start_period: 5s
+      timeout: 3s
 
   redis:
     image: cgr.dev/chainguard/redis:7.0
@@ -82,6 +107,12 @@ services:
       - "--user default off resetchannels -@all"
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -h 127.0.0.1 --user redis -a password PING | grep 'PONG' || exit 1"]
+      interval: 5s
+      retries: 5
+      start_period: 3s
+      timeout: 5s
 
 volumes:
   db-data:
