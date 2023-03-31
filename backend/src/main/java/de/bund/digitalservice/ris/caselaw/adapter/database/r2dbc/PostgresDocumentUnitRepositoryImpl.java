@@ -778,7 +778,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return metadataRepository
         .findByUuid(documentUnit.uuid())
         .map(DocumentUnitMetadataDTO::getId)
-        .flatMap(proceedingDecisionLinkRepository::existsByParentDocumentUnitId)
+        .flatMap(proceedingDecisionLinkRepository::existsByChildDocumentUnitId)
         .filter(isLinked -> !isLinked)
         .map(isLinked -> documentUnit);
   }
@@ -818,10 +818,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             tuple ->
                 proceedingDecisionLinkRepository
                     .findByParentDocumentUnitIdAndChildDocumentUnitId(tuple.getT1(), tuple.getT2())
-                    .flatMap(
-                        proceedingDecisionLinkDTO ->
-                            proceedingDecisionLinkRepository.deleteById(
-                                proceedingDecisionLinkDTO.getId())));
+                    .map(ProceedingDecisionLinkDTO::getId)
+                    .flatMap(proceedingDecisionLinkRepository::deleteById));
   }
 
   @Override

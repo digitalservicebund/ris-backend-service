@@ -234,14 +234,7 @@ public class DocumentUnitService {
     return repository
         .unlinkDocumentUnits(parentUuid, childUuid)
         .doOnError(ex -> log.error("Couldn't unlink the ProceedingDecision", ex))
-        .then(
-            repository
-                .findByUuid(childUuid)
-                .filter(
-                    childDocumentUnit ->
-                        DataSource.PROCEEDING_DECISION.equals(childDocumentUnit.dataSource()))
-                .flatMap(repository::filterUnlinkedDocumentUnit)
-                .flatMap(repository::delete))
+        .then(deleteIfOrphanedProceedingDecision(childUuid))
         .thenReturn("done");
   }
 
@@ -264,5 +257,15 @@ public class DocumentUnitService {
         .dataSource(DataSource.PROCEEDING_DECISION)
         .coreData(coreData)
         .build();
+  }
+
+  private Mono<Void> deleteIfOrphanedProceedingDecision(UUID documentUnitUuid) {
+    return repository
+        .findByUuid(documentUnitUuid)
+        .filter(
+            childDocumentUnit ->
+                DataSource.PROCEEDING_DECISION.equals(childDocumentUnit.dataSource()))
+        .flatMap(repository::filterUnlinkedDocumentUnit)
+        .flatMap(repository::delete);
   }
 }

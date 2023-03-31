@@ -61,8 +61,8 @@ public class ProceedingDecisionIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    repository.deleteAll().block();
     linkRepository.deleteAll().block();
+    repository.deleteAll().block();
   }
 
   @Test
@@ -147,5 +147,88 @@ public class ProceedingDecisionIntegrationTest {
 
     assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNull();
+  }
+
+  @Test
+  void testRemoveProceedingDecisionLinkAndKeepLinkedProceedingDecision() {
+    UUID parentUuid1 = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO1 =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid1)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    parentDocumentUnitDTO1 = repository.save(parentDocumentUnitDTO1).block();
+
+    UUID parentUuid2 = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO2 =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid2)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890124")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    parentDocumentUnitDTO2 = repository.save(parentDocumentUnitDTO2).block();
+
+    UUID childUuid = UUID.randomUUID();
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(childUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("abcdefghjikl")
+            .dataSource(DataSource.PROCEEDING_DECISION)
+            .build();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
+
+    ProceedingDecisionLinkDTO linkDTO1 =
+        ProceedingDecisionLinkDTO.builder()
+            .parentDocumentUnitId(parentDocumentUnitDTO1.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
+            .build();
+    linkDTO1 = linkRepository.save(linkDTO1).block();
+    assertThat(linkDTO1).isNotNull();
+
+    ProceedingDecisionLinkDTO linkDTO2 =
+        ProceedingDecisionLinkDTO.builder()
+            .parentDocumentUnitId(parentDocumentUnitDTO2.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
+            .build();
+    linkDTO2 = linkRepository.save(linkDTO2).block();
+    assertThat(linkDTO2).isNotNull();
+
+    webClient
+        .mutateWith(csrf())
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + parentUuid1 + "/proceedingdecisions/" + childUuid)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    assertThat(linkRepository.findById(linkDTO1.getId()).block()).isNull();
+    assertThat(linkRepository.findById(linkDTO2.getId()).block()).isNotNull();
+    assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
+  }
+
+  @Test
+  void testRemoveNonExistingProceedingDecisionLink() {
+    UUID parentUuid = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    repository.save(parentDocumentUnitDTO).block();
+
+    webClient
+        .mutateWith(csrf())
+        .delete()
+        .uri(
+            "/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + "invalidUUID")
+        .exchange()
+        .expectStatus()
+        .is4xxClientError();
   }
 }
