@@ -7,10 +7,11 @@ services:
     volumes:
       - ./traefik.yaml:/etc/traefik/config.yml:ro
     command:
-      - "--ping=true"
       - "--api.dashboard=false"
       - "--providers.file.filename=/etc/traefik/config.yml"
       - "--entryPoints.http.address=:80"
+      - "--entryPoints.ping.address=:8082"
+      - "--ping.entryPoint=ping"
     ports:
       - 80:80
     healthcheck:
@@ -43,7 +44,7 @@ services:
       - db
       - redis
     ports:
-      - 8081:8080
+      - 8080:8080
     healthcheck:
       test: curl --silent --fail http://127.0.0.1:8080/actuator/health/readiness | grep UP || exit 1
       interval: 10s

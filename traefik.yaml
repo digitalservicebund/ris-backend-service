@@ -5,13 +5,13 @@ http:
       service: backend
     frontend:
       rule: "PathPrefix(`/`)"
-      service: frontend 
-  
+      service: frontend
+
   services:
     backend:
       loadBalancer:
         servers:
-          - url: "http://localhost:8081"
+          - url: "http://localhost:8080"
 
     frontend:
       loadBalancer:
