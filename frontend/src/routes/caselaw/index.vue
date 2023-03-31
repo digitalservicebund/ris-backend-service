@@ -14,13 +14,15 @@ const documentUnitListEntries = ref(
 
 async function handleDelete(documentUnitListEntry: DocumentUnitListEntry) {
   if (documentUnitListEntries.value) {
-    const status = (
-      await documentUnitService.delete(documentUnitListEntry.uuid)
-    ).status
-    if (status === 200) {
+    const response = await documentUnitService.delete(
+      documentUnitListEntry.uuid
+    )
+    if (response.status === 200) {
       documentUnitListEntries.value = documentUnitListEntries.value.filter(
         (item) => item != documentUnitListEntry
       )
+    } else {
+      alert("Fehler beim Löschen der Dokumentationseinheit: " + response.data)
     }
   }
 }
