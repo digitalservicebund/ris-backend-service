@@ -200,13 +200,13 @@ public class DocumentUnitService {
                   Flux.fromIterable(documentUnit.proceedingDecisions());
 
               String logMsg =
-                  "Deleted the document unit "
+                  "Dokumentationseinheit gelöscht: "
                       + documentUnitUuid
                       + (documentUnit.proceedingDecisions().isEmpty()
                           ? ""
-                          : ", and its links to "
+                          : ", zudem die Verknüpfungen mit "
                               + documentUnit.proceedingDecisions().size()
-                              + " proceeding decisions");
+                              + " vorgehenden Entscheidungen");
 
               return deleteAttachedFile
                   .thenMany(
@@ -223,9 +223,10 @@ public class DocumentUnitService {
               if (ex instanceof DataIntegrityViolationException) {
                 return Mono.error(
                     new DocumentUnitDeletionException(
-                        "Can't delete document unit because it is a proceeding decision to "
+                        "die Dokumentationseinheit konnte nicht gelöscht werden, "
+                            + "da sie eine vorgehende Entscheidung für "
                             + documentUnitsThisOneIsAChildOf.get()
-                            + " document units"));
+                            + " andere Dokumentationseinheiten darstellt"));
               }
               return Mono.error(
                   new DocumentUnitDeletionException("Couldn't delete the DocumentUnit"));
