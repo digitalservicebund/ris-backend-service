@@ -230,7 +230,7 @@ public class DocumentUnitService {
                 repository.findAllLinkedDocumentUnitsByParentDocumentUnitId(documentUnitUuid));
   }
 
-  public Mono<String> unlinkProceedingDecision(UUID parentUuid, UUID childUuid) {
+  public Mono<String> removeProceedingDecision(UUID parentUuid, UUID childUuid) {
     return repository
         .unlinkDocumentUnits(parentUuid, childUuid)
         .doOnError(ex -> log.error("Couldn't unlink the ProceedingDecision", ex))

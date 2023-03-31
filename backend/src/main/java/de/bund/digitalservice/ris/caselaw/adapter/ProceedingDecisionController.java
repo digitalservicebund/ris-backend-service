@@ -31,11 +31,11 @@ public class ProceedingDecisionController {
   }
 
   @DeleteMapping(value = "/{childUuid}")
-  public Mono<ResponseEntity<String>> unlinkProceedingDecision(
+  public Mono<ResponseEntity<String>> removeProceedingDecision(
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
 
     return service
-        .unlinkProceedingDecision(parentUuid, childUuid)
+        .removeProceedingDecision(parentUuid, childUuid)
         .map(str -> ResponseEntity.status(HttpStatus.OK).body(str))
         .onErrorReturn(
             ResponseEntity.internalServerError().body("Couldn't remove the ProceedingDecision"));
