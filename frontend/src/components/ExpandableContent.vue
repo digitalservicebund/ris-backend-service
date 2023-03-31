@@ -47,17 +47,19 @@ const resizeObserver = new ResizeObserver((entries) => {
 })
 </script>
 <template>
-  <div class="expandable-content mb-[4rem]">
+  <div class="mb-[4rem]">
     <button
       :aria-labelledby="headerId"
-      class="expandable-content__header"
+      class="flex justify-between w-full"
       @click="toggleContentVisibility"
     >
       <slot name="header">
         <span>{{ header }}</span>
       </slot>
+
       <span class="icon material-icons">{{ iconName }}</span>
     </button>
+
     <transition
       ref="expandableContainer"
       class="expandable"
@@ -101,20 +103,5 @@ const resizeObserver = new ResizeObserver((entries) => {
 .expand-leave-active {
   overflow: hidden;
   transition: all 0.5s ease-in-out;
-}
-
-.expandable-content {
-  width: 100%;
-
-  &__header {
-    display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .icon {
-    cursor: pointer;
-  }
 }
 </style>
