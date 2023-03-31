@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequestMapping("api/v1/caselaw/documentunits/{uuid}/proceedingdecisions")
 public class ProceedingDecisionController {
+
   private final DocumentUnitService service;
 
   public ProceedingDecisionController(DocumentUnitService service) {
@@ -24,10 +26,18 @@ public class ProceedingDecisionController {
   }
 
   @PutMapping
-  public Flux<ProceedingDecision> addProceedingDecision(
+  public Flux<ProceedingDecision> createProceedingDecision(
       @PathVariable("uuid") UUID documentUnitUuid,
       @RequestBody ProceedingDecision proceedingDecision) {
-    return service.addProceedingDecision(documentUnitUuid, proceedingDecision);
+    return service.createProceedingDecision(documentUnitUuid, proceedingDecision);
+  }
+
+  @PutMapping(value = "/{childUuid}")
+  public Mono<ResponseEntity<DocumentUnit>> addProceedingDecision(
+      @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
+    return service
+        .linkProceedingDecision(parentUuid, childUuid)
+        .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit));
   }
 
   @DeleteMapping(value = "/{childUuid}")

@@ -14,9 +14,11 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecis
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -230,5 +232,49 @@ public class ProceedingDecisionIntegrationTest {
         .exchange()
         .expectStatus()
         .is4xxClientError();
+  }
+
+  @Test
+  void testLinkTwoExistingDocumentUnits() {
+    UUID parentUuid = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
+
+    UUID childUuid = UUID.randomUUID();
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(childUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("abcdefghjikl")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
+        .exchange()
+        .expectStatus()
+        .isCreated()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().proceedingDecisions().size()).isEqualTo(1);
+              assertThat(response.getResponseBody().proceedingDecisions().get(0).uuid())
+                  .isEqualTo(childUuid);
+            });
+
+    List<ProceedingDecisionLinkDTO> list = linkRepository.findAll().collectList().block();
+    assertThat(list).hasSize(1);
+    assertThat(list.get(0).getParentDocumentUnitId()).isEqualTo(parentDocumentUnitDTO.getId());
+    assertThat(list.get(0).getChildDocumentUnitId()).isEqualTo(childDocumentUnitDTO.getId());
   }
 }

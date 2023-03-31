@@ -258,7 +258,7 @@ public class DocumentUnitService {
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
-  public Flux<ProceedingDecision> addProceedingDecision(
+  public Flux<ProceedingDecision> createProceedingDecision(
       UUID documentUnitUuid, ProceedingDecision proceedingDecision) {
 
     return generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
@@ -273,6 +273,12 @@ public class DocumentUnitService {
         .flatMapMany(
             documentUnit ->
                 repository.findAllLinkedDocumentUnitsByParentDocumentUnitId(documentUnitUuid));
+  }
+
+  public Mono<DocumentUnit> linkProceedingDecision(UUID parentUuid, UUID childUuid) {
+    return repository
+        .linkDocumentUnits(parentUuid, childUuid)
+        .flatMap(v -> repository.findByUuid(parentUuid));
   }
 
   public Mono<String> removeProceedingDecision(UUID parentUuid, UUID childUuid) {
