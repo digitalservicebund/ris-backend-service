@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { watch, ref } from "vue"
 import DecisionList from "./DecisionList.vue"
+import InlineDecision from "./InlineDecision.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
 import { proceedingDecisionFields } from "@/fields/caselaw"
@@ -83,19 +84,6 @@ watch(
     immediate: true,
   }
 )
-
-const buildSearchResultRowString = (proceedingDecision: ProceedingDecision) => {
-  return [
-    proceedingDecision.court?.type,
-    proceedingDecision.court?.location,
-    proceedingDecision.documentType?.label,
-    proceedingDecision.date,
-    proceedingDecision.fileNumber,
-    proceedingDecision.documentNumber,
-  ]
-    .filter((v) => v !== undefined)
-    .join(", ")
-}
 </script>
 
 <template>
@@ -142,7 +130,7 @@ const buildSearchResultRowString = (proceedingDecision: ProceedingDecision) => {
         class="link-01-bold mb-24 mt-12 table-row underline"
       >
         <div class="table-cell">
-          {{ buildSearchResultRowString(proceedingDecision) }}
+          <InlineDecision :decision="proceedingDecision" />
         </div>
         <div class="p-8 table-cell">
           <TextButton
