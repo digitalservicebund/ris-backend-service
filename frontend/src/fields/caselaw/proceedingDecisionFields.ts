@@ -27,9 +27,9 @@ export const proceedingDecisionFields: InputField[] = [
   {
     name: "date",
     type: InputType.DATE,
-    label: "Datum",
+    label: "Entscheidungsdatum",
     inputAttributes: {
-      ariaLabel: "Datum Rechtszug",
+      ariaLabel: "Entscheidungsdatum Rechtszug",
     },
   },
   {
