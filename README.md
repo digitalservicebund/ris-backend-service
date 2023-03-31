@@ -73,28 +73,9 @@ Create .env file
 ./run.sh dev
 ```
 
-If you don't want to watch the log stream but let docker perform health checks until everything ist up, use detached mode:
-```bash
-./run.sh dev -d
-```
-
-
 The Application is available at http://127.0.0.1
 
 This will start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
-
-To see logs of the containers, use e.g.
-
-```bash
-docker compose logs # for all
-docker compose logs frontend # for specific services
-```
-
-To Stop the whole environment:
-
-```bash
-./run.sh down
-```
 
 Read the component individual documentation to figure out how to run them individually:
 
