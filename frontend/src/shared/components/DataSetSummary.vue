@@ -47,7 +47,7 @@ function wrappedSummarizer(dataEntry: T): VNode {
       :is="summary"
       v-for="(summary, index) in summaries"
       :key="index"
-      class="border-b-1 border-b-blue-500 label-02-reg last:border-none py-10"
+      class="border-b-1 border-b-blue-500 first:pt-0 label-02-reg last:border-none last:pb-0 py-10"
     />
   </div>
 </template>
