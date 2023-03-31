@@ -684,59 +684,48 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
     return Mono.zip(documentUnitDTOIdsViaFileNumber, documentTypeDTOId)
         .flatMapMany(
-            tuple -> {
-              Long[] docUnitIds;
-              if (tuple.getT1().isEmpty()) {
-                if (proceedingDecision.fileNumber() == null
-                    || proceedingDecision.fileNumber().isBlank()) {
-                  // @Query needs null and not empty list to ignore it
-                  docUnitIds = null;
-                } else {
-                  // search string exists, but no matching file number found
-                  // --> no chance for a search result
-                  return Flux.empty();
-                }
-              } else {
-                docUnitIds = tuple.getT1().toArray(Long[]::new);
-              }
-              Long docTypeId = tuple.getT2() == -1L ? null : tuple.getT2();
-              LOGGER.debug(
-                  "searchForProceedingDecisions params: {}, {}, {}, {}, {}",
-                  courtType,
-                  courtLocation,
-                  decisionDate,
-                  docUnitIds,
-                  docTypeId);
-              return metadataRepository.findByCourtDateFileNumberAndDocumentType(
-                  courtType, courtLocation, decisionDate, docUnitIds, docTypeId);
-            })
+            tuple ->
+                search(
+                    proceedingDecision,
+                    tuple.getT1(),
+                    tuple.getT2(),
+                    courtType,
+                    courtLocation,
+                    decisionDate))
         .flatMap(this::injectAdditionalInformation)
-        .map(
-            documentUnitMetadataDTO ->
-                ProceedingDecision.builder()
-                    .uuid(documentUnitMetadataDTO.getUuid())
-                    .documentNumber(documentUnitMetadataDTO.getDocumentnumber())
-                    .dataSource(documentUnitMetadataDTO.getDataSource())
-                    .court(
-                        Court.builder()
-                            .type(documentUnitMetadataDTO.getCourtType())
-                            .location(documentUnitMetadataDTO.getCourtLocation())
-                            .build())
-                    .date(documentUnitMetadataDTO.getDecisionDate())
-                    .fileNumber(
-                        documentUnitMetadataDTO.getFileNumbers() == null
-                                || documentUnitMetadataDTO.getFileNumbers().isEmpty()
-                            ? null
-                            : documentUnitMetadataDTO.getFileNumbers().get(0).getFileNumber())
-                    .documentType(
-                        documentUnitMetadataDTO.getDocumentTypeDTO() == null
-                            ? null
-                            : DocumentType.builder()
-                                .label(documentUnitMetadataDTO.getDocumentTypeDTO().getLabel())
-                                .jurisShortcut(
-                                    documentUnitMetadataDTO.getDocumentTypeDTO().getJurisShortcut())
-                                .build())
-                    .build());
+        .map(ProceedingDecisionTransformer::transformToDomain);
+  }
+
+  private Flux<DocumentUnitMetadataDTO> search(
+      ProceedingDecision proceedingDecision,
+      List<Long> documentUnitDTOIdsViaFileNumber,
+      Long documentTypeDTOId,
+      String courtType,
+      String courtLocation,
+      Instant decisionDate) {
+    Long[] docUnitIds;
+    if (documentUnitDTOIdsViaFileNumber.isEmpty()) {
+      if (proceedingDecision.fileNumber() == null || proceedingDecision.fileNumber().isBlank()) {
+        // @Query needs null and not empty list to ignore it
+        docUnitIds = null;
+      } else {
+        // search string exists, but no matching file number found
+        // --> no chance for a search result
+        return Flux.empty();
+      }
+    } else {
+      docUnitIds = documentUnitDTOIdsViaFileNumber.toArray(Long[]::new);
+    }
+    Long docTypeId = documentTypeDTOId == -1L ? null : documentTypeDTOId;
+    LOGGER.debug(
+        "searchForProceedingDecisions params: {}, {}, {}, {}, {}",
+        courtType,
+        courtLocation,
+        decisionDate,
+        docUnitIds,
+        docTypeId);
+    return metadataRepository.findByCourtDateFileNumberAndDocumentType(
+        courtType, courtLocation, decisionDate, docUnitIds, docTypeId);
   }
 
   public Flux<DocumentUnitListEntry> findAll(Sort sort) {
