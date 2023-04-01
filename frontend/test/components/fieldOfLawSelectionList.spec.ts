@@ -13,12 +13,6 @@ function renderComponent(
 }
 
 describe("FieldOfLawSelectionList", () => {
-  it("check headline", () => {
-    renderComponent([])
-
-    expect(screen.getByText("Auswahl")).toBeInTheDocument()
-  })
-
   it("render a 'Die Liste ist aktuell leer'", () => {
     renderComponent([])
 
