@@ -15,20 +15,19 @@ function handleUpdateModelValue(item: ComboboxInputModelType | undefined) {
 </script>
 
 <template>
-  <h1 class="heading-03-regular pb-8">Direkteingabe</h1>
+  <p class="heading-04-regular pb-8">Direkteingabe Sachgebiet</p>
   <div class="flex flex-col">
-    <div class="pb-28">
-      <div class="flex flex-row items-stretch">
-        <div class="grow">
-          <ComboboxInput
-            id="directInputCombobox"
-            aria-label="Direkteingabe-Sachgebietssuche eingeben"
-            clear-on-choosing-item
-            :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
-            @update:model-value="handleUpdateModelValue"
-          >
-          </ComboboxInput>
-        </div>
+    <div class="flex flex-row items-stretch">
+      <div class="grow">
+        <ComboboxInput
+          id="directInputCombobox"
+          aria-label="Direkteingabe-Sachgebietssuche eingeben"
+          clear-on-choosing-item
+          :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+          placeholder="Sachgebiet"
+          @update:model-value="handleUpdateModelValue"
+        >
+        </ComboboxInput>
       </div>
     </div>
   </div>
