@@ -118,8 +118,8 @@ function handleToggle() {
         <div v-if="showNorms" class="flex flex-col pb-6 pl-8">
           <div class="flex flex-row flex-wrap font-size-14px norms-font-color">
             <span v-for="(norm, idx) in node.norms" :key="idx">
-              <strong>{{ norm.abbreviation }}</strong>
-              {{ norm.singleNormDescription
+              <strong>{{ norm.singleNormDescription }}</strong>
+              {{ norm.abbreviation
               }}{{ idx < node.norms.length - 1 ? ",&nbsp;" : "" }}
             </span>
           </div>
