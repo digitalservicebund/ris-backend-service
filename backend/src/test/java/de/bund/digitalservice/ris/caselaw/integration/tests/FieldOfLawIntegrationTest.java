@@ -354,17 +354,17 @@ class FieldOfLawIntegrationTest {
   @Test
   void testOrderingOfGetFieldsOfLawByNormsAndSearchQuery() {
     String[][] fieldOfLawData = {
-      {"AB-01", "Some text here", "abc", "§ 123"},
-      {"AB-01-01", "More text also here", "cab", "§ 456"},
+      {"AB-01", "Some text here", "§ 123", "abc"},
+      {"AB-01-01", "More text also here", "§ 456", "cab"},
       {"CD", "Other text without more", null, null},
-      {"CD-01", "Text means writing here", "dab", "§ 012"},
-      {"CD-02", "Aber a word starting with ab and text + here", "abx", "§ 345"}
+      {"CD-01", "Text means writing here", "§ 012", "dab"},
+      {"CD-02", "Aber a word starting with ab and text + here", "§ 345", "abx"}
     };
 
     String searchStr = "norm:\"ab\" AB here text";
 
     List<String> expectedIdentifiers = Arrays.asList("CD-02", "AB-01", "AB-01-01");
-    List<Integer> expectedScores = Arrays.asList(43, 33, 28);
+    List<Integer> expectedScores = Arrays.asList(38, 28, 28);
 
     int normCount = 0;
     for (int i = 0; i < fieldOfLawData.length; i++) {
@@ -378,8 +378,8 @@ class FieldOfLawIntegrationTest {
           NormDTO.builder()
               .id((long) normCount++)
               .fieldOfLawId(folId)
-              .abbreviation(fol[2])
-              .singleNormDescription(fol[3])
+              .singleNormDescription(fol[2])
+              .abbreviation(fol[3])
               .build();
       normRepository.save(normDTO).block();
     }
