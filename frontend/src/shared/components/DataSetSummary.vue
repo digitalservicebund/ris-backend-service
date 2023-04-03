@@ -1,29 +1,21 @@
-<script lang="ts" generic="T" setup>
+<script lang="ts" setup>
 import { computed, h } from "vue"
 import type { VNode } from "vue"
 
 const props = defineProps<{
-  // Remove validation once Vue 3.3.0 got released which fixes this issue.
-  data: {
-    type: T | T[]
-    validator: () => true
-  }
-  summarizer?: (dataEntry: T) => string | VNode
+  data: undefined
+  summarizer?: (dataEntry: undefined) => string | VNode
 }>()
 
 const dataAsList = computed(() =>
   Array.isArray(props.data) ? props.data : [props.data]
 )
 
-// Remove type cast once Vue 3.3.0 got released which fixes this issue.
-const summarizer = computed(
-  () =>
-    (props.summarizer ?? defaultSummarizer) as (dataEntry: T) => string | VNode
-)
-
+const summarizer = computed(() => props.summarizer ?? defaultSummarizer)
 const summaries = computed(() => dataAsList.value.map(wrappedSummarizer))
 
-function defaultSummarizer(dataEntry: T): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function defaultSummarizer(dataEntry: any): string {
   if (["string", "boolean", "number"].includes(typeof dataEntry)) {
     return `${dataEntry}`
   } else if (Array.isArray(dataEntry)) {
@@ -35,7 +27,7 @@ function defaultSummarizer(dataEntry: T): string {
   }
 }
 
-function wrappedSummarizer(dataEntry: T): VNode {
+function wrappedSummarizer(dataEntry: undefined): VNode {
   const summary = summarizer.value(dataEntry)
   return typeof summary == "string" ? h("span", summary) : summary
 }
