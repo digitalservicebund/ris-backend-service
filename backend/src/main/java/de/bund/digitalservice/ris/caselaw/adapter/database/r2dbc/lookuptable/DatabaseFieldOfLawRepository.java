@@ -47,7 +47,8 @@ public interface DatabaseFieldOfLawRepository extends R2dbcRepository<FieldOfLaw
   @Query(
       "SELECT sf.* FROM lookuptable_field_of_law sf WHERE sf.id IN ( "
           + "SELECT n.field_of_law_id FROM lookuptable_field_of_law_norm n "
-          + "WHERE LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%'));")
+          + "WHERE LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%') "
+          + "OR LOWER(CONCAT(n.single_norm_description, ' ', n.abbreviation)) LIKE LOWER('%'||:normStr||'%'));")
   Flux<FieldOfLawDTO> findByNormStr(String normStr);
 
   @Query(
