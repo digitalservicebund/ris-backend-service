@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.utils;
+package de.bund.digitalservice.ris.caselaw.adapter;
 
 import jakarta.annotation.PostConstruct;
 import java.io.File;

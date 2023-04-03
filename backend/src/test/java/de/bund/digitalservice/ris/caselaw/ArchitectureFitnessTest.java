@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw;
 
+import com.tngtech.archunit.core.domain.JavaClass.Predicates;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption.Predefined;
@@ -23,6 +24,7 @@ class ArchitectureFitnessTest {
   static final String JPA_LAYER_PACKAGES =
       "de.bund.digitalservice.ris.caselaw.adapter.database.jpa..";
   static final String DOMAIN_LAYER_PACKAGES = "de.bund.digitalservice.ris.caselaw.domain..";
+  static final String RIS_PACKAGES = "de.bund.digitalservice.ris..";
 
   static JavaClasses classes;
 
@@ -46,14 +48,30 @@ class ArchitectureFitnessTest {
 
   @Test
   @Disabled("Domain services need to be refactored to not depend on outside packages")
-  void domainClassesShouldOnlyDependOnDomainOrStdLibClasses() {
+  void domainClassesShouldOnlyDependOnDomainOrExternalLibClasses() {
     ArchRule rule =
         ArchRuleDefinition.classes()
             .that()
             .resideInAPackage(DOMAIN_LAYER_PACKAGES)
             .should()
-            .onlyDependOnClassesThat()
-            .resideInAnyPackage(DOMAIN_LAYER_PACKAGES, "java..");
+            .onlyDependOnClassesThat(
+                Predicates.resideInAPackage(DOMAIN_LAYER_PACKAGES)
+                    .or(Predicates.resideOutsideOfPackage(RIS_PACKAGES)));
+    rule.check(classes);
+  }
+
+  @Test
+  void domainClassesShouldOnlyHavePrivateFields() {
+    ArchRule rule =
+        ArchRuleDefinition.fields()
+            .that()
+            .areDeclaredInClassesThat()
+            .areNotEnums()
+            .and()
+            .areDeclaredInClassesThat()
+            .resideInAPackage(DOMAIN_LAYER_PACKAGES)
+            .should()
+            .bePrivate();
     rule.check(classes);
   }
 

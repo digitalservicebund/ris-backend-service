@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.utils;
+package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 public class DocxConverterException extends RuntimeException {
   public DocxConverterException(String message, Exception exception) {

@@ -1,5 +1,6 @@
-package de.bund.digitalservice.ris.caselaw.utils;
+package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
+import de.bund.digitalservice.ris.caselaw.domain.Converter;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
 import de.bund.digitalservice.ris.caselaw.domain.docx.ErrorElement;
@@ -10,7 +11,7 @@ import org.docx4j.wml.P;
 import org.docx4j.wml.Style;
 import org.docx4j.wml.Tbl;
 
-public class DocxConverter {
+public class DocxConverter implements Converter<DocumentUnitDocx> {
   Map<String, Style> styles;
   Map<String, DocxImagePart> images;
   Map<String, ListNumberingDefinition> listNumberingDefinitions;

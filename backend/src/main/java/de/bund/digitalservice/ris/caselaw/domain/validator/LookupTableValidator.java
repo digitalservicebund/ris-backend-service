@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain.validator;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
+import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashMap;

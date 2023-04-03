@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocxConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import java.util.List;
 import org.springframework.http.MediaType;
@@ -29,7 +28,7 @@ public class DocumentUnitDocxController {
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
   public Mono<ResponseEntity<Docx2Html>> html(@PathVariable String id) {
     return service
-        .getHtml(id)
+        .getConvertedObject(id)
         .map(ResponseEntity::ok)
         .onErrorReturn(ResponseEntity.internalServerError().build());
   }

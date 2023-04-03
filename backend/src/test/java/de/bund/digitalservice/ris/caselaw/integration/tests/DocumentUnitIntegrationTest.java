@@ -18,10 +18,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepos
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -31,6 +30,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -75,10 +75,10 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDocumentUnitMetadataRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
-  @Autowired private CourtRepository courtRepository;
+  @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private StateRepository stateRepository;
   @Autowired private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
-  @Autowired private DocumentTypeRepository documentTypeRepository;
+  @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseIncorrectCourtRepository incorrectCourtRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -88,12 +88,12 @@ class DocumentUnitIntegrationTest {
     fileNumberRepository.deleteAll().block();
     deviatingEcliRepository.deleteAll().block();
     previousDecisionRepository.deleteAll().block();
-    courtRepository.deleteAll().block();
+    databaseCourtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
     deviatingDecisionDateRepository.deleteAll().block();
     incorrectCourtRepository.deleteAll().block();
     repository.deleteAll().block();
-    documentTypeRepository.deleteAll().block();
+    databaseDocumentTypeRepository.deleteAll().block();
   }
 
   @Test
@@ -459,7 +459,7 @@ class DocumentUnitIntegrationTest {
             .federalstate(stateShortcutInCourtAndState)
             .region(regionInCourt)
             .build();
-    courtRepository.save(courtDTO).block();
+    databaseCourtRepository.save(courtDTO).block();
     stateRepository
         .save(
             StateDTO.builder()
@@ -518,7 +518,7 @@ class DocumentUnitIntegrationTest {
             .documentType('R')
             .label("ABC123")
             .build();
-    documentTypeRepository.save(documentTypeDTO).block();
+    databaseDocumentTypeRepository.save(documentTypeDTO).block();
 
     DocumentUnitDTO dto =
         DocumentUnitDTO.builder()

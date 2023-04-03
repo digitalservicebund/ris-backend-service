@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import static de.bund.digitalservice.ris.caselaw.utils.ServiceUtils.byteBufferToArray;
+import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
@@ -10,8 +10,8 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLink
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.FieldOfLawTransformer;
@@ -42,9 +42,9 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class LookupTableImporterService {
 
-  private final DocumentTypeRepository documentTypeRepository;
+  private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   private final JPADocumentTypeRepository jpaDocumentTypeRepository;
-  private final CourtRepository courtRepository;
+  private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
   private final JPAFieldOfLawRepository jpaFieldOfLawRepository;
   private final JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository;
@@ -53,15 +53,15 @@ public class LookupTableImporterService {
       Pattern.compile("\\p{Lu}{2}(-\\d{2})+(?![\\p{L}\\d-])");
 
   public LookupTableImporterService(
-      DocumentTypeRepository documentTypeRepository,
+      DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
       JPADocumentTypeRepository jpaDocumentTypeRepository,
-      CourtRepository courtRepository,
+      DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
       JPAFieldOfLawRepository jpaFieldOfLawRepository,
       JPAFieldOfLawLinkRepository jpaFieldOfLawLinkRepository) {
-    this.documentTypeRepository = documentTypeRepository;
+    this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
     this.jpaDocumentTypeRepository = jpaDocumentTypeRepository;
-    this.courtRepository = courtRepository;
+    this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
     this.jpaFieldOfLawRepository = jpaFieldOfLawRepository;
     this.jpaFieldOfLawLinkRepository = jpaFieldOfLawLinkRepository;
@@ -183,9 +183,9 @@ public class LookupTableImporterService {
                         .build())
             .toList();
 
-    return courtRepository
+    return databaseCourtRepository
         .deleteAll()
-        .thenMany(courtRepository.saveAll(courtsDTO))
+        .thenMany(databaseCourtRepository.saveAll(courtsDTO))
         .collectList()
         .map(list -> "Successfully imported the court lookup table");
   }

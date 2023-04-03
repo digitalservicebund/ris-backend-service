@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface DocumentTypeRepository extends R2dbcRepository<DocumentTypeDTO, Long> {
+public interface DatabaseDocumentTypeRepository extends R2dbcRepository<DocumentTypeDTO, Long> {
 
   Mono<DocumentTypeDTO> findByJurisShortcut(String jurisShortcut);
 

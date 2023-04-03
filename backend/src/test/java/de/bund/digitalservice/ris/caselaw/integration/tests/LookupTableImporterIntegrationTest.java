@@ -8,7 +8,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.LookupTableImporterService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPADocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordDTO;
@@ -60,7 +60,7 @@ class LookupTableImporterIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private JPADocumentTypeRepository jpaDocumentTypeRepository;
-  @Autowired private CourtRepository courtRepository;
+  @Autowired private DatabaseCourtRepository databaseCourtRepository;
   @Autowired private StateRepository stateRepository;
   @Autowired private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @Autowired private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
@@ -73,7 +73,7 @@ class LookupTableImporterIntegrationTest {
   @AfterEach
   void cleanUp() {
     jpaDocumentTypeRepository.deleteAll();
-    courtRepository.deleteAll().block();
+    databaseCourtRepository.deleteAll().block();
     stateRepository.deleteAll().block();
     fieldOfLawRepository.deleteAll().block(); // will cascade delete the other 3 repo-contents
   }
@@ -143,7 +143,7 @@ class LookupTableImporterIntegrationTest {
                 assertThat(response.getResponseBody())
                     .isEqualTo("Successfully imported the court lookup table"));
 
-    List<CourtDTO> courtDTOs = courtRepository.findAll().collectList().block();
+    List<CourtDTO> courtDTOs = databaseCourtRepository.findAll().collectList().block();
     assertThat(courtDTOs).hasSize(1);
     CourtDTO courtDTO = courtDTOs.get(0);
     assertThat(courtDTO.getId()).isEqualTo(5L);

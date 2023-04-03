@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-import static de.bund.digitalservice.ris.caselaw.utils.ServiceUtils.byteBufferToArray;
+import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

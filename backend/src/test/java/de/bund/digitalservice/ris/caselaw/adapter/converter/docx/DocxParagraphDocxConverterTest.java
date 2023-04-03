@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.utils;
+package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -15,7 +15,7 @@ import org.docx4j.wml.Text;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-class DocxParagraphConverterTest {
+class DocxParagraphDocxConverterTest {
   private DocxConverter converter;
 
   @BeforeEach

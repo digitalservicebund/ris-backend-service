@@ -18,9 +18,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAFieldOfLawRepo
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPAKeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.jpa.JPANormDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import java.nio.ByteBuffer;
@@ -44,11 +44,11 @@ class LookupTableImporterServiceTest {
 
   @SpyBean private LookupTableImporterService service;
 
-  @MockBean private DocumentTypeRepository documentTypeRepository;
+  @MockBean private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
 
   @MockBean private JPADocumentTypeRepository jpaDocumentTypeRepository;
 
-  @MockBean private CourtRepository courtRepository;
+  @MockBean private DatabaseCourtRepository databaseCourtRepository;
 
   @MockBean private StateRepository stateRepository;
 
@@ -60,7 +60,7 @@ class LookupTableImporterServiceTest {
 
   @Test
   void testImportDocumentTypeLookupTable() {
-    when(documentTypeRepository.deleteAll()).thenReturn(Mono.empty());
+    when(databaseDocumentTypeRepository.deleteAll()).thenReturn(Mono.empty());
 
     String doctypesXml =
         """
@@ -93,8 +93,8 @@ class LookupTableImporterServiceTest {
                     "Successfully imported the document type lookup table", documentTypeDTO))
         .verifyComplete();
 
-    verify(documentTypeRepository, never()).deleteAll();
-    verify(documentTypeRepository, never()).saveAll(anyCollection());
+    verify(databaseDocumentTypeRepository, never()).deleteAll();
+    verify(databaseDocumentTypeRepository, never()).saveAll(anyCollection());
     verify(jpaDocumentTypeRepository, atMostOnce()).deleteAll();
     verify(jpaDocumentTypeRepository, atMostOnce()).saveAll(documentTypeDTOs);
   }
@@ -113,8 +113,8 @@ class LookupTableImporterServiceTest {
                 .newEntry(true)
                 .build());
 
-    when(courtRepository.deleteAll()).thenReturn(Mono.empty());
-    when(courtRepository.saveAll(courtsDTO)).thenReturn(Flux.fromIterable(courtsDTO));
+    when(databaseCourtRepository.deleteAll()).thenReturn(Mono.empty());
+    when(databaseCourtRepository.saveAll(courtsDTO)).thenReturn(Flux.fromIterable(courtsDTO));
 
     String courtsXml =
         """
@@ -136,10 +136,10 @@ class LookupTableImporterServiceTest {
             courtDTO -> assertEquals("Successfully imported the court lookup table", courtDTO))
         .verifyComplete();
 
-    verify(courtRepository).deleteAll();
+    verify(databaseCourtRepository).deleteAll();
     // this was already tested by using when(courtRepository.saveAll(courtsDTO)), but we leave it
     // here as an example how to use captors
-    verify(courtRepository).saveAll(courtDTOlistCaptor.capture());
+    verify(databaseCourtRepository).saveAll(courtDTOlistCaptor.capture());
     assertThat(courtDTOlistCaptor.getValue())
         .extracting("courttype", "courtlocation")
         .containsExactly(tuple("type123", "location123"));

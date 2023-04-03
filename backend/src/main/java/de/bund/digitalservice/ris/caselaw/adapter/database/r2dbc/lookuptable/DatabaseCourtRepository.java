@@ -7,7 +7,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface CourtRepository extends R2dbcRepository<CourtDTO, Long> {
+public interface DatabaseCourtRepository extends R2dbcRepository<CourtDTO, Long> {
 
   Mono<CourtDTO> findByCourttypeAndCourtlocation(String courttype, String courtlocation);
 

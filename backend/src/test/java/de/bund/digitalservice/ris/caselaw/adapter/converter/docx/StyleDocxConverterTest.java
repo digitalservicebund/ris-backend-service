@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.utils;
+package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
-class StyleConverterTest {
+class StyleDocxConverterTest {
   @Test
   void testGetListFromString_withNullString() {
 

@@ -5,8 +5,10 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.LookupTableController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresJPAConfig;
@@ -32,7 +34,9 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       LookupTableService.class,
       FlywayConfig.class,
       PostgresConfig.class,
-      PostgresJPAConfig.class
+      PostgresJPAConfig.class,
+      PostgresDocumentTypeRepositoryImpl.class,
+      PostgresCourtRepositoryImpl.class
     },
     controllers = {LookupTableController.class})
 class LookupTableIntegrationTest {
@@ -49,8 +53,8 @@ class LookupTableIntegrationTest {
   }
 
   @Autowired private WebTestClient webClient;
-  @Autowired private CourtRepository courtRepository;
-  @Autowired private DocumentTypeRepository documentTypeRepository;
+  @Autowired private DatabaseCourtRepository databaseCourtRepository;
+  @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
 
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -58,14 +62,14 @@ class LookupTableIntegrationTest {
 
   @AfterEach
   void cleanUp() {
-    courtRepository.deleteAll().block();
-    documentTypeRepository.deleteAll().block();
+    databaseCourtRepository.deleteAll().block();
+    databaseDocumentTypeRepository.deleteAll().block();
   }
 
   @Test
   void testGetAllCourts() {
     CourtDTO courtDTO = CourtDTO.builder().courttype("AB").courtlocation("Berlin").build();
-    courtRepository.save(courtDTO).block();
+    databaseCourtRepository.save(courtDTO).block();
     courtDTO =
         CourtDTO.builder()
             .courttype("BGH")
@@ -73,7 +77,7 @@ class LookupTableIntegrationTest {
             .superiorcourt("ja")
             .foreigncountry("nein")
             .build();
-    courtRepository.save(courtDTO).block();
+    databaseCourtRepository.save(courtDTO).block();
 
     webClient
         .mutateWith(csrf())
@@ -104,7 +108,7 @@ class LookupTableIntegrationTest {
     };
 
     for (String[] court : courtData) {
-      courtRepository
+      databaseCourtRepository
           .save(CourtDTO.builder().courttype(court[0]).courtlocation(court[1]).build())
           .block();
     }

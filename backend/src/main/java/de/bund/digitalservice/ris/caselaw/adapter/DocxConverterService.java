@@ -1,11 +1,12 @@
-package de.bund.digitalservice.ris.caselaw.domain;
+package de.bund.digitalservice.ris.caselaw.adapter;
 
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocumentUnitDocxListUtils;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
+import de.bund.digitalservice.ris.caselaw.domain.ConverterService;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.Docx2Html;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocxImagePart;
-import de.bund.digitalservice.ris.caselaw.utils.DocumentUnitDocxListUtils;
-import de.bund.digitalservice.ris.caselaw.utils.DocxConverter;
-import de.bund.digitalservice.ris.caselaw.utils.DocxConverterException;
 import java.awt.Dimension;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -27,6 +28,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.docx4j.model.listnumbering.ListNumberingDefinition;
 import org.docx4j.openpackaging.contenttype.ContentTypes;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
@@ -42,8 +44,6 @@ import org.freehep.graphicsio.ImageGraphics2D;
 import org.freehep.graphicsio.emf.EMFInputStream;
 import org.freehep.graphicsio.emf.EMFPanel;
 import org.freehep.graphicsio.emf.EMFRenderer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
@@ -61,9 +61,8 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.S3Object;
 
 @Service
-public class DocxConverterService {
-  private static final Logger LOGGER = LoggerFactory.getLogger(DocxConverterService.class);
-
+@Slf4j
+public class DocxConverterService implements ConverterService {
   private final S3AsyncClient client;
   private final DocumentBuilderFactory documentBuilderFactory;
   private final DocxConverter converter;
@@ -120,7 +119,7 @@ public class DocxConverterService {
         .map(response -> response.contents().stream().map(S3Object::key).toList());
   }
 
-  public Mono<Docx2Html> getHtml(String fileName) {
+  public Mono<Docx2Html> getConvertedObject(String fileName) {
     GetObjectRequest request = GetObjectRequest.builder().bucket(bucketName).key(fileName).build();
 
     CompletableFuture<ResponseBytes<GetObjectResponse>> futureResponse =
@@ -141,7 +140,7 @@ public class DocxConverterService {
               }
               return new Docx2Html(content);
             })
-        .doOnError(ex -> LOGGER.error("Couldn't convert docx", ex));
+        .doOnError(ex -> log.error("Couldn't convert docx", ex));
   }
 
   public List<DocumentUnitDocx> parseAsDocumentUnitDocxList(InputStream inputStream) {
@@ -271,7 +270,7 @@ public class DocxConverterService {
                       new DocxImagePart(
                           ContentTypes.IMAGE_PNG, byteArrayOutputStream.toByteArray())));
     } catch (Exception ex) {
-      LOGGER.error("Couldn't convert emf to png", ex);
+      log.error("Couldn't convert emf to png", ex);
     }
   }
 }

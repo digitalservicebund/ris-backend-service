@@ -2,9 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import static org.mockito.Mockito.verify;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -29,9 +29,9 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   @MockBean private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @MockBean private DatabaseIncorrectCourtRepository incorrectCourtRepository;
-  @MockBean private CourtRepository courtRepository;
+  @MockBean private DatabaseCourtRepository databaseCourtRepository;
   @MockBean private StateRepository stateRepository;
-  @MockBean private DocumentTypeRepository documentTypeRepository;
+  @MockBean private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @MockBean private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @MockBean private DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   @MockBean private DatabaseKeywordRepository keywordRepository;
@@ -47,9 +47,9 @@ class PostgresDocumentUnitRepositoryImplTest {
             proceedingDecisionLinkRepository,
             deviatingDecisionDateRepository,
             incorrectCourtRepository,
-            courtRepository,
+            databaseCourtRepository,
             stateRepository,
-            documentTypeRepository,
+            databaseDocumentTypeRepository,
             fieldOfLawRepository,
             documentUnitFieldsOfLawRepository,
             keywordRepository);

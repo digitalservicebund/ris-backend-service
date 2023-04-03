@@ -1,11 +1,10 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
@@ -18,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
@@ -48,9 +48,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   private final DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository;
   private final DatabaseIncorrectCourtRepository incorrectCourtRepository;
-  private final CourtRepository courtRepository;
+  private final DatabaseCourtRepository databaseCourtRepository;
   private final StateRepository stateRepository;
-  private final DocumentTypeRepository documentTypeRepository;
+  private final DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
@@ -63,9 +63,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseProceedingDecisionLinkRepository proceedingDecisionLinkRepository,
       DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository,
       DatabaseIncorrectCourtRepository incorrectCourtRepository,
-      CourtRepository courtRepository,
+      DatabaseCourtRepository databaseCourtRepository,
       StateRepository stateRepository,
-      DocumentTypeRepository documentTypeRepository,
+      DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository) {
@@ -77,9 +77,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.deviatingEcliRepository = deviatingEcliRepository;
     this.deviatingDecisionDateRepository = deviatingDecisionDateRepository;
     this.incorrectCourtRepository = incorrectCourtRepository;
-    this.courtRepository = courtRepository;
+    this.databaseCourtRepository = databaseCourtRepository;
     this.stateRepository = stateRepository;
-    this.documentTypeRepository = documentTypeRepository;
+    this.databaseDocumentTypeRepository = databaseDocumentTypeRepository;
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
@@ -139,7 +139,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       documentUnitDTO.setDocumentTypeId(null);
       return Mono.just(documentUnitDTO);
     }
-    return documentTypeRepository
+    return databaseDocumentTypeRepository
         .findByJurisShortcut(documentUnit.coreData().documentType().jurisShortcut())
         .map(
             documentTypeDTO -> {
@@ -201,7 +201,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       return Mono.just(CourtDTO.builder().build());
     }
 
-    return courtRepository
+    return databaseCourtRepository
         .findByCourttypeAndCourtlocation(
             documentUnit.coreData().court().type(), documentUnit.coreData().court().location())
         .defaultIfEmpty(CourtDTO.builder().build());
@@ -582,7 +582,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     if (documentUnitMetadataDTO.getDocumentTypeId() == null) {
       return Mono.just(documentUnitMetadataDTO);
     }
-    return documentTypeRepository
+    return databaseDocumentTypeRepository
         .findById(documentUnitMetadataDTO.getDocumentTypeId())
         .defaultIfEmpty(DocumentTypeDTO.builder().build())
         .map(
@@ -650,7 +650,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     if (documentUnitMetadataDTO.getDocumentTypeId() == null) {
       return Mono.just(documentUnitMetadataDTO);
     }
-    return documentTypeRepository
+    return databaseDocumentTypeRepository
         .findById(documentUnitMetadataDTO.getDocumentTypeId())
         .defaultIfEmpty(DocumentTypeDTO.builder().build())
         .map(
@@ -678,7 +678,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     Mono<Long> documentTypeDTOId =
         (docType == null || docType.jurisShortcut() == null)
             ? Mono.just(-1L)
-            : documentTypeRepository
+            : databaseDocumentTypeRepository
                 .findByJurisShortcut(proceedingDecision.documentType().jurisShortcut())
                 .mapNotNull(DocumentTypeDTO::getId);
 

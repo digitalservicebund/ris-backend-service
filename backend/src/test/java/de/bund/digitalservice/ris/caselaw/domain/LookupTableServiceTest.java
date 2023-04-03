@@ -5,11 +5,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.CourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.FieldOfLawKeywordRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.NormRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresCourtRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.PostgresDocumentTypeRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.util.List;
@@ -24,13 +26,17 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 
 @ExtendWith(SpringExtension.class)
-@Import(LookupTableService.class)
+@Import({
+  LookupTableService.class,
+  PostgresDocumentTypeRepositoryImpl.class,
+  PostgresCourtRepositoryImpl.class
+})
 class LookupTableServiceTest {
 
   @SpyBean private LookupTableService service;
 
-  @MockBean private DocumentTypeRepository documentTypeRepository;
-  @MockBean private CourtRepository courtRepository;
+  @MockBean private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
+  @MockBean private DatabaseCourtRepository databaseCourtRepository;
   @MockBean private FieldOfLawRepository fieldOfLawRepository;
   @MockBean private NormRepository normRepository;
   @MockBean private FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
@@ -40,7 +46,7 @@ class LookupTableServiceTest {
     DocumentTypeDTO documentTypeDTO = DocumentTypeDTO.EMPTY;
     documentTypeDTO.setJurisShortcut("ABC");
     documentTypeDTO.setLabel("LabelABC");
-    when(documentTypeRepository.findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R'))
+    when(databaseDocumentTypeRepository.findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R'))
         .thenReturn(Flux.just(documentTypeDTO));
 
     StepVerifier.create(service.getCaselawDocumentTypes(Optional.empty()))
@@ -52,7 +58,8 @@ class LookupTableServiceTest {
             })
         .verifyComplete();
 
-    verify(documentTypeRepository).findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R');
+    verify(databaseDocumentTypeRepository)
+        .findAllByDocumentTypeOrderByJurisShortcutAscLabelAsc('R');
   }
 
   @Test
@@ -71,7 +78,7 @@ class LookupTableServiceTest {
     courtB.setSuperiorcourt("Nein");
     courtB.setForeigncountry("Nein");
 
-    when(courtRepository.findAllByOrderByCourttypeAscCourtlocationAsc())
+    when(databaseCourtRepository.findAllByOrderByCourttypeAscCourtlocationAsc())
         .thenReturn(Flux.fromIterable(List.of(courtA, courtB)));
 
     StepVerifier.create(service.getCourts(Optional.empty()))
@@ -79,6 +86,6 @@ class LookupTableServiceTest {
         .expectNext(new Court("XYZ", "Hamburg", "XYZ Hamburg", null))
         .verifyComplete();
 
-    verify(courtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();
+    verify(databaseCourtRepository).findAllByOrderByCourttypeAscCourtlocationAsc();
   }
 }

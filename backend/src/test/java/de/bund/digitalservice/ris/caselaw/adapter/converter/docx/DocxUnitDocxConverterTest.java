@@ -1,11 +1,11 @@
-package de.bund.digitalservice.ris.caselaw.utils;
+package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
 
-class DocxUnitConverterTest {
+class DocxUnitDocxConverterTest {
   @Test
   void testConvertTwipToPixel() {
     var result = DocxUnitConverter.convertTwipToPixel(1440);

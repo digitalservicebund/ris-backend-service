@@ -9,6 +9,9 @@ import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.DocxConverterService;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverter;
+import de.bund.digitalservice.ris.caselaw.adapter.converter.docx.DocxConverterException;
 import de.bund.digitalservice.ris.caselaw.config.ConverterConfig;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
@@ -22,8 +25,6 @@ import de.bund.digitalservice.ris.caselaw.domain.docx.RunTextElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableCellElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.TableRowElement;
-import de.bund.digitalservice.ris.caselaw.utils.DocxConverter;
-import de.bund.digitalservice.ris.caselaw.utils.DocxConverterException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,7 +143,7 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
+      StepVerifier.create(service.getConvertedObject("test.docx"))
           .consumeNextWith(
               docx2Html -> {
                 assertNotNull(docx2Html);
@@ -180,7 +181,7 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
+      StepVerifier.create(service.getConvertedObject("test.docx"))
           .consumeNextWith(Assertions::assertNotNull)
           .verifyComplete();
 
@@ -232,7 +233,7 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
+      StepVerifier.create(service.getConvertedObject("test.docx"))
           .consumeNextWith(Assertions::assertNotNull)
           .verifyComplete();
 
@@ -263,7 +264,7 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenReturn(mlPackage);
 
-      StepVerifier.create(service.getHtml("test.docx"))
+      StepVerifier.create(service.getConvertedObject("test.docx"))
           .consumeNextWith(
               docx2Html -> {
                 assertNotNull(docx2Html);
@@ -357,7 +358,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -444,7 +445,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -507,7 +508,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -552,7 +553,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -588,7 +589,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -620,7 +621,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -656,7 +657,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -692,7 +693,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -730,7 +731,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -766,7 +767,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -821,7 +822,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -905,7 +906,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1012,7 +1013,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1121,7 +1122,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1229,7 +1230,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1334,7 +1335,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1439,7 +1440,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1550,7 +1551,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1635,7 +1636,7 @@ class DocxConverterServiceTest {
             .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
             .thenReturn(mlPackage);
 
-        StepVerifier.create(service.getHtml("test.docx"))
+        StepVerifier.create(service.getConvertedObject("test.docx"))
             .consumeNextWith(
                 docx2Html -> {
                   assertNotNull(docx2Html);
@@ -1659,7 +1660,7 @@ class DocxConverterServiceTest {
         .thenReturn(CompletableFuture.completedFuture(responseBytes));
     when(responseBytes.asInputStream()).thenReturn(null);
 
-    StepVerifier.create(service.getHtml("test.docx"))
+    StepVerifier.create(service.getConvertedObject("test.docx"))
         .consumeNextWith(docx2Html -> assertEquals(Docx2Html.EMPTY, docx2Html))
         .verifyComplete();
   }
@@ -1676,7 +1677,7 @@ class DocxConverterServiceTest {
           .when(() -> WordprocessingMLPackage.load(any(InputStream.class)))
           .thenThrow(Docx4JException.class);
 
-      StepVerifier.create(service.getHtml("test.docx"))
+      StepVerifier.create(service.getConvertedObject("test.docx"))
           .expectErrorMatches(
               throwable ->
                   throwable instanceof DocxConverterException

@@ -1,6 +1,5 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
+package de.bund.digitalservice.ris.caselaw.domain;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import java.util.List;
 
 public enum LegalEffect {

@@ -1,4 +1,4 @@
-package de.bund.digitalservice.ris.caselaw.utils;
+package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import de.bund.digitalservice.ris.caselaw.domain.docx.Style;
 import java.util.ArrayList;

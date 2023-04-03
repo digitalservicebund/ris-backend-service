@@ -4,7 +4,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocxConverterService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ class DocumentUnitDocxControllerTest {
 
   @Test
   void testHtml() {
-    when(service.getHtml("123")).thenReturn(Mono.empty());
+    when(service.getConvertedObject("123")).thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
@@ -50,6 +49,6 @@ class DocumentUnitDocxControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).getHtml("123");
+    verify(service).getConvertedObject("123");
   }
 }

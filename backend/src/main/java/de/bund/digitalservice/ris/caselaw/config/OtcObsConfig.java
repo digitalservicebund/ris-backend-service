@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.config;
 
-import de.bund.digitalservice.ris.caselaw.utils.S3AsyncMockClient;
+import de.bund.digitalservice.ris.caselaw.adapter.S3AsyncMockClient;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Duration;
