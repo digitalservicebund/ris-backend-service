@@ -263,10 +263,7 @@ public class DocumentUnitService {
 
     return generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
         .flatMap(
-            documentUnit ->
-                repository
-                    .linkDocumentUnits(documentUnitUuid, documentUnit.uuid())
-                    .map(v -> documentUnit))
+            documentUnit -> repository.linkDocumentUnits(documentUnitUuid, documentUnit.uuid()))
         .flatMap(
             documentUnit ->
                 updateDocumentUnit(enrichNewDocumentUnitWithData(documentUnit, proceedingDecision)))
@@ -276,9 +273,7 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> linkProceedingDecision(UUID parentUuid, UUID childUuid) {
-    return repository
-        .linkDocumentUnits(parentUuid, childUuid)
-        .flatMap(v -> repository.findByUuid(parentUuid));
+    return repository.linkDocumentUnits(parentUuid, childUuid);
   }
 
   public Mono<String> removeProceedingDecision(UUID parentUuid, UUID childUuid) {

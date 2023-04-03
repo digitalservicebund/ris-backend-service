@@ -778,7 +778,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<ProceedingDecisionLinkDTO> linkDocumentUnits(
+  public Mono<DocumentUnit> linkDocumentUnits(
       UUID parentDocumentUnitUuid, UUID childDocumentUnitUuid) {
     Mono<Long> parentDocumentUnitId =
         metadataRepository.findByUuid(parentDocumentUnitUuid).map(DocumentUnitMetadataDTO::getId);
@@ -788,11 +788,15 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return Mono.zip(parentDocumentUnitId, childDocumentUnitId)
         .flatMap(
             tuple ->
-                proceedingDecisionLinkRepository.save(
-                    ProceedingDecisionLinkDTO.builder()
-                        .parentDocumentUnitId(tuple.getT1())
-                        .childDocumentUnitId(tuple.getT2())
-                        .build()));
+                proceedingDecisionLinkRepository
+                    .save(
+                        ProceedingDecisionLinkDTO.builder()
+                            .parentDocumentUnitId(tuple.getT1())
+                            .childDocumentUnitId(tuple.getT2())
+                            .build())
+                    .map(ProceedingDecisionLinkDTO::getParentDocumentUnitId)
+                    .flatMap(repository::findById)
+                    .map(DocumentUnitTransformer::transformDTO));
   }
 
   @Override

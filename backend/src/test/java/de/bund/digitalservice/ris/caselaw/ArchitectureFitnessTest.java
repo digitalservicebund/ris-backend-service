@@ -47,7 +47,6 @@ class ArchitectureFitnessTest {
   }
 
   @Test
-  @Disabled("Domain services need to be refactored to not depend on outside packages")
   void domainClassesShouldOnlyDependOnDomainOrExternalLibClasses() {
     ArchRule rule =
         ArchRuleDefinition.classes()
