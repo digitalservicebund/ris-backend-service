@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFile
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -13,8 +14,14 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORI
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
@@ -30,6 +37,7 @@ import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 import java.util.UUID
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 import de.bund.digitalservice.ris.norms.juris.converter.model.Article as ArticleData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Norm as NormData
 import de.bund.digitalservice.ris.norms.juris.converter.model.Paragraph as ParagraphData
@@ -76,37 +84,58 @@ fun mapDomainToData(norm: Norm): NormData {
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
+    val divergentDocumentNumber = data.divergentDocumentNumber?.let { listOf(Metadatum(data.divergentDocumentNumber, DIVERGENT_DOCUMENT_NUMBER, 0)) } ?: listOf()
+    val frameKeywords = createMetadataForType(data.frameKeywords, KEYWORD)
+    val risAbbreviationInternationalLaw = createMetadataForType(data.risAbbreviationInternationalLaw, RIS_ABBREVIATION_INTERNATIONAL_LAW)
+    val unofficialLongTitle = createMetadataForType(data.unofficialLongTitle, UNOFFICIAL_LONG_TITLE)
+    val unofficialShortTitle = createMetadataForType(data.unofficialShortTitle, UNOFFICIAL_SHORT_TITLE)
+    val unofficialAbbreviation = createMetadataForType(data.unofficialAbbreviation, UNOFFICIAL_ABBREVIATION)
+    val unofficialReference = createMetadataForType(data.unofficialReference, UNOFFICIAL_REFERENCE)
+    val referenceNumber = createMetadataForType(data.referenceNumber, REFERENCE_NUMBER)
+    val definition = createMetadataForType(data.definition, DEFINITION)
+    val ageOfMajorityIndication = createMetadataForType(data.ageOfMajorityIndication, AGE_OF_MAJORITY_INDICATION)
+    val validityRule = createMetadataForType(data.validityRule, VALIDITY_RULE)
+    val participationType = createMetadataForType(data.participationType, PARTICIPATION_TYPE)
+    val participationInstitution = createMetadataForType(data.participationInstitution, PARTICIPATION_INSTITUTION)
+    val leadJurisdiction = createMetadataForType(data.leadJurisdiction, LEAD_JURISDICTION)
+    val leadUnit = createMetadataForType(data.leadUnit, LEAD_UNIT)
+    val subjectFna = createMetadataForType(data.subjectFna, SUBJECT_FNA)
+    val subjectGesta = createMetadataForType(data.subjectGesta, SUBJECT_GESTA)
+
     val metadata: MutableList<Metadatum<*>> = mutableListOf()
-    if (data.divergentDocumentNumber !== null) {
-        metadata.add(Metadatum(data.divergentDocumentNumber, DIVERGENT_DOCUMENT_NUMBER, 0))
-    }
-    metadata.addAll(createMetadataForType(data.frameKeywords, KEYWORD))
-    metadata.addAll(createMetadataForType(data.risAbbreviationInternationalLaw, RIS_ABBREVIATION_INTERNATIONAL_LAW))
-    metadata.addAll(createMetadataForType(data.unofficialLongTitle, UNOFFICIAL_LONG_TITLE))
-    metadata.addAll(createMetadataForType(data.unofficialShortTitle, UNOFFICIAL_SHORT_TITLE))
-    metadata.addAll(createMetadataForType(data.unofficialAbbreviation, UNOFFICIAL_ABBREVIATION))
-    metadata.addAll(createMetadataForType(data.unofficialReference, UNOFFICIAL_REFERENCE))
-    metadata.addAll(createMetadataForType(data.referenceNumber, REFERENCE_NUMBER))
-    metadata.addAll(createMetadataForType(data.definition, DEFINITION))
-    metadata.addAll(createMetadataForType(data.ageOfMajorityIndication, AGE_OF_MAJORITY_INDICATION))
-    metadata.addAll(createMetadataForType(data.validityRule, VALIDITY_RULE))
+
+    metadata.addAll(frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialLongTitle + unofficialShortTitle + unofficialAbbreviation + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule + participationType + participationInstitution + leadJurisdiction + leadUnit + subjectFna + subjectGesta)
+
+    val sections = listOf(
+        MetadataSection(Section.GENERAL_INFORMATION, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw),
+        MetadataSection(Section.HEADINGS_AND_ABBREVIATIONS, unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle),
+        MetadataSection(Section.UNOFFICIAL_REFERENCE, unofficialReference),
+        MetadataSection(Section.REFERENCE_NUMBER, referenceNumber),
+        MetadataSection(Section.DEFINITION, definition),
+        MetadataSection(Section.AGE_OF_MAJORITY_INDICATION, ageOfMajorityIndication),
+        MetadataSection(Section.VALIDITY_RULE, validityRule),
+        MetadataSection(Section.SUBJECT_AREA, subjectFna + subjectGesta),
+        MetadataSection(Section.LEAD, leadJurisdiction + leadUnit),
+        MetadataSection(Section.PARTICIPATING_INSTITUTIONS, participationInstitution + participationType),
+    )
 
     return Norm(
         guid = guid,
         articles = mapArticlesToDomain(data.articles),
         metadata = metadata,
+        metadataSections = sections,
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         documentCategory = data.documentCategory,
         providerEntity = data.providerEntity,
         providerDecidingBody = data.providerDecidingBody,
         providerIsResolutionMajority = data.providerIsResolutionMajority,
-        participationType = data.participationType,
-        participationInstitution = data.participationInstitution,
-        leadJurisdiction = data.leadJurisdiction,
-        leadUnit = data.leadUnit,
-        subjectFna = data.subjectFna,
-        subjectGesta = data.subjectGesta,
+        participationType = data.participationType.firstOrNull(),
+        participationInstitution = data.participationInstitution.firstOrNull(),
+        leadJurisdiction = data.leadJurisdiction.firstOrNull(),
+        leadUnit = data.leadUnit.firstOrNull(),
+        subjectFna = data.subjectFna.firstOrNull(),
+        subjectGesta = data.subjectGesta.firstOrNull(),
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
         entryIntoForceDate = parseDateString(data.entryIntoForceDate),
@@ -157,9 +186,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     )
 }
 
-private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> {
-    return data.mapIndexed { index, value -> Metadatum(value, type, index) }
-}
+private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> = data
+    .mapIndexed { index, value -> Metadatum(value, type, index) }
 
 fun mapArticlesToDomain(articles: List<ArticleData>): List<Article> {
     return articles.map { article ->

@@ -23,6 +23,7 @@ interface NormsMapper {
             normDto.guid,
             articles,
             metadata,
+            listOf(),
             normDto.officialLongTitle,
             normDto.risAbbreviation,
             normDto.documentNumber,

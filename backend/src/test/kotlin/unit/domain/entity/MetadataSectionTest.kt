@@ -16,25 +16,11 @@ class MetadataSectionTest {
         val section = MetadataSection(
             MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
             listOf(unofficialLongTitle, unofficialShortTitle),
-            5,
         )
 
         assertThat(section.name).isEqualTo(MetadataSectionName.HEADINGS_AND_ABBREVIATIONS)
         assertThat(section.metadata).isEqualTo(listOf(unofficialLongTitle, unofficialShortTitle))
-        assertThat(section.order).isEqualTo(5)
         assertThat(section.sections).isNull()
-    }
-
-    @Test
-    fun `it has per default the order number zero`() {
-        val unofficialLongTitle = Metadatum("unofficialLongTitle", UNOFFICIAL_LONG_TITLE)
-        val unofficialShortTitle = Metadatum("unofficialShortTitle", UNOFFICIAL_SHORT_TITLE)
-        val section = MetadataSection(
-            MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
-            listOf(unofficialLongTitle, unofficialShortTitle),
-        )
-
-        assertThat(section.order).isEqualTo(0)
     }
 
     @Test
@@ -49,7 +35,6 @@ class MetadataSectionTest {
             MetadataSection(
                 MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
                 listOf(unofficialLongTitle, unofficialShortTitle),
-                0,
                 listOf(section),
             )
         }

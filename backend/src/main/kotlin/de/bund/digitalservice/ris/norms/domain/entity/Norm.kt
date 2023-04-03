@@ -9,6 +9,7 @@ data class Norm(
     val guid: UUID,
     val articles: List<Article> = emptyList(),
     val metadata: List<Metadatum<*>> = emptyList(),
+    val metadataSections: List<MetadataSection> = emptyList(),
 
     val officialLongTitle: String,
     var risAbbreviation: String? = null,
