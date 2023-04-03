@@ -33,7 +33,7 @@ public class ProceedingDecisionController {
   }
 
   @PutMapping(value = "/{childUuid}")
-  public Mono<ResponseEntity<DocumentUnit>> addProceedingDecision(
+  public Mono<ResponseEntity<DocumentUnit>> linkProceedingDecision(
       @PathVariable("uuid") UUID parentUuid, @PathVariable UUID childUuid) {
     return service
         .linkProceedingDecision(parentUuid, childUuid)
