@@ -17,6 +17,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -68,6 +69,146 @@ public class ProceedingDecisionIntegrationTest {
   }
 
   @Test
+  void testAddProceedingDecisionLink() {
+    UUID parentUuid = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    repository.save(parentDocumentUnitDTO).block();
+
+    ProceedingDecision proceedingDecision =
+        ProceedingDecision.builder().dataSource(DataSource.PROCEEDING_DECISION).build();
+
+    assertThat(
+            linkRepository
+                .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
+                .collectList()
+                .block())
+        .isEmpty();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions")
+        .bodyValue(proceedingDecision)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    assertThat(
+            linkRepository
+                .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
+                .collectList()
+                .block())
+        .hasSize(1);
+
+    List<Long> childUuids =
+        linkRepository
+            .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
+            .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId)
+            .collectList()
+            .block();
+
+    childUuids.stream()
+        .map(childUuid -> assertThat(repository.findById(childUuid).block()).isNotNull());
+  }
+
+  @Test
+  void testAddProceedingDecisionLink_alsoAppendsPreviousDecisionsToDocumentUnit() {
+    UUID parentUuid = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
+
+    UUID childUuid = UUID.randomUUID();
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(childUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("abcdefghjikl")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
+
+    ProceedingDecisionLinkDTO linkDTO =
+        ProceedingDecisionLinkDTO.builder()
+            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
+            .build();
+    linkDTO = linkRepository.save(linkDTO).block();
+    assertThat(linkDTO).isNotNull();
+
+    DocumentUnitDTO finalParentDocumentUnitDTO = parentDocumentUnitDTO;
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/documentunits/1234567890123")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              DocumentUnit responseBody = response.getResponseBody();
+              assertThat(responseBody.proceedingDecisions()).hasSize(1);
+            });
+  }
+
+  @Test
+  void testLinkExistingProceedingDecision() {
+    UUID parentUuid = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
+
+    UUID childUuid = UUID.randomUUID();
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(childUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("abcdefghjikl")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
+
+    assertThat(
+            linkRepository
+                .findByParentDocumentUnitIdAndChildDocumentUnitId(
+                    parentDocumentUnitDTO.getId(), childDocumentUnitDTO.getId())
+                .block())
+        .isNull();
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    assertThat(
+            linkRepository
+                .findByParentDocumentUnitIdAndChildDocumentUnitId(
+                    parentDocumentUnitDTO.getId(), childDocumentUnitDTO.getId())
+                .block())
+        .isNotNull();
+  }
+
+  @Test
   void testRemoveProceedingDecisionLink() {
     UUID parentUuid = UUID.randomUUID();
     DocumentUnitDTO parentDocumentUnitDTO =
@@ -107,6 +248,62 @@ public class ProceedingDecisionIntegrationTest {
 
     assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
     assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
+  }
+
+  @Test
+  void testRemoveProceedingDecisionLink_alsoRemovesProceedingDecisionFromDocumentUnit() {
+    UUID parentUuid = UUID.randomUUID();
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(parentUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("1234567890123")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
+
+    UUID childUuid = UUID.randomUUID();
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(childUuid)
+            .creationtimestamp(Instant.now())
+            .documentnumber("abcdefghjikl")
+            .dataSource(DataSource.NEURIS)
+            .build();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
+
+    ProceedingDecisionLinkDTO linkDTO =
+        ProceedingDecisionLinkDTO.builder()
+            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
+            .build();
+    linkDTO = linkRepository.save(linkDTO).block();
+    assertThat(linkDTO).isNotNull();
+
+    webClient
+        .mutateWith(csrf())
+        .delete()
+        .uri("/api/v1/caselaw/documentunits/" + parentUuid + "/proceedingdecisions/" + childUuid)
+        .exchange()
+        .expectStatus()
+        .is2xxSuccessful();
+
+    assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
+    assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/documentunits/1234567890123")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              DocumentUnit responseBody = response.getResponseBody();
+              assertThat(responseBody.proceedingDecisions()).isEmpty();
+            });
   }
 
   @Test
