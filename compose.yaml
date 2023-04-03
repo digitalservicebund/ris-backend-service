@@ -10,12 +10,13 @@ services:
       - "--api.dashboard=false"
       - "--providers.file.filename=/etc/traefik/config.yml"
       - "--entryPoints.http.address=:80"
+      - "--ping=true"
       - "--entryPoints.ping.address=:8082"
       - "--ping.entryPoint=ping"
     ports:
       - 80:80
     healthcheck:
-      test: ["CMD", "traefik", "healthcheck", "--ping"]
+      test: ["CMD", "traefik", "healthcheck", "--entrypoints.ping.address=:8082", "--ping.entryPoint=ping", "--ping"]
       interval: 5s
       retries: 3
       start_period: 3s
