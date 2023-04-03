@@ -3,6 +3,7 @@ package utils
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
@@ -34,6 +35,8 @@ fun createRandomNorm(): Norm {
             "(" + Random().nextInt(1, 50).toString() + ")"
         }.randomize(named("citationYear")) {
             EasyRandom(EasyRandomParameters().stringLengthRange(4, 4)).nextObject(String::class.java)
+        }.randomize(named("metadataSections")) {
+            emptyList<MetadataSection>()
         }
     return EasyRandom(parameters).nextObject(Norm::class.java)
 }
