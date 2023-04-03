@@ -41,6 +41,8 @@ export function defaultSummarizer(dataEntry: any): string {
  * providing the `data`, but instead of the default summarizer, the provided one
  * is used. This higher order component generator works a little like bounding
  * a context to a function in JavaScript.
+ * This is especially useful when the DataSetSummary component is passed as
+ * property to another component.
  */
 export function withSummarizer(
   summarizer: (dataEntry: undefined) => string | VNode
@@ -60,12 +62,13 @@ export function withSummarizer(
 </script>
 
 <template>
-  <div class="flex flex-col items-start">
-    <component
-      :is="summary"
+  <div class="flex flex-col items-start w-full">
+    <div
       v-for="(summary, index) in summaries"
       :key="index"
-      class="border-b-1 border-b-blue-500 first:pt-0 label-02-reg last:border-none last:pb-0 py-10"
-    />
+      class="border-b-1 border-b-blue-500 first:pt-0 flex flex-start label-02-reg last:border-none last:pb-0 py-10 w-full"
+    >
+      <component :is="summary" />
+    </div>
   </div>
 </template>

@@ -30,7 +30,7 @@ function collapse(): void {
     open-icon-name="expand_more"
   >
     <template #header>
-      <div class="flex">
+      <div class="flex w-full">
         <h2 class="label-02-bold min-w-[20rem] text-left">{{ title }}</h2>
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />
       </div>
