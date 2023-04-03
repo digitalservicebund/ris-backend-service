@@ -1,6 +1,7 @@
 <script lang="ts" setup>
-import { computed, h } from "vue"
+import { computed, h, defineComponent } from "vue"
 import type { VNode } from "vue"
+import Ourselves from "@/shared/components/DataSetSummary.vue"
 
 const props = defineProps<{
   data: undefined
@@ -14,8 +15,15 @@ const dataAsList = computed(() =>
 const summarizer = computed(() => props.summarizer ?? defaultSummarizer)
 const summaries = computed(() => dataAsList.value.map(wrappedSummarizer))
 
+function wrappedSummarizer(dataEntry: undefined): VNode {
+  const summary = summarizer.value(dataEntry)
+  return typeof summary == "string" ? h("span", summary) : summary
+}
+</script>
+
+<script lang="ts">
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function defaultSummarizer(dataEntry: any): string {
+export function defaultSummarizer(dataEntry: any): string {
   if (["string", "boolean", "number"].includes(typeof dataEntry)) {
     return `${dataEntry}`
   } else if (Array.isArray(dataEntry)) {
@@ -27,9 +35,27 @@ function defaultSummarizer(dataEntry: any): string {
   }
 }
 
-function wrappedSummarizer(dataEntry: undefined): VNode {
-  const summary = summarizer.value(dataEntry)
-  return typeof summary == "string" ? h("span", summary) : summary
+/**
+ * Creates a new component variant of the DataSetSummary by attaching a fixed
+ * summarizer function to it. The new component can be used as before by just
+ * providing the `data`, but instead of the default summarizer, the provided one
+ * is used. This higher order component generator works a little like bounding
+ * a context to a function in JavaScript.
+ */
+export function withSummarizer(
+  summarizer: (dataEntry: undefined) => string | VNode
+) {
+  return defineComponent({
+    props: {
+      data: {
+        type: undefined,
+        default: undefined,
+      },
+    },
+    setup(props) {
+      return () => h(Ourselves, { ...props, summarizer })
+    },
+  })
 }
 </script>
 
