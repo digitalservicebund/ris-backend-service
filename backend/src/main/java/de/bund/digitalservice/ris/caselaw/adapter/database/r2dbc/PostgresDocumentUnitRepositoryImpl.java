@@ -796,6 +796,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             .build())
                     .map(ProceedingDecisionLinkDTO::getParentDocumentUnitId)
                     .flatMap(repository::findById)
+                    .flatMap(this::injectAdditionalInformation)
                     .map(DocumentUnitTransformer::transformDTO));
   }
 
