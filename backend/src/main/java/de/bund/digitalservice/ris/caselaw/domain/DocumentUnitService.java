@@ -259,17 +259,20 @@ public class DocumentUnitService {
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Flux<ProceedingDecision> createProceedingDecision(
-      UUID documentUnitUuid, ProceedingDecision proceedingDecision) {
+      UUID parentDocumentUnitUuid, ProceedingDecision proceedingDecision) {
 
     return generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
         .flatMap(
-            documentUnit -> repository.linkDocumentUnits(documentUnitUuid, documentUnit.uuid()))
+            childDocumentUnit ->
+                updateDocumentUnit(
+                    enrichNewDocumentUnitWithData(childDocumentUnit, proceedingDecision)))
         .flatMap(
-            documentUnit ->
-                updateDocumentUnit(enrichNewDocumentUnitWithData(documentUnit, proceedingDecision)))
+            childDocumentUnit ->
+                repository.linkDocumentUnits(parentDocumentUnitUuid, childDocumentUnit.uuid()))
         .flatMapMany(
             documentUnit ->
-                repository.findAllLinkedDocumentUnitsByParentDocumentUnitId(documentUnitUuid));
+                repository.findAllLinkedDocumentUnitsByParentDocumentUnitId(
+                    parentDocumentUnitUuid));
   }
 
   public Mono<DocumentUnit> linkProceedingDecision(UUID parentUuid, UUID childUuid) {
