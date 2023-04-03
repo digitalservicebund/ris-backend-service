@@ -58,6 +58,7 @@ function deleteChip(keyword: string | undefined) {
 }
 
 const handleOnBlur = () => {
+  errorMessage.value = undefined
   currentInput.value = ""
 }
 
@@ -92,6 +93,7 @@ watch(chips, () => {
       type="text"
       @blur="handleOnBlur"
       @input="emitInputEvent"
+      @keydown.prevent.tab="focusFirst"
       @keypress.enter="saveChip"
       @keyup.right="focusFirst"
     />

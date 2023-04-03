@@ -421,6 +421,19 @@ describe("chips input as bottom list", () => {
     expect(chipList[0]).toHaveFocus()
   })
 
+  it("sets first chip of list active on arrow key 'tab'", async () => {
+    const { user } = renderComponentWithBottomList()
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+
+    const chipList = screen.getAllByLabelText("chip")
+    await user.type(input, "{Tab}")
+    expect(chipList[0]).toHaveFocus()
+  })
+
   it("sets focus on input when pressing arrow key 'left' on first chip", async () => {
     const { user } = renderComponentWithBottomList()
     const input: HTMLInputElement = screen.getByRole("textbox")
@@ -478,6 +491,29 @@ describe("chips input as bottom list", () => {
     await user.type(chipOne, "{arrowright}")
     expect(chipTwo).toHaveFocus()
     await user.type(chipTwo, "{arrowright}") // nothing happens further right
+    expect(chipTwo).toHaveFocus()
+  })
+
+  it("focus via tabbing behaves as expected", async () => {
+    const { user } = renderComponentWithBottomList()
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+    await user.type(input, "two")
+    await user.type(input, "{enter}")
+
+    const chipList = screen.getAllByLabelText("chip")
+    expect(chipList.length).toBe(2)
+
+    const chipOne = chipList[0] as HTMLElement
+    const chipTwo = chipList[1] as HTMLElement
+
+    await user.type(input, "{Tab}")
+    expect(chipOne).toHaveFocus()
+
+    await user.type(chipOne, "{Tab}")
     expect(chipTwo).toHaveFocus()
   })
 })

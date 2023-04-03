@@ -4,7 +4,6 @@ import { ResponseError } from "@/services/httpClient"
 import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
-  focusedItem?: number
   modelValue?: string[]
   error?: ResponseError
 }
@@ -87,7 +86,6 @@ const setFocusedItemIndex = (index: number) => {
 }
 watch(props, () => {
   if (props.modelValue) chips.value = props.modelValue
-  if (props.focusedItem) focusedItemIndex.value = props.focusedItem
   errorMessage.value = props.error
 })
 
@@ -118,6 +116,7 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
         tabindex="0"
         @click="setFocusedItemIndex(i)"
         @input="emitInputEvent"
+        @keydown.prevent.tab="focusNext"
         @keypress.enter="enterDelete"
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
