@@ -1,13 +1,13 @@
 import { render, screen } from "@testing-library/vue"
 import SearchResultList, {
-  SearchResult,
+  SearchResults,
 } from "@/components/proceedingDecisions/SearchResultList.vue"
 
 function renderComponent() {
-  const searchResults: SearchResult = [
+  const searchResults: SearchResults = [
     {
       decision: {
-        court: { type: "fooType", location: "fooLocation" },
+        court: { type: "fooType", location: "fooLocation", label: "fooLabel" },
         documentNumber: "fooDocumentNumber",
       },
       isLinked: true,
