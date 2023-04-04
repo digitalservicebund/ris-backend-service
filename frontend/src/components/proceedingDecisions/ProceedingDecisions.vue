@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { watch, ref } from "vue"
 import DecisionList from "./DecisionList.vue"
-import InlineDecision from "./InlineDecision.vue"
+import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
 import { proceedingDecisionFields } from "@/fields/caselaw"
@@ -23,7 +23,7 @@ const defaultModel: ProceedingDecision = {
 }
 
 const proceedingDecisionList = ref<ProceedingDecision[]>()
-const proceedingDecisionSearchResults = ref<ProceedingDecision[]>([])
+const proceedingDecisionSearchResults = ref<SearchResults>()
 const proceedingDecisionInput = ref<ProceedingDecision>(defaultModel)
 
 function isNotEmpty(decision: ProceedingDecision): boolean {
@@ -72,19 +72,31 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
   }
 }
 
+function isLinked(decision: ProceedingDecision): boolean {
+  if (!proceedingDecisionList.value) return false
+
+  return proceedingDecisionList.value.some(
+    (linkedDecision) => linkedDecision.uuid == decision.uuid
+  )
+}
+
 async function search() {
   const response = await DocumentUnitService.searchByProceedingDecisionInput(
     proceedingDecisionInput.value
   )
   if (response.data) {
-    proceedingDecisionSearchResults.value = response.data
+    response.data.map((searchResultEntry) => {
+      return {
+        searchResultEntry: searchResultEntry,
+        isLinked: isLinked(searchResultEntry),
+      }
+    })
   }
 }
 
 watch(
   props,
   () => {
-    // console.log(props.proceedingDecisions)
     proceedingDecisionList.value = props.proceedingDecisions
   },
   {
@@ -124,29 +136,11 @@ watch(
       @click="createProceedingDecision(proceedingDecisionInput)"
     />
 
-    <div v-if="proceedingDecisionSearchResults.length > 0" class="mb-10 mt-20">
-      <strong
-        >Suche hat {{ proceedingDecisionSearchResults.length }} Treffer
-        ergeben</strong
-      >
-    </div>
-    <div class="table">
-      <div
-        v-for="proceedingDecision in proceedingDecisionSearchResults"
-        :key="proceedingDecision.uuid"
-        class="link-01-bold mb-24 mt-12 table-row underline"
-      >
-        <div class="table-cell">
-          <InlineDecision :decision="proceedingDecision" />
-        </div>
-        <div class="p-8 table-cell">
-          <TextButton
-            aria-label="Treffer übernehmen"
-            label="Übernehmen"
-            @click="linkProceedingDecision(proceedingDecision.uuid as string)"
-          />
-        </div>
-      </div>
+    <div v-if="proceedingDecisionSearchResults" class="mb-10 mt-20">
+      <SearchResultList
+        :search-results="proceedingDecisionSearchResults"
+        @link-decision="linkProceedingDecision"
+      />
     </div>
   </ExpandableContent>
 </template>
