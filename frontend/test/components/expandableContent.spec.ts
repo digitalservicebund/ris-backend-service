@@ -37,17 +37,17 @@ describe("ExpandableContent", () => {
   })
 
   it("renders default slot into content", () => {
-    renderComponent({ defaultSlot: "test content" })
-    const content = screen.getByText("test content")
+    renderComponent({ defaultSlot: "test content", isExpanded: true })
+    const content = screen.queryByText("test content")
 
     expect(content).toBeInTheDocument()
   })
 
   it("hides content per default", () => {
     renderComponent({ defaultSlot: "test content" })
-    const content = screen.getByText("test content")
+    const content = screen.queryByText("test content")
 
-    expect(content).not.toBeVisible()
+    expect(content).not.toBeInTheDocument()
   })
 
   it("can open content per default with property", () => {
@@ -65,15 +65,16 @@ describe("ExpandableContent", () => {
       defaultSlot: "test content",
     })
     const header = screen.getByRole("button")
-    let content = screen.getByText("test content")
 
-    expect(content).not.toBeVisible()
+    expect(screen.queryByText("test content")).not.toBeInTheDocument()
+
     await user.click(header)
-    content = screen.getByText("test content")
-    expect(content).toBeVisible()
+
+    expect(screen.getByText("test content")).toBeInTheDocument()
+
     await user.click(header)
-    content = screen.getByText("test content")
-    expect(content).not.toBeVisible()
+
+    expect(screen.queryByText("test content")).not.toBeInTheDocument()
   })
 
   it("emits update event when content gets toggled", async () => {

@@ -64,8 +64,8 @@ describe("ExpandableDataSet", () => {
     const slot = screen.queryByText("special")
     const button = screen.queryByText("Fertig")
 
-    expect(slot).not.toBeVisible()
-    expect(button).not.toBeVisible()
+    expect(slot).not.toBeInTheDocument()
+    expect(button).not.toBeInTheDocument()
   })
 
   it("toggles the default slot and close button when clicking on title", async () => {
@@ -80,8 +80,8 @@ describe("ExpandableDataSet", () => {
 
     await user.click(title)
 
-    expect(screen.queryByText("content")).not.toBeVisible()
-    expect(screen.queryByText("Fertig")).not.toBeVisible()
+    expect(screen.queryByText("content")).not.toBeInTheDocument()
+    expect(screen.queryByText("Fertig")).not.toBeInTheDocument()
   })
 
   it("shows the default slot and close button when clicking on the summary", async () => {
@@ -123,7 +123,7 @@ describe("ExpandableDataSet", () => {
     await user.click(button)
     const slot = screen.queryByText("content")
 
-    expect(button).not.toBeVisible()
-    expect(slot).not.toBeVisible()
+    expect(button).not.toBeInTheDocument()
+    expect(slot).not.toBeInTheDocument()
   })
 })

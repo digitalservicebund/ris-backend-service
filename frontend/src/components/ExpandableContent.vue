@@ -46,6 +46,7 @@ const resizeObserver = new ResizeObserver((entries) => {
   }
 })
 </script>
+
 <template>
   <div class="mb-[4rem]">
     <button
@@ -67,7 +68,7 @@ const resizeObserver = new ResizeObserver((entries) => {
       name="expand"
       :style="{ height: containerHeight.valueOf + 'px' }"
     >
-      <div v-show="isExpanded">
+      <div v-if="isExpanded">
         <slot />
       </div>
     </transition>
@@ -79,29 +80,19 @@ const resizeObserver = new ResizeObserver((entries) => {
   an effect on the actual height, but is just used to get the transition effect. -->
 
 <style lang="scss" scoped>
-.expand-enter-from {
-  max-height: 0;
-}
-
-.expand-enter-to {
-  max-height: 1000px;
-}
-
-.expand-enter-active {
-  overflow: hidden;
-  transition: all 0.5s ease-in-out;
-}
-
-.expand-leave-from {
-  max-height: 1000px;
-}
-
+.expand-enter-from,
 .expand-leave-to {
   max-height: 0;
 }
 
+.expand-leave-from,
+.expand-enter-to {
+  max-height: 1000px;
+}
+
+.expand-enter-active,
 .expand-leave-active {
   overflow: hidden;
-  transition: all 0.5s ease-in-out;
+  transition: all 0.1s ease-in-out;
 }
 </style>
