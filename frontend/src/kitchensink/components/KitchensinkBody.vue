@@ -6,6 +6,7 @@ import ChipsView from "@/kitchensink/views/ChipsView.vue"
 import CodeSnippetView from "@/kitchensink/views/CodeSnippetView.vue"
 import DocumentUnitInfoPanelView from "@/kitchensink/views/DocumentUnitInfoPanelView.vue"
 import DropdownView from "@/kitchensink/views/DropdownView.vue"
+import EditableListView from "@/kitchensink/views/EditableListView.vue"
 import ErrorView from "@/kitchensink/views/ErrorView.vue"
 import ExpandableContentView from "@/kitchensink/views/ExpandableContentView.vue"
 import ExpandableDataSetView from "@/kitchensink/views/ExpandableDataSetView.vue"
@@ -60,6 +61,8 @@ const component = computed(() => {
       return DocumentUnitInfoPanelView
     case "PropertyInfoView":
       return PropertyInfoView
+    case "EditableList":
+      return EditableListView
     default:
       return ErrorView
   }

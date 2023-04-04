@@ -1,0 +1,162 @@
+<script lang="ts" setup>
+import { computed, nextTick, ref, useAttrs, watch } from "vue"
+import type { Component } from "vue"
+import DataSetSummary from "@/shared/components/DataSetSummary.vue"
+
+interface Props {
+  editComponent: Component
+  summaryComponent?: Component
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  modelValue: any[]
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  defaultValue: any
+}
+
+interface Emits {
+  (event: "update:modelValue", value: undefined[]): void
+  (event: "deleteLastEntry"): void
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  summaryComponent: DataSetSummary,
+})
+
+const emit = defineEmits<Emits>()
+const attributes = useAttrs()
+
+const modelValueList = ref<undefined[]>([])
+const elementList = ref<HTMLElement[]>([])
+const editIndex = ref<number | undefined>(undefined)
+
+const currentEditElement = computed(() =>
+  editIndex.value !== undefined ? elementList.value[editIndex.value] : undefined
+)
+
+function setEditIndex(index: number | undefined) {
+  editIndex.value = index
+}
+
+function addNewModelEntry() {
+  const { defaultValue } = props
+  const newEntry =
+    typeof defaultValue === "object" ? { ...defaultValue } : defaultValue
+  modelValueList.value.push(newEntry)
+  editIndex.value = modelValueList.value.length - 1
+}
+
+function removeModelEntry(index: number) {
+  modelValueList.value.splice(index, 1)
+
+  if (editIndex.value !== undefined && index < editIndex.value) {
+    editIndex.value -= 1
+  }
+}
+
+async function focusFirstInputOfCurrentEditElement() {
+  await nextTick()
+
+  if (currentEditElement.value) {
+    const firstInputElement =
+      currentEditElement.value.getElementsByTagName("input")[0]
+    firstInputElement?.focus()
+  }
+}
+
+watch(
+  () => props.modelValue,
+  () => (modelValueList.value = props.modelValue),
+  { immediate: true, deep: true }
+)
+
+watch(
+  modelValueList,
+  () => {
+    if (modelValueList.value.length == 0) {
+      addNewModelEntry()
+    }
+  },
+  { deep: true, immediate: true }
+)
+
+watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
+  deep: true,
+})
+
+watch(editIndex, focusFirstInputOfCurrentEditElement)
+</script>
+
+<template>
+  <div class="w-full">
+    <div
+      v-for="(entry, index) in modelValueList"
+      :key="index"
+      ref="elementList"
+    >
+      <div
+        v-if="index !== editIndex"
+        class="border-b-1 border-b-blue-500 flex justify-between py-10"
+      >
+        <component :is="summaryComponent" :data="entry" />
+
+        <div class="flex">
+          <button
+            aria-label="Eintrag bearbeiten"
+            class="icon material-icons"
+            @click="setEditIndex(index)"
+          >
+            edit_note
+          </button>
+
+          <button
+            aria-label="Eintrag löschen"
+            class="icon material-icons"
+            @click="removeModelEntry(index)"
+          >
+            delete
+          </button>
+        </div>
+      </div>
+
+      <component
+        :is="editComponent"
+        v-else
+        v-bind="attributes"
+        v-model="modelValueList[index]"
+        class="mt-16"
+        @keydown.enter="setEditIndex(undefined)"
+      />
+    </div>
+
+    <button
+      aria-label="Weitere Angabe"
+      class="bg-blue-300 focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white inline-flex items-center leading-18 mt-16 outline-0 outline-blue-800 outline-none outline-offset-4 p-4 text-14 text-blue-800 whitespace-nowrap"
+      @click="addNewModelEntry"
+    >
+      <span class="material-icons text-14">add</span>
+      Weitere Angabe
+    </button>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.icon {
+  padding: 3px 2px;
+  color: #004b76;
+  outline: none;
+
+  &:hover {
+    background-color: #ecf1f4;
+  }
+
+  &:focus {
+    padding: 1px 0;
+    border: 2px solid #004b76;
+  }
+
+  &:active {
+    border: none !important;
+    background: #b3c9d6;
+    outline: none;
+  }
+}
+</style>
