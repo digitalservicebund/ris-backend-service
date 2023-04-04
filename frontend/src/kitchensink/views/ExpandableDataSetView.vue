@@ -6,7 +6,6 @@ import DataSetSummary, {
   defaultSummarizer,
 } from "@/shared/components/DataSetSummary.vue"
 
-function chipSummarizer(this: { color: string }, dataEntry: undefined) {
 function chipSummarizer(dataEntry: undefined) {
   return h(
     "div",
