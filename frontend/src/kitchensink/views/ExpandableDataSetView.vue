@@ -7,14 +7,15 @@ import DataSetSummary, {
 } from "@/shared/components/DataSetSummary.vue"
 
 function chipSummarizer(this: { color: string }, dataEntry: undefined) {
+function chipSummarizer(dataEntry: undefined) {
   return h(
     "div",
-    { class: `bg-${this.color} rounded-full py-4 px-10 text-white font-bold` },
+    { class: `bg-yellow-700 rounded-full py-4 px-10 text-white font-bold` },
     defaultSummarizer(dataEntry)
   )
 }
 
-const ChipSummary = withSummarizer(chipSummarizer.bind({ color: "yellow-700" }))
+const ChipSummary = withSummarizer(chipSummarizer)
 </script>
 
 <template>
@@ -28,15 +29,15 @@ const ChipSummary = withSummarizer(chipSummarizer.bind({ color: "yellow-700" }))
   <ExpandableDataSet
     :data-set="['Single Value']"
     :summary-component="DataSetSummary"
-    title="Long Section Name"
+    title="A Much Longer Section Name"
   >
     <div class="h-64">Content</div>
   </ExpandableDataSet>
 
   <ExpandableDataSet
-    :data-set="['First Value', 'SecondValue']"
+    :data-set="['First Value', 'Second Value']"
     :summary-component="ChipSummary"
-    title="Short Section"
+    title="Special Section"
   >
     <div class="h-64">Content</div>
   </ExpandableDataSet>

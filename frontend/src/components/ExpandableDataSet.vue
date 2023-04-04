@@ -25,13 +25,13 @@ function collapse(): void {
 <template>
   <ExpandableContent
     v-model:is-expanded="isExpanded"
-    class="p-16"
+    class="bg-white p-16"
     close-icon-name="expand_less"
     open-icon-name="expand_more"
   >
     <template #header>
       <div class="flex w-full">
-        <h2 class="label-02-bold min-w-[20rem] text-left">{{ title }}</h2>
+        <h2 class="label-02-bold min-w-[14rem] text-left">{{ title }}</h2>
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />
       </div>
     </template>

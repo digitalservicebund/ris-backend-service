@@ -17,7 +17,7 @@ const setSelectedComponent = (component: risComponent) => {
 <template>
   <div
     id="kitchensink"
-    class="absolute bg-white box-border h-full left-0 overflow-y-scroll top-0 w-full"
+    class="absolute bg-gray-100 box-border h-full left-0 overflow-y-scroll top-0 w-full"
   >
     <KitchensinkHeader
       :components="components"
