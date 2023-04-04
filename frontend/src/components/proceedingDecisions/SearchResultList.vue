@@ -26,7 +26,7 @@ export type SearchResults = {
     >
       <div class="table-cell">
         <InlineDecision :decision="searchResult.decision" />
-        <span :v-if="searchResult.isLinked">Bereits hinzugefügt</span>
+        <span v-if="searchResult.isLinked">Bereits hinzugefügt</span>
       </div>
       <div class="p-8 table-cell">
         <TextButton
