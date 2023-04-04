@@ -116,4 +116,10 @@ describe("DocumentUnitProceedingDecisions", async () => {
     await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
     expect(fetchSpy).toBeCalledTimes(0)
   })
+
+  it.todo("lists search results")
+
+  it.todo("adds proceeding decision from search results")
+
+  it.todo("search updates list with empty result")
 })

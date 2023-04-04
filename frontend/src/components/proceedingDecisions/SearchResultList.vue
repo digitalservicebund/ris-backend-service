@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import InlineDecision from "./InlineDecision.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
+import TextButton from "@/shared/components/input/TextButton.vue"
 
 defineProps<{ searchResults: SearchResults }>()
 const emits = defineEmits<{
