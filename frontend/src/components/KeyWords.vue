@@ -2,7 +2,7 @@
 import { ref, watch } from "vue"
 import { ResponseError } from "@/services/httpClient"
 import KeywordsService from "@/services/keywordsService"
-import KeywordsInput from "@/shared/components/input/ChipsInputBottom.vue"
+import KeywordsChipsInput from "@/shared/components/input/KeywordsChipsInput.vue"
 
 const props = defineProps<{
   documentUnitUuid: string
@@ -67,14 +67,14 @@ watch(
     <h1 class="heading-03-regular mb-[1rem]">Schlagwörter</h1>
     <div class="flex flex-row">
       <div class="flex-1">
-        <KeywordsInput
+        <KeywordsChipsInput
           id="keywords"
           aria-label="Schlagwörter"
           :error="errorMessage"
           :model-value="keywords"
           @add-chip="addKeyword"
           @delete-chip="deleteKeyword"
-        ></KeywordsInput>
+        ></KeywordsChipsInput>
       </div>
     </div>
   </div>
