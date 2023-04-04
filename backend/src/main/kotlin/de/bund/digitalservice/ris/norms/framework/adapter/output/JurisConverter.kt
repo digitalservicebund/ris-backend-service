@@ -57,30 +57,34 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
 }
 
 fun mapDomainToData(norm: Norm): NormData {
-    @Suppress("UNCHECKED_CAST")
-    val keywords = norm.metadata.toMutableSet()
+    val keywords = norm.metadataSections
+        .flatMap { it.metadata }
         .filter { it.type == KEYWORD }
         .sortedBy { it.order }
-        .map { it.value } as MutableList<String>
+        .map { it.value.toString() }
+    val divergentNumber = norm.metadataSections
+        .flatMap { it.metadata }
+        .filter { it.type == DIVERGENT_DOCUMENT_NUMBER }
+        .minByOrNull { it.order }?.value.toString()
 
-    val normData = NormData()
-    normData.announcementDate = encodeLocalDate(norm.announcementDate)
-    normData.citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear
-    normData.documentCategory = norm.documentCategory
-    normData.divergentDocumentNumber = norm.metadata.filter { it.type == DIVERGENT_DOCUMENT_NUMBER }.minByOrNull { it.order }?.value.toString()
-    normData.entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate)
-    normData.expirationDate = encodeLocalDate(norm.expirationDate)
-    normData.frameKeywords = keywords
-    normData.officialAbbreviation = norm.officialAbbreviation
-    normData.officialLongTitle = norm.officialLongTitle
-    normData.officialShortTitle = norm.officialShortTitle
-    normData.providerEntity = norm.providerEntity
-    normData.providerDecidingBody = norm.providerDecidingBody
-    normData.printAnnouncementGazette = norm.printAnnouncementGazette
-    normData.printAnnouncementYear = norm.printAnnouncementYear
-    normData.printAnnouncementNumber = norm.printAnnouncementNumber
-    normData.risAbbreviation = norm.risAbbreviation
-    return normData
+    return NormData(
+        announcementDate = encodeLocalDate(norm.announcementDate),
+        citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear,
+        documentCategory = norm.documentCategory,
+        divergentDocumentNumber = divergentNumber,
+        entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate),
+        expirationDate = encodeLocalDate(norm.expirationDate),
+        frameKeywords = keywords,
+        officialAbbreviation = norm.officialAbbreviation,
+        officialLongTitle = norm.officialLongTitle,
+        officialShortTitle = norm.officialShortTitle,
+        providerEntity = norm.providerEntity,
+        providerDecidingBody = norm.providerDecidingBody,
+        printAnnouncementGazette = norm.printAnnouncementGazette,
+        printAnnouncementYear = norm.printAnnouncementYear,
+        printAnnouncementNumber = norm.printAnnouncementNumber,
+        risAbbreviation = norm.risAbbreviation,
+    )
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
@@ -102,10 +106,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val subjectFna = createMetadataForType(data.subjectFna, SUBJECT_FNA)
     val subjectGesta = createMetadataForType(data.subjectGesta, SUBJECT_GESTA)
 
-    val metadata: MutableList<Metadatum<*>> = mutableListOf()
-
-    metadata.addAll(frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialLongTitle + unofficialShortTitle + unofficialAbbreviation + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule + participationType + participationInstitution + leadJurisdiction + leadUnit + subjectFna + subjectGesta)
-
     val sections = listOf(
         MetadataSection(Section.GENERAL_INFORMATION, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw),
         MetadataSection(Section.HEADINGS_AND_ABBREVIATIONS, unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle),
@@ -122,7 +122,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     return Norm(
         guid = guid,
         articles = mapArticlesToDomain(data.articles),
-        metadata = metadata,
         metadataSections = sections,
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,

@@ -4,8 +4,11 @@ import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseC
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
@@ -48,3 +51,13 @@ fun createRandomFileReference(): FileReference {
 private fun createRandomLocalDateInString(): String {
     return EasyRandom().nextObject(LocalDate::class.java).toString()
 }
+
+fun createSimpleSections(): List<MetadataSection> = listOf(
+    MetadataSection(
+        MetadataSectionName.GENERAL_INFORMATION,
+        listOf(
+            Metadatum("foo", MetadatumType.KEYWORD, 0),
+            Metadatum("bar", MetadatumType.KEYWORD, 1),
+        ),
+    ),
+)

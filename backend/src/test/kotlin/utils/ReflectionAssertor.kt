@@ -3,6 +3,7 @@ package utils
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
@@ -51,8 +52,9 @@ fun assertNormAndEditNormFrameProperties(
     norm: Norm,
     normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
 ) {
-    val normMembers = Norm::class.memberProperties
-    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
+    // TODO Remove the filter on properties when all implementation is done for RISDEV-1208
+    val normMembers = Norm::class.memberProperties.filter { it.name != "metadataSections" }
+    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties.filter { it.name != "metadata" }
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
         val found = normMembers.find { normMember -> normFramePropertiesMember.name == normMember.name }
         assertThat(normFramePropertiesMember.get(normFrameProperties)).isEqualTo(found?.get(norm))
@@ -70,7 +72,9 @@ fun assertNormsAreEqual(norm1: Norm, norm2: Norm) {
 }
 
 fun getNormWithSortedListProperties(norm: Norm): Norm {
-    val metadata = norm.metadata.toMutableList().sortedWith(metadatumComparator)
+    val sections = norm.metadataSections.map {
+        MetadataSection(it.name, it.metadata.toMutableList().sortedWith(metadatumComparator), it.sections)
+    }
     val fileReferences = norm.files.toMutableList().sortedWith(fileReferenceComparator)
     var articles = norm.articles.toMutableList().sortedWith(articleComparator)
 
@@ -78,7 +82,7 @@ fun getNormWithSortedListProperties(norm: Norm): Norm {
         it.copy(paragraphs = it.paragraphs.toMutableList().sortedWith(paragraphComparator))
     }
 
-    return norm.copy(metadata = metadata, files = fileReferences, articles = articles)
+    return norm.copy(metadataSections = sections, files = fileReferences, articles = articles)
 }
 
 // As there is n natural sorting for our domain classes, the comparators try to

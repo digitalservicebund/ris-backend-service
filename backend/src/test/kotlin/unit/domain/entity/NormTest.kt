@@ -1,8 +1,8 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import utils.createSimpleSections
 import java.time.LocalDate
 import java.util.UUID
 
@@ -32,17 +32,16 @@ class NormTest {
     @Test
     fun `can create a norm with a list of metadata`() {
         val guid = UUID.randomUUID()
-        val keyword = Metadatum("foo", MetadatumType.KEYWORD)
-        val another_keyword = Metadatum("bar", MetadatumType.KEYWORD)
+        val sections = createSimpleSections()
         val norm =
             Norm(
                 guid = guid,
-                metadata = listOf(keyword, another_keyword),
+                metadataSections = createSimpleSections(),
                 officialLongTitle = "long title",
             )
 
-        assertThat(norm.metadata).hasSize(2)
-        assertThat(norm.metadata).contains(keyword, another_keyword)
+        assertThat(norm.metadataSections.flatMap { it.metadata }).hasSize(2)
+        assertThat(norm.metadataSections.flatMap { it.metadata }).containsAll(sections.first().metadata)
     }
 
     @Test

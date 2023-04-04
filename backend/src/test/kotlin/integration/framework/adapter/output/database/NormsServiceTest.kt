@@ -9,9 +9,11 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPo
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
@@ -30,6 +32,7 @@ import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
 import utils.assertNormsAreEqual
 import utils.createRandomNorm
+import utils.createSimpleSections
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -204,9 +207,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save norm with metadata and retrieve it by its GUID`() {
-        val keyword = Metadatum("foo", KEYWORD, 0)
-        val other_keyword = Metadatum("bar", KEYWORD, 1)
-        val norm = NORM.copy(metadata = listOf(keyword, other_keyword))
+        val norm = NORM.copy(metadataSections = createSimpleSections())
         val saveCommand = SaveNormOutputPort.Command(norm)
         val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
 
@@ -308,9 +309,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `it replaces the metadata when editing a norm`() {
-        val keyword = Metadatum("foo", KEYWORD, 0)
-        val otherKeyword = Metadatum("bar", KEYWORD, 1)
-        val initialNorm = NORM.copy(metadata = listOf(keyword, otherKeyword))
+        val initialNorm = NORM.copy(metadataSections = createSimpleSections())
         val saveCommand = SaveNormOutputPort.Command(initialNorm)
         val guidQuery = GetNormByGuidOutputPort.Query(initialNorm.guid)
 
@@ -319,8 +318,11 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .expectNextCount(1)
             .verifyComplete()
 
-        val newKeyword = Metadatum("baz", KEYWORD, 0)
-        val updatedNorm = initialNorm.copy(metadata = listOf(newKeyword))
+        val section = MetadataSection(
+            MetadataSectionName.GENERAL_INFORMATION,
+            listOf(Metadatum("baz", KEYWORD, 0)),
+        )
+        val updatedNorm = initialNorm.copy(metadataSections = listOf(section))
         val editCommand = EditNormOutputPort.Command(updatedNorm)
 
         normsService.editNorm(editCommand)

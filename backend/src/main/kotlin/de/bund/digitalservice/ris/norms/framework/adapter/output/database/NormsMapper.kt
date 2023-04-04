@@ -3,11 +3,13 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.database
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
@@ -17,13 +19,12 @@ interface NormsMapper {
         normDto: NormDto,
         articles: List<Article>,
         fileReferences: List<FileReference>,
-        metadata: List<Metadatum<*>>,
+        metadataSections: List<MetadataSection>,
     ): Norm {
         return Norm(
             normDto.guid,
             articles,
-            metadata,
-            listOf(),
+            metadataSections,
             normDto.officialLongTitle,
             normDto.risAbbreviation,
             normDto.documentNumber,
@@ -136,6 +137,10 @@ interface NormsMapper {
 
     fun articleToEntity(articleDto: ArticleDto, paragraphs: List<Paragraph>): Article {
         return Article(articleDto.guid, articleDto.title, articleDto.marker, paragraphs)
+    }
+
+    fun metadataSectionToEntity(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): MetadataSection {
+        return MetadataSection(metadataSectionDto.name, metadata)
     }
 
     fun fileReferenceToEntity(fileReferenceDto: FileReferenceDto): FileReference {
@@ -269,8 +274,12 @@ interface NormsMapper {
         return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, fileReference.createdAt)
     }
 
-    fun metadatumToDto(metadatum: Metadatum<*>, normId: Int, id: Int = 0): MetadatumDto {
-        return MetadatumDto(id, metadatum.value.toString(), metadatum.type, metadatum.order, normId)
+    fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, id: Int = 0): List<MetadatumDto> {
+        return metadata.map { MetadatumDto(id, it.value.toString(), it.type, it.order, sectionId) }
+    }
+
+    fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
+        return MetadataSectionDto(id, metadataSection.name, normId, sectionId)
     }
 
     // TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated

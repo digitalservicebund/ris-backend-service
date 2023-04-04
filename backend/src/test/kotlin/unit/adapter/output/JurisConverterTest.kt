@@ -27,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import utils.createRandomNorm
+import utils.createSimpleSections
 import java.io.File
 import java.nio.ByteBuffer
 import java.time.LocalDate
@@ -224,17 +225,17 @@ class JurisConverterTest {
             assertThat(norm?.otherFootnote).isEqualTo("test other footnote")
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
-
-            assertThat(norm?.metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test unofficial short title", UNOFFICIAL_SHORT_TITLE, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test unofficial abbreviation", UNOFFICIAL_ABBREVIATION, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test unofficial reference", UNOFFICIAL_REFERENCE, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test validity rule", VALIDITY_RULE, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test reference number", REFERENCE_NUMBER, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test definition", DEFINITION, 0))
-            assertThat(norm?.metadata).contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 0))
+            val metadata = norm?.metadataSections?.flatMap { it.metadata }
+            assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 0))
+            assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 0))
+            assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 0))
+            assertThat(metadata).contains(Metadatum("test unofficial short title", UNOFFICIAL_SHORT_TITLE, 0))
+            assertThat(metadata).contains(Metadatum("test unofficial abbreviation", UNOFFICIAL_ABBREVIATION, 0))
+            assertThat(metadata).contains(Metadatum("test unofficial reference", UNOFFICIAL_REFERENCE, 0))
+            assertThat(metadata).contains(Metadatum("test validity rule", VALIDITY_RULE, 0))
+            assertThat(metadata).contains(Metadatum("test reference number", REFERENCE_NUMBER, 0))
+            assertThat(metadata).contains(Metadatum("test definition", DEFINITION, 0))
+            assertThat(metadata).contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 0))
         }
 
         @Test
@@ -246,9 +247,9 @@ class JurisConverterTest {
             every { extractData(any()) } returns data
 
             val norm = converter.parseJurisXml(query).block()
-
-            assertThat(norm?.metadata).contains(Metadatum("foo", KEYWORD, 0))
-            assertThat(norm?.metadata).contains(Metadatum("bar", KEYWORD, 1))
+            val metadata = norm?.metadataSections?.flatMap { it.metadata }
+            assertThat(metadata).contains(Metadatum("foo", KEYWORD, 0))
+            assertThat(metadata).contains(Metadatum("bar", KEYWORD, 1))
         }
 
         @Test
@@ -371,8 +372,7 @@ class JurisConverterTest {
 
         @Test
         fun `it correctly maps the norm metadata values including the order`() {
-            val metadata = listOf(Metadatum("foo", KEYWORD, 1), Metadatum("bar", KEYWORD, 0))
-            val normWithMetadata = norm.copy(metadata = metadata)
+            val normWithMetadata = norm.copy(metadataSections = createSimpleSections())
             val command = GenerateNormFileOutputPort.Command(normWithMetadata, generatedZipFile.readBytes())
             val converter = JurisConverter()
 
@@ -381,7 +381,7 @@ class JurisConverterTest {
             verify(exactly = 1) {
                 generateZip(
                     withArg {
-                        assertThat(it.frameKeywords).isEqualTo(listOf("bar", "foo"))
+                        assertThat(it.frameKeywords).isEqualTo(listOf("foo", "bar"))
                     },
                     any(),
                 )

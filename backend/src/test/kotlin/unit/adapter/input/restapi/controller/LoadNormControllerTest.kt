@@ -2,9 +2,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
@@ -20,6 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
 import utils.convertNormToJson
 import utils.createRandomNorm
+import utils.createSimpleSections
 import java.util.*
 
 @ExtendWith(SpringExtension::class)
@@ -72,7 +71,7 @@ class LoadNormControllerTest {
 
     @Test
     fun `it maps the norm entity to the expected data schema`() {
-        val norm = createRandomNorm().copy(metadata = listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1)))
+        val norm = createRandomNorm().copy(metadataSections = createSimpleSections())
         val responseJson = convertNormToJson(LoadNormController.NormResponseSchema.fromUseCaseData(norm))
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)

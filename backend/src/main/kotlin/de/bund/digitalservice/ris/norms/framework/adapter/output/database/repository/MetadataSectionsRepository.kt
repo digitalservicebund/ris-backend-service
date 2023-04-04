@@ -1,15 +1,15 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository
 
-import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import org.springframework.data.repository.reactive.ReactiveCrudRepository
 import org.springframework.stereotype.Repository
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 @Repository
-interface MetadataRepository : ReactiveCrudRepository<MetadatumDto, Int> {
+interface MetadataSectionsRepository : ReactiveCrudRepository<MetadataSectionDto, Int> {
 
-    fun findBySectionId(normId: Int): Flux<MetadatumDto>
+    fun findByNormId(normId: Int): Flux<MetadataSectionDto>
 
-    fun deleteBySectionId(normId: Int): Mono<Void>
+    fun deleteByNormId(normId: Int): Mono<Void>
 }

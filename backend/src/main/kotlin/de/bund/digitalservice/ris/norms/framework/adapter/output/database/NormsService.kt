@@ -7,15 +7,18 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenc
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ArticlesRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.FileReferenceRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataRepository
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.MetadataSectionsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.NormsRepository
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.repository.ParagraphsRepository
 import org.springframework.context.annotation.Primary
@@ -36,6 +39,7 @@ class NormsService(
     val paragraphsRepository: ParagraphsRepository,
     val fileReferenceRepository: FileReferenceRepository,
     val metadataRepository: MetadataRepository,
+    val metadataSectionsRepository: MetadataSectionsRepository,
     client: DatabaseClient,
 ) : NormsMapper,
     GetNormByGuidOutputPort,
@@ -76,15 +80,15 @@ class NormsService(
             .map(::fileReferenceToEntity)
             .collectList()
 
-        val findMetadataRequest = findNormRequest.flatMapMany { metadataRepository.findByNormId(it.id) }
-            .map(::metadatumToEntity)
+        val findSectionsRequest = findNormRequest.flatMapMany { metadataSectionsRepository.findByNormId(it.id) }
+            .flatMap(::getSectionMetadata)
             .collectList()
 
         return Mono.zip(
             findNormRequest,
             buildArticlesRequest,
             findFileReferencesRequest,
-            findMetadataRequest,
+            findSectionsRequest,
         ).map {
             normToEntity(it.t1, it.t2, it.t3, it.t4)
         }
@@ -132,11 +136,26 @@ class NormsService(
     }
 
     private fun saveNormMetadata(norm: Norm, normDto: NormDto): Flux<MetadatumDto> {
-        return metadataRepository.deleteByNormId(normDto.id)
-            .thenMany(Flux.fromIterable(norm.metadata))
-            .map { metadatumToDto(it, normDto.id) }
-            .flatMap(metadataRepository::save)
+        return deleteOldMetadata(normDto.id)
+            .thenMany(Flux.fromIterable(norm.metadataSections))
+            .map { metadataSectionToDto(it, normDto.id) }
+            .flatMap(metadataSectionsRepository::save)
+            .flatMap { saveSectionMetadata(it, norm) }
     }
+
+    private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, norm: Norm): Flux<MetadatumDto> {
+        return metadataRepository.saveAll(
+            metadataListToDto(
+                norm.metadataSections.filter { it.name == metadataSectionDto.name }.flatMap { it.metadata },
+                metadataSectionDto.id,
+            ),
+        )
+    }
+
+    private fun deleteOldMetadata(normId: Int): Mono<Void> = metadataSectionsRepository.findByNormId(normId)
+        .flatMap {
+            metadataRepository.deleteBySectionId(it.id)
+        }.then(metadataSectionsRepository.deleteByNormId(normId))
 
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {
         return paragraphsRepository.saveAll(
@@ -154,6 +173,13 @@ class NormsService(
             .flatMap(::getArticleWithParagraphs)
             .collectList()
             .map { articles -> normToEntity(normDto, articles, emptyList(), emptyList()) }
+    }
+
+    private fun getSectionMetadata(metadataSectionDto: MetadataSectionDto): Mono<MetadataSection> {
+        return metadataRepository.findBySectionId(metadataSectionDto.id)
+            .map(::metadatumToEntity)
+            .collectList()
+            .map { metadata -> metadataSectionToEntity(metadataSectionDto, metadata) }
     }
 
     private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {
