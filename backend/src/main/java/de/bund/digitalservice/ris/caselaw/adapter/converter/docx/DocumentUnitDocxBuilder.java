@@ -226,6 +226,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
 
   private NumberingListEntryIndex setNumberingListEntryIndex(ListLevel listLevel, String iLvl) {
     DocumentUnitNumberingListNumberFormat numberFormat;
+
     switch (listLevel.getNumFmt()) {
       case BULLET -> numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
       case DECIMAL -> numberFormat = DocumentUnitNumberingListNumberFormat.DECIMAL;
@@ -240,6 +241,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
         numberFormat = DocumentUnitNumberingListNumberFormat.BULLET;
       }
     }
+
     String restartNummerAfterBreak = "";
     String lvlText = "";
     String suff = "tab";
@@ -259,8 +261,12 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
       if (listLevel.IsBullet()) {
         lvlPickBullet = lvl.getLvlPicBulletId() != null;
       }
-      startVal = lvl.getStart().getVal().toString();
-      lvlText = listLevel.getLevelText().isBlank() ? "" : listLevel.getLevelText();
+
+      startVal = lvl.getStart() != null ? lvl.getStart().getVal().toString() : "1";
+      lvlText =
+          listLevel.getLevelText() == null || listLevel.getLevelText().isBlank()
+              ? ""
+              : listLevel.getLevelText();
       restartNummerAfterBreak =
           lvl.getLvlRestart() != null ? lvl.getLvlRestart().getVal().toString() : "";
       isLgl = lvl.getIsLgl() != null && lvl.getIsLgl().isVal();
@@ -274,6 +280,7 @@ public class DocumentUnitDocxBuilder extends DocxBuilder {
                 : "";
       }
     }
+
     return new NumberingListEntryIndex(
         lvlText,
         startVal,
