@@ -85,12 +85,14 @@ async function search() {
     proceedingDecisionInput.value
   )
   if (response.data) {
-    response.data.map((searchResultEntry) => {
-      return {
-        searchResultEntry: searchResultEntry,
-        isLinked: isLinked(searchResultEntry),
+    proceedingDecisionSearchResults.value = response.data.map(
+      (searchResultEntry) => {
+        return {
+          decision: searchResultEntry,
+          isLinked: isLinked(searchResultEntry),
+        }
       }
-    })
+    )
   }
 }
 
@@ -136,7 +138,13 @@ watch(
       @click="createProceedingDecision(proceedingDecisionInput)"
     />
 
-    <div v-if="proceedingDecisionSearchResults" class="mb-10 mt-20">
+    <div
+      v-if="
+        proceedingDecisionSearchResults &&
+        proceedingDecisionSearchResults.length > 0
+      "
+      class="mb-10 mt-20"
+    >
       <SearchResultList
         :search-results="proceedingDecisionSearchResults"
         @link-decision="linkProceedingDecision"
