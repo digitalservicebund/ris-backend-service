@@ -52,6 +52,7 @@ const render = () => {
     {
       class: classes,
       "aria-label": props.ariaLabel,
+      label: props.label,
       disabled,
       href,
       download,
