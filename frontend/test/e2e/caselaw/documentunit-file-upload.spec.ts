@@ -9,10 +9,7 @@ test.describe("upload an original document to a doc unit", () => {
     await navigateToFiles(page, documentNumber)
   })
 
-  test("upload and delete docx file per file chooser", async ({
-    page,
-    documentNumber,
-  }) => {
+  test("upload and delete docx file per file chooser", async ({ page }) => {
     await uploadTestfile(page, "sample.docx")
     await expect(page.locator("text=Hochgeladen am")).toBeVisible()
     await page.waitForSelector("text=sample.docx")
@@ -27,20 +24,12 @@ test.describe("upload an original document to a doc unit", () => {
         "text=Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus"
       )
     ).toBeVisible()
-    await page.goto("/")
+    await page.reload()
     await expect(
-      page.locator(`a[href*="/caselaw/documentunit/${documentNumber}/files"]`)
+      page.locator(
+        "text=Aktuell ist keine Datei hinterlegt. Wählen Sie die Datei des Originaldokumentes aus"
+      )
     ).toBeVisible()
-    await expect(
-      page.locator(".table-row", {
-        hasText: documentNumber,
-      })
-    ).toBeVisible()
-    await expect(
-      page.locator(".table-row", {
-        hasText: "sample.docx",
-      })
-    ).toBeHidden()
   })
 
   test("upload non-docx file per file chooser", async ({ page }) => {
