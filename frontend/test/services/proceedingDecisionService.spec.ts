@@ -40,7 +40,7 @@ describe("documentUnitService", () => {
     return {
       default: {
         getProceedingDecisions: vi.fn().mockReturnValue(testGetResponse),
-        addProceedingDecision: vi.fn().mockReturnValue(testPutResponse),
+        createProceedingDecision: vi.fn().mockReturnValue(testPutResponse),
         // deleteProceedingDecision: vi.fn().mockReturnValue(testDeleteResponse),
       },
     }
@@ -52,7 +52,7 @@ describe("documentUnitService", () => {
   })
 
   it("add proceeding decision", async () => {
-    const result = await service.addProceedingDecision("123", testModel)
+    const result = await service.createProceedingDecision("123", testModel)
     expect(result.data).toEqual([testModel])
   })
 
