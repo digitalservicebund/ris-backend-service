@@ -42,6 +42,7 @@ function saveChip() {
   if (trimmed.length > 0) {
     if (chips.value.includes(trimmed)) {
       errorMessage.value = { title: "Schlagwort bereits vergeben." }
+      currentInput.value = ""
       return
     }
     emits("addChip", trimmed)
@@ -60,6 +61,14 @@ function deleteChip(keyword: string | undefined) {
 const handleOnBlur = () => {
   errorMessage.value = undefined
   currentInput.value = ""
+}
+
+const handleTab = (event: KeyboardEvent) => {
+  //only focus previous on shift + tab
+  if (!event.shiftKey) {
+    event.preventDefault()
+    focusFirst()
+  }
 }
 
 const focusFirst = () => {
@@ -93,7 +102,7 @@ watch(chips, () => {
       type="text"
       @blur="handleOnBlur"
       @input="emitInputEvent"
-      @keydown.prevent.tab="focusFirst"
+      @keydown.tab="handleTab"
       @keypress.enter="saveChip"
       @keyup.right="focusFirst"
     />
