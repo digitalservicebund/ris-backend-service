@@ -30,18 +30,31 @@ function isNotEmpty(decision: ProceedingDecision): boolean {
   return Object.values(decision).some((value) => value !== undefined)
 }
 
-const addProceedingDecision = async (
+async function createProceedingDecision(
   proceedingDecision: ProceedingDecision
-) => {
+) {
   if (isNotEmpty(proceedingDecision)) {
-    const response = await proceedingDecisionService.addProceedingDecision(
+    const response = await proceedingDecisionService.createProceedingDecision(
       props.documentUnitUuid,
       proceedingDecision
     )
     if (response.data) {
-      // console.log(response.data)
       proceedingDecisionList.value = response.data
+    } else {
+      console.error(response.error)
     }
+  }
+}
+
+async function linkProceedingDecision(childUuid: string) {
+  const response = await proceedingDecisionService.linkProceedingDecision(
+    props.documentUnitUuid,
+    childUuid
+  )
+  if (response.data) {
+    proceedingDecisionList.value = response.data
+  } else {
+    console.error(response.error)
   }
 }
 
@@ -55,23 +68,17 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
       (listItem) => listItem.uuid !== decision.uuid
     )
   } else {
-    console.log(response.error)
+    console.error(response.error)
   }
 }
 
-const search = async () => {
-  // console.log("Searching with input:", proceedingDecisionInput.value)
+async function search() {
   const response = await DocumentUnitService.searchByProceedingDecisionInput(
     proceedingDecisionInput.value
   )
   if (response.data) {
-    console.log("response:", response.data)
     proceedingDecisionSearchResults.value = response.data
   }
-}
-
-const addProceedingDecisionViaSearchResults = async () => {
-  // TODO
 }
 
 watch(
@@ -114,7 +121,7 @@ watch(
     <TextButton
       aria-label="Entscheidung manuell hinzufügen"
       label="Manuell Hinzufügen"
-      @click="addProceedingDecision(proceedingDecisionInput)"
+      @click="createProceedingDecision(proceedingDecisionInput)"
     />
 
     <div v-if="proceedingDecisionSearchResults.length > 0" class="mb-10 mt-20">
@@ -136,7 +143,7 @@ watch(
           <TextButton
             aria-label="Treffer übernehmen"
             label="Übernehmen"
-            @click="addProceedingDecisionViaSearchResults"
+            @click="linkProceedingDecision(proceedingDecision.uuid as string)"
           />
         </div>
       </div>

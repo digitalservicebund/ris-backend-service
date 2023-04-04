@@ -1,13 +1,17 @@
-import { ProceedingDecision } from "./../domain/documentUnit"
+import DocumentUnit, { ProceedingDecision } from "./../domain/documentUnit"
 import httpClient, { ServiceResponse } from "./httpClient"
 
 interface ProceedingDecisionService {
   getProceedingDecisions(
     uuid: string
   ): Promise<ServiceResponse<ProceedingDecision[]>>
-  addProceedingDecision(
+  createProceedingDecision(
     uuid: string,
     proceedingDecision: ProceedingDecision
+  ): Promise<ServiceResponse<ProceedingDecision[]>>
+  linkProceedingDecision(
+    parentUuid: string,
+    childUuid: string
   ): Promise<ServiceResponse<ProceedingDecision[]>>
   removeProceedingDecision(
     parentUuid: string,
@@ -28,7 +32,7 @@ const service: ProceedingDecisionService = {
     return response
   },
 
-  async addProceedingDecision(
+  async createProceedingDecision(
     uuid: string,
     proceedingDecision: ProceedingDecision
   ) {
@@ -52,6 +56,26 @@ const service: ProceedingDecisionService = {
       }
     }
     return response
+  },
+
+  async linkProceedingDecision(parentUuid: string, childUuid: string) {
+    const response = await httpClient.put<undefined, DocumentUnit>(
+      `caselaw/documentunits/${parentUuid}/proceedingdecisions/${childUuid}`
+    )
+    if (response.status >= 300) {
+      return {
+        status: 500,
+        error: {
+          title: `Vorgehende Entscheidung ${childUuid} konnte der Dokumentationseinheit ${parentUuid} nicht hinzugefügt werden.`,
+        },
+      }
+    } else {
+      return {
+        status: 200,
+        data: (response.data as DocumentUnit)
+          .proceedingDecisions as ProceedingDecision[],
+      }
+    }
   },
 
   async removeProceedingDecision(parentUuid: string, childUuid: string) {

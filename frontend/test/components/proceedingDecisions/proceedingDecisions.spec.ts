@@ -46,9 +46,9 @@ describe("DocumentUnitProceedingDecisions", async () => {
     expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
   })
 
-  it("adds proceeding decision and updates list of existing ones", async () => {
+  it("creates new proceeding decision and updates list of existing ones", async () => {
     const fetchSpy = vi
-      .spyOn(service, "addProceedingDecision")
+      .spyOn(service, "createProceedingDecision")
       .mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -91,9 +91,9 @@ describe("DocumentUnitProceedingDecisions", async () => {
     expect(screen.getByText(/testFileNumber2/)).toBeVisible()
   })
 
-  it("does not add if decision is undefined", async () => {
+  it("does not create decision if undefined", async () => {
     const fetchSpy = vi
-      .spyOn(service, "addProceedingDecision")
+      .spyOn(service, "createProceedingDecision")
       .mockImplementation(() =>
         Promise.resolve({
           status: 200,
