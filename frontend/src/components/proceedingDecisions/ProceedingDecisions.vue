@@ -15,16 +15,14 @@ const props = defineProps<{
   proceedingDecisions?: ProceedingDecision[]
 }>()
 
-const defaultModel: ProceedingDecision = {
+const proceedingDecisions = ref<ProceedingDecision[]>()
+const searchResults = ref<SearchResults>()
+const input = ref<ProceedingDecision>({
   court: undefined,
   documentType: undefined,
   date: undefined,
   fileNumber: undefined,
-}
-
-const proceedingDecisionList = ref<ProceedingDecision[]>()
-const searchResults = ref<SearchResults>()
-const proceedingDecisionInput = ref<ProceedingDecision>(defaultModel)
+})
 
 function isNotEmpty(decision: ProceedingDecision): boolean {
   return Object.values(decision).some((value) => value !== undefined)
@@ -39,7 +37,7 @@ async function createProceedingDecision(
       proceedingDecision
     )
     if (response.data) {
-      proceedingDecisionList.value = response.data
+      proceedingDecisions.value = response.data
     } else {
       console.error(response.error)
     }
@@ -52,7 +50,7 @@ async function linkProceedingDecision(childUuid: string) {
     childUuid
   )
   if (response.data) {
-    proceedingDecisionList.value = response.data
+    proceedingDecisions.value = response.data
 
     updateSearchResultsLinkStatus(childUuid)
   } else {
@@ -66,7 +64,7 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
     decision.uuid as string
   )
   if (response.data) {
-    proceedingDecisionList.value = proceedingDecisionList.value?.filter(
+    proceedingDecisions.value = proceedingDecisions.value?.filter(
       (listItem) => listItem.uuid !== decision.uuid
     )
   } else {
@@ -75,10 +73,10 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
 }
 
 function isLinked(decision: ProceedingDecision): boolean {
-  if (!proceedingDecisionList.value) return false
+  if (!proceedingDecisions.value) return false
 
-  return proceedingDecisionList.value.some(
-    (linkedDecision) => linkedDecision.uuid == decision.uuid
+  return proceedingDecisions.value.some(
+    (proceedingDecision) => proceedingDecision.uuid == decision.uuid
   )
 }
 
@@ -95,7 +93,7 @@ function updateSearchResultsLinkStatus(linkedUuid: string) {
 
 async function search() {
   const response = await DocumentUnitService.searchByProceedingDecisionInput(
-    proceedingDecisionInput.value
+    input.value
   )
   if (response.data) {
     searchResults.value = response.data.map((searchResult) => {
@@ -110,7 +108,7 @@ async function search() {
 watch(
   props,
   () => {
-    proceedingDecisionList.value = props.proceedingDecisions
+    proceedingDecisions.value = props.proceedingDecisions
   },
   {
     immediate: true,
@@ -125,13 +123,13 @@ watch(
     </template>
 
     <DecisionList
-      v-if="proceedingDecisionList"
-      :decisions="proceedingDecisionList"
+      v-if="proceedingDecisions"
+      :decisions="proceedingDecisions"
       @remove-link="removeProceedingDecision"
     />
 
     <InputGroup
-      v-model="proceedingDecisionInput"
+      v-model="input"
       :column-count="2"
       :fields="proceedingDecisionFields"
     ></InputGroup>
@@ -146,7 +144,7 @@ watch(
     <TextButton
       aria-label="Entscheidung manuell hinzufügen"
       label="Manuell Hinzufügen"
-      @click="createProceedingDecision(proceedingDecisionInput)"
+      @click="createProceedingDecision(input)"
     />
 
     <div v-if="searchResults" class="mb-10 mt-20">

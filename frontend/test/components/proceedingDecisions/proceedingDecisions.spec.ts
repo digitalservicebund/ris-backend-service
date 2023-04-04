@@ -119,7 +119,7 @@ describe("DocumentUnitProceedingDecisions", async () => {
 
   it.todo("lists search results")
 
-  it.todo("adds proceeding decision from search results")
+  it.todo("adds proceeding decision from search results and updates indicators")
 
   it.todo("search updates list with empty result")
 })
