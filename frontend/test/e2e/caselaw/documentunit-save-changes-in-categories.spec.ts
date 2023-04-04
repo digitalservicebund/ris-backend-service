@@ -191,6 +191,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await expect(page.locator("text=testone").first()).toBeVisible()
     await expect(page.locator("text=testtwo").first()).toBeVisible()
+    await expect(page.locator("text=testthree").first()).toBeVisible()
 
     //Navigate back and delete on enter
     await page.keyboard.press("ArrowLeft")

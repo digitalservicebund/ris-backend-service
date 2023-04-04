@@ -179,6 +179,22 @@ describe("chips input as inline list", () => {
     expect(chipList[0]).toHaveFocus()
   })
 
+  it("sets last chip of list active on key 'shift' + 'tab'", async () => {
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+    await user.type(input, "two")
+    await user.type(input, "{enter}")
+
+    const chipList = screen.getAllByLabelText("chip")
+    expect(chipList.length).toBe(2)
+    await user.keyboard("{Shift>}{Tab}{/Shift}")
+    expect(chipList[1]).toHaveFocus()
+  })
+
   it("sets focus on input when pressing arrow key 'right' on last chip", async () => {
     const { user } = renderComponent()
     const input: HTMLInputElement = screen.getByRole("textbox")
@@ -287,6 +303,32 @@ describe("chips input as inline list", () => {
     await user.type(input, "{arrowright}") // nothing happens further right
     expect(input).toHaveFocus()
     expect(input).toHaveValue("")
+  })
+
+  it("focus via tabbing behaves as expected", async () => {
+    const { user } = renderComponent()
+    const input: HTMLInputElement = screen.getByRole("textbox")
+    expect(input).toHaveValue("")
+
+    await user.type(input, "one")
+    await user.type(input, "{enter}")
+    await user.type(input, "two")
+    await user.type(input, "{enter}")
+
+    const chipList = screen.getAllByLabelText("chip")
+    expect(chipList.length).toBe(2)
+
+    const chipOne = chipList[0] as HTMLElement
+    const chipTwo = chipList[1] as HTMLElement
+
+    await user.keyboard("{Shift>}{Tab}{/Shift}")
+    expect(chipTwo).toHaveFocus()
+
+    await user.keyboard("{Shift>}{Tab}{/Shift}")
+    expect(chipOne).toHaveFocus()
+
+    await user.keyboard("{Tab}")
+    expect(chipTwo).toHaveFocus()
   })
 
   it("click middle chip and continue navigating by arrow keys", async () => {
@@ -421,7 +463,7 @@ describe("chips input as bottom list", () => {
     expect(chipList[0]).toHaveFocus()
   })
 
-  it("sets first chip of list active on arrow key 'tab'", async () => {
+  it("sets first chip of list active on key 'tab'", async () => {
     const { user } = renderComponentWithBottomList()
     const input: HTMLInputElement = screen.getByRole("textbox")
     expect(input).toHaveValue("")
