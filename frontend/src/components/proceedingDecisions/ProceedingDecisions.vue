@@ -23,7 +23,7 @@ const defaultModel: ProceedingDecision = {
 }
 
 const proceedingDecisionList = ref<ProceedingDecision[]>()
-const proceedingDecisionSearchResults = ref<SearchResults>()
+const searchResults = ref<SearchResults>()
 const proceedingDecisionInput = ref<ProceedingDecision>(defaultModel)
 
 function isNotEmpty(decision: ProceedingDecision): boolean {
@@ -53,6 +53,8 @@ async function linkProceedingDecision(childUuid: string) {
   )
   if (response.data) {
     proceedingDecisionList.value = response.data
+
+    updateSearchResultsLinkStatus(childUuid)
   } else {
     console.error(response.error)
   }
@@ -80,19 +82,28 @@ function isLinked(decision: ProceedingDecision): boolean {
   )
 }
 
+function updateSearchResultsLinkStatus(linkedUuid: string) {
+  if (searchResults.value == undefined) return
+
+  searchResults.value = searchResults.value.map((searchResult) => {
+    if (searchResult.decision.uuid === linkedUuid) {
+      searchResult.isLinked = true
+    }
+    return searchResult
+  })
+}
+
 async function search() {
   const response = await DocumentUnitService.searchByProceedingDecisionInput(
     proceedingDecisionInput.value
   )
   if (response.data) {
-    proceedingDecisionSearchResults.value = response.data.map(
-      (searchResultEntry) => {
-        return {
-          decision: searchResultEntry,
-          isLinked: isLinked(searchResultEntry),
-        }
+    searchResults.value = response.data.map((searchResult) => {
+      return {
+        decision: searchResult,
+        isLinked: isLinked(searchResult),
       }
-    )
+    })
   }
 }
 
@@ -138,15 +149,9 @@ watch(
       @click="createProceedingDecision(proceedingDecisionInput)"
     />
 
-    <div
-      v-if="
-        proceedingDecisionSearchResults &&
-        proceedingDecisionSearchResults.length > 0
-      "
-      class="mb-10 mt-20"
-    >
+    <div v-if="searchResults" class="mb-10 mt-20">
       <SearchResultList
-        :search-results="proceedingDecisionSearchResults"
+        :search-results="searchResults"
         @link-decision="linkProceedingDecision"
       />
     </div>
