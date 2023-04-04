@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import ChipsInputBottom from "@/shared/components/input/ChipsInputBottom.vue"
+import ChipsInputBottom from "@/shared/components/input/KeywordsChipsInput.vue"
 import type { ChipsInputModelType } from "@/shared/components/input/types"
 
 const chipsValue1 = ref<ChipsInputModelType>(["one", "two"])
