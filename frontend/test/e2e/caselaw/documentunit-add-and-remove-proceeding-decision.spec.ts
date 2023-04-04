@@ -83,9 +83,38 @@ test.describe("Add and remove proceeding decisions", () => {
     ).toHaveCount(2)
   })
 
-  // test("delete proceeding decision", async ({ page, documentNumber }) => {
-  //   TBD
-  // })
+  test("remove proceeding decision", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleProceedingDecisionsSection(page)
+    await fillProceedingDecisionInputs(page, {
+      court: "AG Aalen",
+      date: "2004-12-03",
+      fileNumber: "1a2b3c",
+      documentType: "AnU",
+    })
+
+    await page.getByText("Manuell Hinzufügen").click()
+
+    await expect(
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
+    ).toHaveCount(1)
+
+    await page
+      .locator("li", { hasText: "AG Aalen" })
+      .getByLabel("Löschen")
+      .click()
+
+    await expect(
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
+    ).toHaveCount(0)
+
+    page.reload()
+    await toggleProceedingDecisionsSection(page)
+
+    await expect(
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
+    ).toHaveCount(0)
+  })
 
   // test("test add proveeding decision with missing required fields not possible", async ({
   //   page,
