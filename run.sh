@@ -99,16 +99,16 @@ _dev() {
   
   wait=""
   services=""
-  while [[ "${1#}" =~ ^- && ! "${1#}" == "--" ]]; do case $1 in
-  -n | --no-backend )
-    shift; services="traefik redis db frontend";
-    ;;
-  -d | --detached )
-    shift; wait="--wait";
-    ;;
-  esac; done
-  if [[ "${1#}" == '--' ]]; then shift; fi
-  
+  for arg in "$@"; do
+    case $arg in
+      -n|--no-backend)
+        services="traefik redis db frontend"
+        ;;
+      -d|--detached)
+        wait="--wait"
+        ;;
+    esac
+  done
   docker compose up $wait $services
 
   echo "The application is available at http://127.0.0.1"
