@@ -7,7 +7,6 @@ export const proceedingDecisionFields: InputField[] = [
     name: "court",
     type: InputType.COMBOBOX,
     label: "Gericht",
-    required: true,
     inputAttributes: {
       ariaLabel: "Gericht Rechtszug",
       placeholder: "Gerichtstyp Gerichtsort",
