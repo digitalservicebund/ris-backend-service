@@ -87,7 +87,7 @@ watch(
     >
       <InputFieldComponent
         v-for="field in group"
-        :id="field.name"
+        :id="field.id"
         :key="field.name"
         class="input-group__row__field"
         :label="field.label"
@@ -96,7 +96,7 @@ watch(
         :style="fieldStyle"
       >
         <InputElement
-          :id="field.name"
+          :id="field.id"
           v-model="inputValues[field.name]"
           :attributes="field.inputAttributes"
           :type="field.type"

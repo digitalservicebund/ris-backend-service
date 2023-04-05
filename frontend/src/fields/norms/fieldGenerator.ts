@@ -21,11 +21,13 @@ export const undefinedDropDownItems: DropdownItem[] = [
 
 export function dropdown(
   name: string,
+  id: string,
   label: string,
   items: DropdownItem[]
 ): DropdownInputField {
   return {
     name: name,
+    id: id,
     type: InputType.DROPDOWN,
     label: label,
     inputAttributes: {

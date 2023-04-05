@@ -5,6 +5,7 @@ import comboboxItemService from "@/services/comboboxItemService"
 export const proceedingDecisionFields: InputField[] = [
   {
     name: "court",
+    id: "proceedingdecision_court",
     type: InputType.COMBOBOX,
     label: "Gericht",
     inputAttributes: {
@@ -15,6 +16,7 @@ export const proceedingDecisionFields: InputField[] = [
   },
   {
     name: "date",
+    id: "proceedingdecision_date",
     type: InputType.DATE,
     label: "Entscheidungsdatum",
     inputAttributes: {
@@ -23,6 +25,7 @@ export const proceedingDecisionFields: InputField[] = [
   },
   {
     name: "fileNumber",
+    id: "proceedingdecision_fileNumber",
     type: InputType.TEXT,
     label: "Aktenzeichen",
     inputAttributes: {
@@ -31,6 +34,7 @@ export const proceedingDecisionFields: InputField[] = [
   },
   {
     name: "documentType",
+    id: "proceedingdecision_documentType",
     type: InputType.COMBOBOX,
     label: "Dokumenttyp",
     inputAttributes: {

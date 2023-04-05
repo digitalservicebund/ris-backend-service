@@ -4,6 +4,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const generalData: InputField[] = [
   {
     name: "officialLongTitle",
+    id: "officialLongTitle",
     type: InputType.TEXT,
     label: "Amtliche Langüberschrift",
     inputAttributes: {
@@ -12,6 +13,7 @@ export const generalData: InputField[] = [
   },
   {
     name: "risAbbreviation",
+    id: "risAbbreviation",
     type: InputType.TEXT,
     label: "Juris-Abkürzung",
     inputAttributes: {
@@ -20,11 +22,13 @@ export const generalData: InputField[] = [
   },
   defineChipsField(
     "risAbbreviationInternationalLaw",
+    "risAbbreviationInternationalLaw",
     "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
     "Juris-Abkürzung für völkerrechtliche Vereinbarungen"
   ),
   {
     name: "documentNumber",
+    id: "documentNumber",
     type: InputType.TEXT,
     label: "Dokumentnummer",
     inputAttributes: {
@@ -33,11 +37,13 @@ export const generalData: InputField[] = [
   },
   defineChipsField(
     "divergentDocumentNumber",
+    "divergentDocumentNumber",
     "Abweichende Dokumentnummer",
     "Abweichende Dokumentnummer"
   ),
   {
     name: "documentCategory",
+    id: "documentCategory",
     type: InputType.TEXT,
     label: "Dokumentart",
     inputAttributes: {
@@ -45,6 +51,7 @@ export const generalData: InputField[] = [
     },
   },
   defineChipsField(
+    "frameKeywords",
     "frameKeywords",
     "Schlagwörter im Rahmenelement",
     "Schlagwörter im Rahmenelement"

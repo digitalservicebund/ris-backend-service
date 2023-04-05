@@ -13,6 +13,7 @@ import comboboxItemService from "@/services/comboboxItemService"
 
 export function defineTextField(
   name: string,
+  id: string,
   label: string,
   ariaLabel: string,
   placeholder?: string,
@@ -21,6 +22,7 @@ export function defineTextField(
 ): InputField {
   return {
     name,
+    id,
     type: InputType.TEXT,
     label,
     required: DocumentUnit.isRequiredField(name),
@@ -35,12 +37,14 @@ export function defineTextField(
 
 export function defineChipsField(
   name: string,
+  id: string,
   label: string,
   ariaLabel: string,
   placeholder?: string
 ): InputField {
   return {
     name,
+    id,
     type: InputType.CHIPS,
     label,
     required: DocumentUnit.isRequiredField(name),
@@ -53,12 +57,14 @@ export function defineChipsField(
 
 export function defineChipsDateField(
   name: string,
+  id: string,
   label: string,
   ariaLabel: string,
   placeholder?: string
 ): InputField {
   return {
     name,
+    id,
     type: InputType.DATECHIPS,
     label,
     required: DocumentUnit.isRequiredField(name),
@@ -71,12 +77,14 @@ export function defineChipsDateField(
 
 export function defineDateField(
   name: string,
+  id: string,
   label: string,
   ariaLabel: string,
   validationError?: ValidationError
 ): InputField {
   return {
     name,
+    id,
     type: InputType.DATE,
     label,
     required: DocumentUnit.isRequiredField(name),
@@ -86,6 +94,7 @@ export function defineDateField(
 
 export function defineComboboxField(
   name: string,
+  id: string,
   label: string,
   ariaLabel: string,
   itemService: ComboboxAttributes["itemService"],
@@ -94,6 +103,7 @@ export function defineComboboxField(
 ): InputField {
   return {
     name,
+    id,
     type: InputType.COMBOBOX,
     label,
     required: DocumentUnit.isRequiredField(name),
@@ -108,6 +118,7 @@ export function defineComboboxField(
 
 export function defineDropdownField(
   name: string,
+  id: string,
   label: string,
   ariaLabel: string,
   items: DropdownItem[],
@@ -116,6 +127,7 @@ export function defineDropdownField(
 ): InputField {
   return {
     name,
+    id,
     type: InputType.DROPDOWN,
     label,
     required: DocumentUnit.isRequiredField(name),
@@ -131,10 +143,12 @@ export function defineDropdownField(
 export function defineNestedInputField(
   ariaLabel: string,
   name: NestedInputField["name"],
+  id: NestedInputField["name"],
   fields: NestedInputAttributes["fields"]
 ): InputField {
   return {
     name,
+    id,
     type: InputType.NESTED,
     inputAttributes: {
       ariaLabel,
@@ -147,8 +161,10 @@ export const courtFields: InputField[] = [
   defineNestedInputField(
     "Fehlerhaftes Gericht",
     "nestedInputOfCourtAndIncorrectCourts",
+    "nestedInputOfCourtAndIncorrectCourts",
     {
       parent: defineComboboxField(
+        "court",
         "court",
         "Gericht",
         "Gericht",
@@ -156,6 +172,7 @@ export const courtFields: InputField[] = [
         "Gerichtstyp Gerichtsort"
       ),
       child: defineChipsField(
+        "incorrectCourts",
         "incorrectCourts",
         "Fehlerhaftes Gericht",
         "Fehlerhaftes Gericht",
@@ -168,14 +185,17 @@ export const coreDataFields: InputField[] = [
   defineNestedInputField(
     "Abweichendes Aktenzeichen",
     "nestedInputOfFileNumbersAndDeviatingFileNumbers",
+    "nestedInputOfFileNumbersAndDeviatingFileNumbers",
     {
       parent: defineChipsField(
+        "fileNumbers",
         "fileNumbers",
         "Aktenzeichen",
         "Aktenzeichen",
         ""
       ),
       child: defineChipsField(
+        "deviatingFileNumbers",
         "deviatingFileNumbers",
         "Abweichendes Aktenzeichen",
         "Abweichendes Aktenzeichen",
@@ -186,8 +206,10 @@ export const coreDataFields: InputField[] = [
   defineNestedInputField(
     "Abweichendes Entscheidungsdatum",
     "nestedInputOfDecisionDateAndDeviatingDecisionDates",
+    "nestedInputOfDecisionDateAndDeviatingDecisionDates",
     {
       parent: defineDateField(
+        "decisionDate",
         "decisionDate",
         "Entscheidungsdatum",
         "Entscheidungsdatum",
@@ -195,14 +217,21 @@ export const coreDataFields: InputField[] = [
       ),
       child: defineChipsDateField(
         "deviatingDecisionDates",
+        "deviatingDecisionDates",
         "Abweichendes Entscheidungsdatum",
         "Abweichendes Entscheidungsdatum",
         undefined
       ),
     }
   ),
-  defineTextField("appraisalBody", "Spruchkörper", "Spruchkörper"),
+  defineTextField(
+    "appraisalBody",
+    "appraisalBody",
+    "Spruchkörper",
+    "Spruchkörper"
+  ),
   defineComboboxField(
+    "documentType",
     "documentType",
     "Dokumenttyp",
     "Dokumenttyp",
@@ -212,9 +241,11 @@ export const coreDataFields: InputField[] = [
   defineNestedInputField(
     "Abweichender ECLI",
     "nestedInputOfEcliAndDeviatingEclis",
+    "nestedInputOfEcliAndDeviatingEclis",
     {
-      parent: defineTextField("ecli", "ECLI", "ECLI", ""),
+      parent: defineTextField("ecli", "ecli", "ECLI", "ECLI", ""),
       child: defineChipsField(
+        "deviatingEclis",
         "deviatingEclis",
         "Abweichender ECLI",
         "Abweichender ECLI",
@@ -222,14 +253,16 @@ export const coreDataFields: InputField[] = [
       ),
     }
   ),
-  defineTextField("procedure", "Vorgang", "Vorgang"),
+  defineTextField("procedure", "procedure", "Vorgang", "Vorgang"),
   defineDropdownField(
+    "legalEffect",
     "legalEffect",
     "Rechtskraft",
     "Rechtskraft",
     legalEffectTypes.items
   ),
   defineTextField(
+    "region",
     "region",
     "Region",
     "Region",

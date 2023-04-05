@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const applicationScope: InputField[] = [
   {
     name: "applicationScopeArea",
+    id: "applicationScopeArea",
     type: InputType.TEXT,
     label: "Gebiet",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const applicationScope: InputField[] = [
   },
   {
     name: "applicationScopeStartDate",
+    id: "applicationScopeStartDate",
     type: InputType.DATE,
     label: "Anfangsdatum",
     inputAttributes: {
@@ -20,6 +22,7 @@ export const applicationScope: InputField[] = [
   },
   {
     name: "applicationScopeEndDate",
+    id: "applicationScopeEndDate",
     type: InputType.DATE,
     label: "Endedatum",
     inputAttributes: {

@@ -40,10 +40,7 @@ test.describe("a11y of start page (/caselaw)", () => {
 test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/categories)", () => {
   test("first load", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    //TODO: we make the assumption, that the field id in the configs always matches the domain model. Input field IDs need to have the same value like the model name, e.g. the court input fields in coreData and proceedingDecision both need to have the ID "court", because the model is named so. This results in a "duplicate-id-aria" violation, we need some decoupling here, so we are able to use different ids in the frontend. Also the ModelComponentRepeater creates components with the same id, we will need some kind of indexing in the ids here. That's why we disable the "duplicate-id-aria" rule for now.
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -61,9 +58,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.locator("[aria-label='Gericht']").fill("bayern")
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -86,9 +81,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
 
     await page.keyboard.press("Enter")
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -110,9 +103,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .fill("2022-02-01")
     await page.keyboard.press("Enter")
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -129,9 +120,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("zwischen")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(3)
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -147,9 +136,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await page.locator("[aria-label='Abweichender ECLI']").fill("three")
     await page.keyboard.press("Enter")
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -159,9 +146,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -181,9 +166,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       date: "2004-12-03",
     })
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 
@@ -193,9 +176,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     await editorField.click()
     await editorField.type("this is text")
 
-    const accessibilityScanResults = await new AxeBuilder({ page })
-      .disableRules(["duplicate-id-aria"])
-      .analyze()
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
 

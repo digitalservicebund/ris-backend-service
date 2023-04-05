@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const reissue: InputField[] = [
   {
     name: "reissueNote",
+    id: "reissueNote",
     type: InputType.TEXT,
     label: "Neufassungshinweis",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const reissue: InputField[] = [
   },
   {
     name: "reissueArticle",
+    id: "reissueArticle",
     type: InputType.TEXT,
     label: "Bezeichnung der Bekanntmachung",
     inputAttributes: {
@@ -19,6 +21,7 @@ export const reissue: InputField[] = [
   },
   {
     name: "reissueDate",
+    id: "reissueDate",
     type: InputType.DATE,
     label: "Datum der Bekanntmachung",
     inputAttributes: {
@@ -28,6 +31,7 @@ export const reissue: InputField[] = [
   },
   {
     name: "reissueReference",
+    id: "reissueReference",
     type: InputType.TEXT,
     label: "Fundstelle der Bekanntmachung",
     inputAttributes: {

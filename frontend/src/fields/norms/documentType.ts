@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const documentType: InputField[] = [
   {
     name: "documentTypeName",
+    id: "documentTypeName",
     type: InputType.TEXT,
     label: "Typbezeichnung",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const documentType: InputField[] = [
   },
   {
     name: "documentNormCategory",
+    id: "documentNormCategory",
     type: InputType.TEXT,
     label: "Art der Norm",
     inputAttributes: {
@@ -19,6 +21,7 @@ export const documentType: InputField[] = [
   },
   {
     name: "documentTemplateName",
+    id: "documentTemplateName",
     type: InputType.TEXT,
     label: "Bezeichnung gemäß Vorlage",
     inputAttributes: {

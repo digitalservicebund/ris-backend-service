@@ -23,6 +23,7 @@ export interface BaseInputAttributes {
 
 export interface BaseInputField {
   name: string
+  id: string
   type: InputType
   label?: string
   required?: boolean
@@ -75,6 +76,7 @@ export interface NestedInputAttributes extends BaseInputAttributes {
 
 export interface NestedInputField extends Omit<BaseInputField, "name"> {
   name: `nestedInputOf${Capitalize<string>}And${Capitalize<string>}`
+  id: `nestedInputOf${Capitalize<string>}And${Capitalize<string>}`
   type: InputType.NESTED
   inputAttributes: NestedInputAttributes
 }

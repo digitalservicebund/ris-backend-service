@@ -1,9 +1,10 @@
-import { LabelPosition } from "@/shared/components/input/InputField.vue"
+import LabelPosition from "@/shared/components/input/InputField.vue"
 import { InputField, InputType } from "@/shared/components/input/types"
 
 export const normProvider: InputField[] = [
   {
     name: "providerEntity",
+    id: "providerEntity",
     type: InputType.TEXT,
     label: "Staat, Land, Stadt, Landkreis oder juristische Person",
     inputAttributes: {
@@ -12,6 +13,7 @@ export const normProvider: InputField[] = [
   },
   {
     name: "providerDecidingBody",
+    id: "providerDecidingBody",
     type: InputType.TEXT,
     label: "Beschließendes Organ",
     inputAttributes: {
@@ -20,6 +22,7 @@ export const normProvider: InputField[] = [
   },
   {
     name: "providerIsResolutionMajority",
+    id: "providerIsResolutionMajority",
     type: InputType.CHECKBOX,
     label: "Beschlussfassung mit qualifizierter Mehrheit",
     inputAttributes: {

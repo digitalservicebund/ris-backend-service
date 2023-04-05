@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const digitalAnnouncement: InputField[] = [
   {
     name: "digitalAnnouncementMedium",
+    id: "digitalAnnouncementMedium",
     type: InputType.TEXT,
     label: "Verkündungsmedium",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementDate",
+    id: "digitalAnnouncementDate",
     type: InputType.DATE,
     label: "Verkündungsdatum",
     inputAttributes: {
@@ -20,6 +22,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementEdition",
+    id: "digitalAnnouncementEdition",
     type: InputType.TEXT,
     label: "Ausgabenummer",
     inputAttributes: {
@@ -28,6 +31,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementYear",
+    id: "digitalAnnouncementYear",
     type: InputType.TEXT,
     label: "Jahr",
     inputAttributes: {
@@ -36,6 +40,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementPage",
+    id: "digitalAnnouncementPage",
     type: InputType.TEXT,
     label: "Seitenzahlen",
     inputAttributes: {
@@ -44,6 +49,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementArea",
+    id: "digitalAnnouncementArea",
     type: InputType.TEXT,
     label: "Bereich der Veröffentlichung",
     inputAttributes: {
@@ -52,6 +58,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementAreaNumber",
+    id: "digitalAnnouncementAreaNumber",
     type: InputType.TEXT,
     label: "Nummer der Veröffentlichung im jeweiligen Bereich",
     inputAttributes: {
@@ -60,6 +67,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementInfo",
+    id: "digitalAnnouncementInfo",
     type: InputType.TEXT,
     label: "Zusatzangaben",
     inputAttributes: {
@@ -68,6 +76,7 @@ export const digitalAnnouncement: InputField[] = [
   },
   {
     name: "digitalAnnouncementExplanations",
+    id: "digitalAnnouncementExplanations",
     type: InputType.TEXT,
     label: "Erläuterungen",
     inputAttributes: {

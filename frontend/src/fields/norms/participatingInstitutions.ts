@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const participatingInstitutions: InputField[] = [
   {
     name: "participationType",
+    id: "participationType",
     type: InputType.TEXT,
     label: "Art der Mitwirkung",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const participatingInstitutions: InputField[] = [
   },
   {
     name: "participationInstitution",
+    id: "participationInstitution",
     type: InputType.TEXT,
     label: "Mitwirkendes Organ",
     inputAttributes: {

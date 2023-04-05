@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const lead: InputField[] = [
   {
     name: "leadJurisdiction",
+    id: "leadJurisdiction",
     type: InputType.TEXT,
     label: "Ressort",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const lead: InputField[] = [
   },
   {
     name: "leadUnit",
+    id: "leadUnit",
     type: InputType.TEXT,
     label: "Organisationseinheit",
     inputAttributes: {

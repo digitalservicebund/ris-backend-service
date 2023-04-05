@@ -93,8 +93,8 @@ export function useTransformNestedData<E extends Emits>(
         .forEach((item) => {
           nestedData = mapData(
             nestedData,
-            item.inputAttributes.fields.parent.name,
-            item.inputAttributes.fields.child.name
+            item.inputAttributes.fields.parent.id,
+            item.inputAttributes.fields.child.id
           )
         })
       return nestedData

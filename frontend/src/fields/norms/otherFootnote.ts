@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const otherFootnote: InputField[] = [
   {
     name: "footnoteChange",
+    id: "footnoteChange",
     type: InputType.TEXT,
     label: "Änderungsfußnote",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const otherFootnote: InputField[] = [
   },
   {
     name: "footnoteComment",
+    id: "footnoteComment",
     type: InputType.TEXT,
     label: "Kommentierende Fußnote",
     inputAttributes: {
@@ -19,6 +21,7 @@ export const otherFootnote: InputField[] = [
   },
   {
     name: "footnoteDecision",
+    id: "footnoteDecision",
     type: InputType.TEXT,
     label: "BVerfG-Entscheidung",
     inputAttributes: {
@@ -27,6 +30,7 @@ export const otherFootnote: InputField[] = [
   },
   {
     name: "footnoteStateLaw",
+    id: "footnoteStateLaw",
     type: InputType.TEXT,
     label: "Landesrecht",
     inputAttributes: {
@@ -35,6 +39,7 @@ export const otherFootnote: InputField[] = [
   },
   {
     name: "footnoteEuLaw",
+    id: "footnoteEuLaw",
     type: InputType.TEXT,
     label: "EU/EG-Recht",
     inputAttributes: {
@@ -43,6 +48,7 @@ export const otherFootnote: InputField[] = [
   },
   {
     name: "otherFootnote",
+    id: "otherFootnote",
     type: InputType.TEXT,
     label: "Sonstige Fußnote",
     inputAttributes: {

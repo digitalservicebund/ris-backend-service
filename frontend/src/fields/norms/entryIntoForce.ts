@@ -4,6 +4,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const entryIntoForce: InputField[] = [
   {
     name: "entryIntoForceDate",
+    id: "entryIntoForceDate",
     type: InputType.DATE,
     label: "Datum des Inkrafttretens",
     inputAttributes: {
@@ -13,10 +14,12 @@ export const entryIntoForce: InputField[] = [
   },
   dropdown(
     "entryIntoForceDateState",
+    "entryIntoForceDateState",
     "Unbestimmtes Datum des Inkrafttretens",
     undefinedDropDownItems
   ),
   {
+    id: "principleEntryIntoForceDate",
     name: "principleEntryIntoForceDate",
     type: InputType.DATE,
     label: "Grundsätzliches Inkrafttretedatum",
@@ -27,11 +30,13 @@ export const entryIntoForce: InputField[] = [
   },
   dropdown(
     "principleEntryIntoForceDateState",
+    "principleEntryIntoForceDateState",
     "Unbestimmtes grundsätzliches Inkrafttretedatum",
     undefinedDropDownItems
   ),
   {
     name: "divergentEntryIntoForceDate",
+    id: "divergentEntryIntoForceDate",
     type: InputType.DATE,
     label: "Bestimmtes abweichendes Inkrafttretedatum",
     inputAttributes: {
@@ -41,11 +46,13 @@ export const entryIntoForce: InputField[] = [
   },
   dropdown(
     "divergentEntryIntoForceDateState",
+    "divergentEntryIntoForceDateState",
     "Unbestimmtes abweichendes Inkrafttretedatum",
     undefinedDropDownItems
   ),
   {
     name: "entryIntoForceNormCategory",
+    id: "entryIntoForceNormCategory",
     type: InputType.TEXT,
     label: "Art der Norm",
     inputAttributes: {

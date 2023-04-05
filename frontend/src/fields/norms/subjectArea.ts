@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const subjectArea: InputField[] = [
   {
     name: "subjectFna",
+    id: "subjectFna",
     type: InputType.TEXT,
     label: "FNA-Nummer",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const subjectArea: InputField[] = [
   },
   {
     name: "subjectPreviousFna",
+    id: "subjectPreviousFna",
     type: InputType.TEXT,
     label: "Frühere FNA-Nummer",
     inputAttributes: {
@@ -19,6 +21,7 @@ export const subjectArea: InputField[] = [
   },
   {
     name: "subjectGesta",
+    id: "subjectGesta",
     type: InputType.TEXT,
     label: "GESTA-Nummer",
     inputAttributes: {
@@ -27,6 +30,7 @@ export const subjectArea: InputField[] = [
   },
   {
     name: "subjectBgb3",
+    id: "subjectBgb3",
     type: InputType.TEXT,
     label: "Bundesgesetzblatt Teil III",
     inputAttributes: {

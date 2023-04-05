@@ -3,6 +3,7 @@ import { InputField, InputType } from "@/shared/components/input/types"
 export const printAnnouncement: InputField[] = [
   {
     name: "printAnnouncementGazette",
+    id: "printAnnouncementGazette",
     type: InputType.TEXT,
     label: "Verkündungsblatt",
     inputAttributes: {
@@ -11,6 +12,7 @@ export const printAnnouncement: InputField[] = [
   },
   {
     name: "printAnnouncementYear",
+    id: "printAnnouncementYear",
     type: InputType.TEXT,
     label: "Jahr",
     inputAttributes: {
@@ -19,6 +21,7 @@ export const printAnnouncement: InputField[] = [
   },
   {
     name: "printAnnouncementNumber",
+    id: "printAnnouncementNumber",
     type: InputType.TEXT,
     label: "Nummer",
     inputAttributes: {
@@ -27,6 +30,7 @@ export const printAnnouncement: InputField[] = [
   },
   {
     name: "printAnnouncementPage",
+    id: "printAnnouncementPage",
     type: InputType.TEXT,
     label: "Seitenzahl",
     inputAttributes: {
@@ -35,6 +39,7 @@ export const printAnnouncement: InputField[] = [
   },
   {
     name: "printAnnouncementInfo",
+    id: "printAnnouncementInfo",
     type: InputType.TEXT,
     label: "Zusatzangaben",
     inputAttributes: {
@@ -43,6 +48,7 @@ export const printAnnouncement: InputField[] = [
   },
   {
     name: "printAnnouncementExplanations",
+    id: "printAnnouncementExplanations",
     type: InputType.TEXT,
     label: "Erläuterungen",
     inputAttributes: {

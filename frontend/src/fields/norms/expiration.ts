@@ -1,10 +1,11 @@
 import { dropdown, undefinedDropDownItems } from "@/fields/norms/fieldGenerator"
-import { LabelPosition } from "@/shared/components/input/InputField.vue"
+import LabelPosition from "@/shared/components/input/InputField.vue"
 import { InputField, InputType } from "@/shared/components/input/types"
 
 export const expiration: InputField[] = [
   {
     name: "expirationDate",
+    id: "expirationDate",
     type: InputType.DATE,
     label: "Datum des Außerkrafttretens",
     inputAttributes: {
@@ -14,11 +15,13 @@ export const expiration: InputField[] = [
   },
   dropdown(
     "expirationDateState",
+    "expirationDateState",
     "Unbestimmtes Datum des Außerkrafttretens",
     undefinedDropDownItems
   ),
   {
     name: "isExpirationDateTemp",
+    id: "isExpirationDateTemp",
     type: InputType.CHECKBOX,
     label: "Befristet",
     inputAttributes: {
@@ -28,6 +31,7 @@ export const expiration: InputField[] = [
   },
   {
     name: "principleExpirationDate",
+    id: "principleExpirationDate",
     type: InputType.DATE,
     label: "Grundsätzliches Außerkrafttretedatum",
     inputAttributes: {
@@ -37,11 +41,13 @@ export const expiration: InputField[] = [
   },
   dropdown(
     "principleExpirationDateState",
+    "principleExpirationDateState",
     "Unbestimmtes grundsätzliches Außerkrafttretdatum",
     undefinedDropDownItems
   ),
   {
     name: "divergentExpirationDate",
+    id: "divergentExpirationDate",
     type: InputType.DATE,
     label: "Bestimmtes abweichendes Außerkrafttretedatum",
     inputAttributes: {
@@ -51,11 +57,13 @@ export const expiration: InputField[] = [
   },
   dropdown(
     "divergentExpirationDateState",
+    "divergentExpirationDateState",
     "Unbestimmtes abweichendes Außerkrafttretdatum",
     undefinedDropDownItems
   ),
   {
     name: "expirationNormCategory",
+    id: "expirationNormCategory",
     type: InputType.TEXT,
     label: "Art der Norm",
     inputAttributes: {
