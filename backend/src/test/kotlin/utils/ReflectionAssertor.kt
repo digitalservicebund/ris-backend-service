@@ -52,9 +52,8 @@ fun assertNormAndEditNormFrameProperties(
     norm: Norm,
     normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
 ) {
-    // TODO Remove the filter on properties when all implementation is done for RISDEV-1208
-    val normMembers = Norm::class.memberProperties.filter { it.name != "metadataSections" }
-    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties.filter { it.name != "metadata" }
+    val normMembers = Norm::class.memberProperties
+    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
         val found = normMembers.find { normMember -> normFramePropertiesMember.name == normMember.name }
         assertThat(normFramePropertiesMember.get(normFrameProperties)).isEqualTo(found?.get(norm))

@@ -2,7 +2,9 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
@@ -36,7 +38,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
     class NormFramePropertiesRequestSchema {
         lateinit var officialLongTitle: String
-        var metadata: List<MetadatumRequestSchema> = emptyList()
+        lateinit var metadataSections: List<MetadataSectionRequestSchema>
         var risAbbreviation: String? = null
         var documentNumber: String? = null
         var documentCategory: String? = null
@@ -165,11 +167,11 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var text: String? = null
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
-            val metadata = this.metadata.map { it.toUseCaseData() }
+            val metadataSections = this.metadataSections.map { it.toUseCaseData() }
 
             return EditNormFrameUseCase.NormFrameProperties(
                 this.officialLongTitle,
-                metadata,
+                metadataSections,
                 this.risAbbreviation,
                 this.documentNumber,
                 this.documentCategory,
@@ -272,6 +274,18 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.ageIndicationEnd,
                 this.text,
             )
+        }
+    }
+
+    class MetadataSectionRequestSchema {
+        lateinit var name: MetadataSectionName
+        lateinit var metadata: List<MetadatumRequestSchema>
+        var sections: List<MetadataSectionRequestSchema>? = null
+
+        fun toUseCaseData(): MetadataSection {
+            val metadata = this.metadata.map { it.toUseCaseData() }
+            val childSections = this.sections?.map { it.toUseCaseData() }
+            return MetadataSection(name = this.name, metadata = metadata, sections = childSections)
         }
     }
 

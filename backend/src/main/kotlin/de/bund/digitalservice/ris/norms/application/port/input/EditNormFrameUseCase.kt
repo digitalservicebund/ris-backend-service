@@ -1,6 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import reactor.core.publisher.Mono
 import java.time.LocalDate
@@ -14,7 +14,7 @@ interface EditNormFrameUseCase {
     data class
     NormFrameProperties(
         val officialLongTitle: String,
-        val metadata: List<Metadatum<*>> = emptyList(),
+        val metadataSections: List<MetadataSection>,
         var risAbbreviation: String? = null,
         var documentNumber: String? = null,
         var documentCategory: String? = null,
