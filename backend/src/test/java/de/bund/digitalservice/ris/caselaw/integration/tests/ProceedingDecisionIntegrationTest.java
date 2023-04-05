@@ -147,7 +147,6 @@ public class ProceedingDecisionIntegrationTest {
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
 
-    DocumentUnitDTO finalParentDocumentUnitDTO = parentDocumentUnitDTO;
     webClient
         .mutateWith(csrf())
         .get()
