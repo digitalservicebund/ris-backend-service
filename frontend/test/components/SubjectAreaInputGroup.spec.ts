@@ -2,60 +2,112 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 
-function renderComponent(options?: { modelValue?: unknown }) {
-  const props = {
-    modelValue: options?.modelValue,
+function renderComponent(options?: {
+  modelValue?: {
+    fna?: string
+    previousFna?: string
+    gesta?: string
+    bgb3?: string
   }
-  const utils = render(SubjectAreaInputGroup, { props })
-  const user = userEvent.setup()
-  return { user, ...utils }
-}
+}) {
+  const props = {
+    modelValue: options?.modelValue ?? {
+      fna: "",
+      previousFna: "",
+      gesta: "",
+      bgb3: "",
+    },
+  }
 
-function getInputFields() {
-  const input1 = screen.getByLabelText("FNA-Nummer") as HTMLInputElement
-  const input2 = screen.getByLabelText("Frühere FNA-Nummer") as HTMLInputElement
-  const input3 = screen.getByLabelText("GESTA-Nummer") as HTMLInputElement
-  const input4 = screen.getByLabelText(
-    "Bundesgesetzblatt Teil III"
-  ) as HTMLInputElement
-
-  return { input1, input2, input3, input4 }
+  return render(SubjectAreaInputGroup, { props })
 }
 
 describe("SubjectAreaInputGroup", () => {
-  it("renders an InputGroup with the given input fields", async () => {
+  it("renders an input field for the fna value", async () => {
+    renderComponent({
+      modelValue: { fna: "test value" },
+    })
+
+    const input = screen.queryByRole("textbox", {
+      name: "FNA-Nummer",
+    }) as HTMLInputElement
+
+    expect(input).toBeVisible()
+    expect(input).toHaveValue("test value")
+  })
+  it("renders an input field for the previousFna value", async () => {
+    renderComponent({
+      modelValue: { previousFna: "test value" },
+    })
+
+    const input = screen.queryByRole("textbox", {
+      name: "Frühere FNA-Nummer",
+    }) as HTMLInputElement
+
+    expect(input).toBeVisible()
+    expect(input).toHaveValue("test value")
+  })
+  it("renders an input field for the gesta value", async () => {
     renderComponent({
       modelValue: {
-        subjectFna: "",
-        subjectPreviousFna: "",
-        subjectGesta: "",
-        subjectBgb3: "",
+        gesta: "test value",
       },
     })
 
-    const { input1, input2, input3, input4 } = getInputFields()
+    const input = screen.queryByRole("textbox", {
+      name: "GESTA-Nummer",
+    }) as HTMLInputElement
 
-    expect(input1).toBeInTheDocument()
-    expect(input2).toBeInTheDocument()
-    expect(input3).toBeInTheDocument()
-    expect(input4).toBeInTheDocument()
+    expect(input).toBeVisible()
+    expect(input).toHaveValue("test value")
+  })
+  it("renders an input field for the bgb3 value", async () => {
+    renderComponent({
+      modelValue: {
+        bgb3: "test value",
+      },
+    })
+
+    const input = screen.queryByRole("textbox", {
+      name: "Bundesgesetzblatt Teil III",
+    }) as HTMLInputElement
+
+    expect(input).toBeVisible()
+    expect(input).toHaveValue("test value")
   })
 
-  it("renders input field with given data ", async () => {
-    renderComponent({
-      modelValue: {
-        subjectFna: "foo",
-        subjectPreviousFna: "bar",
-        subjectGesta: "baz",
-        subjectBgb3: "bun",
-      },
+  it("updates the model value when user types into the input fields", async () => {
+    const user = userEvent.setup()
+    const modelValue = { fna: "", previousFna: "", gesta: "", bgb3: "" }
+    renderComponent({ modelValue })
+
+    const fnaInput = screen.queryByRole("textbox", {
+      name: "FNA-Nummer",
+    }) as HTMLInputElement
+
+    const previousFnaInput = screen.queryByRole("textbox", {
+      name: "Frühere FNA-Nummer",
+    }) as HTMLInputElement
+
+    const gestaInput = screen.queryByRole("textbox", {
+      name: "GESTA-Nummer",
+    }) as HTMLInputElement
+
+    const bgb3input = screen.queryByRole("textbox", {
+      name: "Bundesgesetzblatt Teil III",
+    }) as HTMLInputElement
+
+    await user.type(fnaInput, "foo")
+    await user.type(previousFnaInput, "bar")
+    await user.type(gestaInput, "baz")
+    await user.type(bgb3input, "ban")
+    await userEvent.tab() // Remove once text inputs are no more lazy.
+
+    expect(modelValue).toEqual({
+      fna: "foo",
+      previousFna: "bar",
+      gesta: "baz",
+      bgb3: "ban",
     })
-
-    const { input1, input2, input3, input4 } = getInputFields()
-
-    expect(input1.value).toBe("foo")
-    expect(input2.value).toBe("bar")
-    expect(input3.value).toBe("baz")
-    expect(input4.value).toBe("bun")
   })
 })

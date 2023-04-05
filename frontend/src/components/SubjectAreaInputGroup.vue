@@ -1,73 +1,96 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue"
-import InputGroup from "@/shared/components/input/InputGroup.vue"
-import { InputField, InputType } from "@/shared/components/input/types"
+import InputField from "@/shared/components/input/InputField.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
+type subjectArea = {
+  fna: "string"
+  previousFna: "string"
+  gesta: "string"
+  bgb3: "string"
+}
 interface Props {
-  modelValue: {
-    subjectFna: string
-    subjectPreviousFna: string
-    subjectGesta: string
-    subjectBgb3: string
-  }
+  modelValue: subjectArea
 }
 
 interface Emits {
-  (event: "update:modelValue", value: unknown): void
+  (event: "update:modelValue", value: subjectArea): void
 }
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const inputValues = ref({})
-const fields: InputField[] = [
-  {
-    name: "subjectFna",
-    type: InputType.TEXT,
-    label: "FNA-Nummer",
-    inputAttributes: {
-      ariaLabel: "FNA-Nummer",
-    },
-  },
-  {
-    name: "subjectPreviousFna",
-    type: InputType.TEXT,
-    label: "Frühere FNA-Nummer",
-    inputAttributes: {
-      ariaLabel: "Frühere FNA-Nummer",
-    },
-  },
-  {
-    name: "subjectGesta",
-    type: InputType.TEXT,
-    label: "GESTA-Nummer",
-    inputAttributes: {
-      ariaLabel: "GESTA-Nummer",
-    },
-  },
-  {
-    name: "subjectBgb3",
-    type: InputType.TEXT,
-    label: "Bundesgesetzblatt Teil III",
-    inputAttributes: {
-      ariaLabel: "Bundesgesetzblatt Teil III",
-    },
-  },
-]
+
+const inputValue = ref<subjectArea>(props.modelValue)
 
 watch(
-  () => props.modelValue,
-  () => (inputValues.value = props.modelValue),
+  () => props,
+  () => (inputValue.value = props.modelValue),
   { immediate: true, deep: true }
 )
 
 watch(
-  inputValues,
+  inputValue,
   () => {
-    emit("update:modelValue", inputValues.value)
+    emit("update:modelValue", inputValue.value)
   },
   { deep: true }
 )
 </script>
 
 <template>
-  <InputGroup v-model="inputValues" :column-count="2" :fields="fields" />
+  <div class="flex flex-col">
+    <div class="flex">
+      <InputField
+        id="subjectFna"
+        aria-label="FNA-Nummer"
+        class="w-1/2"
+        label="FNA-Nummer"
+      >
+        <TextInput
+          id="subjectFna"
+          v-model="inputValue.fna"
+          aria-label="FNA-Nummer"
+        />
+      </InputField>
+      <InputField
+        id="subjectPreviousFna"
+        aria-label="Frühere FNA-Nummer"
+        class="w-1/2"
+        label="Frühere FNA-Nummer"
+      >
+        <TextInput
+          id="subjectPreviousFna"
+          v-model="inputValue.previousFna"
+          aria-label="Frühere FNA-Nummer"
+          class="[&:not(:hover,:focus)]:border-l-0"
+        />
+      </InputField>
+    </div>
+    <div class="flex">
+      <InputField
+        id="subjectGesta"
+        aria-label="GESTA-Nummer"
+        class="w-1/2"
+        label="GESTA-Nummer"
+      >
+        <TextInput
+          id="subjectGesta"
+          v-model="inputValue.gesta"
+          aria-label="GESTA-Nummer"
+        />
+      </InputField>
+      <InputField
+        id="subjectBgb3"
+        aria-label="Bundesgesetzblatt Teil III"
+        class="w-1/2"
+        label="Bundesgesetzblatt Teil III"
+      >
+        <TextInput
+          id="subjectBgb3"
+          v-model="inputValue.bgb3"
+          aria-label="Bundesgesetzblatt Teil III"
+          class="[&:not(:hover,:focus)]:border-l-0"
+        />
+      </InputField>
+    </div>
+  </div>
 </template>
