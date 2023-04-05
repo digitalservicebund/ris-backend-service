@@ -668,7 +668,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     Court court = proceedingDecision.court();
     courtType = (court == null || court.type() == null) ? null : court.type();
     courtLocation = (court == null || court.location() == null) ? null : court.location();
-    Instant decisionDate = proceedingDecision.date().truncatedTo(ChronoUnit.DAYS);
+    Instant decisionDate =
+        proceedingDecision.date() == null
+            ? null
+            : proceedingDecision.date().truncatedTo(ChronoUnit.DAYS);
     DocumentType docType = proceedingDecision.documentType();
 
     Mono<List<Long>> documentUnitDTOIdsViaFileNumber =
