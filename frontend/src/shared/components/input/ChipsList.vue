@@ -54,13 +54,6 @@ function enterDelete() {
   updateModelValue()
 }
 
-const handleTab = (event: KeyboardEvent) => {
-  event.preventDefault()
-  if (event.shiftKey) {
-    focusPrevious()
-  } else focusNext()
-}
-
 const focusFirst = () => {
   focusedItemIndex.value = 0
 }
@@ -122,8 +115,8 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
         class="bg-blue-500 body-01-reg chip"
         tabindex="0"
         @click="setFocusedItemIndex(i)"
+        @focus="setFocusedItemIndex(i)"
         @input="emitInputEvent"
-        @keydown.prevent.tab="handleTab"
         @keypress.enter="enterDelete"
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"

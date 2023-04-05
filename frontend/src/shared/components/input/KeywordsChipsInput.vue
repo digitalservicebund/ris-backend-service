@@ -63,14 +63,6 @@ const handleOnBlur = () => {
   currentInput.value = ""
 }
 
-const handleTab = (event: KeyboardEvent) => {
-  //only focus previous on shift + tab
-  if (!event.shiftKey) {
-    event.preventDefault()
-    focusFirst()
-  }
-}
-
 const focusFirst = () => {
   if (chipsList.value !== undefined && currentInput.value === "")
     chipsList.value.focusFirst()
@@ -102,7 +94,6 @@ watch(chips, () => {
       type="text"
       @blur="handleOnBlur"
       @input="emitInputEvent"
-      @keydown.tab="handleTab"
       @keypress.enter="saveChip"
       @keyup.right="focusFirst"
     />
