@@ -53,6 +53,7 @@ export function generateBaseInputField(
   return {
     type: InputType.TEXT,
     name: generateString({ prefix: "name-" }),
+    id: generateString({ prefix: "id-" }),
     label: generateString({ prefix: "Label " }),
     inputAttributes: generateBaseInputAttributes(),
     ...partialField,

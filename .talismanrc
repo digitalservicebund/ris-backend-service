@@ -1,8 +1,6 @@
 fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
-  - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 42900279f3c91db440380a54d8486db54b26c8746592e1c79071fcfae3a7df74
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml
@@ -17,9 +15,10 @@ fileignoreconfig:
     checksum: 4f1b9d21ab8630ae8ffb0feae26fb6054ce586bfffd0048f4c1aeaab73694b28
   - filename: backend/src/test/kotlin/unit/application/service/GetFileServiceTest.kt
     checksum: d96870998f33fa027c52da99d9eb8192d161b3585eae9a272a2777cdf2d524af
-version: ""
-
-
+  - filename: frontend/test/test-helper/dataGenerators.ts
+    checksum: bd7f4a218c82ff3098b2de48cf2836fd3ab219f59dcda55f0a26974c5d54fc70
+  - filename: frontend/test/composables/useTransformNestedData.spec.ts
+    checksum: 7c5ab1e2907b06b369ea94091a9f8ee9ed23ac07fc61bac229fffb9f3ce182d1
   - filename: "*.sql"
     ignore_detectors: [filename]
 

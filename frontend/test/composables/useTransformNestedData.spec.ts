@@ -12,17 +12,20 @@ const data = ref({
 const oneField: InputField[] = [
   {
     name: "nestedInputOfTestKey1AndTestKey2",
+    id: "nestedInputOfTestKey1AndTestKey2",
     type: InputType.NESTED,
     inputAttributes: {
       ariaLabel: "baz",
       fields: {
         parent: {
           name: "testKey1",
+          id: "testKey1",
           type: InputType.TEXT,
           inputAttributes: { ariaLabel: "foo" },
         },
         child: {
           name: "testKey2",
+          id: "testKey2",
           type: InputType.TEXT,
           inputAttributes: { ariaLabel: "bar" },
         },
@@ -35,17 +38,20 @@ const twoFields = [
   ...oneField,
   {
     name: "nestedInputOfTestKey3AndTestKey4",
+    id: "nestedInputOfTestKey3AndTestKey4",
     type: InputType.NESTED,
     inputAttributes: {
       ariaLabel: "baz",
       fields: {
         parent: {
           name: "testKey3",
+          id: "testKey3",
           type: InputType.TEXT,
           inputAttributes: { ariaLabel: "foo" },
         },
         child: {
           name: "testKey4",
+          id: "testKey4",
           type: InputType.TEXT,
           inputAttributes: { ariaLabel: "bar" },
         },
