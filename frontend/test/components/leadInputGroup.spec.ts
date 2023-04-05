@@ -2,67 +2,56 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 
-function renderComponent(options?: { modelValue?: unknown }) {
+function renderComponent(options?: {
+  modelValue?: { jurisdiction?: string; unit?: string }
+}) {
   const props = {
-    modelValue: options?.modelValue,
+    modelValue: options?.modelValue ?? { jurisdiction: "", unit: "" },
   }
-  const utils = render(LeadInputGroup, { props })
-  const user = userEvent.setup()
-  return { user, ...utils }
-}
 
-async function getInputFields() {
-  const input1 = screen.getByLabelText("Ressort") as HTMLInputElement
-  const input2 = screen.getByLabelText(
-    "Organisationseinheit"
-  ) as HTMLInputElement
-
-  return { input1, input2 }
+  return render(LeadInputGroup, { props })
 }
 
 describe("LeadInputGroup", () => {
-  it("renders an InputGroup with the given input fields", async () => {
-    renderComponent({ modelValue: { leadJurisdiction: "", leadUnit: "" } })
+  it("renders an input field for the jurisdiction value", async () => {
+    renderComponent({ modelValue: { jurisdiction: "test value" } })
 
-    const { input1, input2 } = await getInputFields()
+    const input = screen.queryByRole("textbox", {
+      name: "Ressort",
+    }) as HTMLInputElement
 
-    expect(input1).toBeInTheDocument()
-    expect(input2).toBeInTheDocument()
+    expect(input).toBeVisible()
+    expect(input).toHaveValue("test value")
   })
 
-  it("renders input field with given data ", async () => {
-    renderComponent({
-      modelValue: { leadJurisdiction: "foo", leadUnit: "baz" },
-    })
+  it("renders an input field for the unit value", async () => {
+    renderComponent({ modelValue: { unit: "test value" } })
 
-    const { input1, input2 } = await getInputFields()
+    const input = screen.queryByRole("textbox", {
+      name: "Organisationseinheit",
+    }) as HTMLInputElement
 
-    expect(input1.value).toBe("foo")
-    expect(input2.value).toBe("baz")
+    expect(input).toBeVisible()
+    expect(input).toHaveValue("test value")
   })
 
-  it("should emit update:modelValue when input values with the new input values", async () => {
-    const { emitted, user } = renderComponent({
-      modelValue: { leadJurisdiction: "foo", leadUnit: "baz" },
-    })
+  it("updates the model value when user types into the input fields", async () => {
+    const user = userEvent.setup()
+    const modelValue = { jurisdiction: "", unit: "" }
+    renderComponent({ modelValue })
 
-    const { input1, input2 } = await getInputFields()
+    const jurisdictionInput = screen.queryByRole("textbox", {
+      name: "Ressort",
+    }) as HTMLInputElement
 
-    expect(input1.value).toBe("foo")
-    expect(input2.value).toBe("baz")
+    const unitInput = screen.queryByRole("textbox", {
+      name: "Organisationseinheit",
+    }) as HTMLInputElement
 
-    await user.clear(input2)
+    await user.type(jurisdictionInput, "foo")
+    await user.type(unitInput, "bar")
+    await userEvent.tab() // Remove once text inputs are no more lazy.
 
-    await user.type(input1, "bar")
-    await user.type(input2, "bar")
-
-    await userEvent.tab()
-
-    expect(emitted()["update:modelValue"]).toHaveLength(3)
-    expect(emitted()["update:modelValue"]).toEqual([
-      [{ leadJurisdiction: "foobar", leadUnit: "bar" }],
-      [{ leadJurisdiction: "foobar", leadUnit: "bar" }],
-      [{ leadJurisdiction: "foobar", leadUnit: "bar" }],
-    ])
+    expect(modelValue).toEqual({ jurisdiction: "foo", unit: "bar" })
   })
 })

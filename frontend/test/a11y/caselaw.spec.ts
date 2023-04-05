@@ -192,6 +192,19 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
     const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
     expect(accessibilityScanResults.violations).toEqual([])
   })
+
+  test("schlagwörter", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Schlagwörter']").fill("one")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Schlagwörter']").fill("two")
+    await page.keyboard.press("Enter")
+
+    const accessibilityScanResults = await new AxeBuilder({ page }).analyze()
+    expect(accessibilityScanResults.violations).toEqual([])
+  })
 })
 
 test.describe("a11y of document page (/caselaw/documentunit/{documentNumber}/files)", () => {
