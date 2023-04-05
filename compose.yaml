@@ -30,13 +30,6 @@ services:
     - ./loki-local-config.yaml:/etc/loki/local-config.yaml:ro
     command: -config.file=/etc/loki/local-config.yaml
 
-  promtail:
-    image: grafana/promtail:2.8.0
-    volumes:
-      - /var/log:/var/log
-      - ./promtail-docker-config.yaml:/etc/promtail/config.yml:ro
-    command: -config.file=/etc/promtail/config.yml
-
   grafana:
     environment:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning

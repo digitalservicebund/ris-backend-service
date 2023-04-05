@@ -102,7 +102,7 @@ _dev() {
   for arg in "$@"; do
     case $arg in
       -n|--no-backend)
-        services="traefik redis db frontend loki promtail grafana"
+        services="traefik redis db frontend loki grafana"
         ;;
       -d|--detached)
         wait="--wait"
