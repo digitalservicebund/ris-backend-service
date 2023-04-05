@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -162,15 +164,25 @@ class FieldOfLawIntegrationTest {
     assertThat(identifiers).isEmpty();
   }
 
-  @Test
-  void testGetFieldsOfLawByNormsQuery() {
+  @ParameterizedTest
+  @ValueSource(
+      strings = {
+        "§ 123", // paragraph
+        "§ 123 abc", // paragraph followed by norm
+        "§123", // paragraph without whitespace
+        "abc", // norm
+        "abc § 123", // norm followed by paragraph
+        "abc §123", // norm followed by paragraph without whitespace
+        "abc § 12", // norm followed by incomplete paragraph
+      })
+  void testGetFieldsOfLawByNormsQuery(String query) {
     prepareDatabase();
 
     EntityExchangeResult<String> result =
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"abc\"&pg=0&sz=3")
+            .uri("/api/v1/caselaw/fieldsoflaw?q=norm:\"" + query + "\"&pg=0&sz=3")
             .exchange()
             .expectStatus()
             .isOk()
