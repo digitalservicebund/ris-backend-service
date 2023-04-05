@@ -18,14 +18,23 @@ import java.time.LocalDate
 import java.util.Random
 
 fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
-    return EasyRandom().nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
+    val parameters: EasyRandomParameters =
+        EasyRandomParameters()
+            .randomize(named("metadataSections")) {
+                createSimpleSections()
+            }
+    return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
 }
 
 fun createRandomEditNormRequestSchema(): EditNormFrameController.NormFramePropertiesRequestSchema {
     val parameters: EasyRandomParameters =
         EasyRandomParameters().randomize(named(".+Date\$")) {
+            // needed for string date fields
             createRandomLocalDateInString()
-        } // needed for string date fields
+        }
+            .randomize(named("metadataSections")) {
+                createSimpleSections()
+            }
     return EasyRandom(parameters)
         .nextObject(EditNormFrameController.NormFramePropertiesRequestSchema::class.java)
 }

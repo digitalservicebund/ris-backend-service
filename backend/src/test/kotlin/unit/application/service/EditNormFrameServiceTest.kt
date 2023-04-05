@@ -2,7 +2,10 @@ package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import io.mockk.every
 import io.mockk.mockk
@@ -21,7 +24,7 @@ class EditNormFrameServiceTest {
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)
         val guid = UUID.randomUUID()
-        val properties = EditNormFrameUseCase.NormFrameProperties("new title")
+        val properties = EditNormFrameUseCase.NormFrameProperties("new title", emptyList())
         val command = EditNormFrameUseCase.Command(guid, properties)
 
         every { editNormOutputPort.editNorm(any()) } returns Mono.just(true)
@@ -42,7 +45,11 @@ class EditNormFrameServiceTest {
     fun `it calls the output port to save the norm with optional data and fields`() {
         val guid = UUID.randomUUID()
         val metadata = listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1))
-        val properties = createRandomNormFameProperties().copy(metadata = metadata)
+        val metadataSections = listOf(
+            MetadataSection(MetadataSectionName.GENERAL_INFORMATION, metadata, null),
+            MetadataSection(MetadataSectionName.DEFINITION, listOf(Metadatum("definition", DEFINITION, 0)), null),
+        )
+        val properties = createRandomNormFameProperties().copy(metadataSections = metadataSections)
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)
         val command = EditNormFrameUseCase.Command(guid, properties)

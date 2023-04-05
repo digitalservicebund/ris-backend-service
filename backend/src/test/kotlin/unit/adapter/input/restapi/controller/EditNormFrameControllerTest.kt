@@ -67,7 +67,7 @@ class EditNormFrameControllerTest {
             .put()
             .uri("/api/v1/norms/761b5537-5aa5-4901-81f7-fbf7e040a7c8")
             .contentType(APPLICATION_JSON)
-            .body(BodyInserters.fromValue("""{ "officialLongTitle": "new title" }"""))
+            .body(BodyInserters.fromValue("""{ "officialLongTitle": "new title", "metadataSections": [] }"""))
             .exchange()
             .expectStatus()
             .isNoContent()

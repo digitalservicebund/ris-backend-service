@@ -2,11 +2,7 @@ package de.bund.digitalservice.ris.norms.application.service
 
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.application.port.output.EditNormOutputPort
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
 import java.util.UUID
@@ -25,7 +21,7 @@ class EditNormFrameService(private val editNormOutputPort: EditNormOutputPort) :
 private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFrameProperties) = Norm(
     guid = guid,
     articles = listOf(),
-    metadataSections = mapMetadataToMetadataSections(properties.metadata),
+    metadataSections = properties.metadataSections,
     officialLongTitle = properties.officialLongTitle,
     risAbbreviation = properties.risAbbreviation,
     documentNumber = properties.documentNumber,
@@ -129,36 +125,3 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     ageIndicationEnd = properties.ageIndicationEnd,
     text = properties.text,
 )
-
-private fun mapMetadataToMetadataSections(metadata: List<Metadatum<*>>): List<MetadataSection> {
-    val divergentDocumentNumber = metadata.filter { it.type == MetadatumType.DIVERGENT_DOCUMENT_NUMBER }
-    val frameKeywords = metadata.filter { it.type == MetadatumType.KEYWORD }
-    val risAbbreviationInternationalLaw = metadata.filter { it.type == MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW }
-    val unofficialLongTitle = metadata.filter { it.type == MetadatumType.UNOFFICIAL_LONG_TITLE }
-    val unofficialShortTitle = metadata.filter { it.type == MetadatumType.UNOFFICIAL_SHORT_TITLE }
-    val unofficialAbbreviation = metadata.filter { it.type == MetadatumType.UNOFFICIAL_ABBREVIATION }
-    val unofficialReference = metadata.filter { it.type == MetadatumType.UNOFFICIAL_REFERENCE }
-    val referenceNumber = metadata.filter { it.type == MetadatumType.REFERENCE_NUMBER }
-    val definition = metadata.filter { it.type == MetadatumType.DEFINITION }
-    val ageOfMajorityIndication = metadata.filter { it.type == MetadatumType.AGE_OF_MAJORITY_INDICATION }
-    val validityRule = metadata.filter { it.type == MetadatumType.VALIDITY_RULE }
-    val participationType = metadata.filter { it.type == MetadatumType.PARTICIPATION_TYPE }
-    val participationInstitution = metadata.filter { it.type == MetadatumType.PARTICIPATION_INSTITUTION }
-    val leadJurisdiction = metadata.filter { it.type == MetadatumType.LEAD_JURISDICTION }
-    val leadUnit = metadata.filter { it.type == MetadatumType.LEAD_UNIT }
-    val subjectFna = metadata.filter { it.type == MetadatumType.SUBJECT_FNA }
-    val subjectGesta = metadata.filter { it.type == MetadatumType.SUBJECT_GESTA }
-
-    return listOf(
-        MetadataSection(MetadataSectionName.GENERAL_INFORMATION, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw),
-        MetadataSection(MetadataSectionName.HEADINGS_AND_ABBREVIATIONS, unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle),
-        MetadataSection(MetadataSectionName.UNOFFICIAL_REFERENCE, unofficialReference),
-        MetadataSection(MetadataSectionName.REFERENCE_NUMBER, referenceNumber),
-        MetadataSection(MetadataSectionName.DEFINITION, definition),
-        MetadataSection(MetadataSectionName.AGE_OF_MAJORITY_INDICATION, ageOfMajorityIndication),
-        MetadataSection(MetadataSectionName.VALIDITY_RULE, validityRule),
-        MetadataSection(MetadataSectionName.SUBJECT_AREA, subjectFna + subjectGesta),
-        MetadataSection(MetadataSectionName.LEAD, leadJurisdiction + leadUnit),
-        MetadataSection(MetadataSectionName.PARTICIPATING_INSTITUTIONS, participationInstitution + participationType),
-    )
-}

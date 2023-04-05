@@ -32,7 +32,7 @@ fun convertNormToJson(norm: LoadNormController.NormResponseSchema): String {
         }
     }
     val gson: Gson =
-        GsonBuilder().registerTypeAdapter(LocalDate::class.java, LocalDateSerializer()).create()
+        GsonBuilder().registerTypeAdapter(LocalDate::class.java, LocalDateSerializer()).serializeNulls().create()
     return gson.toJson(norm)
 }
 

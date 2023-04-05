@@ -4,9 +4,11 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
@@ -41,7 +43,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     private constructor(
         val guid: String,
         val articles: List<ArticleResponseSchema>,
-        val metadata: List<MetadatumResponseSchema>,
+        val metadataSections: List<MetadataSectionResponseSchema>,
         val officialLongTitle: String,
         var risAbbreviation: String?,
         var documentNumber: String?,
@@ -151,14 +153,11 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
             fun fromUseCaseData(data: Norm): NormResponseSchema {
                 val articles = data.articles.map(ArticleResponseSchema::fromUseCaseData)
                 val files = data.files.map(FileReferenceResponseSchema::fromUseCaseData)
-                val metadata = data.metadataSections
-                    .flatMap { it.metadata }
-                    .map(MetadatumResponseSchema::fromUseCaseData)
-
+                val metadataSections = data.metadataSections.map(MetadataSectionResponseSchema::fromUseCaseData)
                 return NormResponseSchema(
                     encodeGuid(data.guid),
                     articles,
-                    metadata,
+                    metadataSections,
                     data.officialLongTitle,
                     data.risAbbreviation,
                     data.documentNumber,
@@ -307,12 +306,21 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         }
     }
 
+    data class MetadataSectionResponseSchema private constructor(val name: MetadataSectionName, val metadata: List<MetadatumResponseSchema>, val sections: List<MetadataSectionResponseSchema>?) {
+        companion object {
+            fun fromUseCaseData(metadataSection: MetadataSection): MetadataSectionResponseSchema {
+                val metadata = metadataSection.metadata.map { MetadatumResponseSchema.fromUseCaseData(it) }
+                val childSections = metadataSection.sections?.map { fromUseCaseData(it) }
+                return MetadataSectionResponseSchema(name = metadataSection.name, metadata = metadata, sections = childSections)
+            }
+        }
+    }
+
     data class MetadatumResponseSchema private constructor(val value: String, val type: String, val order: Int) {
         companion object {
             fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseSchema {
                 val value: String = metadatum.value as String
                 val type = metadatum.type.name
-
                 return MetadatumResponseSchema(value = value, type = type, order = metadatum.order)
             }
         }
