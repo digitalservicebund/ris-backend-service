@@ -22,9 +22,11 @@ function renderComponent(options?: {
       parent: defineTextField(
         "text input 1",
         "text input 1",
+        "text input 1",
         "text input 1 label"
       ),
       child: defineTextField(
+        "text input 2",
         "text input 2",
         "text input 2",
         "text input 2 label"
@@ -83,9 +85,11 @@ describe("NestedInput", () => {
         parent: defineTextField(
           "text input 1",
           "text input 1",
+          "text input 1",
           "text input label"
         ),
         child: defineDateField(
+          "decisionDate",
           "decisionDate",
           "Entscheidungsdatum",
           "date input label",

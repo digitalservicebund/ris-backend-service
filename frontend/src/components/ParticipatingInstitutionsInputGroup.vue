@@ -16,6 +16,7 @@ const inputValues = ref({})
 const fields: InputField[] = [
   {
     name: "participationType",
+    id: "participationType",
     type: InputType.TEXT,
     label: "Art der Mitwirkung",
     inputAttributes: {
@@ -24,6 +25,7 @@ const fields: InputField[] = [
   },
   {
     name: "participationInstitution",
+    id: "participationInstitution",
     type: InputType.TEXT,
     label: "Mitwirkendes Organ",
     inputAttributes: {

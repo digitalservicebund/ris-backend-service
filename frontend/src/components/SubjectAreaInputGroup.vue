@@ -21,6 +21,7 @@ const inputValues = ref({})
 const fields: InputField[] = [
   {
     name: "subjectFna",
+    id: "subjectFna",
     type: InputType.TEXT,
     label: "FNA-Nummer",
     inputAttributes: {
@@ -29,6 +30,7 @@ const fields: InputField[] = [
   },
   {
     name: "subjectPreviousFna",
+    id: "subjectPreviousFna",
     type: InputType.TEXT,
     label: "Frühere FNA-Nummer",
     inputAttributes: {
@@ -37,6 +39,7 @@ const fields: InputField[] = [
   },
   {
     name: "subjectGesta",
+    id: "subjectGesta",
     type: InputType.TEXT,
     label: "GESTA-Nummer",
     inputAttributes: {
@@ -45,6 +48,7 @@ const fields: InputField[] = [
   },
   {
     name: "subjectBgb3",
+    id: "subjectBgb3",
     type: InputType.TEXT,
     label: "Bundesgesetzblatt Teil III",
     inputAttributes: {

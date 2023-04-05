@@ -16,6 +16,7 @@ const inputValues = ref({})
 const fields: InputField[] = [
   {
     name: "leadJurisdiction",
+    id: "leadJurisdiction",
     type: InputType.TEXT,
     label: "Ressort",
     inputAttributes: {
@@ -24,6 +25,7 @@ const fields: InputField[] = [
   },
   {
     name: "leadUnit",
+    id: "leadUnit",
     type: InputType.TEXT,
     label: "Organisationseinheit",
     inputAttributes: {
