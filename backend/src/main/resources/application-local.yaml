@@ -22,6 +22,9 @@ spring:
         provider:
           keycloak:
             issuer-uri: ${OAUTH2_CLIENT_ISSUER:}
+neuris:
+  loki:
+    url: http://loki:3100/loki/api/v1/push
 #logging:
 #  level:
 #    org.hibernate.SQL: DEBUG
