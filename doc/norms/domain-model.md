@@ -156,6 +156,7 @@ classDiagram
 
   class MetadataSectionName  {
      <<enumeration>>
+     NORM,
      GENERAL_INFORMATION,
      HEADINGS_AND_ABBREVIATIONS,
      UNOFFICIAL_REFERENCE,
@@ -165,7 +166,7 @@ classDiagram
      VALIDITY_RULE,
      SUBJECT_AREA,
      LEAD,
-     PARTICIPATING_INSTITUTIONS
+     PARTICIPATION
   }
 
   class MetadatumType  {
