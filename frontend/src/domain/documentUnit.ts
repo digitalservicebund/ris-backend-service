@@ -49,6 +49,11 @@ export type ProceedingDecision = {
   documentType?: DocumentType
 }
 
+export type SearchResults = {
+  decision: ProceedingDecision
+  isLinked: boolean
+}[]
+
 export default class DocumentUnit {
   readonly uuid: string
   readonly id?: string

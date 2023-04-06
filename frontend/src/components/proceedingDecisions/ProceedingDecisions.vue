@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { watch, ref } from "vue"
 import DecisionList from "./DecisionList.vue"
-import SearchResultList, { SearchResults } from "./SearchResultList.vue"
+import SearchResultList from "./SearchResultList.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
-import { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision, SearchResults } from "@/domain/documentUnit"
 import { proceedingDecisionFields } from "@/fields/caselaw"
 import DocumentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"

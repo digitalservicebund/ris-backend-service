@@ -1,7 +1,7 @@
+import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import SearchResultList, {
-  SearchResults,
-} from "@/components/proceedingDecisions/SearchResultList.vue"
+import SearchResultList from "@/components/proceedingDecisions/SearchResultList.vue"
+import { SearchResults } from "@/domain/documentUnit"
 
 function renderComponent(searchResults?: SearchResults) {
   const props: { searchResults: SearchResults } = {
@@ -20,15 +20,25 @@ function renderComponent(searchResults?: SearchResults) {
     ],
   }
 
-  return render(SearchResultList, {
+  const utils = render(SearchResultList, {
     props,
     global: {
       stubs: { routerLink: { template: "<a><slot/></a>" } },
     },
   })
+  const user = userEvent.setup()
+  return { user, ...utils }
 }
 
 describe("ProceedingDecision SearchResult List", () => {
+  it("renders correctly", async () => {
+    renderComponent()
+
+    expect(await screen.findByText("fooType fooLocation")).toBeVisible()
+    expect(await screen.findByText("Übernehmen")).toBeVisible()
+    expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
+  })
+
   it("indicates not yet added proceeding decisions", async () => {
     renderComponent()
 
@@ -36,7 +46,7 @@ describe("ProceedingDecision SearchResult List", () => {
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
   })
 
-  it("indicates alreadt added proceeding decisions", async () => {
+  it("indicates already added proceeding decisions", async () => {
     renderComponent([
       {
         decision: {
@@ -53,5 +63,18 @@ describe("ProceedingDecision SearchResult List", () => {
 
     expect(await screen.findByText("Übernehmen")).toBeVisible() //todo change this
     expect(await screen.findByText(/Bereits hinzugefügt/)).toBeVisible()
+  })
+
+  it("clicking on 'Übernehmen' emits link decision event", async () => {
+    const { user, emitted } = renderComponent()
+
+    expect(await screen.findByText("fooType fooLocation")).toBeVisible()
+    expect(await screen.findByText("Übernehmen")).toBeVisible()
+    expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
+
+    const button = await screen.findByText("Übernehmen")
+    await user.click(button)
+
+    expect(emitted().linkDecision).toBeTruthy()
   })
 })
