@@ -4,7 +4,7 @@
 classDiagram
   class Norm {
     +UUID guid
-    +List~Metadatum~ metadata
+    +List~MetadataSection~ metadataSections
     +List~Article~ articles
 
     +String officialLongTitle
@@ -129,7 +129,6 @@ classDiagram
 
   class MetadataSection {
       +MetadataSectionName name
-      +Integer order
       List~Metadatum~ metadata
       List~MetadataSection~ sections
   }
