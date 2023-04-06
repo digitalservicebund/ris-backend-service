@@ -671,7 +671,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     Instant decisionDate =
         proceedingDecision.date() == null
             ? null
-            : proceedingDecision.date().atZone(ZoneId.systemDefault()).toInstant();
+            : proceedingDecision.date().atZone(ZoneId.of("UTC")).toInstant();
     DocumentType docType = proceedingDecision.documentType();
 
     Mono<List<Long>> documentUnitDTOIdsViaFileNumber =
