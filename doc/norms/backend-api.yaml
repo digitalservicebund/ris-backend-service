@@ -668,7 +668,7 @@ components:
         entryIntoForceDateState:
           type: string
           example: ''
-        metadata:
+        metadataSections:
           type: array
           items:
             $ref: '#/components/schemas/MetadataSection'
