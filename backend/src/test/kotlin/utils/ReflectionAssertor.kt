@@ -72,7 +72,7 @@ fun assertNormsAreEqual(norm1: Norm, norm2: Norm) {
 
 fun getNormWithSortedListProperties(norm: Norm): Norm {
     val sections = norm.metadataSections.map {
-        MetadataSection(it.name, it.metadata.toMutableList().sortedWith(metadatumComparator), it.sections)
+        MetadataSection(it.name, it.metadata.toMutableList().sortedWith(metadatumComparator), it.order, it.sections)
     }
     val fileReferences = norm.files.toMutableList().sortedWith(fileReferenceComparator)
     var articles = norm.articles.toMutableList().sortedWith(articleComparator)

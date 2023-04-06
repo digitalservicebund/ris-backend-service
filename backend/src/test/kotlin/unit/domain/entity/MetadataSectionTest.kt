@@ -9,10 +9,11 @@ import org.assertj.core.api.Assertions.catchException
 import org.junit.jupiter.api.Test
 
 class MetadataSectionTest {
+    private val unofficialLongTitle = Metadatum("unofficialLongTitle", UNOFFICIAL_LONG_TITLE)
+    private val unofficialShortTitle = Metadatum("unofficialShortTitle", UNOFFICIAL_SHORT_TITLE)
+
     @Test
     fun `can create metadataSection for headings and abbreviations`() {
-        val unofficialLongTitle = Metadatum("unofficialLongTitle", UNOFFICIAL_LONG_TITLE)
-        val unofficialShortTitle = Metadatum("unofficialShortTitle", UNOFFICIAL_SHORT_TITLE)
         val section = MetadataSection(
             MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
             listOf(unofficialLongTitle, unofficialShortTitle),
@@ -21,12 +22,22 @@ class MetadataSectionTest {
         assertThat(section.name).isEqualTo(MetadataSectionName.HEADINGS_AND_ABBREVIATIONS)
         assertThat(section.metadata).isEqualTo(listOf(unofficialLongTitle, unofficialShortTitle))
         assertThat(section.sections).isNull()
+        assertThat(section.order).isEqualTo(1)
+    }
+
+    @Test
+    fun `can create metadataSection with different order`() {
+        val section = MetadataSection(
+            MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
+            listOf(unofficialLongTitle, unofficialShortTitle),
+            5,
+        )
+
+        assertThat(section.order).isEqualTo(5)
     }
 
     @Test
     fun `it throws an illegal argument exception if child sections are incorrect`() {
-        val unofficialLongTitle = Metadatum("unofficialLongTitle", UNOFFICIAL_LONG_TITLE)
-        val unofficialShortTitle = Metadatum("unofficialShortTitle", UNOFFICIAL_SHORT_TITLE)
         val section = MetadataSection(
             MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
             listOf(unofficialLongTitle, unofficialShortTitle),
@@ -35,6 +46,7 @@ class MetadataSectionTest {
             MetadataSection(
                 MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
                 listOf(unofficialLongTitle, unofficialShortTitle),
+                1,
                 listOf(section),
             )
         }
@@ -46,7 +58,6 @@ class MetadataSectionTest {
 
     @Test
     fun `it throws an illegal argument exception if metadata do not belong`() {
-        val unofficialLongTitle = Metadatum("unofficialLongTitle", UNOFFICIAL_LONG_TITLE)
         val unofficialReference = Metadatum("unofficialReference", UNOFFICIAL_REFERENCE)
         val exception = catchException {
             MetadataSection(

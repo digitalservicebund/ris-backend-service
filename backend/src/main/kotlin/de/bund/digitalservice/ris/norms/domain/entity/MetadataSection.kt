@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 data class MetadataSection(
     val name: MetadataSectionName,
     val metadata: List<Metadatum<*>>,
+    val order: Int = 1,
     val sections: List<MetadataSection>? = null,
 ) {
     init {
