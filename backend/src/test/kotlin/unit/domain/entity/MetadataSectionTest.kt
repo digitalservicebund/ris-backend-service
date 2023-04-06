@@ -15,11 +15,11 @@ class MetadataSectionTest {
     @Test
     fun `can create metadataSection for headings and abbreviations`() {
         val section = MetadataSection(
-            MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
+            MetadataSectionName.NORM,
             listOf(unofficialLongTitle, unofficialShortTitle),
         )
 
-        assertThat(section.name).isEqualTo(MetadataSectionName.HEADINGS_AND_ABBREVIATIONS)
+        assertThat(section.name).isEqualTo(MetadataSectionName.NORM)
         assertThat(section.metadata).isEqualTo(listOf(unofficialLongTitle, unofficialShortTitle))
         assertThat(section.sections).isNull()
         assertThat(section.order).isEqualTo(1)
@@ -28,7 +28,7 @@ class MetadataSectionTest {
     @Test
     fun `can create metadataSection with different order`() {
         val section = MetadataSection(
-            MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
+            MetadataSectionName.NORM,
             listOf(unofficialLongTitle, unofficialShortTitle),
             5,
         )
@@ -39,12 +39,12 @@ class MetadataSectionTest {
     @Test
     fun `it throws an illegal argument exception if child sections are incorrect`() {
         val section = MetadataSection(
-            MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
+            MetadataSectionName.NORM,
             listOf(unofficialLongTitle, unofficialShortTitle),
         )
         val exception = catchException {
             MetadataSection(
-                MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
+                MetadataSectionName.NORM,
                 listOf(unofficialLongTitle, unofficialShortTitle),
                 1,
                 listOf(section),
@@ -61,13 +61,13 @@ class MetadataSectionTest {
         val unofficialReference = Metadatum("unofficialReference", UNOFFICIAL_REFERENCE)
         val exception = catchException {
             MetadataSection(
-                MetadataSectionName.HEADINGS_AND_ABBREVIATIONS,
+                MetadataSectionName.NORM,
                 listOf(unofficialLongTitle, unofficialReference),
             )
         }
 
         assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(exception.message)
-            .isEqualTo("Incorrect metadata for section '${MetadataSectionName.HEADINGS_AND_ABBREVIATIONS}'")
+            .isEqualTo("Incorrect metadata for section '${MetadataSectionName.NORM}'")
     }
 }

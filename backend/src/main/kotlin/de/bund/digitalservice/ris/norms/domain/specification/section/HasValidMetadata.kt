@@ -27,9 +27,10 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Sect
 val hasValidMetadata =
     object : Specification<MetadataSection> {
         override fun isSatisfiedBy(instance: MetadataSection): Boolean = when (instance.name) {
-            Section.NORM -> hasType(listOf(VALIDITY_RULE, AGE_OF_MAJORITY_INDICATION, DEFINITION, REFERENCE_NUMBER, UNOFFICIAL_REFERENCE), instance)
-            Section.GENERAL_INFORMATION -> hasType(listOf(KEYWORD, DIVERGENT_DOCUMENT_NUMBER, RIS_ABBREVIATION_INTERNATIONAL_LAW), instance)
-            Section.HEADINGS_AND_ABBREVIATIONS -> hasType(listOf(UNOFFICIAL_LONG_TITLE, UNOFFICIAL_SHORT_TITLE, UNOFFICIAL_ABBREVIATION), instance)
+            Section.NORM -> hasType(
+                listOf(VALIDITY_RULE, AGE_OF_MAJORITY_INDICATION, DEFINITION, REFERENCE_NUMBER, UNOFFICIAL_REFERENCE, KEYWORD, DIVERGENT_DOCUMENT_NUMBER, RIS_ABBREVIATION_INTERNATIONAL_LAW, UNOFFICIAL_LONG_TITLE, UNOFFICIAL_SHORT_TITLE, UNOFFICIAL_ABBREVIATION),
+                instance,
+            )
             Section.SUBJECT_AREA -> hasType(listOf(SUBJECT_FNA, SUBJECT_PREVIOUS_FNA, SUBJECT_GESTA, SUBJECT_BGB_3), instance)
             Section.LEAD -> hasType(listOf(LEAD_JURISDICTION, LEAD_UNIT), instance)
             Section.PARTICIPATION -> hasType(listOf(PARTICIPATION_TYPE, PARTICIPATION_INSTITUTION), instance)

@@ -63,7 +63,7 @@ private fun createRandomLocalDateInString(): String {
 
 fun createSimpleSections(): List<MetadataSection> = listOf(
     MetadataSection(
-        MetadataSectionName.GENERAL_INFORMATION,
+        MetadataSectionName.NORM,
         listOf(
             Metadatum("foo", MetadatumType.KEYWORD, 0),
             Metadatum("bar", MetadatumType.KEYWORD, 1),

@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
@@ -88,7 +89,7 @@ fun mapDomainToData(norm: Norm): NormData {
 }
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
-    val divergentDocumentNumber = data.divergentDocumentNumber?.let { listOf(Metadatum(data.divergentDocumentNumber, DIVERGENT_DOCUMENT_NUMBER, 0)) } ?: listOf()
+    val divergentDocumentNumber = data.divergentDocumentNumber?.let { listOf(Metadatum(data.divergentDocumentNumber, DIVERGENT_DOCUMENT_NUMBER, 1)) } ?: listOf()
     val frameKeywords = createMetadataForType(data.frameKeywords, KEYWORD)
     val risAbbreviationInternationalLaw = createMetadataForType(data.risAbbreviationInternationalLaw, RIS_ABBREVIATION_INTERNATIONAL_LAW)
     val unofficialLongTitle = createMetadataForType(data.unofficialLongTitle, UNOFFICIAL_LONG_TITLE)
@@ -107,13 +108,10 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val subjectGesta = createMetadataForType(data.subjectGesta, SUBJECT_GESTA)
 
     val sections = listOf(
-        MetadataSection(Section.GENERAL_INFORMATION, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw),
-        MetadataSection(Section.HEADINGS_AND_ABBREVIATIONS, unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle),
-        MetadataSection(Section.NORM, unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
-        MetadataSection(Section.SUBJECT_AREA, subjectFna + subjectGesta),
-        MetadataSection(Section.LEAD, leadJurisdiction + leadUnit),
-        MetadataSection(Section.PARTICIPATION, participationInstitution + participationType),
-    )
+        MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
+    ) + createSectionsFromMetadata(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
+        createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
+        createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType)
 
     return Norm(
         guid = guid,
@@ -182,7 +180,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
 }
 
 private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> = data
-    .mapIndexed { index, value -> Metadatum(value, type, index) }
+    .mapIndexed { index, value -> Metadatum(value, type, index + 1) }
 
 fun mapArticlesToDomain(articles: List<ArticleData>): List<Article> {
     return articles.map { article ->
@@ -209,3 +207,13 @@ fun parseDateString(value: String?): LocalDate? = value?.let { try { LocalDate.p
 
 fun parseDateStateString(value: String?): UndefinedDate? =
     if (value.isNullOrEmpty()) null else UndefinedDate.valueOf(value)
+
+fun createSectionsFromMetadata(sectionName: MetadataSectionName, metadata: List<Metadatum<*>>) = metadata
+    .groupBy { it.order }
+    .mapValues {
+        MetadataSection(
+            sectionName,
+            it.value.map { metadatum -> Metadatum(metadatum.value, metadatum.type, 1) },
+            it.key,
+        )
+    }.values
