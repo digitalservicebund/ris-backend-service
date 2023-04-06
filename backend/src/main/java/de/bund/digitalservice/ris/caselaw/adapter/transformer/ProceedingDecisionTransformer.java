@@ -12,16 +12,16 @@ public class ProceedingDecisionTransformer {
   public static ProceedingDecision transformToDomain(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
     Court court = null;
-    if (documentUnitMetadataDTO.getCourtType() != null
-        && documentUnitMetadataDTO.getCourtLocation() != null) {
+    if (documentUnitMetadataDTO.getCourtType() != null) {
       court =
-          new Court(
-              documentUnitMetadataDTO.getCourtType(),
-              documentUnitMetadataDTO.getCourtLocation(),
-              documentUnitMetadataDTO.getCourtType()
-                  + " "
-                  + documentUnitMetadataDTO.getCourtLocation(),
-              "");
+          Court.builder()
+              .type(documentUnitMetadataDTO.getCourtType())
+              .location(documentUnitMetadataDTO.getCourtLocation())
+              .label(
+                  Court.generateLabel(
+                      documentUnitMetadataDTO.getCourtType(),
+                      documentUnitMetadataDTO.getCourtLocation()))
+              .build();
     }
 
     String fileNumber = null;

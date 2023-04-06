@@ -54,7 +54,7 @@ describe("Decision ListItem", () => {
     renderComponent({
       court: { type: "foo", location: "bar", label: "testLabel" },
     })
-    expect(await screen.findByText(/foo bar/)).toBeVisible()
+    expect(await screen.findByText(/testLabel/)).toBeVisible()
   })
 
   it("renders documentType shortcut", async () => {

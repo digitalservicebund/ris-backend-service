@@ -9,9 +9,7 @@ const props = defineProps<{
 function renderDecision(): string {
   const decision = props.decision
   return [
-    ...(decision.court
-      ? [`${decision.court.type} ${decision.court.location}`]
-      : []),
+    ...(decision.court ? [`${decision.court.label}`] : []),
     ...(decision.documentType ? [decision.documentType?.jurisShortcut] : []),
     ...(decision.date ? [dayjs(decision.date).format("DD.MM.YYYY")] : []),
     ...(decision.fileNumber ? [decision.fileNumber] : []),

@@ -112,7 +112,7 @@ public class DocumentUnitTransformer {
   public static Court getCourtObject(String courtType, String courtLocation) {
     Court court = null;
     if (courtType != null) {
-      String label = (courtType + " " + (courtLocation == null ? "" : courtLocation)).trim();
+      String label = Court.generateLabel(courtType, courtLocation);
       court = new Court(courtType, courtLocation, label, null);
     }
     return court;
