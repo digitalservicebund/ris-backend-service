@@ -226,16 +226,16 @@ class JurisConverterTest {
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
-            assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 0))
-            assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 0))
-            assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 0))
-            assertThat(metadata).contains(Metadatum("test unofficial short title", UNOFFICIAL_SHORT_TITLE, 0))
-            assertThat(metadata).contains(Metadatum("test unofficial abbreviation", UNOFFICIAL_ABBREVIATION, 0))
-            assertThat(metadata).contains(Metadatum("test unofficial reference", UNOFFICIAL_REFERENCE, 0))
-            assertThat(metadata).contains(Metadatum("test validity rule", VALIDITY_RULE, 0))
-            assertThat(metadata).contains(Metadatum("test reference number", REFERENCE_NUMBER, 0))
-            assertThat(metadata).contains(Metadatum("test definition", DEFINITION, 0))
-            assertThat(metadata).contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 0))
+            assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
+            assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
+            assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))
+            assertThat(metadata).contains(Metadatum("test unofficial short title", UNOFFICIAL_SHORT_TITLE, 1))
+            assertThat(metadata).contains(Metadatum("test unofficial abbreviation", UNOFFICIAL_ABBREVIATION, 1))
+            assertThat(metadata).contains(Metadatum("test unofficial reference", UNOFFICIAL_REFERENCE, 1))
+            assertThat(metadata).contains(Metadatum("test validity rule", VALIDITY_RULE, 1))
+            assertThat(metadata).contains(Metadatum("test reference number", REFERENCE_NUMBER, 1))
+            assertThat(metadata).contains(Metadatum("test definition", DEFINITION, 1))
+            assertThat(metadata).contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 1))
         }
 
         @Test
@@ -248,8 +248,8 @@ class JurisConverterTest {
 
             val norm = converter.parseJurisXml(query).block()
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
-            assertThat(metadata).contains(Metadatum("foo", KEYWORD, 0))
-            assertThat(metadata).contains(Metadatum("bar", KEYWORD, 1))
+            assertThat(metadata).contains(Metadatum("foo", KEYWORD, 1))
+            assertThat(metadata).contains(Metadatum("bar", KEYWORD, 2))
         }
 
         @Test

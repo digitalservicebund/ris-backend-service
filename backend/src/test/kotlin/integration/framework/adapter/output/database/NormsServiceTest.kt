@@ -319,7 +319,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .verifyComplete()
 
         val section = MetadataSection(
-            MetadataSectionName.GENERAL_INFORMATION,
+            MetadataSectionName.NORM,
             listOf(Metadatum("baz", KEYWORD, 0)),
         )
         val updatedNorm = initialNorm.copy(metadataSections = listOf(section))

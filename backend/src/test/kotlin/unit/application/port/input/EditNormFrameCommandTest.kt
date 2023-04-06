@@ -26,7 +26,7 @@ class EditNormFrameCommandTest {
     fun `can create command with optional fields`() {
         val guid = UUID.randomUUID()
         val metadata = listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1))
-        val metadataSections = listOf(MetadataSection(MetadataSectionName.GENERAL_INFORMATION, metadata))
+        val metadataSections = listOf(MetadataSection(MetadataSectionName.NORM, metadata))
         val properties = createRandomNormFameProperties().copy(metadataSections = metadataSections)
         val command = EditNormFrameUseCase.Command(guid, properties)
 

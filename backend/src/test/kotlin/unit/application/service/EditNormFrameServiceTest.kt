@@ -46,7 +46,7 @@ class EditNormFrameServiceTest {
         val guid = UUID.randomUUID()
         val metadata = listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1))
         val metadataSections = listOf(
-            MetadataSection(MetadataSectionName.GENERAL_INFORMATION, metadata),
+            MetadataSection(MetadataSectionName.NORM, metadata),
             MetadataSection(MetadataSectionName.NORM, listOf(Metadatum("definition", DEFINITION, 0))),
         )
         val properties = createRandomNormFameProperties().copy(metadataSections = metadataSections)
