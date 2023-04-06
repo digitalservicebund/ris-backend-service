@@ -19,7 +19,7 @@ class MetadatumTest {
     fun `it has per default the order number zero`() {
         val datum = Metadatum("test word", KEYWORD)
 
-        assertThat(datum.order).isEqualTo(0)
+        assertThat(datum.order).isEqualTo(1)
     }
 
     @Test

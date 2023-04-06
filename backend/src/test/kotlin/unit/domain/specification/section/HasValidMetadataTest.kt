@@ -26,7 +26,7 @@ class HasValidMetadataTest {
     @Test
     fun `it is not satisfied if any of the metadatum types do not belong to the section`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.NORM
+        every { instance.name } returns MetadataSectionName.LEAD
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("Keyword", MetadatumType.KEYWORD),
