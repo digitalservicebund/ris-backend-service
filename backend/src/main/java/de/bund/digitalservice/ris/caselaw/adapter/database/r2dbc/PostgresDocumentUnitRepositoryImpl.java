@@ -22,7 +22,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -671,7 +671,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     Instant decisionDate =
         proceedingDecision.date() == null
             ? null
-            : proceedingDecision.date().truncatedTo(ChronoUnit.DAYS);
+            : proceedingDecision.date().atZone(ZoneId.systemDefault()).toInstant();
     DocumentType docType = proceedingDecision.documentType();
 
     Mono<List<Long>> documentUnitDTOIdsViaFileNumber =
