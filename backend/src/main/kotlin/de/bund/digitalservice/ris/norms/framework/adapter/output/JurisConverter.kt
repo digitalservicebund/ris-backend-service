@@ -109,14 +109,10 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val sections = listOf(
         MetadataSection(Section.GENERAL_INFORMATION, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw),
         MetadataSection(Section.HEADINGS_AND_ABBREVIATIONS, unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle),
-        MetadataSection(Section.UNOFFICIAL_REFERENCE, unofficialReference),
-        MetadataSection(Section.REFERENCE_NUMBER, referenceNumber),
-        MetadataSection(Section.DEFINITION, definition),
-        MetadataSection(Section.AGE_OF_MAJORITY_INDICATION, ageOfMajorityIndication),
-        MetadataSection(Section.VALIDITY_RULE, validityRule),
+        MetadataSection(Section.NORM, unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
         MetadataSection(Section.SUBJECT_AREA, subjectFna + subjectGesta),
         MetadataSection(Section.LEAD, leadJurisdiction + leadUnit),
-        MetadataSection(Section.PARTICIPATING_INSTITUTIONS, participationInstitution + participationType),
+        MetadataSection(Section.PARTICIPATION, participationInstitution + participationType),
     )
 
     return Norm(
