@@ -57,7 +57,6 @@ describe("DateInput", () => {
 
     await userEvent.clear(input)
     await userEvent.type(input, "2020-05-12")
-    await userEvent.tab()
 
     expect(input).toHaveValue("2020-05-12")
   })
@@ -73,7 +72,6 @@ describe("DateInput", () => {
     await userEvent.clear(input)
     await userEvent.type(input, "2020-05-12")
     await userEvent.tab()
-    await nextTick()
 
     expect(input).toHaveValue("2020-05-12")
     expect(emitted()["update:modelValue"]).toBeTruthy()

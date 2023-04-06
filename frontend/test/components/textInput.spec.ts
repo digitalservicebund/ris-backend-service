@@ -70,9 +70,8 @@ describe("TextInput", () => {
   it("emits model update event when user types into input", async () => {
     const { emitted, user } = renderComponent()
     const input: HTMLInputElement = screen.getByRole("textbox")
-    await user.type(input, "ab")
-    await userEvent.tab()
+    await user.type(input, "a")
 
-    expect(emitted()["update:modelValue"]).toEqual([["ab"]])
+    expect(emitted()["update:modelValue"]).toEqual([["a"]])
   })
 })

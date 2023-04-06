@@ -134,7 +134,6 @@ describe("PublicationDocument:", () => {
 
       await userEvent.clear(inputReceiverAddress)
       await userEvent.type(inputReceiverAddress, "test.email")
-      await userEvent.tab()
 
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
@@ -151,7 +150,6 @@ describe("PublicationDocument:", () => {
       )
 
       await userEvent.type(inputReceiverAddress, "test.email@test.com")
-      await userEvent.tab()
 
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",
@@ -207,7 +205,6 @@ describe("PublicationDocument:", () => {
       )
 
       await userEvent.type(inputReceiverAddress, "test.email@test.com")
-      await userEvent.tab()
 
       const publishButton = screen.getByRole("button", {
         name: "Dokumentationseinheit veröffentlichen",

@@ -377,7 +377,6 @@ describe("chips input as inline list", () => {
 
     await user.type(input, "ab")
     await user.type(input, "{enter}")
-    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toEqual([[["ab"]]])
   })

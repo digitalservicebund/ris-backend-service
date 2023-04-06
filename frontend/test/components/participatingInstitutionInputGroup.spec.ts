@@ -55,7 +55,6 @@ describe("ParticipatingInstitutionsInputGroup", () => {
 
     await user.type(typeInput, "foo")
     await user.type(institutionInput, "bar")
-    await userEvent.tab() // Remove once text inputs are no more lazy.
 
     expect(modelValue).toEqual({ type: "foo", institution: "bar" })
   })

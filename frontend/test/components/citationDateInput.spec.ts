@@ -59,7 +59,6 @@ describe("Citation date/year field", () => {
       expect(dateInputField?.type).toBe("date")
 
       await userEvent.type(dateInputField, "2020-05-12")
-      await userEvent.tab()
 
       expect(dateInputField).toHaveValue("2020-05-12")
     })

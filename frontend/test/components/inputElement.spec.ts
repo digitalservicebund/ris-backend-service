@@ -58,7 +58,6 @@ describe("InputElement", () => {
     })
     const input = screen.getByRole("textbox")
     await user.type(input, "a")
-    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([["a"]])

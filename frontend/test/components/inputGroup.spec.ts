@@ -82,7 +82,6 @@ describe("InputFieldGroup", () => {
 
     const input = screen.getByRole("textbox")
     await user.type(input, "c")
-    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([[{ foo: "abc" }]])
@@ -98,7 +97,6 @@ describe("InputFieldGroup", () => {
 
     const input = screen.getByRole("textbox")
     await user.type(input, "a")
-    await userEvent.tab()
 
     expect(emitted()["update:modelValue"]).toHaveLength(1)
     expect(emitted()["update:modelValue"]).toEqual([[{ foo: "a" }]])

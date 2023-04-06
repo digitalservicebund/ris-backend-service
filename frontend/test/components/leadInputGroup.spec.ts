@@ -50,7 +50,6 @@ describe("LeadInputGroup", () => {
 
     await user.type(jurisdictionInput, "foo")
     await user.type(unitInput, "bar")
-    await userEvent.tab() // Remove once text inputs are no more lazy.
 
     expect(modelValue).toEqual({ jurisdiction: "foo", unit: "bar" })
   })

@@ -101,7 +101,6 @@ describe("SubjectAreaInputGroup", () => {
     await user.type(previousFnaInput, "bar")
     await user.type(gestaInput, "baz")
     await user.type(bgb3input, "ban")
-    await userEvent.tab() // Remove once text inputs are no more lazy.
 
     expect(modelValue).toEqual({
       fna: "foo",
