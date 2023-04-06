@@ -2,8 +2,12 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 
 import de.bund.digitalservice.ris.norms.application.port.output.ConvertNormToXmlOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
@@ -150,7 +154,7 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = "documentTypeName",
                     documentNormCategory = "documentNormCategory",
                     providerDecidingBody = "providerDecidingBody",
-                    participationInstitution = "participationInstitution",
+                    metadataSections = listOf(MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("participationInstitution", MetadatumType.PARTICIPATION_INSTITUTION)))),
                 ),
         )
 
@@ -174,7 +178,6 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = null,
                     documentNormCategory = null,
                     providerDecidingBody = null,
-                    participationInstitution = null,
                 ),
         )
 
@@ -198,8 +201,9 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = "SO",
                     documentNormCategory = "Rechtsetzungsdokument",
                     providerDecidingBody = "Präsident des Deutschen Bundestages",
-                    participationInstitution = "Bundeskanzleramt",
+                    metadataSections = listOf(MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("Bundeskanzleramt", MetadatumType.PARTICIPATION_INSTITUTION)))),
                 ),
+
         )
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
@@ -220,7 +224,7 @@ class ToLegalDocMLConverterTest {
             createRandomNorm()
                 .copy(
                     providerDecidingBody = "Bundesministerinnen",
-                    participationInstitution = "BMinisterium",
+                    metadataSections = listOf(MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("BMinisterium", MetadatumType.PARTICIPATION_INSTITUTION)))),
                 ),
         )
 

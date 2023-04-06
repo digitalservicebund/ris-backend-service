@@ -7,8 +7,14 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORI
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
@@ -174,12 +180,6 @@ class JurisConverterTest {
             assertThat(norm?.providerEntity).isEqualTo("test provider entity")
             assertThat(norm?.providerDecidingBody).isEqualTo("test provider deciding body")
             assertThat(norm?.providerIsResolutionMajority).isEqualTo(true)
-            assertThat(norm?.participationType).isEqualTo("test participation type")
-            assertThat(norm?.participationInstitution).isEqualTo("test participation institution")
-            assertThat(norm?.leadJurisdiction).isEqualTo("test lead jurisdiction")
-            assertThat(norm?.leadUnit).isEqualTo("test lead unit")
-            assertThat(norm?.subjectFna).isEqualTo("test subject FNA")
-            assertThat(norm?.subjectGesta).isEqualTo("test subject Gesta")
             assertThat(norm?.officialShortTitle).isEqualTo("test official short title")
             assertThat(norm?.officialAbbreviation).isEqualTo("test official abbreviation")
             assertThat(norm?.entryIntoForceDate).isEqualTo(LocalDate.parse("2022-01-01"))
@@ -236,6 +236,12 @@ class JurisConverterTest {
             assertThat(metadata).contains(Metadatum("test reference number", REFERENCE_NUMBER, 1))
             assertThat(metadata).contains(Metadatum("test definition", DEFINITION, 1))
             assertThat(metadata).contains(Metadatum("test age of majority indication", AGE_OF_MAJORITY_INDICATION, 1))
+            assertThat(metadata).contains(Metadatum("test participation type", PARTICIPATION_TYPE, 1))
+            assertThat(metadata).contains(Metadatum("test participation institution", PARTICIPATION_INSTITUTION, 1))
+            assertThat(metadata).contains(Metadatum("test lead jurisdiction", LEAD_JURISDICTION, 1))
+            assertThat(metadata).contains(Metadatum("test lead unit", LEAD_UNIT, 1))
+            assertThat(metadata).contains(Metadatum("test subject FNA", SUBJECT_FNA, 1))
+            assertThat(metadata).contains(Metadatum("test subject Gesta", SUBJECT_GESTA, 1))
         }
 
         @Test
