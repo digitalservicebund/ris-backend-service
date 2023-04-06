@@ -3,6 +3,8 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output.xml
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ContentDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.IdentifiedElement
@@ -22,7 +24,12 @@ fun mapNormToDto(norm: Norm): NormDto {
         documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
         documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
         providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, norm.providerDecidingBody ?: ""),
-        participationInstitution = getMappedValue(Property.PARTICIPATION_INSTITUTION, norm.participationInstitution ?: ""),
+        participationInstitution = getMappedValue(
+            Property.PARTICIPATION_INSTITUTION,
+            norm.metadataSections.firstOrNull {
+                it.name == MetadataSectionName.PARTICIPATION
+            }?.metadata?.first { it.type == MetadatumType.PARTICIPATION_INSTITUTION }?.value.toString(),
+        ),
         printAnnouncementGazette = norm.eli.gazette,
         printAnnouncementPage = norm.printAnnouncementPage,
         eli = norm.eli.toString(),

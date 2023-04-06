@@ -27,17 +27,6 @@ interface EditNormFrameUseCase {
         var providerDecidingBody: String? = null,
         var providerIsResolutionMajority: Boolean? = null,
 
-        var participationType: String? = null,
-        var participationInstitution: String? = null,
-
-        var leadJurisdiction: String? = null,
-        var leadUnit: String? = null,
-
-        var subjectFna: String? = null,
-        var subjectPreviousFna: String? = null,
-        var subjectGesta: String? = null,
-        var subjectBgb3: String? = null,
-
         var officialShortTitle: String? = null,
         var officialAbbreviation: String? = null,
 

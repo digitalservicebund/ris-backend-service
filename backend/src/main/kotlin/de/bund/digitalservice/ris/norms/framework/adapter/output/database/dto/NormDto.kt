@@ -36,25 +36,6 @@ data class NormDto(
     @Column("provider_is_resolution_majority")
     var providerIsResolutionMajority: Boolean? = null,
 
-    @Column("participation_type")
-    var participationType: String? = null,
-    @Column("participation_institution")
-    var participationInstitution: String? = null,
-
-    @Column("lead_jurisdiction")
-    var leadJurisdiction: String? = null,
-    @Column("lead_unit")
-    var leadUnit: String? = null,
-
-    @Column("subject_fna")
-    var subjectFna: String? = null,
-    @Column("subject_previous_fna")
-    var subjectPreviousFna: String? = null,
-    @Column("subject_gesta")
-    var subjectGesta: String? = null,
-    @Column("subject_bgb3")
-    var subjectBgb3: String? = null,
-
     @Column("official_short_title")
     var officialShortTitle: String? = null,
     @Column("official_abbreviation")
