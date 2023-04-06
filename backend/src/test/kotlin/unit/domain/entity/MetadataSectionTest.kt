@@ -61,13 +61,13 @@ class MetadataSectionTest {
         val unofficialReference = Metadatum("unofficialReference", UNOFFICIAL_REFERENCE)
         val exception = catchException {
             MetadataSection(
-                MetadataSectionName.NORM,
+                MetadataSectionName.LEAD,
                 listOf(unofficialLongTitle, unofficialReference),
             )
         }
 
         assertThat(exception).isInstanceOf(IllegalArgumentException::class.java)
         assertThat(exception.message)
-            .isEqualTo("Incorrect metadata for section '${MetadataSectionName.NORM}'")
+            .isEqualTo("Incorrect metadata for section '${MetadataSectionName.LEAD}'")
     }
 }
