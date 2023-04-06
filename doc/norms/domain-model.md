@@ -129,6 +129,7 @@ classDiagram
 
   class MetadataSection {
       +MetadataSectionName name
+      +Integer order
       List~Metadatum~ metadata
       List~MetadataSection~ sections
   }

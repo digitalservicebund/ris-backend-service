@@ -301,8 +301,8 @@ components:
         - GENERAL_INFORMATION
         - HEADINGS_AND_ABBREVIATIONS
         - SUBJECT_AREA
-        - LEAD,
-        - PARTICIPATING_INSTITUTIONS
+        - LEAD
+        - PARTICIPATION
     MetadataSection:
       type: object
       properties:
