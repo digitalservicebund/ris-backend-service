@@ -279,7 +279,7 @@ interface NormsMapper {
     }
 
     fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
-        return MetadataSectionDto(id, metadataSection.name, normId, sectionId)
+        return MetadataSectionDto(id, metadataSection.name, normId, metadataSection.order, sectionId)
     }
 
     // TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated

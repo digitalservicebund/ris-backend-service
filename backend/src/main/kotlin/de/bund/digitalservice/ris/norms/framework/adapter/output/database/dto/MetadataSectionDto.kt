@@ -10,6 +10,8 @@ data class MetadataSectionDto(
     @Id
     val id: Int,
     val name: MetadataSectionName,
+    @Column("order_number")
+    val order: Int,
     @Column("norm_id")
     val normId: Int,
     @Column("section_id")
