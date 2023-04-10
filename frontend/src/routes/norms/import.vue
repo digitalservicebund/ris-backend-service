@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import { ResponseError } from "@/services/httpClient"
-import { importNorm } from "@/services/normsService"
+import { importNorm } from "@/services/norms"
 import FileUpload from "@/shared/components/FileUpload.vue"
 
 const error = ref<ResponseError>()

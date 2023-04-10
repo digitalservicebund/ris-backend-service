@@ -1,7 +1,7 @@
 import { flushPromises } from "@vue/test-utils"
 import { setActivePinia, createPinia } from "pinia"
 import { MetaDatum, MetaDatumType, NormResponse } from "@/domain/Norm"
-import { editNormFrame, getNormByGuid } from "@/services/normsService"
+import { editNormFrame, getNormByGuid } from "@/services/norms"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 import { addMetadata } from "@/utilities/normUtilities"
 import { generateNorm } from "~/test-helper/dataGenerators"

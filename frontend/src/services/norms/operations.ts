@@ -1,8 +1,8 @@
 import dayjs from "dayjs"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
-import httpClient, { ServiceResponse } from "./httpClient"
 import { FrameData, NormResponse } from "@/domain/Norm"
+import httpClient, { ServiceResponse } from "@/services/httpClient"
 import {
   applyToFrameData,
   getNormEditRequestFromFrameData,
