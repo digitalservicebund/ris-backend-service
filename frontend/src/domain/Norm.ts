@@ -16,10 +16,65 @@ export type Paragraph = {
 }
 
 export type NullableFrameData = NullableType<FrameData>
+export enum MetadatumType {
+  KEYWORD = "KEYWORD",
+  UNOFFICIAL_LONG_TITLE = "UNOFFICIAL_LONG_TITLE",
+  UNOFFICIAL_SHORT_TITLE = "UNOFFICIAL_SHORT_TITLE",
+  UNOFFICIAL_ABBREVIATION = "UNOFFICIAL_ABBREVIATION",
+  UNOFFICIAL_REFERENCE = "UNOFFICIAL_REFERENCE",
+  DIVERGENT_DOCUMENT_NUMBER = "DIVERGENT_DOCUMENT_NUMBER",
+  REFERENCE_NUMBER = "REFERENCE_NUMBER",
+  DEFINITION = "DEFINITION",
+  RIS_ABBREVIATION_INTERNATIONAL_LAW = "RIS_ABBREVIATION_INTERNATIONAL_LAW",
+  AGE_OF_MAJORITY_INDICATION = "AGE_OF_MAJORITY_INDICATION",
+  VALIDITY_RULE = "VALIDITY_RULE",
+  LEAD_JURISDICTION = "LEAD_JURISDICTION",
+  LEAD_UNIT = "LEAD_UNIT",
+  PARTICIPATION_TYPE = "PARTICIPATION_TYPE",
+  PARTICIPATION_INSTITUTION = "PARTICIPATION_INSTITUTION",
+  SUBJECT_FNA = "SUBJECT_FNA",
+  SUBJECT_PREVIOUS_FNA = "SUBJECT_PREVIOUS_FNA",
+  SUBJECT_GESTA = "SUBJECT_GESTA",
+  SUBJECT_BGB_3 = "SUBJECT_BGB_3",
+}
 
-export type NullableNormEditRequest = NullableType<NormEditRequest>
+// TODO: Establish typing that requires all `MetadatumType`s to be listed.
+export type MetadataValueType = {
+  [MetadatumType.KEYWORD]: string
+  [MetadatumType.UNOFFICIAL_LONG_TITLE]: string
+  [MetadatumType.UNOFFICIAL_SHORT_TITLE]: string
+  [MetadatumType.UNOFFICIAL_ABBREVIATION]: string
+  [MetadatumType.UNOFFICIAL_REFERENCE]: string
+  [MetadatumType.DIVERGENT_DOCUMENT_NUMBER]: string
+  [MetadatumType.REFERENCE_NUMBER]: string
+  [MetadatumType.DEFINITION]: string
+  [MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW]: string
+  [MetadatumType.AGE_OF_MAJORITY_INDICATION]: string
+  [MetadatumType.VALIDITY_RULE]: string
+  [MetadatumType.LEAD_JURISDICTION]: string
+  [MetadatumType.LEAD_UNIT]: string
+  [MetadatumType.PARTICIPATION_TYPE]: string
+  [MetadatumType.PARTICIPATION_INSTITUTION]: string
+  [MetadatumType.SUBJECT_FNA]: string
+  [MetadatumType.SUBJECT_PREVIOUS_FNA]: string
+  [MetadatumType.SUBJECT_GESTA]: string
+  [MetadatumType.SUBJECT_BGB_3]: string
+}
 
-export type NormBase = {
+export type Metadata = {
+  [Type in MetadatumType]?: MetadataValueType[Type][]
+}
+
+export enum MetadataSectionName {
+  NORM = "NORM",
+  SUBJECT_AREA = "SUBJECT_AREA",
+  LEAD = "LEAD",
+  PARTICIPATION = "PARTICIPATION",
+}
+
+export type MetadataSections = {
+  [Name in MetadataSectionName]?: (Metadata & MetadataSections)[]
+}
   documentTemplateName?: string
   leadUnit?: string
   participationInstitution?: string
