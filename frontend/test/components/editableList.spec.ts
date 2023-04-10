@@ -44,7 +44,7 @@ function renderComponent(options?: {
     summaryComponent: markRaw(
       options?.summaryComponent ?? JsonStringifySummary
     ),
-    modelValue: options?.modelValue ?? [],
+    modelValue: options?.modelValue,
     defaultValue: options?.defaultValue ?? "",
   }
 
@@ -180,6 +180,19 @@ describe("EditableList", () => {
     expect(input).toBeInTheDocument()
     expect(input).toHaveValue("default entry")
     expect(modelValue).toEqual(["default entry"])
+  })
+
+  it("automatically adds a default entry in edit mode if list is undefined", () => {
+    renderComponent({
+      editComponent: SimpleTextEditComponent,
+      modelValue: undefined,
+      defaultValue: "default entry",
+    })
+
+    const input = screen.queryByRole("textbox") as HTMLInputElement
+
+    expect(input).toBeInTheDocument()
+    expect(input).toHaveValue("default entry")
   })
 
   it("automatically adds a default entry in edit mode if user deletes all entries", async () => {

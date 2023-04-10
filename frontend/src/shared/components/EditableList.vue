@@ -7,7 +7,7 @@ interface Props {
   editComponent: Component
   summaryComponent?: Component
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  modelValue: any[]
+  modelValue?: any[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultValue: any
 }
@@ -19,6 +19,7 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
+  modelValue: () => [],
 })
 
 const emit = defineEmits<Emits>()
@@ -129,7 +130,7 @@ watch(editIndex, focusFirstInputOfCurrentEditElement)
 
     <button
       aria-label="Weitere Angabe"
-      class="bg-blue-300 focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white inline-flex items-center leading-18 mt-16 outline-0 outline-blue-800 outline-none outline-offset-4 p-4 text-14 text-blue-800 whitespace-nowrap"
+      class="bg-blue-300 focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white inline-flex items-center leading-18 mt-8 outline-0 outline-blue-800 outline-none outline-offset-4 p-4 text-14 text-blue-800 whitespace-nowrap"
       @click="addNewModelEntry"
     >
       <span class="material-icons text-14">add</span>
