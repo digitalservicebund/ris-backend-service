@@ -17,20 +17,20 @@ function renderComponent<T>(options?: {
 }
 
 describe("DataSetSummary", () => {
-  it("keeps string values as they are for the default summary", async () => {
+  it("keeps string values as they are for the default summary", () => {
     renderComponent({ data: ["some test value"] })
 
-    const summary = await screen.findByText("some test value")
+    const summary = screen.queryByText("some test value", { exact: true })
 
     expect(summary).toBeInTheDocument()
   })
 
-  it("displays a summary for each entry in the dataset in correct order", async () => {
+  it("displays a summary for each entry in the dataset in correct order", () => {
     renderComponent({ data: ["first value", "second value", "third value"] })
 
-    const firstSummary = await screen.findByText("first value")
-    const secondSummary = await screen.findByText("second value")
-    const thirdSummary = await screen.findByText("third value")
+    const firstSummary = screen.getByText("first value", { exact: true })
+    const secondSummary = screen.getByText("second value", { exact: true })
+    const thirdSummary = screen.getByText("third value", { exact: true })
 
     expect(firstSummary).toBeInTheDocument()
     expect(secondSummary).toBeInTheDocument()
@@ -43,66 +43,74 @@ describe("DataSetSummary", () => {
     )
   })
 
-  it("summarizes simple data set entries using the string conversion", async () => {
+  it("summarizes simple data set entries using the string conversion", () => {
     renderComponent({ data: ["foo", 1, true] })
 
-    const stringSummary = await screen.findByText("foo")
-    const numberSummary = await screen.findByText("1")
-    const booleanSummary = await screen.findByText("true")
+    const stringSummary = screen.queryByText("foo", { exact: true })
+    const numberSummary = screen.queryByText("1", { exact: true })
+    const booleanSummary = screen.queryByText("true", { exact: true })
 
     expect(stringSummary).toBeInTheDocument()
     expect(numberSummary).toBeInTheDocument()
     expect(booleanSummary).toBeInTheDocument()
   })
 
-  it(" summarizes data set entries that are lists with a comma separator", async () => {
+  it(" summarizes data set entries that are lists with a comma separator", () => {
     renderComponent({ data: [["foo", "bar", "baz"]] })
 
-    const summary = await screen.findByText("foo, bar, baz")
+    const summary = screen.queryByText("foo, bar, baz")
 
     expect(summary).toBeInTheDocument()
   })
 
-  it("summarizes data set entries that are an object using their values and a pipe separator", async () => {
+  it("summarizes data set entries that are an object using their values and a pipe separator", () => {
     renderComponent({ data: [{ foo: 1, bar: 2, baz: 3 }] })
 
-    const summary = await screen.findByText("1 | 2 | 3")
+    const summary = screen.queryByText("1 | 2 | 3")
 
     expect(summary).toBeInTheDocument()
   })
 
-  it("summarizes complex nested data set structures of mixed types", async () => {
+  it("summarizes complex nested data set structures of mixed types", () => {
     renderComponent({ data: [{ foo: "foo", bar: [1, 2], baz: true }] })
 
-    const summary = await screen.findByText("foo | 1, 2 | true")
+    const summary = screen.queryByText("foo | 1, 2 | true")
 
     expect(summary).toBeInTheDocument()
   })
 
-  it("summarizes data sets that are not a list as single entry", async () => {
+  it("summarizes data sets that are not a list as single entry", () => {
     renderComponent({ data: { foo: "foo", bar: "bar" } })
 
-    const summary = await screen.findByText("foo | bar")
+    const summary = screen.queryByText("foo | bar")
 
     expect(summary).toBeInTheDocument()
   })
 
-  it("uses custom string summarizer function if given for custom summaries", async () => {
+  it("skips missing data set parts for summary", () => {
+    renderComponent({ data: { foo: undefined, bar: "bar" } })
+
+    const summary = screen.queryByText("bar", { exact: true })
+
+    expect(summary).toBeInTheDocument()
+  })
+
+  it("uses custom string summarizer function if given for custom summaries", () => {
     const summarizer = (dataEntry: string) => `the value is: ${dataEntry}`
     renderComponent({ data: ["foo"], summarizer })
 
-    const summary = await screen.findByText("the value is: foo")
+    const summary = screen.queryByText("the value is: foo")
 
     expect(summary).toBeInTheDocument()
   })
 
-  it("uses custom VNode summarizer function if given for complex summaries", async () => {
+  it("uses custom VNode summarizer function if given for complex summaries", () => {
     const summarizer = (dataEntry: string) =>
       h("div", { "data-testid": "special-identifier" }, dataEntry as string)
 
     renderComponent({ data: ["foo"], summarizer })
 
-    const summary = await screen.findByTestId("special-identifier")
+    const summary = screen.queryByTestId("special-identifier")
 
     expect(summary).toBeInTheDocument()
   })

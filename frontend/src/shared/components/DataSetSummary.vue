@@ -27,9 +27,15 @@ export function defaultSummarizer(dataEntry: any): string {
   if (["string", "boolean", "number"].includes(typeof dataEntry)) {
     return `${dataEntry}`
   } else if (Array.isArray(dataEntry)) {
-    return dataEntry.map(defaultSummarizer).join(", ")
+    return dataEntry
+      .map(defaultSummarizer)
+      .filter((value) => value != "")
+      .join(", ")
   } else if (typeof dataEntry == "object" && dataEntry !== null) {
-    return Object.values(dataEntry).map(defaultSummarizer).join(" | ")
+    return Object.values(dataEntry)
+      .map(defaultSummarizer)
+      .filter((value) => value != "")
+      .join(" | ")
   } else {
     return ""
   }
