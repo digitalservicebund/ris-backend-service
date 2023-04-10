@@ -2,7 +2,7 @@
 import { ref } from "vue"
 import { useRouter } from "vue-router"
 import NormsList from "@/components/NormsList.vue"
-import { getAllNorms } from "@/services/normsService"
+import { getAllNorms } from "@/services/norms"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
 const norms = ref((await getAllNorms()).data)

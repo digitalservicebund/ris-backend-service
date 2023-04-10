@@ -7,7 +7,7 @@ import {
   getNormByGuid,
   importNorm,
   triggerFileGeneration,
-} from "@/services/normsService"
+} from "@/services/norms/operations"
 
 vi.mock("@/services/httpClient")
 
