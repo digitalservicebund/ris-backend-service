@@ -80,9 +80,9 @@ const ENCORDERS: MetadataValueEncoders = {
  * @example
  * ```ts
  * decodeMetadata([
- *  { type: COMMENT, value: "text", order: 1 }
- *  { type: DATE, value: "20-03-2001", order: 0 }
- *  { type: COMMENT, value: "other text", order: 0 }
+ *  { type: COMMENT, value: "text", order: 2 }
+ *  { type: DATE, value: "20-03-2001", order: 1 }
+ *  { type: COMMENT, value: "other text", order: 1 }
  * ])
  * // => { COMMENT: ["other text", "text"], DATE: ["20-03-2001"] }
  * ```
@@ -108,9 +108,9 @@ function decodeMetadata(metadata: MetadatumSchema[]): Metadata {
  * encodeMetadata({ COMMENT: ["other text", "text"], DATE: ["20-03-2001"] })
  * // =>
  * // [
- * //   { type: COMMENT, value: "other text", order: 0 },
- * //   { type: COMMENT, value: "text", order: 1 },
- * //   { type: DATE, value: "20-03-2001, order: 0 },
+ * //   { type: COMMENT, value: "other text", order: 1 },
+ * //   { type: COMMENT, value: "text", order: 2 },
+ * //   { type: DATE, value: "20-03-2001, order: 1 },
  * // ]
  * ```
  *
@@ -119,9 +119,9 @@ function decodeMetadata(metadata: MetadatumSchema[]): Metadata {
  */
 function encodeMetadata(metadata: Metadata): MetadatumSchema[] {
   const encodedMapping = mapValues(metadata, (group, type) =>
-    group?.map((value, order) => ({
+    group?.map((value, index) => ({
       type,
-      order,
+      order: index + 1,
       // FIXME: Type system is tricky here...
       value: ENCORDERS[type](value as never),
     }))
@@ -141,29 +141,29 @@ function encodeMetadata(metadata: Metadata): MetadatumSchema[] {
  * decodeMetadataSections([
  *  {
  *    name: RELEASE,
- *     order: 1,
+ *     order: 2,
  *     metadata: [
- *       { type: DATE, value: "20-03-2001", order: 0 },
- *       { type: COMMENT, value: "text", order: 0 },
+ *       { type: DATE, value: "20-03-2001", order: 1 },
+ *       { type: COMMENT, value: "text", order: 1 },
  *     ],
  *     sections: [{
  *       name: INSTITUTION,
- *       order: 0,
+ *       order: 1,
  *       metadata: [
- *         { type: NAME, value: "House", order: 0 }
+ *         { type: NAME, value: "House", order: 1 }
  *       ],
  *     }],
  *  },
  *  {
  *    name: RELEASE:
- *    order: 0,
+ *    order: 1,
  *  },
  *  {
  *    name: PROOF,
- *    order: 0,
+ *    order: 1,
  *    metadata: [
- *     { type: DOCUMENT, value: "example.pdf", order: 0 }
- *     { type: DOCUMENT, value: "other.txt", order: 1 }
+ *     { type: DOCUMENT, value: "example.pdf", order: 1 }
+ *     { type: DOCUMENT, value: "other.txt", order: 2 }
  *    ]
  *  }
  * ])
@@ -215,29 +215,29 @@ export function decodeMetadataSections(
  * // [
  * //   {
  * //     name: RELEASE:
- * //     order: 0,
+ * //     order: 1,
  * //   },
  * //   {
  * //     name: RELEASE,
- * //      order: 1,
+ * //      order: 2,
  * //      metadata: [
- * //        { type: DATE, value: "20-03-2001", order: 0 },
- * //        { type: COMMENT, value: "text", order: 0 },
+ * //        { type: DATE, value: "20-03-2001", order: 1 },
+ * //        { type: COMMENT, value: "text", order: 1 },
  * //      ],
  * //      sections: [{
  * //        name: INSTITUTION,
- * //        order: 0,
+ * //        order: 1,
  * //        metadata: [
- * //          { type: NAME, value: "House", order: 0 }
+ * //          { type: NAME, value: "House", order: 1 }
  * //        ],
  * //      }],
  * //   },
  * //   {
  * //     name: PROOF,
- * //     order: 0,
+ * //     order: 1,
  * //     metadata: [
- * //      { type: DOCUMENT, value: "example.pdf", order: 0 }
- * //      { type: DOCUMENT, value: "other.txt", order: 1 }
+ * //      { type: DOCUMENT, value: "example.pdf", order: 1 }
+ * //      { type: DOCUMENT, value: "other.txt", order: 2 }
  * //     ]
  * //   }
  * // ]
@@ -254,7 +254,7 @@ export function encodeMetadataSections(
   }
 
   const encodedMapping = mapValues(sections, (group, name) =>
-    group?.map((value, order) => {
+    group?.map((value, index) => {
       const metadata = filterEntries(
         value,
         (data, key) =>
@@ -269,7 +269,7 @@ export function encodeMetadataSections(
 
       return {
         name,
-        order,
+        order: index + 1,
         metadata: encodeMetadata(metadata),
         sections: encodeMetadataSections(childSections),
       }
