@@ -1,12 +1,11 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
+import { Metadata, MetadatumType } from "@/domain/Norm"
 
-function renderComponent(options?: {
-  modelValue?: { jurisdiction?: string; unit?: string }
-}) {
+function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {
-    modelValue: options?.modelValue ?? { jurisdiction: "", unit: "" },
+    modelValue: options?.modelValue ?? {},
   }
 
   return render(LeadInputGroup, { props })
@@ -14,7 +13,9 @@ function renderComponent(options?: {
 
 describe("LeadInputGroup", () => {
   it("renders an input field for the jurisdiction value", async () => {
-    renderComponent({ modelValue: { jurisdiction: "test value" } })
+    renderComponent({
+      modelValue: { [MetadatumType.LEAD_JURISDICTION]: ["test value"] },
+    })
 
     const input = screen.queryByRole("textbox", {
       name: "Ressort",
@@ -25,7 +26,9 @@ describe("LeadInputGroup", () => {
   })
 
   it("renders an input field for the unit value", async () => {
-    renderComponent({ modelValue: { unit: "test value" } })
+    renderComponent({
+      modelValue: { [MetadatumType.LEAD_UNIT]: ["test value"] },
+    })
 
     const input = screen.queryByRole("textbox", {
       name: "Organisationseinheit",
@@ -37,7 +40,7 @@ describe("LeadInputGroup", () => {
 
   it("updates the model value when user types into the input fields", async () => {
     const user = userEvent.setup()
-    const modelValue = { jurisdiction: "", unit: "" }
+    const modelValue = {}
     renderComponent({ modelValue })
 
     const jurisdictionInput = screen.queryByRole("textbox", {
@@ -51,6 +54,9 @@ describe("LeadInputGroup", () => {
     await user.type(jurisdictionInput, "foo")
     await user.type(unitInput, "bar")
 
-    expect(modelValue).toEqual({ jurisdiction: "foo", unit: "bar" })
+    expect(modelValue).toEqual({
+      [MetadatumType.LEAD_JURISDICTION]: ["foo"],
+      [MetadatumType.LEAD_UNIT]: ["bar"],
+    })
   })
 })

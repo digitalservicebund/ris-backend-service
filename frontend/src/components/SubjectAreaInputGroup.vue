@@ -1,39 +1,50 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
+import { Metadata } from "@/domain/Norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
-type subjectArea = {
-  fna: "string"
-  previousFna: "string"
-  gesta: "string"
-  bgb3: "string"
-}
 interface Props {
-  modelValue: subjectArea
+  modelValue: Metadata
 }
 
 interface Emits {
-  (event: "update:modelValue", value: subjectArea): void
+  (event: "update:modelValue", value: Metadata): void
 }
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const inputValue = ref<subjectArea>(props.modelValue)
+const inputValue = ref(props.modelValue)
 
-watch(
-  () => props,
-  () => (inputValue.value = props.modelValue),
-  { immediate: true, deep: true }
-)
+const fna = computed({
+  get: () => inputValue.value.SUBJECT_FNA?.[0],
+  set: (data?: string) => data && (inputValue.value.SUBJECT_FNA = [data]),
+})
 
-watch(
-  inputValue,
-  () => {
-    emit("update:modelValue", inputValue.value)
-  },
-  { deep: true }
-)
+const previousFna = computed({
+  get: () => inputValue.value.SUBJECT_PREVIOUS_FNA?.[0],
+  set: (data?: string) =>
+    data && (inputValue.value.SUBJECT_PREVIOUS_FNA = [data]),
+})
+
+const gesta = computed({
+  get: () => inputValue.value.SUBJECT_GESTA?.[0],
+  set: (data?: string) => data && (inputValue.value.SUBJECT_GESTA = [data]),
+})
+
+const bgb3 = computed({
+  get: () => inputValue.value.SUBJECT_BGB_3?.[0],
+  set: (data?: string) => data && (inputValue.value.SUBJECT_BGB_3 = [data]),
+})
+
+watch(props, () => (inputValue.value = props.modelValue), {
+  immediate: true,
+  deep: true,
+})
+
+watch(inputValue, () => emit("update:modelValue", inputValue.value), {
+  deep: true,
+})
 </script>
 
 <template>
@@ -45,11 +56,7 @@ watch(
         class="w-1/2"
         label="FNA-Nummer"
       >
-        <TextInput
-          id="subjectFna"
-          v-model="inputValue.fna"
-          aria-label="FNA-Nummer"
-        />
+        <TextInput id="subjectFna" v-model="fna" aria-label="FNA-Nummer" />
       </InputField>
       <InputField
         id="subjectPreviousFna"
@@ -59,7 +66,7 @@ watch(
       >
         <TextInput
           id="subjectPreviousFna"
-          v-model="inputValue.previousFna"
+          v-model="previousFna"
           aria-label="Frühere FNA-Nummer"
           class="[&:not(:hover,:focus)]:border-l-0"
         />
@@ -74,7 +81,7 @@ watch(
       >
         <TextInput
           id="subjectGesta"
-          v-model="inputValue.gesta"
+          v-model="gesta"
           aria-label="GESTA-Nummer"
         />
       </InputField>
@@ -86,7 +93,7 @@ watch(
       >
         <TextInput
           id="subjectBgb3"
-          v-model="inputValue.bgb3"
+          v-model="bgb3"
           aria-label="Bundesgesetzblatt Teil III"
           class="[&:not(:hover,:focus)]:border-l-0"
         />

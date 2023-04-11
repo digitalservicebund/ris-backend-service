@@ -1,22 +1,31 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
+import { Metadata } from "@/domain/Norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
-type Lead = { jurisdiction: string; unit: string }
-
 interface Props {
-  modelValue: Lead
+  modelValue: Metadata
 }
 
 interface Emits {
-  (event: "update:modelValue", value: Lead): void
+  (event: "update:modelValue", value: Metadata): void
 }
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const inputValue = ref<Lead>(props.modelValue)
+const inputValue = ref(props.modelValue)
+
+const jurisdiction = computed({
+  get: () => inputValue.value.LEAD_JURISDICTION?.[0],
+  set: (data?: string) => data && (inputValue.value.LEAD_JURISDICTION = [data]),
+})
+
+const unit = computed({
+  get: () => inputValue.value.LEAD_UNIT?.[0],
+  set: (data?: string) => data && (inputValue.value.LEAD_UNIT = [data]),
+})
 
 watch(props, () => (inputValue.value = props.modelValue), {
   immediate: true,
@@ -38,7 +47,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
     >
       <TextInput
         id="leadJurisdiction"
-        v-model="inputValue.jurisdiction"
+        v-model="jurisdiction"
         aria-label="Ressort"
       />
     </InputField>
@@ -51,7 +60,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
     >
       <TextInput
         id="leadUnit"
-        v-model="inputValue.unit"
+        v-model="unit"
         aria-label="Organisationseinheit"
         class="[&:not(:hover,:focus)]:border-l-0"
       />

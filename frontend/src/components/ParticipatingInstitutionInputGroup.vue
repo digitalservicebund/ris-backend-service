@@ -1,34 +1,42 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
+import { Metadata } from "@/domain/Norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
-type ParticipationInstitutions = { type: string; institution: string }
 interface Props {
-  modelValue: ParticipationInstitutions
+  modelValue: Metadata
 }
 
 interface Emits {
-  (event: "update:modelValue", value: ParticipationInstitutions): void
+  (event: "update:modelValue", value: Metadata): void
 }
+
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const inputValue = ref<ParticipationInstitutions>(props.modelValue)
+const inputValue = ref(props.modelValue)
 
-watch(
-  () => props,
-  () => (inputValue.value = props.modelValue),
-  { immediate: true, deep: true }
-)
+const type = computed({
+  get: () => inputValue.value.PARTICIPATION_TYPE?.[0],
+  set: (data?: string) =>
+    data && (inputValue.value.PARTICIPATION_TYPE = [data]),
+})
 
-watch(
-  inputValue,
-  () => {
-    emit("update:modelValue", inputValue.value)
-  },
-  { deep: true }
-)
+const institution = computed({
+  get: () => inputValue.value.PARTICIPATION_INSTITUTION?.[0],
+  set: (data?: string) =>
+    data && (inputValue.value.PARTICIPATION_INSTITUTION = [data]),
+})
+
+watch(props, () => (inputValue.value = props.modelValue), {
+  immediate: true,
+  deep: true,
+})
+
+watch(inputValue, () => emit("update:modelValue", inputValue.value), {
+  deep: true,
+})
 </script>
 
 <template>
@@ -41,7 +49,7 @@ watch(
     >
       <TextInput
         id="participationType"
-        v-model="inputValue.type"
+        v-model="type"
         aria-label="Art der Mitwirkung"
       />
     </InputField>
@@ -54,7 +62,7 @@ watch(
     >
       <TextInput
         id="participationInstitution"
-        v-model="inputValue.institution"
+        v-model="institution"
         aria-label="Mitwirkendes Organ"
         class="[&:not(:hover,:focus)]:border-l-0"
       />
