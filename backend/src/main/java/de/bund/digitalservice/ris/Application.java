@@ -11,7 +11,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
   @PostConstruct
   public void init() {
-    TimeZone.setDefault(TimeZone.getTimeZone("Europe/Berlin"));
+    TimeZone.setDefault(TimeZone.getTimeZone("UTC"));
   }
 
   public static void main(String[] args) {
