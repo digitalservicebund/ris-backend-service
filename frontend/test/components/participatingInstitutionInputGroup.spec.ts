@@ -1,21 +1,20 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import ParticipatingInstitutionsInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
+import { Metadata, MetadatumType } from "@/domain/Norm"
 
-function renderComponent(options?: {
-  modelValue?: { type?: string; institution?: string }
-}) {
+function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {
-    modelValue: options?.modelValue ?? { type: "", institution: "" },
+    modelValue: options?.modelValue ?? {},
   }
 
   return render(ParticipatingInstitutionsInputGroup, { props })
 }
 
 describe("ParticipatingInstitutionsInputGroup", () => {
-  it("renders an input field for the jurisdiction type value", async () => {
+  it("renders an input field for the type value", async () => {
     renderComponent({
-      modelValue: { type: "test value" },
+      modelValue: { [MetadatumType.PARTICIPATION_TYPE]: ["test value"] },
     })
 
     const input = screen.queryByRole("textbox", {
@@ -26,9 +25,9 @@ describe("ParticipatingInstitutionsInputGroup", () => {
     expect(input).toHaveValue("test value")
   })
 
-  it("renders an input field for the jurisdiction institution value", async () => {
+  it("renders an input field for the institution value", async () => {
     renderComponent({
-      modelValue: { institution: "test value" },
+      modelValue: { [MetadatumType.PARTICIPATION_INSTITUTION]: ["test value"] },
     })
 
     const input = screen.queryByRole("textbox", {
@@ -42,7 +41,7 @@ describe("ParticipatingInstitutionsInputGroup", () => {
 
   it("updates the model value when user types into the input fields", async () => {
     const user = userEvent.setup()
-    const modelValue = { type: "", institution: "" }
+    const modelValue = {}
     renderComponent({ modelValue })
 
     const typeInput = screen.queryByRole("textbox", {
@@ -56,6 +55,9 @@ describe("ParticipatingInstitutionsInputGroup", () => {
     await user.type(typeInput, "foo")
     await user.type(institutionInput, "bar")
 
-    expect(modelValue).toEqual({ type: "foo", institution: "bar" })
+    expect(modelValue).toEqual({
+      [MetadatumType.PARTICIPATION_TYPE]: ["foo"],
+      [MetadatumType.PARTICIPATION_INSTITUTION]: ["bar"],
+    })
   })
 })
