@@ -259,11 +259,11 @@ interface NormsMapper {
     }
 
     fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, id: Int = 0): List<MetadatumDto> {
-        return metadata.map { MetadatumDto(id, it.value.toString(), it.type, it.order, sectionId) }
+        return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId) }
     }
 
     fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
-        return MetadataSectionDto(id, metadataSection.name, normId, metadataSection.order, sectionId)
+        return MetadataSectionDto(id = id, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId)
     }
 
     // TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
