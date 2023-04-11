@@ -641,6 +641,19 @@ class DocumentUnitServiceTest {
     verify(publishService).getLastPublishedXml(TEST_UUID);
   }
 
+  @Test
+  void testSearchForDocumentUnitsByProceedingDecisionInput() {
+    ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
+
+    when(repository.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision))
+        .thenReturn(Flux.just(proceedingDecision));
+
+    StepVerifier.create(service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision))
+        .consumeNextWith(pd -> assertEquals(pd, proceedingDecision))
+        .verifyComplete();
+    verify(repository).searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+  }
+
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {
     return CompletableFuture.completedFuture(DeleteObjectResponse.builder().build());
   }

@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
@@ -348,5 +349,24 @@ class DocumentUnitControllerTest {
         .is5xxServerError();
 
     verify(service).getLastPublishedXmlMail(TEST_UUID);
+  }
+
+  @Test
+  void testSearchForDocumentUnitsByProceedingDecisionInput() {
+    ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
+    when(service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision))
+        .thenReturn(Flux.empty());
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search")
+        .header(HttpHeaders.CONTENT_TYPE, "application/json")
+        .bodyValue(proceedingDecision)
+        .exchange()
+        .expectStatus()
+        .isOk();
+
+    verify(service).searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
   }
 }
