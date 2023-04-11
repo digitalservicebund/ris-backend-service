@@ -132,7 +132,7 @@ interface NormsMapper {
     }
 
     fun metadataSectionToEntity(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): MetadataSection {
-        return MetadataSection(metadataSectionDto.name, metadata)
+        return MetadataSection(name = metadataSectionDto.name, order = metadataSectionDto.order, metadata = metadata)
     }
 
     fun fileReferenceToEntity(fileReferenceDto: FileReferenceDto): FileReference {

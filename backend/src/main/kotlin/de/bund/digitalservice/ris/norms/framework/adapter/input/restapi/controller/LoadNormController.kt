@@ -290,12 +290,12 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         }
     }
 
-    data class MetadataSectionResponseSchema private constructor(val name: MetadataSectionName, val metadata: List<MetadatumResponseSchema>, val sections: List<MetadataSectionResponseSchema>?) {
+    data class MetadataSectionResponseSchema private constructor(val name: MetadataSectionName, val order: Int, val metadata: List<MetadatumResponseSchema>, val sections: List<MetadataSectionResponseSchema>?) {
         companion object {
             fun fromUseCaseData(metadataSection: MetadataSection): MetadataSectionResponseSchema {
                 val metadata = metadataSection.metadata.map { MetadatumResponseSchema.fromUseCaseData(it) }
                 val childSections = metadataSection.sections?.map { fromUseCaseData(it) }
-                return MetadataSectionResponseSchema(name = metadataSection.name, metadata = metadata, sections = childSections)
+                return MetadataSectionResponseSchema(name = metadataSection.name, order = metadataSection.order, metadata = metadata, sections = childSections)
             }
         }
     }
