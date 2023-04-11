@@ -117,12 +117,12 @@ function decodeMetadata(metadata: MetadatumSchema[]): Metadata {
  * @param metadata to encode from response schema
  * @returns un-grouped metadata object collection
  */
-function encodeMetadata(mapping: Metadata): MetadatumSchema[] {
-  const encodedMapping = mapValues(mapping, (group, type) =>
-    group.map((value, order) => ({
+function encodeMetadata(metadata: Metadata): MetadatumSchema[] {
+  const encodedMapping = mapValues(metadata, (group, type) =>
+    group?.map((value, order) => ({
       type,
       order,
-      // FIXME: MetadatumType system is tricky here...
+      // FIXME: Type system is tricky here...
       value: ENCORDERS[type](value as never),
     }))
   )
@@ -247,15 +247,19 @@ export function decodeMetadataSections(
  * @returns un-grouped metadata section object collection
  */
 export function encodeMetadataSections(
-  mapping: MetadataSections
-): MetadataSectionSchema[] {
-  const encodedMapping = mapValues(mapping, (group, name) =>
+  sections: MetadataSections
+): MetadataSectionSchema[] | null {
+  if (Object.entries(sections).length == 0) {
+    return null
+  }
+
+  const encodedMapping = mapValues(sections, (group, name) =>
     group.map((value, order) => {
       const metadata = filterEntries(value, (_, key) =>
         Object.keys(MetadatumType).includes(key)
       ) as Metadata
 
-      const sections = filterEntries(value, (_, key) =>
+      const childSections = filterEntries(value, (_, key) =>
         Object.keys(MetadataSectionName).includes(key)
       ) as MetadataSections
 
@@ -263,7 +267,7 @@ export function encodeMetadataSections(
         name,
         order,
         metadata: encodeMetadata(metadata),
-        sections: encodeMetadataSections(sections),
+        sections: encodeMetadataSections(childSections),
       }
     })
   )
