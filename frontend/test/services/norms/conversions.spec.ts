@@ -274,6 +274,29 @@ describe("conversions", () => {
   })
 
   describe("encodeMetadataSections()", () => {
+    it("maps empty section list to null", () => {
+      const decoded: MetadataSections = {}
+
+      const encoded = encodeMetadataSections(decoded)
+
+      expect(encoded).toBeNull()
+    })
+
+    it("maps empty child sections list to null", () => {
+      const decoded: MetadataSections = { LEAD: [{ LEAD_UNIT: [] }] }
+
+      const encoded = encodeMetadataSections(decoded)
+
+      expect(encoded).toStrictEqual([
+        {
+          name: MetadataSectionName.LEAD,
+          order: 0,
+          metadata: [],
+          sections: null,
+        },
+      ])
+    })
+
     it("maps section names based on group key", () => {
       const decoded: MetadataSections = {
         LEAD: [{}],
@@ -287,13 +310,13 @@ describe("conversions", () => {
           name: MetadataSectionName.LEAD,
           order: 0,
           metadata: [],
-          sections: [],
+          sections: null,
         },
         {
           name: MetadataSectionName.PARTICIPATION,
           order: 0,
           metadata: [],
-          sections: [],
+          sections: null,
         },
       ])
     })
@@ -313,7 +336,7 @@ describe("conversions", () => {
           metadata: [
             { type: MetadatumType.LEAD_UNIT, value: "first", order: 0 },
           ],
-          sections: [],
+          sections: null,
         },
         {
           name: MetadataSectionName.LEAD,
@@ -321,7 +344,7 @@ describe("conversions", () => {
           metadata: [
             { type: MetadatumType.LEAD_UNIT, value: "second", order: 0 },
           ],
-          sections: [],
+          sections: null,
         },
         {
           name: MetadataSectionName.PARTICIPATION,
@@ -333,7 +356,7 @@ describe("conversions", () => {
               order: 0,
             },
           ],
-          sections: [],
+          sections: null,
         },
       ])
     })
@@ -353,7 +376,7 @@ describe("conversions", () => {
           metadata: [
             { type: MetadatumType.LEAD_UNIT, value: "text", order: 0 },
           ],
-          sections: [],
+          sections: null,
         },
       ])
     })
@@ -379,7 +402,7 @@ describe("conversions", () => {
             { type: MetadatumType.LEAD_UNIT, value: "second", order: 1 },
             { type: MetadatumType.LEAD_JURISDICTION, value: "text", order: 0 },
           ],
-          sections: [],
+          sections: null,
         },
       ])
     })
@@ -416,7 +439,7 @@ describe("conversions", () => {
         {
           name: MetadataSectionName.LEAD,
           order: 0,
-          sections: [],
+          sections: null,
           metadata: [
             {
               type: MetadatumType.LEAD_UNIT,
@@ -454,7 +477,7 @@ describe("conversions", () => {
             {
               name: MetadataSectionName.PARTICIPATION,
               order: 0,
-              sections: [],
+              sections: null,
               metadata: [
                 {
                   type: MetadatumType.PARTICIPATION_TYPE,
@@ -478,7 +501,7 @@ describe("conversions", () => {
         {
           name: MetadataSectionName.PARTICIPATION,
           order: 0,
-          sections: [],
+          sections: null,
           metadata: [
             {
               type: MetadatumType.PARTICIPATION_TYPE,
