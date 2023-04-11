@@ -321,6 +321,31 @@ describe("conversions", () => {
       ])
     })
 
+    it("ignores metadata groups or child sections which are undefined", () => {
+      const decoded: MetadataSections = {
+        LEAD: [
+          {
+            LEAD_UNIT: ["first"],
+            LEAD_JURISDICTION: undefined,
+            SUBJECT_AREA: undefined,
+          },
+        ],
+      }
+
+      const encoded = encodeMetadataSections(decoded)
+
+      expect(encoded).toStrictEqual([
+        {
+          name: MetadataSectionName.LEAD,
+          order: 0,
+          metadata: [
+            { type: MetadatumType.LEAD_UNIT, value: "first", order: 0 },
+          ],
+          sections: null,
+        },
+      ])
+    })
+
     it("sets section order property based on their collection index", () => {
       const decoded: MetadataSections = {
         LEAD: [{ LEAD_UNIT: ["first"] }, { LEAD_UNIT: ["second"] }],
