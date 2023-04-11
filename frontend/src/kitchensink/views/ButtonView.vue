@@ -2,7 +2,6 @@
 import { ref } from "vue"
 import SaveDocumentUnitButton from "@/components/SaveDocumentUnitButton.vue"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
-import NestedButton from "@/shared/components/input/NestedButton.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
 const updateStatus = ref(UpdateStatus)
@@ -66,12 +65,6 @@ const updateStatus = ref(UpdateStatus)
       <TextButton button-type="ghost" icon="close" />
 
       <TextButton button-type="ghost" disabled label="Disabled" />
-    </div>
-
-    <div class="flex flex-col gap-y-20 items-start">
-      <h2 class="heading-02-regular">Nested Button</h2>
-      <NestedButton label="Nested Button" />
-      <NestedButton icon="add" label="Nested Button with icon" />
     </div>
 
     <div class="flex flex-col gap-y-20 items-start">
