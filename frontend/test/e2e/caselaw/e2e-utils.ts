@@ -72,13 +72,20 @@ export async function fillProceedingDecisionInputs(
       .fill(value ?? generateString())
   }
 
-  await fillInput("Gericht Rechtszug", values?.court)
-  if (values?.court) await page.locator(`text=${values?.court}`).click()
-  await fillInput("Entscheidungsdatum Rechtszug", values?.date)
-  await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
-  await fillInput("Dokumenttyp Rechtszug", values?.documentType)
-  if (values?.documentType)
+  if (values?.court) {
+    await fillInput("Gericht Rechtszug", values?.court)
+    await page.locator(`text=${values?.court}`).click()
+  }
+  if (values?.date) {
+    await fillInput("Entscheidungsdatum Rechtszug", values?.date)
+  }
+  if (values?.fileNumber) {
+    await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
+  }
+  if (values?.documentType) {
+    await fillInput("Dokumenttyp Rechtszug", values?.documentType)
     await page.locator("[aria-label='dropdown-option']").first().click()
+  }
 }
 
 export async function deleteDocumentUnit(page: Page, documentNumber: string) {
