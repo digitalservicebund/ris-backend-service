@@ -62,7 +62,7 @@ export type MetadataValueType = {
 }
 
 export type Metadata = {
-  [Type in MetadatumType]?: MetadataValueType[Type][]
+  [Type in MetadatumType]?: MetadataValueType[Type][] | undefined
 }
 
 export enum MetadataSectionName {
@@ -73,7 +73,7 @@ export enum MetadataSectionName {
 }
 
 export type MetadataSections = {
-  [Name in MetadataSectionName]?: (Metadata & MetadataSections)[]
+  [Name in MetadataSectionName]?: (Metadata & MetadataSections)[] | undefined
 }
   documentTemplateName?: string
   leadUnit?: string

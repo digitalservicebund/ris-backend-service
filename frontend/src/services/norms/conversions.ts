@@ -254,13 +254,17 @@ export function encodeMetadataSections(
   }
 
   const encodedMapping = mapValues(sections, (group, name) =>
-    group.map((value, order) => {
-      const metadata = filterEntries(value, (_, key) =>
-        Object.keys(MetadatumType).includes(key)
+    group?.map((value, order) => {
+      const metadata = filterEntries(
+        value,
+        (data, key) =>
+          Object.keys(MetadatumType).includes(key) && data !== undefined
       ) as Metadata
 
-      const childSections = filterEntries(value, (_, key) =>
-        Object.keys(MetadataSectionName).includes(key)
+      const childSections = filterEntries(
+        value,
+        (data, key) =>
+          Object.keys(MetadataSectionName).includes(key) && data !== undefined
       ) as MetadataSections
 
       return {
