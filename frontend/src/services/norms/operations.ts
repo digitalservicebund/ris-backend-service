@@ -1,26 +1,11 @@
-import dayjs from "dayjs"
-import timezone from "dayjs/plugin/timezone"
-import utc from "dayjs/plugin/utc"
-import { FrameData, NormResponse } from "@/domain/Norm"
-import httpClient, { ServiceResponse } from "@/services/httpClient"
 import {
-  applyToFrameData,
-  getNormEditRequestFromFrameData,
-  NullableBoolean,
-  NullableString,
-} from "@/utilities/normUtilities"
-
-type NormList = { officialLongTitle: string; guid: string }[]
-dayjs.extend(utc)
-dayjs.extend(timezone)
-
-function encodeString(data: NullableString): NullableString {
-  return data && data.length > 0 ? data : null
-}
-
-function encodeBoolean(data: NullableBoolean): NullableBoolean {
-  return data ?? null
-}
+  decodeNorm,
+  encodeMetadataSections,
+  encodeFlatMetadata,
+} from "./conversions"
+import { NormListResponseSchema, NormResponseSchema } from "./schemas"
+import { FlatMetadata, MetadataSections, Norm } from "@/domain/Norm"
+import httpClient, { ServiceResponse } from "@/services/httpClient"
 
 const errorMessages = {
   FILE_TOO_BIG: {
@@ -49,25 +34,12 @@ const errorMessages = {
   },
 }
 
-// Makes the assumption that we currently get a date string in the following
-// format: `2022-11-14T23:00:00.000Z`. To comply with the expected date format
-// of the API, we only take the first 10 characters.
-//
-// TODO: Improve by working with enriched date type.
-function encodeDate(data?: string | null): string | null {
-  return data && data.length > 0
-    ? dayjs(data).tz("Europe/Berlin").format("YYYY-MM-DD")
-    : null
-}
-
-function encodeFrameData(data: FrameData) {
-  return applyToFrameData(data, encodeString, encodeBoolean, encodeDate)
-}
-
-export async function getAllNorms(): Promise<ServiceResponse<NormList>> {
-  const { data, status, error } = await httpClient.get<{ data: NormList }>(
-    "norms"
-  )
+export async function getAllNorms(): Promise<
+  ServiceResponse<NormListResponseSchema>
+> {
+  const { data, status, error } = await httpClient.get<{
+    data: NormListResponseSchema
+  }>("norms")
 
   if (status >= 300 || error) {
     return {
@@ -86,11 +58,11 @@ export async function getAllNorms(): Promise<ServiceResponse<NormList>> {
 
 export async function getNormByGuid(
   guid: string
-): Promise<ServiceResponse<NormResponse>> {
-  const { status, data, error } = await httpClient.get<NormResponse>(
+): Promise<ServiceResponse<Norm>> {
+  const { status, data, error } = await httpClient.get<NormResponseSchema>(
     `norms/${guid}`
   )
-  if (status >= 300 || error) {
+  if (status >= 300 || error || data == undefined) {
     return {
       status: status,
       error: errorMessages.LOADING_ERROR,
@@ -98,24 +70,29 @@ export async function getNormByGuid(
   } else {
     return {
       status,
-      data,
+      data: decodeNorm(data),
     }
   }
 }
 
 export async function editNormFrame(
   guid: string,
-  frameData: FrameData
+  metadataSections: MetadataSections,
+  flatMetadata: FlatMetadata
 ): Promise<ServiceResponse<void>> {
-  const body = getNormEditRequestFromFrameData(encodeFrameData(frameData))
+  const headers = {
+    Accept: "application/json",
+    "Content-Type": "application/json",
+  }
+
+  const body = {
+    ...encodeFlatMetadata(flatMetadata),
+    metadataSections: encodeMetadataSections(metadataSections) ?? [],
+  }
+
   const { status, error } = await httpClient.put(
     `norms/${guid}`,
-    {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    },
+    { headers },
     body
   )
 
@@ -141,14 +118,13 @@ export async function importNorm(file: File): Promise<ServiceResponse<string>> {
     }
   }
 
+  const headers = { "Content-Type": "application/zip", "X-Filename": file.name }
+
   const { status, error, data } = await httpClient.post<
     unknown,
     { guid: string }
-  >(
-    "norms",
-    { headers: { "Content-Type": "application/zip", "X-Filename": file.name } },
-    file
-  )
+  >("norms", { headers }, file)
+
   if (status >= 400 || error) {
     if (status === 413) {
       return {

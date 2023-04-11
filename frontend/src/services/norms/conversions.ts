@@ -1,4 +1,12 @@
-import { MetadatumSchema, MetadataSectionSchema } from "./schemas"
+import dayjs from "dayjs"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
+import {
+  MetadatumSchema,
+  MetadataSectionSchema,
+  NormResponseSchema,
+  FlatMetadataRequestSchema,
+} from "./schemas"
 import {
   groupBy,
   mapValues,
@@ -13,7 +21,31 @@ import {
   Metadata,
   MetadataSections,
   MetadataValueType,
+  Norm,
+  FlatMetadata,
 } from "@/domain/Norm"
+
+function encodeString(data?: string | null): string | null {
+  return data && data.length > 0 ? data : null
+}
+
+function encodeBoolean(data?: boolean | null): boolean | null {
+  return data ?? null
+}
+
+// Makes the assumption that we currently get a date string in the following
+// format: `2022-11-14T23:00:00.000Z`. To comply with the expected date format
+// of the API, we only take the first 10 characters.
+//
+// TODO: Improve by working with enriched date type.
+function encodeDate(data?: string | null): string | null {
+  dayjs.extend(utc)
+  dayjs.extend(timezone)
+
+  return data && data.length > 0
+    ? dayjs(data).tz("Europe/Berlin").format("YYYY-MM-DD")
+    : null
+}
 
 type MetadataValueDecoders = {
   [Property in keyof MetadataValueType]: (
@@ -277,4 +309,156 @@ export function encodeMetadataSections(
   )
 
   return mergeValues(encodedMapping)
+}
+
+export function decodeNorm(norm: NormResponseSchema): Norm {
+  const { metadataSections, ...stableData } = norm
+  return {
+    metadataSections: decodeMetadataSections(metadataSections ?? []),
+    ...stableData,
+  }
+}
+
+export function encodeFlatMetadata(
+  flatMetadata: FlatMetadata
+): FlatMetadataRequestSchema {
+  return {
+    documentTemplateName: encodeString(flatMetadata.documentTemplateName),
+    ageIndicationEnd: encodeString(flatMetadata.ageIndicationEnd),
+    ageIndicationStart: encodeString(flatMetadata.ageIndicationStart),
+    announcementDate: encodeDate(flatMetadata.announcementDate),
+    applicationScopeArea: encodeString(flatMetadata.applicationScopeArea),
+    applicationScopeEndDate: encodeDate(flatMetadata.applicationScopeEndDate),
+    applicationScopeStartDate: encodeDate(
+      flatMetadata.applicationScopeStartDate
+    ),
+    categorizedReference: encodeString(flatMetadata.categorizedReference),
+    celexNumber: encodeString(flatMetadata.celexNumber),
+    citationDate: encodeDate(flatMetadata.citationDate),
+    citationYear: encodeString(flatMetadata.citationYear),
+    completeCitation: encodeString(flatMetadata.completeCitation),
+    digitalAnnouncementDate: encodeDate(flatMetadata.digitalAnnouncementDate),
+    digitalAnnouncementArea: encodeString(flatMetadata.digitalAnnouncementArea),
+    digitalAnnouncementAreaNumber: encodeString(
+      flatMetadata.digitalAnnouncementAreaNumber
+    ),
+    digitalAnnouncementEdition: encodeString(
+      flatMetadata.digitalAnnouncementEdition
+    ),
+    digitalAnnouncementExplanations: encodeString(
+      flatMetadata.digitalAnnouncementExplanations
+    ),
+    digitalAnnouncementInfo: encodeString(flatMetadata.digitalAnnouncementInfo),
+    digitalAnnouncementMedium: encodeString(
+      flatMetadata.digitalAnnouncementMedium
+    ),
+    digitalAnnouncementPage: encodeString(flatMetadata.digitalAnnouncementPage),
+    digitalAnnouncementYear: encodeString(flatMetadata.digitalAnnouncementYear),
+    digitalEvidenceAppendix: encodeString(flatMetadata.digitalEvidenceAppendix),
+    digitalEvidenceExternalDataNote: encodeString(
+      flatMetadata.digitalEvidenceExternalDataNote
+    ),
+    digitalEvidenceLink: encodeString(flatMetadata.digitalEvidenceLink),
+    digitalEvidenceRelatedData: encodeString(
+      flatMetadata.digitalEvidenceRelatedData
+    ),
+    divergentEntryIntoForceDate: encodeDate(
+      flatMetadata.divergentEntryIntoForceDate
+    ),
+    divergentEntryIntoForceDateState: encodeString(
+      flatMetadata.divergentEntryIntoForceDateState
+    ),
+    divergentExpirationDate: encodeDate(flatMetadata.divergentExpirationDate),
+    divergentExpirationDateState: encodeString(
+      flatMetadata.divergentExpirationDateState
+    ),
+    documentCategory: encodeString(flatMetadata.documentCategory),
+    documentNormCategory: encodeString(flatMetadata.documentNormCategory),
+    documentNumber: encodeString(flatMetadata.documentNumber),
+    documentStatusDate: encodeDate(flatMetadata.documentStatusDate),
+    documentStatusDescription: encodeString(
+      flatMetadata.documentStatusDescription
+    ),
+    documentStatusEntryIntoForceDate: encodeDate(
+      flatMetadata.documentStatusEntryIntoForceDate
+    ),
+    documentStatusProof: encodeString(flatMetadata.documentStatusProof),
+    documentStatusReference: encodeString(flatMetadata.documentStatusReference),
+    documentStatusWorkNote: encodeString(flatMetadata.documentStatusWorkNote),
+    documentTextProof: encodeString(flatMetadata.documentTextProof),
+    documentTypeName: encodeString(flatMetadata.documentTypeName),
+    entryIntoForceDate: encodeDate(flatMetadata.entryIntoForceDate),
+    entryIntoForceDateState: encodeString(flatMetadata.entryIntoForceDateState),
+    entryIntoForceNormCategory: encodeString(
+      flatMetadata.entryIntoForceNormCategory
+    ),
+    euAnnouncementExplanations: encodeString(
+      flatMetadata.euAnnouncementExplanations
+    ),
+    euAnnouncementGazette: encodeString(flatMetadata.euAnnouncementGazette),
+    euAnnouncementInfo: encodeString(flatMetadata.euAnnouncementInfo),
+    euAnnouncementNumber: encodeString(flatMetadata.euAnnouncementNumber),
+    euAnnouncementPage: encodeString(flatMetadata.euAnnouncementPage),
+    euAnnouncementSeries: encodeString(flatMetadata.euAnnouncementSeries),
+    euAnnouncementYear: encodeString(flatMetadata.euAnnouncementYear),
+    eli: encodeString(flatMetadata.eli),
+    expirationDate: encodeDate(flatMetadata.expirationDate),
+    expirationDateState: encodeString(flatMetadata.expirationDateState),
+    expirationNormCategory: encodeString(flatMetadata.expirationNormCategory),
+    isExpirationDateTemp: encodeBoolean(flatMetadata.isExpirationDateTemp),
+    officialAbbreviation: encodeString(flatMetadata.officialAbbreviation),
+    officialLongTitle: encodeString(flatMetadata.officialLongTitle) ?? "",
+    officialShortTitle: encodeString(flatMetadata.officialShortTitle),
+    otherDocumentNote: encodeString(flatMetadata.otherDocumentNote),
+    otherFootnote: encodeString(flatMetadata.otherFootnote),
+    footnoteChange: encodeString(flatMetadata.footnoteChange),
+    footnoteComment: encodeString(flatMetadata.footnoteComment),
+    footnoteDecision: encodeString(flatMetadata.footnoteDecision),
+    footnoteStateLaw: encodeString(flatMetadata.footnoteStateLaw),
+    footnoteEuLaw: encodeString(flatMetadata.footnoteEuLaw),
+    otherOfficialAnnouncement: encodeString(
+      flatMetadata.otherOfficialAnnouncement
+    ),
+    otherStatusNote: encodeString(flatMetadata.otherStatusNote),
+    principleEntryIntoForceDate: encodeDate(
+      flatMetadata.principleEntryIntoForceDate
+    ),
+    principleEntryIntoForceDateState: encodeString(
+      flatMetadata.principleEntryIntoForceDateState
+    ),
+    principleExpirationDate: encodeDate(flatMetadata.principleExpirationDate),
+    principleExpirationDateState: encodeString(
+      flatMetadata.principleExpirationDateState
+    ),
+    printAnnouncementExplanations: encodeString(
+      flatMetadata.printAnnouncementExplanations
+    ),
+    printAnnouncementGazette: encodeString(
+      flatMetadata.printAnnouncementGazette
+    ),
+    printAnnouncementInfo: encodeString(flatMetadata.printAnnouncementInfo),
+    printAnnouncementNumber: encodeString(flatMetadata.printAnnouncementNumber),
+    printAnnouncementPage: encodeString(flatMetadata.printAnnouncementPage),
+    printAnnouncementYear: encodeString(flatMetadata.printAnnouncementYear),
+    providerEntity: encodeString(flatMetadata.providerEntity),
+    providerDecidingBody: encodeString(flatMetadata.providerDecidingBody),
+    providerIsResolutionMajority: encodeBoolean(
+      flatMetadata.providerIsResolutionMajority
+    ),
+    publicationDate: encodeDate(flatMetadata.publicationDate),
+    reissueArticle: encodeString(flatMetadata.reissueArticle),
+    reissueDate: encodeDate(flatMetadata.reissueDate),
+    reissueNote: encodeString(flatMetadata.reissueNote),
+    reissueReference: encodeString(flatMetadata.reissueReference),
+    repealArticle: encodeString(flatMetadata.repealArticle),
+    repealDate: encodeDate(flatMetadata.repealDate),
+    repealNote: encodeString(flatMetadata.repealNote),
+    repealReferences: encodeString(flatMetadata.repealReferences),
+    risAbbreviation: encodeString(flatMetadata.risAbbreviation),
+    statusDate: encodeDate(flatMetadata.statusDate),
+    statusDescription: encodeString(flatMetadata.statusDescription),
+    statusNote: encodeString(flatMetadata.statusNote),
+    statusReference: encodeString(flatMetadata.statusReference),
+    text: encodeString(flatMetadata.text),
+  }
 }

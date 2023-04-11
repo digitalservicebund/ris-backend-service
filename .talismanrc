@@ -24,3 +24,4 @@ allowed_patterns:
   - https://github.com/jk1/Gradle-License-Report/blob/7cf695c38126b63ef9e907345adab84dfa92ea0e/src/main/resources/default-license-normalizer-bundle.json
   - paketobuildpacks/builder@sha256:367c3da5ae0a3caeb12e7e5bc317cb0b21e700c7f7bbb29204f70151cb5d8e66
 threshold: medium
+  - KEYWORD

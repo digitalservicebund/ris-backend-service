@@ -205,22 +205,18 @@ export function generateMetadataSections(
   return sections
 }
 
+export function generateFlatMetadata(
+  partialFlatMetadata?: Partial<FlatMetadata>
+): FlatMetadata {
   return {
-    guid: generateGuid(),
-    articles: [generateArticle()],
     documentTemplateName: generateString(),
-    leadUnit: generateString(),
-    participationInstitution: generateString(),
-    subjectBgb3: generateString(),
     ageIndicationEnd: generateString(),
     ageIndicationStart: generateString(),
-    ageOfMajorityIndication: [generateString(), generateString()],
     announcementDate: generateString(),
     categorizedReference: generateString(),
     celexNumber: generateString(),
     citationDate: generateString(),
     completeCitation: generateString(),
-    definition: [generateString(), generateString()],
     digitalAnnouncementDate: generateString(),
     digitalAnnouncementArea: generateString(),
     digitalAnnouncementAreaNumber: generateString(),
@@ -234,7 +230,6 @@ export function generateMetadataSections(
     digitalEvidenceExternalDataNote: generateString(),
     digitalEvidenceLink: generateString(),
     digitalEvidenceRelatedData: generateString(),
-    divergentDocumentNumber: [generateString(), generateString()],
     divergentEntryIntoForceDate: generateString(),
     divergentEntryIntoForceDateState: generateString(),
     divergentExpirationDate: generateString(),
@@ -263,9 +258,7 @@ export function generateMetadataSections(
     expirationDate: generateString(),
     expirationDateState: generateString(),
     expirationNormCategory: generateString(),
-    frameKeywords: [generateString(), generateString()],
     isExpirationDateTemp: false,
-    leadJurisdiction: generateString(),
     officialAbbreviation: generateString(),
     officialLongTitle: generateString(),
     officialShortTitle: generateString(),
@@ -278,7 +271,6 @@ export function generateMetadataSections(
     footnoteEuLaw: generateString(),
     otherOfficialAnnouncement: generateString(),
     otherStatusNote: generateString(),
-    participationType: generateString(),
     principleEntryIntoForceDate: generateString(),
     principleEntryIntoForceDateState: generateString(),
     principleExpirationDate: generateString(),
@@ -293,7 +285,6 @@ export function generateMetadataSections(
     providerDecidingBody: generateString(),
     providerIsResolutionMajority: false,
     publicationDate: generateString(),
-    referenceNumber: [generateString(), generateString()],
     reissueArticle: generateString(),
     reissueDate: generateString(),
     reissueNote: generateString(),
@@ -303,20 +294,21 @@ export function generateMetadataSections(
     repealNote: generateString(),
     repealReferences: generateString(),
     risAbbreviation: generateString(),
-    risAbbreviationInternationalLaw: [generateString(), generateString()],
     statusDate: generateString(),
     statusDescription: generateString(),
     statusNote: generateString(),
     statusReference: generateString(),
-    subjectFna: generateString(),
-    subjectGesta: generateString(),
-    subjectPreviousFna: generateString(),
     text: generateString(),
-    unofficialAbbreviation: [generateString(), generateString()],
-    unofficialLongTitle: [generateString(), generateString()],
-    unofficialReference: [generateString(), generateString()],
-    unofficialShortTitle: [generateString(), generateString()],
-    validityRule: [generateString(), generateString()],
+    ...partialFlatMetadata,
+  }
+}
+
+export function generateNorm(partialNorm?: Partial<Norm>): Norm {
+  return {
+    guid: generateGuid(),
+    articles: [generateArticle()],
+    metadataSections: generateMetadataSections(),
+    ...generateFlatMetadata(),
     ...partialNorm,
   }
 }

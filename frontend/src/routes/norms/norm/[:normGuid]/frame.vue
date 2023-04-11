@@ -4,15 +4,17 @@ import { computed, toRefs } from "vue"
 import { useRoute } from "vue-router"
 import CitationDateInput from "@/components/CitationDateInput.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
+import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
+import LeadInputGroup from "@/components/LeadInputGroup.vue"
+import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
+import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { FrameData } from "@/domain/Norm"
+import { Metadata, MetadataSections } from "@/domain/Norm"
 import { ageIndication } from "@/fields/norms/ageIndication"
-import { ageOfMajorityIndication } from "@/fields/norms/ageOfMajorityIndication"
 import { announcementDate } from "@/fields/norms/announcementDate"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { celexNumber } from "@/fields/norms/celexNumber"
 import { completeCitation } from "@/fields/norms/completeCitation"
-import { definition } from "@/fields/norms/definition"
 import { digitalAnnouncement } from "@/fields/norms/digitalAnnouncement"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
@@ -25,31 +27,24 @@ import { expiration } from "@/fields/norms/expiration"
 import { generalData } from "@/fields/norms/generalData"
 import { headingsAndAbbreviations } from "@/fields/norms/headingsAndAbbreviations"
 import { headingsAndAbbreviationsUnofficial } from "@/fields/norms/headingsAndAbbreviationsUnofficial"
-import { lead } from "@/fields/norms/lead"
 import { normProvider } from "@/fields/norms/normProvider"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
 import { otherOfficialReferences } from "@/fields/norms/otherOfficialReferences"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
-import { participatingInstitutions } from "@/fields/norms/participatingInstitutions"
 import { printAnnouncement } from "@/fields/norms/printAnnouncement"
-import { referenceNumber } from "@/fields/norms/referenceNumber"
 import { reissue } from "@/fields/norms/reissue"
 import { repeal } from "@/fields/norms/repeal"
 import { status } from "@/fields/norms/status"
-import { subjectArea } from "@/fields/norms/subjectArea"
 import { text } from "@/fields/norms/text"
 import { unofficialReference } from "@/fields/norms/unofficialReference"
-import { validityRule } from "@/fields/norms/validityRule"
+import EditableList from "@/shared/components/EditableList.vue"
+import ChipsInput from "@/shared/components/input/ChipsInput.vue"
+import InputField from "@/shared/components/input/InputField.vue"
 import InputGroup from "@/shared/components/input/InputGroup.vue"
 import SaveButton from "@/shared/components/input/SaveButton.vue"
+import { ModelType } from "@/shared/components/input/types"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
-import {
-  applyToFrameData,
-  getFrameDataFromNorm,
-  NullableBoolean,
-  NullableString,
-} from "@/utilities/normUtilities"
 
 const route = useRoute()
 const { hash: routeHash } = toRefs(route)
@@ -57,158 +52,192 @@ useScrollToHash(routeHash)
 
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
-const convertToEmptyString = (value: NullableString) => {
-  return value === undefined ? "" : value
-}
-const convertToFalse = (value: NullableBoolean) => {
-  return value === undefined ? false : value
-}
 
-const frameData = computed({
+const metadataSections = computed({
+  get: () => loadedNorm.value?.metadataSections ?? {},
+  set: (sections: MetadataSections) =>
+    loadedNorm.value && (loadedNorm.value.metadataSections = sections),
+})
+
+const normSection = computed({
+  get: () => metadataSections.value.NORM?.[0] ?? {},
+  set: (section: Metadata) => (metadataSections.value.NORM = [section]),
+})
+
+const flatMetadata = computed({
   get: () => {
-    return applyToFrameData(
-      loadedNorm.value ? getFrameDataFromNorm(loadedNorm.value) : undefined,
-      convertToEmptyString,
-      convertToFalse,
-      convertToEmptyString
-    ) as FrameData
+    const { guid, articles, files, metadataSections, ...flatMetadata } =
+      loadedNorm.value ?? {}
+
+    return {
+      ...flatMetadata,
+      // Intermediate metadata that is still mixed and used in `InputGroup`s.
+      frameKeywords: normSection.value.KEYWORD,
+      unofficialShortTitle: normSection.value.UNOFFICIAL_SHORT_TITLE,
+      unofficialReference: normSection.value.UNOFFICIAL_REFERENCE,
+      unofficialLongTitle: normSection.value.UNOFFICIAL_LONG_TITLE,
+      unofficialAbbreviation: normSection.value.UNOFFICIAL_ABBREVIATION,
+      risAbbreviationInternationalLaw:
+        normSection.value.RIS_ABBREVIATION_INTERNATIONAL_LAW,
+      divergentDocumentNumber: normSection.value.DIVERGENT_DOCUMENT_NUMBER,
+    } as Record<string, ModelType>
   },
-  set: (data: FrameData) => {
+  set: (data: Record<string, ModelType>) => {
     if (loadedNorm.value !== undefined) {
-      loadedNorm.value.documentTemplateName = data.documentTemplateName
-      loadedNorm.value.leadUnit = data.leadUnit
-      loadedNorm.value.participationInstitution = data.participationInstitution
-      loadedNorm.value.subjectBgb3 = data.subjectBgb3
-      loadedNorm.value.ageIndicationEnd = data.ageIndicationEnd
-      loadedNorm.value.ageIndicationStart = data.ageIndicationStart
-      loadedNorm.value.ageOfMajorityIndication = data.ageOfMajorityIndication
-      loadedNorm.value.announcementDate = data.announcementDate
-      loadedNorm.value.applicationScopeArea = data.applicationScopeArea
-      loadedNorm.value.applicationScopeEndDate = data.applicationScopeEndDate
+      loadedNorm.value.documentTemplateName =
+        data.documentTemplateName as string
+      loadedNorm.value.ageIndicationEnd = data.ageIndicationEnd as string
+      loadedNorm.value.ageIndicationStart = data.ageIndicationStart as string
+      loadedNorm.value.announcementDate = data.announcementDate as string
+      loadedNorm.value.applicationScopeArea =
+        data.applicationScopeArea as string
+      loadedNorm.value.applicationScopeEndDate =
+        data.applicationScopeEndDate as string
       loadedNorm.value.applicationScopeStartDate =
-        data.applicationScopeStartDate
-      loadedNorm.value.categorizedReference = data.categorizedReference
-      loadedNorm.value.celexNumber = data.celexNumber
-      loadedNorm.value.citationDate = data.citationDate
-      loadedNorm.value.completeCitation = data.completeCitation
-      loadedNorm.value.definition = data.definition
-      loadedNorm.value.digitalAnnouncementDate = data.digitalAnnouncementDate
-      loadedNorm.value.digitalAnnouncementArea = data.digitalAnnouncementArea
+        data.applicationScopeStartDate as string
+      loadedNorm.value.categorizedReference =
+        data.categorizedReference as string
+      loadedNorm.value.celexNumber = data.celexNumber as string
+      loadedNorm.value.citationDate = data.citationDate as string
+      loadedNorm.value.completeCitation = data.completeCitation as string
+      loadedNorm.value.digitalAnnouncementDate =
+        data.digitalAnnouncementDate as string
+      loadedNorm.value.digitalAnnouncementArea =
+        data.digitalAnnouncementArea as string
       loadedNorm.value.digitalAnnouncementAreaNumber =
-        data.digitalAnnouncementAreaNumber
+        data.digitalAnnouncementAreaNumber as string
       loadedNorm.value.digitalAnnouncementEdition =
-        data.digitalAnnouncementEdition
+        data.digitalAnnouncementEdition as string
       loadedNorm.value.digitalAnnouncementExplanations =
-        data.digitalAnnouncementExplanations
-      loadedNorm.value.digitalAnnouncementInfo = data.digitalAnnouncementInfo
+        data.digitalAnnouncementExplanations as string
+      loadedNorm.value.digitalAnnouncementInfo =
+        data.digitalAnnouncementInfo as string
       loadedNorm.value.digitalAnnouncementMedium =
-        data.digitalAnnouncementMedium
-      loadedNorm.value.digitalAnnouncementPage = data.digitalAnnouncementPage
-      loadedNorm.value.digitalAnnouncementYear = data.digitalAnnouncementYear
-      loadedNorm.value.digitalEvidenceAppendix = data.digitalEvidenceAppendix
+        data.digitalAnnouncementMedium as string
+      loadedNorm.value.digitalAnnouncementPage =
+        data.digitalAnnouncementPage as string
+      loadedNorm.value.digitalAnnouncementYear =
+        data.digitalAnnouncementYear as string
+      loadedNorm.value.digitalEvidenceAppendix =
+        data.digitalEvidenceAppendix as string
       loadedNorm.value.digitalEvidenceExternalDataNote =
-        data.digitalEvidenceExternalDataNote
-      loadedNorm.value.digitalEvidenceLink = data.digitalEvidenceLink
+        data.digitalEvidenceExternalDataNote as string
+      loadedNorm.value.digitalEvidenceLink = data.digitalEvidenceLink as string
       loadedNorm.value.digitalEvidenceRelatedData =
-        data.digitalEvidenceRelatedData
-      loadedNorm.value.divergentDocumentNumber = data.divergentDocumentNumber
+        data.digitalEvidenceRelatedData as string
       loadedNorm.value.divergentEntryIntoForceDate =
-        data.divergentEntryIntoForceDate
+        data.divergentEntryIntoForceDate as string
       loadedNorm.value.divergentEntryIntoForceDateState =
-        data.divergentEntryIntoForceDateState
-      loadedNorm.value.divergentExpirationDate = data.divergentExpirationDate
+        data.divergentEntryIntoForceDateState as string
+      loadedNorm.value.divergentExpirationDate =
+        data.divergentExpirationDate as string
       loadedNorm.value.divergentExpirationDateState =
-        data.divergentExpirationDateState
-      loadedNorm.value.documentCategory = data.documentCategory
-      loadedNorm.value.documentNormCategory = data.documentNormCategory
-      loadedNorm.value.documentNumber = data.documentNumber
-      loadedNorm.value.documentStatusDate = data.documentStatusDate
+        data.divergentExpirationDateState as string
+      loadedNorm.value.documentNormCategory =
+        data.documentNormCategory as string
+      loadedNorm.value.documentStatusDate = data.documentStatusDate as string
       loadedNorm.value.documentStatusDescription =
-        data.documentStatusDescription
+        data.documentStatusDescription as string
       loadedNorm.value.documentStatusEntryIntoForceDate =
-        data.documentStatusEntryIntoForceDate
-      loadedNorm.value.documentStatusProof = data.documentStatusProof
-      loadedNorm.value.documentStatusReference = data.documentStatusReference
-      loadedNorm.value.documentStatusWorkNote = data.documentStatusWorkNote
-      loadedNorm.value.documentTextProof = data.documentTextProof
-      loadedNorm.value.documentTypeName = data.documentTypeName
-      loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate
-      loadedNorm.value.entryIntoForceDateState = data.entryIntoForceDateState
+        data.documentStatusEntryIntoForceDate as string
+      loadedNorm.value.documentStatusProof = data.documentStatusProof as string
+      loadedNorm.value.documentStatusReference =
+        data.documentStatusReference as string
+      loadedNorm.value.documentStatusWorkNote =
+        data.documentStatusWorkNote as string
+      loadedNorm.value.documentTextProof = data.documentTextProof as string
+      loadedNorm.value.documentTypeName = data.documentTypeName as string
+      loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate as string
+      loadedNorm.value.entryIntoForceDateState =
+        data.entryIntoForceDateState as string
       loadedNorm.value.entryIntoForceNormCategory =
-        data.entryIntoForceNormCategory
+        data.entryIntoForceNormCategory as string
       loadedNorm.value.euAnnouncementExplanations =
-        data.euAnnouncementExplanations
-      loadedNorm.value.euAnnouncementGazette = data.euAnnouncementGazette
-      loadedNorm.value.euAnnouncementInfo = data.euAnnouncementInfo
-      loadedNorm.value.euAnnouncementNumber = data.euAnnouncementNumber
-      loadedNorm.value.euAnnouncementPage = data.euAnnouncementPage
-      loadedNorm.value.euAnnouncementSeries = data.euAnnouncementSeries
-      loadedNorm.value.euAnnouncementYear = data.euAnnouncementYear
-      loadedNorm.value.eli = data.eli
-      loadedNorm.value.expirationDate = data.expirationDate
-      loadedNorm.value.expirationDateState = data.expirationDateState
-      loadedNorm.value.expirationNormCategory = data.expirationNormCategory
-      loadedNorm.value.frameKeywords = data.frameKeywords
-      loadedNorm.value.isExpirationDateTemp = data.isExpirationDateTemp
-      loadedNorm.value.leadJurisdiction = data.leadJurisdiction
-      loadedNorm.value.officialAbbreviation = data.officialAbbreviation
-      loadedNorm.value.officialLongTitle = data.officialLongTitle
-      loadedNorm.value.officialShortTitle = data.officialShortTitle
-      loadedNorm.value.otherDocumentNote = data.otherDocumentNote
-      loadedNorm.value.otherFootnote = data.otherFootnote
-      loadedNorm.value.footnoteChange = data.footnoteChange
-      loadedNorm.value.footnoteComment = data.footnoteComment
-      loadedNorm.value.footnoteDecision = data.footnoteDecision
-      loadedNorm.value.footnoteStateLaw = data.footnoteStateLaw
-      loadedNorm.value.footnoteEuLaw = data.footnoteEuLaw
+        data.euAnnouncementExplanations as string
+      loadedNorm.value.euAnnouncementGazette =
+        data.euAnnouncementGazette as string
+      loadedNorm.value.euAnnouncementInfo = data.euAnnouncementInfo as string
+      loadedNorm.value.euAnnouncementNumber =
+        data.euAnnouncementNumber as string
+      loadedNorm.value.euAnnouncementPage = data.euAnnouncementPage as string
+      loadedNorm.value.euAnnouncementSeries =
+        data.euAnnouncementSeries as string
+      loadedNorm.value.euAnnouncementYear = data.euAnnouncementYear as string
+      loadedNorm.value.eli = data.eli as string
+      loadedNorm.value.expirationDate = data.expirationDate as string
+      loadedNorm.value.expirationDateState = data.expirationDateState as string
+      loadedNorm.value.expirationNormCategory =
+        data.expirationNormCategory as string
+      loadedNorm.value.isExpirationDateTemp =
+        data.isExpirationDateTemp as boolean
+      loadedNorm.value.officialAbbreviation =
+        data.officialAbbreviation as string
+      loadedNorm.value.officialLongTitle = data.officialLongTitle as string
+      loadedNorm.value.officialShortTitle = data.officialShortTitle as string
+      loadedNorm.value.otherDocumentNote = data.otherDocumentNote as string
+      loadedNorm.value.otherFootnote = data.otherFootnote as string
+      loadedNorm.value.footnoteChange = data.footnoteChange as string
+      loadedNorm.value.footnoteComment = data.footnoteComment as string
+      loadedNorm.value.footnoteDecision = data.footnoteDecision as string
+      loadedNorm.value.footnoteStateLaw = data.footnoteStateLaw as string
+      loadedNorm.value.footnoteEuLaw = data.footnoteEuLaw as string
       loadedNorm.value.otherOfficialAnnouncement =
-        data.otherOfficialAnnouncement
-      loadedNorm.value.otherStatusNote = data.otherStatusNote
-      loadedNorm.value.participationType = data.participationType
+        data.otherOfficialAnnouncement as string
+      loadedNorm.value.otherStatusNote = data.otherStatusNote as string
       loadedNorm.value.principleEntryIntoForceDate =
-        data.principleEntryIntoForceDate
+        data.principleEntryIntoForceDate as string
       loadedNorm.value.principleEntryIntoForceDateState =
-        data.principleEntryIntoForceDateState
-      loadedNorm.value.principleExpirationDate = data.principleExpirationDate
+        data.principleEntryIntoForceDateState as string
+      loadedNorm.value.principleExpirationDate =
+        data.principleExpirationDate as string
       loadedNorm.value.principleExpirationDateState =
-        data.principleExpirationDateState
+        data.principleExpirationDateState as string
       loadedNorm.value.printAnnouncementExplanations =
-        data.printAnnouncementExplanations
-      loadedNorm.value.printAnnouncementGazette = data.printAnnouncementGazette
-      loadedNorm.value.printAnnouncementInfo = data.printAnnouncementInfo
-      loadedNorm.value.printAnnouncementNumber = data.printAnnouncementNumber
-      loadedNorm.value.printAnnouncementPage = data.printAnnouncementPage
-      loadedNorm.value.printAnnouncementYear = data.printAnnouncementYear
-      loadedNorm.value.providerEntity = data.providerEntity
-      loadedNorm.value.providerDecidingBody = data.providerDecidingBody
+        data.printAnnouncementExplanations as string
+      loadedNorm.value.printAnnouncementGazette =
+        data.printAnnouncementGazette as string
+      loadedNorm.value.printAnnouncementInfo =
+        data.printAnnouncementInfo as string
+      loadedNorm.value.printAnnouncementNumber =
+        data.printAnnouncementNumber as string
+      loadedNorm.value.printAnnouncementPage =
+        data.printAnnouncementPage as string
+      loadedNorm.value.printAnnouncementYear =
+        data.printAnnouncementYear as string
+      loadedNorm.value.providerEntity = data.providerEntity as string
+      loadedNorm.value.providerDecidingBody =
+        data.providerDecidingBody as string
       loadedNorm.value.providerIsResolutionMajority =
-        data.providerIsResolutionMajority
-      loadedNorm.value.publicationDate = data.publicationDate
-      loadedNorm.value.referenceNumber = data.referenceNumber
-      loadedNorm.value.reissueArticle = data.reissueArticle
-      loadedNorm.value.reissueDate = data.reissueDate
-      loadedNorm.value.reissueNote = data.reissueNote
-      loadedNorm.value.reissueReference = data.reissueReference
-      loadedNorm.value.repealArticle = data.repealArticle
-      loadedNorm.value.repealDate = data.repealDate
-      loadedNorm.value.repealNote = data.repealNote
-      loadedNorm.value.repealReferences = data.repealReferences
-      loadedNorm.value.risAbbreviation = data.risAbbreviation
-      loadedNorm.value.risAbbreviationInternationalLaw =
-        data.risAbbreviationInternationalLaw
-      loadedNorm.value.statusDate = data.statusDate
-      loadedNorm.value.statusDescription = data.statusDescription
-      loadedNorm.value.statusNote = data.statusNote
-      loadedNorm.value.statusReference = data.statusReference
-      loadedNorm.value.subjectFna = data.subjectFna
-      loadedNorm.value.subjectGesta = data.subjectGesta
-      loadedNorm.value.subjectPreviousFna = data.subjectPreviousFna
-      loadedNorm.value.text = data.text
-      loadedNorm.value.unofficialAbbreviation = data.unofficialAbbreviation
-      loadedNorm.value.unofficialLongTitle = data.unofficialLongTitle
-      loadedNorm.value.unofficialReference = data.unofficialReference
-      loadedNorm.value.unofficialShortTitle = data.unofficialShortTitle
-      loadedNorm.value.validityRule = data.validityRule
+        data.providerIsResolutionMajority as boolean
+      loadedNorm.value.publicationDate = data.publicationDate as string
+      loadedNorm.value.reissueArticle = data.reissueArticle as string
+      loadedNorm.value.reissueDate = data.reissueDate as string
+      loadedNorm.value.reissueNote = data.reissueNote as string
+      loadedNorm.value.reissueReference = data.reissueReference as string
+      loadedNorm.value.repealArticle = data.repealArticle as string
+      loadedNorm.value.repealDate = data.repealDate as string
+      loadedNorm.value.repealNote = data.repealNote as string
+      loadedNorm.value.repealReferences = data.repealReferences as string
+      loadedNorm.value.statusDate = data.statusDate as string
+      loadedNorm.value.statusDescription = data.statusDescription as string
+      loadedNorm.value.statusNote = data.statusNote as string
+      loadedNorm.value.statusReference = data.statusReference as string
+      loadedNorm.value.text = data.text as string
+
+      // Intermediate metadata that is still mixed and used in `InputGroup`s.
+      normSection.value.KEYWORD = data.frameKeywords as string[]
+      normSection.value.UNOFFICIAL_SHORT_TITLE =
+        data.unofficialShortTitle as string[]
+      normSection.value.UNOFFICIAL_REFERENCE =
+        data.unofficialReference as string[]
+      normSection.value.UNOFFICIAL_LONG_TITLE =
+        data.unofficialLongTitle as string[]
+      normSection.value.UNOFFICIAL_ABBREVIATION =
+        data.unofficialAbbreviation as string[]
+      normSection.value.RIS_ABBREVIATION_INTERNATIONAL_LAW =
+        data.bbreviationInternationalLaw as string[]
+      normSection.value.DIVERGENT_DOCUMENT_NUMBER =
+        data.divergentDocumentNumber as string[]
     }
   },
 })
@@ -236,7 +265,11 @@ const citationData = computed({
       <legend id="generalDataFields" class="heading-02-regular mb-[1rem]">
         Allgemeine Angaben
       </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="generalData" />
+      <InputGroup
+        v-model="flatMetadata"
+        :column-count="1"
+        :fields="generalData"
+      />
     </fieldset>
 
     <fieldset>
@@ -244,7 +277,7 @@ const citationData = computed({
         Dokumenttyp
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="documentType"
       />
@@ -255,39 +288,50 @@ const citationData = computed({
         Normgeber
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="normProvider"
       />
     </fieldset>
 
-    <fieldset>
-      <legend
-        id="participatingInstitutionsFields"
-        class="heading-02-regular mb-[1rem]"
-      >
-        Mitwirkende Organe
-      </legend>
-      <InputGroup
-        v-model="frameData"
-        :column-count="1"
-        :fields="participatingInstitutions"
+    <ExpandableDataSet
+      id="participatingInstitutionsFields"
+      class="mt-40"
+      :data-set="metadataSections.PARTICIPATION"
+      title="Mitwirkende Organe"
+    >
+      <EditableList
+        v-model="metadataSections.PARTICIPATION"
+        :default-value="{}"
+        :edit-component="ParticipatingInstitutionInputGroup"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
-    <fieldset>
-      <legend id="leadFields" class="heading-02-regular mb-[1rem]">
-        Federführung
-      </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="lead" />
-    </fieldset>
+    <ExpandableDataSet
+      id="leadFields"
+      class="-mt-40"
+      :data-set="metadataSections.LEAD"
+      title="Federführung"
+    >
+      <EditableList
+        v-model="metadataSections.LEAD"
+        :default-value="{}"
+        :edit-component="LeadInputGroup"
+      />
+    </ExpandableDataSet>
 
-    <fieldset>
-      <legend id="subjectAreaFields" class="heading-02-regular mb-[1rem]">
-        Sachgebiet
-      </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="subjectArea" />
-    </fieldset>
+    <ExpandableDataSet
+      id="subjectAreaFields"
+      class="-mt-40"
+      :data-set="metadataSections.SUBJECT_AREA"
+      title="Sachgebiet"
+    >
+      <EditableList
+        v-model="metadataSections.SUBJECT_AREA"
+        :default-value="{}"
+        :edit-component="SubjectAreaInputGroup"
+      />
+    </ExpandableDataSet>
 
     <fieldset>
       <legend
@@ -297,7 +341,7 @@ const citationData = computed({
         Überschriften und Abkürzungen
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="headingsAndAbbreviations"
       />
@@ -313,7 +357,7 @@ const citationData = computed({
         </h2>
       </template>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="headingsAndAbbreviationsUnofficial"
       />
@@ -324,7 +368,7 @@ const citationData = computed({
         Inkrafttreten
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="entryIntoForce"
       />
@@ -334,7 +378,11 @@ const citationData = computed({
       <legend id="expirationFields" class="heading-02-regular mb-[1rem]">
         Außerkrafttreten
       </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="expiration" />
+      <InputGroup
+        v-model="flatMetadata"
+        :column-count="1"
+        :fields="expiration"
+      />
     </fieldset>
 
     <fieldset>
@@ -342,7 +390,7 @@ const citationData = computed({
         Verkündungsdatum
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="announcementDate"
       />
@@ -363,7 +411,7 @@ const citationData = computed({
         Papierverkündung
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="printAnnouncement"
       />
@@ -377,7 +425,7 @@ const citationData = computed({
         Elektronisches Verkündungsblatt
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="digitalAnnouncement"
       />
@@ -388,7 +436,7 @@ const citationData = computed({
         Amtsblatt der EU
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="euAnnouncement"
       />
@@ -401,7 +449,7 @@ const citationData = computed({
         Sonstige amtliche Fundstelle
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="otherOfficialReferences"
       />
@@ -415,7 +463,7 @@ const citationData = computed({
         Nichtamtliche Fundstelle
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="unofficialReference"
       />
@@ -426,7 +474,7 @@ const citationData = computed({
         Vollzitat
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="completeCitation"
       />
@@ -439,26 +487,26 @@ const citationData = computed({
       <legend id="statusFields" class="heading-03-regular mb-[1rem]">
         Stand
       </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="status" />
+      <InputGroup v-model="flatMetadata" :column-count="1" :fields="status" />
     </fieldset>
     <fieldset>
       <legend id="repealFields" class="heading-03-regular mb-[1rem]">
         Aufhebung
       </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="repeal" />
+      <InputGroup v-model="flatMetadata" :column-count="1" :fields="repeal" />
     </fieldset>
     <fieldset>
       <legend id="reissueFields" class="heading-03-regular mb-[1rem]">
         Neufassung
       </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="reissue" />
+      <InputGroup v-model="flatMetadata" :column-count="1" :fields="reissue" />
     </fieldset>
     <fieldset>
       <legend id="otherStatusNoteFields" class="heading-03-regular mb-[1rem]">
         Sonstiger Hinweis
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="otherStatusNote"
       />
@@ -475,7 +523,7 @@ const citationData = computed({
         Stand der dokumentarischen Bearbeitung
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="documentStatus"
       />
@@ -485,7 +533,7 @@ const citationData = computed({
         Textnachweis
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="documentTextProof"
       />
@@ -495,7 +543,7 @@ const citationData = computed({
         Sonstiger Hinweis
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="otherDocumentNote"
       />
@@ -509,7 +557,7 @@ const citationData = computed({
         Aktivverweisung
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="categorizedReference"
       />
@@ -520,21 +568,28 @@ const citationData = computed({
         Fußnote
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="otherFootnote"
       />
     </fieldset>
 
-    <fieldset>
+    <fieldset class="mb-40">
       <legend id="validityRuleFields" class="heading-02-regular mb-[1rem]">
         Gültigkeitsregelung
       </legend>
-      <InputGroup
-        v-model="frameData"
-        :column-count="1"
-        :fields="validityRule"
-      />
+
+      <InputField
+        id="validityRule"
+        aria-label="Gültigkeitsregelung"
+        label="Gültigkeitsregelung"
+      >
+        <ChipsInput
+          id="validityRyle"
+          v-model="normSection.VALIDITY_RULE"
+          aria-label="Gültigkeitsregelung"
+        />
+      </InputField>
     </fieldset>
 
     <fieldset>
@@ -542,33 +597,44 @@ const citationData = computed({
         Elektronischer Nachweis
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="digitalEvidence"
       />
     </fieldset>
 
-    <fieldset>
+    <fieldset class="mb-40">
       <legend id="referenceNumberFields" class="heading-02-regular mb-[1rem]">
         Aktenzeichen
       </legend>
-      <InputGroup
-        v-model="frameData"
-        :column-count="1"
-        :fields="referenceNumber"
-      />
+
+      <InputField
+        id="referenceNumber"
+        aria-label="Aktenzeichen"
+        label="Aktenzeichen"
+      >
+        <ChipsInput
+          id="referenceNumber"
+          v-model="normSection.REFERENCE_NUMBER"
+          aria-label="Aktenzeichen"
+        />
+      </InputField>
     </fieldset>
 
     <fieldset>
       <legend id="eliFields" class="heading-02-regular mb-[1rem]">ELI</legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="eli" />
+      <InputGroup v-model="flatMetadata" :column-count="1" :fields="eli" />
     </fieldset>
 
     <fieldset>
       <legend id="celexNumberFields" class="heading-02-regular mb-[1rem]">
         CELEX-Nummer
       </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="celexNumber" />
+      <InputGroup
+        v-model="flatMetadata"
+        :column-count="1"
+        :fields="celexNumber"
+      />
     </fieldset>
 
     <fieldset>
@@ -576,36 +642,50 @@ const citationData = computed({
         Altersangabe
       </legend>
       <InputGroup
-        v-model="frameData"
+        v-model="flatMetadata"
         :column-count="1"
         :fields="ageIndication"
       />
     </fieldset>
 
-    <fieldset>
+    <fieldset class="mb-40">
       <legend id="definitionFields" class="heading-02-regular mb-[1rem]">
         Definition
       </legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="definition" />
+
+      <InputField id="definition" aria-label="Definition" label="Definition">
+        <ChipsInput
+          id="definition"
+          v-model="normSection.DEFINITION"
+          aria-label="Definition"
+        />
+      </InputField>
     </fieldset>
 
-    <fieldset>
+    <fieldset class="mb-40">
       <legend
         id="ageOfMajorityIndicationFields"
         class="heading-02-regular mb-[1rem]"
       >
         Angaben zur Volljährigkeit
       </legend>
-      <InputGroup
-        v-model="frameData"
-        :column-count="1"
-        :fields="ageOfMajorityIndication"
-      />
+
+      <InputField
+        id="ageOfMajorityIndication"
+        aria-label="Angaben zur Volljährigkeit"
+        label="Angaben zur Volljährigkeit"
+      >
+        <ChipsInput
+          id="ageOfMajorityIndication"
+          v-model="normSection.AGE_OF_MAJORITY_INDICATION"
+          aria-label="Angaben zur Volljährigkeit"
+        />
+      </InputField>
     </fieldset>
 
     <fieldset>
       <legend id="textFields" class="heading-02-regular mb-[1rem]">Text</legend>
-      <InputGroup v-model="frameData" :column-count="1" :fields="text" />
+      <InputGroup v-model="flatMetadata" :column-count="1" :fields="text" />
     </fieldset>
 
     <SaveButton
