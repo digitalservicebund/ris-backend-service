@@ -53,7 +53,11 @@ const entryIntoForceInfo = computed(() => {
 
 const propertyInfos = computed(() => [
   { label: "Fundstelle", value: announcementInfo.value },
-  { label: "FNA", value: loadedNorm.value?.subjectFna },
+  {
+    label: "FNA",
+    value:
+      loadedNorm.value?.metadataSections?.SUBJECT_AREA?.[0]?.SUBJECT_FNA?.[0],
+  },
   { label: "Inkrafttreten", value: entryIntoForceInfo.value },
 ])
 

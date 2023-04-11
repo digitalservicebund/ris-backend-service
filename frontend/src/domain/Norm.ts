@@ -1,5 +1,11 @@
-type NullableType<Type> = {
-  [Property in keyof Type]: Type[Property] | null
+export interface Norm extends NormBase, FlatMetadata {
+  metadataSections?: MetadataSections
+}
+
+export interface NormBase {
+  readonly guid: string
+  readonly articles: Article[]
+  readonly files?: FileReference[]
 }
 
 export type Article = {
@@ -15,7 +21,12 @@ export type Paragraph = {
   text: string
 }
 
-export type NullableFrameData = NullableType<FrameData>
+export interface FileReference {
+  readonly name: string
+  readonly hash: string
+  readonly createdAt: string
+}
+
 export enum MetadatumType {
   KEYWORD = "KEYWORD",
   UNOFFICIAL_LONG_TITLE = "UNOFFICIAL_LONG_TITLE",
@@ -75,10 +86,9 @@ export enum MetadataSectionName {
 export type MetadataSections = {
   [Name in MetadataSectionName]?: (Metadata & MetadataSections)[] | undefined
 }
+
+export type FlatMetadata = {
   documentTemplateName?: string
-  leadUnit?: string
-  participationInstitution?: string
-  subjectBgb3?: string
   ageIndicationEnd?: string
   ageIndicationStart?: string
   announcementDate?: string
@@ -133,7 +143,6 @@ export type MetadataSections = {
   expirationDateState?: string
   expirationNormCategory?: string
   isExpirationDateTemp?: boolean
-  leadJurisdiction?: string
   officialAbbreviation?: string
   officialLongTitle: string
   officialShortTitle?: string
@@ -146,7 +155,6 @@ export type MetadataSections = {
   footnoteEuLaw?: string
   otherOfficialAnnouncement?: string
   otherStatusNote?: string
-  participationType?: string
   principleEntryIntoForceDate?: string
   principleEntryIntoForceDateState?: string
   principleExpirationDate?: string
@@ -174,65 +182,5 @@ export type MetadataSections = {
   statusDescription?: string
   statusNote?: string
   statusReference?: string
-  subjectFna?: string
-  subjectGesta?: string
-  subjectPreviousFna?: string
   text?: string
-}
-
-export type FrameData = NormBase & {
-  frameKeywords?: string[]
-  validityRule?: string[]
-  unofficialShortTitle?: string[]
-  unofficialReference?: string[]
-  unofficialLongTitle?: string[]
-  unofficialAbbreviation?: string[]
-  risAbbreviationInternationalLaw?: string[]
-  referenceNumber?: string[]
-  definition?: string[]
-  ageOfMajorityIndication?: string[]
-  divergentDocumentNumber?: string[]
-}
-
-export interface Norm extends FrameData {
-  readonly guid: string
-  readonly articles: Article[]
-  readonly files?: FileReference[]
-}
-
-export interface NormResponse extends NormBase {
-  readonly guid: string
-  readonly articles: Article[]
-  readonly files?: FileReference[]
-  metadata?: MetaDatum[]
-}
-
-export interface NormEditRequest extends NormBase {
-  metadata?: MetaDatum[]
-}
-
-export interface FileReference {
-  readonly name: string
-  readonly hash: string
-  readonly createdAt: string
-}
-
-export interface MetaDatum {
-  readonly value: string
-  readonly type: MetaDatumType
-  readonly order: number
-}
-
-export enum MetaDatumType {
-  KEYWORD = "KEYWORD",
-  UNOFFICIAL_LONG_TITLE = "UNOFFICIAL_LONG_TITLE",
-  UNOFFICIAL_SHORT_TITLE = "UNOFFICIAL_SHORT_TITLE",
-  UNOFFICIAL_ABBREVIATION = "UNOFFICIAL_ABBREVIATION",
-  UNOFFICIAL_REFERENCE = "UNOFFICIAL_REFERENCE",
-  DIVERGENT_DOCUMENT_NUMBER = "DIVERGENT_DOCUMENT_NUMBER",
-  REFERENCE_NUMBER = "REFERENCE_NUMBER",
-  DEFINITION = "DEFINITION",
-  RIS_ABBREVIATION_INTERNATIONAL_LAW = "RIS_ABBREVIATION_INTERNATIONAL_LAW",
-  AGE_OF_MAJORITY_INDICATION = "AGE_OF_MAJORITY_INDICATION",
-  VALIDITY_RULE = "VALIDITY_RULE",
 }

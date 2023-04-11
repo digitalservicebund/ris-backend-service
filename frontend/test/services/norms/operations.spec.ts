@@ -1,4 +1,4 @@
-import { MetaDatumType } from "@/domain/Norm"
+import { MetadataSectionName, MetadatumType } from "@/domain/Norm"
 import httpClient from "@/services/httpClient"
 import {
   editNormFrame,
@@ -81,12 +81,15 @@ describe("normsService", () => {
     it("returns response body if server connection was successful", async () => {
       vi.mocked(httpClient).get.mockResolvedValue({
         status: 200,
-        data: "fake-norm",
+        data: { officialLongTitle: "title" },
       })
 
       const response = await getNormByGuid("fake-guid")
 
-      expect(response.data).toBe("fake-norm")
+      expect(response.data).toStrictEqual({
+        officialLongTitle: "title",
+        metadataSections: {},
+      })
     })
 
     it("responds with correct error message if server response status is above 300", async () => {
@@ -122,24 +125,29 @@ describe("normsService", () => {
         .mocked(httpClient)
         .put.mockResolvedValueOnce({ status: 204, data: "" })
 
-      await editNormFrame("fake-guid", {
-        officialLongTitle: "new title",
-        officialShortTitle: "",
-        officialAbbreviation: undefined,
-        referenceNumber: [],
-        publicationDate: "2022-11-14T23:00:00.000Z",
-        announcementDate: "",
-        citationDate: undefined,
-        citationYear: "2011",
-        frameKeywords: ["Keyword1"],
-        providerEntity: "new provider entity",
-        providerDecidingBody: undefined,
-        providerIsResolutionMajority: undefined,
-        leadJurisdiction: undefined,
-        leadUnit: undefined,
-        participationType: undefined,
-        participationInstitution: undefined,
-      })
+      await editNormFrame(
+        "fake-guid",
+        {
+          [MetadataSectionName.LEAD]: [
+            {
+              [MetadatumType.LEAD_UNIT]: ["first", "second"],
+              [MetadatumType.LEAD_JURISDICTION]: ["text"],
+            },
+          ],
+        },
+        {
+          officialLongTitle: "new title",
+          officialShortTitle: "",
+          officialAbbreviation: undefined,
+          publicationDate: "2022-11-14T23:00:00.000Z",
+          announcementDate: "",
+          citationDate: undefined,
+          citationYear: "2011",
+          providerEntity: "new provider entity",
+          providerDecidingBody: undefined,
+          providerIsResolutionMajority: undefined,
+        }
+      )
 
       expect(httpClientPut).toHaveBeenCalledOnce()
       expect(httpClientPut).toHaveBeenLastCalledWith(
@@ -151,24 +159,43 @@ describe("normsService", () => {
           },
         },
         {
+          metadataSections: [
+            {
+              name: MetadataSectionName.LEAD,
+              order: 1,
+              sections: null,
+              metadata: [
+                {
+                  type: MetadatumType.LEAD_UNIT,
+                  order: 1,
+                  value: "first",
+                },
+                {
+                  type: MetadatumType.LEAD_UNIT,
+                  order: 2,
+                  value: "second",
+                },
+                {
+                  type: MetadatumType.LEAD_JURISDICTION,
+                  order: 1,
+                  value: "text",
+                },
+              ],
+            },
+          ],
           announcementDate: null,
           documentTemplateName: null,
           citationDate: null,
           citationYear: "2011",
           officialAbbreviation: null,
           officialLongTitle: "new title",
-          participationType: null,
           providerDecidingBody: null,
           providerEntity: "new provider entity",
           providerIsResolutionMajority: null,
           publicationDate: "2022-11-15",
           officialShortTitle: null,
           isExpirationDateTemp: null,
-          leadJurisdiction: null,
           risAbbreviation: null,
-          leadUnit: null,
-          participationInstitution: null,
-          subjectBgb3: null,
           ageIndicationEnd: null,
           ageIndicationStart: null,
           applicationScopeArea: null,
@@ -250,17 +277,7 @@ describe("normsService", () => {
           statusDescription: null,
           statusNote: null,
           statusReference: null,
-          subjectFna: null,
-          subjectGesta: null,
-          subjectPreviousFna: null,
           text: null,
-          metadata: [
-            {
-              value: "Keyword1",
-              type: MetaDatumType.KEYWORD,
-              order: 1,
-            },
-          ],
         }
       )
     })
@@ -271,9 +288,11 @@ describe("normsService", () => {
         data: "",
       })
 
-      const response = await editNormFrame("fake-guid", {
-        officialLongTitle: "new title",
-      })
+      const response = await editNormFrame(
+        "fake-guid",
+        {},
+        { officialLongTitle: "new title" }
+      )
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden."
@@ -286,9 +305,13 @@ describe("normsService", () => {
         error: { title: "error" },
       })
 
-      const response = await editNormFrame("fake-guid", {
-        officialLongTitle: "new title",
-      })
+      const response = await editNormFrame(
+        "fake-guid",
+        {},
+        {
+          officialLongTitle: "new title",
+        }
+      )
 
       expect(response.error?.title).toBe(
         "Dokumentationseinheit konnte nicht bearbeitet werden."
