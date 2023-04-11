@@ -661,7 +661,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  public Flux<ProceedingDecision> searchForDocumentUnityByProceedingDecisionInput(
+  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
       ProceedingDecision proceedingDecision) {
     String courtType;
     String courtLocation;

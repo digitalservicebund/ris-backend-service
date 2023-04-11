@@ -56,7 +56,6 @@ public class FieldOfLawService {
     Mono<List<FieldOfLaw>> unorderedList;
     if (matcher.find()) {
       normStr = matcher.group(1).trim().replaceAll("\\§(\\d+)", "\\§ $1");
-      ;
       String afterNormSearchStr = matcher.group(2).trim();
       if (afterNormSearchStr.isEmpty()) {
         searchTerms = null;

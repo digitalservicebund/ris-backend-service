@@ -254,7 +254,7 @@ public class DocumentUnitService {
 
   public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
       ProceedingDecision proceedingDecision) {
-    return repository.searchForDocumentUnityByProceedingDecisionInput(proceedingDecision);
+    return repository.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
