@@ -146,7 +146,9 @@ class NormsService(
     private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, norm: Norm): Flux<MetadatumDto> {
         return metadataRepository.saveAll(
             metadataListToDto(
-                norm.metadataSections.filter { it.name == metadataSectionDto.name }.flatMap { it.metadata },
+                norm.metadataSections
+                    .filter { it.name == metadataSectionDto.name && it.order == metadataSectionDto.order }
+                    .flatMap { it.metadata },
                 metadataSectionDto.id,
             ),
         )

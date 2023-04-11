@@ -15,8 +15,11 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
+import org.assertj.core.api.Assertions
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -256,6 +259,42 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .assertNext { assertNormsAreEqual(norm, it) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save norm with 2 sections that are having the same types and get them back`() {
+        val section1 = MetadataSection(
+            MetadataSectionName.PARTICIPATION,
+            listOf(
+                Metadatum("Foo", PARTICIPATION_TYPE),
+                Metadatum("Bar", PARTICIPATION_INSTITUTION),
+            ),
+            1,
+        )
+        val section2 = MetadataSection(
+            MetadataSectionName.PARTICIPATION,
+            listOf(
+                Metadatum("Hello", PARTICIPATION_TYPE),
+                Metadatum("World", PARTICIPATION_INSTITUTION),
+            ),
+            2,
+        )
+
+        val norm = NORM.copy(metadataSections = listOf(section1, section2))
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .assertNext {
+                Assertions.assertThat(it.metadataSections).isEqualTo(norm.metadataSections)
+            }
             .verifyComplete()
     }
 
