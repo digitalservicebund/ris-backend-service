@@ -258,11 +258,6 @@ components:
       type: string
       pattern: '^[1-2]\d{3}-[0-1]\d-[0-3]\d$'
       example: '2020-10-21'
-    Year:
-      description: The year format in XML files
-      type: string
-      pattern: '^[1-2]\d{3}$'
-      example: '2020'
     UndefinedDate:
       description: A field that takes one of three values
       type: string
@@ -293,16 +288,23 @@ components:
         - SUBJECT_PREVIOUS_FNA
         - SUBJECT_GESTA
         - SUBJECT_BGB_3
+        - DATE
+        - YEAR
+        - RANGE_START
+        - RANGE_START_UNIT
+        - RANGE_END
+        - RANGE_END_UNIT
+
     MetadataSectionName:
       description: A field that indicates the name of the section
       type: string
       enum:
         - NORM
-        - GENERAL_INFORMATION
-        - HEADINGS_AND_ABBREVIATIONS
         - SUBJECT_AREA
         - LEAD
         - PARTICIPATION
+        - CITATION_DATE
+        - AGE_INDICATION
     MetadataSection:
       type: object
       properties:
@@ -413,10 +415,6 @@ components:
           example: SaubFahrzeugBeschG
         announcementDate:
           $ref: '#/components/schemas/Date'
-        citationDate:
-          $ref: '#/components/schemas/Date'
-        citationYear:
-          $ref: '#/components/schemas/Year'
         providerEntity:
           type: string
           example: DEU
@@ -630,12 +628,6 @@ components:
           type: string
           example: ''
         otherDocumentNote:
-          type: string
-          example: ''
-        ageIndicationStart:
-          type: string
-          example: ''
-        ageIndicationEnd:
           type: string
           example: ''
         eli:

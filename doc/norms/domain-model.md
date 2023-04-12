@@ -43,8 +43,6 @@ classDiagram
     Date announcementDate
     Date publicationDate
 
-    Date citationDate
-
     String printAnnouncementGazette
     String printAnnouncementYear
     String printAnnouncementNumber
@@ -114,9 +112,6 @@ classDiagram
 
     String celexNumber
 
-    String ageIndicationStart
-    String ageIndicationEnd
-
     String text
     List~FileReference~ files
   }
@@ -158,11 +153,11 @@ classDiagram
   class MetadataSectionName  {
      <<enumeration>>
      NORM,
-     GENERAL_INFORMATION,
-     HEADINGS_AND_ABBREVIATIONS,
      SUBJECT_AREA,
      LEAD,
-     PARTICIPATION
+     PARTICIPATION,
+     CITATION_DATE,
+     AGE_INDICATION
   }
 
   class MetadatumType  {
@@ -185,7 +180,14 @@ classDiagram
       SUBJECT_FNA,
       SUBJECT_PREVIOUS_FNA,
       SUBJECT_GESTA,
-      SUBJECT_BGB_3
+      SUBJECT_BGB_3,
+      DATE,
+      YEAR,
+      START,
+      START_UNIT
+      END,
+      UNIT,
+      END_UNIT
   }
 
   class FileReference {
