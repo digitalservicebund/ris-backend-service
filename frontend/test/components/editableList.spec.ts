@@ -131,7 +131,7 @@ describe("EditableList", () => {
       modelValue: ["entry 1", "entry 2", "entry 3"],
     })
 
-    await user.click(screen.queryByText('"entry 2"'))
+    await user.click(screen.getByText('"entry 2"'))
 
     expect(screen.queryByText('"entry 1"')).toBeVisible()
     expect(screen.queryByText('"entry 2"')).not.toBeInTheDocument()
