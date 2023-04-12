@@ -59,6 +59,7 @@ async function linkProceedingDecision(childUuid: string) {
 }
 
 async function removeProceedingDecision(decision: ProceedingDecision) {
+  console.log("removeProceedingDecision")
   const response = await proceedingDecisionService.removeProceedingDecision(
     props.documentUnitUuid,
     decision.uuid as string
@@ -67,6 +68,7 @@ async function removeProceedingDecision(decision: ProceedingDecision) {
     proceedingDecisions.value = proceedingDecisions.value?.filter(
       (listItem) => listItem.uuid !== decision.uuid
     )
+    updateSearchResultsLinkStatus(decision.uuid as string)
   } else {
     console.error(response.error)
   }
@@ -80,12 +82,12 @@ function isLinked(decision: ProceedingDecision): boolean {
   )
 }
 
-function updateSearchResultsLinkStatus(linkedUuid: string) {
+function updateSearchResultsLinkStatus(uuid: string) {
   if (searchResults.value == undefined) return
 
   searchResults.value = searchResults.value.map((searchResult) => {
-    if (searchResult.decision.uuid === linkedUuid) {
-      searchResult.isLinked = true
+    if (searchResult.decision.uuid === uuid) {
+      searchResult.isLinked = !searchResult.isLinked
     }
     return searchResult
   })
