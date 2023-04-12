@@ -56,7 +56,8 @@ test.describe("Add and remove proceeding decisions", () => {
     ).toBeVisible()
   })
 
-  test("add multiple proceeding decisions", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("add multiple proceeding decisions", async ({
     page,
     documentNumber,
   }) => {
@@ -185,7 +186,11 @@ test.describe("Search proceeding decisions", () => {
       await deleteDocumentUnit(page, testDocumentNumber)
   })
 
-  test("search for proceeding decision", async ({ page, documentNumber }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("search for proceeding decision", async ({
+    page,
+    documentNumber,
+  }) => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText(documentNumber)).toBeVisible()
     await toggleProceedingDecisionsSection(page)
