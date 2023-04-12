@@ -22,8 +22,12 @@ const service: KeywordService = {
     return response
   },
   async addKeyword(uuid: string, keyword: string) {
-    const response = await httpClient.put<undefined, string[]>(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords/${keyword}`
+    const response = await httpClient.put<string, string[]>(
+      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords`,
+      {
+        headers: { "Content-Type": "text/plain" },
+      },
+      keyword
     )
     if (response.status >= 300) {
       response.error = {

@@ -29,6 +29,27 @@ test.describe("Add and remove keywords to content related indexing", () => {
     await expect(page.locator("text=one").first()).toBeVisible()
   })
 
+  test("add keywords with special character", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await page.locator("[aria-label='Schlagwörter']").fill("one")
+    await page.keyboard.press("Enter")
+
+    await page.locator("[aria-label='Schlagwörter']").fill("two%")
+    await page.keyboard.press("Enter")
+
+    await expect(page.locator("text=one").first()).toBeVisible()
+    await expect(page.locator("text=two%").first()).toBeVisible()
+
+    await page.reload()
+
+    await expect(page.locator("text=two%").first()).toBeVisible()
+    await expect(page.locator("text=one").first()).toBeVisible()
+  })
+
   // eslint-disable-next-line playwright/no-skipped-test
   test.skip("add same keyword not working", async ({
     page,
