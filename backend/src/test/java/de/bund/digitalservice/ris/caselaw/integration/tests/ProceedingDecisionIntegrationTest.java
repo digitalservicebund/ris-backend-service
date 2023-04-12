@@ -6,9 +6,15 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.ProceedingDecisionController;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
@@ -18,9 +24,13 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +38,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -41,8 +52,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       PostgresConfig.class
     },
     controllers = {ProceedingDecisionController.class, DocumentUnitController.class})
-public class ProceedingDecisionIntegrationTest {
-
+class ProceedingDecisionIntegrationTest {
   @Container
   static PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:12");
 
@@ -57,7 +67,10 @@ public class ProceedingDecisionIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
+  @Autowired private DatabaseDocumentUnitMetadataRepository metadataRepository;
   @Autowired private DatabaseProceedingDecisionLinkRepository linkRepository;
+  @Autowired private FileNumberRepository fileNumberRepository;
+  @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
@@ -472,5 +485,140 @@ public class ProceedingDecisionIntegrationTest {
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getParentDocumentUnitId()).isEqualTo(parentDocumentUnitDTO.getId());
     assertThat(list.get(0).getChildDocumentUnitId()).isEqualTo(childDocumentUnitDTO.getId());
+  }
+
+  @Test
+  void testSearchForDocumentUnitsByProceedingDecisionInput() {
+    Instant date1 = Instant.parse("2023-01-02T00:00:00.00Z");
+    DocumentUnitMetadataDTO documentUnit1 =
+        buildDocumentUnitMetadataDTO("SomeCourt", "Berlin", date1, List.of("AkteX", "AkteY"), "CD");
+
+    Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
+    DocumentUnitMetadataDTO documentUnit2 =
+        buildDocumentUnitMetadataDTO("AnotherCourt", "Hamburg", date2, null, "EF");
+
+    Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
+    DocumentUnitMetadataDTO documentUnit3 =
+        buildDocumentUnitMetadataDTO("YetAnotherCourt", "Munich", date3, List.of("AkteX"), "GH");
+
+    // no search criteria --> matches all
+    simulateAPICall(ProceedingDecision.builder().build())
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).hasSize(3);
+            });
+
+    // search by date
+    simulateAPICall(ProceedingDecision.builder().date(date1).build())
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody()[0].date()).isEqualTo(date1);
+            });
+
+    // search by court
+    simulateAPICall(
+            ProceedingDecision.builder().court(Court.builder().type("SomeCourt").build()).build())
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody()[0].court().type()).isEqualTo("SomeCourt");
+            });
+
+    // search by fileNumber
+    simulateAPICall(ProceedingDecision.builder().fileNumber("AkteX").build())
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).hasSize(2);
+              assertThat(response.getResponseBody()[0].fileNumber()).isEqualTo("AkteX");
+              assertThat(response.getResponseBody()[1].fileNumber()).isEqualTo("AkteX");
+            });
+
+    // search by documentType
+    simulateAPICall(
+            ProceedingDecision.builder()
+                .documentType(DocumentType.builder().jurisShortcut("GH").build())
+                .build())
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).hasSize(1);
+              assertThat(response.getResponseBody()[0].documentType().jurisShortcut())
+                  .isEqualTo("GH");
+            });
+
+    // matching 3 criteria but not the 4th one --> no result
+    simulateAPICall(
+            ProceedingDecision.builder()
+                .date(date1)
+                .court(Court.builder().type("SomeCourt").build())
+                .fileNumber("AkteX")
+                .documentType(DocumentType.builder().jurisShortcut("XY").build())
+                .build())
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).isEmpty();
+            });
+  }
+
+  private BodySpec<ProceedingDecision[], ?> simulateAPICall(
+      ProceedingDecision proceedingDecisionSearchInput) {
+    return webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search")
+        .bodyValue(proceedingDecisionSearchInput)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(ProceedingDecision[].class);
+  }
+
+  private DocumentUnitMetadataDTO buildDocumentUnitMetadataDTO(
+      String courtType,
+      String courtLocation,
+      Instant decisionDate,
+      List<String> fileNumbers,
+      String documentTypeJurisShortcut) {
+
+    Long documentTypeId = null;
+    if (documentTypeJurisShortcut != null) {
+      DocumentTypeDTO documentTypeDTO =
+          DocumentTypeDTO.builder()
+              .changeIndicator('a')
+              .documentType('b')
+              .label("ABC123")
+              .jurisShortcut(documentTypeJurisShortcut)
+              .build();
+      documentTypeId = databaseDocumentTypeRepository.save(documentTypeDTO).block().getId();
+    }
+
+    DocumentUnitMetadataDTO documentUnitMetadataDTO =
+        DocumentUnitMetadataDTO.builder()
+            .uuid(UUID.randomUUID())
+            .documentnumber(RandomStringUtils.randomAlphanumeric(13))
+            .creationtimestamp(Instant.now())
+            .courtType(courtType)
+            .courtLocation(courtLocation)
+            .decisionDate(decisionDate)
+            .documentTypeId(documentTypeId)
+            .dataSource(DataSource.NEURIS)
+            .build();
+    Long id = metadataRepository.save(documentUnitMetadataDTO).block().getId();
+
+    List<FileNumberDTO> fileNumberDTOs;
+    if (fileNumbers != null) {
+      fileNumberDTOs =
+          fileNumbers.stream()
+              .map(fn -> FileNumberDTO.builder().fileNumber(fn).documentUnitId(id).build())
+              .collect(Collectors.toList());
+      fileNumberRepository.saveAll(fileNumberDTOs).collectList().block();
+    }
+    return documentUnitMetadataDTO;
   }
 }
