@@ -1,5 +1,4 @@
-import { expect } from "@playwright/test"
-import { Page } from "playwright"
+import { expect, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
 
 export const navigateToCategories = async (
