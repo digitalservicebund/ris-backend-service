@@ -1,4 +1,4 @@
-import { MetaDatumType } from "@/domain/Norm"
+import { MetadatumType } from "@/domain/Norm"
 
 export const normData = {
   jurisZipFileName: "Finanzdisziplin.2-0.zip",
@@ -197,17 +197,17 @@ export const normData = {
   metadata: [
     {
       value: "BGBl I 2023, Nr 002",
-      type: MetaDatumType.KEYWORD,
+      type: MetadatumType.KEYWORD,
       order: 1,
     },
     {
       value: "Finanzdisziplin",
-      type: MetaDatumType.KEYWORD,
+      type: MetadatumType.KEYWORD,
       order: 2,
     },
     {
       value: "BJNR0020A0023",
-      type: MetaDatumType.DIVERGENT_DOCUMENT_NUMBER,
+      type: MetadatumType.DIVERGENT_DOCUMENT_NUMBER,
       order: 1,
     },
   ],

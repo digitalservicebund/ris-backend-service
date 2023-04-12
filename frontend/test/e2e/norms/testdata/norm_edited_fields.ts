@@ -1,4 +1,4 @@
-import { MetaDatumType } from "@/domain/Norm"
+import { MetadatumType } from "@/domain/Norm"
 
 export const newNorm = {
   officialLongTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge",
@@ -118,57 +118,57 @@ export const newNorm = {
   metadata: [
     {
       value: "frameKeywords",
-      type: MetaDatumType.KEYWORD,
+      type: MetadatumType.KEYWORD,
       order: 1,
     },
     {
       value: "risAbbreviationInternationalLaw",
-      type: MetaDatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW,
+      type: MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW,
       order: 1,
     },
     {
       value: "divergentDocumentNumber",
-      type: MetaDatumType.DIVERGENT_DOCUMENT_NUMBER,
+      type: MetadatumType.DIVERGENT_DOCUMENT_NUMBER,
       order: 1,
     },
     {
       value: "unofficialLongTitle",
-      type: MetaDatumType.UNOFFICIAL_LONG_TITLE,
+      type: MetadatumType.UNOFFICIAL_LONG_TITLE,
       order: 1,
     },
     {
       value: "unofficialShortTitle",
-      type: MetaDatumType.UNOFFICIAL_SHORT_TITLE,
+      type: MetadatumType.UNOFFICIAL_SHORT_TITLE,
       order: 1,
     },
     {
       value: "unofficialAbbreviation",
-      type: MetaDatumType.UNOFFICIAL_ABBREVIATION,
+      type: MetadatumType.UNOFFICIAL_ABBREVIATION,
       order: 1,
     },
     {
       value: "unofficialReference",
-      type: MetaDatumType.UNOFFICIAL_REFERENCE,
+      type: MetadatumType.UNOFFICIAL_REFERENCE,
       order: 1,
     },
     {
       value: "validityRule",
-      type: MetaDatumType.VALIDITY_RULE,
+      type: MetadatumType.VALIDITY_RULE,
       order: 1,
     },
     {
       value: "referenceNumber",
-      type: MetaDatumType.REFERENCE_NUMBER,
+      type: MetadatumType.REFERENCE_NUMBER,
       order: 1,
     },
     {
       value: "definition",
-      type: MetaDatumType.DEFINITION,
+      type: MetadatumType.DEFINITION,
       order: 1,
     },
     {
       value: "ageOfMajorityIndication",
-      type: MetaDatumType.AGE_OF_MAJORITY_INDICATION,
+      type: MetadatumType.AGE_OF_MAJORITY_INDICATION,
       order: 1,
     },
   ],

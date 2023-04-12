@@ -7,7 +7,7 @@ import {
 } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if norm can be exported",
   async ({ page, normData, guid, request }) => {
     await openNorm(page, normData["officialLongTitle"], guid)

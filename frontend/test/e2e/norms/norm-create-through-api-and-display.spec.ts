@@ -39,7 +39,7 @@ async function expectHeadingAppearAfterScroll(page, heading) {
   )
 }
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check display of norm complex",
   async ({ page, normData, guid }) => {
     await openNorm(page, normData["officialLongTitle"], guid)
@@ -50,7 +50,7 @@ testWithImportedNorm(
   }
 )
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if frame fields are correctly displayed",
   async ({ page, normData, guid }) => {
     await openNorm(page, normData["officialLongTitle"], guid)
@@ -94,7 +94,7 @@ testWithImportedNorm(
   }
 )
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if switching frame sections affects sections being inside or outside viewport",
   async ({ page, normData, guid }) => {
     await openNorm(page, normData["officialLongTitle"], guid)

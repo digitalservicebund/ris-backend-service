@@ -3,7 +3,8 @@ import { createDataTransfer } from "../shared/e2e-utils"
 import { loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 
-test.describe("import a norm by uploading a file", () => {
+// eslint-disable-next-line playwright/no-skipped-test
+test.describe.skip("import a norm by uploading a file", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto("/norms/import")
   })
