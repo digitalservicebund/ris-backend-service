@@ -2,7 +2,7 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 42900279f3c91db440380a54d8486db54b26c8746592e1c79071fcfae3a7df74
+    checksum: 62b13a4b5747b394c08f4749c40c9dbafeda017df60dd091f7e87d3243b03df2
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml

@@ -1,4 +1,14 @@
-import { Article, Norm, Paragraph } from "@/domain/Norm"
+import {
+  Article,
+  FlatMetadata,
+  Metadata,
+  MetadataSectionName,
+  MetadataSections,
+  MetadataValueType,
+  MetadatumType,
+  Norm,
+  Paragraph,
+} from "@/domain/Norm"
 import {
   InputType,
   BaseInputAttributes,
@@ -7,8 +17,38 @@ import {
   TextInputField,
 } from "@/shared/components/input/types"
 
+type MetadataValueGenerators = {
+  [Type in keyof MetadataValueType]: () => MetadataValueType[Type]
+}
+
+const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
+  [MetadatumType.KEYWORD]: generateString,
+  [MetadatumType.UNOFFICIAL_LONG_TITLE]: generateString,
+  [MetadatumType.UNOFFICIAL_SHORT_TITLE]: generateString,
+  [MetadatumType.UNOFFICIAL_ABBREVIATION]: generateString,
+  [MetadatumType.UNOFFICIAL_REFERENCE]: generateString,
+  [MetadatumType.DIVERGENT_DOCUMENT_NUMBER]: generateString,
+  [MetadatumType.REFERENCE_NUMBER]: generateString,
+  [MetadatumType.DEFINITION]: generateString,
+  [MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW]: generateString,
+  [MetadatumType.AGE_OF_MAJORITY_INDICATION]: generateString,
+  [MetadatumType.VALIDITY_RULE]: generateString,
+  [MetadatumType.LEAD_JURISDICTION]: generateString,
+  [MetadatumType.LEAD_UNIT]: generateString,
+  [MetadatumType.PARTICIPATION_TYPE]: generateString,
+  [MetadatumType.PARTICIPATION_INSTITUTION]: generateString,
+  [MetadatumType.SUBJECT_FNA]: generateString,
+  [MetadatumType.SUBJECT_PREVIOUS_FNA]: generateString,
+  [MetadatumType.SUBJECT_GESTA]: generateString,
+  [MetadatumType.SUBJECT_BGB_3]: generateString,
+}
+
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
 const HEXADECIMAL_CHARACTERS = "0123456789abcdef"
+
+export function generateRandomNumber(minimum = 0, maximum = 10): number {
+  return Math.floor(Math.random() * (maximum - minimum) + minimum)
+}
 
 export function generateString(options?: {
   characterSet?: string
@@ -21,7 +61,7 @@ export function generateString(options?: {
 
   for (let i = 0; i < length; i++) {
     output += characterSet.charAt(
-      Math.floor(Math.random() * characterSet.length)
+      generateRandomNumber(0, characterSet.length - 1)
     )
   }
 
@@ -114,7 +154,57 @@ export function generateArticle(partialArticle?: Partial<Article>): Article {
   }
 }
 
-export function generateNorm(partialNorm?: Partial<Norm>): Norm {
+export function pickRandomMetadatumType(): MetadatumType {
+  const options = Object.keys(MetadatumType)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index] as MetadatumType
+}
+
+export function generateMetadata(partialMetadata?: Partial<Metadata>) {
+  const metadata = {} as Metadata
+  const metadataCount = generateRandomNumber()
+
+  for (let i = 0; i < metadataCount; i++) {
+    const type = pickRandomMetadatumType()
+    const values = new Array(generateRandomNumber())
+      .fill(0)
+      .map(METADATA_VALUE_GENERATORS[type])
+    metadata[type] = values
+  }
+
+  Object.entries(partialMetadata ?? {}).forEach(([type, values]) => {
+    metadata[type as MetadatumType] = values
+  })
+
+  return metadata
+}
+
+export function pickRandomMetadataSectionName(): MetadataSectionName {
+  const options = Object.keys(MetadataSectionName)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index] as MetadataSectionName
+}
+
+export function generateMetadataSections(
+  partialSections?: Partial<MetadataSections>
+): MetadataSections {
+  const sections = {} as MetadataSections
+
+  for (let i = 0; i < generateRandomNumber(1); i++) {
+    const name = pickRandomMetadataSectionName()
+    // Do not use child sections here to prevent random infinite loop.
+    sections[name] = new Array(generateRandomNumber())
+      .fill(0)
+      .map(generateMetadata)
+  }
+
+  Object.entries(partialSections ?? {}).forEach(([name, metadata]) => {
+    sections[name as MetadataSectionName] = metadata
+  })
+
+  return sections
+}
+
   return {
     guid: generateGuid(),
     articles: [generateArticle()],
