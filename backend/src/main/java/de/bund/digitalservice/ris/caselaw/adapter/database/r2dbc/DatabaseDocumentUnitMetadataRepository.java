@@ -24,7 +24,8 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "(:decisionDate IS NULL OR decision_date = :decisionDate) AND"
           + "(:docUnitIds IS NULL OR id IN (SELECT * FROM UNNEST(:docUnitIds))) AND "
           + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
-          + "data_source != 'PROCEEDING_DECISION' LIMIT 20")
+          + "data_source != 'PROCEEDING_DECISION' "
+          + "LIMIT 20")
   Flux<DocumentUnitMetadataDTO> findByCourtDateFileNumberAndDocumentType(
       String courtType,
       String courtLocation,

@@ -696,7 +696,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     courtType,
                     courtLocation,
                     decisionDate))
-        .flatMap(this::injectAdditionalInformation)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(ProceedingDecisionTransformer::transformToDomain);
   }
 

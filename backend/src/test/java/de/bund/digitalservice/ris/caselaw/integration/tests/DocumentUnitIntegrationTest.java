@@ -31,12 +31,17 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
+import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
+import reactor.core.publisher.Flux;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 
 @RISIntegrationTest(
@@ -722,5 +728,68 @@ class DocumentUnitIntegrationTest {
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getLegalEffect())
         .isEqualTo(documentUnitFromFrontend.coreData().legalEffect());
+  }
+
+  @Test
+  void testSearchResultsAreDeterministic() {
+    Flux<DocumentUnitDTO> documentUnitDTOs =
+        Flux.range(0, 20)
+            .map(index -> UUID.randomUUID())
+            .map(
+                uuid ->
+                    DocumentUnitDTO.builder()
+                        .uuid(uuid)
+                        .creationtimestamp(Instant.now())
+                        .documentnumber(RandomStringUtils.random(10, true, true))
+                        .build())
+            .flatMap(documentUnitDTO -> repository.save(documentUnitDTO));
+
+    documentUnitDTOs.blockLast();
+    assertThat(repository.findAll().collectList().block()).hasSize(20);
+
+    List<UUID> responseUUIDs = new ArrayList<>();
+
+    ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search")
+        .bodyValue(proceedingDecision)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(ProceedingDecision[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).hasSize(20);
+
+              Arrays.stream(response.getResponseBody())
+                  .map(ProceedingDecision::uuid)
+                  .map(responseUUIDs::add)
+                  .collect(Collectors.toList());
+            });
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/search")
+        .bodyValue(proceedingDecision)
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(ProceedingDecision[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody()).hasSize(20);
+
+              List<UUID> responseUUIDs2 =
+                  Arrays.stream(response.getResponseBody())
+                      .map(ProceedingDecision::uuid)
+                      .collect(Collectors.toList());
+
+              assertThat(responseUUIDs2).isEqualTo(responseUUIDs);
+            });
   }
 }
