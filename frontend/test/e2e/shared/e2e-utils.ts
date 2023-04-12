@@ -1,4 +1,4 @@
-import { JSHandle, Page } from "playwright"
+import { JSHandle, Page } from "@playwright/test"
 
 export const isInViewport = (page: Page, selector: string, inside: boolean) => {
   return page
