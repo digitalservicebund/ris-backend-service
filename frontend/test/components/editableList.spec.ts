@@ -123,6 +123,26 @@ describe("EditableList", () => {
     expect(input).toHaveValue("entry 2")
   })
 
+  it("shows edit component for correct entry when entry is clicked", async () => {
+    const user = userEvent.setup()
+    renderComponent({
+      editComponent: SimpleTextEditComponent,
+      summaryComponent: JsonStringifySummary,
+      modelValue: ["entry 1", "entry 2", "entry 3"],
+    })
+
+    await user.click(screen.queryByText('"entry 2"'))
+
+    expect(screen.queryByText('"entry 1"')).toBeVisible()
+    expect(screen.queryByText('"entry 2"')).not.toBeInTheDocument()
+    expect(screen.queryByText('"entry 3"')).toBeVisible()
+
+    const input = screen.queryByRole("textbox") as HTMLInputElement
+
+    expect(input).toBeInTheDocument()
+    expect(input).toHaveValue("entry 2")
+  })
+
   it("deletes correct entry when delete button is clicked", async () => {
     const modelValue = ["entry 1", "entry 2"]
     renderComponent({
