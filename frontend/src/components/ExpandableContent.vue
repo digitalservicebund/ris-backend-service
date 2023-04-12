@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch, onMounted } from "vue"
+import { computed, ref, watch } from "vue"
 
 interface Props {
   header?: string
@@ -19,8 +19,6 @@ const props = withDefaults(defineProps<Props>(), {
   headerId: "",
 })
 const emit = defineEmits<Emits>()
-const expandableContainer = ref()
-const containerHeight = ref(0)
 const isExpanded = ref(false)
 const iconName = computed(() =>
   isExpanded.value ? props.closeIconName : props.openIconName
@@ -34,17 +32,6 @@ watch(
   { immediate: true }
 )
 watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
-
-onMounted(() => {
-  const expandableContainer = document.querySelector(".expandable")
-  if (expandableContainer != null) resizeObserver.observe(expandableContainer)
-})
-
-const resizeObserver = new ResizeObserver((entries) => {
-  for (const entry of entries) {
-    containerHeight.value = entry.contentRect.width
-  }
-})
 </script>
 
 <template>
@@ -61,38 +48,8 @@ const resizeObserver = new ResizeObserver((entries) => {
       <span class="icon material-icons">{{ iconName }}</span>
     </button>
 
-    <transition
-      ref="expandableContainer"
-      class="expandable"
-      :class="{ expanded: isExpanded }"
-      name="expand"
-      :style="{ height: containerHeight.valueOf + 'px' }"
-    >
-      <div v-if="isExpanded">
-        <slot />
-      </div>
-    </transition>
+    <div v-if="isExpanded">
+      <slot />
+    </div>
   </div>
 </template>
-
-<!-- Transitions are difficult to handle with dynamic heights. To use the max-height as
-  transition parameter is a known workaround for this issue, the max-height doesn't have
-  an effect on the actual height, but is just used to get the transition effect. -->
-
-<style lang="scss" scoped>
-.expand-enter-from,
-.expand-leave-to {
-  max-height: 0;
-}
-
-.expand-leave-from,
-.expand-enter-to {
-  max-height: 1000px;
-}
-
-.expand-enter-active,
-.expand-leave-active {
-  overflow: hidden;
-  transition: all 0.1s ease-in-out;
-}
-</style>
