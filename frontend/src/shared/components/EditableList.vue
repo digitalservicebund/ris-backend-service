@@ -132,7 +132,7 @@ watch(editIndex, focusFirstInputOfCurrentEditElement)
 
     <button
       aria-label="Weitere Angabe"
-      class="bg-blue-300 focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white inline-flex items-center leading-18 mt-8 outline-0 outline-blue-800 outline-none outline-offset-4 p-4 text-14 text-blue-800 whitespace-nowrap"
+      class="add-button bg-blue-300 focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white inline-flex items-center leading-18 mt-8 outline-0 outline-blue-800 outline-none outline-offset-4 pr-[0.25rem] py-[0.125rem] text-14 text-blue-800 whitespace-nowrap"
       @click="addNewModelEntry"
     >
       <span class="material-icons text-14">add</span>
@@ -160,6 +160,12 @@ watch(editIndex, focusFirstInputOfCurrentEditElement)
     border: none !important;
     background: #b3c9d6;
     outline: none;
+  }
+}
+
+.add-button {
+  &:focus:not(:focus-visible) {
+    @apply outline-transparent;
   }
 }
 </style>
