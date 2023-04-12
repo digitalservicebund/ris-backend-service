@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Fie
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Transient;
@@ -15,6 +16,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table("doc_unit")
+@EqualsAndHashCode(callSuper = true)
 public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
   public static final DocumentUnitDTO EMPTY = new DocumentUnitDTO();
 
