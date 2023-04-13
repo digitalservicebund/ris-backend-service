@@ -124,6 +124,6 @@ class HasValidMetadataTest {
             Metadatum("citation year", MetadatumType.YEAR),
         )
 
-        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
 }
