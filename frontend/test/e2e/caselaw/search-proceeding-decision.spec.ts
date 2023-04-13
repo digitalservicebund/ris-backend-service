@@ -18,7 +18,7 @@ test.describe("Search proceeding decisions", () => {
 
     await fillProceedingDecisionInputs(page, {
       court: secondaryDocumentUnit.coreData.court?.label,
-      fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[1],
+      fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[0],
       documentType: secondaryDocumentUnit.coreData.documentType?.jurisShortcut,
     })
 
