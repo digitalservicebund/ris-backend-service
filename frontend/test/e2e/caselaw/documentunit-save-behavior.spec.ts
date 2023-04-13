@@ -4,8 +4,7 @@ import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("autosave on documentation units", () => {
   test("test save button status change", async ({ page, documentNumber }) => {
-    navigateToCategories(page, documentNumber)
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+    await navigateToCategories(page, documentNumber)
     await waitForSaving(page)
   })
 

@@ -32,20 +32,25 @@ export const uploadTestfile = async (page: Page, filename: string) => {
   await expect(page.locator("text=Dokument wird geladen.")).toBeHidden()
 }
 
-export const waitForSaving = async (page: Page): Promise<void> => {
-  await expect(
-    page.locator("text=Zuletzt gespeichert um >> nth=0")
-  ).toBeVisible()
-  await expect(
-    page.locator("text=Zuletzt gespeichert um >> nth=1")
-  ).toBeVisible()
-}
+export async function waitForSaving(page: Page) {
+  const saveButton = page.locator("[aria-label='Stammdaten Speichern Button']")
+  const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
 
-export async function clickSaveButton(page: Page): Promise<void> {
-  await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-  await expect(
-    page.locator("text=Zuletzt gespeichert um").first()
-  ).toBeVisible()
+  if (await saveStatus.isVisible()) {
+    const timeBeforeSave = /Zuletzt gespeichert um (.*) Uhr/.exec(
+      await page
+        .getByText(/Zuletzt gespeichert um .* Uhr/)
+        .first()
+        .innerText()
+    )?.[1] as string
+    await saveButton.click()
+    await expect(
+      page.getByText(`Zuletzt gespeichert um ${timeBeforeSave} Uhr`).first()
+    ).toBeHidden()
+  } else {
+    await saveButton.click()
+    await expect(saveStatus).toBeVisible()
+  }
 }
 
 export async function toggleProceedingDecisionsSection(
@@ -74,6 +79,9 @@ export async function fillProceedingDecisionInputs(
   if (values?.court) {
     await fillInput("Gericht Rechtszug", values?.court)
     await page.locator(`text=${values?.court}`).click()
+    expect(await page.getByLabel("Gericht Rechtszug").inputValue()).toBe(
+      values.court
+    )
   }
   if (values?.date) {
     await fillInput("Entscheidungsdatum Rechtszug", values?.date)

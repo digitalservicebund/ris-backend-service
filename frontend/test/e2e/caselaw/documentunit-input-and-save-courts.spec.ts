@@ -63,7 +63,6 @@ test.describe("Court and incorrect court", () => {
       .fill("incorrectCourt2")
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
     await waitForSaving(page)
 
     await page.reload()
@@ -77,7 +76,6 @@ test.describe("Court and incorrect court", () => {
       .locator(":text('IncorrectCourt1') + div > [aria-label='Löschen']")
       .click()
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
     await waitForSaving(page)
 
     await page.reload()

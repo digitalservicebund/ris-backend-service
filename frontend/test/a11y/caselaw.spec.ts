@@ -5,10 +5,10 @@ import {
   navigateToCategories,
   navigateToFiles,
   navigateToPublication,
-  clickSaveButton,
   toggleProceedingDecisionsSection,
   fillProceedingDecisionInputs,
   uploadTestfile,
+  waitForSaving,
 } from "../e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "../e2e/caselaw/fixtures"
 
@@ -174,7 +174,7 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
       fileNumber: "1a2b3c",
     })
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
     await page.reload()
     await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {

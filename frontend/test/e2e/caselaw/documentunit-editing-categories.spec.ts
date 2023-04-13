@@ -208,7 +208,6 @@ test.describe("ensuring the editing experience in categories is as expected", ()
     await page.locator("text=Nein").click()
     expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Nein")
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
     await waitForSaving(page)
 
     expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Nein")

@@ -1,5 +1,5 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, clickSaveButton } from "./e2e-utils"
+import { navigateToCategories, waitForSaving } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("save changes in core data and texts and verify it persists", () => {
@@ -10,7 +10,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='ECLI']").fill("abc123")
     await page.keyboard.press("Enter")
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.reload()
     expect(await page.inputValue("[aria-label='Aktenzeichen']")).toBe("")
@@ -27,7 +27,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='ECLI']").fill("abc123")
     await page.keyboard.press("Enter")
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.goto("/")
     await expect(
@@ -69,7 +69,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='Abweichendes Aktenzeichen']").fill("three")
     await page.keyboard.press("Enter")
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.reload()
 
@@ -120,7 +120,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
       .fill("2022-02-01")
     await page.keyboard.press("Enter")
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.reload()
 
@@ -161,7 +161,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='Abweichender ECLI']").fill("three")
     await page.keyboard.press("Enter")
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.reload()
 
@@ -219,7 +219,7 @@ test.describe("save changes in core data and texts and verify it persists", () =
 
     await expect(page.locator("text=testone").first()).toBeHidden()
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.reload()
 
@@ -295,12 +295,12 @@ test.describe("save changes in core data and texts and verify it persists", () =
     await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
     await page.keyboard.press("Tab")
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
     await page.keyboard.press("Tab")
 
-    await clickSaveButton(page)
+    await waitForSaving(page)
 
     await page.reload()
 
