@@ -155,8 +155,7 @@ class DocumentUnitKeywordIntegrationTest {
         .uri(
             "/api/v1/caselaw/documentunits/"
                 + documentUnitUuid
-                + "/contentrelatedindexing/keywords")
-        .bodyValue("keyword01")
+                + "/contentrelatedindexing/keywords/keyword01")
         .exchange()
         .expectStatus()
         .isOk()
@@ -175,8 +174,7 @@ class DocumentUnitKeywordIntegrationTest {
         .uri(
             "/api/v1/caselaw/documentunits/"
                 + documentUnitUuid
-                + "/contentrelatedindexing/keywords")
-        .bodyValue("keyword01")
+                + "/contentrelatedindexing/keywords/keyword01")
         .exchange()
         .expectStatus()
         .isOk()
@@ -206,8 +204,7 @@ class DocumentUnitKeywordIntegrationTest {
         .uri(
             "/api/v1/caselaw/documentunits/"
                 + documentUnitUuid
-                + "/contentrelatedindexing/keywords")
-        .bodyValue("keyword01")
+                + "/contentrelatedindexing/keywords/keyword01")
         .exchange()
         .expectStatus()
         .isOk()

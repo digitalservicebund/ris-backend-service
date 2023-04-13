@@ -22,13 +22,10 @@ const service: KeywordService = {
     return response
   },
   async addKeyword(uuid: string, keyword: string) {
-    const response = await httpClient.put<string, string[]>(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords`,
-      {
-        headers: { "Content-Type": "text/plain" },
-      },
-      keyword
+    const encodedString = encodeURI(
+      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords/${keyword}`
     )
+    const response = await httpClient.put<string, string[]>(encodedString)
     if (response.status >= 300) {
       response.error = {
         title: `Schlagwort ${keyword} konnte nicht hinzugefügt werden`,
@@ -37,9 +34,10 @@ const service: KeywordService = {
     return response
   },
   async deleteKeyword(uuid: string, keyword: string) {
-    const response = await httpClient.delete<string[]>(
+    const encodedString = encodeURI(
       `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords/${keyword}`
     )
+    const response = await httpClient.delete<string[]>(encodedString)
     if (response.status >= 300) {
       response.error = {
         title: `Schlagwort ${keyword} konnte nicht entfernt werden`,
