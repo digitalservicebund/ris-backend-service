@@ -70,7 +70,7 @@ class GenerateNormFileServiceTest {
         val guid = UUID.randomUUID()
         val command = GenerateNormFileUseCase.Command(guid)
 
-        val norm = createRandomNorm()
+        val norm = createRandomNorm().apply { files = listOf(createRandomFileReference()) }
         val file = ByteArray(10)
 
         every { getNormByGuidOutputPort.getNormByGuid(any()) } returns Mono.just(norm)

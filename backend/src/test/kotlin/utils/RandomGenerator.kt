@@ -49,6 +49,8 @@ fun createRandomNorm(): Norm {
             EasyRandom(EasyRandomParameters().stringLengthRange(4, 4)).nextObject(String::class.java)
         }.randomize(named("metadataSections")) {
             emptyList<MetadataSection>()
+        }.randomize(named("files")) {
+            emptyList<FileReference>()
         }
     return EasyRandom(parameters).nextObject(Norm::class.java)
 }

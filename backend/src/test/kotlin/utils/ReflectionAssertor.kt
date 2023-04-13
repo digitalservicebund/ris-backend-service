@@ -60,23 +60,23 @@ fun assertNormAndEditNormFrameProperties(
     }
 }
 
-/**
- * ATTENTION: File references are excluded atm., as they do not work properly,
- * yet. We NEED to fix this!
- */
 fun assertNormsAreEqual(norm1: Norm, norm2: Norm) {
-    val sortedNorm1 = getNormWithSortedListProperties(norm1).copy(files = emptyList())
-    val sortedNorm2 = getNormWithSortedListProperties(norm2).copy(files = emptyList())
-    assertThat(sortedNorm1.articles).isEqualTo(sortedNorm2.articles)
+    val sortedNorm1 = getNormWithSortedListProperties(norm1)
+    val sortedNorm2 = getNormWithSortedListProperties(norm2)
+    assertThat(sortedNorm1).isEqualTo(sortedNorm2)
 }
 
 fun getNormWithSortedListProperties(norm: Norm): Norm {
-    val sections = norm.metadataSections.map {
-        MetadataSection(it.name, it.metadata.toMutableList().sortedWith(metadatumComparator), it.order, it.sections)
+    var sections = norm.metadataSections.toMutableList().sortedWith(metadataSectionComparator)
+    sections = sections.map {
+        it.copy(
+            metadata = it.metadata.toMutableList().sortedWith(metadatumComparator),
+            sections = it.sections?.toMutableList()?.sortedWith(metadataSectionComparator),
+        )
     }
     val fileReferences = norm.files.toMutableList().sortedWith(fileReferenceComparator)
-    var articles = norm.articles.toMutableList().sortedWith(articleComparator)
 
+    var articles = norm.articles.toMutableList().sortedWith(articleComparator)
     articles = articles.map {
         it.copy(paragraphs = it.paragraphs.toMutableList().sortedWith(paragraphComparator))
     }
@@ -87,6 +87,7 @@ fun getNormWithSortedListProperties(norm: Norm): Norm {
 // As there is n natural sorting for our domain classes, the comparators try to
 // be exhaustive on the properties as possible. Else it could happen to easily
 // with random/stupid test data that the sorting is not definitely.
+private val metadataSectionComparator = compareBy<MetadataSection>({ it.name }, { it.order })
 private val metadatumComparator = compareBy<Metadatum<*>>({ it.type }, { it.order })
 private val fileReferenceComparator = compareBy<FileReference>({ it.hash }, { it.name }, { it.createdAt })
 private val articleComparator = compareBy<Article>({ it.guid }, { it.marker }, { it.title })

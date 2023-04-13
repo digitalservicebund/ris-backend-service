@@ -387,11 +387,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .verifyComplete()
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
-            .assertNext {
-                assertThat(it.files.size == 1, `is`(true))
-                assertThat(it.files[0].name == FILE1.name, `is`(true))
-                assertThat(it.files[0].hash == FILE1.hash, `is`(true))
-            }
+            .assertNext { assertNormsAreEqual(norm, it) }
             .verifyComplete()
     }
 
