@@ -8,7 +8,7 @@ import {
 } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if norm zip can be generated properly after an edit",
   async ({ page, normData, guid }) => {
     await openNorm(page, normData["officialLongTitle"], guid)
