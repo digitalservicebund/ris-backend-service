@@ -39,14 +39,31 @@ async function expectHeadingAppearAfterScroll(page, heading) {
   )
 }
 
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check display of norm complex",
   async ({ page, normData, guid }) => {
     await openNorm(page, normData["officialLongTitle"], guid)
 
     await expect(page).toHaveURL(`/norms/norm/${guid}`)
     await expect(page.getByText(normData["officialLongTitle"])).toBeVisible()
-    // We do no more import the "Regelungstext". No further tests required.
+
+    for (const article of Object.values(normData["articles"])) {
+      await expect(
+        page.getByText(article["marker"], { exact: true })
+      ).toBeVisible()
+      await expect(
+        page.getByText(article["title"], { exact: true })
+      ).toBeVisible()
+      for (const paragraph of Object.values(article["paragraphs"])) {
+        if (paragraph["marker"] === undefined) {
+          await expect(page.getByText(paragraph["text"])).toBeVisible()
+        } else {
+          await expect(
+            page.getByText(paragraph["marker"] + " " + paragraph["text"])
+          ).toBeVisible()
+        }
+      }
+    }
   }
 )
 
