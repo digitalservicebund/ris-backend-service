@@ -1,10 +1,12 @@
 import { Locator, test } from "@playwright/test"
+import DocumentUnit from "../../../src/domain/documentUnit"
 import { navigateToCategories } from "./e2e-utils"
 
 // Declare the types of your fixtures.
 type MyFixtures = {
   documentNumber: string
   editorField: Locator
+  secondaryDocumentUnit: DocumentUnit
 }
 
 export const testWithDocumentUnit = test.extend<MyFixtures>({
@@ -17,6 +19,36 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
     await use(documentNumber)
 
     await request.delete(`/api/v1/caselaw/documentunits/${uuid}`)
+  },
+
+  secondaryDocumentUnit: async ({ request }, use) => {
+    const response = await request.post(`/api/v1/caselaw/documentunits`, {
+      data: { documentationCenterAbbreviation: "foo", documentType: "X" },
+    })
+    const secondaryDocumentUnit = await response.json()
+    const updateResponse = await request.put(
+      `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`,
+      {
+        data: {
+          ...secondaryDocumentUnit,
+          coreData: {
+            ...secondaryDocumentUnit.coreData,
+            court: {
+              type: "AG",
+              location: "Aachen",
+            },
+            fileNumbers: ["fooAktenzeichen"],
+            documentType: { jurisShortcut: "AnU", label: "Anerkenntnisurteil" },
+          },
+        },
+      }
+    )
+
+    use(await updateResponse.json())
+
+    await request.delete(
+      `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`
+    )
   },
 
   editorField: async ({ page, documentNumber }, use) => {
