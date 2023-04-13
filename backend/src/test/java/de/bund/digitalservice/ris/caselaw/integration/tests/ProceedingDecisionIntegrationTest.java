@@ -77,8 +77,12 @@ class ProceedingDecisionIntegrationTest {
 
   @AfterEach
   void cleanUp() {
+    // has to be cleaned first to avoid foreign key constraint violation in the following deletions
     linkRepository.deleteAll().block();
     repository.deleteAll().block();
+    metadataRepository.deleteAll().block();
+    fileNumberRepository.deleteAll().block();
+    databaseDocumentTypeRepository.deleteAll().block();
   }
 
   @Test
@@ -488,28 +492,19 @@ class ProceedingDecisionIntegrationTest {
   }
 
   @Test
-  void testSearchForDocumentUnitsByProceedingDecisionInput() {
-    Instant date1 = Instant.parse("2023-01-02T00:00:00.00Z");
-    DocumentUnitMetadataDTO documentUnit1 =
-        buildDocumentUnitMetadataDTO("SomeCourt", "Berlin", date1, List.of("AkteX", "AkteY"), "CD");
-
-    Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
-    DocumentUnitMetadataDTO documentUnit2 =
-        buildDocumentUnitMetadataDTO("AnotherCourt", "Hamburg", date2, null, "EF");
-
-    Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
-    DocumentUnitMetadataDTO documentUnit3 =
-        buildDocumentUnitMetadataDTO("YetAnotherCourt", "Munich", date3, List.of("AkteX"), "GH");
-
-    // no search criteria --> matches all
+  void testSearchForDocumentUnitsByProceedingDecisionInput_noSearchCriteria_shouldMatchAll() {
+    prepareDocumentUnitMetadataDTOs();
     simulateAPICall(ProceedingDecision.builder().build())
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody()).hasSize(3);
             });
+  }
 
-    // search by date
+  @Test
+  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyDate_shouldMatchOne() {
+    Instant date1 = prepareDocumentUnitMetadataDTOs();
     simulateAPICall(ProceedingDecision.builder().date(date1).build())
         .consumeWith(
             response -> {
@@ -517,8 +512,11 @@ class ProceedingDecisionIntegrationTest {
               assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody()[0].date()).isEqualTo(date1);
             });
+  }
 
-    // search by court
+  @Test
+  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyCourt_shouldMatchOne() {
+    prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
             ProceedingDecision.builder().court(Court.builder().type("SomeCourt").build()).build())
         .consumeWith(
@@ -527,8 +525,11 @@ class ProceedingDecisionIntegrationTest {
               assertThat(response.getResponseBody()).hasSize(1);
               assertThat(response.getResponseBody()[0].court().type()).isEqualTo("SomeCourt");
             });
+  }
 
-    // search by fileNumber
+  @Test
+  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyFileNumber_shouldMatchTwo() {
+    prepareDocumentUnitMetadataDTOs();
     simulateAPICall(ProceedingDecision.builder().fileNumber("AkteX").build())
         .consumeWith(
             response -> {
@@ -537,8 +538,11 @@ class ProceedingDecisionIntegrationTest {
               assertThat(response.getResponseBody()[0].fileNumber()).isEqualTo("AkteX");
               assertThat(response.getResponseBody()[1].fileNumber()).isEqualTo("AkteX");
             });
+  }
 
-    // search by documentType
+  @Test
+  void testSearchForDocumentUnitsByProceedingDecisionInput_onlyDocumentType_shouldMatchOne() {
+    prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
             ProceedingDecision.builder()
                 .documentType(DocumentType.builder().jurisShortcut("GH").build())
@@ -550,8 +554,12 @@ class ProceedingDecisionIntegrationTest {
               assertThat(response.getResponseBody()[0].documentType().jurisShortcut())
                   .isEqualTo("GH");
             });
+  }
 
-    // matching 3 criteria but not the 4th one --> no result
+  @Test
+  void
+      testSearchForDocumentUnitsByProceedingDecisionInput_threeMatchingOneDoesNot_shouldMatchNothing() {
+    Instant date1 = prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
             ProceedingDecision.builder()
                 .date(date1)
@@ -564,6 +572,21 @@ class ProceedingDecisionIntegrationTest {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody()).isEmpty();
             });
+  }
+
+  private Instant prepareDocumentUnitMetadataDTOs() {
+    Instant date1 = Instant.parse("2023-01-02T00:00:00.00Z");
+    DocumentUnitMetadataDTO documentUnit1 =
+        buildDocumentUnitMetadataDTO("SomeCourt", "Berlin", date1, List.of("AkteX", "AkteY"), "CD");
+
+    Instant date2 = Instant.parse("2023-02-03T00:00:00.00Z");
+    DocumentUnitMetadataDTO documentUnit2 =
+        buildDocumentUnitMetadataDTO("AnotherCourt", "Hamburg", date2, null, "EF");
+
+    Instant date3 = Instant.parse("2023-03-04T00:00:00.00Z");
+    DocumentUnitMetadataDTO documentUnit3 =
+        buildDocumentUnitMetadataDTO("YetAnotherCourt", "Munich", date3, List.of("AkteX"), "GH");
+    return date1;
   }
 
   private BodySpec<ProceedingDecision[], ?> simulateAPICall(

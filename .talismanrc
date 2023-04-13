@@ -12,7 +12,7 @@ fileignoreconfig:
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/ProceedingDecisionIntegrationTest.java
-    checksum: 1369ad29989a04124af2b558b0d002ad5859ef190569d4637d3fd89eb522b442
+    checksum: 3255e1a60a6ec357c06c1077d6ac0227f839546193a0dce4ffb3c92cdddb40d1
   - filename: "*.sql"
     ignore_detectors: [filename]
 
