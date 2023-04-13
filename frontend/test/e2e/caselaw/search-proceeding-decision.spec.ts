@@ -28,6 +28,10 @@ test.describe("Search proceeding decisions", () => {
 
     await expect(page.getByText("Suchergebnis")).toBeVisible()
 
+    await expect(
+      page.getByText("AG Aachen, AnU, fooAktenzeichen")
+    ).toBeVisible()
+
     await page
       .locator(".table-row", {
         hasText: "AG Aachen, AnU, fooAktenzeichen",
