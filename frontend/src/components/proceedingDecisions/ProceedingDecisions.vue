@@ -59,7 +59,6 @@ async function linkProceedingDecision(childUuid: string) {
 }
 
 async function removeProceedingDecision(decision: ProceedingDecision) {
-  console.log("removeProceedingDecision")
   const response = await proceedingDecisionService.removeProceedingDecision(
     props.documentUnitUuid,
     decision.uuid as string
