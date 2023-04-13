@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import InlineDecision from "./InlineDecision.vue"
-import { SearchResults } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/documentUnit"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
 defineProps<{ searchResults: SearchResults }>()
@@ -9,7 +9,12 @@ const emits = defineEmits<{
 }>()
 </script>
 
-<script lang="ts"></script>
+<script lang="ts">
+export interface SearchResults {
+  decision: ProceedingDecision
+  isLinked: boolean
+}
+</script>
 
 <template>
   <strong>Suchergebnis:</strong>
