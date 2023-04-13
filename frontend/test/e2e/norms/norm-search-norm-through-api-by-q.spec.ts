@@ -2,7 +2,7 @@ import { expect } from "@playwright/test"
 import { testWithImportedNorm } from "./fixtures"
 import { normData } from "./testdata/norm_basic"
 
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check norm can be retrieved by search in long title",
   async ({ request }) => {
     const response = await request.get(
@@ -12,7 +12,7 @@ testWithImportedNorm.skip(
   }
 )
 
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check norm can be retrieved by search in short title",
   async ({ request }) => {
     const response = await request.get(
@@ -22,7 +22,7 @@ testWithImportedNorm.skip(
   }
 )
 
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check 404 is returned if no articles found",
   async ({ request }) => {
     const response = await request.get(`/api/v1/norms?q=invalidSearchQuery`)
