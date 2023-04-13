@@ -44,7 +44,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
       }
     )
 
-    use(await updateResponse.json())
+    await use(await updateResponse.json())
 
     await request.delete(
       `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`
