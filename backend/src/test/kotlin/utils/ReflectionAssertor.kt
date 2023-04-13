@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controll
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 import kotlin.comparisons.compareBy
 import kotlin.reflect.full.memberProperties
 
@@ -66,6 +67,10 @@ fun assertNormsAreEqual(norm1: Norm, norm2: Norm) {
     assertThat(sortedNorm1).isEqualTo(sortedNorm2)
 }
 
+/**
+ * Comparison of FileReference, we need to reduce to milliseconds (don't care about micro or nano seconds) since
+ * postgres can only save up to 6 digits (meaning micro seconds) but is automatically rounding up if needed.
+ */
 fun getNormWithSortedListProperties(norm: Norm): Norm {
     var sections = norm.metadataSections.toMutableList().sortedWith(metadataSectionComparator)
     sections = sections.map {
@@ -74,7 +79,8 @@ fun getNormWithSortedListProperties(norm: Norm): Norm {
             sections = it.sections?.toMutableList()?.sortedWith(metadataSectionComparator),
         )
     }
-    val fileReferences = norm.files.toMutableList().sortedWith(fileReferenceComparator)
+    val fileReferences = norm.files.toMutableList().map { it.copy(createdAt = it.createdAt.truncatedTo(ChronoUnit.MILLIS)) }
+        .sortedWith(fileReferenceComparator)
 
     var articles = norm.articles.toMutableList().sortedWith(articleComparator)
     articles = articles.map {
