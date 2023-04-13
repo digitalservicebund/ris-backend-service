@@ -1,7 +1,8 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import SearchResultList from "@/components/proceedingDecisions/SearchResultList.vue"
-import { SearchResults } from "@/domain/documentUnit"
+import SearchResultList, {
+  SearchResults,
+} from "@/components/proceedingDecisions/SearchResultList.vue"
 
 function renderComponent(searchResults?: SearchResults) {
   const props: { searchResults: SearchResults } = {
