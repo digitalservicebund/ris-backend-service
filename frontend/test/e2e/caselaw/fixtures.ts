@@ -1,5 +1,6 @@
 import { Locator, test } from "@playwright/test"
 import DocumentUnit from "../../../src/domain/documentUnit"
+import { generateString } from "../../test-helper/dataGenerators"
 import { navigateToCategories } from "./e2e-utils"
 
 // Declare the types of your fixtures.
@@ -37,7 +38,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
               type: "AG",
               location: "Aachen",
             },
-            fileNumbers: ["fooAktenzeichen"],
+            fileNumbers: [generateString()],
             documentType: { jurisShortcut: "AnU", label: "Anerkenntnisurteil" },
           },
         },

@@ -28,16 +28,11 @@ test.describe("Search proceeding decisions", () => {
 
     await expect(page.getByText("Suchergebnis")).toBeVisible()
 
-    await expect(
-      page.getByText("AG Aachen, AnU, fooAktenzeichen")
-    ).toBeVisible()
-
-    await page
-      .locator(".table-row", {
-        hasText: "AG Aachen, AnU, fooAktenzeichen",
-      })
-      .locator("[aria-label='Treffer übernehmen']")
-      .click()
+    const result = page.locator(".table-row", {
+      hasText: `AG Aachen, AnU, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`,
+    })
+    await expect(result).toBeVisible()
+    await result.locator("[aria-label='Treffer übernehmen']").click()
 
     await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
 
