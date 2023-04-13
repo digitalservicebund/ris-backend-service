@@ -1,4 +1,5 @@
 import { expect } from "@playwright/test"
+import { generateString } from "../../test-helper/dataGenerators"
 import { navigateToCategories } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
@@ -14,19 +15,21 @@ test.describe("Add and remove keywords to content related indexing", () => {
   test("add keywords", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Schlagwörter']").fill("one")
-    await page.keyboard.press("Enter")
+    const firstKeyword = generateString()
+    const secondKeyword = generateString()
 
-    await page.locator("[aria-label='Schlagwörter']").fill("two")
+    await page.locator("[aria-label='Schlagwörter']").fill(firstKeyword)
     await page.keyboard.press("Enter")
+    await expect(page.getByText(firstKeyword)).toBeVisible()
 
-    await expect(page.locator("text=one").first()).toBeVisible()
-    await expect(page.locator("text=two").first()).toBeVisible()
+    await page.locator("[aria-label='Schlagwörter']").fill(secondKeyword)
+    await page.keyboard.press("Enter")
+    await expect(page.getByText(secondKeyword)).toBeVisible()
 
     await page.reload()
 
-    await expect(page.locator("text=two").first()).toBeVisible()
-    await expect(page.locator("text=one").first()).toBeVisible()
+    await expect(page.getByText(firstKeyword)).toBeVisible()
+    await expect(page.getByText(secondKeyword)).toBeVisible()
   })
 
   test("add keywords with special character", async ({
@@ -35,55 +38,56 @@ test.describe("Add and remove keywords to content related indexing", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Schlagwörter']").fill("one")
-    await page.keyboard.press("Enter")
+    const keywordWithSpecialCharacters = generateString() + "%&/"
 
-    await page.locator("[aria-label='Schlagwörter']").fill("two%")
+    await page
+      .locator("[aria-label='Schlagwörter']")
+      .fill(keywordWithSpecialCharacters)
     await page.keyboard.press("Enter")
-
-    await expect(page.locator("text=one").first()).toBeVisible()
-    await expect(page.locator("text=two%").first()).toBeVisible()
+    await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
 
     await page.reload()
 
-    await expect(page.locator("text=two%").first()).toBeVisible()
-    await expect(page.locator("text=one").first()).toBeVisible()
+    await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
   })
 
   // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("add same keyword not working", async ({
-    page,
-    documentNumber,
-  }) => {
+  test("add same keyword not working", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Schlagwörter']").fill("one")
+    const keyword = generateString()
+
+    await page.locator("[aria-label='Schlagwörter']").fill(keyword)
+    await page.keyboard.press("Enter")
+    await expect(page.getByText(keyword)).toBeVisible()
+
+    await page.locator("[aria-label='Schlagwörter']").fill(keyword)
     await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Schlagwörter']").fill("one")
-    await page.keyboard.press("Enter")
-
-    await expect(
-      page.locator("text=Schlagwort bereits vergeben").first()
-    ).toBeVisible()
+    await expect(page.getByText("Schlagwort bereits vergeben")).toBeVisible()
   })
 
   test("delete keywords", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Schlagwörter']").fill("one")
+    const firstKeyword = generateString()
+    const secondKeyword = generateString()
+
+    await page.locator("[aria-label='Schlagwörter']").fill(firstKeyword)
     await page.keyboard.press("Enter")
+    await expect(page.getByText(firstKeyword)).toBeVisible()
 
-    await page.locator("[aria-label='Schlagwörter']").fill("two")
+    await page.locator("[aria-label='Schlagwörter']").fill(secondKeyword)
     await page.keyboard.press("Enter")
+    await expect(page.getByText(secondKeyword)).toBeVisible()
 
-    await expect(page.locator("text=one").first()).toBeVisible()
-    await expect(page.locator("text=two").first()).toBeVisible()
-
-    await page.keyboard.press("Backspace")
+    await page.keyboard.press("ArrowRight")
+    await page.keyboard.press("ArrowRight")
+    await page.keyboard.press("Enter")
 
     await page.reload()
 
-    await expect(page.locator("text=two").first()).toBeHidden()
+    await expect(page.getByText(firstKeyword)).toBeVisible()
+    await expect(page.getByText(secondKeyword)).toBeHidden()
   })
 })
