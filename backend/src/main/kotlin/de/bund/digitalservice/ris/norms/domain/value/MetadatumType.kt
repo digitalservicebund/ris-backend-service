@@ -20,4 +20,10 @@ enum class MetadatumType {
     SUBJECT_PREVIOUS_FNA,
     SUBJECT_GESTA,
     SUBJECT_BGB_3,
+    DATE,
+    YEAR,
+    RANGE_START,
+    RANGE_START_UNIT,
+    RANGE_END,
+    RANGE_END_UNIT,
 }

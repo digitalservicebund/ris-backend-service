@@ -5,4 +5,6 @@ enum class MetadataSectionName {
     SUBJECT_AREA,
     LEAD,
     PARTICIPATION,
+    CITATION_DATE,
+    AGE_IDENTIFICATION,
 }

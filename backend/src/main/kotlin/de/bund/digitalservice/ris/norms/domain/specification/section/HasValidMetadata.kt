@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
@@ -11,6 +12,10 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDIC
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_BGB_3
@@ -22,6 +27,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName as Section
 
 val hasValidMetadata =
@@ -34,7 +40,25 @@ val hasValidMetadata =
             Section.SUBJECT_AREA -> hasType(listOf(SUBJECT_FNA, SUBJECT_PREVIOUS_FNA, SUBJECT_GESTA, SUBJECT_BGB_3), instance)
             Section.LEAD -> hasType(listOf(LEAD_JURISDICTION, LEAD_UNIT), instance)
             Section.PARTICIPATION -> hasType(listOf(PARTICIPATION_TYPE, PARTICIPATION_INSTITUTION), instance)
+            Section.CITATION_DATE -> hasOneOfType(listOf(DATE, YEAR), instance)
+            Section.AGE_IDENTIFICATION -> hasOnlyBlocksOf(
+                listOf(listOf(RANGE_START, RANGE_START_UNIT), listOf(RANGE_END, RANGE_END_UNIT)),
+                instance,
+            )
         }
 
-        private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean = instance.metadata.all { types.contains(it.type) }
+        private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
+            instance.metadata.all { types.contains(it.type) }
+        private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
+            instance.metadata.count() == 1 && hasType(types, instance)
+        private fun hasOnlyBlocksOf(types: List<List<MetadatumType>>, instance: MetadataSection): Boolean {
+            var result = true
+            types.forEach { typeList ->
+                if (instance.metadata.any { typeList.contains(it.type) }) {
+                    val all = typeList.all { type -> instance.metadata.any { type == it.type } }
+                    result = result and all
+                }
+            }
+            return result
+        }
     }
