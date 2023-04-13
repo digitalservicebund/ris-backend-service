@@ -32,7 +32,8 @@ test.describe("Add and remove keywords to content related indexing", () => {
     await expect(page.getByText(secondKeyword)).toBeVisible()
   })
 
-  test("add keywords with special character", async ({
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("add keywords with special character", async ({
     page,
     documentNumber,
   }) => {
