@@ -10,10 +10,10 @@ const emits = defineEmits<{
 </script>
 
 <script lang="ts">
-export interface SearchResults {
+export type SearchResults = {
   decision: ProceedingDecision
   isLinked: boolean
-}
+}[]
 </script>
 
 <template>
