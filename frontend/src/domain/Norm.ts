@@ -47,6 +47,12 @@ export enum MetadatumType {
   SUBJECT_PREVIOUS_FNA = "SUBJECT_PREVIOUS_FNA",
   SUBJECT_GESTA = "SUBJECT_GESTA",
   SUBJECT_BGB_3 = "SUBJECT_BGB_3",
+  YEAR = "YEAR",
+  DATE = "DATE",
+  RANGE_START = "RANGE_START",
+  RANGE_START_UNIT = "RANGE_START_UNIT",
+  RANGE_END = "RANGE_END",
+  RANGE_END_UNIT = "RANGE_END_UNIT",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -70,6 +76,12 @@ export type MetadataValueType = {
   [MetadatumType.SUBJECT_PREVIOUS_FNA]: string
   [MetadatumType.SUBJECT_GESTA]: string
   [MetadatumType.SUBJECT_BGB_3]: string
+  [MetadatumType.DATE]: string
+  [MetadatumType.YEAR]: string
+  [MetadatumType.RANGE_START]: string
+  [MetadatumType.RANGE_START_UNIT]: string
+  [MetadatumType.RANGE_END]: string
+  [MetadatumType.RANGE_END_UNIT]: string
 }
 
 export type Metadata = {
@@ -81,6 +93,8 @@ export enum MetadataSectionName {
   SUBJECT_AREA = "SUBJECT_AREA",
   LEAD = "LEAD",
   PARTICIPATION = "PARTICIPATION",
+  CITATION_DATE = "CITATION_DATE",
+  AGE_INDICATION = "AGE_INDICATION",
 }
 
 export type MetadataSections = {
