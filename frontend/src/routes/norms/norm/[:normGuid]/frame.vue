@@ -349,12 +349,12 @@ const citationData = computed({
 
     <ExpandableContent header-id="headingsAndAbbreviationsUnofficial">
       <template #header>
-        <h2
+        <legend
           id="headingsAndAbbreviationsUnofficial"
           class="link-01-bold mb-[1rem]"
         >
           Nichtamtliche Überschriften und Abkürzungen
-        </h2>
+        </legend>
       </template>
       <InputGroup
         v-model="flatMetadata"

@@ -1,11 +1,81 @@
 import { expect, test } from "@playwright/test"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
-import { MetaDatumType } from "@/domain/Norm"
+import { Norm } from "@/domain/Norm"
 
 type MyFixtures = {
-  normData: object
+  normData: NormData
   guid: string
+}
+
+// This helps to get clean and simple hover types in the IDE.
+type CleanTypeWrapper<Type> = unknown & {
+  [Property in keyof Type]: Type[Property]
+}
+
+type UnionOmit<Type, KeyToOmit extends PropertyKey> = Type extends unknown
+  ? Omit<Type, KeyToOmit>
+  : never
+
+type NullUnionOmit<Type, KeyToOmit extends PropertyKey> = null extends Type
+  ? UnionOmit<NonNullable<Type>, KeyToOmit>
+  : UnionOmit<Type, KeyToOmit>
+
+type RecursiveOmitHelper<Type, KeyToOmit extends PropertyKey> = {
+  [Property in keyof Type]: CleanTypeWrapper<
+    RecursiveOmit<Type[Property], KeyToOmit>
+  >
+}
+
+/**
+ * Used to recursively omit a property via its key from a nested object type.
+ * While `Omit<Type, Key>` only removes the property from the first level, this
+ * does it deeply nested.
+ * The challenge within the helper types is to address the problem of nullable
+ * type unions and proper tool tips within development environments.
+ *
+ * @example
+ * ```ts
+ * type WithProperty = {
+ *   a: string, b: number, c: {
+ *     a: string, d: boolean, e: {
+ *       a: string, f: string | null
+ *     }
+ *   }
+ * }
+ * type WithoutPropertyA = RecursiveOmit<WithProperty, 'a'>
+ * // => // { b: number, c: { d: boolean, e: { f: string | null } } }
+ * ```
+ */
+type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
+  [Property in KeyToOmit]: unknown
+}
+  ? NullUnionOmit<RecursiveOmitHelper<Type, KeyToOmit>, KeyToOmit>
+  : RecursiveOmitHelper<Type, KeyToOmit>
+
+export type NormData = RecursiveOmit<Norm, "guid"> & {
+  jurisZipFileName: string
+}
+
+export enum FieldType {
+  TEXT,
+  CHECKBOX,
+  CHIPS,
+  DROPDOWN,
+}
+
+export type Field = {
+  type: FieldType
+  name: string
+  label: string
+} & ({ value: unknown; values?: never } | { value?: never; values?: unknown[] })
+
+export type NormSection = {
+  heading: string
+  id?: string
+  isRepeatedSection?: boolean
+  fields?: Field[]
+  sections?: NormSection[]
 }
 
 export const testWithImportedNorm = test.extend<MyFixtures>({
@@ -22,65 +92,53 @@ export const testWithImportedNorm = test.extend<MyFixtures>({
   },
 })
 
-export function getNormBySections(norm) {
+export function getNormBySections(norm: NormData): NormSection[] {
   return [
     {
       heading: "Allgemeine Angaben",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "officialLongTitle",
           label: "Amtliche Langüberschrift",
           value: norm.officialLongTitle,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "risAbbreviation",
           label: "Juris-Abkürzung",
           value: norm.risAbbreviation,
         },
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "risAbbreviationInternationalLaw",
           label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
-          value: norm.metadata
-            .filter(
-              (metaDatum) =>
-                (metaDatum.type =
-                  MetaDatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW)
-            )
-            .map((metaDatum) => metaDatum.value),
+          value:
+            norm.metadataSections?.NORM?.[0].RIS_ABBREVIATION_INTERNATIONAL_LAW,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "documentNumber",
           label: "Dokumentnummer",
           value: norm.documentNumber,
         },
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "divergentDocumentNumber",
           label: "Abweichende Dokumentnummer",
-          value: norm.metadata
-            .filter(
-              (metaDatum) =>
-                (metaDatum.type = MetaDatumType.DIVERGENT_DOCUMENT_NUMBER)
-            )
-            .map((metaDatum) => metaDatum.value),
+          value: norm.metadataSections?.NORM?.[0].DIVERGENT_DOCUMENT_NUMBER,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "documentCategory",
           label: "Dokumentart",
           value: norm.documentCategory,
         },
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "frameKeywords",
           label: "Schlagwörter im Rahmenelement",
-          value: norm.metadata
-            .filter((metaDatum) => (metaDatum.type = MetaDatumType.KEYWORD))
-            .map((metaDatum) => metaDatum.value),
+          value: norm.metadataSections?.NORM?.[0].KEYWORD,
         },
       ],
     },
@@ -88,19 +146,19 @@ export function getNormBySections(norm) {
       heading: "Dokumenttyp",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "documentTypeName",
           label: "Typbezeichnung",
           value: norm.documentTypeName,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "documentNormCategory",
           label: "Art der Norm",
           value: norm.documentNormCategory,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "documentTemplateName",
           label: "Bezeichnung gemäß Vorlage",
           value: norm.documentTemplateName,
@@ -111,19 +169,19 @@ export function getNormBySections(norm) {
       heading: "Normgeber",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "providerEntity",
           label: "Staat, Land, Stadt, Landkreis oder juristische Person",
           value: norm.providerEntity,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "providerDecidingBody",
           label: "Beschließendes Organ",
           value: norm.providerDecidingBody,
         },
         {
-          type: "checkbox",
+          type: FieldType.CHECKBOX,
           name: "providerIsResolutionMajority",
           label: "Beschlussfassung mit qualifizierter Mehrheit",
           value: norm.providerIsResolutionMajority,
@@ -132,64 +190,86 @@ export function getNormBySections(norm) {
     },
     {
       heading: "Mitwirkende Organe",
+      id: "participatingInstitutionsFields",
+      isRepeatedSection: true,
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "participationType",
           label: "Art der Mitwirkung",
-          value: norm.participationType,
+          values: norm.metadataSections?.PARTICIPATION?.map(
+            (section) => section?.PARTICIPATION_TYPE?.[0]
+          ),
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "participationInstitution",
           label: "Mitwirkendes Organ",
-          value: norm.participationInstitution,
+          values: norm.metadataSections?.PARTICIPATION?.map(
+            (section) => section?.PARTICIPATION_INSTITUTION?.[0]
+          ),
         },
       ],
     },
     {
       heading: "Federführung",
+      isRepeatedSection: true,
+      id: "leadFields",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "leadJurisdiction",
           label: "Ressort",
-          value: norm.leadJurisdiction,
+          values: norm.metadataSections?.LEAD?.map(
+            (section) => section?.LEAD_JURISDICTION?.[0]
+          ),
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "leadUnit",
           label: "Organisationseinheit",
-          value: norm.leadUnit,
+          values: norm.metadataSections?.LEAD?.map(
+            (section) => section?.LEAD_UNIT?.[0]
+          ),
         },
       ],
     },
     {
       heading: "Sachgebiet",
+      isRepeatedSection: true,
+      id: "subjectAreaFields",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "subjectFna",
           label: "FNA-Nummer",
-          value: norm.subjectFna,
+          values: norm.metadataSections?.SUBJECT_AREA?.map(
+            (section) => section?.SUBJECT_FNA?.[0]
+          ),
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "subjectPreviousFna",
           label: "Frühere FNA-Nummer",
-          value: norm.subjectPreviousFna,
+          values: norm.metadataSections?.SUBJECT_AREA?.map(
+            (section) => section?.SUBJECT_PREVIOUS_FNA?.[0]
+          ),
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "subjectGesta",
           label: "GESTA-Nummer",
-          value: norm.subjectGesta,
+          values: norm.metadataSections?.SUBJECT_AREA?.map(
+            (section) => section?.SUBJECT_GESTA?.[0]
+          ),
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "subjectBgb3",
           label: "Bundesgesetzblatt Teil III",
-          value: norm.subjectBgb3,
+          values: norm.metadataSections?.SUBJECT_AREA?.map(
+            (section) => section?.SUBJECT_BGB_3?.[0]
+          ),
         },
       ],
     },
@@ -197,49 +277,41 @@ export function getNormBySections(norm) {
       heading: "Überschriften und Abkürzungen",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "officialShortTitle",
           label: "Amtliche Kurzüberschrift",
           value: norm.officialShortTitle,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "officialAbbreviation",
           label: "Amtliche Buchstabenabkürzung",
           value: norm.officialAbbreviation,
         },
+      ],
+      sections: [
         {
-          type: "repeated",
-          name: "unofficialLongTitle",
-          label: "Nichtamtliche Langüberschrift",
-          value: norm.metadata
-            .filter(
-              (metaDatum) =>
-                (metaDatum.type = MetaDatumType.UNOFFICIAL_LONG_TITLE)
-            )
-            .map((metaDatum) => metaDatum.value),
-        },
-        {
-          type: "repeated",
-          name: "unofficialShortTitle",
-          label: "Nichtamtliche Kurzüberschrift",
-          value: norm.metadata
-            .filter(
-              (metaDatum) =>
-                (metaDatum.type = MetaDatumType.UNOFFICIAL_SHORT_TITLE)
-            )
-            .map((metaDatum) => metaDatum.value),
-        },
-        {
-          type: "repeated",
-          name: "unofficialAbbreviation",
-          label: "Nichtamtliche Buchstabenabkürzung",
-          value: norm.metadata
-            .filter(
-              (metaDatum) =>
-                (metaDatum.type = MetaDatumType.UNOFFICIAL_ABBREVIATION)
-            )
-            .map((metaDatum) => metaDatum.value),
+          heading: "Nichtamtliche Überschriften und Abkürzungen",
+          fields: [
+            {
+              type: FieldType.CHIPS,
+              name: "unofficialLongTitle",
+              label: "Nichtamtliche Langüberschrift",
+              value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_LONG_TITLE,
+            },
+            {
+              type: FieldType.CHIPS,
+              name: "unofficialShortTitle",
+              label: "Nichtamtliche Kurzüberschrift",
+              value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_SHORT_TITLE,
+            },
+            {
+              type: FieldType.CHIPS,
+              name: "unofficialAbbreviation",
+              label: "Nichtamtliche Buchstabenabkürzung",
+              value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_ABBREVIATION,
+            },
+          ],
         },
       ],
     },
@@ -247,37 +319,37 @@ export function getNormBySections(norm) {
       heading: "Inkrafttreten",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "entryIntoForceDate",
           label: "Datum des Inkrafttretens",
           value: norm.entryIntoForceDate,
         },
         {
-          type: "dropdown",
+          type: FieldType.DROPDOWN,
           name: "entryIntoForceDateState",
           label: "Unbestimmtes Datum des Inkrafttretens",
           value: norm.entryIntoForceDateState,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "principleEntryIntoForceDate",
           label: "Grundsätzliches Inkrafttretedatum",
           value: norm.principleEntryIntoForceDate,
         },
         {
-          type: "dropdown",
+          type: FieldType.DROPDOWN,
           name: "principleEntryIntoForceDateState",
           label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
           value: norm.principleEntryIntoForceDateState,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "divergentEntryIntoForceDate",
           label: "Bestimmtes abweichendes Inkrafttretedatum",
           value: norm.divergentEntryIntoForceDate,
         },
         {
-          type: "dropdown",
+          type: FieldType.DROPDOWN,
           name: "divergentEntryIntoForceDateState",
           label: "Unbestimmtes abweichendes Inkrafttretedatum",
           value: norm.divergentEntryIntoForceDateState,
@@ -288,49 +360,49 @@ export function getNormBySections(norm) {
       heading: "Außerkrafttreten",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "expirationDate",
           label: "Datum des Außerkrafttretens",
           value: norm.expirationDate,
         },
         {
-          type: "dropdown",
+          type: FieldType.DROPDOWN,
           name: "expirationDateState",
           label: "Unbestimmtes Datum des Außerkrafttretens",
           value: norm.expirationDateState,
         },
         {
-          type: "checkbox",
+          type: FieldType.CHECKBOX,
           name: "isExpirationDateTemp",
           label: "Befristet",
           value: norm.isExpirationDateTemp,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "principleExpirationDate",
           label: "Grundsätzliches Außerkrafttretedatum",
           value: norm.principleExpirationDate,
         },
         {
-          type: "dropdown",
+          type: FieldType.DROPDOWN,
           name: "principleExpirationDateState",
           label: "Unbestimmtes grundsätzliches Außerkrafttretdatum",
           value: norm.principleExpirationDateState,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "divergentExpirationDate",
           label: "Bestimmtes abweichendes Außerkrafttretedatum",
           value: norm.divergentExpirationDate,
         },
         {
-          type: "dropdown",
+          type: FieldType.DROPDOWN,
           name: "divergentExpirationDateState",
           label: "Unbestimmtes abweichendes Außerkrafttretdatum",
           value: norm.divergentExpirationDateState,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "expirationNormCategory",
           label: "Art der Norm",
           value: norm.expirationNormCategory,
@@ -341,13 +413,13 @@ export function getNormBySections(norm) {
       heading: "Verkündungsdatum",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "announcementDate",
           label: "Verkündungsdatum",
           value: norm.announcementDate,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "publicationDate",
           label: "Veröffentlichungsdatum",
           value: norm.publicationDate,
@@ -358,7 +430,7 @@ export function getNormBySections(norm) {
       heading: "Zitierdatum",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "citationDate",
           label: "Zitierdatum",
           value: norm.citationDate,
@@ -372,37 +444,37 @@ export function getNormBySections(norm) {
           heading: "Papierverkündung",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "printAnnouncementGazette",
               label: "Verkündungsblatt",
               value: norm.printAnnouncementGazette,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "printAnnouncementYear",
               label: "Jahr",
               value: norm.printAnnouncementYear,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "printAnnouncementNumber",
               label: "Nummer",
               value: norm.printAnnouncementNumber,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "printAnnouncementPage",
               label: "Seitenzahl",
               value: norm.printAnnouncementPage,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "printAnnouncementInfo",
               label: "Zusatzangaben",
               value: norm.printAnnouncementInfo,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "printAnnouncementExplanations",
               label: "Erläuterungen",
               value: norm.printAnnouncementExplanations,
@@ -413,55 +485,55 @@ export function getNormBySections(norm) {
           heading: "Elektronisches Verkündungsblatt",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementMedium",
               label: "Verkündungsmedium",
               value: norm.digitalAnnouncementMedium,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementDate",
               label: "Verkündungsdatum",
               value: norm.digitalAnnouncementDate,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementEdition",
               label: "Ausgabenummer",
               value: norm.digitalAnnouncementEdition,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementYear",
               label: "Jahr",
               value: norm.digitalAnnouncementYear,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementPage",
               label: "Seitenzahlen",
               value: norm.digitalAnnouncementPage,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementArea",
               label: "Bereich der Veröffentlichung",
               value: norm.digitalAnnouncementArea,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementAreaNumber",
               label: "Nummer der Veröffentlichung im jeweiligen Bereich",
               value: norm.digitalAnnouncementAreaNumber,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementInfo",
               label: "Zusatzangaben",
               value: norm.digitalAnnouncementInfo,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "digitalAnnouncementExplanations",
               label: "Erläuterungen",
               value: norm.digitalAnnouncementExplanations,
@@ -472,43 +544,43 @@ export function getNormBySections(norm) {
           heading: "Amtsblatt der EU",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "euAnnouncementGazette",
               label: "Amtsblatt der EU",
               value: norm.euAnnouncementGazette,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "euAnnouncementYear",
               label: "Jahresangabe",
               value: norm.euAnnouncementYear,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "euAnnouncementSeries",
               label: "Reihe",
               value: norm.euAnnouncementSeries,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "euAnnouncementNumber",
               label: "Nummer des Amtsblatts",
               value: norm.euAnnouncementNumber,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "euAnnouncementPage",
               label: "Seitenzahl",
               value: norm.euAnnouncementPage,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "euAnnouncementInfo",
               label: "Zusatzangaben",
               value: norm.euAnnouncementInfo,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "euAnnouncementExplanations",
               label: "Erläuterungen",
               value: norm.euAnnouncementExplanations,
@@ -519,7 +591,7 @@ export function getNormBySections(norm) {
           heading: "Sonstige amtliche Fundstelle",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "otherOfficialAnnouncement",
               label: "Sonstige amtliche Fundstelle",
               value: norm.otherOfficialAnnouncement,
@@ -534,15 +606,10 @@ export function getNormBySections(norm) {
 
       fields: [
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "unofficialReference",
           label: "Nichtamtliche Fundstelle",
-          value: norm.metadata
-            .filter(
-              (metaDatum) =>
-                (metaDatum.type = MetaDatumType.UNOFFICIAL_REFERENCE)
-            )
-            .map((metaDatum) => metaDatum.value),
+          value: "",
         },
       ],
     },
@@ -550,7 +617,7 @@ export function getNormBySections(norm) {
       heading: "Vollzitat",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "completeCitation",
           label: "Vollzitat",
           value: norm.completeCitation,
@@ -564,25 +631,25 @@ export function getNormBySections(norm) {
           heading: "Stand",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "statusNote",
               label: "Änderungshinweis",
               value: norm.statusNote,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "statusDescription",
               label: "Bezeichnung der Änderungsvorschrift",
               value: norm.statusDescription,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "statusDate",
               label: "Datum der Änderungsvorschrift",
               value: norm.statusDate,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "statusReference",
               label: "Fundstellen der Änderungsvorschrift",
               value: norm.statusReference,
@@ -593,25 +660,25 @@ export function getNormBySections(norm) {
           heading: "Aufhebung",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "repealNote",
               label: "Änderungshinweis",
               value: norm.repealNote,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "repealArticle",
               label: "Artikel der Änderungsvorschrift",
               value: norm.repealArticle,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "repealDate",
               label: "Datum der Änderungsvorschrift",
               value: norm.repealDate,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "repealReferences",
               label: "Fundstellen der Änderungsvorschrift",
               value: norm.repealReferences,
@@ -622,25 +689,25 @@ export function getNormBySections(norm) {
           heading: "Neufassung",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "reissueNote",
               label: "Neufassungshinweis",
               value: norm.reissueNote,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "reissueArticle",
               label: "Bezeichnung der Bekanntmachung",
               value: norm.reissueArticle,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "reissueDate",
               label: "Datum der Bekanntmachung",
               value: norm.reissueDate,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "reissueReference",
               label: "Fundstelle der Bekanntmachung",
               value: norm.reissueReference,
@@ -651,7 +718,7 @@ export function getNormBySections(norm) {
           heading: "Sonstiger Hinweis",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "otherStatusNote",
               label: "Sonstiger Hinweis",
               value: norm.otherStatusNote,
@@ -667,37 +734,37 @@ export function getNormBySections(norm) {
           heading: "Stand der dokumentarischen Bearbeitung",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "documentStatusWorkNote",
               label: "Bearbeitungshinweis",
               value: norm.documentStatusWorkNote,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "documentStatusDescription",
               label: "Bezeichnung der Änderungsvorschrift",
               value: norm.documentStatusDescription,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "documentStatusDate",
               label: "Datum der Änderungsvorschrift",
               value: norm.documentStatusDate,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "documentStatusReference",
               label: "Fundstelle der Änderungsvorschrift",
               value: norm.documentStatusReference,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "documentStatusEntryIntoForceDate",
               label: "Datum des Inkrafttretens der Änderung",
               value: norm.documentStatusEntryIntoForceDate,
             },
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "documentStatusProof",
               label:
                 "Angaben zum textlichen und/oder dokumentarischen Nachweis",
@@ -709,7 +776,7 @@ export function getNormBySections(norm) {
           heading: "Textnachweis",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "documentTextProof",
               label: "Textnachweis",
               value: norm.documentTextProof,
@@ -720,7 +787,7 @@ export function getNormBySections(norm) {
           heading: "Sonstiger Hinweis",
           fields: [
             {
-              type: "text",
+              type: FieldType.TEXT,
               name: "otherDocumentNote",
               label: "Sonstiger Hinweis",
               value: norm.otherDocumentNote,
@@ -733,7 +800,7 @@ export function getNormBySections(norm) {
       heading: "Aktivverweisung",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "categorizedReference",
           label: "Aktivverweisung",
           value: norm.categorizedReference,
@@ -744,37 +811,37 @@ export function getNormBySections(norm) {
       heading: "Fußnote",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "otherFootnote",
           label: "Sonstige Fußnote",
           value: norm.otherFootnote,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "footnoteChange",
           label: "Änderungsfußnote",
           value: norm.footnoteChange,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "footnoteComment",
           label: "Kommentierende Fußnote",
           value: norm.footnoteComment,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "footnoteDecision",
           label: "BVerfG-Entscheidung",
           value: norm.footnoteDecision,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "footnoteStateLaw",
           label: "Landesrecht",
           value: norm.footnoteStateLaw,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "footnoteEuLaw",
           label: "EU/EG-Recht",
           value: norm.footnoteEuLaw,
@@ -785,14 +852,10 @@ export function getNormBySections(norm) {
       heading: "Gültigkeitsregelung",
       fields: [
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "validityRule",
           label: "Gültigkeitsregelung",
-          value: norm.metadata
-            .filter(
-              (metaDatum) => (metaDatum.type = MetaDatumType.VALIDITY_RULE)
-            )
-            .map((metaDatum) => metaDatum.value),
+          value: "",
         },
       ],
     },
@@ -800,25 +863,25 @@ export function getNormBySections(norm) {
       heading: "Elektronischer Nachweis",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "digitalEvidenceLink",
           label: "Verlinkung",
           value: norm.digitalEvidenceLink,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "digitalEvidenceRelatedData",
           label: "Zugehörige Dateien",
           value: norm.digitalEvidenceRelatedData,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "digitalEvidenceExternalDataNote",
           label: "Hinweis auf fremde Verlinkung oder Daten",
           value: norm.digitalEvidenceExternalDataNote,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "digitalEvidenceAppendix",
           label: "Zusatz zum Nachweis",
           value: norm.digitalEvidenceAppendix,
@@ -829,14 +892,10 @@ export function getNormBySections(norm) {
       heading: "Aktenzeichen",
       fields: [
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "referenceNumber",
           label: "Aktenzeichen",
-          value: norm.metadata
-            .filter(
-              (metaDatum) => (metaDatum.type = MetaDatumType.REFERENCE_NUMBER)
-            )
-            .map((metaDatum) => metaDatum.value),
+          value: "",
         },
       ],
     },
@@ -844,7 +903,7 @@ export function getNormBySections(norm) {
       heading: "CELEX-Nummer",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "celexNumber",
           label: "CELEX-Nummer",
           value: norm.celexNumber,
@@ -855,13 +914,13 @@ export function getNormBySections(norm) {
       heading: "Altersangabe",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "ageIndicationStart",
           label: "Anfang",
           value: norm.ageIndicationStart,
         },
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "ageIndicationEnd",
           label: "Ende",
           value: norm.ageIndicationEnd,
@@ -872,12 +931,10 @@ export function getNormBySections(norm) {
       heading: "Definition",
       fields: [
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "definition",
           label: "Definition",
-          value: norm.metadata
-            .filter((metaDatum) => (metaDatum.type = MetaDatumType.DEFINITION))
-            .map((metaDatum) => metaDatum.value),
+          value: norm.metadataSections?.NORM?.[0]?.DEFINITION,
         },
       ],
     },
@@ -885,15 +942,10 @@ export function getNormBySections(norm) {
       heading: "Angaben zur Volljährigkeit",
       fields: [
         {
-          type: "repeated",
+          type: FieldType.CHIPS,
           name: "ageOfMajorityIndication",
           label: "Angaben zur Volljährigkeit",
-          value: norm.metadata
-            .filter(
-              (metaDatum) =>
-                (metaDatum.type = MetaDatumType.AGE_OF_MAJORITY_INDICATION)
-            )
-            .map((metaDatum) => metaDatum.value),
+          value: norm.metadataSections?.NORM?.[0]?.AGE_OF_MAJORITY_INDICATION,
         },
       ],
     },
@@ -901,7 +953,7 @@ export function getNormBySections(norm) {
       heading: "Text",
       fields: [
         {
-          type: "text",
+          type: FieldType.TEXT,
           name: "text",
           label: "Text",
           value: norm.text,

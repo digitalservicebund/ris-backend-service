@@ -96,6 +96,7 @@ watch(editIndex, focusFirstInputOfCurrentEditElement)
       <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
       <div
         v-if="index !== editIndex"
+        aria-label="Listen Eintrag"
         class="border-b-1 border-b-blue-500 cursor-pointer flex justify-between py-10"
         @click="setEditIndex(index)"
       >
