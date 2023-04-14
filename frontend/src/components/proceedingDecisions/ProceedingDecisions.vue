@@ -1,12 +1,14 @@
 <script lang="ts" setup>
-import { watch, ref } from "vue"
+import dayjs from "dayjs"
+import { h, watch, ref } from "vue"
 import DecisionList from "./DecisionList.vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
-import ExpandableContent from "@/components/ExpandableContent.vue"
+import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import { ProceedingDecision } from "@/domain/documentUnit"
 import { proceedingDecisionFields } from "@/fields/caselaw"
 import DocumentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"
+import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import InputGroup from "@/shared/components/input/InputGroup.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
@@ -106,6 +108,23 @@ async function search() {
   }
 }
 
+function decisionSummarizer(dataEntry: undefined) {
+  return h("div", renderDecision(dataEntry))
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function renderDecision(dataEntry: any): string {
+  return [
+    ...(dataEntry.court ? [`${dataEntry.court.label}`] : []),
+    ...(dataEntry.documentType ? [dataEntry.documentType?.jurisShortcut] : []),
+    ...(dataEntry.date ? [dayjs(dataEntry.date).format("DD.MM.YYYY")] : []),
+    ...(dataEntry.fileNumber ? [dataEntry.fileNumber] : []),
+    ...(dataEntry.documentNumber ? [dataEntry.documentNumber] : []),
+  ].join(", ")
+}
+
+const DecisionSummary = withSummarizer(decisionSummarizer)
+
 watch(
   props,
   () => {
@@ -118,11 +137,11 @@ watch(
 </script>
 
 <template>
-  <ExpandableContent>
-    <template #header>
-      <h1 class="heading-02-regular mb-[1rem]">Vorgehende Entscheidungen</h1>
-    </template>
-
+  <ExpandableDataSet
+    :data-set="proceedingDecisions"
+    :summary-component="DecisionSummary"
+    title="Vorgehende Entscheidung"
+  >
     <DecisionList
       v-if="proceedingDecisions"
       :decisions="proceedingDecisions"
@@ -135,18 +154,22 @@ watch(
       :fields="proceedingDecisionFields"
     ></InputGroup>
 
-    <TextButton
-      aria-label="Nach Entscheidungen suchen"
-      class="mr-28"
-      label="Suchen"
-      @click="search"
-    />
+    <div>
+      <TextButton
+        aria-label="Nach Entscheidungen suchen"
+        button-type="secondary"
+        class="mr-28"
+        label="Suchen"
+        @click="search"
+      />
 
-    <TextButton
-      aria-label="Entscheidung manuell hinzufügen"
-      label="Manuell Hinzufügen"
-      @click="createProceedingDecision(input)"
-    />
+      <TextButton
+        aria-label="Entscheidung manuell hinzufügen"
+        button-type="tertiary"
+        label="Manuell Hinzufügen"
+        @click="createProceedingDecision(input)"
+      />
+    </div>
 
     <div v-if="searchResults" class="mb-10 mt-20">
       <SearchResultList
@@ -154,5 +177,5 @@ watch(
         @link-decision="linkProceedingDecision"
       />
     </div>
-  </ExpandableContent>
+  </ExpandableDataSet>
 </template>

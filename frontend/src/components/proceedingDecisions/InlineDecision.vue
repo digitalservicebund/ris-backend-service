@@ -25,7 +25,7 @@ function hasLink(): boolean {
 <template>
   <router-link
     v-if="hasLink()"
-    class="underline"
+    class="text-blue-800 underline"
     target="_blank"
     :to="{
       name: 'caselaw-documentUnit-:documentNumber-categories',
