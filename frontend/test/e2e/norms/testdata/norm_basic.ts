@@ -10,7 +10,7 @@ export const normData: NormData = {
       paragraphs: [
         {
           marker: "",
-          text: '§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert: 1. In Nummer 1 wird das Wort "Fertigarzneimittel" durch das Wort "Tierarzneimittel" ersetzt. 2. Nummer 2 wird wie folgt gefasst: "2. entsprechend der jeweiligen Zulassungsbedingungen angewendet werden."',
+          text: "§ 2 der Verordnung über Stoffe mit pharmakologischer Wirkung in der Fassung der Bekanntmachung vom 8. Juli 2009 (BGBl. I S. 1768) wird wie folgt geändert:",
         },
       ],
     },
@@ -24,7 +24,7 @@ export const normData: NormData = {
         },
         {
           marker: "(2)",
-          text: "Gleichzeitig treten außer Kraft 1. die Tierarzneimittel-Prüfrichtlinienverordnung vom 18. Februar 2010 (BGBl. I S. 130), 2. die AMG-Blauzungenkrankheit-Ausnahmeverordnung vom 7. April 2008 (BGBl. I S. 721), 3. die Tierarzneimittel-Mitteilungendurchführungsverordnung vom 18. Juni 2014 (BGBl. I S. 797) und 4. die Verordnung mit arzneimittelrechtlichen Vorschriften über die Arzneimittelverwendung in landwirtschaftlichen Betrieben vom 17. Juli 2015 (BGBl. I S. 1380).",
+          text: "Gleichzeitig treten außer Kraft",
         },
       ],
     },
