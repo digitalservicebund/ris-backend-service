@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import java.time.LocalDate
@@ -26,10 +26,10 @@ fun assertEditNormFrameProperties(
 
 fun assertEditNormFramePropertiesAndEditNormRequestSchema(
     normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
-    normFrameRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema,
+    normFrameRequestSchema: EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema,
 ) {
     val normFrameRequestSchemaMembers =
-        EditNormFrameController.NormFramePropertiesRequestSchema::class.memberProperties
+        EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.memberProperties
     val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
         val found =

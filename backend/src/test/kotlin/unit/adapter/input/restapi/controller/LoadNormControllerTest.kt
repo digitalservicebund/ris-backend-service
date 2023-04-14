@@ -1,8 +1,20 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
+import de.bund.digitalservice.ris.norms.domain.entity.Article
+import de.bund.digitalservice.ris.norms.domain.entity.FileReference
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import io.mockk.every
 import io.mockk.slot
 import io.mockk.verify
@@ -16,7 +28,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Mono
-import utils.convertNormToJson
+import utils.convertLoadNormResponseTestSchemaToJson
 import utils.createRandomNorm
 import utils.createSimpleSections
 import java.util.*
@@ -72,7 +84,7 @@ class LoadNormControllerTest {
     @Test
     fun `it maps the norm entity to the expected data schema`() {
         val norm = createRandomNorm().copy(metadataSections = createSimpleSections())
-        val responseJson = convertNormToJson(LoadNormController.NormResponseSchema.fromUseCaseData(norm))
+        val responseJson = convertLoadNormResponseTestSchemaToJson(NormResponseTestSchema.fromUseCaseData(norm))
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)
 
@@ -111,5 +123,276 @@ class LoadNormControllerTest {
             .exchange()
             .expectStatus()
             .is5xxServerError()
+    }
+
+    data class NormResponseTestSchema
+    private constructor(
+        val guid: String,
+        val articles: List<ArticleResponseTestSchema>,
+        val metadataSections: List<MetadataSectionResponseTestSchema>,
+        val officialLongTitle: String,
+        var risAbbreviation: String?,
+        var documentNumber: String?,
+        var documentCategory: String?,
+        var documentTypeName: String?,
+        var documentNormCategory: String?,
+        var documentTemplateName: String?,
+        var providerEntity: String?,
+        var providerDecidingBody: String?,
+        var providerIsResolutionMajority: Boolean?,
+        var officialShortTitle: String?,
+        var officialAbbreviation: String?,
+        var entryIntoForceDate: String?,
+        var entryIntoForceDateState: UndefinedDate?,
+        var principleEntryIntoForceDate: String?,
+        var principleEntryIntoForceDateState: UndefinedDate?,
+        var divergentEntryIntoForceDate: String?,
+        var divergentEntryIntoForceDateState: UndefinedDate?,
+        var entryIntoForceNormCategory: String?,
+        var expirationDate: String?,
+        var expirationDateState: UndefinedDate?,
+        @get:JsonProperty("isExpirationDateTemp") var isExpirationDateTemp: Boolean?,
+        var principleExpirationDate: String?,
+        var principleExpirationDateState: UndefinedDate?,
+        var divergentExpirationDate: String?,
+        var divergentExpirationDateState: UndefinedDate?,
+        var expirationNormCategory: String?,
+        var announcementDate: String?,
+        var publicationDate: String?,
+        var citationDate: String?,
+        var citationYear: String?,
+        var printAnnouncementGazette: String?,
+        var printAnnouncementYear: String?,
+        var printAnnouncementNumber: String?,
+        var printAnnouncementPage: String?,
+        var printAnnouncementInfo: String?,
+        var printAnnouncementExplanations: String?,
+        var digitalAnnouncementMedium: String?,
+        var digitalAnnouncementDate: String?,
+        var digitalAnnouncementEdition: String?,
+        var digitalAnnouncementYear: String?,
+        var digitalAnnouncementPage: String?,
+        var digitalAnnouncementArea: String?,
+        var digitalAnnouncementAreaNumber: String?,
+        var digitalAnnouncementInfo: String?,
+        var digitalAnnouncementExplanations: String?,
+        var euAnnouncementGazette: String?,
+        var euAnnouncementYear: String?,
+        var euAnnouncementSeries: String?,
+        var euAnnouncementNumber: String?,
+        var euAnnouncementPage: String?,
+        var euAnnouncementInfo: String?,
+        var euAnnouncementExplanations: String?,
+        var otherOfficialAnnouncement: String?,
+        var completeCitation: String?,
+        var statusNote: String?,
+        var statusDescription: String?,
+        var statusDate: String?,
+        var statusReference: String?,
+        var repealNote: String?,
+        var repealArticle: String?,
+        var repealDate: String?,
+        var repealReferences: String?,
+        var reissueNote: String?,
+        var reissueArticle: String?,
+        var reissueDate: String?,
+        var reissueReference: String?,
+        var otherStatusNote: String?,
+        var documentStatusWorkNote: String?,
+        var documentStatusDescription: String?,
+        var documentStatusDate: String?,
+        var documentStatusReference: String?,
+        var documentStatusEntryIntoForceDate: String?,
+        var documentStatusProof: String?,
+        var documentTextProof: String?,
+        var otherDocumentNote: String?,
+        var applicationScopeArea: String?,
+        var applicationScopeStartDate: String?,
+        var applicationScopeEndDate: String?,
+        var categorizedReference: String?,
+        var otherFootnote: String?,
+        var footnoteChange: String?,
+        var footnoteComment: String?,
+        var footnoteDecision: String?,
+        var footnoteStateLaw: String?,
+        var footnoteEuLaw: String?,
+        var digitalEvidenceLink: String?,
+        var digitalEvidenceRelatedData: String?,
+        var digitalEvidenceExternalDataNote: String?,
+        var digitalEvidenceAppendix: String?,
+        var eli: String,
+        var celexNumber: String?,
+        var ageIndicationStart: String?,
+        var ageIndicationEnd: String?,
+        var text: String?,
+        var files: List<FileReferenceResponseTestSchema>,
+    ) {
+        companion object {
+            fun fromUseCaseData(data: Norm): NormResponseTestSchema {
+                val articles = data.articles.map(ArticleResponseTestSchema::fromUseCaseData)
+                val files = data.files.map(FileReferenceResponseTestSchema::fromUseCaseData)
+                val metadataSections = data.metadataSections.map(MetadataSectionResponseTestSchema::fromUseCaseData)
+                return NormResponseTestSchema(
+                    encodeGuid(data.guid),
+                    articles,
+                    metadataSections,
+                    data.officialLongTitle,
+                    data.risAbbreviation,
+                    data.documentNumber,
+                    data.documentCategory,
+                    data.documentTypeName,
+                    data.documentNormCategory,
+                    data.documentTemplateName,
+                    data.providerEntity,
+                    data.providerDecidingBody,
+                    data.providerIsResolutionMajority,
+                    data.officialShortTitle,
+                    data.officialAbbreviation,
+                    encodeLocalDate(data.entryIntoForceDate),
+                    data.entryIntoForceDateState,
+                    encodeLocalDate(data.principleEntryIntoForceDate),
+                    data.principleEntryIntoForceDateState,
+                    encodeLocalDate(data.divergentEntryIntoForceDate),
+                    data.divergentEntryIntoForceDateState,
+                    data.entryIntoForceNormCategory,
+                    encodeLocalDate(data.expirationDate),
+                    data.expirationDateState,
+                    data.isExpirationDateTemp,
+                    encodeLocalDate(data.principleExpirationDate),
+                    data.principleExpirationDateState,
+                    encodeLocalDate(data.divergentExpirationDate),
+                    data.divergentExpirationDateState,
+                    data.expirationNormCategory,
+                    encodeLocalDate(data.announcementDate),
+                    encodeLocalDate(data.publicationDate),
+                    encodeLocalDate(data.citationDate),
+                    data.citationYear,
+                    data.printAnnouncementGazette,
+                    data.printAnnouncementYear,
+                    data.printAnnouncementNumber,
+                    data.printAnnouncementPage,
+                    data.printAnnouncementInfo,
+                    data.printAnnouncementExplanations,
+                    data.digitalAnnouncementMedium,
+                    encodeLocalDate(data.digitalAnnouncementDate),
+                    data.digitalAnnouncementEdition,
+                    data.digitalAnnouncementYear,
+                    data.digitalAnnouncementPage,
+                    data.digitalAnnouncementArea,
+                    data.digitalAnnouncementAreaNumber,
+                    data.digitalAnnouncementInfo,
+                    data.digitalAnnouncementExplanations,
+                    data.euAnnouncementGazette,
+                    data.euAnnouncementYear,
+                    data.euAnnouncementSeries,
+                    data.euAnnouncementNumber,
+                    data.euAnnouncementPage,
+                    data.euAnnouncementInfo,
+                    data.euAnnouncementExplanations,
+                    data.otherOfficialAnnouncement,
+                    data.completeCitation,
+                    data.statusNote,
+                    data.statusDescription,
+                    encodeLocalDate(data.statusDate),
+                    data.statusReference,
+                    data.repealNote,
+                    data.repealArticle,
+                    encodeLocalDate(data.repealDate),
+                    data.repealReferences,
+                    data.reissueNote,
+                    data.reissueArticle,
+                    encodeLocalDate(data.reissueDate),
+                    data.reissueReference,
+                    data.otherStatusNote,
+                    data.documentStatusWorkNote,
+                    data.documentStatusDescription,
+                    encodeLocalDate(data.documentStatusDate),
+                    data.documentStatusReference,
+                    encodeLocalDate(data.documentStatusEntryIntoForceDate),
+                    data.documentStatusProof,
+                    data.documentTextProof,
+                    data.otherDocumentNote,
+                    data.applicationScopeArea,
+                    encodeLocalDate(data.applicationScopeStartDate),
+                    encodeLocalDate(data.applicationScopeEndDate),
+                    data.categorizedReference,
+                    data.otherFootnote,
+                    data.footnoteChange,
+                    data.footnoteComment,
+                    data.footnoteDecision,
+                    data.footnoteStateLaw,
+                    data.footnoteEuLaw,
+                    data.digitalEvidenceLink,
+                    data.digitalEvidenceRelatedData,
+                    data.digitalEvidenceExternalDataNote,
+                    data.digitalEvidenceAppendix,
+                    encodeEli(data.eli),
+                    data.celexNumber,
+                    data.ageIndicationStart,
+                    data.ageIndicationEnd,
+                    data.text,
+                    files = files,
+                )
+            }
+        }
+    }
+
+    data class ArticleResponseTestSchema
+    private constructor(
+        val guid: String,
+        var title: String? = null,
+        val marker: String,
+        val paragraphs: List<ParagraphResponseTestSchema>,
+    ) {
+        companion object {
+            fun fromUseCaseData(data: Article): ArticleResponseTestSchema {
+                val paragraphs = data.paragraphs.map { ParagraphResponseTestSchema.fromUseCaseData(it) }
+                return ArticleResponseTestSchema(
+                    encodeGuid(data.guid),
+                    data.title,
+                    data.marker,
+                    paragraphs,
+                )
+            }
+        }
+    }
+
+    data class ParagraphResponseTestSchema
+    private constructor(val guid: String, val marker: String? = null, val text: String) {
+        companion object {
+            fun fromUseCaseData(data: Paragraph): ParagraphResponseTestSchema {
+                return ParagraphResponseTestSchema(encodeGuid(data.guid), data.marker, data.text)
+            }
+        }
+    }
+
+    data class FileReferenceResponseTestSchema private constructor(val name: String, val hash: String, val createdAt: String) {
+        companion object {
+            fun fromUseCaseData(data: FileReference) = FileReferenceResponseTestSchema(
+                data.name,
+                data.hash,
+                encodeLocalDateTime(data.createdAt),
+            )
+        }
+    }
+
+    data class MetadataSectionResponseTestSchema private constructor(val name: MetadataSectionName, val order: Int, val metadata: List<MetadatumResponseTestSchema>, val sections: List<MetadataSectionResponseTestSchema>?) {
+        companion object {
+            fun fromUseCaseData(metadataSection: MetadataSection): MetadataSectionResponseTestSchema {
+                val metadata = metadataSection.metadata.map { MetadatumResponseTestSchema.fromUseCaseData(it) }
+                val childSections = metadataSection.sections?.map { fromUseCaseData(it) }
+                return MetadataSectionResponseTestSchema(name = metadataSection.name, order = metadataSection.order, metadata = metadata, sections = childSections)
+            }
+        }
+    }
+
+    data class MetadatumResponseTestSchema private constructor(val value: String, val type: String, val order: Int) {
+        companion object {
+            fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseTestSchema {
+                val value: String = metadatum.value as String
+                val type = metadatum.type.name
+                return MetadatumResponseTestSchema(value = value, type = type, order = metadatum.order)
+            }
+        }
     }
 }

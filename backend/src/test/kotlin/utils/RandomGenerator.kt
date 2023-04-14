@@ -9,7 +9,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
 import org.jeasy.random.FieldPredicates.inClass
@@ -26,7 +26,7 @@ fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
     return EasyRandom(parameters).nextObject(EditNormFrameUseCase.NormFrameProperties::class.java)
 }
 
-fun createRandomEditNormRequestSchema(): EditNormFrameController.NormFramePropertiesRequestSchema {
+fun createRandomEditNormRequestTestSchema(): EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema {
     val parameters: EasyRandomParameters =
         EasyRandomParameters().randomize(named(".+Date\$")) {
             // needed for string date fields
@@ -36,7 +36,7 @@ fun createRandomEditNormRequestSchema(): EditNormFrameController.NormFrameProper
                 createSimpleSections()
             }
     return EasyRandom(parameters)
-        .nextObject(EditNormFrameController.NormFramePropertiesRequestSchema::class.java)
+        .nextObject(EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.java)
 }
 
 fun createRandomNorm(): Norm {

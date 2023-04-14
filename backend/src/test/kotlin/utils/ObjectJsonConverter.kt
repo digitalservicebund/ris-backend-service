@@ -7,21 +7,21 @@ import com.google.gson.JsonPrimitive
 import com.google.gson.JsonSerializationContext
 import com.google.gson.JsonSerializer
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameController
-import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.LoadNormController
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.LoadNormControllerTest
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDateTime
 import java.lang.reflect.Type
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-fun convertEditNormRequestSchemaToJson(
-    editNormRequestSchema: EditNormFrameController.NormFramePropertiesRequestSchema,
+fun convertEditNormRequestTestSchemaToJson(
+    editNormRequestSchema: EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema,
 ): String {
     return Gson().toJson(editNormRequestSchema)
 }
 
-fun convertNormToJson(norm: LoadNormController.NormResponseSchema): String {
+fun convertLoadNormResponseTestSchemaToJson(norm: LoadNormControllerTest.NormResponseTestSchema): String {
     class LocalDateSerializer : JsonSerializer<LocalDate> {
         override fun serialize(
             src: LocalDate?,
