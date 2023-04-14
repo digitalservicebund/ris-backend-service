@@ -299,8 +299,8 @@ describe("conversions", () => {
 
     it("maps section names based on group key", () => {
       const decoded: MetadataSections = {
-        LEAD: [{}],
-        PARTICIPATION: [{}],
+        LEAD: [{ LEAD_UNIT: ["text"] }],
+        PARTICIPATION: [{ PARTICIPATION_TYPE: ["text"] }],
       }
 
       const encoded = encodeMetadataSections(decoded)
@@ -309,13 +309,17 @@ describe("conversions", () => {
         {
           name: MetadataSectionName.LEAD,
           order: 1,
-          metadata: [],
+          metadata: [
+            { type: MetadatumType.LEAD_UNIT, value: "text", order: 1 },
+          ],
           sections: null,
         },
         {
           name: MetadataSectionName.PARTICIPATION,
           order: 1,
-          metadata: [],
+          metadata: [
+            { type: MetadatumType.PARTICIPATION_TYPE, value: "text", order: 1 },
+          ],
           sections: null,
         },
       ])

@@ -79,9 +79,15 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.SUBJECT_PREVIOUS_FNA]: (data: string) => data,
   [MetadatumType.SUBJECT_GESTA]: (data: string) => data,
   [MetadatumType.SUBJECT_BGB_3]: (data: string) => data,
+  [MetadatumType.DATE]: (data: string) => data,
+  [MetadatumType.YEAR]: (data: string) => data,
+  [MetadatumType.RANGE_START]: (data: string) => data,
+  [MetadatumType.RANGE_START_UNIT]: (data: string) => data,
+  [MetadatumType.RANGE_END]: (data: string) => data,
+  [MetadatumType.RANGE_END_UNIT]: (data: string) => data,
 }
 
-const ENCORDERS: MetadataValueEncoders = {
+const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.KEYWORD]: (data: string) => data,
   [MetadatumType.UNOFFICIAL_LONG_TITLE]: (data: string) => data,
   [MetadatumType.UNOFFICIAL_SHORT_TITLE]: (data: string) => data,
@@ -101,6 +107,12 @@ const ENCORDERS: MetadataValueEncoders = {
   [MetadatumType.SUBJECT_PREVIOUS_FNA]: (data: string) => data,
   [MetadatumType.SUBJECT_GESTA]: (data: string) => data,
   [MetadatumType.SUBJECT_BGB_3]: (data: string) => data,
+  [MetadatumType.DATE]: (data: string) => data,
+  [MetadatumType.YEAR]: (data: string) => data,
+  [MetadatumType.RANGE_START]: (data: string) => data,
+  [MetadatumType.RANGE_START_UNIT]: (data: string) => data,
+  [MetadatumType.RANGE_END]: (data: string) => data,
+  [MetadatumType.RANGE_END_UNIT]: (data: string) => data,
 }
 
 /**
@@ -149,13 +161,17 @@ function decodeMetadata(metadata: MetadatumSchema[]): Metadata {
  * @param metadata to encode from response schema
  * @returns un-grouped metadata object collection
  */
-function encodeMetadata(metadata: Metadata): MetadatumSchema[] {
+function encodeMetadata(metadata: Metadata): MetadatumSchema[] | null {
+  if (Object.entries(metadata).length == 0) {
+    return null
+  }
+
   const encodedMapping = mapValues(metadata, (group, type) =>
     group?.map((value, index) => ({
       type,
       order: index + 1,
       // FIXME: Type system is tricky here...
-      value: ENCORDERS[type](value as never),
+      value: ENCODERS[type](value as never),
     }))
   )
 
@@ -308,7 +324,11 @@ export function encodeMetadataSections(
     })
   )
 
-  return mergeValues(encodedMapping)
+  const encodedSections = mergeValues(encodedMapping)
+  const nonEmptySections = encodedSections.filter(
+    (section) => section.metadata || section.sections
+  )
+  return nonEmptySections
 }
 
 export function decodeNorm(norm: NormResponseSchema): Norm {
@@ -334,8 +354,6 @@ export function encodeFlatMetadata(
     ),
     categorizedReference: encodeString(flatMetadata.categorizedReference),
     celexNumber: encodeString(flatMetadata.celexNumber),
-    citationDate: encodeDate(flatMetadata.citationDate),
-    citationYear: encodeString(flatMetadata.citationYear),
     completeCitation: encodeString(flatMetadata.completeCitation),
     digitalAnnouncementDate: encodeDate(flatMetadata.digitalAnnouncementDate),
     digitalAnnouncementArea: encodeString(flatMetadata.digitalAnnouncementArea),

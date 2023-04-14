@@ -27,7 +27,7 @@ export interface MetadatumSchema {
 export interface MetadataSectionSchema {
   name: MetadataSectionName
   order: number
-  metadata?: MetadatumSchema[]
+  metadata?: MetadatumSchema[] | null
   sections?: MetadataSectionSchema[] | null
 }
 
