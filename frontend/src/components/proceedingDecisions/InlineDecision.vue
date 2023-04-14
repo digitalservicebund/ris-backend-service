@@ -13,6 +13,7 @@ function renderDecision(): string {
     ...(decision.documentType ? [decision.documentType?.jurisShortcut] : []),
     ...(decision.date ? [dayjs(decision.date).format("DD.MM.YYYY")] : []),
     ...(decision.fileNumber ? [decision.fileNumber] : []),
+    ...(decision.documentNumber ? [decision.documentNumber] : []),
   ].join(", ")
 }
 

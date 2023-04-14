@@ -35,7 +35,7 @@ describe("ProceedingDecision SearchResult List", () => {
   it("renders correctly", async () => {
     renderComponent()
 
-    expect(await screen.findByText("fooLabel")).toBeVisible()
+    expect(await screen.findByText("fooLabel, fooDocumentNumber")).toBeVisible()
     expect(await screen.findByText("Übernehmen")).toBeVisible()
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
   })
@@ -69,7 +69,7 @@ describe("ProceedingDecision SearchResult List", () => {
   it("clicking on 'Übernehmen' emits link decision event", async () => {
     const { user, emitted } = renderComponent()
 
-    expect(await screen.findByText("fooLabel")).toBeVisible()
+    expect(await screen.findByText("fooLabel, fooDocumentNumber")).toBeVisible()
     expect(await screen.findByText("Übernehmen")).toBeVisible()
     expect(screen.queryByText(/Bereits hinzugefügt/)).not.toBeInTheDocument()
 

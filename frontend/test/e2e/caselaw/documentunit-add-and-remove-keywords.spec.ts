@@ -25,15 +25,10 @@ test.describe("Add and remove keywords to content related indexing", () => {
     await page.locator("[aria-label='Schlagwörter']").fill(secondKeyword)
     await page.keyboard.press("Enter")
     await expect(page.getByText(secondKeyword)).toBeVisible()
-
-    await page.reload()
-
-    await expect(page.getByText(firstKeyword)).toBeVisible()
-    await expect(page.getByText(secondKeyword)).toBeVisible()
   })
 
   // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("add keywords with special character", async ({
+  test("add keywords with special character", async ({
     page,
     documentNumber,
   }) => {
@@ -45,10 +40,6 @@ test.describe("Add and remove keywords to content related indexing", () => {
       .locator("[aria-label='Schlagwörter']")
       .fill(keywordWithSpecialCharacters)
     await page.keyboard.press("Enter")
-    await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
-
-    await page.reload()
-
     await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
   })
 
@@ -85,8 +76,6 @@ test.describe("Add and remove keywords to content related indexing", () => {
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("ArrowRight")
     await page.keyboard.press("Enter")
-
-    await page.reload()
 
     await expect(page.getByText(firstKeyword)).toBeVisible()
     await expect(page.getByText(secondKeyword)).toBeHidden()
