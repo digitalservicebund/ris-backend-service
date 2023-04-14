@@ -1,13 +1,11 @@
 <script lang="ts" setup>
-import { h, ref } from "vue"
+import { ref } from "vue"
 import FieldOfLawSelectionList from "./FieldOfLawSelectionList.vue"
 import FieldOfLawTree from "./FieldOfLawTree.vue"
-import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import FieldOfLawDirectInputSearch from "@/components/FieldOfLawDirectInputSearch.vue"
 import FieldOfLawSearch from "@/components/FieldOfLawSearch.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
-import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 
 const props = defineProps<{
   documentUnitUuid: string
@@ -58,64 +56,45 @@ function handleResetClickedNode() {
 function handleLinkedFieldClicked(identifier: string) {
   clickedIdentifier.value = identifier
 }
-
-function selectedFieldsOfLawSummarizer(dataEntry: undefined) {
-  return h("div", renderDecision(dataEntry))
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderDecision(dataEntry: any): string {
-  return [
-    ...(dataEntry.identifier ? [dataEntry.identifier] : []),
-    ...(dataEntry.text ? [dataEntry.text] : []),
-  ].join(", ")
-}
-
-const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
 </script>
 
 <template>
-  <ExpandableDataSet
-    :data-set="selectedFieldsOfLaw"
-    :summary-component="SelectedFieldsOfLawSummary"
-    title="Sachgebiete"
-  >
-    <div class="w-full">
-      <div class="flex flex-row">
-        <div class="bg-white flex flex-1 flex-col p-20">
-          <div class="p-20">
-            <FieldOfLawSearch
-              :show-norms="showNorms"
-              @do-show-norms="showNorms = true"
-              @node-clicked="handleNodeClicked"
-            />
-          </div>
-          <h1 class="heading-03-regular pb-8">Auswahl</h1>
-          <div class="p-20">
-            <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
-          </div>
-          <div class="px-24">
-            <FieldOfLawSelectionList
-              :selected-fields-of-law="selectedFieldsOfLaw"
-              @linked-field:clicked="handleLinkedFieldClicked"
-              @node-clicked="handleNodeClicked"
-              @remove-from-list="handleRemoveByIdentifier"
-            ></FieldOfLawSelectionList>
-          </div>
-        </div>
-        <div class="bg-white flex-1 p-20">
-          <FieldOfLawTree
-            :clicked-identifier="clickedIdentifier"
-            :selected-nodes="selectedFieldsOfLaw"
+  <div class="bg-gray-100 flex flex-col p-20">
+    <h1 class="heading-03-regular mb-[1rem]">Sachgebiete</h1>
+    <div class="flex flex-row">
+      <div class="bg-white flex flex-1 flex-col p-20">
+        <div class="p-20">
+          <FieldOfLawSearch
             :show-norms="showNorms"
-            @add-to-list="handleAdd"
+            @do-show-norms="showNorms = true"
+            @node-clicked="handleNodeClicked"
+          />
+        </div>
+        <h1 class="heading-03-regular pb-8">Auswahl</h1>
+        <div class="p-20">
+          <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
+        </div>
+        <div class="px-24">
+          <FieldOfLawSelectionList
+            :selected-fields-of-law="selectedFieldsOfLaw"
             @linked-field:clicked="handleLinkedFieldClicked"
+            @node-clicked="handleNodeClicked"
             @remove-from-list="handleRemoveByIdentifier"
-            @reset-clicked-node="handleResetClickedNode"
-            @toggle-show-norms="showNorms = !showNorms"
-          ></FieldOfLawTree>
+          ></FieldOfLawSelectionList>
         </div>
       </div>
+      <div class="bg-white flex-1 p-20">
+        <FieldOfLawTree
+          :clicked-identifier="clickedIdentifier"
+          :selected-nodes="selectedFieldsOfLaw"
+          :show-norms="showNorms"
+          @add-to-list="handleAdd"
+          @linked-field:clicked="handleLinkedFieldClicked"
+          @remove-from-list="handleRemoveByIdentifier"
+          @reset-clicked-node="handleResetClickedNode"
+          @toggle-show-norms="showNorms = !showNorms"
+        ></FieldOfLawTree>
+      </div>
     </div>
-  </ExpandableDataSet>
+  </div>
 </template>
