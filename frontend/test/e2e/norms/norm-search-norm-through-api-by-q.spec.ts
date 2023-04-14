@@ -6,7 +6,7 @@ testWithImportedNorm(
   "Check norm can be retrieved by search in long title",
   async ({ request }) => {
     const response = await request.get(
-      `/api/v1/norms?q=Mitteln aus der Finanzdisziplin`
+      `/api/v1/norms?q=Verordnung zur Anpassung`
     )
     await assertResponseOk(response)
   }
@@ -16,7 +16,7 @@ testWithImportedNorm(
   "Check norm can be retrieved by search in short title",
   async ({ request }) => {
     const response = await request.get(
-      `/api/v1/norms?q=Finanzdisziplin-Erstattungsverordnung`
+      `/api/v1/norms?q=Angepasstes Tierarzneimittelrecht`
     )
     await assertResponseOk(response)
   }

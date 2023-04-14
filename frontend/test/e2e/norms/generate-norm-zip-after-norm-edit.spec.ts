@@ -21,7 +21,7 @@ testWithImportedNorm(
       type: "text",
       name: "officialShortTitle",
       label: "Amtliche Kurzüberschrift",
-      value: "Finanzdisziplin-Erstattungsverordnung",
+      value: "Angepasstes Tierarzneimittelrecht",
     }
     const newValue = "Changed-Official-Short-Title"
     await page.locator("a:has-text('Überschriften und Abkürzungen')").click()
