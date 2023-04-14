@@ -27,7 +27,6 @@ test.describe("Add and remove keywords to content related indexing", () => {
     await expect(page.getByText(secondKeyword)).toBeVisible()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
   test("add keywords with special character", async ({
     page,
     documentNumber,
@@ -43,7 +42,6 @@ test.describe("Add and remove keywords to content related indexing", () => {
     await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
   test("add same keyword not working", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
