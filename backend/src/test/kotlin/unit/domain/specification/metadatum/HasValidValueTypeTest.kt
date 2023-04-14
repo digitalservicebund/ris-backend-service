@@ -2,7 +2,12 @@ package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START_UNIT
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -19,6 +24,41 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a keyword is not a string`() {
         val instance = getMockedMetadatum(103, KEYWORD)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a date is a string`() {
+        val instance = getMockedMetadatum("citation date", DATE)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a range start is not a string`() {
+        val instance = getMockedMetadatum(123, RANGE_START)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a range start unit is a string`() {
+        val instance = getMockedMetadatum("range start unit", RANGE_START_UNIT)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a range end is not a string`() {
+        val instance = getMockedMetadatum(123, RANGE_END)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a range end unit is a string`() {
+        val instance = getMockedMetadatum("range end unit", RANGE_END_UNIT)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

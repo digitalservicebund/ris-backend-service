@@ -152,48 +152,60 @@ classDiagram
 
   class MetadataSectionName  {
      <<enumeration>>
-     NORM,
-     SUBJECT_AREA,
-     LEAD,
-     PARTICIPATION,
-     CITATION_DATE,
+     NORM
+     SUBJECT_AREA
+     LEAD
+     PARTICIPATION
+     CITATION_DATE
      AGE_INDICATION
   }
 
   class MetadatumType  {
       <<enumeration>>
-      KEYWORD,
-      UNOFFICIAL_LONG_TITLE,
-      UNOFFICIAL_SHORT_TITLE,
-      UNOFFICIAL_ABBREVIATION,
-      UNOFFICIAL_REFERENCE,
-      DIVERGENT_DOCUMENT_NUMBER,
-      REFERENCE_NUMBER,
-      DEFINITION,
-      RIS_ABBREVIATION_INTERNATIONAL_LAW,
-      AGE_OF_MAJORITY_INDICATION,
-      VALIDITY_RULE,
-      LEAD_JURISDICTION,
-      LEAD_UNIT,
-      PARTICIPATION_TYPE,
-      PARTICIPATION_INSTITUTION,
-      SUBJECT_FNA,
-      SUBJECT_PREVIOUS_FNA,
-      SUBJECT_GESTA,
-      SUBJECT_BGB_3,
-      DATE,
-      YEAR,
-      START,
-      START_UNIT
-      END,
-      UNIT,
-      END_UNIT
+      KEYWORD
+      UNOFFICIAL_LONG_TITLE
+      UNOFFICIAL_SHORT_TITLE
+      UNOFFICIAL_ABBREVIATION
+      UNOFFICIAL_REFERENCE
+      DIVERGENT_DOCUMENT_NUMBER
+      REFERENCE_NUMBER
+      DEFINITION
+      RIS_ABBREVIATION_INTERNATIONAL_LAW
+      AGE_OF_MAJORITY_INDICATION
+      VALIDITY_RULE
+      LEAD_JURISDICTION
+      LEAD_UNIT
+      PARTICIPATION_TYPE
+      PARTICIPATION_INSTITUTION
+      SUBJECT_FNA
+      SUBJECT_PREVIOUS_FNA
+      SUBJECT_GESTA
+      SUBJECT_BGB_3
+      DATE
+      YEAR
+      RANGE_START
+      RANGE_START_UNIT
+      RANGE_END
+      RANGE_END_UNIT
   }
 
   class FileReference {
     +String name
     +String hash
     +Timestamp createdAt
+  }
+
+  enum RangeUnit {
+    <<enumeration>>
+    YEARS
+    MONTHS
+    WEEKS
+    DAYS
+    HOURS
+    MINUTES
+    SECONDS
+    YEARS_OF_LIFE
+    MONTHS_OF_LIFE
   }
 
   Norm "1" --> "*" MetadataSection

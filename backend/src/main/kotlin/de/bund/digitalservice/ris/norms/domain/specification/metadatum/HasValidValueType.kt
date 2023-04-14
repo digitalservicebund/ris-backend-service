@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.RangeUnit
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
@@ -27,6 +28,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_RE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
+import java.time.LocalDate
 
 val hasValidValueType =
     object : Specification<Metadatum<*>> {
@@ -37,10 +39,11 @@ val hasValidValueType =
                 RIS_ABBREVIATION_INTERNATIONAL_LAW, AGE_OF_MAJORITY_INDICATION,
                 VALIDITY_RULE, LEAD_JURISDICTION, LEAD_UNIT, PARTICIPATION_TYPE,
                 PARTICIPATION_INSTITUTION, SUBJECT_FNA, SUBJECT_PREVIOUS_FNA,
-                SUBJECT_GESTA, SUBJECT_BGB_3, DATE, YEAR, RANGE_START, RANGE_START_UNIT, RANGE_END,
-                RANGE_END_UNIT,
+                SUBJECT_GESTA, SUBJECT_BGB_3, YEAR, RANGE_START, RANGE_END,
 
                 -> instance.value is String
+                RANGE_START_UNIT, RANGE_END_UNIT -> instance.value is RangeUnit
+                DATE -> instance.value is LocalDate
             }
         }
     }

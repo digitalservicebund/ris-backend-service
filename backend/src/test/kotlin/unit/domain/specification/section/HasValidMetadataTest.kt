@@ -2,12 +2,14 @@ package de.bund.digitalservice.ris.norms.domain.specification.section
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.entity.RangeUnit
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.LocalDate
 
 class HasValidMetadataTest {
     @Test
@@ -43,7 +45,7 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
-            Metadatum("range start unit", MetadatumType.RANGE_START_UNIT),
+            Metadatum(RangeUnit.YEARS, MetadatumType.RANGE_START_UNIT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
@@ -56,9 +58,9 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
-            Metadatum("range start unit", MetadatumType.RANGE_START_UNIT),
+            Metadatum(RangeUnit.YEARS, MetadatumType.RANGE_START_UNIT),
             Metadatum("range end", MetadatumType.RANGE_END),
-            Metadatum("range end unit", MetadatumType.RANGE_END_UNIT),
+            Metadatum(RangeUnit.DAYS, MetadatumType.RANGE_END_UNIT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
@@ -71,8 +73,8 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
-            Metadatum("range start unit", MetadatumType.RANGE_START_UNIT),
-            Metadatum("range end unit", MetadatumType.RANGE_END_UNIT),
+            Metadatum(RangeUnit.DAYS, MetadatumType.RANGE_START_UNIT),
+            Metadatum(RangeUnit.WEEKS, MetadatumType.RANGE_END_UNIT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
@@ -96,7 +98,7 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.CITATION_DATE
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("citation date", MetadatumType.DATE),
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
@@ -120,8 +122,33 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.CITATION_DATE
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("citation date", MetadatumType.DATE),
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
             Metadatum("citation year", MetadatumType.YEAR),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it throws an error on citation date with a not allowed value`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.CITATION_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("something other", MetadatumType.LEAD_JURISDICTION),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it throws an error on citation date with date and a not allowed metadatum`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.CITATION_DATE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("something other", MetadatumType.LEAD_UNIT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()

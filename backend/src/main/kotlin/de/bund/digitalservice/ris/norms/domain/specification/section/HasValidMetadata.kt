@@ -52,6 +52,10 @@ val hasValidMetadata =
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.count() == 1 && hasType(types, instance)
         private fun hasOnlyBlocksOf(types: List<List<MetadatumType>>, instance: MetadataSection): Boolean {
+            if (instance.metadata.any { !types.flatten().contains(it.type) }) {
+                return false
+            }
+
             var result = true
             types.forEach { typeList ->
                 if (instance.metadata.any { typeList.contains(it.type) }) {
