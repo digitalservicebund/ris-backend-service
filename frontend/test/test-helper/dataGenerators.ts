@@ -41,6 +41,12 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.SUBJECT_PREVIOUS_FNA]: generateString,
   [MetadatumType.SUBJECT_GESTA]: generateString,
   [MetadatumType.SUBJECT_BGB_3]: generateString,
+  [MetadatumType.DATE]: generateString,
+  [MetadatumType.YEAR]: generateString,
+  [MetadatumType.RANGE_START]: generateString,
+  [MetadatumType.RANGE_START_UNIT]: generateString,
+  [MetadatumType.RANGE_END]: generateString,
+  [MetadatumType.RANGE_END_UNIT]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
