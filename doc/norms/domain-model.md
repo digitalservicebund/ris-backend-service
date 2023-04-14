@@ -195,7 +195,7 @@ classDiagram
     +Timestamp createdAt
   }
 
-  enum RangeUnit {
+  class RangeUnit {
     <<enumeration>>
     YEARS
     MONTHS
