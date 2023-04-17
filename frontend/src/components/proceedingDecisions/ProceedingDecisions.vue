@@ -114,13 +114,18 @@ function decisionSummarizer(dataEntry: undefined) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function renderDecision(dataEntry: any): string {
-  return [
-    ...(dataEntry.court ? [`${dataEntry.court.label}`] : []),
-    ...(dataEntry.documentType ? [dataEntry.documentType?.jurisShortcut] : []),
-    ...(dataEntry.date ? [dayjs(dataEntry.date).format("DD.MM.YYYY")] : []),
-    ...(dataEntry.fileNumber ? [dataEntry.fileNumber] : []),
-    ...(dataEntry.documentNumber ? [dataEntry.documentNumber] : []),
-  ].join(", ")
+  if (dataEntry == undefined) {
+    return ""
+  } else
+    return [
+      ...(dataEntry.court ? [`${dataEntry.court.label}`] : []),
+      ...(dataEntry.documentType
+        ? [dataEntry.documentType?.jurisShortcut]
+        : []),
+      ...(dataEntry.date ? [dayjs(dataEntry.date).format("DD.MM.YYYY")] : []),
+      ...(dataEntry.fileNumber ? [dataEntry.fileNumber] : []),
+      ...(dataEntry.documentNumber ? [dataEntry.documentNumber] : []),
+    ].join(", ")
 }
 
 const DecisionSummary = withSummarizer(decisionSummarizer)
@@ -140,7 +145,7 @@ watch(
   <ExpandableDataSet
     :data-set="proceedingDecisions"
     :summary-component="DecisionSummary"
-    title="Vorgehende Entscheidung"
+    title="Vorgehende Entscheidungen"
   >
     <DecisionList
       v-if="proceedingDecisions"
