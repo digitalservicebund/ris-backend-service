@@ -142,6 +142,7 @@ watch(
 </script>
 
 <template>
+  <h1 class="heading-02-regular mb-[1rem]">Rechtszug</h1>
   <ExpandableDataSet
     :data-set="proceedingDecisions"
     :summary-component="DecisionSummary"
