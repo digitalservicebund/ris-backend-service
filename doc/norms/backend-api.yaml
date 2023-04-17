@@ -294,6 +294,17 @@ components:
         - RANGE_START_UNIT
         - RANGE_END
         - RANGE_END_UNIT
+        - ANNOUNCEMENT_GAZETTE
+        - NUMBER
+        - PAGE_NUMBER
+        - ADDITIONAL_INFO
+        - EXPLANATION
+        - ANNOUNCEMENT_MEDIUM
+        - AREA_OF_PUBLICATION
+        - NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
+        - EU_GOVERNMENT_GAZETTE
+        - SERIES
+        - OTHER_OFFICIAL_REFERENCE
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -305,6 +316,11 @@ components:
         - PARTICIPATION
         - CITATION_DATE
         - AGE_INDICATION
+        - PRINT_ANNOUNCEMENT
+        - DIGITAL_ANNOUNCEMENT
+        - EU_GOVERNMENT_GAZETTE
+        - OTHER_OFFICIAL_REFERENCE
+
     MetadataSection:
       type: object
       properties:
@@ -468,15 +484,6 @@ components:
         risAbbreviation:
           type: string
           example: SaubFahrzeugBeschG
-        printAnnouncementGazette:
-          type: string
-          example: ''
-        printAnnouncementYear:
-          type: string
-          example: '1996'
-        printAnnouncementPage:
-          type: string
-          example: '1102'
         documentStatusWorkNote:
           type: string
           example: ''
@@ -557,65 +564,6 @@ components:
         documentTemplateName:
           type: string
           example: Template
-        printAnnouncementNumber:
-          type: string
-          example: ''
-        printAnnouncementInfo:
-          type: string
-          example: ''
-        printAnnouncementExplanations:
-          type: string
-          example: ''
-        digitalAnnouncementMedium:
-          type: string
-          example: ''
-        digitalAnnouncementDate:
-          $ref: '#/components/schemas/Date'
-        digitalAnnouncementEdition:
-          type: string
-          example: ''
-        digitalAnnouncementYear:
-          type: string
-          example: ''
-        digitalAnnouncementPage:
-          type: string
-          example: ''
-        digitalAnnouncementArea:
-          type: string
-          example: ''
-        digitalAnnouncementAreaNumber:
-          type: string
-          example: ''
-        digitalAnnouncementInfo:
-          type: string
-          example: ''
-        digitalAnnouncementExplanations:
-          type: string
-          example: ''
-        euAnnouncementGazette:
-          type: string
-          example: ''
-        euAnnouncementYear:
-          type: string
-          example: ''
-        euAnnouncementSeries:
-          type: string
-          example: ''
-        euAnnouncementNumber:
-          type: string
-          example: ''
-        euAnnouncementPage:
-          type: string
-          example: ''
-        euAnnouncementInfo:
-          type: string
-          example: ''
-        euAnnouncementExplanations:
-          type: string
-          example: ''
-        otherOfficialAnnouncement:
-          type: string
-          example: ''
         documentStatusReference:
           type: string
           example: ''

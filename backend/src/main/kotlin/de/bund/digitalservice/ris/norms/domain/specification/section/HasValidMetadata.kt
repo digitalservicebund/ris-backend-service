@@ -18,7 +18,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDIC
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCES
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -59,7 +59,7 @@ val hasValidMetadata =
             Section.PRINT_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_GAZETTE, YEAR, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.DIGITAL_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_MEDIUM, DATE, NUMBER, YEAR, PAGE_NUMBER, AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.EU_GOVERNMENT_GAZETTE -> hasType(listOf(EU_GOVERNMENT_GAZETTE, YEAR, SERIES, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
-            Section.OTHER_OFFICIAL_REFERENCES -> hasType(listOf(OTHER_OFFICIAL_REFERENCES), instance)
+            Section.OTHER_OFFICIAL_REFERENCE -> hasType(listOf(OTHER_OFFICIAL_REFERENCE), instance)
         }
 
         private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean =

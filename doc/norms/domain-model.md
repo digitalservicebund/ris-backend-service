@@ -43,30 +43,6 @@ classDiagram
     Date announcementDate
     Date publicationDate
 
-    String printAnnouncementGazette
-    String printAnnouncementYear
-    String printAnnouncementNumber
-    String printAnnouncementPage
-    String printAnnouncementInfo
-    String printAnnouncementExplanations
-    String digitalAnnouncementMedium
-    Date digitalAnnouncementDate
-    String digitalAnnouncementEdition
-    String digitalAnnouncementYear
-    String digitalAnnouncementPage
-    String digitalAnnouncementArea
-    String digitalAnnouncementAreaNumber
-    String digitalAnnouncementInfo
-    String digitalAnnouncementExplanations
-    String euAnnouncementGazette
-    String euAnnouncementYear
-    String euAnnouncementSeries
-    String euAnnouncementNumber
-    String euAnnouncementPage
-    String euAnnouncementInfo
-    String euAnnouncementExplanations
-    String otherOfficialAnnouncement
-
     String completeCitation
 
     String statusNote
@@ -161,7 +137,7 @@ classDiagram
      PRINT_ANNOUNCEMENT
      DIGITAL_ANNOUNCEMENT
      EU_GOVERNMENT_GAZETTE
-     OTHER_OFFICIAL_REFERENCES
+     OTHER_OFFICIAL_REFERENCE
   }
 
   class MetadatumType  {
@@ -201,7 +177,7 @@ classDiagram
       NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
       EU_GOVERNMENT_GAZETTE
       SERIES
-      OTHER_OFFICIAL_REFERENCES
+      OTHER_OFFICIAL_REFERENCE
   }
 
   class FileReference {

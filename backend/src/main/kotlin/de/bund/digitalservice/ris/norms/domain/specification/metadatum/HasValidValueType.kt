@@ -18,7 +18,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDIC
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCES
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -53,7 +53,7 @@ val hasValidValueType =
                 SUBJECT_GESTA, SUBJECT_BGB_3, YEAR, RANGE_START, RANGE_END, ANNOUNCEMENT_GAZETTE,
                 NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION, ANNOUNCEMENT_MEDIUM,
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
-                EU_GOVERNMENT_GAZETTE, SERIES, OTHER_OFFICIAL_REFERENCES,
+                EU_GOVERNMENT_GAZETTE, SERIES, OTHER_OFFICIAL_REFERENCE,
                 -> instance.value is String
 
                 RANGE_START_UNIT, RANGE_END_UNIT -> instance.value is RangeUnit
