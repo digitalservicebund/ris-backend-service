@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { navigateToCategories, waitForSaving } from "../e2e-utils"
 import { testWithDocumentUnit as test } from "../fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("saving behaviour", () => {
   test("test could not update documentUnit", async ({
@@ -84,8 +85,12 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
-    await page.locator("[aria-label='ECLI']").fill("abc123")
+    const fileNumber = generateString()
+    const ecli = generateString()
+
+    await page.locator("[aria-label='Aktenzeichen']").fill(fileNumber)
+    await page.keyboard.press("Enter")
+    await page.locator("[aria-label='ECLI']").fill(ecli)
     await page.keyboard.press("Enter")
 
     await waitForSaving(page)
@@ -101,7 +106,7 @@ test.describe("saving behaviour", () => {
     ).toBeVisible()
     await expect(
       page.locator(".table-row", {
-        hasText: "abc",
+        hasText: fileNumber,
       })
     ).toBeVisible()
   })

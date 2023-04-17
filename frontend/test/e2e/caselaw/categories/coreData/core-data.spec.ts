@@ -7,6 +7,7 @@ test.describe("core data", () => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+    await page.keyboard.press("Enter")
     await page.locator("[aria-label='ECLI']").fill("abc123")
     await page.keyboard.press("Enter")
 
