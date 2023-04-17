@@ -26,7 +26,7 @@ const focusedItemIndex = ref<number>()
 const containerRef = ref<HTMLElement>()
 
 function updateModelValue() {
-  emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
+  emits("update:modelValue", chips.value)
 }
 
 function deleteChip(index: number) {
