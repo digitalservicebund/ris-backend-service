@@ -1,14 +1,13 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "./e2e-utils"
+import { navigateToCategories, toggleFieldOfLawSection } from "./e2e-utils"
 import { testWithDocumentUnit as test } from "./fixtures"
 
 test.describe("Add and remove field of to a document unit", () => {
   test("rendering", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
+    await expect(page.getByText("Sachgebiete")).toBeVisible()
+    await toggleFieldOfLawSection(page)
 
-    await expect(
-      page.getByRole("heading", { name: "Sachgebiete" })
-    ).toBeVisible()
     await expect(page.getByRole("heading", { name: "Auswahl" })).toBeVisible()
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeVisible()
     await expect(page.getByText("Normen anzeigen")).toBeVisible()
@@ -23,6 +22,7 @@ test.describe("Add and remove field of to a document unit", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
 
     await page
       .getByRole("button", {
@@ -39,6 +39,7 @@ test.describe("Add and remove field of to a document unit", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
 
     await page
       .getByRole("button", {
@@ -60,6 +61,7 @@ test.describe("Add and remove field of to a document unit", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
 
     await page
       .getByRole("button", {
@@ -99,6 +101,7 @@ test.describe("Add and remove field of to a document unit", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
 
     await page
       .getByRole("button", {
@@ -145,6 +148,7 @@ test.describe("Add and remove field of to a document unit", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
 
     await page
       .getByRole("button", {
@@ -192,6 +196,7 @@ test.describe("Add and remove field of to a document unit", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
 
     await page
       .getByRole("button", {

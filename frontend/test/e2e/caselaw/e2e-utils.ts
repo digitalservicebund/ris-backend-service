@@ -53,6 +53,10 @@ export async function waitForSaving(page: Page) {
   }
 }
 
+export async function toggleFieldOfLawSection(page: Page): Promise<void> {
+  await page.locator("text=Sachgebiete").click()
+}
+
 export async function toggleProceedingDecisionsSection(
   page: Page
 ): Promise<void> {
