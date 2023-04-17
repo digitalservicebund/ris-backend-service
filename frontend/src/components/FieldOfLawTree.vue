@@ -54,21 +54,25 @@ const buildDirectPathTreeTo = async (clickedIdentifier: string) => {
 </script>
 
 <template>
-  <button
-    aria-label="Normen anzeigen"
-    class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 mb-12 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
-    @click="emit('toggle-show-norms')"
-  >
-    <span
-      v-if="showNorms"
-      aria-label="Sachgebiet entfernen"
-      class="material-icons selected-icon"
-    >
-      done
-    </span>
-  </button>
-  <span class="pl-8">Normen anzeigen</span>
-  <h1 class="heading-03-regular pb-8">Sachgebietsbaum</h1>
+  <div class="flex items-center justify-between pb-10">
+    <h1 class="heading-03-regular">Sachgebietsbaum</h1>
+    <div class="flex items-center">
+      <button
+        aria-label="Normen anzeigen"
+        class="align-top appearance-none border-2 focus:outline-2 h-24 hover:outline-2 outline-0 outline-blue-800 outline-none outline-offset-[-4px] rounded-sm text-blue-800 w-24"
+        @click="emit('toggle-show-norms')"
+      >
+        <span
+          v-if="showNorms"
+          aria-label="Sachgebiet entfernen"
+          class="material-icons selected-icon"
+        >
+          done
+        </span>
+      </button>
+      <span class="pl-8">Normen anzeigen</span>
+    </div>
+  </div>
   <FieldOfLawNodeComponent
     :key="root.identifier"
     :node="root"

@@ -17,7 +17,9 @@ function handleLinkedFieldClicked(identifier: string) {
 </script>
 
 <template>
-  <div v-if="!props.selectedFieldsOfLaw.length">Die Liste ist aktuell leer</div>
+  <div v-if="!props.selectedFieldsOfLaw.length" class="pt-14">
+    Die Liste ist aktuell leer
+  </div>
   <div v-else>
     <FieldOfLawSelectionListEntry
       v-for="fieldOfLaw in props.selectedFieldsOfLaw"

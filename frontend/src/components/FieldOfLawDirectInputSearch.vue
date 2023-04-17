@@ -15,7 +15,7 @@ function handleUpdateModelValue(item: ComboboxInputModelType | undefined) {
 </script>
 
 <template>
-  <p class="heading-04-regular pb-8">Direkteingabe Sachgebiet</p>
+  <p class="heading-04-regular pb-8 pt-24">Direkteingabe Sachgebiet</p>
   <div class="flex flex-col">
     <div class="flex flex-row items-stretch">
       <div class="grow">
