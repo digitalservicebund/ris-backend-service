@@ -1,12 +1,12 @@
 import { expect } from "@playwright/test"
 
 import {
-  fillTextInput,
   getDownloadedFileContent,
   getMetaDataFileAsString,
   openNorm,
 } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
+import { FieldType, fillInputField } from "./utilities"
 
 testWithImportedNorm(
   "Check if norm zip can be generated properly after an edit",
@@ -17,17 +17,11 @@ testWithImportedNorm(
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
     await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
-    const field = {
-      type: "text",
-      name: "officialShortTitle",
-      label: "Amtliche Kurzüberschrift",
-      value: "Angepasstes Tierarzneimittelrecht",
-    }
-    const newValue = "Changed-Official-Short-Title"
     await page.locator("a:has-text('Überschriften und Abkürzungen')").click()
-    await expect(page.locator(`label[for="${field.name}"]`)).toBeVisible()
+    await expect(page.locator(`label[for="officialShortTitle"]`)).toBeVisible()
 
-    await fillTextInput(page, field, newValue)
+    const newValue = "Changed-Official-Short-Title"
+    await fillInputField(page, FieldType.TEXT, "officialShortTitle", newValue)
 
     await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
     await expect(

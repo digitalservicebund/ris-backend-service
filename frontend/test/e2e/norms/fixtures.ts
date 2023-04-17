@@ -1,7 +1,8 @@
 import { expect, test } from "@playwright/test"
+import { Norm } from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
-import { Norm } from "@/domain/Norm"
+import { FieldType, MetadataInputSection } from "./utilities"
 
 type MyFixtures = {
   normData: NormData
@@ -57,27 +58,6 @@ export type NormData = RecursiveOmit<Norm, "guid"> & {
   jurisZipFileName: string
 }
 
-export enum FieldType {
-  TEXT,
-  CHECKBOX,
-  CHIPS,
-  DROPDOWN,
-}
-
-export type Field = {
-  type: FieldType
-  name: string
-  label: string
-} & ({ value: unknown; values?: never } | { value?: never; values?: unknown[] })
-
-export type NormSection = {
-  heading: string
-  id?: string
-  isRepeatedSection?: boolean
-  fields?: Field[]
-  sections?: NormSection[]
-}
-
 export const testWithImportedNorm = test.extend<MyFixtures>({
   normData,
   guid: async ({ normData, request }, use) => {
@@ -92,7 +72,7 @@ export const testWithImportedNorm = test.extend<MyFixtures>({
   },
 })
 
-export function getNormBySections(norm: NormData): NormSection[] {
+export function getNormBySections(norm: NormData): MetadataInputSection[] {
   return [
     {
       heading: "Allgemeine Angaben",
@@ -603,13 +583,12 @@ export function getNormBySections(norm: NormData): NormSection[] {
 
     {
       heading: "Nichtamtliche Fundstelle",
-
       fields: [
         {
           type: FieldType.CHIPS,
           name: "unofficialReference",
           label: "Nichtamtliche Fundstelle",
-          value: "",
+          value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_REFERENCE,
         },
       ],
     },
