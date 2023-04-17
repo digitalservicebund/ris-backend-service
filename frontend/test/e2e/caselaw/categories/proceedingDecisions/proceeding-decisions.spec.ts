@@ -3,8 +3,8 @@ import {
   fillProceedingDecisionInputs,
   navigateToCategories,
   toggleProceedingDecisionsSection,
-} from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+} from "../../e2e-utils"
+import { testWithDocumentUnit as test } from "../../fixtures"
 
 test.describe("Add and remove proceeding decisions", () => {
   test("rendering", async ({ page, documentNumber }) => {
@@ -116,11 +116,4 @@ test.describe("Add and remove proceeding decisions", () => {
       page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
     ).toHaveCount(0)
   })
-
-  // test("test add proceeding decision with missing required fields not possible", async ({
-  //   page,
-  //   documentNumber,
-  // }) => {
-  //   TBD
-  // })
 })

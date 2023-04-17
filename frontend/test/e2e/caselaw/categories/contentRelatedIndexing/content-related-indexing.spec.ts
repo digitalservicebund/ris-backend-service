@@ -1,8 +1,8 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+import { navigateToCategories } from "~/e2e/caselaw/e2e-utils"
+import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 
-test.describe("Inhaltliche Erschließung", () => {
+test.describe("content related indexing", () => {
   test("render 'Inhaltliche Erschließung' on the page and in the menu", async ({
     page,
     documentNumber,

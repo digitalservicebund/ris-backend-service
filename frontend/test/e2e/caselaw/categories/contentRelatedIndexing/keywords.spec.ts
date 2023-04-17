@@ -1,7 +1,7 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../test-helper/dataGenerators"
-import { navigateToCategories } from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+import { navigateToCategories } from "~/e2e/caselaw/e2e-utils"
+import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("Add and remove keywords to content related indexing", () => {
   test("rendering", async ({ page, documentNumber }) => {

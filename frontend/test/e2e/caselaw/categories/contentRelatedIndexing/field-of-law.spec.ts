@@ -1,6 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, toggleFieldOfLawSection } from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+import {
+  navigateToCategories,
+  toggleFieldOfLawSection,
+} from "~/e2e/caselaw/e2e-utils"
+import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 
 test.describe("Add and remove field of to a document unit", () => {
   test("rendering", async ({ page, documentNumber }) => {

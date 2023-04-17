@@ -1,8 +1,8 @@
 import fs from "fs"
 import { expect } from "@playwright/test"
-import { createDataTransfer } from "../shared/e2e-utils"
-import { navigateToFiles, uploadTestfile } from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+import { navigateToFiles, uploadTestfile } from "../e2e-utils"
+import { testWithDocumentUnit as test } from "../fixtures"
+import { createDataTransfer } from "~/e2e/shared/e2e-utils"
 
 test.describe("upload an original document to a doc unit", () => {
   test.beforeEach(async ({ page, documentNumber }) => {

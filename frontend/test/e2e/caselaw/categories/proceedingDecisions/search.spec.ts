@@ -3,8 +3,8 @@ import {
   fillProceedingDecisionInputs,
   navigateToCategories,
   toggleProceedingDecisionsSection,
-} from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+} from "~/e2e/caselaw/e2e-utils"
+import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 
 test.describe("Search proceeding decisions", () => {
   test("search for existing proceeding decision and add", async ({

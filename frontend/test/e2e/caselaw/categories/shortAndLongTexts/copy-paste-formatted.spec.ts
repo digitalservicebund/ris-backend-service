@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
-import { navigateToFiles, uploadTestfile } from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+import { navigateToFiles, uploadTestfile } from "../../e2e-utils"
+import { testWithDocumentUnit as test } from "../../fixtures"
 
 // eslint-disable-next-line playwright/no-skipped-test
 test.skip(

@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test"
-import { navigateToPublication, waitForSaving } from "./e2e-utils"
-import { testWithDocumentUnit as test } from "./fixtures"
+import { navigateToPublication, waitForSaving } from "../e2e-utils"
+import { testWithDocumentUnit as test } from "../fixtures"
 
 test.describe("ensuring the publishing of documentunits works as expected", () => {
   test("publication page shows all possible missing required fields when no fields filled", async ({
