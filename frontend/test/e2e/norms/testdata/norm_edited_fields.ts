@@ -1,7 +1,7 @@
-import { MetadatumType } from "@/domain/Norm"
+import { NormData } from "../fixtures"
 
-export const newNorm = {
-  officialLongTitle: "Gesetz über die Beschaffung sauberer Straßenfahrzeuge",
+export const newNorm: NormData = {
+  jurisZipFileName: "",
   articles: [
     {
       marker: "§ 1",
@@ -18,6 +18,73 @@ export const newNorm = {
       ],
     },
   ],
+  metadataSections: {
+    NORM: [
+      {
+        KEYWORD: ["Neues Schlagwort 1 ", "Neues Schlagwort 2"],
+        DIVERGENT_DOCUMENT_NUMBER: [
+          "Neue abweichende Dokumentennummer 1",
+          "Neue abweichende Dokumentennummer 2",
+        ],
+        RIS_ABBREVIATION_INTERNATIONAL_LAW: [
+          "Neue Juris-Abkürzung für völkerrechtliche Vereinbarungen 1",
+          "Neue Juris-Abkürzung für völkerrechtliche Vereinbarungen 2",
+        ],
+        UNOFFICIAL_ABBREVIATION: [
+          "Neue Nichtamtliche Buchstabenabkürzung 1",
+          "Neue Nichtamtliche Buchstabenabkürzung 2",
+        ],
+        UNOFFICIAL_SHORT_TITLE: [
+          "Neue Nichtamtliche Kurzüberschrift 1",
+          "Neue Nichtamtliche Kurzüberschrift 2",
+        ],
+        UNOFFICIAL_LONG_TITLE: [
+          "Neue Nichtamtliche Langüberschrift1",
+          "Neue Nichtamtliche Langüberschrift2",
+        ],
+        UNOFFICIAL_REFERENCE: [
+          "Neue nichtamtliche Fundstelle 1",
+          "Neue nichtamtliche Fundstelle 2",
+        ],
+        REFERENCE_NUMBER: ["Neues Aktenzeichen 1", "Neues Aktenzeichen 2"],
+        DEFINITION: ["Neue Definition 1", "Neue Definition 2"],
+        AGE_OF_MAJORITY_INDICATION: [
+          "Neue Volljährigkeit 1",
+          "Neue Volljährigkeit 2",
+        ],
+        VALIDITY_RULE: [
+          "Neue Gültigkeitsregelung 1",
+          "Neue Gültigkeitsregelung 2",
+        ],
+      },
+    ],
+    SUBJECT_AREA: [
+      { SUBJECT_FNA: ["Neue FNA 1"], SUBJECT_GESTA: ["Neue GESTA 1"] },
+      { SUBJECT_FNA: ["Neue FNA 2"], SUBJECT_GESTA: ["Neue GESTA 2"] },
+    ],
+    LEAD: [
+      {
+        LEAD_JURISDICTION: ["Neues Ressort 1"],
+        LEAD_UNIT: ["Neue Organisationseinheit 1"],
+      },
+      {
+        LEAD_JURISDICTION: ["Neues Ressort 2"],
+        LEAD_UNIT: ["Neue Organisationseinheit 2"],
+      },
+    ],
+    PARTICIPATION: [
+      {
+        PARTICIPATION_TYPE: ["Neue Art der Mitwirkung 1"],
+        PARTICIPATION_INSTITUTION: ["Neues mitwirkendes Organ 1"],
+      },
+      {
+        PARTICIPATION_TYPE: ["Neue Art der Mitwirkung 2"],
+        PARTICIPATION_INSTITUTION: ["Neues mitwirkendes Organ 2"],
+      },
+    ],
+  },
+  officialLongTitle:
+    "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
   officialShortTitle: "officialShortTitle",
   officialAbbreviation: "officialAbbreviation",
   announcementDate: "2022-11-01",
@@ -25,17 +92,10 @@ export const newNorm = {
   providerEntity: "providerEntity",
   providerDecidingBody: "providerDecidingBody",
   providerIsResolutionMajority: false,
-  leadJurisdiction: "leadJurisdiction",
-  leadUnit: "leadUnit",
-  participationType: "participationType",
-  participationInstitution: "participationInstitution",
-  subjectFna: "subjectFna",
-  subjectGesta: "subjectGesta",
   risAbbreviation: "risAbbreviation",
   documentTemplateName: "documentTemplateName",
   publicationDate: "2022-11-01",
   isExpirationDateTemp: false,
-  subjectBgb3: "subjectBgb3",
   ageIndicationEnd: "ageIndicationEnd",
   ageIndicationStart: "ageIndicationStart",
   categorizedReference: "categorizedReference",
@@ -113,63 +173,5 @@ export const newNorm = {
   statusDescription: "statusDescription",
   statusNote: "statusNote",
   statusReference: "statusReference",
-  subjectPreviousFna: "subjectPreviousFna",
   text: "text",
-  metadata: [
-    {
-      value: "frameKeywords",
-      type: MetadatumType.KEYWORD,
-      order: 1,
-    },
-    {
-      value: "risAbbreviationInternationalLaw",
-      type: MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW,
-      order: 1,
-    },
-    {
-      value: "divergentDocumentNumber",
-      type: MetadatumType.DIVERGENT_DOCUMENT_NUMBER,
-      order: 1,
-    },
-    {
-      value: "unofficialLongTitle",
-      type: MetadatumType.UNOFFICIAL_LONG_TITLE,
-      order: 1,
-    },
-    {
-      value: "unofficialShortTitle",
-      type: MetadatumType.UNOFFICIAL_SHORT_TITLE,
-      order: 1,
-    },
-    {
-      value: "unofficialAbbreviation",
-      type: MetadatumType.UNOFFICIAL_ABBREVIATION,
-      order: 1,
-    },
-    {
-      value: "unofficialReference",
-      type: MetadatumType.UNOFFICIAL_REFERENCE,
-      order: 1,
-    },
-    {
-      value: "validityRule",
-      type: MetadatumType.VALIDITY_RULE,
-      order: 1,
-    },
-    {
-      value: "referenceNumber",
-      type: MetadatumType.REFERENCE_NUMBER,
-      order: 1,
-    },
-    {
-      value: "definition",
-      type: MetadatumType.DEFINITION,
-      order: 1,
-    },
-    {
-      value: "ageOfMajorityIndication",
-      type: MetadatumType.AGE_OF_MAJORITY_INDICATION,
-      order: 1,
-    },
-  ],
 }
