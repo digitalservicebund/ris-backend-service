@@ -153,4 +153,129 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `can generate print announcement with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINT_ANNOUNCEMENT
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("announcement gazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            Metadatum("year", MetadatumType.YEAR),
+            Metadatum("number", MetadatumType.NUMBER),
+            Metadatum("page number", MetadatumType.PAGE_NUMBER),
+            Metadatum("additional info #1", MetadatumType.ADDITIONAL_INFO),
+            Metadatum("additional info #2", MetadatumType.ADDITIONAL_INFO),
+            Metadatum("explanation #1", MetadatumType.EXPLANATION),
+            Metadatum("explanation #2", MetadatumType.EXPLANATION),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on print announcement with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.PRINT_ANNOUNCEMENT
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("announcement gazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate digital announcement with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIGITAL_ANNOUNCEMENT
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+            Metadatum(LocalDate.now(), MetadatumType.DATE),
+            Metadatum("number", MetadatumType.NUMBER),
+            Metadatum("year", MetadatumType.YEAR),
+            Metadatum("page number", MetadatumType.PAGE_NUMBER),
+            Metadatum("area of publication", MetadatumType.AREA_OF_PUBLICATION),
+            Metadatum("number of the publication in the respective area", MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA),
+            Metadatum("additional info #1", MetadatumType.ADDITIONAL_INFO),
+            Metadatum("additional info #2", MetadatumType.ADDITIONAL_INFO),
+            Metadatum("explanation #1", MetadatumType.EXPLANATION),
+            Metadatum("explanation #2", MetadatumType.EXPLANATION),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on digital announcement with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIGITAL_ANNOUNCEMENT
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("announcement gazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate eu government gazette with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.EU_GOVERNMENT_GAZETTE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("eu government gazette", MetadatumType.EU_GOVERNMENT_GAZETTE),
+            Metadatum("year", MetadatumType.YEAR),
+            Metadatum("series", MetadatumType.SERIES),
+            Metadatum("number", MetadatumType.NUMBER),
+            Metadatum("page number", MetadatumType.PAGE_NUMBER),
+            Metadatum("additional info #1", MetadatumType.ADDITIONAL_INFO),
+            Metadatum("additional info #2", MetadatumType.ADDITIONAL_INFO),
+            Metadatum("explanation #1", MetadatumType.EXPLANATION),
+            Metadatum("explanation #2", MetadatumType.EXPLANATION),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on eu government gazette with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.EU_GOVERNMENT_GAZETTE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("eu government gazette", MetadatumType.EU_GOVERNMENT_GAZETTE),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `can generate other official references with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_REFERENCES
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("other official references", MetadatumType.OTHER_OFFICIAL_REFERENCES),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on other official references with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_REFERENCES
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("other official references", MetadatumType.OTHER_OFFICIAL_REFERENCES),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
 }

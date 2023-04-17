@@ -3,13 +3,23 @@ package de.bund.digitalservice.ris.norms.domain.specification.section
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ADDITIONAL_INFO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_MEDIUM
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCES
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
@@ -18,6 +28,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SERIES
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_BGB_3
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
@@ -45,14 +56,19 @@ val hasValidMetadata =
                 listOf(listOf(RANGE_START, RANGE_START_UNIT), listOf(RANGE_END, RANGE_END_UNIT)),
                 instance,
             )
+            Section.PRINT_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_GAZETTE, YEAR, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
+            Section.DIGITAL_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_MEDIUM, DATE, NUMBER, YEAR, PAGE_NUMBER, AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA, ADDITIONAL_INFO, EXPLANATION), instance)
+            Section.EU_GOVERNMENT_GAZETTE -> hasType(listOf(EU_GOVERNMENT_GAZETTE, YEAR, SERIES, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
+            Section.OTHER_OFFICIAL_REFERENCES -> hasType(listOf(OTHER_OFFICIAL_REFERENCES), instance)
         }
 
         private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.all { types.contains(it.type) }
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.count() == 1 && hasType(types, instance)
+
         private fun hasOnlyBlocksOf(types: List<List<MetadatumType>>, instance: MetadataSection): Boolean {
-            if (instance.metadata.any { !types.flatten().contains(it.type) }) {
+            if (!hasType(types.flatten(), instance)) {
                 return false
             }
 
