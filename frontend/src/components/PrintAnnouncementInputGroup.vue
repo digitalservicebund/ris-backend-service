@@ -34,22 +34,54 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
 
-const dateValue = computed({
-  get: () => inputValue.value?.date,
-  set: (value) => (inputValue.value = { ...inputValue.value, date: value }),
+watch(inputValue, () => {
+  if (!selectedInputType.value) {
+    selectedInputType.value = InputType.PRINT
+  }
+}, {
+  deep: true,
+  immediate: true
 })
 
-const yearValue = computed({
-  get: () => inputValue.value?.year,
-  set: (value) => (inputValue.value = { ...inputValue.value, year: value }),
-})
+function createComputedProperty(key: string) {
+  return computed({
+    get: () => inputValue.value[key]?.[0],
+    set: (data?: string) => data && (inputValue.value[key] = [data]),
+  });
+}
+
+const printGazette = createComputedProperty("PRINT_GAZETTE");
+const printYear = createComputedProperty("PRINT_YEAR");
+const printNumber = createComputedProperty("PRINT_NUMBER");
+const printPage = createComputedProperty("PRINT_PAGE");
+const printInfo = createComputedProperty("PRINT_INFO");
+const printExplanations = createComputedProperty("PRINT_EXPLANATIONS");
+const digitalMedium = createComputedProperty("DIGITAL_MEDIUM");
+const digitalDate = createComputedProperty("DIGITAL_DATE");
+const digitalEdition = createComputedProperty("DIGITAL_EDITION");
+const digitalYear = createComputedProperty("DIGITAL_YEAR");
+const digitalArea = createComputedProperty("DIGITAL_AREA");
+const digitalAreaNumber = createComputedProperty("DIGITAL_AREA_NUMBER");
+const digitalInfo = createComputedProperty("DIGITAL_INFO");
+const digitalExplanations = createComputedProperty("DIGITAL_EXPLANATIONS");
+const euYear = createComputedProperty("EU_YEAR");
+const euSeries = createComputedProperty("EU_SERIES");
+const euNumber = createComputedProperty("EU_NUMBER");
+const euPage = createComputedProperty("EU_PAGE");
+const euInfo = createComputedProperty("EU_INFO");
+const euExplanations = createComputedProperty("EU_EXPLANATIONS");
+const otherAnnouncement = createComputedProperty("OTHER_ANNOUNCEMENT");
+
+
+
+
 </script>
 
 <template>
   <div class="pb-32">
-    <div class="flex gap-24">
-      <div class="flex flex-wrap radio-group">
-        <label class="form-control pb-24 w-1/3">
+    <div class="flex gap-176 flex-wrap">
+      <div class="flex flex-col gap-24 radio-group">
+        <label class="form-control">
           <input
             v-model="selectedInputType"
             aria-label=""
@@ -59,17 +91,7 @@ const yearValue = computed({
           />
           Papierverkündungsblatt
         </label>
-        <label class="form-control pb-24 shrink-1 w-2/3">
-          <input
-            v-model="selectedInputType"
-            aria-label=""
-            name="OfficialAnnouncement"
-            type="radio"
-            :value="InputType.DIGITAL"
-          />
-          Elektronisches Verkündungsblatt
-        </label>
-        <label class="form-control pb-24 w-1/3">
+        <label class="form-control">
           <input
             v-model="selectedInputType"
             aria-label=""
@@ -79,7 +101,19 @@ const yearValue = computed({
           />
           Amtsblatt der EU
         </label>
-        <label class="form-control pb-24 shrink-1 w-2/3">
+      </div>
+      <div class="flex flex-col gap-24 radio-group">
+        <label class="flex form-control items-start">
+          <input
+            v-model="selectedInputType"
+            aria-label=""
+            name="OfficialAnnouncement"
+            type="radio"
+            :value="InputType.DIGITAL"
+          />
+          Elektronisches Verkündungsblatt
+        </label>
+        <label class="form-control">
           <input
             v-model="selectedInputType"
             aria-label=""
@@ -91,52 +125,58 @@ const yearValue = computed({
         </label>
       </div>
     </div>
-
     <div v-if="selectedInputType === InputType.PRINT">
-      <div class="flex gap-24">
+      <div class="flex justify-between ful-w gap-16">
         <InputField
           id="printAnnouncementGazette"
           aria-label="Verkündungsblatt"
-          class="basis-full"
+          class="w-1/3"
           label="Verkündungsblatt"
         >
           <TextInput
             id="printAnnouncementGazette"
             alt-text="Verkündungsblatt"
             aria-label="Verkündungsblatt"
-            value=""
+            v-model="printGazette"
           />
         </InputField>
-        <InputField id="printAnnouncementYear" aria-label="Jahr" label="Jahr">
+        <InputField
+          id="printAnnouncementYear"
+          aria-label="Jahr"
+          class="md:w-auto"
+          label="Jahr"
+        >
           <TextInput
             id="printAnnouncementYear"
             alt-text="Jahr"
             aria-label="Jahr"
-            value=""
+            v-model="printYear"
           />
         </InputField>
         <InputField
           id="printAnnouncementNumber"
           aria-label="Nummer"
+          class="md:w-auto"
           label="Nummer"
         >
           <TextInput
             id="printAnnouncementNumber"
             alt-text="Nummer"
             aria-label="Nummer"
-            value=""
+            v-model="printNumber"
           />
         </InputField>
         <InputField
           id="printAnnouncementPage"
           aria-label="Seitenzahl"
+          class="md:w-auto"
           label="Seitenzahl"
         >
           <TextInput
             id="printAnnouncementPage"
             alt-text="Seitenzahl"
             aria-label="Seitenzahl"
-            value=""
+            v-model="printPage"
           />
         </InputField>
       </div>
@@ -144,280 +184,252 @@ const yearValue = computed({
         <InputField
           id="printAnnouncementInfo"
           aria-label="Zusatzangaben"
-          class="flex-grow-1"
           label="Zusatzangaben"
         >
           <textarea
-            id="printAnnouncementInfo"
-            alt-text="Zusatzangaben"
-            aria-label="Zusatzangaben"
-            class="outline outline-2 outline-blue-900 overflow-y-auto p-10"
-            rows="4"
-            value=""
+              id="printAnnouncementInfo"
+              aria-label="Zusatzangaben"
+              class="outline outline-2 outline-blue-900 overflow-y-auto mt-4"
+              rows="4"
+              v-model="printInfo"
           />
         </InputField>
 
         <InputField
           id="printAnnouncementExplanations"
           aria-label="Erläuterungen"
-          class="flex-grow-1"
           label="Erläuterungen"
         >
-          <textarea
-            id="printAnnouncementExplanations"
-            alt-text="Erläuterungen"
-            aria-label="Erläuterungen"
-            class="outline outline-2 outline-blue-900 overflow-y-auto p-10"
-            rows="4"
-            value=""
-          />
+         <textarea
+             id="printAnnouncementExplanations"
+             aria-label="Erläuterungen"
+             class="outline outline-2 outline-blue-900 overflow-y-auto mt-4"
+             rows="4"
+             v-model="printExplanations"
+         />
         </InputField>
       </div>
     </div>
     <div v-if="selectedInputType === InputType.DIGITAL">
-      <div class="flex flex-wrap">
+      <div>
+        <div class="grid grid-cols-2 gap-16">
         <InputField
           id="digitalAnnouncementMedium"
           aria-label="Verkündungsmedium"
-          class="basis-full"
+
           label="Verkündungsmedium"
         >
           <TextInput
             id="citationYear"
             alt-text="Verkündungsmedium"
             aria-label="Verkündungsmedium"
-            value=""
+            v-model="digitalMedium"
           />
         </InputField>
         <InputField
           id="digitalAnnouncementDate"
           aria-label="Verkündungsdatum"
-          class="pr-24 w-1/2"
+
           label="Verkündungsdatum"
         >
           <TextInput
             id="digitalAnnouncementDate"
             alt-text="Verkündungsdatum"
             aria-label="Verkündungsdatum"
-            value=""
+            v-model="digitalDate"
           />
         </InputField>
         <InputField
           id="digitalAnnouncementEdition"
           aria-label="Ausgabenummer"
-          class="w-1/2"
+
           label="Ausgabenummer"
         >
           <TextInput
             id="digitalAnnouncementEdition"
             alt-text="Ausgabenummer"
             aria-label="Ausgabenummer"
-            value=""
+            v-model="digitalEdition"
           />
         </InputField>
         <InputField
           id="digitalAnnouncementYear"
           aria-label="Jahr"
-          class="pr-24 w-1/2"
+
           label="Jahr"
         >
           <TextInput
             id="digitalAnnouncementYear"
             alt-text="Jahr"
             aria-label="Jahr"
-            value=""
-          />
-        </InputField>
-        <InputField
-          id="digitalAnnouncementPage"
-          aria-label="Seitenzahlen"
-          class="w-1/2"
-          label="Seitenzahlen"
-        >
-          <TextInput
-            id="digitalAnnouncementYear"
-            alt-text="Seitenzahlen"
-            aria-label="Seitenzahlen"
-            value=""
+            v-model="digitalYear"
           />
         </InputField>
         <InputField
           id="digitalAnnouncementArea"
           aria-label="Bereich der Veröffentlichung"
-          class="pr-24 w-1/2"
+
           label="Bereich der Veröffentlichung"
         >
           <TextInput
             id="digitalAnnouncementArea"
             alt-text="Bereich der Veröffentlichung"
             aria-label="Bereich der Veröffentlichung"
-            value=""
+            v-model="digitalArea"
           />
         </InputField>
         <InputField
           id="digitalAnnouncementAreaNumber"
           aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-          class="w-1/2"
+
           label="Nummer der Veröffentlichung im jeweiligen Bereich"
         >
           <TextInput
             id="digitalAnnouncementAreaNumber"
             alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
             aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-            value=""
+            v-model="digitalAreaNumber"
           />
         </InputField>
+      </div>
       </div>
       <div>
         <InputField
           id="digitalAnnouncementInfo"
           aria-label="Zusatzangaben"
-          class="basis-full"
           label="Zusatzangaben"
         >
           <textarea
-            id="digitalAnnouncementInfo"
-            alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
-            aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-            class="outline outline-2 outline-blue-900 overflow-y-auto p-10"
-            rows="4"
-            value=""
+              id="digitalAnnouncementInfo"
+              aria-label="Zusatzangaben"
+              class="outline outline-2 outline-blue-900 overflow-y-auto mt-2"
+              rows="4"
+              v-model="digitalInfo"
           />
         </InputField>
         <InputField
           id="digitalAnnouncementExplanations"
           aria-label="Erläuterungen"
-          class="basis-full"
           label="Erläuterungen"
         >
           <textarea
-            id="digitalAnnouncementExplanations"
-            alt-text="Erläuterungen"
-            aria-label="Erläuterungen"
-            class="outline outline-2 outline-blue-900 overflow-y-auto p-10"
-            rows="4"
-            value=""
+              id="digitalAnnouncementExplanations"
+              aria-label="Erläuterungen"
+              class="outline outline-2 outline-blue-900 overflow-y-auto mt-2"
+              rows="4"
+              v-model="digitalExplanations"
           />
         </InputField>
       </div>
     </div>
     <div v-if="selectedInputType === InputType.EU">
-      <div class="flex flex-wrap">
-        <InputField
+      <div class="w-full">
+      <InputField
+        id="euAnnouncementGazette"
+        aria-label="Amtsblatt der EU"
+        label="Amtsblatt der EU"
+      >
+        <TextInput
           id="euAnnouncementGazette"
+          alt-text="Amtsblatt der EU"
           aria-label="Amtsblatt der EU"
-          class="basis-full"
-          label="Amtsblatt der EU"
-        >
-          <TextInput
-            id="euAnnouncementGazette"
-            v-model="yearValue"
-            alt-text="Amtsblatt der EU"
-            aria-label="Amtsblatt der EU"
-            value=""
-          />
-        </InputField>
-
-        <InputField
+        />
+      </InputField>
+      </div>
+      <div class="flex justify-between gap-16">
+      <InputField
           id="euAnnouncementYear"
-          aria-label="Jahr"
-          class="pr-24 w-1/4"
-          label="Jahr"
-        >
-          <TextInput
+          aria-label="Jahresangabe"
+          class="w-full"
+          label="Jahresangabe"
+      >
+        <TextInput
             id="euAnnouncementYear"
-            alt-text="Jahr"
-            aria-label="Jahr"
-            value=""
-          />
-        </InputField>
-        <InputField
+            alt-text="Jahresangabe"
+            aria-label="Jahresangabe"
+            v-model="euYear"
+        />
+      </InputField>
+      <InputField
           id="euAnnouncementSeries"
           aria-label="Reihe"
-          class="pr-24 w-1/4"
+          class="w-full"
           label="Reihe"
-        >
-          <TextInput
+      >
+        <TextInput
             id="euAnnouncementSeries"
             alt-text="Reihe"
             aria-label="Reihe"
-            value=""
-          />
-        </InputField>
-        <InputField
+            v-model="euSeries"
+        />
+      </InputField>
+      <InputField
           id="euAnnouncementNumber"
           aria-label="Nummer des Amtsblatts"
-          class="pr-24 w-1/4"
+          class="w-full"
           label="Nummer des Amtsblatts"
-        >
-          <TextInput
+      >
+        <TextInput
             id="euAnnouncementNumber"
             alt-text="Nummer des Amtsblatts"
             aria-label="Nummer des Amtsblatts"
-            value=""
-          />
-        </InputField>
-        <InputField
+            v-model="euNumber"
+        />
+      </InputField>
+      <InputField
           id="euAnnouncementPage"
           aria-label="Seitenzahl"
-          class="w-1/4"
+          class="w-full"
           label="Seitenzahl"
-        >
-          <TextInput
+      >
+        <TextInput
             id="euAnnouncementPage"
             alt-text="Seitenzahl"
             aria-label="Seitenzahl"
-            value=""
-          />
-        </InputField>
+            v-model="euPage"
+        />
+      </InputField>
       </div>
-      <div>
-        <InputField
-          id="digitalAnnouncementInfo"
+      <InputField
+          id="euAnnouncementInfo"
           aria-label="Zusatzangaben"
-          class="basis-full"
           label="Zusatzangaben"
-        >
-          <textarea
-            id="digitalAnnouncementInfo"
-            alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
-            aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-            class="outline outline-2 outline-blue-900 overflow-y-auto p-10"
+      >
+        <textarea
+            id="euAnnouncementInfo"
+            aria-label="Zusatzangaben"
+            class="outline outline-2 outline-blue-900 overflow-y-auto mt-4"
             rows="4"
-            value=""
-          />
-        </InputField>
-        <InputField
-          id="digitalAnnouncementExplanations"
+            v-model="euInfo"
+        />
+      </InputField>
+      <InputField
+          id="euAnnouncementExplanations"
           aria-label="Erläuterungen"
-          class="basis-full"
           label="Erläuterungen"
-        >
-          <textarea
-            id="digitalAnnouncementExplanations"
-            alt-text="Erläuterungen"
+      >
+        <textarea
+            id="euAnnouncementExplanations"
             aria-label="Erläuterungen"
-            class="outline outline-2 outline-blue-900 overflow-y-auto p-10"
+            class="outline outline-2 outline-blue-900 overflow-y-auto mt-4"
             rows="4"
-            value=""
-          />
-        </InputField>
-      </div>
+            v-model="euExplanations"
+        />
+      </InputField>
+
     </div>
     <div v-if="selectedInputType === InputType.OTHER">
       <InputField
         id="otherOfficialAnnouncement"
         aria-label="Sonstige amtliche Fundstelle"
-        class="basis-full"
         label="Sonstige amtliche Fundstelle"
       >
         <textarea
           id="otherOfficialAnnouncement"
-          alt-text="Sonstige amtliche Fundstelle"
           aria-label="Sonstige amtliche Fundstelle"
-          class="outline outline-2 outline-blue-900 overflow-y-auto p-10"
+          class="outline outline-2 outline-blue-900 overflow-y-auto mt-4"
           rows="4"
-          value=""
+          v-model="otherAnnouncement"
         />
       </InputField>
     </div>
