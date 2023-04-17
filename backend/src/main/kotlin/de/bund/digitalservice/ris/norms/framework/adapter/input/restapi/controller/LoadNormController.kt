@@ -303,7 +303,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
     data class MetadatumResponseSchema private constructor(val value: String, val type: String, val order: Int) {
         companion object {
             fun fromUseCaseData(metadatum: Metadatum<*>): MetadatumResponseSchema {
-                val value: String = metadatum.value as String
+                val value: String = metadatum.value.toString()
                 val type = metadatum.type.name
                 return MetadatumResponseSchema(value = value, type = type, order = metadatum.order)
             }

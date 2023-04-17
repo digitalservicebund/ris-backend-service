@@ -7,6 +7,8 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
@@ -139,7 +141,14 @@ interface NormsMapper {
         return FileReference(fileReferenceDto.name, fileReferenceDto.hash, fileReferenceDto.createdAt)
     }
 
-    fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> = Metadatum(metadatumDto.value, metadatumDto.type, metadatumDto.order)
+    fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
+        val value = when (metadatumDto.type) {
+            MetadatumType.DATE -> decodeLocalDate(metadatumDto.value)
+            else -> metadatumDto.value
+        }
+
+        return Metadatum(value, metadatumDto.type, metadatumDto.order)
+    }
 
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
         return NormDto(

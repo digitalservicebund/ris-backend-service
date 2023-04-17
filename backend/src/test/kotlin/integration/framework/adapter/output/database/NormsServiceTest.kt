@@ -14,10 +14,12 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import org.assertj.core.api.Assertions
 import org.hamcrest.CoreMatchers.`is`
@@ -415,5 +417,13 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 assertThat(it.files[0].hash == FILE1.hash, `is`(true))
             }
             .verifyComplete()
+    }
+
+    @Test
+    fun `it maps metadatum of date type to entity properly`() {
+        val metadatumDto = MetadatumDto(1, "2020-12-23", MetadatumType.DATE, 1, 1)
+        val result = normsService.metadatumToEntity(metadatumDto)
+
+        Assertions.assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))
     }
 }
