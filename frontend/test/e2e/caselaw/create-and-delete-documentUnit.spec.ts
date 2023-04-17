@@ -1,15 +1,8 @@
 import { expect, test } from "@playwright/test"
-import { deleteDocumentUnit, documentUnitExists } from "./e2e-utils"
+import { deleteDocumentUnit } from "./e2e-utils"
 import { testWithDocumentUnit } from "./fixtures"
 
 test.describe("create a doc unit and delete it again", () => {
-  let documentNumber: string
-
-  test.afterEach(async ({ page }) => {
-    if (await documentUnitExists(page, documentNumber))
-      await deleteDocumentUnit(page, documentNumber)
-  })
-
   test("create and delete new doc unit", async ({ page }) => {
     await page.goto("/")
     await page.locator("button >> text=Neue Dokumentationseinheit").click()
@@ -19,7 +12,7 @@ test.describe("create a doc unit and delete it again", () => {
     )
 
     // Given the earlier expectation we can assume that the regex will match...
-    documentNumber = /caselaw\/documentunit\/(.*)\/files/g.exec(
+    const documentNumber = /caselaw\/documentunit\/(.*)\/files/g.exec(
       page.url()
     )?.[1] as string
 
