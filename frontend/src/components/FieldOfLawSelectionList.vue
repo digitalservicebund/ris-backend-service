@@ -17,17 +17,19 @@ function handleLinkedFieldClicked(identifier: string) {
 </script>
 
 <template>
-  <div v-if="!props.selectedFieldsOfLaw.length" class="pt-14">
-    Die Liste ist aktuell leer
-  </div>
-  <div v-else>
-    <FieldOfLawSelectionListEntry
-      v-for="fieldOfLaw in props.selectedFieldsOfLaw"
-      :key="fieldOfLaw.identifier"
-      :field-of-law="fieldOfLaw"
-      @linked-field:clicked="handleLinkedFieldClicked"
-      @node-clicked="emit('node-clicked', fieldOfLaw)"
-      @remove-from-list="emit('remove-from-list', fieldOfLaw.identifier)"
-    />
+  <div class="pt-20">
+    <div v-if="!props.selectedFieldsOfLaw.length">
+      Die Liste ist aktuell leer
+    </div>
+    <div v-else>
+      <FieldOfLawSelectionListEntry
+        v-for="fieldOfLaw in props.selectedFieldsOfLaw"
+        :key="fieldOfLaw.identifier"
+        :field-of-law="fieldOfLaw"
+        @linked-field:clicked="handleLinkedFieldClicked"
+        @node-clicked="emit('node-clicked', fieldOfLaw)"
+        @remove-from-list="emit('remove-from-list', fieldOfLaw.identifier)"
+      />
+    </div>
   </div>
 </template>
