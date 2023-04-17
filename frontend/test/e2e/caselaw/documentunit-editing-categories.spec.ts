@@ -171,6 +171,7 @@ test.describe("ensuring the editing experience in categories is as expected", ()
 
     // clear the court
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
+    await expect(page.getByText("AG Aalen")).toBeHidden()
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
     // dropdown should not open
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
