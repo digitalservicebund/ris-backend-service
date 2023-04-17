@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import type { Component } from "vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
@@ -9,10 +9,12 @@ interface Props {
   title: string
   dataSet: any // eslint-disable-line @typescript-eslint/no-explicit-any
   summaryComponent?: Component
+  asColumn?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
+  asColumn: false,
 })
 
 const isExpanded = ref(false)
@@ -20,6 +22,14 @@ const isExpanded = ref(false)
 function collapse(): void {
   isExpanded.value = false
 }
+
+const column = computed(() => ({
+  "flex-col": props.asColumn,
+}))
+
+const padding = computed(() => ({
+  "pb-[1rem]": props.asColumn && !isExpanded.value,
+}))
 </script>
 
 <template>
@@ -31,8 +41,10 @@ function collapse(): void {
     open-icon-name="expand_more"
   >
     <template #header>
-      <div class="flex w-full">
-        <h2 class="label-02-bold min-w-[14rem] text-left">{{ title }}</h2>
+      <div class="flex w-full" :class="column">
+        <h2 class="label-02-bold min-w-[14rem] text-left" :class="padding">
+          {{ title }}
+        </h2>
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />
       </div>
     </template>
