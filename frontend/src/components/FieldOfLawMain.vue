@@ -88,14 +88,6 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
             @do-show-norms="showNorms = true"
             @node-clicked="handleNodeClicked"
           />
-          <h1 class="heading-03-regular pb-8">Ausgewählte Sachgebiete</h1>
-          <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
-          <FieldOfLawSelectionList
-            :selected-fields-of-law="selectedFieldsOfLaw"
-            @linked-field:clicked="handleLinkedFieldClicked"
-            @node-clicked="handleNodeClicked"
-            @remove-from-list="handleRemoveByIdentifier"
-          ></FieldOfLawSelectionList>
         </div>
         <div class="bg-white flex-1 p-20">
           <FieldOfLawTree
@@ -109,6 +101,17 @@ const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
             @toggle-show-norms="showNorms = !showNorms"
           ></FieldOfLawTree>
         </div>
+      </div>
+      <hr class="border-blue-700 w-full" />
+      <div class="bg-white p-20">
+        <h1 class="heading-03-regular pb-8">Ausgewählte Sachgebiete</h1>
+        <FieldOfLawDirectInputSearch @add-to-list="handleAdd" />
+        <FieldOfLawSelectionList
+          :selected-fields-of-law="selectedFieldsOfLaw"
+          @linked-field:clicked="handleLinkedFieldClicked"
+          @node-clicked="handleNodeClicked"
+          @remove-from-list="handleRemoveByIdentifier"
+        ></FieldOfLawSelectionList>
       </div>
     </div>
   </ExpandableDataSet>
