@@ -276,6 +276,13 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         lateinit var type: MetadatumType
         var order: Int = 1
 
-        fun toUseCaseData(): Metadatum<*> = Metadatum(value = this.value, type = this.type, order = this.order)
+        fun toUseCaseData(): Metadatum<*> {
+            val value = when (this.type) {
+                MetadatumType.DATE -> decodeLocalDate(this.value)
+                else -> this.value
+            }
+
+            return Metadatum(value = value, type = this.type, order = this.order)
+        }
     }
 }

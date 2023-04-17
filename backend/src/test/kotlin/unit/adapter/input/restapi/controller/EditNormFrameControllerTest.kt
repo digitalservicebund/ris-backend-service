@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import io.mockk.every
 import io.mockk.verify
@@ -21,6 +22,7 @@ import reactor.core.publisher.Mono
 import utils.assertEditNormFramePropertiesAndEditNormRequestSchema
 import utils.convertEditNormRequestTestSchemaToJson
 import utils.createRandomEditNormRequestTestSchema
+import java.time.LocalDate
 import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
@@ -90,6 +92,15 @@ class EditNormFrameControllerTest {
             .exchange()
             .expectStatus()
             .is5xxServerError()
+    }
+
+    @Test
+    fun `it correctly maps the dates from string to localdate in metadata`() {
+        val schema = EditNormFrameController.MetadatumRequestSchema()
+        schema.value = "2022-12-01"
+        schema.type = MetadatumType.DATE
+
+        assertThat(schema.toUseCaseData().value).isEqualTo(LocalDate.of(2022, 12, 1))
     }
 
     class NormFramePropertiesTestRequestSchema {
