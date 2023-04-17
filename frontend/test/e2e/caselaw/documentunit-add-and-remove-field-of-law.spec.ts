@@ -8,7 +8,9 @@ test.describe("Add and remove field of to a document unit", () => {
     await expect(page.getByText("Sachgebiete")).toBeVisible()
     await toggleFieldOfLawSection(page)
 
-    await expect(page.getByRole("heading", { name: "Auswahl" })).toBeVisible()
+    await expect(
+      page.getByRole("heading", { name: "Ausgewählte Sachgebiete" })
+    ).toBeVisible()
     await expect(page.getByText("Die Liste ist aktuell leer")).toBeVisible()
     await expect(page.getByText("Normen anzeigen")).toBeVisible()
     await expect(
