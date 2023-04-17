@@ -133,8 +133,10 @@ const flatMetadata = computed({
         data.divergentExpirationDate as string
       loadedNorm.value.divergentExpirationDateState =
         data.divergentExpirationDateState as string
+      loadedNorm.value.documentCategory = data.documentCategory as string
       loadedNorm.value.documentNormCategory =
         data.documentNormCategory as string
+      loadedNorm.value.documentNumber = data.documentNumber as string
       loadedNorm.value.documentStatusDate = data.documentStatusDate as string
       loadedNorm.value.documentStatusDescription =
         data.documentStatusDescription as string
@@ -218,6 +220,7 @@ const flatMetadata = computed({
       loadedNorm.value.repealDate = data.repealDate as string
       loadedNorm.value.repealNote = data.repealNote as string
       loadedNorm.value.repealReferences = data.repealReferences as string
+      loadedNorm.value.risAbbreviation = data.risAbbreviation as string
       loadedNorm.value.statusDate = data.statusDate as string
       loadedNorm.value.statusDescription = data.statusDescription as string
       loadedNorm.value.statusNote = data.statusNote as string
@@ -235,7 +238,7 @@ const flatMetadata = computed({
       normSection.value.UNOFFICIAL_ABBREVIATION =
         data.unofficialAbbreviation as string[]
       normSection.value.RIS_ABBREVIATION_INTERNATIONAL_LAW =
-        data.bbreviationInternationalLaw as string[]
+        data.risAbbreviationInternationalLaw as string[]
       normSection.value.DIVERGENT_DOCUMENT_NUMBER =
         data.divergentDocumentNumber as string[]
     }

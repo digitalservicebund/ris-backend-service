@@ -354,6 +354,8 @@ export function encodeFlatMetadata(
     ),
     categorizedReference: encodeString(flatMetadata.categorizedReference),
     celexNumber: encodeString(flatMetadata.celexNumber),
+    citationDate: encodeDate(flatMetadata.citationDate),
+    citationYear: encodeString(flatMetadata.citationYear),
     completeCitation: encodeString(flatMetadata.completeCitation),
     digitalAnnouncementDate: encodeDate(flatMetadata.digitalAnnouncementDate),
     digitalAnnouncementArea: encodeString(flatMetadata.digitalAnnouncementArea),
