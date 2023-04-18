@@ -135,6 +135,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
                 databaseDocumentUnitFieldsOfLawRepository.findAllByDocumentUnitId(documentUnitId))
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .flatMap(databaseFieldOfLawRepository::findById)
+        .flatMap(this::injectAdditionalInformation)
         .map(FieldOfLawTransformer::transformToDomain)
         .collectList()
         .map(
