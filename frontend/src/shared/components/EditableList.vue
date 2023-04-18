@@ -98,9 +98,12 @@ watch(editIndex, focusFirstInputOfCurrentEditElement)
         v-if="index !== editIndex"
         aria-label="Listen Eintrag"
         class="border-b-1 border-b-blue-500 cursor-pointer flex justify-between py-10"
-        @click="setEditIndex(index)"
       >
-        <component :is="summaryComponent" :data="entry" />
+        <component
+          :is="summaryComponent"
+          :data="entry"
+          @click="setEditIndex(index)"
+        />
 
         <div class="flex">
           <button
