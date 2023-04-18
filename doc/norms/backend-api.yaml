@@ -305,6 +305,9 @@ components:
         - EU_GOVERNMENT_GAZETTE
         - SERIES
         - OTHER_OFFICIAL_REFERENCE
+        - ENTITY
+        - DECIDING_BODY
+        - RESOLUTION_MAJORITY
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -320,6 +323,7 @@ components:
         - DIGITAL_ANNOUNCEMENT
         - EU_GOVERNMENT_GAZETTE
         - OTHER_OFFICIAL_REFERENCE
+        - NORM_PROVIDER
 
     MetadataSection:
       type: object

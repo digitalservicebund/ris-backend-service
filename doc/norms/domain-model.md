@@ -16,10 +16,6 @@ classDiagram
     String documentNormCategory
     String documentTemplateName
 
-    String providerEntity
-    String providerDecidingBody
-    Boolean providerIsResolutionMajority
-
     String officialShortTitle
     String officialAbbreviation
 
