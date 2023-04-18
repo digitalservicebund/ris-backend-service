@@ -1,14 +1,10 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import FieldOfLawSearchResultListEntry from "@/components/FieldOfLawSearchResultListEntry.vue"
+import FieldOfLawSelectionListEntry from "@/components/FieldOfLawSelectionListEntry.vue"
 import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-
-const props = defineProps<{
-  showNorms: boolean
-}>()
 
 const emit = defineEmits<{
   (event: "node-clicked", node: FieldOfLawNode): void
@@ -73,12 +69,11 @@ function handlePagination(backwards: boolean) {
       </div>
     </div>
     <div v-if="results">
-      <FieldOfLawSearchResultListEntry
-        v-for="(node, idx) in results.content"
+      <FieldOfLawSelectionListEntry
+        v-for="(fieldOfLawNode, idx) in results.content"
         :key="idx"
-        :node="node"
-        :show-norms="props.showNorms"
-        @node-clicked="emit('node-clicked', node)"
+        :field-of-law="fieldOfLawNode"
+        @node-clicked="emit('node-clicked', fieldOfLawNode)"
       />
       <div
         v-if="results.numberOfElements < results.totalElements"
