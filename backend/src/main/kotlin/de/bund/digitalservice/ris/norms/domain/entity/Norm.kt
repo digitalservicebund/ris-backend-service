@@ -1,6 +1,8 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
 import de.bund.digitalservice.ris.norms.domain.value.Eli
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import java.time.LocalDate
 import java.util.UUID
@@ -45,9 +47,6 @@ data class Norm(
 
     var announcementDate: LocalDate? = null,
     var publicationDate: LocalDate? = null,
-
-    var citationDate: LocalDate? = null,
-    var citationYear: String? = null,
 
     var printAnnouncementGazette: String? = null,
     var printAnnouncementYear: String? = null,
@@ -118,9 +117,6 @@ data class Norm(
 
     var celexNumber: String? = null,
 
-    var ageIndicationStart: String? = null,
-    var ageIndicationEnd: String? = null,
-
     var text: String? = null,
     var files: List<FileReference> = listOf(),
 
@@ -130,8 +126,10 @@ data class Norm(
             Eli(
                 printAnnouncementGazette,
                 announcementDate,
-                citationDate,
-                citationYear,
+                metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
+                    .filter { it.type == MetadatumType.DATE }.minByOrNull { it.order }?.let { it.value as LocalDate },
+                metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
+                    .filter { it.type == MetadatumType.YEAR }.minByOrNull { it.order }?.let { it.value as String },
                 printAnnouncementPage,
             )
 }

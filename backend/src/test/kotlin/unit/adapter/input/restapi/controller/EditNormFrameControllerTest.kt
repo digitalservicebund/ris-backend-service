@@ -143,9 +143,6 @@ class EditNormFrameControllerTest {
         var announcementDate: String? = null
         var publicationDate: String? = null
 
-        var citationDate: String? = null
-        var citationYear: String? = null
-
         var printAnnouncementGazette: String? = null
         var printAnnouncementYear: String? = null
         var printAnnouncementNumber: String? = null
@@ -216,9 +213,6 @@ class EditNormFrameControllerTest {
         var eli: String? = null
 
         var celexNumber: String? = null
-
-        var ageIndicationStart: String? = null
-        var ageIndicationEnd: String? = null
 
         var text: String? = null
     }

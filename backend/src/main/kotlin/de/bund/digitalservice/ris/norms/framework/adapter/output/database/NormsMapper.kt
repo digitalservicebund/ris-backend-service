@@ -57,8 +57,6 @@ interface NormsMapper {
             normDto.expirationNormCategory,
             normDto.announcementDate,
             normDto.publicationDate,
-            normDto.citationDate,
-            normDto.citationYear,
             normDto.printAnnouncementGazette,
             normDto.printAnnouncementYear,
             normDto.printAnnouncementNumber,
@@ -119,8 +117,6 @@ interface NormsMapper {
             normDto.digitalEvidenceExternalDataNote,
             normDto.digitalEvidenceAppendix,
             normDto.celexNumber,
-            normDto.ageIndicationStart,
-            normDto.ageIndicationEnd,
             normDto.text,
             fileReferences,
         )
@@ -185,8 +181,6 @@ interface NormsMapper {
             norm.expirationNormCategory,
             norm.announcementDate,
             norm.publicationDate,
-            norm.citationDate,
-            norm.citationYear,
             norm.printAnnouncementGazette,
             norm.printAnnouncementYear,
             norm.printAnnouncementNumber,
@@ -247,8 +241,6 @@ interface NormsMapper {
             norm.digitalEvidenceExternalDataNote,
             norm.digitalEvidenceAppendix,
             norm.celexNumber,
-            norm.ageIndicationStart,
-            norm.ageIndicationEnd,
             norm.text,
         )
     }

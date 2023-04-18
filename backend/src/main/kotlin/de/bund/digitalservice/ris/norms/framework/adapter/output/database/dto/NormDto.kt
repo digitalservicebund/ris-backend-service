@@ -78,11 +78,6 @@ data class NormDto(
     @Column("publication_date")
     var publicationDate: LocalDate? = null,
 
-    @Column("citation_date")
-    var citationDate: LocalDate? = null,
-    @Column("citation_year")
-    var citationYear: String? = null,
-
     @Column("print_announcement_gazette")
     var printAnnouncementGazette: String? = null,
     @Column("print_announcement_year")
@@ -211,11 +206,6 @@ data class NormDto(
 
     @Column("celex_number")
     var celexNumber: String? = null,
-
-    @Column("age_indication_start")
-    var ageIndicationStart: String? = null,
-    @Column("age_indication_end")
-    var ageIndicationEnd: String? = null,
 
     @Column("text")
     var text: String? = null,

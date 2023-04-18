@@ -77,9 +77,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var announcementDate: String? = null
         var publicationDate: String? = null
 
-        var citationDate: String? = null
-        var citationYear: String? = null
-
         var printAnnouncementGazette: String? = null
         var printAnnouncementYear: String? = null
         var printAnnouncementNumber: String? = null
@@ -151,9 +148,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         var celexNumber: String? = null
 
-        var ageIndicationStart: String? = null
-        var ageIndicationEnd: String? = null
-
         var text: String? = null
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
@@ -190,8 +184,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.expirationNormCategory,
                 decodeLocalDate(this.announcementDate),
                 decodeLocalDate(this.publicationDate),
-                decodeLocalDate(this.citationDate),
-                this.citationYear,
                 this.printAnnouncementGazette,
                 this.printAnnouncementYear,
                 this.printAnnouncementNumber,
@@ -252,8 +244,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.digitalEvidenceExternalDataNote,
                 this.digitalEvidenceAppendix,
                 this.celexNumber,
-                this.ageIndicationStart,
-                this.ageIndicationEnd,
                 this.text,
             )
         }

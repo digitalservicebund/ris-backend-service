@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.norms.domain.entity
 
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.createSimpleSections
@@ -25,7 +27,6 @@ class NormTest {
         assertThat(norm.applicationScopeStartDate).isNull()
         assertThat(norm.categorizedReference).isNull()
         assertThat(norm.digitalEvidenceExternalDataNote).isNull()
-        assertThat(norm.ageIndicationStart).isNull()
         assertThat(norm.text).isNull()
     }
 
@@ -71,10 +72,13 @@ class NormTest {
     fun `can create a norm with optional date and boolean fields`() {
         val publicationDate = LocalDate.of(2022, 11, 17)
         val announcementDate = LocalDate.of(2022, 11, 18)
-        val citationDate = LocalDate.of(2022, 11, 19)
         val paragraph = Paragraph(UUID.randomUUID(), "marker", "text")
         val article = Article(UUID.randomUUID(), "title", "marker", listOf(paragraph))
         val guid = UUID.randomUUID()
+
+        val citationDate = Metadatum(LocalDate.of(2022, 11, 19), MetadatumType.DATE)
+        val citationDateSection = MetadataSection(MetadataSectionName.CITATION_DATE, listOf(citationDate))
+
         val norm =
             Norm(
                 guid = guid,
@@ -82,15 +86,14 @@ class NormTest {
                 officialLongTitle = "long title",
                 publicationDate = publicationDate,
                 announcementDate = announcementDate,
-                citationDate = citationDate,
                 providerIsResolutionMajority = true,
                 risAbbreviation = "ABC",
                 documentStatusDescription = "document status description",
                 applicationScopeStartDate = LocalDate.of(2022, 11, 18),
                 categorizedReference = "categorized reference",
                 digitalEvidenceExternalDataNote = "digital evidence external data note",
-                ageIndicationStart = "age indication start",
                 text = "text",
+                metadataSections = listOf(citationDateSection),
             )
 
         assertThat(norm.guid).isEqualTo(guid)
@@ -98,7 +101,7 @@ class NormTest {
         assertThat(norm.articles).isEqualTo(listOf(article))
         assertThat(norm.publicationDate).isEqualTo(publicationDate)
         assertThat(norm.announcementDate).isEqualTo(announcementDate)
-        assertThat(norm.citationDate).isEqualTo(citationDate)
+        assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
         assertThat(norm.providerIsResolutionMajority).isTrue()
         assertThat(norm.risAbbreviation).isEqualTo("ABC")
         assertThat(norm.documentStatusDescription).isEqualTo("document status description")
@@ -106,7 +109,6 @@ class NormTest {
         assertThat(norm.categorizedReference).isEqualTo("categorized reference")
         assertThat(norm.digitalEvidenceExternalDataNote)
             .isEqualTo("digital evidence external data note")
-        assertThat(norm.ageIndicationStart).isEqualTo("age indication start")
         assertThat(norm.text).isEqualTo("text")
     }
 }

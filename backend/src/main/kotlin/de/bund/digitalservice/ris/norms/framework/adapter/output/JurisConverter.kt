@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
@@ -28,6 +29,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
@@ -58,24 +60,19 @@ class JurisConverter() : ParseJurisXmlOutputPort, GenerateNormFileOutputPort {
 }
 
 fun mapDomainToData(norm: Norm): NormData {
-    val keywords = norm.metadataSections
-        .flatMap { it.metadata }
-        .filter { it.type == KEYWORD }
-        .sortedBy { it.order }
-        .map { it.value.toString() }
-    val divergentNumber = norm.metadataSections
-        .flatMap { it.metadata }
-        .filter { it.type == DIVERGENT_DOCUMENT_NUMBER }
-        .minByOrNull { it.order }?.value.toString()
+    val keywords = extractStringValues(norm, MetadataSectionName.NORM, KEYWORD)
+    val divergentNumber = extractFirstStringValue(norm, MetadataSectionName.NORM, DIVERGENT_DOCUMENT_NUMBER)
+    val citationDates = extractLocalDateValues(norm, MetadataSectionName.CITATION_DATE, DATE)
+    val citationYears = extractStringValues(norm, MetadataSectionName.CITATION_DATE, YEAR)
 
     return NormData(
         announcementDate = encodeLocalDate(norm.announcementDate),
-        citationDate = encodeLocalDate(norm.citationDate) ?: norm.citationYear,
+        citationDateList = citationDates.filterNotNull() + citationYears,
         documentCategory = norm.documentCategory,
         divergentDocumentNumber = divergentNumber,
         entryIntoForceDate = encodeLocalDate(norm.entryIntoForceDate),
         expirationDate = encodeLocalDate(norm.expirationDate),
-        frameKeywords = keywords,
+        frameKeywordList = keywords,
         officialAbbreviation = norm.officialAbbreviation,
         officialLongTitle = norm.officialLongTitle,
         officialShortTitle = norm.officialShortTitle,
@@ -90,33 +87,44 @@ fun mapDomainToData(norm: Norm): NormData {
 
 fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val divergentDocumentNumber = data.divergentDocumentNumber?.let { listOf(Metadatum(data.divergentDocumentNumber, DIVERGENT_DOCUMENT_NUMBER, 1)) } ?: listOf()
-    val frameKeywords = createMetadataForType(data.frameKeywords, KEYWORD)
-    val risAbbreviationInternationalLaw = createMetadataForType(data.risAbbreviationInternationalLaw, RIS_ABBREVIATION_INTERNATIONAL_LAW)
-    val unofficialLongTitle = createMetadataForType(data.unofficialLongTitle, UNOFFICIAL_LONG_TITLE)
-    val unofficialShortTitle = createMetadataForType(data.unofficialShortTitle, UNOFFICIAL_SHORT_TITLE)
-    val unofficialAbbreviation = createMetadataForType(data.unofficialAbbreviation, UNOFFICIAL_ABBREVIATION)
-    val unofficialReference = createMetadataForType(data.unofficialReference, UNOFFICIAL_REFERENCE)
-    val referenceNumber = createMetadataForType(data.referenceNumber, REFERENCE_NUMBER)
-    val definition = createMetadataForType(data.definition, DEFINITION)
-    val ageOfMajorityIndication = createMetadataForType(data.ageOfMajorityIndication, AGE_OF_MAJORITY_INDICATION)
-    val validityRule = createMetadataForType(data.validityRule, VALIDITY_RULE)
-    val participationType = createMetadataForType(data.participationType, PARTICIPATION_TYPE)
-    val participationInstitution = createMetadataForType(data.participationInstitution, PARTICIPATION_INSTITUTION)
-    val leadJurisdiction = createMetadataForType(data.leadJurisdiction, LEAD_JURISDICTION)
-    val leadUnit = createMetadataForType(data.leadUnit, LEAD_UNIT)
-    val subjectFna = createMetadataForType(data.subjectFna, SUBJECT_FNA)
-    val subjectGesta = createMetadataForType(data.subjectGesta, SUBJECT_GESTA)
+    val frameKeywords = createMetadataForType(data.frameKeywordList, KEYWORD)
+    val risAbbreviationInternationalLaw = createMetadataForType(data.risAbbreviationInternationalLawList, RIS_ABBREVIATION_INTERNATIONAL_LAW)
+    val unofficialLongTitle = createMetadataForType(data.unofficialLongTitleList, UNOFFICIAL_LONG_TITLE)
+    val unofficialShortTitle = createMetadataForType(data.unofficialShortTitleList, UNOFFICIAL_SHORT_TITLE)
+    val unofficialAbbreviation = createMetadataForType(data.unofficialAbbreviationList, UNOFFICIAL_ABBREVIATION)
+    val unofficialReference = createMetadataForType(data.unofficialReferenceList, UNOFFICIAL_REFERENCE)
+    val referenceNumber = createMetadataForType(data.referenceNumberList, REFERENCE_NUMBER)
+    val definition = createMetadataForType(data.definitionList, DEFINITION)
+    val ageOfMajorityIndication = createMetadataForType(data.ageOfMajorityIndicationList, AGE_OF_MAJORITY_INDICATION)
+    val validityRule = createMetadataForType(data.validityRuleList, VALIDITY_RULE)
+    val participationType = createMetadataForType(data.participationTypeList, PARTICIPATION_TYPE)
+    val participationInstitution = createMetadataForType(data.participationInstitutionList, PARTICIPATION_INSTITUTION)
+    val leadJurisdiction = createMetadataForType(data.leadJurisdictionList, LEAD_JURISDICTION)
+    val leadUnit = createMetadataForType(data.leadUnitList, LEAD_UNIT)
+    val subjectFna = createMetadataForType(data.subjectFnaList, SUBJECT_FNA)
+    val subjectGesta = createMetadataForType(data.subjectGestaList, SUBJECT_GESTA)
+
+    val citationDateSections = data.citationDateList.mapIndexed { index, value ->
+        if (value.length == 4 && value.toIntOrNull() != null) {
+            MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(value, YEAR, 1)), index)
+        } else if (value.length > 4 && parseDateString(value) != null) {
+            MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(parseDateString(value), DATE, 1)), index)
+        } else {
+            null
+        }
+    }
 
     val sections = listOf(
         MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
     ) + createSectionsFromMetadata(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
-        createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType)
+        createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
+        citationDateSections
 
     return Norm(
         guid = guid,
         articles = mapArticlesToDomain(data.articles),
-        metadataSections = sections,
+        metadataSections = sections.filterNotNull(),
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         documentCategory = data.documentCategory,
@@ -142,8 +150,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         divergentExpirationDateState = parseDateStateString(data.divergentExpirationDateState),
         expirationNormCategory = data.expirationNormCategory,
         announcementDate = parseDateString(data.announcementDate),
-        citationDate = parseDateString(data.citationDate),
-        citationYear = if (data.citationDate?.length == 4 && data.citationDate?.toIntOrNull() != null) data.citationDate else null,
         printAnnouncementGazette = data.printAnnouncementGazette,
         printAnnouncementYear = data.printAnnouncementYear,
         printAnnouncementPage = data.printAnnouncementPage,
@@ -211,3 +217,29 @@ fun createSectionsFromMetadata(sectionName: MetadataSectionName, metadata: List<
             it.key,
         )
     }.values
+
+private fun extractStringValues(norm: Norm, sectionName: MetadataSectionName, metadatumType: MetadatumType): List<String> {
+    return norm.metadataSections
+        .filter { it.name == sectionName }
+        .flatMap { it.metadata }
+        .filter { it.type == metadatumType }
+        .sortedBy { it.order }
+        .map { it.value.toString() }
+}
+
+private fun extractLocalDateValues(norm: Norm, sectionName: MetadataSectionName, metadatumType: MetadatumType): List<String?> {
+    return norm.metadataSections
+        .filter { it.name == sectionName }
+        .flatMap { it.metadata }
+        .filter { it.type == metadatumType }
+        .sortedBy { it.order }
+        .map { encodeLocalDate(it.value as LocalDate) }
+}
+
+private fun extractFirstStringValue(norm: Norm, sectionName: MetadataSectionName, metadatumType: MetadatumType): String {
+    return norm.metadataSections
+        .filter { it.name == sectionName }
+        .flatMap { it.metadata }
+        .filter { it.type == metadatumType }
+        .minByOrNull { it.order }?.value.toString()
+}

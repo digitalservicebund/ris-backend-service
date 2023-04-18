@@ -51,8 +51,6 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     expirationNormCategory = properties.expirationNormCategory,
     announcementDate = properties.announcementDate,
     publicationDate = properties.publicationDate,
-    citationDate = properties.citationDate,
-    citationYear = properties.citationYear,
     printAnnouncementGazette = properties.printAnnouncementGazette,
     printAnnouncementYear = properties.printAnnouncementYear,
     printAnnouncementNumber = properties.printAnnouncementNumber,
@@ -113,7 +111,5 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     digitalEvidenceExternalDataNote = properties.digitalEvidenceExternalDataNote,
     digitalEvidenceAppendix = properties.digitalEvidenceAppendix,
     celexNumber = properties.celexNumber,
-    ageIndicationStart = properties.ageIndicationStart,
-    ageIndicationEnd = properties.ageIndicationEnd,
     text = properties.text,
 )

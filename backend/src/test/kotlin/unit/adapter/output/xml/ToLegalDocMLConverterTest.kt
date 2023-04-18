@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.w3c.dom.Document
@@ -15,6 +16,7 @@ import org.w3c.dom.Node
 import org.xml.sax.InputSource
 import reactor.test.StepVerifier
 import utils.createRandomNorm
+import utils.createRandomNormWithCitationDate
 import java.io.File
 import java.io.StringReader
 import java.io.StringWriter
@@ -33,7 +35,7 @@ import kotlin.collections.ArrayList
 class ToLegalDocMLConverterTest {
     @Test
     fun `it creates a Akoma Ntoso document with correct schema and version`() {
-        val document = convertNormToLegalDocML()
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
         assertThat(document.getElementsByTagName("akn:akomaNtoso").length).isEqualTo(1)
         assertThat(document.firstChild.nodeName).isEqualTo("akn:akomaNtoso")
 
@@ -47,7 +49,7 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it adds the correct main element with name`() {
-        val document = convertNormToLegalDocML()
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val mainElement = document.getElementsByTagName("akn:bill")
 
@@ -57,7 +59,7 @@ class ToLegalDocMLConverterTest {
     @Test
     fun `it creates the preface with the norm its official titles`() {
         val norm =
-            createRandomNorm()
+            createRandomNormWithCitationDate()
                 .copy(
                     officialLongTitle = "test official long title",
                     officialShortTitle = "test official short title",
@@ -78,7 +80,7 @@ class ToLegalDocMLConverterTest {
     fun `it creates the identification tag with proper data`() {
         val guid = UUID.randomUUID()
         val norm =
-            createRandomNorm()
+            createRandomNormWithCitationDate()
                 .copy(
                     guid = guid,
                     printAnnouncementGazette = "printAnnouncementGazette",
@@ -136,7 +138,7 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it creates the constant metadata tags `() {
-        val document = convertNormToLegalDocML(createRandomNorm())
+        val document = convertNormToLegalDocML(createRandomNormWithCitationDate())
 
         val metadata = document.getElementsByTagName("meta:legalDocML.de_metadaten").item(0)
         val form = getFirstChildNodeWithTagName(metadata, "meta:form")
@@ -154,7 +156,10 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = "documentTypeName",
                     documentNormCategory = "documentNormCategory",
                     providerDecidingBody = "providerDecidingBody",
-                    metadataSections = listOf(MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("participationInstitution", MetadatumType.PARTICIPATION_INSTITUTION)))),
+                    metadataSections = listOf(
+                        MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("participationInstitution", MetadatumType.PARTICIPATION_INSTITUTION))),
+                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                    ),
                 ),
         )
 
@@ -173,7 +178,7 @@ class ToLegalDocMLConverterTest {
     @Test
     fun `it creates the metadata tag with default values if null provided`() {
         val document = convertNormToLegalDocML(
-            createRandomNorm()
+            createRandomNormWithCitationDate()
                 .copy(
                     documentTypeName = null,
                     documentNormCategory = null,
@@ -201,7 +206,10 @@ class ToLegalDocMLConverterTest {
                     documentTypeName = "SO",
                     documentNormCategory = "Rechtsetzungsdokument",
                     providerDecidingBody = "Präsident des Deutschen Bundestages",
-                    metadataSections = listOf(MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("Bundeskanzleramt", MetadatumType.PARTICIPATION_INSTITUTION)))),
+                    metadataSections = listOf(
+                        MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("Bundeskanzleramt", MetadatumType.PARTICIPATION_INSTITUTION))),
+                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                    ),
                 ),
 
         )
@@ -224,7 +232,10 @@ class ToLegalDocMLConverterTest {
             createRandomNorm()
                 .copy(
                     providerDecidingBody = "Bundesministerinnen",
-                    metadataSections = listOf(MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("BMinisterium", MetadatumType.PARTICIPATION_INSTITUTION)))),
+                    metadataSections = listOf(
+                        MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("BMinisterium", MetadatumType.PARTICIPATION_INSTITUTION))),
+                        MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                    ),
                 ),
         )
 
@@ -247,7 +258,9 @@ class ToLegalDocMLConverterTest {
                 marker = "§ 9a",
                 paragraphs = listOf(paragraph),
             )
-        val norm = createRandomNorm().copy(articles = listOf(article))
+        val norm = createRandomNormWithCitationDate().copy(
+            articles = listOf(article),
+        )
         val document = convertNormToLegalDocML(norm)
 
         val body = document.getElementsByTagName("akn:body").item(0)
@@ -304,7 +317,9 @@ class ToLegalDocMLConverterTest {
                 marker = "§ 1",
                 paragraphs = listOf(paragraph),
             )
-        val norm = createRandomNorm().copy(articles = listOf(article))
+        val norm = createRandomNormWithCitationDate().copy(
+            articles = listOf(article),
+        )
         val document = convertNormToLegalDocML(norm)
 
         val body = document.getElementsByTagName("akn:body").item(0)
@@ -381,7 +396,9 @@ class ToLegalDocMLConverterTest {
                 marker = "§ 1",
                 paragraphs = listOf(paragraph),
             )
-        val norm = createRandomNorm().copy(articles = listOf(article))
+        val norm = createRandomNormWithCitationDate().copy(
+            articles = listOf(article),
+        )
         val document = convertNormToLegalDocML(norm)
 
         val body = document.getElementsByTagName("akn:body").item(0)
@@ -447,7 +464,7 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it produces valid xml content according to xml schema definition`() {
-        val norm = createRandomNorm()
+        val norm = createRandomNormWithCitationDate()
         val document = convertNormToLegalDocML(norm)
         val domSource = DOMSource(document)
         val writer = StringWriter()

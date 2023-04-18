@@ -2,8 +2,11 @@ package de.bund.digitalservice.ris.norms.framework.adapter.output
 
 import de.bund.digitalservice.ris.norms.application.port.output.GenerateNormFileOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.ParseJurisXmlOutputPort
+import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
@@ -20,7 +23,9 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import io.mockk.clearAllMocks
@@ -104,23 +109,23 @@ class JurisConverterTest {
                 NormData().apply {
                     officialLongTitle = "test official long title"
                     risAbbreviation = "test ris abbreviation"
-                    risAbbreviationInternationalLaw = listOf("test ris abbreviation international law")
+                    risAbbreviationInternationalLawList = listOf("test ris abbreviation international law")
                     divergentDocumentNumber = "test document number"
                     documentCategory = "test document category"
                     providerEntity = "test provider entity"
                     providerDecidingBody = "test provider deciding body"
                     providerIsResolutionMajority = true
-                    participationType = listOf("test participation type")
-                    participationInstitution = listOf("test participation institution")
-                    leadJurisdiction = listOf("test lead jurisdiction")
-                    leadUnit = listOf("test lead unit")
-                    subjectFna = listOf("test subject FNA")
-                    subjectGesta = listOf("test subject Gesta")
+                    participationTypeList = listOf("test participation type")
+                    participationInstitutionList = listOf("test participation institution")
+                    leadJurisdictionList = listOf("test lead jurisdiction")
+                    leadUnitList = listOf("test lead unit")
+                    subjectFnaList = listOf("test subject FNA")
+                    subjectGestaList = listOf("test subject Gesta")
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
-                    unofficialLongTitle = listOf("test unofficial long title")
-                    unofficialShortTitle = listOf("test unofficial short title")
-                    unofficialAbbreviation = listOf("test unofficial abbreviation")
+                    unofficialLongTitleList = listOf("test unofficial long title")
+                    unofficialShortTitleList = listOf("test unofficial short title")
+                    unofficialAbbreviationList = listOf("test unofficial abbreviation")
                     entryIntoForceDate = "2022-01-01"
                     entryIntoForceDateState = "UNDEFINED_UNKNOWN"
                     principleEntryIntoForceDate = "2022-01-02"
@@ -136,11 +141,11 @@ class JurisConverterTest {
                     divergentExpirationDateState = "UNDEFINED_UNKNOWN"
                     expirationNormCategory = "test expiration norm category"
                     announcementDate = "2022-01-07"
-                    citationDate = "2022-01-08"
+                    citationDateList = listOf("2022-01-08")
                     printAnnouncementGazette = "test print announcement gazette"
                     printAnnouncementYear = "test print announcement year"
                     printAnnouncementPage = "test print announcement page"
-                    unofficialReference = listOf("test unofficial reference")
+                    unofficialReferenceList = listOf("test unofficial reference")
                     statusNote = "test status note"
                     statusDescription = "test status description"
                     statusDate = "2022-01-09"
@@ -162,11 +167,11 @@ class JurisConverterTest {
                     applicationScopeEndDate = "2022-01-14"
                     categorizedReference = "test categorized reference"
                     otherFootnote = "test other footnote"
-                    validityRule = listOf("test validity rule")
-                    referenceNumber = listOf("test reference number")
+                    validityRuleList = listOf("test validity rule")
+                    referenceNumberList = listOf("test reference number")
                     celexNumber = "test celex number"
-                    definition = listOf("test definition")
-                    ageOfMajorityIndication = listOf("test age of majority indication")
+                    definitionList = listOf("test definition")
+                    ageOfMajorityIndicationList = listOf("test age of majority indication")
                     text = "test text"
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
@@ -197,8 +202,6 @@ class JurisConverterTest {
             assertThat(norm?.divergentExpirationDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
             assertThat(norm?.expirationNormCategory).isEqualTo("test expiration norm category")
             assertThat(norm?.announcementDate).isEqualTo(LocalDate.parse("2022-01-07"))
-            assertThat(norm?.citationDate).isEqualTo(LocalDate.parse("2022-01-08"))
-            assertThat(norm?.citationYear).isNull()
             assertThat(norm?.printAnnouncementGazette).isEqualTo("test print announcement gazette")
             assertThat(norm?.printAnnouncementYear).isEqualTo("test print announcement year")
             assertThat(norm?.printAnnouncementPage).isEqualTo("test print announcement page")
@@ -242,11 +245,12 @@ class JurisConverterTest {
             assertThat(metadata).contains(Metadatum("test lead unit", LEAD_UNIT, 1))
             assertThat(metadata).contains(Metadatum("test subject FNA", SUBJECT_FNA, 1))
             assertThat(metadata).contains(Metadatum("test subject Gesta", SUBJECT_GESTA, 1))
+            assertThat(metadata).contains(Metadatum(decodeLocalDate("2022-01-08"), DATE, 1))
         }
 
         @Test
         fun `it correctly maps the parsed data to metdata using the index order`() {
-            val data = NormData().apply { frameKeywords = listOf("foo", "bar") }
+            val data = NormData().apply { frameKeywordList = listOf("foo", "bar") }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
             val converter = JurisConverter()
 
@@ -264,7 +268,7 @@ class JurisConverterTest {
             val data =
                 NormData().apply {
                     officialLongTitle = "test official long title"
-                    citationDate = "2022"
+                    citationDateList = listOf("2022")
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
             every { extractData(any()) } returns data
@@ -272,8 +276,8 @@ class JurisConverterTest {
             val norm = converter.parseJurisXml(query).block()
 
             assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
-            assertThat(norm?.citationDate).isNull()
-            assertThat(norm?.citationYear).isEqualTo("2022")
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }).contains(Metadatum("2022", YEAR, 1))
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == DATE }).isEmpty()
         }
 
         @Test
@@ -282,7 +286,7 @@ class JurisConverterTest {
             val data =
                 NormData().apply {
                     officialLongTitle = "test official long title"
-                    citationDate = "20112-2-1"
+                    citationDateList = listOf("20112-2-1")
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
             every { extractData(any()) } returns data
@@ -290,8 +294,8 @@ class JurisConverterTest {
             val norm = converter.parseJurisXml(query).block()
 
             assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
-            assertThat(norm?.citationDate).isNull()
-            assertThat(norm?.citationYear).isNull()
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == DATE }).isEmpty()
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == YEAR }).isEmpty()
         }
 
         @Test
@@ -300,7 +304,7 @@ class JurisConverterTest {
             val data =
                 NormData().apply {
                     officialLongTitle = "test official long title"
-                    citationDate = "201c"
+                    citationDateList = listOf("201c")
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
             every { extractData(any()) } returns data
@@ -308,8 +312,8 @@ class JurisConverterTest {
             val norm = converter.parseJurisXml(query).block()
 
             assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
-            assertThat(norm?.citationDate).isNull()
-            assertThat(norm?.citationYear).isNull()
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == DATE }).isEmpty()
+            assertThat(norm?.metadataSections?.flatMap { it.metadata }?.filter { it.type == YEAR }).isEmpty()
         }
 
         @Test
@@ -330,7 +334,11 @@ class JurisConverterTest {
 
     @Nested
     inner class GenerateNormFile {
-        val norm = createRandomNorm().apply { citationDate = null }
+        val norm = createRandomNorm().copy(
+            metadataSections = listOf(
+                MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum("2002", YEAR))),
+            ),
+        )
         val normData = mapDomainToData(norm)
         val generatedZipFile = File.createTempFile("Temp", ".zip")
 
@@ -370,10 +378,13 @@ class JurisConverterTest {
 
         @Test
         fun `it takes the value of the citation year for the citation date in the external norm entity`() {
-            assertThat(norm.citationDate).isNull()
-            assertThat(norm.citationYear).isNotNull
-            assertThat(normData.citationDate).isNotNull
-            assertThat(normData.citationDate).isEqualTo(norm.citationYear)
+            assertThat(norm.metadataSections.flatMap { it.metadata }.filter { it.type == DATE }).isEmpty()
+
+            assertThat(norm.metadataSections.flatMap { it.metadata }.filter { it.type == YEAR }).isNotNull()
+            assertThat(normData.citationDateList).isNotNull
+
+            val citationDateYear = norm.metadataSections.flatMap { it.metadata }.filter { it.type == YEAR }.first().value.toString()
+            assertThat(normData.citationDateList).contains(citationDateYear)
         }
 
         @Test
@@ -387,7 +398,7 @@ class JurisConverterTest {
             verify(exactly = 1) {
                 generateZip(
                     withArg {
-                        assertThat(it.frameKeywords).isEqualTo(listOf("foo", "bar"))
+                        assertThat(it.frameKeywordList).isEqualTo(listOf("foo", "bar"))
                     },
                     any(),
                 )

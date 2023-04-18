@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.jeasy.random.EasyRandom
 import org.jeasy.random.EasyRandomParameters
 import org.jeasy.random.FieldPredicates.inClass
@@ -53,6 +54,14 @@ fun createRandomNorm(): Norm {
             emptyList<FileReference>()
         }
     return EasyRandom(parameters).nextObject(Norm::class.java)
+}
+
+fun createRandomNormWithCitationDate(): Norm {
+    return createRandomNorm().copy(
+        metadataSections = listOf(
+            MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+        ),
+    )
 }
 
 fun createRandomFileReference(): FileReference {

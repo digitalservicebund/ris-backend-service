@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.ContentDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.xml.dto.IdentifiedElement
@@ -14,13 +15,20 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import org.jsoup.nodes.TextNode
+import java.time.LocalDate
 
 fun mapNormToDto(norm: Norm): NormDto {
+    val firstCitationDate = norm.metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
+        .filter { it.type == MetadatumType.DATE }.minByOrNull { it.order }?.let { encodeLocalDate(it.value as LocalDate) }
+
+    val firstCitationYear = norm.metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
+        .filter { it.type == MetadatumType.YEAR }.minByOrNull { it.order }?.let { it.value.toString() }
+
     return NormDto(
         guid = norm.guid.toString(),
         officialLongTitle = IdentifiedElement(norm.officialLongTitle),
         officialShortTitle = IdentifiedElement(norm.officialShortTitle),
-        announcementDate = norm.announcementDate?.toString() ?: norm.citationDate?.toString(),
+        announcementDate = norm.announcementDate?.toString() ?: (firstCitationDate ?: firstCitationYear),
         documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
         documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
         providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, norm.providerDecidingBody ?: ""),

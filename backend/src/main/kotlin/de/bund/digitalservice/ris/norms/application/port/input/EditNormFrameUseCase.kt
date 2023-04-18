@@ -50,9 +50,6 @@ interface EditNormFrameUseCase {
         var announcementDate: LocalDate? = null,
         var publicationDate: LocalDate? = null,
 
-        var citationDate: LocalDate? = null,
-        var citationYear: String? = null,
-
         var printAnnouncementGazette: String? = null,
         var printAnnouncementYear: String? = null,
         var printAnnouncementNumber: String? = null,
@@ -121,9 +118,6 @@ interface EditNormFrameUseCase {
         var digitalEvidenceAppendix: String? = null,
 
         var celexNumber: String? = null,
-
-        var ageIndicationStart: String? = null,
-        var ageIndicationEnd: String? = null,
 
         var text: String? = null,
     )

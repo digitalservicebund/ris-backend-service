@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutpu
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
+import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.FileReferenceDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadataSectionDto
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import java.util.*
 
 @Component
 @Primary
@@ -53,11 +55,8 @@ class NormsService(
     private val criteria: NormsCriteriaBuilder = NormsCriteriaBuilder()
 
     override fun getNormByEli(query: GetNormByEliOutputPort.Query): Mono<Norm> {
-        val selectQuery = Query.query(criteria.getEliCriteria(query.gazette, query.year, query.page))
-        return template.select(NormDto::class.java)
-            .matching(selectQuery)
-            .first()
-            .flatMap(::getNormWithArticles)
+        return normsRepository.findNormByEli(Eli.parseGazette(query.gazette), query.year, query.page)
+            .flatMap { getNormByGuid(GetNormByGuidOutputPort.Query(UUID.fromString(it))) }
     }
 
     override fun searchNorms(

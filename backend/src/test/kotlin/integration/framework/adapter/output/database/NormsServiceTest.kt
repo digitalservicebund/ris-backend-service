@@ -14,10 +14,11 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
@@ -173,16 +174,44 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save simple norm and retrieved by eli with citation year`() {
+        val citationDate = Metadatum("2001", YEAR)
+        val citationDateSection = MetadataSection(MetadataSectionName.CITATION_DATE, listOf(citationDate))
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
             officialLongTitle = "Test Title",
-            citationYear = "2001",
             printAnnouncementPage = "1125",
             printAnnouncementGazette = "bg-1",
+            metadataSections = listOf(citationDateSection),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2001", "1125")
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save simple norm and retrieved by eli with citation date`() {
+        val citationDate = Metadatum(LocalDate.of(2020, 2, 15), DATE)
+        val citationDateSection = MetadataSection(MetadataSectionName.CITATION_DATE, listOf(citationDate))
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            officialLongTitle = "Test Title",
+            printAnnouncementPage = "1125",
+            printAnnouncementGazette = "bg-1",
+            metadataSections = listOf(citationDateSection),
+        )
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2020", "1125")
 
         normsService.saveNorm(saveCommand)
             .`as`(StepVerifier::create)
@@ -421,7 +450,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `it maps metadatum of date type to entity properly`() {
-        val metadatumDto = MetadatumDto(1, "2020-12-23", MetadatumType.DATE, 1, 1)
+        val metadatumDto = MetadatumDto(1, "2020-12-23", DATE, 1, 1)
         val result = normsService.metadatumToEntity(metadatumDto)
 
         Assertions.assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))
