@@ -1,5 +1,5 @@
 import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
-import FieldOfLawSelectionListEntry from "@/components/FieldOfLawSelectionListEntry.vue"
+import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 function renderComponent(fieldOfLaw: Partial<FieldOfLawNode>): RenderResult {
@@ -7,10 +7,10 @@ function renderComponent(fieldOfLaw: Partial<FieldOfLawNode>): RenderResult {
     fieldOfLaw,
   }
 
-  return render(FieldOfLawSelectionListEntry, { props })
+  return render(FieldOfLawListEntry, { props })
 }
 
-describe("FieldOfLawSelectionListEntry", () => {
+describe("FieldOfLawListEntry", () => {
   it("render entry", () => {
     renderComponent({
       identifier: "ST-01-02-03",

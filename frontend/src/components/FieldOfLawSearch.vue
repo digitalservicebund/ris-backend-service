@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue"
-import FieldOfLawSelectionListEntry from "@/components/FieldOfLawSelectionListEntry.vue"
+import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
 import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 import TextButton from "@/shared/components/input/TextButton.vue"
@@ -69,7 +69,7 @@ function handlePagination(backwards: boolean) {
       </div>
     </div>
     <div v-if="results">
-      <FieldOfLawSelectionListEntry
+      <FieldOfLawListEntry
         v-for="(fieldOfLawNode, idx) in results.content"
         :key="idx"
         :field-of-law="fieldOfLawNode"

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import FieldOfLawSelectionListEntry from "./FieldOfLawSelectionListEntry.vue"
+import FieldOfLawListEntry from "./FieldOfLawListEntry.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 const props = defineProps<{
@@ -23,7 +23,7 @@ function handleLinkedFieldClicked(identifier: string) {
     </div>
     <div v-else>
       <hr class="border-blue-500 mt-20 w-full" />
-      <FieldOfLawSelectionListEntry
+      <FieldOfLawListEntry
         v-for="fieldOfLaw in props.selectedFieldsOfLaw"
         :key="fieldOfLaw.identifier"
         :field-of-law="fieldOfLaw"
