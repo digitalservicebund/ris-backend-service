@@ -267,10 +267,8 @@ function getLabel(value: string, unit: RangeUnit): string {
   }
 }
 
-function ageIndicatorSummarizer(data: Metadata) {
-  if (!data) {
-    return null
-  }
+function ageIndicatorSummarizer(data: Metadata): string {
+  if (!data) return ""
 
   const start = data.RANGE_START?.[0]
   const startUnit = data.RANGE_START_UNIT?.[0]
@@ -290,14 +288,12 @@ function ageIndicatorSummarizer(data: Metadata) {
     const endLabel = getLabel(end, endUnit)
     return ` - ${endLabel}`
   } else {
-    return null
+    return ""
   }
 }
 
-function citationDateSummarizer(data: Metadata) {
-  if (!data) {
-    return null
-  }
+function citationDateSummarizer(data: Metadata): string {
+  if (!data) return ""
 
   if (data.YEAR) {
     return data.YEAR.toString()

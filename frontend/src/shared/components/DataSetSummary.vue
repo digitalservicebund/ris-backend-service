@@ -51,7 +51,8 @@ export function defaultSummarizer(dataEntry: any): string {
  * property to another component.
  */
 export function withSummarizer(
-  summarizer: (dataEntry: undefined) => string | VNode
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  summarizer: (dataEntry: any) => string | VNode
 ) {
   return defineComponent({
     props: {
