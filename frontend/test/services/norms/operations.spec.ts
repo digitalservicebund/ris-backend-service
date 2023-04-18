@@ -199,8 +199,6 @@ describe("normsService", () => {
           applicationScopeStartDate: null,
           categorizedReference: null,
           celexNumber: null,
-          citationDate: null,
-          citationYear: null,
           completeCitation: null,
           digitalAnnouncementDate: null,
           digitalAnnouncementArea: null,

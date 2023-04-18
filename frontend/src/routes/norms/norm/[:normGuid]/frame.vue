@@ -2,15 +2,15 @@
 import { storeToRefs } from "pinia"
 import { computed, toRefs } from "vue"
 import { useRoute } from "vue-router"
-import CitationDateInput from "@/components/CitationDateInput.vue"
+import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
+import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import ExpandableContent from "@/components/ExpandableContent.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { Metadata, MetadataSections } from "@/domain/Norm"
-import { ageIndication } from "@/fields/norms/ageIndication"
+import { Metadata, MetadataSections, RangeUnit } from "@/domain/Norm"
 import { announcementDate } from "@/fields/norms/announcementDate"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { celexNumber } from "@/fields/norms/celexNumber"
@@ -38,6 +38,7 @@ import { repeal } from "@/fields/norms/repeal"
 import { status } from "@/fields/norms/status"
 import { text } from "@/fields/norms/text"
 import { unofficialReference } from "@/fields/norms/unofficialReference"
+import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
 import ChipsInput from "@/shared/components/input/ChipsInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
@@ -98,7 +99,6 @@ const flatMetadata = computed({
       loadedNorm.value.categorizedReference =
         data.categorizedReference as string
       loadedNorm.value.celexNumber = data.celexNumber as string
-      loadedNorm.value.citationDate = data.citationDate as string
       loadedNorm.value.completeCitation = data.completeCitation as string
       loadedNorm.value.digitalAnnouncementDate =
         data.digitalAnnouncementDate as string
@@ -245,18 +245,85 @@ const flatMetadata = computed({
   },
 })
 
-const citationData = computed({
-  get: () => ({
-    date: loadedNorm.value?.citationDate,
-    year: loadedNorm.value?.citationYear,
-  }),
-  set(value) {
-    if (loadedNorm.value) {
-      loadedNorm.value.citationDate = value.date
-      loadedNorm.value.citationYear = value.year
+function getLabel(value: string, unit: RangeUnit): string {
+  const pluralN = value === "1" ? "" : "n"
+  switch (unit) {
+    case RangeUnit.YEARS:
+      return value + ` Jahr` + (value === "1" ? "" : "e")
+    case RangeUnit.MONTHS:
+      return value + ` Monat` + (value === "1" ? "" : "e")
+    case RangeUnit.WEEKS:
+      return value + " Woche" + pluralN
+    case RangeUnit.DAYS:
+      return value + " Tag" + (value === "1" ? "" : "e")
+    case RangeUnit.HOURS:
+      return value + " Stunde" + pluralN
+    case RangeUnit.MINUTES:
+      return value + " Minute" + pluralN
+    case RangeUnit.SECONDS:
+      return value + " Sekunde" + pluralN
+    case RangeUnit.YEARS_OF_LIFE:
+      return value + " Lebensjahre"
+    case RangeUnit.MONTHS_OF_LIFE:
+      return value + " Lebensmonate"
+  }
+}
+
+function ageIndicatorSummarizer(data: Metadata) {
+  if (!data) {
+    return null
+  }
+
+  const start = data.RANGE_START?.[0]
+  const startUnit = data.RANGE_START_UNIT?.[0]
+  const end = data.RANGE_END?.[0]
+  const endUnit = data.RANGE_END_UNIT?.[0]
+
+  if (start && startUnit) {
+    if (end && endUnit) {
+      const startLabel = getLabel(start, startUnit)
+      const endLabel = getLabel(end, endUnit)
+      return `${startLabel} - ${endLabel}`
+    } else {
+      const label = getLabel(start, startUnit)
+      return `${label}`
     }
-  },
-})
+  } else if (end && endUnit) {
+    const endLabel = getLabel(end, endUnit)
+    return ` - ${endLabel}`
+  } else {
+    return null
+  }
+}
+
+function citationDateSummarizer(data: Metadata) {
+  if (!data) {
+    return null
+  }
+
+  if (data.YEAR) {
+    return data.YEAR.toString()
+  }
+
+  function formatDate(dateStrings: string[] | undefined): string {
+    if (!dateStrings) {
+      return ""
+    }
+
+    const dateString = Array.isArray(dateStrings) ? dateStrings[0] : dateStrings
+
+    const date = new Date(dateString)
+    const day = date.getDate().toString().padStart(2, "0")
+    const month = (date.getMonth() + 1).toString().padStart(2, "0")
+    const year = date.getFullYear().toString()
+    return `${day}.${month}.${year}`
+  }
+
+  return formatDate(data.DATE)
+}
+
+const AgeIndicationSummary = withSummarizer(ageIndicatorSummarizer)
+const CitationDateSummary = withSummarizer(citationDateSummarizer)
 </script>
 
 <template>
@@ -399,12 +466,20 @@ const citationData = computed({
       />
     </fieldset>
 
-    <fieldset>
-      <legend id="citationDateFields" class="heading-02-regular mb-[2rem]">
-        Zitierdatum
-      </legend>
-      <CitationDateInput v-model="citationData" />
-    </fieldset>
+    <ExpandableDataSet
+      id="citationDateFields"
+      class="mt-40"
+      :data-set="metadataSections.CITATION_DATE"
+      :summary-component="CitationDateSummary"
+      title="Zitierdatum"
+    >
+      <EditableList
+        v-model="metadataSections.CITATION_DATE"
+        :default-value="{}"
+        :edit-component="CitationDateInputGroup"
+        :summary-component="CitationDateSummary"
+      />
+    </ExpandableDataSet>
 
     <h2 id="officialAnnouncementFields" class="heading-02-regular mb-[1rem]">
       Amtliche Fundstelle
@@ -444,6 +519,7 @@ const citationData = computed({
         :fields="euAnnouncement"
       />
     </fieldset>
+
     <fieldset>
       <legend
         id="otherOfficialReferencesFields"
@@ -492,18 +568,21 @@ const citationData = computed({
       </legend>
       <InputGroup v-model="flatMetadata" :column-count="1" :fields="status" />
     </fieldset>
+
     <fieldset>
       <legend id="repealFields" class="heading-03-regular mb-[1rem]">
         Aufhebung
       </legend>
       <InputGroup v-model="flatMetadata" :column-count="1" :fields="repeal" />
     </fieldset>
+
     <fieldset>
       <legend id="reissueFields" class="heading-03-regular mb-[1rem]">
         Neufassung
       </legend>
       <InputGroup v-model="flatMetadata" :column-count="1" :fields="reissue" />
     </fieldset>
+
     <fieldset>
       <legend id="otherStatusNoteFields" class="heading-03-regular mb-[1rem]">
         Sonstiger Hinweis
@@ -531,6 +610,7 @@ const citationData = computed({
         :fields="documentStatus"
       />
     </fieldset>
+
     <fieldset>
       <legend id="documentTextProofFields" class="heading-03-regular mb-[1rem]">
         Textnachweis
@@ -541,6 +621,7 @@ const citationData = computed({
         :fields="documentTextProof"
       />
     </fieldset>
+
     <fieldset>
       <legend id="otherDocumentNoteFields" class="heading-03-regular mb-[1rem]">
         Sonstiger Hinweis
@@ -640,16 +721,20 @@ const citationData = computed({
       />
     </fieldset>
 
-    <fieldset>
-      <legend id="ageIndicationFields" class="heading-02-regular mb-[1rem]">
-        Altersangabe
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="ageIndication"
+    <ExpandableDataSet
+      id="ageIndicationFields"
+      class="mt-40"
+      :data-set="metadataSections.AGE_INDICATION"
+      :summary-component="AgeIndicationSummary"
+      title="Altersangabe"
+    >
+      <EditableList
+        v-model="metadataSections.AGE_INDICATION"
+        :default-value="{}"
+        :edit-component="AgeIndicationInputGroup"
+        :summary-component="AgeIndicationSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <fieldset class="mb-40">
       <legend id="definitionFields" class="heading-02-regular mb-[1rem]">

@@ -79,9 +79,9 @@ export type MetadataValueType = {
   [MetadatumType.DATE]: string
   [MetadatumType.YEAR]: string
   [MetadatumType.RANGE_START]: string
-  [MetadatumType.RANGE_START_UNIT]: string
+  [MetadatumType.RANGE_START_UNIT]: RangeUnit
   [MetadatumType.RANGE_END]: string
-  [MetadatumType.RANGE_END_UNIT]: string
+  [MetadatumType.RANGE_END_UNIT]: RangeUnit
 }
 
 export type Metadata = {
@@ -111,8 +111,6 @@ export type FlatMetadata = {
   applicationScopeStartDate?: string
   categorizedReference?: string
   celexNumber?: string
-  citationDate?: string
-  citationYear?: string
   completeCitation?: string
   digitalAnnouncementDate?: string
   digitalAnnouncementArea?: string
@@ -197,4 +195,16 @@ export type FlatMetadata = {
   statusNote?: string
   statusReference?: string
   text?: string
+}
+
+export enum RangeUnit {
+  YEARS = "YEARS",
+  MONTHS = "MONTHS",
+  WEEKS = "WEEKS",
+  DAYS = "DAYS",
+  HOURS = "HOURS",
+  MINUTES = "MINUTES",
+  SECONDS = "SECONDS",
+  YEARS_OF_LIFE = "YEARS_OF_LIFE",
+  MONTHS_OF_LIFE = "MONTHS_OF_LIFE",
 }

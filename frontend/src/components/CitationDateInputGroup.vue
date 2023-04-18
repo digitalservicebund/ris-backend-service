@@ -1,20 +1,15 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
+import { Metadata } from "@/domain/Norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { useInputModel } from "@/shared/composables/useInputModel"
-
-type CitationDate = { date?: string; year?: string }
 
 interface Props {
-  value?: CitationDate
-  modelValue?: CitationDate
+  modelValue: Metadata
 }
 
 interface Emits {
-  (event: "update:modelValue", value?: CitationDate): void
-
-  (event: "input", value: Event): void
+  (event: "update:modelValue", value: Metadata): void
 }
 
 const props = defineProps<Props>()
@@ -25,12 +20,66 @@ enum InputType {
   YEAR = "year",
 }
 
+const inputValue = ref(props.modelValue)
 const YearPlaceHolder = "JJJJ"
+const selectedInputType = ref<InputType>(InputType.DATE)
+function detectSelectedInputType(): void {
+  if (inputValue.value.YEAR && inputValue.value.YEAR.length > 0) {
+    selectedInputType.value = InputType.YEAR
+  } else selectedInputType.value = InputType.DATE
+}
 
-const selectedInputType = ref<InputType | undefined>(undefined)
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== undefined) {
+      inputValue.value = newValue
+    }
+  },
+  { immediate: true }
+)
 
-const { inputValue } = useInputModel<CitationDate, Props, Emits>(props, emit)
+watch(inputValue, () => emit("update:modelValue", inputValue.value), {
+  deep: true,
+})
 
+watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
+
+const dateValue = computed({
+  get: () => inputValue.value.DATE?.[0],
+  set: (value) => value && (inputValue.value.DATE = [value]),
+})
+
+watch(
+  inputValue,
+  () => {
+    switch (selectedInputType.value) {
+      case InputType.DATE:
+        inputValue.value.YEAR = undefined
+        break
+      case InputType.YEAR:
+        inputValue.value.DATE = undefined
+        break
+    }
+  },
+  { deep: true }
+)
+
+const yearValue = computed({
+  get: () => inputValue.value.YEAR?.[0],
+  set: (value) => value && (inputValue.value.YEAR = [value]),
+})
+const handlePaste = async (event: ClipboardEvent) => {
+  const clipboardData = event.clipboardData
+  if (clipboardData !== null) {
+    const pastedText = clipboardData.getData("text/plain")
+    if (/^\d+$/.test(pastedText.substring(0, 3))) {
+      return
+    } else {
+      event.preventDefault()
+    }
+  }
+}
 function onlyAllowNumbers(event: KeyboardEvent) {
   const isNumber = /^\d+$/.test(event.key)
   const isControlKey = [
@@ -43,62 +92,15 @@ function onlyAllowNumbers(event: KeyboardEvent) {
     event.preventDefault()
   }
 }
-
-const handlePaste = async (event: ClipboardEvent) => {
-  const clipboardData = event.clipboardData
-  if (clipboardData !== null) {
-    const pastedText = clipboardData.getData("text/plain")
-    if (/^\d+$/.test(pastedText.substring(0, 3))) {
-      return
-    } else {
-      event.preventDefault()
-    }
-  }
-}
-
-watch(
-  inputValue,
-  () => {
-    if (inputValue.value) {
-      switch (selectedInputType.value) {
-        case InputType.DATE:
-          inputValue.value.year = undefined
-          break
-        case InputType.YEAR:
-          // this if needed because of behaviour in DateInput component
-          if (inputValue.value.date !== "") {
-            inputValue.value.date = undefined
-          }
-          break
-      }
-    }
-    selectedInputType.value = inputValue.value?.year
-      ? InputType.YEAR
-      : InputType.DATE
-  },
-  {
-    immediate: true,
-  }
-)
-
-const dateValue = computed({
-  get: () => inputValue.value?.date,
-  set: (value) => (inputValue.value = { ...inputValue.value, date: value }),
-})
-
-const yearValue = computed({
-  get: () => inputValue.value?.year,
-  set: (value) => (inputValue.value = { ...inputValue.value, year: value }),
-})
 </script>
 
 <template>
-  <div class="pb-32 w-240">
-    <div class="radio-group">
+  <div class="pb-32 w-288">
+    <div class="radio-group w-320">
       <label class="form-control">
         <input
           v-model="selectedInputType"
-          aria-label="Citation Date"
+          aria-label="Wählen Sie Zitierdatum Datum"
           name="inputType"
           type="radio"
           :value="InputType.DATE"
@@ -108,7 +110,7 @@ const yearValue = computed({
       <label class="form-control">
         <input
           v-model="selectedInputType"
-          aria-label="Citation Year"
+          aria-label="Wählen Sie Zitierdatum Jahr"
           name="inputType"
           type="radio"
           :value="InputType.YEAR"
@@ -127,7 +129,7 @@ const yearValue = computed({
       v-if="selectedInputType === InputType.DATE"
       id="citationDate"
       v-model="dateValue"
-      alt-text="Citadation Date Input Field"
+      alt-text="Zitierdatum Datum"
       aria-label="Zitierdatum Datum"
       is-future-date
     />
@@ -136,7 +138,7 @@ const yearValue = computed({
         v-if="selectedInputType === InputType.YEAR"
         id="citationYear"
         v-model="yearValue"
-        alt-text="Citation Year Input Field"
+        alt-text="Zitierdatum Jahresangabe"
         aria-label="Zitierdatum Jahresangabe"
         maxlength="4"
         :placeholder="YearPlaceHolder"

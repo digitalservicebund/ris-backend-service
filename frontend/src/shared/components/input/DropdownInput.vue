@@ -13,6 +13,7 @@ interface Props {
   value?: DropdownInputModelType
   ariaLabel: string
   placeholder?: string
+  hasSmallerHeight?: boolean
 }
 
 interface Emits {
@@ -83,6 +84,12 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener("click", closeDropDownWhenClickOutside)
 })
+
+const computedStyle = computed(() => {
+  return props.hasSmallerHeight
+    ? { padding: "9.5px 16px" }
+    : { padding: "12px 16px" }
+})
 </script>
 
 <template>
@@ -96,7 +103,7 @@ onBeforeUnmount(() => {
       @click="toggleDropdown"
       @keydown.enter="toggleDropdown"
     >
-      <div class="bg-white input-container">
+      <div class="bg-white input-container" :style="computedStyle">
         <input
           :id="id"
           v-model="selectedLabel"

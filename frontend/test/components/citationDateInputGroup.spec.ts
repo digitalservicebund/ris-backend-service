@@ -1,13 +1,18 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen, fireEvent } from "@testing-library/vue"
-import CitationDateInput from "@/components/CitationDateInput.vue"
+import { Metadata } from "../../src/domain/Norm"
+import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 
-function renderComponent(options?: { ariaLabel?: string }) {
+function renderComponent(options?: {
+  ariaLabel?: string
+  modelValue?: Metadata
+}) {
   const user = userEvent.setup()
   const props = {
     ariaLabel: options?.ariaLabel ?? "aria-label",
+    modelValue: options?.modelValue ?? {},
   }
-  const utils = render(CitationDateInput, { props })
+  const utils = render(CitationDateInputGroup, { props })
   return { user, props, ...utils }
 }
 
@@ -33,7 +38,7 @@ describe("Citation date/year field", () => {
         "Jahresangabe"
       ) as HTMLInputElement
       const dateInputField = screen.getByLabelText(
-        "Zitierdatum"
+        "Zitierdatum Datum"
       ) as HTMLInputElement
 
       expect(dateRadioButton).toBeInTheDocument()
@@ -51,7 +56,7 @@ describe("Citation date/year field", () => {
     it("User can enter a date input", async () => {
       renderComponent()
       const dateInputField = screen.getByLabelText(
-        "Zitierdatum"
+        "Zitierdatum Datum"
       ) as HTMLInputElement
 
       expect(dateInputField).toBeInTheDocument()

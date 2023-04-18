@@ -23,7 +23,12 @@ import {
   MetadataValueType,
   Norm,
   FlatMetadata,
+  RangeUnit,
 } from "@/domain/Norm"
+
+function identity<T>(data: T): T {
+  return data
+}
 
 function encodeString(data?: string | null): string | null {
   return data && data.length > 0 ? data : null
@@ -38,13 +43,17 @@ function encodeBoolean(data?: boolean | null): boolean | null {
 // of the API, we only take the first 10 characters.
 //
 // TODO: Improve by working with enriched date type.
-function encodeDate(data?: string | null): string | null {
+function encodeDate(data?: string): string {
   dayjs.extend(utc)
   dayjs.extend(timezone)
 
   return data && data.length > 0
     ? dayjs(data).tz("Europe/Berlin").format("YYYY-MM-DD")
-    : null
+    : ""
+}
+
+function encodeNullDate(data?: string | null): string | null {
+  return data ? encodeDate(data) : null
 }
 
 type MetadataValueDecoders = {
@@ -59,60 +68,74 @@ type MetadataValueEncoders = {
   ) => MetadatumSchema["value"]
 }
 
+function decodeRangeUnit(data: string): RangeUnit {
+  const indexOfKeyPassed = Object.keys(RangeUnit).indexOf(data)
+
+  const unit = Object.values(RangeUnit)[indexOfKeyPassed]
+
+  if (unit) {
+    return unit
+  } else throw new Error(`Could not decode RangeUnit: '${data}'`)
+}
+
+function encodeRangeUnit(data: RangeUnit): string {
+  return data
+}
+
 const DECODERS: MetadataValueDecoders = {
-  [MetadatumType.KEYWORD]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_LONG_TITLE]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_SHORT_TITLE]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_ABBREVIATION]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_REFERENCE]: (data: string) => data,
-  [MetadatumType.DIVERGENT_DOCUMENT_NUMBER]: (data: string) => data,
-  [MetadatumType.REFERENCE_NUMBER]: (data: string) => data,
-  [MetadatumType.DEFINITION]: (data: string) => data,
-  [MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW]: (data: string) => data,
-  [MetadatumType.AGE_OF_MAJORITY_INDICATION]: (data: string) => data,
-  [MetadatumType.VALIDITY_RULE]: (data: string) => data,
-  [MetadatumType.LEAD_JURISDICTION]: (data: string) => data,
-  [MetadatumType.LEAD_UNIT]: (data: string) => data,
-  [MetadatumType.PARTICIPATION_TYPE]: (data: string) => data,
-  [MetadatumType.PARTICIPATION_INSTITUTION]: (data: string) => data,
-  [MetadatumType.SUBJECT_FNA]: (data: string) => data,
-  [MetadatumType.SUBJECT_PREVIOUS_FNA]: (data: string) => data,
-  [MetadatumType.SUBJECT_GESTA]: (data: string) => data,
-  [MetadatumType.SUBJECT_BGB_3]: (data: string) => data,
-  [MetadatumType.DATE]: (data: string) => data,
-  [MetadatumType.YEAR]: (data: string) => data,
-  [MetadatumType.RANGE_START]: (data: string) => data,
-  [MetadatumType.RANGE_START_UNIT]: (data: string) => data,
-  [MetadatumType.RANGE_END]: (data: string) => data,
-  [MetadatumType.RANGE_END_UNIT]: (data: string) => data,
+  [MetadatumType.KEYWORD]: identity,
+  [MetadatumType.UNOFFICIAL_LONG_TITLE]: identity,
+  [MetadatumType.UNOFFICIAL_SHORT_TITLE]: identity,
+  [MetadatumType.UNOFFICIAL_ABBREVIATION]: identity,
+  [MetadatumType.UNOFFICIAL_REFERENCE]: identity,
+  [MetadatumType.DIVERGENT_DOCUMENT_NUMBER]: identity,
+  [MetadatumType.REFERENCE_NUMBER]: identity,
+  [MetadatumType.DEFINITION]: identity,
+  [MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW]: identity,
+  [MetadatumType.AGE_OF_MAJORITY_INDICATION]: identity,
+  [MetadatumType.VALIDITY_RULE]: identity,
+  [MetadatumType.LEAD_JURISDICTION]: identity,
+  [MetadatumType.LEAD_UNIT]: identity,
+  [MetadatumType.PARTICIPATION_TYPE]: identity,
+  [MetadatumType.PARTICIPATION_INSTITUTION]: identity,
+  [MetadatumType.SUBJECT_FNA]: identity,
+  [MetadatumType.SUBJECT_PREVIOUS_FNA]: identity,
+  [MetadatumType.SUBJECT_GESTA]: identity,
+  [MetadatumType.SUBJECT_BGB_3]: identity,
+  [MetadatumType.DATE]: identity,
+  [MetadatumType.YEAR]: identity,
+  [MetadatumType.RANGE_START]: identity,
+  [MetadatumType.RANGE_START_UNIT]: decodeRangeUnit,
+  [MetadatumType.RANGE_END]: identity,
+  [MetadatumType.RANGE_END_UNIT]: decodeRangeUnit,
 }
 
 const ENCODERS: MetadataValueEncoders = {
-  [MetadatumType.KEYWORD]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_LONG_TITLE]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_SHORT_TITLE]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_ABBREVIATION]: (data: string) => data,
-  [MetadatumType.UNOFFICIAL_REFERENCE]: (data: string) => data,
-  [MetadatumType.DIVERGENT_DOCUMENT_NUMBER]: (data: string) => data,
-  [MetadatumType.REFERENCE_NUMBER]: (data: string) => data,
-  [MetadatumType.DEFINITION]: (data: string) => data,
-  [MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW]: (data: string) => data,
-  [MetadatumType.AGE_OF_MAJORITY_INDICATION]: (data: string) => data,
-  [MetadatumType.VALIDITY_RULE]: (data: string) => data,
-  [MetadatumType.LEAD_JURISDICTION]: (data: string) => data,
-  [MetadatumType.LEAD_UNIT]: (data: string) => data,
-  [MetadatumType.PARTICIPATION_TYPE]: (data: string) => data,
-  [MetadatumType.PARTICIPATION_INSTITUTION]: (data: string) => data,
-  [MetadatumType.SUBJECT_FNA]: (data: string) => data,
-  [MetadatumType.SUBJECT_PREVIOUS_FNA]: (data: string) => data,
-  [MetadatumType.SUBJECT_GESTA]: (data: string) => data,
-  [MetadatumType.SUBJECT_BGB_3]: (data: string) => data,
-  [MetadatumType.DATE]: (data: string) => data,
-  [MetadatumType.YEAR]: (data: string) => data,
-  [MetadatumType.RANGE_START]: (data: string) => data,
-  [MetadatumType.RANGE_START_UNIT]: (data: string) => data,
-  [MetadatumType.RANGE_END]: (data: string) => data,
-  [MetadatumType.RANGE_END_UNIT]: (data: string) => data,
+  [MetadatumType.KEYWORD]: identity,
+  [MetadatumType.UNOFFICIAL_LONG_TITLE]: identity,
+  [MetadatumType.UNOFFICIAL_SHORT_TITLE]: identity,
+  [MetadatumType.UNOFFICIAL_ABBREVIATION]: identity,
+  [MetadatumType.UNOFFICIAL_REFERENCE]: identity,
+  [MetadatumType.DIVERGENT_DOCUMENT_NUMBER]: identity,
+  [MetadatumType.REFERENCE_NUMBER]: identity,
+  [MetadatumType.DEFINITION]: identity,
+  [MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW]: identity,
+  [MetadatumType.AGE_OF_MAJORITY_INDICATION]: identity,
+  [MetadatumType.VALIDITY_RULE]: identity,
+  [MetadatumType.LEAD_JURISDICTION]: identity,
+  [MetadatumType.LEAD_UNIT]: identity,
+  [MetadatumType.PARTICIPATION_TYPE]: identity,
+  [MetadatumType.PARTICIPATION_INSTITUTION]: identity,
+  [MetadatumType.SUBJECT_FNA]: identity,
+  [MetadatumType.SUBJECT_PREVIOUS_FNA]: identity,
+  [MetadatumType.SUBJECT_GESTA]: identity,
+  [MetadatumType.SUBJECT_BGB_3]: identity,
+  [MetadatumType.DATE]: encodeDate,
+  [MetadatumType.YEAR]: identity,
+  [MetadatumType.RANGE_START]: identity,
+  [MetadatumType.RANGE_START_UNIT]: encodeRangeUnit,
+  [MetadatumType.RANGE_END]: identity,
+  [MetadatumType.RANGE_END_UNIT]: encodeRangeUnit,
 }
 
 /**
@@ -346,18 +369,20 @@ export function encodeFlatMetadata(
     documentTemplateName: encodeString(flatMetadata.documentTemplateName),
     ageIndicationEnd: encodeString(flatMetadata.ageIndicationEnd),
     ageIndicationStart: encodeString(flatMetadata.ageIndicationStart),
-    announcementDate: encodeDate(flatMetadata.announcementDate),
+    announcementDate: encodeNullDate(flatMetadata.announcementDate),
     applicationScopeArea: encodeString(flatMetadata.applicationScopeArea),
-    applicationScopeEndDate: encodeDate(flatMetadata.applicationScopeEndDate),
-    applicationScopeStartDate: encodeDate(
+    applicationScopeEndDate: encodeNullDate(
+      flatMetadata.applicationScopeEndDate
+    ),
+    applicationScopeStartDate: encodeNullDate(
       flatMetadata.applicationScopeStartDate
     ),
     categorizedReference: encodeString(flatMetadata.categorizedReference),
     celexNumber: encodeString(flatMetadata.celexNumber),
-    citationDate: encodeDate(flatMetadata.citationDate),
-    citationYear: encodeString(flatMetadata.citationYear),
     completeCitation: encodeString(flatMetadata.completeCitation),
-    digitalAnnouncementDate: encodeDate(flatMetadata.digitalAnnouncementDate),
+    digitalAnnouncementDate: encodeNullDate(
+      flatMetadata.digitalAnnouncementDate
+    ),
     digitalAnnouncementArea: encodeString(flatMetadata.digitalAnnouncementArea),
     digitalAnnouncementAreaNumber: encodeString(
       flatMetadata.digitalAnnouncementAreaNumber
@@ -382,24 +407,26 @@ export function encodeFlatMetadata(
     digitalEvidenceRelatedData: encodeString(
       flatMetadata.digitalEvidenceRelatedData
     ),
-    divergentEntryIntoForceDate: encodeDate(
+    divergentEntryIntoForceDate: encodeNullDate(
       flatMetadata.divergentEntryIntoForceDate
     ),
     divergentEntryIntoForceDateState: encodeString(
       flatMetadata.divergentEntryIntoForceDateState
     ),
-    divergentExpirationDate: encodeDate(flatMetadata.divergentExpirationDate),
+    divergentExpirationDate: encodeNullDate(
+      flatMetadata.divergentExpirationDate
+    ),
     divergentExpirationDateState: encodeString(
       flatMetadata.divergentExpirationDateState
     ),
     documentCategory: encodeString(flatMetadata.documentCategory),
     documentNormCategory: encodeString(flatMetadata.documentNormCategory),
     documentNumber: encodeString(flatMetadata.documentNumber),
-    documentStatusDate: encodeDate(flatMetadata.documentStatusDate),
+    documentStatusDate: encodeNullDate(flatMetadata.documentStatusDate),
     documentStatusDescription: encodeString(
       flatMetadata.documentStatusDescription
     ),
-    documentStatusEntryIntoForceDate: encodeDate(
+    documentStatusEntryIntoForceDate: encodeNullDate(
       flatMetadata.documentStatusEntryIntoForceDate
     ),
     documentStatusProof: encodeString(flatMetadata.documentStatusProof),
@@ -407,7 +434,7 @@ export function encodeFlatMetadata(
     documentStatusWorkNote: encodeString(flatMetadata.documentStatusWorkNote),
     documentTextProof: encodeString(flatMetadata.documentTextProof),
     documentTypeName: encodeString(flatMetadata.documentTypeName),
-    entryIntoForceDate: encodeDate(flatMetadata.entryIntoForceDate),
+    entryIntoForceDate: encodeNullDate(flatMetadata.entryIntoForceDate),
     entryIntoForceDateState: encodeString(flatMetadata.entryIntoForceDateState),
     entryIntoForceNormCategory: encodeString(
       flatMetadata.entryIntoForceNormCategory
@@ -422,7 +449,7 @@ export function encodeFlatMetadata(
     euAnnouncementSeries: encodeString(flatMetadata.euAnnouncementSeries),
     euAnnouncementYear: encodeString(flatMetadata.euAnnouncementYear),
     eli: encodeString(flatMetadata.eli),
-    expirationDate: encodeDate(flatMetadata.expirationDate),
+    expirationDate: encodeNullDate(flatMetadata.expirationDate),
     expirationDateState: encodeString(flatMetadata.expirationDateState),
     expirationNormCategory: encodeString(flatMetadata.expirationNormCategory),
     isExpirationDateTemp: encodeBoolean(flatMetadata.isExpirationDateTemp),
@@ -440,13 +467,15 @@ export function encodeFlatMetadata(
       flatMetadata.otherOfficialAnnouncement
     ),
     otherStatusNote: encodeString(flatMetadata.otherStatusNote),
-    principleEntryIntoForceDate: encodeDate(
+    principleEntryIntoForceDate: encodeNullDate(
       flatMetadata.principleEntryIntoForceDate
     ),
     principleEntryIntoForceDateState: encodeString(
       flatMetadata.principleEntryIntoForceDateState
     ),
-    principleExpirationDate: encodeDate(flatMetadata.principleExpirationDate),
+    principleExpirationDate: encodeNullDate(
+      flatMetadata.principleExpirationDate
+    ),
     principleExpirationDateState: encodeString(
       flatMetadata.principleExpirationDateState
     ),
@@ -465,17 +494,17 @@ export function encodeFlatMetadata(
     providerIsResolutionMajority: encodeBoolean(
       flatMetadata.providerIsResolutionMajority
     ),
-    publicationDate: encodeDate(flatMetadata.publicationDate),
+    publicationDate: encodeNullDate(flatMetadata.publicationDate),
     reissueArticle: encodeString(flatMetadata.reissueArticle),
-    reissueDate: encodeDate(flatMetadata.reissueDate),
+    reissueDate: encodeNullDate(flatMetadata.reissueDate),
     reissueNote: encodeString(flatMetadata.reissueNote),
     reissueReference: encodeString(flatMetadata.reissueReference),
     repealArticle: encodeString(flatMetadata.repealArticle),
-    repealDate: encodeDate(flatMetadata.repealDate),
+    repealDate: encodeNullDate(flatMetadata.repealDate),
     repealNote: encodeString(flatMetadata.repealNote),
     repealReferences: encodeString(flatMetadata.repealReferences),
     risAbbreviation: encodeString(flatMetadata.risAbbreviation),
-    statusDate: encodeDate(flatMetadata.statusDate),
+    statusDate: encodeNullDate(flatMetadata.statusDate),
     statusDescription: encodeString(flatMetadata.statusDescription),
     statusNote: encodeString(flatMetadata.statusNote),
     statusReference: encodeString(flatMetadata.statusReference),
