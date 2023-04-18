@@ -41,7 +41,7 @@ class HasValidMetadataTest {
     @Test
     fun `can only generate age identification with blocks of range value and unit`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.AGE_IDENTIFICATION
+        every { instance.name } returns MetadataSectionName.AGE_INDICATION
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
@@ -54,7 +54,7 @@ class HasValidMetadataTest {
     @Test
     fun `can only generate age identification with both blocks of range value and unit`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.AGE_IDENTIFICATION
+        every { instance.name } returns MetadataSectionName.AGE_INDICATION
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
@@ -69,7 +69,7 @@ class HasValidMetadataTest {
     @Test
     fun `it throws an error on age identification with only one of range value or range unit`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.AGE_IDENTIFICATION
+        every { instance.name } returns MetadataSectionName.AGE_INDICATION
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
@@ -83,7 +83,7 @@ class HasValidMetadataTest {
     @Test
     fun `it throws an error on age identification with one of range value or range unit and one not complete range`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.AGE_IDENTIFICATION
+        every { instance.name } returns MetadataSectionName.AGE_INDICATION
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),

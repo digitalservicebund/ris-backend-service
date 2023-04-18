@@ -52,7 +52,7 @@ val hasValidMetadata =
             Section.LEAD -> hasType(listOf(LEAD_JURISDICTION, LEAD_UNIT), instance)
             Section.PARTICIPATION -> hasType(listOf(PARTICIPATION_TYPE, PARTICIPATION_INSTITUTION), instance)
             Section.CITATION_DATE -> hasOneOfType(listOf(DATE, YEAR), instance)
-            Section.AGE_IDENTIFICATION -> hasOnlyBlocksOf(
+            Section.AGE_INDICATION -> hasOnlyBlocksOf(
                 listOf(listOf(RANGE_START, RANGE_START_UNIT), listOf(RANGE_END, RANGE_END_UNIT)),
                 instance,
             )
