@@ -8,6 +8,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -59,6 +60,13 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a range end unit is a string`() {
         val instance = getMockedMetadatum("range end unit", RANGE_END_UNIT)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a resolution majority is a string`() {
+        val instance = getMockedMetadatum("resolution majority", RESOLUTION_MAJORITY)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

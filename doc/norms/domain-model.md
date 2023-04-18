@@ -138,6 +138,7 @@ classDiagram
      DIGITAL_ANNOUNCEMENT
      EU_GOVERNMENT_GAZETTE
      OTHER_OFFICIAL_REFERENCE
+     NORM_PROVIDER
   }
 
   class MetadatumType  {
@@ -178,6 +179,9 @@ classDiagram
       EU_GOVERNMENT_GAZETTE
       SERIES
       OTHER_OFFICIAL_REFERENCE
+      ENTITY
+      DECIDING_BODY
+      RESOLUTION_MAJORITY
   }
 
   class FileReference {

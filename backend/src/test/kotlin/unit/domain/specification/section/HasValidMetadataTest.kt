@@ -278,4 +278,31 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `can generate norm provider with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.NORM_PROVIDER
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("norm entity", MetadatumType.ENTITY),
+            Metadatum("deciding body", MetadatumType.DECIDING_BODY),
+            Metadatum(true, MetadatumType.RESOLUTION_MAJORITY),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on norm provider with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.NORM_PROVIDER
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("norm entity", MetadatumType.ENTITY),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
 }

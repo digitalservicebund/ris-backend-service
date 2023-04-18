@@ -431,15 +431,6 @@ components:
           example: SaubFahrzeugBeschG
         announcementDate:
           $ref: '#/components/schemas/Date'
-        providerEntity:
-          type: string
-          example: DEU
-        providerDecidingBody:
-          type: string
-          example: BT
-        providerIsResolutionMajority:
-          type: boolean
-          example: true
         documentNumber:
           type: string
           example: ''
