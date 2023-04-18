@@ -90,9 +90,9 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
         </InputField>
         <InputField
           id="ageIndicationStartUnit"
-          aria-label="EinHeit"
+          aria-label="Einheit"
           class="w-1/2"
-          label="EinHeit"
+          label="Einheit"
         >
           <DropdownInput
             id="ageIndicationStartUnit"
