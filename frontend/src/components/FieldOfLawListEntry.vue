@@ -4,7 +4,7 @@ import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
 interface Props {
   fieldOfLaw: FieldOfLawNode
-  showBin: boolean
+  showBin?: boolean
 }
 
 const props = defineProps<Props>()
