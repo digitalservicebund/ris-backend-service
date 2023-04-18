@@ -8,6 +8,7 @@ import {
   MetadatumType,
   Norm,
   Paragraph,
+  RangeUnit,
 } from "@/domain/Norm"
 import {
   InputType,
@@ -44,9 +45,9 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.DATE]: generateString,
   [MetadatumType.YEAR]: generateString,
   [MetadatumType.RANGE_START]: generateString,
-  [MetadatumType.RANGE_START_UNIT]: generateString,
+  [MetadatumType.RANGE_START_UNIT]: pickRandomRangeUnit,
   [MetadatumType.RANGE_END]: generateString,
-  [MetadatumType.RANGE_END_UNIT]: generateString,
+  [MetadatumType.RANGE_END_UNIT]: pickRandomRangeUnit,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -72,6 +73,12 @@ export function generateString(options?: {
   }
 
   return output
+}
+
+export function pickRandomRangeUnit(): RangeUnit {
+  const options = Object.keys(RangeUnit)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index] as RangeUnit
 }
 
 export function generateBaseInputAttributes(
@@ -174,12 +181,13 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
     const type = pickRandomMetadatumType()
     const values = new Array(generateRandomNumber())
       .fill(0)
-      .map(METADATA_VALUE_GENERATORS[type])
+      .map(METADATA_VALUE_GENERATORS[type]) as string[] & RangeUnit[]
     metadata[type] = values
   }
 
   Object.entries(partialMetadata ?? {}).forEach(([type, values]) => {
-    metadata[type as MetadatumType] = values
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    metadata[type as MetadatumType] = values as any
   })
 
   return metadata
@@ -216,12 +224,9 @@ export function generateFlatMetadata(
 ): FlatMetadata {
   return {
     documentTemplateName: generateString(),
-    ageIndicationEnd: generateString(),
-    ageIndicationStart: generateString(),
     announcementDate: generateString(),
     categorizedReference: generateString(),
     celexNumber: generateString(),
-    citationDate: generateString(),
     completeCitation: generateString(),
     digitalAnnouncementDate: generateString(),
     digitalAnnouncementArea: generateString(),

@@ -367,8 +367,6 @@ export function encodeFlatMetadata(
 ): FlatMetadataRequestSchema {
   return {
     documentTemplateName: encodeString(flatMetadata.documentTemplateName),
-    ageIndicationEnd: encodeString(flatMetadata.ageIndicationEnd),
-    ageIndicationStart: encodeString(flatMetadata.ageIndicationStart),
     announcementDate: encodeNullDate(flatMetadata.announcementDate),
     applicationScopeArea: encodeString(flatMetadata.applicationScopeArea),
     applicationScopeEndDate: encodeNullDate(

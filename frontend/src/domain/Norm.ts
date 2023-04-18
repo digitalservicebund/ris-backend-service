@@ -103,8 +103,6 @@ export type MetadataSections = {
 
 export type FlatMetadata = {
   documentTemplateName?: string
-  ageIndicationEnd?: string
-  ageIndicationStart?: string
   announcementDate?: string
   applicationScopeArea?: string
   applicationScopeEndDate?: string

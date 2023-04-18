@@ -87,8 +87,6 @@ const flatMetadata = computed({
     if (loadedNorm.value !== undefined) {
       loadedNorm.value.documentTemplateName =
         data.documentTemplateName as string
-      loadedNorm.value.ageIndicationEnd = data.ageIndicationEnd as string
-      loadedNorm.value.ageIndicationStart = data.ageIndicationStart as string
       loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.applicationScopeArea =
         data.applicationScopeArea as string
