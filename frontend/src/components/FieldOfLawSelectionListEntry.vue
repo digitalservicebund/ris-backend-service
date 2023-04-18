@@ -2,7 +2,13 @@
 import TokenizeText from "@/components/TokenizeText.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-const props = defineProps<{ fieldOfLaw: FieldOfLawNode }>()
+interface Props {
+  fieldOfLaw: FieldOfLawNode
+  showBin: boolean
+}
+
+const props = defineProps<Props>()
+
 const emit = defineEmits<{
   (event: "remove-from-list"): void
   (event: "node-clicked"): void
@@ -15,10 +21,10 @@ function handleTokenClick(tokenContent: string) {
 </script>
 
 <template>
-  <div class="flex">
+  <div class="flex mt-20">
     <div class="flex flex-col grow">
       <div class="flex">
-        <div class="label-02-reg pt-8 text-blue-800">
+        <div class="flex label-02-reg pt-8 text-blue-800">
           <span
             :aria-label="
               fieldOfLaw.identifier +
@@ -26,23 +32,23 @@ function handleTokenClick(tokenContent: string) {
               fieldOfLaw.text +
               ' im Sachgebietsbaum anzeigen'
             "
-            class="link"
+            class="identifier link"
             @click="emit('node-clicked')"
             @keyup.enter="emit('node-clicked')"
           >
             {{ props.fieldOfLaw.identifier }}
           </span>
+          <span class="text-wrapper">
+            <TokenizeText
+              :keywords="props.fieldOfLaw.linkedFields ?? []"
+              :text="props.fieldOfLaw.text"
+              @link-token:clicked="handleTokenClick"
+            />
+          </span>
         </div>
       </div>
-      <div class="grow label-03-reg pb-16 pt-4 text-blue-800">
-        <TokenizeText
-          :keywords="props.fieldOfLaw.linkedFields ?? []"
-          :text="props.fieldOfLaw.text"
-          @link-token:clicked="handleTokenClick"
-        />
-      </div>
     </div>
-    <div>
+    <div v-if="props.showBin">
       <button
         :aria-label="
           fieldOfLaw.identifier + ' ' + fieldOfLaw.text + ' entfernen'
@@ -54,9 +60,19 @@ function handleTokenClick(tokenContent: string) {
       </button>
     </div>
   </div>
+  <hr class="border-blue-500 mt-8 w-full" />
 </template>
 
 <style lang="scss" scoped>
+.identifier {
+  width: 50px;
+  margin-right: 10px;
+}
+
+.text-wrapper {
+  margin-left: 50px;
+}
+
 .link {
   cursor: pointer;
   text-decoration: underline;

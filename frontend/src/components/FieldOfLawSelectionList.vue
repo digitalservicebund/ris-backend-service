@@ -22,10 +22,12 @@ function handleLinkedFieldClicked(identifier: string) {
       Die Liste ist aktuell leer
     </div>
     <div v-else>
+      <hr class="border-blue-500 mt-20 w-full" />
       <FieldOfLawSelectionListEntry
         v-for="fieldOfLaw in props.selectedFieldsOfLaw"
         :key="fieldOfLaw.identifier"
         :field-of-law="fieldOfLaw"
+        show-bin
         @linked-field:clicked="handleLinkedFieldClicked"
         @node-clicked="emit('node-clicked', fieldOfLaw)"
         @remove-from-list="emit('remove-from-list', fieldOfLaw.identifier)"
