@@ -192,8 +192,6 @@ describe("normsService", () => {
           officialShortTitle: null,
           isExpirationDateTemp: null,
           risAbbreviation: null,
-          ageIndicationEnd: null,
-          ageIndicationStart: null,
           applicationScopeArea: null,
           applicationScopeEndDate: null,
           applicationScopeStartDate: null,
