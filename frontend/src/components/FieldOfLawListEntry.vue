@@ -27,9 +27,9 @@ function handleTokenClick(tokenContent: string) {
         <div class="flex label-02-reg pt-8 text-blue-800">
           <span
             :aria-label="
-              fieldOfLaw.identifier +
+              props.fieldOfLaw.identifier +
               ' ' +
-              fieldOfLaw.text +
+              props.fieldOfLaw.text +
               ' im Sachgebietsbaum anzeigen'
             "
             class="identifier link"

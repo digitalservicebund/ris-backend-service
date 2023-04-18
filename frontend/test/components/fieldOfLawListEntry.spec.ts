@@ -2,9 +2,13 @@ import { fireEvent, render, RenderResult, screen } from "@testing-library/vue"
 import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 
-function renderComponent(fieldOfLaw: Partial<FieldOfLawNode>): RenderResult {
+function renderComponent(
+  fieldOfLaw: Partial<FieldOfLawNode>,
+  showBin: boolean
+): RenderResult {
   const props = {
     fieldOfLaw,
+    showBin,
   }
 
   return render(FieldOfLawListEntry, { props })
@@ -12,10 +16,13 @@ function renderComponent(fieldOfLaw: Partial<FieldOfLawNode>): RenderResult {
 
 describe("FieldOfLawListEntry", () => {
   it("render entry", () => {
-    renderComponent({
-      identifier: "ST-01-02-03",
-      text: "Steuerrecht 1-2-3",
-    })
+    renderComponent(
+      {
+        identifier: "ST-01-02-03",
+        text: "Steuerrecht 1-2-3",
+      },
+      true
+    )
 
     expect(screen.getByText("ST-01-02-03")).toBeInTheDocument()
     expect(screen.getByText("Steuerrecht 1-2-3")).toBeInTheDocument()
@@ -30,10 +37,13 @@ describe("FieldOfLawListEntry", () => {
   })
 
   it("click on 'Löschen' emit 'remove-from-list'", async () => {
-    const { emitted } = renderComponent({
-      identifier: "ST-01-02-03",
-      text: "Steuerrecht 1-2-3",
-    })
+    const { emitted } = renderComponent(
+      {
+        identifier: "ST-01-02-03",
+        text: "Steuerrecht 1-2-3",
+      },
+      true
+    )
 
     await fireEvent.click(
       screen.getByLabelText("ST-01-02-03 Steuerrecht 1-2-3 entfernen")
@@ -43,10 +53,13 @@ describe("FieldOfLawListEntry", () => {
   })
 
   it("click on 'Auswahl im Sachgebietsbaum' emit 'select-node", async () => {
-    const { emitted } = renderComponent({
-      identifier: "ST-01-02-03",
-      text: "Steuerrecht 1-2-3",
-    })
+    const { emitted } = renderComponent(
+      {
+        identifier: "ST-01-02-03",
+        text: "Steuerrecht 1-2-3",
+      },
+      false
+    )
 
     await fireEvent.click(
       screen.getByLabelText(
