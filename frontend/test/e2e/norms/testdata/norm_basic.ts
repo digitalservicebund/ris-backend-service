@@ -69,6 +69,8 @@ export const normData: NormData = {
       { PARTICIPATION_TYPE: ["EZ"], PARTICIPATION_INSTITUTION: ["BR"] },
       { PARTICIPATION_TYPE: ["RU"], PARTICIPATION_INSTITUTION: ["NT"] },
     ],
+    CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2001-03-10"] }],
+    AGE_INDICATION: [],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
@@ -85,7 +87,6 @@ export const normData: NormData = {
   principleExpirationDateState: "UNDEFINED_UNKNOWN",
   divergentExpirationDateState: "UNDEFINED_NOT_PRESENT",
   announcementDate: "2023-01-06",
-  citationDate: "2023-01-02",
   printAnnouncementGazette: "BGBl I",
   printAnnouncementYear: "2023",
   printAnnouncementPage: "3",

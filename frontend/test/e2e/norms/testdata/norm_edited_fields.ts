@@ -82,13 +82,16 @@ export const newNorm: NormData = {
         PARTICIPATION_INSTITUTION: ["Neues mitwirkendes Organ 2"],
       },
     ],
+    // TODO: add some dates here
+    CITATION_DATE: [],
+    // TODO: allow mapping from range unit enumeration to dropdown items
+    AGE_INDICATION: [],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
   officialShortTitle: "officialShortTitle",
   officialAbbreviation: "officialAbbreviation",
   announcementDate: "2022-11-01",
-  citationDate: "2022-11-01",
   providerEntity: "providerEntity",
   providerDecidingBody: "providerDecidingBody",
   providerIsResolutionMajority: false,
@@ -96,8 +99,6 @@ export const newNorm: NormData = {
   documentTemplateName: "documentTemplateName",
   publicationDate: "2022-11-01",
   isExpirationDateTemp: false,
-  ageIndicationEnd: "ageIndicationEnd",
-  ageIndicationStart: "ageIndicationStart",
   categorizedReference: "categorizedReference",
   celexNumber: "celexNumber",
   completeCitation: "completeCitation",

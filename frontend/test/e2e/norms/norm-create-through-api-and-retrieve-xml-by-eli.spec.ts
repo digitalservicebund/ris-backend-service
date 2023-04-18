@@ -73,7 +73,7 @@ testWithImportedNorm(
       proprietary
         .querySelector("meta\\:bearbeitendeInstitution")
         .textContent.trim()
-    ).toBe("nicht-vorhanden")
+    ).toBe("bundesrat")
 
     expect(
       xmlDOM.window.document.querySelector("akn\\:docTitle").textContent.trim()

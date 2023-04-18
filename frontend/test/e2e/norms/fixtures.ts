@@ -408,12 +408,17 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Zitierdatum",
+      id: "citationDateFields",
+      isRepeatedSection: true,
+      // TODO: Add logic to also insert years.
       fields: [
         {
           type: FieldType.TEXT,
           name: "citationDate",
           label: "Zitierdatum",
-          value: norm.citationDate,
+          values: norm.metadataSections?.CITATION_DATE?.map(
+            (section) => section?.DATE?.[0]
+          ),
         },
       ],
     },
@@ -891,18 +896,40 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Altersangabe",
+      id: "ageIndicationFields",
+      isRepeatedSection: true,
       fields: [
         {
           type: FieldType.TEXT,
           name: "ageIndicationStart",
           label: "Anfang",
-          value: norm.ageIndicationStart,
+          values: norm.metadataSections?.AGE_INDICATION?.map(
+            (section) => section?.RANGE_START?.[0]
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          name: "ageIndicationStartUnit",
+          label: "Einheit",
+          values: norm.metadataSections?.AGE_INDICATION?.map(
+            (section) => section?.RANGE_START_UNIT?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
           name: "ageIndicationEnd",
           label: "Ende",
-          value: norm.ageIndicationEnd,
+          values: norm.metadataSections?.AGE_INDICATION?.map(
+            (section) => section?.RANGE_END?.[0]
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          name: "ageIndicationEndUnit",
+          label: "Einheit",
+          values: norm.metadataSections?.AGE_INDICATION?.map(
+            (section) => section?.RANGE_END_UNIT?.[0]
+          ),
         },
       ],
     },
