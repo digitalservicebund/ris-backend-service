@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { h, watch, ref } from "vue"
+import { RouterLink } from "vue-router"
 import DecisionList from "./DecisionList.vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
@@ -108,24 +108,24 @@ async function search() {
   }
 }
 
-function decisionSummarizer(dataEntry: undefined) {
-  return h("div", renderDecision(dataEntry))
-}
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderDecision(dataEntry: any): string {
-  if (dataEntry == undefined) {
-    return ""
-  } else
-    return [
-      ...(dataEntry.court ? [`${dataEntry.court.label}`] : []),
-      ...(dataEntry.documentType
-        ? [dataEntry.documentType?.jurisShortcut]
-        : []),
-      ...(dataEntry.date ? [dayjs(dataEntry.date).format("DD.MM.YYYY")] : []),
-      ...(dataEntry.fileNumber ? [dataEntry.fileNumber] : []),
-      ...(dataEntry.documentNumber ? [dataEntry.documentNumber] : []),
-    ].join(", ")
+function decisionSummarizer(dataEntry: any) {
+  return h("div", [
+    ProceedingDecision.hasLink(dataEntry)
+      ? h(
+          RouterLink,
+          {
+            class: ["link-01-bold", "underline"],
+            target: "_blank",
+            to: {
+              name: "caselaw-documentUnit-:documentNumber-categories",
+              params: { documentNumber: dataEntry.documentNumber },
+            },
+          },
+          ProceedingDecision.renderDecision(dataEntry)
+        )
+      : h("span", ProceedingDecision.renderDecision(dataEntry)),
+  ])
 }
 
 const DecisionSummary = withSummarizer(decisionSummarizer)
@@ -142,47 +142,49 @@ watch(
 </script>
 
 <template>
-  <h1 class="heading-02-regular mb-[1rem]">Rechtszug</h1>
-  <ExpandableDataSet
-    as-column
-    :data-set="proceedingDecisions"
-    :summary-component="DecisionSummary"
-    title="Vorgehende Entscheidungen"
-  >
-    <DecisionList
-      v-if="proceedingDecisions"
-      :decisions="proceedingDecisions"
-      @remove-link="removeProceedingDecision"
-    />
-
-    <InputGroup
-      v-model="input"
-      :column-count="2"
-      :fields="proceedingDecisionFields"
-    ></InputGroup>
-
-    <div>
-      <TextButton
-        aria-label="Nach Entscheidungen suchen"
-        button-type="secondary"
-        class="mr-28"
-        label="Suchen"
-        @click="search"
+  <div>
+    <h1 class="heading-02-regular mb-[1rem]">Rechtszug</h1>
+    <ExpandableDataSet
+      as-column
+      :data-set="proceedingDecisions"
+      :summary-component="DecisionSummary"
+      title="Vorgehende Entscheidungen"
+    >
+      <DecisionList
+        v-if="proceedingDecisions"
+        :decisions="proceedingDecisions"
+        @remove-link="removeProceedingDecision"
       />
 
-      <TextButton
-        aria-label="Entscheidung manuell hinzufügen"
-        button-type="tertiary"
-        label="Manuell Hinzufügen"
-        @click="createProceedingDecision(input)"
-      />
-    </div>
+      <InputGroup
+        v-model="input"
+        :column-count="2"
+        :fields="proceedingDecisionFields"
+      ></InputGroup>
 
-    <div v-if="searchResults" class="mb-10 mt-20">
-      <SearchResultList
-        :search-results="searchResults"
-        @link-decision="linkProceedingDecision"
-      />
-    </div>
-  </ExpandableDataSet>
+      <div>
+        <TextButton
+          aria-label="Nach Entscheidungen suchen"
+          button-type="secondary"
+          class="mr-28"
+          label="Suchen"
+          @click="search"
+        />
+
+        <TextButton
+          aria-label="Entscheidung manuell hinzufügen"
+          button-type="tertiary"
+          label="Manuell Hinzufügen"
+          @click="createProceedingDecision(input)"
+        />
+      </div>
+
+      <div v-if="searchResults" class="mb-10 mt-20">
+        <SearchResultList
+          :search-results="searchResults"
+          @link-decision="linkProceedingDecision"
+        />
+      </div>
+    </ExpandableDataSet>
+  </div>
 </template>

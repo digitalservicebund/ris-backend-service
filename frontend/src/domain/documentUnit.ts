@@ -1,3 +1,5 @@
+import dayjs from "dayjs"
+
 export type CoreData = {
   fileNumbers?: string[]
   deviatingFileNumbers?: string[]
@@ -39,14 +41,34 @@ export type Texts = {
   decisionReasons?: string
 }
 
-export type ProceedingDecision = {
-  uuid?: string
-  documentNumber?: string
-  dataSource?: "NEURIS" | "MIGRATION" | "PROCEEDING_DECISION"
-  court?: Court
-  date?: string
-  fileNumber?: string
-  documentType?: DocumentType
+export class ProceedingDecision {
+  public uuid?: string
+  public documentNumber?: string
+  public dataSource?: "NEURIS" | "MIGRATION" | "PROCEEDING_DECISION"
+  public court?: Court
+  public date?: string
+  public fileNumber?: string
+  public documentType?: DocumentType
+
+  public static renderDecision(decision: ProceedingDecision): string {
+    if (decision == undefined) return ""
+    else {
+      return [
+        ...(decision.court ? [`${decision.court.label}`] : []),
+        ...(decision.documentType
+          ? [decision.documentType?.jurisShortcut]
+          : []),
+        ...(decision.date ? [dayjs(decision.date).format("DD.MM.YYYY")] : []),
+        ...(decision.fileNumber ? [decision.fileNumber] : []),
+        ...(decision.documentNumber ? [decision.documentNumber] : []),
+      ].join(", ")
+    }
+  }
+
+  public static hasLink(decision: ProceedingDecision): boolean {
+    if (decision === undefined) return false
+    else return decision.dataSource !== "PROCEEDING_DECISION"
+  }
 }
 
 export default class DocumentUnit {

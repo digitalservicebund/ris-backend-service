@@ -2,7 +2,8 @@ import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitProceedingDecisions from "@/components/proceedingDecisions/ProceedingDecisions.vue"
 import type { ProceedingDecision } from "@/domain/documentUnit"
-import service from "@/services/proceedingDecisionService"
+import documentUnitService from "@/services/documentUnitService"
+import proceedingDecisionService from "@/services/proceedingDecisionService"
 
 function renderComponent(options?: {
   documentUnitUuid?: string
@@ -46,9 +47,9 @@ describe("DocumentUnitProceedingDecisions", async () => {
     expect(screen.getByLabelText("Dokumenttyp Rechtszug")).toBeInTheDocument()
   })
 
-  it("creates new proceeding decision and updates list of existing ones", async () => {
+  it("creates new proceeding decision", async () => {
     const fetchSpy = vi
-      .spyOn(service, "createProceedingDecision")
+      .spyOn(proceedingDecisionService, "createProceedingDecision")
       .mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -61,15 +62,6 @@ describe("DocumentUnitProceedingDecisions", async () => {
                 label: "documentType1",
               },
               fileNumber: "testFileNumber1",
-            },
-            {
-              court: { type: "type2", location: "location2", label: "label2" },
-              date: "2022-02-02",
-              documentType: {
-                jurisShortcut: "documentTypeShortcut2",
-                label: "documentType2",
-              },
-              fileNumber: "testFileNumber2",
             },
           ],
         })
@@ -78,22 +70,32 @@ describe("DocumentUnitProceedingDecisions", async () => {
     await openExpandableArea(user)
 
     expect(screen.queryByText(/testFileNumber1/)).not.toBeInTheDocument()
-    expect(screen.queryByText(/testFileNumber2/)).not.toBeInTheDocument()
 
     await user.type(
       await screen.findByLabelText("Aktenzeichen Rechtszug"),
-      "foo FileNumber"
+      "testFileNumber1"
     )
     await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
     expect(fetchSpy).toBeCalledTimes(1)
 
     expect(screen.getByText(/testFileNumber1/)).toBeVisible()
-    expect(screen.getByText(/testFileNumber2/)).toBeVisible()
   })
 
   it("does not create decision if undefined", async () => {
+    const fetchSpy = vi.spyOn(
+      proceedingDecisionService,
+      "createProceedingDecision"
+    )
+    const { user } = renderComponent()
+    await openExpandableArea(user)
+
+    await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
+    expect(fetchSpy).toBeCalledTimes(0)
+  })
+
+  it("lists search results", async () => {
     const fetchSpy = vi
-      .spyOn(service, "createProceedingDecision")
+      .spyOn(documentUnitService, "searchByProceedingDecisionInput")
       .mockImplementation(() =>
         Promise.resolve({
           status: 200,
@@ -105,7 +107,16 @@ describe("DocumentUnitProceedingDecisions", async () => {
                 jurisShortcut: "documentTypeShortcut1",
                 label: "documentType1",
               },
-              fileNumber: "testFileNumber1",
+              fileNumber: "test fileNumber",
+            },
+            {
+              court: { type: "type2", location: "location2", label: "label2" },
+              date: "2022-02-02",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut2",
+                label: "documentType2",
+              },
+              fileNumber: "test fileNumber",
             },
           ],
         })
@@ -113,13 +124,51 @@ describe("DocumentUnitProceedingDecisions", async () => {
     const { user } = renderComponent()
     await openExpandableArea(user)
 
-    await user.click(screen.getByLabelText("Entscheidung manuell hinzufügen"))
-    expect(fetchSpy).toBeCalledTimes(0)
+    expect(screen.queryByText(/test fileNumber/)).not.toBeInTheDocument()
+
+    await user.type(
+      await screen.findByLabelText("Aktenzeichen Rechtszug"),
+      "test fileNumber"
+    )
+    await user.click(screen.getByLabelText("Nach Entscheidungen suchen"))
+    expect(fetchSpy).toBeCalledTimes(1)
+
+    expect(screen.getAllByText(/test fileNumber/).length).toBe(2)
   })
 
-  it.todo("lists search results")
+  it("adds proceeding decision from search results and updates indicators"),
+    async () => {
+      const fetchSpy = vi
+        .spyOn(documentUnitService, "searchByProceedingDecisionInput")
+        .mockImplementation(() =>
+          Promise.resolve({
+            status: 200,
+            data: [
+              {
+                court: {
+                  type: "type1",
+                  location: "location1",
+                  label: "label1",
+                },
+                date: "2022-02-01",
+                documentType: {
+                  jurisShortcut: "documentTypeShortcut1",
+                  label: "documentType1",
+                },
+                fileNumber: "test fileNumber",
+              },
+            ],
+          })
+        )
+      const { user } = renderComponent()
+      await openExpandableArea(user)
 
-  it.todo("adds proceeding decision from search results and updates indicators")
+      await user.click(screen.getByLabelText("Nach Entscheidungen suchen"))
+      expect(fetchSpy).toBeCalledTimes(1)
 
-  it.todo("search updates list with empty result")
+      expect(screen.getByText(/test fileNumber/)).toBeVisible()
+      await user.click(screen.getByLabelText("Treffer übernehmen"))
+      expect(screen.getByText(/Bereits hinzugefügt/)).toBeVisible()
+      expect(screen.getAllByText(/test fileNumber/).length).toBe(2)
+    }
 })
