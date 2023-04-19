@@ -9,6 +9,7 @@ on:
   workflow_dispatch:
 
 env:
+  RUN_ID: ${{ github.run_id }}
   CONTAINER_REGISTRY: ghcr.io
   CONTAINER_IMAGE_NAME: ${{ github.repository }}
   CONTAINER_IMAGE_VERSION: ${{ github.sha }}
@@ -71,30 +72,22 @@ jobs:
         run: |
           mkdir /tmp/images
           docker save -o /tmp/images/backend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
-      - name: set env variables
-        shell: bash
-        run: |
-          echo "DOCKER_IMAGES_KEY=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
       - uses: actions/cache@v3
         with:
           path: /tmp/images
-          key: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
-          restore-keys: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
+          key: docker-images-cache-${{ env.RUN_ID }}
+          restore-keys: docker-images-cache-${{ env.RUN_ID }}
 
   restore-backend-image:
     runs-on: ubuntu-latest
     needs:
       - build-backend-image
     steps:
-      - name: set env variables
-        shell: bash
-        run: |
-          echo "DOCKER_IMAGES_KEY=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
       - uses: actions/cache@v3
         with:
           path: /tmp/images
-          key: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
-          restore-keys: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
+          key: docker-images-cache-${{ env.RUN_ID }}
+          restore-keys: docker-images-cache-${{ env.RUN_ID }}
       - name: load image
         shell: bash
         run: |
