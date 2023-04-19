@@ -227,7 +227,7 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.EU_GOVERNMENT_GAZETTE
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("eu government gazette", MetadatumType.EU_GOVERNMENT_GAZETTE),
+            Metadatum("entity", MetadatumType.ENTITY),
             Metadatum("year", MetadatumType.YEAR),
             Metadatum("series", MetadatumType.SERIES),
             Metadatum("number", MetadatumType.NUMBER),
@@ -247,7 +247,7 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.EU_GOVERNMENT_GAZETTE
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("eu government gazette", MetadatumType.EU_GOVERNMENT_GAZETTE),
+            Metadatum("entity", MetadatumType.ENTITY),
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
@@ -260,7 +260,7 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_REFERENCE
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("other official references", MetadatumType.OTHER_OFFICIAL_REFERENCE),
+            Metadatum("entity", MetadatumType.ENTITY),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
@@ -272,7 +272,7 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_REFERENCE
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("other official references", MetadatumType.OTHER_OFFICIAL_REFERENCE),
+            Metadatum("entity", MetadatumType.ENTITY),
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
