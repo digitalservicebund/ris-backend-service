@@ -114,6 +114,14 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.ENTITY]: identity,
   [MetadatumType.DECIDING_BODY]: identity,
   [MetadatumType.RESOLUTION_MAJORITY]: decodeBoolean,
+  [MetadatumType.ADDITIONAL_INFO]: identity,
+  [MetadatumType.EXPLANATION]: identity,
+  [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
+  [MetadatumType.AREA_OF_PUBLICATION]: identity,
+  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
+  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
+  [MetadatumType.SERIES]: identity,
+  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -155,6 +163,13 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.ENTITY]: identity,
   [MetadatumType.DECIDING_BODY]: identity,
   [MetadatumType.RESOLUTION_MAJORITY]: encodeBoolean,
+  [MetadatumType.ADDITIONAL_INFO]: identity,
+  [MetadatumType.EXPLANATION]: identity,
+  [MetadatumType.AREA_OF_PUBLICATION]: identity,
+  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
+  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
+  [MetadatumType.SERIES]: identity,
+  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
 }
 
 /**
