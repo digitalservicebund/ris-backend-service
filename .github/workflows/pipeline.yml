@@ -99,7 +99,7 @@ jobs:
         shell: bash
         run: |
           ls /tmp/images
-          docker load -i backend-image.tar
+          docker load -i /tmp/images/backend-image.tar
           docker image ls
 
   build-frontend:
