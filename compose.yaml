@@ -24,6 +24,7 @@ services:
  
   backend:
     image: gradle:7-jdk17
+    user: ${MY_UID}:${MY_GID}
     extra_hosts:
       - localhost:host-gateway
     container_name: backend
