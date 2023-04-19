@@ -594,7 +594,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: staging
-          version: ${{ needs.build-and-push-backend-image.outputs.version }}
+          version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
@@ -682,7 +682,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: production
-          version: ${{ needs.build-and-push-backend-image.outputs.version }}
+          version: ${{ needs.push-backend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
