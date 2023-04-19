@@ -35,7 +35,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
 </script>
 
 <template>
-  <div class="mb-[4rem]">
+  <div>
     <button
       :aria-labelledby="headerId"
       class="flex justify-between w-full"
