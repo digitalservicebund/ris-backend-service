@@ -75,7 +75,7 @@ jobs:
         shell: bash
         run: |
           echo "DOCKER_IMAGES_KEY=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: /tmp/images
           key: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
@@ -90,15 +90,17 @@ jobs:
         shell: bash
         run: |
           echo "DOCKER_IMAGES_KEY=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
-      - uses: actions/cache@v2
+      - uses: actions/cache@v3
         with:
           path: /tmp/images
           key: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
           restore-keys: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
-      - name: check if image exists
+      - name: load image
         shell: bash
         run: |
           ls /tmp/images
+          docker load -i backend-image.tar
+          docker image ls
 
   build-frontend:
     runs-on: ubuntu-latest
