@@ -64,6 +64,9 @@ jobs:
       - name: Grant execute permission for gradlew
         working-directory: ./backend
         run: chmod +x gradlew
+      - name: Build container image
+        working-directory: ./backend
+        run: ./gradlew bootBuildImage
       - name: set env variables
         shell: bash
         run: |
@@ -89,7 +92,7 @@ jobs:
           key: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
           restore-keys: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
       - name: check if image exists
-        shell: brash
+        shell: bash
         run: |
           docker image ls
 
