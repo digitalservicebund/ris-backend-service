@@ -49,6 +49,33 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+  build-backend-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Validate gradle wrapper
+        uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17.0"
+          distribution: "temurin"
+          cache: gradle
+      - name: Grant execute permission for gradlew
+        working-directory: ./backend
+        run: chmod +x gradlew
+      - name: Build container image
+        working-directory: ./backend
+        run: ./gradlew bootBuildImage
+      - name: Save image
+        working-directory: ./backend
+        run: docker save -o backend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+      - name: Upload image as artifact
+        uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
+        with:
+          name: backend-image
+          path: backend-image.tar
+
   build-frontend:
     runs-on: ubuntu-latest
     steps:
