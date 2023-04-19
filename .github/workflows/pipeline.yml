@@ -78,22 +78,6 @@ jobs:
           key: docker-images-cache-${{ env.RUN_ID }}
           restore-keys: docker-images-cache-${{ env.RUN_ID }}
 
-  restore-backend-image:
-    runs-on: ubuntu-latest
-    needs:
-      - build-backend-image
-    steps:
-      - uses: actions/cache@v3
-        with:
-          path: /tmp/images
-          key: docker-images-cache-${{ env.RUN_ID }}
-          restore-keys: docker-images-cache-${{ env.RUN_ID }}
-      - name: load image
-        shell: bash
-        run: |
-          ls /tmp/images
-          docker load -i /tmp/images/backend-image.tar
-
   build-frontend:
     runs-on: ubuntu-latest
     steps:
@@ -456,7 +440,7 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push-backend-image:
+  push-backend-image-to-registry:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
@@ -599,7 +583,7 @@ jobs:
     needs:
       [
         build-and-push-frontend-image,
-        build-and-push-backend-image,
+        push-backend-image-to-registry,
         build-github-pages,
       ]
     permissions:
@@ -685,7 +669,7 @@ jobs:
     environment: production
     needs:
       - build-and-push-frontend-image
-      - build-and-push-backend-image
+      - push-backend-image-to-registry
       - build-github-pages
       - deploy-staging-verify-e2e-chrome
       - deploy-staging-verify-e2e-firefox
