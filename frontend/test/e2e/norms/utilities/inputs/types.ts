@@ -32,8 +32,9 @@ export type AnyField = Field<FieldType, FieldValue>
 // Resolve that mess...
 export type MetadataInputSection = {
   id?: string
-  heading: string
+  heading?: string
   isRepeatedSection?: boolean
+  isSingleFieldSection?: boolean
   fields?: AnyField[]
   sections?: MetadataInputSection[]
 }

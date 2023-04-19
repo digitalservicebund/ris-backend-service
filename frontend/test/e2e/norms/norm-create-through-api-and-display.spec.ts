@@ -1,16 +1,30 @@
-import { expect } from "@playwright/test"
+import { Page, expect } from "@playwright/test"
 
 import { openNorm } from "./e2e-utils"
 import { getNormBySections, testWithImportedNorm } from "./fixtures"
-import { expectMetadataInputSectionToHaveCorrectData } from "./utilities"
+import {
+  MetadataInputSection,
+  expectMetadataInputSectionToHaveCorrectData,
+} from "./utilities"
 
-async function expectHeadingAppearAfterScroll(page, heading) {
-  const locator = page.locator(`a span:text-is('${heading}')`)
+async function expectSectionAppearsAfterScroll(
+  page: Page,
+  section: MetadataInputSection
+) {
+  const locator = page.locator(`a span:text-is('${section.heading}')`)
   await expect(locator).toBeVisible()
   await locator.click()
-  await expect(page).toHaveInsideViewport(
-    `legend:text-is("${heading}"), h2:text-is("${heading}")`
-  )
+
+  if (section.isSingleFieldSection) {
+    const firstFieldLabel = section.fields?.[0].label ?? ""
+    await expect(page).toHaveInsideViewport(
+      `label:text-is("${firstFieldLabel}")`
+    )
+  } else {
+    await expect(page).toHaveInsideViewport(
+      `legend:text-is("${section.heading}"), h2:text-is("${section.heading}")`
+    )
+  }
 }
 
 testWithImportedNorm(
@@ -71,14 +85,12 @@ testWithImportedNorm(
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
     await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
-    await expect(page).toHaveInsideViewport(
-      'legend:text-is("Allgemeine Angaben")'
-    )
 
     const sections = getNormBySections(normData)
+    const sectionsWithHeading = sections.filter((section) => !!section.heading)
 
-    for (const section of sections) {
-      await expectHeadingAppearAfterScroll(page, section.heading)
+    for (const section of sectionsWithHeading) {
+      await expectSectionAppearsAfterScroll(page, section)
     }
   }
 )

@@ -16,9 +16,6 @@ testWithImportedNorm(
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
     await expect(locatorFrameButton).toBeVisible()
     await locatorFrameButton.click()
-    await expect(page).toHaveURL(`/norms/norm/${guid}/frame`)
-    await page.locator("a:has-text('Überschriften und Abkürzungen')").click()
-    await expect(page.locator(`label[for="officialShortTitle"]`)).toBeVisible()
 
     const newValue = "Changed-Official-Short-Title"
     await fillInputField(page, FieldType.TEXT, "officialShortTitle", newValue)

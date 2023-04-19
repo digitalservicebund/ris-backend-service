@@ -133,6 +133,8 @@ export async function fillMetadataInputSection(
 ): Promise<void> {
   if (section.isRepeatedSection) {
     await fillRepeatedMetadataSectionList(page, section)
+  } else if (section.isSingleFieldSection) {
+    await fillInputFieldGroup(page, section.fields ?? [])
   } else {
     await fillInputFieldGroup(page, section.fields ?? [])
 

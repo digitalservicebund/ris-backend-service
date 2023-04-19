@@ -56,7 +56,7 @@ export async function expectRepeatedSectionListHasCorrectEntries(
 ): Promise<void> {
   const expandable = page.locator(`#${section.id}`)
   await expect(expandable).toBeVisible()
-  await expect(expandable).toContainText(section.heading)
+  await expect(expandable).toContainText(section.heading ?? "")
   await expandable.click()
   const numberOfSectionRepetition = Math.max(
     ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
@@ -79,6 +79,8 @@ export async function expectMetadataInputSectionToHaveCorrectData(
 ): Promise<void> {
   if (section.isRepeatedSection) {
     await expectRepeatedSectionListHasCorrectEntries(page, section)
+  } else if (section.isSingleFieldSection) {
+    await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
   } else {
     const heading = page.locator(`a span:text-is("${section.heading}")`)
     await expect(heading).toBeVisible()

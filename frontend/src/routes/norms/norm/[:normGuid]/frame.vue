@@ -1,32 +1,30 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, toRefs } from "vue"
+import { computed, toRefs, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
-import ExpandableContent from "@/components/ExpandableContent.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
+import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { Metadata, MetadataSections, RangeUnit } from "@/domain/Norm"
-import { announcementDate } from "@/fields/norms/announcementDate"
+import {
+  FlatMetadata,
+  Metadata,
+  MetadataSections,
+  RangeUnit,
+} from "@/domain/Norm"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
-import { celexNumber } from "@/fields/norms/celexNumber"
-import { completeCitation } from "@/fields/norms/completeCitation"
 import { digitalAnnouncement } from "@/fields/norms/digitalAnnouncement"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
 import { documentType } from "@/fields/norms/documentType"
-import { eli } from "@/fields/norms/eli"
 import { entryIntoForce } from "@/fields/norms/entryIntoForce"
 import { euAnnouncement } from "@/fields/norms/euAnnouncement"
 import { expiration } from "@/fields/norms/expiration"
-import { generalData } from "@/fields/norms/generalData"
-import { headingsAndAbbreviations } from "@/fields/norms/headingsAndAbbreviations"
-import { headingsAndAbbreviationsUnofficial } from "@/fields/norms/headingsAndAbbreviationsUnofficial"
 import { normProvider } from "@/fields/norms/normProvider"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
@@ -36,15 +34,11 @@ import { printAnnouncement } from "@/fields/norms/printAnnouncement"
 import { reissue } from "@/fields/norms/reissue"
 import { repeal } from "@/fields/norms/repeal"
 import { status } from "@/fields/norms/status"
-import { text } from "@/fields/norms/text"
-import { unofficialReference } from "@/fields/norms/unofficialReference"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
-import ChipsInput from "@/shared/components/input/ChipsInput.vue"
-import InputField from "@/shared/components/input/InputField.vue"
 import InputGroup from "@/shared/components/input/InputGroup.vue"
 import SaveButton from "@/shared/components/input/SaveButton.vue"
-import { ModelType } from "@/shared/components/input/types"
+import { InputType } from "@/shared/components/input/types"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const route = useRoute()
@@ -65,26 +59,23 @@ const normSection = computed({
   set: (section: Metadata) => (metadataSections.value.NORM = [section]),
 })
 
-const flatMetadata = computed({
-  get: () => {
-    const { guid, articles, files, metadataSections, ...flatMetadata } =
+const flatMetadata = ref<FlatMetadata>({} as FlatMetadata)
+
+watch(
+  loadedNorm,
+  () => {
+    const { guid, articles, files, metadataSections, ...data } =
       loadedNorm.value ?? {}
 
-    return {
-      ...flatMetadata,
-      // Intermediate metadata that is still mixed and used in `InputGroup`s.
-      frameKeywords: normSection.value.KEYWORD,
-      unofficialShortTitle: normSection.value.UNOFFICIAL_SHORT_TITLE,
-      unofficialReference: normSection.value.UNOFFICIAL_REFERENCE,
-      unofficialLongTitle: normSection.value.UNOFFICIAL_LONG_TITLE,
-      unofficialAbbreviation: normSection.value.UNOFFICIAL_ABBREVIATION,
-      risAbbreviationInternationalLaw:
-        normSection.value.RIS_ABBREVIATION_INTERNATIONAL_LAW,
-      divergentDocumentNumber: normSection.value.DIVERGENT_DOCUMENT_NUMBER,
-    } as Record<string, ModelType>
+    flatMetadata.value = data as FlatMetadata
   },
-  set: (data: Record<string, ModelType>) => {
-    if (loadedNorm.value !== undefined) {
+  { immediate: true, deep: true }
+)
+
+watch(
+  flatMetadata,
+  (data) => {
+    if (loadedNorm.value !== undefined && data !== undefined) {
       loadedNorm.value.documentTemplateName =
         data.documentTemplateName as string
       loadedNorm.value.announcementDate = data.announcementDate as string
@@ -224,24 +215,10 @@ const flatMetadata = computed({
       loadedNorm.value.statusNote = data.statusNote as string
       loadedNorm.value.statusReference = data.statusReference as string
       loadedNorm.value.text = data.text as string
-
-      // Intermediate metadata that is still mixed and used in `InputGroup`s.
-      normSection.value.KEYWORD = data.frameKeywords as string[]
-      normSection.value.UNOFFICIAL_SHORT_TITLE =
-        data.unofficialShortTitle as string[]
-      normSection.value.UNOFFICIAL_REFERENCE =
-        data.unofficialReference as string[]
-      normSection.value.UNOFFICIAL_LONG_TITLE =
-        data.unofficialLongTitle as string[]
-      normSection.value.UNOFFICIAL_ABBREVIATION =
-        data.unofficialAbbreviation as string[]
-      normSection.value.RIS_ABBREVIATION_INTERNATIONAL_LAW =
-        data.risAbbreviationInternationalLaw as string[]
-      normSection.value.DIVERGENT_DOCUMENT_NUMBER =
-        data.divergentDocumentNumber as string[]
     }
   },
-})
+  { deep: true }
+)
 
 function getLabel(value: string, unit: RangeUnit): string {
   const pluralN = value === "1" ? "" : "n"
@@ -321,20 +298,55 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
 </script>
 
 <template>
-  <div class="max-w-screen-lg">
-    <h1 class="h-[1px] overflow-hidden w-[1px]">
+  <div class="flex flex-col gap-8 max-w-screen-lg">
+    <SingleDataFieldSection
+      id="officialLongTitle"
+      v-model="flatMetadata.officialLongTitle"
+      label="Amtliche Langüberschrift"
+    />
+
+    <SingleDataFieldSection
+      id="risAbbreviation"
+      v-model="flatMetadata.risAbbreviation"
+      label="Juris-Abkürzung"
+    />
+
+    <SingleDataFieldSection
+      id="risAbbreviationInternationalLaw"
+      v-model="normSection.RIS_ABBREVIATION_INTERNATIONAL_LAW"
+      label="Juris-Abkürzung für völkerrechtliche Vereinbarungen"
+      :type="InputType.CHIPS"
+    />
+
+    <SingleDataFieldSection
+      id="documentNumber"
+      v-model="flatMetadata.documentNumber"
+      label="Dokumentnummer"
+    />
+
+    <SingleDataFieldSection
+      id="divergentDocumentNumbers"
+      v-model="normSection.DIVERGENT_DOCUMENT_NUMBER"
+      label="Abweichende Dokumentnummer"
+      :type="InputType.CHIPS"
+    />
+
+    <SingleDataFieldSection
+      id="documentCategory"
+      v-model="flatMetadata.documentCategory"
+      label="Dokumentart"
+    />
+
+    <SingleDataFieldSection
+      id="frameKeywords"
+      v-model="normSection.KEYWORD"
+      label="Schlagwörter im Rahmenelement"
+      :type="InputType.CHIPS"
+    />
+
+    <h1 class="h-[1px] mt-40 overflow-hidden w-[1px]">
       Dokumentation des Rahmenelements
     </h1>
-    <fieldset>
-      <legend id="generalDataFields" class="heading-02-regular mb-[1rem]">
-        Allgemeine Angaben
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="generalData"
-      />
-    </fieldset>
 
     <fieldset>
       <legend id="documentTypeFields" class="heading-02-regular mb-[1rem]">
@@ -347,7 +359,7 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </fieldset>
 
-    <fieldset>
+    <fieldset class="mb-32">
       <legend id="normProviderFields" class="heading-02-regular mb-[1rem]">
         Normgeber
       </legend>
@@ -359,8 +371,7 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
     </fieldset>
 
     <ExpandableDataSet
-      id="participatingInstitutionsFields"
-      class="mt-40"
+      id="participatingInstitutions"
       :data-set="metadataSections.PARTICIPATION"
       title="Mitwirkende Organe"
     >
@@ -372,8 +383,7 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
     </ExpandableDataSet>
 
     <ExpandableDataSet
-      id="leadFields"
-      class="-mt-40"
+      id="leads"
       :data-set="metadataSections.LEAD"
       title="Federführung"
     >
@@ -385,8 +395,7 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
     </ExpandableDataSet>
 
     <ExpandableDataSet
-      id="subjectAreaFields"
-      class="-mt-40"
+      id="subjectAreas"
       :data-set="metadataSections.SUBJECT_AREA"
       title="Sachgebiet"
     >
@@ -397,38 +406,44 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </ExpandableDataSet>
 
+    <SingleDataFieldSection
+      id="officialShortTitle"
+      v-model="flatMetadata.officialShortTitle"
+      label="Amtliche Kurzüberschrift"
+    />
+
+    <SingleDataFieldSection
+      id="officialAbbreviation"
+      v-model="flatMetadata.officialAbbreviation"
+      label="Amtliche Buchstabenabkürzung"
+    />
+
+    <SingleDataFieldSection
+      id="unofficialLongTitles"
+      v-model="normSection.UNOFFICIAL_LONG_TITLE"
+      label="Nichtamtliche Langüberschrift"
+      :type="InputType.CHIPS"
+    />
+
+    <SingleDataFieldSection
+      id="unofficialShortTitles"
+      v-model="normSection.UNOFFICIAL_SHORT_TITLE"
+      label="Nichtamtliche Kurzüberschrift"
+      :type="InputType.CHIPS"
+    />
+
+    <SingleDataFieldSection
+      id="unofficialAbbreviations"
+      v-model="normSection.UNOFFICIAL_ABBREVIATION"
+      label="Nichtamtliche Buchstabenabkürzung"
+      :type="InputType.CHIPS"
+    />
+
     <fieldset>
       <legend
-        id="headingsAndAbbreviations"
-        class="heading-02-regular mb-[1rem]"
+        id="entryIntoForceFields"
+        class="heading-02-regular mb-[1rem] mt-32"
       >
-        Überschriften und Abkürzungen
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="headingsAndAbbreviations"
-      />
-    </fieldset>
-
-    <ExpandableContent header-id="headingsAndAbbreviationsUnofficial">
-      <template #header>
-        <legend
-          id="headingsAndAbbreviationsUnofficial"
-          class="link-01-bold mb-[1rem]"
-        >
-          Nichtamtliche Überschriften und Abkürzungen
-        </legend>
-      </template>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="headingsAndAbbreviationsUnofficial"
-      />
-    </ExpandableContent>
-
-    <fieldset>
-      <legend id="entryIntoForceFields" class="heading-02-regular mb-[1rem]">
         Inkrafttreten
       </legend>
       <InputGroup
@@ -449,20 +464,22 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </fieldset>
 
-    <fieldset>
-      <legend id="announcementDateFields" class="heading-02-regular mb-[1rem]">
-        Verkündungsdatum
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="announcementDate"
-      />
-    </fieldset>
+    <SingleDataFieldSection
+      id="announcementDate"
+      v-model="flatMetadata.announcementDate"
+      label="Verkündungsdatum"
+      :type="InputType.DATE"
+    />
+
+    <SingleDataFieldSection
+      id="publicationDate"
+      v-model="flatMetadata.publicationDate"
+      label="Veröffentlichungsdatum"
+      :type="InputType.DATE"
+    />
 
     <ExpandableDataSet
-      id="citationDateFields"
-      class="mt-40"
+      id="citationDates"
       :data-set="metadataSections.CITATION_DATE"
       :summary-component="CitationDateSummary"
       title="Zitierdatum"
@@ -475,7 +492,10 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </ExpandableDataSet>
 
-    <h2 id="officialAnnouncementFields" class="heading-02-regular mb-[1rem]">
+    <h2
+      id="officialAnnouncementFields"
+      class="heading-02-regular mb-[1rem] mt-32"
+    >
       Amtliche Fundstelle
     </h2>
     <fieldset>
@@ -528,32 +548,20 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </fieldset>
 
-    <fieldset>
-      <legend
-        id="unofficialReferenceFields"
-        class="heading-02-regular mb-[1rem]"
-      >
-        Nichtamtliche Fundstelle
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="unofficialReference"
-      />
-    </fieldset>
+    <SingleDataFieldSection
+      id="unofficialReferences"
+      v-model="normSection.UNOFFICIAL_REFERENCE"
+      label="Nichtamtliche Fundstelle"
+      :type="InputType.CHIPS"
+    />
 
-    <fieldset>
-      <legend id="completeCitationFields" class="heading-02-regular mb-[1rem]">
-        Vollzitat
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="completeCitation"
-      />
-    </fieldset>
+    <SingleDataFieldSection
+      id="completeCitation"
+      v-model="flatMetadata.completeCitation"
+      label="Vollzitat"
+    />
 
-    <h2 id="statusIndicationFields" class="heading-02-regular mb-[1rem]">
+    <h2 id="statusIndicationFields" class="heading-02-regular mb-[1rem] mt-32">
       Stand-Angabe
     </h2>
     <fieldset>
@@ -652,25 +660,14 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </fieldset>
 
-    <fieldset class="mb-40">
-      <legend id="validityRuleFields" class="heading-02-regular mb-[1rem]">
-        Gültigkeitsregelung
-      </legend>
+    <SingleDataFieldSection
+      id="validityRules"
+      v-model="normSection.VALIDITY_RULE"
+      label="Gültigkeitsregelung"
+      :type="InputType.CHIPS"
+    />
 
-      <InputField
-        id="validityRule"
-        aria-label="Gültigkeitsregelung"
-        label="Gültigkeitsregelung"
-      >
-        <ChipsInput
-          id="validityRyle"
-          v-model="normSection.VALIDITY_RULE"
-          aria-label="Gültigkeitsregelung"
-        />
-      </InputField>
-    </fieldset>
-
-    <fieldset>
+    <fieldset class="mt-32">
       <legend id="digitalEvidenceFields" class="heading-02-regular mb-[1rem]">
         Elektronischer Nachweis
       </legend>
@@ -681,43 +678,28 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </fieldset>
 
-    <fieldset class="mb-40">
-      <legend id="referenceNumberFields" class="heading-02-regular mb-[1rem]">
-        Aktenzeichen
-      </legend>
+    <SingleDataFieldSection
+      id="referenceNumbers"
+      v-model="normSection.REFERENCE_NUMBER"
+      label="Aktenzeichen"
+      :type="InputType.CHIPS"
+    />
 
-      <InputField
-        id="referenceNumber"
-        aria-label="Aktenzeichen"
-        label="Aktenzeichen"
-      >
-        <ChipsInput
-          id="referenceNumber"
-          v-model="normSection.REFERENCE_NUMBER"
-          aria-label="Aktenzeichen"
-        />
-      </InputField>
-    </fieldset>
+    <SingleDataFieldSection
+      id="eli"
+      v-model="flatMetadata.eli"
+      label="ELI"
+      readonly
+    />
 
-    <fieldset>
-      <legend id="eliFields" class="heading-02-regular mb-[1rem]">ELI</legend>
-      <InputGroup v-model="flatMetadata" :column-count="1" :fields="eli" />
-    </fieldset>
-
-    <fieldset>
-      <legend id="celexNumberFields" class="heading-02-regular mb-[1rem]">
-        CELEX-Nummer
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="celexNumber"
-      />
-    </fieldset>
+    <SingleDataFieldSection
+      id="celexNumber"
+      v-model="flatMetadata.celexNumber"
+      label="CELEX-Nummer"
+    />
 
     <ExpandableDataSet
-      id="ageIndicationFields"
-      class="mt-40"
+      id="ageIndications"
       :data-set="metadataSections.AGE_INDICATION"
       :summary-component="AgeIndicationSummary"
       title="Altersangabe"
@@ -730,45 +712,25 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </ExpandableDataSet>
 
-    <fieldset class="mb-40">
-      <legend id="definitionFields" class="heading-02-regular mb-[1rem]">
-        Definition
-      </legend>
+    <SingleDataFieldSection
+      id="definitions"
+      v-model="normSection.DEFINITION"
+      label="Definition"
+      :type="InputType.CHIPS"
+    />
 
-      <InputField id="definition" aria-label="Definition" label="Definition">
-        <ChipsInput
-          id="definition"
-          v-model="normSection.DEFINITION"
-          aria-label="Definition"
-        />
-      </InputField>
-    </fieldset>
+    <SingleDataFieldSection
+      id="ageOfMajorityIndications"
+      v-model="normSection.AGE_OF_MAJORITY_INDICATION"
+      label="Angaben zur Volljährigkeit"
+      :type="InputType.CHIPS"
+    />
 
-    <fieldset class="mb-40">
-      <legend
-        id="ageOfMajorityIndicationFields"
-        class="heading-02-regular mb-[1rem]"
-      >
-        Angaben zur Volljährigkeit
-      </legend>
-
-      <InputField
-        id="ageOfMajorityIndication"
-        aria-label="Angaben zur Volljährigkeit"
-        label="Angaben zur Volljährigkeit"
-      >
-        <ChipsInput
-          id="ageOfMajorityIndication"
-          v-model="normSection.AGE_OF_MAJORITY_INDICATION"
-          aria-label="Angaben zur Volljährigkeit"
-        />
-      </InputField>
-    </fieldset>
-
-    <fieldset>
-      <legend id="textFields" class="heading-02-regular mb-[1rem]">Text</legend>
-      <InputGroup v-model="flatMetadata" :column-count="1" :fields="text" />
-    </fieldset>
+    <SingleDataFieldSection
+      id="text"
+      v-model="flatMetadata.text"
+      label="Text"
+    />
 
     <SaveButton
       aria-label="Rahmendaten Speichern Button"
