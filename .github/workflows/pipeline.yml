@@ -93,7 +93,6 @@ jobs:
         run: |
           ls /tmp/images
           docker load -i /tmp/images/backend-image.tar
-          docker image ls
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -244,7 +243,6 @@ jobs:
         run: |
           ls /tmp/images
           docker load -i /tmp/images/backend-image.tar
-          docker image ls
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -463,6 +461,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - build-backend
+      - build-backend-image
       - audit-licenses-backend
       - vulnerability-scan-backend
     permissions:
@@ -472,16 +471,14 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - uses: actions/cache@v3
         with:
-          java-version: "17.0"
-          distribution: "temurin"
-          cache: gradle
-      - name: Grant execute permission for gradlew
-        working-directory: ./backend
-        run: chmod +x gradlew
+          path: /tmp/images
+          key: docker-images-cache-${{ env.RUN_ID }}
+          restore-keys: docker-images-cache-${{ env.RUN_ID }}
+      - name: load image
+        shell: bash
+        run: docker load -i /tmp/images/backend-image.tar
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -490,9 +487,8 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and publish backend container image
-        working-directory: ./backend
-        run: CONTAINER_REGISTRY_USER=${{ github.actor }} CONTAINER_REGISTRY_PASSWORD=${{ secrets.GITHUB_TOKEN }} ./gradlew bootBuildImage --publishImage
+      - name: Publish backend container image
+        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
