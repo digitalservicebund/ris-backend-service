@@ -67,13 +67,15 @@ jobs:
       - name: Build container image
         working-directory: ./backend
         run: ./gradlew bootBuildImage
+      - name: Save image
+        run: docker save -o backend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: set env variables
         shell: bash
         run: |
           echo "DOCKER_IMAGES_KEY=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
       - uses: actions/cache@v2
         with:
-          path: /tmp/docker/images
+          path: ./backend
           key: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
           restore-keys: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
 
@@ -88,13 +90,13 @@ jobs:
           echo "DOCKER_IMAGES_KEY=$(echo $GITHUB_RUN_ID)" >> $GITHUB_ENV
       - uses: actions/cache@v2
         with:
-          path: /tmp/docker/images
+          path: ./backend
           key: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
           restore-keys: docker-images-cache-${{ env.DOCKER_IMAGES_KEY }}
       - name: check if image exists
         shell: bash
         run: |
-          docker image ls
+          ls backend/
 
   build-frontend:
     runs-on: ubuntu-latest
