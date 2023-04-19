@@ -23,6 +23,7 @@ interface Props {
   modelValue: ModelType
   attributes: InputAttributes
   validationError?: ValidationError
+  disableError?: boolean
 }
 
 interface Emits {
@@ -34,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: InputType.TEXT,
   modelValue: undefined,
   validationError: undefined,
+  disableError: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -102,7 +104,7 @@ export default {
     v-model:validation-error="validationError"
   />
   <!-- TODO this is a workaround, errors shoudld be displayes in in the InputField component in the future -->
-  <div class="h-16 label-03-reg text-red-800">
+  <div v-if="!disableError" class="h-16 label-03-reg text-red-800">
     {{ errorMessage?.defaultMessage }}
   </div>
 </template>
