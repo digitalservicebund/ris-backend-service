@@ -35,7 +35,7 @@ const padding = computed(() => ({
 <template>
   <ExpandableContent
     v-model:is-expanded="isExpanded"
-    class="bg-white p-16"
+    class="bg-white p-16 pt-20"
     :class="{ 'hover:bg-blue-300': !isExpanded }"
     close-icon-name="expand_less"
     open-icon-name="expand_more"
