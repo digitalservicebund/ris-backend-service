@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue"
+import { computed, useAttrs, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
@@ -37,6 +37,12 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const emit = defineEmits<Emits>()
+
+const fallthroughAttributes = useAttrs()
+const combinedAttributes = computed(() => ({
+  ...props.attributes,
+  ...fallthroughAttributes,
+}))
 
 const component = computed(() => {
   switch (props.type) {
@@ -81,12 +87,18 @@ const validationError = computed({
 })
 </script>
 
+<script lang="ts">
+export default {
+  inheritAttrs: false,
+}
+</script>
+
 <template>
   <component
     :is="component"
     :id="id"
     v-model="value"
-    v-bind="attributes"
+    v-bind="combinedAttributes"
     v-model:validation-error="validationError"
   />
   <!-- TODO this is a workaround, errors shoudld be displayes in in the InputField component in the future -->
