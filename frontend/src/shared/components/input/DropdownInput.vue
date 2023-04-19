@@ -87,7 +87,7 @@ onBeforeUnmount(() => {
 
 const computedStyle = computed(() => {
   return props.hasSmallerHeight
-    ? { padding: "9.5px 16px" }
+    ? { padding: "9px 16px" }
     : { padding: "12px 16px" }
 })
 </script>
