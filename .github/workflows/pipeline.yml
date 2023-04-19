@@ -68,7 +68,6 @@ jobs:
         working-directory: ./backend
         run: ./gradlew bootBuildImage
       - name: Save image
-        working-directory: ./backend
         run: docker save -o backend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Upload image as artifact
         uses: actions/upload-artifact@65d862660abb392b8c4a3d1195a2108db131dd05
