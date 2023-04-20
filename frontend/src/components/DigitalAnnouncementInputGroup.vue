@@ -38,16 +38,16 @@ function createComputedProperty(key: string) {
   })
 }
 
-const digitalMedium = createComputedProperty("MEDIUM")
-const digitalDate = createComputedProperty("DATE")
-const digitalEdition = createComputedProperty("DIGITAL_EDITION")
-const digitalYear = createComputedProperty("YEAR")
-const digitalArea = createComputedProperty("AREA_OF_PUBLICATION")
-const digitalAreaNumber = createComputedProperty(
+const announcementMedium = createComputedProperty("ANNOUNCEMENT_MEDIUM")
+const date = createComputedProperty("DATE")
+const number = createComputedProperty("NUMBER")
+const year = createComputedProperty("YEAR")
+const areaOfPublication = createComputedProperty("AREA_OF_PUBLICATION")
+const numberOfThePublicationInTheRespectiveArea = createComputedProperty(
   "NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA"
 )
-const digitalInfo = createComputedProperty("ADDITIONAL_INFO")
-const digitalExplanations = createComputedProperty("EXPLANATION")
+const additionalInfo = createComputedProperty("ADDITIONAL_INFO")
+const explanation = createComputedProperty("EXPLANATION")
 </script>
 <template>
   <div>
@@ -59,7 +59,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
       >
         <TextInput
           id="citationYear"
-          v-model="digitalMedium"
+          v-model="announcementMedium"
           alt-text="Verkündungsmedium"
           aria-label="Verkündungsmedium"
         />
@@ -71,7 +71,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
       >
         <TextInput
           id="digitalAnnouncementDate"
-          v-model="digitalDate"
+          v-model="date"
           alt-text="Verkündungsdatum"
           aria-label="Verkündungsdatum"
         />
@@ -83,7 +83,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
       >
         <TextInput
           id="digitalAnnouncementEdition"
-          v-model="digitalEdition"
+          v-model="number"
           alt-text="Ausgabenummer"
           aria-label="Ausgabenummer"
         />
@@ -91,7 +91,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
       <InputField id="digitalAnnouncementYear" aria-label="Jahr" label="Jahr">
         <TextInput
           id="digitalAnnouncementYear"
-          v-model="digitalYear"
+          v-model="year"
           alt-text="Jahr"
           aria-label="Jahr"
         />
@@ -103,7 +103,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
       >
         <TextInput
           id="digitalAnnouncementArea"
-          v-model="digitalArea"
+          v-model="areaOfPublication"
           alt-text="Bereich der Veröffentlichung"
           aria-label="Bereich der Veröffentlichung"
         />
@@ -115,7 +115,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
       >
         <TextInput
           id="digitalAnnouncementAreaNumber"
-          v-model="digitalAreaNumber"
+          v-model="numberOfThePublicationInTheRespectiveArea"
           alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
           aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
         />
@@ -130,7 +130,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
     >
       <textarea
         id="digitalAnnouncementInfo"
-        v-model="digitalInfo"
+        v-model="additionalInfo"
         aria-label="Zusatzangaben"
         class="mt-2 outline outline-2 outline-blue-900 overflow-y-auto"
         rows="4"
@@ -143,7 +143,7 @@ const digitalExplanations = createComputedProperty("EXPLANATION")
     >
       <textarea
         id="digitalAnnouncementExplanations"
-        v-model="digitalExplanations"
+        v-model="explanation"
         aria-label="Erläuterungen"
         class="mt-2 outline outline-2 outline-blue-900 overflow-y-auto"
         rows="4"

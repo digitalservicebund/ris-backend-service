@@ -38,12 +38,12 @@ function createComputedProperty(key: string) {
   })
 }
 
-const printGazette = createComputedProperty("ANNOUNCEMENT_GAZETTE")
-const printYear = createComputedProperty("YEAR")
-const printNumber = createComputedProperty("NUMBER")
-const printPage = createComputedProperty("PAGE_NUMBER")
-const printInfo = createComputedProperty("ADDITIONAL_INFO")
-const printExplanations = createComputedProperty("EXPLANATION")
+const announcementGazette = createComputedProperty("ANNOUNCEMENT_GAZETTE")
+const year = createComputedProperty("YEAR")
+const number = createComputedProperty("NUMBER")
+const pageNumber = createComputedProperty("PAGE_NUMBER")
+const additionalInfo = createComputedProperty("ADDITIONAL_INFO")
+const explanation = createComputedProperty("EXPLANATION")
 </script>
 <template>
   <div class="flex ful-w gap-16 justify-between">
@@ -55,7 +55,7 @@ const printExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="printAnnouncementGazette"
-        v-model="printGazette"
+        v-model="announcementGazette"
         alt-text="Verkündungsblatt"
         aria-label="Verkündungsblatt"
       />
@@ -68,7 +68,7 @@ const printExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="printAnnouncementYear"
-        v-model="printYear"
+        v-model="year"
         alt-text="Jahr"
         aria-label="Jahr"
       />
@@ -81,7 +81,7 @@ const printExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="printAnnouncementNumber"
-        v-model="printNumber"
+        v-model="number"
         alt-text="Nummer"
         aria-label="Nummer"
       />
@@ -94,7 +94,7 @@ const printExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="printAnnouncementPage"
-        v-model="printPage"
+        v-model="pageNumber"
         alt-text="Seitenzahl"
         aria-label="Seitenzahl"
       />
@@ -108,7 +108,7 @@ const printExplanations = createComputedProperty("EXPLANATION")
     >
       <textarea
         id="printAnnouncementInfo"
-        v-model="printInfo"
+        v-model="additionalInfo"
         aria-label="Zusatzangaben"
         class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
         rows="4"
@@ -122,7 +122,7 @@ const printExplanations = createComputedProperty("EXPLANATION")
     >
       <textarea
         id="printAnnouncementExplanations"
-        v-model="printExplanations"
+        v-model="explanation"
         aria-label="Erläuterungen"
         class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
         rows="4"
