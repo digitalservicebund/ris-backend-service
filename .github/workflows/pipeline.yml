@@ -95,11 +95,13 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           gradle-version: release-candidate
-          arguments: build
+          arguments: build -x integrationTest -x test
           build-root-directory: ./backend
 
-  backend-tests:
+  backend-unit-tests:
     runs-on: ubuntu-latest
+    needs:
+      - gradle-build-action-test
     steps:
       - uses: actions/checkout@v3
       - name: Set up JDK
@@ -110,7 +112,24 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.5
-          arguments: test
+          arguments: test -x integrationTest
+          build-root-directory: ./backend
+
+  backend-integration-tests:
+    runs-on: ubuntu-latest
+    needs:
+      - gradle-build-action-test
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17.0"
+          distribution: "temurin"
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.5
+          arguments: integrationTest -x test
           build-root-directory: ./backend
 
   build-frontend:
