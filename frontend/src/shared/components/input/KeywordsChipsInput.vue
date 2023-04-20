@@ -59,7 +59,7 @@ function deleteChip(keyword: string | undefined) {
 }
 
 const handleOnBlur = () => {
-  errorMessage.value = undefined
+  // errorMessage.value = undefined
   currentInput.value = ""
 }
 
