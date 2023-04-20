@@ -1,6 +1,7 @@
 export enum FieldType {
   TEXT,
   CHECKBOX,
+  RADIO,
   CHIPS,
   DROPDOWN,
 }
@@ -10,6 +11,7 @@ export type FieldValue = string | boolean | string[]
 export type FieldValueTypeMapping = {
   [FieldType.TEXT]: string
   [FieldType.CHECKBOX]: boolean
+  [FieldType.RADIO]: boolean
   [FieldType.CHIPS]: string[]
   [FieldType.DROPDOWN]: string
 }
@@ -20,7 +22,7 @@ export type Field<
   Value extends FieldValueTypeMapping[Type]
 > = {
   type: Type
-  name: string
+  id: string
   label: string
 } & (
   | { value: Value; values?: never }

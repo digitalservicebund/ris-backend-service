@@ -6,26 +6,36 @@ import {
   MetadataInputSection,
 } from "./types"
 
-type FieldFiller<T> = (page: Page, name: string, value: T) => Promise<void>
+type FieldFiller<T> = (page: Page, id: string, value: T) => Promise<void>
 
 type FieldFillerMapping = {
   [Type in FieldType]: FieldFiller<FieldValueTypeMapping[Type]>
 }
 
-const fillCheckbox: FieldFiller<boolean> = async (page, name, value) => {
-  const selector = `role=checkbox[name="${name}"]`
-  await page.setChecked(selector, value)
+const fillTextInput: FieldFiller<string> = async (page, id, value) => {
+  const input = page.locator(`input#${id}`)
+  await expect(input).toBeEditable()
+  await input.fill(value)
 }
 
-const fillTextInput: FieldFiller<string> = async (page, name, value) => {
-  const selector = `input#${name}`
-  const locator = page.locator(selector)
-  await expect(locator).toBeEditable()
-  await locator.fill(value)
+const fillCheckbox: FieldFiller<boolean> = async (page, id, value) => {
+  const input = page.locator(`input#${id}`)
+  await expect(input).toBeEditable()
+  await input.setChecked(value)
 }
 
-const fillChipsInput: FieldFiller<string[]> = async (page, name, value) => {
-  const input = page.locator(`input#${name}`)
+const fillRadioButton: FieldFiller<boolean> = async (page, id, value) => {
+  // You can not "uncheck" a radio button. You must click a different one in the
+  // same radio button group.
+  if (value) {
+    const input = page.locator(`input#${id}`)
+    await expect(input).toBeEditable()
+    await input.check()
+  }
+}
+
+const fillChipsInput: FieldFiller<string[]> = async (page, id, value) => {
+  const input = page.locator(`input#${id}`)
   const wrapper = page.locator("div .input", { has: input })
 
   // Clear all chips first
@@ -43,10 +53,8 @@ const fillChipsInput: FieldFiller<string[]> = async (page, name, value) => {
   }
 }
 
-const fillDropdown: FieldFiller<string> = async (page, name, value) => {
-  const selector = `input#${name}`
-  const locatorInput = page.locator(selector + "+ button")
-  await locatorInput.click()
+const fillDropdown: FieldFiller<string> = async (page, id, value) => {
+  await page.locator(`input#${id} + button`).click()
   const locatorDropdownOptions = page.locator('[aria-label="dropdown-option"]')
   const count = await locatorDropdownOptions.count()
 
@@ -63,6 +71,7 @@ const fillDropdown: FieldFiller<string> = async (page, name, value) => {
 const FIELD_FILLERS: FieldFillerMapping = {
   [FieldType.TEXT]: fillTextInput,
   [FieldType.CHECKBOX]: fillCheckbox,
+  [FieldType.RADIO]: fillRadioButton,
   [FieldType.CHIPS]: fillChipsInput,
   [FieldType.DROPDOWN]: fillDropdown,
 }
@@ -70,9 +79,9 @@ const FIELD_FILLERS: FieldFillerMapping = {
 export function fillInputField<
   Type extends FieldType,
   Value extends FieldValueTypeMapping[Type]
->(page: Page, type: Type, name: string, value: Value): Promise<void> {
+>(page: Page, type: Type, id: string, value: Value): Promise<void> {
   const filler = FIELD_FILLERS[type]
-  return filler(page, name, value)
+  return filler(page, id, value)
 }
 
 export async function fillInputFieldGroup(
@@ -81,12 +90,11 @@ export async function fillInputFieldGroup(
   valueIndex?: number
 ) {
   for (const field of fields) {
-    const name = field.type == FieldType.CHECKBOX ? field.label : field.name
     const value =
       valueIndex !== undefined ? field.values?.[valueIndex] : field.value
 
     if (value !== undefined) {
-      await fillInputField(page, field.type, name, value)
+      await fillInputField(page, field.type, field.id, value)
     }
   }
 }

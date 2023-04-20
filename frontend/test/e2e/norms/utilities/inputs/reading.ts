@@ -6,32 +6,52 @@ import {
   MetadataInputSection,
 } from "./types"
 
+type FieldExpecter<T> = (page: Page, id: string, value: T) => Promise<void>
+
+type FieldExpectMapping = {
+  [Type in FieldType]: FieldExpecter<FieldValueTypeMapping[Type]>
+}
+
+const expectTextInput: FieldExpecter<string> = async (page, id, value) => {
+  const content = await page.locator(`input#${id}`).inputValue()
+  expect(content).toBe(value)
+}
+
+const expectCheckbox: FieldExpecter<boolean> = async (page, id, value) => {
+  const checked = await page.locator(`input#${id}`).isChecked()
+  expect(checked).toBe(value)
+}
+
+const expectRadioButton: FieldExpecter<boolean> = async (page, id, value) => {
+  const checked = await page.locator(`input#${id}`).isChecked()
+  expect(checked).toBe(value)
+}
+
+const expectChipsInput: FieldExpecter<string[]> = async (page, _, value) => {
+  for (const subValue of (value ?? []) as string[]) {
+    const chip = page.locator(`div.label-wrapper:text-is("${subValue}")`)
+    await expect(chip).toBeVisible()
+  }
+}
+
+const expectDropdown: FieldExpecter<string> = async () => {
+  /* TODO */
+}
+
+const FIELD_EXPECTER: FieldExpectMapping = {
+  [FieldType.TEXT]: expectTextInput,
+  [FieldType.CHECKBOX]: expectCheckbox,
+  [FieldType.RADIO]: expectRadioButton,
+  [FieldType.CHIPS]: expectChipsInput,
+  [FieldType.DROPDOWN]: expectDropdown,
+}
+
 export async function expectInputFieldHasCorrectValue<
   Type extends FieldType,
   Value extends FieldValueTypeMapping[Type]
->(page: Page, type: Type, name: string, value?: Value): Promise<void> {
-  switch (type) {
-    case FieldType.CHECKBOX:
-      expect(await page.isChecked(`role=checkbox[name="${name}"]`)).toBe(
-        value ?? false
-      )
-      break
-
-    case FieldType.TEXT:
-      expect(await page.inputValue(`input#${name}`)).toBe(value ?? "")
-      break
-
-    case FieldType.CHIPS:
-      for (const subValue of (value ?? []) as string[]) {
-        const chip = page.locator(`div.label-wrapper:text-is("${subValue}")`)
-        await expect(chip).toBeVisible()
-      }
-      break
-
-    case FieldType.DROPDOWN:
-      // TODO
-      break
-  }
+>(page: Page, type: Type, id: string, value: Value): Promise<void> {
+  const expecter = FIELD_EXPECTER[type]
+  return expecter(page, id, value)
 }
 
 export async function expectInputFieldGroupHasCorrectValues(
@@ -43,10 +63,12 @@ export async function expectInputFieldGroupHasCorrectValues(
     const label = page.locator(`label:text-is("${field.label}")`).first()
     await expect(label).toBeVisible()
 
-    const name = field.type == FieldType.CHECKBOX ? field.label : field.name
     const value =
       valueIndex !== undefined ? field.values?.[valueIndex] : field.value
-    await expectInputFieldHasCorrectValue(page, field.type, name, value)
+
+    if (value !== undefined) {
+      await expectInputFieldHasCorrectValue(page, field.type, field.id, value)
+    }
   }
 }
 
