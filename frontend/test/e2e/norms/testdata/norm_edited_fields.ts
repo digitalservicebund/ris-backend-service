@@ -1,3 +1,4 @@
+import { RangeUnit } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
 
 export const newNorm: NormData = {
@@ -84,8 +85,20 @@ export const newNorm: NormData = {
     ],
     // TODO: add some dates here
     CITATION_DATE: [],
-    // TODO: allow mapping from range unit enumeration to dropdown items
-    AGE_INDICATION: [],
+    AGE_INDICATION: [
+      {
+        RANGE_START: ["1"],
+        RANGE_START_UNIT: [RangeUnit.DAYS],
+        RANGE_END: ["2"],
+        RANGE_END_UNIT: [RangeUnit.WEEKS],
+      },
+      {
+        RANGE_START: ["3"],
+        RANGE_START_UNIT: [RangeUnit.MONTHS],
+        RANGE_END: ["4"],
+        RANGE_END_UNIT: [RangeUnit.YEARS],
+      },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",

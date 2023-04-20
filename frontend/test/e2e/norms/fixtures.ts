@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { Norm } from "../../../src/domain/Norm"
+import { Norm, RangeUnit } from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
@@ -53,6 +53,29 @@ type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
 }
   ? NullUnionOmit<RecursiveOmitHelper<Type, KeyToOmit>, KeyToOmit>
   : RecursiveOmitHelper<Type, KeyToOmit>
+
+function rangeUnitToDropdownEntry(unit?: RangeUnit): string | undefined {
+  switch (unit) {
+    case RangeUnit.SECONDS:
+      return "Sekunde"
+    case RangeUnit.MINUTES:
+      return "Minute"
+    case RangeUnit.HOURS:
+      return "Stunde"
+    case RangeUnit.DAYS:
+      return "Tag"
+    case RangeUnit.WEEKS:
+      return "Woche"
+    case RangeUnit.MONTHS:
+      return "Monat"
+    case RangeUnit.YEARS:
+      return "Jahr"
+    case RangeUnit.MONTHS_OF_LIFE:
+      return "Lebensmonate"
+    case RangeUnit.YEARS_OF_LIFE:
+      return "Lebensjahre"
+  }
+}
 
 export type NormData = RecursiveOmit<Norm, "guid"> & {
   jurisZipFileName: string
@@ -967,7 +990,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Einheit",
           values: norm.metadataSections?.AGE_INDICATION?.map(
             (section) => section?.RANGE_START_UNIT?.[0]
-          ),
+          ).map(rangeUnitToDropdownEntry),
         },
         {
           type: FieldType.TEXT,
@@ -983,7 +1006,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Einheit",
           values: norm.metadataSections?.AGE_INDICATION?.map(
             (section) => section?.RANGE_END_UNIT?.[0]
-          ),
+          ).map(rangeUnitToDropdownEntry),
         },
       ],
     },
