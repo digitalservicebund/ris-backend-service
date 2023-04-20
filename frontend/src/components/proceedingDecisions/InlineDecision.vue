@@ -7,9 +7,7 @@ defineProps<{
 </script>
 
 <template>
-  <div
-    class="border-b-1 border-b-blue-500 first:pt-0 flex flex-start label-02-reg last:border-none last:pb-0 py-10 w-full"
-  >
+  <div>
     <router-link
       v-if="ProceedingDecision.hasLink(decision)"
       class="link-01-bold underline"

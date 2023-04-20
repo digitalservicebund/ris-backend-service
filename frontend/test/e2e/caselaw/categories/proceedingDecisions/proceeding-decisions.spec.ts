@@ -101,7 +101,7 @@ test.describe("Add and remove proceeding decisions", () => {
     ).toHaveCount(1)
 
     await page
-      .locator("li", { hasText: "AG Aalen" })
+      .locator("div", { hasText: "AG Aalen" })
       .getByLabel("Löschen")
       .click()
 

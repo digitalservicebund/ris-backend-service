@@ -124,7 +124,11 @@ function decisionSummarizer(dataEntry: any) {
           },
           ProceedingDecision.renderDecision(dataEntry)
         )
-      : h("span", ProceedingDecision.renderDecision(dataEntry)),
+      : h(
+          "span",
+          { class: ["link-02-reg"] },
+          ProceedingDecision.renderDecision(dataEntry)
+        ),
   ])
 }
 
@@ -142,7 +146,7 @@ watch(
 </script>
 
 <template>
-  <div>
+  <div class="mb-[4rem]">
     <h1 class="heading-02-regular mb-[1rem]">Rechtszug</h1>
     <ExpandableDataSet
       as-column

@@ -18,11 +18,11 @@ const sortedDecisions = computed(() =>
 </script>
 
 <template>
-  <ul>
-    <li
+  <div class="flex flex-col items-start text-start w-full">
+    <div
       v-for="decision in sortedDecisions"
       :key="decision.uuid"
-      class="flex items-center justify-between mb-24 mt-12"
+      class="border-b-1 border-b-blue-500 first:pt-0 flex flex-start justify-between label-02-reg last:border-none last:pb-0 py-10 w-full"
     >
       <InlineDecision :decision="decision" />
       <span
@@ -32,6 +32,6 @@ const sortedDecisions = computed(() =>
         @keyup.enter="emit('removeLink', decision)"
         >delete_outline</span
       >
-    </li>
-  </ul>
+    </div>
+  </div>
 </template>

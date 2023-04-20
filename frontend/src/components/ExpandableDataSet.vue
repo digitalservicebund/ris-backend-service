@@ -28,7 +28,7 @@ const column = computed(() => ({
 }))
 
 const padding = computed(() => ({
-  "pb-[1rem]": props.asColumn && !isExpanded.value,
+  "mb-[1.65rem]": props.asColumn && !isExpanded.value,
 }))
 </script>
 
