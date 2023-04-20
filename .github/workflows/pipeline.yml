@@ -124,13 +124,11 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-          cache: gradle
-      - name: Grant execute permission for gradlew
-        working-directory: ./backend
-        run: chmod +x gradlew
-      - name: Build container image
-        working-directory: ./backend
-        run: ./gradlew bootBuildImage
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.5
+          arguments: bootBuildImage
+          build-root-directory: ./backend
       - name: Save image
         run: |
           mkdir /tmp/images
