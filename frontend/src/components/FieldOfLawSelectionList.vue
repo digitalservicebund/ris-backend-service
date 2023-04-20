@@ -7,13 +7,9 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   (event: "remove-from-list", identifier: string): void
-  (event: "node-clicked", node: FieldOfLawNode): void
+  (event: "node-clicked", identifier: string): void
   (event: "linkedField:clicked", identifier: string): void
 }>()
-
-function handleLinkedFieldClicked(identifier: string) {
-  emit("linkedField:clicked", identifier)
-}
 </script>
 
 <template>
@@ -28,8 +24,8 @@ function handleLinkedFieldClicked(identifier: string) {
         :key="fieldOfLaw.identifier"
         :field-of-law="fieldOfLaw"
         show-bin
-        @linked-field:clicked="handleLinkedFieldClicked"
-        @node-clicked="emit('node-clicked', fieldOfLaw)"
+        @linked-field:clicked="(identifier) => emit('node-clicked', identifier)"
+        @node-clicked="emit('node-clicked', fieldOfLaw.identifier)"
         @remove-from-list="emit('remove-from-list', fieldOfLaw.identifier)"
       />
     </div>

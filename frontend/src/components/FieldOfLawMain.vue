@@ -47,8 +47,8 @@ const handleRemoveByIdentifier = async (identifier: string) => {
   }
 }
 
-function handleNodeClicked(node: FieldOfLawNode) {
-  clickedIdentifier.value = node.identifier
+function handleNodeClicked(identifier: string) {
+  clickedIdentifier.value = identifier
 }
 
 function handleResetClickedNode() {

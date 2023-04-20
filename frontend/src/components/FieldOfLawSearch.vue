@@ -7,7 +7,8 @@ import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
 const emit = defineEmits<{
-  (event: "node-clicked", node: FieldOfLawNode): void
+  (event: "linkedField:clicked", identifier: string): void
+  (event: "node-clicked", identifier: string): void
   (event: "do-show-norms"): void
 }>()
 
@@ -26,7 +27,7 @@ function submitSearch(isNewSearch = true) {
     if (!response.data) return
     results.value = response.data
     if (results.value.content.length > 0 && isNewSearch) {
-      emit("node-clicked", results.value.content[0])
+      emit("node-clicked", results.value.content[0].identifier)
       if (searchStr.value.includes("norm:")) {
         emit("do-show-norms")
       }
@@ -73,7 +74,8 @@ function handlePagination(backwards: boolean) {
         v-for="(fieldOfLawNode, idx) in results.content"
         :key="idx"
         :field-of-law="fieldOfLawNode"
-        @node-clicked="emit('node-clicked', fieldOfLawNode)"
+        @linked-field:clicked="(identifier) => emit('node-clicked', identifier)"
+        @node-clicked="emit('node-clicked', fieldOfLawNode.identifier)"
       />
       <div
         v-if="results.numberOfElements < results.totalElements"
