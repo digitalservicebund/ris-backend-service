@@ -22,7 +22,7 @@ on:
 
 jobs:
   playwright-test:
-    uses: ./.github/workflows/playwright-test.yml
+    uses: ./.github/workflows/_playwright-test.yml
     with:
       browser: ${{ inputs.browser }}
       mode: ${{ inputs.mode }}

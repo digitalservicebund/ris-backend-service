@@ -9,6 +9,9 @@ on:
         required: false
         type: string
         default: e2e
+      subproject:
+        required: false
+        type: string
     secrets:
       STAGING_URL:
         required: true
@@ -45,7 +48,7 @@ jobs:
           E2E_TEST_BASIC_AUTH_PASSWORD: ${{ secrets.E2E_TEST_BASIC_AUTH_PASSWORD }}
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
-        run: npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
+        run: npm run test:${{ inputs.mode }}${{ inputs.subproject == null && '' || format(':{0}', inputs.subproject) }} -- --project ${{ inputs.browser }}
         working-directory: ./frontend
       - name: Upload screenshots of failed tests
         uses: actions/upload-artifact@v3
