@@ -13,12 +13,14 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -59,8 +61,8 @@ val hasValidMetadata =
             )
             Section.PRINT_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_GAZETTE, YEAR, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.DIGITAL_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_MEDIUM, DATE, NUMBER, YEAR, PAGE_NUMBER, AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA, ADDITIONAL_INFO, EXPLANATION), instance)
-            Section.EU_GOVERNMENT_GAZETTE -> hasType(listOf(ENTITY, YEAR, SERIES, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
-            Section.OTHER_OFFICIAL_REFERENCE -> hasType(listOf(ENTITY), instance)
+            Section.EU_ANNOUNCEMENT -> hasType(listOf(EU_GOVERNMENT_GAZETTE, YEAR, SERIES, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
+            Section.OTHER_OFFICIAL_ANNOUNCEMENT -> hasType(listOf(OTHER_OFFICIAL_REFERENCE), instance)
             Section.NORM_PROVIDER -> hasType(listOf(ENTITY, DECIDING_BODY, RESOLUTION_MAJORITY), instance)
         }
 

@@ -13,12 +13,14 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -54,7 +56,7 @@ val hasValidValueType =
                 SUBJECT_GESTA, SUBJECT_BGB_3, YEAR, RANGE_START, RANGE_END, ANNOUNCEMENT_GAZETTE,
                 NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION, ANNOUNCEMENT_MEDIUM,
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
-                SERIES, ENTITY, DECIDING_BODY,
+                SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
                 -> instance.value is String
 
                 RANGE_START_UNIT, RANGE_END_UNIT -> instance.value is RangeUnit

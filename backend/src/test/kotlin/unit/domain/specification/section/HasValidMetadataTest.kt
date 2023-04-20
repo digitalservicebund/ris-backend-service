@@ -224,10 +224,10 @@ class HasValidMetadataTest {
     @Test
     fun `can generate eu government gazette with right metadata`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.EU_GOVERNMENT_GAZETTE
+        every { instance.name } returns MetadataSectionName.EU_ANNOUNCEMENT
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("entity", MetadatumType.ENTITY),
+            Metadatum("entity", MetadatumType.EU_GOVERNMENT_GAZETTE),
             Metadatum("year", MetadatumType.YEAR),
             Metadatum("series", MetadatumType.SERIES),
             Metadatum("number", MetadatumType.NUMBER),
@@ -244,10 +244,10 @@ class HasValidMetadataTest {
     @Test
     fun `it throws an error on eu government gazette with right and wrong metadata`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.EU_GOVERNMENT_GAZETTE
+        every { instance.name } returns MetadataSectionName.EU_ANNOUNCEMENT
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("entity", MetadatumType.ENTITY),
+            Metadatum("eu government gazette", MetadatumType.EU_GOVERNMENT_GAZETTE),
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
         )
 
@@ -257,10 +257,10 @@ class HasValidMetadataTest {
     @Test
     fun `can generate other official references with right metadata`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_REFERENCE
+        every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("entity", MetadatumType.ENTITY),
+            Metadatum("other official reference", MetadatumType.OTHER_OFFICIAL_REFERENCE),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
@@ -269,7 +269,7 @@ class HasValidMetadataTest {
     @Test
     fun `it throws an error on other official references with right and wrong metadata`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_REFERENCE
+        every { instance.name } returns MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("entity", MetadatumType.ENTITY),
