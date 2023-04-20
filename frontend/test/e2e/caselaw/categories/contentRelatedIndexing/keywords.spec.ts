@@ -3,7 +3,7 @@ import { navigateToCategories } from "~/e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
-test.describe("Add and remove keywords to content related indexing", () => {
+test.describe("keywords", () => {
   test("rendering", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
@@ -47,14 +47,23 @@ test.describe("Add and remove keywords to content related indexing", () => {
 
     const keyword = generateString()
 
-    await page.locator("[aria-label='Schlagwörter']").fill(keyword)
+    const input = page.locator("[aria-label='Schlagwörter']")
+
+    // first
+    await input.fill(keyword)
+    await expect(input).toHaveValue(keyword)
     await page.keyboard.press("Enter")
+    await expect(input).toHaveValue("")
     await expect(page.getByText(keyword)).toBeVisible()
 
-    await page.locator("[aria-label='Schlagwörter']").fill(keyword)
+    // second
+    await input.fill(keyword)
+    await expect(input).toHaveValue(keyword)
     await page.keyboard.press("Enter")
+    await expect(input).toHaveValue("")
+    await expect(page.getByText(keyword)).toBeVisible()
 
-    await expect(page.getByText("Schlagwort bereits vergeben")).toBeVisible()
+    await expect(page.getByText(/Schlagwort bereits vergeben/)).toBeVisible()
   })
 
   test("delete keywords", async ({ page, documentNumber }) => {
