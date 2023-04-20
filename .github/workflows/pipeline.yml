@@ -31,7 +31,12 @@ jobs:
         with:
           gradle-version: 7.5
           arguments: build -x integrationTest -x test
-          build-root-directory: ./backend
+          build-root-directory: ./backend --profile
+      - name: Upload build performance report
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-report
+          path: backend/build/reports/profile/profile*.html
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
