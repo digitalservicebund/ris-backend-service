@@ -18,7 +18,7 @@ env:
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
 
 jobs:
-  build-backend:
+  backend-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,18 +27,11 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-          cache: gradle
-      - name: Grant execute permission for gradlew
-        working-directory: ./backend
-        run: chmod +x gradlew
-      - name: Build with Gradle
-        working-directory: ./backend
-        run: ./gradlew build --profile
-      - name: Upload build performance report
-        uses: actions/upload-artifact@v3
+      - uses: gradle/gradle-build-action@v2
         with:
-          name: performance-report
-          path: backend/build/reports/profile/profile*.html
+          gradle-version: 7.5
+          arguments: build -x integrationTest -x test
+          build-root-directory: ./backend
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -48,14 +41,74 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Build backend :point_right:"
+          job_name: "Backend build :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-backend-image:
+  backend-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17.0"
+          distribution: "temurin"
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.5
+          arguments: test -x integrationTest
+          build-root-directory: ./backend
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Backend unit tests :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  backend-integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17.0"
+          distribution: "temurin"
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: 7.5
+          arguments: integrationTest -x test
+          build-root-directory: ./backend
+      - name: Send status to Slack
+        # Third-party action, pin to commit SHA!
+        # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+        uses: lazy-actions/slatify@c4847b8c84e3e8076fd3c42cc00517a10426ed65
+        if: ${{ failure() && github.ref == 'refs/heads/main' && env.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          type: ${{ job.status }}
+          job_name: "Backend integration tests :point_right:"
+          mention: "here"
+          mention_if: "failure"
+          commit: true
+          url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  backend-build-image:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -82,55 +135,11 @@ jobs:
           path: /tmp/images
           key: docker-images-cache-${{ env.RUN_ID }}
           restore-keys: docker-images-cache-${{ env.RUN_ID }}
-
-  gradle-build-action-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+      - name: Save build-folder
+        uses: actions/upload-artifact@v3
         with:
-          java-version: "17.0"
-          distribution: "temurin"
-      - uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: release-candidate
-          arguments: build -x integrationTest -x test
-          build-root-directory: ./backend
-
-  backend-unit-tests:
-    runs-on: ubuntu-latest
-    needs:
-      - gradle-build-action-test
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-      - uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 7.5
-          arguments: test -x integrationTest
-          build-root-directory: ./backend
-
-  backend-integration-tests:
-    runs-on: ubuntu-latest
-    needs:
-      - gradle-build-action-test
-    steps:
-      - uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: "17.0"
-          distribution: "temurin"
-      - uses: gradle/gradle-build-action@v2
-        with:
-          gradle-version: 7.5
-          arguments: integrationTest -x test
-          build-root-directory: ./backend
+          name: compiled-backend
+          path: ./backend/build
 
   build-frontend:
     runs-on: ubuntu-latest
@@ -251,7 +260,9 @@ jobs:
     needs:
       - audit-licenses-backend
       - audit-licenses-frontend
-      - build-backend
+      - backend-build
+      - backend-unit-tests
+      - backend-integration-tests
     steps:
       - uses: actions/checkout@v3
       - name: Download licence reports
@@ -273,7 +284,7 @@ jobs:
   vulnerability-scan-backend:
     runs-on: ubuntu-latest
     needs:
-      - build-backend-image
+      - backend-build-image
     permissions:
       contents: read
       security-events: write
@@ -409,7 +420,7 @@ jobs:
   analyze-backend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build-backend, vulnerability-scan-backend]
+    needs: [backend-build-image, vulnerability-scan-backend]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -505,8 +516,10 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
-      - build-backend
-      - build-backend-image
+      - backend-build
+      - backend-unit-tests
+      - backend-integration-tests
+      - backend-build-image
       - audit-licenses-backend
       - vulnerability-scan-backend
     permissions:
