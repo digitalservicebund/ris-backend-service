@@ -70,9 +70,8 @@ export enum MetadatumType {
   EXPLANATION = "EXPLANATION",
   AREA_OF_PUBLICATION = "AREA_OF_PUBLICATION",
   NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA = "NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA",
-  EU_GOVERNMENT_GAZETTE = "EU_GOVERNMENT_GAZETTE",
+  ENTITY = "ENTITY",
   SERIES = "SERIES",
-  OTHER_OFFICIAL_REFERENCE = "OTHER_OFFICIAL_REFERENCE",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -122,9 +121,8 @@ export type MetadataValueType = {
   [MetadatumType.ANNOUNCEMENT_MEDIUM]: string
   [MetadatumType.AREA_OF_PUBLICATION]: string
   [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: string
-  [MetadatumType.EU_GOVERNMENT_GAZETTE]: string
+  [MetadatumType.ENTITY]: string
   [MetadatumType.SERIES]: string
-  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: string
 }
 
 export type Metadata = {
