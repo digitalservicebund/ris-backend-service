@@ -12,7 +12,7 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import de.bund.digitalservice.ris.shared.exceptions.GlobalExceptionHandler
+import de.bund.digitalservice.ris.shared.exceptions.NotFoundExceptionHandler
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -36,7 +36,7 @@ import utils.createRandomNorm
 import java.time.Duration
 
 @ExtendWith(SpringExtension::class)
-@Import(FlywayConfig::class, NormsService::class, EditNormFrameService::class, LoadNormService::class, GlobalExceptionHandler::class)
+@Import(FlywayConfig::class, NormsService::class, EditNormFrameService::class, LoadNormService::class, NotFoundExceptionHandler::class)
 @WebFluxTest(controllers = [LoadNormController::class, EditNormFrameController::class])
 @WithMockUser
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
