@@ -59,16 +59,25 @@ function handleLinkedFieldClicked(identifier: string) {
   clickedIdentifier.value = identifier
 }
 
-function selectedFieldsOfLawSummarizer(dataEntry: undefined) {
-  return h("div", renderDecision(dataEntry))
+function handleIdentifierClickInSummary(identifier: string) {
+  setTimeout(() => {
+    clickedIdentifier.value = identifier
+  }, 20)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function renderDecision(dataEntry: any): string {
-  return [
-    ...(dataEntry.identifier ? [dataEntry.identifier] : []),
-    ...(dataEntry.text ? [dataEntry.text] : []),
-  ].join(", ")
+function selectedFieldsOfLawSummarizer(dataEntry: any) {
+  return h("div", [
+    h(
+      "span",
+      {
+        class: "text-blue-800",
+        onClick: () => handleIdentifierClickInSummary(dataEntry.identifier),
+      },
+      dataEntry.identifier
+    ),
+    ", " + dataEntry.text,
+  ])
 }
 
 const SelectedFieldsOfLawSummary = withSummarizer(selectedFieldsOfLawSummarizer)
