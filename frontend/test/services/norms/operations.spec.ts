@@ -188,7 +188,7 @@ describe("normsService", () => {
           providerDecidingBody: null,
           providerEntity: "new provider entity",
           providerIsResolutionMajority: null,
-          publicationDate: "2022-11-15",
+          publicationDate: "2022-11-14",
           officialShortTitle: null,
           isExpirationDateTemp: null,
           risAbbreviation: null,

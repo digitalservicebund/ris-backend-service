@@ -77,7 +77,7 @@ class JurisConverterTest {
             val norm = converter.parseJurisXml(query).block()
             val fileCreatedAt = norm?.files?.first()?.createdAt?.hour
 
-            assertThat(fileCreatedAt).isEqualTo(LocalDateTime.now(ZoneId.of("Europe/Berlin")).hour)
+            assertThat(fileCreatedAt).isEqualTo(LocalDateTime.now(ZoneId.of("UTC")).hour)
         }
 
         @Test
