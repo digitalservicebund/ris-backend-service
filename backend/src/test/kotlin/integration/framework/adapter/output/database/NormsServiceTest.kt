@@ -22,9 +22,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.MetadatumDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
-import org.assertj.core.api.Assertions
-import org.hamcrest.CoreMatchers.`is`
-import org.hamcrest.MatcherAssert.assertThat
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -324,7 +322,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .assertNext {
-                Assertions.assertThat(it.metadataSections).isEqualTo(norm.metadataSections)
+                assertThat(it.metadataSections).isEqualTo(norm.metadataSections)
             }
             .verifyComplete()
     }
@@ -365,14 +363,14 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .assertNext {
-                assertThat(it.officialLongTitle == updatedNorm.officialLongTitle, `is`(true))
-                assertThat(it.documentNumber == updatedNorm.documentNumber, `is`(true))
-                assertThat(it.providerEntity == updatedNorm.providerEntity, `is`(true))
-                assertThat(it.entryIntoForceDate == updatedNorm.entryIntoForceDate, `is`(true))
-                assertThat(it.expirationDateState == updatedNorm.expirationDateState, `is`(true))
-                assertThat(it.printAnnouncementGazette == updatedNorm.printAnnouncementGazette, `is`(true))
-                assertThat(it.completeCitation == updatedNorm.completeCitation, `is`(true))
-                assertThat(it.celexNumber == updatedNorm.celexNumber, `is`(true))
+                assertThat(it.officialLongTitle).isEqualTo(updatedNorm.officialLongTitle)
+                assertThat(it.documentNumber).isEqualTo(updatedNorm.documentNumber)
+                assertThat(it.providerEntity).isEqualTo(updatedNorm.providerEntity)
+                assertThat(it.entryIntoForceDate).isEqualTo(updatedNorm.entryIntoForceDate)
+                assertThat(it.expirationDateState).isEqualTo(updatedNorm.expirationDateState)
+                assertThat(it.printAnnouncementGazette).isEqualTo(updatedNorm.printAnnouncementGazette)
+                assertThat(it.completeCitation).isEqualTo(updatedNorm.completeCitation)
+                assertThat(it.celexNumber).isEqualTo(updatedNorm.celexNumber)
             }
             .verifyComplete()
     }
@@ -441,9 +439,9 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .assertNext {
-                assertThat(it.files.size == 1, `is`(true))
-                assertThat(it.files[0].name == FILE1.name, `is`(true))
-                assertThat(it.files[0].hash == FILE1.hash, `is`(true))
+                assertThat(it.files).hasSize(1)
+                assertThat(it.files[0].name).isEqualTo(FILE1.name)
+                assertThat(it.files[0].hash).isEqualTo(FILE1.hash)
             }
             .verifyComplete()
     }
@@ -453,6 +451,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val metadatumDto = MetadatumDto(1, "2020-12-23", DATE, 1, 1)
         val result = normsService.metadatumToEntity(metadatumDto)
 
-        Assertions.assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))
+        assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))
     }
 }
