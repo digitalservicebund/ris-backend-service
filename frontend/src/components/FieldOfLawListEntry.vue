@@ -70,7 +70,7 @@ function handleTokenClick(tokenContent: string) {
 }
 
 .text-wrapper {
-  margin-left: 50px;
+  margin-left: 105px;
 }
 
 .link {
