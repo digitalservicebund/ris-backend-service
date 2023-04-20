@@ -71,6 +71,7 @@ function handleTokenClick(tokenContent: string) {
 
 .text-wrapper {
   margin-left: 105px;
+  color: black;
 }
 
 .link {
