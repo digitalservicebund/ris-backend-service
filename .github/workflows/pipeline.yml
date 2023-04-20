@@ -33,7 +33,12 @@ jobs:
         run: chmod +x gradlew
       - name: Build with Gradle
         working-directory: ./backend
-        run: ./gradlew build
+        run: ./gradlew build --profile
+      - name: Upload build performance report
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-report
+          path: backend/build/reports/profile/profile*.html
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -197,6 +202,7 @@ jobs:
     needs:
       - audit-licenses-backend
       - audit-licenses-frontend
+      - build-backend
     steps:
       - uses: actions/checkout@v3
       - name: Download licence reports
@@ -204,6 +210,12 @@ jobs:
         with:
           name: licence-reports
           path: _site
+      - name: Download build performance report
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-report
+          path: _site
+      - run: mv _site/profile*.html _site/profile-report.html
       - name: Upload GitHub licence page
         uses: actions/upload-pages-artifact@v1.0.7
         with:
