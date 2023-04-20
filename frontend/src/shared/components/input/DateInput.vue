@@ -57,11 +57,9 @@ watch(
           defaultMessage: "Kein valides Datum",
           field: props.id,
         })
-        emit("update:modelValue", undefined)
       }
     } else {
       emit("update:validationError", undefined)
-      emit("update:modelValue", inputValue.value)
     }
   },
   { immediate: true }
@@ -87,7 +85,12 @@ const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
 
-function clearInput() {
+function handleOnBlur() {
+  if (!hasError.value && inputValue.value)
+    emit("update:modelValue", dayjs(inputValue.value).toISOString())
+}
+
+function backspaceDelete() {
   emit("update:modelValue", undefined)
 }
 </script>
@@ -102,7 +105,8 @@ function clearInput() {
     max="9999-12-31"
     min="1000-01-01"
     type="date"
-    @keydown.delete="clearInput"
+    @blur="handleOnBlur"
+    @keydown.delete="backspaceDelete"
   />
 </template>
 
