@@ -24,7 +24,7 @@ export type SearchResults = {
       :key="searchResult.decision.uuid"
       class="mb-24 mt-12 table-row"
     >
-      <div class="link-01-bold table-cell">
+      <div class="table-cell">
         <InlineDecision :decision="searchResult.decision" />
       </div>
       <div class="p-8 table-cell">

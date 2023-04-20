@@ -22,7 +22,7 @@ const sortedDecisions = computed(() =>
     <li
       v-for="decision in sortedDecisions"
       :key="decision.uuid"
-      class="flex items-center justify-between link-01-bold mb-24 mt-12"
+      class="flex items-center justify-between mb-24 mt-12"
     >
       <InlineDecision :decision="decision" />
       <span

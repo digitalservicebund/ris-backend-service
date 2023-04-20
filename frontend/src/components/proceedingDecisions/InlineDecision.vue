@@ -7,17 +7,23 @@ defineProps<{
 </script>
 
 <template>
-  <router-link
-    v-if="ProceedingDecision.hasLink(decision)"
-    class="text-blue-800 underline"
-    target="_blank"
-    :to="{
-      name: 'caselaw-documentUnit-:documentNumber-categories',
-      params: { documentNumber: decision.documentNumber },
-    }"
+  <div
+    class="border-b-1 border-b-blue-500 first:pt-0 flex flex-start label-02-reg last:border-none last:pb-0 py-10 w-full"
   >
-    {{ ProceedingDecision.renderDecision(decision) }}
-  </router-link>
+    <router-link
+      v-if="ProceedingDecision.hasLink(decision)"
+      class="link-01-bold underline"
+      target="_blank"
+      :to="{
+        name: 'caselaw-documentUnit-:documentNumber-categories',
+        params: { documentNumber: decision.documentNumber },
+      }"
+    >
+      {{ ProceedingDecision.renderDecision(decision) }}
+    </router-link>
 
-  <span v-else>{{ ProceedingDecision.renderDecision(decision) }}</span>
+    <span v-else class="label-02-reg">{{
+      ProceedingDecision.renderDecision(decision)
+    }}</span>
+  </div>
 </template>
