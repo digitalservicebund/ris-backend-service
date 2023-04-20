@@ -173,6 +173,10 @@ jar {
 compileKotlin { kotlinOptions.jvmTarget = "17" }
 compileTestKotlin { kotlinOptions.jvmTarget = "17" }
 
+tasks.withType(Test).configureEach {
+  maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
+}
+
 test {
   useJUnitPlatform {
     excludeTags "integration"
