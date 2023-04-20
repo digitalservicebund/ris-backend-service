@@ -1,4 +1,4 @@
-name: Pipeline
+name: Parallel pipeline build of backend
 
 on:
   # Allow to run this workflow manually
