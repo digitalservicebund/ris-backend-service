@@ -83,6 +83,21 @@ jobs:
           key: docker-images-cache-${{ env.RUN_ID }}
           restore-keys: docker-images-cache-${{ env.RUN_ID }}
 
+  gradle-build-action-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: "17.0"
+          distribution: "temurin"
+      - uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: release-candidate
+          arguments: build
+          build-root-directory: ./backend
+
   build-frontend:
     runs-on: ubuntu-latest
     steps:
