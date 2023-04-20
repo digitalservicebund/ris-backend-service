@@ -139,7 +139,7 @@ jobs:
           key: docker-images-cache-${{ env.RUN_ID }}
           restore-keys: docker-images-cache-${{ env.RUN_ID }}
 
-  build-frontend:
+  frontend-build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -342,7 +342,7 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  vulnerability-scan-frontend:
+  frontend-build-image-and-scan:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -399,6 +399,15 @@ jobs:
           name: "vuln-frontend.json"
           path: "vuln-frontend.json"
           if-no-files-found: error
+      - name: Save image
+        run: |
+          mkdir /tmp/images
+          docker save -o /tmp/images/frontend-image.tar ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+      - uses: actions/cache@v3
+        with:
+          path: /tmp/images
+          key: docker-frontend-images-cache-${{ env.RUN_ID }}
+          restore-keys: docker-frontend-images-cache-${{ env.RUN_ID }}
       - name: Send status to Slack
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -471,7 +480,7 @@ jobs:
   analyze-frontend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [build-frontend, vulnerability-scan-frontend]
+    needs: [frontend-build, frontend-build-image-and-scan]
     steps:
       - uses: actions/checkout@v3
         with:
@@ -581,13 +590,13 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  build-and-push-frontend-image:
+  push-frontend-image-to-registry:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
-      - build-frontend
+      - frontend-build
+      - frontend-build-image-and-scan
       - audit-licenses-frontend
-      - vulnerability-scan-frontend
     permissions:
       contents: read
       id-token: write # This is used to complete the identity challenge with sigstore/fulcio..
@@ -595,7 +604,14 @@ jobs:
     outputs:
       version: ${{ steps.set-version.outputs.version }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: /tmp/images
+          key: docker-frontend-images-cache-${{ env.RUN_ID }}
+          restore-keys: docker-images-cache-${{ env.RUN_ID }}
+      - name: load image
+        shell: bash
+        run: docker load -i /tmp/images/frontend-image.tar
       - name: Log into container registry
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -604,13 +620,8 @@ jobs:
           registry: ${{ env.CONTAINER_REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and publish frontend container image
-        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-        with:
-          push: true
-          tags: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
-          context: ./frontend
-          file: ./frontend/Dockerfile.prod
+      - name: Publish backend container image
+        run: docker push ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
       - name: Install cosign
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
@@ -654,7 +665,7 @@ jobs:
     environment: staging
     needs:
       [
-        build-and-push-frontend-image,
+        push-frontend-image-to-registry,
         push-backend-image-to-registry,
         build-github-pages,
       ]
@@ -677,7 +688,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: staging
-          version: ${{ needs.build-and-push-frontend-image.outputs.version }}
+          version: ${{ needs.push-frontend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
@@ -762,7 +773,7 @@ jobs:
     concurrency: deploy-production
     environment: production
     needs:
-      - build-and-push-frontend-image
+      - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - build-github-pages
       - e2e-caselaw-chrome
@@ -789,7 +800,7 @@ jobs:
         uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
         with:
           environment: production
-          version: ${{ needs.build-and-push-frontend-image.outputs.version }}
+          version: ${{ needs.push-frontend-image-to-registry.outputs.version }}
           deploying_repo: ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
