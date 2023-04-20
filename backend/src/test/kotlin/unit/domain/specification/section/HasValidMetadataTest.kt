@@ -227,7 +227,7 @@ class HasValidMetadataTest {
         every { instance.name } returns MetadataSectionName.EU_ANNOUNCEMENT
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
-            Metadatum("entity", MetadatumType.EU_GOVERNMENT_GAZETTE),
+            Metadatum("eu government gazette", MetadatumType.EU_GOVERNMENT_GAZETTE),
             Metadatum("year", MetadatumType.YEAR),
             Metadatum("series", MetadatumType.SERIES),
             Metadatum("number", MetadatumType.NUMBER),

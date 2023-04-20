@@ -59,6 +59,7 @@ val hasValidMetadata =
                 listOf(listOf(RANGE_START, RANGE_START_UNIT), listOf(RANGE_END, RANGE_END_UNIT)),
                 instance,
             )
+            Section.OFFICIAL_REFERENCE -> hasNone(instance)
             Section.PRINT_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_GAZETTE, YEAR, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.DIGITAL_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_MEDIUM, DATE, NUMBER, YEAR, PAGE_NUMBER, AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.EU_ANNOUNCEMENT -> hasType(listOf(EU_GOVERNMENT_GAZETTE, YEAR, SERIES, NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION), instance)
@@ -66,6 +67,8 @@ val hasValidMetadata =
             Section.NORM_PROVIDER -> hasType(listOf(ENTITY, DECIDING_BODY, RESOLUTION_MAJORITY), instance)
         }
 
+        private fun hasNone(instance: MetadataSection): Boolean =
+            instance.metadata.isEmpty()
         private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.all { types.contains(it.type) }
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =

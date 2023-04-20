@@ -319,6 +319,7 @@ components:
         - PARTICIPATION
         - CITATION_DATE
         - AGE_INDICATION
+        - OFFICIAL_REFERENCE
         - PRINT_ANNOUNCEMENT
         - DIGITAL_ANNOUNCEMENT
         - EU_ANNOUNCEMENT
