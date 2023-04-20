@@ -38,12 +38,13 @@ function createComputedProperty(key: string) {
   })
 }
 
-const euYear = createComputedProperty("YEAR")
-const euSeries = createComputedProperty("SERIES")
-const euNumber = createComputedProperty("NUMBER")
-const euPage = createComputedProperty("PAGE_NUMBER")
-const euInfo = createComputedProperty("ADDITIONAL_INFO")
-const euExplanations = createComputedProperty("EXPLANATION")
+const entity = createComputedProperty("ENTITY")
+const year = createComputedProperty("YEAR")
+const series = createComputedProperty("SERIES")
+const number = createComputedProperty("NUMBER")
+const pageNumber = createComputedProperty("PAGE_NUMBER")
+const additionalInfo = createComputedProperty("ADDITIONAL_INFO")
+const explanation = createComputedProperty("EXPLANATION")
 </script>
 <template>
   <div class="w-full">
@@ -54,6 +55,7 @@ const euExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="euAnnouncementGazette"
+        v-model="entity"
         alt-text="Amtsblatt der EU"
         aria-label="Amtsblatt der EU"
       />
@@ -68,7 +70,7 @@ const euExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="euAnnouncementYear"
-        v-model="euYear"
+        v-model="year"
         alt-text="Jahresangabe"
         aria-label="Jahresangabe"
       />
@@ -81,7 +83,7 @@ const euExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="euAnnouncementSeries"
-        v-model="euSeries"
+        v-model="series"
         alt-text="Reihe"
         aria-label="Reihe"
       />
@@ -94,7 +96,7 @@ const euExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="euAnnouncementNumber"
-        v-model="euNumber"
+        v-model="number"
         alt-text="Nummer des Amtsblatts"
         aria-label="Nummer des Amtsblatts"
       />
@@ -107,7 +109,7 @@ const euExplanations = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="euAnnouncementPage"
-        v-model="euPage"
+        v-model="pageNumber"
         alt-text="Seitenzahl"
         aria-label="Seitenzahl"
       />
@@ -120,7 +122,7 @@ const euExplanations = createComputedProperty("EXPLANATION")
   >
     <textarea
       id="euAnnouncementInfo"
-      v-model="euInfo"
+      v-model="additionalInfo"
       aria-label="Zusatzangaben"
       class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
       rows="4"
@@ -133,7 +135,7 @@ const euExplanations = createComputedProperty("EXPLANATION")
   >
     <textarea
       id="euAnnouncementExplanations"
-      v-model="euExplanations"
+      v-model="explanation"
       aria-label="Erläuterungen"
       class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
       rows="4"

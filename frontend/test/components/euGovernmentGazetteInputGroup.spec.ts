@@ -1,23 +1,24 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import PrintAnnouncementInputGroup from "@/components/PrintAnnouncementInputGroup.vue"
+import EuGovernmentGazetteInputGroup from "@/components/EuGovernmentGazetteInputGroup.vue"
 import { Metadata, MetadatumType } from "@/domain/Norm"
 
 function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {
     modelValue: options?.modelValue ?? {},
   }
-  const utils = render(PrintAnnouncementInputGroup, { props })
+  const utils = render(EuGovernmentGazetteInputGroup, { props })
   const user = userEvent.setup()
   return { user, ...utils }
 }
 
-describe("PrintAnnouncementInputGroup", () => {
-  it("renders all print announcement inputs", () => {
+describe("EuGovernmentGazetteInputGroup", () => {
+  it("renders all inputs", () => {
     renderComponent({
       modelValue: {
-        [MetadatumType.ANNOUNCEMENT_GAZETTE]: ["test value"],
+        [MetadatumType.ENTITY]: ["test value"],
         [MetadatumType.YEAR]: ["test value"],
+        [MetadatumType.SERIES]: ["test value"],
         [MetadatumType.NUMBER]: ["test value"],
         [MetadatumType.PAGE_NUMBER]: ["test value"],
         [MetadatumType.ADDITIONAL_INFO]: ["test value"],
@@ -25,16 +26,20 @@ describe("PrintAnnouncementInputGroup", () => {
       },
     })
 
-    const announcementGazetteInput = screen.queryByRole("textbox", {
-      name: "Verkündungsblatt",
+    const entityInput = screen.queryByRole("textbox", {
+      name: "Amtsblatt der EU",
     }) as HTMLInputElement
 
     const yearInput = screen.queryByRole("textbox", {
-      name: "Jahr",
+      name: "Jahresangabe",
+    }) as HTMLInputElement
+
+    const seriesInput = screen.queryByRole("textbox", {
+      name: "Reihe",
     }) as HTMLInputElement
 
     const numberInput = screen.queryByRole("textbox", {
-      name: "Nummer",
+      name: "Nummer des Amtsblatts",
     }) as HTMLInputElement
 
     const pageNumberInput = screen.queryByRole("textbox", {
@@ -49,11 +54,14 @@ describe("PrintAnnouncementInputGroup", () => {
       name: "Erläuterungen",
     }) as HTMLInputElement
 
-    expect(announcementGazetteInput).toBeInTheDocument()
-    expect(announcementGazetteInput).toHaveValue("test value")
+    expect(entityInput).toBeInTheDocument()
+    expect(entityInput).toHaveValue("test value")
 
     expect(yearInput).toBeInTheDocument()
     expect(yearInput).toHaveValue("test value")
+
+    expect(seriesInput).toBeInTheDocument()
+    expect(seriesInput).toHaveValue("test value")
 
     expect(numberInput).toBeInTheDocument()
     expect(numberInput).toHaveValue("test value")
@@ -71,24 +79,27 @@ describe("PrintAnnouncementInputGroup", () => {
   it("shows the correct model value entry in the associated input", () => {
     renderComponent({
       modelValue: {
-        [MetadatumType.ANNOUNCEMENT_GAZETTE]: ["abc"],
-        [MetadatumType.YEAR]: ["2012"],
-        [MetadatumType.NUMBER]: ["123"],
+        [MetadatumType.ENTITY]: ["abc"],
+        [MetadatumType.YEAR]: ["01-01-2023"],
+        [MetadatumType.SERIES]: ["foo"],
+        [MetadatumType.NUMBER]: ["1"],
         [MetadatumType.PAGE_NUMBER]: ["2"],
-        [MetadatumType.ADDITIONAL_INFO]: ["Info Text"],
-        [MetadatumType.EXPLANATION]: ["Explanation text"],
+        [MetadatumType.ADDITIONAL_INFO]: ["test info"],
+        [MetadatumType.EXPLANATION]: ["test explanation"],
       },
     })
 
-    const announcementGazetteInput = screen.queryByDisplayValue("abc")
-    const yearInput = screen.queryByDisplayValue("2012")
-    const numberInput = screen.queryByDisplayValue("123")
+    const entityInput = screen.queryByDisplayValue("abc")
+    const yearInput = screen.queryByDisplayValue("01-01-2023")
+    const seriesInput = screen.queryByDisplayValue("foo")
+    const numberInput = screen.queryByDisplayValue("1")
     const pageNumberInput = screen.queryByDisplayValue("2")
-    const additionalInfoInput = screen.queryByDisplayValue("Info Text")
-    const explanationInput = screen.queryByDisplayValue("Explanation text")
+    const additionalInfoInput = screen.queryByDisplayValue("test info")
+    const explanationInput = screen.queryByDisplayValue("test explanation")
 
-    expect(announcementGazetteInput).toBeInTheDocument()
+    expect(entityInput).toBeInTheDocument()
     expect(yearInput).toBeInTheDocument()
+    expect(seriesInput).toBeInTheDocument()
     expect(numberInput).toBeInTheDocument()
     expect(pageNumberInput).toBeInTheDocument()
     expect(additionalInfoInput).toBeInTheDocument()
@@ -102,17 +113,19 @@ describe("PrintAnnouncementInputGroup", () => {
 
     const input = screen.getAllByRole("textbox")
     await user.type(input[0], "foo")
-    await user.type(input[1], "bar")
-    await user.type(input[2], "ban")
-    await user.type(input[3], "baz")
-    await user.type(input[4], "foo bar")
-    await user.type(input[5], "bar foo")
+    await user.type(input[1], "2023")
+    await user.type(input[2], "0")
+    await user.type(input[3], "1")
+    await user.type(input[4], "2")
+    await user.type(input[5], "foo bar")
+    await user.type(input[6], "bar foo")
 
     expect(modelValue).toEqual({
-      [MetadatumType.ANNOUNCEMENT_GAZETTE]: ["foo"],
-      [MetadatumType.YEAR]: ["bar"],
-      [MetadatumType.NUMBER]: ["ban"],
-      [MetadatumType.PAGE_NUMBER]: ["baz"],
+      [MetadatumType.ENTITY]: ["foo"],
+      [MetadatumType.YEAR]: ["2023"],
+      [MetadatumType.SERIES]: ["0"],
+      [MetadatumType.NUMBER]: ["1"],
+      [MetadatumType.PAGE_NUMBER]: ["2"],
       [MetadatumType.ADDITIONAL_INFO]: ["foo bar"],
       [MetadatumType.EXPLANATION]: ["bar foo"],
     })
