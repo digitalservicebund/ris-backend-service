@@ -67,6 +67,7 @@ function handleTokenClick(tokenContent: string) {
 .identifier {
   width: 50px;
   margin-right: 10px;
+  white-space: nowrap;
 }
 
 .text-wrapper {
