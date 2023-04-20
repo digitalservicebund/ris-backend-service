@@ -138,11 +138,6 @@ jobs:
           path: /tmp/images
           key: docker-images-cache-${{ env.RUN_ID }}
           restore-keys: docker-images-cache-${{ env.RUN_ID }}
-      - name: Save build-folder
-        uses: actions/upload-artifact@v3
-        with:
-          name: compiled-backend
-          path: ./backend/build
 
   build-frontend:
     runs-on: ubuntu-latest
