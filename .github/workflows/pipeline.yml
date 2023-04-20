@@ -30,8 +30,8 @@ jobs:
       - uses: gradle/gradle-build-action@v2
         with:
           gradle-version: 7.5
-          arguments: build -x integrationTest -x test
-          build-root-directory: ./backend --profile
+          arguments: build --profile -x integrationTest -x test
+          build-root-directory: ./backend
       - name: Upload build performance report
         uses: actions/upload-artifact@v3
         with:
