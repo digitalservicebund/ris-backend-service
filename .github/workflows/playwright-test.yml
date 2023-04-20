@@ -19,6 +19,11 @@ jobs:
   playwright-test:
     runs-on: ubuntu-latest
     steps:
+      - name: Cache browser binaries
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ inputs.browser }}
       - uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
