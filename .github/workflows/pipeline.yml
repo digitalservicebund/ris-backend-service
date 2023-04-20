@@ -647,31 +647,41 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
-  deploy-staging-verify-e2e-chrome:
+  e2e-chrome:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [deploy-staging]
-    uses: ./.github/workflows/playwright-test.yml
+    uses: ./.github/workflows/_playwright-test.yml
     with:
       browser: chromium
       mode: e2e
     secrets: inherit
 
-  deploy-staging-verify-e2e-firefox:
+  e2e-firefox:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [deploy-staging]
-    uses: ./.github/workflows/playwright-test.yml
+    uses: ./.github/workflows/_playwright-test.yml
     with:
       browser: firefox
       mode: e2e
     secrets: inherit
 
-  deploy-staging-verify-a11y-chrome:
+  a11y-chrome:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [deploy-staging]
-    uses: ./.github/workflows/playwright-test.yml
+    uses: ./.github/workflows/_playwright-test.yml
     with:
       browser: chromium
       mode: a11y
+    secrets: inherit
+
+  e2e-norms-chrome:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [deploy-staging]
+    uses: ./.github/workflows/_playwright-test.yml
+    with:
+      browser: chromium
+      mode: e2e
+      subproject: norms
     secrets: inherit
 
   deploy-production:
@@ -683,9 +693,10 @@ jobs:
       - build-and-push-frontend-image
       - push-backend-image-to-registry
       - build-github-pages
-      - deploy-staging-verify-e2e-chrome
-      - deploy-staging-verify-e2e-firefox
-      - deploy-staging-verify-a11y-chrome
+      - e2e-chrome
+      - e2e-firefox
+      - a11y-chrome
+      - e2e-norms-chrome
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
