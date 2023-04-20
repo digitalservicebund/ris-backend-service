@@ -411,7 +411,12 @@ jobs:
   analyze-backend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [backend-build-image-and-scan]
+    # needs:
+    #   - backend-build
+    #   - backend-unit-tests
+    #   - backend-integration-tests
+    #   - backend-build-image-and-scan
+    #   - audit-licenses-backend
     steps:
       - uses: actions/checkout@v3
         with:
@@ -464,7 +469,9 @@ jobs:
   analyze-frontend:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [frontend-build, frontend-build-image-and-scan]
+    # needs:
+    #   - frontend-build
+    #   - frontend-build-image-and-scan
     steps:
       - uses: actions/checkout@v3
         with:
@@ -647,11 +654,8 @@ jobs:
     concurrency: deploy-staging
     environment: staging
     needs:
-      [
-        push-frontend-image-to-registry,
-        push-backend-image-to-registry,
-        build-github-pages,
-      ]
+      - push-frontend-image-to-registry
+      - push-backend-image-to-registry
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
