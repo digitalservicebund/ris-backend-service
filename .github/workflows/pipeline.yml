@@ -730,6 +730,12 @@ jobs:
   build-github-pages:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - e2e-caselaw-chrome
+      - e2e-caselaw-firefox
+      - e2e-norms-chrome
+      - e2e-norms-firefox
+      - a11y-chrome
     permissions:
       pages: write
       id-token: write
