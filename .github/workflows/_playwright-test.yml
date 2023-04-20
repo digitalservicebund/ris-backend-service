@@ -50,9 +50,9 @@ jobs:
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: |
           if [[ -z "${{ inputs.subproject }}" ]]; then
-            echo npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
+            npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
           else
-            echo npm run test:${{ inputs.mode }}:${{ inputs.subproject }} -- --project ${{ inputs.browser }}
+            npm run test:${{ inputs.mode }}:${{ inputs.subproject }} -- --project ${{ inputs.browser }}
           fi
         working-directory: ./frontend
       - name: Upload screenshots of failed tests
