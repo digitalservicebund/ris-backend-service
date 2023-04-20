@@ -750,6 +750,23 @@ jobs:
         with:
           path: _site
 
+  deploy-github-pages:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: build-github-pages
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2.0.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -758,7 +775,6 @@ jobs:
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
-      - build-github-pages
       - e2e-caselaw-chrome
       - e2e-caselaw-firefox
       - e2e-norms-chrome
@@ -812,20 +828,3 @@ jobs:
           commit: true
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
-
-  deploy-github-pages:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: deploy-production
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2.0.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
