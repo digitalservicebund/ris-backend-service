@@ -727,44 +727,6 @@ jobs:
       mode: a11y
     secrets: inherit
 
-  build-github-pages:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs:
-      - e2e-caselaw-chrome
-      - e2e-caselaw-firefox
-      - e2e-norms-chrome
-      - e2e-norms-firefox
-      - a11y-chrome
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Download licence reports
-        uses: actions/download-artifact@v3
-        with:
-          name: licence-reports
-          path: _site
-      - name: Download build performance report
-        uses: actions/download-artifact@v3
-        with:
-          name: performance-report
-          path: _site
-      - run: mv _site/profile*.html _site/profile-report.html
-      - name: Upload GitHub licence page
-        uses: actions/upload-pages-artifact@v1.0.7
-        with:
-          path: _site
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v2.0.0
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -826,3 +788,41 @@ jobs:
           commit: true
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  build-github-pages:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs:
+      - e2e-caselaw-chrome
+      - e2e-caselaw-firefox
+      - e2e-norms-chrome
+      - e2e-norms-firefox
+      - a11y-chrome
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Download licence reports
+        uses: actions/download-artifact@v3
+        with:
+          name: licence-reports
+          path: _site
+      - name: Download build performance report
+        uses: actions/download-artifact@v3
+        with:
+          name: performance-report
+          path: _site
+      - run: mv _site/profile*.html _site/profile-report.html
+      - name: Upload GitHub licence page
+        uses: actions/upload-pages-artifact@v1.0.7
+        with:
+          path: _site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2.0.0
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
