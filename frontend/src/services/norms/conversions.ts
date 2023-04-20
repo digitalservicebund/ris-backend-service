@@ -119,9 +119,8 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
   [MetadatumType.AREA_OF_PUBLICATION]: identity,
   [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
-  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
+  [MetadatumType.ENTITY]: identity,
   [MetadatumType.SERIES]: identity,
-  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -167,9 +166,8 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.EXPLANATION]: identity,
   [MetadatumType.AREA_OF_PUBLICATION]: identity,
   [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
-  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
+  [MetadatumType.ENTITY]: identity,
   [MetadatumType.SERIES]: identity,
-  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
 }
 
 /**
