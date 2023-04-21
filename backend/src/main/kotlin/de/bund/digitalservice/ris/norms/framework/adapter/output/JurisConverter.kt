@@ -12,12 +12,14 @@ import de.bund.digitalservice.ris.norms.domain.entity.getHashFromContent
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
@@ -34,6 +36,7 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import java.nio.ByteBuffer
@@ -78,9 +81,7 @@ fun mapDomainToData(norm: Norm): NormData {
         officialShortTitle = norm.officialShortTitle,
         providerEntity = norm.providerEntity,
         providerDecidingBody = norm.providerDecidingBody,
-        printAnnouncementGazette = norm.printAnnouncementGazette,
-        printAnnouncementYear = norm.printAnnouncementYear,
-        printAnnouncementNumber = norm.printAnnouncementNumber,
+        printAnnouncementList = extractPrintAnnouncementList(norm),
         risAbbreviation = norm.risAbbreviation,
     )
 }
@@ -97,12 +98,15 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val definition = createMetadataForType(data.definitionList, DEFINITION)
     val ageOfMajorityIndication = createMetadataForType(data.ageOfMajorityIndicationList, AGE_OF_MAJORITY_INDICATION)
     val validityRule = createMetadataForType(data.validityRuleList, VALIDITY_RULE)
-    val participationType = createMetadataForType(data.participationTypeList, PARTICIPATION_TYPE)
-    val participationInstitution = createMetadataForType(data.participationInstitutionList, PARTICIPATION_INSTITUTION)
-    val leadJurisdiction = createMetadataForType(data.leadJurisdictionList, LEAD_JURISDICTION)
-    val leadUnit = createMetadataForType(data.leadUnitList, LEAD_UNIT)
-    val subjectFna = createMetadataForType(data.subjectFnaList, SUBJECT_FNA)
-    val subjectGesta = createMetadataForType(data.subjectGestaList, SUBJECT_GESTA)
+    val participationType = createMetadataForType(data.participationList.map { it.type }, PARTICIPATION_TYPE)
+    val participationInstitution = createMetadataForType(data.participationList.map { it.institution }, PARTICIPATION_INSTITUTION)
+    val leadJurisdiction = createMetadataForType(data.leadList.map { it.jurisdiction }, LEAD_JURISDICTION)
+    val leadUnit = createMetadataForType(data.leadList.map { it.unit }, LEAD_UNIT)
+    val subjectFna = createMetadataForType(data.subjectAreaList.map { it.fna }, SUBJECT_FNA)
+    val subjectGesta = createMetadataForType(data.subjectAreaList.map { it.gesta }, SUBJECT_GESTA)
+    val printAnnouncementGazette = createMetadataForType(data.printAnnouncementList.map { it.gazette }, ANNOUNCEMENT_GAZETTE)
+    val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.map { it.page }, PAGE_NUMBER)
+    val printAnnouncementYear = createMetadataForType(data.printAnnouncementList.map { it.year }, YEAR)
 
     val citationDateSections = data.citationDateList.mapIndexed { index, value ->
         if (value.length == 4 && value.toIntOrNull() != null) {
@@ -119,6 +123,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     ) + createSectionsFromMetadata(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
+        createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
         citationDateSections
 
     return Norm(
@@ -150,9 +155,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         divergentExpirationDateState = parseDateStateString(data.divergentExpirationDateState),
         expirationNormCategory = data.expirationNormCategory,
         announcementDate = parseDateString(data.announcementDate),
-        printAnnouncementGazette = data.printAnnouncementGazette,
-        printAnnouncementYear = data.printAnnouncementYear,
-        printAnnouncementPage = data.printAnnouncementPage,
         statusNote = data.statusNote,
         statusDescription = data.statusDescription,
         statusDate = parseDateString(data.statusDate),
@@ -243,3 +245,14 @@ private fun extractFirstStringValue(norm: Norm, sectionName: MetadataSectionName
         .filter { it.type == metadatumType }
         .minByOrNull { it.order }?.value.toString()
 }
+
+private fun extractPrintAnnouncementList(norm: Norm): List<PrintAnnouncement> = norm
+    .metadataSections
+    .filter { it.name == MetadataSectionName.PRINT_ANNOUNCEMENT }
+    .map { section ->
+        PrintAnnouncement(
+            section.metadata.find { it.type == YEAR }?.value.toString(),
+            section.metadata.find { it.type == PAGE_NUMBER }?.value.toString(),
+            section.metadata.find { it.type == ANNOUNCEMENT_GAZETTE }?.value.toString(),
+        )
+    }
