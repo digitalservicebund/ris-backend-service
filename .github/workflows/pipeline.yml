@@ -638,7 +638,7 @@ jobs:
         with:
           environment: staging
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
-          image_repos: ris-backend-service,ris-backend-service/frontend
+          deploying_repos: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-staging
