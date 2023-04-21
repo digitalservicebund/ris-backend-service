@@ -308,6 +308,9 @@ components:
         - OTHER_OFFICIAL_REFERENCE
         - DECIDING_BODY
         - RESOLUTION_MAJORITY
+        - TYPE_NAME
+        - NORM_CATEGORY
+        - TEMPLATE_NAME
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -325,6 +328,7 @@ components:
         - EU_ANNOUNCEMENT
         - OTHER_OFFICIAL_ANNOUNCEMENT
         - NORM_PROVIDER
+        - DOCUMENT_TYPE
 
     MetadataSection:
       type: object
@@ -551,15 +555,6 @@ components:
           example: ''
         publicationDate:
           $ref: '#/components/schemas/Date'
-        documentTypeName:
-          type: string
-          example: RV
-        documentNormCategory:
-          type: string
-          example: XX
-        documentTemplateName:
-          type: string
-          example: Template
         documentStatusReference:
           type: string
           example: ''

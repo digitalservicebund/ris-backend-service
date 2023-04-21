@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CITATION_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIGITAL_ANNOUNCEMENT
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DOCUMENT_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.EU_ANNOUNCEMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.LEAD
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.NORM
@@ -21,7 +22,7 @@ val hasValidChildren =
         override fun isSatisfiedBy(instance: MetadataSection): Boolean = when (instance.name) {
             NORM, NORM_PROVIDER, SUBJECT_AREA, LEAD, PARTICIPATION,
             CITATION_DATE, AGE_INDICATION, PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT,
-            EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT,
+            EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT, DOCUMENT_TYPE,
             -> hasNone(instance)
 
             OFFICIAL_REFERENCE -> hasType(listOf(PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT, EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT), instance)

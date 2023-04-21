@@ -13,4 +13,5 @@ enum class MetadataSectionName {
     EU_ANNOUNCEMENT,
     OTHER_OFFICIAL_ANNOUNCEMENT,
     NORM_PROVIDER,
+    DOCUMENT_TYPE,
 }

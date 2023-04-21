@@ -136,6 +136,7 @@ classDiagram
      EU_ANNOUNCEMENT
      OTHER_OFFICIAL_ANNOUNCEMENT
      NORM_PROVIDER
+     DOCUMENT_TYPE
   }
 
   class MetadatumType  {
@@ -179,6 +180,9 @@ classDiagram
     OTHER_OFFICIAL_REFERENCE,
     DECIDING_BODY,
     RESOLUTION_MAJORITY,
+    TYPE_NAME,
+    NORM_CATEGORY,
+    TEMPLATE_NAME,
   }
 
   class FileReference {

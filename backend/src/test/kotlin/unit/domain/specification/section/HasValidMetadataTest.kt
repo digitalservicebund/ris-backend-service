@@ -304,4 +304,31 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `can generate document type with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_TYPE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("type name", MetadatumType.TYPE_NAME),
+            Metadatum("norm category", MetadatumType.NORM_CATEGORY),
+            Metadatum("template name", MetadatumType.TEMPLATE_NAME),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on document type with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DOCUMENT_TYPE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("type name", MetadatumType.TYPE_NAME),
+            Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
 }
