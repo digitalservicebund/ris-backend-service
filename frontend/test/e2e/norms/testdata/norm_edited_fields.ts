@@ -82,7 +82,7 @@ export const newNorm: NormData = {
         PARTICIPATION_INSTITUTION: ["Neues mitwirkendes Organ 2"],
       },
     ],
-    CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2023-03-02"] }],
+    CITATION_DATE: [{ DATE: ["2022-03-02"] }, { YEAR: ["1990"] }],
     AGE_INDICATION: [
       {
         RANGE_START: ["1 Jahr"],

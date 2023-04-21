@@ -468,14 +468,37 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       heading: "Zitierdatum",
       id: "citationDates",
       isRepeatedSection: true,
-      // TODO: Add logic to also insert years.
       fields: [
+        {
+          type: FieldType.RADIO,
+          id: "citationTypeDate",
+          label: "Datum",
+          values: norm.metadataSections?.CITATION_DATE?.map(
+            (section) => !!section?.DATE
+          ),
+        },
         {
           type: FieldType.TEXT,
           id: "citationDate",
-          label: "Zitierdatum",
+          label: "Jahresangabe",
           values: norm.metadataSections?.CITATION_DATE?.map(
             (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "citationTypeYear",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.CITATION_DATE?.map(
+            (section) => !!section?.YEAR
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "citationYear",
+          label: "Zitierdatum",
+          values: norm.metadataSections?.CITATION_DATE?.map(
+            (section) => section?.YEAR?.[0]
           ),
         },
       ],
