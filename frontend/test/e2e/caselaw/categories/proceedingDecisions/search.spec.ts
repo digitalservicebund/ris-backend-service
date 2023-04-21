@@ -5,8 +5,19 @@ import {
   toggleProceedingDecisionsSection,
 } from "~/e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("Search proceeding decisions", () => {
+  test("renders default", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+    await toggleProceedingDecisionsSection(page)
+
+    await expect(
+      page.getByText("Noch keine Suchparameter eingegeben")
+    ).toBeVisible()
+  })
+
   test("search for existing proceeding decision and add", async ({
     page,
     documentNumber,
@@ -38,5 +49,23 @@ test.describe("Search proceeding decisions", () => {
 
     await page.getByText("delete_outline").click()
     await expect(page.getByText("Bereits hinzugefügt")).toBeHidden()
+  })
+
+  test("search with no results", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+    await expect(page.getByText(documentNumber)).toBeVisible()
+    await toggleProceedingDecisionsSection(page)
+
+    await fillProceedingDecisionInputs(page, {
+      fileNumber: generateString(),
+    })
+
+    await page
+      .getByRole("button", { name: "Nach Entscheidungen suchen" })
+      .click()
+
+    await expect(
+      page.getByText("Suche hat keine Treffer ergeben")
+    ).toBeVisible()
   })
 })

@@ -183,7 +183,7 @@ watch(
         />
       </div>
 
-      <div v-if="searchResults" class="mb-10 mt-20">
+      <div class="mb-10 mt-20">
         <SearchResultList
           :search-results="searchResults"
           @link-decision="linkProceedingDecision"
