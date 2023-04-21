@@ -4,9 +4,8 @@ RIS system context C4 model
 C4Context
     title Systemkontext des Rechtsinformationssystems
 
-    Person(person_norms_documentary, "Norm Documentary")
     Person(person_caselaw_documentary, "Case-Law Documentary")
-
+    Person(person_norms_documentary, "Norm Documentary")
 
 
     Boundary(boundary_data_consumer, "Data Consumer") {
@@ -23,12 +22,14 @@ C4Context
 
 
     Rel(person_norms_documentary, system_ris_service, "documents norms")
+    Rel(person_norms_documentary, system_jdv, "uploads norms")
     Rel(person_caselaw_documentary, system_ris_service, "documents verdicts")
     Rel(system_ris_service, system_jdv, "push verdicts")
     Rel(system_e_gesetzgebung, system_ris_service, "search norms")
 
-    UpdateRelStyle(person_norms_documentary, system_ris_service, $offsetY="-60", $offsetX="-230")
-    UpdateRelStyle(person_caselaw_documentary, system_ris_service, $offsetY="-60", $offsetX="-20")
+    UpdateRelStyle(person_caselaw_documentary, system_ris_service, $offsetY="-60", $offsetX="-250")
+    UpdateRelStyle(person_norms_documentary, system_ris_service, $offsetY="-60", $offsetX="-140")
+    UpdateRelStyle(person_norms_documentary, system_jdv, $offsetY="-60", $offsetX="-100")
     UpdateRelStyle(system_ris_service, system_jdv, $offsetY="-20", $offsetX="-50")
     UpdateRelStyle(system_e_gesetzgebung, system_ris_service, $offsetY="-20", $offsetX="-50")
 
