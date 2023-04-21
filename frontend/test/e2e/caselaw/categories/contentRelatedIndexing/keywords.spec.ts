@@ -80,11 +80,10 @@ test.describe("keywords", () => {
     await page.keyboard.press("Enter")
     await expect(page.getByText(secondKeyword)).toBeVisible()
 
-    await page.keyboard.press("Tab")
-    await expect(await page.locator("*:focus").textContent()).toMatch(
-      firstKeyword
-    )
-    await page.keyboard.press("Enter")
+    await page
+      .locator("[aria-label='chip']", { hasText: firstKeyword })
+      .getByLabel("Löschen")
+      .click()
 
     await expect(await page.getByText(secondKeyword)).toBeVisible()
     await expect(await page.getByText(firstKeyword)).toBeHidden()
