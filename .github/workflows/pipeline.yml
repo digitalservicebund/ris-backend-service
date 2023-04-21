@@ -733,23 +733,12 @@ jobs:
       id-token: write # Enable OIDC for gitsign
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
-      - name: Deploy new backend image
-        uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
+      - name: Deploy new images
+        uses: digitalservicebund/github-actions/argocd-deploy@7479179f541d984bc99eb8529cf7f3fc4ce3087d
         with:
           environment: production
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
-          deploying_repo: ris-backend-service
-          infra_repo: neuris-infra
-          deploy_key: ${{ secrets.DEPLOY_KEY }}
-          app: ris-production
-          argocd_pipeline_password: ${{ secrets.ARGOCD_PIPELINE_PASSWORD }}
-          argocd_server: ${{ secrets.ARGOCD_SERVER }}
-      - name: Deploy new frontend image
-        uses: digitalservicebund/github-actions/argocd-deploy@ccfe8dfdcadb4bd87d074b4e3c946453dfc98360
-        with:
-          environment: production
-          version: ${{ needs.push-frontend-image-to-registry.outputs.version }}
-          deploying_repo: ris-backend-service/frontend
+          deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-production
