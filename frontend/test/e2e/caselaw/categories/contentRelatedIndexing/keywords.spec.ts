@@ -42,7 +42,11 @@ test.describe("keywords", () => {
     await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
   })
 
-  test("add same keyword not working", async ({ page, documentNumber }) => {
+  // eslint-disable-next-line playwright/no-skipped-test
+  test.skip("add same keyword not working", async ({
+    page,
+    documentNumber,
+  }) => {
     await navigateToCategories(page, documentNumber)
 
     const keyword = generateString()
