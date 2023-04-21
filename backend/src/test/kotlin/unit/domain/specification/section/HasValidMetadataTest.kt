@@ -196,7 +196,6 @@ class HasValidMetadataTest {
             Metadatum(LocalDate.now(), MetadatumType.DATE),
             Metadatum("number", MetadatumType.NUMBER),
             Metadatum("year", MetadatumType.YEAR),
-            Metadatum("page number", MetadatumType.PAGE_NUMBER),
             Metadatum("area of publication", MetadatumType.AREA_OF_PUBLICATION),
             Metadatum("number of the publication in the respective area", MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA),
             Metadatum("additional info #1", MetadatumType.ADDITIONAL_INFO),
