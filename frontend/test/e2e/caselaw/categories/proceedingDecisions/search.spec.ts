@@ -26,7 +26,7 @@ test.describe("Search proceeding decisions", () => {
       .getByRole("button", { name: "Nach Entscheidungen suchen" })
       .click()
 
-    await expect(page.getByText("Suchergebnis")).toBeVisible()
+    await expect(page.getByText("Suche hat 1 Treffer ergeben")).toBeVisible()
 
     const result = page.locator(".table-row", {
       hasText: `AG Aachen, AnU, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`,
