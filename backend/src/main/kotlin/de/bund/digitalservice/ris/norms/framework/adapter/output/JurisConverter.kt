@@ -13,12 +13,14 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_MEDIUM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -36,6 +38,7 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -82,6 +85,7 @@ fun mapDomainToData(norm: Norm): NormData {
         providerEntity = norm.providerEntity,
         providerDecidingBody = norm.providerDecidingBody,
         printAnnouncementList = extractPrintAnnouncementList(norm),
+        digitalAnnouncementList = extractDigitalAnnouncementList(norm),
         risAbbreviation = norm.risAbbreviation,
     )
 }
@@ -107,6 +111,9 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val printAnnouncementGazette = createMetadataForType(data.printAnnouncementList.map { it.gazette }, ANNOUNCEMENT_GAZETTE)
     val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.map { it.page }, PAGE_NUMBER)
     val printAnnouncementYear = createMetadataForType(data.printAnnouncementList.map { it.year }, YEAR)
+    val digitalAnnouncementYear = createMetadataForType(data.digitalAnnouncementList.map { it.year }, YEAR)
+    val digitalAnnouncementNumber = createMetadataForType(data.digitalAnnouncementList.map { it.number }, NUMBER)
+    val digitalAnnouncementMedium = createMetadataForType(data.digitalAnnouncementList.map { it.medium }, ANNOUNCEMENT_MEDIUM)
 
     val citationDateSections = data.citationDateList.mapIndexed { index, value ->
         if (value.length == 4 && value.toIntOrNull() != null) {
@@ -124,6 +131,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
         createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
+        createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear) +
         citationDateSections
 
     return Norm(
@@ -254,5 +262,16 @@ private fun extractPrintAnnouncementList(norm: Norm): List<PrintAnnouncement> = 
             section.metadata.find { it.type == YEAR }?.value.toString(),
             section.metadata.find { it.type == PAGE_NUMBER }?.value.toString(),
             section.metadata.find { it.type == ANNOUNCEMENT_GAZETTE }?.value.toString(),
+        )
+    }
+
+private fun extractDigitalAnnouncementList(norm: Norm): List<DigitalAnnouncement> = norm
+    .metadataSections
+    .filter { it.name == MetadataSectionName.DIGITAL_ANNOUNCEMENT }
+    .map { section ->
+        DigitalAnnouncement(
+            section.metadata.find { it.type == YEAR }?.value.toString(),
+            section.metadata.find { it.type == NUMBER }?.value.toString(),
+            section.metadata.find { it.type == ANNOUNCEMENT_MEDIUM }?.value.toString(),
         )
     }
