@@ -634,11 +634,11 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
       - name: Deploy new images
-        uses: digitalservicebund/github-actions/argocd-deploy@7479179f541d984bc99eb8529cf7f3fc4ce3087d
+        uses: digitalservicebund/github-actions/argocd-deploy@a223a68bc5982e5175beb73c708d99d8f9ba7858
         with:
           environment: staging
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
-          deploying_repos: ris-backend-service,ris-backend-service/frontend
+          deploying_repo: ris-backend-service,ris-backend-service/frontend
           infra_repo: neuris-infra
           deploy_key: ${{ secrets.DEPLOY_KEY }}
           app: ris-staging
@@ -734,7 +734,7 @@ jobs:
     steps:
       - uses: chainguard-dev/actions/setup-gitsign@ac42db4c9c2e2bd9f66aadf3290c5995891d91a3
       - name: Deploy new images
-        uses: digitalservicebund/github-actions/argocd-deploy@7479179f541d984bc99eb8529cf7f3fc4ce3087d
+        uses: digitalservicebund/github-actions/argocd-deploy@a223a68bc5982e5175beb73c708d99d8f9ba7858
         with:
           environment: production
           version: ${{ needs.push-backend-image-to-registry.outputs.version }}
