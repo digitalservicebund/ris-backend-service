@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import DigitalAnnouncementInputGroup from "@/components/DigitalAnnouncementInputGroup.vue"
-import EuGovernmentGazetteInputGroup from "@/components/EuGovernmentGazetteInputGroup.vue"
-import OtherOfficialReferenceInputGroup from "@/components/OtherOfficialReferenceInputGroup.vue"
+import EuAnnouncementInputGroup from "@/components/EuAnnouncementInputGroup.vue"
+import OtherOfficialAnnouncementInputGroup from "@/components/OtherOfficialAnnouncementInputGroup.vue"
 import PrintAnnouncementInputGroup from "@/components/PrintAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
@@ -60,9 +60,9 @@ const component = computed(() => {
     case InputType.DIGITAL:
       return DigitalAnnouncementInputGroup
     case InputType.EU:
-      return EuGovernmentGazetteInputGroup
+      return EuAnnouncementInputGroup
     case InputType.OTHER:
-      return OtherOfficialReferenceInputGroup
+      return OtherOfficialAnnouncementInputGroup
     default:
       return null
   }

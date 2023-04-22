@@ -30,9 +30,10 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
 
-const entity = computed({
-  get: () => inputValue.value.ENTITY?.[0],
-  set: (value) => value && (inputValue.value.ENTITY = [value]),
+const otherOfficialReference = computed({
+  get: () => inputValue.value.OTHER_OFFICIAL_REFERENCE?.[0],
+  set: (value) =>
+    value && (inputValue.value.OTHER_OFFICIAL_REFERENCE = [value]),
 })
 </script>
 <template>
@@ -43,7 +44,7 @@ const entity = computed({
   >
     <textarea
       id="otherOfficialAnnouncement"
-      v-model="entity"
+      v-model="otherOfficialReference"
       aria-label="Sonstige amtliche Fundstelle"
       class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
       rows="4"

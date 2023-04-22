@@ -38,7 +38,7 @@ function createComputedProperty(key: string) {
   })
 }
 
-const entity = createComputedProperty("ENTITY")
+const entity = createComputedProperty("EU_GOVERNMENT_GAZETTE")
 const year = createComputedProperty("YEAR")
 const series = createComputedProperty("SERIES")
 const number = createComputedProperty("NUMBER")
