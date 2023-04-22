@@ -1,13 +1,13 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import EuGovernmentGazetteInputGroup from "@/components/EuGovernmentGazetteInputGroup.vue"
+import EuAnnouncementInputGroup from "@/components/EuAnnouncementInputGroup.vue"
 import { Metadata, MetadatumType } from "@/domain/Norm"
 
 function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {
     modelValue: options?.modelValue ?? {},
   }
-  const utils = render(EuGovernmentGazetteInputGroup, { props })
+  const utils = render(EuAnnouncementInputGroup, { props })
   const user = userEvent.setup()
   return { user, ...utils }
 }
@@ -16,7 +16,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
   it("renders all inputs", () => {
     renderComponent({
       modelValue: {
-        [MetadatumType.ENTITY]: ["test value"],
+        [MetadatumType.EU_GOVERNMENT_GAZETTE]: ["test value"],
         [MetadatumType.YEAR]: ["test value"],
         [MetadatumType.SERIES]: ["test value"],
         [MetadatumType.NUMBER]: ["test value"],
@@ -26,7 +26,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
       },
     })
 
-    const entityInput = screen.queryByRole("textbox", {
+    const euGovernmentGazetteInput = screen.queryByRole("textbox", {
       name: "Amtsblatt der EU",
     }) as HTMLInputElement
 
@@ -54,8 +54,8 @@ describe("EuGovernmentGazetteInputGroup", () => {
       name: "Erläuterungen",
     }) as HTMLInputElement
 
-    expect(entityInput).toBeInTheDocument()
-    expect(entityInput).toHaveValue("test value")
+    expect(euGovernmentGazetteInput).toBeInTheDocument()
+    expect(euGovernmentGazetteInput).toHaveValue("test value")
 
     expect(yearInput).toBeInTheDocument()
     expect(yearInput).toHaveValue("test value")
@@ -79,7 +79,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
   it("shows the correct model value entry in the associated input", () => {
     renderComponent({
       modelValue: {
-        [MetadatumType.ENTITY]: ["abc"],
+        [MetadatumType.EU_GOVERNMENT_GAZETTE]: ["abc"],
         [MetadatumType.YEAR]: ["01-01-2023"],
         [MetadatumType.SERIES]: ["foo"],
         [MetadatumType.NUMBER]: ["1"],
@@ -89,7 +89,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
       },
     })
 
-    const entityInput = screen.queryByDisplayValue("abc")
+    const euGovernmentGazetteInput = screen.queryByDisplayValue("abc")
     const yearInput = screen.queryByDisplayValue("01-01-2023")
     const seriesInput = screen.queryByDisplayValue("foo")
     const numberInput = screen.queryByDisplayValue("1")
@@ -97,7 +97,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
     const additionalInfoInput = screen.queryByDisplayValue("test info")
     const explanationInput = screen.queryByDisplayValue("test explanation")
 
-    expect(entityInput).toBeInTheDocument()
+    expect(euGovernmentGazetteInput).toBeInTheDocument()
     expect(yearInput).toBeInTheDocument()
     expect(seriesInput).toBeInTheDocument()
     expect(numberInput).toBeInTheDocument()
@@ -121,7 +121,7 @@ describe("EuGovernmentGazetteInputGroup", () => {
     await user.type(input[6], "bar foo")
 
     expect(modelValue).toEqual({
-      [MetadatumType.ENTITY]: ["foo"],
+      [MetadatumType.EU_GOVERNMENT_GAZETTE]: ["foo"],
       [MetadatumType.YEAR]: ["2023"],
       [MetadatumType.SERIES]: ["0"],
       [MetadatumType.NUMBER]: ["1"],
