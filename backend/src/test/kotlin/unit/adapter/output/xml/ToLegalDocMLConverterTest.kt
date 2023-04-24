@@ -78,14 +78,20 @@ class ToLegalDocMLConverterTest {
 
     @Test
     fun `it creates the identification tag with proper data`() {
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("printAnnouncementGazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
+                Metadatum("1102", MetadatumType.PAGE),
+            ),
+        )
         val guid = UUID.randomUUID()
         val norm =
             createRandomNormWithCitationDate()
                 .copy(
                     guid = guid,
-                    printAnnouncementGazette = "printAnnouncementGazette",
                     announcementDate = LocalDate.parse("2001-01-01"),
-                    printAnnouncementPage = "1102",
+                    metadataSections = listOf(printAnnouncementSection),
                 )
         val document = convertNormToLegalDocML(norm)
 

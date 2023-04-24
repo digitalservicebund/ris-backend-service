@@ -39,7 +39,7 @@ fun mapNormToDto(norm: Norm): NormDto {
             }?.metadata?.first { it.type == MetadatumType.PARTICIPATION_INSTITUTION }?.value.toString(),
         ),
         printAnnouncementGazette = norm.eli.gazette,
-        printAnnouncementPage = norm.printAnnouncementPage,
+        printAnnouncementPage = norm.eli.printAnnouncementPage,
         eli = norm.eli.toString(),
         articles = norm.articles.sortedBy { if (it.marker.contains("§")) it.marker.substring(2).toInt() else it.marker.substring(4).toInt() }
             .mapIndexed { index, article ->
