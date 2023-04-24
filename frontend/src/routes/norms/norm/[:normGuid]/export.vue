@@ -33,7 +33,7 @@ const downloadUrl = computed(() =>
 const downloadIsPossible = computed(() => downloadUrl.value != undefined)
 
 const formatDateTime = function (date: string): string {
-  return dayjs(date).tz("Europe/Berlin").format("DD.MM.YYYY HH:mm")
+  return dayjs.utc(date).tz(dayjs.tz.guess()).format("DD.MM.YYYY HH:mm")
 }
 
 async function getFileLink() {
