@@ -672,57 +672,13 @@ jobs:
     needs: [deploy-staging]
     strategy:
       matrix:
-        mode: [e2e, a11y]
         browser: [chromium, firefox]
         subproject: [caselaw, norms]
-        exclude:
-          - mode: a11y
-            browser: firefox
     uses: ./.github/workflows/_playwright-test.yml
     with:
-      browser: ${{ matrix.browser }}
-      mode: ${{ matrix.mode }}
       subproject: ${{ matrix.subproject}}
-    secrets: inherit
-
-  e2e-caselaw-chrome:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      browser: chromium
+      browser: ${{ matrix.browser }}
       mode: e2e
-      subproject: caselaw
-    secrets: inherit
-
-  e2e-caselaw-firefox:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      browser: firefox
-      mode: e2e
-      subproject: caselaw
-    secrets: inherit
-
-  e2e-norms-chrome:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      browser: chromium
-      mode: e2e
-      subproject: norms
-    secrets: inherit
-
-  e2e-norms-firefox:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      browser: firefox
-      mode: e2e
-      subproject: norms
     secrets: inherit
 
   a11y-chrome:
@@ -742,10 +698,7 @@ jobs:
     needs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
-      - e2e-caselaw-chrome
-      - e2e-caselaw-firefox
-      - e2e-norms-chrome
-      - e2e-norms-firefox
+      - e2e-tests
       - a11y-chrome
     permissions:
       id-token: write # Enable OIDC for gitsign
@@ -789,10 +742,7 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
-      - e2e-caselaw-chrome
-      - e2e-caselaw-firefox
-      - e2e-norms-chrome
-      - e2e-norms-firefox
+      - e2e-tests
       - a11y-chrome
     permissions:
       pages: write
