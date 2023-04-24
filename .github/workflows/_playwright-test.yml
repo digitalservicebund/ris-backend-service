@@ -40,7 +40,7 @@ jobs:
           path: |
             ./frontend/node_modules
           key: modules-${{ hashFiles('./frontend/package-lock.json') }}
-
+          restore-keys: modules-${{ hashFiles('./frontend/package-lock.json') }}
       - name: Install playwright
         run: |
           npx --yes playwright install --with-deps ${{ inputs.browser }}
