@@ -667,6 +667,26 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+  e2e-tests:
+    if: ${{ github.ref == 'refs/heads/main' }}
+    needs: [deploy-staging]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        mode: [e2e, a11y]
+        browser: [chromium, firefox]
+        subproject: [caselaw, norms]
+        exclude:
+          - mode: a11y
+            browser: firefox
+    steps:
+      - uses: ./.github/workflows/_playwright-test.yml
+        with:
+          browser: ${{ matrix.browser }}
+          mode: ${{ matrix.mode }}
+          subproject: ${{ matrix.subproject}}
+          secrets: inherit
+
   e2e-caselaw-chrome:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [deploy-staging]
