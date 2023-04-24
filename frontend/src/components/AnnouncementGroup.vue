@@ -4,14 +4,14 @@ import DigitalAnnouncementInputGroup from "@/components/DigitalAnnouncementInput
 import EuAnnouncementInputGroup from "@/components/EuAnnouncementInputGroup.vue"
 import OtherOfficialAnnouncementInputGroup from "@/components/OtherOfficialAnnouncementInputGroup.vue"
 import PrintAnnouncementInputGroup from "@/components/PrintAnnouncementInputGroup.vue"
-import { Metadata } from "@/domain/Norm"
+import { MetadataSections } from "@/domain/Norm"
 
 interface Props {
-  modelValue: Metadata
+  modelValue: MetadataSections
 }
 
 interface Emits {
-  (event: "update:modelValue", value: Metadata): void
+  (event: "update:modelValue", value: MetadataSections): void
 }
 
 const props = defineProps<Props>()
@@ -24,7 +24,7 @@ enum InputType {
   OTHER = "otherAnnouncement",
 }
 
-const inputValue = ref<Metadata>(props.modelValue)
+const inputValue = ref<MetadataSections>(props.modelValue)
 const selectedInputType = ref<InputType | undefined>(undefined)
 
 watch(props, () => (inputValue.value = props.modelValue), {
