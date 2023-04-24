@@ -22,11 +22,6 @@ jobs:
   playwright-test:
     runs-on: ubuntu-latest
     steps:
-      - name: Cache browser binaries
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ inputs.browser }}
       - uses: actions/checkout@v3
       - name: Setup Node
         uses: actions/setup-node@v3
@@ -35,12 +30,27 @@ jobs:
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: cache node modules
+        id: cache-node
         uses: actions/cache@v3
         with:
           path: |
             ./frontend/node_modules
           key: modules-${{ hashFiles('./frontend/package-lock.json') }}
-      - name: Install playwright
+      - name: Install node modules
+        if: steps.cache-node.outputs.cache-hit != 'true'
+        run: |
+          npm ci
+        working-directory: ./frontend
+      - name: Get Playwright version
+        run: echo "PLAYWRIGHT_VERSION=$(jq -r '.dependencies["@playwright/test"].version' package-lock.json)" >> $GITHUB_ENV
+      - name: Cache browser binaries
+        id: cache-browser-binaries
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install playwright browsers
+        if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
         run: |
           npx --yes playwright install --with-deps ${{ inputs.browser }}
         working-directory: ./frontend

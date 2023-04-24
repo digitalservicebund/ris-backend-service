@@ -714,14 +714,39 @@ jobs:
           url: ${{ secrets.SLACK_WEBHOOK_URL }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
+  prep-playwright-tests:
+    runs-on: ubuntu-latest
+    if: ${{ github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version-file: ./frontend/.node-version
+          cache: npm
+          cache-dependency-path: ./frontend/package-lock.json
+      - name: Get Playwright version
+        run: echo "PLAYWRIGHT_VERSION=$(jq -r '.dependencies["@playwright/test"].version' package-lock.json)" >> $GITHUB_ENV
+      - name: Cache browser binaries
+        id: cache-browser-binaries
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install browsers
+        if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
+        run: |
+          npx --yes playwright install --with-deps chromium firefox
+        working-directory: ./frontend
+
   e2e-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
+    needs: [deploy-staging, prep-playwright-tests]
     strategy:
       fail-fast: false
       matrix:
-        browser: [chromium, firefox]
         subproject: [caselaw, norms]
+        browser: [chromium, firefox]
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: ${{ matrix.subproject}}
@@ -731,7 +756,7 @@ jobs:
 
   a11y-chrome:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
+    needs: [deploy-staging, prep-playwright-tests]
     uses: ./.github/workflows/_playwright-test.yml
     with:
       browser: chromium
