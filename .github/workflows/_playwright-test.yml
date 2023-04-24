@@ -70,7 +70,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "Playwright ${{ inputs.mode }} test ${{ inputs.browser }} :point_right:"
+          job_name: "${{ inputs.subproject }} ${{ inputs.mode }} test :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true
