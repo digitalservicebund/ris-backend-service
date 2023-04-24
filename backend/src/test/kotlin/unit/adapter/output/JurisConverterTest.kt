@@ -13,7 +13,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOC
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
@@ -229,7 +229,7 @@ class JurisConverterTest {
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
             assertThat(metadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
             assertThat(metadata).contains(Metadatum("test print announcement year", YEAR, 1))
-            assertThat(metadata).contains(Metadatum("test print announcement page", PAGE_NUMBER, 1))
+            assertThat(metadata).contains(Metadatum("test print announcement page", PAGE, 1))
             assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
             assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
             assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))

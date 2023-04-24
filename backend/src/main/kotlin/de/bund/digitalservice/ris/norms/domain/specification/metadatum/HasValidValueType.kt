@@ -22,7 +22,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
@@ -57,7 +57,7 @@ val hasValidValueType =
                 VALIDITY_RULE, LEAD_JURISDICTION, LEAD_UNIT, PARTICIPATION_TYPE,
                 PARTICIPATION_INSTITUTION, SUBJECT_FNA, SUBJECT_PREVIOUS_FNA,
                 SUBJECT_GESTA, SUBJECT_BGB_3, YEAR, RANGE_START, RANGE_END, ANNOUNCEMENT_GAZETTE,
-                NUMBER, PAGE_NUMBER, ADDITIONAL_INFO, EXPLANATION, ANNOUNCEMENT_MEDIUM,
+                NUMBER, PAGE, ADDITIONAL_INFO, EXPLANATION, ANNOUNCEMENT_MEDIUM,
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
                 TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME,

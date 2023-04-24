@@ -21,7 +21,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
@@ -109,7 +109,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val subjectFna = createMetadataForType(data.subjectAreaList.map { it.fna.toString() }, SUBJECT_FNA)
     val subjectGesta = createMetadataForType(data.subjectAreaList.map { it.gesta.toString() }, SUBJECT_GESTA)
     val printAnnouncementGazette = createMetadataForType(data.printAnnouncementList.map { it.gazette.toString() }, ANNOUNCEMENT_GAZETTE)
-    val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.map { it.page.toString() }, PAGE_NUMBER)
+    val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.map { it.page.toString() }, PAGE)
     val printAnnouncementYear = createMetadataForType(data.printAnnouncementList.map { it.year.toString() }, YEAR)
     val digitalAnnouncementYear = createMetadataForType(data.digitalAnnouncementList.map { it.year.toString() }, YEAR)
     val digitalAnnouncementNumber = createMetadataForType(data.digitalAnnouncementList.map { it.number.toString() }, NUMBER)
@@ -260,7 +260,7 @@ private fun extractPrintAnnouncementList(norm: Norm): List<PrintAnnouncement> = 
     .map { section ->
         PrintAnnouncement(
             section.metadata.find { it.type == YEAR }?.value.toString(),
-            section.metadata.find { it.type == PAGE_NUMBER }?.value.toString(),
+            section.metadata.find { it.type == PAGE }?.value.toString(),
             section.metadata.find { it.type == ANNOUNCEMENT_GAZETTE }?.value.toString(),
         )
     }
