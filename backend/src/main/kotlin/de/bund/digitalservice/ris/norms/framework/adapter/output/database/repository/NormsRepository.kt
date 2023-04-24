@@ -17,8 +17,8 @@ interface NormsRepository : ReactiveCrudRepository<NormDto, UUID> {
             "FROM norms n " +
             "LEFT JOIN metadata_sections ms ON n.id = ms.norm_id " +
             "LEFT JOIN metadata m ON ms.id  = m.section_id " +
-            "WHERE n.print_announcement_gazette = :gazette " +
-            "AND n.print_announcement_page = :page " +
+            "AND (ms.name = 'PRINT_ANNOUNCEMENT' AND m.type = 'ANNOUNCEMENT_GAZETTE' AND m.value = :gazette) " +
+            "AND (ms.name = 'PRINT_ANNOUNCEMENT' AND m.type = 'PAGE' AND m.value = :page) " +
             "AND( " +
             "(EXTRACT(YEAR FROM n.announcement_date) = CAST(:year AS DOUBLE PRECISION)) " +
             "OR " +
