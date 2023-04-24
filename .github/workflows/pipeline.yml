@@ -27,7 +27,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
           gradle-version: 7.5
           arguments: build --profile -x integrationTest -x test
@@ -62,7 +62,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
           gradle-version: 7.5
           arguments: test -x integrationTest
@@ -92,9 +92,9 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          gradle-version: 7.5
+          gradle-version: current
           arguments: integrationTest -x test
           build-root-directory: ./backend
       - name: Send status to Slack
@@ -127,7 +127,7 @@ jobs:
         with:
           java-version: "17.0"
           distribution: "temurin"
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
           gradle-version: 7.5
           arguments: bootBuildImage
