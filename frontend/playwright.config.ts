@@ -11,7 +11,7 @@ const config: PlaywrightTestConfig = {
     viewport: { width: 1280, height: 720 },
     acceptDownloads: true,
     baseURL: process.env.E2E_BASE_URL ?? "http://127.0.0.1",
-    screenshot: "only-on-failure",
+    screenshot: { mode: "only-on-failure", fullPage: true },
     storageState: "test/e2e/shared/storageState.json",
     timezoneId: "Europe/Berlin",
   },
