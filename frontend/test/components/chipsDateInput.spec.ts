@@ -28,7 +28,7 @@ function renderComponent(options?: {
 
 describe("ChipsInput", () => {
   beforeEach(() => {
-    dayjs.tz.setDefault("UTC")
+    dayjs.tz.setDefault("Europe/Berlin")
   })
 
   afterEach(() => {

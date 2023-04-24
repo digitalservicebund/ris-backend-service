@@ -13,7 +13,7 @@ const config: PlaywrightTestConfig = {
     baseURL: process.env.E2E_BASE_URL ?? "http://127.0.0.1",
     screenshot: "only-on-failure",
     storageState: "test/e2e/shared/storageState.json",
-    timezoneId: "UTC",
+    timezoneId: "Europe/Berlin",
   },
   projects: [
     {
