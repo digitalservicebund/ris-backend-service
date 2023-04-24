@@ -15,7 +15,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     renderComponent({
       modelValue: {
         [MetadatumType.ANNOUNCEMENT_MEDIUM]: ["test value"],
-        [MetadatumType.DATE]: ["test value"],
+        [MetadatumType.DATE]: ["2023-01-01"],
         [MetadatumType.NUMBER]: ["test value"],
         [MetadatumType.YEAR]: ["test value"],
         [MetadatumType.AREA_OF_PUBLICATION]: ["test value"],
@@ -31,18 +31,13 @@ describe("DigitalAnnouncementInputGroup", () => {
       name: "Verkündungsmedium",
     }) as HTMLInputElement
 
-    const dateInput = screen.queryByRole("textbox", {
-      name: "Verkündungsdatum",
+    const dateInput = screen.getByLabelText("Verkündungsdatum", {
+      selector: 'input[type="date"]',
     }) as HTMLInputElement
 
     const numberInput = screen.queryByRole("textbox", {
       name: "Ausgabenummer",
     }) as HTMLInputElement
-
-    // digital edition in template missing
-
-    // number missing from here
-    // page number missing from here
 
     const yearInput = screen.queryByRole("textbox", {
       name: "Jahr",
@@ -71,7 +66,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(announcementMediumInput).toHaveValue("test value")
 
     expect(dateInput).toBeInTheDocument()
-    expect(dateInput).toHaveValue("test value")
+    expect(dateInput).toHaveValue("2023-01-01")
 
     expect(numberInput).toBeInTheDocument()
     expect(numberInput).toHaveValue("test value")
@@ -96,7 +91,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     renderComponent({
       modelValue: {
         [MetadatumType.ANNOUNCEMENT_MEDIUM]: ["foo"],
-        [MetadatumType.DATE]: ["01-01-2023"],
+        [MetadatumType.DATE]: ["2023-01-01"],
         [MetadatumType.NUMBER]: ["1"],
         [MetadatumType.YEAR]: ["2023"],
         [MetadatumType.AREA_OF_PUBLICATION]: ["bar"],
@@ -109,7 +104,9 @@ describe("DigitalAnnouncementInputGroup", () => {
     })
 
     const announcementMediumInput = screen.queryByDisplayValue("foo")
-    const dateInput = screen.queryByDisplayValue("01-01-2023")
+    const dateInput = screen.getByLabelText("Verkündungsdatum", {
+      selector: 'input[type="date"]',
+    }) as HTMLInputElement
     const numberInput = screen.queryByDisplayValue("1")
     const yearInput = screen.queryByDisplayValue("2023")
     const areaOfPublicationInput = screen.queryByDisplayValue("bar")
@@ -120,6 +117,7 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     expect(announcementMediumInput).toBeInTheDocument()
     expect(dateInput).toBeInTheDocument()
+    expect(dateInput).toHaveValue("2023-01-01")
     expect(numberInput).toBeInTheDocument()
     expect(yearInput).toBeInTheDocument()
     expect(areaOfPublicationInput).toBeInTheDocument()
@@ -135,17 +133,15 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     const input = screen.getAllByRole("textbox")
     await user.type(input[0], "foo")
-    await user.type(input[1], "01-01-2023")
-    await user.type(input[2], "1")
-    await user.type(input[3], "2023")
-    await user.type(input[4], "foo bar")
-    await user.type(input[5], "bar foo")
-    await user.type(input[6], "foo baz")
-    await user.type(input[7], "ban baz")
+    await user.type(input[1], "1")
+    await user.type(input[2], "2023")
+    await user.type(input[3], "foo bar")
+    await user.type(input[4], "bar foo")
+    await user.type(input[5], "foo baz")
+    await user.type(input[6], "ban baz")
 
     expect(modelValue).toEqual({
       [MetadatumType.ANNOUNCEMENT_MEDIUM]: ["foo"],
-      [MetadatumType.DATE]: ["01-01-2023"],
       [MetadatumType.NUMBER]: ["1"],
       [MetadatumType.YEAR]: ["2023"],
       [MetadatumType.AREA_OF_PUBLICATION]: ["foo bar"],

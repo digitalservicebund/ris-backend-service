@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -69,11 +71,12 @@ const explanation = createComputedProperty("EXPLANATION")
         aria-label="Verkündungsdatum"
         label="Verkündungsdatum"
       >
-        <TextInput
+        <DateInput
           id="digitalAnnouncementDate"
           v-model="date"
           alt-text="Verkündungsdatum"
           aria-label="Verkündungsdatum"
+          is-future-date
         />
       </InputField>
       <InputField
@@ -89,7 +92,7 @@ const explanation = createComputedProperty("EXPLANATION")
         />
       </InputField>
       <InputField id="digitalAnnouncementYear" aria-label="Jahr" label="Jahr">
-        <TextInput
+        <YearInput
           id="digitalAnnouncementYear"
           v-model="year"
           alt-text="Jahr"

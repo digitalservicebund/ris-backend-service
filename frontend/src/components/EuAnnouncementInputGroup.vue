@@ -3,6 +3,7 @@ import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -38,7 +39,7 @@ function createComputedProperty(key: string) {
   })
 }
 
-const entity = createComputedProperty("EU_GOVERNMENT_GAZETTE")
+const defaultValueEuGovernmentGazette = "Amtsblatt der EU"
 const year = createComputedProperty("YEAR")
 const series = createComputedProperty("SERIES")
 const number = createComputedProperty("NUMBER")
@@ -55,9 +56,9 @@ const explanation = createComputedProperty("EXPLANATION")
     >
       <TextInput
         id="euAnnouncementGazette"
-        v-model="entity"
         alt-text="Amtsblatt der EU"
         aria-label="Amtsblatt der EU"
+        :value="defaultValueEuGovernmentGazette"
       />
     </InputField>
   </div>
@@ -68,7 +69,7 @@ const explanation = createComputedProperty("EXPLANATION")
       class="w-full"
       label="Jahresangabe"
     >
-      <TextInput
+      <YearInput
         id="euAnnouncementYear"
         v-model="year"
         alt-text="Jahresangabe"

@@ -102,7 +102,7 @@ describe("PrintAnnouncementInputGroup", () => {
 
     const input = screen.getAllByRole("textbox")
     await user.type(input[0], "foo")
-    await user.type(input[1], "bar")
+    await user.type(input[1], "2023")
     await user.type(input[2], "ban")
     await user.type(input[3], "baz")
     await user.type(input[4], "foo bar")
@@ -110,7 +110,7 @@ describe("PrintAnnouncementInputGroup", () => {
 
     expect(modelValue).toEqual({
       [MetadatumType.ANNOUNCEMENT_GAZETTE]: ["foo"],
-      [MetadatumType.YEAR]: ["bar"],
+      [MetadatumType.YEAR]: ["2023"],
       [MetadatumType.NUMBER]: ["ban"],
       [MetadatumType.PAGE_NUMBER]: ["baz"],
       [MetadatumType.ADDITIONAL_INFO]: ["foo bar"],
