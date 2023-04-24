@@ -671,6 +671,7 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs: [deploy-staging]
     strategy:
+      fail-fast: false
       matrix:
         browser: [chromium, firefox]
         subproject: [caselaw, norms]
