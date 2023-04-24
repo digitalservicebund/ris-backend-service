@@ -34,9 +34,15 @@ jobs:
           node-version-file: ./frontend/.node-version
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
-      - name: Install dependencies
+      - name: cache node modules
+        uses: actions/checkout@v3
+        with:
+          path: |
+            ./frontend/node_modules
+          key: modules-${{ hashFiles('./frontend/package-lock.json') }}
+
+      - name: Install playwright
         run: |
-          npm ci
           npx --yes playwright install --with-deps ${{ inputs.browser }}
         working-directory: ./frontend
       - name: Run ${{ inputs.mode }} tests in ${{ inputs.browser }}
