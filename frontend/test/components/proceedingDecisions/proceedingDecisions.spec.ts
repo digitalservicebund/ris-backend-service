@@ -13,9 +13,7 @@ function renderComponent(options?: {
     documentUnitUuid: options?.documentUnitUuid
       ? options?.documentUnitUuid
       : "fooUuid",
-    proceedingDecisions: options?.proceedingDecisions
-      ? options?.proceedingDecisions
-      : [],
+    proceedingDecisions: options?.proceedingDecisions,
   }
 
   const user = userEvent.setup()

@@ -10,13 +10,11 @@ interface Props {
   dataSet: any // eslint-disable-line @typescript-eslint/no-explicit-any
   summaryComponent?: Component
   asColumn?: boolean
-  fallbackText?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
   asColumn: false,
-  fallbackText: undefined,
 })
 
 const isExpanded = ref(false)
@@ -30,7 +28,7 @@ const column = computed(() => ({
 }))
 
 const padding = computed(() => ({
-  "mb-[1.65rem]": props.asColumn,
+  "mb-[1.65rem]": props.asColumn && !isExpanded.value,
 }))
 </script>
 
@@ -44,20 +42,14 @@ const padding = computed(() => ({
   >
     <template #header>
       <div class="flex w-full" :class="column">
-        <h2
-          class="label-02-bold mb-24 min-w-[14rem] text-left"
-          :class="padding"
-        >
+        <h2 class="label-02-bold min-w-[14rem] text-left" :class="padding">
           {{ title }}
         </h2>
-        <span v-if="dataSet.length === 0" class="label-02-reg text-start"
-          >{{ fallbackText }}
-        </span>
         <Component :is="summaryComponent" v-if="!isExpanded" :data="dataSet" />
       </div>
     </template>
 
-    <div class="flex flex-col gap-32 items-start">
+    <div class="flex flex-col gap-32 items-start mt-24">
       <slot />
       <TextButton aria-label="Fertig" label="Fertig" @click="collapse" />
     </div>
