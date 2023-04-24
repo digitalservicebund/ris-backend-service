@@ -42,6 +42,7 @@ jobs:
           npm ci
         working-directory: ./frontend
       - name: Get Playwright version
+        working-directory: ./frontend
         run: echo "PLAYWRIGHT_VERSION=$(jq -r '.dependencies["@playwright/test"].version' package-lock.json)" >> $GITHUB_ENV
       - name: Cache browser binaries
         id: cache-browser-binaries
