@@ -678,7 +678,7 @@ jobs:
 
   e2e-tests:
     if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging]
+    needs: [deploy-staging, frontend-build]
     strategy:
       fail-fast: false
       matrix:
