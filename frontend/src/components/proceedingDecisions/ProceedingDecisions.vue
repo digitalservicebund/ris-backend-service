@@ -151,6 +151,7 @@ watch(
     <ExpandableDataSet
       as-column
       :data-set="proceedingDecisions"
+      fallback-text="Noch keine vorhergehende Entscheidung hinzugefügt."
       :summary-component="DecisionSummary"
       title="Vorgehende Entscheidungen"
     >
