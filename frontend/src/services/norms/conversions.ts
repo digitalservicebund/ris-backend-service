@@ -108,6 +108,10 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.RANGE_START_UNIT]: decodeRangeUnit,
   [MetadatumType.RANGE_END]: identity,
   [MetadatumType.RANGE_END_UNIT]: decodeRangeUnit,
+  [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
+  [MetadatumType.ANNOUNCEMENT_GAZETTE]: identity,
+  [MetadatumType.NUMBER]: identity,
+  [MetadatumType.PAGE]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -136,6 +140,10 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.RANGE_START_UNIT]: encodeRangeUnit,
   [MetadatumType.RANGE_END]: identity,
   [MetadatumType.RANGE_END_UNIT]: encodeRangeUnit,
+  [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
+  [MetadatumType.ANNOUNCEMENT_GAZETTE]: identity,
+  [MetadatumType.NUMBER]: identity,
+  [MetadatumType.PAGE]: identity,
 }
 
 /**
