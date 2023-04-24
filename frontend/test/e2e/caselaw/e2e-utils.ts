@@ -126,3 +126,17 @@ export async function documentUnitExists(
     ).text()
   ).includes("uuid")
 }
+
+export async function waitForInputValue(
+  page: Page,
+  selector: string,
+  expectedValue: string
+) {
+  await page.waitForFunction(
+    ({ selector, expectedValue }) => {
+      const input = document.querySelector(selector) as HTMLInputElement
+      return input && input.value === expectedValue
+    },
+    { selector, expectedValue }
+  )
+}

@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, waitForSaving } from "../../e2e-utils"
+import {
+  navigateToCategories,
+  waitForSaving,
+  waitForInputValue,
+} from "../../e2e-utils"
 import { testWithDocumentUnit as test } from "../../fixtures"
 
 test.describe("court", () => {
@@ -20,7 +24,7 @@ test.describe("court", () => {
 
     await page.reload()
 
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("BGH")
+    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
   })
 
   test("open incorrect court field, input one, save and reload", async ({
@@ -91,7 +95,7 @@ test.describe("court", () => {
     const totalCourts = 3925
 
     // on start: closed dropdown, no input text
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
     await expect(page.locator("text=AG Aachen")).toBeHidden()
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
@@ -107,12 +111,12 @@ test.describe("court", () => {
 
     // type search string: 2 results for "bayern"
     await page.locator("[aria-label='Gericht']").fill("bayern")
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("bayern")
+    await waitForInputValue(page, "[aria-label='Gericht']", "bayern")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(2)
 
     // use the clear icon
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
       totalCourts
     )
@@ -121,7 +125,7 @@ test.describe("court", () => {
     await page
       .locator("[aria-label='Gericht'] + button.input-expand-icon")
       .click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
     // open dropdown again by typing a search string
@@ -133,7 +137,7 @@ test.describe("court", () => {
     // close dropdown using the esc key, user input text gets removed and last saved value restored
     await page.keyboard.down("Escape")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
   })
 
   test("test correct esc/tab behaviour in court dropdown", async ({
@@ -142,7 +146,7 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
     await page.locator("[aria-label='Gericht']").fill("BVerfG")
@@ -177,21 +181,19 @@ test.describe("court", () => {
 
     // clicking on dropdown item triggers auto save
     await page.locator("text=AG Aalen").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
+    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
 
     // saving... and then saved
     await waitForSaving(page)
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was set by the backend based on state database table
-    expect(await page.inputValue("[aria-label='Region']")).toBe(
-      "Baden-Württemberg"
-    )
+    await waitForInputValue(page, "[aria-label='Region']", "Baden-Württemberg")
 
     // clear the court
     await page.locator("[aria-label='Auswahl zurücksetzen']").click()
     await expect(page.getByText("AG Aalen")).toBeHidden()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("")
+    await waitForInputValue(page, "[aria-label='Gericht']", "")
     // dropdown should not open
     await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
 
@@ -199,7 +201,7 @@ test.describe("court", () => {
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was cleared by the backend
-    expect(await page.inputValue("[aria-label='Region']")).toBe("")
+    await waitForInputValue(page, "[aria-label='Region']", "")
   })
 
   test("test that setting a special court sets legal effect to yes, but it can be changed afterwards", async ({
@@ -208,27 +210,25 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
-      "Keine Angabe"
-    )
+    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
 
     await page.locator("[aria-label='Gericht']").fill("bgh")
     await page.locator("text=BGH").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("BGH")
+    await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
     await waitForSaving(page)
 
-    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Ja")
+    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
 
     await page
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
     await page.locator("text=Nein").click()
-    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Nein")
+    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Nein")
 
     await waitForSaving(page)
 
-    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe("Nein")
+    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Nein")
   })
 
   test("test that setting a non-special court leaves legal effect unchanged", async ({
@@ -237,18 +237,13 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
-      "Keine Angabe"
-    )
+    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
 
     await page.locator("[aria-label='Gericht']").fill("aachen")
     await page.locator("text=AG Aachen").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aachen")
+    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aachen")
     await waitForSaving(page)
 
-    await page.reload() // TODO remove reload when update via response.data works
-    expect(await page.inputValue("[aria-label='Rechtskraft']")).toBe(
-      "Keine Angabe"
-    )
+    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
   })
 })
