@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
 import DateInput from "@/shared/components/input/DateInput.vue"
-import TextInput from "@/shared/components/input/TextInput.vue"
+import YearInput from "@/shared/components/input/YearInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -69,29 +69,6 @@ const yearValue = computed({
   get: () => inputValue.value.YEAR?.[0],
   set: (value) => value && (inputValue.value.YEAR = [value]),
 })
-const handlePaste = async (event: ClipboardEvent) => {
-  const clipboardData = event.clipboardData
-  if (clipboardData !== null) {
-    const pastedText = clipboardData.getData("text/plain")
-    if (/^\d+$/.test(pastedText.substring(0, 3))) {
-      return
-    } else {
-      event.preventDefault()
-    }
-  }
-}
-function onlyAllowNumbers(event: KeyboardEvent) {
-  const isNumber = /^\d+$/.test(event.key)
-  const isControlKey = [
-    "Backspace",
-    "Delete",
-    "ArrowLeft",
-    "ArrowRight",
-  ].includes(event.key)
-  if (!isNumber && !isControlKey) {
-    event.preventDefault()
-  }
-}
 </script>
 
 <template>
@@ -134,16 +111,12 @@ function onlyAllowNumbers(event: KeyboardEvent) {
       is-future-date
     />
     <div>
-      <TextInput
+      <YearInput
         v-if="selectedInputType === InputType.YEAR"
         id="citationYear"
         v-model="yearValue"
-        alt-text="Zitierdatum Jahresangabe"
         aria-label="Zitierdatum Jahresangabe"
-        maxlength="4"
         :placeholder="YearPlaceHolder"
-        @keypress="onlyAllowNumbers"
-        @paste="handlePaste"
       />
     </div>
   </div>
