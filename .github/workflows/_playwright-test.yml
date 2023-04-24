@@ -35,7 +35,7 @@ jobs:
           cache: npm
           cache-dependency-path: ./frontend/package-lock.json
       - name: cache node modules
-        uses: actions/checkout@v3
+        uses: actions/cache@v3
         with:
           path: |
             ./frontend/node_modules
