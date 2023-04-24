@@ -7,7 +7,6 @@ interface Props {
   value?: string
   modelValue?: string
   ariaLabel: string
-  placeHolder?: string
 }
 
 interface Emits {
@@ -17,6 +16,7 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const inputValue = ref(props.modelValue)
+const YearPlaceHolder = "JJJJ"
 
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
@@ -63,7 +63,7 @@ function onlyAllowNumbers(event: KeyboardEvent) {
     v-model="inputValue"
     :aria-label="ariaLabel"
     maxlength="4"
-    :place-holder="placeHolder"
+    :placeholder="YearPlaceHolder"
     @keypress="onlyAllowNumbers"
     @paste="handlePaste"
   />

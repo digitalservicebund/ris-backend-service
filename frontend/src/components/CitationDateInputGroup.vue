@@ -21,7 +21,6 @@ enum InputType {
 }
 
 const inputValue = ref(props.modelValue)
-const YearPlaceHolder = "JJJJ"
 const selectedInputType = ref<InputType>(InputType.DATE)
 function detectSelectedInputType(): void {
   if (inputValue.value.YEAR && inputValue.value.YEAR.length > 0) {
@@ -116,7 +115,6 @@ const yearValue = computed({
         id="citationYear"
         v-model="yearValue"
         aria-label="Zitierdatum Jahresangabe"
-        :placeholder="YearPlaceHolder"
       />
     </div>
   </div>
