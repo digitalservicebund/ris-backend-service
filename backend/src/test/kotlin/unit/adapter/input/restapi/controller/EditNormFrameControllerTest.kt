@@ -36,6 +36,12 @@ class EditNormFrameControllerTest {
     @Test
     fun `it correctly maps the parameter and body to the command calling the service`() {
         val editNormRequestSchema = createRandomEditNormRequestTestSchema()
+        editNormRequestSchema.digitalAnnouncementMedium = null
+        editNormRequestSchema.digitalAnnouncementPage = null
+        editNormRequestSchema.digitalAnnouncementYear = null
+        editNormRequestSchema.printAnnouncementGazette = null
+        editNormRequestSchema.printAnnouncementPage = null
+        editNormRequestSchema.printAnnouncementYear = null
         val editJson = convertEditNormRequestTestSchemaToJson(editNormRequestSchema)
 
         every { editNormFrameService.editNormFrame(any()) } returns Mono.just(true)

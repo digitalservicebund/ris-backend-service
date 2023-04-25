@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
@@ -175,17 +176,17 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.expirationNormCategory,
                     encodeLocalDate(data.announcementDate),
                     encodeLocalDate(data.publicationDate),
-                    data.printAnnouncementGazette,
-                    data.printAnnouncementYear,
+                    getMetadataFromSection(data, MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE),
+                    getMetadataFromSection(data, MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.YEAR),
                     data.printAnnouncementNumber,
-                    data.printAnnouncementPage,
+                    getMetadataFromSection(data, MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.PAGE),
                     data.printAnnouncementInfo,
                     data.printAnnouncementExplanations,
-                    data.digitalAnnouncementMedium,
+                    getMetadataFromSection(data, MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_MEDIUM),
                     encodeLocalDate(data.digitalAnnouncementDate),
                     data.digitalAnnouncementEdition,
-                    data.digitalAnnouncementYear,
-                    data.digitalAnnouncementPage,
+                    getMetadataFromSection(data, MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.YEAR),
+                    getMetadataFromSection(data, MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.NUMBER),
                     data.digitalAnnouncementArea,
                     data.digitalAnnouncementAreaNumber,
                     data.digitalAnnouncementInfo,
@@ -240,6 +241,9 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     files = files,
                 )
             }
+
+            private fun getMetadataFromSection(norm: Norm, section: MetadataSectionName, type: MetadatumType): String? = norm.metadataSections
+                .filter { it.name == section }.flatMap { it.metadata }.filter { it.type == type }.minByOrNull { it.order }?.let { it.value as String }
         }
     }
 

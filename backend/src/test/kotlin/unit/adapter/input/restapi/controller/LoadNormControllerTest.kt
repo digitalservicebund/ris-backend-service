@@ -83,7 +83,15 @@ class LoadNormControllerTest {
 
     @Test
     fun `it maps the norm entity to the expected data schema`() {
-        val norm = createRandomNorm().copy(metadataSections = createSimpleSections())
+        val norm = createRandomNorm().copy(
+            metadataSections = createSimpleSections(),
+            digitalAnnouncementMedium = null,
+            digitalAnnouncementPage = null,
+            digitalAnnouncementYear = null,
+            printAnnouncementGazette = null,
+            printAnnouncementPage = null,
+            printAnnouncementYear = null,
+        )
         val responseJson = convertLoadNormResponseTestSchemaToJson(NormResponseTestSchema.fromUseCaseData(norm))
 
         every { loadNormService.loadNorm(any()) } returns Mono.just(norm)

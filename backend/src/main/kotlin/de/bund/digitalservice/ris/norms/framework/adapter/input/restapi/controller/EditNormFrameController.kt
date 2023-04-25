@@ -151,11 +151,30 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var text: String? = null
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
-            val metadataSections = this.metadataSections.map { it.toUseCaseData() }
+            val metadataSections = this.metadataSections
+                .filter { it.name != MetadataSectionName.PRINT_ANNOUNCEMENT && it.name != MetadataSectionName.DIGITAL_ANNOUNCEMENT }
+                .map { it.toUseCaseData() }
+                .toMutableList() +
+                getSection(
+                    mapOf(
+                        MetadatumType.YEAR to this.printAnnouncementYear,
+                        MetadatumType.ANNOUNCEMENT_GAZETTE to this.printAnnouncementGazette,
+                        MetadatumType.PAGE to this.printAnnouncementPage,
+                    ),
+                    MetadataSectionName.PRINT_ANNOUNCEMENT,
+                ) +
+                getSection(
+                    mapOf(
+                        MetadatumType.ANNOUNCEMENT_MEDIUM to this.digitalAnnouncementMedium,
+                        MetadatumType.YEAR to this.digitalAnnouncementYear,
+                        MetadatumType.NUMBER to this.digitalAnnouncementPage,
+                    ),
+                    MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+                )
 
             return EditNormFrameUseCase.NormFrameProperties(
                 this.officialLongTitle,
-                metadataSections,
+                metadataSections.filter { it.metadata.isNotEmpty() },
                 this.risAbbreviation,
                 this.documentNumber,
                 this.documentCategory,
@@ -247,6 +266,11 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.text,
             )
         }
+
+        private fun getSection(metadata: Map<MetadatumType, String?>, section: MetadataSectionName) = MetadataSection(
+            section,
+            metadata.entries.filter { it.value != null }.map { Metadatum(it.value as String, it.key) },
+        )
     }
 
     class MetadataSectionRequestSchema {
