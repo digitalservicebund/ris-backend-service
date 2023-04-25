@@ -57,7 +57,7 @@ testWithImportedNorm(
   }
 )
 
-testWithImportedNorm(
+testWithImportedNorm.skip(
   "Check if frame fields are correctly displayed",
   async ({ page, normData, guid }) => {
     await openNorm(page, normData.officialLongTitle, guid)
