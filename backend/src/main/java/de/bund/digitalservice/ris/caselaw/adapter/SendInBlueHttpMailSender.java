@@ -15,6 +15,7 @@ import sendinblue.auth.ApiKeyAuth;
 import sibApi.TransactionalEmailsApi;
 import sibModel.SendSmtpEmail;
 import sibModel.SendSmtpEmailAttachment;
+import sibModel.SendSmtpEmailReplyTo;
 import sibModel.SendSmtpEmailSender;
 import sibModel.SendSmtpEmailTo;
 
@@ -62,6 +63,11 @@ public class SendInBlueHttpMailSender implements HttpMailSender {
     sendSmtpEmail.setSubject(subject);
     sendSmtpEmail.setAttachment(attachmentList);
     sendSmtpEmail.setTags(tags);
+
+    SendSmtpEmailReplyTo replyTo = new SendSmtpEmailReplyTo();
+    replyTo.setEmail("florian.zechmeister@digitalservice.bund.de");
+    replyTo.setName("Test Florian");
+    sendSmtpEmail.setReplyTo(replyTo);
 
     try {
       api.sendTransacEmail(sendSmtpEmail);
