@@ -29,6 +29,17 @@ async function changeToYearInput() {
   expect(yearRadioButton).toBeChecked()
 }
 
+async function changeToDateInput() {
+  const dateRadioButton = screen.getByLabelText("Datum") as HTMLInputElement
+  expect(dateRadioButton).toBeInTheDocument()
+  expect(dateRadioButton).toBeVisible()
+  expect(dateRadioButton).not.toBeChecked()
+
+  await fireEvent.click(dateRadioButton)
+
+  expect(dateRadioButton).toBeChecked()
+}
+
 describe("Citation date/year field", () => {
   describe("Default date component", () => {
     it("Shows 2 radio buttons with 1 selected by default and corresponding field displayed", () => {
@@ -110,6 +121,77 @@ describe("Citation date/year field", () => {
       await userEvent.type(yearInputField, "12345")
       expect(yearInputField.value).toBe("1234")
       expect(yearInputField.value.length).toBe(4)
+    })
+  })
+
+  describe("Behaviour when switching between date and year components", () => {
+    it("Date value is deleted after year value is entered", async () => {
+      renderComponent()
+
+      const dateInputField = screen.getByLabelText(
+        "Zitierdatum Datum"
+      ) as HTMLInputElement
+
+      expect(dateInputField).toBeInTheDocument()
+      expect(dateInputField).toBeVisible()
+
+      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.tab()
+
+      expect(dateInputField).toHaveValue("2020-05-12")
+
+      await changeToYearInput()
+
+      const yearInputFieldNew = screen.getByLabelText(
+        "Zitierdatum"
+      ) as HTMLInputElement
+
+      await userEvent.type(yearInputFieldNew, "1989")
+      expect(yearInputFieldNew.value).toBe("1989")
+
+      await changeToDateInput()
+
+      const dateInputFieldNew = screen.getByLabelText(
+        "Zitierdatum Datum"
+      ) as HTMLInputElement
+
+      expect(dateInputFieldNew).not.toHaveValue()
+    })
+
+    it("Year value is deleted after date value is entered", async () => {
+      renderComponent()
+      await changeToYearInput()
+      const yearInputField = screen.getByLabelText(
+        "Zitierdatum"
+      ) as HTMLInputElement
+
+      expect(yearInputField).toBeInTheDocument()
+      expect(yearInputField).toBeVisible()
+
+      await userEvent.type(yearInputField, "1989")
+      expect(yearInputField.value).toBe("1989")
+
+      await changeToDateInput()
+
+      const dateInputField = screen.getByLabelText(
+        "Zitierdatum Datum"
+      ) as HTMLInputElement
+
+      expect(dateInputField).toBeInTheDocument()
+      expect(dateInputField).toBeVisible()
+
+      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.tab()
+
+      expect(dateInputField).toHaveValue("2020-05-12")
+
+      await changeToYearInput()
+
+      const yearInputFieldNew = screen.getByLabelText(
+        "Zitierdatum"
+      ) as HTMLInputElement
+
+      expect(yearInputFieldNew).not.toHaveValue()
     })
   })
 })
