@@ -14,6 +14,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
@@ -134,13 +135,19 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save multiple norms and retrieve only one by eli parameters`() {
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("1125", MetadatumType.PAGE),
+                Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            ),
+        )
         val firstNorm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
+            metadataSections = listOf(printAnnouncementSection),
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
-            printAnnouncementPage = "1125",
-            printAnnouncementGazette = "bg-1",
         )
         val secondNorm = Norm(
             guid = UUID.randomUUID(),
@@ -152,7 +159,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         )
         val saveFirstNormCommand = SaveNormOutputPort.Command(firstNorm)
         val saveSecondNormCommand = SaveNormOutputPort.Command(secondNorm)
-        val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2022", "111")
+        val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2022", "1125")
 
         normsService.saveNorm(saveFirstNormCommand)
             .`as`(StepVerifier::create)
