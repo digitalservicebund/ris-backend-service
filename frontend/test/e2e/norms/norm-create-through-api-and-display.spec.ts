@@ -17,13 +17,17 @@ async function expectSectionAppearsAfterScroll(
 
   if (section.isSingleFieldSection) {
     const firstFieldLabel = section.fields?.[0].label ?? ""
-    await expect(page).toHaveInsideViewport(
-      `label:text-is("${firstFieldLabel}")`
-    )
+    await expect(
+      page.locator(`label:text-is("${firstFieldLabel}")`)
+    ).toBeInViewport()
   } else {
-    await expect(page).toHaveInsideViewport(
-      `legend:text-is("${section.heading}"), h2:text-is("${section.heading}")`
-    )
+    await expect(
+      page
+        .locator(
+          `legend:text-is("${section.heading}"), h2:text-is("${section.heading}")`
+        )
+        .first()
+    ).toBeInViewport()
   }
 }
 

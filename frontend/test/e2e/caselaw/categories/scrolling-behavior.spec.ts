@@ -14,13 +14,13 @@ test.describe("scrolling behavior with hashes", () => {
       `a[href*="/caselaw/documentunit/${documentNumber}/categories#texts"]`
     )
 
-    await expect(page).toHaveInsideViewport(coreDataHeadline)
-    await expect(page).toHaveOutsideViewport(textsHeadline)
+    await expect(page.locator(coreDataHeadline)).toBeInViewport()
+    await expect(page.locator(textsHeadline)).not.toBeInViewport()
 
     await textsNavItem.click()
 
-    await expect(page).toHaveOutsideViewport(coreDataHeadline)
-    await expect(page).toHaveInsideViewport(textsHeadline)
+    await expect(page.locator(coreDataHeadline)).not.toBeInViewport()
+    await expect(page.locator(textsHeadline)).toBeInViewport()
   })
 
   test("scroll to container with hash from different route", async ({
@@ -39,11 +39,11 @@ test.describe("scrolling behavior with hashes", () => {
     )
 
     await textsNavItem.click()
-    await expect(page).toHaveOutsideViewport(coreDataHeadline)
-    await expect(page).toHaveInsideViewport(textsHeadline)
+    await expect(page.locator(coreDataHeadline)).not.toBeInViewport()
+    await expect(page.locator(textsHeadline)).toBeInViewport()
 
     await coreDataNavItem.click()
-    await expect(page).toHaveOutsideViewport(textsHeadline)
-    await expect(page).toHaveInsideViewport(coreDataHeadline)
+    await expect(page.locator(textsHeadline)).not.toBeInViewport()
+    await expect(page.locator(coreDataHeadline)).toBeInViewport()
   })
 })
