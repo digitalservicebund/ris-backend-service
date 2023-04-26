@@ -73,15 +73,15 @@ export const normData: NormData = {
     ],
     CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2001-03-10"] }],
     AGE_INDICATION: [],
+    NORM_PROVIDER: [
+      { ENTITY: ["DEU"], DECIDING_BODY: ["BT"], RESOLUTION_MAJORITY: [false] },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
   officialShortTitle: "Angepasstes Tierarzneimittelrecht",
   risAbbreviation: "Tierarznei",
   documentCategory: "N",
-  providerEntity: "DEU",
-  providerDecidingBody: "BT",
-  providerIsResolutionMajority: false,
   entryIntoForceDate: "2007-01-01",
   principleEntryIntoForceDate: "2007-01-01",
   divergentEntryIntoForceDateState: "UNDEFINED_NOT_PRESENT",

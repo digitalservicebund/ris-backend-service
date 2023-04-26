@@ -79,6 +79,9 @@ class NormTest {
         val citationDate = Metadatum(LocalDate.of(2022, 11, 19), MetadatumType.DATE)
         val citationDateSection = MetadataSection(MetadataSectionName.CITATION_DATE, listOf(citationDate))
 
+        val resolutionMajority = Metadatum(true, MetadatumType.RESOLUTION_MAJORITY)
+        val normProviderSection = MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(resolutionMajority))
+
         val norm =
             Norm(
                 guid = guid,
@@ -86,14 +89,13 @@ class NormTest {
                 officialLongTitle = "long title",
                 publicationDate = publicationDate,
                 announcementDate = announcementDate,
-                providerIsResolutionMajority = true,
                 risAbbreviation = "ABC",
                 documentStatusDescription = "document status description",
                 applicationScopeStartDate = LocalDate.of(2022, 11, 18),
                 categorizedReference = "categorized reference",
                 digitalEvidenceExternalDataNote = "digital evidence external data note",
                 text = "text",
-                metadataSections = listOf(citationDateSection),
+                metadataSections = listOf(citationDateSection, normProviderSection),
             )
 
         assertThat(norm.guid).isEqualTo(guid)
@@ -102,7 +104,7 @@ class NormTest {
         assertThat(norm.publicationDate).isEqualTo(publicationDate)
         assertThat(norm.announcementDate).isEqualTo(announcementDate)
         assertThat(norm.metadataSections.flatMap { it.metadata }).contains(citationDate)
-        assertThat(norm.providerIsResolutionMajority).isTrue()
+        assertThat(norm.metadataSections.flatMap { it.metadata }).contains(resolutionMajority)
         assertThat(norm.risAbbreviation).isEqualTo("ABC")
         assertThat(norm.documentStatusDescription).isEqualTo("document status description")
         assertThat(norm.applicationScopeStartDate).isEqualTo(LocalDate.of(2022, 11, 18))

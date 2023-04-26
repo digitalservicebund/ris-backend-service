@@ -35,9 +35,6 @@ interface NormsMapper {
             normDto.documentTypeName,
             normDto.documentNormCategory,
             normDto.documentTemplateName,
-            normDto.providerEntity,
-            normDto.providerDecidingBody,
-            normDto.providerIsResolutionMajority,
             normDto.officialShortTitle,
             normDto.officialAbbreviation,
             normDto.entryIntoForceDate,
@@ -142,6 +139,7 @@ interface NormsMapper {
         val value = when (metadatumDto.type) {
             MetadatumType.DATE -> decodeLocalDate(metadatumDto.value)
             MetadatumType.RANGE_START_UNIT, MetadatumType.RANGE_END_UNIT -> RangeUnit.valueOf(metadatumDto.value)
+            MetadatumType.RESOLUTION_MAJORITY -> metadatumDto.value.toBoolean()
             else -> metadatumDto.value
         }
 
@@ -159,9 +157,6 @@ interface NormsMapper {
             norm.documentTypeName,
             norm.documentNormCategory,
             norm.documentTemplateName,
-            norm.providerEntity,
-            norm.providerDecidingBody,
-            norm.providerIsResolutionMajority,
             norm.officialShortTitle,
             norm.officialAbbreviation,
             norm.entryIntoForceDate,

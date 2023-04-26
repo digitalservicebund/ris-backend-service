@@ -34,7 +34,7 @@ function encodeString(data?: string | null): string | null {
   return data && data.length > 0 ? data : null
 }
 
-function encodeBoolean(data?: boolean | null): boolean | null {
+function encodeBooleanInFlatten(data?: boolean | null): boolean | null {
   return data ?? null
 }
 
@@ -68,6 +68,10 @@ type MetadataValueEncoders = {
   ) => MetadatumSchema["value"]
 }
 
+function decodeBoolean(data: string): boolean {
+  return JSON.parse(data)
+}
+
 function decodeRangeUnit(data: string): RangeUnit {
   const indexOfKeyPassed = Object.keys(RangeUnit).indexOf(data)
 
@@ -80,6 +84,10 @@ function decodeRangeUnit(data: string): RangeUnit {
 
 function encodeRangeUnit(data: RangeUnit): string {
   return data
+}
+
+function encodeBoolean(data: boolean): string {
+  return String(data)
 }
 
 const DECODERS: MetadataValueDecoders = {
@@ -112,6 +120,9 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: identity,
   [MetadatumType.NUMBER]: identity,
   [MetadatumType.PAGE]: identity,
+  [MetadatumType.ENTITY]: identity,
+  [MetadatumType.DECIDING_BODY]: identity,
+  [MetadatumType.RESOLUTION_MAJORITY]: decodeBoolean,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -144,6 +155,9 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: identity,
   [MetadatumType.NUMBER]: identity,
   [MetadatumType.PAGE]: identity,
+  [MetadatumType.ENTITY]: identity,
+  [MetadatumType.DECIDING_BODY]: identity,
+  [MetadatumType.RESOLUTION_MAJORITY]: encodeBoolean,
 }
 
 /**
@@ -458,7 +472,9 @@ export function encodeFlatMetadata(
     expirationDate: encodeNullDate(flatMetadata.expirationDate),
     expirationDateState: encodeString(flatMetadata.expirationDateState),
     expirationNormCategory: encodeString(flatMetadata.expirationNormCategory),
-    isExpirationDateTemp: encodeBoolean(flatMetadata.isExpirationDateTemp),
+    isExpirationDateTemp: encodeBooleanInFlatten(
+      flatMetadata.isExpirationDateTemp
+    ),
     officialAbbreviation: encodeString(flatMetadata.officialAbbreviation),
     officialLongTitle: encodeString(flatMetadata.officialLongTitle) ?? "",
     officialShortTitle: encodeString(flatMetadata.officialShortTitle),
@@ -495,11 +511,6 @@ export function encodeFlatMetadata(
     printAnnouncementNumber: encodeString(flatMetadata.printAnnouncementNumber),
     printAnnouncementPage: encodeString(flatMetadata.printAnnouncementPage),
     printAnnouncementYear: encodeString(flatMetadata.printAnnouncementYear),
-    providerEntity: encodeString(flatMetadata.providerEntity),
-    providerDecidingBody: encodeString(flatMetadata.providerDecidingBody),
-    providerIsResolutionMajority: encodeBoolean(
-      flatMetadata.providerIsResolutionMajority
-    ),
     publicationDate: encodeNullDate(flatMetadata.publicationDate),
     reissueArticle: encodeString(flatMetadata.reissueArticle),
     reissueDate: encodeNullDate(flatMetadata.reissueDate),

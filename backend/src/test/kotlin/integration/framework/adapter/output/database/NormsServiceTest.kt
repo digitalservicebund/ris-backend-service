@@ -374,7 +374,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val updatedNorm = NORM.copy(
             officialLongTitle = "new title",
             documentNumber = "document number",
-            providerEntity = "provider entity",
             entryIntoForceDate = LocalDate.now(),
             expirationDateState = UndefinedDate.UNDEFINED_FUTURE,
             printAnnouncementGazette = "print gazette",
@@ -394,7 +393,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .assertNext {
                 assertThat(it.officialLongTitle).isEqualTo(updatedNorm.officialLongTitle)
                 assertThat(it.documentNumber).isEqualTo(updatedNorm.documentNumber)
-                assertThat(it.providerEntity).isEqualTo(updatedNorm.providerEntity)
                 assertThat(it.entryIntoForceDate).isEqualTo(updatedNorm.entryIntoForceDate)
                 assertThat(it.expirationDateState).isEqualTo(updatedNorm.expirationDateState)
                 assertThat(it.printAnnouncementGazette).isEqualTo(updatedNorm.printAnnouncementGazette)

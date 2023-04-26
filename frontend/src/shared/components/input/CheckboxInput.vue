@@ -28,6 +28,16 @@ const { inputValue, emitInputEvent } = useInputModel<boolean, Props, Emits>(
   emit
 )
 
+function updateValue() {
+  if (inputValue.value === undefined) {
+    inputValue.value = true
+    console.log("I am here. Value: " + true)
+  } else {
+    inputValue.value = !inputValue.value
+    console.log("I am here. Value: " + inputValue.value)
+  }
+}
+
 const isInvalid = computed(() => props.validationError !== undefined)
 </script>
 <template>
@@ -39,6 +49,7 @@ const isInvalid = computed(() => props.validationError !== undefined)
     :class="{ 'border-red-800': isInvalid, 'outline-red-800': isInvalid }"
     type="checkbox"
     @input="emitInputEvent"
+    @keydown.enter="updateValue"
   />
 </template>
 

@@ -161,10 +161,10 @@ class ToLegalDocMLConverterTest {
                 .copy(
                     documentTypeName = "documentTypeName",
                     documentNormCategory = "documentNormCategory",
-                    providerDecidingBody = "providerDecidingBody",
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("participationInstitution", MetadatumType.PARTICIPATION_INSTITUTION))),
                         MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                        MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("providerDecidingBody", MetadatumType.DECIDING_BODY))),
                     ),
                 ),
         )
@@ -188,7 +188,6 @@ class ToLegalDocMLConverterTest {
                 .copy(
                     documentTypeName = null,
                     documentNormCategory = null,
-                    providerDecidingBody = null,
                 ),
         )
 
@@ -211,10 +210,10 @@ class ToLegalDocMLConverterTest {
                 .copy(
                     documentTypeName = "SO",
                     documentNormCategory = "Rechtsetzungsdokument",
-                    providerDecidingBody = "Präsident des Deutschen Bundestages",
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("Bundeskanzleramt", MetadatumType.PARTICIPATION_INSTITUTION))),
                         MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                        MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("Präsident des Deutschen Bundestages", MetadatumType.DECIDING_BODY))),
                     ),
                 ),
 
@@ -237,10 +236,10 @@ class ToLegalDocMLConverterTest {
         val document = convertNormToLegalDocML(
             createRandomNorm()
                 .copy(
-                    providerDecidingBody = "Bundesministerinnen",
                     metadataSections = listOf(
                         MetadataSection(MetadataSectionName.PARTICIPATION, listOf(Metadatum("BMinisterium", MetadatumType.PARTICIPATION_INSTITUTION))),
                         MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(decodeLocalDate("2002-02-02"), MetadatumType.DATE))),
+                        MetadataSection(MetadataSectionName.NORM_PROVIDER, listOf(Metadatum("Bundesministerinnen", MetadatumType.DECIDING_BODY))),
                     ),
                 ),
         )

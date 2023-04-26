@@ -57,6 +57,9 @@ export enum MetadatumType {
   ANNOUNCEMENT_GAZETTE = "ANNOUNCEMENT_GAZETTE",
   NUMBER = "NUMBER",
   PAGE = "PAGE",
+  ENTITY = "ENTITY",
+  DECIDING_BODY = "DECIDING_BODY",
+  RESOLUTION_MAJORITY = "RESOLUTION_MAJORITY",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -90,6 +93,9 @@ export type MetadataValueType = {
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: string
   [MetadatumType.NUMBER]: string
   [MetadatumType.PAGE]: string
+  [MetadatumType.ENTITY]: string
+  [MetadatumType.DECIDING_BODY]: string
+  [MetadatumType.RESOLUTION_MAJORITY]: boolean
 }
 
 export type Metadata = {
@@ -105,6 +111,7 @@ export enum MetadataSectionName {
   AGE_INDICATION = "AGE_INDICATION",
   DIGITAL_ANNOUNCEMENT = "DIGITAL_ANNOUNCEMENT",
   PRINT_ANNOUNCEMENT = "PRINT_ANNOUNCEMENT",
+  NORM_PROVIDER = "NORM_PROVIDER",
 }
 
 export type MetadataSections = {
@@ -185,9 +192,6 @@ export type FlatMetadata = {
   printAnnouncementNumber?: string
   printAnnouncementPage?: string
   printAnnouncementYear?: string
-  providerEntity?: string
-  providerDecidingBody?: string
-  providerIsResolutionMajority?: boolean
   publicationDate?: string
   reissueArticle?: string
   reissueDate?: string

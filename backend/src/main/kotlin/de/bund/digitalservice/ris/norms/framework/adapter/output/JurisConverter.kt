@@ -15,8 +15,10 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORI
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_MEDIUM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
@@ -25,6 +27,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
@@ -82,8 +85,8 @@ fun mapDomainToData(norm: Norm): NormData {
         officialAbbreviation = norm.officialAbbreviation,
         officialLongTitle = norm.officialLongTitle,
         officialShortTitle = norm.officialShortTitle,
-        providerEntity = norm.providerEntity,
-        providerDecidingBody = norm.providerDecidingBody,
+        providerEntity = extractFirstStringValue(norm, MetadataSectionName.NORM_PROVIDER, ENTITY),
+        providerDecidingBody = extractFirstStringValue(norm, MetadataSectionName.NORM_PROVIDER, DECIDING_BODY),
         printAnnouncementList = extractPrintAnnouncementList(norm),
         digitalAnnouncementList = extractDigitalAnnouncementList(norm),
         risAbbreviation = norm.risAbbreviation,
@@ -132,7 +135,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
         createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
         createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear) +
-        citationDateSections
+        citationDateSections +
+        addProviderSection(data)
 
     return Norm(
         guid = guid,
@@ -141,9 +145,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         documentCategory = data.documentCategory,
-        providerEntity = data.providerEntity,
-        providerDecidingBody = data.providerDecidingBody,
-        providerIsResolutionMajority = data.providerIsResolutionMajority,
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
         entryIntoForceDate = parseDateString(data.entryIntoForceDate),
@@ -187,6 +188,21 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         celexNumber = data.celexNumber,
         text = data.text,
     )
+}
+
+fun addProviderSection(data: NormData): MetadataSection? {
+    val metadata = mutableListOf<Metadatum<*>>()
+    if (data.providerEntity !== null) {
+        metadata.add(Metadatum(data.providerEntity, ENTITY, 1))
+    }
+    if (data.providerDecidingBody !== null) {
+        metadata.add(Metadatum(data.providerDecidingBody, DECIDING_BODY, 1))
+    }
+    if (data.providerIsResolutionMajority !== null) {
+        metadata.add(Metadatum(data.providerIsResolutionMajority, RESOLUTION_MAJORITY, 1))
+    }
+
+    return if (metadata.size > 0) MetadataSection(Section.NORM_PROVIDER, metadata) else null
 }
 
 private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> = data

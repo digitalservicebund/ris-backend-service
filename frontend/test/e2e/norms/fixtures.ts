@@ -201,24 +201,32 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Normgeber",
+      isRepeatedSection: true,
+      id: "normProviders",
       fields: [
         {
           type: FieldType.TEXT,
-          id: "providerEntity",
+          id: "normProviderEntity",
           label: "Staat, Land, Stadt, Landkreis oder juristische Person",
-          value: norm.providerEntity,
+          values: norm.metadataSections?.NORM_PROVIDER?.map(
+            (section) => section?.ENTITY?.[0]
+          ),
         },
         {
           type: FieldType.TEXT,
-          id: "providerDecidingBody",
+          id: "normProviderDecidingBody",
           label: "Beschließendes Organ",
-          value: norm.providerDecidingBody,
+          values: norm.metadataSections?.NORM_PROVIDER?.map(
+            (section) => section?.DECIDING_BODY?.[0]
+          ),
         },
         {
           type: FieldType.CHECKBOX,
-          id: "providerIsResolutionMajority",
+          id: "normProviderIsResolutionMajority",
           label: "Beschlussfassung mit qualifizierter Mehrheit",
-          value: norm.providerIsResolutionMajority,
+          values: norm.metadataSections?.NORM_PROVIDER?.map(
+            (section) => section?.RESOLUTION_MAJORITY?.[0]
+          ),
         },
       ],
     },

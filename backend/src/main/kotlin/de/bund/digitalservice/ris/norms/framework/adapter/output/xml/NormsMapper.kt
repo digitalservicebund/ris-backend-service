@@ -21,6 +21,9 @@ fun mapNormToDto(norm: Norm): NormDto {
     val firstCitationDate = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let { encodeLocalDate(it.value as LocalDate) }
     val firstCitationYear = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let { it.value as String }
 
+    val firstProviderDecidingBody = norm.metadataSections.filter { it.name == MetadataSectionName.NORM_PROVIDER }.flatMap { it.metadata }
+        .filter { it.type == MetadatumType.DECIDING_BODY }.minByOrNull { it.order }?.let { it.value.toString() }
+
     return NormDto(
         guid = norm.guid.toString(),
         officialLongTitle = IdentifiedElement(norm.officialLongTitle),
@@ -28,7 +31,7 @@ fun mapNormToDto(norm: Norm): NormDto {
         announcementDate = norm.announcementDate?.toString() ?: (firstCitationDate ?: firstCitationYear),
         documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
         documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
-        providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, norm.providerDecidingBody ?: ""),
+        providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, firstProviderDecidingBody ?: ""),
         participationInstitution = getMappedValue(
             Property.PARTICIPATION_INSTITUTION,
             norm.getFirstMetadatum(MetadataSectionName.PARTICIPATION, MetadatumType.PARTICIPATION_INSTITUTION)?.value.toString(),

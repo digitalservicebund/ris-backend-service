@@ -52,6 +52,9 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: generateString,
   [MetadatumType.PAGE]: generateString,
   [MetadatumType.NUMBER]: generateString,
+  [MetadatumType.ENTITY]: generateString,
+  [MetadatumType.DECIDING_BODY]: generateString,
+  [MetadatumType.RESOLUTION_MAJORITY]: pickRandomBoolean,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -59,6 +62,10 @@ const HEXADECIMAL_CHARACTERS = "0123456789abcdef"
 
 export function generateRandomNumber(minimum = 0, maximum = 10): number {
   return Math.floor(Math.random() * (maximum - minimum) + minimum)
+}
+
+export function pickRandomBoolean(): boolean {
+  return Math.random() < 0.5
 }
 
 export function generateString(options?: {
@@ -180,12 +187,15 @@ export function pickRandomMetadatumType(): MetadatumType {
 export function generateMetadata(partialMetadata?: Partial<Metadata>) {
   const metadata = {} as Metadata
   const metadataCount = generateRandomNumber()
-
   for (let i = 0; i < metadataCount; i++) {
     const type = pickRandomMetadatumType()
     const values = new Array(generateRandomNumber())
       .fill(0)
-      .map(METADATA_VALUE_GENERATORS[type]) as string[] & RangeUnit[]
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore TS2345
+      .map(METADATA_VALUE_GENERATORS[type]) as string[] &
+      RangeUnit[] &
+      boolean[]
     metadata[type] = values
   }
 
@@ -296,9 +306,6 @@ export function generateFlatMetadata(
     printAnnouncementNumber: generateString(),
     printAnnouncementPage: generateString(),
     printAnnouncementYear: generateString(),
-    providerEntity: generateString(),
-    providerDecidingBody: generateString(),
-    providerIsResolutionMajority: false,
     publicationDate: generateString(),
     reissueArticle: generateString(),
     reissueDate: generateString(),

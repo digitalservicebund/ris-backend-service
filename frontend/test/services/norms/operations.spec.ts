@@ -141,9 +141,6 @@ describe("normsService", () => {
           officialAbbreviation: undefined,
           publicationDate: "2022-11-14T23:00:00.000Z",
           announcementDate: "",
-          providerEntity: "new provider entity",
-          providerDecidingBody: undefined,
-          providerIsResolutionMajority: undefined,
         }
       )
 

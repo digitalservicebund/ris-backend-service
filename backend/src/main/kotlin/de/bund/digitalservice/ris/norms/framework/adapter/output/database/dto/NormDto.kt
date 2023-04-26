@@ -29,13 +29,6 @@ data class NormDto(
     @Column("document_template_name")
     var documentTemplateName: String? = null,
 
-    @Column("provider_entity")
-    var providerEntity: String? = null,
-    @Column("provider_deciding_body")
-    var providerDecidingBody: String? = null,
-    @Column("provider_is_resolution_majority")
-    var providerIsResolutionMajority: Boolean? = null,
-
     @Column("official_short_title")
     var officialShortTitle: String? = null,
     @Column("official_abbreviation")

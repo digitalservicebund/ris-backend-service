@@ -120,10 +120,6 @@ class EditNormFrameControllerTest {
         var documentNormCategory: String? = null
         var documentTemplateName: String? = null
 
-        var providerEntity: String? = null
-        var providerDecidingBody: String? = null
-        var providerIsResolutionMajority: Boolean? = null
-
         var officialShortTitle: String? = null
         var officialAbbreviation: String? = null
 

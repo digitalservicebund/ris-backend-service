@@ -181,9 +181,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.documentTypeName,
                 this.documentNormCategory,
                 this.documentTemplateName,
-                this.providerEntity,
-                this.providerDecidingBody,
-                this.providerIsResolutionMajority,
                 this.officialShortTitle,
                 this.officialAbbreviation,
                 decodeLocalDate(this.entryIntoForceDate),
@@ -295,9 +292,9 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             val value = when (this.type) {
                 MetadatumType.DATE -> decodeLocalDate(this.value)
                 MetadatumType.RANGE_START_UNIT, MetadatumType.RANGE_END_UNIT -> RangeUnit.valueOf(this.value)
+                MetadatumType.RESOLUTION_MAJORITY -> this.value.toBoolean()
                 else -> this.value
             }
-
             return Metadatum(value = value, type = this.type, order = this.order)
         }
     }

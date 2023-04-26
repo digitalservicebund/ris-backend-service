@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, toRefs, ref, watch } from "vue"
+import { computed, toRefs, ref, watch, h } from "vue"
 import { useRoute } from "vue-router"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
+import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
@@ -25,7 +26,6 @@ import { documentType } from "@/fields/norms/documentType"
 import { entryIntoForce } from "@/fields/norms/entryIntoForce"
 import { euAnnouncement } from "@/fields/norms/euAnnouncement"
 import { expiration } from "@/fields/norms/expiration"
-import { normProvider } from "@/fields/norms/normProvider"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
 import { otherOfficialReferences } from "@/fields/norms/otherOfficialReferences"
@@ -195,11 +195,6 @@ watch(
         data.printAnnouncementPage as string
       loadedNorm.value.printAnnouncementYear =
         data.printAnnouncementYear as string
-      loadedNorm.value.providerEntity = data.providerEntity as string
-      loadedNorm.value.providerDecidingBody =
-        data.providerDecidingBody as string
-      loadedNorm.value.providerIsResolutionMajority =
-        data.providerIsResolutionMajority as boolean
       loadedNorm.value.publicationDate = data.publicationDate as string
       loadedNorm.value.reissueArticle = data.reissueArticle as string
       loadedNorm.value.reissueDate = data.reissueDate as string
@@ -293,8 +288,38 @@ function citationDateSummarizer(data: Metadata): string {
   return formatDate(data.DATE)
 }
 
+function normProviderSummarizer(data: Metadata) {
+  if (!data) return ""
+
+  const entity = data.ENTITY?.[0]
+  const decidingBody = data.DECIDING_BODY?.[0]
+  const isResolutionMajority = data.RESOLUTION_MAJORITY?.[0]
+
+  const summaryLine = [entity, decidingBody]
+    .filter((value) => value != "" && value != null)
+    .join(" | ")
+
+  if (isResolutionMajority) {
+    return h("div", { class: ["flex", "gap-8"] }, [
+      h(
+        "span",
+        summaryLine.length == 0 ? summaryLine : summaryLine.concat(" | ")
+      ),
+      h("img", {
+        src: "/src/assets/icons/ckeckbox_regular.svg",
+        width: "16",
+        alt: "Schwarzes Haken",
+      }),
+      h("span", "Beschlussfassung mit qual. Mehrheit"),
+    ])
+  } else {
+    return summaryLine
+  }
+}
+
 const AgeIndicationSummary = withSummarizer(ageIndicatorSummarizer)
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
+const NormProviderSummary = withSummarizer(normProviderSummarizer)
 </script>
 
 <template>
@@ -359,16 +384,19 @@ const CitationDateSummary = withSummarizer(citationDateSummarizer)
       />
     </fieldset>
 
-    <fieldset class="mb-32">
-      <legend id="normProviderFields" class="heading-02-regular mb-[1rem]">
-        Normgeber
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="normProvider"
+    <ExpandableDataSet
+      id="normProviders"
+      :data-set="metadataSections.NORM_PROVIDER"
+      :summary-component="NormProviderSummary"
+      title="Normgeber"
+    >
+      <EditableList
+        v-model="metadataSections.NORM_PROVIDER"
+        :default-value="{}"
+        :edit-component="NormProviderInputGroup"
+        :summary-component="NormProviderSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="participatingInstitutions"
