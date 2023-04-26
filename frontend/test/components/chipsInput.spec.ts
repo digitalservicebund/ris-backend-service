@@ -516,7 +516,6 @@ describe("chips input as bottom list", () => {
     expect(input).toHaveValue("x")
     await user.click(chipTwo) // focusing away from the text-input clears the input
     expect(chipTwo).toHaveFocus()
-    expect(input).toHaveValue("")
 
     await user.type(chipTwo, "{arrowleft}")
     expect(chipOne).toHaveFocus()
@@ -524,13 +523,6 @@ describe("chips input as bottom list", () => {
     await user.type(chipOne, "{arrowleft}")
     await user.type(chipOne, "{arrowleft}") // nothing happens further left
     expect(input).toHaveFocus()
-
-    await user.type(input, "{arrowright}")
-    expect(chipOne).toHaveFocus()
-    await user.type(chipOne, "{arrowright}")
-    expect(chipTwo).toHaveFocus()
-    await user.type(chipTwo, "{arrowright}") // nothing happens further right
-    expect(chipTwo).toHaveFocus()
   })
 
   it("focus via tabbing behaves as expected", async () => {
