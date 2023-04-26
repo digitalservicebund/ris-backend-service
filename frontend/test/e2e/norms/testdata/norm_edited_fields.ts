@@ -84,7 +84,7 @@ export const newNorm: NormData = {
       },
     ],
     // TODO: add some dates here
-    CITATION_DATE: [],
+    CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2023-03-02"] }],
     AGE_INDICATION: [
       {
         RANGE_START: ["1"],
