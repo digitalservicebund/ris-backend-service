@@ -60,7 +60,9 @@ export class ProceedingDecision {
           : []),
         ...(decision.date ? [dayjs(decision.date).format("DD.MM.YYYY")] : []),
         ...(decision.fileNumber ? [decision.fileNumber] : []),
-        ...(decision.documentNumber ? [decision.documentNumber] : []),
+        ...(decision.documentNumber && this.hasLink(decision)
+          ? [decision.documentNumber]
+          : []),
       ].join(", ")
     }
   }
