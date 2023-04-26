@@ -161,6 +161,8 @@ dependencies {
 
   implementation "org.jsoup:jsoup:1.15.4"
 
+  implementation "com.github.loki4j:loki-logback-appender:1.4.0"
+
   testImplementation "org.jeasy:easy-random-core:5.0.0"
   testImplementation "com.google.code.gson:gson:2.10.1"
 }

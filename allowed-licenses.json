@@ -84,6 +84,9 @@
       "moduleLicense": null,
       "moduleVersion": "3.0.0",
       "moduleName": "com.squareup.okio:okio"
+    },
+    {
+      "moduleLicense": "BSD Software License, 2-clause version"
     }
   ]
 }
