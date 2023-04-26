@@ -170,17 +170,17 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.expirationNormCategory,
                     encodeLocalDate(data.announcementDate),
                     encodeLocalDate(data.publicationDate),
-                    getMetadataFromSection(data, MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE),
-                    getMetadataFromSection(data, MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.YEAR),
+                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE)?.let { it.value as String },
+                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.YEAR)?.let { it.value as String },
                     data.printAnnouncementNumber,
-                    getMetadataFromSection(data, MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.PAGE),
+                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.PAGE)?.let { it.value as String },
                     data.printAnnouncementInfo,
                     data.printAnnouncementExplanations,
-                    getMetadataFromSection(data, MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_MEDIUM),
+                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_MEDIUM)?.let { it.value as String },
                     encodeLocalDate(data.digitalAnnouncementDate),
                     data.digitalAnnouncementEdition,
-                    getMetadataFromSection(data, MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.YEAR),
-                    getMetadataFromSection(data, MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.NUMBER),
+                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.YEAR)?.let { it.value as String },
+                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.EDITION)?.let { it.value as String },
                     data.digitalAnnouncementArea,
                     data.digitalAnnouncementAreaNumber,
                     data.digitalAnnouncementInfo,
@@ -235,9 +235,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     files = files,
                 )
             }
-
-            private fun getMetadataFromSection(norm: Norm, section: MetadataSectionName, type: MetadatumType): String? = norm.metadataSections
-                .filter { it.name == section }.flatMap { it.metadata }.filter { it.type == type }.minByOrNull { it.order }?.let { it.value as String }
         }
     }
 

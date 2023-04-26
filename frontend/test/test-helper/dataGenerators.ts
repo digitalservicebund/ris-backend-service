@@ -52,6 +52,7 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: generateString,
   [MetadatumType.PAGE]: generateString,
   [MetadatumType.NUMBER]: generateString,
+  [MetadatumType.EDITION]: generateString,
   [MetadatumType.ENTITY]: generateString,
   [MetadatumType.DECIDING_BODY]: generateString,
   [MetadatumType.RESOLUTION_MAJORITY]: pickRandomBoolean,

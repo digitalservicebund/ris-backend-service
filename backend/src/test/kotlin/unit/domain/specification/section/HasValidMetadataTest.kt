@@ -194,7 +194,7 @@ class HasValidMetadataTest {
         every { instance.metadata } returns listOf(
             Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
             Metadatum(LocalDate.now(), MetadatumType.DATE),
-            Metadatum("number", MetadatumType.NUMBER),
+            Metadatum("number", MetadatumType.EDITION),
             Metadatum("year", MetadatumType.YEAR),
             Metadatum("area of publication", MetadatumType.AREA_OF_PUBLICATION),
             Metadatum("number of the publication in the respective area", MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA),

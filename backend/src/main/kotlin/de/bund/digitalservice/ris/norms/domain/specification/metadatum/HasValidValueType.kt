@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EDITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EU_GOVERNMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
@@ -60,7 +61,7 @@ val hasValidValueType =
                 NUMBER, PAGE, ADDITIONAL_INFO, EXPLANATION, ANNOUNCEMENT_MEDIUM,
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
-                TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME,
+                TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME, EDITION,
                 -> instance.value is String
 
                 RANGE_START_UNIT, RANGE_END_UNIT -> instance.value is RangeUnit

@@ -57,6 +57,7 @@ export enum MetadatumType {
   ANNOUNCEMENT_GAZETTE = "ANNOUNCEMENT_GAZETTE",
   NUMBER = "NUMBER",
   PAGE = "PAGE",
+  EDITION = "EDITION",
   ENTITY = "ENTITY",
   DECIDING_BODY = "DECIDING_BODY",
   RESOLUTION_MAJORITY = "RESOLUTION_MAJORITY",
@@ -93,6 +94,7 @@ export type MetadataValueType = {
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: string
   [MetadatumType.NUMBER]: string
   [MetadatumType.PAGE]: string
+  [MetadatumType.EDITION]: string
   [MetadatumType.ENTITY]: string
   [MetadatumType.DECIDING_BODY]: string
   [MetadatumType.RESOLUTION_MAJORITY]: boolean

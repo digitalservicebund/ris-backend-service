@@ -167,7 +167,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                     mapOf(
                         MetadatumType.ANNOUNCEMENT_MEDIUM to this.digitalAnnouncementMedium,
                         MetadatumType.YEAR to this.digitalAnnouncementYear,
-                        MetadatumType.NUMBER to this.digitalAnnouncementPage,
+                        MetadatumType.EDITION to this.digitalAnnouncementPage,
                     ),
                     MetadataSectionName.DIGITAL_ANNOUNCEMENT,
                 )
