@@ -124,12 +124,17 @@ data class Norm(
     val eli: Eli
         get() =
             Eli(
-                printAnnouncementGazette,
+                getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE)?.let { it.value as String },
                 announcementDate,
-                metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
-                    .filter { it.type == MetadatumType.DATE }.minByOrNull { it.order }?.let { it.value as LocalDate },
-                metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
-                    .filter { it.type == MetadatumType.YEAR }.minByOrNull { it.order }?.let { it.value as String },
-                printAnnouncementPage,
+                getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let { it.value as LocalDate },
+                getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let { it.value as String },
+                getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.PAGE)?.let { it.value as String },
             )
+
+    fun getFirstMetadatum(sectionName: MetadataSectionName, type: MetadatumType): Metadatum<*>? = metadataSections
+        .filter { it.name == sectionName }
+        .minByOrNull { it.order }
+        ?.let {
+            it.metadata.filter { metadatum -> metadatum.type == type }.minByOrNull { metadatum -> metadatum.order }
+        }
 }

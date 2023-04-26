@@ -53,6 +53,10 @@ export enum MetadatumType {
   RANGE_START_UNIT = "RANGE_START_UNIT",
   RANGE_END = "RANGE_END",
   RANGE_END_UNIT = "RANGE_END_UNIT",
+  ANNOUNCEMENT_MEDIUM = "ANNOUNCEMENT_MEDIUM",
+  ANNOUNCEMENT_GAZETTE = "ANNOUNCEMENT_GAZETTE",
+  NUMBER = "NUMBER",
+  PAGE = "PAGE",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -82,6 +86,10 @@ export type MetadataValueType = {
   [MetadatumType.RANGE_START_UNIT]: RangeUnit
   [MetadatumType.RANGE_END]: string
   [MetadatumType.RANGE_END_UNIT]: RangeUnit
+  [MetadatumType.ANNOUNCEMENT_MEDIUM]: string
+  [MetadatumType.ANNOUNCEMENT_GAZETTE]: string
+  [MetadatumType.NUMBER]: string
+  [MetadatumType.PAGE]: string
 }
 
 export type Metadata = {
@@ -95,6 +103,8 @@ export enum MetadataSectionName {
   PARTICIPATION = "PARTICIPATION",
   CITATION_DATE = "CITATION_DATE",
   AGE_INDICATION = "AGE_INDICATION",
+  DIGITAL_ANNOUNCEMENT = "DIGITAL_ANNOUNCEMENT",
+  PRINT_ANNOUNCEMENT = "PRINT_ANNOUNCEMENT",
 }
 
 export type MetadataSections = {

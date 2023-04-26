@@ -48,6 +48,10 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.RANGE_START_UNIT]: pickRandomRangeUnit,
   [MetadatumType.RANGE_END]: generateString,
   [MetadatumType.RANGE_END_UNIT]: pickRandomRangeUnit,
+  [MetadatumType.ANNOUNCEMENT_MEDIUM]: generateString,
+  [MetadatumType.ANNOUNCEMENT_GAZETTE]: generateString,
+  [MetadatumType.PAGE]: generateString,
+  [MetadatumType.NUMBER]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"

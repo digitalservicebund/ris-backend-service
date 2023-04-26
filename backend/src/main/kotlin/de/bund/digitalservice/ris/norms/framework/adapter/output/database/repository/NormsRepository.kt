@@ -16,20 +16,23 @@ interface NormsRepository : ReactiveCrudRepository<NormDto, UUID> {
         "SELECT DISTINCT n.guid " +
             "FROM norms n " +
             "LEFT JOIN metadata_sections ms ON n.id = ms.norm_id " +
-            "LEFT JOIN metadata m ON ms.id  = m.section_id " +
-            "WHERE n.print_announcement_gazette = :gazette " +
-            "AND n.print_announcement_page = :page " +
+            "LEFT JOIN metadata_sections ms2 ON n.id = ms2.norm_id " +
+            "LEFT JOIN metadata m1 ON ms.id  = m1.section_id " +
+            "LEFT JOIN metadata m2 ON ms2.id  = m2.section_id " +
+            "LEFT JOIN metadata m3 ON ms2.id  = m3.section_id " +
+            "WHERE (ms2.name = 'PRINT_ANNOUNCEMENT' AND m2.type = 'ANNOUNCEMENT_GAZETTE' AND m2.value = :gazette) " +
+            "AND (ms2.name = 'PRINT_ANNOUNCEMENT' AND m3.type = 'PAGE' AND m3.value = :page) " +
             "AND( " +
             "(EXTRACT(YEAR FROM n.announcement_date) = CAST(:year AS DOUBLE PRECISION)) " +
             "OR " +
-            "(n.announcement_date IS NULL AND ms.name = 'CITATION_DATE' AND m.type = 'DATE' AND substring(m.value FROM 0 FOR 5) = :year) " +
+            "(n.announcement_date IS NULL AND ms.name = 'CITATION_DATE' AND m1.type = 'DATE' AND substring(m1.value FROM 0 FOR 5) = :year) " +
             "OR " +
-            "(n.announcement_date IS NULL AND ms.name = 'CITATION_DATE' AND m.type = 'YEAR' AND m.value = :year AND n.id NOT IN " +
-            "(SELECT DISTINCT ms2.norm_id " +
-            "FROM metadata_sections ms2 " +
-            "JOIN metadata m2 ON ms2.id = m2.section_id " +
-            "WHERE ms2.name = 'CITATION_DATE' " +
-            "AND m2.type = 'DATE' " +
+            "(n.announcement_date IS NULL AND ms.name = 'CITATION_DATE' AND m1.type = 'YEAR' AND m1.value = :year AND n.id NOT IN " +
+            "(SELECT DISTINCT ms3.norm_id " +
+            "FROM metadata_sections ms3 " +
+            "JOIN metadata m4 ON ms3.id = m4.section_id " +
+            "WHERE ms3.name = 'CITATION_DATE' " +
+            "AND m4.type = 'DATE' " +
             "))) limit 1;",
     )
     fun findNormByEli(gazette: String, year: String, page: String): Mono<String>

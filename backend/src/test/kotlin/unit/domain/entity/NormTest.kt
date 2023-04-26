@@ -111,4 +111,39 @@ class NormTest {
             .isEqualTo("digital evidence external data note")
         assertThat(norm.text).isEqualTo("text")
     }
+
+    @Test
+    fun `it can create a proper eli from the respective sections`() {
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("BGBl I", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                Metadatum("BGBL II", MetadatumType.ANNOUNCEMENT_GAZETTE, 2),
+                Metadatum("1102", MetadatumType.PAGE, 1),
+                Metadatum("1102", MetadatumType.PAGE, 2),
+            ),
+        )
+        val citationDateSection = MetadataSection(
+            MetadataSectionName.CITATION_DATE,
+            listOf(
+                Metadatum(LocalDate.of(2022, 11, 19), MetadatumType.DATE),
+            ),
+        )
+        val announcementDate = LocalDate.of(2022, 11, 18)
+        val guid = UUID.randomUUID()
+
+        val norm =
+            Norm(
+                guid = guid,
+                officialLongTitle = "long title",
+                announcementDate = announcementDate,
+                metadataSections = listOf(printAnnouncementSection, citationDateSection),
+            )
+
+        assertThat(norm.eli.gazette).isEqualTo("bgbl-1")
+        assertThat(norm.eli.printAnnouncementGazette).isEqualTo("BGBl I")
+        assertThat(norm.eli.citationDate).isEqualTo(LocalDate.of(2022, 11, 19))
+        assertThat(norm.eli.announcementDate).isEqualTo(LocalDate.of(2022, 11, 18))
+        assertThat(norm.eli.toString()).isEqualTo("eli/bgbl-1/2022/s1102")
+    }
 }

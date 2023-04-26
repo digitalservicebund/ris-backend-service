@@ -6,12 +6,14 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DIVERGENT_DOCUMENT_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
@@ -28,6 +30,10 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
+import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
+import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
+import de.bund.digitalservice.ris.norms.juris.converter.model.SubjectArea
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -115,12 +121,9 @@ class JurisConverterTest {
                     providerEntity = "test provider entity"
                     providerDecidingBody = "test provider deciding body"
                     providerIsResolutionMajority = true
-                    participationTypeList = listOf("test participation type")
-                    participationInstitutionList = listOf("test participation institution")
-                    leadJurisdictionList = listOf("test lead jurisdiction")
-                    leadUnitList = listOf("test lead unit")
-                    subjectFnaList = listOf("test subject FNA")
-                    subjectGestaList = listOf("test subject Gesta")
+                    participationList = listOf(Participation("test participation type", "test participation institution"))
+                    leadList = listOf(Lead("test lead jurisdiction", "test lead unit"))
+                    subjectAreaList = listOf(SubjectArea("test subject FNA", "test subject Gesta"))
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
                     unofficialLongTitleList = listOf("test unofficial long title")
@@ -142,9 +145,7 @@ class JurisConverterTest {
                     expirationNormCategory = "test expiration norm category"
                     announcementDate = "2022-01-07"
                     citationDateList = listOf("2022-01-08")
-                    printAnnouncementGazette = "test print announcement gazette"
-                    printAnnouncementYear = "test print announcement year"
-                    printAnnouncementPage = "test print announcement page"
+                    printAnnouncementList = listOf(PrintAnnouncement("test print announcement year", "test print announcement page", "test print announcement gazette"))
                     unofficialReferenceList = listOf("test unofficial reference")
                     statusNote = "test status note"
                     statusDescription = "test status description"
@@ -197,9 +198,6 @@ class JurisConverterTest {
             assertThat(norm?.expirationDate).isEqualTo(LocalDate.parse("2022-01-04"))
             assertThat(norm?.expirationDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
             assertThat(norm?.principleExpirationDate).isEqualTo(LocalDate.parse("2022-01-05"))
-            assertThat(norm?.printAnnouncementGazette).isEqualTo("test print announcement gazette")
-            assertThat(norm?.printAnnouncementYear).isEqualTo("test print announcement year")
-            assertThat(norm?.printAnnouncementPage).isEqualTo("test print announcement page")
             assertThat(norm?.principleExpirationDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
             assertThat(norm?.divergentExpirationDate).isEqualTo(LocalDate.parse("2022-01-06"))
             assertThat(norm?.divergentExpirationDateState).isEqualTo(UndefinedDate.UNDEFINED_UNKNOWN)
@@ -229,6 +227,9 @@ class JurisConverterTest {
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
+            assertThat(metadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
+            assertThat(metadata).contains(Metadatum("test print announcement year", YEAR, 1))
+            assertThat(metadata).contains(Metadatum("test print announcement page", PAGE, 1))
             assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
             assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
             assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))

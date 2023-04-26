@@ -1,7 +1,7 @@
 import { NormData } from "../fixtures"
 
 export const normData: NormData = {
-  jurisZipFileName: "Tierarznei.3-0_multi.zip",
+  jurisZipFileName: "Tierarznei.3-0_multi_1.zip",
   articles: [
     {
       marker: "Art 2",
@@ -58,8 +58,10 @@ export const normData: NormData = {
       },
     ],
     SUBJECT_AREA: [
-      { SUBJECT_FNA: ["FNA 315-12"], SUBJECT_GESTA: ["GESTA 123-45"] },
-      { SUBJECT_FNA: ["FNA 671-34"], SUBJECT_GESTA: ["GESTA 678-90"] },
+      { SUBJECT_FNA: ["FNA 315-12"] },
+      { SUBJECT_FNA: ["FNA 671-34"] },
+      { SUBJECT_GESTA: ["GESTA 123-45"] },
+      { SUBJECT_GESTA: ["GESTA 678-90"] },
     ],
     LEAD: [
       { LEAD_JURISDICTION: ["BMVBS"], LEAD_UNIT: ["RS III 2"] },
