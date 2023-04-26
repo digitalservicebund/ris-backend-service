@@ -91,8 +91,6 @@ const conditionalClasses = computed(() => ({
 function backspaceDelete() {
   emit("update:modelValue", undefined)
 }
-
-watch
 </script>
 
 <template>
