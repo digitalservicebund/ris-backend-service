@@ -111,13 +111,19 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save simple norm and retrieved by eli`() {
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("1125", MetadatumType.PAGE),
+                Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            ),
+        )
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
+            metadataSections = listOf(printAnnouncementSection),
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
-            printAnnouncementPage = "1125",
-            printAnnouncementGazette = "bg-1",
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2022", "1125")
@@ -135,7 +141,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
     @Test
     fun `save multiple norms and retrieve only one by eli parameters`() {
-        val printAnnouncementSection = MetadataSection(
+        val printAnnouncementSection1 = MetadataSection(
             MetadataSectionName.PRINT_ANNOUNCEMENT,
             listOf(
                 Metadatum("1125", MetadatumType.PAGE),
@@ -145,17 +151,23 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val firstNorm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            metadataSections = listOf(printAnnouncementSection),
+            metadataSections = listOf(printAnnouncementSection1),
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
+        )
+        val printAnnouncementSection2 = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("111", MetadatumType.PAGE),
+                Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            ),
         )
         val secondNorm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
+            metadataSections = listOf(printAnnouncementSection2),
             officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
-            printAnnouncementPage = "111",
-            printAnnouncementGazette = "bg-1",
         )
         val saveFirstNormCommand = SaveNormOutputPort.Command(firstNorm)
         val saveSecondNormCommand = SaveNormOutputPort.Command(secondNorm)
@@ -173,7 +185,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         normsService.getNormByEli(eliQuery)
             .`as`(StepVerifier::create)
-            .assertNext { assertNormsAreEqual(secondNorm, it) }
+            .assertNext { assertNormsAreEqual(firstNorm, it) }
             .verifyComplete()
     }
 
@@ -181,13 +193,18 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     fun `save simple norm and retrieved by eli with citation year`() {
         val citationDate = Metadatum("2001", YEAR)
         val citationDateSection = MetadataSection(MetadataSectionName.CITATION_DATE, listOf(citationDate))
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("1125", MetadatumType.PAGE),
+                Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            ),
+        )
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
             officialLongTitle = "Test Title",
-            printAnnouncementPage = "1125",
-            printAnnouncementGazette = "bg-1",
-            metadataSections = listOf(citationDateSection),
+            metadataSections = listOf(citationDateSection, printAnnouncementSection),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2001", "1125")
@@ -207,13 +224,18 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     fun `save simple norm and retrieved by eli with citation date`() {
         val citationDate = Metadatum(LocalDate.of(2020, 2, 15), DATE)
         val citationDateSection = MetadataSection(MetadataSectionName.CITATION_DATE, listOf(citationDate))
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("1125", MetadatumType.PAGE),
+                Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            ),
+        )
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
             officialLongTitle = "Test Title",
-            printAnnouncementPage = "1125",
-            printAnnouncementGazette = "bg-1",
-            metadataSections = listOf(citationDateSection),
+            metadataSections = listOf(citationDateSection, printAnnouncementSection),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2020", "1125")
@@ -329,7 +351,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .assertNext {
-                assertThat(it.metadataSections).isEqualTo(norm.metadataSections)
+                assertThat(it.metadataSections.groupBy { it.order }).isEqualTo(norm.metadataSections.groupBy { it.order })
             }
             .verifyComplete()
     }

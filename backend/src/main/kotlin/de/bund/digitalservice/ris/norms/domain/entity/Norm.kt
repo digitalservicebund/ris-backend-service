@@ -124,16 +124,17 @@ data class Norm(
     val eli: Eli
         get() =
             Eli(
-                getMetadataFromSections(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE)?.let { it.value as String },
+                getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE)?.let { it.value as String },
                 announcementDate,
-                getMetadataFromSections(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let { it.value as LocalDate },
-                getMetadataFromSections(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let { it.value as String },
-                getMetadataFromSections(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.PAGE)?.let { it.value as String },
+                getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let { it.value as LocalDate },
+                getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let { it.value as String },
+                getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.PAGE)?.let { it.value as String },
             )
 
-    private fun getMetadataFromSections(sectionName: MetadataSectionName, type: MetadatumType): Metadatum<*>? = metadataSections
+    fun getFirstMetadatum(sectionName: MetadataSectionName, type: MetadatumType): Metadatum<*>? = metadataSections
         .filter { it.name == sectionName }
-        .flatMap { it.metadata }
-        .filter { it.type == type }
         .minByOrNull { it.order }
+        ?.let {
+            it.metadata.filter { metadatum -> metadatum.type == type }.minByOrNull { metadatum -> metadatum.order }
+        }
 }

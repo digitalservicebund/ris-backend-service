@@ -18,11 +18,8 @@ import org.jsoup.nodes.TextNode
 import java.time.LocalDate
 
 fun mapNormToDto(norm: Norm): NormDto {
-    val firstCitationDate = norm.metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
-        .filter { it.type == MetadatumType.DATE }.minByOrNull { it.order }?.let { encodeLocalDate(it.value as LocalDate) }
-
-    val firstCitationYear = norm.metadataSections.filter { it.name == MetadataSectionName.CITATION_DATE }.flatMap { it.metadata }
-        .filter { it.type == MetadatumType.YEAR }.minByOrNull { it.order }?.let { it.value.toString() }
+    val firstCitationDate = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let { encodeLocalDate(it.value as LocalDate) }
+    val firstCitationYear = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let { it.value as String }
 
     return NormDto(
         guid = norm.guid.toString(),
@@ -34,9 +31,7 @@ fun mapNormToDto(norm: Norm): NormDto {
         providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, norm.providerDecidingBody ?: ""),
         participationInstitution = getMappedValue(
             Property.PARTICIPATION_INSTITUTION,
-            norm.metadataSections.firstOrNull {
-                it.name == MetadataSectionName.PARTICIPATION
-            }?.metadata?.first { it.type == MetadatumType.PARTICIPATION_INSTITUTION }?.value.toString(),
+            norm.getFirstMetadatum(MetadataSectionName.PARTICIPATION, MetadatumType.PARTICIPATION_INSTITUTION)?.value.toString(),
         ),
         printAnnouncementGazette = norm.eli.gazette,
         printAnnouncementPage = norm.eli.printAnnouncementPage,

@@ -106,8 +106,8 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val participationInstitution = createMetadataForType(data.participationList.map { it.institution.toString() }, PARTICIPATION_INSTITUTION)
     val leadJurisdiction = createMetadataForType(data.leadList.map { it.jurisdiction.toString() }, LEAD_JURISDICTION)
     val leadUnit = createMetadataForType(data.leadList.map { it.unit.toString() }, LEAD_UNIT)
-    val subjectFna = createMetadataForType(data.subjectAreaList.map { it.fna.toString() }, SUBJECT_FNA)
-    val subjectGesta = createMetadataForType(data.subjectAreaList.map { it.gesta.toString() }, SUBJECT_GESTA)
+    val subjectFna = createMetadataForType(data.subjectAreaList.filter { it.fna != null }.map { it.fna.toString() }, SUBJECT_FNA)
+    val subjectGesta = createMetadataForType(data.subjectAreaList.filter { it.gesta != null }.map { it.gesta.toString() }, SUBJECT_GESTA)
     val printAnnouncementGazette = createMetadataForType(data.printAnnouncementList.map { it.gazette.toString() }, ANNOUNCEMENT_GAZETTE)
     val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.map { it.page.toString() }, PAGE)
     val printAnnouncementYear = createMetadataForType(data.printAnnouncementList.map { it.year.toString() }, YEAR)
@@ -127,7 +127,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
 
     val sections = listOf(
         MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
-    ) + createSectionsFromMetadata(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
+    ) + createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
         createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
@@ -227,6 +227,11 @@ fun createSectionsFromMetadata(sectionName: MetadataSectionName, metadata: List<
             it.key,
         )
     }.values
+
+private fun createSectionsWithoutGrouping(sectionName: MetadataSectionName, metadata: List<Metadatum<*>>) = metadata
+    .mapIndexed { index, metadatum ->
+        MetadataSection(sectionName, listOf(Metadatum(metadatum.value, metadatum.type, 1)), index)
+    }
 
 private fun extractStringValues(norm: Norm, sectionName: MetadataSectionName, metadatumType: MetadatumType): List<String> {
     return norm.metadataSections
