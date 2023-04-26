@@ -2,6 +2,7 @@
 import { storeToRefs } from "pinia"
 import { computed, toRefs, ref, watch, h } from "vue"
 import { useRoute } from "vue-router"
+import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
@@ -306,7 +307,7 @@ function normProviderSummarizer(data: Metadata) {
         summaryLine.length == 0 ? summaryLine : summaryLine.concat(" | ")
       ),
       h("img", {
-        src: "/src/assets/icons/ckeckbox_regular.svg",
+        src: CheckMark,
         width: "16",
         alt: "Schwarzes Haken",
       }),
