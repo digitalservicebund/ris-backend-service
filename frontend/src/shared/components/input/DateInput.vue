@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 
@@ -24,9 +23,8 @@ const inputValue = ref<string>()
 watch(
   props,
   () => {
-    inputValue.value = props.modelValue
-      ? dayjs(props.modelValue).format("YYYY-MM-DD")
-      : props.value
+    //From the ISO String, only the first part is needed for the input value -> YYYY-MM-DD
+    inputValue.value = props.modelValue && props.modelValue.slice(0, 10)
   },
   {
     immediate: true,
@@ -59,6 +57,9 @@ watch(
         })
       }
     } else {
+      if (inputValue.value) {
+        emit("update:modelValue", new Date(inputValue.value).toISOString())
+      }
       emit("update:validationError", undefined)
     }
   },
@@ -76,7 +77,9 @@ watch(
           field: props.id,
         })
       }
-    } else emit("update:validationError", undefined)
+    } else {
+      emit("update:validationError", undefined)
+    }
   },
   { immediate: true }
 )
@@ -85,14 +88,11 @@ const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
 
-function handleOnBlur() {
-  if (!hasError.value && inputValue.value)
-    emit("update:modelValue", dayjs(inputValue.value).toISOString())
-}
-
 function backspaceDelete() {
   emit("update:modelValue", undefined)
 }
+
+watch
 </script>
 
 <template>
@@ -102,10 +102,7 @@ function backspaceDelete() {
     :aria-label="ariaLabel"
     class="bg-white border-2 border-blue-800 focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
-    max="9999-12-31"
-    min="1000-01-01"
     type="date"
-    @blur="handleOnBlur"
     @keydown.delete="backspaceDelete"
   />
 </template>

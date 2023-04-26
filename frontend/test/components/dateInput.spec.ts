@@ -91,9 +91,17 @@ describe("DateInput", () => {
   })
 
   it("does not allow dates in the future", async () => {
-    const { emitted } = renderComponent({
-      value: "2099-02-10",
+    const { emitted } = renderComponent()
+    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    const futureDate = "2099-02-10"
+
+    Object.defineProperty(input, "target", {
+      value: futureDate,
     })
+
+    await userEvent.clear(input)
+    await userEvent.type(input, futureDate)
+    await nextTick()
 
     expect(emitted()["update:modelValue"]).not.toBeTruthy()
 
