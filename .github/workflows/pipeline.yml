@@ -22,6 +22,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Get Gradle version
+        working-directory: ./backend
+        run: |
+          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -29,7 +33,7 @@ jobs:
           distribution: "temurin"
       - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          gradle-version: 7.5
+          gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: build --profile -x integrationTest -x test
           build-root-directory: ./backend
       - name: Upload build performance report
@@ -57,6 +61,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Get Gradle version
+        working-directory: ./backend
+        run: |
+          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -64,7 +72,7 @@ jobs:
           distribution: "temurin"
       - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          gradle-version: 7.5
+          gradle-version: ${{ env.GRADLE_VERSION}}
           arguments: test -x integrationTest
           build-root-directory: ./backend
       - name: Send status to Slack
@@ -87,6 +95,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - name: Get Gradle version
+        working-directory: ./backend
+        run: |
+          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@v3
         with:
@@ -94,7 +106,7 @@ jobs:
           distribution: "temurin"
       - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          gradle-version: current
+          gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: integrationTest -x test
           build-root-directory: ./backend
       - name: Send status to Slack
@@ -120,6 +132,10 @@ jobs:
       security-events: write
     steps:
       - uses: actions/checkout@v3
+      - name: Get Gradle version
+        working-directory: ./backend
+        run: |
+          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Validate gradle wrapper
         uses: gradle/wrapper-validation-action@ccb4328a959376b642e027874838f60f8e596de3
       - name: Set up JDK
@@ -129,7 +145,7 @@ jobs:
           distribution: "temurin"
       - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          gradle-version: 7.5
+          gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: bootBuildImage
           build-root-directory: ./backend
       - name: Run Trivy vulnerability scanner
