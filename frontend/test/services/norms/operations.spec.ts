@@ -134,6 +134,11 @@ describe("normsService", () => {
               [MetadatumType.LEAD_JURISDICTION]: ["text"],
             },
           ],
+          [MetadataSectionName.NORM_PROVIDER]: [
+            {
+              [MetadatumType.ENTITY]: ["new provider entity"],
+            },
+          ],
         },
         {
           officialLongTitle: "new title",
@@ -177,14 +182,23 @@ describe("normsService", () => {
                 },
               ],
             },
+            {
+              name: MetadataSectionName.NORM_PROVIDER,
+              order: 1,
+              sections: null,
+              metadata: [
+                {
+                  type: MetadatumType.ENTITY,
+                  order: 1,
+                  value: "new provider entity",
+                },
+              ],
+            },
           ],
           announcementDate: null,
           documentTemplateName: null,
           officialAbbreviation: null,
           officialLongTitle: "new title",
-          providerDecidingBody: null,
-          providerEntity: "new provider entity",
-          providerIsResolutionMajority: null,
           publicationDate: "2022-11-15",
           officialShortTitle: null,
           isExpirationDateTemp: null,
