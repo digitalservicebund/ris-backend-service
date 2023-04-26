@@ -285,9 +285,8 @@ describe("chips input as inline list", () => {
     const chipTwo = chipList[1] as HTMLElement
 
     expect(input).toHaveValue("x")
-    await user.click(chipTwo) // focusing away from the text-input clears the input
+    await user.click(chipTwo)
     expect(chipTwo).toHaveFocus()
-    expect(input).toHaveValue("")
 
     await user.type(chipTwo, "{arrowleft}")
     expect(chipOne).toHaveFocus()
@@ -302,7 +301,6 @@ describe("chips input as inline list", () => {
     expect(input).toHaveFocus()
     await user.type(input, "{arrowright}") // nothing happens further right
     expect(input).toHaveFocus()
-    expect(input).toHaveValue("")
   })
 
   it("focus via tabbing behaves as expected", async () => {

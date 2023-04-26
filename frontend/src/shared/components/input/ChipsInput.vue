@@ -41,10 +41,6 @@ function saveChip() {
   }
 }
 
-const handleOnBlur = () => {
-  currentInput.value = ""
-}
-
 const focusPrevious = () => {
   if (chipsList.value !== undefined && currentInput.value === "")
     chipsList.value.focusPrevious()
@@ -77,7 +73,6 @@ watch(chips, () => {
       v-model="currentInput"
       :aria-label="ariaLabel"
       type="text"
-      @blur="handleOnBlur"
       @input="emitInputEvent"
       @keypress.enter="saveChip"
       @keyup.left="focusPrevious"
