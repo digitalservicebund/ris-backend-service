@@ -74,7 +74,7 @@ export const normData: NormData = {
     CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2001-03-10"] }],
     AGE_INDICATION: [],
     NORM_PROVIDER: [
-      { ENTITY: ["DEU"], DECIDING_BODY: ["BT"], RESOLUTION_MAJORITY: [false] },
+      { ENTITY: ["DEU"], DECIDING_BODY: ["BT"], RESOLUTION_MAJORITY: [true] },
     ],
   },
   officialLongTitle:
