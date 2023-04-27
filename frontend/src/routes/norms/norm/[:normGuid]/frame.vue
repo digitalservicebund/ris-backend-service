@@ -4,6 +4,7 @@ import { computed, toRefs, ref, watch, h } from "vue"
 import { useRoute } from "vue-router"
 import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
+import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
@@ -14,19 +15,15 @@ import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { FlatMetadata, Metadata, MetadataSections } from "@/domain/Norm"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
-import { digitalAnnouncement } from "@/fields/norms/digitalAnnouncement"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
 import { documentType } from "@/fields/norms/documentType"
 import { entryIntoForce } from "@/fields/norms/entryIntoForce"
-import { euAnnouncement } from "@/fields/norms/euAnnouncement"
 import { expiration } from "@/fields/norms/expiration"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
-import { otherOfficialReferences } from "@/fields/norms/otherOfficialReferences"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
-import { printAnnouncement } from "@/fields/norms/printAnnouncement"
 import { reissue } from "@/fields/norms/reissue"
 import { repeal } from "@/fields/norms/repeal"
 import { status } from "@/fields/norms/status"
@@ -233,6 +230,57 @@ function citationDateSummarizer(data: Metadata): string {
   return formatDate(data.DATE)
 }
 
+function printAnnouncementSummary(data: Metadata): string {
+  if (!data || !data.length) return ""
+  const printAnnouncementData = data[0] // assuming there's only one item in the array
+  if (!printAnnouncementData) return ""
+  // generate summary string based on the printAnnouncementData
+  return "Print Announcement Summary"
+}
+function digitalAnnouncementSummary(data: Metadata): string {
+  if (!data || !data.length) return ""
+  const digitalAnnouncementData = data[0] // assuming there's only one item in the array
+  if (!digitalAnnouncementData) return ""
+  // generate summary string based on the digitalAnnouncementData
+  return "Digital Announcement Summary"
+}
+function euAnnouncementSummary(data: Metadata): string {
+  if (!data || !data.length) return ""
+  const euAnnouncementData = data[0] // assuming there's only one item in the array
+  if (!euAnnouncementData) return ""
+  // generate summary string based on the euAnnouncementData
+  return "EU Announcement Summary"
+}
+function otherOfficialReferenceSummary(data: Metadata): string {
+  if (!data || !data.length) return ""
+  const otherOfficialReferenceData = data[0] // assuming there's only one item in the array
+  if (!otherOfficialReferenceData) return ""
+  // generate summary string based on the otherOfficialReferenceData
+  return "Other Official Reference Summary"
+}
+function officialReferenceSummarizer(data: MetadataSections): string {
+  // if (data.PRINT_ANNOUNCEMENT && data.PRINT_ANNOUNCEMENT.length > 0) {
+  //   return printAnnouncementSummary(data.PRINT_ANNOUNCEMENT);
+  // } else if (data.DIGITAL_ANNOUNCEMENT && data.DIGITAL_ANNOUNCEMENT.length > 0) {
+  //   return digitalAnnouncementSummary(data.DIGITAL_ANNOUNCEMENT);
+  // } else if (data.EU_ANNOUNCEMENT && data.EU_ANNOUNCEMENT.length > 0) {
+  //   return euAnnouncementSummary(data.EU_ANNOUNCEMENT);
+  // } else if (data.OTHER_OFFICIAL_ANNOUNCEMENT && data.OTHER_OFFICIAL_ANNOUNCEMENT.length > 0) {
+  //   return otherOfficialReferenceSummary(data.OTHER_OFFICIAL_ANNOUNCEMENT);
+  // }
+  // return '';
+  if (!data) return "no data"
+  if (data.PRINT_ANNOUNCEMENT) {
+    return printAnnouncementSummary(data.PRINT_ANNOUNCEMENT[0])
+  } else if (data.DIGITAL_ANNOUNCEMENT) {
+    return digitalAnnouncementSummary(data.DIGITAL_ANNOUNCEMENT[0])
+  } else if (data.EU_ANNOUNCEMENT) {
+    return euAnnouncementSummary(data.EU_ANNOUNCEMENT[0])
+  } else if (data.OTHER_OFFICIAL_ANNOUNCEMENT) {
+    return otherOfficialReferenceSummary(data.OTHER_OFFICIAL_ANNOUNCEMENT[0])
+  } else return ""
+}
+
 function normProviderSummarizer(data: Metadata) {
   if (!data) return ""
 
@@ -263,6 +311,7 @@ function normProviderSummarizer(data: Metadata) {
 }
 
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
+const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 </script>
 
@@ -464,61 +513,19 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
       />
     </ExpandableDataSet>
 
-    <h2
+    <ExpandableDataSet
       id="officialAnnouncementFields"
-      class="heading-02-regular mb-[1rem] mt-32"
+      :data-set="metadataSections.OFFICIAL_REFERENCE"
+      :summary-component="OfficialReferenceSummary"
+      title="Amtliche Fundstelle"
     >
-      Amtliche Fundstelle
-    </h2>
-    <fieldset>
-      <legend id="printAnnouncementFields" class="heading-03-regular mb-[1rem]">
-        Papierverkündung
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="printAnnouncement"
+      <EditableList
+        v-model="metadataSections.PRINT_ANNOUNCEMENT"
+        :default-value="{}"
+        :edit-component="AnnouncementGroup"
+        :summary-component="OfficialReferenceSummary"
       />
-    </fieldset>
-
-    <fieldset>
-      <legend
-        id="digitalAnnouncementFields"
-        class="heading-03-regular mb-[1rem]"
-      >
-        Elektronisches Verkündungsblatt
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="digitalAnnouncement"
-      />
-    </fieldset>
-
-    <fieldset>
-      <legend id="euAnnouncementFields" class="heading-03-regular mb-[1rem]">
-        Amtsblatt der EU
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="euAnnouncement"
-      />
-    </fieldset>
-
-    <fieldset>
-      <legend
-        id="otherOfficialReferencesFields"
-        class="heading-03-regular mb-[1rem]"
-      >
-        Sonstige amtliche Fundstelle
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="otherOfficialReferences"
-      />
-    </fieldset>
+    </ExpandableDataSet>
 
     <SingleDataFieldSection
       id="unofficialReferences"
