@@ -258,7 +258,6 @@ export function generateFlatMetadata(
     digitalAnnouncementExplanations: generateString(),
     digitalAnnouncementInfo: generateString(),
     digitalAnnouncementMedium: generateString(),
-    digitalAnnouncementPage: generateString(),
     digitalAnnouncementYear: generateString(),
     digitalEvidenceAppendix: generateString(),
     digitalEvidenceExternalDataNote: generateString(),

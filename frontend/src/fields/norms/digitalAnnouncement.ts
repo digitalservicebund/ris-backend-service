@@ -35,14 +35,6 @@ export const digitalAnnouncement: InputField[] = [
     },
   },
   {
-    name: "digitalAnnouncementPage",
-    type: InputType.TEXT,
-    label: "Seitenzahlen",
-    inputAttributes: {
-      ariaLabel: "Seitenzahlen",
-    },
-  },
-  {
     name: "digitalAnnouncementArea",
     type: InputType.TEXT,
     label: "Bereich der Veröffentlichung",

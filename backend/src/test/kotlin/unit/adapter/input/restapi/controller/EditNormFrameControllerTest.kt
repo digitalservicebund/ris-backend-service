@@ -37,7 +37,6 @@ class EditNormFrameControllerTest {
     fun `it correctly maps the parameter and body to the command calling the service`() {
         val editNormRequestSchema = createRandomEditNormRequestTestSchema()
         editNormRequestSchema.digitalAnnouncementMedium = null
-        editNormRequestSchema.digitalAnnouncementPage = null
         editNormRequestSchema.digitalAnnouncementYear = null
         editNormRequestSchema.printAnnouncementGazette = null
         editNormRequestSchema.printAnnouncementPage = null
@@ -172,7 +171,6 @@ class EditNormFrameControllerTest {
         var digitalAnnouncementDate: String? = null
         var digitalAnnouncementEdition: String? = null
         var digitalAnnouncementYear: String? = null
-        var digitalAnnouncementPage: String? = null
         var digitalAnnouncementArea: String? = null
         var digitalAnnouncementAreaNumber: String? = null
         var digitalAnnouncementInfo: String? = null

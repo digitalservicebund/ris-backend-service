@@ -60,7 +60,6 @@ class EditNormFrameServiceTest {
             digitalAnnouncementDate = null,
             digitalAnnouncementEdition = null,
             digitalAnnouncementYear = null,
-            digitalAnnouncementPage = null,
             digitalAnnouncementArea = null,
             digitalAnnouncementAreaNumber = null,
             digitalAnnouncementInfo = null,

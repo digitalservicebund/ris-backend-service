@@ -216,7 +216,6 @@ describe("normsService", () => {
           digitalAnnouncementExplanations: null,
           digitalAnnouncementInfo: null,
           digitalAnnouncementMedium: null,
-          digitalAnnouncementPage: null,
           digitalAnnouncementYear: null,
           digitalEvidenceAppendix: null,
           digitalEvidenceExternalDataNote: null,

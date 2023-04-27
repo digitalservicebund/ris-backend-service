@@ -152,7 +152,6 @@ export type FlatMetadata = {
   digitalAnnouncementExplanations?: string
   digitalAnnouncementInfo?: string
   digitalAnnouncementMedium?: string
-  digitalAnnouncementPage?: string
   digitalAnnouncementYear?: string
   digitalEvidenceAppendix?: string
   digitalEvidenceExternalDataNote?: string

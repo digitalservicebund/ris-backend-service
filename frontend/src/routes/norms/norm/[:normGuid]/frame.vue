@@ -104,8 +104,6 @@ watch(
         data.digitalAnnouncementInfo as string
       loadedNorm.value.digitalAnnouncementMedium =
         data.digitalAnnouncementMedium as string
-      loadedNorm.value.digitalAnnouncementPage =
-        data.digitalAnnouncementPage as string
       loadedNorm.value.digitalAnnouncementYear =
         data.digitalAnnouncementYear as string
       loadedNorm.value.digitalEvidenceAppendix =

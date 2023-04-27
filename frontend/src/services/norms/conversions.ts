@@ -433,7 +433,6 @@ export function encodeFlatMetadata(
     digitalAnnouncementMedium: encodeString(
       flatMetadata.digitalAnnouncementMedium
     ),
-    digitalAnnouncementPage: encodeString(flatMetadata.digitalAnnouncementPage),
     digitalAnnouncementYear: encodeString(flatMetadata.digitalAnnouncementYear),
     digitalEvidenceAppendix: encodeString(flatMetadata.digitalEvidenceAppendix),
     digitalEvidenceExternalDataNote: encodeString(

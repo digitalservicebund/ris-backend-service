@@ -576,12 +576,6 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
             },
             {
               type: FieldType.TEXT,
-              id: "digitalAnnouncementPage",
-              label: "Seitenzahlen",
-              value: norm.digitalAnnouncementPage,
-            },
-            {
-              type: FieldType.TEXT,
               id: "digitalAnnouncementArea",
               label: "Bereich der Veröffentlichung",
               value: norm.digitalAnnouncementArea,

@@ -88,7 +88,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var digitalAnnouncementDate: String? = null
         var digitalAnnouncementEdition: String? = null
         var digitalAnnouncementYear: String? = null
-        var digitalAnnouncementPage: String? = null
         var digitalAnnouncementArea: String? = null
         var digitalAnnouncementAreaNumber: String? = null
         var digitalAnnouncementInfo: String? = null
@@ -178,7 +177,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                         MetadatumType.ANNOUNCEMENT_MEDIUM to this.digitalAnnouncementMedium,
                         MetadatumType.DATE to decodeLocalDate(this.digitalAnnouncementDate),
                         MetadatumType.YEAR to this.digitalAnnouncementYear,
-                        MetadatumType.EDITION to (this.digitalAnnouncementPage ?: this.digitalAnnouncementEdition),
+                        MetadatumType.EDITION to this.digitalAnnouncementEdition,
                         MetadatumType.AREA_OF_PUBLICATION to this.digitalAnnouncementArea,
                         MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA to this.digitalAnnouncementAreaNumber,
                         MetadatumType.ADDITIONAL_INFO to this.digitalAnnouncementInfo,
@@ -243,7 +242,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 decodeLocalDate(this.digitalAnnouncementDate),
                 this.digitalAnnouncementEdition,
                 this.digitalAnnouncementYear,
-                this.digitalAnnouncementPage,
                 this.digitalAnnouncementArea,
                 this.digitalAnnouncementAreaNumber,
                 this.digitalAnnouncementInfo,
