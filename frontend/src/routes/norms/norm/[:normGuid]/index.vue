@@ -1,27 +1,40 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
+import { Article } from "@/domain/Norm"
 import { useLoadedNormStore } from "@/stores/loadedNorm"
 
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
 
 if (loadedNorm.value !== undefined) {
-  loadedNorm.value.articles
-    .filter(
-      (article) =>
-        article.marker !== "Eingangsformel" &&
-        article.marker !== "Schlussformel"
+  const preamble: Article[] = loadedNorm.value.articles.filter(
+    (article) => article.marker === "Eingangsformel"
+  )
+
+  const close: Article[] = loadedNorm.value.articles.filter(
+    (article) => article.marker === "Schlussformel"
+  )
+
+  const articlesWithoutPreambleAndClose: Article[] =
+    loadedNorm.value.articles.filter(
+      (article) => !["Eingangsformel", "Schlussformel"].includes(article.marker)
     )
-    .sort((a, b) => {
-      if (a.marker.includes("Art")) {
-        return Number(a.marker.substring(4)) < Number(b.marker.substring(4))
-          ? -1
-          : 1
-      }
+
+  articlesWithoutPreambleAndClose.sort((a, b) => {
+    if (a.marker.includes("Art")) {
+      return Number(a.marker.substring(4)) < Number(b.marker.substring(4))
+        ? -1
+        : 1
+    } else {
       return Number(a.marker.substring(2)) < Number(b.marker.substring(2))
         ? -1
         : 1
-    })
+    }
+  })
+
+  loadedNorm.value.articles = preamble
+    .concat(articlesWithoutPreambleAndClose)
+    .concat(close)
 
   loadedNorm.value.articles.forEach((article) => {
     if (article.paragraphs.filter((f) => f.marker == null).length == 0) {
