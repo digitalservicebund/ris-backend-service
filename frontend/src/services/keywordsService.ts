@@ -22,9 +22,9 @@ const service: KeywordService = {
     return response
   },
   async addKeyword(uuid: string, keyword: string) {
-    const encodedString = encodeURI(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords/${keyword}`
-    )
+    const encodedkeyword = encodeURIComponent(keyword)
+    const encodedString = `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords/${encodedkeyword}`
+
     const response = await httpClient.put<string, string[]>(encodedString)
     if (response.status >= 300) {
       response.error = {
@@ -34,9 +34,9 @@ const service: KeywordService = {
     return response
   },
   async deleteKeyword(uuid: string, keyword: string) {
-    const encodedString = encodeURI(
-      `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords/${keyword}`
-    )
+    const encodedkeyword = encodeURIComponent(keyword)
+    const encodedString = `caselaw/documentunits/${uuid}/contentrelatedindexing/keywords/${encodedkeyword}`
+
     const response = await httpClient.delete<string[]>(encodedString)
     if (response.status >= 300) {
       response.error = {
