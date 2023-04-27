@@ -44,12 +44,36 @@ class EditNormFrameServiceTest {
     @Test
     fun `it calls the output port to save the norm with optional data and fields`() {
         val guid = UUID.randomUUID()
-        val metadata = listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1))
         val metadataSections = listOf(
-            MetadataSection(MetadataSectionName.NORM, metadata),
+            MetadataSection(MetadataSectionName.NORM, listOf(Metadatum("foo", KEYWORD, 0), Metadatum("bar", KEYWORD, 1))),
             MetadataSection(MetadataSectionName.NORM, listOf(Metadatum("definition", DEFINITION, 0))),
         )
-        val properties = createRandomNormFameProperties().copy(metadataSections = metadataSections)
+        val properties = createRandomNormFameProperties().copy(
+            metadataSections = metadataSections,
+            printAnnouncementGazette = null,
+            printAnnouncementYear = null,
+            printAnnouncementNumber = null,
+            printAnnouncementPage = null,
+            printAnnouncementInfo = null,
+            printAnnouncementExplanations = null,
+            digitalAnnouncementMedium = null,
+            digitalAnnouncementDate = null,
+            digitalAnnouncementEdition = null,
+            digitalAnnouncementYear = null,
+            digitalAnnouncementPage = null,
+            digitalAnnouncementArea = null,
+            digitalAnnouncementAreaNumber = null,
+            digitalAnnouncementInfo = null,
+            digitalAnnouncementExplanations = null,
+            euAnnouncementGazette = null,
+            euAnnouncementYear = null,
+            euAnnouncementSeries = null,
+            euAnnouncementNumber = null,
+            euAnnouncementPage = null,
+            euAnnouncementInfo = null,
+            euAnnouncementExplanations = null,
+            otherOfficialAnnouncement = null,
+        )
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)
         val command = EditNormFrameUseCase.Command(guid, properties)

@@ -376,7 +376,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             documentNumber = "document number",
             entryIntoForceDate = LocalDate.now(),
             expirationDateState = UndefinedDate.UNDEFINED_FUTURE,
-            printAnnouncementGazette = "print gazette",
             completeCitation = "complete citation",
             celexNumber = "celex number",
         )
@@ -395,7 +394,6 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 assertThat(it.documentNumber).isEqualTo(updatedNorm.documentNumber)
                 assertThat(it.entryIntoForceDate).isEqualTo(updatedNorm.entryIntoForceDate)
                 assertThat(it.expirationDateState).isEqualTo(updatedNorm.expirationDateState)
-                assertThat(it.printAnnouncementGazette).isEqualTo(updatedNorm.printAnnouncementGazette)
                 assertThat(it.completeCitation).isEqualTo(updatedNorm.completeCitation)
                 assertThat(it.celexNumber).isEqualTo(updatedNorm.celexNumber)
             }

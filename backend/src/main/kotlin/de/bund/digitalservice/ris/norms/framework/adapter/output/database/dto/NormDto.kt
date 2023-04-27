@@ -71,53 +71,6 @@ data class NormDto(
     @Column("publication_date")
     var publicationDate: LocalDate? = null,
 
-    @Column("print_announcement_gazette")
-    var printAnnouncementGazette: String? = null,
-    @Column("print_announcement_year")
-    var printAnnouncementYear: String? = null,
-    @Column("print_announcement_number")
-    var printAnnouncementNumber: String? = null,
-    @Column("print_announcement_page")
-    var printAnnouncementPage: String? = null,
-    @Column("print_announcement_info")
-    var printAnnouncementInfo: String? = null,
-    @Column("print_announcement_explanations")
-    var printAnnouncementExplanations: String? = null,
-    @Column("digital_announcement_medium")
-    var digitalAnnouncementMedium: String? = null,
-    @Column("digital_announcement_date")
-    var digitalAnnouncementDate: LocalDate? = null,
-    @Column("digital_announcement_edition")
-    var digitalAnnouncementEdition: String? = null,
-    @Column("digital_announcement_year")
-    var digitalAnnouncementYear: String? = null,
-    @Column("digital_announcement_page")
-    var digitalAnnouncementPage: String? = null,
-    @Column("digital_announcement_area")
-    var digitalAnnouncementArea: String? = null,
-    @Column("digital_announcement_area_number")
-    var digitalAnnouncementAreaNumber: String? = null,
-    @Column("digital_announcement_info")
-    var digitalAnnouncementInfo: String? = null,
-    @Column("digital_announcement_explanations")
-    var digitalAnnouncementExplanations: String? = null,
-    @Column("eu_announcement_gazette")
-    var euAnnouncementGazette: String? = null,
-    @Column("eu_announcement_year")
-    var euAnnouncementYear: String? = null,
-    @Column("eu_announcement_series")
-    var euAnnouncementSeries: String? = null,
-    @Column("eu_announcement_number")
-    var euAnnouncementNumber: String? = null,
-    @Column("eu_announcement_page")
-    var euAnnouncementPage: String? = null,
-    @Column("eu_announcement_info")
-    var euAnnouncementInfo: String? = null,
-    @Column("eu_announcement_explanations")
-    var euAnnouncementExplanations: String? = null,
-    @Column("other_official_announcement")
-    var otherOfficialAnnouncement: String? = null,
-
     @Column("complete_citation")
     var completeCitation: String? = null,
 
