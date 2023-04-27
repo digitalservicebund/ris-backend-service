@@ -34,6 +34,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLo
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
+import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.SubjectArea
@@ -121,9 +122,10 @@ class JurisConverterTest {
                     risAbbreviationInternationalLawList = listOf("test ris abbreviation international law")
                     divergentDocumentNumber = "test document number"
                     documentCategory = "test document category"
-                    providerEntity = "test provider entity"
-                    providerDecidingBody = "test provider deciding body"
-                    providerIsResolutionMajority = true
+                    normProviderList = listOf(
+                        NormProvider("test provider entity", "test provider deciding body", true),
+                        NormProvider("DEU", "BT", false),
+                    )
                     participationList = listOf(Participation("test participation type", "test participation institution"))
                     leadList = listOf(Lead("test lead jurisdiction", "test lead unit"))
                     subjectAreaList = listOf(SubjectArea("test subject FNA", "test subject Gesta"))
@@ -250,6 +252,9 @@ class JurisConverterTest {
             assertThat(metadata).contains(Metadatum("test provider entity", ENTITY, 1))
             assertThat(metadata).contains(Metadatum("test provider deciding body", DECIDING_BODY, 1))
             assertThat(metadata).contains(Metadatum(true, RESOLUTION_MAJORITY, 1))
+            assertThat(metadata).contains(Metadatum("DEU", ENTITY, 1))
+            assertThat(metadata).contains(Metadatum("BT", DECIDING_BODY, 1))
+            assertThat(metadata).contains(Metadatum(false, RESOLUTION_MAJORITY, 1))
         }
 
         @Test

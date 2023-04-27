@@ -43,6 +43,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLo
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
+import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
@@ -75,6 +76,13 @@ fun mapDomainToData(norm: Norm): NormData {
     val citationDates = extractLocalDateValues(norm, MetadataSectionName.CITATION_DATE, DATE)
     val citationYears = extractStringValues(norm, MetadataSectionName.CITATION_DATE, YEAR)
 
+    val normProviders: List<NormProvider> = norm.metadataSections.filter { section -> section.name == MetadataSectionName.NORM_PROVIDER }.map {
+        val entity = it.metadata.find { metadatum -> metadatum.type == ENTITY }?.value as String
+        val decidingBody = it.metadata.find { metadatum -> metadatum.type == DECIDING_BODY }?.value as String
+        val isResolutionMajority = it.metadata.find { metadatum -> metadatum.type == RESOLUTION_MAJORITY }?.value as Boolean
+        NormProvider(entity, decidingBody, isResolutionMajority)
+    }
+
     return NormData(
         announcementDate = encodeLocalDate(norm.announcementDate),
         citationDateList = citationDates.filterNotNull() + citationYears,
@@ -86,8 +94,7 @@ fun mapDomainToData(norm: Norm): NormData {
         officialAbbreviation = norm.officialAbbreviation,
         officialLongTitle = norm.officialLongTitle,
         officialShortTitle = norm.officialShortTitle,
-        providerEntity = extractFirstStringValue(norm, MetadataSectionName.NORM_PROVIDER, ENTITY),
-        providerDecidingBody = extractFirstStringValue(norm, MetadataSectionName.NORM_PROVIDER, DECIDING_BODY),
+        normProviderList = normProviders,
         printAnnouncementList = extractPrintAnnouncementList(norm),
         digitalAnnouncementList = extractDigitalAnnouncementList(norm),
         risAbbreviation = norm.risAbbreviation,
@@ -106,12 +113,16 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val definition = createMetadataForType(data.definitionList, DEFINITION)
     val ageOfMajorityIndication = createMetadataForType(data.ageOfMajorityIndicationList, AGE_OF_MAJORITY_INDICATION)
     val validityRule = createMetadataForType(data.validityRuleList, VALIDITY_RULE)
+
     val participationType = createMetadataForType(data.participationList.map { it.type.toString() }, PARTICIPATION_TYPE)
     val participationInstitution = createMetadataForType(data.participationList.map { it.institution.toString() }, PARTICIPATION_INSTITUTION)
+
     val leadJurisdiction = createMetadataForType(data.leadList.map { it.jurisdiction.toString() }, LEAD_JURISDICTION)
     val leadUnit = createMetadataForType(data.leadList.map { it.unit.toString() }, LEAD_UNIT)
+
     val subjectFna = createMetadataForType(data.subjectAreaList.filter { it.fna != null }.map { it.fna.toString() }, SUBJECT_FNA)
     val subjectGesta = createMetadataForType(data.subjectAreaList.filter { it.gesta != null }.map { it.gesta.toString() }, SUBJECT_GESTA)
+
     val printAnnouncementGazette = createMetadataForType(data.printAnnouncementList.map { it.gazette.toString() }, ANNOUNCEMENT_GAZETTE)
     val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.map { it.page.toString() }, PAGE)
     val printAnnouncementYear = createMetadataForType(data.printAnnouncementList.map { it.year.toString() }, YEAR)
@@ -137,7 +148,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
         createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear) +
         citationDateSections +
-        addProviderSection(data)
+        addProviderSections(data.normProviderList)
 
     return Norm(
         guid = guid,
@@ -191,19 +202,20 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     )
 }
 
-fun addProviderSection(data: NormData): MetadataSection? {
-    val metadata = mutableListOf<Metadatum<*>>()
-    if (data.providerEntity !== null) {
-        metadata.add(Metadatum(data.providerEntity, ENTITY, 1))
-    }
-    if (data.providerDecidingBody !== null) {
-        metadata.add(Metadatum(data.providerDecidingBody, DECIDING_BODY, 1))
-    }
-    if (data.providerIsResolutionMajority !== null) {
-        metadata.add(Metadatum(data.providerIsResolutionMajority, RESOLUTION_MAJORITY, 1))
-    }
-
-    return if (metadata.size > 0) MetadataSection(Section.NORM_PROVIDER, metadata) else null
+fun addProviderSections(normProviders: List<NormProvider>): List<MetadataSection> {
+    return normProviders.mapIndexed { index, normProvider ->
+        val metadata = mutableListOf<Metadatum<*>>()
+        if (normProvider.entity !== null) {
+            metadata.add(Metadatum(normProvider.entity, ENTITY, 1))
+        }
+        if (normProvider.decidingBody !== null) {
+            metadata.add(Metadatum(normProvider.decidingBody, DECIDING_BODY, 1))
+        }
+        if (normProvider.isResolutionMajority !== null) {
+            metadata.add(Metadatum(normProvider.isResolutionMajority, RESOLUTION_MAJORITY, 1))
+        }
+        if (metadata.size > 0) MetadataSection(Section.NORM_PROVIDER, metadata, index + 1) else null
+    }.filterNotNull()
 }
 
 private fun createMetadataForType(data: List<*>, type: MetadatumType): List<Metadatum<*>> = data

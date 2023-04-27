@@ -186,7 +186,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA)?.let { it.value as String },
                     data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.ADDITIONAL_INFO)?.let { it.value as String },
                     data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.EXPLANATION)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE)?.let { it.value as String },
+                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.EU_GOVERNMENT_GAZETTE)?.let { it.value as String },
                     data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.YEAR)?.let { it.value as String },
                     data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.SERIES)?.let { it.value as String },
                     data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.NUMBER)?.let { it.value as String },

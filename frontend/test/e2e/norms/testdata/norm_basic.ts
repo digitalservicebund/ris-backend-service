@@ -75,6 +75,11 @@ export const normData: NormData = {
     AGE_INDICATION: [],
     NORM_PROVIDER: [
       { ENTITY: ["DEU"], DECIDING_BODY: ["BT"], RESOLUTION_MAJORITY: [true] },
+      {
+        ENTITY: ["DEU"],
+        DECIDING_BODY: ["BMinI"],
+        RESOLUTION_MAJORITY: [false],
+      },
     ],
   },
   officialLongTitle:

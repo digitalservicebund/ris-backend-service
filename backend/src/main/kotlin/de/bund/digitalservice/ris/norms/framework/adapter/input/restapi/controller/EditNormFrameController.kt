@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
+import java.time.LocalDate
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
@@ -175,7 +176,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 getSection(
                     mapOf(
                         MetadatumType.ANNOUNCEMENT_MEDIUM to this.digitalAnnouncementMedium,
-                        MetadatumType.DATE to this.digitalAnnouncementDate,
+                        MetadatumType.DATE to decodeLocalDate(this.digitalAnnouncementDate),
                         MetadatumType.YEAR to this.digitalAnnouncementYear,
                         MetadatumType.EDITION to (this.digitalAnnouncementPage ?: this.digitalAnnouncementEdition),
                         MetadatumType.AREA_OF_PUBLICATION to this.digitalAnnouncementArea,
@@ -187,7 +188,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 ) +
                 getSection(
                     mapOf(
-                        MetadatumType.ANNOUNCEMENT_GAZETTE to this.euAnnouncementGazette,
+                        MetadatumType.EU_GOVERNMENT_GAZETTE to this.euAnnouncementGazette,
                         MetadatumType.YEAR to this.euAnnouncementYear,
                         MetadatumType.SERIES to this.euAnnouncementSeries,
                         MetadatumType.NUMBER to this.euAnnouncementNumber,
@@ -296,9 +297,9 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             )
         }
 
-        private fun getSection(metadata: Map<MetadatumType, String?>, section: MetadataSectionName) = MetadataSection(
+        private fun getSection(metadata: Map<MetadatumType, *>, section: MetadataSectionName) = MetadataSection(
             section,
-            metadata.entries.filter { it.value != null }.map { Metadatum(it.value as String, it.key) },
+            metadata.entries.filter { it.value != null }.map { Metadatum(if (it.value is LocalDate) it.value else it.value as String, it.key) },
         )
     }
 
