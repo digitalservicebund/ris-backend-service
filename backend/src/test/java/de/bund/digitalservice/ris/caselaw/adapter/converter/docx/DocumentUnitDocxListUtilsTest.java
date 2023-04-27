@@ -2,6 +2,8 @@ package de.bund.digitalservice.ris.caselaw.adapter.converter.docx;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import ch.qos.logback.classic.Level;
+import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
 import de.bund.digitalservice.ris.caselaw.domain.docx.DocumentUnitDocx;
 import de.bund.digitalservice.ris.caselaw.domain.docx.NumberingList;
@@ -59,6 +61,7 @@ class DocumentUnitDocxListUtilsTest {
   @Test
   void testPostprocessBorderNumbers_withNumberlessBorderNumbersButDifferentNumIds_shouldLogError(
       CapturedOutput output) {
+    TestMemoryAppender memoryAppender = new TestMemoryAppender(DocumentUnitDocxListUtils.class);
     List<DocumentUnitDocx> list = new ArrayList<>();
     list.add(createNumberlessBorderNumberWithNumId(7));
     list.add(createNumberlessBorderNumberWithNumId(8));
@@ -74,8 +77,12 @@ class DocumentUnitDocxListUtilsTest {
     BorderNumber borderNumber1 = (BorderNumber) list.get(1);
     assertThat(borderNumber1.getNumber()).isEqualTo("2");
     assertThat(borderNumber1.getNumId()).isEqualTo(8);
-    // TODO
-    // assertThat(output).contains("Unexpected case of a new numId");
+
+    assertThat(memoryAppender.count(Level.ERROR)).isEqualTo(1);
+    assertThat(memoryAppender.getMessage(Level.ERROR, 0))
+        .isEqualTo(
+            "Unexpected case of a new numId. Are there more than one border number blocks in this document? Then we need to support this case. Until then every border number block after the first one will not start at 1. Insteadit is a continuous counting up across the whole document. ");
+    memoryAppender.detachLoggingTestAppender();
   }
 
   @Test

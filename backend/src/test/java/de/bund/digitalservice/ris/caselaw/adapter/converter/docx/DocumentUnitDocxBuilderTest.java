@@ -10,8 +10,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.LoggerContext;
 import de.bund.digitalservice.ris.caselaw.TestMemoryAppender;
 import de.bund.digitalservice.ris.caselaw.domain.docx.AnchorImageElement;
 import de.bund.digitalservice.ris.caselaw.domain.docx.BorderNumber;
@@ -64,7 +62,6 @@ import org.docx4j.wml.Text;
 import org.docx4j.wml.U;
 import org.docx4j.wml.UnderlineEnumeration;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
 
 class DocumentUnitDocxBuilderTest {
   @Test
@@ -1125,7 +1122,7 @@ class DocumentUnitDocxBuilderTest {
 
   @Test
   void testBuild_withNumberingList_withNotAllowedNumberingFormat() {
-    TestMemoryAppender memoryAppender = addLoggingTestAppender();
+    TestMemoryAppender memoryAppender = new TestMemoryAppender(DocumentUnitDocxBuilder.class);
     DocumentUnitDocxBuilder builder = DocumentUnitDocxBuilder.newInstance();
     PPr pPr = new PPr();
     NumPr numPr = new NumPr();
@@ -1178,26 +1175,7 @@ class DocumentUnitDocxBuilderTest {
         "not implemented number format (CHICAGO) in list. use default bullet list",
         memoryAppender.getMessage(Level.ERROR, 0));
 
-    detachLoggingTestAppender(memoryAppender);
-  }
-
-  private TestMemoryAppender addLoggingTestAppender() {
-    TestMemoryAppender memoryAppender = new TestMemoryAppender();
-    memoryAppender.setContext((LoggerContext) LoggerFactory.getILoggerFactory());
-
-    Logger logger = (Logger) LoggerFactory.getLogger(DocumentUnitDocxBuilder.class);
-    logger.addAppender(memoryAppender);
-
-    memoryAppender.start();
-
-    return memoryAppender;
-  }
-
-  private void detachLoggingTestAppender(TestMemoryAppender memoryAppender) {
-    memoryAppender.stop();
-
-    Logger logger = (Logger) LoggerFactory.getLogger(DocumentUnitDocxBuilder.class);
-    logger.detachAppender(memoryAppender);
+    memoryAppender.detachLoggingTestAppender();
   }
 
   private Inline generateInline(String name, String description, Dimension size) {
