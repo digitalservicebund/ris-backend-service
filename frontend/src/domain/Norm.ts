@@ -4,7 +4,7 @@ export interface Norm extends NormBase, FlatMetadata {
 
 export interface NormBase {
   readonly guid: string
-  readonly articles: Article[]
+  articles: Article[]
   readonly files?: FileReference[]
 }
 
