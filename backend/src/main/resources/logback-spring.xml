@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <!-- <include resource="org/springframework/boot/logging/logback/base.xml" /> -->
-    <springProfile name="staging">
+    <springProfile name="staging,production">
         <springProperty name="lokiUrl" source="neuris.loki.url"/>
         <appender name="LOKI" class="com.github.loki4j.logback.Loki4jAppender">
             <http>
