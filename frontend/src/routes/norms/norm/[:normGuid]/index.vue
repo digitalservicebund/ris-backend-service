@@ -6,9 +6,23 @@ const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
 
 if (loadedNorm.value !== undefined) {
-  loadedNorm.value.articles.sort((a, b) =>
-    Number(a.marker.substring(2)) < Number(b.marker.substring(2)) ? -1 : 1
-  )
+  loadedNorm.value.articles
+    .filter(
+      (article) =>
+        article.marker !== "Eingangsformel" &&
+        article.marker !== "Schlussformel"
+    )
+    .sort((a, b) => {
+      if (a.marker.includes("Art")) {
+        return Number(a.marker.substring(4)) < Number(b.marker.substring(4))
+          ? -1
+          : 1
+      }
+      return Number(a.marker.substring(2)) < Number(b.marker.substring(2))
+        ? -1
+        : 1
+    })
+
   loadedNorm.value.articles.forEach((article) => {
     if (article.paragraphs.filter((f) => f.marker == null).length == 0) {
       article.paragraphs.sort((a, b) =>
@@ -29,7 +43,14 @@ if (loadedNorm.value !== undefined) {
         {{ loadedNorm.officialLongTitle }}
       </h1>
       <div v-for="article in loadedNorm.articles" :key="article.guid">
-        <h2 class="label-01-regular mt-40 text-center">
+        <h2
+          class="mt-40 text-center"
+          :class="[
+            ['Eingangsformel', 'Schlussformel'].includes(article.marker)
+              ? 'label-01-bold mb-16'
+              : 'label-01-regular',
+          ]"
+        >
           {{ article.marker }}
         </h2>
         <h2
