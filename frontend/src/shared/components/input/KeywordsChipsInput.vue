@@ -58,6 +58,10 @@ function deleteChip(keyword: string | undefined) {
   emits("deleteChip", keyword)
 }
 
+const handleOnBlur = () => {
+  errorMessage.value = undefined
+}
+
 const focusFirst = () => {
   if (chipsList.value !== undefined && currentInput.value === "")
     chipsList.value.focusFirst()
@@ -76,6 +80,11 @@ watch(props, () => {
 watch(chips, () => {
   if (chips.value === undefined) focusInput()
 })
+
+watch(currentInput, () => {
+  if (errorMessage.value && currentInput.value !== "")
+    errorMessage.value = undefined
+})
 </script>
 
 <template>
@@ -87,6 +96,7 @@ watch(chips, () => {
       :aria-label="ariaLabel"
       class="input mb-[0.5rem]"
       type="text"
+      @blur="handleOnBlur"
       @input="emitInputEvent"
       @keypress.enter="saveChip"
       @keyup.right="focusFirst"
