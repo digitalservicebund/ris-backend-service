@@ -83,7 +83,6 @@ export const newNorm: NormData = {
         PARTICIPATION_INSTITUTION: ["Neues mitwirkendes Organ 2"],
       },
     ],
-    // TODO: add some dates here
     CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2023-03-02"] }],
     AGE_INDICATION: [
       {
