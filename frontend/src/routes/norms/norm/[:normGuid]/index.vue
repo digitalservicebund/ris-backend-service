@@ -32,7 +32,10 @@ if (loadedNorm.value !== undefined) {
         <h2 class="label-01-regular mt-40 text-center">
           {{ article.marker }}
         </h2>
-        <h2 class="label-01-bold mb-16 text-center">
+        <h2
+          v-if="article.title != null"
+          class="label-01-bold mb-16 text-center"
+        >
           {{ article.title }}
         </h2>
 
