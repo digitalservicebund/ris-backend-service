@@ -152,24 +152,56 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
             val metadataSections = this.metadataSections
-                .filter { it.name != MetadataSectionName.PRINT_ANNOUNCEMENT && it.name != MetadataSectionName.DIGITAL_ANNOUNCEMENT }
-                .map { it.toUseCaseData() }
+                .filter {
+                    listOf(
+                        MetadataSectionName.PRINT_ANNOUNCEMENT,
+                        MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+                        MetadataSectionName.EU_ANNOUNCEMENT,
+                        MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT,
+                    ).contains(it.name).not()
+                }.map { it.toUseCaseData() }
                 .toMutableList() +
                 getSection(
                     mapOf(
-                        MetadatumType.YEAR to this.printAnnouncementYear,
                         MetadatumType.ANNOUNCEMENT_GAZETTE to this.printAnnouncementGazette,
+                        MetadatumType.YEAR to this.printAnnouncementYear,
+                        MetadatumType.NUMBER to this.printAnnouncementNumber,
                         MetadatumType.PAGE to this.printAnnouncementPage,
+                        MetadatumType.ADDITIONAL_INFO to this.printAnnouncementInfo,
+                        MetadatumType.EXPLANATION to this.printAnnouncementExplanations,
                     ),
                     MetadataSectionName.PRINT_ANNOUNCEMENT,
                 ) +
                 getSection(
                     mapOf(
                         MetadatumType.ANNOUNCEMENT_MEDIUM to this.digitalAnnouncementMedium,
+                        MetadatumType.DATE to this.digitalAnnouncementDate,
                         MetadatumType.YEAR to this.digitalAnnouncementYear,
-                        MetadatumType.EDITION to this.digitalAnnouncementPage,
+                        MetadatumType.EDITION to (this.digitalAnnouncementPage ?: this.digitalAnnouncementEdition),
+                        MetadatumType.AREA_OF_PUBLICATION to this.digitalAnnouncementArea,
+                        MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA to this.digitalAnnouncementAreaNumber,
+                        MetadatumType.ADDITIONAL_INFO to this.digitalAnnouncementInfo,
+                        MetadatumType.EXPLANATION to this.digitalAnnouncementExplanations,
                     ),
                     MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+                ) +
+                getSection(
+                    mapOf(
+                        MetadatumType.ANNOUNCEMENT_GAZETTE to this.euAnnouncementGazette,
+                        MetadatumType.YEAR to this.euAnnouncementYear,
+                        MetadatumType.SERIES to this.euAnnouncementSeries,
+                        MetadatumType.NUMBER to this.euAnnouncementNumber,
+                        MetadatumType.PAGE to this.euAnnouncementPage,
+                        MetadatumType.ADDITIONAL_INFO to this.euAnnouncementInfo,
+                        MetadatumType.EXPLANATION to this.euAnnouncementExplanations,
+                    ),
+                    MetadataSectionName.EU_ANNOUNCEMENT,
+                ) +
+                getSection(
+                    mapOf(
+                        MetadatumType.OTHER_OFFICIAL_REFERENCE to this.otherOfficialAnnouncement,
+                    ),
+                    MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT,
                 )
 
             return EditNormFrameUseCase.NormFrameProperties(

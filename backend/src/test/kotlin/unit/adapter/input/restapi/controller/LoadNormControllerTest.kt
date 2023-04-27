@@ -91,6 +91,23 @@ class LoadNormControllerTest {
             printAnnouncementGazette = null,
             printAnnouncementPage = null,
             printAnnouncementYear = null,
+            digitalAnnouncementArea = null,
+            digitalAnnouncementAreaNumber = null,
+            digitalAnnouncementDate = null,
+            digitalAnnouncementEdition = null,
+            digitalAnnouncementExplanations = null,
+            digitalAnnouncementInfo = null,
+            euAnnouncementExplanations = null,
+            euAnnouncementGazette = null,
+            euAnnouncementInfo = null,
+            euAnnouncementNumber = null,
+            euAnnouncementPage = null,
+            euAnnouncementSeries = null,
+            euAnnouncementYear = null,
+            otherOfficialAnnouncement = null,
+            printAnnouncementExplanations = null,
+            printAnnouncementInfo = null,
+            printAnnouncementNumber = null,
         )
         val responseJson = convertLoadNormResponseTestSchemaToJson(NormResponseTestSchema.fromUseCaseData(norm))
 

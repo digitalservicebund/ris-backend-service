@@ -42,6 +42,23 @@ class EditNormFrameControllerTest {
         editNormRequestSchema.printAnnouncementGazette = null
         editNormRequestSchema.printAnnouncementPage = null
         editNormRequestSchema.printAnnouncementYear = null
+        editNormRequestSchema.digitalAnnouncementArea = null
+        editNormRequestSchema.digitalAnnouncementAreaNumber = null
+        editNormRequestSchema.digitalAnnouncementDate = null
+        editNormRequestSchema.digitalAnnouncementEdition = null
+        editNormRequestSchema.digitalAnnouncementExplanations = null
+        editNormRequestSchema.digitalAnnouncementInfo = null
+        editNormRequestSchema.euAnnouncementExplanations = null
+        editNormRequestSchema.euAnnouncementGazette = null
+        editNormRequestSchema.euAnnouncementInfo = null
+        editNormRequestSchema.euAnnouncementNumber = null
+        editNormRequestSchema.euAnnouncementPage = null
+        editNormRequestSchema.euAnnouncementSeries = null
+        editNormRequestSchema.euAnnouncementYear = null
+        editNormRequestSchema.otherOfficialAnnouncement = null
+        editNormRequestSchema.printAnnouncementExplanations = null
+        editNormRequestSchema.printAnnouncementInfo = null
+        editNormRequestSchema.printAnnouncementNumber = null
         val editJson = convertEditNormRequestTestSchemaToJson(editNormRequestSchema)
 
         every { editNormFrameService.editNormFrame(any()) } returns Mono.just(true)
