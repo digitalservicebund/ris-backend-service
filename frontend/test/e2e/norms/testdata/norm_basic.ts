@@ -1,7 +1,7 @@
 import { NormData } from "../fixtures"
 
 export const normData: NormData = {
-  jurisZipFileName: "Tierarznei.3-0_multi_1.zip",
+  jurisZipFileName: "Tierarznei.3-0_multi.zip",
   articles: [
     {
       marker: "Art 2",
