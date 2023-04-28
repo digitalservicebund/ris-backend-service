@@ -25,15 +25,11 @@ val hasValidChildren =
             EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT, DOCUMENT_TYPE,
             -> hasNone(instance)
 
-            OFFICIAL_REFERENCE -> hasType(listOf(PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT, EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT), instance)
+            OFFICIAL_REFERENCE -> hasOneOfType(listOf(PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT, EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =
             instance.sections.isNullOrEmpty()
-        private fun hasType(sectionNames: List<MetadataSectionName>, instance: MetadataSection): Boolean {
-            if (instance.sections == null) {
-                return false
-            }
-            return instance.sections.all { sectionNames.contains(it.name) }
-        }
+        private fun hasOneOfType(sectionNames: List<MetadataSectionName>, instance: MetadataSection): Boolean =
+            instance.sections?.count() == 1 && instance.sections.all { sectionNames.contains(it.name) }
     }

@@ -111,7 +111,7 @@ class HasValidChildrenTest {
     }
 
     @Test
-    fun `it is satisfied that the official reference section only contains allowed children sections`() {
+    fun `it is satisfied that the official reference section only contains only one of the allowed children sections`() {
         val instance = mockk<MetadataSection>()
         every { instance.name } returns MetadataSectionName.OFFICIAL_REFERENCE
         every { instance.sections } returns listOf(
@@ -119,6 +119,17 @@ class HasValidChildrenTest {
             MetadataSection(MetadataSectionName.DIGITAL_ANNOUNCEMENT, listOf(Metadatum("announcement medium", MetadatumType.ANNOUNCEMENT_MEDIUM))),
             MetadataSection(MetadataSectionName.EU_ANNOUNCEMENT, listOf(Metadatum("eu government gazette", MetadatumType.EU_GOVERNMENT_GAZETTE))),
             MetadataSection(MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT, listOf(Metadatum("other official reference", MetadatumType.OTHER_OFFICIAL_REFERENCE))),
+        )
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is satisfied that the official reference section only contains only the allowed children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.OFFICIAL_REFERENCE
+        every { instance.sections } returns listOf(
+            MetadataSection(MetadataSectionName.PRINT_ANNOUNCEMENT, listOf(Metadatum("announcement gazette", MetadatumType.ANNOUNCEMENT_GAZETTE))),
         )
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
