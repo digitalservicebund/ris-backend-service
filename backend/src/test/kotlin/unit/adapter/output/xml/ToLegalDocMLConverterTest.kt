@@ -79,10 +79,17 @@ class ToLegalDocMLConverterTest {
     @Test
     fun `it creates the identification tag with proper data`() {
         val printAnnouncementSection = MetadataSection(
-            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            MetadataSectionName.OFFICIAL_REFERENCE,
+            listOf(),
+            1,
             listOf(
-                Metadatum("printAnnouncementGazette", MetadatumType.ANNOUNCEMENT_GAZETTE),
-                Metadatum("1102", MetadatumType.PAGE),
+                MetadataSection(
+                    MetadataSectionName.PRINT_ANNOUNCEMENT,
+                    listOf(
+                        Metadatum("printAnnouncementGazette", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                        Metadatum("1102", MetadatumType.PAGE, 1),
+                    ),
+                ),
             ),
         )
         val guid = UUID.randomUUID()

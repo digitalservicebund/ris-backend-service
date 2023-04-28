@@ -117,12 +117,19 @@ class NormTest {
     @Test
     fun `it can create a proper eli from the respective sections`() {
         val printAnnouncementSection = MetadataSection(
-            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            MetadataSectionName.OFFICIAL_REFERENCE,
+            listOf(),
+            1,
             listOf(
-                Metadatum("BGBl I", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
-                Metadatum("BGBL II", MetadatumType.ANNOUNCEMENT_GAZETTE, 2),
-                Metadatum("1102", MetadatumType.PAGE, 1),
-                Metadatum("1102", MetadatumType.PAGE, 2),
+                MetadataSection(
+                    MetadataSectionName.PRINT_ANNOUNCEMENT,
+                    listOf(
+                        Metadatum("BGBl I", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                        Metadatum("BGBL II", MetadatumType.ANNOUNCEMENT_GAZETTE, 2),
+                        Metadatum("1102", MetadatumType.PAGE, 1),
+                        Metadatum("1102", MetadatumType.PAGE, 2),
+                    ),
+                ),
             ),
         )
         val citationDateSection = MetadataSection(
@@ -147,5 +154,65 @@ class NormTest {
         assertThat(norm.eli.citationDate).isEqualTo(LocalDate.of(2022, 11, 19))
         assertThat(norm.eli.announcementDate).isEqualTo(LocalDate.of(2022, 11, 18))
         assertThat(norm.eli.toString()).isEqualTo("eli/bgbl-1/2022/s1102")
+    }
+
+    @Test
+    fun `it can create retrieve first metadata in a flat sections list`() {
+        val leadSection = MetadataSection(
+            MetadataSectionName.LEAD,
+            listOf(
+                Metadatum("jurisdiction1", MetadatumType.LEAD_JURISDICTION, 1),
+                Metadatum("jurisdiction2", MetadatumType.LEAD_JURISDICTION, 2),
+                Metadatum("lead1", MetadatumType.LEAD_UNIT, 1),
+                Metadatum("lead2", MetadatumType.LEAD_UNIT, 2),
+            ),
+        )
+        val citationDateSection = MetadataSection(
+            MetadataSectionName.CITATION_DATE,
+            listOf(
+                Metadatum(LocalDate.of(2022, 11, 19), MetadatumType.DATE),
+            ),
+        )
+
+        val norm =
+            Norm(
+                guid = UUID.randomUUID(),
+                officialLongTitle = "long title",
+                metadataSections = listOf(leadSection, citationDateSection),
+            )
+
+        assertThat(norm.getFirstMetadatum(MetadataSectionName.LEAD, MetadatumType.LEAD_JURISDICTION)?.value).isEqualTo("jurisdiction1")
+        assertThat(norm.getFirstMetadatum(MetadataSectionName.LEAD, MetadatumType.LEAD_UNIT)?.value).isEqualTo("lead1")
+    }
+
+    @Test
+    fun `it can retrieve first metadata in a tree of sections with two levels`() {
+        val printAnnouncementSection1 = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("gazette1", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                Metadatum("gazette2", MetadatumType.ANNOUNCEMENT_GAZETTE, 2),
+            ),
+            1,
+        )
+        val printAnnouncementSection2 = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("gazette3", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                Metadatum("gazette4", MetadatumType.ANNOUNCEMENT_GAZETTE, 2),
+            ),
+            2,
+        )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection1))
+        val referenceSection2 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 2, listOf(printAnnouncementSection2))
+
+        val norm =
+            Norm(
+                guid = UUID.randomUUID(),
+                officialLongTitle = "long title",
+                metadataSections = listOf(referenceSection1, referenceSection2),
+            )
+
+        assertThat(norm.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE, MetadataSectionName.OFFICIAL_REFERENCE)?.value).isEqualTo("gazette1")
     }
 }
