@@ -2,11 +2,11 @@ fileignoreconfig:
   - filename: "*README.md"
     ignore_detectors: [filecontent]
   - filename: frontend/test/test-helper/dataGenerators.ts
-    checksum: 2126423b8db3205543a0f990d487eecaf1c87f068b92cca1856f7b2dabbbf83d
+    checksum: 89ff7c6f13b276ea2c1f65f920157ac3eed03fda117c99e3f0fd0ef3db631752
   - filename: frontend/FRONTEND_STYLEGUIDE.md
     checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
   - filename: doc/norms/backend-api.yaml
-    checksum: 56ed1d05f04ca4b5f62de3d37b623ed17c3d81be02be4b47c912d3c7711eb6de
+    checksum: ea8c3c035360509a42808da85419260e47cfef1ab14c09c2acb18d2c5000b486
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
     checksum: fa91f7fac42dcf3fc0aab40f5baaa367b335acf3ba208373ed067c6f6659f52b
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
