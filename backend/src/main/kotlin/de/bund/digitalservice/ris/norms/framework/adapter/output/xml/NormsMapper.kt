@@ -21,9 +21,6 @@ fun mapNormToDto(norm: Norm): NormDto {
     val firstCitationDate = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.DATE)?.let { encodeLocalDate(it.value as LocalDate) }
     val firstCitationYear = norm.getFirstMetadatum(MetadataSectionName.CITATION_DATE, MetadatumType.YEAR)?.let { it.value as String }
 
-    val firstProviderDecidingBody = norm.metadataSections.filter { it.name == MetadataSectionName.NORM_PROVIDER }.flatMap { it.metadata }
-        .filter { it.type == MetadatumType.DECIDING_BODY }.minByOrNull { it.order }?.let { it.value.toString() }
-
     return NormDto(
         guid = norm.guid.toString(),
         officialLongTitle = IdentifiedElement(norm.officialLongTitle),
@@ -31,7 +28,10 @@ fun mapNormToDto(norm: Norm): NormDto {
         announcementDate = norm.announcementDate?.toString() ?: (firstCitationDate ?: firstCitationYear),
         documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
         documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
-        providerDecidingBody = getMappedValue(Property.PROVIDER_DECIDING_BODY, firstProviderDecidingBody ?: ""),
+        providerDecidingBody = getMappedValue(
+            Property.PROVIDER_DECIDING_BODY,
+            norm.getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.DECIDING_BODY)?.value.toString(),
+        ),
         participationInstitution = getMappedValue(
             Property.PARTICIPATION_INSTITUTION,
             norm.getFirstMetadatum(MetadataSectionName.PARTICIPATION, MetadatumType.PARTICIPATION_INSTITUTION)?.value.toString(),
@@ -39,7 +39,7 @@ fun mapNormToDto(norm: Norm): NormDto {
         printAnnouncementGazette = norm.eli.gazette,
         printAnnouncementPage = norm.eli.printAnnouncementPage,
         eli = norm.eli.toString(),
-        articles = norm.articles.sortedBy { if (it.marker.contains("§")) it.marker.substring(2).toInt() else it.marker.substring(4).toInt() }
+        articles = norm.articles.filter { it.marker !in listOf("Eingangsformel", "Schlussformel") }.sortedBy { if (it.marker.contains("§")) it.marker.substring(2).toInt() else it.marker.substring(4).toInt() }
             .mapIndexed { index, article ->
                 mapArticleToDto(article, index)
             },

@@ -98,15 +98,19 @@ export const newNorm: NormData = {
         RANGE_END_UNIT: [RangeUnit.YEARS],
       },
     ],
+    NORM_PROVIDER: [
+      {
+        ENTITY: ["providerEntity"],
+        DECIDING_BODY: ["providerDecidingBody"],
+        RESOLUTION_MAJORITY: [false],
+      },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
   officialShortTitle: "officialShortTitle",
   officialAbbreviation: "officialAbbreviation",
   announcementDate: "2022-11-01",
-  providerEntity: "providerEntity",
-  providerDecidingBody: "providerDecidingBody",
-  providerIsResolutionMajority: false,
   risAbbreviation: "risAbbreviation",
   documentTemplateName: "documentTemplateName",
   publicationDate: "2022-11-01",
