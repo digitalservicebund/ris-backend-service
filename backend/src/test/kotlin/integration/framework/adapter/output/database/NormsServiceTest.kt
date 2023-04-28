@@ -267,6 +267,41 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
+    fun `save a norm with official reference sections and retrieve it by guid`() {
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("gazette1", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                Metadatum("gazette2", MetadatumType.ANNOUNCEMENT_GAZETTE, 2),
+            ),
+            1,
+        )
+        val digitalAnnouncementSection = MetadataSection(
+            MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+            listOf(
+                Metadatum("medium1", MetadatumType.ANNOUNCEMENT_MEDIUM, 1),
+                Metadatum("medium2", MetadatumType.ANNOUNCEMENT_MEDIUM, 2),
+            ),
+            2,
+        )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
+        val referenceSection2 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 2, listOf(digitalAnnouncementSection))
+        val norm = Norm(guid = UUID.randomUUID(), officialLongTitle = "title", metadataSections = listOf(referenceSection1, referenceSection2))
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
     fun `save norm with metadata and retrieve it by its GUID`() {
         val norm = NORM.copy(metadataSections = createSimpleSections())
         val saveCommand = SaveNormOutputPort.Command(norm)
