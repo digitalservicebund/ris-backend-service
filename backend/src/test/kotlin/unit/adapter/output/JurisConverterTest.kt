@@ -273,6 +273,11 @@ class JurisConverterTest {
             assertThat(metadata).contains(Metadatum(false, RESOLUTION_MAJORITY, 1))
             assertThat(metadata).contains(Metadatum("Lebensjahr 10", RANGE_START, 1))
             assertThat(metadata).contains(Metadatum("Monate 11", RANGE_START, 1))
+
+            val printAnnouncementMetadata = norm?.metadataSections?.flatMap { it.sections ?: listOf() }?.flatMap { it.metadata }
+            assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
+            assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement year", YEAR, 1))
+            assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement page", PAGE, 1))
         }
 
         @Test

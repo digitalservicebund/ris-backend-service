@@ -70,7 +70,7 @@ val hasValidMetadata =
         private fun hasNone(instance: MetadataSection): Boolean =
             instance.metadata.isEmpty()
         private fun hasType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
-            instance.metadata.all { types.contains(it.type) }
+            instance.metadata.all { it.type in types }
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.count() == 1 && hasType(types, instance)
     }

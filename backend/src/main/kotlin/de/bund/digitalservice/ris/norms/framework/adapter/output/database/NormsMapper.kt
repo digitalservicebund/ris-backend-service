@@ -216,6 +216,16 @@ interface NormsMapper {
         return MetadataSectionDto(id = id, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId)
     }
 
+    fun metadataSectionsToDto(sections: List<MetadataSection>?, normId: Int, sectionId: Int? = null, id: Int = 0): List<MetadataSectionDto>? {
+        return sections?.map {
+            metadataSectionToDto(
+                it,
+                normId,
+                sectionId,
+            )
+        }
+    }
+
     // TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
     fun queryFieldToDbColumn(field: QueryFields): String {
         return when (field) {
