@@ -324,7 +324,7 @@ onBeforeUnmount(() => {
         @keyup.up="keyup"
       >
         <span>
-          {{ item.label }}
+          <span>{{ item.label }}</span>
           <div
             v-if="hasAdditionalInfo(item)"
             aria-label="additional-dropdown-info"
@@ -332,12 +332,13 @@ onBeforeUnmount(() => {
             :class="getAdditionalInfoStyle(item)"
           >
             {{ getAdditionalInfo(item) }}
-          </div></span
-        >
+          </div>
+        </span>
       </div>
     </div>
   </div>
 </template>
+`
 
 <style lang="scss" scoped>
 .dropdown-container {

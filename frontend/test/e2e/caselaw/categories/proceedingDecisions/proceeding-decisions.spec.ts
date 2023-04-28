@@ -54,8 +54,7 @@ test.describe("Add and remove proceeding decisions", () => {
     ).toBeVisible()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("add multiple proceeding decisions", async ({
+  test("add same proceeding decision twice", async ({
     page,
     documentNumber,
   }) => {
@@ -69,6 +68,10 @@ test.describe("Add and remove proceeding decisions", () => {
     })
 
     await page.getByText("Manuell Hinzufügen").click()
+
+    await expect(
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
+    ).toBeVisible()
 
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",

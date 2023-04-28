@@ -82,10 +82,12 @@ export async function fillProceedingDecisionInputs(
 
   if (values?.court) {
     await fillInput("Gericht Rechtszug", values?.court)
-    await page.locator(`text=${values?.court}`).click()
-    expect(await page.getByLabel("Gericht Rechtszug").inputValue()).toBe(
-      values.court
-    )
+    await page.getByText(values.court, { exact: true }).click()
+
+    await expect(async () => {
+      const inputValue = await page.getByLabel("Gericht Rechtszug").inputValue()
+      expect(inputValue).toBe(values.court)
+    }).toPass({ timeout: 5000 })
   }
   if (values?.date) {
     await fillInput("Entscheidungsdatum Rechtszug", values?.date)
