@@ -31,5 +31,5 @@ val hasValidChildren =
         private fun hasNone(instance: MetadataSection): Boolean =
             instance.sections.isNullOrEmpty()
         private fun hasOneOfType(sectionNames: List<MetadataSectionName>, instance: MetadataSection): Boolean =
-            instance.sections?.count() == 1 && instance.sections.all { sectionNames.contains(it.name) }
+            instance.sections?.count() == 1 && instance.sections.all { it.name in sectionNames }
     }

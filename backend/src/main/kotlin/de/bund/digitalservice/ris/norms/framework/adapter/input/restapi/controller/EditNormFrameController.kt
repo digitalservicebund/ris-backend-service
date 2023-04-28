@@ -170,6 +170,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                         MetadatumType.EXPLANATION to this.printAnnouncementExplanations,
                     ),
                     MetadataSectionName.PRINT_ANNOUNCEMENT,
+                    1,
                 ) +
                 getSection(
                     mapOf(
@@ -183,6 +184,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                         MetadatumType.EXPLANATION to this.digitalAnnouncementExplanations,
                     ),
                     MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+                    2,
                 ) +
                 getSection(
                     mapOf(
@@ -195,12 +197,14 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                         MetadatumType.EXPLANATION to this.euAnnouncementExplanations,
                     ),
                     MetadataSectionName.EU_ANNOUNCEMENT,
+                    3,
                 ) +
                 getSection(
                     mapOf(
                         MetadatumType.OTHER_OFFICIAL_REFERENCE to this.otherOfficialAnnouncement,
                     ),
                     MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT,
+                    4,
                 )
 
             return EditNormFrameUseCase.NormFrameProperties(
@@ -294,9 +298,16 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             )
         }
 
-        private fun getSection(metadata: Map<MetadatumType, *>, section: MetadataSectionName) = MetadataSection(
-            section,
-            metadata.entries.filter { it.value != null }.map { Metadatum(if (it.value is LocalDate) it.value else it.value as String, it.key) },
+        private fun getSection(metadata: Map<MetadatumType, *>, section: MetadataSectionName, order: Int) = MetadataSection(
+            MetadataSectionName.OFFICIAL_REFERENCE,
+            listOf(),
+            order,
+            listOf(
+                MetadataSection(
+                    section,
+                    metadata.entries.filter { it.value != null }.map { Metadatum(if (it.value is LocalDate) it.value else it.value as String, it.key) },
+                ),
+            ),
         )
     }
 
