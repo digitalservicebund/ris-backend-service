@@ -13,6 +13,7 @@ const config: PlaywrightTestConfig = {
     screenshot: { mode: "only-on-failure", fullPage: true },
     storageState: "test/e2e/shared/storageState.json",
     timezoneId: "Europe/Berlin",
+    trace: "on-first-retry",
   },
   projects: [
     {
