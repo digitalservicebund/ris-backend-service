@@ -285,7 +285,7 @@ describe("Combobox Element", () => {
     expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItemElements).toHaveLength(1)
     expect(dropdownItemElements[0]).toHaveTextContent(
-      "ABC aufgehoben seit: 1973"
+      "ABCaufgehoben seit: 1973"
     )
 
     const additionalInfoElement = screen.getAllByLabelText(
