@@ -18,6 +18,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
@@ -179,6 +180,7 @@ class JurisConverterTest {
                     definitionList = listOf("test definition")
                     ageOfMajorityIndicationList = listOf("test age of majority indication")
                     text = "test text"
+                    ageIndicationStartList = listOf("Lebensjahr 10", "Monate 11")
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
             every { extractData(any()) } returns data
@@ -255,6 +257,8 @@ class JurisConverterTest {
             assertThat(metadata).contains(Metadatum("DEU", ENTITY, 1))
             assertThat(metadata).contains(Metadatum("BT", DECIDING_BODY, 1))
             assertThat(metadata).contains(Metadatum(false, RESOLUTION_MAJORITY, 1))
+            assertThat(metadata).contains(Metadatum("Lebensjahr 10", RANGE_START, 1))
+            assertThat(metadata).contains(Metadatum("Monate 11", RANGE_START, 1))
         }
 
         @Test
