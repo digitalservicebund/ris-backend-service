@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import de.bund.digitalservice.ris.norms.application.port.input.EditNormFrameUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.RangeUnit
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
@@ -322,7 +321,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         fun toUseCaseData(): Metadatum<*> {
             val value = when (this.type) {
                 MetadatumType.DATE -> decodeLocalDate(this.value)
-                MetadatumType.RANGE_START_UNIT, MetadatumType.RANGE_END_UNIT -> RangeUnit.valueOf(this.value)
                 MetadatumType.RESOLUTION_MAJORITY -> this.value.toBoolean()
                 else -> this.value
             }

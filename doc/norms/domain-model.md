@@ -163,9 +163,7 @@ classDiagram
     DATE,
     YEAR,
     RANGE_START,
-    RANGE_START_UNIT,
     RANGE_END,
-    RANGE_END_UNIT,
     ANNOUNCEMENT_GAZETTE,
     NUMBER,
     PAGE_NUMBER,
@@ -189,19 +187,6 @@ classDiagram
     +String name
     +String hash
     +Timestamp createdAt
-  }
-
-  class RangeUnit {
-    <<enumeration>>
-    YEARS
-    MONTHS
-    WEEKS
-    DAYS
-    HOURS
-    MINUTES
-    SECONDS
-    YEARS_OF_LIFE
-    MONTHS_OF_LIFE
   }
 
   Norm "1" --> "*" MetadataSection

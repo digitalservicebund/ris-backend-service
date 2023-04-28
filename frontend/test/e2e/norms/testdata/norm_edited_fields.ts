@@ -1,4 +1,3 @@
-import { RangeUnit } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
 
 export const newNorm: NormData = {
@@ -86,16 +85,12 @@ export const newNorm: NormData = {
     CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2023-03-02"] }],
     AGE_INDICATION: [
       {
-        RANGE_START: ["1"],
-        RANGE_START_UNIT: [RangeUnit.DAYS],
-        RANGE_END: ["2"],
-        RANGE_END_UNIT: [RangeUnit.WEEKS],
+        RANGE_START: ["1 Jahr"],
+        RANGE_END: ["2 Jahre"],
       },
       {
-        RANGE_START: ["3"],
-        RANGE_START_UNIT: [RangeUnit.MONTHS],
-        RANGE_END: ["4"],
-        RANGE_END_UNIT: [RangeUnit.YEARS],
+        RANGE_START: ["3 Monate"],
+        RANGE_END: ["4 Monate"],
       },
     ],
     NORM_PROVIDER: [

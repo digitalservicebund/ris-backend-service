@@ -12,12 +12,7 @@ import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstit
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import {
-  FlatMetadata,
-  Metadata,
-  MetadataSections,
-  RangeUnit,
-} from "@/domain/Norm"
+import { FlatMetadata, Metadata, MetadataSections } from "@/domain/Norm"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { digitalAnnouncement } from "@/fields/norms/digitalAnnouncement"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
@@ -214,55 +209,6 @@ watch(
   { deep: true }
 )
 
-function getLabel(value: string, unit: RangeUnit): string {
-  const pluralN = value === "1" ? "" : "n"
-  switch (unit) {
-    case RangeUnit.YEARS:
-      return value + ` Jahr` + (value === "1" ? "" : "e")
-    case RangeUnit.MONTHS:
-      return value + ` Monat` + (value === "1" ? "" : "e")
-    case RangeUnit.WEEKS:
-      return value + " Woche" + pluralN
-    case RangeUnit.DAYS:
-      return value + " Tag" + (value === "1" ? "" : "e")
-    case RangeUnit.HOURS:
-      return value + " Stunde" + pluralN
-    case RangeUnit.MINUTES:
-      return value + " Minute" + pluralN
-    case RangeUnit.SECONDS:
-      return value + " Sekunde" + pluralN
-    case RangeUnit.YEARS_OF_LIFE:
-      return value + " Lebensjahre"
-    case RangeUnit.MONTHS_OF_LIFE:
-      return value + " Lebensmonate"
-  }
-}
-
-function ageIndicatorSummarizer(data: Metadata): string {
-  if (!data) return ""
-
-  const start = data.RANGE_START?.[0]
-  const startUnit = data.RANGE_START_UNIT?.[0]
-  const end = data.RANGE_END?.[0]
-  const endUnit = data.RANGE_END_UNIT?.[0]
-
-  if (start && startUnit) {
-    if (end && endUnit) {
-      const startLabel = getLabel(start, startUnit)
-      const endLabel = getLabel(end, endUnit)
-      return `${startLabel} - ${endLabel}`
-    } else {
-      const label = getLabel(start, startUnit)
-      return `${label}`
-    }
-  } else if (end && endUnit) {
-    const endLabel = getLabel(end, endUnit)
-    return ` - ${endLabel}`
-  } else {
-    return ""
-  }
-}
-
 function citationDateSummarizer(data: Metadata): string {
   if (!data) return ""
 
@@ -316,7 +262,6 @@ function normProviderSummarizer(data: Metadata) {
   }
 }
 
-const AgeIndicationSummary = withSummarizer(ageIndicatorSummarizer)
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 </script>
@@ -728,14 +673,12 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
     <ExpandableDataSet
       id="ageIndications"
       :data-set="metadataSections.AGE_INDICATION"
-      :summary-component="AgeIndicationSummary"
       title="Altersangabe"
     >
       <EditableList
         v-model="metadataSections.AGE_INDICATION"
         :default-value="{}"
         :edit-component="AgeIndicationInputGroup"
-        :summary-component="AgeIndicationSummary"
       />
     </ExpandableDataSet>
 

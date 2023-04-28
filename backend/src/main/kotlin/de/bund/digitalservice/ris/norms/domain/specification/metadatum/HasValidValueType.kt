@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.RangeUnit
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ADDITIONAL_INFO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
@@ -27,9 +26,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
@@ -63,8 +60,6 @@ val hasValidValueType =
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
                 TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME, EDITION,
                 -> instance.value is String
-
-                RANGE_START_UNIT, RANGE_END_UNIT -> instance.value is RangeUnit
 
                 DATE -> instance.value is LocalDate
 

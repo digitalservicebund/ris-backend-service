@@ -2,7 +2,6 @@ package de.bund.digitalservice.ris.norms.domain.specification.section
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.RangeUnit
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import io.mockk.every
@@ -45,7 +44,6 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
-            Metadatum(RangeUnit.YEARS, MetadatumType.RANGE_START_UNIT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
@@ -58,38 +56,10 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("range start", MetadatumType.RANGE_START),
-            Metadatum(RangeUnit.YEARS, MetadatumType.RANGE_START_UNIT),
             Metadatum("range end", MetadatumType.RANGE_END),
-            Metadatum(RangeUnit.DAYS, MetadatumType.RANGE_END_UNIT),
         )
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
-    }
-
-    @Test
-    fun `it throws an error on age identification with only one of range value or range unit`() {
-        val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.AGE_INDICATION
-        every { instance.sections } returns null
-        every { instance.metadata } returns listOf(
-            Metadatum("range start", MetadatumType.RANGE_START),
-            Metadatum(RangeUnit.DAYS, MetadatumType.RANGE_START_UNIT),
-            Metadatum(RangeUnit.WEEKS, MetadatumType.RANGE_END_UNIT),
-        )
-
-        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
-    }
-
-    @Test
-    fun `it throws an error on age identification with one of range value or range unit and one not complete range`() {
-        val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.AGE_INDICATION
-        every { instance.sections } returns null
-        every { instance.metadata } returns listOf(
-            Metadatum("range start", MetadatumType.RANGE_START),
-        )
-
-        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
 
     @Test

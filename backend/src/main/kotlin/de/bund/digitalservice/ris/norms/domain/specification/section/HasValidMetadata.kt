@@ -27,9 +27,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.REFERENCE_NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
@@ -59,10 +57,7 @@ val hasValidMetadata =
             Section.LEAD -> hasType(listOf(LEAD_JURISDICTION, LEAD_UNIT), instance)
             Section.PARTICIPATION -> hasType(listOf(PARTICIPATION_TYPE, PARTICIPATION_INSTITUTION), instance)
             Section.CITATION_DATE -> hasOneOfType(listOf(DATE, YEAR), instance)
-            Section.AGE_INDICATION -> hasOnlyBlocksOf(
-                listOf(listOf(RANGE_START, RANGE_START_UNIT), listOf(RANGE_END, RANGE_END_UNIT)),
-                instance,
-            )
+            Section.AGE_INDICATION -> hasType(listOf(RANGE_START, RANGE_END), instance)
             Section.OFFICIAL_REFERENCE -> hasNone(instance)
             Section.PRINT_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_GAZETTE, YEAR, NUMBER, PAGE, ADDITIONAL_INFO, EXPLANATION), instance)
             Section.DIGITAL_ANNOUNCEMENT -> hasType(listOf(ANNOUNCEMENT_MEDIUM, DATE, YEAR, EDITION, AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA, ADDITIONAL_INFO, EXPLANATION), instance)
@@ -78,19 +73,4 @@ val hasValidMetadata =
             instance.metadata.all { types.contains(it.type) }
         private fun hasOneOfType(types: List<MetadatumType>, instance: MetadataSection): Boolean =
             instance.metadata.count() == 1 && hasType(types, instance)
-
-        private fun hasOnlyBlocksOf(types: List<List<MetadatumType>>, instance: MetadataSection): Boolean {
-            if (!hasType(types.flatten(), instance)) {
-                return false
-            }
-
-            var result = true
-            types.forEach { typeList ->
-                if (instance.metadata.any { typeList.contains(it.type) }) {
-                    val all = typeList.all { type -> instance.metadata.any { type == it.type } }
-                    result = result and all
-                }
-            }
-            return result
-        }
     }

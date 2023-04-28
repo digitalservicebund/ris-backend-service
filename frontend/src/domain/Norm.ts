@@ -50,9 +50,7 @@ export enum MetadatumType {
   YEAR = "YEAR",
   DATE = "DATE",
   RANGE_START = "RANGE_START",
-  RANGE_START_UNIT = "RANGE_START_UNIT",
   RANGE_END = "RANGE_END",
-  RANGE_END_UNIT = "RANGE_END_UNIT",
   ANNOUNCEMENT_MEDIUM = "ANNOUNCEMENT_MEDIUM",
   ANNOUNCEMENT_GAZETTE = "ANNOUNCEMENT_GAZETTE",
   ADDITIONAL_INFO = "ADDITIONAL_INFO",
@@ -94,9 +92,7 @@ export type MetadataValueType = {
   [MetadatumType.DATE]: string
   [MetadatumType.YEAR]: string
   [MetadatumType.RANGE_START]: string
-  [MetadatumType.RANGE_START_UNIT]: RangeUnit
   [MetadatumType.RANGE_END]: string
-  [MetadatumType.RANGE_END_UNIT]: RangeUnit
   [MetadatumType.ANNOUNCEMENT_MEDIUM]: string
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: string
   [MetadatumType.ADDITIONAL_INFO]: string
@@ -224,16 +220,4 @@ export type FlatMetadata = {
   statusNote?: string
   statusReference?: string
   text?: string
-}
-
-export enum RangeUnit {
-  YEARS = "YEARS",
-  MONTHS = "MONTHS",
-  WEEKS = "WEEKS",
-  DAYS = "DAYS",
-  HOURS = "HOURS",
-  MINUTES = "MINUTES",
-  SECONDS = "SECONDS",
-  YEARS_OF_LIFE = "YEARS_OF_LIFE",
-  MONTHS_OF_LIFE = "MONTHS_OF_LIFE",
 }

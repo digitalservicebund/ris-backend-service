@@ -291,9 +291,7 @@ components:
         - DATE
         - YEAR
         - RANGE_START
-        - RANGE_START_UNIT
         - RANGE_END
-        - RANGE_END_UNIT
         - ANNOUNCEMENT_GAZETTE
         - NUMBER
         - PAGE_NUMBER

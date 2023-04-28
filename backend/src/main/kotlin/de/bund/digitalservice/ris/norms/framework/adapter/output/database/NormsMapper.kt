@@ -7,7 +7,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.entity.RangeUnit
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
@@ -115,7 +114,6 @@ interface NormsMapper {
     fun metadatumToEntity(metadatumDto: MetadatumDto): Metadatum<*> {
         val value = when (metadatumDto.type) {
             MetadatumType.DATE -> decodeLocalDate(metadatumDto.value)
-            MetadatumType.RANGE_START_UNIT, MetadatumType.RANGE_END_UNIT -> RangeUnit.valueOf(metadatumDto.value)
             MetadatumType.RESOLUTION_MAJORITY -> metadatumDto.value.toBoolean()
             else -> metadatumDto.value
         }

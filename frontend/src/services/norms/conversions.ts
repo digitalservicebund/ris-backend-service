@@ -23,7 +23,6 @@ import {
   MetadataValueType,
   Norm,
   FlatMetadata,
-  RangeUnit,
 } from "@/domain/Norm"
 
 function identity<T>(data: T): T {
@@ -72,20 +71,6 @@ function decodeBoolean(data: string): boolean {
   return JSON.parse(data)
 }
 
-function decodeRangeUnit(data: string): RangeUnit {
-  const indexOfKeyPassed = Object.keys(RangeUnit).indexOf(data)
-
-  const unit = Object.values(RangeUnit)[indexOfKeyPassed]
-
-  if (unit) {
-    return unit
-  } else throw new Error(`Could not decode RangeUnit: '${data}'`)
-}
-
-function encodeRangeUnit(data: RangeUnit): string {
-  return data
-}
-
 function encodeBoolean(data: boolean): string {
   return String(data)
 }
@@ -113,9 +98,7 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.DATE]: identity,
   [MetadatumType.YEAR]: identity,
   [MetadatumType.RANGE_START]: identity,
-  [MetadatumType.RANGE_START_UNIT]: decodeRangeUnit,
   [MetadatumType.RANGE_END]: identity,
-  [MetadatumType.RANGE_END_UNIT]: decodeRangeUnit,
   [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: identity,
   [MetadatumType.ADDITIONAL_INFO]: identity,
@@ -156,9 +139,7 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.DATE]: encodeDate,
   [MetadatumType.YEAR]: identity,
   [MetadatumType.RANGE_START]: identity,
-  [MetadatumType.RANGE_START_UNIT]: encodeRangeUnit,
   [MetadatumType.RANGE_END]: identity,
-  [MetadatumType.RANGE_END_UNIT]: encodeRangeUnit,
   [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
   [MetadatumType.ANNOUNCEMENT_GAZETTE]: identity,
   [MetadatumType.ADDITIONAL_INFO]: identity,

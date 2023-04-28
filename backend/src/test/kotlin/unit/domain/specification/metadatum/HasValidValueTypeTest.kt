@@ -5,9 +5,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START_UNIT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
 import io.mockk.every
 import io.mockk.mockk
@@ -44,22 +42,8 @@ class HasValidValueTypeTest {
     }
 
     @Test
-    fun `it is not satisfied if the value for a range start unit is a string`() {
-        val instance = getMockedMetadatum("range start unit", RANGE_START_UNIT)
-
-        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
-    }
-
-    @Test
     fun `it is not satisfied if the value for a range end is not a string`() {
         val instance = getMockedMetadatum(123, RANGE_END)
-
-        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
-    }
-
-    @Test
-    fun `it is not satisfied if the value for a range end unit is a string`() {
-        val instance = getMockedMetadatum("range end unit", RANGE_END_UNIT)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }
