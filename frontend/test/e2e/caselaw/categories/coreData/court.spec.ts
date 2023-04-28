@@ -3,6 +3,7 @@ import {
   navigateToCategories,
   waitForSaving,
   waitForInputValue,
+  waitForSaveStatusChanged,
 } from "../../e2e-utils"
 import { testWithDocumentUnit as test } from "../../fixtures"
 
@@ -212,10 +213,14 @@ test.describe("court", () => {
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
 
+    const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
+
     await page.locator("[aria-label='Gericht']").fill("bgh")
     await page.locator("text=BGH").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-    await waitForSaving(page)
+
+    // racing condition if the selection of court and autosave at the same moment
+    await waitForSaveStatusChanged(page, saveStatus)
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
 

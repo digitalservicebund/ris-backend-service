@@ -1,4 +1,4 @@
-import { expect, Page } from "@playwright/test"
+import { expect, Locator, Page } from "@playwright/test"
 import { generateString } from "../../test-helper/dataGenerators"
 
 export const navigateToCategories = async (
@@ -49,6 +49,25 @@ export async function waitForSaving(page: Page) {
     ).toBeHidden()
   } else {
     await saveButton.click()
+    await expect(saveStatus).toBeVisible()
+  }
+}
+
+export async function waitForSaveStatusChanged(
+  page: Page,
+  saveStatus: Locator
+) {
+  if (await saveStatus.isVisible()) {
+    const timeBeforeSave = /Zuletzt gespeichert um (.*) Uhr/.exec(
+      await page
+        .getByText(/Zuletzt gespeichert um .* Uhr/)
+        .first()
+        .innerText()
+    )?.[1] as string
+    await expect(
+      page.getByText(`Zuletzt gespeichert um ${timeBeforeSave} Uhr`).first()
+    ).toBeHidden()
+  } else {
     await expect(saveStatus).toBeVisible()
   }
 }
