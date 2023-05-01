@@ -72,7 +72,10 @@ export const normData: NormData = {
       { PARTICIPATION_TYPE: ["RU"], PARTICIPATION_INSTITUTION: ["NT"] },
     ],
     CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2001-03-10"] }],
-    AGE_INDICATION: [],
+    AGE_INDICATION: [
+      { RANGE_START: ["Lebensjahr 28"] },
+      { RANGE_START: ["Monate 8"] },
+    ],
     NORM_PROVIDER: [
       { ENTITY: ["DEU"], DECIDING_BODY: ["BT"], RESOLUTION_MAJORITY: [true] },
       {

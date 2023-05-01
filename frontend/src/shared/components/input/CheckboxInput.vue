@@ -5,8 +5,8 @@ import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string
-  value?: boolean | undefined
-  modelValue?: boolean | undefined
+  value: boolean | undefined
+  modelValue: boolean | undefined
   ariaLabel: string
   validationError?: ValidationError
 }
@@ -31,10 +31,8 @@ const { inputValue, emitInputEvent } = useInputModel<boolean, Props, Emits>(
 function updateValue() {
   if (inputValue.value === undefined) {
     inputValue.value = true
-    console.log("I am here. Value: " + true)
   } else {
     inputValue.value = !inputValue.value
-    console.log("I am here. Value: " + inputValue.value)
   }
 }
 
