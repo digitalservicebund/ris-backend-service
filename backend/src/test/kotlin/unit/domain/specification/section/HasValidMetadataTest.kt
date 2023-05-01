@@ -282,7 +282,9 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("type name", MetadatumType.TYPE_NAME),
-            Metadatum("norm category", MetadatumType.NORM_CATEGORY),
+            Metadatum(true, MetadatumType.BASE_NORM),
+            Metadatum(false, MetadatumType.AMENDMENT_NORM),
+            Metadatum(true, MetadatumType.TRANSITIONAL_NORM),
             Metadatum("template name", MetadatumType.TEMPLATE_NAME),
         )
 

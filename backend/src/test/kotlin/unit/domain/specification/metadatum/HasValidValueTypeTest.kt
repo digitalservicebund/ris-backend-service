@@ -2,11 +2,14 @@ package de.bund.digitalservice.ris.norms.domain.specification.metadatum
 
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AMENDMENT_NORM
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.BASE_NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TRANSITIONAL_NORM
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -51,6 +54,27 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a resolution majority is a string`() {
         val instance = getMockedMetadatum("resolution majority", RESOLUTION_MAJORITY)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a base norm is a string`() {
+        val instance = getMockedMetadatum("base norm", BASE_NORM)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a amendment norm is a string`() {
+        val instance = getMockedMetadatum("amendment norm", AMENDMENT_NORM)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a transitional norm is a string`() {
+        val instance = getMockedMetadatum("transitional norm", TRANSITIONAL_NORM)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

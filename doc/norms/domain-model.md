@@ -12,10 +12,6 @@ classDiagram
     String documentNumber
     String documentCategory
 
-    String documentTypeName
-    String documentNormCategory
-    String documentTemplateName
-
     String officialShortTitle
     String officialAbbreviation
 
@@ -141,6 +137,7 @@ classDiagram
 
   class MetadatumType  {
       <<enumeration>>
+<<<<<<< Updated upstream
     KEYWORD,
     UNOFFICIAL_LONG_TITLE,
     UNOFFICIAL_SHORT_TITLE,
@@ -181,6 +178,52 @@ classDiagram
     TYPE_NAME,
     NORM_CATEGORY,
     TEMPLATE_NAME,
+=======
+    KEYWORD
+    UNOFFICIAL_LONG_TITLE
+    UNOFFICIAL_SHORT_TITLE
+    UNOFFICIAL_ABBREVIATION
+    UNOFFICIAL_REFERENCE
+    DIVERGENT_DOCUMENT_NUMBER
+    REFERENCE_NUMBER
+    DEFINITION
+    RIS_ABBREVIATION_INTERNATIONAL_LAW
+    AGE_OF_MAJORITY_INDICATION
+    VALIDITY_RULE
+    LEAD_JURISDICTION
+    LEAD_UNIT
+    PARTICIPATION_TYPE
+    PARTICIPATION_INSTITUTION
+    SUBJECT_FNA
+    SUBJECT_PREVIOUS_FNA
+    SUBJECT_GESTA
+    SUBJECT_BGB_3
+    DATE
+    YEAR
+    RANGE_START
+    RANGE_START_UNIT
+    RANGE_END
+    RANGE_END_UNIT
+    ANNOUNCEMENT_GAZETTE
+    NUMBER
+    PAGE_NUMBER
+    ADDITIONAL_INFO
+    EXPLANATION
+    ANNOUNCEMENT_MEDIUM
+    AREA_OF_PUBLICATION
+    NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
+    SERIES
+    EU_GOVERNMENT_GAZETTE
+    ENTITY
+    OTHER_OFFICIAL_REFERENCE
+    DECIDING_BODY
+    RESOLUTION_MAJORITY
+    TYPE_NAME
+    BASE_NORM
+    AMENDMENT_NORM
+    TRANSITIONAL_NORM
+    TEMPLATE_NAME
+>>>>>>> Stashed changes
   }
 
   class FileReference {
