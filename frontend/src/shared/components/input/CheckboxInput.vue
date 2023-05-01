@@ -5,8 +5,8 @@ import { useInputModel } from "@/shared/composables/useInputModel"
 
 interface Props {
   id: string
-  value: boolean | undefined
-  modelValue: boolean | undefined
+  value?: boolean | undefined
+  modelValue?: boolean | undefined
   ariaLabel: string
   validationError?: ValidationError
 }
