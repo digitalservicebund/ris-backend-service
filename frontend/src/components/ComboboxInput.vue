@@ -113,13 +113,13 @@ const setChosenItem = (item: ComboboxItem) => {
   candidateForSelection.value = undefined
 }
 
-const onEnter = () => {
+const onEnter = async () => {
   if (candidateForSelection.value) {
     setChosenItem(candidateForSelection.value)
     return
   }
   updateInputText()
-  toggleDropdown()
+  await toggleDropdown()
 }
 
 const keyup = () => {
