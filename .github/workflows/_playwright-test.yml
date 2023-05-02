@@ -51,7 +51,7 @@ jobs:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ env.PLAYWRIGHT_VERSION }}
       - name: Install playwright browsers
-        if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
+        # if: steps.cache-browser-binaries.outputs.cache-hit != 'true'
         run: |
           npx --yes playwright install --with-deps ${{ inputs.browser }}
         working-directory: ./frontend
