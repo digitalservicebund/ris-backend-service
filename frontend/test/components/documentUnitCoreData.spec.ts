@@ -26,8 +26,8 @@ describe("Core Data", () => {
 
     const chipList = wrapper.findAll(".chip")
     expect(chipList.length).toBe(2)
-    expect(wrapper.find("one"))
-    expect(wrapper.find("two"))
+    expect(wrapper.find("one")).toBeVisible()
+    expect(wrapper.find("two")).toBeVisible()
 
     expect((wrapper.find("#ecli").element as HTMLInputElement).value).toBe(
       "abc123"
