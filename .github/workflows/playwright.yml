@@ -19,14 +19,6 @@ on:
         options:
           - e2e
           - a11y
-      runs:
-        description: "Number of subsequent runs"
-        required: false
-        type: string
-        default: "1"
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    - cron:  '00 6 * * *'
 
 jobs:
   playwright-test:
@@ -34,5 +26,4 @@ jobs:
     with:
       browser: ${{ inputs.browser }}
       mode: ${{ inputs.mode }}
-      runs: ${{ inputs.runs }}
     secrets: inherit
