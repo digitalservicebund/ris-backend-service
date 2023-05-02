@@ -78,9 +78,9 @@ fun mapDomainToData(norm: Norm): NormData {
     val citationYears = extractStringValues(norm, MetadataSectionName.CITATION_DATE, YEAR)
 
     val normProviders: List<NormProvider> = norm.metadataSections.filter { section -> section.name == MetadataSectionName.NORM_PROVIDER }.map {
-        val entity = it.metadata.find { metadatum -> metadatum.type == ENTITY }?.value as String
-        val decidingBody = it.metadata.find { metadatum -> metadatum.type == DECIDING_BODY }?.value as String
-        val isResolutionMajority = it.metadata.find { metadatum -> metadatum.type == RESOLUTION_MAJORITY }?.value as Boolean
+        val entity = it.metadata.find { metadatum -> metadatum.type == ENTITY }?.let { found -> found.value as String }
+        val decidingBody = it.metadata.find { metadatum -> metadatum.type == DECIDING_BODY }?.let { found -> found.value as String }
+        val isResolutionMajority = it.metadata.find { metadatum -> metadatum.type == RESOLUTION_MAJORITY }?.let { found -> found.value as Boolean }
         NormProvider(entity, decidingBody, isResolutionMajority)
     }
 
