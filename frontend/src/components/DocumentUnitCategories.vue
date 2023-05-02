@@ -66,9 +66,9 @@ const showDocPanel = useToggleStateInRouteQuery(
 
 watch(
   showDocPanel,
-  () => {
+  async () => {
     if (showDocPanel.value && fileAsHTML.value.length == 0) {
-      getOriginalDocumentUnit()
+      await getOriginalDocumentUnit()
     }
   },
   { immediate: true }
@@ -77,7 +77,7 @@ watch(
 const coreData = computed({
   // get: () => props.documentUnit.coreData,
   get: () => updatedDocumentUnit.value.coreData,
-  set: (newValues) => {
+  set: async (newValues) => {
     let triggerSaving = false
     if (
       updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
@@ -86,7 +86,7 @@ const coreData = computed({
     }
     Object.assign(updatedDocumentUnit.value.coreData, newValues)
     if (triggerSaving) {
-      handleUpdateDocumentUnit()
+      await handleUpdateDocumentUnit()
     }
   },
 })
@@ -115,17 +115,17 @@ async function getOriginalDocumentUnit() {
 }
 
 /** Overwrite ctrl + S to update documentUnit */
-const handleUpdateDocumentUnitWithShortCut = (event: KeyboardEvent) => {
+const handleUpdateDocumentUnitWithShortCut = async (event: KeyboardEvent) => {
   const OS = navigator.userAgent.indexOf("Mac") != -1 ? "Mac" : "Window"
   if (OS === "Mac") {
     if (!event.metaKey) return
     if (event.key !== "s") return
-    handleUpdateDocumentUnit()
+    await handleUpdateDocumentUnit()
     event.preventDefault()
   } else {
     if (!event.ctrlKey) return
     if (event.key !== "s") return
-    handleUpdateDocumentUnit()
+    await handleUpdateDocumentUnit()
     event.preventDefault()
   }
 }
@@ -133,7 +133,7 @@ const handleUpdateDocumentUnitWithShortCut = (event: KeyboardEvent) => {
 // Time interval to automatic update documentUnit every 10sec
 // Only update documentUnit when there is any change after 10sec and last update is done
 const autoUpdate = () => {
-  automaticUpload.value = setInterval(() => {
+  automaticUpload.value = setInterval(async () => {
     hasDataChange.value =
       JSON.stringify(updatedDocumentUnit.value) !==
       lastUpdatedDocumentUnit.value
@@ -142,7 +142,7 @@ const autoUpdate = () => {
       hasDataChange.value &&
       updateStatus.value !== UpdateStatus.ON_UPDATE
     ) {
-      handleUpdateDocumentUnit()
+      await handleUpdateDocumentUnit()
     }
     // Offline mode
     if (isOnline.value && !navigator.onLine) {
@@ -150,7 +150,7 @@ const autoUpdate = () => {
     }
     if (!isOnline.value && navigator.onLine) {
       isOnline.value = true
-      handleUpdateDocumentUnit()
+      await handleUpdateDocumentUnit()
     }
   }, 10000)
 }
@@ -167,7 +167,7 @@ onMounted(async () => {
     false
   )
   autoUpdate()
-  getOriginalDocumentUnit()
+  await getOriginalDocumentUnit()
 })
 onUnmounted(() => {
   window.removeEventListener("scroll", onScroll)

@@ -37,7 +37,7 @@ function updateModelValue() {
   emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
-function saveChip() {
+async function saveChip() {
   const trimmed = currentInput.value.trim()
   if (trimmed.length > 0) {
     if (chips.value.includes(trimmed)) {
@@ -45,7 +45,7 @@ function saveChip() {
       currentInput.value = ""
       return
     }
-    emits("addChip", trimmed)
+    await emits("addChip", trimmed)
     if (!errorMessage.value) {
       chips.value.push(trimmed)
       updateModelValue()
@@ -54,8 +54,8 @@ function saveChip() {
   }
 }
 
-function deleteChip(keyword: string | undefined) {
-  emits("deleteChip", keyword)
+async function deleteChip(keyword: string | undefined) {
+  await emits("deleteChip", keyword)
 }
 
 const handleOnBlur = () => {

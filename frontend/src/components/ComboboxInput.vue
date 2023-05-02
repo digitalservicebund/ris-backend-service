@@ -77,25 +77,25 @@ function updateInputText() {
   inputText.value = getLabelFromSelectedValue()
 }
 
-const toggleDropdown = () => {
+const toggleDropdown = async () => {
   showDropdown.value = !showDropdown.value
   focusedItemIndex.value = 0
   if (showDropdown.value) {
     if (inputText.value) {
       filter.value = inputText.value
     }
-    updateCurrentItems()
+    await updateCurrentItems()
     inputFieldRef.value?.focus()
   }
 }
 
-const clearSelection = () => {
+const clearSelection = async () => {
   emit("update:modelValue", undefined)
   filter.value = ""
   inputText.value = ""
   focusedItemIndex.value = 0
   if (showDropdown.value) {
-    updateCurrentItems()
+    await updateCurrentItems()
   }
   inputFieldRef.value?.focus()
 }
@@ -147,11 +147,11 @@ const updateFocusedItem = () => {
   if (item && item.innerText !== NO_MATCHING_ENTRY) item.focus()
 }
 
-const onTextChange = () => {
+const onTextChange = async () => {
   focusedItemIndex.value = 0
   showDropdown.value = true
   filter.value = inputText.value
-  updateCurrentItems()
+  await updateCurrentItems()
 }
 
 const updateCurrentItems = async () => {

@@ -30,25 +30,27 @@ function canLoadMoreChildren() {
   return node.value.childrenCount > node.value.children.length
 }
 
-function handleToggle() {
+async function handleToggle() {
   if (canLoadMoreChildren()) {
     let childToReattach: FieldOfLawNode
     if (node.value.children.length > 0) {
       // can only happen if inDirectPathMode
       childToReattach = toRaw(node.value.children[0])
     }
-    FieldOfLawService.getChildrenOf(node.value.identifier).then((response) => {
-      if (!response.data) return
-      node.value.children = response.data
-      if (!childToReattach) return
-      const parentToReattachTo = node.value.children.find(
-        (node) => node.identifier === childToReattach.identifier
-      )
-      if (!parentToReattachTo) return
-      parentToReattachTo.children = childToReattach.children
-      parentToReattachTo.isExpanded = true
-      parentToReattachTo.inDirectPathMode = true
-    })
+    await FieldOfLawService.getChildrenOf(node.value.identifier).then(
+      (response) => {
+        if (!response.data) return
+        node.value.children = response.data
+        if (!childToReattach) return
+        const parentToReattachTo = node.value.children.find(
+          (node) => node.identifier === childToReattach.identifier
+        )
+        if (!parentToReattachTo) return
+        parentToReattachTo.children = childToReattach.children
+        parentToReattachTo.isExpanded = true
+        parentToReattachTo.inDirectPathMode = true
+      }
+    )
   }
   if (node.value.inDirectPathMode) {
     node.value.inDirectPathMode = false

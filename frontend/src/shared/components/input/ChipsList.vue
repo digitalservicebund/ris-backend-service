@@ -29,8 +29,8 @@ function updateModelValue() {
   emits("update:modelValue", chips.value)
 }
 
-function deleteChip(index: number) {
-  emits("deleteChip", chips.value[index])
+async function deleteChip(index: number) {
+  await emits("deleteChip", chips.value[index])
   if (!errorMessage.value) {
     chips.value.splice(index, 1)
     updateModelValue()
@@ -42,9 +42,9 @@ function resetFocus() {
   focusedItemIndex.value = undefined
 }
 
-function enterDelete() {
+async function enterDelete() {
   if (focusedItemIndex.value !== undefined) {
-    emits("deleteChip", chips.value[focusedItemIndex.value])
+    await emits("deleteChip", chips.value[focusedItemIndex.value])
     chips.value.splice(focusedItemIndex.value, 1)
     // bring focus on second last item if last item was deleted
     if (focusedItemIndex.value === chips.value.length) {

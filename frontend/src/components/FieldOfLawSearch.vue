@@ -17,9 +17,9 @@ const results = ref<Page<FieldOfLawNode>>()
 const currentPage = ref(0)
 const RESULTS_PER_PAGE = 10
 
-function submitSearch(isNewSearch = true) {
+async function submitSearch(isNewSearch = true) {
   if (isNewSearch) currentPage.value = 0
-  FieldOfLawService.searchForFieldsOfLaw(
+  await FieldOfLawService.searchForFieldsOfLaw(
     searchStr.value,
     currentPage.value,
     RESULTS_PER_PAGE
