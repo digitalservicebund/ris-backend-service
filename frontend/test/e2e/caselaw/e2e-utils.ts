@@ -1,4 +1,5 @@
 import { expect, Page } from "@playwright/test"
+import { generateString } from "../../test-helper/dataGenerators"
 
 export const navigateToCategories = async (
   page: Page,
@@ -105,4 +106,48 @@ export async function waitForInputValue(
     },
     { selector, expectedValue }
   )
+}
+
+export async function toggleProceedingDecisionsSection(
+  page: Page
+): Promise<void> {
+  await page.locator("text=Vorgehende Entscheidungen").click()
+}
+
+export async function fillProceedingDecisionInputs(
+  page: Page,
+  values?: {
+    court?: string
+    date?: string
+    fileNumber?: string
+    documentType?: string
+  },
+  decisionIndex = 0
+): Promise<void> {
+  const fillInput = async (ariaLabel: string, value?: string) => {
+    await page
+      .locator(`[aria-label='${ariaLabel}']`)
+      .nth(decisionIndex)
+      .fill(value ?? generateString())
+  }
+
+  if (values?.court) {
+    await fillInput("Gericht Rechtszug", values?.court)
+    await page.getByText(values.court, { exact: true }).click()
+
+    await expect(async () => {
+      const inputValue = await page.getByLabel("Gericht Rechtszug").inputValue()
+      expect(inputValue).toBe(values.court)
+    }).toPass({ timeout: 5000 })
+  }
+  if (values?.date) {
+    await fillInput("Entscheidungsdatum Rechtszug", values?.date)
+  }
+  if (values?.fileNumber) {
+    await fillInput("Aktenzeichen Rechtszug", values?.fileNumber)
+  }
+  if (values?.documentType) {
+    await fillInput("Dokumenttyp Rechtszug", values?.documentType)
+    await page.locator("[aria-label='dropdown-option']").first().click()
+  }
 }
