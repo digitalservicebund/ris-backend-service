@@ -1,10 +1,13 @@
 import { computed, ref, watch } from "vue"
-import { RouteLocationNormalizedLoaded, Router } from "vue-router"
+import type {
+  RouteLocationNormalizedLoaded,
+  RouteLocationRaw,
+} from "vue-router"
 
 export function useToggleStateInRouteQuery(
   queryParameterName: string,
   route: RouteLocationNormalizedLoaded,
-  routerCallback: Router["replace"],
+  routerCallback: (route: RouteLocationRaw) => void,
   defaultState = true
 ) {
   const toggleState = ref(defaultState)
