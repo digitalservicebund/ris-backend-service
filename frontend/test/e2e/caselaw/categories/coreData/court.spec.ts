@@ -177,15 +177,29 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
+    const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
+    let saveTimeStamp
+
+    //Todo: this block needs to be moved to waitForSaveStatusChanged method
+    // eslint-disable-next-line playwright/no-conditional-in-test
+    if (await saveStatus.isVisible()) {
+      saveTimeStamp = /Zuletzt gespeichert um (.*) Uhr/.exec(
+        await page
+          .getByText(/Zuletzt gespeichert um .* Uhr/)
+          .first()
+          .innerText()
+      )?.[1] as string
+    }
 
     await page.locator("[aria-label='Gericht']").fill("aalen")
 
     // clicking on dropdown item triggers auto save
     await page.locator("text=AG Aalen").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
+    await waitForSaveStatusChanged(page, saveTimeStamp)
 
     // saving... and then saved
-    await waitForSaving(page)
+
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was set by the backend based on state database table
@@ -219,8 +233,10 @@ test.describe("court", () => {
     await page.locator("text=BGH").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
 
-    // racing condition if the selection of court and autosave at the same moment
+    // racing condition if selection of court and autosave happens at the same moment
     await waitForSaveStatusChanged(page, saveStatus)
+
+    await page.reload()
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
 

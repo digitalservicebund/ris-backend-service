@@ -1,4 +1,4 @@
-import { expect, Page, Locator } from "@playwright/test"
+import { expect, Page } from "@playwright/test"
 
 export const navigateToCategories = async (
   page: Page,
@@ -43,9 +43,8 @@ export async function waitForSaving(page: Page) {
         .innerText()
     )?.[1] as string
     await saveButton.click()
-    await expect(
-      page.getByText(`Zuletzt gespeichert um ${timeBeforeSave} Uhr`).first()
-    ).toBeHidden()
+    await expect(page.getByText(`Zuletzt gespeichert um`).first()).toBeVisible()
+    await expect(page.getByText(`${timeBeforeSave}`).first()).toBeHidden()
   } else {
     await saveButton.click()
     await expect(saveStatus).toBeVisible()
@@ -54,20 +53,11 @@ export async function waitForSaving(page: Page) {
 
 export async function waitForSaveStatusChanged(
   page: Page,
-  saveStatus: Locator
+  saveTimeStamp: string
 ) {
-  if (await saveStatus.isVisible()) {
-    const timeBeforeSave = /Zuletzt gespeichert um (.*) Uhr/.exec(
-      await page
-        .getByText(/Zuletzt gespeichert um .* Uhr/)
-        .first()
-        .innerText()
-    )?.[1] as string
-    await expect(
-      page.getByText(`Zuletzt gespeichert um ${timeBeforeSave} Uhr`).first()
-    ).toBeHidden()
-  } else {
-    await expect(saveStatus).toBeVisible()
+  await expect(page.getByText(`Zuletzt gespeichert um`).first()).toBeVisible()
+  if (saveTimeStamp) {
+    await expect(page.getByText(`${saveTimeStamp}`).first()).toBeHidden()
   }
 }
 

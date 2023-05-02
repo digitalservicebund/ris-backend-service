@@ -113,6 +113,8 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(page.getByText("abc").first()).toBeVisible()
     await waitForSaving(page)
 
+    await page.reload()
+
     await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
     expect(
       await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
@@ -120,14 +122,20 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await page.keyboard.press("Tab")
     await waitForSaving(page)
 
+    await page.reload()
+
     await page.locator("[aria-label='Gericht']").fill("vgh mannheim")
     await page.locator("text=VGH Mannheim").click()
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("VGH Mannheim")
     await waitForSaving(page)
 
+    await page.reload()
+
     await page.locator("[aria-label='Dokumenttyp']").fill("AnU")
     await page.locator("text=AnU - Anerkenntnisurteil").click()
     await waitForSaving(page)
+
+    await page.reload()
 
     await page
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
