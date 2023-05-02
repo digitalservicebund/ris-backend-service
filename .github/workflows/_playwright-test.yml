@@ -9,6 +9,10 @@ on:
         required: false
         type: string
         default: e2e
+      runs:
+        required: false
+        type: number
+        default: 1
       subproject:
         required: false
         type: string
@@ -65,11 +69,9 @@ jobs:
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: |
-          if [[ -z "${{ inputs.subproject }}" ]]; then
-            npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}
-          else
-            npm run test:${{ inputs.mode }}:${{ inputs.subproject }} -- --project ${{ inputs.browser }}
-          fi
+          for i in {1..${{ inputs.runs }}}; do 
+            npm run test:${{ inputs.mode }}${{ inputs.subproject:+:${{ inputs.subproject }}}} -- --project ${{ inputs.browser }}
+          done
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v3
