@@ -1,5 +1,9 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories, waitForSaving } from "../e2e-utils"
+import {
+  navigateToCategories,
+  waitForSaving,
+  waitForInputValue,
+} from "../e2e-utils"
 import { testWithDocumentUnit as test } from "../fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
@@ -24,19 +28,21 @@ test.describe("saving behaviour", () => {
     ).toBeVisible()
   })
 
-  test("change Spruchkörper two times with save with button after each change", async ({
+  test("change Spruchkörper two times, saving after each change", async ({
     page,
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
 
     await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-    await page.keyboard.press("Tab")
+    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
 
     await waitForSaving(page)
 
+    await page.reload()
+
     await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
-    await page.keyboard.press("Tab")
+    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
 
     await waitForSaving(page)
 
