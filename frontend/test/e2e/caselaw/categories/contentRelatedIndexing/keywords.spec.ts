@@ -1,7 +1,11 @@
 import { expect } from "@playwright/test"
-import { navigateToCategories } from "~/e2e/caselaw/e2e-utils"
-import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
-import { generateString } from "~/test-helper/dataGenerators"
+import { generateString } from "../../../../test-helper/dataGenerators"
+import {
+  navigateToCategories,
+  waitForSaving,
+  waitForInputValue,
+} from "../../e2e-utils"
+import { testWithDocumentUnit as test } from "../../fixtures"
 
 test.describe("keywords", () => {
   test("rendering", async ({ page, documentNumber }) => {
@@ -42,30 +46,26 @@ test.describe("keywords", () => {
     await expect(page.getByText(keywordWithSpecialCharacters)).toBeVisible()
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("add same keyword not working", async ({
-    page,
-    documentNumber,
-  }) => {
+  test("add same keyword not working", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 
     const keyword = generateString()
 
-    const input = page.locator("[aria-label='Schlagwörter']")
-
     // first
-    await input.fill(keyword)
-    await expect(input).toHaveValue(keyword)
-    await page.keyboard.press("Enter")
-    await expect(input).toHaveValue("")
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Schlagwörter']").fill(keyword)
+        await waitForInputValue(page, "[aria-label='Schlagwörter']", keyword)
+        await page.keyboard.press("Enter")
+      },
+      page,
+      { clickSaveButton: true }
+    )
     await expect(page.getByText(keyword)).toBeVisible()
 
-    // second
-    await input.fill(keyword)
-    await expect(input).toHaveValue(keyword)
+    await page.locator("[aria-label='Schlagwörter']").fill(keyword)
+    await waitForInputValue(page, "[aria-label='Schlagwörter']", keyword)
     await page.keyboard.press("Enter")
-    await expect(input).toHaveValue("")
-    await expect(page.getByText(keyword)).toBeVisible()
 
     await expect(page.getByText(/Schlagwort bereits vergeben/)).toBeVisible()
   })
