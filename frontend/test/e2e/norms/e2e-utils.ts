@@ -1,6 +1,7 @@
 import fs from "fs"
 import { tmpdir } from "os"
 import path from "path"
+import internal from "stream"
 import { APIRequestContext, expect } from "@playwright/test"
 import jsZip from "jszip"
 import { Page } from "playwright"
@@ -86,7 +87,7 @@ export const openNorm = async (
   await locatorA.click()
 }
 
-export async function getDownloadedFileContent(page, filename) {
+export async function getDownloadedFileContent(page: Page, filename: string) {
   const [download] = await Promise.all([
     page.waitForEvent("download"),
     page.locator('a:has-text("Zip Datei speichern")').click(),
@@ -98,7 +99,7 @@ export async function getDownloadedFileContent(page, filename) {
   ).toBeGreaterThan(0)
   const readable = await download.createReadStream()
   const chunks = []
-  for await (const chunk of readable) {
+  for await (const chunk of readable as internal.Readable) {
     chunks.push(chunk)
   }
 
@@ -114,7 +115,7 @@ export async function getMetaDataFileAsString(
         (filename) => filename.endsWith(".xml") && !filename.includes("BJNE")
       )
       .pop()
-    return zip.files[metadataFileName]
+    return zip.files[metadataFileName as string]
       .async("string")
       .then((xmlContent) => xmlContent.replace(/ {2}|\r\n|\n|\r/gm, ""))
   })
