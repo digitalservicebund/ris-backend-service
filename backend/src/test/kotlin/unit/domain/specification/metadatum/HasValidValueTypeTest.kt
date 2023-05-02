@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_END
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RANGE_START
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MAJORITY
@@ -51,6 +52,13 @@ class HasValidValueTypeTest {
     @Test
     fun `it is not satisfied if the value for a resolution majority is a string`() {
         val instance = getMockedMetadatum("resolution majority", RESOLUTION_MAJORITY)
+
+        assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
+    }
+
+    @Test
+    fun `it is not satisfied if the value for a norm category is a string`() {
+        val instance = getMockedMetadatum("norm category", NORM_CATEGORY)
 
         assertThat(hasValidValueType.isSatisfiedBy(instance)).isFalse()
     }

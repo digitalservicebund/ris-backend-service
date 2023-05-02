@@ -43,6 +43,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_RE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import java.time.LocalDate
 
 val hasValidValueType =
@@ -58,10 +59,12 @@ val hasValidValueType =
                 NUMBER, PAGE, ADDITIONAL_INFO, EXPLANATION, ANNOUNCEMENT_MEDIUM,
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
-                TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME, EDITION,
+                TYPE_NAME, TEMPLATE_NAME, EDITION,
                 -> instance.value is String
 
                 DATE -> instance.value is LocalDate
+
+                NORM_CATEGORY -> instance.value is NormCategory
 
                 RESOLUTION_MAJORITY -> instance.value is Boolean
             }

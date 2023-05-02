@@ -12,10 +12,6 @@ classDiagram
     String documentNumber
     String documentCategory
 
-    String documentTypeName
-    String documentNormCategory
-    String documentTemplateName
-
     String officialShortTitle
     String officialAbbreviation
 
