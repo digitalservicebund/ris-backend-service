@@ -128,13 +128,18 @@ test.describe("a11y of categories page (/caselaw/documentunit/{documentNumber}/c
   test("proceeding decision", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await toggleProceedingDecisionsSection(page)
-    await fillProceedingDecisionInputs(page, {
-      court: "AG Aalen",
-      date: "2004-12-03",
-      fileNumber: "1a2b3c",
-    })
 
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await fillProceedingDecisionInputs(page, {
+          court: "AG Aalen",
+          date: "2004-12-03",
+          fileNumber: "1a2b3c",
+        })
+      },
+      page,
+      { clickSaveButton: true }
+    )
     await page.reload()
     await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {
