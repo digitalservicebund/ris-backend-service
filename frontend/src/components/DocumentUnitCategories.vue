@@ -77,8 +77,8 @@ watch(
 const coreData = ref<CoreData>()
 
 watch(
-  () => props.documentUnit,
-  () => (coreData.value = props.documentUnit.coreData),
+  () => updatedDocumentUnit,
+  () => (coreData.value = updatedDocumentUnit.value.coreData),
   { immediate: true, deep: true }
 )
 
@@ -141,10 +141,19 @@ const handleUpdateDocumentUnitWithShortCut = async (event: KeyboardEvent) => {
   }
 }
 
+// Return Promise from interval to use it async context
+function interval() {
+  return new Promise(function (resolve) {
+    setInterval(function () {
+      resolve("Hello")
+    }, 10000)
+  })
+}
+
 // Time interval to automatic update documentUnit every 10sec
 // Only update documentUnit when there is any change after 10sec and last update is done
 const autoUpdate = () => {
-  automaticUpload.value = setInterval(async () => {
+  automaticUpload.value = interval().then(async () => {
     hasDataChange.value =
       JSON.stringify(updatedDocumentUnit.value) !==
       lastUpdatedDocumentUnit.value
@@ -163,8 +172,9 @@ const autoUpdate = () => {
       isOnline.value = true
       await handleUpdateDocumentUnit()
     }
-  }, 10000)
+  })
 }
+
 // Clear time Interval
 const removeAutoUpdate = () => {
   clearInterval(automaticUpload.value)
