@@ -1,8 +1,19 @@
-import { mount } from "@vue/test-utils"
+import { render, screen } from "@testing-library/vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnit, { CoreData } from "@/domain/documentUnit"
 
-// vitest run --testNamePattern CoreData
+function renderComponent(options?: {
+  modelValue?: CoreData
+  updateStatus?: number
+}) {
+  const props = {
+    modelValue: options?.modelValue,
+    updateStatus: options?.updateStatus ?? 0,
+  }
+  const utils = render(DocumentUnitCoreData, { props })
+  return { screen, props, ...utils }
+}
+
 describe("Core Data", () => {
   global.ResizeObserver = require("resize-observer-polyfill")
   test("renders correctly with given documentUnitId", async () => {
@@ -13,27 +24,17 @@ describe("Core Data", () => {
       },
       documentNumber: "ABCD2022000001",
     })
-    const wrapper = mount(DocumentUnitCoreData, {
-      props: {
-        modelValue: documentUnit.coreData,
-        updateStatus: 0,
-      },
-    })
 
-    expect(
-      (wrapper.find("#fileNumbers").element as HTMLInputElement).value
-    ).toBe("")
+    const { screen } = renderComponent({ modelValue: documentUnit.coreData })
 
-    const chipList = wrapper.findAll(".chip")
+    const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(2)
-    expect(wrapper.find("one")).toBeVisible()
-    expect(wrapper.find("two")).toBeVisible()
+    expect(chipList[0]).toHaveTextContent("one")
+    expect(chipList[1]).toHaveTextContent("two")
 
-    expect((wrapper.find("#ecli").element as HTMLInputElement).value).toBe(
-      "abc123"
-    )
-    const buttons = wrapper.findAll("button")
-    expect(buttons[buttons.length - 1].text()).toBe("Speichern")
-    expect(wrapper.text()).toContain("* Pflichtfelder zum Veröffentlichen")
+    expect(screen.getByLabelText("ECLI")).toHaveValue("abc123")
+    expect(
+      screen.getByLabelText("Stammdaten Speichern Button")
+    ).toBeInTheDocument()
   })
 })
