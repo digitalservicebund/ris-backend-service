@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, toRefs, watch } from "vue"
+import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
@@ -9,7 +9,7 @@ import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import DocumentUnitProceedingDecision from "@/components/proceedingDecisions/ProceedingDecisions.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
-import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
+import DocumentUnit, { Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
@@ -74,33 +74,22 @@ watch(
   { immediate: true }
 )
 
-const coreData = ref<CoreData>(props.documentUnit.coreData)
-
-watch(
-  () => updatedDocumentUnit.value,
-  () => (coreData.value = updatedDocumentUnit.value.coreData),
-  { immediate: true, deep: true }
-)
-
-watch(
-  coreData,
-  async () => {
+const coreData = computed({
+  // get: () => props.documentUnit.coreData,
+  get: () => updatedDocumentUnit.value.coreData,
+  set: async (newValues) => {
     let triggerSaving = false
     if (
-      updatedDocumentUnit.value.coreData.court?.label !==
-      coreData.value?.court?.label
+      updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
     ) {
       triggerSaving = true
     }
-    Object.assign(updatedDocumentUnit.value.coreData, coreData.value)
+    Object.assign(updatedDocumentUnit.value.coreData, newValues)
     if (triggerSaving) {
       await handleUpdateDocumentUnit()
     }
   },
-  {
-    deep: true,
-  }
-)
+})
 
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
