@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, toRefs, watch } from "vue"
+import { ref, onMounted, onUnmounted, toRefs, watch } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import DocumentUnitContentRelatedIndexing from "@/components/DocumentUnitContentRelatedIndexing.vue"
 import DocumentUnitCoreData from "@/components/DocumentUnitCoreData.vue"
@@ -9,7 +9,7 @@ import OriginalFileSidePanel from "@/components/OriginalFileSidePanel.vue"
 import DocumentUnitProceedingDecision from "@/components/proceedingDecisions/ProceedingDecisions.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
-import DocumentUnit, { Texts } from "@/domain/documentUnit"
+import DocumentUnit, { CoreData, Texts } from "@/domain/documentUnit"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
@@ -74,22 +74,33 @@ watch(
   { immediate: true }
 )
 
-const coreData = computed({
-  // get: () => props.documentUnit.coreData,
-  get: () => updatedDocumentUnit.value.coreData,
-  set: async (newValues) => {
+const coreData = ref<CoreData>()
+
+watch(
+  () => props.documentUnit,
+  () => (coreData.value = props.documentUnit.coreData),
+  { immediate: true, deep: true }
+)
+
+watch(
+  coreData,
+  async () => {
     let triggerSaving = false
     if (
-      updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
+      updatedDocumentUnit.value.coreData.court?.label !==
+      coreData.value?.court?.label
     ) {
       triggerSaving = true
     }
-    Object.assign(updatedDocumentUnit.value.coreData, newValues)
+    Object.assign(updatedDocumentUnit.value.coreData, coreData.value)
     if (triggerSaving) {
       await handleUpdateDocumentUnit()
     }
   },
-})
+  {
+    deep: true,
+  }
+)
 
 const { hash: routeHash } = toRefs(route)
 useScrollToHash(routeHash)
