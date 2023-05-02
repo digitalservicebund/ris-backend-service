@@ -94,33 +94,39 @@ test.describe("decision date", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
-    expect(
-      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-    ).toBe("2022-02-03")
+    await waitForSaving(
+      async () => {
+        await page
+          .locator("[aria-label='Entscheidungsdatum']")
+          .fill("2022-02-03")
+        expect(
+          await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+        ).toBe("2022-02-03")
 
-    await expect(
-      page.locator("text=Abweichendes Entscheidungsdatum>")
-    ).toBeHidden()
+        await expect(
+          page.locator("text=Abweichendes Entscheidungsdatum>")
+        ).toBeHidden()
 
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
-      .click()
+        await page
+          .locator("[aria-label='Abweichendes Entscheidungsdatum anzeigen']")
+          .click()
 
-    await expect(
-      page.locator("text=Abweichendes Entscheidungsdatum").first()
-    ).toBeVisible()
+        await expect(
+          page.locator("text=Abweichendes Entscheidungsdatum").first()
+        ).toBeVisible()
 
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("2022-02-02")
-    await page.keyboard.press("Enter")
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("2022-02-01")
-    await page.keyboard.press("Enter")
-
-    await waitForSaving(page)
+        await page
+          .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+          .fill("2022-02-02")
+        await page.keyboard.press("Enter")
+        await page
+          .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+          .fill("2022-02-01")
+        await page.keyboard.press("Enter")
+      },
+      page,
+      { clickSaveButton: true }
+    )
 
     await page.reload()
 

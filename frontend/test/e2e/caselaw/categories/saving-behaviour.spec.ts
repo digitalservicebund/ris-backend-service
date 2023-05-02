@@ -34,20 +34,25 @@ test.describe("saving behaviour", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
-    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Spruchkörper']").fill("VG-001")
+        await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-001")
+      },
+      page,
+      { clickSaveButton: true }
+    )
 
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
+        await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
     await page.reload()
-
-    await page.locator("[aria-label='Spruchkörper']").fill("VG-002")
-    await waitForInputValue(page, "[aria-label='Spruchkörper']", "VG-002")
-
-    await waitForSaving(page)
-
-    await page.reload()
-
     expect(await page.inputValue("[aria-label='Spruchkörper']")).toBe("VG-002")
   })
 
@@ -60,12 +65,16 @@ test.describe("saving behaviour", () => {
     const fileNumber = generateString()
     const ecli = generateString()
 
-    await page.locator("[aria-label='Aktenzeichen']").fill(fileNumber)
-    await page.keyboard.press("Enter")
-    await page.locator("[aria-label='ECLI']").fill(ecli)
-    await page.keyboard.press("Enter")
-
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Aktenzeichen']").fill(fileNumber)
+        await page.keyboard.press("Enter")
+        await page.locator("[aria-label='ECLI']").fill(ecli)
+        await page.keyboard.press("Enter")
+      },
+      page,
+      { clickSaveButton: true }
+    )
 
     await page.goto("/")
     await expect(

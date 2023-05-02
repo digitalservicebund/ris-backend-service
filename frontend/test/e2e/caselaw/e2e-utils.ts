@@ -32,34 +32,38 @@ export const uploadTestfile = async (page: Page, filename: string) => {
   await expect(page.locator("text=Dokument wird geladen.")).toBeHidden()
 }
 
-export async function waitForSaving(page: Page) {
-  const saveButton = page.locator("[aria-label='Stammdaten Speichern Button']")
-  const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
-
-  if (await saveStatus.isVisible()) {
-    const timeBeforeSave = /Zuletzt gespeichert um (.*) Uhr/.exec(
-      await page
-        .getByText(/Zuletzt gespeichert um .* Uhr/)
-        .first()
-        .innerText()
-    )?.[1] as string
-    await saveButton.click()
-    await expect(page.getByText(`Zuletzt gespeichert um`).first()).toBeVisible()
-    await expect(page.getByText(`${timeBeforeSave}`).first()).toBeHidden()
-  } else {
-    await saveButton.click()
-    await expect(saveStatus).toBeVisible()
-  }
-}
-
-export async function waitForSaveStatusChanged(
+export async function waitForSaving(
+  body: () => Promise<void>,
   page: Page,
-  saveTimeStamp: string
+  options?: { clickSaveButton?: boolean; reload?: boolean }
 ) {
-  await expect(page.getByText(`Zuletzt gespeichert um`).first()).toBeVisible()
-  if (saveTimeStamp) {
-    await expect(page.getByText(`${saveTimeStamp}`).first()).toBeHidden()
+  if (options?.reload) {
+    await page.reload()
   }
+
+  const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
+  let lastSaving: string | undefined = undefined
+  if (await saveStatus.isVisible()) {
+    lastSaving = /Zuletzt gespeichert um (.*) Uhr/.exec(
+      await saveStatus.innerText()
+    )?.[1] as string
+  }
+
+  await body()
+
+  if (options?.clickSaveButton) {
+    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+  }
+
+  await Promise.all([
+    await expect(
+      page.getByText(`Zuletzt gespeichert um`).first()
+    ).toBeVisible(),
+    lastSaving ??
+      (await expect(
+        page.getByText(`Zuletzt gespeichert um ${lastSaving} Uhr`).first()
+      ).toBeHidden()),
+  ])
 }
 
 export async function toggleFieldOfLawSection(page: Page): Promise<void> {

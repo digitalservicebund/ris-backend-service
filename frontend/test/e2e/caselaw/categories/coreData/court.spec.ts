@@ -1,9 +1,8 @@
 import { expect } from "@playwright/test"
 import {
   navigateToCategories,
-  waitForSaving,
   waitForInputValue,
-  waitForSaveStatusChanged,
+  waitForSaving,
 } from "../../e2e-utils"
 import { testWithDocumentUnit as test } from "../../fixtures"
 
@@ -14,17 +13,16 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Gericht']").fill("BGH")
-
-    await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(1)
-
-    await page.keyboard.press("ArrowDown")
-    await page.keyboard.press("Enter")
-
-    await waitForSaving(page)
+    await waitForSaving(async () => {
+      await page.locator("[aria-label='Gericht']").fill("BGH")
+      await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
+        1
+      )
+      await page.keyboard.press("ArrowDown")
+      await page.keyboard.press("Enter")
+    }, page)
 
     await page.reload()
-
     await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
   })
 
@@ -34,20 +32,23 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
-
-    await page
-      .locator("[aria-label='Fehlerhaftes Gericht']")
-      .fill("incorrectCourt1")
-    await page.keyboard.press("Enter")
-
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await page
+          .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
+          .click()
+        await page
+          .locator("[aria-label='Fehlerhaftes Gericht']")
+          .fill("incorrectCourt1")
+        await page.keyboard.press("Enter")
+      },
+      page,
+      { clickSaveButton: true }
+    )
 
     await page.reload()
 
     await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
-
     await expect(page.locator("text=IncorrectCourt1").first()).toBeVisible()
   })
 
@@ -57,36 +58,43 @@ test.describe("court", () => {
   }) => {
     await navigateToCategories(page, documentNumber)
 
-    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
+    await waitForSaving(
+      async () => {
+        await page
+          .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
+          .click()
+        await page
+          .locator("[aria-label='Fehlerhaftes Gericht']")
+          .fill("incorrectCourt1")
+        await page.keyboard.press("Enter")
+        await page
+          .locator("[aria-label='Fehlerhaftes Gericht']")
+          .fill("incorrectCourt2")
+        await page.keyboard.press("Enter")
+      },
+      page,
+      { clickSaveButton: true }
+    )
 
-    await page
-      .locator("[aria-label='Fehlerhaftes Gericht']")
-      .fill("incorrectCourt1")
-    await page.keyboard.press("Enter")
-    await page
-      .locator("[aria-label='Fehlerhaftes Gericht']")
-      .fill("incorrectCourt2")
-    await page.keyboard.press("Enter")
+    await waitForSaving(
+      async () => {
+        await page
+          .locator("[aria-label='Fehlerhaftes Gericht anzeigen']")
+          .click()
 
-    await waitForSaving(page)
+        await expect(page.locator("text=IncorrectCourt1")).toBeVisible()
+        await expect(page.locator("text=IncorrectCourt2")).toBeVisible()
+
+        await page
+          .locator(":text('IncorrectCourt1') + div > [aria-label='Löschen']")
+          .click()
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
     await page.reload()
-
     await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
-
-    await expect(page.locator("text=IncorrectCourt1")).toBeVisible()
-    await expect(page.locator("text=IncorrectCourt2")).toBeVisible()
-
-    await page
-      .locator(":text('IncorrectCourt1') + div > [aria-label='Löschen']")
-      .click()
-
-    await waitForSaving(page)
-
-    await page.reload()
-
-    await page.locator("[aria-label='Fehlerhaftes Gericht anzeigen']").click()
-
     await expect(page.locator("text=IncorrectCourt1")).toHaveCount(0)
     await expect(page.locator("text=IncorrectCourt2")).toBeVisible()
   })
@@ -177,44 +185,36 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
-    let saveTimeStamp
 
-    //Todo: this block needs to be moved to waitForSaveStatusChanged method
-    // eslint-disable-next-line playwright/no-conditional-in-test
-    if (await saveStatus.isVisible()) {
-      saveTimeStamp = /Zuletzt gespeichert um (.*) Uhr/.exec(
-        await page
-          .getByText(/Zuletzt gespeichert um .* Uhr/)
-          .first()
-          .innerText()
-      )?.[1] as string
-    }
+    await waitForSaving(async () => {
+      await page.locator("[aria-label='Gericht']").fill("aalen")
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
-
-    // clicking on dropdown item triggers auto save
-    await page.locator("text=AG Aalen").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
-    await waitForSaveStatusChanged(page, saveTimeStamp)
-
-    // saving... and then saved
+      // clicking on dropdown item triggers auto save
+      await page.locator("text=AG Aalen").click()
+      await waitForInputValue(page, "[aria-label='Gericht']", "AG Aalen")
+    }, page)
 
     await expect(page.locator("text=Region")).toBeVisible()
 
     // region was set by the backend based on state database table
     await waitForInputValue(page, "[aria-label='Region']", "Baden-Württemberg")
 
-    // clear the court
-    await page.locator("[aria-label='Auswahl zurücksetzen']").click()
-    await expect(page.getByText("AG Aalen")).toBeHidden()
-    await waitForInputValue(page, "[aria-label='Gericht']", "")
-    // dropdown should not open
-    await expect(page.locator("[aria-label='dropdown-option']")).toBeHidden()
+    await waitForSaving(
+      async () => {
+        // clear the court
+        await page.locator("[aria-label='Auswahl zurücksetzen']").click()
+        await expect(page.getByText("AG Aalen")).toBeHidden()
+        await waitForInputValue(page, "[aria-label='Gericht']", "")
+        // dropdown should not open
+        await expect(
+          page.locator("[aria-label='dropdown-option']")
+        ).toBeHidden()
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
-    await waitForSaving(page)
     await expect(page.locator("text=Region")).toBeVisible()
-
     // region was cleared by the backend
     await waitForInputValue(page, "[aria-label='Region']", "")
   })
@@ -224,30 +224,26 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
 
-    const saveStatus = page.getByText(/Zuletzt gespeichert um .* Uhr/).first()
+    await waitForSaving(async () => {
+      await page.locator("[aria-label='Gericht']").fill("bgh")
+      await page.locator("text=BGH").click()
+    }, page)
 
-    await page.locator("[aria-label='Gericht']").fill("bgh")
-    await page.locator("text=BGH").click()
     await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-
-    // racing condition if selection of court and autosave happens at the same moment
-    await waitForSaveStatusChanged(page, saveStatus)
-
-    await page.reload()
-
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Ja")
 
-    await page
-      .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
-      .click()
-
-    await page.locator("text=Nein").click()
-    await waitForInputValue(page, "[aria-label='Rechtskraft']", "Nein")
-
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await page
+          .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
+          .click()
+        await page.locator("text=Nein").click()
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Nein")
   })
@@ -257,13 +253,13 @@ test.describe("court", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
 
-    await page.locator("[aria-label='Gericht']").fill("aachen")
-    await page.locator("text=AG Aachen").click()
-    await waitForInputValue(page, "[aria-label='Gericht']", "AG Aachen")
-    await waitForSaving(page)
+    await waitForSaving(async () => {
+      await page.locator("[aria-label='Gericht']").fill("aachen")
+      await page.locator("text=AG Aachen").click()
+      await waitForInputValue(page, "[aria-label='Gericht']", "AG Aachen")
+    }, page)
 
     await waitForInputValue(page, "[aria-label='Rechtskraft']", "Keine Angabe")
   })

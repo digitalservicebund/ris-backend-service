@@ -22,7 +22,6 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     documentNumber,
   }) => {
     await navigateToPublication(page, documentNumber)
-
     await expect(page.locator("li:has-text('Aktenzeichen')")).toBeVisible()
     await expect(page.locator("li:has-text('Gericht')")).toBeVisible()
     await expect(
@@ -31,13 +30,14 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
     await page.locator("[aria-label='Rubriken bearbeiten']").click()
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
-    await page.keyboard.press("Enter")
+    await waitForSaving(async () => {
+      await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+      await page.keyboard.press("Enter")
 
-    await page.locator("[aria-label='Gericht']").fill("aalen")
-    await page.locator("text=AG Aalen").click() // triggers autosave
+      await page.locator("[aria-label='Gericht']").fill("aalen")
+      await page.locator("text=AG Aalen").click() // triggers autosave
+    }, page)
 
-    await waitForSaving(page)
     expect(await page.inputValue("[aria-label='Gericht']")).toBe("AG Aalen")
 
     await navigateToPublication(page, documentNumber)
@@ -108,45 +108,62 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await navigateToPublication(page, documentNumber)
     await page.locator("[aria-label='Rubriken bearbeiten']").click()
 
-    await page.locator("[aria-label='Aktenzeichen']").fill("abc")
-    await page.keyboard.press("Enter")
-    await expect(page.getByText("abc").first()).toBeVisible()
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Aktenzeichen']").fill("abc")
+        await page.keyboard.press("Enter")
+        await expect(page.getByText("abc").first()).toBeVisible()
+      },
+      page,
+      { clickSaveButton: true }
+    )
 
-    await page.reload()
+    await waitForSaving(
+      async () => {
+        await page
+          .locator("[aria-label='Entscheidungsdatum']")
+          .fill("2022-02-03")
+        expect(
+          await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+        ).toBe("2022-02-03")
+        await page.keyboard.press("Tab")
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
-    expect(
-      await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-    ).toBe("2022-02-03")
-    await page.keyboard.press("Tab")
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Gericht']").fill("vgh mannheim")
+        await page.locator("text=VGH Mannheim").click()
+        expect(await page.inputValue("[aria-label='Gericht']")).toBe(
+          "VGH Mannheim"
+        )
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
-    await page.reload()
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Dokumenttyp']").fill("AnU")
+        await page.locator("text=AnU - Anerkenntnisurteil").click()
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
-    await page.locator("[aria-label='Gericht']").fill("vgh mannheim")
-    await page.locator("text=VGH Mannheim").click()
-    expect(await page.inputValue("[aria-label='Gericht']")).toBe("VGH Mannheim")
-    await waitForSaving(page)
+    await waitForSaving(
+      async () => {
+        await page
+          .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
+          .click()
+        await page.locator("text=Ja").click()
+      },
+      page,
+      { clickSaveButton: true, reload: true }
+    )
 
-    await page.reload()
-
-    await page.locator("[aria-label='Dokumenttyp']").fill("AnU")
-    await page.locator("text=AnU - Anerkenntnisurteil").click()
-    await waitForSaving(page)
-
-    await page.reload()
-
-    await page
-      .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
-      .click()
-
-    await page.locator("text=Ja").click()
-    await waitForSaving(page)
-
-    await expect(
-      page.locator("text=Zuletzt gespeichert um").first()
-    ).toBeVisible()
     await navigateToPublication(page, documentNumber)
 
     await expect(
