@@ -4,11 +4,9 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ADDITIONAL_INFO
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AGE_OF_MAJORITY_INDICATION
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AMENDMENT_NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_GAZETTE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ANNOUNCEMENT_MEDIUM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.AREA_OF_PUBLICATION
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.BASE_NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DECIDING_BODY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DEFINITION
@@ -20,6 +18,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.EXPLANATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.OTHER_OFFICIAL_REFERENCE
@@ -37,7 +36,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_PREVIOUS_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TRANSITIONAL_NORM
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
@@ -45,6 +43,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_RE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import java.time.LocalDate
 
 val hasValidValueType =
@@ -65,8 +64,9 @@ val hasValidValueType =
 
                 DATE -> instance.value is LocalDate
 
-                RESOLUTION_MAJORITY, BASE_NORM, AMENDMENT_NORM, TRANSITIONAL_NORM,
-                -> instance.value is Boolean
+                NORM_CATEGORY -> instance.value is NormCategory
+
+                RESOLUTION_MAJORITY -> instance.value is Boolean
             }
         }
     }

@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat
@@ -282,9 +283,8 @@ class HasValidMetadataTest {
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum("type name", MetadatumType.TYPE_NAME),
-            Metadatum(true, MetadatumType.BASE_NORM),
-            Metadatum(false, MetadatumType.AMENDMENT_NORM),
-            Metadatum(true, MetadatumType.TRANSITIONAL_NORM),
+            Metadatum(NormCategory.BASE_NORM, MetadatumType.NORM_CATEGORY),
+            Metadatum(NormCategory.TRANSITIONAL_NORM, MetadatumType.NORM_CATEGORY),
             Metadatum("template name", MetadatumType.TEMPLATE_NAME),
         )
 

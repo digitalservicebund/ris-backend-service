@@ -307,9 +307,7 @@ components:
         - DECIDING_BODY
         - RESOLUTION_MAJORITY
         - TYPE_NAME
-        - BASE_NORM
-        - AMENDMENT_NORM
-        - TRANSITIONAL_NORM
+        - NORM_CATEGORY
         - TEMPLATE_NAME
 
     MetadataSectionName:
