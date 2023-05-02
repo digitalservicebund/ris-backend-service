@@ -74,7 +74,7 @@ watch(
   { immediate: true }
 )
 
-const coreData = ref<CoreData>()
+const coreData = ref<CoreData>(props.documentUnit.coreData)
 
 watch(
   () => updatedDocumentUnit,
