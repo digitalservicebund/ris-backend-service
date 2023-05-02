@@ -1,9 +1,11 @@
 import AxeBuilder from "@axe-core/playwright"
 import { expect } from "@playwright/test"
 import {
-  navigateToCategories,
-  toggleProceedingDecisionsSection,
   fillProceedingDecisionInputs,
+  toggleProceedingDecisionsSection,
+} from "../../e2e/caselaw/categories/proceedingDecisions/proceeding-decisions.spec"
+import {
+  navigateToCategories,
   waitForSaving,
 } from "../../e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "../../e2e/caselaw/fixtures"
