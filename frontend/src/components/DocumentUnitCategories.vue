@@ -77,7 +77,7 @@ watch(
 const coreData = computed({
   // get: () => props.documentUnit.coreData,
   get: () => updatedDocumentUnit.value.coreData,
-  set: async (newValues) => {
+  set: (newValues) => {
     let triggerSaving = false
     if (
       updatedDocumentUnit.value.coreData.court?.label !== newValues.court?.label
@@ -86,7 +86,7 @@ const coreData = computed({
     }
     Object.assign(updatedDocumentUnit.value.coreData, newValues)
     if (triggerSaving) {
-      await handleUpdateDocumentUnit()
+      handleUpdateDocumentUnit()
     }
   },
 })
