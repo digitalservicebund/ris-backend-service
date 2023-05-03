@@ -17,8 +17,8 @@ interface Props {
 
 interface Emits {
   (event: "update:modelValue", value?: string[]): void
-  (event: "addChip", value?: string): Promise<void>
-  (event: "deleteChip", value?: string): Promise<void>
+  (event: "addChip", value?: string): void
+  (event: "deleteChip", value?: string): void
   (event: "input", value: Event): void
 }
 
@@ -37,7 +37,7 @@ function updateModelValue() {
   emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
-async function saveChip() {
+function saveChip() {
   const trimmed = currentInput.value.trim()
   if (trimmed.length > 0) {
     if (chips.value.includes(trimmed)) {
@@ -45,7 +45,7 @@ async function saveChip() {
       currentInput.value = ""
       return
     }
-    await emits("addChip", trimmed)
+    emits("addChip", trimmed)
     if (!errorMessage.value) {
       chips.value.push(trimmed)
       updateModelValue()
@@ -54,8 +54,8 @@ async function saveChip() {
   }
 }
 
-async function deleteChip(keyword: string | undefined) {
-  await emits("deleteChip", keyword)
+function deleteChip(keyword: string | undefined) {
+  emits("deleteChip", keyword)
 }
 
 const handleOnBlur = () => {

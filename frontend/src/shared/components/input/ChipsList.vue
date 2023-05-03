@@ -12,7 +12,7 @@ interface Emits {
   (event: "update:modelValue", value?: string[]): void
   (event: "previousClickedOnFirst"): void
   (event: "nextClickedOnLast"): void
-  (event: "deleteChip", value?: string): Promise<void>
+  (event: "deleteChip", value?: string): void
   (event: "input", value: Event): void
 }
 
@@ -29,12 +29,10 @@ function updateModelValue() {
   emits("update:modelValue", chips.value)
 }
 
-async function deleteChip(index: number) {
-  await emits("deleteChip", chips.value[index])
-  if (!errorMessage.value) {
-    chips.value.splice(index, 1)
-    updateModelValue()
-  }
+function deleteChip(index: number) {
+  emits("deleteChip", chips.value[index])
+  chips.value.splice(index, 1)
+  updateModelValue()
   resetFocus()
 }
 
@@ -42,9 +40,9 @@ function resetFocus() {
   focusedItemIndex.value = undefined
 }
 
-async function enterDelete() {
+function enterDelete() {
   if (focusedItemIndex.value !== undefined) {
-    await emits("deleteChip", chips.value[focusedItemIndex.value])
+    emits("deleteChip", chips.value[focusedItemIndex.value])
     chips.value.splice(focusedItemIndex.value, 1)
     // bring focus on second last item if last item was deleted
     if (focusedItemIndex.value === chips.value.length) {
