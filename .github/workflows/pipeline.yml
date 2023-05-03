@@ -778,6 +778,7 @@ jobs:
     with:
       browser: chromium
       mode: a11y
+      subproject: all
     secrets: inherit
 
   deploy-production:
