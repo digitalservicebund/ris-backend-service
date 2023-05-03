@@ -121,7 +121,7 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
       >
-        <div class="label-wrapper">{{ chip }}</div>
+        <div class="label-wrapper whitespace-pre-wrap">{{ chip }}</div>
 
         <div class="icon-wrapper">
           <em

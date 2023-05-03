@@ -68,6 +68,7 @@ const yearValue = computed({
     <div class="radio-group w-320">
       <label class="form-control">
         <input
+          id="citationTypeDate"
           v-model="selectedInputType"
           aria-label="Wählen Sie Zitierdatum Datum"
           name="inputType"
@@ -78,6 +79,7 @@ const yearValue = computed({
       </label>
       <label class="form-control">
         <input
+          id="citationTypeYear"
           v-model="selectedInputType"
           aria-label="Wählen Sie Zitierdatum Jahr"
           name="inputType"
