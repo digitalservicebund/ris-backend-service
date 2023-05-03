@@ -50,7 +50,10 @@ springBoot { buildInfo() }
 testlogger { theme "mocha" }
 
 dependencies {
+
   implementation "org.springframework.boot:spring-boot-starter-actuator"
+  // => CVE-2023-20873
+  implementation "org.springframework.boot:spring-boot-actuator-autoconfigure:3.0.6"
   implementation "org.springframework.boot:spring-boot-starter-security"
   // => CVE-2022-31692
   implementation "org.springframework.security:spring-security-core:6.0.2"
