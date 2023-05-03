@@ -69,6 +69,7 @@ jobs:
           GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }}
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: |
+          echo "Running ${{ inputs.mode }} ${{ inputs.subproject || '' }} tests ${{ inputs.runs }} times"
           if [[ -z "${{ inputs.subproject }}" ]]; then
             for i in {1..${{ inputs.runs }}}; do npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }} --retries=0; done
           else
@@ -92,7 +93,7 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           type: ${{ job.status }}
-          job_name: "${{ inputs.subproject }} ${{ inputs.mode }} test :point_right:"
+          job_name: "${{ inputs.runs }}x ${{ inputs.subproject }} ${{ inputs.mode }} test :point_right:"
           mention: "here"
           mention_if: "failure"
           commit: true

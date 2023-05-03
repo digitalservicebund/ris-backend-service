@@ -19,20 +19,27 @@ on:
         options:
           - e2e
           - a11y
+      subproject:
+        description: "Subproject"
+        required: false
+        type: choice
+        options:
+          - norms
+          - caselaw
       runs:
         description: "Number of subsequent runs"
         required: false
         type: string
         default: "1"
   schedule:
-    # * is a special character in YAML so you have to quote this string
     - cron:  '00 6 * * *'
 
 jobs:
   playwright-test:
     uses: ./.github/workflows/_playwright-test.yml
     with:
-      browser: ${{ inputs.browser }}
-      mode: ${{ inputs.mode }}
-      runs: ${{ inputs.runs }}
+      browser: ${{ inputs.browser || 'chromium' }} 
+      mode: ${{ inputs.mode || 'e2e' }}  
+      runs: ${{ inputs.runs || '1' }} 
+      subproject: ${{ inputs.subproject }}
     secrets: inherit
