@@ -70,9 +70,9 @@ jobs:
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: |
           if [[ -z "${{ inputs.subproject }}" ]]; then
-            for i in {1..${{ inputs.runs }}}; do npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }}; done
+            for i in {1..${{ inputs.runs }}}; do npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }} --retries=0; done
           else
-            for i in {1..${{ inputs.runs }}}; do npm run test:${{ inputs.mode }}:${{ inputs.subproject }} -- --project ${{ inputs.browser }}; done
+            for i in {1..${{ inputs.runs }}}; do npm run test:${{ inputs.mode }}:${{ inputs.subproject }} -- --project ${{ inputs.browser }} --retries=0; done
           fi
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
