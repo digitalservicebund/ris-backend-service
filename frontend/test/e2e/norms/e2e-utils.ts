@@ -11,13 +11,7 @@ const REMOTE_JURIS_TEST_FILE_FOLDER_URL =
 
 async function getLocalJurisTestFileFolderPath(): Promise<string> {
   const folderPath = path.join(tmpdir(), "ris-norms_juris-test-files")
-
-  try {
-    await fs.promises.access(folderPath, fs.constants.F_OK)
-  } catch {
-    await fs.promises.mkdir(folderPath)
-  }
-
+  await fs.promises.mkdir(folderPath, { recursive: true })
   return folderPath
 }
 
