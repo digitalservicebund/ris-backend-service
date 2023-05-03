@@ -20,8 +20,8 @@ export function useToggleStateInRouteQuery(
     { immediate: true }
   )
 
-  watch(toggleState, () => {
-    routerCallback({
+  watch(toggleState, async () => {
+    await routerCallback({
       ...route,
       query: {
         ...route.query,

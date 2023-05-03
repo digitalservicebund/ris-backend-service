@@ -35,12 +35,12 @@ async function submitSearch(isNewSearch = true) {
   })
 }
 
-function handlePagination(backwards: boolean) {
+async function handlePagination(backwards: boolean) {
   if (backwards && results.value?.first) return
   if (!backwards && results.value?.last) return
 
   currentPage.value += backwards ? -1 : 1
-  submitSearch(false)
+  await submitSearch(false)
 }
 </script>
 
