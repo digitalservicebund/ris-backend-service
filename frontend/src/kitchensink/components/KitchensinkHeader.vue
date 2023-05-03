@@ -25,7 +25,7 @@ const isSelectedComponent = (component: risComponent) => {
       class="flex flex-col flex-nowrap gap-y-10 justify-start overflow-hidden py-10 relative w-2/3"
     >
       <!-- Title -->
-      <h1 class="font-bold text-64">Kitchensink</h1>
+      <h1 class="font-sans text-64">Kitchensink</h1>
       <!-- Navbar -->
       <div
         class="flex flex-row flex-wrap gap-x-20 gap-y-20 justify-start navbar overflow-x-scroll overflow-y-hidden"

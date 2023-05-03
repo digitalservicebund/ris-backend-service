@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,vue,js,ts}"],
+  // corePlugins: {
+  //   preflight: false,
+  // },
   theme: {
     colors: {
       inherit: "inherit",
@@ -48,16 +51,8 @@ module.exports = {
       background: "rgba(184, 189, 195, 0.5)",
     },
     fontFamily: {
-      regular: [
+      sans: [
         "BundesSansWeb",
-        "Calibri",
-        "Verdana",
-        "Arial",
-        "Helvetica",
-        "sans-serif",
-      ],
-      bold: [
-        "BundesSansWeb Bold",
         "Calibri",
         "Verdana",
         "Arial",

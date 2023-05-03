@@ -63,7 +63,7 @@ const onDelete = () => {
       class="border-collapse document-unit-list-table table w-full"
     >
       <div
-        class="bg-gray-400 font-bold leading-[3] table-row text-18 text-center"
+        class="bg-gray-400 font-bold font-sans leading-[3] table-row text-18 text-center"
       >
         <div class="table-cell">Dokumentnummer</div>
         <div class="table-cell">Angelegt am</div>

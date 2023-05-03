@@ -1,25 +1,13 @@
 @import "@/styles/font_styles";
 @import "material-icons/iconfont/material-icons.css";
+@import "@digitalservice4germany/angie/fonts.css";
+@import "@digitalservice4germany/angie/angie.css";
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@font-face {
-  font-family: BundesSansWeb;
-  font-weight: 400;
-  src: url("/fonts/BundesSans-Web-Regular.woff2"),
-    url("/fonts/BundesSans-Web-Regular.woff");
-}
-
-@font-face {
-  font-family: "BundesSansWeb Bold";
-  font-weight: 700;
-  src: url("/fonts/BundesSans-Web-Bold.woff2"),
-    url("/fonts/BundesSans-Web-Bold.woff");
-}
-
 body {
-  @apply text-18 font-normal font-regular leading-default text-black;
+  @apply text-18 font-normal font-sans leading-default text-black;
 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
