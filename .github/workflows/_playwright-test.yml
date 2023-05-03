@@ -70,11 +70,16 @@ jobs:
           GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
         run: |
           echo "Running ${{ inputs.mode }} ${{ inputs.subproject || '' }} tests ${{ inputs.runs }} times"
-          if [[ -z "${{ inputs.subproject }}" ]]; then
-            for i in {1..${{ inputs.runs }}}; do npm run test:${{ inputs.mode }} -- --project ${{ inputs.browser }} --retries=0; done
-          else
-            for i in {1..${{ inputs.runs }}}; do npm run test:${{ inputs.mode }}:${{ inputs.subproject }} -- --project ${{ inputs.browser }} --retries=0; done
+
+          test_target=${{ inputs.mode }}
+          if [[ -n ${{ inputs.subproject }} && ${{ inputs.subproject }} != 'all' ]]; then
+            test_target=${{ inputs.mode }}:${{ inputs.subproject }}
           fi
+
+          for i in $(seq 1 ${{ inputs.runs}}); do
+            echo "Attempt $i" 
+            npm run test:"$test_target" -- --project ${{ inputs.browser }} --retries=0
+          done
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v3

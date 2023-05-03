@@ -26,6 +26,7 @@ on:
         options:
           - norms
           - caselaw
+          - all
       runs:
         description: "Number of subsequent runs"
         required: false
