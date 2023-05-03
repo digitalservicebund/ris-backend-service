@@ -35,7 +35,7 @@ const handleUpdateValueDocumentUnitTexts = async (
 const handleUpdateDocumentUnit = async () => {
   updateStatus.value = UpdateStatus.ON_UPDATE
   const response = await documentUnitService.update(updatedDocumentUnit.value)
-  if (response.error && response.error.validationErrors) {
+  if (response?.error?.validationErrors) {
     validationErrors.value = response.error.validationErrors
   } else {
     validationErrors.value = []
