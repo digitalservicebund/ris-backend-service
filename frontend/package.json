@@ -26,7 +26,7 @@
     "audit:licences": "license-checker --production --excludePrivatePackages --onlyAllow \"$(. ./parseAllowedLicences.sh)\" --csv --out ./frontend-licence-report.csv"
   },
   "dependencies": {
-    "@axe-core/playwright": "^4.6.0",
+    "@axe-core/playwright": "^4.7.0",
     "@tiptap/extension-bold": "^2.0.0-beta.209",
     "@tiptap/extension-bullet-list": "^2.0.0-beta.209",
     "@tiptap/extension-color": "^2.0.0-beta.209",
