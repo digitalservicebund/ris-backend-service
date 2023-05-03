@@ -102,6 +102,7 @@ watch(editIndex, focusFirstInputOfCurrentEditElement)
         <component
           :is="summaryComponent"
           :data="entry"
+          tabindex="0"
           @click="setEditIndex(index)"
         />
 
