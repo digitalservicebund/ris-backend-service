@@ -282,7 +282,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("medium1", MetadatumType.ANNOUNCEMENT_MEDIUM, 1),
                 Metadatum("medium2", MetadatumType.ANNOUNCEMENT_MEDIUM, 2),
             ),
-            2,
+            1,
         )
         val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val referenceSection2 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 2, listOf(digitalAnnouncementSection))
