@@ -93,6 +93,20 @@ pre-push:
       # exit 0
       tags: security audit
       run: currentbranch=$(git rev-parse --abbrev-ref HEAD); echo "refs/heads/$currentbranch HEAD refs/heads/$currentbranch $(git log -1 origin/$currentbranch --format='%H')" | talisman --githook pre-push
+    check-pipeline-status:
+      run: |
+        which gh 2>&1 >/dev/null || exit 0
+
+        conclusion="$(
+          gh run list --branch main --workflow pipeline --json conclusion,status \
+          --jq '[.[] | select(.status=="completed")][0].conclusion' \
+        )"
+
+        if [[ "$conclusion" != "success" ]]; then
+          echo "The last completed pipeline run has failed!"
+          echo "If you intend to fix the pipeline use '--no-verify', BUT ONLY IF all other hooks are okay."
+          exit 1
+        fi
 
 skip_output:
   - meta
