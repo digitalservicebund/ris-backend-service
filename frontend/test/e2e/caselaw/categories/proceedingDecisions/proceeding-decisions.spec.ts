@@ -48,7 +48,9 @@ test.describe("Proceeding decisions", () => {
     await page.getByText("Manuell Hinzufügen").click()
 
     await expect(
-      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`)
+      page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`, {
+        exact: true,
+      })
     ).toBeVisible()
 
     await page.reload()
@@ -92,7 +94,7 @@ test.describe("Proceeding decisions", () => {
     await page.getByText("Manuell Hinzufügen").click()
 
     await expect(
-      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
+      page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c", { exact: true })
     ).toBeVisible()
 
     await fillProceedingDecisionInputs(page, {

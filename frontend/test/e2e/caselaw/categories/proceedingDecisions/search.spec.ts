@@ -45,6 +45,12 @@ test.describe("Search proceeding decisions", () => {
     await expect(result).toBeVisible()
     await result.locator("[aria-label='Treffer übernehmen']").click()
 
+    await expect(
+      page.getByText(
+        `AG Aachen, AnU, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}, ${secondaryDocumentUnit.documentNumber}`
+      )
+    ).toBeVisible()
+
     await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
 
     await page.getByText("delete_outline").click()
