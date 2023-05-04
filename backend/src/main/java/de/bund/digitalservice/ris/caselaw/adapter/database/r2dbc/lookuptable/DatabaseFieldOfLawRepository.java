@@ -72,7 +72,7 @@ public interface DatabaseFieldOfLawRepository extends R2dbcRepository<FieldOfLaw
           + "        (SELECT value "
           + "         FROM param_arrays "
           + "         WHERE KEY = 'search'), 1)"
-          + "  AND LOWER(CONCAT(n.abbreviation, ' ', n.single_norm_description)) LIKE LOWER('%'||:normStr||'%');")
+          + "  AND LOWER(CONCAT(n.single_norm_description, ' ', n.abbreviation)) LIKE LOWER('%'||:normStr||'%');")
   Flux<FieldOfLawDTO> findByNormStrAndSearchTerms(String normStr, String[] searchTerms);
 
   @Query(
