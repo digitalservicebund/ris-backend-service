@@ -21,12 +21,36 @@ interface NormsMapper {
         normDto: NormDto,
         articles: List<Article>,
         fileReferences: List<FileReference>,
-        metadataSections: List<MetadataSection>,
+        dtoSections: List<MetadataSectionDto>,
+        dtoMetadata: List<MetadatumDto> = emptyList(),
     ): Norm {
+        val listDomainSections = mutableListOf<MetadataSection>()
+
+        // 1. Objective: move children from parent level to their respective parents because otherwise we can't instantite the parent MetadataSection
+        dtoSections.filter { dtoSectionToFilter -> dtoSectionToFilter.sectionId == null }.map { dtoCurrentParentSection ->
+            val dtoChildrenOfCurrentParentSection = dtoSections.filter { it2 -> it2.sectionId == dtoCurrentParentSection.id }
+            if (dtoChildrenOfCurrentParentSection.isEmpty()) {
+                // Parent section without children, meaning with metadata
+                val dtoMetadatumOfCurrentParentSection = dtoMetadata.filter { dtoMetadatum -> dtoCurrentParentSection.id == dtoMetadatum.sectionId }
+                val convertedSection = metadataSectionToEntity(dtoCurrentParentSection, dtoMetadatumOfCurrentParentSection.map { metadatumToEntity(it) })
+                listDomainSections.add(convertedSection)
+            } else {
+                // Parent section with children (assumming without metadata)
+                val listChildrenDomain = mutableListOf<MetadataSection>()
+                dtoChildrenOfCurrentParentSection.map { dtoChildOfCurrentParentSection ->
+                    val dtoMetadatumOfChild = dtoMetadata.filter { dtoMetadatum -> dtoChildOfCurrentParentSection.id == dtoMetadatum.sectionId }
+                    val convertedChildSection = metadataSectionToEntity(dtoChildOfCurrentParentSection, dtoMetadatumOfChild.map { metadatumToEntity(it) })
+                    listChildrenDomain.add(convertedChildSection)
+                }
+                val domainParent = MetadataSection(name = dtoCurrentParentSection.name, order = dtoCurrentParentSection.order, guid = dtoCurrentParentSection.guid, metadata = emptyList(), sections = listChildrenDomain)
+                listDomainSections.add(domainParent)
+            }
+        }
+
         return Norm(
             normDto.guid,
             articles,
-            metadataSections,
+            listDomainSections,
             normDto.officialLongTitle,
             normDto.risAbbreviation,
             normDto.documentNumber,
@@ -104,7 +128,7 @@ interface NormsMapper {
     }
 
     fun metadataSectionToEntity(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): MetadataSection {
-        return MetadataSection(name = metadataSectionDto.name, order = metadataSectionDto.order, metadata = metadata)
+        return MetadataSection(name = metadataSectionDto.name, order = metadataSectionDto.order, metadata = metadata, guid = metadataSectionDto.guid)
     }
 
     fun fileReferenceToEntity(fileReferenceDto: FileReferenceDto): FileReference {
@@ -213,11 +237,11 @@ interface NormsMapper {
     }
 
     fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
-        return MetadataSectionDto(id = id, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId)
+        return MetadataSectionDto(id = id, guid = metadataSection.guid, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId)
     }
 
-    fun metadataSectionsToDto(sections: List<MetadataSection>?, normId: Int, sectionId: Int? = null, id: Int = 0): List<MetadataSectionDto>? {
-        return sections?.map {
+    fun metadataSectionsToDto(sections: List<MetadataSection>, normId: Int, sectionId: Int? = null, id: Int = 0): List<MetadataSectionDto> {
+        return sections.map {
             metadataSectionToDto(
                 it,
                 normId,
