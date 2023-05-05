@@ -8,8 +8,9 @@ const props = withDefaults(
     itemsPerPage: number
     itemService: PageableService<any> // eslint-disable-line @typescript-eslint/no-explicit-any
     getInitalData?: boolean
+    navigationPosition?: "top" | "bottom"
   }>(),
-  { getInitalData: false }
+  { getInitalData: false, navigationPosition: "top" }
 )
 
 const emits = defineEmits<{
@@ -63,7 +64,9 @@ export type PageableService<T> = {
 </script>
 
 <template>
-  <div v-if="page?.content" class="flex flex-col items-center">
+  <slot v-if="props.navigationPosition == 'bottom'"></slot>
+
+  <div v-if="page?.content" class="flex flex-col items-center my-32">
     <div class="flex items-center">
       <div class="flex flex-grow items-center justify-center relative">
         <button
@@ -93,5 +96,5 @@ export type PageableService<T> = {
       Total {{ page?.totalElements }} Items
     </div>
   </div>
-  <slot></slot>
+  <slot v-if="props.navigationPosition == 'top'"></slot>
 </template>

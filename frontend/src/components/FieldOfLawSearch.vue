@@ -59,6 +59,7 @@ async function handleUpdateItems(newItems: FieldOfLawNode[]) {
       ref="paginationComponentRef"
       :item-service="service.searchForFieldsOfLaw"
       :items-per-page="itemsPerPage"
+      navigation-position="bottom"
       @update-items="handleUpdateItems"
     >
       <FieldOfLawListEntry
