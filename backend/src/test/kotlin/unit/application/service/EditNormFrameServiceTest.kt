@@ -50,28 +50,6 @@ class EditNormFrameServiceTest {
         )
         val properties = createRandomNormFameProperties().copy(
             metadataSections = metadataSections,
-            printAnnouncementGazette = null,
-            printAnnouncementYear = null,
-            printAnnouncementNumber = null,
-            printAnnouncementPage = null,
-            printAnnouncementInfo = null,
-            printAnnouncementExplanations = null,
-            digitalAnnouncementMedium = null,
-            digitalAnnouncementDate = null,
-            digitalAnnouncementEdition = null,
-            digitalAnnouncementYear = null,
-            digitalAnnouncementArea = null,
-            digitalAnnouncementAreaNumber = null,
-            digitalAnnouncementInfo = null,
-            digitalAnnouncementExplanations = null,
-            euAnnouncementGazette = null,
-            euAnnouncementYear = null,
-            euAnnouncementSeries = null,
-            euAnnouncementNumber = null,
-            euAnnouncementPage = null,
-            euAnnouncementInfo = null,
-            euAnnouncementExplanations = null,
-            otherOfficialAnnouncement = null,
         )
         val editNormOutputPort = mockk<EditNormOutputPort>()
         val service = EditNormFrameService(editNormOutputPort)

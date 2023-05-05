@@ -118,10 +118,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            metadataSections = listOf(printAnnouncementSection),
+            metadataSections = listOf(referenceSection1),
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
@@ -148,10 +150,11 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection1))
         val firstNorm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            metadataSections = listOf(printAnnouncementSection1),
+            metadataSections = listOf(referenceSection1),
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
@@ -162,10 +165,11 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection2 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection2))
         val secondNorm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            metadataSections = listOf(printAnnouncementSection2),
+            metadataSections = listOf(referenceSection2),
             officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
@@ -200,11 +204,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
             officialLongTitle = "Test Title",
-            metadataSections = listOf(citationDateSection, printAnnouncementSection),
+            metadataSections = listOf(citationDateSection, referenceSection1),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2001", "1125")
@@ -231,11 +236,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
             officialLongTitle = "Test Title",
-            metadataSections = listOf(citationDateSection, printAnnouncementSection),
+            metadataSections = listOf(citationDateSection, referenceSection1),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2020", "1125")

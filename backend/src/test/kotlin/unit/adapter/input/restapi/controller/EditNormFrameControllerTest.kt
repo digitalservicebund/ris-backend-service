@@ -36,28 +36,6 @@ class EditNormFrameControllerTest {
     @Test
     fun `it correctly maps the parameter and body to the command calling the service`() {
         val editNormRequestSchema = createRandomEditNormRequestTestSchema()
-        editNormRequestSchema.digitalAnnouncementMedium = null
-        editNormRequestSchema.digitalAnnouncementYear = null
-        editNormRequestSchema.printAnnouncementGazette = null
-        editNormRequestSchema.printAnnouncementPage = null
-        editNormRequestSchema.printAnnouncementYear = null
-        editNormRequestSchema.digitalAnnouncementArea = null
-        editNormRequestSchema.digitalAnnouncementAreaNumber = null
-        editNormRequestSchema.digitalAnnouncementDate = null
-        editNormRequestSchema.digitalAnnouncementEdition = null
-        editNormRequestSchema.digitalAnnouncementExplanations = null
-        editNormRequestSchema.digitalAnnouncementInfo = null
-        editNormRequestSchema.euAnnouncementExplanations = null
-        editNormRequestSchema.euAnnouncementGazette = null
-        editNormRequestSchema.euAnnouncementInfo = null
-        editNormRequestSchema.euAnnouncementNumber = null
-        editNormRequestSchema.euAnnouncementPage = null
-        editNormRequestSchema.euAnnouncementSeries = null
-        editNormRequestSchema.euAnnouncementYear = null
-        editNormRequestSchema.otherOfficialAnnouncement = null
-        editNormRequestSchema.printAnnouncementExplanations = null
-        editNormRequestSchema.printAnnouncementInfo = null
-        editNormRequestSchema.printAnnouncementNumber = null
         val editJson = convertEditNormRequestTestSchemaToJson(editNormRequestSchema)
 
         every { editNormFrameService.editNormFrame(any()) } returns Mono.just(true)
@@ -160,29 +138,6 @@ class EditNormFrameControllerTest {
 
         var announcementDate: String? = null
         var publicationDate: String? = null
-
-        var printAnnouncementGazette: String? = null
-        var printAnnouncementYear: String? = null
-        var printAnnouncementNumber: String? = null
-        var printAnnouncementPage: String? = null
-        var printAnnouncementInfo: String? = null
-        var printAnnouncementExplanations: String? = null
-        var digitalAnnouncementMedium: String? = null
-        var digitalAnnouncementDate: String? = null
-        var digitalAnnouncementEdition: String? = null
-        var digitalAnnouncementYear: String? = null
-        var digitalAnnouncementArea: String? = null
-        var digitalAnnouncementAreaNumber: String? = null
-        var digitalAnnouncementInfo: String? = null
-        var digitalAnnouncementExplanations: String? = null
-        var euAnnouncementGazette: String? = null
-        var euAnnouncementYear: String? = null
-        var euAnnouncementSeries: String? = null
-        var euAnnouncementNumber: String? = null
-        var euAnnouncementPage: String? = null
-        var euAnnouncementInfo: String? = null
-        var euAnnouncementExplanations: String? = null
-        var otherOfficialAnnouncement: String? = null
 
         var completeCitation: String? = null
 
