@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 
 @RestController
 @RequestMapping(ApiConfiguration.API_NORMS_PATH)
@@ -77,29 +76,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var announcementDate: String? = null
         var publicationDate: String? = null
 
-        var printAnnouncementGazette: String? = null
-        var printAnnouncementYear: String? = null
-        var printAnnouncementNumber: String? = null
-        var printAnnouncementPage: String? = null
-        var printAnnouncementInfo: String? = null
-        var printAnnouncementExplanations: String? = null
-        var digitalAnnouncementMedium: String? = null
-        var digitalAnnouncementDate: String? = null
-        var digitalAnnouncementEdition: String? = null
-        var digitalAnnouncementYear: String? = null
-        var digitalAnnouncementArea: String? = null
-        var digitalAnnouncementAreaNumber: String? = null
-        var digitalAnnouncementInfo: String? = null
-        var digitalAnnouncementExplanations: String? = null
-        var euAnnouncementGazette: String? = null
-        var euAnnouncementYear: String? = null
-        var euAnnouncementSeries: String? = null
-        var euAnnouncementNumber: String? = null
-        var euAnnouncementPage: String? = null
-        var euAnnouncementInfo: String? = null
-        var euAnnouncementExplanations: String? = null
-        var otherOfficialAnnouncement: String? = null
-
         var completeCitation: String? = null
 
         var statusNote: String? = null
@@ -150,66 +126,11 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var text: String? = null
 
         fun toUseCaseData(): EditNormFrameUseCase.NormFrameProperties {
-            val metadataSections = this.metadataSections
-                .filter {
-                    listOf(
-                        MetadataSectionName.PRINT_ANNOUNCEMENT,
-                        MetadataSectionName.DIGITAL_ANNOUNCEMENT,
-                        MetadataSectionName.EU_ANNOUNCEMENT,
-                        MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT,
-                    ).contains(it.name).not()
-                }.map { it.toUseCaseData() }
-                .toMutableList() +
-                getSection(
-                    mapOf(
-                        MetadatumType.ANNOUNCEMENT_GAZETTE to this.printAnnouncementGazette,
-                        MetadatumType.YEAR to this.printAnnouncementYear,
-                        MetadatumType.NUMBER to this.printAnnouncementNumber,
-                        MetadatumType.PAGE to this.printAnnouncementPage,
-                        MetadatumType.ADDITIONAL_INFO to this.printAnnouncementInfo,
-                        MetadatumType.EXPLANATION to this.printAnnouncementExplanations,
-                    ),
-                    MetadataSectionName.PRINT_ANNOUNCEMENT,
-                    1,
-                ) +
-                getSection(
-                    mapOf(
-                        MetadatumType.ANNOUNCEMENT_MEDIUM to this.digitalAnnouncementMedium,
-                        MetadatumType.DATE to decodeLocalDate(this.digitalAnnouncementDate),
-                        MetadatumType.YEAR to this.digitalAnnouncementYear,
-                        MetadatumType.EDITION to this.digitalAnnouncementEdition,
-                        MetadatumType.AREA_OF_PUBLICATION to this.digitalAnnouncementArea,
-                        MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA to this.digitalAnnouncementAreaNumber,
-                        MetadatumType.ADDITIONAL_INFO to this.digitalAnnouncementInfo,
-                        MetadatumType.EXPLANATION to this.digitalAnnouncementExplanations,
-                    ),
-                    MetadataSectionName.DIGITAL_ANNOUNCEMENT,
-                    2,
-                ) +
-                getSection(
-                    mapOf(
-                        MetadatumType.EU_GOVERNMENT_GAZETTE to this.euAnnouncementGazette,
-                        MetadatumType.YEAR to this.euAnnouncementYear,
-                        MetadatumType.SERIES to this.euAnnouncementSeries,
-                        MetadatumType.NUMBER to this.euAnnouncementNumber,
-                        MetadatumType.PAGE to this.euAnnouncementPage,
-                        MetadatumType.ADDITIONAL_INFO to this.euAnnouncementInfo,
-                        MetadatumType.EXPLANATION to this.euAnnouncementExplanations,
-                    ),
-                    MetadataSectionName.EU_ANNOUNCEMENT,
-                    3,
-                ) +
-                getSection(
-                    mapOf(
-                        MetadatumType.OTHER_OFFICIAL_REFERENCE to this.otherOfficialAnnouncement,
-                    ),
-                    MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT,
-                    4,
-                )
+            val metadataSections = this.metadataSections.map { it.toUseCaseData() }
 
             return EditNormFrameUseCase.NormFrameProperties(
                 this.officialLongTitle,
-                metadataSections.filter { it.metadata.isNotEmpty() },
+                metadataSections,
                 this.risAbbreviation,
                 this.documentNumber,
                 this.documentCategory,
@@ -235,28 +156,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.expirationNormCategory,
                 decodeLocalDate(this.announcementDate),
                 decodeLocalDate(this.publicationDate),
-                this.printAnnouncementGazette,
-                this.printAnnouncementYear,
-                this.printAnnouncementNumber,
-                this.printAnnouncementPage,
-                this.printAnnouncementInfo,
-                this.printAnnouncementExplanations,
-                this.digitalAnnouncementMedium,
-                decodeLocalDate(this.digitalAnnouncementDate),
-                this.digitalAnnouncementEdition,
-                this.digitalAnnouncementYear,
-                this.digitalAnnouncementArea,
-                this.digitalAnnouncementAreaNumber,
-                this.digitalAnnouncementInfo,
-                this.digitalAnnouncementExplanations,
-                this.euAnnouncementGazette,
-                this.euAnnouncementYear,
-                this.euAnnouncementSeries,
-                this.euAnnouncementNumber,
-                this.euAnnouncementPage,
-                this.euAnnouncementInfo,
-                this.euAnnouncementExplanations,
-                this.otherOfficialAnnouncement,
                 this.completeCitation,
                 this.statusNote,
                 this.statusDescription,
@@ -297,30 +196,19 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 this.text,
             )
         }
-
-        private fun getSection(metadata: Map<MetadatumType, *>, section: MetadataSectionName, order: Int) = MetadataSection(
-            MetadataSectionName.OFFICIAL_REFERENCE,
-            listOf(),
-            order,
-            listOf(
-                MetadataSection(
-                    section,
-                    metadata.entries.filter { it.value != null }.map { Metadatum(if (it.value is LocalDate) it.value else it.value as String, it.key) },
-                ),
-            ),
-        )
     }
 
     class MetadataSectionRequestSchema {
         lateinit var name: MetadataSectionName
         lateinit var metadata: List<MetadatumRequestSchema>
+        lateinit var guid: String
         var order: Int = 1
         var sections: List<MetadataSectionRequestSchema>? = null
 
         fun toUseCaseData(): MetadataSection {
             val metadata = this.metadata.map { it.toUseCaseData() }
             val childSections = this.sections?.map { it.toUseCaseData() }
-            return MetadataSection(name = this.name, order = order, metadata = metadata, sections = childSections)
+            return MetadataSection(name = this.name, order = order, guid = decodeGuid(this.guid), metadata = metadata, sections = childSections)
         }
     }
 

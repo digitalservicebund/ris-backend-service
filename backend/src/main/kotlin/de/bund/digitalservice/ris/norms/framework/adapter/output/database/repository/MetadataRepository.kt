@@ -12,4 +12,6 @@ interface MetadataRepository : ReactiveCrudRepository<MetadatumDto, Int> {
     fun findBySectionId(normId: Int): Flux<MetadatumDto>
 
     fun deleteBySectionId(normId: Int): Mono<Void>
+
+    fun findBySectionIdIn(sectionIds: List<Int>): Flux<MetadatumDto>
 }
