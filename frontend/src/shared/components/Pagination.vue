@@ -26,8 +26,12 @@ async function previousPage() {
   page.value && !page.value.first && (await updateItems(page.value.number - 1))
 }
 
-async function updateItems(newPage: number) {
-  const response = await props.itemService(newPage, props.itemsPerPage, "")
+async function updateItems(newPage: number, searchStr?: string) {
+  const response = await props.itemService(
+    newPage,
+    props.itemsPerPage,
+    searchStr ?? ""
+  )
   if (response.data) {
     emits("updateItems", response.data.content)
     page.value = response.data
@@ -35,6 +39,8 @@ async function updateItems(newPage: number) {
 }
 
 onMounted(() => props.getInitalData && updateItems(0))
+
+defineExpose({ updateItems })
 </script>
 
 <script lang="ts">

@@ -2,10 +2,10 @@
 import { ref } from "vue"
 import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
-import FieldOfLawService from "@/services/fieldOfLawService"
+import service from "@/services/fieldOfLawService"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import { Page } from "@/shared/components/Pagination.vue"
+import Pagination from "@/shared/components/Pagination.vue"
 
 const emit = defineEmits<{
   (event: "linkedField:clicked", identifier: string): void
@@ -14,34 +14,19 @@ const emit = defineEmits<{
 }>()
 
 const searchStr = ref("")
-const results = ref<Page<FieldOfLawNode>>()
-const currentPage = ref(0)
-const RESULTS_PER_PAGE = 10
+const results = ref<FieldOfLawNode[]>()
+const itemsPerPage = 10
 
-async function submitSearch(isNewSearch = true) {
-  if (isNewSearch) currentPage.value = 0
-  await FieldOfLawService.searchForFieldsOfLaw(
-    currentPage.value,
-    RESULTS_PER_PAGE,
-    searchStr.value
-  ).then((response) => {
-    if (!response.data) return
-    results.value = response.data
-    if (results.value && results.value.content.length > 0 && isNewSearch) {
-      emit("node-clicked", results.value.content[0].identifier)
-      if (searchStr.value.includes("norm:")) {
-        emit("do-show-norms")
-      }
-    }
-  })
+const paginationComponentRef = ref<InstanceType<typeof Pagination>>()
+
+async function submitSearch() {
+  await paginationComponentRef.value?.updateItems(0, searchStr.value)
+  results.value?.[0] && emit("node-clicked", results.value[0].identifier)
+  searchStr.value.includes("norm:") && emit("do-show-norms")
 }
 
-async function handlePagination(backwards: boolean) {
-  if (backwards && results.value?.first) return
-  if (!backwards && results.value?.last) return
-
-  currentPage.value += backwards ? -1 : 1
-  await submitSearch(false)
+async function handleUpdateItems(newItems: FieldOfLawNode[]) {
+  results.value = newItems
 }
 </script>
 
@@ -70,62 +55,19 @@ async function handlePagination(backwards: boolean) {
         </div>
       </div>
     </div>
-    <div v-if="results">
+    <Pagination
+      ref="paginationComponentRef"
+      :item-service="service.searchForFieldsOfLaw"
+      :items-per-page="itemsPerPage"
+      @update-items="handleUpdateItems"
+    >
       <FieldOfLawListEntry
-        v-for="(fieldOfLawNode, idx) in results.content"
+        v-for="(fieldOfLawNode, idx) in results"
         :key="idx"
         :field-of-law="fieldOfLawNode"
         @linked-field:clicked="(identifier) => emit('node-clicked', identifier)"
         @node-clicked="emit('node-clicked', fieldOfLawNode.identifier)"
       />
-      <div
-        v-if="results.numberOfElements < results.totalElements"
-        class="flex flex-row justify-center pt-16"
-      >
-        <div
-          class="link pr-6"
-          :class="results.first ? 'disabled-link' : ''"
-          @click="handlePagination(true)"
-          @keyup.enter="handlePagination(true)"
-        >
-          zurück
-        </div>
-        <div class="page-count">
-          {{ currentPage + 1 }} von {{ results.totalPages }}
-        </div>
-        <div
-          class="link pl-6"
-          :class="results.last ? 'disabled-link' : ''"
-          @click="handlePagination(false)"
-          @keyup.enter="handlePagination(false)"
-        >
-          vor
-        </div>
-      </div>
-    </div>
+    </Pagination>
   </div>
 </template>
-
-<style lang="scss" scoped>
-.link {
-  cursor: pointer;
-  text-decoration: underline;
-
-  &:active {
-    text-decoration-thickness: 4px;
-  }
-
-  &:focus {
-    border: 4px solid #004b76;
-  }
-}
-
-.disabled-link {
-  color: gray;
-  cursor: default;
-}
-
-.page-count {
-  color: gray;
-}
-</style>
