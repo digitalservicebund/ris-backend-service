@@ -83,6 +83,7 @@ testWithImportedNorm(
 testWithImportedNorm(
   "Check if switching frame sections affects sections being inside or outside viewport",
   async ({ page, normData, guid }) => {
+    testWithImportedNorm.slow()
     await openNorm(page, normData.officialLongTitle, guid)
 
     const locatorFrameButton = page.locator("a:has-text('Rahmen')")
