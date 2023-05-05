@@ -24,10 +24,7 @@ const sortedDecisions = computed(() =>
       :key="decision.uuid"
       class="border-b-1 border-b-blue-500 first:pt-0 flex flex-start justify-between label-02-reg last:border-none last:pb-0 py-10 w-full"
     >
-      <InlineDecision
-        :decision="decision"
-        :tabindex="decision.dataSource === 'PROCEEDING_DECISION' ? -1 : 0"
-      />
+      <InlineDecision :decision="decision" />
       <span
         aria-label="Löschen"
         class="cursor-pointer font-base icon material-icons ml-[1.5rem] text-blue-800"
