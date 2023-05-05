@@ -76,10 +76,7 @@ jobs:
             test_target=${{ inputs.mode }}:${{ inputs.subproject }}
           fi
 
-          for i in $(seq 1 ${{ inputs.runs}}); do
-            echo "Attempt $i" 
-            npm run test:"$test_target" -- --project ${{ inputs.browser }} --retries=0
-          done
+          npm run test:"$test_target" -- --project ${{ inputs.browser }} --repeat-each ${{ inputs.runs}}
         working-directory: ./frontend
       - name: Upload screenshots and traces of failed tests
         uses: actions/upload-artifact@v3
