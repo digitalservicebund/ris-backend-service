@@ -72,7 +72,7 @@ jobs:
           echo "Running ${{ inputs.mode }} ${{ inputs.subproject || '' }} tests ${{ inputs.runs }} times"
 
           test_target=${{ inputs.mode }}
-          if [[ -n ${{ inputs.subproject || '' }} && ${{ inputs.subproject }} != 'all' ]]; then
+          if [[ ${{ inputs.subproject || 'all' }} != 'all' ]]; then
             test_target=${{ inputs.mode }}:${{ inputs.subproject }}
           fi
 
