@@ -4,7 +4,7 @@ import DigitalAnnouncementInputGroup from "@/components/DigitalAnnouncementInput
 import EuAnnouncementInputGroup from "@/components/EuAnnouncementInputGroup.vue"
 import OtherOfficialAnnouncementInputGroup from "@/components/OtherOfficialAnnouncementInputGroup.vue"
 import PrintAnnouncementInputGroup from "@/components/PrintAnnouncementInputGroup.vue"
-import { MetadataSections } from "@/domain/Norm"
+import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
 
 interface Props {
   modelValue: MetadataSections
@@ -17,51 +17,63 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-enum InputType {
-  PRINT = "printAnnouncement",
-  DIGITAL = "digitalAnnouncement",
-  EU = "euAnnouncement",
-  OTHER = "otherAnnouncement",
-}
+type ChildSectionName =
+  | MetadataSectionName.PRINT_ANNOUNCEMENT
+  | MetadataSectionName.DIGITAL_ANNOUNCEMENT
+  | MetadataSectionName.EU_ANNOUNCEMENT
+  | MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
 
-const inputValue = ref<MetadataSections>(props.modelValue)
-const selectedInputType = ref<InputType | undefined>(undefined)
-
-watch(props, () => (inputValue.value = props.modelValue), {
-  immediate: true,
-  deep: true,
-})
-
-watch(inputValue, () => emit("update:modelValue", inputValue.value), {
-  deep: true,
-})
+const childSection = ref<Metadata>({})
+const selectedChildSectionName = ref<ChildSectionName>(
+  MetadataSectionName.PRINT_ANNOUNCEMENT
+)
 
 watch(
-  inputValue,
-  () => {
-    if (!selectedInputType.value) {
-      selectedInputType.value = InputType.PRINT
-    }
-  },
+  childSection,
+  () =>
+    emit("update:modelValue", {
+      [selectedChildSectionName.value]: [childSection.value],
+    }),
   {
     deep: true,
-    immediate: true,
   }
 )
 
-watch(selectedInputType, () => {
-  inputValue.value = {}
-})
+watch(
+  () => props.modelValue,
+  (modelValue) => {
+    if (modelValue.PRINT_ANNOUNCEMENT) {
+      selectedChildSectionName.value = MetadataSectionName.PRINT_ANNOUNCEMENT
+      childSection.value = modelValue.PRINT_ANNOUNCEMENT[0]
+    } else if (modelValue.DIGITAL_ANNOUNCEMENT) {
+      selectedChildSectionName.value = MetadataSectionName.DIGITAL_ANNOUNCEMENT
+      childSection.value = modelValue.DIGITAL_ANNOUNCEMENT[0]
+    } else if (modelValue.EU_ANNOUNCEMENT) {
+      selectedChildSectionName.value = MetadataSectionName.EU_ANNOUNCEMENT
+      childSection.value = modelValue.EU_ANNOUNCEMENT[0]
+    } else if (modelValue.OTHER_OFFICIAL_ANNOUNCEMENT) {
+      selectedChildSectionName.value =
+        MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT
+      childSection.value = modelValue.OTHER_OFFICIAL_ANNOUNCEMENT[0]
+    }
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+)
+
+watch(selectedChildSectionName, () => (childSection.value = {}))
 
 const component = computed(() => {
-  switch (selectedInputType.value) {
-    case InputType.PRINT:
+  switch (selectedChildSectionName.value) {
+    case MetadataSectionName.PRINT_ANNOUNCEMENT:
       return PrintAnnouncementInputGroup
-    case InputType.DIGITAL:
+    case MetadataSectionName.DIGITAL_ANNOUNCEMENT:
       return DigitalAnnouncementInputGroup
-    case InputType.EU:
+    case MetadataSectionName.EU_ANNOUNCEMENT:
       return EuAnnouncementInputGroup
-    case InputType.OTHER:
+    case MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT:
       return OtherOfficialAnnouncementInputGroup
     default:
       return null
@@ -75,21 +87,23 @@ const component = computed(() => {
       <div class="flex flex-col gap-24 radio-group">
         <label class="form-control">
           <input
-            v-model="selectedInputType"
+            id="printAnnouncementSelection"
+            v-model="selectedChildSectionName"
             aria-label="Papierverkündungsblatt"
             name="OfficialAnnouncement"
             type="radio"
-            :value="InputType.PRINT"
+            :value="MetadataSectionName.PRINT_ANNOUNCEMENT"
           />
           Papierverkündungsblatt
         </label>
         <label class="form-control">
           <input
-            v-model="selectedInputType"
+            id="euAnnouncementSelection"
+            v-model="selectedChildSectionName"
             aria-label="Amtsblatt der EU"
             name="OfficialAnnouncement"
             type="radio"
-            :value="InputType.EU"
+            :value="MetadataSectionName.EU_ANNOUNCEMENT"
           />
           Amtsblatt der EU
         </label>
@@ -97,27 +111,29 @@ const component = computed(() => {
       <div class="flex flex-col gap-24 radio-group">
         <label class="flex form-control items-start">
           <input
-            v-model="selectedInputType"
+            id="digitalAnnouncementSelection"
+            v-model="selectedChildSectionName"
             aria-label="Elektronisches Verkündungsblatt"
             name="OfficialAnnouncement"
             type="radio"
-            :value="InputType.DIGITAL"
+            :value="MetadataSectionName.DIGITAL_ANNOUNCEMENT"
           />
           Elektronisches Verkündungsblatt
         </label>
         <label class="form-control">
           <input
-            v-model="selectedInputType"
+            id="otherAnnouncementSelection"
+            v-model="selectedChildSectionName"
             aria-label="Sonstige amtliche Fundstelle"
             name="OfficialAnnouncement"
             type="radio"
-            :value="InputType.OTHER"
+            :value="MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT"
           />
           Sonstige amtliche Fundstelle
         </label>
       </div>
     </div>
-    <component :is="component" v-model="inputValue" />
+    <component :is="component" v-model="childSection" />
   </div>
 </template>
 

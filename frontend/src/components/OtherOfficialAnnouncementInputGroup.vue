@@ -2,6 +2,7 @@
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
 import InputField from "@/shared/components/input/InputField.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
 interface Props {
   modelValue: Metadata
@@ -32,8 +33,8 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 
 const otherOfficialReference = computed({
   get: () => inputValue.value.OTHER_OFFICIAL_REFERENCE?.[0],
-  set: (value) =>
-    value && (inputValue.value.OTHER_OFFICIAL_REFERENCE = [value]),
+  set: (data?: string) =>
+    data && (inputValue.value.OTHER_OFFICIAL_REFERENCE = [data]),
 })
 </script>
 <template>
@@ -42,12 +43,10 @@ const otherOfficialReference = computed({
     aria-label="Sonstige amtliche Fundstelle"
     label="Sonstige amtliche Fundstelle"
   >
-    <textarea
+    <TextInput
       id="otherOfficialAnnouncement"
       v-model="otherOfficialReference"
       aria-label="Sonstige amtliche Fundstelle"
-      class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
-      rows="4"
     />
   </InputField>
 </template>

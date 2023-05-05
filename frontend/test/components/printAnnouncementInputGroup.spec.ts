@@ -19,7 +19,7 @@ describe("PrintAnnouncementInputGroup", () => {
         [MetadatumType.ANNOUNCEMENT_GAZETTE]: ["test value"],
         [MetadatumType.YEAR]: ["test value"],
         [MetadatumType.NUMBER]: ["test value"],
-        [MetadatumType.PAGE_NUMBER]: ["test value"],
+        [MetadatumType.PAGE]: ["test value"],
         [MetadatumType.ADDITIONAL_INFO]: ["test value"],
         [MetadatumType.EXPLANATION]: ["test value"],
       },
@@ -37,7 +37,7 @@ describe("PrintAnnouncementInputGroup", () => {
       name: "Nummer",
     }) as HTMLInputElement
 
-    const pageNumberInput = screen.queryByRole("textbox", {
+    const pageInput = screen.queryByRole("textbox", {
       name: "Seitenzahl",
     }) as HTMLInputElement
 
@@ -58,8 +58,8 @@ describe("PrintAnnouncementInputGroup", () => {
     expect(numberInput).toBeInTheDocument()
     expect(numberInput).toHaveValue("test value")
 
-    expect(pageNumberInput).toBeInTheDocument()
-    expect(pageNumberInput).toHaveValue("test value")
+    expect(pageInput).toBeInTheDocument()
+    expect(pageInput).toHaveValue("test value")
 
     expect(additionalInfoInput).toBeInTheDocument()
     expect(additionalInfoInput).toHaveValue("test value")
@@ -74,7 +74,7 @@ describe("PrintAnnouncementInputGroup", () => {
         [MetadatumType.ANNOUNCEMENT_GAZETTE]: ["abc"],
         [MetadatumType.YEAR]: ["2012"],
         [MetadatumType.NUMBER]: ["123"],
-        [MetadatumType.PAGE_NUMBER]: ["2"],
+        [MetadatumType.PAGE]: ["2"],
         [MetadatumType.ADDITIONAL_INFO]: ["Info Text"],
         [MetadatumType.EXPLANATION]: ["Explanation text"],
       },
@@ -83,14 +83,14 @@ describe("PrintAnnouncementInputGroup", () => {
     const announcementGazetteInput = screen.queryByDisplayValue("abc")
     const yearInput = screen.queryByDisplayValue("2012")
     const numberInput = screen.queryByDisplayValue("123")
-    const pageNumberInput = screen.queryByDisplayValue("2")
+    const pageInput = screen.queryByDisplayValue("2")
     const additionalInfoInput = screen.queryByDisplayValue("Info Text")
     const explanationInput = screen.queryByDisplayValue("Explanation text")
 
     expect(announcementGazetteInput).toBeInTheDocument()
     expect(yearInput).toBeInTheDocument()
     expect(numberInput).toBeInTheDocument()
-    expect(pageNumberInput).toBeInTheDocument()
+    expect(pageInput).toBeInTheDocument()
     expect(additionalInfoInput).toBeInTheDocument()
     expect(explanationInput).toBeInTheDocument()
   })
@@ -112,7 +112,7 @@ describe("PrintAnnouncementInputGroup", () => {
       [MetadatumType.ANNOUNCEMENT_GAZETTE]: ["foo"],
       [MetadatumType.YEAR]: ["2023"],
       [MetadatumType.NUMBER]: ["ban"],
-      [MetadatumType.PAGE_NUMBER]: ["baz"],
+      [MetadatumType.PAGE]: ["baz"],
       [MetadatumType.ADDITIONAL_INFO]: ["foo bar"],
       [MetadatumType.EXPLANATION]: ["bar foo"],
     })

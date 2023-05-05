@@ -200,15 +200,14 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
 
     class MetadataSectionRequestSchema {
         lateinit var name: MetadataSectionName
-        lateinit var metadata: List<MetadatumRequestSchema>
-        lateinit var guid: String
+        var metadata: List<MetadatumRequestSchema>? = null
         var order: Int = 1
         var sections: List<MetadataSectionRequestSchema>? = null
 
         fun toUseCaseData(): MetadataSection {
-            val metadata = this.metadata.map { it.toUseCaseData() }
+            val metadata = this.metadata?.map { it.toUseCaseData() }
             val childSections = this.sections?.map { it.toUseCaseData() }
-            return MetadataSection(name = this.name, order = order, guid = decodeGuid(this.guid), metadata = metadata, sections = childSections)
+            return MetadataSection(name = this.name, order = order, metadata = metadata ?: emptyList(), sections = childSections)
         }
     }
 

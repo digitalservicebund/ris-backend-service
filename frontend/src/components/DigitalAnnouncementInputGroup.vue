@@ -33,23 +33,52 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
 
-function createComputedProperty(key: string) {
-  return computed({
-    get: () => inputValue.value[key]?.[0],
-    set: (data?: string) => data && (inputValue.value[key] = [data]),
-  })
-}
+const announcementMedium = computed({
+  get: () => inputValue.value.ANNOUNCEMENT_MEDIUM?.[0],
+  set: (data?: string) =>
+    data && (inputValue.value.ANNOUNCEMENT_MEDIUM = [data]),
+})
 
-const announcementMedium = createComputedProperty("ANNOUNCEMENT_MEDIUM")
-const date = createComputedProperty("DATE")
-const number = createComputedProperty("NUMBER")
-const year = createComputedProperty("YEAR")
-const areaOfPublication = createComputedProperty("AREA_OF_PUBLICATION")
-const numberOfThePublicationInTheRespectiveArea = createComputedProperty(
-  "NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA"
-)
-const additionalInfo = createComputedProperty("ADDITIONAL_INFO")
-const explanation = createComputedProperty("EXPLANATION")
+const date = computed({
+  get: () => inputValue.value.DATE?.[0],
+  set: (data?: string) => data && (inputValue.value.DATE = [data]),
+})
+
+const edition = computed({
+  get: () => inputValue.value.EDITION?.[0],
+  set: (data?: string) => data && (inputValue.value.EDITION = [data]),
+})
+
+const year = computed({
+  get: () => inputValue.value.YEAR?.[0],
+  set: (data?: string) => data && (inputValue.value.YEAR = [data]),
+})
+
+const areaOfPublication = computed({
+  get: () => inputValue.value.AREA_OF_PUBLICATION?.[0],
+  set: (data?: string) =>
+    data && (inputValue.value.AREA_OF_PUBLICATION = [data]),
+})
+
+const numberOfThePublicationInTheRespectiveArea = computed({
+  get: () =>
+    inputValue.value.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0],
+  set: (data?: string) =>
+    data &&
+    (inputValue.value.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA = [
+      data,
+    ]),
+})
+
+const additionalInfo = computed({
+  get: () => inputValue.value.ADDITIONAL_INFO?.[0],
+  set: (data?: string) => data && (inputValue.value.ADDITIONAL_INFO = [data]),
+})
+
+const explanation = computed({
+  get: () => inputValue.value.EXPLANATION?.[0],
+  set: (data?: string) => data && (inputValue.value.EXPLANATION = [data]),
+})
 </script>
 <template>
   <div>
@@ -60,7 +89,7 @@ const explanation = createComputedProperty("EXPLANATION")
         label="Verkündungsmedium"
       >
         <TextInput
-          id="citationYear"
+          id="digitalAnnouncementMedium"
           v-model="announcementMedium"
           alt-text="Verkündungsmedium"
           aria-label="Verkündungsmedium"
@@ -86,7 +115,7 @@ const explanation = createComputedProperty("EXPLANATION")
       >
         <TextInput
           id="digitalAnnouncementEdition"
-          v-model="number"
+          v-model="edition"
           alt-text="Ausgabenummer"
           aria-label="Ausgabenummer"
         />
@@ -131,12 +160,10 @@ const explanation = createComputedProperty("EXPLANATION")
       aria-label="Zusatzangaben"
       label="Zusatzangaben"
     >
-      <textarea
+      <TextInput
         id="digitalAnnouncementInfo"
         v-model="additionalInfo"
         aria-label="Zusatzangaben"
-        class="mt-2 outline outline-2 outline-blue-900 overflow-y-auto"
-        rows="4"
       />
     </InputField>
     <InputField
@@ -144,12 +171,10 @@ const explanation = createComputedProperty("EXPLANATION")
       aria-label="Erläuterungen"
       label="Erläuterungen"
     >
-      <textarea
+      <TextInput
         id="digitalAnnouncementExplanations"
         v-model="explanation"
         aria-label="Erläuterungen"
-        class="mt-2 outline outline-2 outline-blue-900 overflow-y-auto"
-        rows="4"
       />
     </InputField>
   </div>
