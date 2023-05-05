@@ -6,14 +6,12 @@ const itemsPerPage = 10
 const items = ref<number[]>()
 
 async function itemService(page: number) {
-  const totalElements = 50
+  const totalElements = 60
   const start = page * itemsPerPage
   const end =
     page > totalElements / itemsPerPage
       ? totalElements
       : (page + 1) * itemsPerPage
-
-  console.log(page, totalElements / itemsPerPage)
 
   return {
     status: 200,
@@ -38,6 +36,7 @@ async function handleUpdateItems(newItems: number[]) {
 <template>
   <div>
     <Pagination
+      get-inital-data
       :item-service="itemService"
       :items-per-page="itemsPerPage"
       @update-items="handleUpdateItems"

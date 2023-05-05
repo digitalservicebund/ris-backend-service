@@ -64,7 +64,7 @@ async function updateItems(newPage: number) {
   // else
 }
 
-onMounted(() => updateItems(0))
+onMounted(() => props.getInitalData && updateItems(0))
 </script>
 
 <template>
