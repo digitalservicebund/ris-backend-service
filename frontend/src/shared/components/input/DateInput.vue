@@ -59,6 +59,8 @@ watch(
         })
       }
     } else {
+      // We have to check the year doesn't start with zero because datejs accepts years with leading 0s
+      // see https://github.com/iamkun/dayjs/issues/1237
       if (inputValue.value && !inputValue.value.startsWith("0")) {
         emit("update:modelValue", dayjs(inputValue.value).toISOString())
       }

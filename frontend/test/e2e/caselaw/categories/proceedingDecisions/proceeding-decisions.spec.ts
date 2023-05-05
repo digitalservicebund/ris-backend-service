@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { generateString } from "../../../../test-helper/dataGenerators"
 import {
+  deleteDocumentUnit,
   fillProceedingDecisionInputs,
   navigateToCategories,
   toggleProceedingDecisionsSection,
@@ -117,40 +118,44 @@ test.describe("Proceeding decisions", () => {
     page,
     documentNumber,
   }) => {
-    await test.step(`create documentunit as future proceeding decision`, async () => {
-      await page.goto("/")
-      await page.locator("button >> text=Neue Dokumentationseinheit").click()
-      await page.waitForSelector("text=oder Datei auswählen")
-      await expect(page).toHaveURL(
-        /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/
-      )
+    const proceedingDocumentNumber =
+      await test.step(`create documentunit as future proceeding decision`, async () => {
+        await page.goto("/")
+        await page.locator("button >> text=Neue Dokumentationseinheit").click()
+        await page.waitForSelector("text=oder Datei auswählen")
+        await expect(page).toHaveURL(
+          /\/caselaw\/documentunit\/[A-Z0-9]{13}\/files$/
+        )
 
-      // Given the earlier expectation we can assume that the regex will match...
-      const proceedingDocumentNumber =
-        /caselaw\/documentunit\/(.*)\/files/g.exec(page.url())?.[1] as string
+        // Given the earlier expectation we can assume that the regex will match...
+        const proceedingDocumentNumber =
+          /caselaw\/documentunit\/(.*)\/files/g.exec(page.url())?.[1] as string
 
-      await navigateToCategories(page, proceedingDocumentNumber)
+        await navigateToCategories(page, proceedingDocumentNumber)
 
-      await waitForSaving(async () => {
-        await page.locator("[aria-label='Gericht']").fill("BGH")
-        await page.locator("text=BGH").click()
-        await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
-      }, page)
+        await waitForSaving(async () => {
+          await page.locator("[aria-label='Gericht']").fill("BGH")
+          await page.locator("text=BGH").click()
+          await waitForInputValue(page, "[aria-label='Gericht']", "BGH")
+        }, page)
 
-      await page.locator("[aria-label='Entscheidungsdatum']").fill("2020-12-03")
-      expect(
-        await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-      ).toBe("2020-12-03")
+        await page
+          .locator("[aria-label='Entscheidungsdatum']")
+          .fill("2020-12-03")
+        expect(
+          await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
+        ).toBe("2020-12-03")
 
-      await waitForSaving(
-        async () => {
-          await page.locator("[aria-label='Aktenzeichen']").fill("abcde")
-          await page.keyboard.press("Enter")
-        },
-        page,
-        { clickSaveButton: true }
-      )
-    })
+        await waitForSaving(
+          async () => {
+            await page.locator("[aria-label='Aktenzeichen']").fill("abcde")
+            await page.keyboard.press("Enter")
+          },
+          page,
+          { clickSaveButton: true }
+        )
+        return proceedingDocumentNumber
+      })
 
     await test.step(`find created documentunit in proceeding decisions`, async () => {
       await navigateToCategories(page, documentNumber)
@@ -166,7 +171,13 @@ test.describe("Proceeding decisions", () => {
 
       await page.getByText("Suchen").click()
 
-      await expect(page.getByText("BGH, 03.12.2020, abcde")).toBeVisible()
+      await expect(
+        page.getByText("BGH, 03.12.2020, abcde, " + proceedingDocumentNumber, {
+          exact: false,
+        })
+      ).toBeVisible()
     })
+
+    await deleteDocumentUnit(page, proceedingDocumentNumber)
   })
 })
