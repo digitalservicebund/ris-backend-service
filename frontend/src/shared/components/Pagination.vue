@@ -16,7 +16,7 @@ const emits = defineEmits<{
   (e: "updateItems", items: any[]): void // eslint-disable-line @typescript-eslint/no-explicit-any
 }>()
 
-interface Page {
+type Page = {
   content: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
   size: number
   totalElements: number
@@ -27,41 +27,28 @@ interface Page {
   last: boolean
 }
 
-interface PageableService {
+type PageableService = {
   (page: number, size: number, searchStr?: string): Promise<
     ServiceResponse<Page>
   >
 }
 
-const currentPage = ref<number>()
-const totalItems = ref<number>()
-const totalPages = ref<number>()
-
-const isFirstPage = ref<boolean>()
-const isLastPage = ref<boolean>()
+const page = ref<Page>()
 
 async function nextPage() {
-  if (!isLastPage.value)
-    await updateItems(currentPage.value ? currentPage.value + 1 : 1)
+  page.value && !page.value.last && (await updateItems(page.value.number + 1))
 }
 
 async function previousPage() {
-  if (!isFirstPage.value && currentPage.value)
-    await updateItems(currentPage.value - 1)
+  page.value && !page.value.first && (await updateItems(page.value.number - 1))
 }
 
 async function updateItems(newPage: number) {
   const response = await props.itemService(newPage, props.itemsPerPage, "")
   if (response.data) {
     emits("updateItems", response.data.content)
-
-    currentPage.value = response.data.number
-    totalItems.value = response.data.totalElements
-    totalPages.value = response.data.totalPages
-    isFirstPage.value = response.data.first
-    isLastPage.value = response.data.last
+    page.value = response.data
   }
-  // else
 }
 
 onMounted(() => props.getInitalData && updateItems(0))
@@ -73,19 +60,19 @@ onMounted(() => props.getInitalData && updateItems(0))
       <div class="flex flex-grow items-center justify-center relative">
         <button
           class="disabled:opacity-25 flex items-center link-01-bold pr-20"
-          :disabled="isFirstPage"
+          :disabled="page?.first"
           @click="previousPage"
           @keydown.enter="previousPage"
         >
           <span class="material-icons no-">arrow_back</span
           ><span class="underline">zurück</span>
         </button>
-        <span v-if="currentPage != undefined" class="pr-20">
-          {{ currentPage + 1 }} von {{ totalPages }}
+        <span v-if="page" class="pr-20">
+          {{ page.number + 1 }} von {{ page.totalPages }}
         </span>
         <button
           class="disabled:opacity-25 flex items-center link-01-bold pr-20"
-          :disabled="isLastPage"
+          :disabled="page?.last"
           @click="nextPage"
           @keydown.enter="nextPage"
         >
@@ -94,8 +81,8 @@ onMounted(() => props.getInitalData && updateItems(0))
         </button>
       </div>
     </div>
-    <div v-if="totalItems" class="-ml-144 label-02-reg mt-2 text-[#4E596A]">
-      Total {{ totalItems }} Items
+    <div class="-ml-144 label-02-reg mt-2 text-[#4E596A]">
+      Total {{ page?.totalElements }} Items
     </div>
   </div>
   <slot></slot>
