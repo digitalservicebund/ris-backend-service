@@ -6,7 +6,7 @@ import { ServiceResponse } from "@/services/httpClient"
 const props = withDefaults(
   defineProps<{
     itemsPerPage: number
-    itemService: PageableService
+    itemService: PageableService<any> // eslint-disable-line @typescript-eslint/no-explicit-any
     getInitalData?: boolean
   }>(),
   { getInitalData: false }
@@ -16,24 +16,7 @@ const emits = defineEmits<{
   (e: "updateItems", items: any[]): void // eslint-disable-line @typescript-eslint/no-explicit-any
 }>()
 
-type Page = {
-  content: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
-  size: number
-  totalElements: number
-  totalPages: number
-  number: number
-  numberOfElements: number
-  first: boolean
-  last: boolean
-}
-
-type PageableService = {
-  (page: number, size: number, searchStr?: string): Promise<
-    ServiceResponse<Page>
-  >
-}
-
-const page = ref<Page>()
+const page = ref<Page<any>>() // eslint-disable-line @typescript-eslint/no-explicit-any
 
 async function nextPage() {
   page.value && !page.value.last && (await updateItems(page.value.number + 1))
@@ -52,6 +35,25 @@ async function updateItems(newPage: number) {
 }
 
 onMounted(() => props.getInitalData && updateItems(0))
+</script>
+
+<script lang="ts">
+export type Page<T> = {
+  content: T[]
+  size: number
+  totalElements: number
+  totalPages: number
+  number: number
+  numberOfElements: number
+  first: boolean
+  last: boolean
+}
+
+export type PageableService<T> = {
+  (page: number, size: number, searchStr?: string): Promise<
+    ServiceResponse<Page<T>>
+  >
+}
 </script>
 
 <template>

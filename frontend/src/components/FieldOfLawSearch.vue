@@ -1,10 +1,11 @@
 <script lang="ts" setup>
 import { ref } from "vue"
 import FieldOfLawListEntry from "@/components/FieldOfLawListEntry.vue"
-import { FieldOfLawNode, Page } from "@/domain/fieldOfLaw"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import FieldOfLawService from "@/services/fieldOfLawService"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import { Page } from "@/shared/components/Pagination.vue"
 
 const emit = defineEmits<{
   (event: "linkedField:clicked", identifier: string): void
@@ -20,13 +21,13 @@ const RESULTS_PER_PAGE = 10
 async function submitSearch(isNewSearch = true) {
   if (isNewSearch) currentPage.value = 0
   await FieldOfLawService.searchForFieldsOfLaw(
-    searchStr.value,
     currentPage.value,
-    RESULTS_PER_PAGE
+    RESULTS_PER_PAGE,
+    searchStr.value
   ).then((response) => {
     if (!response.data) return
     results.value = response.data
-    if (results.value.content.length > 0 && isNewSearch) {
+    if (results.value && results.value.content.length > 0 && isNewSearch) {
       emit("node-clicked", results.value.content[0].identifier)
       if (searchStr.value.includes("norm:")) {
         emit("do-show-norms")
