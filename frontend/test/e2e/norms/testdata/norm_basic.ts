@@ -84,6 +84,28 @@ export const normData: NormData = {
         RESOLUTION_MAJORITY: [false],
       },
     ],
+    OFFICIAL_REFERENCE: [
+      {
+        PRINT_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_GAZETTE: ["BGBl I"], YEAR: ["2023"], PAGE: ["3"] },
+        ],
+      },
+      {
+        PRINT_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_GAZETTE: ["BGBl II"], YEAR: ["2024"], PAGE: ["9"] },
+        ],
+      },
+      {
+        DIGITAL_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_MEDIUM: ["BGBl I"], EDITION: ["3"], YEAR: ["2023"] },
+        ],
+      },
+      {
+        DIGITAL_ANNOUNCEMENT: [
+          { ANNOUNCEMENT_MEDIUM: ["BGBl II"], EDITION: ["9"], YEAR: ["2024"] },
+        ],
+      },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",

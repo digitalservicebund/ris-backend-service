@@ -32,19 +32,36 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
 
-function createComputedProperty(key: string) {
-  return computed({
-    get: () => inputValue.value[key]?.[0],
-    set: (data?: string) => data && (inputValue.value[key] = [data]),
-  })
-}
+const announcementGazette = computed({
+  get: () => inputValue.value.ANNOUNCEMENT_GAZETTE?.[0],
+  set: (data?: string) =>
+    data && (inputValue.value.ANNOUNCEMENT_GAZETTE = [data]),
+})
 
-const announcementGazette = createComputedProperty("ANNOUNCEMENT_GAZETTE")
-const year = createComputedProperty("YEAR")
-const number = createComputedProperty("NUMBER")
-const pageNumber = createComputedProperty("PAGE_NUMBER")
-const additionalInfo = createComputedProperty("ADDITIONAL_INFO")
-const explanation = createComputedProperty("EXPLANATION")
+const year = computed({
+  get: () => inputValue.value.YEAR?.[0],
+  set: (data?: string) => data && (inputValue.value.YEAR = [data]),
+})
+
+const number = computed({
+  get: () => inputValue.value.NUMBER?.[0],
+  set: (data?: string) => data && (inputValue.value.NUMBER = [data]),
+})
+
+const pageNumber = computed({
+  get: () => inputValue.value.PAGE?.[0],
+  set: (data?: string) => data && (inputValue.value.PAGE = [data]),
+})
+
+const additionalInfo = computed({
+  get: () => inputValue.value.ADDITIONAL_INFO?.[0],
+  set: (data?: string) => data && (inputValue.value.ADDITIONAL_INFO = [data]),
+})
+
+const explanation = computed({
+  get: () => inputValue.value.EXPLANATION?.[0],
+  set: (data?: string) => data && (inputValue.value.EXPLANATION = [data]),
+})
 </script>
 <template>
   <div class="flex ful-w gap-16 justify-between">
@@ -107,12 +124,10 @@ const explanation = createComputedProperty("EXPLANATION")
       aria-label="Zusatzangaben"
       label="Zusatzangaben"
     >
-      <textarea
+      <TextInput
         id="printAnnouncementInfo"
         v-model="additionalInfo"
         aria-label="Zusatzangaben"
-        class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
-        rows="4"
       />
     </InputField>
 
@@ -121,12 +136,10 @@ const explanation = createComputedProperty("EXPLANATION")
       aria-label="Erläuterungen"
       label="Erläuterungen"
     >
-      <textarea
+      <TextInput
         id="printAnnouncementExplanations"
         v-model="explanation"
         aria-label="Erläuterungen"
-        class="mt-4 outline outline-2 outline-blue-900 overflow-y-auto"
-        rows="4"
       />
     </InputField>
   </div>

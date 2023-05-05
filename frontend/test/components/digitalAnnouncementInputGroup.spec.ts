@@ -16,7 +16,7 @@ describe("DigitalAnnouncementInputGroup", () => {
       modelValue: {
         [MetadatumType.ANNOUNCEMENT_MEDIUM]: ["test value"],
         [MetadatumType.DATE]: ["2023-01-01"],
-        [MetadatumType.NUMBER]: ["test value"],
+        [MetadatumType.EDITION]: ["test value"],
         [MetadatumType.YEAR]: ["test value"],
         [MetadatumType.AREA_OF_PUBLICATION]: ["test value"],
         [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: [
@@ -35,7 +35,7 @@ describe("DigitalAnnouncementInputGroup", () => {
       selector: 'input[type="date"]',
     }) as HTMLInputElement
 
-    const numberInput = screen.queryByRole("textbox", {
+    const editionInput = screen.queryByRole("textbox", {
       name: "Ausgabenummer",
     }) as HTMLInputElement
 
@@ -68,8 +68,8 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(dateInput).toBeInTheDocument()
     expect(dateInput).toHaveValue("2023-01-01")
 
-    expect(numberInput).toBeInTheDocument()
-    expect(numberInput).toHaveValue("test value")
+    expect(editionInput).toBeInTheDocument()
+    expect(editionInput).toHaveValue("test value")
 
     expect(yearInput).toBeInTheDocument()
     expect(yearInput).toHaveValue("test value")
@@ -92,7 +92,7 @@ describe("DigitalAnnouncementInputGroup", () => {
       modelValue: {
         [MetadatumType.ANNOUNCEMENT_MEDIUM]: ["foo"],
         [MetadatumType.DATE]: ["2023-01-01"],
-        [MetadatumType.NUMBER]: ["1"],
+        [MetadatumType.EDITION]: ["1"],
         [MetadatumType.YEAR]: ["2023"],
         [MetadatumType.AREA_OF_PUBLICATION]: ["bar"],
         [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: [
@@ -107,7 +107,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     const dateInput = screen.getByLabelText("Verkündungsdatum", {
       selector: 'input[type="date"]',
     }) as HTMLInputElement
-    const numberInput = screen.queryByDisplayValue("1")
+    const editionInput = screen.queryByDisplayValue("1")
     const yearInput = screen.queryByDisplayValue("2023")
     const areaOfPublicationInput = screen.queryByDisplayValue("bar")
     const numberOfPublicationInRespectiveAreaInput =
@@ -118,7 +118,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(announcementMediumInput).toBeInTheDocument()
     expect(dateInput).toBeInTheDocument()
     expect(dateInput).toHaveValue("2023-01-01")
-    expect(numberInput).toBeInTheDocument()
+    expect(editionInput).toBeInTheDocument()
     expect(yearInput).toBeInTheDocument()
     expect(areaOfPublicationInput).toBeInTheDocument()
     expect(numberOfPublicationInRespectiveAreaInput).toBeInTheDocument()
@@ -142,7 +142,7 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     expect(modelValue).toEqual({
       [MetadatumType.ANNOUNCEMENT_MEDIUM]: ["foo"],
-      [MetadatumType.NUMBER]: ["1"],
+      [MetadatumType.EDITION]: ["1"],
       [MetadatumType.YEAR]: ["2023"],
       [MetadatumType.AREA_OF_PUBLICATION]: ["foo bar"],
       [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: [

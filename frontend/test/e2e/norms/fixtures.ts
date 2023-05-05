@@ -447,17 +447,6 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
-          id: "announcementDate",
-          label: "Verkündungsdatum",
-          value: norm.announcementDate,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.TEXT,
           id: "publicationDate",
           label: "Veröffentlichungsdatum",
           value: norm.publicationDate,
@@ -505,158 +494,219 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Amtliche Fundstelle",
-      sections: [
+      id: "officialReferences",
+      isRepeatedSection: true,
+      fields: [
         {
-          heading: "Papierverkündung",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementGazette",
-              label: "Verkündungsblatt",
-              value: norm.printAnnouncementGazette,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementYear",
-              label: "Jahr",
-              value: norm.printAnnouncementYear,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementNumber",
-              label: "Nummer",
-              value: norm.printAnnouncementNumber,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementPage",
-              label: "Seitenzahl",
-              value: norm.printAnnouncementPage,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementInfo",
-              label: "Zusatzangaben",
-              value: norm.printAnnouncementInfo,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "printAnnouncementExplanations",
-              label: "Erläuterungen",
-              value: norm.printAnnouncementExplanations,
-            },
-          ],
+          type: FieldType.RADIO,
+          id: "printAnnouncementSelection",
+          label: "Papierverkündungsblatt",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.PRINT_ANNOUNCEMENT
+          ),
         },
         {
-          heading: "Elektronisches Verkündungsblatt",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementMedium",
-              label: "Verkündungsmedium",
-              value: norm.digitalAnnouncementMedium,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementDate",
-              label: "Verkündungsdatum",
-              value: norm.digitalAnnouncementDate,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementEdition",
-              label: "Ausgabenummer",
-              value: norm.digitalAnnouncementEdition,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementYear",
-              label: "Jahr",
-              value: norm.digitalAnnouncementYear,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementArea",
-              label: "Bereich der Veröffentlichung",
-              value: norm.digitalAnnouncementArea,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementAreaNumber",
-              label: "Nummer der Veröffentlichung im jeweiligen Bereich",
-              value: norm.digitalAnnouncementAreaNumber,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementInfo",
-              label: "Zusatzangaben",
-              value: norm.digitalAnnouncementInfo,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "digitalAnnouncementExplanations",
-              label: "Erläuterungen",
-              value: norm.digitalAnnouncementExplanations,
-            },
-          ],
+          type: FieldType.TEXT,
+          id: "printAnnouncementGazette",
+          label: "Verkündungsblatt",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ANNOUNCEMENT_GAZETTE?.[0]),
         },
         {
-          heading: "Amtsblatt der EU",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementGazette",
-              label: "Amtsblatt der EU",
-              value: norm.euAnnouncementGazette,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementYear",
-              label: "Jahresangabe",
-              value: norm.euAnnouncementYear,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementSeries",
-              label: "Reihe",
-              value: norm.euAnnouncementSeries,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementNumber",
-              label: "Nummer des Amtsblatts",
-              value: norm.euAnnouncementNumber,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementPage",
-              label: "Seitenzahl",
-              value: norm.euAnnouncementPage,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementInfo",
-              label: "Zusatzangaben",
-              value: norm.euAnnouncementInfo,
-            },
-            {
-              type: FieldType.TEXT,
-              id: "euAnnouncementExplanations",
-              label: "Erläuterungen",
-              value: norm.euAnnouncementExplanations,
-            },
-          ],
+          type: FieldType.TEXT,
+          id: "printAnnouncementYear",
+          label: "Jahr",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.YEAR?.[0]),
         },
         {
-          heading: "Sonstige amtliche Fundstelle",
-          fields: [
-            {
-              type: FieldType.TEXT,
-              id: "otherOfficialAnnouncement",
-              label: "Sonstige amtliche Fundstelle",
-              value: norm.otherOfficialAnnouncement,
-            },
-          ],
+          type: FieldType.TEXT,
+          id: "printAnnouncementNumber",
+          label: "Nummer",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.NUMBER?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "printAnnouncementPage",
+          label: "Seitenzahl",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.PAGE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "printAnnouncementInfo",
+          label: "Zusatzangaben",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "printAnnouncementExplanations",
+          label: "Erläuterungen",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.PRINT_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EXPLANATION?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "digitalAnnouncementSelection",
+          label: "Elektronisches Verkündungsblatt",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.DIGITAL_ANNOUNCEMENT
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementMedium",
+          label: "Verkündungsmedium",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ANNOUNCEMENT_MEDIUM?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementDate",
+          label: "Verkündungsdatum",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementEdition",
+          label: "Ausgabenummer",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EDITION?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementYear",
+          label: "Jahr",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.YEAR?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementArea",
+          label: "Bereich der Veröffentlichung",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.AREA_OF_PUBLICATION?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementAreaNumber",
+          label: "Nummer der Veröffentlichung im jeweiligen Bereich",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map(
+            (section) =>
+              section?.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0]
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementInfo",
+          label: "Zusatzangaben",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "digitalAnnouncementExplanations",
+          label: "Erläuterungen",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.DIGITAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EXPLANATION?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "euAnnouncementSelection",
+          label: "Amtsblatt der EU",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.EU_ANNOUNCEMENT
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementGazette",
+          label: "Amtsblatt der EU",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EU_GOVERNMENT_GAZETTE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementYear",
+          label: "Jahresangabe",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.YEAR?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementSeries",
+          label: "Reihe",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.SERIES?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementNumber",
+          label: "Nummer des Amtsblatts",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.NUMBER?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementPage",
+          label: "Seitenzahl",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.PAGE?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementInfo",
+          label: "Zusatzangaben",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.ADDITIONAL_INFO?.[0]),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "euAnnouncementExplanations",
+          label: "Erläuterungen",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.EU_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.EXPLANATION?.[0]),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "otherAnnouncementSelection",
+          label: "Sonstige amtliche Fundstelle",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => !!section?.OTHER_OFFICIAL_ANNOUNCEMENT
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "otherOfficialAnnouncement",
+          label: "Sonstige amtliche Fundstelle",
+          values: norm.metadataSections?.OFFICIAL_REFERENCE?.map(
+            (section) => section?.OTHER_OFFICIAL_ANNOUNCEMENT?.[0]
+          ).map((section) => section?.OTHER_OFFICIAL_REFERENCE?.[0]),
         },
       ],
     },

@@ -152,14 +152,6 @@ export type FlatMetadata = {
   categorizedReference?: string
   celexNumber?: string
   completeCitation?: string
-  digitalAnnouncementDate?: string
-  digitalAnnouncementArea?: string
-  digitalAnnouncementAreaNumber?: string
-  digitalAnnouncementEdition?: string
-  digitalAnnouncementExplanations?: string
-  digitalAnnouncementInfo?: string
-  digitalAnnouncementMedium?: string
-  digitalAnnouncementYear?: string
   digitalEvidenceAppendix?: string
   digitalEvidenceExternalDataNote?: string
   digitalEvidenceLink?: string
@@ -182,13 +174,6 @@ export type FlatMetadata = {
   entryIntoForceDate?: string
   entryIntoForceDateState?: string
   entryIntoForceNormCategory?: string
-  euAnnouncementExplanations?: string
-  euAnnouncementGazette?: string
-  euAnnouncementInfo?: string
-  euAnnouncementNumber?: string
-  euAnnouncementPage?: string
-  euAnnouncementSeries?: string
-  euAnnouncementYear?: string
   eli?: string
   expirationDate?: string
   expirationDateState?: string
@@ -204,16 +189,12 @@ export type FlatMetadata = {
   footnoteDecision?: string
   footnoteStateLaw?: string
   footnoteEuLaw?: string
-  otherOfficialAnnouncement?: string
   otherStatusNote?: string
   principleEntryIntoForceDate?: string
   principleEntryIntoForceDateState?: string
   principleExpirationDate?: string
   principleExpirationDateState?: string
-  printAnnouncementExplanations?: string
   printAnnouncementGazette?: string
-  printAnnouncementInfo?: string
-  printAnnouncementNumber?: string
   printAnnouncementPage?: string
   printAnnouncementYear?: string
   publicationDate?: string
