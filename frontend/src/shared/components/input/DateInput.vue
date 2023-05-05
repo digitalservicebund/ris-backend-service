@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 
@@ -24,7 +25,8 @@ watch(
   props,
   () => {
     //From the ISO String, only the first part is needed for the input value -> YYYY-MM-DD
-    inputValue.value = props.modelValue && props.modelValue.slice(0, 10)
+    inputValue.value =
+      props.modelValue && dayjs(props.modelValue).format("YYYY-MM-DD")
   },
   {
     immediate: true,
@@ -57,8 +59,8 @@ watch(
         })
       }
     } else {
-      if (inputValue.value) {
-        emit("update:modelValue", new Date(inputValue.value).toISOString())
+      if (inputValue.value && !inputValue.value.startsWith("0")) {
+        emit("update:modelValue", dayjs(inputValue.value).toISOString())
       }
       emit("update:validationError", undefined)
     }
