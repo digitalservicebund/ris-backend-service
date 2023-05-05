@@ -5,22 +5,27 @@ import Pagination from "@/shared/components/Pagination.vue"
 const itemsPerPage = 10
 const items = ref<number[]>()
 
-async function itemService(page: number, size: number) {
-  const totalElements = 100
-  const start = page * size
-  const end = (page + 1) * size
+async function itemService(page: number) {
+  const totalElements = 50
+  const start = page * itemsPerPage
+  const end =
+    page > totalElements / itemsPerPage
+      ? totalElements
+      : (page + 1) * itemsPerPage
+
+  console.log(page, totalElements / itemsPerPage)
 
   return {
     status: 200,
     data: {
       content: Array.from({ length: end - start }, (_, i) => start + i),
-      size,
+      size: itemsPerPage,
       totalElements,
-      totalPages: totalElements / size,
+      totalPages: totalElements / itemsPerPage,
       number: page,
       numberOfElements: 100,
-      first: page == 1 ? true : false,
-      last: totalElements >= end ? true : false,
+      first: page == 0 ? true : false,
+      last: page + 1 >= totalElements / itemsPerPage ? true : false,
     },
   }
 }
