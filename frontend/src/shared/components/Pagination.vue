@@ -42,12 +42,12 @@ const isLastPage = computed(() =>
   totalPages.value ? page.value == totalPages.value : false
 )
 
-function nextPage() {
-  if (!isLastPage.value) updateItems(page.value ? page.value + 1 : 1)
+async function nextPage() {
+  if (!isLastPage.value) await updateItems(page.value ? page.value + 1 : 1)
 }
 
-function previousPage() {
-  if (!isFirstPage.value && page.value) updateItems(page.value - 1)
+async function previousPage() {
+  if (!isFirstPage.value && page.value) await updateItems(page.value - 1)
 }
 
 async function updateItems(newPage: number) {
