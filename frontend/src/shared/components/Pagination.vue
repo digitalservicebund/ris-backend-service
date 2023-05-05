@@ -63,7 +63,7 @@ export type PageableService<T> = {
 </script>
 
 <template>
-  <div class="flex flex-col items-center">
+  <div v-if="page?.content" class="flex flex-col items-center">
     <div class="flex items-center">
       <div class="flex flex-grow items-center justify-center relative">
         <button
