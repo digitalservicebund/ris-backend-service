@@ -1,9 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ["./src/**/*.{html,vue,js,ts}"],
-  // corePlugins: {
-  //   preflight: false,
-  // },
   theme: {
     colors: {
       inherit: "inherit",
@@ -145,5 +142,5 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@digitalservice4germany/angie")],
 }
