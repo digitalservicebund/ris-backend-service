@@ -7,6 +7,7 @@ export const proceedingDecisionFields: InputField[] = [
     name: "court",
     type: InputType.COMBOBOX,
     label: "Gericht",
+    required: true,
     inputAttributes: {
       ariaLabel: "Gericht Rechtszug",
       placeholder: "Gerichtstyp Gerichtsort",
@@ -17,6 +18,7 @@ export const proceedingDecisionFields: InputField[] = [
     name: "date",
     type: InputType.DATE,
     label: "Entscheidungsdatum",
+    required: true,
     inputAttributes: {
       ariaLabel: "Entscheidungsdatum Rechtszug",
     },
@@ -25,6 +27,7 @@ export const proceedingDecisionFields: InputField[] = [
     name: "fileNumber",
     type: InputType.TEXT,
     label: "Aktenzeichen",
+    required: true,
     inputAttributes: {
       ariaLabel: "Aktenzeichen Rechtszug",
     },
