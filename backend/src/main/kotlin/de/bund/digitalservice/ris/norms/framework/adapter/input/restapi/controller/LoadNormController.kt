@@ -139,7 +139,7 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
             fun fromUseCaseData(data: Norm): NormResponseSchema {
                 val articles = data.articles.map(ArticleResponseSchema::fromUseCaseData)
                 val files = data.files.map(FileReferenceResponseSchema::fromUseCaseData)
-                val metadataSections = data.metadataSections.map(MetadataSectionResponseSchema::fromUseCaseData)
+                val metadataSections = data.metadataSections.filter { it.name != MetadataSectionName.DOCUMENT_TYPE }.map(MetadataSectionResponseSchema::fromUseCaseData)
                 return NormResponseSchema(
                     encodeGuid(data.guid),
                     articles,

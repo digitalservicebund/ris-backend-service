@@ -89,7 +89,7 @@ export const normData: NormData = {
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
   officialShortTitle: "Angepasstes Tierarzneimittelrecht",
   risAbbreviation: "Tierarznei",
-  documentCategory: "N",
+  documentCategory: "NR",
   entryIntoForceDate: "2007-01-01",
   principleEntryIntoForceDate: "2007-01-01",
   divergentEntryIntoForceDateState: "nicht vorhanden",

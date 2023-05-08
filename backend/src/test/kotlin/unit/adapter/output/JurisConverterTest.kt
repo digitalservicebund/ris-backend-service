@@ -15,6 +15,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -24,16 +25,20 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.Participation
@@ -130,6 +135,10 @@ class JurisConverterTest {
                     participationList = listOf(Participation("test participation type", "test participation institution"))
                     leadList = listOf(Lead("test lead jurisdiction", "test lead unit"))
                     subjectAreaList = listOf(SubjectArea("test subject FNA", "test subject Gesta"))
+                    documentTypeList = listOf(
+                        DocumentType("documentName", "documentTemplateName", "BASE_NORM"),
+                        DocumentType("documentName1", "documentTemplateName1", "INVALID_CATEGORYY"),
+                    )
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
                     unofficialLongTitleList = listOf("test unofficial long title")
@@ -231,6 +240,11 @@ class JurisConverterTest {
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
+            assertThat(metadata).contains(Metadatum("documentName", TYPE_NAME, 1))
+            assertThat(metadata).contains(Metadatum(NormCategory.BASE_NORM, NORM_CATEGORY, 1))
+            assertThat(metadata).contains(Metadatum("documentTemplateName", TEMPLATE_NAME, 1))
+            assertThat(metadata).contains(Metadatum("documentName1", TYPE_NAME, 1))
+            assertThat(metadata).contains(Metadatum("documentTemplateName1", TEMPLATE_NAME, 1))
             assertThat(metadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
             assertThat(metadata).contains(Metadatum("test print announcement year", YEAR, 1))
             assertThat(metadata).contains(Metadatum("test print announcement page", PAGE, 1))

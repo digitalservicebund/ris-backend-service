@@ -23,6 +23,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NUMBER
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
@@ -33,12 +34,15 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_SHORT_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.VALIDITY_RULE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.YEAR
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
@@ -48,6 +52,7 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
+import java.lang.IllegalArgumentException
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
@@ -131,6 +136,10 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val digitalAnnouncementNumber = createMetadataForType(data.digitalAnnouncementList.map { it.number.toString() }, EDITION)
     val digitalAnnouncementMedium = createMetadataForType(data.digitalAnnouncementList.map { it.medium.toString() }, ANNOUNCEMENT_MEDIUM)
 
+    val documentTypeName = createMetadataForType(data.documentTypeList.map { it.name.toString() }, TYPE_NAME)
+    val documentNormCategory = createMetadataForType(data.documentTypeList.mapNotNull { parseNormCategory(it.category) }, NORM_CATEGORY)
+    val documentTemplateName = createMetadataForType(data.documentTypeList.map { it.templateName.toString() }, TEMPLATE_NAME)
+
     val citationDateSections = data.citationDateList.mapIndexed { index, value ->
         if (value.length == 4 && value.toIntOrNull() != null) {
             MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(value, YEAR, 1)), index)
@@ -152,6 +161,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
         createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
         createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear) +
+        createSectionsFromMetadata(Section.DOCUMENT_TYPE, documentTypeName + documentNormCategory + documentTemplateName) +
         citationDateSections +
         ageIndicationSections +
         addProviderSections(data.normProviderList)
@@ -249,6 +259,8 @@ fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
 }
 
 fun parseDateString(value: String?): LocalDate? = value?.let { try { LocalDate.parse(value) } catch (e: DateTimeParseException) { null } }
+
+fun parseNormCategory(value: String?): NormCategory? = value?.let { try { NormCategory.valueOf(value) } catch (e: IllegalArgumentException) { null } }
 
 fun parseDateStateString(value: String?): UndefinedDate? =
     if (value.isNullOrEmpty()) null else UndefinedDate.valueOf(value)
