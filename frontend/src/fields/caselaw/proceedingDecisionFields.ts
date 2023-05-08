@@ -40,3 +40,11 @@ export const proceedingDecisionFields: InputField[] = [
     },
   },
 ]
+
+export const proceedingDecisionFieldLabels: { [name: string]: string } =
+  Object.assign(
+    {},
+    ...proceedingDecisionFields.map((field) => ({
+      [field.name]: field.label as string,
+    }))
+  )

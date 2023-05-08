@@ -5,9 +5,9 @@ import InputField from "../shared/components/input/InputField.vue"
 import TextButton from "../shared/components/input/TextButton.vue"
 import TextInput from "../shared/components/input/TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
-import DocumentUnit from "@/domain/documentUnit"
+import DocumentUnit, { ProceedingDecision } from "@/domain/documentUnit"
 import XmlMail from "@/domain/xmlMail"
-import { fieldLabels } from "@/fields/caselaw"
+import { fieldLabels, proceedingDecisionFieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
 import InfoModal from "@/shared/components/InfoModal.vue"
@@ -68,8 +68,18 @@ function selectAll(event: Event) {
 const missingFields = ref(
   props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field])
 )
+
+const missingProceedingDecisionFields = ref(
+  props.documentUnit.proceedingDecisions?.map((proceedingDecision) =>
+    ProceedingDecision.getMissingFields(proceedingDecision).map(
+      (field) => proceedingDecisionFieldLabels[field]
+    )
+  )
+)
 const fieldsMissing = computed(() =>
-  missingFields.value.length ? true : false
+  missingFields.value.length || missingProceedingDecisionFields.value?.length
+    ? true
+    : false
 )
 </script>
 
@@ -99,8 +109,26 @@ const fieldsMissing = computed(() =>
               >
                 {{ field }}
               </li>
+              <li
+                v-if="missingProceedingDecisionFields"
+                class="body-01-reg list-item ml-[1rem]"
+              >
+                Rechtszug
+                <ol class="list-decimal">
+                  <li
+                    v-for="fields in missingProceedingDecisionFields"
+                    :key="missingProceedingDecisionFields.indexOf(fields)"
+                    class="body-01-reg list-item ml-[1rem]"
+                  >
+                    <div v-for="field in fields" :key="fields.indexOf(field)">
+                      {{ field }}
+                    </div>
+                  </li>
+                </ol>
+              </li>
             </ul>
           </div>
+
           <RouterLink :to="categoriesRoute"
             ><TextButton
               aria-label="Rubriken bearbeiten"

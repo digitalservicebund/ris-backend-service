@@ -1,5 +1,11 @@
 import { expect } from "@playwright/test"
-import { navigateToPublication, waitForSaving } from "../e2e-utils"
+import {
+  fillProceedingDecisionInputs,
+  navigateToCategories,
+  navigateToPublication,
+  toggleProceedingDecisionsSection,
+  waitForSaving,
+} from "../e2e-utils"
 import { testWithDocumentUnit as test } from "../fixtures"
 
 test.describe("ensuring the publishing of documentunits works as expected", () => {
@@ -15,6 +21,36 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       page.locator("li:has-text('Entscheidungsdatum')")
     ).toBeVisible()
     await expect(page.locator("li:has-text('Dokumenttyp')")).toBeVisible()
+  })
+
+  test("publication page shows missing required fields of proceeding decisions", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleProceedingDecisionsSection(page)
+
+    await fillProceedingDecisionInputs(page, {
+      court: "AG Aalen",
+    })
+
+    await page.getByText("Manuell Hinzufügen").click()
+
+    await expect(
+      page.getByText(`AG Aalen`, {
+        exact: true,
+      })
+    ).toBeVisible()
+    await navigateToPublication(page, documentNumber)
+
+    await expect(page.locator("li:has-text('Rechtszug')")).toBeVisible()
+
+    await expect(
+      page.locator("li:has-text('Rechtszug')").getByText("Entscheidungsdatum")
+    ).toBeVisible()
+    await expect(
+      page.locator("li:has-text('Rechtszug')").getByText("Aktenzeichen")
+    ).toBeVisible()
   })
 
   test("publication page updates missing required fields after fields were updated", async ({

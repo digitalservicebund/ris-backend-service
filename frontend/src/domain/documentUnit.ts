@@ -50,6 +50,8 @@ export class ProceedingDecision {
   public fileNumber?: string
   public documentType?: DocumentType
 
+  static requiredFields = ["fileNumber", "court", "date"] as const
+
   public static renderDecision(decision: ProceedingDecision): string {
     if (decision == undefined) return ""
     else {
@@ -70,6 +72,27 @@ export class ProceedingDecision {
   public static hasLink(decision: ProceedingDecision): boolean {
     if (decision === undefined) return false
     else return decision.dataSource !== "PROCEEDING_DECISION"
+  }
+
+  public static getMissingFields(decision: ProceedingDecision) {
+    return ProceedingDecision.requiredFields.filter((field) =>
+      this.isEmpty(decision[field])
+    )
+  }
+
+  public static isEmpty(
+    value: CoreData[(typeof DocumentUnit.requiredFields)[number]]
+  ) {
+    if (value === undefined || !value || value === null) {
+      return true
+    }
+    if (value instanceof Array && value.length === 0) {
+      return true
+    }
+    if (typeof value === "object" && "location" in value && "type" in value) {
+      return value.location === "" && value.type === ""
+    }
+    return false
   }
 }
 
