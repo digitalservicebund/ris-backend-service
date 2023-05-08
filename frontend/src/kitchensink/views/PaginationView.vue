@@ -1,45 +1,48 @@
 <script lang="ts" setup>
-import { ref } from "vue"
-import Pagination from "@/shared/components/Pagination.vue"
+import { onMounted, ref } from "vue"
+import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const itemsPerPage = 10
 const items = ref<number[]>()
+const currentPage = ref<Page<number>>()
 
-async function itemService(page: number) {
+async function mockedItemService(page: number, size: number) {
   const totalElements = 60
-  const start = page * itemsPerPage
-  const end =
-    page > totalElements / itemsPerPage
-      ? totalElements
-      : (page + 1) * itemsPerPage
+  const start = page * size
+  const end = page > totalElements / size ? totalElements : (page + 1) * size
 
   return {
     status: 200,
     data: {
       content: Array.from({ length: end - start }, (_, i) => start + i),
-      size: itemsPerPage,
+      size: size,
       totalElements,
-      totalPages: totalElements / itemsPerPage,
+      totalPages: totalElements / size,
       number: page,
       numberOfElements: 100,
       first: page == 0 ? true : false,
-      last: page + 1 >= totalElements / itemsPerPage ? true : false,
+      last: page + 1 >= totalElements / size ? true : false,
     },
   }
 }
 
-async function handleUpdateItems(newItems: number[]) {
-  items.value = newItems
+async function updateItems(page: number) {
+  const response = await mockedItemService(page, itemsPerPage)
+  if (response.data) {
+    items.value = response.data.content
+    currentPage.value = response.data
+  }
 }
+
+onMounted(() => updateItems(0))
 </script>
 
 <template>
   <div>
     <Pagination
-      get-inital-data
-      :item-service="itemService"
-      :items-per-page="itemsPerPage"
-      @update-items="handleUpdateItems"
+      v-if="currentPage"
+      :page="currentPage"
+      @update-page="updateItems"
     >
       <ul v-for="item in items" :key="item">
         <span>{{ item }}</span>

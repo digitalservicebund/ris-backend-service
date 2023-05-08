@@ -1,47 +1,27 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { ref, withDefaults, onMounted } from "vue"
+import { withDefaults } from "vue"
 import { ServiceResponse } from "@/services/httpClient"
 
 const props = withDefaults(
   defineProps<{
-    itemsPerPage: number
-    itemService: PageableService<any> // eslint-disable-line @typescript-eslint/no-explicit-any
-    getInitalData?: boolean
+    page: Page<any> // eslint-disable-line @typescript-eslint/no-explicit-any
     navigationPosition?: "top" | "bottom"
   }>(),
-  { getInitalData: false, navigationPosition: "top" }
+  { navigationPosition: "top" }
 )
 
 const emits = defineEmits<{
-  (e: "updateItems", items: any[]): void // eslint-disable-line @typescript-eslint/no-explicit-any
+  (e: "updatePage", page: number): void // eslint-disable-line @typescript-eslint/no-explicit-any
 }>()
 
-const page = ref<Page<any>>() // eslint-disable-line @typescript-eslint/no-explicit-any
-
 async function nextPage() {
-  page.value && !page.value.last && (await updateItems(page.value.number + 1))
+  !props.page.last && emits("updatePage", props.page.number + 1)
 }
 
 async function previousPage() {
-  page.value && !page.value.first && (await updateItems(page.value.number - 1))
+  !props.page.first && emits("updatePage", props.page.number - 1)
 }
-
-async function updateItems(newPage: number, searchStr?: string) {
-  const response = await props.itemService(
-    newPage,
-    props.itemsPerPage,
-    searchStr
-  )
-  if (response.data) {
-    emits("updateItems", response.data.content)
-    page.value = response.data
-  }
-}
-
-onMounted(() => props.getInitalData && updateItems(0))
-
-defineExpose({ updateItems })
 </script>
 
 <script lang="ts">

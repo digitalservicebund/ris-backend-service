@@ -5,7 +5,7 @@ import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import service from "@/services/fieldOfLawService"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
-import Pagination from "@/shared/components/Pagination.vue"
+import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const emit = defineEmits<{
   (event: "linkedField:clicked", identifier: string): void
@@ -15,18 +15,25 @@ const emit = defineEmits<{
 
 const searchStr = ref("")
 const results = ref<FieldOfLawNode[]>()
+const currentPage = ref<Page<FieldOfLawNode>>()
 const itemsPerPage = 10
 
-const paginationComponentRef = ref<InstanceType<typeof Pagination>>()
-
-async function submitSearch() {
-  await paginationComponentRef.value?.updateItems(0, searchStr.value)
-  results.value?.[0] && emit("node-clicked", results.value[0].identifier)
-  searchStr.value.includes("norm:") && emit("do-show-norms")
-}
-
-async function handleUpdateItems(newItems: FieldOfLawNode[]) {
-  results.value = newItems
+async function submitSearch(page: number) {
+  const response = await service.searchForFieldsOfLaw(
+    page,
+    itemsPerPage,
+    searchStr.value
+  )
+  if (response.data) {
+    currentPage.value = response.data
+    results.value = response.data.content
+    results.value?.[0] && emit("node-clicked", results.value[0].identifier)
+    searchStr.value.includes("norm:") && emit("do-show-norms")
+  } else {
+    currentPage.value = undefined
+    results.value = undefined
+    console.error("Error searching for Nodes")
+  }
 }
 </script>
 
@@ -41,7 +48,7 @@ async function handleUpdateItems(newItems: FieldOfLawNode[]) {
             v-model="searchStr"
             aria-label="Sachgebiete Suche"
             full-height
-            @enter-released="submitSearch"
+            @enter-released="submitSearch(0)"
           />
         </div>
         <div class="pl-8">
@@ -56,11 +63,10 @@ async function handleUpdateItems(newItems: FieldOfLawNode[]) {
       </div>
     </div>
     <Pagination
-      ref="paginationComponentRef"
-      :item-service="service.searchForFieldsOfLaw"
-      :items-per-page="itemsPerPage"
+      v-if="currentPage"
       navigation-position="bottom"
-      @update-items="handleUpdateItems"
+      :page="currentPage"
+      @update-page="submitSearch"
     >
       <FieldOfLawListEntry
         v-for="(fieldOfLawNode, idx) in results"
