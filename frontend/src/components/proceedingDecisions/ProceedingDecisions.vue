@@ -110,26 +110,31 @@ async function search() {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function decisionSummarizer(dataEntry: any) {
-  return h("div", [
-    ProceedingDecision.hasLink(dataEntry)
-      ? h(
-          RouterLink,
-          {
-            class: ["link-01-bold", "underline"],
-            target: "_blank",
-            to: {
-              name: "caselaw-documentUnit-:documentNumber-categories",
-              params: { documentNumber: dataEntry.documentNumber },
+  return h(
+    "div",
+    { tabindex: ProceedingDecision.hasLink(dataEntry) ? 0 : -1 },
+    [
+      ProceedingDecision.hasLink(dataEntry)
+        ? h(
+            RouterLink,
+            {
+              class: ["link-01-bold", "underline"],
+              target: "_blank",
+              tabindex: -1,
+              to: {
+                name: "caselaw-documentUnit-:documentNumber-categories",
+                params: { documentNumber: dataEntry.documentNumber },
+              },
             },
-          },
-          ProceedingDecision.renderDecision(dataEntry)
-        )
-      : h(
-          "span",
-          { class: ["link-02-reg"] },
-          ProceedingDecision.renderDecision(dataEntry)
-        ),
-  ])
+            ProceedingDecision.renderDecision(dataEntry)
+          )
+        : h(
+            "span",
+            { class: ["link-02-reg"] },
+            ProceedingDecision.renderDecision(dataEntry)
+          ),
+    ]
+  )
 }
 
 const DecisionSummary = withSummarizer(decisionSummarizer)
