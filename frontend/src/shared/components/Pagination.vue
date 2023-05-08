@@ -31,7 +31,7 @@ async function updateItems(newPage: number, searchStr?: string) {
   const response = await props.itemService(
     newPage,
     props.itemsPerPage,
-    searchStr ?? ""
+    searchStr
   )
   if (response.data) {
     emits("updateItems", response.data.content)
@@ -65,11 +65,11 @@ export type PageableService<T> = {
 
 <template>
   <slot v-if="props.navigationPosition == 'bottom'"></slot>
-
   <div v-if="page?.content" class="flex flex-col items-center my-32">
     <div class="flex items-center">
       <div class="flex flex-grow items-center justify-center relative">
         <button
+          aria-label="vorherige Ergebnisse"
           class="disabled:opacity-25 flex items-center link-01-bold pr-20"
           :disabled="page?.first"
           @click="previousPage"
@@ -82,6 +82,7 @@ export type PageableService<T> = {
           {{ page.number + 1 }} von {{ page.totalPages }}
         </span>
         <button
+          aria-label="nächste Ergebnisse"
           class="disabled:opacity-25 flex items-center link-01-bold pr-20"
           :disabled="page?.last"
           @click="nextPage"
