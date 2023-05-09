@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
@@ -14,7 +13,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumen
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.time.Instant;
@@ -110,18 +108,18 @@ public class DocumentUnitListEntryIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunits")
+        .uri("/api/v1/caselaw/documentunits?pg=0&sz=3")
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(DocumentUnitListEntry[].class)
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(1);
-              assertThat(response.getResponseBody()[0].documentNumber()).isEqualTo("1234567890123");
-              assertThat(response.getResponseBody()[0].uuid()).isEqualTo(neurisDto.getUuid());
-              assertThat(response.getResponseBody()[0].fileNumber()).isEqualTo("AkteX");
-            });
+        .expectBody()
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content[0].documentNumber")
+        .isEqualTo("1234567890123")
+        .jsonPath("$.content[0].uuid")
+        .isEqualTo(neurisDto.getUuid().toString())
+        .jsonPath("$.content[0].fileNumber")
+        .isEqualTo("AkteX");
   }
 }

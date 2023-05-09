@@ -18,8 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -162,8 +163,12 @@ public class DocumentUnitService {
         .flatMap(Function.identity());
   }
 
-  public Flux<DocumentUnitListEntry> getAll() {
-    return repository.findAll(Sort.by(Order.desc("creationtimestamp")));
+  public Mono<Page<DocumentUnitListEntry>> getAll(Pageable pageable) {
+    return repository
+        .findAll(pageable)
+        .collectList()
+        .zipWith(repository.count())
+        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {

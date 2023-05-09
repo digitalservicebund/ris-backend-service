@@ -30,7 +30,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
@@ -732,9 +732,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         courtType, courtLocation, decisionDate, docUnitIds, docTypeId);
   }
 
-  public Flux<DocumentUnitListEntry> findAll(Sort sort) {
+  public Flux<DocumentUnitListEntry> findAll(Pageable pageable) {
     return metadataRepository
-        .findAllByDataSourceLike(sort, DataSource.NEURIS.name())
+        .findAllByDataSourceLike(DataSource.NEURIS.name(), pageable)
         .flatMap(this::injectFileNumbers)
         .map(
             documentUnitDTO ->
@@ -826,5 +826,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findByUuid(childDocumentUnitUuid)
         .map(DocumentUnitMetadataDTO::getId)
         .flatMap(proceedingDecisionLinkRepository::countByChildDocumentUnitId);
+  }
+
+  @Override
+  public Mono<Long> count() {
+    return repository.count();
   }
 }

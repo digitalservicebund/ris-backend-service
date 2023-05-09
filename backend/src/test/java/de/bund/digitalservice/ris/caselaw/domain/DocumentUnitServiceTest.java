@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
@@ -26,6 +27,7 @@ import org.mockito.MockedStatic;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
@@ -185,15 +187,23 @@ class DocumentUnitServiceTest {
 
   @Test
   void testGetAll() {
+    PageRequest pageRequest = PageRequest.of(0, 10, Sort.by(Order.desc("creationtimestamp")));
+
     List<DocumentUnitListEntry> entries =
         Arrays.asList(
             DocumentUnitListEntry.builder().build(), DocumentUnitListEntry.builder().build());
-    when(repository.findAll(Sort.by(Order.desc("creationtimestamp"))))
-        .thenReturn(Flux.fromIterable(entries));
+    when(repository.findAll(pageRequest)).thenReturn(Flux.fromIterable(entries));
+    when(repository.count()).thenReturn(Mono.just((long) entries.size()));
 
-    StepVerifier.create(service.getAll()).expectNextSequence(entries).verifyComplete();
+    StepVerifier.create(service.getAll(pageRequest))
+        .assertNext(
+            page -> {
+              assertEquals(entries.size(), page.getNumberOfElements());
+              assertTrue(entries.containsAll(page.getContent()));
+            })
+        .verifyComplete();
 
-    verify(repository).findAll(Sort.by(Order.desc("creationtimestamp")));
+    verify(repository).findAll(pageRequest);
   }
 
   @Test

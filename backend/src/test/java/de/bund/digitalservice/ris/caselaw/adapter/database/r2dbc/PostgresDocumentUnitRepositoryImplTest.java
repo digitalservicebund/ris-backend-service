@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import reactor.core.publisher.Flux;
@@ -58,11 +59,15 @@ class PostgresDocumentUnitRepositoryImplTest {
   @Test
   void testFindAll() {
     Sort sort = Sort.unsorted();
-    Mockito.when(metadataRepository.findAllByDataSourceLike(sort, DataSource.NEURIS.name()))
+    Mockito.when(
+            metadataRepository.findAllByDataSourceLike(
+                DataSource.NEURIS.name(), PageRequest.of(0, 10, sort)))
         .thenReturn(Flux.empty());
 
-    StepVerifier.create(postgresDocumentUnitRepository.findAll(sort)).verifyComplete();
+    StepVerifier.create(postgresDocumentUnitRepository.findAll(PageRequest.of(0, 10, sort)))
+        .verifyComplete();
 
-    verify(metadataRepository).findAllByDataSourceLike(sort, DataSource.NEURIS.name());
+    verify(metadataRepository)
+        .findAllByDataSourceLike(DataSource.NEURIS.name(), PageRequest.of(0, 10, sort));
   }
 }

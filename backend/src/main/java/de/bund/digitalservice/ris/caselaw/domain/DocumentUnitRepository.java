@@ -1,7 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
 import java.util.UUID;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -27,7 +27,9 @@ public interface DocumentUnitRepository {
   Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
       ProceedingDecision proceedingDecision);
 
-  Flux<DocumentUnitListEntry> findAll(Sort sort);
+  Mono<Long> count();
+
+  Flux<DocumentUnitListEntry> findAll(Pageable pageable);
 
   Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
       UUID parentDocumentUnitUuid);

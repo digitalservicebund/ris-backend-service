@@ -4,9 +4,10 @@ import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
 } from "./httpClient"
+import { PageableService, Page } from "@/shared/components/Pagination.vue"
 
 interface DocumentUnitService {
-  getAllListEntries(): Promise<ServiceResponse<DocumentUnitListEntry[]>>
+  getAllListEntries: PageableService<DocumentUnitListEntry>
   getByDocumentNumber(
     documentNumber: string
   ): Promise<ServiceResponse<DocumentUnit>>
@@ -22,9 +23,9 @@ interface DocumentUnitService {
 }
 
 const service: DocumentUnitService = {
-  async getAllListEntries() {
-    const response = await httpClient.get<DocumentUnitListEntry[]>(
-      "caselaw/documentunits"
+  async getAllListEntries(page: number, size: number) {
+    const response = await httpClient.get<Page<DocumentUnitListEntry>>(
+      `caselaw/documentunits?pg=${page}&sz=${size}`
     )
     if (response.status >= 300) {
       response.error = {

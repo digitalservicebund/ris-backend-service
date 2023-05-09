@@ -30,6 +30,9 @@ import org.mockito.Captor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -129,17 +132,17 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGetAll() {
-    when(service.getAll()).thenReturn(Flux.empty());
+    when(service.getAll(PageRequest.of(0, 10))).thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/documentunits")
+        .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).getAll();
+    verify(service).getAll(PageRequest.of(0, 10, Sort.by(Order.desc("creationtimestamp"))));
   }
 
   @Test

@@ -10,6 +10,10 @@ import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -23,6 +27,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -68,10 +73,11 @@ public class DocumentUnitController {
   }
 
   @GetMapping(value = "")
-  public Flux<DocumentUnitListEntry> getAll() {
+  public Mono<Page<DocumentUnitListEntry>> getAll(
+      @RequestParam("pg") int page, @RequestParam("sz") int size) {
     log.debug("All DocumentUnits were requested");
 
-    return service.getAll();
+    return service.getAll(PageRequest.of(page, size, Sort.by(Order.desc("creationtimestamp"))));
   }
 
   @GetMapping(value = "/{documentNumber}")
