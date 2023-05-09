@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.createSimpleSections
+import utils.factory.norm
 import java.time.LocalDate
 import java.util.UUID
 
