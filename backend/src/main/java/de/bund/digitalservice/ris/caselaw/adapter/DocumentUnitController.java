@@ -12,8 +12,6 @@ import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -75,9 +73,8 @@ public class DocumentUnitController {
   @GetMapping(value = "")
   public Mono<Page<DocumentUnitListEntry>> getAll(
       @RequestParam("pg") int page, @RequestParam("sz") int size) {
-    log.debug("All DocumentUnits were requested");
 
-    return service.getAll(PageRequest.of(page, size, Sort.by(Order.desc("creationtimestamp"))));
+    return service.getAll(PageRequest.of(page, size));
   }
 
   @GetMapping(value = "/{documentNumber}")

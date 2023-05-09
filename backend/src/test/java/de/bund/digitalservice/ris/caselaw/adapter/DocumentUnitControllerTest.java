@@ -31,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -142,7 +140,7 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isOk();
 
-    verify(service).getAll(PageRequest.of(0, 10, Sort.by(Order.desc("creationtimestamp"))));
+    verify(service).getAll(PageRequest.of(0, 10));
   }
 
   @Test

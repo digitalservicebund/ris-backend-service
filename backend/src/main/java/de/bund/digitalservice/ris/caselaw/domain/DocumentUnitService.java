@@ -20,7 +20,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -165,7 +168,11 @@ public class DocumentUnitService {
 
   public Mono<Page<DocumentUnitListEntry>> getAll(Pageable pageable) {
     return repository
-        .findAll(pageable)
+        .findAll(
+            PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Order.desc("creationtimestamp"))))
         .collectList()
         .zipWith(repository.count(DataSource.NEURIS))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
