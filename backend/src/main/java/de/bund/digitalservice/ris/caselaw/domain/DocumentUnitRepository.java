@@ -27,7 +27,7 @@ public interface DocumentUnitRepository {
   Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
       ProceedingDecision proceedingDecision);
 
-  Mono<Long> count();
+  Mono<Long> count(DataSource dataSource);
 
   Flux<DocumentUnitListEntry> findAll(Pageable pageable);
 

@@ -167,7 +167,7 @@ public class DocumentUnitService {
     return repository
         .findAll(pageable)
         .collectList()
-        .zipWith(repository.count())
+        .zipWith(repository.count(DataSource.NEURIS))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 

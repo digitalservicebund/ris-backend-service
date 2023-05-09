@@ -829,7 +829,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> count() {
-    return repository.count();
+  public Mono<Long> count(DataSource dataSource) {
+    return metadataRepository.countByDataSource(dataSource);
   }
 }

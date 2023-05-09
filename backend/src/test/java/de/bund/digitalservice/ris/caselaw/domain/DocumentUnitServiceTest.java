@@ -193,7 +193,7 @@ class DocumentUnitServiceTest {
         Arrays.asList(
             DocumentUnitListEntry.builder().build(), DocumentUnitListEntry.builder().build());
     when(repository.findAll(pageRequest)).thenReturn(Flux.fromIterable(entries));
-    when(repository.count()).thenReturn(Mono.just((long) entries.size()));
+    when(repository.count(DataSource.NEURIS)).thenReturn(Mono.just((long) entries.size()));
 
     StepVerifier.create(service.getAll(pageRequest))
         .assertNext(

@@ -120,6 +120,8 @@ public class DocumentUnitListEntryIntegrationTest {
         .jsonPath("$.content[0].uuid")
         .isEqualTo(neurisDto.getUuid().toString())
         .jsonPath("$.content[0].fileNumber")
-        .isEqualTo("AkteX");
+        .isEqualTo("AkteX")
+        .jsonPath("$.totalElements")
+        .isEqualTo(1);
   }
 }
