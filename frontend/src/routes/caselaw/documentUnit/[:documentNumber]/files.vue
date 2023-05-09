@@ -21,7 +21,7 @@ const { documentUnit, error } = await loadDocumentUnit()
 <template>
   <DocumentUnitFiles
     v-if="documentUnit"
-    :document-unit="documentUnit"
+    :document-unit="(documentUnit as DocumentUnit)"
     @update-document-unit="Object.assign(documentUnit as DocumentUnit, $event)"
   />
   <div v-else>

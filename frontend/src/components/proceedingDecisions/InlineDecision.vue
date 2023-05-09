@@ -9,7 +9,7 @@ defineProps<{
 <template>
   <div>
     <router-link
-      v-if="ProceedingDecision.hasLink(decision)"
+      v-if="decision.hasLink"
       class="link-01-bold underline"
       tabindex="-1"
       target="_blank"
@@ -19,12 +19,10 @@ defineProps<{
       }"
     >
       <button class="underline">
-        {{ ProceedingDecision.renderDecision(decision) }}
+        {{ decision.renderDecision }}
       </button>
     </router-link>
 
-    <span v-else class="label-02-reg">{{
-      ProceedingDecision.renderDecision(decision)
-    }}</span>
+    <span v-else class="label-02-reg">{{ decision.renderDecision }}</span>
   </div>
 </template>

@@ -11,20 +11,22 @@ function renderComponent(options?: {
   documentNumber?: string
 }) {
   const props: { decision: ProceedingDecision } = {
-    decision: {
-      court: options?.court ?? {
-        type: "testCourtType",
-        location: "testCourtLocation",
-        label: "label1",
+    decision: new ProceedingDecision({
+      ...{
+        court: options?.court ?? {
+          type: "testCourtType",
+          location: "testCourtLocation",
+          label: "label1",
+        },
+        documentType: options?.documentType ?? {
+          label: "testDocumentType",
+          jurisShortcut: "testDocumentTypeShortcut",
+        },
+        date: options?.date ?? "2004-12-02 12:00:00.000000 +00:00",
+        dataSource: options?.dataSource ?? "PROCEEDING_DECISION",
+        documentNumber: options?.documentNumber ?? "testDocumentNumber",
       },
-      documentType: options?.documentType ?? {
-        label: "testDocumentType",
-        jurisShortcut: "testDocumentTypeShortcut",
-      },
-      date: options?.date ?? "2004-12-02 12:00:00.000000 +00:00",
-      dataSource: options?.dataSource ?? "PROCEEDING_DECISION",
-      documentNumber: options?.documentNumber ?? "testDocumentNumber",
-    },
+    }),
   }
 
   const router = createRouter({

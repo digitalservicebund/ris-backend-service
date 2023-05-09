@@ -52,36 +52,32 @@ export class ProceedingDecision {
 
   static requiredFields = ["fileNumber", "court", "date"] as const
 
-  public static renderDecision(decision: ProceedingDecision): string {
-    if (decision == undefined) return ""
-    else {
-      return [
-        ...(decision.court ? [`${decision.court.label}`] : []),
-        ...(decision.documentType
-          ? [decision.documentType?.jurisShortcut]
-          : []),
-        ...(decision.date ? [dayjs(decision.date).format("DD.MM.YYYY")] : []),
-        ...(decision.fileNumber ? [decision.fileNumber] : []),
-        ...(decision.documentNumber && this.hasLink(decision)
-          ? [decision.documentNumber]
-          : []),
-      ].join(", ")
-    }
+  constructor(data: Partial<ProceedingDecision> = {}) {
+    Object.assign(this, data)
   }
 
-  public static hasLink(decision: ProceedingDecision): boolean {
-    if (decision === undefined) return false
-    else return decision.dataSource !== "PROCEEDING_DECISION"
+  get renderDecision(): string {
+    return [
+      ...(this.court ? [`${this.court.label}`] : []),
+      ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
+      ...(this.date ? [dayjs(this.date).format("DD.MM.YYYY")] : []),
+      ...(this.fileNumber ? [this.fileNumber] : []),
+      ...(this.documentNumber && this.hasLink ? [this.documentNumber] : []),
+    ].join(", ")
   }
 
-  public static getMissingFields(decision: ProceedingDecision) {
+  get hasLink(): boolean {
+    return this.dataSource !== "PROCEEDING_DECISION"
+  }
+
+  get missingRequiredFields() {
     return ProceedingDecision.requiredFields.filter((field) =>
-      this.isEmpty(decision[field])
+      this.requiredFieldIsEmpty(this[field] as keyof ProceedingDecision)
     )
   }
 
-  public static isEmpty(
-    value: CoreData[(typeof DocumentUnit.requiredFields)[number]]
+  private requiredFieldIsEmpty(
+    value: ProceedingDecision[(typeof ProceedingDecision.requiredFields)[number]]
   ) {
     if (value === undefined || !value || value === null) {
       return true
@@ -136,6 +132,11 @@ export default class DocumentUnit {
       if (data.texts && data.texts[textsField] === null)
         delete data.texts[textsField]
     }
+
+    if (data.proceedingDecisions)
+      data.proceedingDecisions = data.proceedingDecisions.map(
+        (decision) => new ProceedingDecision({ ...decision })
+      )
 
     Object.assign(this, data)
   }

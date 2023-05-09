@@ -19,12 +19,7 @@ const props = defineProps<{
 
 const proceedingDecisions = ref<ProceedingDecision[]>()
 const searchResults = ref<SearchResults>()
-const input = ref<ProceedingDecision>({
-  court: undefined,
-  documentType: undefined,
-  date: undefined,
-  fileNumber: undefined,
-})
+const input = ref<ProceedingDecision>(new ProceedingDecision({}))
 
 function isNotEmpty(decision: ProceedingDecision): boolean {
   return Object.values(decision).some((value) => value !== undefined)
@@ -96,7 +91,7 @@ function updateSearchResultsLinkStatus(uuid: string) {
 
 async function search() {
   const response = await DocumentUnitService.searchByProceedingDecisionInput(
-    input.value
+    input.value as ProceedingDecision
   )
   if (response.data) {
     searchResults.value = response.data.map((searchResult) => {
@@ -109,32 +104,24 @@ async function search() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function decisionSummarizer(dataEntry: any) {
-  return h(
-    "div",
-    { tabindex: ProceedingDecision.hasLink(dataEntry) ? 0 : -1 },
-    [
-      ProceedingDecision.hasLink(dataEntry)
-        ? h(
-            RouterLink,
-            {
-              class: ["link-01-bold", "underline"],
-              target: "_blank",
-              tabindex: -1,
-              to: {
-                name: "caselaw-documentUnit-:documentNumber-categories",
-                params: { documentNumber: dataEntry.documentNumber },
-              },
+function decisionSummarizer(dataEntry: ProceedingDecision) {
+  return h("div", { tabindex: dataEntry.hasLink ? 0 : -1 }, [
+    dataEntry.hasLink
+      ? h(
+          RouterLink,
+          {
+            class: ["link-01-bold", "underline"],
+            target: "_blank",
+            tabindex: -1,
+            to: {
+              name: "caselaw-documentUnit-:documentNumber-categories",
+              params: { documentNumber: dataEntry.documentNumber },
             },
-            ProceedingDecision.renderDecision(dataEntry)
-          )
-        : h(
-            "span",
-            { class: ["link-02-reg"] },
-            ProceedingDecision.renderDecision(dataEntry)
-          ),
-    ]
-  )
+          },
+          dataEntry.renderDecision
+        )
+      : h("span", { class: ["link-02-reg"] }, dataEntry.renderDecision),
+  ])
 }
 
 const DecisionSummary = withSummarizer(decisionSummarizer)
@@ -185,7 +172,7 @@ watch(
           aria-label="Entscheidung manuell hinzufügen"
           button-type="tertiary"
           label="Manuell Hinzufügen"
-          @click="createProceedingDecision(input)"
+          @click="createProceedingDecision(input as ProceedingDecision)"
         />
       </div>
 

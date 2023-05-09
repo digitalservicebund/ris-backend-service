@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitProceedingDecisions from "@/components/proceedingDecisions/ProceedingDecisions.vue"
-import type { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/documentUnit"
 import documentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"
 
@@ -56,15 +56,21 @@ describe("DocumentUnitProceedingDecisions", async () => {
         Promise.resolve({
           status: 200,
           data: [
-            {
-              court: { type: "type1", location: "location1", label: "label1" },
-              date: "2022-02-01",
-              documentType: {
-                jurisShortcut: "documentTypeShortcut1",
-                label: "documentType1",
+            new ProceedingDecision({
+              ...{
+                court: {
+                  type: "type1",
+                  location: "location1",
+                  label: "label1",
+                },
+                date: "2022-02-01",
+                documentType: {
+                  jurisShortcut: "documentTypeShortcut1",
+                  label: "documentType1",
+                },
+                fileNumber: "testFileNumber1",
               },
-              fileNumber: "testFileNumber1",
-            },
+            }),
           ],
         })
       )
@@ -102,24 +108,36 @@ describe("DocumentUnitProceedingDecisions", async () => {
         Promise.resolve({
           status: 200,
           data: [
-            {
-              court: { type: "type1", location: "location1", label: "label1" },
-              date: "2022-02-01",
-              documentType: {
-                jurisShortcut: "documentTypeShortcut1",
-                label: "documentType1",
+            new ProceedingDecision({
+              ...{
+                court: {
+                  type: "type1",
+                  location: "location1",
+                  label: "label1",
+                },
+                date: "2022-02-01",
+                documentType: {
+                  jurisShortcut: "documentTypeShortcut1",
+                  label: "documentType1",
+                },
+                fileNumber: "test fileNumber",
               },
-              fileNumber: "test fileNumber",
-            },
-            {
-              court: { type: "type2", location: "location2", label: "label2" },
-              date: "2022-02-02",
-              documentType: {
-                jurisShortcut: "documentTypeShortcut2",
-                label: "documentType2",
+            }),
+            new ProceedingDecision({
+              ...{
+                court: {
+                  type: "type2",
+                  location: "location2",
+                  label: "label2",
+                },
+                date: "2022-02-02",
+                documentType: {
+                  jurisShortcut: "documentTypeShortcut2",
+                  label: "documentType2",
+                },
+                fileNumber: "test fileNumber",
               },
-              fileNumber: "test fileNumber",
-            },
+            }),
           ],
         })
       )
@@ -146,19 +164,21 @@ describe("DocumentUnitProceedingDecisions", async () => {
           Promise.resolve({
             status: 200,
             data: [
-              {
-                court: {
-                  type: "type1",
-                  location: "location1",
-                  label: "label1",
+              new ProceedingDecision({
+                ...{
+                  court: {
+                    type: "type1",
+                    location: "location1",
+                    label: "label1",
+                  },
+                  date: "2022-02-01",
+                  documentType: {
+                    jurisShortcut: "documentTypeShortcut1",
+                    label: "documentType1",
+                  },
+                  fileNumber: "test fileNumber",
                 },
-                date: "2022-02-01",
-                documentType: {
-                  jurisShortcut: "documentTypeShortcut1",
-                  label: "documentType1",
-                },
-                fileNumber: "test fileNumber",
-              },
+              }),
             ],
           })
         )

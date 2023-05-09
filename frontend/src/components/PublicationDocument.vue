@@ -5,7 +5,7 @@ import InputField from "../shared/components/input/InputField.vue"
 import TextButton from "../shared/components/input/TextButton.vue"
 import TextInput from "../shared/components/input/TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
-import DocumentUnit, { ProceedingDecision } from "@/domain/documentUnit"
+import DocumentUnit from "@/domain/documentUnit"
 import XmlMail from "@/domain/xmlMail"
 import { fieldLabels, proceedingDecisionFieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
@@ -71,7 +71,7 @@ const missingFields = ref(
 
 const missingProceedingDecisionFields = ref(
   props.documentUnit.proceedingDecisions?.map((proceedingDecision) =>
-    ProceedingDecision.getMissingFields(proceedingDecision).map(
+    proceedingDecision.missingRequiredFields.map(
       (field) => proceedingDecisionFieldLabels[field]
     )
   )

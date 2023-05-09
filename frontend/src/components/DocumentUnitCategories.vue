@@ -34,7 +34,9 @@ const handleUpdateValueDocumentUnitTexts = async (
 
 const handleUpdateDocumentUnit = async () => {
   updateStatus.value = UpdateStatus.ON_UPDATE
-  const response = await documentUnitService.update(updatedDocumentUnit.value)
+  const response = await documentUnitService.update(
+    updatedDocumentUnit.value as DocumentUnit
+  )
   if (response?.error?.validationErrors) {
     validationErrors.value = response.error.validationErrors
   } else {
@@ -177,7 +179,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <DocumentUnitWrapper :document-unit="updatedDocumentUnit">
+  <DocumentUnitWrapper :document-unit="(updatedDocumentUnit as DocumentUnit)">
     <template #default="{ classes }">
       <div class="flex w-full">
         <div :class="classes">

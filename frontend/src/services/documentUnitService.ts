@@ -67,12 +67,19 @@ const service: DocumentUnitService = {
       response.error = {
         title: "Neue Dokumentationseinheit konnte nicht erstellt werden.",
       }
+    } else {
+      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
+        ...(response.data as DocumentUnit),
+      })
     }
     return response
   },
 
   async update(documentUnit: DocumentUnit) {
-    const response = await httpClient.put(
+    const response = await httpClient.put<
+      DocumentUnit,
+      DocumentUnit | FailedValidationServerResponse
+    >(
       `caselaw/documentunits/${documentUnit.uuid}`,
       {
         headers: {
@@ -80,7 +87,7 @@ const service: DocumentUnitService = {
           "Content-Type": "application/json",
         },
       },
-      JSON.stringify(documentUnit)
+      documentUnit
     )
     if (response.status >= 300) {
       response.error = {
@@ -95,6 +102,10 @@ const service: DocumentUnitService = {
           response.data as FailedValidationServerResponse
         ).errors
       }
+    } else {
+      response.data = new DocumentUnit((response.data as DocumentUnit).uuid, {
+        ...(response.data as DocumentUnit),
+      })
     }
     return response
   },
@@ -132,7 +143,12 @@ const service: DocumentUnitService = {
         title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
       }
     }
-    return response
+    return {
+      status: 200,
+      data: (response.data as ProceedingDecision[]).map(
+        (decision) => new ProceedingDecision({ ...decision })
+      ),
+    }
   },
 }
 

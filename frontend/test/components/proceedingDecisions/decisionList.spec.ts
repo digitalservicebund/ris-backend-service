@@ -5,13 +5,15 @@ import { ProceedingDecision } from "@/domain/documentUnit"
 function renderComponent(options?: { decisions: ProceedingDecision[] }) {
   const props: { decisions: ProceedingDecision[] } = {
     decisions: options?.decisions ?? [
-      {
-        court: {
-          type: "testCourtType",
-          location: "testCourtLocation",
-          label: "label1",
+      new ProceedingDecision({
+        ...{
+          court: {
+            type: "testCourtType",
+            location: "testCourtLocation",
+            label: "label",
+          },
         },
-      },
+      }),
     ],
   }
 
@@ -27,20 +29,24 @@ describe("ProceedingDecision List", () => {
   it("renders correct amount of items", async () => {
     renderComponent({
       decisions: [
-        {
-          court: {
-            type: "testCourtType1",
-            location: "testCourtLocation1",
-            label: "label1",
+        new ProceedingDecision({
+          ...{
+            court: {
+              type: "testCourtType1",
+              location: "testCourtLocation1",
+              label: "label1",
+            },
           },
-        },
-        {
-          court: {
-            type: "testCourtType2",
-            location: "testCourtLocation2",
-            label: "label2",
+        }),
+        new ProceedingDecision({
+          ...{
+            court: {
+              type: "testCourtType2",
+              location: "testCourtLocation2",
+              label: "label2",
+            },
           },
-        },
+        }),
       ],
     })
     expect((await screen.findAllByLabelText("Löschen")).length).toEqual(2)
@@ -49,30 +55,36 @@ describe("ProceedingDecision List", () => {
   it("sorts the decisions by data", async () => {
     renderComponent({
       decisions: [
-        {
-          court: {
-            type: "testCourtType",
-            location: "testCourtLocation",
-            label: "label",
+        new ProceedingDecision({
+          ...{
+            court: {
+              type: "testCourtType",
+              location: "testCourtLocation",
+              label: "label",
+            },
+            date: "10-10-2000 12:00:00.000000 +00:00",
           },
-          date: "10-10-2000 12:00:00.000000 +00:00",
-        },
-        {
-          court: {
-            type: "testCourtType",
-            location: "testCourtLocation",
-            label: "label",
+        }),
+        new ProceedingDecision({
+          ...{
+            court: {
+              type: "testCourtType",
+              location: "testCourtLocation",
+              label: "label",
+            },
+            date: "10-10-2100 12:00:00.000000 +00:00",
           },
-          date: "10-10-2100 12:00:00.000000 +00:00",
-        },
-        {
-          court: {
-            type: "testCourtType",
-            location: "testCourtLocation",
-            label: "label",
+        }),
+        new ProceedingDecision({
+          ...{
+            court: {
+              type: "testCourtType",
+              location: "testCourtLocation",
+              label: "label",
+            },
+            date: "10-10-1900 12:00:00.000000 +00:00",
           },
-          date: "10-10-1900 12:00:00.000000 +00:00",
-        },
+        }),
       ],
     })
 
