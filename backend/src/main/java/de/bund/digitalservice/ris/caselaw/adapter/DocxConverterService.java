@@ -222,7 +222,13 @@ public class DocxConverterService implements ConverterService {
                                 relationship.getId(),
                                 new DocxImagePart(jpegPart.getContentType(), jpegPart.getBytes())));
               } else if (part instanceof MetafileEmfPart emfPart) {
-                convertEMF(mlPackage, images, emfPart);
+                //                convertEMF(mlPackage, images, emfPart);
+                part.getSourceRelationships()
+                    .forEach(
+                        relationship ->
+                            images.put(
+                                relationship.getId(),
+                                new DocxImagePart(emfPart.getContentType(), emfPart.getBytes())));
               } else if (part instanceof ImagePngPart pngPart) {
                 part.getSourceRelationships()
                     .forEach(
