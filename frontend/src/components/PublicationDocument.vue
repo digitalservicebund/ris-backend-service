@@ -70,11 +70,14 @@ const missingFields = ref(
 )
 
 const missingProceedingDecisionFields = ref(
-  props.documentUnit.proceedingDecisions?.map((proceedingDecision) =>
-    proceedingDecision.missingRequiredFields.map(
-      (field) => proceedingDecisionFieldLabels[field]
-    )
-  )
+  props.documentUnit.proceedingDecisions?.map((proceedingDecision) => {
+    return {
+      identifier: proceedingDecision.renderDecision,
+      missingFields: proceedingDecision.missingRequiredFields.map(
+        (field) => proceedingDecisionFieldLabels[field]
+      ),
+    }
+  })
 )
 const fieldsMissing = computed(() =>
   missingFields.value.length || missingProceedingDecisionFields.value?.length
@@ -114,17 +117,21 @@ const fieldsMissing = computed(() =>
                 class="body-01-reg list-item ml-[1rem]"
               >
                 Rechtszug
-                <ol class="list-decimal">
+                <ul>
                   <li
                     v-for="fields in missingProceedingDecisionFields"
                     :key="missingProceedingDecisionFields.indexOf(fields)"
                     class="body-01-reg list-item ml-[1rem]"
                   >
-                    <div v-for="field in fields" :key="fields.indexOf(field)">
-                      {{ field }}
+                    <div v-if="fields.missingFields.length > 0">
+                      <span>{{ fields.identifier }}</span>
+                      -
+                      <span class="label-02-bold">{{
+                        fields.missingFields.join(", ")
+                      }}</span>
                     </div>
                   </li>
-                </ol>
+                </ul>
               </li>
             </ul>
           </div>
