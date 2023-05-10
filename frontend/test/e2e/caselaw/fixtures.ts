@@ -40,6 +40,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
             },
             fileNumbers: [generateString()],
             documentType: { jurisShortcut: "AnU", label: "Anerkenntnisurteil" },
+            decisionDate: "2019-12-31T23:00:00.000Z",
           },
         },
       }
