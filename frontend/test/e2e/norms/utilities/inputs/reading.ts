@@ -65,7 +65,7 @@ export async function expectInputFieldGroupHasCorrectValues(
       valueIndex !== undefined ? field.values?.[valueIndex] : field.value
 
     if (value !== undefined) {
-      const label = page.locator(`label:text-is("${field.label}")`).first()
+      const label = page.locator(`label:has-text("${field.label}")`).first()
       await expect(label).toBeVisible()
 
       await expectInputFieldHasCorrectValue(page, field.type, field.id, value)

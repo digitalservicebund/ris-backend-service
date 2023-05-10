@@ -628,7 +628,7 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
 
     <fieldset>
       <legend id="otherFootnoteFields" class="heading-02-regular mb-[1rem]">
-        Fußnote
+        Fußnoten
       </legend>
       <InputGroup
         v-model="flatMetadata"

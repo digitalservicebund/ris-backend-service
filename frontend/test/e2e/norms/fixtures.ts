@@ -184,7 +184,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         {
           type: FieldType.TEXT,
           id: "normProviderEntity",
-          label: "Staat, Land, Stadt, Landkreis oder juristische Person",
+          label:
+            "Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt",
           values: norm.metadataSections?.NORM_PROVIDER?.map(
             (section) => section?.ENTITY?.[0]
           ),
@@ -918,7 +919,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      heading: "Fußnote",
+      heading: "Fußnoten",
       fields: [
         {
           type: FieldType.TEXT,
