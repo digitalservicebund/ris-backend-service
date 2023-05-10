@@ -39,6 +39,11 @@ async function createProceedingDecision(
       console.error(response.error)
     }
   }
+  resetInput()
+}
+
+function resetInput() {
+  input.value = input.value.clear
 }
 
 async function linkProceedingDecision(childUuid: string) {
@@ -53,6 +58,7 @@ async function linkProceedingDecision(childUuid: string) {
   } else {
     console.error(response.error)
   }
+  resetInput()
 }
 
 async function removeProceedingDecision(decision: ProceedingDecision) {

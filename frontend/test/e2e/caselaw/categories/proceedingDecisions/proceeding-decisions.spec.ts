@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test"
 import { generateString } from "../../../../test-helper/dataGenerators"
 import {
+  checkIfProceedingDecisionCleared,
   deleteDocumentUnit,
   fillProceedingDecisionInputs,
   navigateToCategories,
@@ -50,6 +51,8 @@ test.describe("Proceeding decisions", () => {
 
     await page.getByText("Manuell Hinzufügen").click()
 
+    await checkIfProceedingDecisionCleared(page)
+
     await expect(
       page.getByText(`AG Aalen, AnU, 03.12.2004, ${fileNumber}`, {
         exact: true,
@@ -96,6 +99,8 @@ test.describe("Proceeding decisions", () => {
 
     await page.getByText("Manuell Hinzufügen").click()
 
+    await checkIfProceedingDecisionCleared(page)
+
     await expect(
       page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c", { exact: true })
     ).toBeVisible()
@@ -108,6 +113,8 @@ test.describe("Proceeding decisions", () => {
     })
 
     await page.getByText("Manuell Hinzufügen").click()
+
+    await checkIfProceedingDecisionCleared(page)
 
     await expect(
       page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")

@@ -1,5 +1,6 @@
 import { expect } from "@playwright/test"
 import {
+  checkIfProceedingDecisionCleared,
   fillProceedingDecisionInputs,
   navigateToCategories,
   toggleProceedingDecisionsSection,
@@ -45,11 +46,13 @@ test.describe("Search proceeding decisions", () => {
     await expect(result).toBeVisible()
     await result.locator("[aria-label='Treffer übernehmen']").click()
 
+    await checkIfProceedingDecisionCleared(page)
+
     await expect(
       page.getByText(
         `AG Aachen, AnU, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}, ${secondaryDocumentUnit.documentNumber}`
       )
-    ).toBeVisible()
+    ).toHaveCount(2)
 
     await expect(page.getByText("Bereits hinzugefügt")).toBeVisible()
 

@@ -155,3 +155,10 @@ export async function fillProceedingDecisionInputs(
     await page.locator("[aria-label='dropdown-option']").first().click()
   }
 }
+
+export async function checkIfProceedingDecisionCleared(page: Page) {
+  await expect(page.getByLabel("Gericht Rechtszug")).toHaveValue("")
+  await expect(page.getByLabel("Entscheidungsdatum Rechtszug")).toHaveValue("")
+  await expect(page.getByLabel("Aktenzeichen Rechtszug")).toHaveValue("")
+  await expect(page.getByLabel("Dokumenttyp Rechtszug")).toHaveValue("")
+}
