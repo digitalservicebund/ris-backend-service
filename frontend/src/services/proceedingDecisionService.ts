@@ -1,4 +1,5 @@
-import DocumentUnit, { ProceedingDecision } from "./../domain/documentUnit"
+import DocumentUnit from "./../domain/documentUnit"
+import { ProceedingDecision } from "./../domain/proceedingDecision"
 import httpClient, { ServiceResponse } from "./httpClient"
 
 interface ProceedingDecisionService {

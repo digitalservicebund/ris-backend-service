@@ -1,7 +1,8 @@
 import { render, screen } from "@testing-library/vue"
 import { createRouter, createWebHistory } from "vue-router"
 import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
-import { Court, DocumentType, ProceedingDecision } from "@/domain/documentUnit"
+import { Court, DocumentType } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/proceedingDecision"
 
 function renderComponent(options?: {
   court?: Court

@@ -1,5 +1,6 @@
-import DocumentUnit, { ProceedingDecision } from "../domain/documentUnit"
+import DocumentUnit from "../domain/documentUnit"
 import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
+import { ProceedingDecision } from "../domain/proceedingDecision"
 import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,

@@ -2,7 +2,7 @@
 import dayjs from "dayjs"
 import { computed } from "vue"
 import InlineDecision from "@/components/proceedingDecisions/InlineDecision.vue"
-import { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/proceedingDecision"
 
 const props = defineProps<{
   decisions: ProceedingDecision[]

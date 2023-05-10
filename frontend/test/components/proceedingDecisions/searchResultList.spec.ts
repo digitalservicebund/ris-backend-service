@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/vue"
 import SearchResultList, {
   SearchResults,
 } from "@/components/proceedingDecisions/SearchResultList.vue"
-import { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/proceedingDecision"
 
 function renderComponent(searchResults?: SearchResults) {
   const props: { searchResults: SearchResults } = {

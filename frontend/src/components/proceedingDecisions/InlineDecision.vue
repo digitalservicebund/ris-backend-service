@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/proceedingDecision"
 
 defineProps<{
   decision: ProceedingDecision

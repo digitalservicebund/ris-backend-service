@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, watch } from "vue"
 import InlineDecision from "./InlineDecision.vue"
-import { ProceedingDecision } from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/proceedingDecision"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
 const props = defineProps<{ searchResults: SearchResults | undefined }>()
