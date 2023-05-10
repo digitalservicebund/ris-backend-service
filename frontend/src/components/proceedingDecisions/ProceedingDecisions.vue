@@ -43,7 +43,7 @@ async function createProceedingDecision(
 }
 
 function resetInput() {
-  input.value = input.value.clear
+  input.value = new ProceedingDecision({})
 }
 
 async function linkProceedingDecision(childUuid: string) {

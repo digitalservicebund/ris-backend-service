@@ -76,16 +76,6 @@ export class ProceedingDecision {
     )
   }
 
-  get clear() {
-    this.uuid = undefined
-    this.documentNumber = undefined
-    this.court = undefined
-    this.date = undefined
-    this.fileNumber = undefined
-    this.documentType = undefined
-    return this
-  }
-
   private requiredFieldIsEmpty(
     value: ProceedingDecision[(typeof ProceedingDecision.requiredFields)[number]]
   ) {
