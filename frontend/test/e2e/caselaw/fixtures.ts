@@ -1,7 +1,11 @@
 import { Locator, test } from "@playwright/test"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
 import DocumentUnit from "../../../src/domain/documentUnit"
 import { generateString } from "../../test-helper/dataGenerators"
 import { navigateToCategories } from "./e2e-utils"
+
+dayjs.extend(utc)
 
 // Declare the types of your fixtures.
 type MyFixtures = {
@@ -40,7 +44,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
             },
             fileNumbers: [generateString()],
             documentType: { jurisShortcut: "AnU", label: "Anerkenntnisurteil" },
-            decisionDate: "2019-12-31T23:00:00.000Z",
+            // decisionDate: dayjs("2020-01-01", "YYYY-MM-DD").local().utc().format()
           },
         },
       }
