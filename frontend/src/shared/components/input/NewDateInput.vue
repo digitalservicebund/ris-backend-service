@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
 import { vMaska, MaskaDetail } from "maska"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
@@ -22,10 +23,14 @@ const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 const inputValue = ref<string>()
 
+dayjs.extend(customParseFormat)
 const options = {
   onMaska: (input: MaskaDetail) => {
     input.completed &&
-      emit("update:modelValue", dayjs(inputValue.value).toISOString())
+      emit(
+        "update:modelValue",
+        dayjs(inputValue.value, "DD.MM.YYYY").toISOString()
+      )
   },
 }
 
@@ -34,7 +39,7 @@ watch(
   () => {
     //TODO formatting with DD.MM.YYYY back and forth causes recursive loop
     inputValue.value = props.modelValue
-      ? dayjs(props.modelValue).format("YYYY-MM-DD")
+      ? dayjs(props.modelValue).format("DD.MM.YYYY")
       : undefined
   },
   {
@@ -48,8 +53,10 @@ const conditionalClasses = computed(() => ({
 
 function backspaceDelete() {
   emit("update:modelValue", undefined)
-  emit("update:validationError", undefined)
-  inputValue.value = undefined
+}
+
+function onBlur() {
+  // emit
 }
 </script>
 
@@ -62,8 +69,9 @@ function backspaceDelete() {
     :aria-label="ariaLabel"
     class="bg-white border-2 border-blue-800 focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
-    data-maska="####.##.##"
-    placeholder="YYYY.MM.DD"
+    data-maska="##.##.####"
+    placeholder="DD.MM.YYYY"
+    @blur="onBlur"
     @keydown.delete="backspaceDelete"
   />
 </template>
