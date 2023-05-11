@@ -1,11 +1,11 @@
 import { Locator, test } from "@playwright/test"
 import dayjs from "dayjs"
-import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
 import DocumentUnit from "../../../src/domain/documentUnit"
 import { generateString } from "../../test-helper/dataGenerators"
 import { navigateToCategories } from "./e2e-utils"
 
-dayjs.extend(timezone)
+dayjs.extend(utc)
 
 // Declare the types of your fixtures.
 type MyFixtures = {
@@ -31,9 +31,6 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
       data: { documentationCenterAbbreviation: "foo", documentType: "X" },
     })
     const secondaryDocumentUnit = await response.json()
-    const decisionDate = dayjs("2020-01-01")
-      .tz("Europe/Berlin", true)
-      .toISOString()
     const updateResponse = await request.put(
       `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`,
       {
@@ -47,7 +44,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
             },
             fileNumbers: [generateString()],
             documentType: { jurisShortcut: "AnU", label: "Anerkenntnisurteil" },
-            decisionDate,
+            // decisionDate: dayjs("2020-01-01", "YYYY-MM-DD").local().utc().format()
           },
         },
       }
