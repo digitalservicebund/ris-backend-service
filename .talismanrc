@@ -4,7 +4,7 @@ fileignoreconfig:
   - filename: frontend/test/test-helper/dataGenerators.ts
     checksum: 89ff7c6f13b276ea2c1f65f920157ac3eed03fda117c99e3f0fd0ef3db631752
   - filename: frontend/FRONTEND_STYLEGUIDE.md
-    checksum: 024c241cafa55504e94771f109457721d5eff58b3e66389982f34e23e8ac4a41
+    checksum: e6b8194eba2012f2a769c5a5d3577715a573b441a7b94e744c32b3149d0d3a93
   - filename: doc/norms/backend-api.yaml
     checksum: ea8c3c035360509a42808da85419260e47cfef1ab14c09c2acb18d2c5000b486
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
