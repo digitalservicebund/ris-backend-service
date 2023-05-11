@@ -27,7 +27,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
       data: { documentationCenterAbbreviation: "foo", documentType: "X" },
     })
     const secondaryDocumentUnit = await response.json()
-    const decisionDate = "2019-12-31T22:00:00Z"
+    const decisionDate = "2019-12-31T23:00:00Z"
     const updateResponse = await request.put(
       `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`,
       {
