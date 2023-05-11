@@ -9,6 +9,7 @@ import DateInput from "@/shared/components/input/DateInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import FileInput from "@/shared/components/input/FileInput.vue"
 import NestedInput from "@/shared/components/input/NestedInput.vue"
+import NewDateInput from "@/shared/components/input/NewDateInput.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import {
   InputAttributes,
@@ -56,6 +57,8 @@ const component = computed(() => {
       return DropdownInput
     case InputType.DATE:
       return DateInput
+    case InputType.NEWDATE:
+      return NewDateInput
     case InputType.CUSTOMDATE:
       return CustomDateInput
     case InputType.CHECKBOX:
