@@ -182,8 +182,6 @@ class EditNormFrameControllerTest {
         var digitalEvidenceExternalDataNote: String? = null
         var digitalEvidenceAppendix: String? = null
 
-        var eli: String? = null
-
         var celexNumber: String? = null
 
         var text: String? = null
