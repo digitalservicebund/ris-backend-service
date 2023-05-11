@@ -164,12 +164,12 @@ watch(
   { deep: true }
 )
 
-function formatDate(dateStrings: string[] | undefined): string {
-  if (!dateStrings) {
+function formatDate(dateStrings: (string | undefined)[] | undefined): string {
+  const dateString = Array.isArray(dateStrings) ? dateStrings[0] : dateStrings
+
+  if (!dateString) {
     return ""
   }
-
-  const dateString = Array.isArray(dateStrings) ? dateStrings[0] : dateStrings
 
   const date = new Date(dateString)
   const day = date.getDate().toString().padStart(2, "0")
@@ -224,7 +224,7 @@ function digitalAnnouncementSummary(data: Metadata): string {
 
   return `Elektronisches Verkündungsblatt | ${[
     announcementMedium,
-    formatDate(announcementDate),
+    formatDate([announcementDate]),
     announcementEdition,
     announcementYear,
     announcementAreaOfPub,
