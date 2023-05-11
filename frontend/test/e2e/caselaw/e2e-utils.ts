@@ -125,6 +125,7 @@ export async function fillProceedingDecisionInputs(
     date?: string
     fileNumber?: string
     documentType?: string
+    dateUnknown?: boolean
   },
   decisionIndex = 0
 ): Promise<void> {

@@ -44,6 +44,7 @@ test.describe("Proceeding decisions", () => {
       date: "2004-12-03",
       fileNumber: fileNumber,
       documentType: "AnU",
+      dateUnknown: false,
     })
 
     await page.getByText("Manuell Hinzufügen").click()
@@ -116,5 +117,65 @@ test.describe("Proceeding decisions", () => {
     await expect(
       page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
     ).toHaveCount(2)
+  })
+
+  test("add proceeding decision with unknown date", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleProceedingDecisionsSection(page)
+
+    const fileNumber = generateString()
+
+    await fillProceedingDecisionInputs(page, {
+      court: "AG Aalen",
+      fileNumber: fileNumber,
+      documentType: "AnU",
+      dateUnknown: true,
+    })
+
+    await page.getByText("Manuell Hinzufügen").click()
+
+    await checkIfProceedingDecisionCleared(page)
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`,
+        {
+          exact: true,
+        }
+      )
+    ).toBeVisible()
+
+    await page.reload()
+    await toggleProceedingDecisionsSection(page)
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
+      )
+    ).toHaveCount(1)
+
+    // delete proceedingDecision
+    await page
+      .locator("div", { hasText: "AG Aalen" })
+      .getByLabel("Löschen")
+      .click()
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
+      )
+    ).toHaveCount(0)
+
+    page.reload()
+    await toggleProceedingDecisionsSection(page)
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
+      )
+    ).toHaveCount(0)
   })
 })

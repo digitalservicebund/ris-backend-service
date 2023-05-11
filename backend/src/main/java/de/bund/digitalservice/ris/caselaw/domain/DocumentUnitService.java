@@ -312,6 +312,7 @@ public class DocumentUnitService {
             .documentType(proceedingDecision.documentType())
             .decisionDate(proceedingDecision.date())
             .court(proceedingDecision.court())
+            .dateKnown(proceedingDecision.dateKnown())
             .build();
 
     return documentUnit.toBuilder()
