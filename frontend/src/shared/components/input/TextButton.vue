@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { sanitizeUrl } from "@braintree/sanitize-url"
 import { computed, h } from "vue"
 
 interface Props {
@@ -31,6 +32,7 @@ const buttonClasses = computed(() => ({
 }))
 
 const isLink = computed(() => !!props.href)
+const sanitizedUrl = computed(() => sanitizeUrl(props.href))
 
 const renderIcon = () =>
   props.icon ? h("span", { class: "material-icons" }, props.icon) : undefined
@@ -40,7 +42,7 @@ const renderLabel = () =>
 
 const render = () => {
   const tag = isLink.value ? "a" : "button"
-  const { disabled, href, download, target } = props
+  const { disabled, download, target } = props
 
   return h(
     tag,
@@ -48,7 +50,7 @@ const render = () => {
       class: ["ris-btn", "flex", "gap-12", buttonClasses.value],
       "aria-label": props.ariaLabel,
       disabled,
-      href,
+      href: sanitizedUrl.value,
       download,
       target,
     },
