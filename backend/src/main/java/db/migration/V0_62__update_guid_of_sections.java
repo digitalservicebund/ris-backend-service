@@ -1,5 +1,6 @@
 package db.migration;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.UUID;
@@ -14,8 +15,13 @@ public class V0_62__update_guid_of_sections extends BaseJavaMigration {
         while (rows.next()) {
           int id = rows.getInt(1);
           UUID guid = UUID.randomUUID();
-          try (Statement update = context.getConnection().createStatement()) {
-            update.execute("UPDATE metadata_sections SET guid='" + guid + "' WHERE id=" + id);
+          try (PreparedStatement preparedStatement =
+              context
+                  .getConnection()
+                  .prepareStatement("UPDATE metadata_sections SET guid=? WHERE id=?")) {
+            preparedStatement.setObject(1, guid);
+            preparedStatement.setInt(2, id);
+            preparedStatement.executeUpdate();
           }
         }
       }
