@@ -92,8 +92,10 @@ const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
 
-function backspaceDelete() {
+function resetInput() {
+  emit("update:validationError", undefined)
   emit("update:modelValue", undefined)
+  inputValue.value = undefined
 }
 </script>
 
@@ -105,11 +107,15 @@ function backspaceDelete() {
     class="bg-white border-2 border-blue-800 focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
     type="date"
-    @keydown.delete="backspaceDelete"
+    @keydown.delete="resetInput"
   />
 </template>
 
 <style lang="scss" scoped>
+input::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
 .input {
   &:autofill {
     @apply shadow-white text-inherit;
