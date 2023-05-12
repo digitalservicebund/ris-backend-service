@@ -3,26 +3,21 @@ package utils.factory
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
-import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
-import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import utils.randomString
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.util.UUID
 
 fun norm(block: NormBuilder.() -> Unit): Norm = NormBuilder().apply(block).build()
 
 class NormBuilder {
-    var guid = UUID.randomUUID()
+    var guid: UUID = UUID.randomUUID()
     var officialLongTitle = randomString()
     var risAbbreviation = randomString()
     var documentNumber = randomString()
-    var documentCategory = null
+    var documentCategory = randomString()
     var documentTypeName = randomString()
-    var documentNormCategory = null
+    var documentNormCategory = randomString()
     var documentTemplateName = randomString()
     var officialShortTitle = randomString()
     var officialAbbreviation = randomString()
@@ -32,15 +27,15 @@ class NormBuilder {
     var principleEntryIntoForceDateState = null
     var divergentEntryIntoForceDate = LocalDate.now()
     var divergentEntryIntoForceDateState = null
-    var entryIntoForceNormCategory = null
+    var entryIntoForceNormCategory = randomString()
     var expirationDate = LocalDate.now()
     var expirationDateState = null
-    var isExpirationDateTemp = null
+    var isExpirationDateTemp = true
     var principleExpirationDate = LocalDate.now()
     var principleExpirationDateState = null
     var divergentExpirationDate = LocalDate.now()
     var divergentExpirationDateState = null
-    var expirationNormCategory = null
+    var expirationNormCategory = randomString()
     var announcementDate = LocalDate.now()
     var publicationDate = LocalDate.now()
     var completeCitation = randomString()
@@ -66,8 +61,8 @@ class NormBuilder {
     var documentTextProof = randomString()
     var otherDocumentNote = randomString()
     var applicationScopeArea = randomString()
-    var applicationScopeStartDate = null
-    var applicationScopeEndDate = null
+    var applicationScopeStartDate = LocalDate.now()
+    var applicationScopeEndDate = LocalDate.now()
     var categorizedReference = randomString()
     var otherFootnote = randomString()
     var footnoteChange = randomString()
@@ -96,7 +91,7 @@ class NormBuilder {
         metadataSections = metadataSections,
         files = files,
         articles = articles,
-        risAbbreviation = randomString(),
+        risAbbreviation = risAbbreviation,
         documentNumber = documentNumber,
         documentCategory = documentCategory,
         documentTypeName = documentTypeName,
@@ -162,66 +157,12 @@ class NormBuilder {
     )
 }
 
-class MetadatumBuilder {
-    var value: String? = null
-    var type: MetadatumType = MetadatumType.LEAD_UNIT
-    val order: Int = 1
-
-    fun build(): Metadatum<*> = Metadatum(value, type, order)
-}
-
-class FileBuilder {
-    var name: String = ""
-    var hash: String = ""
-    val createdAt: LocalDateTime = LocalDateTime.now()
-
-    fun build(): FileReference = FileReference(name, hash, createdAt)
-}
-
-class ParagraphBuilder {
-    var guid: UUID = UUID.randomUUID()
-    var marker: String? = null
-    var text: String = ""
-
-    fun build(): Paragraph = Paragraph(guid, marker, text)
-}
-
-class ArticleBuilder {
-    var guid: UUID = UUID.randomUUID()
-    var title: String = ""
-    var marker: String = ""
-    private var paragraphs = mutableListOf<Paragraph>()
-
-    fun paragraphs(block: Paragraphs.() -> Unit) = paragraphs.addAll(Paragraphs().apply(block))
-
-    fun build(): Article = Article(guid, title, marker, paragraphs)
-}
-
-class MetadataSectionBuilder {
-    var name: MetadataSectionName = MetadataSectionName.LEAD
-    private val metadata = mutableListOf<Metadatum<*>>()
-    var order: Int = 1
-    var sections: List<MetadataSection>? = null
-
-    fun metadata(block: Metadata.() -> Unit) = metadata.addAll(Metadata().apply(block))
-
-    fun build(): MetadataSection = MetadataSection(name, metadata, order, sections)
-}
-
 class MetadataSections : ArrayList<MetadataSection>() {
     fun metadataSection(block: MetadataSectionBuilder.() -> Unit) = add(MetadataSectionBuilder().apply(block).build())
 }
 
-class Metadata : ArrayList<Metadatum<*>>() {
-    fun metadatum(block: MetadatumBuilder.() -> Unit) = add(MetadatumBuilder().apply(block).build())
-}
-
 class Articles : ArrayList<Article>() {
     fun article(block: ArticleBuilder.() -> Unit) = add(ArticleBuilder().apply(block).build())
-}
-
-class Paragraphs : ArrayList<Paragraph>() {
-    fun paragraph(block: ParagraphBuilder.() -> Unit) = add(ParagraphBuilder().apply(block).build())
 }
 
 class Files : ArrayList<FileReference>() {
