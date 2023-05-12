@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
-import { vMaska } from "maska"
-import { computed } from "vue"
+import { vMaska, MaskaDetail } from "maska"
+import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 
 interface Props {
@@ -21,42 +21,79 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const inputCompleted = ref<boolean>(false)
+
+const inputValue = ref(
+  props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined
+)
+
+const hasError = computed(
+  () =>
+    props.validationError ||
+    (inputCompleted.value && !isValidDate(inputValue.value))
+)
 
 dayjs.extend(customParseFormat)
 
-const inputValue = computed({
-  get: () =>
-    props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined,
-  set: (newValue) => {
-    isValidDate(newValue)
-      ? emit("update:modelValue", dayjs(newValue, "DD.MM.YYYY").toISOString())
-      : emit("update:modelValue", undefined)
+const options = {
+  onMaska: (input: MaskaDetail) => {
+    inputCompleted.value = input.completed
   },
-})
+}
+
+const conditionalClasses = computed(() => ({
+  input__error: props.validationError || hasError.value,
+}))
 
 function isValidDate(date: string | undefined) {
   return dayjs(date, "DD.MM.YYYY", true).isValid()
 }
 
-const conditionalClasses = computed(() => ({
-  input__error: props.validationError,
-}))
-
 function backspaceDelete() {
   emit("update:modelValue", undefined)
+  emit("update:validationError", undefined)
 }
 
 function onBlur() {
-  //todo
+  !isValidDate(inputValue.value)
+    ? (emit("update:validationError", {
+        defaultMessage: "Kein valides Datum",
+        field: props.id,
+      }),
+      emit("update:modelValue", undefined))
+    : emit("update:validationError", undefined)
 }
+
+watch(inputValue, (is) => {
+  isValidDate(is) &&
+    emit("update:modelValue", dayjs(is, "DD.MM.YYYY").toISOString())
+})
+
+watch(inputCompleted, (is) => {
+  if (is) {
+    !isValidDate(inputValue.value)
+      ? emit("update:validationError", {
+          defaultMessage: "Kein valides Datum",
+          field: props.id,
+        })
+      : emit("update:validationError", undefined)
+  } else {
+    emit("update:validationError", undefined)
+  }
+})
+
+watch(props, () => {
+  inputValue.value = props.modelValue
+    ? dayjs(props.modelValue).format("DD.MM.YYYY")
+    : undefined
+})
 </script>
 
 <template>
-  <!-- Maska -->
   <input
     :id="id"
     v-model="inputValue"
-    v-maska
+    v-maska:[options]
     :aria-label="ariaLabel"
     class="bg-white border-2 border-blue-800 focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
