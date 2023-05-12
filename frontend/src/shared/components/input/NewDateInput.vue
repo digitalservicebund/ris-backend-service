@@ -30,6 +30,9 @@ const inputValue = ref(
 const hasError = computed(
   () =>
     props.validationError ||
+    (inputCompleted.value &&
+      !isInPast(inputValue.value) &&
+      !props.isFutureDate) ||
     (inputCompleted.value && !isValidDate(inputValue.value))
 )
 
@@ -45,8 +48,16 @@ const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
 
-function isValidDate(date: string | undefined) {
-  return dayjs(date, "DD.MM.YYYY", true).isValid()
+function isValidDate(input: string | undefined) {
+  return dayjs(input, "DD.MM.YYYY", true).isValid()
+}
+
+function isInPast(input: string | undefined) {
+  if (input) {
+    const date = new Date(input)
+    const today = new Date()
+    return date < today
+  } else return true
 }
 
 function backspaceDelete() {
@@ -66,14 +77,24 @@ function onBlur() {
 
 watch(inputValue, (is) => {
   isValidDate(is) &&
+    isInPast(is) &&
     emit("update:modelValue", dayjs(is, "DD.MM.YYYY").toISOString())
 })
 
 watch(inputCompleted, (is) => {
   if (is) {
+    //check for valid dates
     !isValidDate(inputValue.value)
       ? emit("update:validationError", {
           defaultMessage: "Kein valides Datum",
+          field: props.id,
+        })
+      : emit("update:validationError", undefined)
+    // check for future dates
+    !isInPast(inputValue.value) && !props.isFutureDate
+      ? emit("update:validationError", {
+          defaultMessage:
+            "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
           field: props.id,
         })
       : emit("update:validationError", undefined)
