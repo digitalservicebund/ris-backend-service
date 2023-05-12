@@ -12,7 +12,6 @@ export enum InputType {
   NESTED = "nested",
   COMBOBOX = "combobox",
   CUSTOMDATE = "customdate",
-  NEWDATE = "newdate",
 }
 
 //BASE
@@ -87,7 +86,7 @@ export interface DateAttributes extends BaseInputAttributes {
 
 export interface DateInputField extends BaseInputField {
   placeholder?: string
-  type: InputType.NEWDATE
+  type: InputType.DATE
   inputAttributes: DateAttributes
 }
 

@@ -110,15 +110,6 @@ const dateInputAttributes: BaseInputAttributes = {
       />
     </InputField>
 
-    <h1 class="font-bold text-24">Textmask Date Input</h1>
-    <InputField id="customDateInputField">
-      <InputElement
-        id="dateInput"
-        :attributes="dateInputAttributes"
-        :type="InputType.NEWDATE"
-      />
-    </InputField>
-
     <h1 class="font-bold text-24">Custom Date Input</h1>
     <InputField id="customDateInputField">
       <InputElement
