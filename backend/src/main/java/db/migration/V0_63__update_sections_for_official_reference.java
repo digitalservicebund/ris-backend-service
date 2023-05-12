@@ -1,5 +1,6 @@
 package db.migration;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.UUID;
@@ -19,28 +20,32 @@ public class V0_63__update_sections_for_official_reference extends BaseJavaMigra
 
           UUID parentGuid = UUID.randomUUID();
 
-          try (Statement change = context.getConnection().createStatement()) {
-            change.execute(
-                "INSERT INTO metadata_sections (name, norm_id, section_id, order_number, guid) VALUES ('OFFICIAL_REFERENCE', "
-                    + normId
-                    + ", NULL, "
-                    + order
-                    + ", '"
-                    + parentGuid
-                    + "');");
+          try (PreparedStatement change =
+              context
+                  .getConnection()
+                  .prepareStatement(
+                      "INSERT INTO metadata_sections (name, norm_id, section_id, order_number, guid) VALUES ('OFFICIAL_REFERENCE', ?, NULL, ?, ?);")) {
+            change.setInt(1, normId);
+            change.setInt(2, order);
+            change.setObject(3, parentGuid);
+            change.execute();
           }
 
-          try (Statement findParent = context.getConnection().createStatement()) {
-            try (ResultSet parent =
-                findParent.executeQuery(
-                    "SELECT * FROM metadata_sections WHERE guid='" + parentGuid + "'")) {
+          try (PreparedStatement findParent =
+              context
+                  .getConnection()
+                  .prepareStatement("SELECT * FROM metadata_sections WHERE guid=?")) {
+            findParent.setObject(1, parentGuid);
+            try (ResultSet parent = findParent.executeQuery()) {
               parent.next();
-              try (Statement update = context.getConnection().createStatement()) {
-                update.execute(
-                    "UPDATE metadata_sections SET section_id='"
-                        + parent.getInt("id")
-                        + "', order_number=1 WHERE id="
-                        + childSectionId);
+              try (PreparedStatement update =
+                  context
+                      .getConnection()
+                      .prepareStatement(
+                          "UPDATE metadata_sections SET section_id=?, order_number=1 WHERE id=?")) {
+                update.setInt(1, parent.getInt("id"));
+                update.setInt(2, childSectionId);
+                update.execute();
               }
             }
           }
