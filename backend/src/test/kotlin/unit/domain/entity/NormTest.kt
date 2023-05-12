@@ -5,6 +5,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import utils.createSimpleSections
+import utils.factory.norm
 import java.time.LocalDate
 import java.util.UUID
 
@@ -154,6 +155,52 @@ class NormTest {
         assertThat(norm.eli.citationDate).isEqualTo(LocalDate.of(2022, 11, 19))
         assertThat(norm.eli.announcementDate).isEqualTo(LocalDate.of(2022, 11, 18))
         assertThat(norm.eli.toString()).isEqualTo("eli/bgbl-1/2022/s1102")
+    }
+
+    @Test
+    fun `can create a norm using type safe builders`() {
+        val norm = norm {
+            officialLongTitle = "officialLongTitle"
+            articles {
+                article {
+                    title = "Title"
+                    paragraphs {
+                        paragraph {
+                            text = "Paragraph"
+                        }
+                    }
+                }
+            }
+            metadataSections {
+                metadataSection {
+                    name = MetadataSectionName.OFFICIAL_REFERENCE
+                    sections {
+                        metadataSection {
+                            name = MetadataSectionName.PRINT_ANNOUNCEMENT
+                            metadata {
+                                metadatum {
+                                    value = "PrintAnnouncementGazette"
+                                    type = MetadatumType.ANNOUNCEMENT_GAZETTE
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            files {
+                file {
+                    name = "file.zip"
+                }
+            }
+        }
+        assertThat(norm.officialLongTitle).isEqualTo("officialLongTitle")
+        assertThat(norm.articles.first().title).isEqualTo("Title")
+        assertThat(norm.articles.first().paragraphs.first().text).isEqualTo("Paragraph")
+        assertThat(norm.metadataSections.first().name).isEqualTo(MetadataSectionName.OFFICIAL_REFERENCE)
+        assertThat(norm.metadataSections.first().metadata).isEmpty()
+        assertThat(norm.metadataSections.first().sections?.first()?.metadata?.first()?.type).isEqualTo(MetadatumType.ANNOUNCEMENT_GAZETTE)
+        assertThat(norm.metadataSections.first().sections?.first()?.metadata?.first()?.value).isEqualTo("PrintAnnouncementGazette")
+        assertThat(norm.files.first().name).isEqualTo("file.zip")
     }
 
     @Test
