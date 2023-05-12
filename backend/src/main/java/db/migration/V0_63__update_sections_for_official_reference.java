@@ -32,7 +32,8 @@ public class V0_63__update_sections_for_official_reference extends BaseJavaMigra
 
           try (Statement findParent = context.getConnection().createStatement()) {
             try (ResultSet parent =
-                findParent.executeQuery("SELECT * metadata_sections WHERE guid=" + parentGuid)) {
+                findParent.executeQuery(
+                    "SELECT * FROM metadata_sections WHERE guid=" + parentGuid)) {
               parent.next();
               try (Statement update = context.getConnection().createStatement()) {
                 update.execute(
