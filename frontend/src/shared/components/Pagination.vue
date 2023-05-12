@@ -1,6 +1,7 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
 import { withDefaults } from "vue"
+import PaginationButton from "./PaginationButton.vue"
 import { ServiceResponse } from "@/services/httpClient"
 
 const props = withDefaults(
@@ -48,29 +49,27 @@ export type PageableService<T> = {
   <div v-if="page?.content" class="flex flex-col items-center my-32">
     <div class="flex items-center">
       <div class="flex flex-grow items-center justify-center relative">
-        <button
+        <PaginationButton
           aria-label="vorherige Ergebnisse"
-          class="disabled:opacity-25 flex items-center link-01-bold pr-20"
           :disabled="page?.first"
           @click="previousPage"
           @keydown.enter="previousPage"
         >
           <span class="material-icons no-">arrow_back</span
           ><span class="underline">zurück</span>
-        </button>
+        </PaginationButton>
         <span v-if="page" class="pr-20">
           {{ page.number + 1 }} von {{ page.totalPages }}
         </span>
-        <button
+        <PaginationButton
           aria-label="nächste Ergebnisse"
-          class="disabled:opacity-25 flex items-center link-01-bold pr-20"
           :disabled="page?.last"
           @click="nextPage"
           @keydown.enter="nextPage"
         >
           <span class="underline">vor</span
           ><span class="material-icons">arrow_forward</span>
-        </button>
+        </PaginationButton>
       </div>
     </div>
     <div class="-ml-144 label-02-reg mt-2 text-[#4E596A]">
