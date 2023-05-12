@@ -25,7 +25,9 @@ const props = defineProps<{
 
 const proceedingDecisions = ref<ProceedingDecision[]>()
 const searchResults = ref<SearchResults>()
-const input = ref<ProceedingDecision>(new ProceedingDecision({}))
+const input = ref<ProceedingDecision>(
+  new ProceedingDecision({ dateKnown: true })
+)
 
 function isNotEmpty(decision: ProceedingDecision): boolean {
   return Object.values(decision).some((value) => value !== undefined)
