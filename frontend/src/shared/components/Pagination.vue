@@ -69,7 +69,7 @@ export type PageableService<TResult, TQuery = TResult> = (
         </PaginationButton>
       </div>
     </div>
-    <div class="-ml-144 label-02-reg mt-2 text-[#4E596A]">
+    <div class="-ml-144 label-02-reg mt-2 text-gray-900">
       Total {{ page?.totalElements }} Items
     </div>
   </div>
