@@ -24,10 +24,10 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 const buttonClasses = computed(() => ({
-  "btn-primary": props.buttonType == "primary",
-  "btn-secondary": props.buttonType == "secondary",
-  "btn-ghost": props.buttonType == "ghost",
-  "btn-tertiary": props.buttonType == "tertiary",
+  "ds-button-primary": props.buttonType == "primary",
+  "ds-button-secondary": props.buttonType == "secondary",
+  "ds-button-ghost": props.buttonType == "ghost",
+  "ds-button-tertiary": props.buttonType == "tertiary",
 }))
 
 const isLink = computed(() => !!props.href)
@@ -45,7 +45,7 @@ const render = () => {
   return h(
     tag,
     {
-      class: ["ris-btn", "flex", "gap-12", buttonClasses.value],
+      class: ["ds-button", "flex", "gap-12", buttonClasses.value],
       "aria-label": props.ariaLabel,
       disabled,
       href,

@@ -29,8 +29,7 @@ const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
 )
 
 const conditionalClasses = computed(() => ({
-  input__error: props.validationError,
-  input__readonly: props.readOnly,
+  "has-error": props.validationError,
   input__fullheight: props.fullHeight,
 }))
 
@@ -42,7 +41,7 @@ const tabindex = computed(() => (props.readOnly ? -1 : 0))
     :id="id"
     v-model="inputValue"
     :aria-label="ariaLabel"
-    class="bg-white border-2 border-blue-800 flex focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 read-only:border-none read-only:hover:outline-0 w-full"
+    class="ds-input"
     :class="conditionalClasses"
     :placeholder="placeholder"
     :readonly="$props.readOnly"
