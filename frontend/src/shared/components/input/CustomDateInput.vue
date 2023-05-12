@@ -83,8 +83,9 @@ function validateInput() {
 }
 
 function backspaceDelete() {
-  emit("update:modelValue", undefined)
   emit("update:validationError", undefined)
+  emit("update:modelValue", undefined)
+  inputValue.value = undefined
 }
 
 function onBlur() {
