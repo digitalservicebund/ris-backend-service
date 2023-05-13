@@ -77,7 +77,7 @@ export function defineDateField(
 ): InputField {
   return {
     name,
-    type: InputType.DATE,
+    type: InputType.CUSTOMDATE,
     label,
     required: DocumentUnit.isRequiredField(name),
     inputAttributes: { ariaLabel, validationError },
