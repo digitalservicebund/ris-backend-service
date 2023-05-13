@@ -21,19 +21,10 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
-const inputCompleted = ref<boolean>(false)
 
+const inputCompleted = ref<boolean>(false)
 const inputValue = ref(
   props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined
-)
-
-const hasError = computed(
-  () =>
-    props.validationError ||
-    (inputCompleted.value &&
-      !isInPast(inputValue.value) &&
-      !props.isFutureDate) ||
-    (inputCompleted.value && !isValidDate(inputValue.value))
 )
 
 dayjs.extend(customParseFormat)
@@ -44,33 +35,39 @@ const options = {
   },
 }
 
+const isValidDate = computed(() => {
+  return dayjs(inputValue.value, "DD.MM.YYYY", true).isValid()
+})
+
+const isInPast = computed(() => {
+  if (inputValue.value) {
+    const date = new Date(inputValue.value)
+    const today = new Date()
+    return date < today
+  } else return true
+})
+
+const hasError = computed(
+  () =>
+    props.validationError ||
+    (inputCompleted.value && !isInPast.value && !props.isFutureDate) ||
+    (inputCompleted.value && !isValidDate.value)
+)
+
 const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
 
-function isValidDate(input: string | undefined) {
-  return dayjs(input, "DD.MM.YYYY", true).isValid()
-}
-
-function isInPast(input: string | undefined) {
-  if (input) {
-    const date = new Date(input)
-    const today = new Date()
-    return date < today
-  } else return true
-}
-
 function validateInput() {
   if (inputCompleted.value) {
     //check for valid dates
-    !isValidDate(inputValue.value)
+    !isValidDate.value
       ? emit("update:validationError", {
           defaultMessage: "Kein valides Datum",
           field: props.id,
         })
-      : emit("update:validationError", undefined)
-    // check for future dates
-    !isInPast(inputValue.value) && !props.isFutureDate
+      : // if valid date, check for future dates
+      !isInPast.value && !props.isFutureDate && isValidDate.value
       ? emit("update:validationError", {
           defaultMessage:
             "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
@@ -92,20 +89,23 @@ function onBlur() {
   validateInput()
 }
 
-watch(inputValue, (is) => {
-  isValidDate(is) &&
-    isInPast(is) &&
-    emit("update:modelValue", dayjs(is, "DD.MM.YYYY").toISOString())
-})
-
-watch(inputCompleted, () => {
-  validateInput()
-})
-
 watch(props, () => {
   inputValue.value = props.modelValue
     ? dayjs(props.modelValue).format("DD.MM.YYYY")
     : undefined
+})
+
+watch(inputValue, () => {
+  isValidDate.value &&
+    isInPast.value &&
+    emit(
+      "update:modelValue",
+      dayjs(inputValue.value, "DD.MM.YYYY").toISOString()
+    )
+})
+
+watch(inputCompleted, () => {
+  validateInput()
 })
 </script>
 
