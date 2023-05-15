@@ -50,6 +50,7 @@ public class DocumentUnitTransformer {
           .ecli(coreData.ecli())
           .appraisalBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
+          .dateKnown(coreData.dateKnown())
           .inputType(coreData.inputType())
           .center(coreData.center());
 
@@ -67,6 +68,7 @@ public class DocumentUnitTransformer {
           .ecli(null)
           .appraisalBody(null)
           .decisionDate(null)
+          .dateKnown(true)
           .inputType(null)
           .center(null)
           .courtType(null)
@@ -165,7 +167,7 @@ public class DocumentUnitTransformer {
             null,
             documentUnitMetadataDTO.getAppraisalBody(),
             documentUnitMetadataDTO.getDecisionDate(),
-            true,
+            documentUnitMetadataDTO.isDateKnown(),
             null,
             documentUnitMetadataDTO.getLegalEffect(),
             documentUnitMetadataDTO.getInputType(),
@@ -268,7 +270,7 @@ public class DocumentUnitTransformer {
             deviatingEclis,
             documentUnitDTO.getAppraisalBody(),
             documentUnitDTO.getDecisionDate(),
-            true,
+            documentUnitDTO.isDateKnown(),
             deviatingDecisionDates,
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),
