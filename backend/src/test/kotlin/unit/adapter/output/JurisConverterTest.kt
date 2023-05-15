@@ -245,9 +245,6 @@ class JurisConverterTest {
             assertThat(metadata).contains(Metadatum("documentTemplateName", TEMPLATE_NAME, 1))
             assertThat(metadata).contains(Metadatum("documentName1", TYPE_NAME, 1))
             assertThat(metadata).contains(Metadatum("documentTemplateName1", TEMPLATE_NAME, 1))
-            assertThat(metadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
-            assertThat(metadata).contains(Metadatum("test print announcement year", YEAR, 1))
-            assertThat(metadata).contains(Metadatum("test print announcement page", PAGE, 1))
             assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
             assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
             assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))
@@ -273,6 +270,11 @@ class JurisConverterTest {
             assertThat(metadata).contains(Metadatum(false, RESOLUTION_MAJORITY, 1))
             assertThat(metadata).contains(Metadatum("Lebensjahr 10", RANGE_START, 1))
             assertThat(metadata).contains(Metadatum("Monate 11", RANGE_START, 1))
+
+            val printAnnouncementMetadata = norm?.metadataSections?.flatMap { it.sections ?: listOf() }?.flatMap { it.metadata }
+            assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
+            assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement year", YEAR, 1))
+            assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement page", PAGE, 1))
         }
 
         @Test

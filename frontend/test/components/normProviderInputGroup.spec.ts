@@ -18,7 +18,7 @@ describe("NormProviderInputGroup", () => {
     })
 
     const input = screen.queryByRole("textbox", {
-      name: "Staat, Land, Stadt, Landkreis oder juristische Person",
+      name: "Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt",
     }) as HTMLInputElement
 
     expect(input).toBeVisible()
@@ -56,7 +56,7 @@ describe("NormProviderInputGroup", () => {
     renderComponent({ modelValue })
 
     const entityInput = screen.queryByRole("textbox", {
-      name: "Staat, Land, Stadt, Landkreis oder juristische Person",
+      name: "Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt",
     }) as HTMLInputElement
 
     const decidingBodyinput = screen.queryByRole("textbox", {

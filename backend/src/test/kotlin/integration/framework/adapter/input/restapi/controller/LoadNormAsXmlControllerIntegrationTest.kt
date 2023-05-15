@@ -76,10 +76,17 @@ class LoadNormAsXmlControllerIntegrationTest : PostgresTestcontainerIntegrationT
             listOf(Metadatum(date, MetadatumType.DATE)),
         )
         val printAnnouncementSection = MetadataSection(
-            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            MetadataSectionName.OFFICIAL_REFERENCE,
+            listOf(),
+            1,
             listOf(
-                Metadatum("BGBl I", MetadatumType.ANNOUNCEMENT_GAZETTE),
-                Metadatum("3", MetadatumType.PAGE),
+                MetadataSection(
+                    MetadataSectionName.PRINT_ANNOUNCEMENT,
+                    listOf(
+                        Metadatum("BGBl I", MetadatumType.ANNOUNCEMENT_GAZETTE),
+                        Metadatum("3", MetadatumType.PAGE),
+                    ),
+                ),
             ),
         )
         val norm = Norm(

@@ -61,13 +61,13 @@ export async function expectInputFieldGroupHasCorrectValues(
   valueIndex?: number
 ): Promise<void> {
   for (const field of fields ?? []) {
-    const label = page.locator(`label:text-is("${field.label}")`).first()
-    await expect(label).toBeVisible()
-
     const value =
       valueIndex !== undefined ? field.values?.[valueIndex] : field.value
 
     if (value !== undefined) {
+      const label = page.locator(`label:has-text("${field.label}")`).first()
+      await expect(label).toBeVisible()
+
       await expectInputFieldHasCorrectValue(page, field.type, field.id, value)
     }
   }

@@ -65,3 +65,52 @@ Colors are defined in [tailwind.config.js](https://github.com/digitalservicebund
 Fontstyles are defined in [\_font_styles.scss](https://github.com/digitalservicebund/ris-backend-service/blob/main/frontend/src/styles/_font_styles.scss) and should be always in sync with the [Angie Foundation Font Styles](https://www.figma.com/file/nMUUyvtI2vQxiC5hW2bjCS/Angie-Foundation?node-id=10%3A118&t=Kj3TtRomXvy1lrKI-0).
 
 Please do not use other colors or fonts, than that ones defined in our styles. If you come across any unexpected colors or fonts do not hesitate to reach out to our designers, to always stay in sync with the Figma designs.
+
+### Tests
+
+For our tests we use playwright.
+Our decision for the structure of tests are non-nested tests. Means every test setup the needed test values and clear they the after the test.
+
+```typescript
+// ❌ Bad
+test.describe("test component", () => {
+  test.describe("test something", () => {
+    var value = 1
+    ...
+    test("test1", () => {
+      expect(value, ...)
+    })
+
+    test("test2", () => {
+      expect(value, ...)
+    })
+  })
+
+  test("test3", () => {
+    var xy = 1
+    ...
+    expect(xy, ...)
+  })
+})
+
+// ✅ Good
+test.describe("test component", () => {
+  test("test1", () => {
+    var value = 1
+    ...
+    expect(value, ...)
+  })
+
+  test("test2", () => {
+    var value = 1
+    ...
+    expect(value, ...)
+  })
+
+  test("test3", () => {
+    var xy = 1
+    ...
+    expect(xy, ...)
+  })
+})
+```

@@ -7,7 +7,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenc
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
 import de.bund.digitalservice.ris.norms.domain.entity.Article
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
+import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.Eli
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ArticleDto
@@ -66,7 +66,7 @@ class NormsService(
         return template.select(NormDto::class.java)
             .matching(selectQuery)
             .all()
-            .flatMap(::getNormWithArticles)
+            .flatMap(::getNormWithMetadata)
     }
 
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
@@ -80,7 +80,9 @@ class NormsService(
             .collectList()
 
         val findSectionsRequest = findNormRequest.flatMapMany { metadataSectionsRepository.findByNormId(it.id) }
-            .flatMap(::getSectionMetadata)
+            .collectList()
+
+        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionIdIn(it.map { section -> section.id }) }
             .collectList()
 
         return Mono.zip(
@@ -88,8 +90,9 @@ class NormsService(
             buildArticlesRequest,
             findFileReferencesRequest,
             findSectionsRequest,
+            findMetadataRequest,
         ).map {
-            normToEntity(it.t1, it.t2, it.t3, it.t4)
+            normToEntity(it.t1, it.t2, it.t3, it.t4, it.t5)
         }
     }
 
@@ -98,9 +101,9 @@ class NormsService(
         val saveNormRequest = normsRepository.save(normToDto(command.norm)).cache()
         val saveArticlesRequest = saveNormRequest.flatMapMany { saveNormArticles(command.norm, it) }
         val saveFileReferencesRequest = saveNormRequest.flatMapMany { saveNormFiles(command.norm, it) }
-        val saveMetadataRequest = saveNormRequest.flatMapMany { saveNormMetadata(command.norm, it) }
+        val saveSectionsRequest = saveNormRequest.flatMapMany { saveNormSectionsWithMetadata(command.norm, it) }
 
-        return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest, saveMetadataRequest).thenReturn(true)
+        return Mono.`when`(saveArticlesRequest, saveFileReferencesRequest, saveSectionsRequest).thenReturn(true)
     }
 
     @Transactional(transactionManager = "connectionFactoryTransactionManager")
@@ -110,7 +113,7 @@ class NormsService(
             .map { normDto -> normToDto(command.norm, normDto.id) }
             .flatMap(normsRepository::save).cache()
 
-        val updateMetadataRequest = saveNormRequest.flatMapMany { normDto -> saveNormMetadata(command.norm, normDto) }
+        val updateMetadataRequest = saveNormRequest.flatMapMany { normDto -> saveNormSectionsWithMetadata(command.norm, normDto) }
 
         return Mono.`when`(saveNormRequest, updateMetadataRequest).thenReturn(true)
     }
@@ -130,27 +133,54 @@ class NormsService(
             .flatMap { article -> saveArticleParagraphs(norm, article) }
     }
 
+    private fun saveNormSectionsWithMetadata(norm: Norm, normDto: NormDto): Flux<MetadataSectionDto> {
+        return deleteOldMetadata(normDto.id)
+            .thenMany(Flux.fromIterable(norm.metadataSections))
+            .flatMap { metadataSectionsRepository.save(metadataSectionToDto(it, normDto.id)) }
+            .flatMap { parentSectionDto ->
+                val sectionDomain = norm.metadataSections.first { it.guid == parentSectionDto.guid }
+                if (sectionDomain.sections.isNullOrEmpty()) {
+                    saveSectionMetadata(
+                        parentSectionDto,
+                        norm.metadataSections
+                            .filter { it.guid == parentSectionDto.guid }
+                            .flatMap { it.metadata },
+                    ).flatMap { Mono.just(parentSectionDto) }
+                } else {
+                    saveChildrenSections(norm, parentSectionDto)
+                }
+            }
+    }
+
+    private fun saveChildrenSections(norm: Norm, parentSection: MetadataSectionDto): Flux<MetadataSectionDto> {
+        return metadataSectionsRepository.saveAll(
+            metadataSectionsToDto(
+                norm.metadataSections
+                    .find { it.guid == parentSection.guid }
+                    ?.sections ?: listOf(),
+                parentSection.normId,
+                parentSection.id,
+            ),
+        ).flatMap { childrenSectionDto ->
+            val childrenSectionsDomain = norm.metadataSections
+                .filter { !it.sections.isNullOrEmpty() }
+                .mapNotNull { it.sections }
+                .flatten()
+            saveSectionMetadata(
+                childrenSectionDto,
+                childrenSectionsDomain
+                    .filter { it.guid == childrenSectionDto.guid }
+                    .flatMap { it.metadata },
+            ).flatMap { Mono.just(childrenSectionDto) }
+        }
+    }
+
     private fun saveNormFiles(norm: Norm, normDto: NormDto): Flux<FileReferenceDto> {
         return fileReferenceRepository.saveAll(fileReferencesToDto(norm.files, normDto.id))
     }
 
-    private fun saveNormMetadata(norm: Norm, normDto: NormDto): Flux<MetadatumDto> {
-        return deleteOldMetadata(normDto.id)
-            .thenMany(Flux.fromIterable(norm.metadataSections))
-            .map { metadataSectionToDto(it, normDto.id) }
-            .flatMap(metadataSectionsRepository::save)
-            .flatMap { saveSectionMetadata(it, norm) }
-    }
-
-    private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, norm: Norm): Flux<MetadatumDto> {
-        return metadataRepository.saveAll(
-            metadataListToDto(
-                norm.metadataSections
-                    .filter { it.name == metadataSectionDto.name && it.order == metadataSectionDto.order }
-                    .flatMap { it.metadata },
-                metadataSectionDto.id,
-            ),
-        )
+    private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): Flux<MetadatumDto> {
+        return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.id))
     }
 
     private fun deleteOldMetadata(normId: Int): Mono<Void> = metadataSectionsRepository.findByNormId(normId)
@@ -169,18 +199,17 @@ class NormsService(
         )
     }
 
-    private fun getNormWithArticles(normDto: NormDto): Mono<Norm> {
-        return articlesRepository.findByNormId(normDto.id)
-            .flatMap(::getArticleWithParagraphs)
+    private fun getNormWithMetadata(normDto: NormDto): Mono<Norm> {
+        val findSectionsRequest = metadataSectionsRepository.findByNormId(normDto.id).collectList()
+        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionIdIn(it.map { section -> section.id }) }
             .collectList()
-            .map { articles -> normToEntity(normDto, articles, emptyList(), emptyList()) }
-    }
 
-    private fun getSectionMetadata(metadataSectionDto: MetadataSectionDto): Mono<MetadataSection> {
-        return metadataRepository.findBySectionId(metadataSectionDto.id)
-            .map(::metadatumToEntity)
-            .collectList()
-            .map { metadata -> metadataSectionToEntity(metadataSectionDto, metadata) }
+        return Mono.zip(
+            findSectionsRequest,
+            findMetadataRequest,
+        ).map {
+            normToEntity(normDto, emptyList(), emptyList(), it.t1, it.t2)
+        }
     }
 
     private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {

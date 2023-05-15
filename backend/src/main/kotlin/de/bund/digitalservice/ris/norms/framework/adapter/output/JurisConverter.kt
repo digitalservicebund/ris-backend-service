@@ -150,20 +150,20 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         }
     }
 
+    val referenceSections = createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
+        createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear)
+
     val ageIndicationSections = data.ageIndicationStartList.mapIndexed { index, value ->
         MetadataSection(MetadataSectionName.AGE_INDICATION, listOf(Metadatum(value, RANGE_START, 1)), index)
     }
-
     val sections = listOf(
         MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
     ) + createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
-        createSectionsFromMetadata(Section.PRINT_ANNOUNCEMENT, printAnnouncementGazette + printAnnouncementYear + printAnnouncementPage) +
-        createSectionsFromMetadata(Section.DIGITAL_ANNOUNCEMENT, digitalAnnouncementNumber + digitalAnnouncementMedium + digitalAnnouncementYear) +
         createSectionsFromMetadata(Section.DOCUMENT_TYPE, documentTypeName + documentNormCategory + documentTemplateName) +
-        citationDateSections +
-        ageIndicationSections +
+        referenceSections.mapIndexed { index, section -> MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), index, listOf(section)) } +
+        citationDateSections + ageIndicationSections +
         addProviderSections(data.normProviderList)
 
     return Norm(

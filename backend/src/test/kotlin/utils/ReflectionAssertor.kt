@@ -36,6 +36,15 @@ fun assertEditNormFramePropertiesAndEditNormRequestSchema(
             normFrameRequestSchemaMembers.find { normFrameRequestSchemaMember ->
                 normFramePropertiesMember.name == normFrameRequestSchemaMember.name
             }
+
+        if (normFramePropertiesMember.name == "metadataSections") {
+            val guidRegex = Regex("guid=[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}")
+            assertThat(normFrameProperties.metadataSections.toString().replace(guidRegex, ""))
+                .isEqualTo(normFrameRequestSchema.metadataSections.toString().replace(guidRegex, ""))
+
+            return@forEach
+        }
+
         when (val normFramePropertiesMemberValue = normFramePropertiesMember.get(normFrameProperties)) {
             is LocalDate ->
                 assertThat(normFramePropertiesMemberValue)

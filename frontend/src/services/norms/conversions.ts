@@ -114,6 +114,14 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.ENTITY]: identity,
   [MetadatumType.DECIDING_BODY]: identity,
   [MetadatumType.RESOLUTION_MAJORITY]: decodeBoolean,
+  [MetadatumType.ADDITIONAL_INFO]: identity,
+  [MetadatumType.EXPLANATION]: identity,
+  [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
+  [MetadatumType.AREA_OF_PUBLICATION]: identity,
+  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
+  [MetadatumType.SERIES]: identity,
+  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
+  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -155,6 +163,13 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.ENTITY]: identity,
   [MetadatumType.DECIDING_BODY]: identity,
   [MetadatumType.RESOLUTION_MAJORITY]: encodeBoolean,
+  [MetadatumType.ADDITIONAL_INFO]: identity,
+  [MetadatumType.EXPLANATION]: identity,
+  [MetadatumType.AREA_OF_PUBLICATION]: identity,
+  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
+  [MetadatumType.SERIES]: identity,
+  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
+  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
 }
 
 /**
@@ -386,7 +401,6 @@ export function encodeFlatMetadata(
 ): FlatMetadataRequestSchema {
   return {
     documentTemplateName: encodeString(flatMetadata.documentTemplateName),
-    announcementDate: encodeNullDate(flatMetadata.announcementDate),
     applicationScopeArea: encodeString(flatMetadata.applicationScopeArea),
     applicationScopeEndDate: encodeNullDate(
       flatMetadata.applicationScopeEndDate
@@ -397,24 +411,6 @@ export function encodeFlatMetadata(
     categorizedReference: encodeString(flatMetadata.categorizedReference),
     celexNumber: encodeString(flatMetadata.celexNumber),
     completeCitation: encodeString(flatMetadata.completeCitation),
-    digitalAnnouncementDate: encodeNullDate(
-      flatMetadata.digitalAnnouncementDate
-    ),
-    digitalAnnouncementArea: encodeString(flatMetadata.digitalAnnouncementArea),
-    digitalAnnouncementAreaNumber: encodeString(
-      flatMetadata.digitalAnnouncementAreaNumber
-    ),
-    digitalAnnouncementEdition: encodeString(
-      flatMetadata.digitalAnnouncementEdition
-    ),
-    digitalAnnouncementExplanations: encodeString(
-      flatMetadata.digitalAnnouncementExplanations
-    ),
-    digitalAnnouncementInfo: encodeString(flatMetadata.digitalAnnouncementInfo),
-    digitalAnnouncementMedium: encodeString(
-      flatMetadata.digitalAnnouncementMedium
-    ),
-    digitalAnnouncementYear: encodeString(flatMetadata.digitalAnnouncementYear),
     digitalEvidenceAppendix: encodeString(flatMetadata.digitalEvidenceAppendix),
     digitalEvidenceExternalDataNote: encodeString(
       flatMetadata.digitalEvidenceExternalDataNote
@@ -455,15 +451,6 @@ export function encodeFlatMetadata(
     entryIntoForceNormCategory: encodeString(
       flatMetadata.entryIntoForceNormCategory
     ),
-    euAnnouncementExplanations: encodeString(
-      flatMetadata.euAnnouncementExplanations
-    ),
-    euAnnouncementGazette: encodeString(flatMetadata.euAnnouncementGazette),
-    euAnnouncementInfo: encodeString(flatMetadata.euAnnouncementInfo),
-    euAnnouncementNumber: encodeString(flatMetadata.euAnnouncementNumber),
-    euAnnouncementPage: encodeString(flatMetadata.euAnnouncementPage),
-    euAnnouncementSeries: encodeString(flatMetadata.euAnnouncementSeries),
-    euAnnouncementYear: encodeString(flatMetadata.euAnnouncementYear),
     eli: encodeString(flatMetadata.eli),
     expirationDate: encodeNullDate(flatMetadata.expirationDate),
     expirationDateState: encodeString(flatMetadata.expirationDateState),
@@ -481,9 +468,6 @@ export function encodeFlatMetadata(
     footnoteDecision: encodeString(flatMetadata.footnoteDecision),
     footnoteStateLaw: encodeString(flatMetadata.footnoteStateLaw),
     footnoteEuLaw: encodeString(flatMetadata.footnoteEuLaw),
-    otherOfficialAnnouncement: encodeString(
-      flatMetadata.otherOfficialAnnouncement
-    ),
     otherStatusNote: encodeString(flatMetadata.otherStatusNote),
     principleEntryIntoForceDate: encodeNullDate(
       flatMetadata.principleEntryIntoForceDate
@@ -497,16 +481,6 @@ export function encodeFlatMetadata(
     principleExpirationDateState: encodeString(
       flatMetadata.principleExpirationDateState
     ),
-    printAnnouncementExplanations: encodeString(
-      flatMetadata.printAnnouncementExplanations
-    ),
-    printAnnouncementGazette: encodeString(
-      flatMetadata.printAnnouncementGazette
-    ),
-    printAnnouncementInfo: encodeString(flatMetadata.printAnnouncementInfo),
-    printAnnouncementNumber: encodeString(flatMetadata.printAnnouncementNumber),
-    printAnnouncementPage: encodeString(flatMetadata.printAnnouncementPage),
-    printAnnouncementYear: encodeString(flatMetadata.printAnnouncementYear),
     publicationDate: encodeNullDate(flatMetadata.publicationDate),
     reissueArticle: encodeString(flatMetadata.reissueArticle),
     reissueDate: encodeNullDate(flatMetadata.reissueDate),

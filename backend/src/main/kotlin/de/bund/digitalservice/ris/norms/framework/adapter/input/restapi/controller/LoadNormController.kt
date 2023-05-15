@@ -9,7 +9,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.ApiConfiguration
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
@@ -22,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import reactor.core.publisher.Mono
-import java.time.LocalDate
 import java.util.UUID
 
 @RestController
@@ -72,28 +70,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
         var expirationNormCategory: String?,
         var announcementDate: String?,
         var publicationDate: String?,
-        var printAnnouncementGazette: String?,
-        var printAnnouncementYear: String?,
-        var printAnnouncementNumber: String?,
-        var printAnnouncementPage: String?,
-        var printAnnouncementInfo: String?,
-        var printAnnouncementExplanations: String?,
-        var digitalAnnouncementMedium: String?,
-        var digitalAnnouncementDate: String?,
-        var digitalAnnouncementEdition: String?,
-        var digitalAnnouncementYear: String?,
-        var digitalAnnouncementArea: String?,
-        var digitalAnnouncementAreaNumber: String?,
-        var digitalAnnouncementInfo: String?,
-        var digitalAnnouncementExplanations: String?,
-        var euAnnouncementGazette: String?,
-        var euAnnouncementYear: String?,
-        var euAnnouncementSeries: String?,
-        var euAnnouncementNumber: String?,
-        var euAnnouncementPage: String?,
-        var euAnnouncementInfo: String?,
-        var euAnnouncementExplanations: String?,
-        var otherOfficialAnnouncement: String?,
         var completeCitation: String?,
         var statusNote: String?,
         var statusDescription: String?,
@@ -170,28 +146,6 @@ class LoadNormController(private val loadNormService: LoadNormUseCase) {
                     data.expirationNormCategory,
                     encodeLocalDate(data.announcementDate),
                     encodeLocalDate(data.publicationDate),
-                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_GAZETTE)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.YEAR)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.NUMBER)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.PAGE)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.ADDITIONAL_INFO)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.PRINT_ANNOUNCEMENT, MetadatumType.EXPLANATION)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.ANNOUNCEMENT_MEDIUM)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.DATE)?.let { encodeLocalDate(it.value as LocalDate) },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.EDITION)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.YEAR)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.AREA_OF_PUBLICATION)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.ADDITIONAL_INFO)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.DIGITAL_ANNOUNCEMENT, MetadatumType.EXPLANATION)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.EU_GOVERNMENT_GAZETTE)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.YEAR)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.SERIES)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.NUMBER)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.PAGE)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.ADDITIONAL_INFO)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.EU_ANNOUNCEMENT, MetadatumType.EXPLANATION)?.let { it.value as String },
-                    data.getFirstMetadatum(MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT, MetadatumType.OTHER_OFFICIAL_REFERENCE)?.let { it.value as String },
                     data.completeCitation,
                     data.statusNote,
                     data.statusDescription,

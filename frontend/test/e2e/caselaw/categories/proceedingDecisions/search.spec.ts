@@ -1,4 +1,6 @@
 import { expect } from "@playwright/test"
+import dayjs from "dayjs"
+import utc from "dayjs/plugin/utc"
 import {
   checkIfProceedingDecisionCleared,
   fillProceedingDecisionInputs,
@@ -7,6 +9,8 @@ import {
 } from "~/e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
+
+dayjs.extend(utc)
 
 test.describe("Search proceeding decisions", () => {
   test("renders default", async ({ page, documentNumber }) => {
@@ -33,6 +37,10 @@ test.describe("Search proceeding decisions", () => {
       fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[0],
       documentType: secondaryDocumentUnit.coreData.documentType?.jurisShortcut,
       date: "01.01.2020",
+      // TODO date: dayjs(secondaryDocumentUnit.coreData.decisionDate)
+      //   .utc()
+      //   .local()
+      //   .format("DD.MM.YYYY"),
     })
 
     await page
@@ -41,8 +49,14 @@ test.describe("Search proceeding decisions", () => {
 
     await expect(page.getByText("Suche hat 1 Treffer ergeben")).toBeVisible()
 
+    // todo ${dayjs(
+    // secondaryDocumentUnit.coreData.decisionDate
+    // )
+    //   .utc()
+    //   .local()
+    //   .format("DD.MM.YYYY"),
     const result = page.locator(".table-row", {
-      hasText: `AG Aachen, AnU, 01.01.2020, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`,
+      hasText: `AG Aachen, AnU, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`,
     })
     await expect(result).toBeVisible()
     await result.locator("[aria-label='Treffer übernehmen']").click()
@@ -51,7 +65,11 @@ test.describe("Search proceeding decisions", () => {
 
     await expect(
       page.getByText(
-        `AG Aachen, AnU, 01.01.2020, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}, ${secondaryDocumentUnit.documentNumber}`
+        // todo add ${dayjs(secondaryDocumentUnit.coreData.decisionDate)
+        // .utc()
+        // .local()
+        // .format("DD.MM.YYYY")},
+        `AG Aachen, AnU, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}, ${secondaryDocumentUnit.documentNumber}`
       )
     ).toHaveCount(2)
 

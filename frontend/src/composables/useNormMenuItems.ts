@@ -47,7 +47,7 @@ export function useNormMenuItems(
         getChildItem("Außerkrafttreten", "expirationFields"),
         getChildItem("Verkündungsdatum", "announcementDate"),
         getChildItem("Zitierdatum", "citationDates"),
-        getChildItem("Amtliche Fundstelle", "officialAnnouncementFields"),
+        getChildItem("Amtliche Fundstelle", "officialReferences"),
         getChildItem("Nichtamtliche Fundstelle", "unofficialReferences"),
         getChildItem("Vollzitat", "completeCitation"),
         getChildItem("Stand-Angabe", "statusIndicationFields"),
@@ -56,7 +56,7 @@ export function useNormMenuItems(
           "documentProcessingStatusFields"
         ),
         getChildItem("Aktivverweisung", "categorizedReferenceFields"),
-        getChildItem("Fußnote", "otherFootnoteFields"),
+        getChildItem("Fußnoten", "otherFootnoteFields"),
         getChildItem("Gültigkeitsregelung", "validityRules"),
         getChildItem("Elektronischer Nachweis", "digitalEvidenceFields"),
         getChildItem("Aktenzeichen", "referenceNumbers"),

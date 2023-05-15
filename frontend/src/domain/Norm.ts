@@ -108,6 +108,16 @@ export type MetadataValueType = {
   [MetadatumType.ENTITY]: string
   [MetadatumType.DECIDING_BODY]: string
   [MetadatumType.RESOLUTION_MAJORITY]: boolean
+  [MetadatumType.ADDITIONAL_INFO]: string
+  [MetadatumType.EXPLANATION]: string
+  [MetadatumType.ADDITIONAL_INFO]: string
+  [MetadatumType.EXPLANATION]: string
+  [MetadatumType.ANNOUNCEMENT_MEDIUM]: string
+  [MetadatumType.AREA_OF_PUBLICATION]: string
+  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: string
+  [MetadatumType.SERIES]: string
+  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: string
+  [MetadatumType.EU_GOVERNMENT_GAZETTE]: string
 }
 
 export type Metadata = {
@@ -126,6 +136,7 @@ export enum MetadataSectionName {
   EU_ANNOUNCEMENT = "EU_ANNOUNCEMENT",
   OTHER_OFFICIAL_ANNOUNCEMENT = "OTHER_OFFICIAL_ANNOUNCEMENT",
   NORM_PROVIDER = "NORM_PROVIDER",
+  OFFICIAL_REFERENCE = "OFFICIAL_REFERENCE",
 }
 
 export type MetadataSections = {
@@ -141,14 +152,6 @@ export type FlatMetadata = {
   categorizedReference?: string
   celexNumber?: string
   completeCitation?: string
-  digitalAnnouncementDate?: string
-  digitalAnnouncementArea?: string
-  digitalAnnouncementAreaNumber?: string
-  digitalAnnouncementEdition?: string
-  digitalAnnouncementExplanations?: string
-  digitalAnnouncementInfo?: string
-  digitalAnnouncementMedium?: string
-  digitalAnnouncementYear?: string
   digitalEvidenceAppendix?: string
   digitalEvidenceExternalDataNote?: string
   digitalEvidenceLink?: string
@@ -171,13 +174,6 @@ export type FlatMetadata = {
   entryIntoForceDate?: string
   entryIntoForceDateState?: string
   entryIntoForceNormCategory?: string
-  euAnnouncementExplanations?: string
-  euAnnouncementGazette?: string
-  euAnnouncementInfo?: string
-  euAnnouncementNumber?: string
-  euAnnouncementPage?: string
-  euAnnouncementSeries?: string
-  euAnnouncementYear?: string
   eli?: string
   expirationDate?: string
   expirationDateState?: string
@@ -193,16 +189,12 @@ export type FlatMetadata = {
   footnoteDecision?: string
   footnoteStateLaw?: string
   footnoteEuLaw?: string
-  otherOfficialAnnouncement?: string
   otherStatusNote?: string
   principleEntryIntoForceDate?: string
   principleEntryIntoForceDateState?: string
   principleExpirationDate?: string
   principleExpirationDateState?: string
-  printAnnouncementExplanations?: string
   printAnnouncementGazette?: string
-  printAnnouncementInfo?: string
-  printAnnouncementNumber?: string
   printAnnouncementPage?: string
   printAnnouncementYear?: string
   publicationDate?: string

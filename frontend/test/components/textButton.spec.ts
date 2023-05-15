@@ -26,6 +26,15 @@ describe("TextButton", () => {
     expect(wrapper.find("button").exists()).toBeFalsy()
   })
 
+  it("cleans url if it contains javascript", () => {
+    const wrapper = mount(TextButton, {
+      props: { href: "javascript:alert(document.domain)" },
+    })
+
+    const anchor = wrapper.get("a")
+    expect(anchor.attributes("href")).toBe("about:blank")
+  })
+
   it("it sets per default no download attribute on anchors", () => {
     const wrapper = mount(TextButton, {
       props: { download: undefined, href: "https://test.org" },

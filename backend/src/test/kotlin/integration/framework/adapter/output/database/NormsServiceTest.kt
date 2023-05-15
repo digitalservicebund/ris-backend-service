@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOut
 import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenceOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
@@ -14,6 +15,8 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OFFICIAL_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINT_ANNOUNCEMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
@@ -110,6 +113,36 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     }
 
     @Test
+    fun `the search norm result includes their ELI property`() {
+        val page = Metadatum("1125", MetadatumType.PAGE)
+        val gazette = Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE)
+        val printAnnouncement = MetadataSection(PRINT_ANNOUNCEMENT, listOf(page, gazette))
+        val officialReference = MetadataSection(OFFICIAL_REFERENCE, emptyList(), 1, listOf(printAnnouncement))
+        val normWithEli = NORM.copy(
+            officialLongTitle = "test title",
+            announcementDate = LocalDate.parse("2022-02-02"),
+            metadataSections = listOf(officialReference),
+        )
+        val saveCommand = SaveNormOutputPort.Command(normWithEli)
+        val parameter = SearchNormsOutputPort.QueryParameter(OFFICIAL_LONG_TITLE, "test title")
+        val searchQuery = SearchNormsOutputPort.Query(listOf(parameter))
+
+        assertThat(normWithEli.eli.toString()).isNotNull()
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.searchNorms(searchQuery)
+            .`as`(StepVerifier::create)
+            .assertNext {
+                assertThat(it.eli.toString()).isNotEqualTo("")
+            }
+            .verifyComplete()
+    }
+
+    @Test
     fun `save simple norm and retrieved by eli`() {
         val printAnnouncementSection = MetadataSection(
             MetadataSectionName.PRINT_ANNOUNCEMENT,
@@ -118,10 +151,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            metadataSections = listOf(printAnnouncementSection),
+            metadataSections = listOf(referenceSection1),
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
@@ -148,10 +183,11 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection1))
         val firstNorm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            metadataSections = listOf(printAnnouncementSection1),
+            metadataSections = listOf(referenceSection1),
             officialLongTitle = "Test Title",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
@@ -162,10 +198,11 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection2 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection2))
         val secondNorm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
-            metadataSections = listOf(printAnnouncementSection2),
+            metadataSections = listOf(referenceSection2),
             officialLongTitle = "Test Title 2",
             announcementDate = LocalDate.parse("2022-02-02"),
         )
@@ -200,11 +237,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
             officialLongTitle = "Test Title",
-            metadataSections = listOf(citationDateSection, printAnnouncementSection),
+            metadataSections = listOf(citationDateSection, referenceSection1),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2001", "1125")
@@ -231,11 +269,12 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
                 Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE),
             ),
         )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
         val norm = Norm(
             guid = UUID.randomUUID(),
             articles = listOf(),
             officialLongTitle = "Test Title",
-            metadataSections = listOf(citationDateSection, printAnnouncementSection),
+            metadataSections = listOf(citationDateSection, referenceSection1),
         )
         val saveCommand = SaveNormOutputPort.Command(norm)
         val eliQuery = GetNormByEliOutputPort.Query("bg-1", "2020", "1125")
@@ -260,6 +299,41 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
             .`as`(StepVerifier::create)
             .expectNextCount(1)
             .verifyComplete()
+        normsService.getNormByGuid(guidQuery)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save a norm with official reference sections and retrieve it by guid`() {
+        val printAnnouncementSection = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("gazette1", MetadatumType.ANNOUNCEMENT_GAZETTE, 1),
+                Metadatum("gazette2", MetadatumType.ANNOUNCEMENT_GAZETTE, 2),
+            ),
+            1,
+        )
+        val digitalAnnouncementSection = MetadataSection(
+            MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+            listOf(
+                Metadatum("medium1", MetadatumType.ANNOUNCEMENT_MEDIUM, 1),
+                Metadatum("medium2", MetadatumType.ANNOUNCEMENT_MEDIUM, 2),
+            ),
+            1,
+        )
+        val referenceSection1 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncementSection))
+        val referenceSection2 = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 2, listOf(digitalAnnouncementSection))
+        val norm = Norm(guid = UUID.randomUUID(), officialLongTitle = "title", metadataSections = listOf(referenceSection1, referenceSection2))
+        val saveCommand = SaveNormOutputPort.Command(norm)
+        val guidQuery = GetNormByGuidOutputPort.Query(norm.guid)
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
         normsService.getNormByGuid(guidQuery)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
