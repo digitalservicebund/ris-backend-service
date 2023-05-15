@@ -54,6 +54,11 @@ const year = computed({
   set: (data?: string) => data && (inputValue.value.YEAR = [data]),
 })
 
+const pageNumber = computed({
+  get: () => inputValue.value.PAGE?.[0],
+  set: (data?: string) => data && (inputValue.value.PAGE = [data]),
+})
+
 const areaOfPublication = computed({
   get: () => inputValue.value.AREA_OF_PUBLICATION?.[0],
   set: (data?: string) =>
@@ -82,76 +87,105 @@ const explanation = computed({
 </script>
 <template>
   <div>
-    <div class="gap-16 grid grid-cols-2">
-      <InputField
-        id="digitalAnnouncementMedium"
-        aria-label="Verkündungsmedium"
-        label="Verkündungsmedium"
-      >
-        <TextInput
+    <div class="gap-16">
+      <div class="flex ful-w gap-16">
+        <InputField
           id="digitalAnnouncementMedium"
-          v-model="announcementMedium"
-          alt-text="Verkündungsmedium"
           aria-label="Verkündungsmedium"
-        />
-      </InputField>
-      <InputField
-        id="digitalAnnouncementDate"
-        aria-label="Verkündungsdatum"
-        label="Verkündungsdatum"
-      >
-        <DateInput
+          class="w-1/2"
+          label="Verkündungsmedium"
+        >
+          <TextInput
+            id="digitalAnnouncementMedium"
+            v-model="announcementMedium"
+            alt-text="Verkündungsmedium"
+            aria-label="Verkündungsmedium"
+          />
+        </InputField>
+        <InputField
           id="digitalAnnouncementDate"
-          v-model="date"
-          alt-text="Verkündungsdatum"
           aria-label="Verkündungsdatum"
-          is-future-date
-        />
-      </InputField>
-      <InputField
-        id="digitalAnnouncementEdition"
-        aria-label="Ausgabenummer"
-        label="Ausgabenummer"
-      >
-        <TextInput
+          class="w-1/2"
+          label="Verkündungsdatum"
+        >
+          <DateInput
+            id="digitalAnnouncementDate"
+            v-model="date"
+            alt-text="Verkündungsdatum"
+            aria-label="Verkündungsdatum"
+            is-future-date
+          />
+        </InputField>
+      </div>
+      <div class="flex ful-w gap-16">
+        <InputField
           id="digitalAnnouncementEdition"
-          v-model="edition"
-          alt-text="Ausgabenummer"
           aria-label="Ausgabenummer"
-        />
-      </InputField>
-      <InputField id="digitalAnnouncementYear" aria-label="Jahr" label="Jahr">
-        <YearInput
+          class="w-1/3"
+          label="Ausgabenummer"
+        >
+          <TextInput
+            id="digitalAnnouncementEdition"
+            v-model="edition"
+            alt-text="Ausgabenummer"
+            aria-label="Ausgabenummer"
+          />
+        </InputField>
+        <InputField
           id="digitalAnnouncementYear"
-          v-model="year"
-          alt-text="Jahr"
           aria-label="Jahr"
-        />
-      </InputField>
-      <InputField
-        id="digitalAnnouncementArea"
-        aria-label="Bereich der Veröffentlichung"
-        label="Bereich der Veröffentlichung"
-      >
-        <TextInput
+          class="w-1/3"
+          label="Jahr"
+        >
+          <YearInput
+            id="digitalAnnouncementYear"
+            v-model="year"
+            alt-text="Jahr"
+            aria-label="Jahr"
+          />
+        </InputField>
+        <InputField
+          id="digitalAnnouncementPageNumber"
+          aria-label="Seitenzahlen"
+          class="w-1/3"
+          label="Seitenzahlen"
+        >
+          <TextInput
+            id="digitalAnnouncementPageNumber"
+            v-model="pageNumber"
+            alt-text="Seitenzahlen"
+            aria-label="Seitenzahlen"
+          />
+        </InputField>
+      </div>
+      <div class="flex ful-w gap-16">
+        <InputField
           id="digitalAnnouncementArea"
-          v-model="areaOfPublication"
-          alt-text="Bereich der Veröffentlichung"
           aria-label="Bereich der Veröffentlichung"
-        />
-      </InputField>
-      <InputField
-        id="digitalAnnouncementAreaNumber"
-        aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-        label="Nummer der Veröffentlichung im jeweiligen Bereich"
-      >
-        <TextInput
+          class="w-1/2"
+          label="Bereich der Veröffentlichung"
+        >
+          <TextInput
+            id="digitalAnnouncementArea"
+            v-model="areaOfPublication"
+            alt-text="Bereich der Veröffentlichung"
+            aria-label="Bereich der Veröffentlichung"
+          />
+        </InputField>
+        <InputField
           id="digitalAnnouncementAreaNumber"
-          v-model="numberOfThePublicationInTheRespectiveArea"
-          alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
           aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-        />
-      </InputField>
+          class="w-1/2"
+          label="Nummer der Veröffentlichung im jeweiligen Bereich"
+        >
+          <TextInput
+            id="digitalAnnouncementAreaNumber"
+            v-model="numberOfThePublicationInTheRespectiveArea"
+            alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
+            aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
+          />
+        </InputField>
+      </div>
     </div>
   </div>
   <div>

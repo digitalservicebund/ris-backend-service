@@ -215,6 +215,7 @@ function digitalAnnouncementSummary(data: Metadata): string {
   const announcementMedium = data.ANNOUNCEMENT_MEDIUM?.[0]
   const announcementDate = data.DATE?.[0]
   const announcementYear = data.YEAR?.[0]
+  const announcementPage = data.PAGE?.[0]
   const announcementEdition = data.EDITION?.[0]
   const announcementAreaOfPub = data.AREA_OF_PUBLICATION?.[0]
   const announcementNumberOfPub =
@@ -227,6 +228,7 @@ function digitalAnnouncementSummary(data: Metadata): string {
     formatDate([announcementDate]),
     announcementEdition,
     announcementYear,
+    announcementPage,
     announcementAreaOfPub,
     announcementNumberOfPub,
     announcementAdditionalInfo,
