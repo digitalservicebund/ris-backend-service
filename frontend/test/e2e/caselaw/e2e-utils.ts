@@ -157,8 +157,12 @@ export async function fillProceedingDecisionInputs(
 }
 
 export async function checkIfProceedingDecisionCleared(page: Page) {
-  await expect(page.getByLabel("Gericht Rechtszug")).toHaveValue("")
-  await expect(page.getByLabel("Entscheidungsdatum Rechtszug")).toHaveValue("")
-  await expect(page.getByLabel("Aktenzeichen Rechtszug")).toHaveValue("")
-  await expect(page.getByLabel("Dokumenttyp Rechtszug")).toHaveValue("")
+  await waitForInputValue(page, "[aria-label='Gericht Rechtszug']", "")
+  await waitForInputValue(
+    page,
+    "[aria-label='Entscheidungsdatum Rechtszug']",
+    ""
+  )
+  await waitForInputValue(page, "[aria-label='Aktenzeichen Rechtszug']", "")
+  await waitForInputValue(page, "[aria-label='Dokumenttyp Rechtszug']", "")
 }

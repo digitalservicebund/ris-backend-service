@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
 import customParseFormat from "dayjs/plugin/customParseFormat"
+import { vMaska, MaskaDetail } from "maska"
 import { computed, ref, watch } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 
@@ -21,240 +22,105 @@ interface Emits {
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const dayValue = ref<string>()
-const monthValue = ref<string>()
-const yearValue = ref<string>()
-
-const dayInputWidth = computed(() => (dayValue.value ? "w-20" : "w-[1.638rem]"))
-const monthInputWidth = computed(() =>
-  monthValue.value ? "w-20" : "w-[1.995rem]"
-)
-const yearInputWidth = computed(() =>
-  yearValue.value ? "w-40" : "w-[2.609rem]"
+const inputCompleted = ref<boolean>(false)
+const inputValue = ref(
+  props.modelValue ? dayjs(props.modelValue).format("DD.MM.YYYY") : undefined
 )
 
-const ariaLabelDay = computed(() => props.ariaLabel + " Tag")
-const ariaLabelMonth = computed(() => props.ariaLabel + " Monat")
-const ariaLabelYear = computed(() => props.ariaLabel + " Jahr")
+dayjs.extend(customParseFormat)
 
-const fullDate = computed(() =>
-  yearValue.value && monthValue.value && dayValue.value ? true : false
-)
-const dateValue = computed(() =>
-  fullDate.value
-    ? yearValue.value + "-" + monthValue.value + "-" + dayValue.value
-    : null
-)
+const isValidDate = computed(() => {
+  return dayjs(inputValue.value, "DD.MM.YYYY", true).isValid()
+})
 
-const isInPast = ref(true)
-const isValidDate = ref(true)
+const isInPast = computed(() => {
+  if (props.isFutureDate) return true
+  return dayjs(inputValue.value, "DD.MM.YYYY", true).isBefore(dayjs())
+})
+
+const onMaska = (event: CustomEvent<MaskaDetail>) => {
+  inputCompleted.value = event.detail.completed
+}
 
 const hasError = computed(
   () =>
     props.validationError ||
-    (!isInPast.value && !props.isFutureDate) ||
-    !isValidDate.value
+    (inputCompleted.value && !isInPast.value && !props.isFutureDate) ||
+    (inputCompleted.value && !isValidDate.value)
 )
 
 const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
 
-dayjs.extend(customParseFormat)
-
-watch(
-  props,
-  () => {
-    if (props.modelValue && !dateValue.value) {
-      const formattedModelValue = dayjs(props.modelValue).format("YYYY-MM-DD")
-      const splitDate = formattedModelValue.split("-")
-      dayValue.value = splitDate[2]
-      monthValue.value = splitDate[1]
-      yearValue.value = splitDate[0]
-    }
-  },
-  {
-    immediate: true,
-  }
-)
-
-watch(
-  isValidDate,
-  () => {
-    if (hasError.value) {
-      emit("update:validationError", {
-        defaultMessage: "Kein valides Datum",
-        field: props.id,
-      })
-    } else {
-      emit("update:validationError", undefined)
-    }
-  },
-  { immediate: true }
-)
-
-watch(
-  isInPast,
-  () => {
-    if (!isInPast.value && !props.isFutureDate) {
-      emit("update:validationError", {
-        defaultMessage:
-          "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
-        field: props.id,
-      })
-    } else emit("update:validationError", undefined)
-  },
-  { immediate: true }
-)
-
-function checkValidDate() {
-  if (dateValue.value)
-    isValidDate.value = dayjs(dateValue.value, "YYYY-MM-DD", true).isValid()
-}
-
-function checkIsInPast() {
-  if (dateValue.value && isValidDate.value) {
-    const date = new Date(dateValue.value)
-    const today = new Date()
-    isInPast.value = date < today
-  } else isInPast.value = true
-}
-
-function handleInput(event: Event) {
-  const target = event.target as HTMLInputElement
-  //automatically jump to next input
-  if (target.value.length >= target.maxLength) {
-    if (!target) return
-    let current = target
-    while (current.nextElementSibling) {
-      if (current.nextElementSibling.tagName.toLowerCase() == "input") {
-        const next = current.nextElementSibling as HTMLInputElement
-        addLeadingZero(target)
-        next.focus()
-        break
-      }
-      current = current.nextElementSibling as HTMLInputElement
-    }
-
-    if (current.nextElementSibling === null) current.blur()
+function validateInput() {
+  if (inputCompleted.value) {
+    //check for valid dates
+    !isValidDate.value
+      ? emit("update:validationError", {
+          defaultMessage: "Kein valides Datum",
+          field: props.id,
+        })
+      : // if valid date, check for future dates
+      !isInPast.value && !props.isFutureDate && isValidDate.value
+      ? emit("update:validationError", {
+          defaultMessage:
+            "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
+          field: props.id,
+        })
+      : emit("update:validationError", undefined)
+  } else {
+    emit("update:validationError", undefined)
   }
 }
 
-function deleteDay() {
-  dayValue.value = undefined
+function backspaceDelete() {
+  emit("update:validationError", undefined)
+  emit("update:modelValue", undefined)
+  inputValue.value = undefined
 }
 
-function deleteMonth() {
-  monthValue.value = undefined
+function onBlur() {
+  validateInput()
 }
 
-function deleteYear() {
-  yearValue.value = undefined
-}
+watch(props, () => {
+  inputValue.value = props.modelValue
+    ? dayjs(props.modelValue).format("DD.MM.YYYY")
+    : undefined
+})
 
-function selectAll(event: Event) {
-  ;(event.target as HTMLInputElement).select()
-}
+watch(inputValue, () => {
+  isValidDate.value &&
+    isInPast.value &&
+    emit(
+      "update:modelValue",
+      dayjs(inputValue.value, "DD.MM.YYYY").toISOString()
+    )
+})
 
-function addLeadingZero(target: HTMLInputElement) {
-  //explicit formatting to handle one digit inputs
-  switch (target.name) {
-    case "day":
-      if (target.value.length === 1) dayValue.value = "0" + target.value
-      else dayValue.value = target.value
-      break
-    case "month":
-      if (target.value.length === 1) monthValue.value = "0" + target.value
-      else monthValue.value = target.value
-      break
-    case "year":
-      if (target.value.length === 1) yearValue.value = "0" + target.value
-      else yearValue.value = target.value
-      break
-  }
-}
-
-function handleOnBlur(event: Event) {
-  const target = event.target as HTMLInputElement
-  addLeadingZero(target)
-  checkValidDate()
-  checkIsInPast()
-  if (!hasError.value && dateValue.value) {
-    emit("update:modelValue", dayjs(dateValue.value).toISOString())
-  }
-}
+watch(inputCompleted, () => {
+  validateInput()
+})
 </script>
 
 <template>
-  <div
-    :ariaLabel="ariaLabel"
-    class="bg-white border-2 border-blue-800 flex flex-row focus:outline-2 h-[3.75rem] hover:outline-2 input items-center outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
+  <input
+    :id="id"
+    v-model="inputValue"
+    v-maska
+    :aria-label="ariaLabel"
+    class="bg-white border-2 border-blue-800 focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
-    tabindex="0"
-    @input="handleInput"
-  >
-    <input
-      :id="id"
-      v-model="dayValue"
-      :aria-label="ariaLabelDay"
-      class="focus:outline-none"
-      :class="dayInputWidth"
-      max="31"
-      maxLength="2"
-      min="1"
-      name="day"
-      placeholder="DD"
-      size="2"
-      type="number"
-      @blur="handleOnBlur"
-      @focus="selectAll"
-      @keydown.delete="deleteDay"
-    />
-    <span>.</span>
-    <input
-      :id="id"
-      v-model="monthValue"
-      :aria-label="ariaLabelMonth"
-      class="focus:outline-none"
-      :class="monthInputWidth"
-      max="12"
-      maxLength="2"
-      min="1"
-      name="month"
-      placeholder="MM"
-      size="2"
-      type="number"
-      @blur="handleOnBlur"
-      @focus="selectAll"
-      @keydown.delete="deleteMonth"
-    />
-    <span>.</span>
-    <input
-      :id="id"
-      v-model="yearValue"
-      :aria-label="ariaLabelYear"
-      class="focus:outline-none"
-      :class="yearInputWidth"
-      max="9999"
-      maxLength="4"
-      min="1000"
-      name="year"
-      placeholder="JJJJ"
-      size="4"
-      type="number"
-      @blur="handleOnBlur"
-      @focus="selectAll"
-      @keydown.delete="deleteYear"
-    />
-  </div>
+    data-maska="##.##.####"
+    placeholder="DD.MM.YYYY"
+    @blur="onBlur"
+    @keydown.delete="backspaceDelete"
+    @maska="onMaska"
+  />
 </template>
 
 <style lang="scss" scoped>
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  appearance: none;
-}
-
 .input {
   &:autofill {
     @apply shadow-white text-inherit;
@@ -266,11 +132,7 @@ input::-webkit-inner-spin-button {
 
   &__error {
     width: 100%;
-    @apply border-red-800 bg-red-200 hover:outline-none;
-
-    :focus {
-      @apply outline-none;
-    }
+    @apply border-red-800 bg-red-200;
 
     &:autofill {
       @apply shadow-error text-inherit;
@@ -278,10 +140,6 @@ input::-webkit-inner-spin-button {
 
     &:autofill:focus {
       @apply shadow-error text-inherit;
-    }
-
-    input {
-      @apply bg-red-200;
     }
   }
 }

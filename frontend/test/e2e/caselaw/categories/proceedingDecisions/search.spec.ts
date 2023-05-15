@@ -36,10 +36,11 @@ test.describe("Search proceeding decisions", () => {
       court: secondaryDocumentUnit.coreData.court?.label,
       fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[0],
       documentType: secondaryDocumentUnit.coreData.documentType?.jurisShortcut,
+      date: "01.01.2020",
       // TODO date: dayjs(secondaryDocumentUnit.coreData.decisionDate)
       //   .utc()
       //   .local()
-      //   .format("YYYY-MM-DD"),
+      //   .format("DD.MM.YYYY"),
     })
 
     await page
@@ -53,7 +54,7 @@ test.describe("Search proceeding decisions", () => {
     // )
     //   .utc()
     //   .local()
-    //   .format("DD.MM.YYYY")}
+    //   .format("DD.MM.YYYY"),
     const result = page.locator(".table-row", {
       hasText: `AG Aachen, AnU, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`,
     })
