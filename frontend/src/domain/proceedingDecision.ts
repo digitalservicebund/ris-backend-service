@@ -9,7 +9,7 @@ export class ProceedingDecision {
   public date?: string
   public fileNumber?: string
   public documentType?: DocumentType
-  public dateKnown?: boolean
+  public dateKnown = true
 
   static requiredFields = ["fileNumber", "court", "date"] as const
 

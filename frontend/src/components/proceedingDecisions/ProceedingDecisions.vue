@@ -25,9 +25,7 @@ const props = defineProps<{
 
 const proceedingDecisions = ref<ProceedingDecision[]>()
 const searchResults = ref<SearchResults>()
-const input = ref<ProceedingDecision>(
-  new ProceedingDecision({ dateKnown: true })
-)
+const input = ref<ProceedingDecision>(new ProceedingDecision())
 
 function isNotEmpty(decision: ProceedingDecision): boolean {
   return Object.values(decision).some((value) => value !== undefined)
@@ -51,7 +49,7 @@ async function createProceedingDecision(
 }
 
 function resetInput() {
-  input.value = new ProceedingDecision({})
+  input.value = new ProceedingDecision()
 }
 
 async function linkProceedingDecision(childUuid: string) {
@@ -182,7 +180,6 @@ watch(
         <div class="fake-input-group__row pb-32">
           <InputField
             id="court"
-            aria-label="Gericht Rechtszug"
             class="fake-input-group__row__field flex-col"
             label="Gericht *"
           >
@@ -196,12 +193,7 @@ watch(
           </InputField>
 
           <div class="fake-input-group__row__field flex-col">
-            <InputField
-              id="date"
-              aria-label="Entscheidungsdatum"
-              class="w-full"
-              label="Entscheidungsdatum *"
-            >
+            <InputField id="date" class="w-full" label="Entscheidungsdatum *">
               <DateInput
                 id="date"
                 v-model="input.date"
@@ -211,7 +203,6 @@ watch(
             </InputField>
             <InputField
               id="dateUnknown"
-              aria-label="Datum Unbekannt"
               label="Datum unbekannt"
               :label-position="LabelPosition.RIGHT"
             >
@@ -227,7 +218,6 @@ watch(
         <div class="fake-input-group__row pb-32">
           <InputField
             id="fileNumber"
-            aria-label="Aktenzeichen Rechtszug"
             class="fake-input-group__row__field flex-col"
             label="Aktenzeichen *"
           >
@@ -240,7 +230,6 @@ watch(
 
           <InputField
             id="documentType"
-            aria-label="Dokumenttyp Rechtszug"
             class="fake-input-group__row__field flex-col"
             label="Dokumenttyp"
           >

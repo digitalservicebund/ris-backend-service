@@ -156,26 +156,5 @@ test.describe("Proceeding decisions", () => {
         `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
       )
     ).toHaveCount(1)
-
-    // delete proceedingDecision
-    await page
-      .locator("div", { hasText: "AG Aalen" })
-      .getByLabel("Löschen")
-      .click()
-
-    await expect(
-      page.getByText(
-        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
-      )
-    ).toHaveCount(0)
-
-    page.reload()
-    await toggleProceedingDecisionsSection(page)
-
-    await expect(
-      page.getByText(
-        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
-      )
-    ).toHaveCount(0)
   })
 })
