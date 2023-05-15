@@ -29,13 +29,6 @@ const inputValue = ref(
 
 dayjs.extend(customParseFormat)
 
-// eslint-disable @typescript-eslint/no-unused-vars
-const options = {
-  onMaska: (input: MaskaDetail) => {
-    inputCompleted.value = input.completed
-  },
-}
-
 const isValidDate = computed(() => {
   return dayjs(inputValue.value, "DD.MM.YYYY", true).isValid()
 })
@@ -44,6 +37,10 @@ const isInPast = computed(() => {
   if (props.isFutureDate) return true
   return dayjs(inputValue.value, "DD.MM.YYYY", true).isBefore(dayjs())
 })
+
+const onMaska = (event: CustomEvent<MaskaDetail>) => {
+  inputCompleted.value = event.detail.completed
+}
 
 const hasError = computed(
   () =>
@@ -111,7 +108,7 @@ watch(inputCompleted, () => {
   <input
     :id="id"
     v-model="inputValue"
-    v-maska:[options]
+    v-maska
     :aria-label="ariaLabel"
     class="bg-white border-2 border-blue-800 focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 uppercase w-full"
     :class="conditionalClasses"
@@ -119,6 +116,7 @@ watch(inputCompleted, () => {
     placeholder="DD.MM.YYYY"
     @blur="onBlur"
     @keydown.delete="backspaceDelete"
+    @maska="onMaska"
   />
 </template>
 
