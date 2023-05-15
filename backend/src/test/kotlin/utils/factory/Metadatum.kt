@@ -7,7 +7,7 @@ import utils.randomString
 fun metadatum(block: MetadatumBuilder.() -> Unit): Metadatum<*> = MetadatumBuilder().apply(block).build()
 
 class MetadatumBuilder {
-    var value: String? = randomString()
+    var value: Any? = randomString()
     var type: MetadatumType = MetadatumType.LEAD_UNIT
 
     fun build(): Metadatum<*> = Metadatum(value, type)

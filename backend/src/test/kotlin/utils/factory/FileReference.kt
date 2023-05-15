@@ -9,7 +9,7 @@ fun file(block: FileBuilder.() -> Unit): FileReference = FileBuilder().apply(blo
 class FileBuilder {
     var name: String = randomString(10) + ".zip"
     var hash: String = randomString(32)
-    val createdAt: LocalDateTime = LocalDateTime.now()
+    var createdAt: LocalDateTime = LocalDateTime.now()
 
     fun build(): FileReference = FileReference(name, hash, createdAt)
 }

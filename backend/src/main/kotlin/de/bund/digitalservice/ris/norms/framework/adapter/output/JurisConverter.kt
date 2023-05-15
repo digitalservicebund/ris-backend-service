@@ -161,7 +161,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     ) + createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
-        createSectionsFromMetadata(Section.DOCUMENT_TYPE, documentTypeName + documentNormCategory + documentTemplateName) +
         referenceSections.mapIndexed { index, section -> MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), index, listOf(section)) } +
         citationDateSections + ageIndicationSections +
         addProviderSections(data.normProviderList)
@@ -173,6 +172,9 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         documentCategory = data.documentCategory,
+        documentTypeName = data.documentTypeList.firstOrNull()?.name,
+        documentNormCategory = data.documentTypeList.firstOrNull()?.category,
+        documentTemplateName = data.documentTypeList.firstOrNull()?.templateName,
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
         entryIntoForceDate = parseDateString(data.entryIntoForceDate),
