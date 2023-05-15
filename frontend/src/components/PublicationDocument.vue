@@ -6,6 +6,7 @@ import TextButton from "../shared/components/input/TextButton.vue"
 import TextInput from "../shared/components/input/TextInput.vue"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import DocumentUnit from "@/domain/documentUnit"
+import { ProceedingDecision } from "@/domain/proceedingDecision"
 import XmlMail from "@/domain/xmlMail"
 import { fieldLabels, proceedingDecisionFieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
@@ -70,20 +71,29 @@ const missingFields = ref(
 )
 
 const missingProceedingDecisionFields = ref(
-  props.documentUnit.proceedingDecisions?.map((proceedingDecision) => {
-    return {
-      identifier: proceedingDecision.renderDecision,
-      missingFields: proceedingDecision.missingRequiredFields.map(
-        (field) => proceedingDecisionFieldLabels[field]
-      ),
-    }
-  })
+  props.documentUnit.proceedingDecisions
+    ?.filter((proceedingDecision) => {
+      return getMissingFields(proceedingDecision).length > 0
+    })
+    .map((proceedingDecision) => {
+      return {
+        identifier: proceedingDecision.renderDecision,
+        missingFields: getMissingFields(proceedingDecision),
+      }
+    })
 )
+
 const fieldsMissing = computed(() =>
   missingFields.value.length || missingProceedingDecisionFields.value?.length
     ? true
     : false
 )
+
+function getMissingFields(proceedingDecision: ProceedingDecision) {
+  return proceedingDecision.missingRequiredFields.map(
+    (field) => proceedingDecisionFieldLabels[field]
+  )
+}
 </script>
 
 <template>
@@ -113,7 +123,10 @@ const fieldsMissing = computed(() =>
                 {{ field }}
               </li>
               <li
-                v-if="missingProceedingDecisionFields"
+                v-if="
+                  missingProceedingDecisionFields &&
+                  missingProceedingDecisionFields.length > 0
+                "
                 class="body-01-reg list-item ml-[1rem]"
               >
                 Rechtszug
@@ -123,7 +136,7 @@ const fieldsMissing = computed(() =>
                     :key="missingProceedingDecisionFields.indexOf(fields)"
                     class="body-01-reg list-item ml-[1rem]"
                   >
-                    <div v-if="fields.missingFields.length > 0">
+                    <div v-if="fields && fields.missingFields.length > 0">
                       <span>{{ fields.identifier }}</span>
                       -
                       <span class="label-02-bold">{{
