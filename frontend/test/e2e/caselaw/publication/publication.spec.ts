@@ -158,10 +158,10 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
       async () => {
         await page
           .locator("[aria-label='Entscheidungsdatum']")
-          .fill("2022-02-03")
+          .fill("03.02.2022")
         expect(
           await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-        ).toBe("2022-02-03")
+        ).toBe("03.02.2022")
         await page.keyboard.press("Tab")
       },
       page,
