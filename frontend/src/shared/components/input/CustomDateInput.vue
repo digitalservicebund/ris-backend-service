@@ -40,11 +40,8 @@ const isValidDate = computed(() => {
 })
 
 const isInPast = computed(() => {
-  if (inputValue.value) {
-    const date = new Date(inputValue.value)
-    const today = new Date()
-    return date < today
-  } else return true
+  if (props.isFutureDate) return true
+  return dayjs(inputValue.value, "DD.MM.YYYY", true).isBefore(dayjs())
 })
 
 const hasError = computed(
