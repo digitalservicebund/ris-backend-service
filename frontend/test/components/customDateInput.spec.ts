@@ -1,5 +1,5 @@
 import userEvent from "@testing-library/user-event"
-import { render, screen } from "@testing-library/vue"
+import { fireEvent, render, screen } from "@testing-library/vue"
 import { nextTick } from "vue"
 import CustomDateInput from "@/shared/components/input/CustomDateInput.vue"
 import { ValidationError } from "@/shared/components/input/types"
@@ -81,15 +81,23 @@ describe("CustomDateInput", () => {
 
   it("emits undefined on backspace delete", async () => {
     const { emitted } = renderComponent({
-      value: "2022-02-03",
+      modelValue: "2022-05-13T18:08:14.036Z",
     })
-    const input = screen.queryByLabelText("aria-label") as HTMLInputElement
+    const input: HTMLInputElement = screen.queryByLabelText(
+      "aria-label"
+    ) as HTMLInputElement
+    expect(input).toHaveValue("13.05.2022")
     await userEvent.type(input, "{backspace}")
+    await fireEvent.update(input)
     await nextTick()
 
     expect(input).toHaveValue("")
+
     expect(emitted()["update:modelValue"]).toBeTruthy()
-    expect(emitted().input).toEqual(undefined)
+
+    const array = emitted()["update:modelValue"] as ValidationError[][]
+
+    expect(array.filter((element) => element[0] === undefined)).toHaveLength(1)
   })
 
   it("does not allow dates in the future", async () => {

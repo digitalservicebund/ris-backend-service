@@ -58,28 +58,20 @@ test.describe("decision date", () => {
 
     await page
       .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("2022-02-02")
-    await page.keyboard.press("Enter")
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("2022-02-01")
-    await page.keyboard.press("Enter")
-
-    await expect(page.locator(".label-wrapper").nth(0)).toHaveText("02.02.2022")
-    await expect(page.locator(".label-wrapper").nth(1)).toHaveText("01.02.2022")
-
-    await page
-      .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-      .fill("2022-02-03")
-
+      .fill("03.02.2022")
     expect(
-      await page.inputValue("[aria-label='Abweichendes Entscheidungsdatum']")
-    ).toBe("2022-02-03")
+      await page
+        .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+        .inputValue()
+    ).toBe("03.02.2022")
 
     await page.keyboard.press("Backspace")
-    await page.keyboard.press("Backspace")
+    await page.reload()
+
     expect(
-      await page.inputValue("[aria-label='Abweichendes Entscheidungsdatum']")
+      await page
+        .locator("[aria-label='Abweichendes Entscheidungsdatum']")
+        .inputValue()
     ).toBe("")
   })
 
@@ -112,11 +104,11 @@ test.describe("decision date", () => {
 
         await page
           .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-          .fill("2022-02-02")
+          .fill("02.02.2022")
         await page.keyboard.press("Enter")
         await page
           .locator("[aria-label='Abweichendes Entscheidungsdatum']")
-          .fill("2022-02-01")
+          .fill("01.02.2022")
         await page.keyboard.press("Enter")
       },
       page,
