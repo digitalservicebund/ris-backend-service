@@ -29,6 +29,7 @@ const inputValue = ref(
 
 dayjs.extend(customParseFormat)
 
+// eslint-disable @typescript-eslint/no-unused-vars
 const options = {
   onMaska: (input: MaskaDetail) => {
     inputCompleted.value = input.completed
