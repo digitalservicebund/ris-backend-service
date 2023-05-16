@@ -7,6 +7,7 @@ import {
   MetadataValueType,
   MetadatumType,
   Norm,
+  NormCategory,
   Paragraph,
 } from "@/domain/Norm"
 import {
@@ -61,6 +62,9 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.ENTITY]: generateString,
   [MetadatumType.DECIDING_BODY]: generateString,
   [MetadatumType.RESOLUTION_MAJORITY]: pickRandomBoolean,
+  [MetadatumType.TYPE_NAME]: generateString,
+  [MetadatumType.NORM_CATEGORY]: pickRandomNormCategory,
+  [MetadatumType.TEMPLATE_NAME]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -178,10 +182,16 @@ export function generateArticle(partialArticle?: Partial<Article>): Article {
   }
 }
 
-export function pickRandomMetadatumType(): MetadatumType {
-  const options = Object.keys(MetadatumType)
+export function pickRandomNormCategory(): NormCategory {
+  const options = Object.values(NormCategory)
   const index = generateRandomNumber(0, options.length - 1)
-  return options[index] as MetadatumType
+  return options[index]
+}
+
+export function pickRandomMetadatumType(): MetadatumType {
+  const options = Object.values(MetadatumType)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index]
 }
 
 export function generateMetadata(partialMetadata?: Partial<Metadata>) {
@@ -193,7 +203,9 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
       .fill(0)
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore TS2345
-      .map(METADATA_VALUE_GENERATORS[type]) as string[] & boolean[]
+      .map(METADATA_VALUE_GENERATORS[type]) as string[] &
+      boolean[] &
+      NormCategory[]
     metadata[type] = values
   }
 
@@ -206,9 +218,9 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
 }
 
 export function pickRandomMetadataSectionName(): MetadataSectionName {
-  const options = Object.keys(MetadataSectionName)
+  const options = Object.values(MetadataSectionName)
   const index = generateRandomNumber(0, options.length - 1)
-  return options[index] as MetadataSectionName
+  return options[index]
 }
 
 export function generateMetadataSections(
