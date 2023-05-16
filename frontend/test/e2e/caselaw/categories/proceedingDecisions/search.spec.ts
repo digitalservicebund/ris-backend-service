@@ -1,6 +1,5 @@
 import { expect } from "@playwright/test"
 import dayjs from "dayjs"
-import utc from "dayjs/plugin/utc"
 import {
   checkIfProceedingDecisionCleared,
   fillProceedingDecisionInputs,
@@ -9,8 +8,6 @@ import {
 } from "~/e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
-
-dayjs.extend(utc)
 
 test.describe("Search proceeding decisions", () => {
   test("renders default", async ({ page, documentNumber }) => {
@@ -36,9 +33,9 @@ test.describe("Search proceeding decisions", () => {
       court: secondaryDocumentUnit.coreData.court?.label,
       fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[0],
       documentType: secondaryDocumentUnit.coreData.documentType?.jurisShortcut,
-      date: dayjs(secondaryDocumentUnit.coreData.decisionDate)
-        .local()
-        .format("YYYY-MM-DD"),
+      date: dayjs(secondaryDocumentUnit.coreData.decisionDate).format(
+        "YYYY-MM-DD"
+      ),
     })
 
     await page
@@ -50,9 +47,7 @@ test.describe("Search proceeding decisions", () => {
     const result = page.locator(".table-row", {
       hasText: `AG Aachen, AnU, ${dayjs(
         secondaryDocumentUnit.coreData.decisionDate
-      )
-        .local()
-        .format("DD.MM.YYYY")}, ${
+      ).format("DD.MM.YYYY")}, ${
         secondaryDocumentUnit.coreData.fileNumbers?.[0]
       }`,
     })
@@ -63,9 +58,9 @@ test.describe("Search proceeding decisions", () => {
 
     await expect(
       page.getByText(
-        `AG Aachen, AnU, ${dayjs(secondaryDocumentUnit.coreData.decisionDate)
-          .local()
-          .format("DD.MM.YYYY")}, ${
+        `AG Aachen, AnU, ${dayjs(
+          secondaryDocumentUnit.coreData.decisionDate
+        ).format("DD.MM.YYYY")}, ${
           secondaryDocumentUnit.coreData.fileNumbers?.[0]
         }`
       )
