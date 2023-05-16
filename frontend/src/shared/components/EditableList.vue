@@ -131,7 +131,7 @@ watch(editIndex, focusFirstInputOfCurrentEditElement)
         v-bind="attributes"
         v-model="modelValueList[index]"
         class="mt-16"
-        @keydown.enter="setEditIndex(undefined)"
+        @keypress.enter="setEditIndex(undefined)"
       />
     </div>
 
