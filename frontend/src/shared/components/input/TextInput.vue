@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, ref } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 import { useInputModel } from "@/shared/composables/useInputModel"
 
@@ -22,6 +22,7 @@ interface Emits {
 
 const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
+const inputRef = ref()
 
 const { inputValue, emitInputEvent } = useInputModel<string, Props, Emits>(
   props,
@@ -35,11 +36,18 @@ const conditionalClasses = computed(() => ({
 }))
 
 const tabindex = computed(() => (props.readOnly ? -1 : 0))
+
+function focusInput() {
+  inputRef.value.focus()
+}
+
+defineExpose({ focusInput })
 </script>
 
 <template>
   <input
     :id="id"
+    ref="inputRef"
     v-model="inputValue"
     :aria-label="ariaLabel"
     class="bg-white border-2 border-blue-800 flex focus:outline-2 h-[3.75rem] hover:outline-2 input outline-0 outline-blue-800 outline-none outline-offset-[-4px] px-16 read-only:border-none read-only:hover:outline-0 w-full"

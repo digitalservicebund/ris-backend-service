@@ -53,13 +53,14 @@ function removeModelEntry(index: number) {
   }
 }
 
-async function focusFirstInputOfCurrentEditElement() {
+async function focusFirstFocusableElementOfCurrentEditElement() {
   await nextTick()
 
   if (currentEditElement.value) {
-    const firstInputElement =
-      currentEditElement.value.getElementsByTagName("input")[0]
-    firstInputElement?.focus()
+    const firstFocusableElement = currentEditElement.value.querySelectorAll(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    )[0] as HTMLElement
+    firstFocusableElement.focus()
   }
 }
 
@@ -83,7 +84,7 @@ watch(modelValueList, () => emit("update:modelValue", modelValueList.value), {
   deep: true,
 })
 
-watch(editIndex, focusFirstInputOfCurrentEditElement)
+watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
 </script>
 
 <template>
