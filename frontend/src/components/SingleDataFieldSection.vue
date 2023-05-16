@@ -62,7 +62,7 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
       :id="id"
       v-model="value"
       :attributes="inputAttributes"
-      class="!border-none hover:outline-none outline-offset-2 self-center w-full"
+      class="!border-none hover:outline-none label-02-reg outline-offset-2 self-center w-full"
       :class="dynamicClasses"
       disable-error
       :type="type"
