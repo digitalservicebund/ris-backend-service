@@ -361,6 +361,10 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
 <template>
   <div class="flex flex-col gap-8 max-w-screen-lg">
+    <h1 class="h-[1px] overflow-hidden w-[1px]">
+      Dokumentation des Rahmenelements
+    </h1>
+
     <SingleDataFieldSection
       id="officialLongTitle"
       v-model="flatMetadata.officialLongTitle"
