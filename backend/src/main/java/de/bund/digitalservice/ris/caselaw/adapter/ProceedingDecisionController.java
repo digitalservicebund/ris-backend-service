@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +29,7 @@ public class ProceedingDecisionController {
   @PutMapping
   public Flux<ProceedingDecision> createProceedingDecision(
       @PathVariable("uuid") UUID documentUnitUuid,
-      @RequestBody ProceedingDecision proceedingDecision) {
+      @Valid @RequestBody ProceedingDecision proceedingDecision) {
     return service.createProceedingDecision(documentUnitUuid, proceedingDecision);
   }
 
