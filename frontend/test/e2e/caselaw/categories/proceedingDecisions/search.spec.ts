@@ -37,7 +37,6 @@ test.describe("Search proceeding decisions", () => {
       fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[0],
       documentType: secondaryDocumentUnit.coreData.documentType?.jurisShortcut,
       date: dayjs(secondaryDocumentUnit.coreData.decisionDate)
-        .utc()
         .local()
         .format("YYYY-MM-DD"),
     })
@@ -52,7 +51,6 @@ test.describe("Search proceeding decisions", () => {
       hasText: `AG Aachen, AnU, ${dayjs(
         secondaryDocumentUnit.coreData.decisionDate
       )
-        .utc()
         .local()
         .format("DD.MM.YYYY")}, ${
         secondaryDocumentUnit.coreData.fileNumbers?.[0]
@@ -66,7 +64,6 @@ test.describe("Search proceeding decisions", () => {
     await expect(
       page.getByText(
         `AG Aachen, AnU, ${dayjs(secondaryDocumentUnit.coreData.decisionDate)
-          .utc()
           .local()
           .format("DD.MM.YYYY")}, ${
           secondaryDocumentUnit.coreData.fileNumbers?.[0]

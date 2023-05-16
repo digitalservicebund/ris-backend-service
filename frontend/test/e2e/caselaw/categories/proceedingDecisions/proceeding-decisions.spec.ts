@@ -1,12 +1,12 @@
 import { expect } from "@playwright/test"
-import { generateString } from "../../../../test-helper/dataGenerators"
 import {
   checkIfProceedingDecisionCleared,
   fillProceedingDecisionInputs,
   navigateToCategories,
   toggleProceedingDecisionsSection,
-} from "../../e2e-utils"
-import { testWithDocumentUnit as test } from "../../fixtures"
+} from "~/e2e/caselaw/e2e-utils"
+import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
+import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("Proceeding decisions", () => {
   test("rendering", async ({ page, documentNumber }) => {
