@@ -14,4 +14,5 @@ public record ProceedingDecision(
     Court court,
     Instant date,
     String fileNumber,
-    DocumentType documentType) {}
+    DocumentType documentType,
+    boolean dateKnown) {}

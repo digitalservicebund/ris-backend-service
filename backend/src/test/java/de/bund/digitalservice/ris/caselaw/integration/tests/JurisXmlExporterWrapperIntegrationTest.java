@@ -152,6 +152,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
                 .dataSource(DataSource.NEURIS)
                 .court(new Court("courtType", "courtPlace", "courtLabel", null))
                 .date(Instant.parse("2020-04-05T00:00:00Z"))
+                .dateKnown(true)
                 .fileNumber("fileNumber")
                 .documentType(
                     DocumentType.builder().jurisShortcut("category").label("category123").build())

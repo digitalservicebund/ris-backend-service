@@ -111,6 +111,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 .creationtimestamp(Instant.now())
                 .documentnumber(documentNumber)
                 .dataSource(DataSource.NEURIS)
+                .dateKnown(true)
                 .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                 .build())
         .map(DocumentUnitTransformer::transformMetadataToDomain);

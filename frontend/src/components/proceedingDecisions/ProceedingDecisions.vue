@@ -1,16 +1,22 @@
 <script lang="ts" setup>
 import { h, watch, ref } from "vue"
 import { RouterLink } from "vue-router"
+import ComboboxInput from "../ComboboxInput.vue"
 import DecisionList from "./DecisionList.vue"
 import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import { ProceedingDecision } from "@/domain/proceedingDecision"
-import { proceedingDecisionFields } from "@/fields/caselaw"
+import comboboxItemService from "@/services/comboboxItemService"
 import DocumentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
-import InputGroup from "@/shared/components/input/InputGroup.vue"
+import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
+import InputField, {
+  LabelPosition,
+} from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
+import TextInput from "@/shared/components/input/TextInput.vue"
 
 const props = defineProps<{
   documentUnitUuid: string
@@ -19,10 +25,17 @@ const props = defineProps<{
 
 const proceedingDecisions = ref<ProceedingDecision[]>()
 const searchResults = ref<SearchResults>()
-const input = ref<ProceedingDecision>(new ProceedingDecision({}))
+const input = ref<ProceedingDecision>(new ProceedingDecision())
 
-function isNotEmpty(decision: ProceedingDecision): boolean {
-  return Object.values(decision).some((value) => value !== undefined)
+function isNotEmpty({
+  court,
+  date,
+  fileNumber,
+  documentType,
+}: ProceedingDecision): boolean {
+  return [court, date, fileNumber, documentType].some(
+    (property) => property != undefined
+  )
 }
 
 async function createProceedingDecision(
@@ -43,7 +56,7 @@ async function createProceedingDecision(
 }
 
 function resetInput() {
-  input.value = new ProceedingDecision({})
+  input.value = new ProceedingDecision()
 }
 
 async function linkProceedingDecision(childUuid: string) {
@@ -140,6 +153,17 @@ watch(
     immediate: true,
   }
 )
+
+watch(
+  input,
+  () => {
+    if (!input.value.dateKnown) input.value.date = undefined
+  },
+  {
+    immediate: true,
+    deep: true,
+  }
+)
 </script>
 
 <template>
@@ -158,11 +182,73 @@ watch(
         @remove-link="removeProceedingDecision"
       />
 
-      <InputGroup
-        v-model="input"
-        :column-count="2"
-        :fields="proceedingDecisionFields"
-      ></InputGroup>
+      <div class="fake-input-group">
+        <div class="fake-input-group__row pb-32">
+          <InputField
+            id="court"
+            class="fake-input-group__row__field flex-col"
+            label="Gericht *"
+          >
+            <ComboboxInput
+              id="court"
+              v-model="input.court"
+              aria-label="Gericht Rechtszug"
+              :item-service="comboboxItemService.getCourts"
+              placeholder="Gerichtstyp Gerichtsort"
+            ></ComboboxInput>
+          </InputField>
+
+          <div class="fake-input-group__row__field flex-col">
+            <InputField id="date" class="w-full" label="Entscheidungsdatum *">
+              <DateInput
+                id="date"
+                v-model="input.date"
+                aria-label="Entscheidungsdatum Rechtszug"
+                :disabled="input.dateUnknown"
+              ></DateInput>
+            </InputField>
+            <InputField
+              id="dateUnknown"
+              label="Datum unbekannt"
+              :label-position="LabelPosition.RIGHT"
+            >
+              <CheckboxInput
+                id="dateUnknown"
+                v-model="input.dateUnknown"
+                aria-label="Datum Unbekannt"
+              ></CheckboxInput>
+            </InputField>
+          </div>
+        </div>
+
+        <div class="fake-input-group__row pb-32">
+          <InputField
+            id="fileNumber"
+            class="fake-input-group__row__field flex-col"
+            label="Aktenzeichen *"
+          >
+            <TextInput
+              id="fileNumber"
+              v-model="input.fileNumber"
+              aria-label="Aktenzeichen Rechtszug"
+            ></TextInput>
+          </InputField>
+
+          <InputField
+            id="documentType"
+            class="fake-input-group__row__field flex-col"
+            label="Dokumenttyp"
+          >
+            <ComboboxInput
+              id="documentType"
+              v-model="input.documentType"
+              aria-label="Dokumenttyp Rechtszug"
+              :item-service="comboboxItemService.getDocumentTypes"
+              placeholder="Bitte auswählen"
+            ></ComboboxInput>
+          </InputField>
+        </div>
+      </div>
 
       <div>
         <TextButton
@@ -190,3 +276,25 @@ watch(
     </ExpandableDataSet>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.fake-input-group {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+
+  &__row {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 2rem;
+
+    &__field {
+      display: flex;
+      width: calc((100% - 2rem) / 2);
+      min-width: 15rem;
+      align-items: start;
+    }
+  }
+}
+</style>

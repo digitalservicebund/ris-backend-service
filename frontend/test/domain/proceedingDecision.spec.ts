@@ -22,6 +22,12 @@ describe("ProceedingDecision", () => {
     expect(proceedingDecision.fileNumber).toEqual("bar")
   })
 
+  it("instantiates with default unkownData", () => {
+    const proceedingDecision = new ProceedingDecision()
+
+    expect(proceedingDecision.dateKnown).toBeTruthy()
+  })
+
   it("returns false if not linked to other docunit", () => {
     const proceedingDecision = new ProceedingDecision({
       dataSource: "PROCEEDING_DECISION",

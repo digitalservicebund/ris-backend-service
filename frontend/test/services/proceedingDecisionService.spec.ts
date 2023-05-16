@@ -8,6 +8,7 @@ const testModel = new ProceedingDecision({
     documentType: undefined,
     date: undefined,
     fileNumber: undefined,
+    dateKnown: true,
   },
 })
 

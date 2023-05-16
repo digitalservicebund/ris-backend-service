@@ -41,7 +41,7 @@ test.describe("Proceeding decisions", () => {
 
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "03.12.2004",
+      date: "2004-12-03",
       fileNumber: fileNumber,
       documentType: "AnU",
     })
@@ -89,7 +89,7 @@ test.describe("Proceeding decisions", () => {
     await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "03.12.2004",
+      date: "2004-12-03",
       fileNumber: "1a2b3c",
       documentType: "AnU",
     })
@@ -104,7 +104,7 @@ test.describe("Proceeding decisions", () => {
 
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "03.12.2004",
+      date: "2004-12-03",
       fileNumber: "1a2b3c",
       documentType: "AnU",
     })
@@ -116,5 +116,46 @@ test.describe("Proceeding decisions", () => {
     await expect(
       page.getByText("AG Aalen, AnU, 03.12.2004, 1a2b3c")
     ).toHaveCount(2)
+  })
+
+  test("add proceeding decision with unknown date", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleProceedingDecisionsSection(page)
+
+    const fileNumber = generateString()
+
+    await test.step("create decision with normal date", async () =>
+      await fillProceedingDecisionInputs(page, {
+        court: "AG Aalen",
+        fileNumber: fileNumber,
+        date: "2004-12-03",
+        documentType: "AnU",
+        dateUnknown: true,
+      }))
+
+    await page.getByText("Manuell Hinzufügen").click()
+
+    await checkIfProceedingDecisionCleared(page)
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`,
+        {
+          exact: true,
+        }
+      )
+    ).toBeVisible()
+
+    await page.reload()
+    await toggleProceedingDecisionsSection(page)
+
+    await expect(
+      page.getByText(
+        `AG Aalen, AnU, unbekanntes Entscheidungsdatum, ${fileNumber}`
+      )
+    ).toHaveCount(1)
   })
 })

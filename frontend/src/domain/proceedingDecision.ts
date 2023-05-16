@@ -9,6 +9,7 @@ export class ProceedingDecision {
   public date?: string
   public fileNumber?: string
   public documentType?: DocumentType
+  public dateKnown = true
 
   static requiredFields = ["fileNumber", "court", "date"] as const
 
@@ -20,6 +21,7 @@ export class ProceedingDecision {
     return [
       ...(this.court ? [`${this.court.label}`] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
+      ...(this.dateUnknown == true ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.date ? [dayjs(this.date).format("DD.MM.YYYY")] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentNumber && this.hasLink ? [this.documentNumber] : []),
@@ -28,6 +30,12 @@ export class ProceedingDecision {
 
   get hasLink(): boolean {
     return this.dataSource !== "PROCEEDING_DECISION"
+  }
+  get dateUnknown(): boolean {
+    return !this.dateKnown
+  }
+  set dateUnknown(dateUnknown: boolean) {
+    this.dateKnown = !dateUnknown
   }
 
   get missingRequiredFields() {
