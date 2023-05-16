@@ -110,7 +110,6 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
               :id="category"
               v-model="selectedNormCategories[category]"
               :aria-label="NORM_CATEGORY_NAMES[category]"
-              class="max-h-20 w-20"
             />
           </InputField>
         </div>
