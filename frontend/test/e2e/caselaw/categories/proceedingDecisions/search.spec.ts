@@ -1,5 +1,4 @@
 import { expect } from "@playwright/test"
-import dayjs from "dayjs"
 import {
   checkIfProceedingDecisionCleared,
   fillProceedingDecisionInputs,
@@ -33,9 +32,7 @@ test.describe("Search proceeding decisions", () => {
       court: secondaryDocumentUnit.coreData.court?.label,
       fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[0],
       documentType: secondaryDocumentUnit.coreData.documentType?.jurisShortcut,
-      date: dayjs(secondaryDocumentUnit.coreData.decisionDate).format(
-        "YYYY-MM-DD"
-      ),
+      date: "2020-01-01",
     })
 
     await page
@@ -45,11 +42,7 @@ test.describe("Search proceeding decisions", () => {
     await expect(page.getByText("Suche hat 1 Treffer ergeben")).toBeVisible()
 
     const result = page.locator(".table-row", {
-      hasText: `AG Aachen, AnU, ${dayjs(
-        secondaryDocumentUnit.coreData.decisionDate
-      ).format("DD.MM.YYYY")}, ${
-        secondaryDocumentUnit.coreData.fileNumbers?.[0]
-      }`,
+      hasText: `AG Aachen, AnU, 01.01.2020, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`,
     })
     await expect(result).toBeVisible()
     await result.locator("[aria-label='Treffer übernehmen']").click()
@@ -58,11 +51,7 @@ test.describe("Search proceeding decisions", () => {
 
     await expect(
       page.getByText(
-        `AG Aachen, AnU, ${dayjs(
-          secondaryDocumentUnit.coreData.decisionDate
-        ).format("DD.MM.YYYY")}, ${
-          secondaryDocumentUnit.coreData.fileNumbers?.[0]
-        }`
+        `AG Aachen, AnU, 01.01.2020, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`
       )
     ).toHaveCount(2)
 
