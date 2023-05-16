@@ -43,7 +43,7 @@ class NormTest {
             )
 
         assertThat(norm.metadataSections.flatMap { it.metadata }).hasSize(2)
-        assertThat(norm.metadataSections.flatMap { it.metadata }).containsAll(sections.first().metadata)
+        assertThat(norm.metadataSections.flatMap { it.metadata }).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").containsAll(sections.first().metadata)
     }
 
     @Test

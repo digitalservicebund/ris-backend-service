@@ -141,7 +141,7 @@ interface NormsMapper {
             else -> metadatumDto.value
         }
 
-        return Metadatum(value, metadatumDto.type, metadatumDto.order)
+        return Metadatum(value, metadatumDto.type, metadatumDto.order, metadatumDto.guid)
     }
 
     fun normToDto(norm: Norm, id: Int = 0): NormDto {
@@ -229,7 +229,7 @@ interface NormsMapper {
     }
 
     fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, id: Int = 0): List<MetadatumDto> {
-        return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId) }
+        return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId, guid = it.guid) }
     }
 
     fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
