@@ -80,19 +80,32 @@ export async function expectRepeatedSectionListHasCorrectEntries(
   const expandable = page.locator(`#${section.id}`)
   await expect(expandable).toBeVisible()
   await expect(expandable).toContainText(section.heading ?? "")
+
   await expandable.click()
+
   const numberOfSectionRepetition = Math.max(
     ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
   )
   const listEntries = expandable.getByLabel("Listen Eintrag")
-  await expect(listEntries).toHaveCount(numberOfSectionRepetition)
+  const entryCount = await listEntries.count()
+  expect(entryCount).toBe(numberOfSectionRepetition)
 
-  for (let index = 0; index < numberOfSectionRepetition; index++) {
-    const entry = listEntries.nth(index)
-    await entry.getByRole("button", { name: "Eintrag bearbeiten" }).click()
-    const fields = section.fields ?? []
+  const fields = section.fields ?? []
+
+  async function expectEntry(index: number): Promise<void> {
     await expectInputFieldGroupHasCorrectValues(page, fields, index)
     await page.keyboard.down("Enter") // Stop editing / close inputs again.
+  }
+
+  // Single entries are automatically in edit mode.
+  if (entryCount == 1) {
+    await expectEntry(0)
+  } else {
+    for (let index = 0; index < numberOfSectionRepetition; index++) {
+      const entry = listEntries.nth(index)
+      await entry.getByRole("button", { name: "Eintrag bearbeiten" }).click()
+      await expectEntry(index)
+    }
   }
 }
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, nextTick, ref, useAttrs, watch } from "vue"
+import { computed, nextTick, ref, useAttrs, watch, onMounted } from "vue"
 import type { Component } from "vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
@@ -64,6 +64,12 @@ async function focusFirstFocusableElementOfCurrentEditElement() {
   }
 }
 
+function editFirstEntryIfOnlyOne(): void {
+  if (modelValueList.value?.length == 1) setEditIndex(0)
+}
+
+onMounted(editFirstEntryIfOnlyOne)
+
 watch(
   () => props.modelValue,
   () => (modelValueList.value = props.modelValue),
@@ -93,11 +99,11 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
       v-for="(entry, index) in modelValueList"
       :key="index"
       ref="elementList"
+      aria-label="Listen Eintrag"
     >
-      <!-- eslint-disable-next-line vuejs-accessibility/click-events-have-key-events -->
       <div
         v-if="index !== editIndex"
-        aria-label="Listen Eintrag"
+        :key="index"
         class="border-b-1 border-b-blue-500 cursor-pointer flex justify-between py-10"
       >
         <component

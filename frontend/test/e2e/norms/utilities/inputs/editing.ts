@@ -99,31 +99,58 @@ export async function fillInputFieldGroup(
   }
 }
 
-export async function fillRepeatedMetadataSectionList(
+/**
+ * Delete all entries of the repeated section, handling all special cases.
+ * For more independent integration with other steps, the section gets opened
+ * AND closed again.
+ */
+export async function clearRepeatedMetadataSectionList(
   page: Page,
   section: MetadataInputSection
 ): Promise<void> {
   const expandable = page.locator(`#${section.id}`)
   await expandable.click()
 
-  // Clear all entries first
   const listEntries = expandable.getByLabel("Listen Eintrag")
   const entryCount = await listEntries.count()
 
-  // Delete backwards to avoid conflicts.
-  for (let index = entryCount - 1; index >= 0; index--) {
-    await listEntries
+  async function deleteEntry(index: number): Promise<void> {
+    return listEntries
       .nth(index)
       .getByRole("button", { name: "Eintrag löschen" })
       .click()
   }
+
+  // Single entries are automatically in edit mode.
+  if (entryCount == 1) {
+    await page.keyboard.press("Enter") // Close edit mode first
+    await deleteEntry(0)
+  } else {
+    // Delete backwards to avoid conflicts.
+    for (let index = entryCount - 1; index >= 0; index--) {
+      await deleteEntry(index)
+    }
+  }
+
+  const finishButton = expandable.getByRole("button", { name: "Fertig" })
+  await finishButton.click()
+}
+
+export async function fillRepeatedMetadataSectionList(
+  page: Page,
+  section: MetadataInputSection
+): Promise<void> {
+  await clearRepeatedMetadataSectionList(page, section)
+
+  const expandable = page.locator(`#${section.id}`)
+  await expandable.click()
 
   const numberOfSectionRepetition = Math.max(
     ...(section.fields ?? []).map((field) => field.values?.length ?? 0)
   )
 
   if (numberOfSectionRepetition > 0) {
-    // After deleting all entries, first entry is in edit mode already.
+    // First entry is automatically in edit mode.
     await fillInputFieldGroup(page, section.fields ?? [], 0)
     await page.keyboard.press("Enter")
   }
@@ -133,6 +160,9 @@ export async function fillRepeatedMetadataSectionList(
     await fillInputFieldGroup(page, section.fields ?? [], index)
     await page.keyboard.press("Enter")
   }
+
+  const finishButton = expandable.getByRole("button", { name: "Fertig" })
+  await finishButton.click()
 }
 
 export async function fillMetadataInputSection(
