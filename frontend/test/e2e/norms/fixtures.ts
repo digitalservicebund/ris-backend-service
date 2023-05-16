@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { Norm } from "../../../src/domain/Norm"
+import { Norm, NormCategory } from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
@@ -155,24 +155,57 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Dokumenttyp",
+      isRepeatedSection: true,
+      id: "documentTypes",
       fields: [
         {
           type: FieldType.TEXT,
           id: "documentTypeName",
           label: "Typbezeichnung",
-          value: norm.documentTypeName,
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) => section?.TYPE_NAME?.[0]
+          ),
         },
         {
-          type: FieldType.TEXT,
-          id: "documentNormCategory",
-          label: "Art der Norm",
-          value: norm.documentNormCategory,
+          type: FieldType.CHECKBOX,
+          id: NormCategory.AMENDMENT_NORM,
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.AMENDMENT_NORM
+              )
+          ),
         },
         {
-          type: FieldType.TEXT,
+          type: FieldType.CHECKBOX,
+          id: NormCategory.BASE_NORM,
+          label: "Stammnorm",
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.BASE_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.TRANSITIONAL_NORM,
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.TRANSITIONAL_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHIPS,
           id: "documentTemplateName",
           label: "Bezeichnung gemäß Vorlage",
-          value: norm.documentTemplateName,
+          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+            (section) => section?.TEMPLATE_NAME
+          ),
         },
       ],
     },
