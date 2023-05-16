@@ -37,7 +37,7 @@ export function useNormMenuItems(
       },
       children: [
         getChildItem("Allgemeine Angaben", "officialLongTitle"),
-        getChildItem("Dokumenttyp", "documentTypeFields"),
+        getChildItem("Dokumenttyp", "documentTypes"),
         getChildItem("Normgeber", "normProviders"),
         getChildItem("Mitwirkende Organe", "participatingInstitutions"),
         getChildItem("Federführung", "leads"),
