@@ -66,6 +66,15 @@ export enum MetadatumType {
   ENTITY = "ENTITY",
   DECIDING_BODY = "DECIDING_BODY",
   RESOLUTION_MAJORITY = "RESOLUTION_MAJORITY",
+  TYPE_NAME = "TYPE_NAME",
+  NORM_CATEGORY = "NORM_CATEGORY",
+  TEMPLATE_NAME = "TEMPLATE_NAME",
+}
+
+export enum NormCategory {
+  AMENDMENT_NORM = "AMENDMENT_NORM",
+  BASE_NORM = "BASE_NORM",
+  TRANSITIONAL_NORM = "TRANSITIONAL_NORM",
 }
 
 // TODO: Establish typing that requires all `MetadatumType`s to be listed.
@@ -108,16 +117,9 @@ export type MetadataValueType = {
   [MetadatumType.ENTITY]: string
   [MetadatumType.DECIDING_BODY]: string
   [MetadatumType.RESOLUTION_MAJORITY]: boolean
-  [MetadatumType.ADDITIONAL_INFO]: string
-  [MetadatumType.EXPLANATION]: string
-  [MetadatumType.ADDITIONAL_INFO]: string
-  [MetadatumType.EXPLANATION]: string
-  [MetadatumType.ANNOUNCEMENT_MEDIUM]: string
-  [MetadatumType.AREA_OF_PUBLICATION]: string
-  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: string
-  [MetadatumType.SERIES]: string
-  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: string
-  [MetadatumType.EU_GOVERNMENT_GAZETTE]: string
+  [MetadatumType.TYPE_NAME]: string
+  [MetadatumType.NORM_CATEGORY]: NormCategory
+  [MetadatumType.TEMPLATE_NAME]: string
 }
 
 export type Metadata = {
@@ -137,6 +139,7 @@ export enum MetadataSectionName {
   OTHER_OFFICIAL_ANNOUNCEMENT = "OTHER_OFFICIAL_ANNOUNCEMENT",
   NORM_PROVIDER = "NORM_PROVIDER",
   OFFICIAL_REFERENCE = "OFFICIAL_REFERENCE",
+  DOCUMENT_TYPE = "DOCUMENT_TYPE",
 }
 
 export type MetadataSections = {
