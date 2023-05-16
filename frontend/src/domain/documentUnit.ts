@@ -11,7 +11,6 @@ export type CoreData = {
   deviatingEclis?: string[]
   appraisalBody?: string
   decisionDate?: string
-  dateKnown?: boolean
   deviatingDecisionDates?: string[]
   legalEffect?: string
   inputType?: string
