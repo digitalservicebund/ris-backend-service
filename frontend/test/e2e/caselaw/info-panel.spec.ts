@@ -57,10 +57,10 @@ test.describe("info panel", () => {
       .first()
     await expect(dateInfo).toHaveText("Entscheidungsdatum - ")
 
-    await page.locator("[aria-label='Entscheidungsdatum']").fill("2022-02-03")
+    await page.locator("[aria-label='Entscheidungsdatum']").fill("03.02.2022")
     expect(
       await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
-    ).toBe("2022-02-03")
+    ).toBe("03.02.2022")
 
     //when using the .fill() method, we need 3 tabs to leave the field
     await page.keyboard.press("Tab")

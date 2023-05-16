@@ -101,7 +101,7 @@ const dateInputAttributes: BaseInputAttributes = {
       value=""
     />
 
-    <h1 class="font-bold text-24">Date Input</h1>
+    <h1 class="font-bold text-24">Native Date Input</h1>
     <InputField id="customDateInputField">
       <InputElement
         id="dateInput"

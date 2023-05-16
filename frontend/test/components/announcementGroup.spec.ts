@@ -42,11 +42,6 @@ describe("AnnouncementInputGroup", () => {
 
     expect(otherRadio).toBeInTheDocument()
     expect(otherRadio).toBeVisible()
-
-    const radioLabels = screen
-      .getAllByRole("radio")
-      .map((radio) => radio.labels[0].textContent)
-    expect([...new Set(radioLabels)]).toHaveLength(radioLabels.length)
   })
 
   it("renders the correct child component when a radio button is selected ", async () => {

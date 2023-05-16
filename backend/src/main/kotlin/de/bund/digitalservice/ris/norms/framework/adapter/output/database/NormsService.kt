@@ -66,7 +66,7 @@ class NormsService(
         return template.select(NormDto::class.java)
             .matching(selectQuery)
             .all()
-            .flatMap(::getNormWithArticles)
+            .flatMap(::getNormWithMetadata)
     }
 
     override fun getNormByGuid(query: GetNormByGuidOutputPort.Query): Mono<Norm> {
@@ -199,11 +199,17 @@ class NormsService(
         )
     }
 
-    private fun getNormWithArticles(normDto: NormDto): Mono<Norm> {
-        return articlesRepository.findByNormId(normDto.id)
-            .flatMap(::getArticleWithParagraphs)
+    private fun getNormWithMetadata(normDto: NormDto): Mono<Norm> {
+        val findSectionsRequest = metadataSectionsRepository.findByNormId(normDto.id).collectList()
+        val findMetadataRequest = findSectionsRequest.flatMapMany { metadataRepository.findBySectionIdIn(it.map { section -> section.id }) }
             .collectList()
-            .map { articles -> normToEntity(normDto, articles, emptyList(), emptyList()) }
+
+        return Mono.zip(
+            findSectionsRequest,
+            findMetadataRequest,
+        ).map {
+            normToEntity(normDto, emptyList(), emptyList(), it.t1, it.t2)
+        }
     }
 
     private fun getArticleWithParagraphs(articleDto: ArticleDto): Mono<Article> {

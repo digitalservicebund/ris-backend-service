@@ -32,9 +32,10 @@ function updateModelValue() {
   emits("update:modelValue", chips.value.length === 0 ? undefined : chips.value)
 }
 
-function saveChip() {
+function saveChip(event: Event) {
   const trimmed = currentInput.value.trim()
   if (trimmed.length > 0) {
+    event.stopPropagation()
     chips.value.push(trimmed)
     updateModelValue()
     currentInput.value = ""

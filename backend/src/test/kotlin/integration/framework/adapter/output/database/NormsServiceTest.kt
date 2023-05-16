@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.application.port.output.GetNormByGuidOut
 import de.bund.digitalservice.ris.norms.application.port.output.SaveFileReferenceOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort
+import de.bund.digitalservice.ris.norms.application.port.output.SearchNormsOutputPort.QueryFields.OFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.entity.Article
 import de.bund.digitalservice.ris.norms.domain.entity.FileReference
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
@@ -14,6 +15,8 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OFFICIAL_REFERENCE
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINT_ANNOUNCEMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
@@ -106,6 +109,36 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         normsService.searchNorms(getAllQuery)
             .`as`(StepVerifier::create)
             .expectNextCount(1)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `the search norm result includes their ELI property`() {
+        val page = Metadatum("1125", MetadatumType.PAGE)
+        val gazette = Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE)
+        val printAnnouncement = MetadataSection(PRINT_ANNOUNCEMENT, listOf(page, gazette))
+        val officialReference = MetadataSection(OFFICIAL_REFERENCE, emptyList(), 1, listOf(printAnnouncement))
+        val normWithEli = NORM.copy(
+            officialLongTitle = "test title",
+            announcementDate = LocalDate.parse("2022-02-02"),
+            metadataSections = listOf(officialReference),
+        )
+        val saveCommand = SaveNormOutputPort.Command(normWithEli)
+        val parameter = SearchNormsOutputPort.QueryParameter(OFFICIAL_LONG_TITLE, "test title")
+        val searchQuery = SearchNormsOutputPort.Query(listOf(parameter))
+
+        assertThat(normWithEli.eli.toString()).isNotNull()
+
+        normsService.saveNorm(saveCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.searchNorms(searchQuery)
+            .`as`(StepVerifier::create)
+            .assertNext {
+                assertThat(it.eli.toString()).isNotEqualTo("")
+            }
             .verifyComplete()
     }
 

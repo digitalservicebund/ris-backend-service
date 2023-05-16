@@ -37,7 +37,7 @@ export function useNormMenuItems(
       },
       children: [
         getChildItem("Allgemeine Angaben", "officialLongTitle"),
-        getChildItem("Dokumenttyp", "documentTypeFields"),
+        getChildItem("Dokumenttyp", "documentTypes"),
         getChildItem("Normgeber", "normProviders"),
         getChildItem("Mitwirkende Organe", "participatingInstitutions"),
         getChildItem("Federführung", "leads"),
@@ -56,7 +56,7 @@ export function useNormMenuItems(
           "documentProcessingStatusFields"
         ),
         getChildItem("Aktivverweisung", "categorizedReferenceFields"),
-        getChildItem("Fußnote", "otherFootnoteFields"),
+        getChildItem("Fußnoten", "otherFootnoteFields"),
         getChildItem("Gültigkeitsregelung", "validityRules"),
         getChildItem("Elektronischer Nachweis", "digitalEvidenceFields"),
         getChildItem("Aktenzeichen", "referenceNumbers"),

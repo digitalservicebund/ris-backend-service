@@ -1,10 +1,12 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
+import customParseFormat from "dayjs/plugin/customParseFormat"
+import { vMaska, MaskaDetail } from "maska"
 import { ref, watch, computed } from "vue"
 import { ValidationError } from "@/shared/components/input/types"
 
 const props = defineProps<Props>()
-const emits = defineEmits<Emits>()
+const emit = defineEmits<Emits>()
 
 interface Props {
   id: string
@@ -32,7 +34,7 @@ watch(
   props,
   () =>
     (chips.value = props.modelValue
-      ? props.modelValue.map((value) => dayjs(value).format("YYYY-MM-DD"))
+      ? props.modelValue.map((value) => dayjs(value).format("DD.MM.YYYY"))
       : []),
   {
     immediate: true,
@@ -40,11 +42,13 @@ watch(
 )
 
 function updateModelValue() {
-  emits(
+  emit(
     "update:modelValue",
     chips.value.length === 0
       ? undefined
-      : chips.value.map((value) => dayjs(value).toISOString())
+      : chips.value.map((value) =>
+          dayjs(value, "DD.MM.YYYY", true).toISOString()
+        )
   )
 }
 
@@ -133,57 +137,67 @@ const setFocusedItemIndex = (index: number) => {
   focusedItemIndex.value = index
 }
 
-const isInPast = computed(() => {
-  if (currentInput.value && currentInput.value !== "") {
-    const date = new Date(currentInput.value)
-    const today = new Date()
-    return date < today
-  } else return true
+const inputCompleted = ref<boolean>(false)
+
+dayjs.extend(customParseFormat)
+
+const isValidDate = computed(() => {
+  return dayjs(currentInput.value, "DD.MM.YYYY", true).isValid()
 })
+
+const isInPast = computed(() => {
+  if (props.isFutureDate) return true
+  return dayjs(currentInput.value, "DD.MM.YYYY", true).isBefore(dayjs())
+})
+
+const onMaska = (event: CustomEvent<MaskaDetail>) => {
+  inputCompleted.value = event.detail.completed
+}
 
 const hasError = computed(
   () =>
     props.validationError ||
-    (!isInPast.value && !props.isFutureDate) ||
-    currentInput.value == ""
-)
-
-watch(
-  currentInput,
-  () => {
-    if (hasError.value) {
-      if (currentInput.value == "") {
-        emits("update:validationError", {
-          defaultMessage: "Entscheidungsdatum ist kein valides Datum",
-          field: props.id,
-        })
-      }
-    } else {
-      emits("update:validationError", undefined)
-    }
-  },
-  { immediate: true }
-)
-
-watch(
-  isInPast,
-  () => {
-    if (hasError.value) {
-      if (!isInPast.value && !props.isFutureDate) {
-        emits("update:validationError", {
-          defaultMessage:
-            "Das Entscheidungsdatum darf nicht in der Zukunft liegen",
-          field: props.id,
-        })
-      }
-    } else emits("update:validationError", undefined)
-  },
-  { immediate: true }
+    (inputCompleted.value && !isInPast.value && !props.isFutureDate) ||
+    (inputCompleted.value && !isValidDate.value)
 )
 
 const conditionalClasses = computed(() => ({
   input__error: props.validationError || hasError.value,
 }))
+
+function validateInput() {
+  if (inputCompleted.value) {
+    //check for valid dates
+    !isValidDate.value
+      ? emit("update:validationError", {
+          defaultMessage: "Kein valides Datum",
+          field: props.id,
+        })
+      : // if valid date, check for future dates
+      !isInPast.value && !props.isFutureDate && isValidDate.value
+      ? emit("update:validationError", {
+          defaultMessage:
+            "Das " + props.ariaLabel + " darf nicht in der Zukunft liegen",
+          field: props.id,
+        })
+      : emit("update:validationError", undefined)
+  } else {
+    emit("update:validationError", undefined)
+  }
+}
+
+function inputDelete() {
+  emit("update:validationError", undefined)
+  currentInput.value = undefined
+}
+
+function onBlur() {
+  validateInput()
+}
+
+watch(inputCompleted, () => {
+  validateInput()
+})
 </script>
 
 <template>
@@ -201,7 +215,7 @@ const conditionalClasses = computed(() => ({
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
       >
-        <div class="label-wrapper">{{ dayjs(chip).format("DD.MM.YYYY") }}</div>
+        <div class="label-wrapper">{{ chip }}</div>
 
         <div class="icon-wrapper">
           <em
@@ -219,15 +233,17 @@ const conditionalClasses = computed(() => ({
       :id="id"
       ref="currentInputField"
       v-model="currentInput"
+      v-maska
       :aria-label="ariaLabel"
       :class="conditionalClasses"
-      max="9999-12-31"
-      min="1000-01-01"
-      type="date"
-      @keydown.delete="backspaceDelete"
+      data-maska="##.##.####"
+      placeholder="DD.MM.YYYY"
+      @blur="onBlur"
+      @keydown.delete="inputDelete"
       @keypress.enter="saveChip"
       @keyup.left="focusPrevious"
       @keyup.right="focusNext"
+      @maska="onMaska"
     />
   </div>
 </template>

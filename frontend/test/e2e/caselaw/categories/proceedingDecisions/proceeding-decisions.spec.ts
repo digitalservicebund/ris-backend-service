@@ -41,7 +41,7 @@ test.describe("Proceeding decisions", () => {
 
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "2004-12-03",
+      date: "03.12.2004",
       fileNumber: fileNumber,
       documentType: "AnU",
     })
@@ -89,7 +89,7 @@ test.describe("Proceeding decisions", () => {
     await toggleProceedingDecisionsSection(page)
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "2004-12-03",
+      date: "03.12.2004",
       fileNumber: "1a2b3c",
       documentType: "AnU",
     })
@@ -104,7 +104,7 @@ test.describe("Proceeding decisions", () => {
 
     await fillProceedingDecisionInputs(page, {
       court: "AG Aalen",
-      date: "2004-12-03",
+      date: "03.12.2004",
       fileNumber: "1a2b3c",
       documentType: "AnU",
     })

@@ -1,3 +1,4 @@
+import { NormCategory } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
 
 export const newNorm: NormData = {
@@ -141,6 +142,22 @@ export const newNorm: NormData = {
       },
       {
         OTHER_OFFICIAL_ANNOUNCEMENT: [{ OTHER_OFFICIAL_REFERENCE: ["BGBl I"] }],
+      },
+    ],
+    DOCUMENT_TYPE: [
+      {
+        TYPE_NAME: ["abc"],
+        NORM_CATEGORY: [
+          NormCategory.BASE_NORM,
+          NormCategory.TRANSITIONAL_NORM,
+          NormCategory.AMENDMENT_NORM,
+        ],
+        TEMPLATE_NAME: ["foo", "bar", "foobar"],
+      },
+      {
+        TYPE_NAME: ["abc"],
+        NORM_CATEGORY: [NormCategory.BASE_NORM],
+        TEMPLATE_NAME: ["foo"],
       },
     ],
   },

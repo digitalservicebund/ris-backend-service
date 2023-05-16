@@ -7,6 +7,7 @@ import {
   MetadataValueType,
   MetadatumType,
   Norm,
+  NormCategory,
   Paragraph,
 } from "@/domain/Norm"
 import {
@@ -61,6 +62,9 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.ENTITY]: generateString,
   [MetadatumType.DECIDING_BODY]: generateString,
   [MetadatumType.RESOLUTION_MAJORITY]: pickRandomBoolean,
+  [MetadatumType.TYPE_NAME]: generateString,
+  [MetadatumType.NORM_CATEGORY]: pickRandomNormCategory,
+  [MetadatumType.TEMPLATE_NAME]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -178,10 +182,16 @@ export function generateArticle(partialArticle?: Partial<Article>): Article {
   }
 }
 
-export function pickRandomMetadatumType(): MetadatumType {
-  const options = Object.keys(MetadatumType)
+export function pickRandomNormCategory(): NormCategory {
+  const options = Object.values(NormCategory)
   const index = generateRandomNumber(0, options.length - 1)
-  return options[index] as MetadatumType
+  return options[index]
+}
+
+export function pickRandomMetadatumType(): MetadatumType {
+  const options = Object.values(MetadatumType)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index]
 }
 
 export function generateMetadata(partialMetadata?: Partial<Metadata>) {
@@ -193,7 +203,9 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
       .fill(0)
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore TS2345
-      .map(METADATA_VALUE_GENERATORS[type]) as string[] & boolean[]
+      .map(METADATA_VALUE_GENERATORS[type]) as string[] &
+      boolean[] &
+      NormCategory[]
     metadata[type] = values
   }
 
@@ -206,9 +218,9 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
 }
 
 export function pickRandomMetadataSectionName(): MetadataSectionName {
-  const options = Object.keys(MetadataSectionName)
+  const options = Object.values(MetadataSectionName)
   const index = generateRandomNumber(0, options.length - 1)
-  return options[index] as MetadataSectionName
+  return options[index]
 }
 
 export function generateMetadataSections(
@@ -240,14 +252,6 @@ export function generateFlatMetadata(
     categorizedReference: generateString(),
     celexNumber: generateString(),
     completeCitation: generateString(),
-    digitalAnnouncementDate: generateString(),
-    digitalAnnouncementArea: generateString(),
-    digitalAnnouncementAreaNumber: generateString(),
-    digitalAnnouncementEdition: generateString(),
-    digitalAnnouncementExplanations: generateString(),
-    digitalAnnouncementInfo: generateString(),
-    digitalAnnouncementMedium: generateString(),
-    digitalAnnouncementYear: generateString(),
     digitalEvidenceAppendix: generateString(),
     digitalEvidenceExternalDataNote: generateString(),
     digitalEvidenceLink: generateString(),
@@ -269,13 +273,6 @@ export function generateFlatMetadata(
     documentTypeName: generateString(),
     entryIntoForceDate: generateString(),
     entryIntoForceDateState: generateString(),
-    euAnnouncementExplanations: generateString(),
-    euAnnouncementGazette: generateString(),
-    euAnnouncementInfo: generateString(),
-    euAnnouncementNumber: generateString(),
-    euAnnouncementPage: generateString(),
-    euAnnouncementSeries: generateString(),
-    euAnnouncementYear: generateString(),
     eli: generateString(),
     expirationDate: generateString(),
     expirationDateState: generateString(),
@@ -291,18 +288,11 @@ export function generateFlatMetadata(
     footnoteDecision: generateString(),
     footnoteStateLaw: generateString(),
     footnoteEuLaw: generateString(),
-    otherOfficialAnnouncement: generateString(),
     otherStatusNote: generateString(),
     principleEntryIntoForceDate: generateString(),
     principleEntryIntoForceDateState: generateString(),
     principleExpirationDate: generateString(),
     principleExpirationDateState: generateString(),
-    printAnnouncementExplanations: generateString(),
-    printAnnouncementGazette: generateString(),
-    printAnnouncementInfo: generateString(),
-    printAnnouncementNumber: generateString(),
-    printAnnouncementPage: generateString(),
-    printAnnouncementYear: generateString(),
     publicationDate: generateString(),
     reissueArticle: generateString(),
     reissueDate: generateString(),

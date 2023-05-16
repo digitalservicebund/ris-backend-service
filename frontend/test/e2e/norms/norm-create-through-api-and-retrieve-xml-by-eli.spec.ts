@@ -55,7 +55,7 @@ testWithImportedNorm(
     const proprietary =
       xmlDOM.window.document.querySelector("akn\\:proprietary")
     expect(proprietary.querySelector("meta\\:typ").textContent.trim()).toBe(
-      "gesetz"
+      "verordnung"
     )
     expect(proprietary.querySelector("meta\\:form").textContent.trim()).toBe(
       "stammform"

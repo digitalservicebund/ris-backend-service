@@ -23,6 +23,7 @@ import {
   MetadataValueType,
   Norm,
   FlatMetadata,
+  NormCategory,
 } from "@/domain/Norm"
 
 function identity<T>(data: T): T {
@@ -75,6 +76,14 @@ function encodeBoolean(data: boolean): string {
   return String(data)
 }
 
+function decodeNormCategory(data: string): NormCategory {
+  const decodedCategory = Object.values(NormCategory).find(
+    (category) => category == data
+  )
+  if (decodedCategory) return decodedCategory
+  else throw new Error(`Unknown Norm Category: "${data}"`)
+}
+
 const DECODERS: MetadataValueDecoders = {
   [MetadatumType.KEYWORD]: identity,
   [MetadatumType.UNOFFICIAL_LONG_TITLE]: identity,
@@ -114,14 +123,9 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.ENTITY]: identity,
   [MetadatumType.DECIDING_BODY]: identity,
   [MetadatumType.RESOLUTION_MAJORITY]: decodeBoolean,
-  [MetadatumType.ADDITIONAL_INFO]: identity,
-  [MetadatumType.EXPLANATION]: identity,
-  [MetadatumType.ANNOUNCEMENT_MEDIUM]: identity,
-  [MetadatumType.AREA_OF_PUBLICATION]: identity,
-  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
-  [MetadatumType.SERIES]: identity,
-  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
-  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
+  [MetadatumType.TYPE_NAME]: identity,
+  [MetadatumType.NORM_CATEGORY]: decodeNormCategory,
+  [MetadatumType.TEMPLATE_NAME]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -163,13 +167,9 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.ENTITY]: identity,
   [MetadatumType.DECIDING_BODY]: identity,
   [MetadatumType.RESOLUTION_MAJORITY]: encodeBoolean,
-  [MetadatumType.ADDITIONAL_INFO]: identity,
-  [MetadatumType.EXPLANATION]: identity,
-  [MetadatumType.AREA_OF_PUBLICATION]: identity,
-  [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: identity,
-  [MetadatumType.SERIES]: identity,
-  [MetadatumType.OTHER_OFFICIAL_REFERENCE]: identity,
-  [MetadatumType.EU_GOVERNMENT_GAZETTE]: identity,
+  [MetadatumType.TYPE_NAME]: identity,
+  [MetadatumType.NORM_CATEGORY]: identity,
+  [MetadatumType.TEMPLATE_NAME]: identity,
 }
 
 /**

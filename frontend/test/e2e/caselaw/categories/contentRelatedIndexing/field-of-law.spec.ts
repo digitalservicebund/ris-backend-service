@@ -5,7 +5,7 @@ import {
 } from "~/e2e/caselaw/e2e-utils"
 import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 
-test.describe("Add and remove field of to a document unit", () => {
+test.describe("field of law", () => {
   test("rendering", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
     await expect(page.getByText("Sachgebiete")).toBeVisible()
@@ -20,7 +20,11 @@ test.describe("Add and remove field of to a document unit", () => {
       page.getByRole("heading", { name: "Sachgebietsbaum" })
     ).toBeVisible()
     await expect(page.getByText("Alle Sachgebiete anzeigen")).toBeVisible()
+    await expect(page.getByRole("heading", { name: "Suche" })).toBeVisible()
+    await expect(page.getByText("Direkteingabe Sachgebiet")).toBeVisible()
   })
+
+  // Tree and selection list
 
   test("click on root element in 'fields of law'-tree open level one", async ({
     page,
@@ -235,6 +239,125 @@ test.describe("Add and remove field of to a document unit", () => {
       page.getByRole("button", {
         name: "SR-07 Ordnungswidrigkeitenrecht hinzufügen",
       })
+    ).toBeVisible()
+  })
+
+  // Search
+
+  test("Search without results", async ({ page, documentNumber }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
+
+    await page.locator("[aria-label='Sachgebiete Suche']").fill("xyz")
+    await page.keyboard.press("Enter")
+    await expect(page.getByText("Total 0 Items")).toBeVisible()
+  })
+
+  test("Search with paginated results - test the pagination navigation", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
+
+    await page.locator("[aria-label='Sachgebiete Suche']").fill("Grundstück")
+
+    await page
+      .getByRole("button", {
+        name: "Sachgebietssuche ausführen",
+      })
+      .click()
+
+    await expect(page.getByText("1 von 3")).toBeVisible()
+    await expect(
+      page.getByRole("button", { name: "vorherige Ergebnisse" })
+    ).toBeDisabled()
+
+    await page
+      .getByRole("button", {
+        name: "nächste Ergebnisse",
+      })
+      .click()
+
+    await expect(page.getByText("2 von 3")).toBeVisible()
+    await expect(
+      page.getByRole("button", { name: "vorherige Ergebnisse" })
+    ).toBeEnabled()
+
+    await page
+      .getByRole("button", {
+        name: "nächste Ergebnisse",
+      })
+      .click()
+
+    await expect(page.getByText("3 von 3")).toBeVisible()
+    await expect(
+      page.getByRole("button", { name: "nächste Ergebnisse" })
+    ).toBeDisabled()
+  })
+
+  test("Search with paginated results - first result to open in tree", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
+
+    await page.locator("[aria-label='Sachgebiete Suche']").fill("Grundstück")
+    await page.keyboard.press("Enter")
+
+    // if these two are visible, it must mean that the tree opened automatically with the first result
+    await expect(page.getByText("Bürgerliches Recht")).toBeVisible()
+    await expect(
+      page.getByText("Fallgruppen der Leistungskondiktion")
+    ).toBeVisible()
+  })
+
+  test("Search with both norm string and stext string - sets show norm checkbox to true", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
+
+    await page
+      .locator("[aria-label='Sachgebiete Suche']")
+      .fill('norm:"§ 252 BGB" Gewinn')
+    await page.keyboard.press("Enter")
+
+    await expect(
+      page.getByLabel(
+        "BR-05-01-06 entgangener Gewinn im Sachgebietsbaum anzeigen"
+      )
+    ).toBeVisible()
+
+    // if this is visible, it means that the "Normen anzeigen" checkbox got set to true
+    await expect(page.getByText("§ 251 BGB")).toBeVisible()
+  })
+
+  // Direct input
+
+  test("Direct input - search and choose item", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+    await toggleFieldOfLawSection(page)
+
+    await page
+      .locator("[aria-label='Direkteingabe-Sachgebietssuche eingeben']")
+      .fill("AR")
+
+    // if this is visible, it means that the dropdown opened with the search results
+    await expect(page.getByText("Abschluss")).toBeVisible()
+
+    await page.getByText("Abschluss").click()
+
+    // it was added to the selection list
+    await expect(
+      page.getByLabel(
+        "AR-01 Arbeitsvertrag: Abschluss, Klauseln, Arten, Betriebsübergang im Sachgebietsbaum anzeigen"
+      )
     ).toBeVisible()
   })
 })

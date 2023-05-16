@@ -18,6 +18,7 @@ describe("DigitalAnnouncementInputGroup", () => {
         [MetadatumType.DATE]: ["2023-01-01"],
         [MetadatumType.EDITION]: ["test value"],
         [MetadatumType.YEAR]: ["test value"],
+        [MetadatumType.PAGE]: ["test value"],
         [MetadatumType.AREA_OF_PUBLICATION]: ["test value"],
         [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: [
           "test value",
@@ -41,6 +42,10 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     const yearInput = screen.queryByRole("textbox", {
       name: "Jahr",
+    }) as HTMLInputElement
+
+    const pageInput = screen.queryByRole("textbox", {
+      name: "Seitenzahlen",
     }) as HTMLInputElement
 
     const areaOfPublicationInput = screen.queryByRole("textbox", {
@@ -74,6 +79,9 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(yearInput).toBeInTheDocument()
     expect(yearInput).toHaveValue("test value")
 
+    expect(pageInput).toBeInTheDocument()
+    expect(pageInput).toHaveValue("test value")
+
     expect(areaOfPublicationInput).toBeInTheDocument()
     expect(areaOfPublicationInput).toHaveValue("test value")
 
@@ -94,6 +102,7 @@ describe("DigitalAnnouncementInputGroup", () => {
         [MetadatumType.DATE]: ["2023-01-01"],
         [MetadatumType.EDITION]: ["1"],
         [MetadatumType.YEAR]: ["2023"],
+        [MetadatumType.PAGE]: ["25"],
         [MetadatumType.AREA_OF_PUBLICATION]: ["bar"],
         [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: [
           "baz",
@@ -109,6 +118,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     }) as HTMLInputElement
     const editionInput = screen.queryByDisplayValue("1")
     const yearInput = screen.queryByDisplayValue("2023")
+    const pageInput = screen.queryByDisplayValue("25")
     const areaOfPublicationInput = screen.queryByDisplayValue("bar")
     const numberOfPublicationInRespectiveAreaInput =
       screen.queryByDisplayValue("baz")
@@ -120,6 +130,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(dateInput).toHaveValue("2023-01-01")
     expect(editionInput).toBeInTheDocument()
     expect(yearInput).toBeInTheDocument()
+    expect(pageInput).toBeInTheDocument()
     expect(areaOfPublicationInput).toBeInTheDocument()
     expect(numberOfPublicationInRespectiveAreaInput).toBeInTheDocument()
     expect(additionalInfoInputInput).toBeInTheDocument()
@@ -135,16 +146,18 @@ describe("DigitalAnnouncementInputGroup", () => {
     await user.type(input[0], "foo")
     await user.type(input[1], "1")
     await user.type(input[2], "2023")
-    await user.type(input[3], "foo bar")
-    await user.type(input[4], "bar foo")
-    await user.type(input[5], "foo baz")
-    await user.type(input[6], "ban baz")
+    await user.type(input[3], "baz baz")
+    await user.type(input[4], "foo bar")
+    await user.type(input[5], "bar foo")
+    await user.type(input[6], "foo baz")
+    await user.type(input[7], "ban baz")
 
     expect(modelValue).toEqual({
       [MetadatumType.ANNOUNCEMENT_MEDIUM]: ["foo"],
       [MetadatumType.EDITION]: ["1"],
       [MetadatumType.YEAR]: ["2023"],
       [MetadatumType.AREA_OF_PUBLICATION]: ["foo bar"],
+      [MetadatumType.PAGE]: ["baz baz"],
       [MetadatumType.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA]: [
         "bar foo",
       ],

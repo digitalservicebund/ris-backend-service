@@ -85,7 +85,8 @@ export interface DateAttributes extends BaseInputAttributes {
 }
 
 export interface DateInputField extends BaseInputField {
-  type: InputType.DATE
+  placeholder?: string
+  type: InputType.DATE | InputType.CUSTOMDATE
   inputAttributes: DateAttributes
 }
 

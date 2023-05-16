@@ -125,14 +125,14 @@ export async function fillProceedingDecisionInputs(
     date?: string
     fileNumber?: string
     documentType?: string
-    dateUnknown?: boolean
   },
   decisionIndex = 0
 ): Promise<void> {
-  const fillInput = async (ariaLabel: string, value = generateString()) => {
-    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
-    await input.fill(value ?? ariaLabel)
-    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
+  const fillInput = async (ariaLabel: string, value?: string) => {
+    await page
+      .locator(`[aria-label='${ariaLabel}']`)
+      .nth(decisionIndex)
+      .fill(value ?? generateString())
   }
 
   if (values?.court) {
@@ -154,27 +154,15 @@ export async function fillProceedingDecisionInputs(
     await fillInput("Dokumenttyp Rechtszug", values?.documentType)
     await page.locator("[aria-label='dropdown-option']").first().click()
   }
-  if (values?.dateUnknown) {
-    const dateUnknownCheckbox = page.getByLabel("Datum unbekannt")
-    if (!(await dateUnknownCheckbox.isChecked())) {
-      await dateUnknownCheckbox.click()
-      await expect(dateUnknownCheckbox).toBeChecked()
-      await waitForInputValue(
-        page,
-        "[aria-label='Entscheidungsdatum Rechtszug']",
-        ""
-      )
-    }
-  }
 }
 
 export async function checkIfProceedingDecisionCleared(page: Page) {
-  ;[
-    "Gericht Rechtszug",
-    "Entscheidungsdatum Rechtszug",
-    "Aktenzeichen Rechtszug",
-    "Dokumenttyp Rechtszug",
-  ].forEach((ariaLabel) =>
-    waitForInputValue(page, `[aria-label='${ariaLabel}']`, "")
+  await waitForInputValue(page, "[aria-label='Gericht Rechtszug']", "")
+  await waitForInputValue(
+    page,
+    "[aria-label='Entscheidungsdatum Rechtszug']",
+    ""
   )
+  await waitForInputValue(page, "[aria-label='Aktenzeichen Rechtszug']", "")
+  await waitForInputValue(page, "[aria-label='Dokumenttyp Rechtszug']", "")
 }

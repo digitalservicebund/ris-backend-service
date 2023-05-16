@@ -15,7 +15,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.ENTITY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_JURISDICTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.LEAD_UNIT
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.NORM_CATEGORY
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PAGE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_INSTITUTION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.PARTICIPATION_TYPE
@@ -25,8 +24,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RESOLUTION_MA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIATION_INTERNATIONAL_LAW
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
-import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
@@ -137,7 +134,6 @@ class JurisConverterTest {
                     subjectAreaList = listOf(SubjectArea("test subject FNA", "test subject Gesta"))
                     documentTypeList = listOf(
                         DocumentType("documentName", "documentTemplateName", "BASE_NORM"),
-                        DocumentType("documentName1", "documentTemplateName1", "INVALID_CATEGORYY"),
                     )
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
@@ -199,6 +195,9 @@ class JurisConverterTest {
             assertThat(norm?.officialLongTitle).isEqualTo("test official long title")
             assertThat(norm?.risAbbreviation).isEqualTo("test ris abbreviation")
             assertThat(norm?.documentCategory).isEqualTo("test document category")
+            assertThat(norm?.documentTypeName).isEqualTo("documentName")
+            assertThat(norm?.documentNormCategory).isEqualTo(NormCategory.BASE_NORM.toString())
+            assertThat(norm?.documentTemplateName).isEqualTo("documentTemplateName")
             assertThat(norm?.officialShortTitle).isEqualTo("test official short title")
             assertThat(norm?.officialAbbreviation).isEqualTo("test official abbreviation")
             assertThat(norm?.entryIntoForceDate).isEqualTo(LocalDate.parse("2022-01-01"))
@@ -240,11 +239,6 @@ class JurisConverterTest {
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
-            assertThat(metadata).contains(Metadatum("documentName", TYPE_NAME, 1))
-            assertThat(metadata).contains(Metadatum(NormCategory.BASE_NORM, NORM_CATEGORY, 1))
-            assertThat(metadata).contains(Metadatum("documentTemplateName", TEMPLATE_NAME, 1))
-            assertThat(metadata).contains(Metadatum("documentName1", TYPE_NAME, 1))
-            assertThat(metadata).contains(Metadatum("documentTemplateName1", TEMPLATE_NAME, 1))
             assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
             assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
             assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))

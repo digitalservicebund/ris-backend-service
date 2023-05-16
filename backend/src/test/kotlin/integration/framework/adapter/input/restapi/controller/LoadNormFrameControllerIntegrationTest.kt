@@ -3,12 +3,9 @@ package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.control
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig
 import de.bund.digitalservice.ris.norms.application.port.output.SaveNormOutputPort
 import de.bund.digitalservice.ris.norms.application.service.LoadNormService
-import de.bund.digitalservice.ris.norms.domain.entity.FileReference
-import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
-import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
+import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.NormsService
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.PostgresTestcontainerIntegrationTest
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
@@ -29,6 +26,7 @@ import org.springframework.security.test.web.reactive.server.SecurityMockServerC
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.test.StepVerifier
+import utils.factory.norm
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
@@ -68,17 +66,45 @@ class LoadNormFrameControllerIntegrationTest : PostgresTestcontainerIntegrationT
     @Test
     fun `it correctly loads a norm with metadata sections via api`() {
         val date = LocalDateTime.now().truncatedTo(ChronoUnit.MICROS)
-        val section = MetadataSection(
-            MetadataSectionName.CITATION_DATE,
-            listOf(Metadatum(date.toLocalDate(), MetadatumType.DATE)),
-        )
-        val norm = Norm(
-            guid = UUID.randomUUID(),
-            officialLongTitle = "officialLongTitle",
-            metadataSections = listOf(section),
-            risAbbreviation = "risAbbreviation",
-            files = listOf(FileReference("norm.zip", "hash", date)),
-        )
+
+        val norm = norm {
+            files {
+                file {
+                    name = "norm.zip"
+                    hash = "hash"
+                    createdAt = date
+                }
+            }
+            metadataSections {
+                metadataSection {
+                    name = MetadataSectionName.CITATION_DATE
+                    metadata {
+                        metadatum {
+                            value = date.toLocalDate()
+                            type = MetadatumType.DATE
+                        }
+                    }
+                }
+                metadataSection {
+                    name = MetadataSectionName.DOCUMENT_TYPE
+                    metadata {
+                        metadatum {
+                            value = NormCategory.BASE_NORM
+                            type = MetadatumType.NORM_CATEGORY
+                        }
+                        metadatum {
+                            value = "documentTypeName"
+                            type = MetadatumType.TYPE_NAME
+                        }
+                        metadatum {
+                            value = "documentTemplateName"
+                            type = MetadatumType.TEMPLATE_NAME
+                        }
+                    }
+                }
+            }
+        }
+
         val saveCommand = SaveNormOutputPort.Command(norm)
         normsService.saveNorm(saveCommand)
             .`as`(StepVerifier::create)
@@ -98,71 +124,72 @@ class LoadNormFrameControllerIntegrationTest : PostgresTestcontainerIntegrationT
                 {
                   "guid":"${norm.guid}",
                   "articles":[],
-                  "metadataSections":[{"name":"CITATION_DATE","order":1,"metadata":[{"value":"${date.toLocalDate()}","type":"DATE","order":1}],"sections":null}],
-                  "officialLongTitle":"officialLongTitle",
-                  "risAbbreviation":"risAbbreviation",
-                  "documentNumber":null,
-                  "documentCategory":null,
-                  "documentTypeName":null,
-                  "documentNormCategory":null,
-                  "documentTemplateName":null,
-                  "officialShortTitle":null,
-                  "officialAbbreviation":null,
-                  "entryIntoForceDate":null,
-                  "entryIntoForceDateState":null,
-                  "principleEntryIntoForceDate":null,
-                  "principleEntryIntoForceDateState":null,
-                  "divergentEntryIntoForceDate":null,
-                  "divergentEntryIntoForceDateState":null,
-                  "entryIntoForceNormCategory":null,
-                  "expirationDate":null,
-                  "expirationDateState":null,
-                  "isExpirationDateTemp":null,
-                  "principleExpirationDate":null,
-                  "principleExpirationDateState":null,
-                  "divergentExpirationDate":null,
-                  "divergentExpirationDateState":null,
-                  "expirationNormCategory":null,
-                  "announcementDate":null,
-                  "publicationDate":null,
-                  "completeCitation":null,
-                  "statusNote":null,
-                  "statusDescription":null,
-                  "statusDate":null,
-                  "statusReference":null,
-                  "repealNote":null,
-                  "repealArticle":null,
-                  "repealDate":null,
-                  "repealReferences":null,
-                  "reissueNote":null,
-                  "reissueArticle":null,
-                  "reissueDate":null,
-                  "reissueReference":null,
-                  "otherStatusNote":null,
-                  "documentStatusWorkNote":null,
-                  "documentStatusDescription":null,
-                  "documentStatusDate":null,
-                  "documentStatusReference":null,
-                  "documentStatusEntryIntoForceDate":null,
-                  "documentStatusProof":null,
-                  "documentTextProof":null,
-                  "otherDocumentNote":null,
-                  "applicationScopeArea":null,
-                  "applicationScopeStartDate":null,
-                  "applicationScopeEndDate":null,
-                  "categorizedReference":null,
-                  "otherFootnote":null,
-                  "footnoteChange":null,
-                  "footnoteComment":null,
-                  "footnoteDecision":null,
-                  "footnoteStateLaw":null,
-                  "footnoteEuLaw":null,
-                  "digitalEvidenceLink":null,
-                  "digitalEvidenceRelatedData":null,
-                  "digitalEvidenceExternalDataNote":null,
-                  "digitalEvidenceAppendix":null,
-                  "eli":"","celexNumber":null,
-                  "text":null,
+                  "metadataSections":[{"name":"CITATION_DATE","order":1,"metadata":[{"value":"${date.toLocalDate()}","type":"DATE","order":1}],"sections":null}, {"name":"DOCUMENT_TYPE","order":1,"metadata":[{"value":"BASE_NORM","type":"NORM_CATEGORY","order":1}, {"value":"documentTypeName","type":"TYPE_NAME","order":1}, {"value":"documentTemplateName","type":"TEMPLATE_NAME","order":1}],"sections":null}],
+                  "officialLongTitle":"${norm.officialLongTitle}",
+                  "risAbbreviation":"${norm.risAbbreviation}",
+                  "documentNumber": "${norm.documentNumber}",
+                  "documentCategory": "${norm.documentCategory}",
+                  "documentTypeName": "${norm.documentTypeName}",
+                  "documentNormCategory": "${norm.documentNormCategory}",
+                  "documentTemplateName": "${norm.documentTemplateName}",
+                  "officialShortTitle": "${norm.officialShortTitle}",
+                  "officialAbbreviation": "${norm.officialAbbreviation}",
+                  "entryIntoForceDate": "${norm.entryIntoForceDate}",
+                  "entryIntoForceDateState": null,
+                  "principleEntryIntoForceDate": "${norm.principleEntryIntoForceDate}",
+                  "principleEntryIntoForceDateState": null,
+                  "divergentEntryIntoForceDate": "${norm.divergentEntryIntoForceDate}",
+                  "divergentEntryIntoForceDateState": null,
+                  "entryIntoForceNormCategory": "${norm.entryIntoForceNormCategory}",
+                  "expirationDate": "${norm.expirationDate}",
+                  "expirationDateState": null,
+                  "isExpirationDateTemp": ${norm.isExpirationDateTemp},
+                  "principleExpirationDate": "${norm.principleExpirationDate}",
+                  "principleExpirationDateState": null,
+                  "divergentExpirationDate": "${norm.divergentExpirationDate}",
+                  "divergentExpirationDateState": null,
+                  "expirationNormCategory": "${norm.expirationNormCategory}",
+                  "announcementDate": "${norm.announcementDate}",
+                  "publicationDate": "${norm.publicationDate}",
+                  "completeCitation": "${norm.completeCitation}",
+                  "statusNote": "${norm.statusNote}",
+                  "statusDescription": "${norm.statusDescription}",
+                  "statusDate": "${norm.statusDate}",
+                  "statusReference": "${norm.statusReference}",
+                  "repealNote": "${norm.repealNote}",
+                  "repealArticle": "${norm.repealArticle}",
+                  "repealDate": "${norm.repealDate}",
+                  "repealReferences": "${norm.repealReferences}",
+                  "reissueNote": "${norm.reissueNote}",
+                  "reissueArticle": "${norm.reissueArticle}",
+                  "reissueDate": "${norm.reissueDate}",
+                  "reissueReference": "${norm.reissueReference}",
+                  "otherStatusNote": "${norm.otherStatusNote}",
+                  "documentStatusWorkNote": "${norm.documentStatusWorkNote}",
+                  "documentStatusDescription": "${norm.documentStatusDescription}",
+                  "documentStatusDate": "${norm.documentStatusDate}",
+                  "documentStatusReference": "${norm.documentStatusReference}",
+                  "documentStatusEntryIntoForceDate": "${norm.documentStatusEntryIntoForceDate}",
+                  "documentStatusProof": "${norm.documentStatusProof}",
+                  "documentTextProof": "${norm.documentTextProof}",
+                  "otherDocumentNote": "${norm.otherDocumentNote}",
+                  "applicationScopeArea": "${norm.applicationScopeArea}",
+                  "applicationScopeStartDate": "${norm.applicationScopeStartDate}",
+                  "applicationScopeEndDate": "${norm.applicationScopeEndDate}",
+                  "categorizedReference": "${norm.categorizedReference}",
+                  "otherFootnote": "${norm.otherFootnote}",
+                  "footnoteChange": "${norm.footnoteChange}",
+                  "footnoteComment": "${norm.footnoteComment}",
+                  "footnoteDecision": "${norm.footnoteDecision}",
+                  "footnoteStateLaw": "${norm.footnoteStateLaw}",
+                  "footnoteEuLaw": "${norm.footnoteEuLaw}",
+                  "digitalEvidenceLink": "${norm.digitalEvidenceLink}",
+                  "digitalEvidenceRelatedData": "${norm.digitalEvidenceRelatedData}",
+                  "digitalEvidenceExternalDataNote": "${norm.digitalEvidenceExternalDataNote}",
+                  "digitalEvidenceAppendix": "${norm.digitalEvidenceAppendix}",
+                  "eli":"",
+                  "celexNumber": "${norm.celexNumber}",
+                  "text": "${norm.text}",
                   "files":[{"name":"norm.zip","hash":"hash","createdAt":"$date"}]}
                 """.trimIndent(),
             )

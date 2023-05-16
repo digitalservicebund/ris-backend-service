@@ -16,7 +16,7 @@ export const proceedingDecisionFields: InputField[] = [
   },
   {
     name: "date",
-    type: InputType.DATE,
+    type: InputType.CUSTOMDATE,
     label: "Entscheidungsdatum",
     required: true,
     inputAttributes: {
