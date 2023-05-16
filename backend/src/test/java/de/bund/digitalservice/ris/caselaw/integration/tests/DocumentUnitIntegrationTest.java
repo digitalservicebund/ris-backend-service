@@ -119,11 +119,13 @@ class DocumentUnitIntegrationTest {
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().documentNumber()).startsWith("ABCD");
+              assertThat(response.getResponseBody().coreData().dateKnown()).isTrue();
             });
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentnumber()).startsWith("ABCD");
+    assertThat(list.get(0).getDateKnown()).isTrue();
   }
 
   @Test

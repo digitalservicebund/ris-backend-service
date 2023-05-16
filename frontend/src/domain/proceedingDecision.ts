@@ -21,8 +21,8 @@ export class ProceedingDecision {
     return [
       ...(this.court ? [`${this.court.label}`] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
+      ...(this.dateUnknown == true ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.date ? [dayjs(this.date).format("DD.MM.YYYY")] : []),
-      ...(this.dateUnknown ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentNumber && this.hasLink ? [this.documentNumber] : []),
     ].join(", ")
