@@ -120,25 +120,25 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val ageOfMajorityIndication = createMetadataForType(data.ageOfMajorityIndicationList, AGE_OF_MAJORITY_INDICATION)
     val validityRule = createMetadataForType(data.validityRuleList, VALIDITY_RULE)
 
-    val participationType = createMetadataForType(data.participationList.map { it.type.toString() }, PARTICIPATION_TYPE)
-    val participationInstitution = createMetadataForType(data.participationList.map { it.institution.toString() }, PARTICIPATION_INSTITUTION)
+    val participationType = createMetadataForType(data.participationList.mapNotNull { it.type }, PARTICIPATION_TYPE)
+    val participationInstitution = createMetadataForType(data.participationList.mapNotNull { it.institution }, PARTICIPATION_INSTITUTION)
 
-    val leadJurisdiction = createMetadataForType(data.leadList.map { it.jurisdiction.toString() }, LEAD_JURISDICTION)
-    val leadUnit = createMetadataForType(data.leadList.map { it.unit.toString() }, LEAD_UNIT)
+    val leadJurisdiction = createMetadataForType(data.leadList.mapNotNull { it.jurisdiction }, LEAD_JURISDICTION)
+    val leadUnit = createMetadataForType(data.leadList.mapNotNull { it.unit }, LEAD_UNIT)
 
-    val subjectFna = createMetadataForType(data.subjectAreaList.filter { it.fna != null }.map { it.fna.toString() }, SUBJECT_FNA)
-    val subjectGesta = createMetadataForType(data.subjectAreaList.filter { it.gesta != null }.map { it.gesta.toString() }, SUBJECT_GESTA)
+    val subjectFna = createMetadataForType(data.subjectAreaList.mapNotNull { it.fna }, SUBJECT_FNA)
+    val subjectGesta = createMetadataForType(data.subjectAreaList.mapNotNull { it.gesta }, SUBJECT_GESTA)
 
-    val printAnnouncementGazette = createMetadataForType(data.printAnnouncementList.map { it.gazette.toString() }, ANNOUNCEMENT_GAZETTE)
-    val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.map { it.page.toString() }, PAGE)
-    val printAnnouncementYear = createMetadataForType(data.printAnnouncementList.map { it.year.toString() }, YEAR)
-    val digitalAnnouncementYear = createMetadataForType(data.digitalAnnouncementList.map { it.year.toString() }, YEAR)
-    val digitalAnnouncementNumber = createMetadataForType(data.digitalAnnouncementList.map { it.number.toString() }, EDITION)
-    val digitalAnnouncementMedium = createMetadataForType(data.digitalAnnouncementList.map { it.medium.toString() }, ANNOUNCEMENT_MEDIUM)
+    val printAnnouncementGazette = createMetadataForType(data.printAnnouncementList.mapNotNull { it.gazette }, ANNOUNCEMENT_GAZETTE)
+    val printAnnouncementPage = createMetadataForType(data.printAnnouncementList.mapNotNull { it.page }, PAGE)
+    val printAnnouncementYear = createMetadataForType(data.printAnnouncementList.mapNotNull { it.year }, YEAR)
+    val digitalAnnouncementYear = createMetadataForType(data.digitalAnnouncementList.mapNotNull { it.year }, YEAR)
+    val digitalAnnouncementNumber = createMetadataForType(data.digitalAnnouncementList.mapNotNull { it.number }, EDITION)
+    val digitalAnnouncementMedium = createMetadataForType(data.digitalAnnouncementList.mapNotNull { it.medium }, ANNOUNCEMENT_MEDIUM)
 
-    val documentTypeName = createMetadataForType(data.documentTypeList.map { it.name.toString() }, TYPE_NAME)
+    val documentTypeName = createMetadataForType(data.documentTypeList.mapNotNull { it.name }, TYPE_NAME)
     val documentNormCategory = createMetadataForType(data.documentTypeList.mapNotNull { parseNormCategory(it.category) }, NORM_CATEGORY)
-    val documentTemplateName = createMetadataForType(data.documentTypeList.map { it.templateName.toString() }, TEMPLATE_NAME)
+    val documentTemplateName = createMetadataForType(data.documentTypeList.mapNotNull { it.templateName }, TEMPLATE_NAME)
 
     val citationDateSections = data.citationDateList.mapIndexed { index, value ->
         if (value.length == 4 && value.toIntOrNull() != null) {
@@ -160,6 +160,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
     ) + createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
+        createSectionsFromMetadata(Section.DOCUMENT_TYPE, documentTypeName + documentNormCategory + documentTemplateName) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
         referenceSections.mapIndexed { index, section -> MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), index, listOf(section)) } +
         citationDateSections + ageIndicationSections +
@@ -172,9 +173,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         officialLongTitle = data.officialLongTitle ?: "",
         risAbbreviation = data.risAbbreviation,
         documentCategory = data.documentCategory,
-        documentTypeName = data.documentTypeList.firstOrNull()?.name,
-        documentNormCategory = data.documentTypeList.firstOrNull()?.category,
-        documentTemplateName = data.documentTypeList.firstOrNull()?.templateName,
         officialShortTitle = data.officialShortTitle,
         officialAbbreviation = data.officialAbbreviation,
         entryIntoForceDate = parseDateString(data.entryIntoForceDate),

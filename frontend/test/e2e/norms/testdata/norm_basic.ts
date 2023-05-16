@@ -106,11 +106,7 @@ export const normData: NormData = {
         ],
       },
     ],
-    // TODO add when data is imported
-    // DOCUMENT_TYPE: [
-    //   { TYPE_NAME: ["RV"]},
-    //   {TYPE_NAME: ["SN"]},
-    // ],
+    DOCUMENT_TYPE: [{ TYPE_NAME: ["RV"] }],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",

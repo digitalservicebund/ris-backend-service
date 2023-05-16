@@ -64,7 +64,7 @@ testWithImportedNorm(
       "verkuendungsfassung"
     )
     expect(proprietary.querySelector("meta\\:art").textContent.trim()).toBe(
-      "regelungstext"
+      "rechtsetzungsdokument"
     )
     expect(
       proprietary.querySelector("meta\\:initiant").textContent.trim()

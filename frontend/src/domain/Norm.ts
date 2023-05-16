@@ -147,7 +147,6 @@ export type MetadataSections = {
 }
 
 export type FlatMetadata = {
-  documentTemplateName?: string
   announcementDate?: string
   applicationScopeArea?: string
   applicationScopeEndDate?: string
@@ -164,7 +163,6 @@ export type FlatMetadata = {
   divergentExpirationDate?: string
   divergentExpirationDateState?: string
   documentCategory?: string
-  documentNormCategory?: string
   documentNumber?: string
   documentStatusDate?: string
   documentStatusDescription?: string
@@ -173,7 +171,6 @@ export type FlatMetadata = {
   documentStatusReference?: string
   documentStatusWorkNote?: string
   documentTextProof?: string
-  documentTypeName?: string
   entryIntoForceDate?: string
   entryIntoForceDateState?: string
   entryIntoForceNormCategory?: string
