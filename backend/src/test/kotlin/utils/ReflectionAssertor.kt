@@ -7,6 +7,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller.EditNormFrameControllerTest
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import org.assertj.core.api.Assertions.assertThat
@@ -32,18 +33,16 @@ fun assertEditNormFramePropertiesAndEditNormRequestSchema(
         EditNormFrameControllerTest.NormFramePropertiesTestRequestSchema::class.memberProperties
     val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
+        if (normFramePropertiesMember.name == "metadataSections") {
+            assertMetadataSections(normFrameProperties.metadataSections.filter { it.name != MetadataSectionName.DOCUMENT_TYPE }, normFrameRequestSchema.metadataSections)
+
+            return@forEach
+        }
+
         val found =
             normFrameRequestSchemaMembers.find { normFrameRequestSchemaMember ->
                 normFramePropertiesMember.name == normFrameRequestSchemaMember.name
             }
-
-        if (normFramePropertiesMember.name == "metadataSections") {
-            val guidRegex = Regex("guid=[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}")
-            assertThat(normFrameProperties.metadataSections.toString().replace(guidRegex, ""))
-                .isEqualTo(normFrameRequestSchema.metadataSections.toString().replace(guidRegex, ""))
-
-            return@forEach
-        }
 
         when (val normFramePropertiesMemberValue = normFramePropertiesMember.get(normFrameProperties)) {
             is LocalDate ->
@@ -63,11 +62,22 @@ fun assertNormAndEditNormFrameProperties(
     normFrameProperties: EditNormFrameUseCase.NormFrameProperties,
 ) {
     val normMembers = Norm::class.memberProperties
-    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties
+    val normFramePropertiesMembers = EditNormFrameUseCase.NormFrameProperties::class.memberProperties.filterNot { it.name in listOf("documentTypeName", "documentNormCategory", "documentTemplateName") }
     normFramePropertiesMembers.forEach { normFramePropertiesMember ->
+        if (normFramePropertiesMember.name == "metadataSections") {
+            assertMetadataSections(normFrameProperties.metadataSections, norm.metadataSections)
+
+            return@forEach
+        }
         val found = normMembers.find { normMember -> normFramePropertiesMember.name == normMember.name }
         assertThat(normFramePropertiesMember.get(normFrameProperties)).isEqualTo(found?.get(norm))
     }
+}
+
+private fun assertMetadataSections(propertiesSections: List<MetadataSection>, schemaSections: List<*>) {
+    val guidRegex = Regex("guid=[0-9a-fA-F]{8}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{4}\\b-[0-9a-fA-F]{12}")
+    assertThat(propertiesSections.toString().replace(guidRegex, ""))
+        .isEqualTo(schemaSections.toString().replace(guidRegex, ""))
 }
 
 fun assertNormsAreEqual(norm1: Norm, norm2: Norm) {

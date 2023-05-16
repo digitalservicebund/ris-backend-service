@@ -26,8 +26,14 @@ fun mapNormToDto(norm: Norm): NormDto {
         officialLongTitle = IdentifiedElement(norm.officialLongTitle),
         officialShortTitle = IdentifiedElement(norm.officialShortTitle),
         announcementDate = norm.announcementDate?.toString() ?: (firstCitationDate ?: firstCitationYear),
-        documentTypeName = getMappedValue(Property.DOCUMENT_TYPE_NAME, norm.documentTypeName ?: ""),
-        documentNormCategory = getMappedValue(Property.DOCUMENT_NORM_CATEGORY, norm.documentNormCategory ?: ""),
+        documentTypeName = getMappedValue(
+            Property.DOCUMENT_TYPE_NAME,
+            norm.getFirstMetadatum(MetadataSectionName.DOCUMENT_TYPE, MetadatumType.TYPE_NAME)?.value.toString(),
+        ),
+        documentNormCategory = getMappedValue(
+            Property.DOCUMENT_NORM_CATEGORY,
+            norm.getFirstMetadatum(MetadataSectionName.DOCUMENT_TYPE, MetadatumType.NORM_CATEGORY)?.value.toString(),
+        ),
         providerDecidingBody = getMappedValue(
             Property.PROVIDER_DECIDING_BODY,
             norm.getFirstMetadatum(MetadataSectionName.NORM_PROVIDER, MetadatumType.DECIDING_BODY)?.value.toString(),

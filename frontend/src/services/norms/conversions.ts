@@ -400,7 +400,6 @@ export function encodeFlatMetadata(
   flatMetadata: FlatMetadata
 ): FlatMetadataRequestSchema {
   return {
-    documentTemplateName: encodeString(flatMetadata.documentTemplateName),
     applicationScopeArea: encodeString(flatMetadata.applicationScopeArea),
     applicationScopeEndDate: encodeNullDate(
       flatMetadata.applicationScopeEndDate
@@ -432,7 +431,6 @@ export function encodeFlatMetadata(
       flatMetadata.divergentExpirationDateState
     ),
     documentCategory: encodeString(flatMetadata.documentCategory),
-    documentNormCategory: encodeString(flatMetadata.documentNormCategory),
     documentNumber: encodeString(flatMetadata.documentNumber),
     documentStatusDate: encodeNullDate(flatMetadata.documentStatusDate),
     documentStatusDescription: encodeString(
@@ -445,7 +443,6 @@ export function encodeFlatMetadata(
     documentStatusReference: encodeString(flatMetadata.documentStatusReference),
     documentStatusWorkNote: encodeString(flatMetadata.documentStatusWorkNote),
     documentTextProof: encodeString(flatMetadata.documentTextProof),
-    documentTypeName: encodeString(flatMetadata.documentTypeName),
     entryIntoForceDate: encodeNullDate(flatMetadata.entryIntoForceDate),
     entryIntoForceDateState: encodeString(flatMetadata.entryIntoForceDateState),
     entryIntoForceNormCategory: encodeString(

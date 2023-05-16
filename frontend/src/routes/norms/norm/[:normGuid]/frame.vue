@@ -69,8 +69,6 @@ watch(
   flatMetadata,
   (data) => {
     if (loadedNorm.value !== undefined && data !== undefined) {
-      loadedNorm.value.documentTemplateName =
-        data.documentTemplateName as string
       loadedNorm.value.applicationScopeArea =
         data.applicationScopeArea as string
       loadedNorm.value.applicationScopeEndDate =
@@ -97,8 +95,6 @@ watch(
       loadedNorm.value.divergentExpirationDateState =
         data.divergentExpirationDateState as string
       loadedNorm.value.documentCategory = data.documentCategory as string
-      loadedNorm.value.documentNormCategory =
-        data.documentNormCategory as string
       loadedNorm.value.documentNumber = data.documentNumber as string
       loadedNorm.value.documentStatusDate = data.documentStatusDate as string
       loadedNorm.value.documentStatusDescription =
@@ -111,7 +107,6 @@ watch(
       loadedNorm.value.documentStatusWorkNote =
         data.documentStatusWorkNote as string
       loadedNorm.value.documentTextProof = data.documentTextProof as string
-      loadedNorm.value.documentTypeName = data.documentTypeName as string
       loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate as string
       loadedNorm.value.entryIntoForceDateState =
         data.entryIntoForceDateState as string

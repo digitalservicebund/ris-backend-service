@@ -19,10 +19,6 @@ interface EditNormFrameUseCase {
         var documentNumber: String? = null,
         var documentCategory: String? = null,
 
-        var documentTypeName: String? = null,
-        var documentNormCategory: String? = null,
-        var documentTemplateName: String? = null,
-
         var officialShortTitle: String? = null,
         var officialAbbreviation: String? = null,
 

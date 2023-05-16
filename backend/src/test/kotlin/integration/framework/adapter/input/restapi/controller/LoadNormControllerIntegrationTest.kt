@@ -38,7 +38,7 @@ import java.util.*
 @WithMockUser
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @AutoConfigureDataR2dbc
-class LoadNormFrameControllerIntegrationTest : PostgresTestcontainerIntegrationTest() {
+class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest() {
     @Autowired
     lateinit var webClient: WebTestClient
 
@@ -129,9 +129,6 @@ class LoadNormFrameControllerIntegrationTest : PostgresTestcontainerIntegrationT
                   "risAbbreviation":"${norm.risAbbreviation}",
                   "documentNumber": "${norm.documentNumber}",
                   "documentCategory": "${norm.documentCategory}",
-                  "documentTypeName": "${norm.documentTypeName}",
-                  "documentNormCategory": "${norm.documentNormCategory}",
-                  "documentTemplateName": "${norm.documentTemplateName}",
                   "officialShortTitle": "${norm.officialShortTitle}",
                   "officialAbbreviation": "${norm.officialAbbreviation}",
                   "entryIntoForceDate": "${norm.entryIntoForceDate}",

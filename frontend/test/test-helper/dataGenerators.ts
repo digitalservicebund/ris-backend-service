@@ -247,7 +247,6 @@ export function generateFlatMetadata(
   partialFlatMetadata?: Partial<FlatMetadata>
 ): FlatMetadata {
   return {
-    documentTemplateName: generateString(),
     announcementDate: generateString(),
     categorizedReference: generateString(),
     celexNumber: generateString(),
@@ -261,7 +260,6 @@ export function generateFlatMetadata(
     divergentExpirationDate: generateString(),
     divergentExpirationDateState: generateString(),
     documentCategory: generateString(),
-    documentNormCategory: generateString(),
     documentNumber: generateString(),
     documentStatusDate: generateString(),
     documentStatusDescription: generateString(),
@@ -270,7 +268,6 @@ export function generateFlatMetadata(
     documentStatusReference: generateString(),
     documentStatusWorkNote: generateString(),
     documentTextProof: generateString(),
-    documentTypeName: generateString(),
     entryIntoForceDate: generateString(),
     entryIntoForceDateState: generateString(),
     eli: generateString(),

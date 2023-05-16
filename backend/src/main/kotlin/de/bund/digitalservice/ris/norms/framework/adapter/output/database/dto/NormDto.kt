@@ -22,13 +22,6 @@ data class NormDto(
     @Column("document_category")
     var documentCategory: String? = null,
 
-    @Column("document_type_name")
-    var documentTypeName: String? = null,
-    @Column("document_norm_category")
-    var documentNormCategory: String? = null,
-    @Column("document_template_name")
-    var documentTemplateName: String? = null,
-
     @Column("official_short_title")
     var officialShortTitle: String? = null,
     @Column("official_abbreviation")
