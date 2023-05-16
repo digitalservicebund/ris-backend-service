@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, toRefs, ref, watch, h } from "vue"
+import { computed, toRefs, ref, watch, h, VNode } from "vue"
 import { useRoute } from "vue-router"
 import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
+import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
@@ -18,7 +19,6 @@ import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
-import { documentType } from "@/fields/norms/documentType"
 import { entryIntoForce } from "@/fields/norms/entryIntoForce"
 import { expiration } from "@/fields/norms/expiration"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
@@ -310,9 +310,53 @@ function normProviderSummarizer(data: Metadata) {
   }
 }
 
+const NORM_CATEGORY_TRANSLATIONS = {
+  AMENDMENT_NORM: "Änderungsnorm",
+  BASE_NORM: "Stammnorm",
+  TRANSITIONAL_NORM: "Übergangsnorm",
+}
+
+function documentTypeSummarizer(data?: Metadata): VNode {
+  const propertyNodes = []
+
+  const typeName = data?.TYPE_NAME?.[0]
+  const categories =
+    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
+  const templateNames = data?.TEMPLATE_NAME ?? []
+
+  propertyNodes.push(typeName)
+
+  if (typeName && categories.length > 0) propertyNodes.push(h("div", "|"))
+
+  categories.forEach((category) =>
+    propertyNodes.push(
+      h("div", { class: ["flex", "gap-4"] }, [
+        h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
+        h("span", NORM_CATEGORY_TRANSLATIONS[category]),
+      ])
+    )
+  )
+
+  if ((typeName || categories.length > 0) && templateNames.length > 0)
+    propertyNodes.push(h("div", "|"))
+
+  templateNames.forEach((templateName) =>
+    propertyNodes.push(
+      h(
+        "div",
+        { class: ["bg-blue-500", "rounded-lg", "px-8", "py-4"] },
+        templateName
+      )
+    )
+  )
+
+  return h("div", { class: ["flex", "gap-8", "items-center"] }, propertyNodes)
+}
+
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
+const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 </script>
 
 <template>
@@ -362,20 +406,19 @@ const NormProviderSummary = withSummarizer(normProviderSummarizer)
       :type="InputType.CHIPS"
     />
 
-    <h1 class="h-[1px] mt-40 overflow-hidden w-[1px]">
-      Dokumentation des Rahmenelements
-    </h1>
-
-    <fieldset>
-      <legend id="documentTypeFields" class="heading-02-regular mb-[1rem]">
-        Dokumenttyp
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="documentType"
+    <ExpandableDataSet
+      id="documentTypes"
+      :data-set="metadataSections.DOCUMENT_TYPE"
+      :summary-component="DocumentTypeSummary"
+      title="Dokumenttyp"
+    >
+      <EditableList
+        v-model="metadataSections.DOCUMENT_TYPE"
+        :default-value="{}"
+        :edit-component="DocumentTypeInputGroup"
+        :summary-component="DocumentTypeSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
     <ExpandableDataSet
       id="normProviders"
