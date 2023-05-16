@@ -15,4 +15,4 @@ public record ProceedingDecision(
     Instant date,
     String fileNumber,
     DocumentType documentType,
-    boolean dateKnown) {}
+    Boolean dateKnown) {}
