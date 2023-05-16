@@ -125,7 +125,7 @@ class DocumentUnitIntegrationTest {
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentnumber()).startsWith("ABCD");
-    assertThat(list.get(0).getDateKnown()).isTrue();
+    assertThat(list.get(0).isDateKnown()).isTrue();
   }
 
   @Test

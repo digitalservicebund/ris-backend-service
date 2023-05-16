@@ -55,7 +55,7 @@ public class DocumentUnitMetadataDTO {
   private Instant decisionDate;
 
   @Column("date_known")
-  private Boolean dateKnown;
+  private boolean dateKnown;
 
   @Column("gerichtssitz")
   private String courtLocation;
