@@ -105,6 +105,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
           :data="entry"
           tabindex="0"
           @click="setEditIndex(index)"
+          @keypress.enter="setEditIndex(index)"
         />
 
         <div class="flex">
