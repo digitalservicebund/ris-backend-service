@@ -27,8 +27,15 @@ const proceedingDecisions = ref<ProceedingDecision[]>()
 const searchResults = ref<SearchResults>()
 const input = ref<ProceedingDecision>(new ProceedingDecision())
 
-function isNotEmpty(decision: ProceedingDecision): boolean {
-  return Object.values(decision).some((value) => value !== undefined)
+function isNotEmpty({
+  court,
+  date,
+  fileNumber,
+  documentType,
+}: ProceedingDecision): boolean {
+  return [court, date, fileNumber, documentType].some(
+    (property) => property != undefined
+  )
 }
 
 async function createProceedingDecision(
@@ -150,12 +157,11 @@ watch(
 watch(
   input,
   () => {
-    if (!input.value.dateKnown) {
-      input.value.date = undefined
-    }
+    if (!input.value.dateKnown) input.value.date = undefined
   },
   {
     immediate: true,
+    deep: true,
   }
 )
 </script>

@@ -44,7 +44,6 @@ test.describe("Proceeding decisions", () => {
       date: "2004-12-03",
       fileNumber: fileNumber,
       documentType: "AnU",
-      dateUnknown: false,
     })
 
     await page.getByText("Manuell Hinzufügen").click()
@@ -128,12 +127,14 @@ test.describe("Proceeding decisions", () => {
 
     const fileNumber = generateString()
 
-    await fillProceedingDecisionInputs(page, {
-      court: "AG Aalen",
-      fileNumber: fileNumber,
-      documentType: "AnU",
-      dateUnknown: true,
-    })
+    await test.step("create decision with normal date", async () =>
+      await fillProceedingDecisionInputs(page, {
+        court: "AG Aalen",
+        fileNumber: fileNumber,
+        date: "2004-12-03",
+        documentType: "AnU",
+        dateUnknown: true,
+      }))
 
     await page.getByText("Manuell Hinzufügen").click()
 

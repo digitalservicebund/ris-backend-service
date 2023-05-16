@@ -129,11 +129,10 @@ export async function fillProceedingDecisionInputs(
   },
   decisionIndex = 0
 ): Promise<void> {
-  const fillInput = async (ariaLabel: string, value?: string) => {
-    await page
-      .locator(`[aria-label='${ariaLabel}']`)
-      .nth(decisionIndex)
-      .fill(value ?? generateString())
+  const fillInput = async (ariaLabel: string, value = generateString()) => {
+    const input = page.locator(`[aria-label='${ariaLabel}']`).nth(decisionIndex)
+    await input.fill(value ?? ariaLabel)
+    await waitForInputValue(page, `[aria-label='${ariaLabel}']`, value)
   }
 
   if (values?.court) {
@@ -155,11 +154,27 @@ export async function fillProceedingDecisionInputs(
     await fillInput("Dokumenttyp Rechtszug", values?.documentType)
     await page.locator("[aria-label='dropdown-option']").first().click()
   }
+  if (values?.dateUnknown) {
+    const dateUnknownCheckbox = page.getByLabel("Datum unbekannt")
+    if (!(await dateUnknownCheckbox.isChecked())) {
+      await dateUnknownCheckbox.click()
+      await expect(dateUnknownCheckbox).toBeChecked()
+      await waitForInputValue(
+        page,
+        "[aria-label='Entscheidungsdatum Rechtszug']",
+        ""
+      )
+    }
+  }
 }
 
 export async function checkIfProceedingDecisionCleared(page: Page) {
-  await expect(page.getByLabel("Gericht Rechtszug")).toHaveValue("")
-  await expect(page.getByLabel("Entscheidungsdatum Rechtszug")).toHaveValue("")
-  await expect(page.getByLabel("Aktenzeichen Rechtszug")).toHaveValue("")
-  await expect(page.getByLabel("Dokumenttyp Rechtszug")).toHaveValue("")
+  ;[
+    "Gericht Rechtszug",
+    "Entscheidungsdatum Rechtszug",
+    "Aktenzeichen Rechtszug",
+    "Dokumenttyp Rechtszug",
+  ].forEach((ariaLabel) =>
+    waitForInputValue(page, `[aria-label='${ariaLabel}']`, "")
+  )
 }

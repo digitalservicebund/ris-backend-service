@@ -57,19 +57,17 @@ describe("DocumentUnitProceedingDecisions", async () => {
           status: 200,
           data: [
             new ProceedingDecision({
-              ...{
-                court: {
-                  type: "type1",
-                  location: "location1",
-                  label: "label1",
-                },
-                date: "2022-02-01",
-                documentType: {
-                  jurisShortcut: "documentTypeShortcut1",
-                  label: "documentType1",
-                },
-                fileNumber: "testFileNumber1",
+              court: {
+                type: "type1",
+                location: "location1",
+                label: "label1",
               },
+              date: "2022-02-01",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut1",
+                label: "documentType1",
+              },
+              fileNumber: "testFileNumber1",
             }),
           ],
         })
@@ -109,34 +107,30 @@ describe("DocumentUnitProceedingDecisions", async () => {
           status: 200,
           data: [
             new ProceedingDecision({
-              ...{
-                court: {
-                  type: "type1",
-                  location: "location1",
-                  label: "label1",
-                },
-                date: "2022-02-01",
-                documentType: {
-                  jurisShortcut: "documentTypeShortcut1",
-                  label: "documentType1",
-                },
-                fileNumber: "test fileNumber",
+              court: {
+                type: "type1",
+                location: "location1",
+                label: "label1",
               },
+              date: "2022-02-01",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut1",
+                label: "documentType1",
+              },
+              fileNumber: "test fileNumber",
             }),
             new ProceedingDecision({
-              ...{
-                court: {
-                  type: "type2",
-                  location: "location2",
-                  label: "label2",
-                },
-                date: "2022-02-02",
-                documentType: {
-                  jurisShortcut: "documentTypeShortcut2",
-                  label: "documentType2",
-                },
-                fileNumber: "test fileNumber",
+              court: {
+                type: "type2",
+                location: "location2",
+                label: "label2",
               },
+              date: "2022-02-02",
+              documentType: {
+                jurisShortcut: "documentTypeShortcut2",
+                label: "documentType2",
+              },
+              fileNumber: "test fileNumber",
             }),
           ],
         })
@@ -165,19 +159,17 @@ describe("DocumentUnitProceedingDecisions", async () => {
             status: 200,
             data: [
               new ProceedingDecision({
-                ...{
-                  court: {
-                    type: "type1",
-                    location: "location1",
-                    label: "label1",
-                  },
-                  date: "2022-02-01",
-                  documentType: {
-                    jurisShortcut: "documentTypeShortcut1",
-                    label: "documentType1",
-                  },
-                  fileNumber: "test fileNumber",
+                court: {
+                  type: "type1",
+                  location: "location1",
+                  label: "label1",
                 },
+                date: "2022-02-01",
+                documentType: {
+                  jurisShortcut: "documentTypeShortcut1",
+                  label: "documentType1",
+                },
+                fileNumber: "test fileNumber",
               }),
             ],
           })
