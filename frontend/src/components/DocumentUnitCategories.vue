@@ -10,6 +10,7 @@ import DocumentUnitProceedingDecision from "@/components/proceedingDecisions/Pro
 import { useScrollToHash } from "@/composables/useScrollToHash"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit, { Texts } from "@/domain/documentUnit"
+import { NormReference } from "@/domain/normReference"
 import { UpdateStatus } from "@/enum/enumUpdateStatus"
 import documentUnitService from "@/services/documentUnitService"
 import fileService from "@/services/fileService"
@@ -30,6 +31,12 @@ const handleUpdateValueDocumentUnitTexts = async (
   const hasInnerText = divElem.innerText.length > 0
   updatedDocumentUnit.value.texts[updatedValue[0]] =
     hasInnerText || hasImgElem || hasTable ? updatedValue[1] : ""
+}
+
+const handleUpdateValueDocumentUnitNorms = async (
+  updatedValue: NormReference[]
+) => {
+  updatedDocumentUnit.value.contentRelatedIndexing.norms = updatedValue
 }
 
 const handleUpdateDocumentUnit = async () => {
@@ -212,7 +219,10 @@ onUnmounted(() => {
 
           <DocumentUnitContentRelatedIndexing
             id="contentRelatedIndexing"
-            :document-unit="props.documentUnit"
+            :document-unit="documentUnit"
+            :update-status="updateStatus"
+            @update-document-unit="handleUpdateDocumentUnit"
+            @update-value="handleUpdateValueDocumentUnitNorms"
           />
         </div>
 

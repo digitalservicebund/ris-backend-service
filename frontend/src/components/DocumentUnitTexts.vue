@@ -3,14 +3,17 @@ import { computed } from "vue"
 import { Texts } from "../domain/documentUnit"
 import TextEditor from "../shared/components/input/TextEditor.vue"
 import SaveDocumentUnitButton from "./SaveDocumentUnitButton.vue"
+
 import { texts } from "@/fields/caselaw"
 import { FieldSize } from "@/shared/components/input/FieldSize"
 
 const props = defineProps<{ texts: Texts; updateStatus: number }>()
+
 const emit = defineEmits<{
   (e: "updateValue", updatedValue: [keyof Texts, string]): Promise<void>
   (e: "updateDocumentUnit"): Promise<void>
 }>()
+
 const data = computed(() =>
   texts.map((item) => {
     return {

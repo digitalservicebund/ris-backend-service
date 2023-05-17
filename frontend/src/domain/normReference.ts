@@ -1,6 +1,6 @@
 export type NormReference = {
-  abbreviation?: string
+  risAbbreviation?: string
   singleNorm?: string
-  year?: string
-  versionDate?: string
+  dateOfVersion?: string
+  dateOfRelevance?: string
 }

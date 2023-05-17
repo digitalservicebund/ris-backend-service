@@ -1,4 +1,5 @@
 import { ProceedingDecision } from "./proceedingDecision"
+import { NormReference } from "@/domain/normReference"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -16,6 +17,10 @@ export type CoreData = {
   inputType?: string
   center?: string
   region?: string
+}
+
+export type ContentRelatedIndexing = {
+  norms?: NormReference[]
 }
 
 export type DocumentType = {
@@ -55,6 +60,7 @@ export default class DocumentUnit {
   public coreData: CoreData = {}
   public texts: Texts = {}
   public proceedingDecisions?: ProceedingDecision[]
+  public contentRelatedIndexing: ContentRelatedIndexing = {}
 
   static requiredFields = [
     "fileNumbers",
