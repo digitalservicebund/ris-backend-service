@@ -1,4 +1,5 @@
 import { NormData } from "../fixtures"
+import { NormCategory } from "@/domain/Norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
@@ -106,7 +107,10 @@ export const normData: NormData = {
         ],
       },
     ],
-    DOCUMENT_TYPE: [{ TYPE_NAME: ["RV"] }],
+    DOCUMENT_TYPE: [
+      { TYPE_NAME: ["RV"] },
+      { NORM_CATEGORY: [NormCategory.BASE_NORM] },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",

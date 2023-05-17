@@ -136,8 +136,9 @@ class JurisConverterTest {
                     leadList = listOf(Lead("test lead jurisdiction", "test lead unit"))
                     subjectAreaList = listOf(SubjectArea("test subject FNA", "test subject Gesta"))
                     documentTypeList = listOf(
-                        DocumentType("documentName", "documentTemplateName", "BASE_NORM"),
-                        DocumentType("documentName1", "documentTemplateName1", "BASE_NORM"),
+                        DocumentType("RV", null, null),
+                        DocumentType(null, "documentTemplateName", null),
+                        DocumentType(null, null, "ÜN"),
                     )
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
@@ -240,11 +241,7 @@ class JurisConverterTest {
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
-            assertThat(metadata).contains(Metadatum("documentName", TYPE_NAME))
-            assertThat(metadata).contains(Metadatum(NormCategory.BASE_NORM, NORM_CATEGORY))
-            assertThat(metadata).contains(Metadatum("documentTemplateName", TEMPLATE_NAME))
-            assertThat(metadata).contains(Metadatum("documentName1", TYPE_NAME))
-            assertThat(metadata).contains(Metadatum("documentTemplateName1", TEMPLATE_NAME))
+
             assertThat(metadata).contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
             assertThat(metadata).contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
             assertThat(metadata).contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))
@@ -275,6 +272,13 @@ class JurisConverterTest {
             assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement gazette", ANNOUNCEMENT_GAZETTE, 1))
             assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement year", YEAR, 1))
             assertThat(printAnnouncementMetadata).contains(Metadatum("test print announcement page", PAGE, 1))
+
+            val documentTypeSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.DOCUMENT_TYPE }
+            assertThat(documentTypeSections).hasSize(3)
+            val documentTypeMetadata = documentTypeSections?.flatMap { it.metadata }
+            assertThat(documentTypeMetadata).contains(Metadatum("RV", TYPE_NAME, 1))
+            assertThat(documentTypeMetadata).contains(Metadatum(NormCategory.TRANSITIONAL_NORM, NORM_CATEGORY, 1))
+            assertThat(documentTypeMetadata).contains(Metadatum("documentTemplateName", TEMPLATE_NAME, 1))
         }
 
         @Test

@@ -52,7 +52,6 @@ import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
-import java.lang.IllegalArgumentException
 import java.nio.ByteBuffer
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
@@ -160,7 +159,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
     ) + createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
-        createSectionsFromMetadata(Section.DOCUMENT_TYPE, documentTypeName + documentNormCategory + documentTemplateName) +
+        createSectionsWithoutGrouping(Section.DOCUMENT_TYPE, documentTypeName + documentNormCategory + documentTemplateName) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
         referenceSections.mapIndexed { index, section -> MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), index, listOf(section)) } +
         citationDateSections + ageIndicationSections +
@@ -260,7 +259,12 @@ fun mapParagraphsToDomain(paragraphs: List<ParagraphData>): List<Paragraph> {
 
 fun parseDateString(value: String?): LocalDate? = value?.let { try { LocalDate.parse(value) } catch (e: DateTimeParseException) { null } }
 
-fun parseNormCategory(value: String?): NormCategory? = value?.let { try { NormCategory.valueOf(value) } catch (e: IllegalArgumentException) { null } }
+fun parseNormCategory(value: String?): NormCategory? = when (value) {
+    "SN" -> NormCategory.BASE_NORM
+    "ÄN" -> NormCategory.AMENDMENT_NORM
+    "ÜN" -> NormCategory.TRANSITIONAL_NORM
+    else -> null
+}
 
 fun parseDateStateString(value: String?): UndefinedDate? =
     if (value.isNullOrEmpty()) null else UndefinedDate.valueOf(value)
