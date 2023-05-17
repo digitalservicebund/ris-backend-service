@@ -12,6 +12,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -240,6 +241,14 @@ public class DocumentUnitTransformer {
               .toList();
     }
 
+    List<DocumentUnitNorm> norms = null;
+    if (documentUnitDTO.getNorms() != null) {
+      norms =
+          documentUnitDTO.getNorms().stream()
+              .map(DocumentUnitNormTransformer::transformToDomain)
+              .toList();
+    }
+
     DataSource dataSource = DataSource.NEURIS;
     if (documentUnitDTO.getDataSource() != null) {
       dataSource = documentUnitDTO.getDataSource();
@@ -286,6 +295,6 @@ public class DocumentUnitTransformer {
             documentUnitDTO.getReasons(),
             documentUnitDTO.getCaseFacts(),
             documentUnitDTO.getDecisionReasons()),
-        new ContentRelatedIndexing(keywords, fieldsOfLaw));
+        new ContentRelatedIndexing(keywords, fieldsOfLaw, norms));
   }
 }

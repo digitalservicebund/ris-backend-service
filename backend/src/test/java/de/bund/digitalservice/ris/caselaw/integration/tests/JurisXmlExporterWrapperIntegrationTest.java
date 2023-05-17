@@ -10,6 +10,7 @@ import de.bund.digitalservice.ris.caselaw.domain.ContentRelatedIndexing;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -163,7 +164,8 @@ public class JurisXmlExporterWrapperIntegrationTest {
         new ContentRelatedIndexing(
             List.of("keyword1", "keyword2"),
             List.of(
-                FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()));
+                FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()),
+            List.of(DocumentUnitNorm.builder().risAbbreviation("RIS").singleNorm("01").build()));
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()

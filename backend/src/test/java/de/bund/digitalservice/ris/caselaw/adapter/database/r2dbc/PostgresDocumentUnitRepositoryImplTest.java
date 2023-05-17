@@ -36,6 +36,7 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseFieldOfLawRepository fieldOfLawRepository;
   @MockBean private DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   @MockBean private DatabaseKeywordRepository keywordRepository;
+  @MockBean private DatabaseDocumentUnitNormRepository documentUnitNormRepository;
 
   @BeforeEach
   public void setup() {
@@ -53,7 +54,8 @@ class PostgresDocumentUnitRepositoryImplTest {
             databaseDocumentTypeRepository,
             fieldOfLawRepository,
             documentUnitFieldsOfLawRepository,
-            keywordRepository);
+            keywordRepository,
+            documentUnitNormRepository);
   }
 
   @Test

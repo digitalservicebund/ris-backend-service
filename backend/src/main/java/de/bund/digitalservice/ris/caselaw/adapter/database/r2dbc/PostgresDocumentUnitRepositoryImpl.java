@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecision
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
@@ -55,6 +56,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseFieldOfLawRepository fieldOfLawRepository;
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
+  private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -69,7 +71,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentTypeRepository databaseDocumentTypeRepository,
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
-      DatabaseKeywordRepository keywordRepository) {
+      DatabaseKeywordRepository keywordRepository,
+      DatabaseDocumentUnitNormRepository documentUnitNormRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -84,6 +87,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.fieldOfLawRepository = fieldOfLawRepository;
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
+    this.documentUnitNormRepository = documentUnitNormRepository;
   }
 
   @Override
@@ -132,6 +136,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingEcli(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> saveNorms(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -253,6 +258,66 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .map(
                       savedFileNumberList -> {
                         documentUnitDTO.setFileNumbers(savedFileNumberList);
+                        return documentUnitDTO;
+                      });
+            });
+  }
+
+  public Mono<DocumentUnitDTO> saveNorms(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+
+    return documentUnitNormRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .flatMap(
+            documentUnitNormDTOs -> {
+              List<DocumentUnitNorm> documentUnitNorms = new ArrayList<>();
+              if (documentUnit.contentRelatedIndexing() == null
+                  || documentUnit.contentRelatedIndexing().norms() == null)
+                return Mono.just(documentUnitDTO);
+
+              documentUnitNorms.addAll(documentUnit.contentRelatedIndexing().norms());
+
+              AtomicInteger normIndex = new AtomicInteger(0);
+              List<DocumentUnitNormDTO> toSave = new ArrayList<>();
+              List<DocumentUnitNormDTO> toDelete = new ArrayList<>();
+
+              documentUnitNormDTOs.forEach(
+                  documentUnitNormDTO -> {
+                    int index = normIndex.getAndIncrement();
+                    if (normIndex.get() < documentUnitNorms.size()) {
+                      documentUnitNormDTO.risAbbreviation =
+                          documentUnitNorms.get(index).risAbbreviation();
+                      documentUnitNormDTO.singleNorm = documentUnitNorms.get(index).singleNorm();
+                      documentUnitNormDTO.dateOfVersion =
+                          documentUnitNorms.get(index).dateOfVersion();
+                      documentUnitNormDTO.dateOfRelevance =
+                          documentUnitNorms.get(index).dateOfRelevance();
+                      toSave.add(documentUnitNormDTO);
+                    } else {
+                      toDelete.add(documentUnitNormDTO);
+                    }
+                  });
+
+              while (normIndex.get() < documentUnitNorms.size()) {
+                int index = normIndex.getAndIncrement();
+                DocumentUnitNormDTO documentUnitNormDTO =
+                    DocumentUnitNormDTO.builder()
+                        .risAbbreviation(documentUnitNorms.get(index).risAbbreviation())
+                        .singleNorm(documentUnitNorms.get(index).singleNorm())
+                        .dateOfVersion(documentUnitNorms.get(index).dateOfVersion())
+                        .dateOfRelevance(documentUnitNorms.get(index).dateOfRelevance())
+                        .documentUnitId(documentUnitDTO.getId())
+                        .build();
+                toSave.add(documentUnitNormDTO);
+              }
+
+              return documentUnitNormRepository
+                  .deleteAll(toDelete)
+                  .then(documentUnitNormRepository.saveAll(toSave).collectList())
+                  .map(
+                      savedNormList -> {
+                        documentUnitDTO.setNorms(savedNormList);
                         return documentUnitDTO;
                       });
             });
@@ -510,8 +575,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectDeviatingDecisionDates)
         .flatMap(this::injectIncorrectCourt)
         .flatMap(this::injectDocumentType)
-        .flatMap(this::injectFieldsOfLaw)
-        .flatMap(this::injectKeywords);
+        .flatMap(this::injectKeywords)
+        .flatMap(this::injectNorms)
+        .flatMap(this::injectFieldsOfLaw);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
@@ -623,6 +689,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             keywordDTO -> {
               documentUnitDTO.setKeywords(keywordDTO);
               return Mono.just(documentUnitDTO);
+            });
+  }
+
+  private Mono<DocumentUnitDTO> injectNorms(DocumentUnitDTO documentUnitDTO) {
+    return documentUnitNormRepository
+        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .collectList()
+        .map(
+            documentUnitNormDTO -> {
+              documentUnitDTO.setNorms(documentUnitNormDTO);
+              return documentUnitDTO;
             });
   }
 
