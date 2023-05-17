@@ -11,7 +11,7 @@ const updateStatus = ref(UpdateStatus)
   <div class="flex flex-col gap-20 items-start w-full">
     <h2 class="heading-02-regular">Text Button</h2>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="primary" label="Button Primary" />
 
       <TextButton
@@ -25,7 +25,12 @@ const updateStatus = ref(UpdateStatus)
       <TextButton button-type="primary" disabled label="Disabled" />
     </div>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
+      <TextButton button-type="primary" size="small" label="Button Small" icon="close" />
+      <TextButton button-type="primary" size="medium" label="Button Medium" icon="close" />
+    </div>
+
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="secondary" label="Button Secondary" />
 
       <TextButton
@@ -39,7 +44,7 @@ const updateStatus = ref(UpdateStatus)
       <TextButton button-type="secondary" disabled label="Disabled" />
     </div>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="tertiary" label="Button Tertiary" />
 
       <TextButton
@@ -53,7 +58,7 @@ const updateStatus = ref(UpdateStatus)
       <TextButton button-type="tertiary" disabled label="Disabled" />
     </div>
 
-    <div class="flex gap-20 w-full">
+    <div class="flex gap-20 items-start w-full">
       <TextButton button-type="ghost" label="Button Ghost" />
 
       <TextButton
@@ -65,6 +70,10 @@ const updateStatus = ref(UpdateStatus)
       <TextButton button-type="ghost" icon="close" />
 
       <TextButton button-type="ghost" disabled label="Disabled" />
+    </div>
+
+    <div class="flex gap-20 items-start w-full">
+      <TextButton button-type="primary" label="Disabled link" disabled href="https://digitalservice.bund.de" />
     </div>
 
     <div class="flex flex-col gap-y-20 items-start">
