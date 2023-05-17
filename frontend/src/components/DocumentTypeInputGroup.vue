@@ -33,12 +33,9 @@ const selectedNormCategories = ref<Record<NormCategory, boolean>>(
 watch(
   selectedNormCategories,
   () => {
-    inputValue.value.NORM_CATEGORY = Object.entries(
-      selectedNormCategories.value
-    )
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      .filter(([_category, isSelected]) => isSelected)
-      .map(([category]) => category as NormCategory)
+    inputValue.value.NORM_CATEGORY = (
+      Object.keys(selectedNormCategories.value) as NormCategory[]
+    ).filter((category) => selectedNormCategories.value[category])
   },
   { deep: true }
 )
