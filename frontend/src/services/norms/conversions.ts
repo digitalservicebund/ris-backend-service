@@ -383,7 +383,9 @@ export function encodeMetadataSections(
 
   const encodedSections = mergeValues(encodedMapping)
   const nonEmptySections = encodedSections.filter(
-    (section) => section.metadata || section.sections
+    (section) =>
+      (section.metadata && section.metadata.length > 0) ||
+      (section.sections && section.sections.length > 0)
   )
   return nonEmptySections
 }
