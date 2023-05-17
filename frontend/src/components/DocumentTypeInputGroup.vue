@@ -70,6 +70,11 @@ watch(props, () => (inputValue.value = props.modelValue), {
 watch(inputValue, () => emit("update:modelValue", inputValue.value), {
   deep: true,
 })
+
+const checkboxStyle = ref({
+  width: "24px",
+  height: "24px",
+})
 </script>
 
 <template>
@@ -107,6 +112,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
               :id="category"
               v-model="selectedNormCategories[category]"
               :aria-label="NORM_CATEGORY_NAMES[category]"
+              :style="checkboxStyle"
             />
           </InputField>
         </div>
