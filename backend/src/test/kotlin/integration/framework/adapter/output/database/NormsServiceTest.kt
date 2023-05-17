@@ -38,12 +38,12 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate
 import org.springframework.data.r2dbc.dialect.PostgresDialect
 import org.springframework.r2dbc.core.DatabaseClient
 import reactor.test.StepVerifier
-import utils.assertNormsAreEqual
 import utils.createRandomNorm
 import utils.createSimpleSections
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit
 import java.util.*
 
 @DataR2dbcTest
@@ -552,4 +552,18 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
 
         assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))
     }
+}
+
+private fun assertNormsAreEqual(norm1: Norm, norm2: Norm) = assertThat(norm1)
+    .usingRecursiveComparison()
+    .ignoringCollectionOrder()
+    .withEqualsForType(::localDatesAreEqualUpToMilliseconds, LocalDateTime::class.java)
+    .isEqualTo(norm2)
+
+/**
+ * We need to reduce to milliseconds (don't care about micro or nano seconds) since
+ * the PostgreSQL database can only save up to 6 digits and automatically rounds up.
+ */
+private fun localDatesAreEqualUpToMilliseconds(first: LocalDateTime, second: LocalDateTime): Boolean {
+    return first.truncatedTo(ChronoUnit.MILLIS) == second.truncatedTo(ChronoUnit.MILLIS)
 }

@@ -12,10 +12,10 @@ import de.bund.digitalservice.ris.norms.domain.value.NormCategory
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
-import utils.assertNormAndEditNormFrameProperties
 import utils.createRandomNormFameProperties
 import utils.factory.metadataSection
 import java.util.*
@@ -38,7 +38,7 @@ class EditNormFrameServiceTest {
         verify {
             editNormOutputPort.editNorm(
                 withArg {
-                    assertNormAndEditNormFrameProperties(it.norm, properties)
+                    assertThat(properties).usingRecursiveComparison().isEqualTo(it.norm)
                 },
             )
         }
@@ -81,7 +81,7 @@ class EditNormFrameServiceTest {
         verify {
             editNormOutputPort.editNorm(
                 withArg {
-                    assertNormAndEditNormFrameProperties(it.norm, properties)
+                    assertThat(properties).usingRecursiveComparison().isEqualTo(it.norm)
                 },
             )
         }

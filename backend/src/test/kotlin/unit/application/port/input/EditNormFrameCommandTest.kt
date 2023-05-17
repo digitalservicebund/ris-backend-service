@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import utils.assertEditNormFrameProperties
 import utils.createRandomNormFameProperties
 import java.util.UUID
 
@@ -19,7 +18,7 @@ class EditNormFrameCommandTest {
         val command = EditNormFrameUseCase.Command(guid, properties)
 
         assertThat(command.guid).isEqualTo(guid)
-        assertEditNormFrameProperties(command.properties, properties)
+        assertThat(command.properties).usingRecursiveComparison().isEqualTo(properties)
     }
 
     @Test
@@ -31,6 +30,6 @@ class EditNormFrameCommandTest {
         val command = EditNormFrameUseCase.Command(guid, properties)
 
         assertThat(command.guid).isEqualTo(guid)
-        assertEditNormFrameProperties(command.properties, properties)
+        assertThat(command.properties).usingRecursiveComparison().isEqualTo(properties)
     }
 }
