@@ -21,7 +21,7 @@ export class ProceedingDecision {
     return [
       ...(this.court ? [`${this.court.label}`] : []),
       ...(this.documentType ? [this.documentType?.jurisShortcut] : []),
-      ...(this.dateUnknown == true ? ["unbekanntes Entscheidungsdatum"] : []),
+      ...(this.dateUnknown === true ? ["unbekanntes Entscheidungsdatum"] : []),
       ...(this.date ? [dayjs(this.date).format("DD.MM.YYYY")] : []),
       ...(this.fileNumber ? [this.fileNumber] : []),
       ...(this.documentNumber && this.hasLink ? [this.documentNumber] : []),
@@ -40,13 +40,17 @@ export class ProceedingDecision {
 
   get missingRequiredFields() {
     return ProceedingDecision.requiredFields.filter((field) =>
-      this.requiredFieldIsEmpty(this[field] as keyof ProceedingDecision)
+      this.requiredFieldIsEmpty(field, this[field] as keyof ProceedingDecision)
     )
   }
 
   private requiredFieldIsEmpty(
+    fieldName: keyof ProceedingDecision,
     value: ProceedingDecision[(typeof ProceedingDecision.requiredFields)[number]]
   ) {
+    if (fieldName === "date" && !value && !this.dateKnown) {
+      return false
+    }
     if (value === undefined || !value || value === null) {
       return true
     }
