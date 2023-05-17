@@ -345,7 +345,11 @@ function documentTypeSummarizer(data?: Metadata): VNode {
     )
   )
 
-  return h("div", { class: ["flex", "gap-8", "items-center"] }, propertyNodes)
+  return h(
+    "div",
+    { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
+    propertyNodes
+  )
 }
 
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
