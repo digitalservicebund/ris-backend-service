@@ -764,11 +764,15 @@ jobs:
       matrix:
         subproject: [caselaw, norms, shared]
         browser: [chromium, firefox]
+        mode: [e2e]
+        include:
+          - mode: a11y
+            browser: chromium
     uses: ./.github/workflows/_playwright-test.yml
     with:
       subproject: ${{ matrix.subproject}}
       browser: ${{ matrix.browser }}
-      mode: e2e
+      mode: ${{ matrix.mode }}
     secrets: inherit
 
   a11y-chrome:
