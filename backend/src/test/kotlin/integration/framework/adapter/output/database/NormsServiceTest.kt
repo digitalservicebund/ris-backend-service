@@ -548,7 +548,7 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     @Test
     fun `it maps metadatum of date type to entity properly`() {
         val guid: UUID = UUID.randomUUID()
-        val metadatumDto = MetadatumDto(1, guid, "2020-12-23", DATE, 1, 1)
+        val metadatumDto = MetadatumDto(1, guid, "2020-12-23", DATE, 1, 1, UUID.randomUUID())
         val result = normsService.metadatumToEntity(metadatumDto)
 
         assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))

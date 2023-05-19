@@ -180,7 +180,7 @@ class NormsService(
     }
 
     private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): Flux<MetadatumDto> {
-        return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.id))
+        return metadataRepository.saveAll(metadataListToDto(metadata, metadataSectionDto.id, metadataSectionDto.guid))
     }
 
     private fun deleteOldMetadata(normId: Int): Mono<Void> = metadataSectionsRepository.findByNormId(normId)

@@ -16,6 +16,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.Me
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.NormDto
 import de.bund.digitalservice.ris.norms.framework.adapter.output.database.dto.ParagraphDto
 import java.time.LocalDate
+import java.util.UUID
 
 interface NormsMapper {
     fun normToEntity(
@@ -228,8 +229,8 @@ interface NormsMapper {
         return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, fileReference.createdAt)
     }
 
-    fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, id: Int = 0): List<MetadatumDto> {
-        return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId, guid = it.guid) }
+    fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, sectionGuid: UUID, id: Int = 0): List<MetadatumDto> {
+        return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId, guid = it.guid, sectionGuid = sectionGuid) }
     }
 
     fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {

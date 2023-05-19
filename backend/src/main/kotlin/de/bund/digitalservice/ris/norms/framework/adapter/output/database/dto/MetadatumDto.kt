@@ -17,4 +17,6 @@ data class MetadatumDto(
     val order: Int,
     @Column("section_id")
     val sectionId: Int,
+    @Column("section_guid")
+    val sectionGuid: UUID,
 )
