@@ -49,12 +49,11 @@ const padding = computed(() => ({
   >
     <template #header>
       <div class="flex w-full" :class="column">
-        <h2
-          class="label-02-bold mb-24 min-w-[14rem] text-left"
-          :class="padding"
-        >
-          {{ title }}
-        </h2>
+        <div class="min-w-[15rem]">
+          <h2 class="label-02-bold mb-24 text-left" :class="padding">
+            {{ title }}
+          </h2>
+        </div>
         <span
           v-if="dataSet?.length === 0 && fallbackText !== undefined"
           class="label-02-reg text-start"

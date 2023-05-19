@@ -7,6 +7,7 @@ import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
+import EntryIntoForceDateInputGroup from "@/components/EntryIntoForceDateInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
@@ -357,6 +358,33 @@ function documentTypeSummarizer(data?: Metadata): VNode {
   )
 }
 
+// function entryIntoForceDateSummarizer(data: Metadata): VNode {
+//   const propertyNodes = []
+//
+//   const date = data?.DATE?.[0]
+//   const categories =
+//       data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
+//
+//   propertyNodes.push(date)
+//
+//   if (date && categories.length > 0) propertyNodes.push(h("div", "|"))
+//
+//   categories.forEach((category) =>
+//       propertyNodes.push(
+//           h("div", { class: ["flex", "gap-4"] }, [
+//             h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
+//             h("span", NORM_CATEGORY_TRANSLATIONS[category]),
+//           ])
+//       )
+//   )
+//
+//   return h(
+//       "div",
+//       { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
+//       propertyNodes
+//   )
+// }
+
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
@@ -517,30 +545,18 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
       :type="InputType.CHIPS"
     />
 
-    <fieldset>
-      <legend
-        id="entryIntoForceFields"
-        class="heading-02-regular mb-[1rem] mt-32"
-      >
-        Inkrafttreten
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="entryIntoForce"
+    <ExpandableDataSet
+      id="entryIntoForceDates"
+      :data-set="metadataSections.ENTRY_INTO_FORCE_DATE"
+      :summary-component="EntryIntoForceDateSummary"
+      title="Abweichendes Inkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.ENTRY_INTO_FORCE_DATE"
+        :default-value="{}"
+        :edit-component="EntryIntoForceDateInputGroup"
       />
-    </fieldset>
-
-    <fieldset>
-      <legend id="expirationFields" class="heading-02-regular mb-[1rem]">
-        Außerkrafttreten
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="expiration"
-      />
-    </fieldset>
+    </ExpandableDataSet>
 
     <SingleDataFieldSection
       id="announcementDate"
