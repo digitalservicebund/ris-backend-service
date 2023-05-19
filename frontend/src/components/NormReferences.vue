@@ -26,7 +26,7 @@ const defaultValue = {}
 
 <template>
   <div class="bg-white mb-[2rem] p-16">
-    <h2 class="label-02-bold mb-[1rem]">Schlagwörter</h2>
+    <h2 class="label-02-bold mb-[1rem]">Normen</h2>
     <EditableList
       v-model="norms"
       :default-value="defaultValue"
