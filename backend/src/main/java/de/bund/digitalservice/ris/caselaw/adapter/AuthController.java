@@ -22,7 +22,6 @@ public class AuthController {
   @GetMapping(value = "me")
   public ResponseEntity<User> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
 
-    User user = userService.getUser(oidcUser);
-    return ResponseEntity.ok(user);
+    return ResponseEntity.ok(userService.getUser(oidcUser));
   }
 }
