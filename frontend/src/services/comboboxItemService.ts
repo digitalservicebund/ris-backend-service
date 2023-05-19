@@ -1,12 +1,14 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Court } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { NormReference } from "@/domain/normReference"
 import { ComboboxItem } from "@/shared/components/input/types"
 
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
   courts = "lookuptable/courts",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
+  risAbbreviations = "lookuptable/risAbbreviations",
 }
 
 type DocumentType = {
@@ -15,7 +17,11 @@ type DocumentType = {
   label: string
 }
 
-type DropdownType = DocumentType[] | Court[] | FieldOfLawNode[]
+type DropdownType =
+  | DocumentType[]
+  | Court[]
+  | FieldOfLawNode[]
+  | NormReference[]
 
 function formatDropdownItems(
   responseData: DropdownType,
@@ -41,6 +47,13 @@ function formatDropdownItems(
           label: item.identifier,
           text: item.text,
         },
+      }))
+    }
+    case Endpoint.risAbbreviations: {
+      return (responseData as NormReference[]).map((item) => ({
+        label: item.risAbbreviation,
+        value: item.risAbbreviation,
+        additionalInformation: item.singleNorm,
       }))
     }
   }
@@ -89,6 +102,8 @@ const service: ComboboxItemService = {
     fetchFromEndpoint(Endpoint.documentTypes, filter),
   getFieldOfLawSearchByIdentifier: (filter?: string) =>
     fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
+  getRisAbbreviations: (filter?: string) =>
+    fetchFromEndpoint(Endpoint.risAbbreviations, filter),
 }
 
 export default service

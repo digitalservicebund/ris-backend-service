@@ -111,11 +111,12 @@ export interface DropdownInputField extends BaseInputField {
 }
 
 //COMBOBOX
-export type ComboboxInputModelType = string | { label: string }
+export type ComboboxInputModelType = string
 
 export type ComboboxItem = {
   label: string
   value: ComboboxInputModelType
+  additionalInformation?: string
 }
 
 export interface ComboboxAttributes extends BaseInputAttributes {
