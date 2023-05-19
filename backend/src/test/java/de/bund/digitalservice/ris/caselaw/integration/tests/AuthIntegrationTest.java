@@ -1,0 +1,55 @@
+package de.bund.digitalservice.ris.caselaw.integration.tests;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOidcLogin;
+
+import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
+import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
+import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
+import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationCenter;
+import de.bund.digitalservice.ris.caselaw.domain.User;
+import java.util.Collections;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.OidcLoginMutator;
+import org.springframework.test.web.reactive.server.WebTestClient;
+
+@RISIntegrationTest(
+    imports = {FlywayConfig.class, PostgresConfig.class, KeycloakUserService.class},
+    controllers = {AuthController.class})
+class AuthIntegrationTest {
+
+  @Autowired private WebTestClient webClient;
+
+  private OidcLoginMutator getMockLogin() {
+    return mockOidcLogin()
+        .idToken(
+            token ->
+                token.claims(
+                    claims -> {
+                      claims.put("groups", Collections.singletonList("/DigitalService"));
+                      claims.put("name", "testUser");
+                    }));
+  }
+
+  @Test
+  void testGetUser() {
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLogin())
+        .get()
+        .uri("/api/v1/auth/me")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(User.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().name()).isEqualTo("testUser");
+              assertThat(response.getResponseBody().documentationCenter())
+                  .isEqualTo(DocumentationCenter.DigitalService);
+            });
+  }
+}

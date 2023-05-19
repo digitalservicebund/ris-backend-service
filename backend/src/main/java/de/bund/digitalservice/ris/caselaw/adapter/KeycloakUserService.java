@@ -3,7 +3,7 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationCenter;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
@@ -17,7 +17,7 @@ public class KeycloakUserService implements UserService {
           "/caselaw/BGH", DocumentationCenter.BGH,
           "/caselaw/BVerfG", DocumentationCenter.BVerfG,
           "/DigitalService", DocumentationCenter.DigitalService,
-          "/CC-RIS", DocumentationCenter.CCRIS);
+          "/tester/CC-RIS", DocumentationCenter.CCRIS);
 
   public User getUser(OidcUser oidcUser) {
     return User.builder()
@@ -27,7 +27,7 @@ public class KeycloakUserService implements UserService {
   }
 
   private DocumentationCenter extractDocumentationCenter(OidcUser oidcUser) {
-    ArrayList<String> groups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
+    List<String> groups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
     return groups.stream()
         .filter(documentationCenterClaims::containsKey)
         .findFirst()
