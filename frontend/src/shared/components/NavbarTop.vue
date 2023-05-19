@@ -44,7 +44,10 @@ onMounted(async () => {
 
     <div v-if="user" class="flex font-bold gap-8 items-center">
       <span aria-hidden="true" class="material-icons"> perm_identity </span>
-      {{ user.name }} | {{ user.documentationCenterAbbreviation }}
+      {{ user.name }}
+      <span v-if="user.documentationCenter">
+        | {{ user.documentationCenter }}</span
+      >
     </div>
   </nav>
 </template>
