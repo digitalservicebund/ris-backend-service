@@ -5,7 +5,6 @@ tap "homebrew/cask"
 cask "docker"
 brew "gopass"
 brew "direnv"
-brew "node"
 brew "nodenv"
 
 # backend
