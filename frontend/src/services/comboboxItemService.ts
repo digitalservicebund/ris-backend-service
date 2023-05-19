@@ -8,7 +8,7 @@ enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
   courts = "lookuptable/courts",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
-  risAbbreviations = "lookuptable/risAbbreviations",
+  risAbbreviations = "normabbreviation",
 }
 
 type DocumentType = {
