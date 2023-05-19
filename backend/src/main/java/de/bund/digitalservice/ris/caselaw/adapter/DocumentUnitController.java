@@ -43,6 +43,7 @@ public class DocumentUnitController {
   @PostMapping(value = "")
   public Mono<ResponseEntity<DocumentUnit>> generateNewDocumentUnit(
       @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
+
     return service
         .generateNewDocumentUnit(documentUnitCreationInfo)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
