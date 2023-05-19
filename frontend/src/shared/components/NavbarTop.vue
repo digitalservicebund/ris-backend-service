@@ -42,12 +42,16 @@ onMounted(async () => {
       >
     </div>
 
-    <div v-if="user" class="flex font-bold gap-8 items-center">
+    <div v-if="user" class="gap-10 grid grid-cols-[auto,1fr]">
       <span aria-hidden="true" class="material-icons"> perm_identity </span>
-      {{ user.name }}
-      <span v-if="user.documentationCenter">
-        | {{ user.documentationCenter }}</span
-      >
+      <div>
+        <div class="label-03-bold">
+          {{ user.name }}
+        </div>
+        <div v-if="user.documentationCenter" class="label-03-reg">
+          {{ user.documentationCenter }}
+        </div>
+      </div>
     </div>
   </nav>
 </template>
