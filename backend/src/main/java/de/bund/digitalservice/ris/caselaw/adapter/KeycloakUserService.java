@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationCenter;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import java.util.List;
@@ -8,30 +9,49 @@ import java.util.Map;
 import java.util.Objects;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 @Service
 public class KeycloakUserService implements UserService {
+  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
-  private static final Map<String, DocumentationCenter> documentationCenterClaims =
+  private static final Map<String, String> documentationCenterClaims =
       Map.of(
-          "/caselaw/BGH", DocumentationCenter.BGH,
-          "/caselaw/BVerfG", DocumentationCenter.BVerfG,
-          "/DigitalService", DocumentationCenter.DigitalService,
-          "/tester/CC-RIS", DocumentationCenter.CCRIS);
+          "/caselaw/BGH", "BGH",
+          "/caselaw/BVerfG", "BVerfG",
+          "/DigitalService", "DigitalService",
+          "/tester/CC-RIS", "CC-RIS");
 
-  public User getUser(OidcUser oidcUser) {
-    return User.builder()
-        .name(oidcUser.getAttribute("name"))
-        .documentationCenter(extractDocumentationCenter(oidcUser))
-        .build();
+  public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+    this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
-  private DocumentationCenter extractDocumentationCenter(OidcUser oidcUser) {
+  public Mono<User> getUser(OidcUser oidcUser) {
+    return extractDocumentationOffice(oidcUser)
+        .map(
+            documentationOffice ->
+                User.builder()
+                    .name(oidcUser.getAttribute("name"))
+                    .documentationOfficeLabel(documentationOffice.label())
+                    .build());
+  }
+
+  private Mono<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {
     List<String> groups = Objects.requireNonNull(oidcUser.getAttribute("groups"));
-    return groups.stream()
-        .filter(documentationCenterClaims::containsKey)
-        .findFirst()
-        .map(documentationCenterClaims::get)
-        .orElse(null);
+    String documentationOfficeKey =
+        groups.stream()
+            .filter(documentationCenterClaims::containsKey)
+            .findFirst()
+            .map(documentationCenterClaims::get)
+            .orElse(null);
+
+    return documentationOfficeRepository
+        .findByLabel(documentationOfficeKey)
+        .map(
+            documentationOfficeDTO ->
+                DocumentationOffice.builder()
+                    .label(documentationOfficeDTO.getLabel())
+                    .abbreviation(documentationOfficeDTO.getAbbreviation())
+                    .build());
   }
 }

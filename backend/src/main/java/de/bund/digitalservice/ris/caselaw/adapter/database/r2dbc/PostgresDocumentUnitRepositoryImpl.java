@@ -57,6 +57,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
+  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -72,7 +73,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
-      DatabaseDocumentUnitNormRepository documentUnitNormRepository) {
+      DatabaseDocumentUnitNormRepository documentUnitNormRepository,
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -88,6 +90,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
+    this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
   @Override
@@ -137,6 +140,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveNorms(documentUnitDTO, documentUnit))
+        .flatMap(documentUnitDTO -> saveDocumentationOffice(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -525,6 +529,25 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
+  private Mono<DocumentUnitDTO> saveDocumentationOffice(
+      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+    if (documentUnit.coreData().documentationOffice() == null) {
+      return Mono.just(documentUnitDTO);
+    }
+
+    return documentationOfficeRepository
+        .save(
+            DocumentationOfficeDTO.builder()
+                .label(documentUnit.coreData().documentationOffice().label())
+                .abbreviation(documentUnit.coreData().documentationOffice().abbreviation())
+                .build())
+        .map(
+            documentationOfficeDTO -> {
+              documentUnitDTO.setDocumentationOffice(documentationOfficeDTO);
+              return documentUnitDTO;
+            });
+  }
+
   @Override
   public Mono<DocumentUnit> attachFile(
       UUID documentUnitUuid, String fileUuid, String type, String fileName) {
@@ -577,7 +600,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectDocumentType)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
-        .flatMap(this::injectFieldsOfLaw);
+        .flatMap(this::injectFieldsOfLaw)
+        .flatMap(this::injectDocumentationOffice);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
@@ -700,6 +724,21 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             documentUnitNormDTO -> {
               documentUnitDTO.setNorms(documentUnitNormDTO);
               return documentUnitDTO;
+            });
+  }
+
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectDocumentationOffice(
+      T documentUnitMetadataDTO) {
+    if (documentUnitMetadataDTO.getDocumentationOffice() == null) {
+      return Mono.just(documentUnitMetadataDTO);
+    }
+    return documentationOfficeRepository
+        .findById(documentUnitMetadataDTO.getDocumentationOfficeId())
+        .defaultIfEmpty(DocumentationOfficeDTO.builder().build())
+        .map(
+            documentationOfficeDTO -> {
+              documentUnitMetadataDTO.setDocumentationOffice(documentationOfficeDTO);
+              return documentUnitMetadataDTO;
             });
   }
 
@@ -856,7 +895,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitMetadataDTO> injectAdditionalInformation(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
-    return injectFileNumbers(documentUnitMetadataDTO).flatMap(this::injectDocumentType);
+    return injectFileNumbers(documentUnitMetadataDTO)
+        .flatMap(this::injectDocumentType)
+        .flatMap(this::injectDocumentationOffice);
   }
 
   @Override

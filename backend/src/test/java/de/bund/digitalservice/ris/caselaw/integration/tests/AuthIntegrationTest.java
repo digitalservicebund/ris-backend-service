@@ -8,7 +8,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentationCenter;
 import de.bund.digitalservice.ris.caselaw.domain.User;
 import java.util.Collections;
 import org.junit.jupiter.api.Test;
@@ -21,7 +20,11 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 
 @RISIntegrationTest(
-    imports = {FlywayConfig.class, PostgresConfig.class, KeycloakUserService.class},
+    imports = {
+      FlywayConfig.class,
+      PostgresConfig.class,
+      KeycloakUserService.class,
+    },
     controllers = {AuthController.class})
 class AuthIntegrationTest {
 
@@ -64,8 +67,8 @@ class AuthIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody().name()).isEqualTo("testUser");
-              assertThat(response.getResponseBody().documentationCenter())
-                  .isEqualTo(DocumentationCenter.DigitalService);
+              assertThat(response.getResponseBody().documentationOfficeLabel())
+                  .isEqualTo("DigitalService");
             });
   }
 }

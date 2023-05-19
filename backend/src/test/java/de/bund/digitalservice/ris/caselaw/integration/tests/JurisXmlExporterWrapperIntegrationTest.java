@@ -11,6 +11,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -131,7 +132,8 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .decisionDate(Instant.parse("2021-01-01T00:00:00Z"))
             .legalEffect("legalEffect")
             .inputType("inputType")
-            .center("center")
+            .documentationOffice(
+                DocumentationOffice.builder().label("fooOffice").label("FO").build())
             .region("region")
             .build();
     Texts texts =
