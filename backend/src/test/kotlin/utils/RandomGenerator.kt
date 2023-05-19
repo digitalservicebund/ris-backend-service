@@ -18,7 +18,7 @@ import org.jeasy.random.EasyRandomParameters
 import org.jeasy.random.FieldPredicates.inClass
 import org.jeasy.random.FieldPredicates.named
 import java.time.LocalDate
-import java.util.*
+import java.util.Random
 
 fun createRandomNormFameProperties(): EditNormFrameUseCase.NormFrameProperties {
     val parameters: EasyRandomParameters =
@@ -80,8 +80,8 @@ fun createSimpleSections(): List<MetadataSection> = listOf(
     MetadataSection(
         MetadataSectionName.NORM,
         listOf(
-            Metadatum("foo", MetadatumType.KEYWORD, 0, UUID.randomUUID()),
-            Metadatum("bar", MetadatumType.KEYWORD, 1, UUID.randomUUID()),
+            Metadatum("foo", MetadatumType.KEYWORD, 0),
+            Metadatum("bar", MetadatumType.KEYWORD, 1),
         ),
     ),
 )
