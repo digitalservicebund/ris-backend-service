@@ -762,7 +762,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        subproject: [caselaw, norms]
+        subproject: [caselaw, norms, shared]
         browser: [chromium, firefox]
     uses: ./.github/workflows/_playwright-test.yml
     with:

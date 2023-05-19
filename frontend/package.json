@@ -12,6 +12,7 @@
     "test:e2e": "playwright test",
     "test:e2e:caselaw": "playwright test test/e2e/caselaw",
     "test:e2e:norms": "playwright test test/e2e/norms",
+    "test:e2e:shared": "playwright test test/e2e/shared",
     "coverage": "TZ=UTC vitest run --coverage",
     "check": "npm run style:check && npm test && npm run test:e2e && npm run test:a11y",
     "dev": "vite",
