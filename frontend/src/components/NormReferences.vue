@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { computed } from "vue"
-import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import { NormReference } from "@/domain/normReference"
 import EditableList from "@/shared/components/EditableList.vue"
@@ -26,11 +25,12 @@ const defaultValue = {}
 </script>
 
 <template>
-  <ExpandableDataSet as-column :data-set="norms" title="Normen">
+  <div class="bg-white mb-[2rem] p-16">
+    <h2 class="label-02-bold mb-[1rem]">Schlagwörter</h2>
     <EditableList
       v-model="norms"
       :default-value="defaultValue"
       :edit-component="NormReferenceInput"
     />
-  </ExpandableDataSet>
+  </div>
 </template>

@@ -23,7 +23,7 @@ const norm = computed({
 </script>
 
 <template>
-  <div class="flex flex-row gap-24 m-24">
+  <div class="flex flex-row gap-24">
     <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">
       <ComboboxInput
         id="norm-reference-abbreviation"
