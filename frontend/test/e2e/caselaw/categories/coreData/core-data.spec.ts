@@ -178,7 +178,7 @@ test.describe("core data", () => {
       .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
       .click()
 
-    await expect(page.locator("text=Ja")).toBeVisible()
+    await expect(page.getByText("Ja", { exact: true })).toBeVisible()
     await expect(page.locator("text=Nein")).toBeVisible()
     await expect(page.locator("text=Keine Angabe")).toBeVisible()
   })

@@ -194,7 +194,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
         await page
           .locator("[aria-label='Rechtskraft'] + button.input-expand-icon")
           .click()
-        await page.locator("text=Ja").click()
+        await page.getByText("Ja", { exact: true }).click()
       },
       page,
       { clickSaveButton: true, reload: true }
