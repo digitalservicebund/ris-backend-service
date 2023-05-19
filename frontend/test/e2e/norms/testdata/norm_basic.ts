@@ -123,7 +123,7 @@ export const normData: NormData = {
   expirationDateState: "unbestimmt (unbekannt)",
   principleExpirationDateState: "unbestimmt (unbekannt)",
   divergentExpirationDateState: "nicht vorhanden",
-  announcementDate: "2023-01-06",
+  announcementDate: "2023-01-02",
   printAnnouncementGazette: "BGBl I",
   printAnnouncementYear: "2023",
   printAnnouncementPage: "3",
