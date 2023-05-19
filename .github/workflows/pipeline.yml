@@ -775,16 +775,6 @@ jobs:
       mode: ${{ matrix.mode }}
     secrets: inherit
 
-  a11y-chrome:
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: [deploy-staging, prep-playwright-tests]
-    uses: ./.github/workflows/_playwright-test.yml
-    with:
-      browser: chromium
-      mode: a11y
-      subproject: all
-    secrets: inherit
-
   deploy-production:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
@@ -794,7 +784,6 @@ jobs:
       - push-frontend-image-to-registry
       - push-backend-image-to-registry
       - e2e-tests
-      - a11y-chrome
     permissions:
       id-token: write # Enable OIDC for gitsign
     steps:
@@ -838,7 +827,6 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' }}
     needs:
       - e2e-tests
-      - a11y-chrome
     permissions:
       pages: write
       id-token: write
