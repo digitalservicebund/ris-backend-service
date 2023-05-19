@@ -1,10 +1,11 @@
-package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
+package de.bund.digitalservice.ris.caselaw.domain.lookuptable;
 
-import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
 import java.util.UUID;
+import org.springframework.data.repository.NoRepositoryBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+@NoRepositoryBean
 public interface NormAbbreviationRepository {
   public Mono<NormAbbreviation> findById(UUID id);
 

@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable;
 
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.NormAbbreviationTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviation;
+import de.bund.digitalservice.ris.caselaw.domain.lookuptable.NormAbbreviationRepository;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Repository;
