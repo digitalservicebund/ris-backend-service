@@ -3,26 +3,23 @@ import { computed } from "vue"
 import FieldOfLawMain from "@/components/FieldOfLawMain.vue"
 import KeyWords from "@/components/KeyWords.vue"
 import Norms from "@/components/NormReferences.vue"
-import DocumentUnit from "@/domain/documentUnit"
-import { NormReference } from "@/domain/normReference"
+import { ContentRelatedIndexing } from "@/domain/documentUnit"
 
 const props = defineProps<{
-  documentUnit: DocumentUnit
+  documentUnitUuid: string
+  modelValue: ContentRelatedIndexing
 }>()
 
 const emit = defineEmits<{
-  (e: "updateValue", updatedValue: NormReference[]): Promise<void>
-  (e: "updateDocumentUnit"): Promise<void>
+  (event: "update:modelValue", value?: ContentRelatedIndexing): void
 }>()
 
-const norms = computed({
+const contentRelatedIndexing = computed({
   get: () => {
-    return props.documentUnit?.contentRelatedIndexing?.norms
-      ? props.documentUnit?.contentRelatedIndexing?.norms
-      : []
+    return props.modelValue
   },
   set: (value) => {
-    emit("updateValue", value)
+    if (value) emit("update:modelValue", value)
   },
 })
 </script>
@@ -30,9 +27,9 @@ const norms = computed({
 <template>
   <div class="mb-[4rem]">
     <h1 class="heading-02-regular mb-[1rem]">Inhaltliche Erschließung</h1>
-    <KeyWords :document-unit-uuid="props.documentUnit.uuid" />
-    <FieldOfLawMain :document-unit-uuid="props.documentUnit.uuid" />
-    <Norms :norms="norms" @update-value="emit('updateValue', norms)" />
+    <KeyWords :document-unit-uuid="props.documentUnitUuid" />
+    <FieldOfLawMain :document-unit-uuid="props.documentUnitUuid" />
+    <Norms v-model="contentRelatedIndexing.norms" />
     <!-- Aktivzitierung -->
   </div>
 </template>

@@ -6,19 +6,19 @@ import { NormReference } from "@/domain/normReference"
 import EditableList from "@/shared/components/EditableList.vue"
 
 const props = defineProps<{
-  norms?: NormReference[]
+  modelValue: NormReference[] | undefined
 }>()
 
 const emit = defineEmits<{
-  (e: "updateValue", updatedValue: NormReference[]): Promise<void>
+  (event: "update:modelValue", value?: NormReference[]): void
 }>()
 
 const norms = computed({
   get: () => {
-    return props.norms ? props.norms : []
+    return props.modelValue
   },
   set: (value) => {
-    emit("updateValue", value)
+    if (value) emit("update:modelValue", value)
   },
 })
 
