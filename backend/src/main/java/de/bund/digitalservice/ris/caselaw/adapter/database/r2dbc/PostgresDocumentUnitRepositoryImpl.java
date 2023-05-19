@@ -285,7 +285,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               documentUnitNormDTOs.forEach(
                   documentUnitNormDTO -> {
                     int index = normIndex.getAndIncrement();
-                    if (normIndex.get() < documentUnitNorms.size()) {
+                    if (index < documentUnitNorms.size()) {
                       documentUnitNormDTO.risAbbreviation =
                           documentUnitNorms.get(index).risAbbreviation();
                       documentUnitNormDTO.singleNorm = documentUnitNorms.get(index).singleNorm();
@@ -664,10 +664,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return incorrectCourtRepository
         .findAllByDocumentUnitId(documentUnitDTO.getId())
         .collectList()
-        .flatMap(
+        .map(
             incorrectCourtDTOs -> {
               documentUnitDTO.setIncorrectCourts(incorrectCourtDTOs);
-              return Mono.just(documentUnitDTO);
+              return documentUnitDTO;
             });
   }
 
@@ -685,10 +685,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return keywordRepository
         .findAllByDocumentUnitId(documentUnitDTO.getId())
         .collectList()
-        .flatMap(
+        .map(
             keywordDTO -> {
               documentUnitDTO.setKeywords(keywordDTO);
-              return Mono.just(documentUnitDTO);
+              return documentUnitDTO;
             });
   }
 
