@@ -141,9 +141,15 @@ input[type="radio"] {
   place-content: center;
 }
 
+input[type="radio"]:hover,
+input[type="radio"]:focus {
+  border: 4px solid #004b76;
+  outline: none;
+}
+
 input[type="radio"]::before {
-  width: 0.75em;
-  height: 0.75em;
+  width: 0.9em;
+  height: 0.9em;
   border-radius: 50%;
   background-color: #004b76;
   content: "";
