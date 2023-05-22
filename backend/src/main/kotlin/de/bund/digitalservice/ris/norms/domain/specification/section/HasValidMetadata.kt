@@ -38,6 +38,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_PREVIOUS_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_LONG_TITLE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_REFERENCE
@@ -65,6 +66,10 @@ val hasValidMetadata =
             Section.OTHER_OFFICIAL_ANNOUNCEMENT -> hasType(listOf(OTHER_OFFICIAL_REFERENCE), instance)
             Section.NORM_PROVIDER -> hasType(listOf(ENTITY, DECIDING_BODY, RESOLUTION_MAJORITY), instance)
             Section.DOCUMENT_TYPE -> hasType(listOf(TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME), instance)
+            Section.DIVERGENT_ENTRY_INTO_FORCE -> hasType(listOf(DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_EXPIRATION -> hasType(listOf(DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_EXPIRATION_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

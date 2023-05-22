@@ -211,6 +211,7 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
                 MetadatumType.DATE -> decodeLocalDate(this.value)
                 MetadatumType.RESOLUTION_MAJORITY -> this.value.toBoolean()
                 MetadatumType.NORM_CATEGORY -> NormCategory.valueOf(this.value)
+                MetadatumType.UNDEFINED_DATE -> UndefinedDate.valueOf(this.value)
                 else -> this.value
             }
             return Metadatum(value = value, type = this.type, order = this.order)

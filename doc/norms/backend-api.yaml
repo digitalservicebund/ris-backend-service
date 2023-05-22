@@ -309,6 +309,7 @@ components:
         - TYPE_NAME
         - NORM_CATEGORY
         - TEMPLATE_NAME
+        - UNDEFINED_DATE
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -327,6 +328,10 @@ components:
         - OTHER_OFFICIAL_ANNOUNCEMENT
         - NORM_PROVIDER
         - DOCUMENT_TYPE
+        - DIVERGENT_ENTRY_INTO_FORCE
+        - DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+        - DIVERGENT_EXPIRATION
+        - DIVERGENT_EXPIRATION_UNDEFINED
 
     MetadataSection:
       type: object
@@ -529,28 +534,14 @@ components:
         text:
           type: string
           example: text
-        divergentExpirationDate:
-          $ref: '#/components/schemas/Date'
-        divergentExpirationDateState:
-          $ref: '#/components/schemas/UndefinedDate'
         principleExpirationDate:
           $ref: '#/components/schemas/Date'
         principleExpirationDateState:
-          $ref: '#/components/schemas/UndefinedDate'
-        expirationNormCategory:
-          type: string
-          example: ''
-        divergentEntryIntoForceDate:
-          $ref: '#/components/schemas/Date'
-        divergentEntryIntoForceDateState:
           $ref: '#/components/schemas/UndefinedDate'
         principleEntryIntoForceDate:
           $ref: '#/components/schemas/Date'
         principleEntryIntoForceDateState:
           $ref: '#/components/schemas/UndefinedDate'
-        entryIntoForceNormCategory:
-          type: string
-          example: ''
         publicationDate:
           $ref: '#/components/schemas/Date'
         documentStatusReference:

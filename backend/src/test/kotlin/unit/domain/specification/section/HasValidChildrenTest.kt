@@ -146,4 +146,40 @@ class HasValidChildrenTest {
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `it is satisfied that the divergent entry into force section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent entry into force undefined section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent expiration section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it is satisfied that the divergent expiration undefined section does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
 }
