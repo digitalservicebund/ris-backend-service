@@ -1,14 +1,14 @@
 import httpClient, { ServiceResponse } from "./httpClient"
 import { Court } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
-import { NormReference } from "@/domain/normReference"
+import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { ComboboxItem } from "@/shared/components/input/types"
 
 enum Endpoint {
   documentTypes = "lookuptable/documentTypes",
   courts = "lookuptable/courts",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
-  risAbbreviations = "normabbreviation",
+  risAbbreviations = `normabbreviation?pg=0&sz=30`,
 }
 
 type DocumentType = {
@@ -21,7 +21,7 @@ type DropdownType =
   | DocumentType[]
   | Court[]
   | FieldOfLawNode[]
-  | NormReference[]
+  | NormAbbreviation[]
 
 function formatDropdownItems(
   responseData: DropdownType,
@@ -50,10 +50,10 @@ function formatDropdownItems(
       }))
     }
     case Endpoint.risAbbreviations: {
-      return (responseData as NormReference[]).map((item) => ({
-        label: item.risAbbreviation,
-        value: item.risAbbreviation,
-        additionalInformation: item.singleNorm,
+      return (responseData as NormAbbreviation[]).map((item) => ({
+        label: item.abbreviation,
+        value: item.abbreviation,
+        additionalInformation: item.officialLongTitle,
       }))
     }
   }
