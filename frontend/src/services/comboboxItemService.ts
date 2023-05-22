@@ -62,7 +62,7 @@ function formatDropdownItems(
 async function fetchFromEndpoint(endpoint: Endpoint, filter?: string) {
   const response = await httpClient.get<DropdownType>(
     `caselaw/${endpoint}`,
-    filter ? { params: { searchStr: filter } } : undefined
+    filter ? { params: { q: filter } } : undefined
   )
   if (response.data) {
     return {
