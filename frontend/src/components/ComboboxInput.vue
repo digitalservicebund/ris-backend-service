@@ -326,6 +326,13 @@ onBeforeUnmount(() => {
         <span>
           <span>{{ item.label }}</span>
           <div
+            v-if="item.additionalInformation"
+            aria-label="additional-dropdown-info"
+            class="body-02-reg"
+          >
+            {{ item.additionalInformation }}
+          </div>
+          <div
             v-if="hasAdditionalInfo(item)"
             aria-label="additional-dropdown-info"
             class="body-02-reg"
