@@ -66,9 +66,11 @@ val hasValidMetadata =
             Section.OTHER_OFFICIAL_ANNOUNCEMENT -> hasType(listOf(OTHER_OFFICIAL_REFERENCE), instance)
             Section.NORM_PROVIDER -> hasType(listOf(ENTITY, DECIDING_BODY, RESOLUTION_MAJORITY), instance)
             Section.DOCUMENT_TYPE -> hasType(listOf(TYPE_NAME, NORM_CATEGORY, TEMPLATE_NAME), instance)
-            Section.DIVERGENT_ENTRY_INTO_FORCE -> hasType(listOf(DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_ENTRY_INTO_FORCE -> hasNone(instance)
+            Section.DIVERGENT_ENTRY_INTO_FORCE_DEFINED -> hasType(listOf(DATE, NORM_CATEGORY), instance)
             Section.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
-            Section.DIVERGENT_EXPIRATION -> hasType(listOf(DATE, NORM_CATEGORY), instance)
+            Section.DIVERGENT_EXPIRATION -> hasNone(instance)
+            Section.DIVERGENT_EXPIRATION_DEFINED -> hasType(listOf(DATE, NORM_CATEGORY), instance)
             Section.DIVERGENT_EXPIRATION_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
         }
 

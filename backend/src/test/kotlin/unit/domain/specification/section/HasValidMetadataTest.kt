@@ -306,9 +306,18 @@ class HasValidMetadataTest {
     }
 
     @Test
-    fun `can generate divergent entry into force with right metadata`() {
+    fun `can generate divergent entry into force without metadata`() {
         val instance = mockk<MetadataSection>()
         every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
+        every { instance.metadata } returns emptyList()
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `can generate divergent entry into force defined with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum(LocalDate.now(), MetadatumType.DATE),
@@ -320,9 +329,9 @@ class HasValidMetadataTest {
     }
 
     @Test
-    fun `it throws an error on divergent entry into force with right and wrong metadata`() {
+    fun `it throws an error on divergent entry into force defined with right and wrong metadata`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
+        every { instance.name } returns MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum(LocalDate.now(), MetadatumType.DATE),
@@ -360,9 +369,18 @@ class HasValidMetadataTest {
     }
 
     @Test
-    fun `can generate divergent expiration with right metadata`() {
+    fun `can generate divergent expiration without metadata`() {
         val instance = mockk<MetadataSection>()
         every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION
+        every { instance.metadata } returns emptyList()
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `can generate divergent expiration defined with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum(LocalDate.now(), MetadatumType.DATE),
@@ -374,9 +392,9 @@ class HasValidMetadataTest {
     }
 
     @Test
-    fun `it throws an error on divergent expiration with right and wrong metadata`() {
+    fun `it throws an error on divergent expiration defined with right and wrong metadata`() {
         val instance = mockk<MetadataSection>()
-        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION
+        every { instance.name } returns MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
         every { instance.sections } returns null
         every { instance.metadata } returns listOf(
             Metadatum(LocalDate.now(), MetadatumType.DATE),
