@@ -26,16 +26,17 @@ The project uses [Vite](https://vitejs.dev/guide/) to provide a fast bundler-les
 
 You have two options:
 
-1. Run all services together
+1. Run all services together:
 
-   ```bash
-   ../run.sh dev
-   ```
+```bash
+./run.sh dev
+```
 
-2. Start the frontend dev server in isolation
-   ```bash
-   npm run dev
-   ```
+2. Start the frontend dev server in isolation:
+
+```bash
+npm run dev
+```
 
 ### Testing
 
@@ -57,7 +58,7 @@ npm test
 npx vitest
 ```
 
-**Gather coverage**:
+**Gather coverage:**
 
 ```bash
 npm run coverage
@@ -65,7 +66,7 @@ npm run coverage
 
 **To run the E2E tests:**
 
-Requires the application to run locally
+(Requires the application to run locally.)
 
 ```bash
 # run all

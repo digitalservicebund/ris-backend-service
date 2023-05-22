@@ -12,10 +12,10 @@ You need (or may want) the following CLI tools. For UNIX users, there is a prepa
 
 - [lefthook](https://github.com/evilmartians/lefthook#install) - manages our git hooks
 - [talisman](https://thoughtworks.github.io/talisman/docs) - scans for secrets before you would commit them
-- [docker](https://docs.docker.com/get-docker/) - our container runtime
+- [docker](https://docs.docker.com/get-docker/) - our container runtime (on macOS, the easiest way is to use [Docker Desktop](https://www.docker.com/products/docker-desktop/))
 - [gopass](https://www.gopass.pw/#install) - a tool to sync secrets
-- [node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
-- [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js Environment
+- [Node.js](https://nodejs.org/en/) - JavaScript runtime & dependency management
+- [nodenv](https://github.com/nodenv/nodenv#installation) - manages the node.js environment
 
 **Backend only:**
 
@@ -31,13 +31,13 @@ You need (or may want) the following CLI tools. For UNIX users, there is a prepa
 - [adr-tools](https://github.com/npryce/adr-tools) - a command-line tool to manage our [Architecture Decision Records (ADRs)](#architecture-decision-records)
 - [direnv](https://github.com/direnv/direnv/blob/master/docs/installation.md) - manages our local environment
 
-If you use [**homebrew**](https://brew.sh/), you can simply execute this to to install all required and optional dependencies
+If you use [`homebrew`](https://brew.sh/), you can simply execute this to to install all required and optional dependencies:
 
 ```bash
 brew bundle
 ```
 
-If you decided to install **direnv**, you have to hook it onto your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md)., e.g. for ZSH add this to `~/.zshrc`
+If you decided to install `direnv`, you have to hook it onto your shell as described [here](https://github.com/direnv/direnv/blob/master/docs/hook.md). E.g. for ZSH add this to `~/.zshrc`:
 
 ```bash
 eval "$(direnv hook zsh)"
@@ -45,7 +45,7 @@ eval "$(direnv hook zsh)"
 
 ## Getting started
 
-To get started with development run:
+To get started with development, run:
 
 ```bash
 ./run.sh init
@@ -57,15 +57,51 @@ This will install a couple of Git hooks which are supposed to help you to:
 - write [conventional commit messages](https://chris.beams.io/posts/git-commit/)
 - not accidentally push [secrets and sensitive information](https://thoughtworks.github.io/talisman/)
 
-### Setup local env
+### Setup local environment
 
-Create .env file
+For shared secrets required for development we're using `gopass`. To set up follow these steps:
+
+Provide some team member a public GPG key with encryption capability (that team member will add you as a recipient).
+
+Then, run:
+
+```bash
+gopass --yes setup --remote git@github.com:digitalservicebund/neuris-password-store.git --alias neuris --name <your-name-from-gpg-key> --email <your-email-from-gpg-key>
+```
+
+> **Note**
+>
+> If there are any issues with this command, you need to clean the store and try again until it works unfortunately ☹️:
+>
+> ```
+> rm -rf ~/.local/share/gopass/stores
+> ```
+
+Try if you can get access:
+
+```bash
+gopass ls
+```
+
+Synchronize the password store:
+
+```bash
+gopass sync
+```
+
+Now you can generate a new `.env` file containig the secrets:
 
 ```bash
 ./run.sh env
 ```
 
-**Note:** This needs to be repeated every time the secrets change
+> **Note**
+>
+> This needs to be repeated every time the secrets change.
+
+### Importing example data
+
+Learn how to import example data for the app [here](https://github.com/digitalservicebund/ris-backend-service/tree/main/backend#lookup-tables). Note that while this step isn't required to run the app, some tests may fail since they depend on preexisting data from the example data set.
 
 ## Development
 
@@ -73,15 +109,19 @@ Create .env file
 ./run.sh dev
 ```
 
-If you don't want to watch the log stream but let docker perform health checks until everything ist up, use detached mode:
+If you don't want to watch the log stream but let Docker perform health checks until everything is up, use detached mode:
+
 ```bash
 ./run.sh dev -d
 ```
 
-
-The Application is available at http://127.0.0.1
+The application is available at <http://127.0.0.1>.
 
 This will start the backend [utilizing Spring Boot developer tools](https://docs.spring.io/spring-boot/docs/current/reference/html/using.html#using.devtools.restart) so changes in the Java sources will be reflected without manually restarting. Similarly, the frontend is served from [Vite](https://vitejs.dev) with [HMR](https://vitejs.dev/guide/features.html#hot-module-replacement).
+
+> **Note**
+>
+> When first starting the development server, dependencies will be installed automatically. This includes supported browsers for E2E and a11y testing through playwright. Should that fail, you can [install them manually](https://github.com/digitalservicebund/ris-backend-service/tree/main/frontend#prerequisites).
 
 To see logs of the containers, use e.g.
 
@@ -90,7 +130,7 @@ docker compose logs # for all
 docker compose logs frontend # for specific services
 ```
 
-To Stop the whole environment:
+To stop the whole environment:
 
 ```bash
 ./run.sh down
@@ -103,10 +143,10 @@ Read the component individual documentation to figure out how to run them indivi
 
 ## Deployment
 
-The pipeline performs the Deployment through GitOps using [ArgoCD](https://argoproj.github.io/cd/) (see [example pipeline deploy step definition](https://github.com/digitalservicebund/ris-backend-service/blob/main/.github/workflows/pipeline.yml#L657-L667)):
+The pipeline performs the deployment through GitOps using [ArgoCD](https://argoproj.github.io/cd/) (see [example pipeline deploy step definition](https://github.com/digitalservicebund/ris-backend-service/blob/main/.github/workflows/pipeline.yml#L657-L667)):
 
 - Build and push the new Docker image (see here)
-- Commit the new tag in the deployment manifest in the neuris-infra repository 
+- Commit the new tag in the deployment manifest in the neuris-infra repository
 - Sync the respective ArgoCD App, which will cause ArgoCD to apply all changed Kubernetes manifests on the cluster to create the desired state
 
 ## Working with [Talisman](https://thoughtworks.github.io/talisman/)

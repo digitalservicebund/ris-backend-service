@@ -21,13 +21,15 @@ Requires the all but backend to be running in docker:
 
 - The launch config in `.vscode/launch.json` should be used automatically
 
-**Start backend from CLI**:
+**Start backend from CLI:**
 
 ```bash
 SPRING_PROFILES_ACTIVE=local ./gradlew bootRun
 ```
 
-**Note:** The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-env).
+> **Note**
+>
+> The application depends on a Java package from a private GitHub package repository. To be able to download it in the Gradle build process, you'll need to set up your local env as described in the [root readme](../README.md#setup-local-environment).
 
 ### Lookup tables
 
@@ -35,7 +37,7 @@ Some dropdown menus in the frontend get populated via calls to the backend that 
 
 To import the XML files, follow these steps:
 
-- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml`, `sachneudata_gesamt.xml` (Link in the Engineering Onboarding WIki)
+- Download the XML files `doktyp.xml`, `gerichtdata_gesamt.xml`, `buland.xml`, `sachneudata_gesamt.xml` (Link in the Engineering Onboarding Wiki)
 - Start the application (see [root README](../README.md)), open it in your browser and log in
 - Copy the `SESSION` cookie value from the Browser Developer Tools --> Application Tab --> Cookies
   (If you prefer using Postman, it also supports [importing cookies](https://github.com/digitalservicebund/ris-backend-service/commit/69684a3872ce9875484761fcb18f3367d0143bce#commitcomment-99597762) from your browser.)
@@ -87,9 +89,9 @@ The project has distinct unit and integration test sets.
 ./gradlew integrationTest
 ```
 
-**Note:** Running integration tests requires passing unit tests (in Gradle terms: integration tests depend on unit
-tests), so unit tests are going to be run first. In case there are failing unit tests we won't attempt to continue
-running any integration tests.
+> **Note**
+>
+> Running integration tests requires passing unit tests (in Gradle terms: integration tests depend on unit tests), so unit tests are going to be run first. In case there are failing unit tests we won't attempt to continue running any integration tests.
 
 **To run integration tests exclusively, without the unit test dependency:**
 
@@ -152,7 +154,7 @@ docker run -p8080:8080 ghcr.io/digitalservicebund/ris-backend-service
 
 Container images in the registry are [signed with keyless signatures](https://github.com/sigstore/cosign/blob/main/KEYLESS.md).
 
-**To verify an image**:
+**To verify an image:**
 
 ```bash
 COSIGN_EXPERIMENTAL=1 cosign verify "ghcr.io/digitalservicebund/ris-backend-service:$(git log -1 origin/main --format='%H')"
