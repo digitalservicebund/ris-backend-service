@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -14,8 +15,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.PublishState;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMail;
 import de.bund.digitalservice.ris.caselaw.domain.XmlMailResponse;
 import java.nio.ByteBuffer;
@@ -23,6 +26,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -32,6 +36,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -45,20 +50,45 @@ class DocumentUnitControllerTest {
   @Autowired private WebTestClient webClient;
 
   @MockBean private DocumentUnitService service;
+  @MockBean private KeycloakUserService userService;
 
   @Captor private ArgumentCaptor<ByteBuffer> captor;
 
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
   private static final String RECEIVER_ADDRESS = "test@exporter.neuris";
 
+  @BeforeEach
+  void setup() {
+    when(userService.getUser(any(OidcUser.class)))
+        .thenReturn(
+            Mono.just(
+                User.builder()
+                    .documentationOffice(
+                        DocumentationOffice.builder().label("BGH").abbreviation("KO").build())
+                    .build()));
+  }
+
   @Test
   void testGenerateNewDocumentUnit() {
     DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
-    when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
+    Mono<User> user =
+        Mono.just(
+            User.builder()
+                .documentationOffice(
+                    DocumentationOffice.builder()
+                        .label("DigitalService")
+                        .abbreviation("XX")
+                        .build())
+                .build());
+
+    when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+    when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY, user))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .post()
         .uri("/api/v1/caselaw/documentunits")
         .bodyValue(documentUnitCreationInfo)
@@ -66,7 +96,8 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY);
+    verify(service, times(1)).generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY, user);
+    verify(userService, times(1)).getUser(any(OidcUser.class));
   }
 
   @Test

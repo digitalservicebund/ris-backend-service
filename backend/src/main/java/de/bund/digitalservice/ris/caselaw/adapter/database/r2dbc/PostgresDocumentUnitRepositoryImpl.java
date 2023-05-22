@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -58,6 +59,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
+  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -73,7 +75,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseFieldOfLawRepository fieldOfLawRepository,
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
-      DatabaseDocumentUnitNormRepository documentUnitNormRepository) {
+      DatabaseDocumentUnitNormRepository documentUnitNormRepository,
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -89,6 +92,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.documentUnitFieldsOfLawRepository = documentUnitFieldsOfLawRepository;
     this.keywordRepository = keywordRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
+    this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
   @Override
@@ -105,6 +109,27 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findByUuid(uuid)
         .flatMap(this::injectAdditionalInformation)
         .map(DocumentUnitTransformer::transformDTO);
+  }
+
+  @Override
+  public Mono<DocumentUnit> createNewDocumentUnit(String documentNumber, User user) {
+    return documentationOfficeRepository
+        .findByLabel(user.documentationOffice().label())
+        .flatMap(
+            documentationOfficeDTO ->
+                metadataRepository
+                    .save(
+                        DocumentUnitMetadataDTO.builder()
+                            .uuid(UUID.randomUUID())
+                            .creationtimestamp(Instant.now())
+                            .documentnumber(documentNumber)
+                            .dataSource(DataSource.NEURIS)
+                            .documentationOfficeId(documentationOfficeDTO.getId())
+                            .documentationOffice(documentationOfficeDTO)
+                            .dateKnown(true)
+                            .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                            .build())
+                    .map(DocumentUnitTransformer::transformMetadataToDomain));
   }
 
   @Override
@@ -578,7 +603,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectDocumentType)
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
-        .flatMap(this::injectFieldsOfLaw);
+        .flatMap(this::injectFieldsOfLaw)
+        .flatMap(this::injectDocumentationOffice);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
@@ -701,6 +727,23 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             documentUnitNormDTO -> {
               documentUnitDTO.setNorms(documentUnitNormDTO);
               return documentUnitDTO;
+            });
+  }
+
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectDocumentationOffice(
+      T documentUnitMetadataDTO) {
+    if (documentUnitMetadataDTO.getDocumentationOfficeId() == null) {
+      return Mono.just(documentUnitMetadataDTO);
+    }
+
+    return documentationOfficeRepository
+        .findById(documentUnitMetadataDTO.getDocumentationOfficeId())
+        .defaultIfEmpty(DocumentationOfficeDTO.builder().build())
+        .map(
+            documentationOfficeDTO -> {
+              if (documentationOfficeDTO.getLabel() != null)
+                documentUnitMetadataDTO.setDocumentationOffice(documentationOfficeDTO);
+              return documentUnitMetadataDTO;
             });
   }
 
@@ -873,7 +916,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private Mono<DocumentUnitMetadataDTO> injectAdditionalInformation(
       DocumentUnitMetadataDTO documentUnitMetadataDTO) {
-    return injectFileNumbers(documentUnitMetadataDTO).flatMap(this::injectDocumentType);
+    return injectFileNumbers(documentUnitMetadataDTO)
+        .flatMap(this::injectDocumentType)
+        .flatMap(this::injectDocumentationOffice);
   }
 
   @Override

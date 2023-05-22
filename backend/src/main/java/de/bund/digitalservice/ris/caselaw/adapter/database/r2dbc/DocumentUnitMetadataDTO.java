@@ -66,11 +66,13 @@ public class DocumentUnitMetadataDTO {
   @Column("eingangsart")
   private String inputType;
 
-  @Column("dokumentationsstelle")
-  private String center;
-
   @Column("region")
   private String region;
+
+  @Column("documentation_office_id")
+  private UUID documentationOfficeId;
+
+  @Transient private DocumentationOfficeDTO documentationOffice;
 
   @Transient private List<FileNumberDTO> fileNumbers;
 }

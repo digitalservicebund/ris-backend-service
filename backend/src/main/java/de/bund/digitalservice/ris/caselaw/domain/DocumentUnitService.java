@@ -65,6 +65,19 @@ public class DocumentUnitService {
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(
+      DocumentUnitCreationInfo documentUnitCreationInfo, Mono<User> user) {
+    return documentNumberService
+        .generateNextDocumentNumber(documentUnitCreationInfo)
+        .zipWith(user)
+        .flatMap(
+            tuple ->
+                repository
+                    .createNewDocumentUnit(tuple.getT1(), tuple.getT2())
+                    .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
+                    .doOnError(ex -> log.error("Couldn't create empty doc unit", ex)));
+  }
+
+  public Mono<DocumentUnit> generateNewDocumentUnit(
       DocumentUnitCreationInfo documentUnitCreationInfo) {
     return documentNumberService
         .generateNextDocumentNumber(documentUnitCreationInfo)
