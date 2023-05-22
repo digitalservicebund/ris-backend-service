@@ -127,7 +127,7 @@ class LookupTableIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/lookuptable/courts?searchStr=land")
+        .uri("/api/v1/caselaw/lookuptable/courts?q=land")
         .exchange()
         .expectStatus()
         .isOk()

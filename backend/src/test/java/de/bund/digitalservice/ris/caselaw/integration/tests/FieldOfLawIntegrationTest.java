@@ -220,7 +220,7 @@ class FieldOfLawIntegrationTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?searchStr=FL-01")
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=FL-01")
             .exchange()
             .expectStatus()
             .isOk()
@@ -433,7 +433,7 @@ class FieldOfLawIntegrationTest {
         webClient
             .mutateWith(csrf())
             .get()
-            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?searchStr=" + searchStr)
+            .uri("/api/v1/caselaw/fieldsoflaw/search-by-identifier?q=" + searchStr)
             .exchange()
             .expectStatus()
             .isOk()
