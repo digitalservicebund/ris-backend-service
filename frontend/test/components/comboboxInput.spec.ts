@@ -265,6 +265,7 @@ describe("Combobox Element", () => {
       {
         label: "ABC",
         value: court,
+        additionalInformation: court.revoked,
       },
     ]
     const fetchSpy = vi
@@ -284,9 +285,7 @@ describe("Combobox Element", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(fetchSpy).toHaveBeenCalledWith(undefined)
     expect(dropdownItemElements).toHaveLength(1)
-    expect(dropdownItemElements[0]).toHaveTextContent(
-      "ABCaufgehoben seit: 1973"
-    )
+    expect(dropdownItemElements[0]).toHaveTextContent("ABC")
 
     const additionalInfoElement = screen.getAllByLabelText(
       "additional-dropdown-info"

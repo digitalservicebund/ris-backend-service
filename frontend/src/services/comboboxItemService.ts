@@ -38,6 +38,7 @@ function formatDropdownItems(
       return (responseData as Court[]).map((item) => ({
         label: item.label,
         value: item,
+        additionalInformation: item.revoked,
       }))
     }
     case Endpoint.fieldOfLawSearchByIdentifier: {
@@ -47,6 +48,7 @@ function formatDropdownItems(
           label: item.identifier,
           text: item.text,
         },
+        additionalInformation: item.text,
       }))
     }
     case Endpoint.risAbbreviations: {
