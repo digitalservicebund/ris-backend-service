@@ -6,7 +6,6 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
-import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
@@ -51,10 +50,8 @@ public class DocumentUnitController {
       @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
 
-    Mono<User> user = userService.getUser(oidcUser);
-
     return service
-        .generateNewDocumentUnit(documentUnitCreationInfo, user)
+        .generateNewDocumentUnit(documentUnitCreationInfo, userService.getUser(oidcUser))
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }

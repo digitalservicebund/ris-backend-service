@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -10,7 +11,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
-import de.bund.digitalservice.ris.caselaw.config.SecurityConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
@@ -72,20 +72,24 @@ class DocumentUnitControllerTest {
   @Test
   void testGenerateNewDocumentUnit() {
     DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
-    when(userService.getUser(any(OidcUser.class)))
-        .thenReturn(
-            Mono.just(
-                User.builder()
-                    .documentationOffice(
-                        DocumentationOffice.builder().label("BGH").abbreviation("KO").build())
-                    .build()));
+    Mono<User> user =
+        Mono.just(
+            User.builder()
+                .documentationOffice(
+                    DocumentationOffice.builder()
+                        .label("DigitalService")
+                        .abbreviation("XX")
+                        .build())
+                .build());
 
-    when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
+    when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+
+    when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY, user))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
 
     webClient
         .mutateWith(csrf())
-        .mutateWith(SecurityConfig.getMockLogin())
+        .mutateWith(getMockLogin())
         .post()
         .uri("/api/v1/caselaw/documentunits")
         .bodyValue(documentUnitCreationInfo)
@@ -93,7 +97,8 @@ class DocumentUnitControllerTest {
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY);
+    verify(service, times(1)).generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY, user);
+    verify(userService, times(1)).getUser(any(OidcUser.class));
   }
 
   @Test
