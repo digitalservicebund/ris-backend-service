@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
@@ -35,12 +36,11 @@ import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -755,41 +755,46 @@ class DocumentUnitIntegrationTest {
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/search")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=20")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(ProceedingDecision[].class)
+        .expectBody()
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(20)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(20);
+              String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
+              assertThat(responseBody).isNotNull();
 
-              Arrays.stream(response.getResponseBody())
-                  .map(ProceedingDecision::uuid)
-                  .map(responseUUIDs::add)
-                  .collect(Collectors.toList());
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
+              assertThat(uuids).hasSize(20);
+              responseUUIDs.addAll(uuids.stream().map(UUID::fromString).toList());
             });
 
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/search")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=20")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(ProceedingDecision[].class)
+        .expectBody()
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(20)
         .consumeWith(
             response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(20);
+              String responseBody = new String(response.getResponseBody(), StandardCharsets.UTF_8);
+              assertThat(responseBody).isNotNull();
 
-              List<UUID> responseUUIDs2 =
-                  Arrays.stream(response.getResponseBody())
-                      .map(ProceedingDecision::uuid)
-                      .collect(Collectors.toList());
+              List<String> uuids = JsonPath.read(responseBody, "$.content[*].uuid");
+              List<UUID> responseUUIDs2 = uuids.stream().map(UUID::fromString).toList();
 
               assertThat(responseUUIDs2).isEqualTo(responseUUIDs);
             });

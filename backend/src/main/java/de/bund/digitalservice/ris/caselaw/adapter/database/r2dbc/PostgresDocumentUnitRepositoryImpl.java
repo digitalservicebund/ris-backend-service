@@ -754,6 +754,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   && proceedingDecision.fileNumber() != null) return Flux.empty();
 
               Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
+              if (documentTypeDTOId == null && proceedingDecision.documentType() != null)
+                return Flux.empty();
 
               return metadataRepository.findByCourtDateFileNumberAndDocumentType(
                   extractCourtType(proceedingDecision),
@@ -777,9 +779,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             tuple -> {
               Long[] documentUnitDTOIdsViaFileNumber =
                   convertListToArrayOrReturnNull(tuple.getT1());
-              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
               if (documentUnitDTOIdsViaFileNumber == null
                   && proceedingDecision.fileNumber() != null) return Mono.just(0L);
+
+              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
+              if (documentTypeDTOId == null && proceedingDecision.documentType() != null)
+                return Mono.just(0L);
 
               return metadataRepository.countByCourtDateFileNumberAndDocumentType(
                   extractCourtType(proceedingDecision),

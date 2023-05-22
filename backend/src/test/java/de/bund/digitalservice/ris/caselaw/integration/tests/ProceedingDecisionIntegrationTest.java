@@ -38,7 +38,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.springframework.test.web.reactive.server.WebTestClient.BodySpec;
+import org.springframework.test.web.reactive.server.WebTestClient.BodyContentSpec;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -495,23 +495,22 @@ class ProceedingDecisionIntegrationTest {
   void testSearchForDocumentUnitsByProceedingDecisionInput_noSearchCriteria_shouldMatchAll() {
     prepareDocumentUnitMetadataDTOs();
     simulateAPICall(ProceedingDecision.builder().build())
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(3);
-            });
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(3);
   }
 
   @Test
   void testSearchForDocumentUnitsByProceedingDecisionInput_onlyDate_shouldMatchOne() {
     Instant date1 = prepareDocumentUnitMetadataDTOs();
     simulateAPICall(ProceedingDecision.builder().date(date1).build())
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(1);
-              assertThat(response.getResponseBody()[0].date()).isEqualTo(date1);
-            });
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(1)
+        .jsonPath("$.content[0].date")
+        .isEqualTo(date1.toString());
   }
 
   @Test
@@ -519,25 +518,24 @@ class ProceedingDecisionIntegrationTest {
     prepareDocumentUnitMetadataDTOs();
     simulateAPICall(
             ProceedingDecision.builder().court(Court.builder().type("SomeCourt").build()).build())
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(1);
-              assertThat(response.getResponseBody()[0].court().type()).isEqualTo("SomeCourt");
-            });
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(1)
+        .jsonPath("$.content[0].court.type")
+        .isEqualTo("SomeCourt");
   }
 
   @Test
   void testSearchForDocumentUnitsByProceedingDecisionInput_onlyFileNumber_shouldMatchTwo() {
     prepareDocumentUnitMetadataDTOs();
     simulateAPICall(ProceedingDecision.builder().fileNumber("AkteX").build())
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(2);
-              assertThat(response.getResponseBody()[0].fileNumber()).isEqualTo("AkteX");
-              assertThat(response.getResponseBody()[1].fileNumber()).isEqualTo("AkteX");
-            });
+        .jsonPath("$.content")
+        .isNotEmpty()
+        .jsonPath("$.content.length()")
+        .isEqualTo(2)
+        .jsonPath("$.content[0].fileNumber")
+        .isEqualTo("AkteX");
   }
 
   @Test
@@ -547,13 +545,12 @@ class ProceedingDecisionIntegrationTest {
             ProceedingDecision.builder()
                 .documentType(DocumentType.builder().jurisShortcut("GH").build())
                 .build())
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).hasSize(1);
-              assertThat(response.getResponseBody()[0].documentType().jurisShortcut())
-                  .isEqualTo("GH");
-            });
+        .jsonPath("$.content")
+        .isArray()
+        .jsonPath("$.content.length()")
+        .isEqualTo(1)
+        .jsonPath("$.content[0].documentType.jurisShortcut")
+        .isEqualTo("GH");
   }
 
   @Test
@@ -567,11 +564,8 @@ class ProceedingDecisionIntegrationTest {
                 .fileNumber("AkteX")
                 .documentType(DocumentType.builder().jurisShortcut("XY").build())
                 .build())
-        .consumeWith(
-            response -> {
-              assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody()).isEmpty();
-            });
+        .jsonPath("$.content.length()")
+        .isEqualTo(0);
   }
 
   private Instant prepareDocumentUnitMetadataDTOs() {
@@ -589,17 +583,16 @@ class ProceedingDecisionIntegrationTest {
     return date1;
   }
 
-  private BodySpec<ProceedingDecision[], ?> simulateAPICall(
-      ProceedingDecision proceedingDecisionSearchInput) {
+  private BodyContentSpec simulateAPICall(ProceedingDecision proceedingDecisionSearchInput) {
     return webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/search")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=30")
         .bodyValue(proceedingDecisionSearchInput)
         .exchange()
         .expectStatus()
         .isOk()
-        .expectBody(ProceedingDecision[].class);
+        .expectBody();
   }
 
   private DocumentUnitMetadataDTO buildDocumentUnitMetadataDTO(
