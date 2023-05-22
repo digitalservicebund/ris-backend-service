@@ -47,7 +47,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   public Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer pageOffset) {
     return repository
         .findBySearchQuery(query, size, pageOffset)
-        .flatMap(this::injectAdditionalInformation)
+        .flatMapSequential(this::injectAdditionalInformation)
         .map(NormAbbreviationTransformer::transformDTO);
   }
 
@@ -59,7 +59,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
             .flatMap(
                 normAbbreviationDocumentTypeDTO ->
                     documentTypeRepository
-                        .findById(normAbbreviationDocumentTypeDTO.documentTypeId())
+                        .findById(normAbbreviationDocumentTypeDTO.getDocumentTypeId())
                         .flatMap(this::injectCategoryLabel))
             .collectList();
     Mono<List<RegionDTO>> regions =
@@ -67,7 +67,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
             .findAllByNormAbbreviationId(normAbbreviationDTO.getId())
             .flatMap(
                 normAbbreviationRegionDTO ->
-                    regionRepository.findById(normAbbreviationRegionDTO.regionId()))
+                    regionRepository.findById(normAbbreviationRegionDTO.getRegionId()))
             .collectList();
 
     return Mono.zip(documentTypes, regions)
@@ -81,15 +81,15 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
   }
 
   private Mono<DocumentTypeNewDTO> injectCategoryLabel(DocumentTypeNewDTO documentTypeNewDTO) {
-    if (documentTypeNewDTO == null || documentTypeNewDTO.documentCategoryId == null) {
+    if (documentTypeNewDTO == null || documentTypeNewDTO.getDocumentCategoryId() == null) {
       return Mono.just(documentTypeNewDTO);
     }
 
     return documentCategoryRepository
-        .findById(documentTypeNewDTO.documentCategoryId)
+        .findById(documentTypeNewDTO.getDocumentCategoryId())
         .map(
             documentCategoryDTO -> {
-              documentTypeNewDTO.setCategoryLabel(documentCategoryDTO.label());
+              documentTypeNewDTO.setCategoryLabel(documentCategoryDTO.getLabel());
               return documentTypeNewDTO;
             });
   }

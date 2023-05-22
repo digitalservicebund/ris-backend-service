@@ -7,6 +7,6 @@ public class RegionTransformer {
   private RegionTransformer() {}
 
   public static Region transformDTO(RegionDTO regionDTO) {
-    return Region.builder().code(regionDTO.code()).label(regionDTO.label()).build();
+    return Region.builder().code(regionDTO.getCode()).label(regionDTO.getLabel()).build();
   }
 }

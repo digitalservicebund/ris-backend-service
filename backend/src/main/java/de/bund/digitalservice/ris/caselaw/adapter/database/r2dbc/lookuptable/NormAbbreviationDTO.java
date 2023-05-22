@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Table;
 
 @Data
@@ -16,7 +17,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Table("norm_abbreviation")
-public class NormAbbreviationDTO {
+public class NormAbbreviationDTO implements Persistable<UUID> {
   @Id UUID id;
   String abbreviation;
   LocalDate decisionDate;
@@ -28,4 +29,10 @@ public class NormAbbreviationDTO {
   Character source;
   @Transient List<DocumentTypeNewDTO> documentTypes;
   @Transient List<RegionDTO> regions;
+  @Transient boolean newEntity = false;
+
+  @Override
+  public boolean isNew() {
+    return id == null || newEntity;
+  }
 }
