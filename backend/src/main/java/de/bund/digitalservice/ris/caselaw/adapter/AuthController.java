@@ -8,6 +8,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -20,8 +21,8 @@ public class AuthController {
   }
 
   @GetMapping(value = "me")
-  public ResponseEntity<User> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
+  public Mono<ResponseEntity<User>> getUser(@AuthenticationPrincipal OidcUser oidcUser) {
 
-    return ResponseEntity.ok(userService.getUser(oidcUser));
+    return userService.getUser(oidcUser).map(ResponseEntity::ok);
   }
 }

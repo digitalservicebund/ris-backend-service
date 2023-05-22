@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisi
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
@@ -13,6 +14,7 @@ import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
 import de.bund.digitalservice.ris.caselaw.domain.Texts;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
@@ -52,8 +54,15 @@ public class DocumentUnitTransformer {
           .appraisalBody(coreData.appraisalBody())
           .decisionDate(coreData.decisionDate())
           .dateKnown(coreData.dateKnown())
-          .inputType(coreData.inputType())
-          .center(coreData.center());
+          .inputType(coreData.inputType());
+
+      if (coreData.documentationOffice() != null) {
+        builder.documentationOffice(
+            DocumentationOfficeDTO.builder()
+                .label(coreData.documentationOffice().label())
+                .abbreviation(coreData.documentationOffice().abbreviation())
+                .build());
+      }
 
       if (coreData.court() != null) {
         builder
@@ -71,7 +80,7 @@ public class DocumentUnitTransformer {
           .decisionDate(null)
           .dateKnown(true)
           .inputType(null)
-          .center(null)
+          .documentationOffice(null)
           .courtType(null)
           .courtLocation(null);
     }
@@ -119,6 +128,17 @@ public class DocumentUnitTransformer {
       court = new Court(courtType, courtLocation, label, null);
     }
     return court;
+  }
+
+  private static DocumentationOffice getDocumentationOffice(
+      DocumentationOfficeDTO documentationOfficeDTO) {
+    if (documentationOfficeDTO == null) {
+      return null;
+    }
+    return DocumentationOffice.builder()
+        .label(documentationOfficeDTO.getLabel())
+        .abbreviation(documentationOfficeDTO.getAbbreviation())
+        .build();
   }
 
   public static DocumentUnit transformMetadataToDomain(
@@ -172,7 +192,7 @@ public class DocumentUnitTransformer {
             null,
             documentUnitMetadataDTO.getLegalEffect(),
             documentUnitMetadataDTO.getInputType(),
-            documentUnitMetadataDTO.getCenter(),
+            getDocumentationOffice(documentUnitMetadataDTO.getDocumentationOffice()),
             documentUnitMetadataDTO.getRegion()),
         null,
         null,
@@ -283,7 +303,7 @@ public class DocumentUnitTransformer {
             deviatingDecisionDates,
             documentUnitDTO.getLegalEffect(),
             documentUnitDTO.getInputType(),
-            documentUnitDTO.getCenter(),
+            getDocumentationOffice(documentUnitDTO.getDocumentationOffice()),
             documentUnitDTO.getRegion()),
         proceedingDecisions,
         new Texts(

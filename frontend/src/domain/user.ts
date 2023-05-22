@@ -1,4 +1,7 @@
 export type User = {
   name: string
-  documentationCenter?: string
+  documentationOffice?: {
+    label: string
+    abbreviation: string
+  }
 }
