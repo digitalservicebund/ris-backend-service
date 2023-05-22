@@ -193,7 +193,8 @@ class DocumentUnitServiceTest {
         Arrays.asList(
             DocumentUnitListEntry.builder().build(), DocumentUnitListEntry.builder().build());
     when(repository.findAll(pageRequest)).thenReturn(Flux.fromIterable(entries));
-    when(repository.count(DataSource.NEURIS)).thenReturn(Mono.just((long) entries.size()));
+    when(repository.countByDataSource(DataSource.NEURIS))
+        .thenReturn(Mono.just((long) entries.size()));
 
     StepVerifier.create(service.getAll(pageRequest))
         .assertNext(
@@ -363,16 +364,18 @@ class DocumentUnitServiceTest {
   }
 
   @Test
-  void testSearchForDocumentUnitsByProceedingDecisionInput() {
+  void testSearchByProceedingDecision() {
     ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
+    PageRequest pageRequest = PageRequest.of(0, 10);
 
-    when(repository.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision))
+    when(repository.searchByProceedingDecision(proceedingDecision, pageRequest))
         .thenReturn(Flux.just(proceedingDecision));
+    when(repository.countByProceedingDecision(proceedingDecision)).thenReturn(Mono.just(1L));
 
-    StepVerifier.create(service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision))
-        .consumeNextWith(pd -> assertEquals(pd, proceedingDecision))
+    StepVerifier.create(service.searchByProceedingDecision(proceedingDecision, pageRequest))
+        .consumeNextWith(pd -> assertEquals(pd.getContent().get(0), proceedingDecision))
         .verifyComplete();
-    verify(repository).searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+    verify(repository).searchByProceedingDecision(proceedingDecision, pageRequest);
   }
 
   private CompletableFuture<DeleteObjectResponse> buildEmptyDeleteObjectResponse() {

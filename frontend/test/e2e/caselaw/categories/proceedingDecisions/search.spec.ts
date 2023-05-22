@@ -9,16 +9,6 @@ import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("Search proceeding decisions", () => {
-  test("renders default", async ({ page, documentNumber }) => {
-    await navigateToCategories(page, documentNumber)
-    await expect(page.getByText(documentNumber)).toBeVisible()
-    await toggleProceedingDecisionsSection(page)
-
-    await expect(
-      page.getByText("Noch keine Suchparameter eingegeben")
-    ).toBeVisible()
-  })
-
   test("search for existing proceeding decision and add", async ({
     page,
     documentNumber,

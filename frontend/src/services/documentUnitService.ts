@@ -18,9 +18,10 @@ interface DocumentUnitService {
   ): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
-  searchByProceedingDecisionInput(
-    proceedingDecision: ProceedingDecision
-  ): Promise<ServiceResponse<ProceedingDecision[]>>
+  searchByProceedingDecisionInput: PageableService<
+    ProceedingDecision,
+    ProceedingDecision
+  >
 }
 
 const service: DocumentUnitService = {
@@ -124,31 +125,39 @@ const service: DocumentUnitService = {
   },
 
   async searchByProceedingDecisionInput(
-    proceedingDecision: ProceedingDecision
+    page: number,
+    size: number,
+    query = new ProceedingDecision()
   ) {
+    console.log(page, size, query)
     const response = await httpClient.put<
       ProceedingDecision,
-      ProceedingDecision[]
+      Page<ProceedingDecision>
     >(
-      `caselaw/documentunits/search`,
+      `caselaw/documentunits/search?pg=${page}&sz=${size}`,
       {
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
         },
       },
-      proceedingDecision
+      query
     )
     if (response.status >= 300) {
       response.error = {
         title: `Die Suche nach passenden Dokumentationseinheit konnte nicht ausgeführt werden`,
       }
     }
+    response.data = response.data as Page<ProceedingDecision>
+    console.log(response.data)
     return {
-      status: 200,
-      data: (response.data as ProceedingDecision[]).map(
-        (decision) => new ProceedingDecision({ ...decision })
-      ),
+      status: response.status,
+      data: {
+        ...response.data,
+        content: response.data.content.map(
+          (decision) => new ProceedingDecision({ ...decision })
+        ),
+      },
     }
   },
 }

@@ -27,6 +27,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.Logger;
@@ -601,13 +602,13 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return fileNumberRepository
         .findAllByDocumentUnitId(documentUnitMetadataDTO.getId())
         .collectList()
-        .flatMap(
+        .map(
             fileNumbers -> {
               documentUnitMetadataDTO.setFileNumbers(
                   fileNumbers.stream()
                       .filter(fileNumberDTO -> !fileNumberDTO.getIsDeviating())
                       .toList());
-              return Mono.just(documentUnitMetadataDTO);
+              return documentUnitMetadataDTO;
             });
   }
 
@@ -739,75 +740,86 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
-      ProceedingDecision proceedingDecision) {
-    String courtType;
-    String courtLocation;
-    Court court = proceedingDecision.court();
-    courtType = (court == null || court.type() == null) ? null : court.type();
-    courtLocation = (court == null || court.location() == null) ? null : court.location();
-    Instant decisionDate =
-        proceedingDecision.date() == null
-            ? null
-            : proceedingDecision.date().atZone(ZoneId.of("UTC")).toInstant();
-    DocumentType docType = proceedingDecision.documentType();
+  public Flux<ProceedingDecision> searchByProceedingDecision(
+      ProceedingDecision proceedingDecision, Pageable pageable) {
 
-    Mono<List<Long>> documentUnitDTOIdsViaFileNumber =
-        fileNumberRepository
-            .findByFileNumber(proceedingDecision.fileNumber())
-            .map(FileNumberDTO::getDocumentUnitId)
-            .collectList();
-    Mono<Long> documentTypeDTOId =
-        (docType == null || docType.jurisShortcut() == null)
-            ? Mono.just(-1L)
-            : databaseDocumentTypeRepository
-                .findByJurisShortcut(proceedingDecision.documentType().jurisShortcut())
-                .mapNotNull(DocumentTypeDTO::getId);
-
-    return Mono.zip(documentUnitDTOIdsViaFileNumber, documentTypeDTOId)
+    return Mono.zip(
+            extractDocumentUnitDTOIdsViaFileNumber(proceedingDecision).collectList(),
+            extractDocumentTypeDTOId(proceedingDecision))
         .flatMapMany(
-            tuple ->
-                search(
-                    proceedingDecision,
-                    tuple.getT1(),
-                    tuple.getT2(),
-                    courtType,
-                    courtLocation,
-                    decisionDate))
+            tuple -> {
+              Long[] documentUnitDTOIdsViaFileNumber =
+                  convertListToArrayOrReturnNull(tuple.getT1());
+              if (documentUnitDTOIdsViaFileNumber == null
+                  && proceedingDecision.fileNumber() != null) return Flux.empty();
+
+              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
+
+              return metadataRepository.findByCourtDateFileNumberAndDocumentType(
+                  extractCourtType(proceedingDecision),
+                  extractCourtLocation(proceedingDecision),
+                  extractDecisionDate(proceedingDecision),
+                  documentUnitDTOIdsViaFileNumber,
+                  documentTypeDTOId,
+                  pageable.getPageSize(),
+                  pageable.getOffset());
+            })
         .flatMapSequential(this::injectAdditionalInformation)
         .map(ProceedingDecisionTransformer::transformToDomain);
   }
 
-  private Flux<DocumentUnitMetadataDTO> search(
-      ProceedingDecision proceedingDecision,
-      List<Long> documentUnitDTOIdsViaFileNumber,
-      Long documentTypeDTOId,
-      String courtType,
-      String courtLocation,
-      Instant decisionDate) {
-    Long[] docUnitIds;
-    if (documentUnitDTOIdsViaFileNumber.isEmpty()) {
-      if (proceedingDecision.fileNumber() == null || proceedingDecision.fileNumber().isBlank()) {
-        // @Query needs null and not empty list to ignore it
-        docUnitIds = null;
-      } else {
-        // search string exists, but no matching file number found
-        // --> no chance for a search result
-        return Flux.empty();
-      }
-    } else {
-      docUnitIds = documentUnitDTOIdsViaFileNumber.toArray(Long[]::new);
-    }
-    Long docTypeId = documentTypeDTOId == -1L ? null : documentTypeDTOId;
-    LOGGER.debug(
-        "searchForProceedingDecisions params: {}, {}, {}, {}, {}",
-        courtType,
-        courtLocation,
-        decisionDate,
-        docUnitIds,
-        docTypeId);
-    return metadataRepository.findByCourtDateFileNumberAndDocumentType(
-        courtType, courtLocation, decisionDate, docUnitIds, docTypeId);
+  @Override
+  public Mono<Long> countByProceedingDecision(ProceedingDecision proceedingDecision) {
+    return Mono.zip(
+            extractDocumentUnitDTOIdsViaFileNumber(proceedingDecision).collectList(),
+            extractDocumentTypeDTOId(proceedingDecision))
+        .flatMap(
+            tuple -> {
+              Long[] documentUnitDTOIdsViaFileNumber =
+                  convertListToArrayOrReturnNull(tuple.getT1());
+              Long documentTypeDTOId = tuple.getT2() == -1L ? null : tuple.getT2();
+              if (documentUnitDTOIdsViaFileNumber == null
+                  && proceedingDecision.fileNumber() != null) return Mono.just(0L);
+
+              return metadataRepository.countByCourtDateFileNumberAndDocumentType(
+                  extractCourtType(proceedingDecision),
+                  extractCourtLocation(proceedingDecision),
+                  extractDecisionDate(proceedingDecision),
+                  documentUnitDTOIdsViaFileNumber,
+                  documentTypeDTOId);
+            });
+  }
+
+  private String extractCourtType(ProceedingDecision proceedingDecision) {
+    return Optional.ofNullable(proceedingDecision.court()).map(Court::type).orElse(null);
+  }
+
+  private String extractCourtLocation(ProceedingDecision proceedingDecision) {
+    return Optional.ofNullable(proceedingDecision.court()).map(Court::location).orElse(null);
+  }
+
+  private Instant extractDecisionDate(ProceedingDecision proceedingDecision) {
+    return Optional.ofNullable(proceedingDecision.date())
+        .map(date -> date.atZone(ZoneId.of("UTC")).toInstant())
+        .orElse(null);
+  }
+
+  private Flux<Long> extractDocumentUnitDTOIdsViaFileNumber(ProceedingDecision proceedingDecision) {
+    return fileNumberRepository
+        .findByFileNumber(proceedingDecision.fileNumber())
+        .map(FileNumberDTO::getDocumentUnitId);
+  }
+
+  private Mono<Long> extractDocumentTypeDTOId(ProceedingDecision proceedingDecision) {
+    return Mono.justOrEmpty(proceedingDecision.documentType())
+        .map(DocumentType::jurisShortcut)
+        .flatMap(databaseDocumentTypeRepository::findByJurisShortcut)
+        .mapNotNull(DocumentTypeDTO::getId)
+        .switchIfEmpty(Mono.just(-1L));
+  }
+
+  private Long[] convertListToArrayOrReturnNull(List<Long> list) {
+    return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
   public Flux<DocumentUnitListEntry> findAll(Pageable pageable) {
@@ -907,7 +919,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<Long> count(DataSource dataSource) {
+  public Mono<Long> count() {
+    return metadataRepository.count();
+  }
+
+  @Override
+  public Mono<Long> countByDataSource(DataSource dataSource) {
     return metadataRepository.countByDataSource(dataSource);
   }
 }

@@ -36,7 +36,6 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ExtendWith(SpringExtension.class)
@@ -353,21 +352,23 @@ class DocumentUnitControllerTest {
   }
 
   @Test
-  void testSearchForDocumentUnitsByProceedingDecisionInput() {
+  void testSearchByProceedingDecision() {
     ProceedingDecision proceedingDecision = ProceedingDecision.builder().build();
-    when(service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision))
-        .thenReturn(Flux.empty());
+    PageRequest pageRequest = PageRequest.of(0, 10);
+
+    when(service.searchByProceedingDecision(proceedingDecision, pageRequest))
+        .thenReturn(Mono.empty());
 
     webClient
         .mutateWith(csrf())
         .put()
-        .uri("/api/v1/caselaw/documentunits/search")
+        .uri("/api/v1/caselaw/documentunits/search?pg=0&sz=10")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
         .bodyValue(proceedingDecision)
         .exchange()
         .expectStatus()
         .isOk();
 
-    verify(service).searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+    verify(service).searchByProceedingDecision(proceedingDecision, pageRequest);
   }
 }

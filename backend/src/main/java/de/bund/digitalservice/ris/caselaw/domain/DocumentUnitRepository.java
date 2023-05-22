@@ -24,10 +24,14 @@ public interface DocumentUnitRepository {
 
   Mono<Void> delete(DocumentUnit documentUnit);
 
-  Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
-      ProceedingDecision proceedingDecision);
+  Flux<ProceedingDecision> searchByProceedingDecision(
+      ProceedingDecision proceedingDecision, Pageable pageable);
 
-  Mono<Long> count(DataSource dataSource);
+  Mono<Long> count();
+
+  Mono<Long> countByProceedingDecision(ProceedingDecision proceedingDecision);
+
+  Mono<Long> countByDataSource(DataSource dataSource);
 
   Flux<DocumentUnitListEntry> findAll(Pageable pageable);
 

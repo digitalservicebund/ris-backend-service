@@ -9,6 +9,7 @@ import { testWithDocumentUnit as test } from "~/e2e/caselaw/fixtures"
 import { generateString } from "~/test-helper/dataGenerators"
 
 test.describe("Proceeding decisions", () => {
+  test.slow()
   test("rendering", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
 

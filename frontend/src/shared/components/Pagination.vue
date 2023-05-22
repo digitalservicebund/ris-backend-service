@@ -13,7 +13,7 @@ const props = withDefaults(
 )
 
 const emits = defineEmits<{
-  (e: "updatePage", page: number): void // eslint-disable-line @typescript-eslint/no-explicit-any
+  (e: "updatePage", page: number): void
 }>()
 
 async function nextPage() {
@@ -37,9 +37,9 @@ export type Page<T> = {
   last: boolean
 }
 
-export type PageableService<T> = {
-  (page: number, size: number, searchStr?: string): Promise<
-    ServiceResponse<Page<T>>
+export type PageableService<TResult, TQuery = TResult> = {
+  (page: number, size: number, query?: TQuery): Promise<
+    ServiceResponse<Page<TResult>>
   >
 }
 </script>

@@ -174,7 +174,7 @@ public class DocumentUnitService {
                 pageable.getPageSize(),
                 Sort.by(Order.desc("creationtimestamp"))))
         .collectList()
-        .zipWith(repository.count(DataSource.NEURIS))
+        .zipWith(repository.countByDataSource(DataSource.NEURIS))
         .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
@@ -264,9 +264,14 @@ public class DocumentUnitService {
     return publishService.getLastPublishedXml(documentUuid);
   }
 
-  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
-      ProceedingDecision proceedingDecision) {
-    return repository.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+  public Mono<Page<ProceedingDecision>> searchByProceedingDecision(
+      ProceedingDecision proceedingDecision, Pageable pageable) {
+
+    return repository
+        .searchByProceedingDecision(proceedingDecision, pageable)
+        .collectList()
+        .zipWith(repository.countByProceedingDecision(proceedingDecision))
+        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")

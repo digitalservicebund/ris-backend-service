@@ -14,21 +14,34 @@ import reactor.core.publisher.Mono;
 public interface DatabaseDocumentUnitMetadataRepository
     extends R2dbcRepository<DocumentUnitMetadataDTO, Long> {
 
+  String WHERE =
+      "(:courtType IS NULL OR gerichtstyp = :courtType) AND "
+          + "(:courtLocation IS NULL OR gerichtssitz = :courtLocation) AND"
+          + "(:decisionDate IS NULL OR decision_date = :decisionDate) AND"
+          + "(:docUnitIds IS NULL OR id IN (SELECT * FROM UNNEST(:docUnitIds))) AND "
+          + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
+          + "data_source != 'PROCEEDING_DECISION' ";
+
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 
   Flux<DocumentUnitMetadataDTO> findAllByDataSourceLike(String dataSource, Pageable pageable);
 
   @Query(
       "SELECT * FROM doc_unit WHERE "
-          + "(:courtType IS NULL OR gerichtstyp = :courtType) AND "
-          + "(:courtLocation IS NULL OR gerichtssitz = :courtLocation) AND"
-          + "(:decisionDate IS NULL OR decision_date = :decisionDate) AND"
-          + "(:docUnitIds IS NULL OR id IN (SELECT * FROM UNNEST(:docUnitIds))) AND "
-          + "(:docTypeId IS NULL OR document_type_id = :docTypeId) AND "
-          + "data_source != 'PROCEEDING_DECISION' "
+          + WHERE
           + "ORDER BY decision_date DESC, id DESC "
-          + "LIMIT 20")
+          + "LIMIT :pageSize OFFSET :offset")
   Flux<DocumentUnitMetadataDTO> findByCourtDateFileNumberAndDocumentType(
+      String courtType,
+      String courtLocation,
+      Instant decisionDate,
+      Long[] docUnitIds,
+      Long docTypeId,
+      Integer pageSize,
+      Long offset);
+
+  @Query("SELECT COUNT(*) FROM doc_unit WHERE" + WHERE)
+  Mono<Long> countByCourtDateFileNumberAndDocumentType(
       String courtType,
       String courtLocation,
       Instant decisionDate,

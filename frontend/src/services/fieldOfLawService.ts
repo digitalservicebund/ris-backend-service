@@ -18,7 +18,7 @@ interface FieldOfLawService {
   getTreeForIdentifier(
     identifier: string
   ): Promise<ServiceResponse<FieldOfLawNode>>
-  searchForFieldsOfLaw: PageableService<FieldOfLawNode>
+  searchForFieldsOfLaw: PageableService<FieldOfLawNode, string>
 }
 
 const service: FieldOfLawService = {
@@ -83,10 +83,10 @@ const service: FieldOfLawService = {
     }
     return response
   },
-  async searchForFieldsOfLaw(page: number, size: number, searchStr?: string) {
+  async searchForFieldsOfLaw(page: number, size: number, query?: string) {
     const response = await httpClient.get<Page<FieldOfLawNode>>(
       `caselaw/fieldsoflaw?pg=${page}&sz=${size}`,
-      { params: { q: searchStr ?? "" } }
+      { params: { q: query ?? "" } }
     )
     if (response.status >= 300) {
       response.error = {

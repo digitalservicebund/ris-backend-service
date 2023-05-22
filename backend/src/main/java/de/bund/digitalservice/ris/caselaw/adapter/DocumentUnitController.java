@@ -27,7 +27,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -131,8 +130,11 @@ public class DocumentUnitController {
   }
 
   @PutMapping(value = "/search")
-  public Flux<ProceedingDecision> searchForDocumentUnitsByProceedingDecisionInput(
+  public Mono<Page<ProceedingDecision>> searchByProceedingDecision(
+      @RequestParam("pg") int page,
+      @RequestParam("sz") int size,
       @RequestBody ProceedingDecision proceedingDecision) {
-    return service.searchForDocumentUnitsByProceedingDecisionInput(proceedingDecision);
+
+    return service.searchByProceedingDecision(proceedingDecision, PageRequest.of(page, size));
   }
 }

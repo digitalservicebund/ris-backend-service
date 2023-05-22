@@ -7,7 +7,7 @@ import SearchResultList, { SearchResults } from "./SearchResultList.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import { ProceedingDecision } from "@/domain/proceedingDecision"
 import comboboxItemService from "@/services/comboboxItemService"
-import DocumentUnitService from "@/services/documentUnitService"
+import documentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
@@ -17,6 +17,7 @@ import InputField, {
 } from "@/shared/components/input/InputField.vue"
 import TextButton from "@/shared/components/input/TextButton.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
+import Pagination, { Page } from "@/shared/components/Pagination.vue"
 
 const props = defineProps<{
   documentUnitUuid: string
@@ -24,7 +25,10 @@ const props = defineProps<{
 }>()
 
 const proceedingDecisions = ref<ProceedingDecision[]>()
+
 const searchResults = ref<SearchResults>()
+const searchResultsCurrentPage = ref<Page<ProceedingDecision>>()
+const searchResultsPerPage = 30
 const input = ref<ProceedingDecision>(new ProceedingDecision())
 
 function isNotEmpty({
@@ -108,12 +112,15 @@ function updateSearchResultsLinkStatus(uuid: string) {
   })
 }
 
-async function search() {
-  const response = await DocumentUnitService.searchByProceedingDecisionInput(
+async function search(page = 0) {
+  const response = await documentUnitService.searchByProceedingDecisionInput(
+    page,
+    searchResultsPerPage,
     input.value as ProceedingDecision
   )
   if (response.data) {
-    searchResults.value = response.data.map((searchResult) => {
+    searchResultsCurrentPage.value = response.data
+    searchResults.value = response.data.content.map((searchResult) => {
       return {
         decision: searchResult,
         isLinked: isLinked(searchResult),
@@ -256,7 +263,7 @@ watch(
           button-type="secondary"
           class="mr-28"
           label="Suchen"
-          @click="search"
+          @click="search(0)"
         />
 
         <TextButton
@@ -267,11 +274,17 @@ watch(
         />
       </div>
 
-      <div class="mb-10 mt-20">
-        <SearchResultList
-          :search-results="searchResults"
-          @link-decision="linkProceedingDecision"
-        />
+      <div v-if="searchResultsCurrentPage" class="mb-10 mt-20">
+        <Pagination
+          navigation-position="bottom"
+          :page="searchResultsCurrentPage"
+          @update-page="search"
+        >
+          <SearchResultList
+            :search-results="searchResults"
+            @link-decision="linkProceedingDecision"
+          />
+        </Pagination>
       </div>
     </ExpandableDataSet>
   </div>
