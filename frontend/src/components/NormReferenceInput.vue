@@ -14,7 +14,7 @@ const emit = defineEmits<{
 
 const norm = computed({
   get() {
-    return props.modelValue
+    return props.modelValue ?? {}
   },
   set(value) {
     emit("update:modelValue", value)
