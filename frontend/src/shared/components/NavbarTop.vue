@@ -48,8 +48,8 @@ onMounted(async () => {
         <div class="label-03-bold">
           {{ user.name }}
         </div>
-        <div v-if="user.documentationOfficeLabel" class="label-03-reg">
-          {{ user.documentationOfficeLabel }}
+        <div v-if="user.documentationOffice" class="label-03-reg">
+          {{ user.documentationOffice.label }}
         </div>
       </div>
     </div>

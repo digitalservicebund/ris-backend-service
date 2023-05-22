@@ -32,7 +32,7 @@ public class KeycloakUserService implements UserService {
             documentationOffice ->
                 User.builder()
                     .name(oidcUser.getAttribute("name"))
-                    .documentationOfficeLabel(documentationOffice.label())
+                    .documentationOffice(documentationOffice)
                     .build());
   }
 

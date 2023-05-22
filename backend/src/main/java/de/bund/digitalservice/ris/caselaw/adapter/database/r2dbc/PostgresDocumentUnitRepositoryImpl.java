@@ -20,6 +20,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -110,6 +111,27 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
+  public Mono<DocumentUnit> createNewDocumentUnit(String documentNumber, User user) {
+    return documentationOfficeRepository
+        .findByLabel(user.documentationOffice().label())
+        .flatMap(
+            documentationOfficeDTO ->
+                metadataRepository
+                    .save(
+                        DocumentUnitMetadataDTO.builder()
+                            .uuid(UUID.randomUUID())
+                            .creationtimestamp(Instant.now())
+                            .documentnumber(documentNumber)
+                            .dataSource(DataSource.NEURIS)
+                            .documentationOfficeId(documentationOfficeDTO.getId())
+                            .documentationOffice(documentationOfficeDTO)
+                            .dateKnown(true)
+                            .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                            .build())
+                    .map(DocumentUnitTransformer::transformMetadataToDomain));
+  }
+
+  @Override
   public Mono<DocumentUnit> createNewDocumentUnit(String documentNumber) {
     return metadataRepository
         .save(
@@ -140,7 +162,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveNorms(documentUnitDTO, documentUnit))
-        .flatMap(documentUnitDTO -> saveDocumentationOffice(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -529,25 +550,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> saveDocumentationOffice(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    if (documentUnit.coreData().documentationOffice() == null) {
-      return Mono.just(documentUnitDTO);
-    }
-
-    return documentationOfficeRepository
-        .save(
-            DocumentationOfficeDTO.builder()
-                .label(documentUnit.coreData().documentationOffice().label())
-                .abbreviation(documentUnit.coreData().documentationOffice().abbreviation())
-                .build())
-        .map(
-            documentationOfficeDTO -> {
-              documentUnitDTO.setDocumentationOffice(documentationOfficeDTO);
-              return documentUnitDTO;
-            });
-  }
-
   @Override
   public Mono<DocumentUnit> attachFile(
       UUID documentUnitUuid, String fileUuid, String type, String fileName) {
@@ -729,15 +731,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   private <T extends DocumentUnitMetadataDTO> Mono<T> injectDocumentationOffice(
       T documentUnitMetadataDTO) {
-    if (documentUnitMetadataDTO.getDocumentationOffice() == null) {
+    if (documentUnitMetadataDTO.getDocumentationOfficeId() == null) {
       return Mono.just(documentUnitMetadataDTO);
     }
+
     return documentationOfficeRepository
         .findById(documentUnitMetadataDTO.getDocumentationOfficeId())
         .defaultIfEmpty(DocumentationOfficeDTO.builder().build())
         .map(
             documentationOfficeDTO -> {
-              documentUnitMetadataDTO.setDocumentationOffice(documentationOfficeDTO);
+              if (documentationOfficeDTO.getLabel() != null)
+                documentUnitMetadataDTO.setDocumentationOffice(documentationOfficeDTO);
               return documentUnitMetadataDTO;
             });
   }
