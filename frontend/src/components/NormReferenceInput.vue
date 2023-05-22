@@ -23,7 +23,7 @@ const norm = computed({
 </script>
 
 <template>
-  <div class="flex flex-row gap-24">
+  <div>
     <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">
       <ComboboxInput
         id="norm-reference-abbreviation"
@@ -35,27 +35,28 @@ const norm = computed({
       >
       </ComboboxInput>
     </InputField>
-
-    <InputField id="norm-reference-abbreviation-field" label="Einzelnorm">
-      <TextInput
-        id="norm-reference-singleNorm"
-        v-model="norm.singleNorm"
-        aria-label="Einzelnorm"
-      ></TextInput>
-    </InputField>
-    <InputField id="norm-date-of-version" label="Fassungsdatum">
-      <CustomDateInput
-        id="norm-date-of-version"
-        v-model="norm.dateOfVersion"
-        aria-label="Fassungsdatum"
-      />
-    </InputField>
-    <InputField id="norm-date-of-relevence" label="Jahr">
-      <TextInput
-        id="norm-date-of-relevence"
-        v-model="norm.dateOfRelevance"
-        aria-label="Jahr"
-      ></TextInput>
-    </InputField>
+    <div class="flex gap-24 justify-between">
+      <InputField id="norm-reference-abbreviation-field" label="Einzelnorm">
+        <TextInput
+          id="norm-reference-singleNorm"
+          v-model="norm.singleNorm"
+          aria-label="Einzelnorm"
+        ></TextInput>
+      </InputField>
+      <InputField id="norm-date-of-version" label="Fassungsdatum">
+        <CustomDateInput
+          id="norm-date-of-version"
+          v-model="norm.dateOfVersion"
+          aria-label="Fassungsdatum"
+        />
+      </InputField>
+      <InputField id="norm-date-of-relevence" label="Jahr">
+        <TextInput
+          id="norm-date-of-relevence"
+          v-model="norm.dateOfRelevance"
+          aria-label="Jahr"
+        ></TextInput>
+      </InputField>
+    </div>
   </div>
 </template>

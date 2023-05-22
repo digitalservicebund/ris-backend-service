@@ -40,7 +40,7 @@ export enum LabelPosition {
 </script>
 
 <template>
-  <div class="flex flex-start" :class="wrapperClasses">
+  <div class="flex flex-start w-full" :class="wrapperClasses">
     <!-- slot rendered BEFORE label if the label position should be to the right or bottom -->
     <slot
       v-if="
