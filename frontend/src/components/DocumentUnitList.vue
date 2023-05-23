@@ -68,6 +68,7 @@ const onDelete = () => {
         <div class="table-cell">Dokumentnummer</div>
         <div class="table-cell">Angelegt am</div>
         <div class="table-cell">Aktenzeichen</div>
+        <div class="table-cell">DokStelle</div>
         <div class="table-cell">Dokumente</div>
         <div class="table-cell">Löschen</div>
       </div>
@@ -96,8 +97,15 @@ const onDelete = () => {
         </div>
         <div class="px-[16px] py-0 table-cell">
           {{
-            documentUnitListEntry && documentUnitListEntry.fileNumber
+            documentUnitListEntry.fileNumber
               ? documentUnitListEntry.fileNumber
+              : "-"
+          }}
+        </div>
+        <div class="px-[16px] py-0 table-cell">
+          {{
+            documentUnitListEntry.documentationOffice
+              ? documentUnitListEntry.documentationOffice.label
               : "-"
           }}
         </div>
