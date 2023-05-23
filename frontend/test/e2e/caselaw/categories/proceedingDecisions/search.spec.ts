@@ -29,7 +29,7 @@ test.describe("Search proceeding decisions", () => {
       .getByRole("button", { name: "Nach Entscheidungen suchen" })
       .click()
 
-    await expect(page.getByText("Suche hat 1 Treffer ergeben")).toBeVisible()
+    await expect(page.getByText("Total 1 Items")).toBeVisible()
 
     const result = page.locator(".table-row", {
       hasText: `AG Aachen, AnU, 01.01.2020, ${secondaryDocumentUnit.coreData.fileNumbers?.[0]}`,

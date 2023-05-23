@@ -21,9 +21,6 @@ export type SearchResults = {
     <span v-if="!searchResults?.length" class="label-03-bold"
       >Suche hat keine Treffer ergeben</span
     >
-    <span v-else class="label-03-bold"
-      >Suche hat {{ searchResults.length }} Treffer ergeben</span
-    >
     <div class="mt-16 table">
       <div
         v-for="searchResult in searchResults"
