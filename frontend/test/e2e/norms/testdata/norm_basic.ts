@@ -118,7 +118,7 @@ export const normData: NormData = {
   documentCategory: "NR",
   entryIntoForceDate: "2007-01-01",
   principleEntryIntoForceDate: "2007-01-01",
-  divergentEntryIntoForceDateState: "nicht vorhanden",
+  divergentEntryIntoForceDateState: "",
   expirationDateState: "unbestimmt (unbekannt)",
   principleExpirationDateState: "unbestimmt (unbekannt)",
   divergentExpirationDateState: "nicht vorhanden",

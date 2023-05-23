@@ -42,7 +42,7 @@ fun mapNormToDto(norm: Norm): NormDto {
             Property.PARTICIPATION_INSTITUTION,
             norm.getFirstMetadatum(MetadataSectionName.PARTICIPATION, MetadatumType.PARTICIPATION_INSTITUTION)?.value.toString(),
         ),
-        printAnnouncementGazette = norm.eli.gazette,
+        printAnnouncementGazette = norm.eli.gazetteOrMedium,
         printAnnouncementPage = norm.eli.printAnnouncementPage,
         eli = norm.eli.toString(),
         articles = norm.articles.filter { it.marker !in listOf("Eingangsformel", "Schlussformel") }.sortedBy { if (it.marker.contains("§")) it.marker.substring(2).toInt() else it.marker.substring(4).toInt() }

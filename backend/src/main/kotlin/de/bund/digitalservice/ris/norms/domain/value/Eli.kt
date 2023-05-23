@@ -7,6 +7,7 @@ import java.time.LocalDate
  * which a legislation can be accessed online. In our application it is a computed value built from the properties
  * passed within the primary constructor.
  *
+ *
  * @property printAnnouncementGazette the printed gazette on which the norm was announced.
  * @property announcementDate the date on which the norm was announced.
  * @property citationDate the date on which the norm was citated.
@@ -15,33 +16,27 @@ import java.time.LocalDate
  */
 data class Eli(
     val printAnnouncementGazette: String?,
+    val digitalAnnouncementMedium: String?,
     val announcementDate: LocalDate?,
     val citationDate: LocalDate?,
     val citationYear: String?,
     val printAnnouncementPage: String?,
+    val digitalAnnouncementPage: String?,
+    val digitalAnnouncementEdition: String?,
 ) {
     companion object {
-        fun parseGazette(gazette: String): String = when (gazette) {
-            "bgbl-1" -> "BGBl I"
-            "bgbl-2" -> "BGBl II"
-            "banz-at" -> "BAnz"
-            else -> gazette
-        }
-    }
-    private val year: Int? = announcementDate?.year ?: (citationDate?.year ?: citationYear?.toInt())
-    val gazette: String? = when (printAnnouncementGazette) {
-        "BGBl I" -> "bgbl-1"
-        "BGBl II" -> "bgbl-2"
-        "BAnz" -> "banz-at"
-        "" -> null
-        else -> printAnnouncementGazette
+        private val gazetteOrMediumMap = mapOf(
+            "BGBl I" to "bgbl-1",
+            "BGBl II" to "bgbl-2",
+            "BAnz" to "banz-at",
+            "" to null,
+        )
+        fun parseGazette(gazette: String): String = gazetteOrMediumMap.filterValues { it == gazette }.keys.firstOrNull() ?: gazette
     }
 
-    override fun toString(): String {
-        return if (year == null || gazette == null || printAnnouncementPage == null) {
-            ""
-        } else {
-            "eli/$gazette/$year/s$printAnnouncementPage"
-        }
-    }
+    val gazetteOrMedium: String? = printAnnouncementGazette?.let { gazetteOrMediumMap.getOrDefault(it, it) } ?: digitalAnnouncementMedium?.let { gazetteOrMediumMap.getOrDefault(it, it) }
+    private val year: Int? = announcementDate?.year ?: (citationDate?.year ?: citationYear?.toInt())
+    private val page: String? = if (printAnnouncementGazette != null) printAnnouncementPage else digitalAnnouncementEdition ?: digitalAnnouncementPage
+
+    override fun toString() = if (year != null && gazetteOrMedium != null && page != null) "eli/$gazetteOrMedium/$year/s$page" else ""
 }

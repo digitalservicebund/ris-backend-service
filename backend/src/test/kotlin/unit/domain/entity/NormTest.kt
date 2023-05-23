@@ -150,7 +150,7 @@ class NormTest {
                 metadataSections = listOf(printAnnouncementSection, citationDateSection),
             )
 
-        assertThat(norm.eli.gazette).isEqualTo("bgbl-1")
+        assertThat(norm.eli.gazetteOrMedium).isEqualTo("bgbl-1")
         assertThat(norm.eli.printAnnouncementGazette).isEqualTo("BGBl I")
         assertThat(norm.eli.citationDate).isEqualTo(LocalDate.of(2022, 11, 19))
         assertThat(norm.eli.announcementDate).isEqualTo(LocalDate.of(2022, 11, 18))
@@ -175,7 +175,7 @@ class NormTest {
                 metadataSection {
                     name = MetadataSectionName.OFFICIAL_REFERENCE
                     sections {
-                        metadataSection {
+                        section {
                             name = MetadataSectionName.PRINT_ANNOUNCEMENT
                             metadata {
                                 metadatum {
