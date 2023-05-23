@@ -7,7 +7,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -59,6 +61,7 @@ public class DocumentUnitListEntryIntegrationTest {
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
+  @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @BeforeEach
   void setUp() {
@@ -68,6 +71,9 @@ public class DocumentUnitListEntryIntegrationTest {
 
   @Test
   void testForCorrectResponseWhenRequestingAll() {
+    DocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByLabel("BGH").block();
+
     DocumentUnitDTO neurisDto =
         repository
             .save(
@@ -76,6 +82,7 @@ public class DocumentUnitListEntryIntegrationTest {
                     .creationtimestamp(Instant.now())
                     .documentnumber("1234567890123")
                     .dataSource(DataSource.NEURIS)
+                    .documentationOfficeId(documentationOfficeDTO.getId())
                     .build())
             .block();
     DocumentUnitDTO migrationDto =
@@ -123,6 +130,8 @@ public class DocumentUnitListEntryIntegrationTest {
         .isEqualTo(neurisDto.getUuid().toString())
         .jsonPath("$.content[0].fileNumber")
         .isEqualTo("AkteX")
+        .jsonPath("$.content[0].documentationOffice.label")
+        .isEqualTo("BGH")
         .jsonPath("$.totalElements")
         .isEqualTo(1);
   }
