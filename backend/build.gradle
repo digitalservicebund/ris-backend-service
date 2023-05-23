@@ -126,7 +126,7 @@ dependencies {
   // for local development:
   // implementation files("../../neuris-juris-xml-export/build/libs/neuris-juris-xml-export-0.1.5.jar")
 
-  implementation("de.bund.digitalservice:ris-norms-juris-converter:0.9.1")
+  implementation("de.bund.digitalservice:ris-norms-juris-converter:0.10.0")
 
   implementation "com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.14.2"
 

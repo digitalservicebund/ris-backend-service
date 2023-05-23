@@ -38,6 +38,8 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
+import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.Lead
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
@@ -145,16 +147,12 @@ class JurisConverterTest {
                     entryIntoForceDateState = "UNDEFINED_UNKNOWN"
                     principleEntryIntoForceDate = "2022-01-02"
                     principleEntryIntoForceDateState = "UNDEFINED_FUTURE"
-                    divergentEntryIntoForceDate = "2022-01-03"
-                    divergentEntryIntoForceDateState = "UNDEFINED_NOT_PRESENT"
-                    entryIntoForceNormCategory = "test entry into force norm category"
+                    divergentEntryIntoForceList = listOf(DivergentEntryIntoForce("2022-01-03", "UNDEFINED_NOT_PRESENT", "test entry into force norm category"))
                     expirationDate = "2022-01-04"
                     expirationDateState = "UNDEFINED_UNKNOWN"
                     principleExpirationDate = "2022-01-05"
                     principleExpirationDateState = "UNDEFINED_UNKNOWN"
-                    divergentExpirationDate = "2022-01-06"
-                    divergentExpirationDateState = "UNDEFINED_UNKNOWN"
-                    expirationNormCategory = "test expiration norm category"
+                    divergentExpirationsList = listOf(DivergentExpiration("2022-01-06", "UNDEFINED_UNKNOWN", "test expiration norm category"))
                     announcementDate = "2022-01-07"
                     citationDateList = listOf("2022-01-08")
                     printAnnouncementList = listOf(PrintAnnouncement("test print announcement year", "test print announcement page", "test print announcement gazette"))
@@ -237,6 +235,7 @@ class JurisConverterTest {
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
             val metadata = norm?.metadataSections?.flatMap { it.metadata }
+
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test document number", DIVERGENT_DOCUMENT_NUMBER, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test ris abbreviation international law", RIS_ABBREVIATION_INTERNATIONAL_LAW, 1))
             assertThat(metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test unofficial long title", UNOFFICIAL_LONG_TITLE, 1))
