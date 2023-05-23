@@ -58,7 +58,7 @@ export type PageableService<TResult, TQuery = TResult> = {
           <span class="material-icons no-">arrow_back</span
           ><span class="underline">zurück</span>
         </PaginationButton>
-        <span v-if="page" class="pr-20">
+        <span v-if="page">
           {{ page.number + 1 }} von {{ page.totalPages }}
         </span>
         <PaginationButton
