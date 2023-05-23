@@ -38,6 +38,7 @@ async function renderComponent(options?: {
   summaryComponent?: Component
   modelValue?: unknown[]
   defaultValue?: unknown
+  disableMultiEntry?: boolean
 }) {
   const props = {
     editComponent: markRaw(options?.editComponent ?? SimpleTextEditComponent),
@@ -46,6 +47,7 @@ async function renderComponent(options?: {
     ),
     modelValue: options?.modelValue,
     defaultValue: options?.defaultValue ?? "",
+    disableMultiEntry: options?.disableMultiEntry ?? false,
   }
 
   render(EditableList, { props })
@@ -285,5 +287,15 @@ describe("EditableList", () => {
 
     expect(input).toBeInTheDocument()
     expect(input).toHaveValue("entry 1")
+  })
+
+  it("renders the component without the multi entry capability", async () => {
+    await renderComponent({
+      disableMultiEntry: true,
+    })
+
+    expect(
+      screen.queryByRole("button", { name: "Weitere Angabe" })
+    ).not.toBeInTheDocument()
   })
 })

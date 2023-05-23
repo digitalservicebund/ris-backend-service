@@ -10,6 +10,7 @@ interface Props {
   modelValue?: any[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   defaultValue: any
+  disableMultiEntry?: boolean
 }
 
 interface Emits {
@@ -20,6 +21,7 @@ interface Emits {
 const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
   modelValue: () => [],
+  disableMultiEntry: false,
 })
 
 const emit = defineEmits<Emits>()
@@ -144,6 +146,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
     </div>
 
     <button
+      v-if="!disableMultiEntry"
       aria-label="Weitere Angabe"
       class="add-button bg-blue-300 focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white inline-flex items-center leading-18 mt-16 outline-0 outline-blue-800 outline-none outline-offset-4 pr-[0.25rem] py-[0.125rem] text-14 text-blue-800 whitespace-nowrap"
       @click="addNewModelEntry"
