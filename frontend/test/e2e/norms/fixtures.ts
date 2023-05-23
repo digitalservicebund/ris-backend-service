@@ -155,7 +155,6 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Dokumenttyp",
-      isRepeatedSection: true,
       id: "documentTypes",
       fields: [
         {

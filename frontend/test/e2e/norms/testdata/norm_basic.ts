@@ -108,8 +108,7 @@ export const normData: NormData = {
       },
     ],
     DOCUMENT_TYPE: [
-      { TYPE_NAME: ["RV"] },
-      { NORM_CATEGORY: [NormCategory.BASE_NORM] },
+      { TYPE_NAME: ["RV"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
     ],
   },
   officialLongTitle:
@@ -119,7 +118,7 @@ export const normData: NormData = {
   documentCategory: "NR",
   entryIntoForceDate: "2007-01-01",
   principleEntryIntoForceDate: "2007-01-01",
-  divergentEntryIntoForceDateState: "nicht vorhanden",
+  divergentEntryIntoForceDateState: "",
   expirationDateState: "unbestimmt (unbekannt)",
   principleExpirationDateState: "unbestimmt (unbekannt)",
   divergentExpirationDateState: "nicht vorhanden",

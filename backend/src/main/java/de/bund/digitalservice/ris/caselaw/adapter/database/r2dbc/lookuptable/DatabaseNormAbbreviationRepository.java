@@ -12,6 +12,6 @@ public interface DatabaseNormAbbreviationRepository
   Flux<NormAbbreviationDTO> findAll(int size);
 
   @Query(
-      "select * from norm_abbreviation where abbreviation like :query||'%' limit :size offset :pageOffset")
+      "select * from norm_abbreviation where abbreviation like :query||'%' order by abbreviation limit :size offset :pageOffset")
   Flux<NormAbbreviationDTO> findBySearchQuery(String query, Integer size, Integer pageOffset);
 }

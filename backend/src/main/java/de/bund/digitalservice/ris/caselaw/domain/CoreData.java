@@ -24,5 +24,5 @@ public record CoreData(
     List<Instant> deviatingDecisionDates,
     @LookupTableConstraint(lookupTableName = "legalEffect") String legalEffect,
     String inputType,
-    String center,
+    DocumentationOffice documentationOffice,
     String region) {}

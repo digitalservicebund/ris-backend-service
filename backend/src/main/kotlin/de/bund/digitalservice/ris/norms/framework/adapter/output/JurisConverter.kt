@@ -48,6 +48,7 @@ import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLo
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
+import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
 import de.bund.digitalservice.ris.norms.juris.converter.model.NormProvider
 import de.bund.digitalservice.ris.norms.juris.converter.model.PrintAnnouncement
 import org.springframework.stereotype.Component
@@ -135,10 +136,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val digitalAnnouncementNumber = createMetadataForType(data.digitalAnnouncementList.mapNotNull { it.number }, EDITION)
     val digitalAnnouncementMedium = createMetadataForType(data.digitalAnnouncementList.mapNotNull { it.medium }, ANNOUNCEMENT_MEDIUM)
 
-    val documentTypeName = createMetadataForType(data.documentTypeList.mapNotNull { it.name }, TYPE_NAME)
-    val documentNormCategory = createMetadataForType(data.documentTypeList.mapNotNull { parseNormCategory(it.category) }, NORM_CATEGORY)
-    val documentTemplateName = createMetadataForType(data.documentTypeList.mapNotNull { it.templateName }, TEMPLATE_NAME)
-
     val citationDateSections = data.citationDateList.mapIndexed { index, value ->
         if (value.length == 4 && value.toIntOrNull() != null) {
             MetadataSection(MetadataSectionName.CITATION_DATE, listOf(Metadatum(value, YEAR, 1)), index)
@@ -159,7 +156,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         MetadataSection(Section.NORM, frameKeywords + divergentDocumentNumber + risAbbreviationInternationalLaw + unofficialAbbreviation + unofficialShortTitle + unofficialLongTitle + unofficialReference + referenceNumber + definition + ageOfMajorityIndication + validityRule),
     ) + createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
-        createSectionsWithoutGrouping(Section.DOCUMENT_TYPE, documentTypeName + documentNormCategory + documentTemplateName) +
+        createSectionForDocumentType(data.documentType) +
         createSectionsFromMetadata(Section.PARTICIPATION, participationInstitution + participationType) +
         referenceSections.mapIndexed { index, section -> MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), index, listOf(section)) } +
         citationDateSections + ageIndicationSections +
@@ -215,6 +212,20 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         celexNumber = data.celexNumber,
         text = data.text,
     )
+}
+
+private fun createSectionForDocumentType(documentType: DocumentType?): MetadataSection? {
+    return if (documentType !== null) {
+        val documentNormCategories = createMetadataForType(documentType.categories.mapNotNull { parseNormCategory(it) }, NORM_CATEGORY)
+        val documentTemplateNames = createMetadataForType(documentType.templateNames.map { it }, TEMPLATE_NAME)
+        val metadata = (documentNormCategories + documentTemplateNames).toMutableList()
+        if (documentType.name != null) {
+            metadata += createMetadataForType(listOf(documentType.name), TYPE_NAME)
+        }
+        MetadataSection(Section.DOCUMENT_TYPE, metadata)
+    } else {
+        null
+    }
 }
 
 fun addProviderSections(normProviders: List<NormProvider>): List<MetadataSection> {

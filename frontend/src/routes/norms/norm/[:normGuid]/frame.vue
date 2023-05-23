@@ -418,6 +418,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
       <EditableList
         v-model="metadataSections.DOCUMENT_TYPE"
         :default-value="{}"
+        disable-multi-entry
         :edit-component="DocumentTypeInputGroup"
         :summary-component="DocumentTypeSummary"
       />

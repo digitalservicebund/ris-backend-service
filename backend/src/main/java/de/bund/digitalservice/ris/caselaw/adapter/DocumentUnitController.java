@@ -6,6 +6,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.validation.Valid;
 import java.nio.ByteBuffer;
 import java.util.UUID;
@@ -17,6 +18,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,17 +37,20 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class DocumentUnitController {
   private final DocumentUnitService service;
+  private final UserService userService;
 
-  public DocumentUnitController(DocumentUnitService service) {
+  public DocumentUnitController(DocumentUnitService service, UserService userService) {
     this.service = service;
+    this.userService = userService;
   }
 
   @PostMapping(value = "")
   public Mono<ResponseEntity<DocumentUnit>> generateNewDocumentUnit(
+      @AuthenticationPrincipal OidcUser oidcUser,
       @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
 
     return service
-        .generateNewDocumentUnit(documentUnitCreationInfo)
+        .generateNewDocumentUnit(documentUnitCreationInfo, userService.getUser(oidcUser))
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }
