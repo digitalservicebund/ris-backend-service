@@ -51,8 +51,20 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     },
     controllers = {NormAbbreviationController.class})
 class NormAbbreviationIntegrationTest {
-  private static final UUID NORM_ABBREVIATION_UUID =
-      UUID.fromString("AAAAAAAA-2222-3333-4444-555555555555");
+  private static final UUID NORM_ABBREVIATION_UUID_1 =
+      UUID.fromString("A1A1A1A1-2222-3333-4444-555555555555");
+  private static final UUID NORM_ABBREVIATION_UUID_2 =
+      UUID.fromString("A2A2A2A2-2222-3333-4444-555555555555");
+  private static final UUID NORM_ABBREVIATION_UUID_3 =
+      UUID.fromString("A3A3A3A3-2222-3333-4444-555555555555");
+  private static final UUID NORM_ABBREVIATION_UUID_4 =
+      UUID.fromString("A4A4A4A4-2222-3333-4444-555555555555");
+  private static final UUID NORM_ABBREVIATION_UUID_5 =
+      UUID.fromString("A5A5A5A5-2222-3333-4444-555555555555");
+  private static final UUID NORM_ABBREVIATION_UUID_6 =
+      UUID.fromString("A6A6A6A6-2222-3333-4444-555555555555");
+  private static final UUID NORM_ABBREVIATION_UUID_7 =
+      UUID.fromString("A7A7A7A7-2222-3333-4444-555555555555");
   private static final UUID DOCUMENT_TYPE_UUID_1 =
       UUID.fromString("D1D1D1D1-2222-3333-4444-555555555555");
   private static final UUID DOCUMENT_TYPE_UUID_2 =
@@ -116,7 +128,7 @@ class NormAbbreviationIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID)
+        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
         .expectStatus()
         .isOk()
@@ -141,7 +153,7 @@ class NormAbbreviationIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID)
+        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
         .expectStatus()
         .isOk()
@@ -166,7 +178,7 @@ class NormAbbreviationIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID)
+        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
         .expectStatus()
         .isOk()
@@ -187,7 +199,7 @@ class NormAbbreviationIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID)
+        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
         .expectStatus()
         .isOk()
@@ -218,7 +230,7 @@ class NormAbbreviationIntegrationTest {
     webClient
         .mutateWith(csrf())
         .get()
-        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID)
+        .uri("/api/v1/caselaw/normabbreviation/" + NORM_ABBREVIATION_UUID_1)
         .exchange()
         .expectStatus()
         .isOk()
@@ -229,19 +241,150 @@ class NormAbbreviationIntegrationTest {
             });
   }
 
+  @Test
+  void testGetNormAbbreviationBySearchQuery() {
+    generateLookupValues();
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/normabbreviation?q=search query")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(NormAbbreviation[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("id")
+                  .containsExactly(NORM_ABBREVIATION_UUID_2);
+            });
+  }
+
+  @Test
+  void testGetNormAbbreviationBySearchQuery_returnInTheRightOrder() {
+    generateLookupValues();
+
+    webClient
+        .mutateWith(csrf())
+        .get()
+        .uri("/api/v1/caselaw/normabbreviation?q=Search")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(NormAbbreviation[].class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody())
+                  .extracting("id")
+                  .containsExactly(
+                      NORM_ABBREVIATION_UUID_6, NORM_ABBREVIATION_UUID_5, NORM_ABBREVIATION_UUID_7);
+            });
+  }
+
   private void generateLookupValues() {
     NormAbbreviationDTO normAbbreviationDTO =
         NormAbbreviationDTO.builder()
-            .id(NORM_ABBREVIATION_UUID)
+            .id(NORM_ABBREVIATION_UUID_1)
             .newEntity(true)
-            .abbreviation("norm abbreviation")
+            .abbreviation("norm abbreviation 1")
             .decisionDate(LocalDate.of(2023, Month.MAY, 19))
             .documentId(1234)
-            .documentNumber("document number")
-            .officialLetterAbbreviation("official letter abbreviation")
-            .officialLongTitle("official long title")
-            .officialShortTitle("official short title")
+            .documentNumber("document number 1")
+            .officialLetterAbbreviation("official letter abbreviation 1")
+            .officialLongTitle("official long title 1")
+            .officialShortTitle("official short title 1")
             .source('S')
+            .build();
+    repository.save(normAbbreviationDTO).block();
+
+    normAbbreviationDTO =
+        NormAbbreviationDTO.builder()
+            .id(NORM_ABBREVIATION_UUID_2)
+            .newEntity(true)
+            .abbreviation("search query at the beginning")
+            .decisionDate(LocalDate.of(2023, Month.MAY, 20))
+            .documentId(2345)
+            .documentNumber("document number 2")
+            .officialLetterAbbreviation("official letter abbreviation 2")
+            .officialLongTitle("official long title 2")
+            .officialShortTitle("official short title 2")
+            .source('T')
+            .build();
+    repository.save(normAbbreviationDTO).block();
+
+    normAbbreviationDTO =
+        NormAbbreviationDTO.builder()
+            .id(NORM_ABBREVIATION_UUID_3)
+            .newEntity(true)
+            .abbreviation("in the middle the search query is located")
+            .decisionDate(LocalDate.of(2023, Month.MAY, 21))
+            .documentId(3456)
+            .documentNumber("document number 3")
+            .officialLetterAbbreviation("official letter abbreviation 3")
+            .officialLongTitle("official long title 3")
+            .officialShortTitle("official short title 3")
+            .source('U')
+            .build();
+    repository.save(normAbbreviationDTO).block();
+
+    normAbbreviationDTO =
+        NormAbbreviationDTO.builder()
+            .id(NORM_ABBREVIATION_UUID_4)
+            .newEntity(true)
+            .abbreviation("SeaRch QueRY not in the right case")
+            .decisionDate(LocalDate.of(2023, Month.MAY, 22))
+            .documentId(4567)
+            .documentNumber("document number 4")
+            .officialLetterAbbreviation("official letter abbreviation 4")
+            .officialLongTitle("official long title 4")
+            .officialShortTitle("official short title 4")
+            .source('V')
+            .build();
+    repository.save(normAbbreviationDTO).block();
+
+    normAbbreviationDTO =
+        NormAbbreviationDTO.builder()
+            .id(NORM_ABBREVIATION_UUID_5)
+            .newEntity(true)
+            .abbreviation("Search B")
+            .decisionDate(LocalDate.of(2023, Month.MAY, 23))
+            .documentId(5678)
+            .documentNumber("document number 5")
+            .officialLetterAbbreviation("official letter abbreviation 5")
+            .officialLongTitle("official long title 5")
+            .officialShortTitle("official short title 5")
+            .source('W')
+            .build();
+    repository.save(normAbbreviationDTO).block();
+
+    normAbbreviationDTO =
+        NormAbbreviationDTO.builder()
+            .id(NORM_ABBREVIATION_UUID_6)
+            .newEntity(true)
+            .abbreviation("Search A")
+            .decisionDate(LocalDate.of(2023, Month.MAY, 24))
+            .documentId(6789)
+            .documentNumber("document number 6")
+            .officialLetterAbbreviation("official letter abbreviation 6")
+            .officialLongTitle("official long title 6")
+            .officialShortTitle("official short title 6")
+            .source('X')
+            .build();
+    repository.save(normAbbreviationDTO).block();
+
+    normAbbreviationDTO =
+        NormAbbreviationDTO.builder()
+            .id(NORM_ABBREVIATION_UUID_7)
+            .newEntity(true)
+            .abbreviation("Search C")
+            .decisionDate(LocalDate.of(2023, Month.MAY, 25))
+            .documentId(7890)
+            .documentNumber("document number 7")
+            .officialLetterAbbreviation("official letter abbreviation 7")
+            .officialLongTitle("official long title 7")
+            .officialShortTitle("official short title 7")
+            .source('Y')
             .build();
     repository.save(normAbbreviationDTO).block();
 
@@ -310,7 +453,7 @@ class NormAbbreviationIntegrationTest {
     NormAbbreviationDocumentTypeDTO normAbbreviationDocumentTypeDTO =
         NormAbbreviationDocumentTypeDTO.builder()
             .newEntity(true)
-            .normAbbreviationId(NORM_ABBREVIATION_UUID)
+            .normAbbreviationId(NORM_ABBREVIATION_UUID_1)
             .documentTypeId(documentTypeUUID)
             .build();
     normAbbreviationDocumentTypeRepository.save(normAbbreviationDocumentTypeDTO).block();
@@ -320,7 +463,7 @@ class NormAbbreviationIntegrationTest {
     NormAbbreviationRegionDTO normAbbreviationRegionDTO =
         NormAbbreviationRegionDTO.builder()
             .newEntity(true)
-            .normAbbreviationId(NORM_ABBREVIATION_UUID)
+            .normAbbreviationId(NORM_ABBREVIATION_UUID_1)
             .regionId(regionUUID)
             .build();
     normAbbreviationRegionRepository.save(normAbbreviationRegionDTO).block();
@@ -340,18 +483,18 @@ class NormAbbreviationIntegrationTest {
 
     private NormAbbreviationTestBuilder getExpectedNormAbbreviation() {
       builder
-          .id(NORM_ABBREVIATION_UUID)
-          .abbreviation("norm abbreviation")
+          .id(NORM_ABBREVIATION_UUID_1)
+          .abbreviation("norm abbreviation 1")
           .documentId(1234)
-          .documentNumber("document number")
+          .documentNumber("document number 1")
           .decisionDate(
               LocalDate.of(2023, Month.MAY, 19)
                   .atStartOfDay()
                   .atZone(ZoneId.of("Europe/Berlin"))
                   .toInstant())
-          .officialLetterAbbreviation("official letter abbreviation")
-          .officialShortTitle("official short title")
-          .officialLongTitle("official long title")
+          .officialLetterAbbreviation("official letter abbreviation 1")
+          .officialShortTitle("official short title 1")
+          .officialLongTitle("official long title 1")
           .source('S');
       return this;
     }
