@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
-import { Court } from "@/domain/documentUnit"
-import { FieldOfLawComboboxItem } from "@/domain/fieldOfLaw"
 import {
   ComboboxItem,
   ComboboxInputModelType,
@@ -29,7 +27,6 @@ const emit = defineEmits<Emits>()
 const NO_MATCHING_ENTRY = "Kein passender Eintrag"
 
 const candidateForSelection = ref<ComboboxItem>() // <-- the top search result
-const selectedValue = ref<ComboboxInputModelType>()
 const inputText = ref<string>()
 const currentlyDisplayedItems = ref<ComboboxItem[]>()
 const showDropdown = ref(false)
@@ -42,40 +39,10 @@ const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
 )
 
-const getLabelFromSelectedValue = (): string | undefined => {
-  if (
-    typeof selectedValue.value === "object" &&
-    "label" in selectedValue.value
-  ) {
-    return selectedValue.value.label
-  } else {
-    return selectedValue.value
-  }
-}
-
-watch(
-  props,
-  () => {
-    selectedValue.value = props.modelValue ?? props.value
-    updateInputText()
-  },
-  {
-    immediate: true,
-  }
-)
-
-watch(selectedValue, () => {
-  emit("update:modelValue", selectedValue.value)
-  updateInputText()
+const selectedValue = computed({
+  get: () => props.modelValue ?? props.value,
+  set: (value) => emit("update:modelValue", value),
 })
-
-function isCourt(input?: ComboboxInputModelType): input is Court {
-  return typeof input === "object" && "location" in input && "type" in input
-}
-
-function updateInputText() {
-  inputText.value = getLabelFromSelectedValue()
-}
 
 const toggleDropdown = async () => {
   showDropdown.value = !showDropdown.value
@@ -118,7 +85,6 @@ const onEnter = async () => {
     setChosenItem(candidateForSelection.value)
     return
   }
-  updateInputText()
   await toggleDropdown()
 }
 
@@ -188,51 +154,25 @@ const selectAllText = () => {
   inputFieldRef.value?.select()
 }
 
+function getLabel() {
+  return typeof selectedValue.value === "object" &&
+    "label" in selectedValue.value
+    ? selectedValue.value.label
+    : selectedValue.value
+}
+
 const closeDropdownAndRevertToLastSavedValue = () => {
   showDropdown.value = false
-  updateInputText()
-  filter.value = inputText.value
+  inputText.value = getLabel()
 }
 
-const isRevokedCourt = (item: ComboboxItem) => {
-  return !!(isCourt(item.value) && item.value.revoked)
-}
-
-function isFieldOfLawComboboxItem(
-  input?: ComboboxInputModelType
-): input is FieldOfLawComboboxItem {
-  return typeof input === "object" && "text" in input
-}
-
-const hasAdditionalInfo = (item: ComboboxItem) => {
-  // this needs to happen in the service, the component should not deal with specific types
-  // the service needs to provide all required info TODO
-  return isRevokedCourt(item) || isFieldOfLawComboboxItem(item.value)
-}
-
-const getRevokedCourtString = (item: ComboboxItem) => {
-  return (item.value as Court).revoked
-}
-
-const getAdditionalInfo = (item: ComboboxItem) => {
-  if (isRevokedCourt(item)) {
-    return getRevokedCourtString(item)
-  }
-  if (isFieldOfLawComboboxItem(item.value)) {
-    return item.value.text
-  }
-  return null
-}
-
-const getAdditionalInfoStyle = (item: ComboboxItem) => {
-  if (isRevokedCourt(item)) {
-    return "dropdown-container__dropdown-item__additional-info-chip"
-  }
-  if (isFieldOfLawComboboxItem(item.value)) {
-    return "dropdown-container__dropdown-item__additional-info-newline"
-  }
-  return ""
-}
+watch(
+  selectedValue,
+  () => {
+    inputText.value = getLabel()
+  },
+  { immediate: true }
+)
 
 onMounted(() => {
   window.addEventListener("click", handleClickOutside)
@@ -307,12 +247,9 @@ onBeforeUnmount(() => {
         aria-label="dropdown-option"
         class="dropdown-container__dropdown-item"
         :class="{
-          'dropdown-container__dropdown-item__with-additional-info':
-            isRevokedCourt(item),
-          'dropdown-container__dropdown-item__candidate-for-selection':
-            candidateForSelection === item,
+          'bg-blue-200': candidateForSelection === item,
           'dropdown-container__dropdown-item__currently-selected':
-            getLabelFromSelectedValue() === item.label,
+            inputText === item.label,
           'dropdown-container__dropdown-item__no-matching-entry':
             item.label === NO_MATCHING_ENTRY,
         }"
@@ -328,17 +265,9 @@ onBeforeUnmount(() => {
           <div
             v-if="item.additionalInformation"
             aria-label="additional-dropdown-info"
-            class="body-02-reg"
+            class="body-02-reg text-neutral-700"
           >
             {{ item.additionalInformation }}
-          </div>
-          <div
-            v-if="hasAdditionalInfo(item)"
-            aria-label="additional-dropdown-info"
-            class="body-02-reg"
-            :class="getAdditionalInfoStyle(item)"
-          >
-            {{ getAdditionalInfo(item) }}
           </div>
         </span>
       </div>
@@ -414,34 +343,6 @@ onBeforeUnmount(() => {
 
     &__no-matching-entry {
       cursor: default !important;
-    }
-
-    &__with-additional-info {
-      @apply text-gray-900;
-
-      font-style: italic;
-    }
-
-    &__additional-info-chip {
-      @apply text-neutral-700;
-      @apply bg-neutral-20;
-
-      padding: 6px 22px;
-      border-radius: 100px;
-      float: right;
-      font-size: 14px;
-      font-style: normal;
-    }
-
-    &__additional-info-newline {
-      @apply text-neutral-700;
-
-      font-size: 14px;
-      font-style: normal;
-    }
-
-    &__candidate-for-selection {
-      @apply bg-blue-200;
     }
 
     &__currently-selected {
