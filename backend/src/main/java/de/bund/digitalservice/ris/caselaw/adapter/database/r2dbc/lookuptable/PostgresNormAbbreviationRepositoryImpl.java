@@ -56,7 +56,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
     Mono<List<DocumentTypeNewDTO>> documentTypes =
         normAbbreviationDocumentTypeRepository
             .findAllByNormAbbreviationId(normAbbreviationDTO.getId())
-            .flatMap(
+            .flatMapSequential(
                 normAbbreviationDocumentTypeDTO ->
                     documentTypeRepository
                         .findById(normAbbreviationDocumentTypeDTO.getDocumentTypeId())
@@ -65,7 +65,7 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
     Mono<List<RegionDTO>> regions =
         normAbbreviationRegionRepository
             .findAllByNormAbbreviationId(normAbbreviationDTO.getId())
-            .flatMap(
+            .flatMapSequential(
                 normAbbreviationRegionDTO ->
                     regionRepository.findById(normAbbreviationRegionDTO.getRegionId()))
             .collectList();
