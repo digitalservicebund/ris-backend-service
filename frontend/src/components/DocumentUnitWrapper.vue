@@ -31,12 +31,17 @@ const decisionDateInfo = computed(() =>
     : undefined
 )
 
+const documentationOffice = computed(
+  () => props.documentUnit.coreData.documentationOffice?.label
+)
+
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)
 
 const propertyInfos = computed(() => [
   { label: "Aktenzeichen", value: fileNumberInfo.value },
   { label: "Entscheidungsdatum", value: decisionDateInfo.value },
   { label: "Gericht", value: courtInfo.value },
+  { label: "Dokumentationsstelle", value: documentationOffice.value },
 ])
 </script>
 

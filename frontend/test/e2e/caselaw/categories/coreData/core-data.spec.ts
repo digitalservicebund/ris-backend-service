@@ -231,8 +231,7 @@ test.describe("core data", () => {
     expect(await page.inputValue("[aria-label='Dokumenttyp']")).toBe("")
   })
 
-  // eslint-disable-next-line playwright/no-skipped-test
-  test.skip("ensure new docUnit has correct documentationOffice", async ({
+  test("ensure new docUnit has correct documentationOffice", async ({
     page,
   }) => {
     await test.step("create new docUnit with logged in user", async () => {
