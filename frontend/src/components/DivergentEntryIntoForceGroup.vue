@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import DivergentEntryIntoForceInputGroup from "@/components/DivergentEntryIntoForceInputGroup.vue"
+import DivergentEntryIntoForceDefinedInputGroup from "@/components/DivergentEntryIntoForceDefinedInputGroup.vue"
 import DivergentEntryIntoForceUndefinedInputGroup from "@/components/DivergentEntryIntoForceUndefinedInputGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
 
@@ -59,7 +59,7 @@ watch(selectedChildSectionName, () => (childSection.value = {}))
 const component = computed(() => {
   switch (selectedChildSectionName.value) {
     case MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED:
-      return DivergentEntryIntoForceInputGroup
+      return DivergentEntryIntoForceDefinedInputGroup
     case MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED:
       return DivergentEntryIntoForceUndefinedInputGroup
     default:
@@ -73,10 +73,10 @@ const component = computed(() => {
     <div class="radio-group w-320">
       <label class="form-control">
         <input
-          id="divergentEntryIntoForceSelection"
+          id="divergentEntryIntoForceDefinedSelection"
           v-model="selectedChildSectionName"
           aria-label="Bestimmtes abweichendes Inkrafttretedatum"
-          name="DivergentEntryIntoForce"
+          name="DivergentEntryIntoForceDefined"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED"
         />

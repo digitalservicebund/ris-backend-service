@@ -98,14 +98,13 @@ const checkboxStyle = ref({
 <template>
   <div class="w-384">
     <InputField
-      id="divergentEntryIntoForceUndefinedDate"
-      aria-label="Unbestimmtes abweichendes Inkrafttretedatum"
-      label="Unbestimmtes abweichendes Inkrafttretedatum"
+      id="divergentExpirationUndefinedDate"
+      label="Unbestimmtes abweichendes Außerkrafttretedatum"
     >
       <DropdownInput
-        id="divergentEntryIntoForceUndefinedDate"
+        id="divergentExpirationUndefinedDate"
         v-model="undefinedDateState"
-        aria-label="Unbestimmtes abweichendes Inkrafttretedatum"
+        aria-label="Unbestimmtes abweichendes Außerkrafttretedatum Dropdown"
         has-smaller-height
         :items="dropdownItems"
         placeholder="Bitte auswählen"

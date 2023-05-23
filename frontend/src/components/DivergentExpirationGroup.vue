@@ -75,8 +75,8 @@ const component = computed(() => {
         <input
           id="divergentExpirationDefinedSelection"
           v-model="selectedChildSectionName"
-          aria-label="Bestimmtes abweichendes Inkrafttretedatum"
-          name="DivergentEntryIntoForce"
+          aria-label="Bestimmtes grundsätzliches Außerkrafttretedatum Radio"
+          name="DivergentExpirationDefined"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED"
         />
@@ -86,8 +86,8 @@ const component = computed(() => {
         <input
           id="divergentExpirationUndefinedSelection"
           v-model="selectedChildSectionName"
-          aria-label="Unbestimmtes Abweichendes Inkrafttretedatum"
-          name="DivergentEntryIntoForceUndefined"
+          aria-label="Unbestimmtes abweichendes Außerkrafttretedatum Radio"
+          name="DivergentExpirationUndefined"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
         />
