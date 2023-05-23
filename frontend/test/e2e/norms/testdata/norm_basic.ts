@@ -108,8 +108,7 @@ export const normData: NormData = {
       },
     ],
     DOCUMENT_TYPE: [
-      { TYPE_NAME: ["RV"] },
-      { NORM_CATEGORY: [NormCategory.BASE_NORM] },
+      { TYPE_NAME: ["RV"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
     ],
   },
   officialLongTitle:

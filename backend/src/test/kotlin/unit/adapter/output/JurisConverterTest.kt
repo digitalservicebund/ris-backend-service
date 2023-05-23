@@ -135,11 +135,7 @@ class JurisConverterTest {
                     participationList = listOf(Participation("test participation type", "test participation institution"))
                     leadList = listOf(Lead("test lead jurisdiction", "test lead unit"))
                     subjectAreaList = listOf(SubjectArea("test subject FNA", "test subject Gesta"))
-                    documentTypeList = listOf(
-                        DocumentType("RV", null, null),
-                        DocumentType(null, "documentTemplateName", null),
-                        DocumentType(null, null, "ÜN"),
-                    )
+                    documentType = DocumentType("RV", listOf("documentTemplateName"), listOf("ÜN"))
                     officialShortTitle = "test official short title"
                     officialAbbreviation = "test official abbreviation"
                     unofficialLongTitleList = listOf("test unofficial long title")
@@ -273,7 +269,7 @@ class JurisConverterTest {
             assertThat(printAnnouncementMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test print announcement page", PAGE, 1))
 
             val documentTypeSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.DOCUMENT_TYPE }
-            assertThat(documentTypeSections).hasSize(3)
+            assertThat(documentTypeSections).hasSize(1)
             val documentTypeMetadata = documentTypeSections?.flatMap { it.metadata }
             assertThat(documentTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("RV", TYPE_NAME, 1))
             assertThat(documentTypeMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(NormCategory.TRANSITIONAL_NORM, NORM_CATEGORY, 1))
