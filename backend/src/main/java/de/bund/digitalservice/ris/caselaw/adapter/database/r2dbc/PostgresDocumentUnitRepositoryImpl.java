@@ -11,7 +11,6 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecis
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.ProceedingDecisionLinkDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DeviatingDecisionDateTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
-import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentationOfficeTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.IncorrectCourtTransformer;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.ProceedingDecisionTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -875,7 +874,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return metadataRepository
         .findAllByDataSourceLike(DataSource.NEURIS.name(), pageable)
         .flatMap(this::injectFileNumbers)
-        .flatMap(this::injectDocumentationOffice)
         .map(
             documentUnitDTO ->
                 DocumentUnitListEntry.builder()
@@ -889,9 +887,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                                 || documentUnitDTO.getFileNumbers().isEmpty()
                             ? null
                             : documentUnitDTO.getFileNumbers().get(0).getFileNumber())
-                    .documentationOffice(
-                        DocumentationOfficeTransformer.transformDTO(
-                            documentUnitDTO.getDocumentationOffice()))
                     .build());
   }
 

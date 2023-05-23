@@ -11,5 +11,4 @@ public record DocumentUnitListEntry(
     Instant creationTimestamp,
     DataSource dataSource,
     String fileName,
-    String fileNumber,
-    DocumentationOffice documentationOffice) {}
+    String fileNumber) {}

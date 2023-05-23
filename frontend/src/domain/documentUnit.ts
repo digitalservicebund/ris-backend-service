@@ -15,7 +15,7 @@ export type CoreData = {
   deviatingDecisionDates?: string[]
   legalEffect?: string
   inputType?: string
-  documentationOffice?: DocumentationOffice
+  center?: string
   region?: string
 }
 
@@ -44,11 +44,6 @@ export type Texts = {
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
-}
-
-export type DocumentationOffice = {
-  label: string
-  abbreviation?: string
 }
 
 export default class DocumentUnit {

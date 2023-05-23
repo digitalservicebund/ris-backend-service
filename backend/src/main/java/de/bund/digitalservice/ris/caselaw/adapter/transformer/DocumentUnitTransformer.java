@@ -58,7 +58,10 @@ public class DocumentUnitTransformer {
 
       if (coreData.documentationOffice() != null) {
         builder.documentationOffice(
-            DocumentationOfficeTransformer.transform(coreData.documentationOffice()));
+            DocumentationOfficeDTO.builder()
+                .label(coreData.documentationOffice().label())
+                .abbreviation(coreData.documentationOffice().abbreviation())
+                .build());
       }
 
       if (coreData.court() != null) {
@@ -132,7 +135,10 @@ public class DocumentUnitTransformer {
     if (documentationOfficeDTO == null) {
       return null;
     }
-    return DocumentationOfficeTransformer.transformDTO(documentationOfficeDTO);
+    return DocumentationOffice.builder()
+        .label(documentationOfficeDTO.getLabel())
+        .abbreviation(documentationOfficeDTO.getAbbreviation())
+        .build();
   }
 
   public static DocumentUnit transformMetadataToDomain(

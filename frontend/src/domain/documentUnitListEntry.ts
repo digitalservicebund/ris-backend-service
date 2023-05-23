@@ -1,5 +1,3 @@
-import { DocumentationOffice } from "./documentUnit"
-
 export type DocumentUnitListEntry = {
   id: string
   uuid: string
@@ -7,5 +5,4 @@ export type DocumentUnitListEntry = {
   creationTimestamp: string
   fileName?: string
   fileNumber?: string
-  documentationOffice?: DocumentationOffice
 }
