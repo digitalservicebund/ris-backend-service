@@ -28,12 +28,15 @@ public class KeycloakUserService implements UserService {
 
   public Mono<User> getUser(OidcUser oidcUser) {
     return extractDocumentationOffice(oidcUser)
-        .map(
-            documentationOffice ->
-                User.builder()
-                    .name(oidcUser.getAttribute("name"))
-                    .documentationOffice(documentationOffice)
-                    .build());
+        .map(documentationOffice -> createUser(oidcUser, documentationOffice))
+        .switchIfEmpty(Mono.defer(() -> Mono.just(createUser(oidcUser, null))));
+  }
+
+  private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
+    return User.builder()
+        .name(oidcUser.getAttribute("name"))
+        .documentationOffice(documentationOffice)
+        .build();
   }
 
   private Mono<DocumentationOffice> extractDocumentationOffice(OidcUser oidcUser) {

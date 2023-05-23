@@ -3,12 +3,14 @@ package de.bund.digitalservice.ris.caselaw.integration.tests;
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
+import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOidcLogin;
 
 import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.User;
+import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -57,5 +59,28 @@ class AuthIntegrationTest {
               assertThat(response.getResponseBody().documentationOffice().label())
                   .isEqualTo("DigitalService");
             });
+  }
+
+  @Test
+  void testGetUserNameWithoutKnownGroup() {
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(
+            mockOidcLogin()
+                .idToken(
+                    token ->
+                        token.claims(
+                            claims -> {
+                              claims.put("groups", Collections.singletonList("foo"));
+                              claims.put("name", "testUser");
+                            })))
+        .get()
+        .uri("/api/v1/auth/me")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(User.class)
+        .consumeWith(
+            response -> assertThat(response.getResponseBody().name()).isEqualTo("testUser"));
   }
 }
