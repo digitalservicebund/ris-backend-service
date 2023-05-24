@@ -9,6 +9,7 @@ import {
   Norm,
   NormCategory,
   Paragraph,
+  UndefinedDate,
 } from "@/domain/Norm"
 import {
   InputType,
@@ -65,6 +66,7 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.TYPE_NAME]: generateString,
   [MetadatumType.NORM_CATEGORY]: pickRandomNormCategory,
   [MetadatumType.TEMPLATE_NAME]: generateString,
+  [MetadatumType.UNDEFINED_DATE]: pickRandomUndefinedDate,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -188,6 +190,12 @@ export function pickRandomNormCategory(): NormCategory {
   return options[index]
 }
 
+export function pickRandomUndefinedDate(): UndefinedDate {
+  const options = Object.values(UndefinedDate)
+  const index = generateRandomNumber(0, options.length - 1)
+  return options[index]
+}
+
 export function pickRandomMetadatumType(): MetadatumType {
   const options = Object.values(MetadatumType)
   const index = generateRandomNumber(0, options.length - 1)
@@ -205,7 +213,8 @@ export function generateMetadata(partialMetadata?: Partial<Metadata>) {
       // @ts-ignore TS2345
       .map(METADATA_VALUE_GENERATORS[type]) as string[] &
       boolean[] &
-      NormCategory[]
+      NormCategory[] &
+      UndefinedDate[]
     metadata[type] = values
   }
 

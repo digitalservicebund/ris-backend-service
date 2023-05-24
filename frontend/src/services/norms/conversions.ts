@@ -24,6 +24,7 @@ import {
   Norm,
   FlatMetadata,
   NormCategory,
+  UndefinedDate,
 } from "@/domain/Norm"
 
 function identity<T>(data: T): T {
@@ -84,6 +85,20 @@ function decodeNormCategory(data: string): NormCategory {
   else throw new Error(`Unknown Norm Category: "${data}"`)
 }
 
+function decodeUndefinedDate(data: string): UndefinedDate {
+  const indexOfKeyPassed = Object.keys(UndefinedDate).indexOf(data)
+
+  const unit = Object.values(UndefinedDate)[indexOfKeyPassed]
+
+  if (unit) {
+    return unit
+  } else throw new Error(`Could not decode UndefinedDate: '${data}'`)
+}
+
+function encodeUndefinedDate(data: UndefinedDate): string {
+  return data
+}
+
 const DECODERS: MetadataValueDecoders = {
   [MetadatumType.KEYWORD]: identity,
   [MetadatumType.UNOFFICIAL_LONG_TITLE]: identity,
@@ -126,6 +141,7 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.TYPE_NAME]: identity,
   [MetadatumType.NORM_CATEGORY]: decodeNormCategory,
   [MetadatumType.TEMPLATE_NAME]: identity,
+  [MetadatumType.UNDEFINED_DATE]: decodeUndefinedDate,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -170,6 +186,7 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.TYPE_NAME]: identity,
   [MetadatumType.NORM_CATEGORY]: identity,
   [MetadatumType.TEMPLATE_NAME]: identity,
+  [MetadatumType.UNDEFINED_DATE]: encodeUndefinedDate,
 }
 
 /**
