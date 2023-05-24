@@ -80,8 +80,8 @@ onUnmounted(() => (loadedNorm.value = undefined))
       class="bg-gray-100 border-gray-400 border-l-1 w-full"
     >
       <DocumentUnitInfoPanel
+        :first-row="propertyInfos"
         :heading="loadedNorm.risAbbreviation"
-        :property-infos="propertyInfos"
       />
       <RouterView class="p-48" />
     </div>
