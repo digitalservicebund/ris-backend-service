@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
-import { NormReference } from "@/domain/normReference"
+import NormReference from "@/domain/normReference"
 
 function renderComponent(options?: { modelValue?: NormReference }) {
   const user = userEvent.setup()

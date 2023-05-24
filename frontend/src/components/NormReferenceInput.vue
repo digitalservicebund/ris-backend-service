@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { NormReference } from "@/domain/normReference"
+import NormReference from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
 import CustomDateInput from "@/shared/components/input/CustomDateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"

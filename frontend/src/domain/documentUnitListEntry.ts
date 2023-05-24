@@ -1,4 +1,4 @@
-import { DocumentationOffice } from "./documentUnit"
+import DocumentationOffice from "./documentationOffice"
 
 export type DocumentUnitListEntry = {
   id: string

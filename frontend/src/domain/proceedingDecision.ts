@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 import { Court, DocumentType } from "./documentUnit"
 
-export class ProceedingDecision {
+export default class ProceedingDecision {
   public uuid?: string
   public documentNumber?: string
   public dataSource?: "NEURIS" | "MIGRATION" | "PROCEEDING_DECISION"

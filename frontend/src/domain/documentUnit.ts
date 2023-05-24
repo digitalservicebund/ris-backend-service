@@ -1,5 +1,6 @@
-import { ProceedingDecision } from "./proceedingDecision"
-import { NormReference } from "@/domain/normReference"
+import DocumentationOffice from "./documentationOffice"
+import NormReference from "./normReference"
+import ProceedingDecision from "./proceedingDecision"
 
 export type CoreData = {
   fileNumbers?: string[]
@@ -44,11 +45,6 @@ export type Texts = {
   reasons?: string
   caseFacts?: string
   decisionReasons?: string
-}
-
-export type DocumentationOffice = {
-  label: string
-  abbreviation?: string
 }
 
 export default class DocumentUnit {

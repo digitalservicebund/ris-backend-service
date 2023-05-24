@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
-import { NormReference } from "@/domain/normReference"
+import NormReference from "@/domain/normReference"
 import EditableList from "@/shared/components/EditableList.vue"
 
 const props = defineProps<{

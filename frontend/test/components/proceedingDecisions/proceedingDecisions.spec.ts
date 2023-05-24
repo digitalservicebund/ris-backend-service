@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import DocumentUnitProceedingDecisions from "@/components/proceedingDecisions/ProceedingDecisions.vue"
-import { ProceedingDecision } from "@/domain/proceedingDecision"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import documentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"
 

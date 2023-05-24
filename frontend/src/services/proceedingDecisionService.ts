@@ -1,6 +1,6 @@
-import DocumentUnit from "./../domain/documentUnit"
-import { ProceedingDecision } from "./../domain/proceedingDecision"
 import httpClient, { ServiceResponse } from "./httpClient"
+import DocumentUnit from "@/domain/documentUnit"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 interface ProceedingDecisionService {
   createProceedingDecision(

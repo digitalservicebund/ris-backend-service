@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import InlineDecision from "./InlineDecision.vue"
-import { ProceedingDecision } from "@/domain/proceedingDecision"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import TextButton from "@/shared/components/input/TextButton.vue"
 
 defineProps<{ searchResults?: SearchResults }>()

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest"
-import { ProceedingDecision } from "@/domain/proceedingDecision"
+import ProceedingDecision from "@/domain/proceedingDecision"
 
 describe("ProceedingDecision", () => {
   it("instantiates a proceeding decision", () => {

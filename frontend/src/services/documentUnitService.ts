@@ -1,10 +1,10 @@
-import DocumentUnit from "../domain/documentUnit"
-import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
-import { ProceedingDecision } from "../domain/proceedingDecision"
 import httpClient, {
   ServiceResponse,
   FailedValidationServerResponse,
 } from "./httpClient"
+import DocumentUnit from "@/domain/documentUnit"
+import { DocumentUnitListEntry } from "@/domain/documentUnitListEntry"
+import ProceedingDecision from "@/domain/proceedingDecision"
 import { PageableService, Page } from "@/shared/components/Pagination.vue"
 
 interface DocumentUnitService {
