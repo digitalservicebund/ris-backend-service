@@ -15,7 +15,7 @@ describe("documentUnit InfoPanel", () => {
   it("renders all given property infos in correct order", async () => {
     render(DocumentUnitInfoPanel, {
       props: {
-        propertyInfos: [
+        secondRow: [
           { label: "foo", value: "value-foo" },
           { label: "bar", value: "value-bar" },
         ],
@@ -46,7 +46,7 @@ describe("documentUnit InfoPanel", () => {
   it("renders a placeholder for an undefined property info value", async () => {
     render(DocumentUnitInfoPanel, {
       props: {
-        propertyInfos: [{ label: "foo", value: undefined }],
+        secondRow: [{ label: "foo", value: undefined }],
       },
     })
 
