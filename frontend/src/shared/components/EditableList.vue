@@ -110,6 +110,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
       >
         <component
           :is="summaryComponent"
+          class="focus-visible:outline-blue-800 focus:outline-none"
           :data="entry"
           tabindex="0"
           @click="setEditIndex(index)"
