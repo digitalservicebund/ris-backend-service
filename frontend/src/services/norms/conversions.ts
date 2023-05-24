@@ -497,6 +497,7 @@ export function encodeFlatMetadata(
     principleExpirationDateState: encodeString(
       flatMetadata.principleExpirationDateState
     ),
+    announcementDate: encodeNullDate(flatMetadata.announcementDate),
     publicationDate: encodeNullDate(flatMetadata.publicationDate),
     reissueArticle: encodeString(flatMetadata.reissueArticle),
     reissueDate: encodeNullDate(flatMetadata.reissueDate),
