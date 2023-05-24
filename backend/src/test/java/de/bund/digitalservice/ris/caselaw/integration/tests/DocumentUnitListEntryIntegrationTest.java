@@ -1,7 +1,9 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
+import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
@@ -19,6 +21,10 @@ import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.web.reactive.server.EntityExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -134,5 +141,52 @@ public class DocumentUnitListEntryIntegrationTest {
         .isEqualTo("BGH")
         .jsonPath("$.totalElements")
         .isEqualTo(1);
+  }
+
+  @Test
+  void testForCorrectOrdering() {
+    DocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByLabel("BGH").block();
+
+    List<Instant> timestampsExpected = new ArrayList<>();
+    for (int i = 0; i < 10; i++) {
+      timestampsExpected.add(Instant.now().minus(i, ChronoUnit.DAYS));
+    }
+    Collections.shuffle(timestampsExpected);
+
+    for (int i = 0; i < 10; i++) {
+      repository
+          .save(
+              DocumentUnitDTO.builder()
+                  .uuid(UUID.randomUUID())
+                  .creationtimestamp(timestampsExpected.get(i))
+                  .documentnumber("123456789012" + i)
+                  .dataSource(DataSource.NEURIS)
+                  .documentationOfficeId(documentationOfficeDTO.getId())
+                  .build())
+          .block();
+    }
+
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .get()
+            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    List<String> timestampActualStrings =
+        JsonPath.read(result.getResponseBody(), "$.content[*].creationTimestamp");
+    List<Instant> timestampsActual = timestampActualStrings.stream().map(Instant::parse).toList();
+    assertThat(timestampsActual).hasSameSizeAs(timestampsExpected);
+
+    for (int i = 0; i < timestampsActual.size() - 1; i++) {
+      Instant tThis = timestampsActual.get(i);
+      Instant tNext = timestampsActual.get(i + 1);
+      assertThat(tThis).isAfter(tNext);
+    }
   }
 }
