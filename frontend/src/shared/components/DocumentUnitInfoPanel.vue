@@ -26,7 +26,7 @@ withDefaults(defineProps<Props>(), {
   >
     <div class="flex items-center space-x-[2rem]">
       <div class="text-30">{{ heading }}</div>
-      <div v-for="entry in firstRow" :key="entry.label" class="grow">
+      <div v-for="entry in firstRow" :key="entry.label">
         <PropertyInfo
           direction="row"
           :label="entry.label"
