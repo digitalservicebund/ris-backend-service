@@ -29,10 +29,10 @@ test.describe("decision date", () => {
       await page.locator("[aria-label='Entscheidungsdatum']").inputValue()
     ).toBe("03.02.2022")
 
-    const infoPanel = page.locator("div", { hasText: documentNumber }).nth(-2)
-    await expect(
-      infoPanel.locator("div", { hasText: "Entscheidungsdatum" }).first()
-    ).toContainText("03.02.2022")
+    const infoPanel = page.getByText(
+      new RegExp(`${documentNumber}.*Entscheidungsdatum.*`)
+    )
+    await expect(infoPanel.getByText("03.02.2022")).toBeVisible()
 
     await page.locator("[aria-label='Entscheidungsdatum']").click()
     await page.keyboard.press("Backspace")
@@ -42,8 +42,10 @@ test.describe("decision date", () => {
     ).toBe("")
 
     await expect(
-      infoPanel.locator("div", { hasText: "Entscheidungsdatum" }).first()
-    ).toHaveText("Entscheidungsdatum -")
+      infoPanel.getByText("Entscheidungsdatum - ", {
+        exact: true,
+      })
+    ).toBeVisible()
   })
 
   test("backspace delete in deviating decision date", async ({

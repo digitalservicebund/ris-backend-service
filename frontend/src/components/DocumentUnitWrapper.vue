@@ -37,11 +37,17 @@ const documentationOffice = computed(
 
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)
 
-const propertyInfos = computed(() => [
+const firstRowInfos = computed(() => [
+  {
+    label: "Dokumentationsstelle",
+    value: documentationOffice.value,
+  },
+])
+
+const secondRowInfos = computed(() => [
   { label: "Aktenzeichen", value: fileNumberInfo.value },
   { label: "Entscheidungsdatum", value: decisionDateInfo.value },
   { label: "Gericht", value: courtInfo.value },
-  { label: "Dokumentationsstelle", value: documentationOffice.value },
 ])
 </script>
 
@@ -61,8 +67,9 @@ const propertyInfos = computed(() => [
 
     <div class="bg-gray-100 flex flex-col w-full">
       <DocumentUnitInfoPanel
+        :first-row="firstRowInfos"
         :heading="documentUnit.documentNumber ?? ''"
-        :property-infos="propertyInfos"
+        :second-row="secondRowInfos"
       />
 
       <div class="flex flex-col grow items-start">

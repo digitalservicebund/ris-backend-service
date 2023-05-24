@@ -8,27 +8,41 @@ interface PropertyInfo {
 
 interface Props {
   heading?: string
-  propertyInfos?: PropertyInfo[]
+  firstRow?: PropertyInfo[]
+  secondRow?: PropertyInfo[]
 }
 
 withDefaults(defineProps<Props>(), {
   heading: "",
-  propertyInfos: () => [],
+  firstRow: () => [],
+  secondRow: () => [],
 })
 </script>
 
 <template>
   <div
-    class="bg-blue-200 border-b border-gray-400 border-solid flex gap-20 h-80 items-center px-[2rem]"
+    class="bg-blue-200 border-b border-gray-400 border-solid grid h-96 items-center px-[2rem]"
   >
-    <div class="text-30">{{ heading }}</div>
+    <div class="flex items-center space-x-[2rem]">
+      <div class="text-30">{{ heading }}</div>
+      <div v-for="entry in firstRow" :key="entry.label" class="grow">
+        <PropertyInfo
+          v-if="entry.value"
+          direction="row"
+          :label="entry.label"
+          :value="entry.value || ' - '"
+        ></PropertyInfo>
+      </div>
+    </div>
 
-    <div v-for="entry in propertyInfos" :key="entry.label" class="grow">
-      <PropertyInfo
-        direction="row"
-        :label="entry.label"
-        :value="entry.value || ' - '"
-      ></PropertyInfo>
+    <div class="flex space-x-[2rem]">
+      <div v-for="entry in secondRow" :key="entry.label" class="-mt-20">
+        <PropertyInfo
+          direction="row"
+          :label="entry.label"
+          :value="entry.value || ' - '"
+        ></PropertyInfo>
+      </div>
     </div>
   </div>
 </template>
