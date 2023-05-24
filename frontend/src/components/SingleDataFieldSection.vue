@@ -55,7 +55,7 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
       class="label-02-bold max-w-[13rem] min-w-[13rem] my-12 text-left"
       :for="id"
     >
-      {{ label }}
+      <h2>{{ label }}</h2>
     </label>
 
     <InputElement
