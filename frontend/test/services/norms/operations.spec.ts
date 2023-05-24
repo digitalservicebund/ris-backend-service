@@ -197,7 +197,7 @@ describe("normsService", () => {
           announcementDate: null,
           officialAbbreviation: null,
           officialLongTitle: "new title",
-          publicationDate: "2022-11-15",
+          publicationDate: "2022-11-14",
           officialShortTitle: null,
           isExpirationDateTemp: null,
           risAbbreviation: null,

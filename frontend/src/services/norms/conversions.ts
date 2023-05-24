@@ -49,7 +49,7 @@ function encodeDate(data?: string): string {
   dayjs.extend(timezone)
 
   return data && data.length > 0
-    ? dayjs(data).utc().tz("Europe/Berlin").format("YYYY-MM-DD")
+    ? dayjs.utc(data).tz(dayjs.tz.guess()).format("YYYY-MM-DD")
     : ""
 }
 
