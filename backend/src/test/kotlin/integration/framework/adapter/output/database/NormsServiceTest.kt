@@ -15,8 +15,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.OFFICIAL_REFERENCE
-import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.PRINT_ANNOUNCEMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.KEYWORD
@@ -116,8 +114,8 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
     fun `the search norm result includes their ELI property`() {
         val page = Metadatum("1125", MetadatumType.PAGE)
         val gazette = Metadatum("bg-1", MetadatumType.ANNOUNCEMENT_GAZETTE)
-        val printAnnouncement = MetadataSection(PRINT_ANNOUNCEMENT, listOf(page, gazette))
-        val officialReference = MetadataSection(OFFICIAL_REFERENCE, emptyList(), 1, listOf(printAnnouncement))
+        val printAnnouncement = MetadataSection(MetadataSectionName.PRINT_ANNOUNCEMENT, listOf(page, gazette))
+        val officialReference = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, emptyList(), 1, listOf(printAnnouncement))
         val normWithEli = NORM.copy(
             officialLongTitle = "test title",
             announcementDate = LocalDate.parse("2022-02-02"),
@@ -552,6 +550,183 @@ class NormsServiceTest : PostgresTestcontainerIntegrationTest() {
         val result = normsService.metadatumToEntity(metadatumDto)
 
         assertThat(result.value).isEqualTo(LocalDate.of(2020, 12, 23))
+    }
+
+    @Test
+    fun `save a norm with no print announcement and retrieve by eli with digital announcement and edition`() {
+        val digitalAnnouncement = MetadataSection(
+            MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+            listOf(
+                Metadatum("medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+                Metadatum("999", MetadatumType.EDITION),
+            ),
+        )
+        val referenceSection = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(digitalAnnouncement))
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            metadataSections = listOf(referenceSection),
+            officialLongTitle = "Test Title 2",
+            announcementDate = LocalDate.parse("2022-02-02"),
+        )
+        val saveNormCommand = SaveNormOutputPort.Command(norm)
+
+        val eliQuery = GetNormByEliOutputPort.Query("medium", "2022", "999")
+
+        normsService.saveNorm(saveNormCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .assertNext { assertNormsAreEqual(norm, it) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save a norm with no print announcement and retrieve by eli with digital announcement and page and no edition`() {
+        val digitalAnnouncement = MetadataSection(
+            MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+            listOf(
+                Metadatum("medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+                Metadatum("999", MetadatumType.PAGE),
+            ),
+        )
+        val referenceSection = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(digitalAnnouncement))
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            metadataSections = listOf(referenceSection),
+            officialLongTitle = "Test Title 2",
+            announcementDate = LocalDate.parse("2022-02-02"),
+        )
+        val saveNormCommand = SaveNormOutputPort.Command(norm)
+
+        val eliQuery = GetNormByEliOutputPort.Query("medium", "2022", "999")
+
+        normsService.saveNorm(saveNormCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .assertNext { assertNormsAreEqual(norm, it) }
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save a norm with no print announcement and do not retrieve by eli because digital announcement has both page and edition and only page matches`() {
+        val digitalAnnouncement = MetadataSection(
+            MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+            listOf(
+                Metadatum("medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+                Metadatum("000", MetadatumType.EDITION),
+                Metadatum("999", MetadatumType.PAGE),
+
+            ),
+        )
+        val referenceSection = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(digitalAnnouncement))
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            metadataSections = listOf(referenceSection),
+            officialLongTitle = "Test Title 2",
+            announcementDate = LocalDate.parse("2022-02-02"),
+        )
+        val saveNormCommand = SaveNormOutputPort.Command(norm)
+
+        val eliQuery = GetNormByEliOutputPort.Query("medium", "2022", "999")
+
+        normsService.saveNorm(saveNormCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .expectNextCount(0)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save a norm with print announcement and digital announcement and dont retrieve by eli because only digital announcement matches`() {
+        val printAnnouncement = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("no-matching", MetadatumType.ANNOUNCEMENT_GAZETTE),
+                Metadatum("000", MetadatumType.PAGE),
+            ),
+        )
+        val digitalAnnouncement = MetadataSection(
+            MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+            listOf(
+                Metadatum("matching", MetadatumType.ANNOUNCEMENT_MEDIUM),
+                Metadatum("999", MetadatumType.EDITION),
+            ),
+        )
+        val referenceSectionPrint = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncement))
+        val referenceSectionDigital = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 2, listOf(digitalAnnouncement))
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            metadataSections = listOf(referenceSectionPrint, referenceSectionDigital),
+            officialLongTitle = "Test Title 2",
+            announcementDate = LocalDate.parse("2022-02-02"),
+        )
+        val saveNormCommand = SaveNormOutputPort.Command(norm)
+
+        val eliQuery = GetNormByEliOutputPort.Query("matching", "2022", "999")
+
+        normsService.saveNorm(saveNormCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .expectNextCount(0)
+            .verifyComplete()
+    }
+
+    @Test
+    fun `save a norm with print announcement and digital announcement and retrieve by eli because digital announcement matches and page in print missing`() {
+        val printAnnouncement = MetadataSection(
+            MetadataSectionName.PRINT_ANNOUNCEMENT,
+            listOf(
+                Metadatum("no-matching", MetadatumType.ANNOUNCEMENT_GAZETTE),
+            ),
+        )
+        val digitalAnnouncement = MetadataSection(
+            MetadataSectionName.DIGITAL_ANNOUNCEMENT,
+            listOf(
+                Metadatum("matching", MetadatumType.ANNOUNCEMENT_MEDIUM),
+                Metadatum("999", MetadatumType.EDITION),
+            ),
+        )
+        val referenceSectionPrint = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 1, listOf(printAnnouncement))
+        val referenceSectionDigital = MetadataSection(MetadataSectionName.OFFICIAL_REFERENCE, listOf(), 2, listOf(digitalAnnouncement))
+        val norm = Norm(
+            guid = UUID.randomUUID(),
+            articles = listOf(),
+            metadataSections = listOf(referenceSectionPrint, referenceSectionDigital),
+            officialLongTitle = "Test Title 2",
+            announcementDate = LocalDate.parse("2022-02-02"),
+        )
+        val saveNormCommand = SaveNormOutputPort.Command(norm)
+
+        val eliQuery = GetNormByEliOutputPort.Query("matching", "2022", "999")
+
+        normsService.saveNorm(saveNormCommand)
+            .`as`(StepVerifier::create)
+            .expectNextCount(1)
+            .verifyComplete()
+
+        normsService.getNormByEli(eliQuery)
+            .`as`(StepVerifier::create)
+            .assertNext { assertNormsAreEqual(norm, it) }
+            .verifyComplete()
     }
 }
 

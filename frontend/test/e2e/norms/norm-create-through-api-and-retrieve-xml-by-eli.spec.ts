@@ -3,6 +3,7 @@ import jsdom from "jsdom"
 import { openNorm } from "./e2e-utils"
 import { testWithImportedNorm } from "./fixtures"
 import { normData as norm } from "./testdata/norm_basic"
+import { FieldType, fillInputField } from "./utilities"
 
 testWithImportedNorm(
   "Check if XML can be retrieved by ELI and content is correct",
@@ -11,8 +12,34 @@ testWithImportedNorm(
     await openNorm(page, normData["officialLongTitle"], guid)
     await page.locator("a:has-text('Rahmen')").click()
 
-    const eliInputValue = await page.inputValue("input#eli")
+    // Update page of print announcement so that this norm we be retrieved for sure by the eli
+    const officialReferencesExpandable = page.locator("#officialReferences")
+    await officialReferencesExpandable.click()
+    const listEntries =
+      officialReferencesExpandable.getByLabel("Listen Eintrag")
+    listEntries
+      .nth(0)
+      .getByRole("button", { name: "Eintrag bearbeiten" })
+      .click()
+    const newRandomGazette = Math.random().toString(36).slice(2, 7)
+    await fillInputField(
+      page,
+      FieldType.TEXT,
+      "printAnnouncementGazette",
+      newRandomGazette
+    )
+    const finishButton = officialReferencesExpandable.getByRole("button", {
+      name: "Fertig",
+    })
+    await finishButton.click()
+    await page.locator("[aria-label='Rahmendaten Speichern Button']").click()
+    await expect(
+      page.locator("text=Zuletzt gespeichert um").first()
+    ).toBeVisible()
+    await page.reload()
 
+    // retrieve by new eli
+    const eliInputValue = await page.inputValue("input#eli")
     await page.goto(`/api/v1/norms/xml/${eliInputValue}`)
 
     const response = await request.get(`/api/v1/norms/xml/${eliInputValue}`)
@@ -50,7 +77,7 @@ testWithImportedNorm(
       xmlDOM.window.document
         .querySelector("akn\\:FRBRname")
         .getAttribute("value")
-    ).toBe("bgbl-1")
+    ).toBe(newRandomGazette)
 
     const proprietary =
       xmlDOM.window.document.querySelector("akn\\:proprietary")
