@@ -15,6 +15,8 @@ fileignoreconfig:
     checksum: 662bece53824d65bf0c831c4d2ac2eb0e0d1fd24db17f01ac79940a4a843b6c1
   - filename: "*.sql"
     ignore_detectors: [filename]
+  - filename: "_site/*"
+    ignore_detectors: [filecontent]
 
 scopeconfig:
   - scope: node
