@@ -873,9 +873,9 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   public Flux<DocumentUnitListEntry> findAll(Pageable pageable) {
     return metadataRepository
-        .findAllByDataSourceLike(DataSource.NEURIS.name(), pageable)
-        .flatMap(this::injectFileNumbers)
-        .flatMap(this::injectDocumentationOffice)
+        .findAllByDataSource(DataSource.NEURIS.name(), pageable)
+        .flatMapSequential(this::injectFileNumbers)
+        .flatMapSequential(this::injectDocumentationOffice)
         .map(
             documentUnitDTO ->
                 DocumentUnitListEntry.builder()

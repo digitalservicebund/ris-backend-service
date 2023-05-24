@@ -24,7 +24,7 @@ public interface DatabaseDocumentUnitMetadataRepository
 
   Mono<DocumentUnitMetadataDTO> findByUuid(UUID documentUnitUuid);
 
-  Flux<DocumentUnitMetadataDTO> findAllByDataSourceLike(String dataSource, Pageable pageable);
+  Flux<DocumentUnitMetadataDTO> findAllByDataSource(String dataSource, Pageable pageable);
 
   @Query(
       "SELECT * FROM doc_unit WHERE "

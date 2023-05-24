@@ -64,7 +64,7 @@ class PostgresDocumentUnitRepositoryImplTest {
   void testFindAll() {
     Sort sort = Sort.unsorted();
     Mockito.when(
-            metadataRepository.findAllByDataSourceLike(
+            metadataRepository.findAllByDataSource(
                 DataSource.NEURIS.name(), PageRequest.of(0, 10, sort)))
         .thenReturn(Flux.empty());
 
@@ -72,6 +72,6 @@ class PostgresDocumentUnitRepositoryImplTest {
         .verifyComplete();
 
     verify(metadataRepository)
-        .findAllByDataSourceLike(DataSource.NEURIS.name(), PageRequest.of(0, 10, sort));
+        .findAllByDataSource(DataSource.NEURIS.name(), PageRequest.of(0, 10, sort));
   }
 }
