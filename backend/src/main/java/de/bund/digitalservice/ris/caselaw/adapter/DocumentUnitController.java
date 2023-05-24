@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.MailResponse;
@@ -23,7 +22,6 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -44,13 +42,13 @@ public class DocumentUnitController {
     this.userService = userService;
   }
 
-  @PostMapping(value = "")
+  @GetMapping(value = "new")
   public Mono<ResponseEntity<DocumentUnit>> generateNewDocumentUnit(
-      @AuthenticationPrincipal OidcUser oidcUser,
-      @RequestBody DocumentUnitCreationInfo documentUnitCreationInfo) {
+      @AuthenticationPrincipal OidcUser oidcUser) {
 
-    return service
-        .generateNewDocumentUnit(documentUnitCreationInfo, userService.getUser(oidcUser))
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMap(service::generateNewDocumentUnit)
         .map(documentUnit -> ResponseEntity.status(HttpStatus.CREATED).body(documentUnit))
         .onErrorReturn(ResponseEntity.internalServerError().body(DocumentUnit.builder().build()));
   }

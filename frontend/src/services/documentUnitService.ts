@@ -12,10 +12,7 @@ interface DocumentUnitService {
   getByDocumentNumber(
     documentNumber: string
   ): Promise<ServiceResponse<DocumentUnit>>
-  createNew(
-    docCenter: string,
-    docType: string
-  ): Promise<ServiceResponse<DocumentUnit>>
+  createNew(): Promise<ServiceResponse<DocumentUnit>>
   update(documentUnit: DocumentUnit): Promise<ServiceResponse<unknown>>
   delete(documentUnitUuid: string): Promise<ServiceResponse<unknown>>
   searchByProceedingDecisionInput: PageableService<
@@ -51,19 +48,9 @@ const service: DocumentUnitService = {
     return response
   },
 
-  async createNew(docCenter: string, docType: string) {
-    const response = await httpClient.post<Partial<DocumentUnit>, DocumentUnit>(
-      "caselaw/documentunits",
-      {
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-      },
-      JSON.stringify({
-        documentationCenterAbbreviation: docCenter,
-        documentType: docType,
-      }) as Partial<DocumentUnit>
+  async createNew() {
+    const response = await httpClient.get<DocumentUnit>(
+      "caselaw/documentunits/new"
     )
     if (response.status >= 300) {
       response.error = {

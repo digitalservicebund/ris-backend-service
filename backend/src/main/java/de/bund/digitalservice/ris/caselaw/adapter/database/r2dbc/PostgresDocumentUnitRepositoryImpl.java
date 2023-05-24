@@ -19,9 +19,9 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
-import de.bund.digitalservice.ris.caselaw.domain.User;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.court.Court;
 import de.bund.digitalservice.ris.caselaw.domain.lookuptable.documenttype.DocumentType;
 import java.time.Instant;
@@ -113,9 +113,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   }
 
   @Override
-  public Mono<DocumentUnit> createNewDocumentUnit(String documentNumber, User user) {
+  public Mono<DocumentUnit> createNewDocumentUnit(
+      String documentNumber, DocumentationOffice documentationOffice) {
     return documentationOfficeRepository
-        .findByLabel(user.documentationOffice().label())
+        .findByLabel(documentationOffice.label())
         .flatMap(
             documentationOfficeDTO ->
                 metadataRepository
@@ -131,21 +132,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
                             .build())
                     .map(DocumentUnitTransformer::transformMetadataToDomain));
-  }
-
-  @Override
-  public Mono<DocumentUnit> createNewDocumentUnit(String documentNumber) {
-    return metadataRepository
-        .save(
-            DocumentUnitMetadataDTO.builder()
-                .uuid(UUID.randomUUID())
-                .creationtimestamp(Instant.now())
-                .documentnumber(documentNumber)
-                .dataSource(DataSource.NEURIS)
-                .dateKnown(true)
-                .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
-                .build())
-        .map(DocumentUnitTransformer::transformMetadataToDomain);
   }
 
   @Override

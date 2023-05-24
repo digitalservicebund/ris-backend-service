@@ -64,24 +64,11 @@ public class DocumentUnitService {
     this.publishService = publishService;
   }
 
-  public Mono<DocumentUnit> generateNewDocumentUnit(
-      DocumentUnitCreationInfo documentUnitCreationInfo, Mono<User> user) {
-    return documentNumberService
-        .generateNextDocumentNumber(documentUnitCreationInfo)
-        .zipWith(user)
+  public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
+    return Mono.just(documentationOffice)
+        .flatMap(documentNumberService::generateNextDocumentNumber)
         .flatMap(
-            tuple ->
-                repository
-                    .createNewDocumentUnit(tuple.getT1(), tuple.getT2())
-                    .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
-                    .doOnError(ex -> log.error("Couldn't create empty doc unit", ex)));
-  }
-
-  public Mono<DocumentUnit> generateNewDocumentUnit(
-      DocumentUnitCreationInfo documentUnitCreationInfo) {
-    return documentNumberService
-        .generateNextDocumentNumber(documentUnitCreationInfo)
-        .flatMap(repository::createNewDocumentUnit)
+            documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
@@ -289,9 +276,11 @@ public class DocumentUnitService {
 
   @Transactional(transactionManager = "connectionFactoryTransactionManager")
   public Flux<ProceedingDecision> createProceedingDecision(
-      UUID parentDocumentUnitUuid, ProceedingDecision proceedingDecision) {
+      UUID parentDocumentUnitUuid,
+      ProceedingDecision proceedingDecision,
+      DocumentationOffice documentationOffice) {
 
-    return generateNewDocumentUnit(new DocumentUnitCreationInfo("KO", "RE"))
+    return generateNewDocumentUnit(documentationOffice)
         .flatMap(
             childDocumentUnit ->
                 updateDocumentUnit(

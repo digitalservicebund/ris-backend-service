@@ -13,9 +13,8 @@ public interface DocumentUnitRepository {
 
   Mono<DocumentUnit> findByUuid(UUID uuid);
 
-  Mono<DocumentUnit> createNewDocumentUnit(String documentNumber, User user);
-
-  Mono<DocumentUnit> createNewDocumentUnit(String documentNumber);
+  Mono<DocumentUnit> createNewDocumentUnit(
+      String documentNumber, DocumentationOffice documentationOffice);
 
   Mono<DocumentUnit> save(DocumentUnit documentUnit);
 

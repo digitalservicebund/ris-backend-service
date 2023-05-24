@@ -12,7 +12,6 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
@@ -70,34 +69,26 @@ class DocumentUnitControllerTest {
 
   @Test
   void testGenerateNewDocumentUnit() {
-    DocumentUnitCreationInfo documentUnitCreationInfo = DocumentUnitCreationInfo.EMPTY;
-    Mono<User> user =
-        Mono.just(
-            User.builder()
-                .documentationOffice(
-                    DocumentationOffice.builder()
-                        .label("DigitalService")
-                        .abbreviation("XX")
-                        .build())
-                .build());
+    DocumentationOffice documentationOffice =
+        DocumentationOffice.builder().label("DigitalService").abbreviation("XX").build();
 
-    when(userService.getUser(any(OidcUser.class))).thenReturn(user);
+    when(userService.getDocumentationOffice(any(OidcUser.class)))
+        .thenReturn(Mono.just(documentationOffice));
 
-    when(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY, user))
+    when(service.generateNewDocumentUnit(documentationOffice))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
 
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLogin())
-        .post()
-        .uri("/api/v1/caselaw/documentunits")
-        .bodyValue(documentUnitCreationInfo)
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isCreated();
 
-    verify(service, times(1)).generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY, user);
-    verify(userService, times(1)).getUser(any(OidcUser.class));
+    verify(service, times(1)).generateNewDocumentUnit(documentationOffice);
+    verify(userService, times(1)).getDocumentationOffice(any(OidcUser.class));
   }
 
   @Test

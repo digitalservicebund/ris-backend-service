@@ -16,9 +16,7 @@ type MyFixtures = {
 
 export const testWithDocumentUnit = test.extend<MyFixtures>({
   documentNumber: async ({ request }, use) => {
-    const response = await request.post(`/api/v1/caselaw/documentunits`, {
-      data: { documentationCenterAbbreviation: "foo", documentType: "X" },
-    })
+    const response = await request.get(`/api/v1/caselaw/documentunits/new`)
     const { uuid, documentNumber } = await response.json()
 
     await use(documentNumber)
@@ -27,9 +25,7 @@ export const testWithDocumentUnit = test.extend<MyFixtures>({
   },
 
   secondaryDocumentUnit: async ({ request }, use) => {
-    const response = await request.post(`/api/v1/caselaw/documentunits`, {
-      data: { documentationCenterAbbreviation: "foo", documentType: "X" },
-    })
+    const response = await request.get(`/api/v1/caselaw/documentunits/new`)
     const secondaryDocumentUnit = await response.json()
     const updateResponse = await request.put(
       `/api/v1/caselaw/documentunits/${secondaryDocumentUnit.uuid}`,

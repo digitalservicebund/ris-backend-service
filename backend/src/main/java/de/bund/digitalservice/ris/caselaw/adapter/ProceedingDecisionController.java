@@ -3,10 +3,13 @@ package de.bund.digitalservice.ris.caselaw.adapter;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
+import de.bund.digitalservice.ris.caselaw.domain.UserService;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -21,16 +24,25 @@ import reactor.core.publisher.Mono;
 public class ProceedingDecisionController {
 
   private final DocumentUnitService service;
+  private final UserService userService;
 
-  public ProceedingDecisionController(DocumentUnitService service) {
+  public ProceedingDecisionController(DocumentUnitService service, UserService userService) {
     this.service = service;
+    this.userService = userService;
   }
 
   @PutMapping
   public Flux<ProceedingDecision> createProceedingDecision(
+      @AuthenticationPrincipal OidcUser oidcUser,
       @PathVariable("uuid") UUID documentUnitUuid,
       @Valid @RequestBody ProceedingDecision proceedingDecision) {
-    return service.createProceedingDecision(documentUnitUuid, proceedingDecision);
+
+    return userService
+        .getDocumentationOffice(oidcUser)
+        .flatMapMany(
+            documentationOffice ->
+                service.createProceedingDecision(
+                    documentUnitUuid, proceedingDecision, documentationOffice));
   }
 
   @PutMapping(value = "/{childUuid}")

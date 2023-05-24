@@ -30,7 +30,6 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.CoreData;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
-import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitCreationInfo;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
@@ -107,14 +106,11 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testForCorrectDbEntryAfterNewDocumentUnitCreation() {
-    DocumentUnitCreationInfo info = new DocumentUnitCreationInfo("ABC", "D");
-
     webClient
         .mutateWith(csrf())
         .mutateWith(getMockLogin())
-        .post()
-        .uri("/api/v1/caselaw/documentunits")
-        .bodyValue(info)
+        .get()
+        .uri("/api/v1/caselaw/documentunits/new")
         .exchange()
         .expectStatus()
         .isCreated()
@@ -122,13 +118,13 @@ class DocumentUnitIntegrationTest {
         .consumeWith(
             response -> {
               assertThat(response.getResponseBody()).isNotNull();
-              assertThat(response.getResponseBody().documentNumber()).startsWith("ABCD");
+              assertThat(response.getResponseBody().documentNumber()).startsWith("XXRE");
               assertThat(response.getResponseBody().coreData().dateKnown()).isTrue();
             });
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentnumber()).startsWith("ABCD");
+    assertThat(list.get(0).getDocumentnumber()).startsWith("XXRE");
     assertThat(list.get(0).isDateKnown()).isTrue();
   }
 

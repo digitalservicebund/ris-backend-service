@@ -64,19 +64,21 @@ class DocumentUnitServiceTest {
 
   @Test
   void testGenerateNewDocumentUnit() {
-    when(repository.createNewDocumentUnit("nextDocumentNumber"))
+    DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+
+    when(repository.createNewDocumentUnit("nextDocumentNumber", documentationOffice))
         .thenReturn(Mono.just(DocumentUnit.builder().build()));
-    when(documentNumberService.generateNextDocumentNumber(DocumentUnitCreationInfo.EMPTY))
+    when(documentNumberService.generateNextDocumentNumber(documentationOffice))
         .thenReturn(Mono.just("nextDocumentNumber"));
     // Can we use a captor to check if the document number was correctly created?
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
 
-    StepVerifier.create(service.generateNewDocumentUnit(DocumentUnitCreationInfo.EMPTY))
+    StepVerifier.create(service.generateNewDocumentUnit(documentationOffice))
         .expectNextCount(1) // That it's a DocumentUnit is given by the generic type..
         .verifyComplete();
-    verify(documentNumberService).generateNextDocumentNumber(DocumentUnitCreationInfo.EMPTY);
-    verify(repository).createNewDocumentUnit("nextDocumentNumber");
+    verify(documentNumberService).generateNextDocumentNumber(documentationOffice);
+    verify(repository).createNewDocumentUnit("nextDocumentNumber", documentationOffice);
   }
 
   // @Test public void testGenerateNewDocumentUnit_withException() {}

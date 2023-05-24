@@ -32,6 +32,10 @@ public class KeycloakUserService implements UserService {
         .switchIfEmpty(Mono.defer(() -> Mono.just(createUser(oidcUser, null))));
   }
 
+  public Mono<DocumentationOffice> getDocumentationOffice(OidcUser oidcUser) {
+    return getUser(oidcUser).map(User::documentationOffice);
+  }
+
   private User createUser(OidcUser oidcUser, DocumentationOffice documentationOffice) {
     return User.builder()
         .name(oidcUser.getAttribute("name"))
