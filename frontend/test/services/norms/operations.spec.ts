@@ -194,6 +194,7 @@ describe("normsService", () => {
               ],
             },
           ],
+          announcementDate: null,
           officialAbbreviation: null,
           officialLongTitle: "new title",
           publicationDate: "2022-11-15",
