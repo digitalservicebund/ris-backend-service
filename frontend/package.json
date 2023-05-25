@@ -52,7 +52,7 @@
     "@tiptap/extension-underline": "^2.0.0-beta.209",
     "@tiptap/vue-3": "^2.0.0-beta.209",
     "@unleash/proxy-client-vue": "^0.0.8",
-    "axios": "^1.3.4",
+    "axios": "^1.4.0",
     "dayjs": "^1.11.7",
     "install": "^0.13.0",
     "maska": "^2.1.9",
