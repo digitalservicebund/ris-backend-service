@@ -16,6 +16,8 @@ const unleashConfig = {
 
 const app = createApp(App).use(router).use(storeManager)
 
+console.log("unleash proxy url", process.env.UNLEASH_PROXY_URL)
+
 if (unleashConfig.url && unleashConfig.clientKey) {
   app.use(unleashPlugin, { config: unleashConfig })
 }
