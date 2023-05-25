@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test"
-import { Norm, NormCategory } from "../../../src/domain/Norm"
+import { Norm, NormCategory, UndefinedDate } from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
@@ -53,6 +53,21 @@ type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
 }
   ? NullUnionOmit<RecursiveOmitHelper<Type, KeyToOmit>, KeyToOmit>
   : RecursiveOmitHelper<Type, KeyToOmit>
+
+function undefinedDateToDropdownEntry(
+  unit?: UndefinedDate
+): string | undefined {
+  switch (unit) {
+    case UndefinedDate.UNDEFINED_UNKNOWN:
+      return "unbestimmt (unbekannt)"
+    case UndefinedDate.UNDEFINED_FUTURE:
+      return "unbestimmt (zukünftig)"
+    case UndefinedDate.UNDEFINED_NOT_PRESENT:
+      return "nicht vorhanden"
+    default:
+      return undefined
+  }
+}
 
 export type NormData = RecursiveOmit<Norm, "guid"> & {
   jurisZipFileName: string
@@ -382,48 +397,119 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
-      heading: "Inkrafttreten",
+      heading: "Abweichendes Inkrafttretedatum",
+      isRepeatedSection: true,
+      id: "divergentEntryIntoForces",
       fields: [
         {
-          type: FieldType.TEXT,
-          id: "entryIntoForceDate",
-          label: "Datum des Inkrafttretens",
-          value: norm.entryIntoForceDate,
-        },
-        {
-          type: FieldType.DROPDOWN,
-          id: "entryIntoForceDateState",
-          label: "Unbestimmtes Datum des Inkrafttretens",
-          value: norm.entryIntoForceDateState,
+          type: FieldType.RADIO,
+          id: "divergentEntryIntoForceDefinedSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
+          ),
         },
         {
           type: FieldType.TEXT,
-          id: "principleEntryIntoForceDate",
-          label: "Grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDate,
+          id: "divergentEntryIntoForceDefinedDate",
+          label: "Bestimmtes grundsätzliches Inkrafttretedatum Date Input",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.AMENDMENT_NORM,
+          label: "Änderungsnorm",
+          values:
+            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.map(
+              (section) =>
+                !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+            ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.BASE_NORM,
+          label: "Stammnorm",
+          values:
+            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.map(
+              (section) =>
+                !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+            ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.TRANSITIONAL_NORM,
+          label: "Übergangsnorm",
+          values:
+            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.map(
+              (section) =>
+                !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+            ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "divergentEntryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
+          ),
         },
         {
           type: FieldType.DROPDOWN,
           id: "principleEntryIntoForceDateState",
           label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDateState,
+          values:
+            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
+              (section) => section?.UNDEFINED_DATE?.[0]
+            ).map(undefinedDateToDropdownEntry),
         },
         {
-          type: FieldType.TEXT,
-          id: "divergentEntryIntoForceDate",
-          label: "Bestimmtes abweichendes Inkrafttretedatum",
-          value: norm.divergentEntryIntoForceDate,
+          type: FieldType.CHECKBOX,
+          id: NormCategory.AMENDMENT_NORM,
+          label: "Änderungsnorm",
+          values:
+            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
+              (section) =>
+                !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+            ),
         },
         {
-          type: FieldType.DROPDOWN,
-          id: "divergentEntryIntoForceDateState",
-          label: "Unbestimmtes abweichendes Inkrafttretedatum",
-          value: norm.divergentEntryIntoForceDateState,
+          type: FieldType.CHECKBOX,
+          id: NormCategory.BASE_NORM,
+          label: "Stammnorm",
+          values:
+            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
+              (section) =>
+                !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+            ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.TRANSITIONAL_NORM,
+          label: "Übergangsnorm",
+          values:
+            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
+              (section) =>
+                !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+            ),
         },
       ],
     },
     {
-      heading: "Außerkrafttreten",
+      heading: "Abweichendes Außerkrafttretedatum",
       fields: [
         {
           type: FieldType.TEXT,
