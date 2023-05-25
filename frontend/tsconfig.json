@@ -23,7 +23,6 @@
     }
   },
   "include": ["src", "src/**/*.vue", "test/**/*.ts", "vite.config.ts"],
-  "exclude": ["test/e2e/norms/**/*.ts"],
   "vueCompilerOptions": {
     "htmlAttributes": [],
     "jsxTemplates": true
