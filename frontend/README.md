@@ -52,10 +52,10 @@ The application has
 npm test
 ```
 
-**With watcher:**
+**Run unit tests with watcher:**
 
 ```bash
-npx vitest
+npm run test:unit:watch
 ```
 
 **Gather coverage:**
