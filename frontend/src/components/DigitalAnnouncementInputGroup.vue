@@ -36,53 +36,55 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 const announcementMedium = computed({
   get: () => inputValue.value.ANNOUNCEMENT_MEDIUM?.[0],
   set: (data?: string) =>
-    data && (inputValue.value.ANNOUNCEMENT_MEDIUM = [data]),
+    (inputValue.value.ANNOUNCEMENT_MEDIUM = data ? [data] : undefined),
 })
 
 const date = computed({
   get: () => inputValue.value.DATE?.[0],
-  set: (data?: string) => data && (inputValue.value.DATE = [data]),
+  set: (data?: string) => (inputValue.value.DATE = data ? [data] : undefined),
 })
 
 const edition = computed({
   get: () => inputValue.value.EDITION?.[0],
-  set: (data?: string) => data && (inputValue.value.EDITION = [data]),
+  set: (data?: string) =>
+    (inputValue.value.EDITION = data ? [data] : undefined),
 })
 
 const year = computed({
   get: () => inputValue.value.YEAR?.[0],
-  set: (data?: string) => data && (inputValue.value.YEAR = [data]),
+  set: (data?: string) => (inputValue.value.YEAR = data ? [data] : undefined),
 })
 
 const pageNumber = computed({
   get: () => inputValue.value.PAGE?.[0],
-  set: (data?: string) => data && (inputValue.value.PAGE = [data]),
+  set: (data?: string) => (inputValue.value.PAGE = data ? [data] : undefined),
 })
 
 const areaOfPublication = computed({
   get: () => inputValue.value.AREA_OF_PUBLICATION?.[0],
   set: (data?: string) =>
-    data && (inputValue.value.AREA_OF_PUBLICATION = [data]),
+    (inputValue.value.AREA_OF_PUBLICATION = data ? [data] : undefined),
 })
 
 const numberOfThePublicationInTheRespectiveArea = computed({
   get: () =>
     inputValue.value.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA?.[0],
   set: (data?: string) =>
-    data &&
-    (inputValue.value.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA = [
-      data,
-    ]),
+    (inputValue.value.NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA = data
+      ? [data]
+      : undefined),
 })
 
 const additionalInfo = computed({
   get: () => inputValue.value.ADDITIONAL_INFO?.[0],
-  set: (data?: string) => data && (inputValue.value.ADDITIONAL_INFO = [data]),
+  set: (data?: string) =>
+    (inputValue.value.ADDITIONAL_INFO = data ? [data] : undefined),
 })
 
 const explanation = computed({
   get: () => inputValue.value.EXPLANATION?.[0],
-  set: (data?: string) => data && (inputValue.value.EXPLANATION = [data]),
+  set: (data?: string) =>
+    (inputValue.value.EXPLANATION = data ? [data] : undefined),
 })
 </script>
 <template>

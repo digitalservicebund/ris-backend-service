@@ -205,6 +205,7 @@ function printAnnouncementSummary(data: Metadata): string {
     .filter(Boolean)
     .join(", ")}`
 }
+
 function digitalAnnouncementSummary(data: Metadata): string {
   if (!data) return ""
 
@@ -233,6 +234,7 @@ function digitalAnnouncementSummary(data: Metadata): string {
     .filter(Boolean)
     .join(", ")}`
 }
+
 function euAnnouncementSummary(data: Metadata): string {
   if (!data) return ""
 
@@ -256,13 +258,15 @@ function euAnnouncementSummary(data: Metadata): string {
     .filter(Boolean)
     .join(", ")}`
 }
+
 function otherOfficialReferenceSummary(data: Metadata): string {
   if (!data) return ""
 
-  const otherOfficialReference = data.OTHER_OFFICIAL_REFERENCE?.[0]
+  const otherOfficialReference = data.OTHER_OFFICIAL_REFERENCE?.[0] ?? ""
 
   return `Sonstige amtliche Fundstelle | ${otherOfficialReference}`
 }
+
 function officialReferenceSummarizer(data: MetadataSections): string {
   if (!data) return ""
 

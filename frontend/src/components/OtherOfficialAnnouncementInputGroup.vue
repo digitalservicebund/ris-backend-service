@@ -34,7 +34,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 const otherOfficialReference = computed({
   get: () => inputValue.value.OTHER_OFFICIAL_REFERENCE?.[0],
   set: (data?: string) =>
-    data && (inputValue.value.OTHER_OFFICIAL_REFERENCE = [data]),
+    (inputValue.value.OTHER_OFFICIAL_REFERENCE = data ? [data] : undefined),
 })
 </script>
 <template>

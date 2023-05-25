@@ -1,28 +1,32 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
-import PrintAnnouncementInputGroup from "@/components/PrintAnnouncementInputGroup.vue"
+import EuAnnouncementInputGroup from "@/components/EuAnnouncementInputGroup.vue"
 import { Metadata } from "@/domain/Norm"
 
 function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {
     modelValue: options?.modelValue ?? {},
   }
-  const utils = render(PrintAnnouncementInputGroup, { props })
+  const utils = render(EuAnnouncementInputGroup, { props })
   const user = userEvent.setup()
   return { user, ...utils }
 }
 
 function getControls() {
-  const announcementGazetteInput = screen.queryByRole("textbox", {
-    name: "Verkündungsblatt",
+  const euGovernmentGazetteInput = screen.queryByRole("textbox", {
+    name: "Amtsblatt der EU",
   }) as HTMLInputElement
 
   const yearInput = screen.queryByRole("textbox", {
-    name: "Jahr",
+    name: "Jahresangabe",
+  }) as HTMLInputElement
+
+  const seriesInput = screen.queryByRole("textbox", {
+    name: "Reihe",
   }) as HTMLInputElement
 
   const numberInput = screen.queryByRole("textbox", {
-    name: "Nummer",
+    name: "Nummer des Amtsblatts",
   }) as HTMLInputElement
 
   const pageInput = screen.queryByRole("textbox", {
@@ -38,8 +42,9 @@ function getControls() {
   }) as HTMLInputElement
 
   return {
-    announcementGazetteInput,
+    euGovernmentGazetteInput,
     yearInput,
+    seriesInput,
     numberInput,
     pageInput,
     additionalInfoInput,
@@ -47,12 +52,13 @@ function getControls() {
   }
 }
 
-describe("PrintAnnouncementInputGroup", () => {
-  it("renders all print announcement inputs", () => {
+describe("EuGovernmentGazetteInputGroup", () => {
+  it("renders all inputs", () => {
     renderComponent({
       modelValue: {
-        ANNOUNCEMENT_GAZETTE: ["test value"],
+        EU_GOVERNMENT_GAZETTE: ["Amtsblatt der EU"],
         YEAR: ["test value"],
+        SERIES: ["test value"],
         NUMBER: ["test value"],
         PAGE: ["test value"],
         ADDITIONAL_INFO: ["test value"],
@@ -61,19 +67,23 @@ describe("PrintAnnouncementInputGroup", () => {
     })
 
     const {
-      announcementGazetteInput,
+      euGovernmentGazetteInput,
       yearInput,
+      seriesInput,
       numberInput,
       pageInput,
       additionalInfoInput,
       explanationInput,
     } = getControls()
 
-    expect(announcementGazetteInput).toBeInTheDocument()
-    expect(announcementGazetteInput).toHaveValue("test value")
+    expect(euGovernmentGazetteInput).toBeInTheDocument()
+    expect(euGovernmentGazetteInput).toHaveValue("Amtsblatt der EU")
 
     expect(yearInput).toBeInTheDocument()
     expect(yearInput).toHaveValue("test value")
+
+    expect(seriesInput).toBeInTheDocument()
+    expect(seriesInput).toHaveValue("test value")
 
     expect(numberInput).toBeInTheDocument()
     expect(numberInput).toHaveValue("test value")
@@ -91,31 +101,36 @@ describe("PrintAnnouncementInputGroup", () => {
   it("shows the correct model value entry in the associated input", () => {
     renderComponent({
       modelValue: {
-        ANNOUNCEMENT_GAZETTE: ["abc"],
-        YEAR: ["2012"],
-        NUMBER: ["123"],
+        EU_GOVERNMENT_GAZETTE: ["Amtsblatt der EU"],
+        YEAR: ["01-01-2023"],
+        SERIES: ["foo"],
+        NUMBER: ["1"],
         PAGE: ["2"],
-        ADDITIONAL_INFO: ["Info Text"],
-        EXPLANATION: ["Explanation text"],
+        ADDITIONAL_INFO: ["test info"],
+        EXPLANATION: ["test explanation"],
       },
     })
 
-    const announcementGazetteInput = screen.queryByDisplayValue("abc")
-    expect(announcementGazetteInput).toBeInTheDocument()
+    const euGovernmentGazetteInput =
+      screen.queryByDisplayValue("Amtsblatt der EU")
+    expect(euGovernmentGazetteInput).toBeInTheDocument()
 
-    const yearInput = screen.queryByDisplayValue("2012")
+    const yearInput = screen.queryByDisplayValue("01-01-2023")
     expect(yearInput).toBeInTheDocument()
 
-    const numberInput = screen.queryByDisplayValue("123")
+    const seriesInput = screen.queryByDisplayValue("foo")
+    expect(seriesInput).toBeInTheDocument()
+
+    const numberInput = screen.queryByDisplayValue("1")
     expect(numberInput).toBeInTheDocument()
 
     const pageInput = screen.queryByDisplayValue("2")
     expect(pageInput).toBeInTheDocument()
 
-    const additionalInfoInput = screen.queryByDisplayValue("Info Text")
+    const additionalInfoInput = screen.queryByDisplayValue("test info")
     expect(additionalInfoInput).toBeInTheDocument()
 
-    const explanationInput = screen.queryByDisplayValue("Explanation text")
+    const explanationInput = screen.queryByDisplayValue("test explanation")
     expect(explanationInput).toBeInTheDocument()
   })
 
@@ -125,61 +140,62 @@ describe("PrintAnnouncementInputGroup", () => {
     renderComponent({ modelValue })
 
     const {
-      announcementGazetteInput,
       yearInput,
+      seriesInput,
       numberInput,
       pageInput,
       additionalInfoInput,
       explanationInput,
     } = getControls()
 
-    await user.type(announcementGazetteInput, "foo")
     await user.type(yearInput, "2023")
-    await user.type(numberInput, "ban")
-    await user.type(pageInput, "baz")
+    await user.type(seriesInput, "0")
+    await user.type(numberInput, "1")
+    await user.type(pageInput, "2")
     await user.type(additionalInfoInput, "foo bar")
     await user.type(explanationInput, "bar foo")
 
     expect(modelValue).toEqual({
-      ANNOUNCEMENT_GAZETTE: ["foo"],
       YEAR: ["2023"],
-      NUMBER: ["ban"],
-      PAGE: ["baz"],
+      SERIES: ["0"],
+      NUMBER: ["1"],
+      PAGE: ["2"],
       ADDITIONAL_INFO: ["foo bar"],
       EXPLANATION: ["bar foo"],
     })
   })
 
-  it("emits update model value event when an input value changes", async () => {
+  it("emits update model value event when an input value is cleared", async () => {
     const user = userEvent.setup()
     const modelValue: Metadata = {
-      ANNOUNCEMENT_GAZETTE: ["abc"],
-      YEAR: ["2012"],
-      NUMBER: ["123"],
+      EU_GOVERNMENT_GAZETTE: ["Amtsblatt der EU"],
+      YEAR: ["2023"],
+      SERIES: ["0"],
+      NUMBER: ["1"],
       PAGE: ["2"],
-      ADDITIONAL_INFO: ["Info Text"],
-      EXPLANATION: ["Explanation text"],
+      ADDITIONAL_INFO: ["foo bar"],
+      EXPLANATION: ["bar foo"],
     }
     renderComponent({ modelValue })
 
     const {
-      announcementGazetteInput,
       yearInput,
+      seriesInput,
       numberInput,
       pageInput,
       additionalInfoInput,
       explanationInput,
     } = getControls()
 
-    expect(announcementGazetteInput).toHaveValue("abc")
-    await user.clear(announcementGazetteInput)
-    expect(modelValue.ANNOUNCEMENT_GAZETTE).toBe(undefined)
-
-    expect(yearInput).toHaveValue("2012")
+    expect(yearInput).toHaveValue("2023")
     await user.clear(yearInput)
     expect(modelValue.YEAR).toBe(undefined)
 
-    expect(numberInput).toHaveValue("123")
+    expect(seriesInput).toHaveValue("0")
+    await user.clear(seriesInput)
+    expect(modelValue.SERIES).toBe(undefined)
+
+    expect(numberInput).toHaveValue("1")
     await user.clear(numberInput)
     expect(modelValue.NUMBER).toBe(undefined)
 
@@ -187,11 +203,11 @@ describe("PrintAnnouncementInputGroup", () => {
     await user.clear(pageInput)
     expect(modelValue.PAGE).toBe(undefined)
 
-    expect(additionalInfoInput).toHaveValue("Info Text")
+    expect(additionalInfoInput).toHaveValue("foo bar")
     await user.clear(additionalInfoInput)
     expect(modelValue.ADDITIONAL_INFO).toBe(undefined)
 
-    expect(explanationInput).toHaveValue("Explanation text")
+    expect(explanationInput).toHaveValue("bar foo")
     await user.clear(explanationInput)
     expect(modelValue.EXPLANATION).toBe(undefined)
   })

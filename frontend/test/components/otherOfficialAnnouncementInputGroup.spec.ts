@@ -49,4 +49,16 @@ describe("OtherOfficialReferenceInputGroup", () => {
       [MetadatumType.OTHER_OFFICIAL_REFERENCE]: ["foo"],
     })
   })
+
+  it("emits update model value event when input value is cleared", async () => {
+    const user = userEvent.setup()
+    const modelValue: Metadata = { OTHER_OFFICIAL_REFERENCE: ["test"] }
+    renderComponent({ modelValue })
+
+    const input = screen.getByRole("textbox")
+    expect(input).toHaveValue("test")
+
+    await user.clear(input)
+    expect(modelValue).toEqual({ OTHER_OFFICIAL_REFERENCE: undefined })
+  })
 })
