@@ -6,8 +6,9 @@ import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
+import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
+import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
 import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
-import EntryIntoForceDateInputGroup from "@/components/EntryIntoForceDateInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
@@ -15,13 +16,16 @@ import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstit
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
-import { FlatMetadata, Metadata, MetadataSections } from "@/domain/Norm"
+import {
+  FlatMetadata,
+  Metadata,
+  MetadataSections,
+  UndefinedDate,
+} from "@/domain/Norm"
 import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
-import { entryIntoForce } from "@/fields/norms/entryIntoForce"
-import { expiration } from "@/fields/norms/expiration"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
@@ -358,37 +362,108 @@ function documentTypeSummarizer(data?: Metadata): VNode {
   )
 }
 
-// function entryIntoForceDateSummarizer(data: Metadata): VNode {
-//   const propertyNodes = []
-//
-//   const date = data?.DATE?.[0]
-//   const categories =
-//       data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
-//
-//   propertyNodes.push(date)
-//
-//   if (date && categories.length > 0) propertyNodes.push(h("div", "|"))
-//
-//   categories.forEach((category) =>
-//       propertyNodes.push(
-//           h("div", { class: ["flex", "gap-4"] }, [
-//             h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
-//             h("span", NORM_CATEGORY_TRANSLATIONS[category]),
-//           ])
-//       )
-//   )
-//
-//   return h(
-//       "div",
-//       { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
-//       propertyNodes
-//   )
-// }
+function divergentEntryIntoForceDefinedSummary(data: Metadata): VNode {
+  const propertyNodes = []
+
+  const date = formatDate(data?.DATE)
+  const categories =
+    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
+
+  propertyNodes.push(date)
+
+  if (date && categories.length > 0) propertyNodes.push(h("div", "|"))
+
+  categories.forEach((category) =>
+    propertyNodes.push(
+      h("div", { class: ["flex", "gap-4"] }, [
+        h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
+        h("span", NORM_CATEGORY_TRANSLATIONS[category]),
+      ])
+    )
+  )
+
+  return h(
+    "div",
+    { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
+    propertyNodes
+  )
+}
+
+function getLabel(value: UndefinedDate): string {
+  switch (value) {
+    case UndefinedDate.UNDEFINED_UNKNOWN:
+      return "unbestimmt (unbekannt)"
+    case UndefinedDate.UNDEFINED_FUTURE:
+      return "unbestimmt (zukünftig)"
+    case UndefinedDate.UNDEFINED_NOT_PRESENT:
+      return "nicht vorhanden"
+  }
+}
+function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
+  const propertyNodes = []
+  const undefinedDate = data.UNDEFINED_DATE?.[0]
+
+  const categories =
+    data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
+
+  propertyNodes.push(getLabel(undefinedDate))
+
+  if (undefinedDate && categories.length > 0) propertyNodes.push(h("div", "|"))
+
+  categories.forEach((category) =>
+    propertyNodes.push(
+      h("div", { class: ["flex", "gap-4"] }, [
+        h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
+        h("span", NORM_CATEGORY_TRANSLATIONS[category]),
+      ])
+    )
+  )
+
+  return h(
+    "div",
+    { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
+    propertyNodes
+  )
+}
+
+function DivergEntentryIntoForceSummarizer(
+  data: MetadataSections
+): VNode | string {
+  if (!data) return ""
+
+  if (data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED) {
+    return divergentEntryIntoForceDefinedSummary(
+      data.DIVERGENT_ENTRY_INTO_FORCE_DEFINED[0]
+    )
+  } else if (data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED) {
+    return divergentEntryIntoForceUndefinedSummary(
+      data.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED[0]
+    )
+  } else return ""
+}
+
+function DivergentExpirationSummarizer(data: MetadataSections): VNode | string {
+  if (!data) return ""
+
+  if (data.DIVERGENT_EXPIRATION_DEFINED) {
+    return divergentEntryIntoForceDefinedSummary(
+      data.DIVERGENT_EXPIRATION_DEFINED[0]
+    )
+  } else if (data.DIVERGENT_EXPIRATION_UNDEFINED) {
+    return divergentEntryIntoForceUndefinedSummary(
+      data.DIVERGENT_EXPIRATION_UNDEFINED[0]
+    )
+  } else return ""
+}
 
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
+const DivergentEntryIntoForceSummary = withSummarizer(
+  DivergEntentryIntoForceSummarizer
+)
+const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
 </script>
 
 <template>
@@ -546,15 +621,32 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
     />
 
     <ExpandableDataSet
-      id="entryIntoForceDates"
-      :data-set="metadataSections.ENTRY_INTO_FORCE_DATE"
-      :summary-component="EntryIntoForceDateSummary"
+      id="divergentEntryIntoForces"
+      border-bottom
+      :data-set="metadataSections.DIVERGENT_ENTRY_INTO_FORCE"
+      :summary-component="DivergentEntryIntoForceSummary"
       title="Abweichendes Inkrafttretedatum"
     >
       <EditableList
-        v-model="metadataSections.ENTRY_INTO_FORCE_DATE"
+        v-model="metadataSections.DIVERGENT_ENTRY_INTO_FORCE"
         :default-value="{}"
-        :edit-component="EntryIntoForceDateInputGroup"
+        :edit-component="DivergentEntryIntoForceGroup"
+        :summary-component="DivergentEntryIntoForceSummary"
+      />
+    </ExpandableDataSet>
+
+    <ExpandableDataSet
+      id="divergentExpirations"
+      border-bottom
+      :data-set="metadataSections.DIVERGENT_EXPIRATION"
+      :summary-component="DivergentExpirationSummary"
+      title="Abweichendes Außerkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.DIVERGENT_EXPIRATION"
+        :default-value="{}"
+        :edit-component="DivergentExpirationGroup"
+        :summary-component="DivergentExpirationSummary"
       />
     </ExpandableDataSet>
 
