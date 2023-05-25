@@ -139,6 +139,7 @@ watch(
         data.principleExpirationDate as string
       loadedNorm.value.principleExpirationDateState =
         data.principleExpirationDateState as string
+      loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.publicationDate = data.publicationDate as string
       loadedNorm.value.reissueArticle = data.reissueArticle as string
       loadedNorm.value.reissueDate = data.reissueDate as string

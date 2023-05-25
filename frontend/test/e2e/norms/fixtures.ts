@@ -480,6 +480,17 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       fields: [
         {
           type: FieldType.TEXT,
+          id: "announcementDate",
+          label: "Verkündungsdatum",
+          value: norm.announcementDate,
+        },
+      ],
+    },
+    {
+      isSingleFieldSection: true,
+      fields: [
+        {
+          type: FieldType.TEXT,
           id: "publicationDate",
           label: "Veröffentlichungsdatum",
           value: norm.publicationDate,

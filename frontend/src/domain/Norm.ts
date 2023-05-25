@@ -155,7 +155,6 @@ export type MetadataSections = {
 }
 
 export type FlatMetadata = {
-  announcementDate?: string
   applicationScopeArea?: string
   applicationScopeEndDate?: string
   applicationScopeStartDate?: string
@@ -205,6 +204,7 @@ export type FlatMetadata = {
   printAnnouncementGazette?: string
   printAnnouncementPage?: string
   printAnnouncementYear?: string
+  announcementDate?: string
   publicationDate?: string
   reissueArticle?: string
   reissueDate?: string
