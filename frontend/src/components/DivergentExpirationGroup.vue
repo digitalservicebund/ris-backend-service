@@ -1,8 +1,20 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia"
 import { computed, ref, watch } from "vue"
 import DivergentExpirationDefinedInputGroup from "@/components/DivergentExpirationDefinedInputGroup.vue"
 import DivergentExpirationUndefinedInputGroup from "@/components/DivergentExpirationUndefinedInputGroup.vue"
 import { Metadata, MetadataSectionName, MetadataSections } from "@/domain/Norm"
+import { useLoadedNormStore } from "@/stores/loadedNorm"
+
+const props = defineProps<Props>()
+const emit = defineEmits<Emits>()
+const store = useLoadedNormStore()
+const { loadedNorm } = storeToRefs(store)
+
+const isDivergentExpirationUndefined =
+  loadedNorm.value?.metadataSections?.DIVERGENT_EXPIRATION?.some(
+    (entry) => entry.DIVERGENT_EXPIRATION_UNDEFINED
+  ) ?? false
 
 interface Props {
   modelValue: MetadataSections
@@ -11,9 +23,6 @@ interface Props {
 interface Emits {
   (event: "update:modelValue", value: MetadataSections): void
 }
-
-const props = defineProps<Props>()
-const emit = defineEmits<Emits>()
 
 type ChildSectionName =
   | MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED
@@ -87,6 +96,7 @@ const component = computed(() => {
           id="divergentExpirationUndefinedSelection"
           v-model="selectedChildSectionName"
           aria-label="Unbestimmtes abweichendes Außerkrafttretedatum Radio"
+          :disabled="isDivergentExpirationUndefined"
           name="DivergentExpirationUndefined"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
@@ -142,5 +152,15 @@ input[type="radio"]::before {
 
 input[type="radio"]:checked::before {
   transform: scale(1);
+}
+
+input[type="radio"]:disabled {
+  color: #717a88;
+}
+
+input[type="radio"]:disabled:hover {
+  border-width: 0.15em;
+  border-color: #717a88;
+  outline: none;
 }
 </style>
