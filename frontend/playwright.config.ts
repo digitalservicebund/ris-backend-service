@@ -35,6 +35,16 @@ const config: PlaywrightTestConfig = {
       },
       dependencies: ["setup"],
     },
+    {
+      name: "a11y",
+      testDir: "test/a11y",
+      use: {
+        ...devices["Desktop Chrome"],
+        channel: "chrome",
+        storageState: "test/e2e/shared/.auth/user.json",
+      },
+      dependencies: ["setup"],
+    },
   ],
 }
 

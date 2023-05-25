@@ -8,7 +8,7 @@
     "build": "vue-tsc --noEmit --skipLibCheck && vite build",
     "clean": "rm -rf dist/",
     "test": "TZ=UTC vitest run",
-    "test:a11y": "playwright test --config=test/a11y/playwright.config.ts",
+    "test:a11y": "playwright test --project=a11y",
     "test:e2e": "playwright test",
     "test:e2e:caselaw": "playwright test test/e2e/caselaw",
     "test:e2e:norms": "playwright test test/e2e/norms",
