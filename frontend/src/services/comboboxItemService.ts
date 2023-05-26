@@ -31,8 +31,9 @@ function formatDropdownItems(
   switch (endpoint) {
     case Endpoint.documentTypes: {
       return (responseData as DocumentType[]).map((item) => ({
-        label: item.jurisShortcut + " - " + item.label,
+        label: item.label,
         value: item,
+        additionalInformation: item.jurisShortcut,
       }))
     }
     case Endpoint.courts: {
@@ -45,18 +46,21 @@ function formatDropdownItems(
     case Endpoint.fieldOfLawSearchByIdentifier: {
       return (responseData as FieldOfLawNode[]).map((item) => ({
         label: item.identifier,
-        value: {
-          label: item.identifier,
-          text: item.text,
-        },
+        value: item,
         additionalInformation: item.text,
       }))
     }
-    case Endpoint.risAbbreviations:
+    case Endpoint.risAbbreviations: {
+      return (responseData as NormAbbreviation[]).map((item) => ({
+        label: item.abbreviation,
+        value: item,
+        additionalInformation: item.officialLongTitle,
+      }))
+    }
     case Endpoint.risAbbreviationsAwesome: {
       return (responseData as NormAbbreviation[]).map((item) => ({
         label: item.abbreviation,
-        value: item.abbreviation,
+        value: item,
         additionalInformation: item.officialLongTitle,
       }))
     }

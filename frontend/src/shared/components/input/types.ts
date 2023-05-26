@@ -1,3 +1,6 @@
+import { Court, DocumentType } from "@/domain/documentUnit"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
+import { NormAbbreviation } from "@/domain/normAbbreviation"
 import { LabelPosition } from "@/shared/components/input/InputField.vue"
 
 export enum InputType {
@@ -111,11 +114,15 @@ export interface DropdownInputField extends BaseInputField {
 }
 
 //COMBOBOX
-export type ComboboxInputModelType = string | { label: string }
+export type ComboboxInputModelType =
+  | DocumentType
+  | Court
+  | NormAbbreviation
+  | FieldOfLawNode
 
 export type ComboboxItem = {
   label: string
-  value: ComboboxInputModelType
+  value?: ComboboxInputModelType
   additionalInformation?: string
 }
 

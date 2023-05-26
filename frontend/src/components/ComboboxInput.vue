@@ -1,27 +1,27 @@
-<script lang="ts" setup>
+<script setup lang="ts" generic="T extends InputModelProps">
 import { onBeforeUnmount, onMounted, ref, watch, computed } from "vue"
 import {
-  ComboboxItem,
-  ComboboxInputModelType,
   ComboboxAttributes,
+  ComboboxInputModelType,
+  ComboboxItem,
 } from "@/shared/components/input/types"
 
 interface Props {
   id: string
   itemService: ComboboxAttributes["itemService"]
-  value?: ComboboxInputModelType
-  modelValue?: ComboboxInputModelType
+  modelValue: T
   ariaLabel: string
   placeholder?: string
   clearOnChoosingItem?: boolean
 }
 
 interface Emits {
-  (event: "update:modelValue", value?: ComboboxInputModelType): void
+  (event: "update:modelValue", value: ComboboxInputModelType | undefined): void
   (event: "input", value: Event): void
 }
 
 const props = defineProps<Props>()
+
 const emit = defineEmits<Emits>()
 
 const NO_MATCHING_ENTRY = "Kein passender Eintrag"
@@ -38,11 +38,6 @@ const focusedItemIndex = ref<number>(0)
 const ariaLabelDropdownIcon = computed(() =>
   showDropdown.value ? "Dropdown schließen" : "Dropdown öffnen"
 )
-
-const selectedValue = computed({
-  get: () => props.modelValue ?? props.value,
-  set: (value) => emit("update:modelValue", value),
-})
 
 const toggleDropdown = async () => {
   showDropdown.value = !showDropdown.value
@@ -131,7 +126,7 @@ const updateCurrentItems = async () => {
     !currentlyDisplayedItems.value ||
     currentlyDisplayedItems.value.length === 0
   ) {
-    currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY, value: "" }]
+    currentlyDisplayedItems.value = [{ label: NO_MATCHING_ENTRY }]
     candidateForSelection.value = undefined
   } else {
     candidateForSelection.value = currentlyDisplayedItems.value[0]
@@ -154,22 +149,15 @@ const selectAllText = () => {
   inputFieldRef.value?.select()
 }
 
-function getLabel() {
-  return typeof selectedValue.value === "object" &&
-    "label" in selectedValue.value
-    ? selectedValue.value.label
-    : selectedValue.value
-}
-
 const closeDropdownAndRevertToLastSavedValue = () => {
   showDropdown.value = false
-  inputText.value = getLabel()
+  inputText.value = props.modelValue?.label
 }
 
 watch(
-  selectedValue,
+  props,
   () => {
-    inputText.value = getLabel()
+    inputText.value = props.modelValue?.label
   },
   { immediate: true }
 )
@@ -183,14 +171,24 @@ onBeforeUnmount(() => {
 })
 </script>
 
+<!-- <script lang="ts">
+export type InputModelProps = {
+  label: string
+}
+</script> -->
+
 <template>
   <div
     ref="dropdownContainerRef"
     class="dropdown-container"
+    role="button"
+    tabindex="0"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
     <div
       class="dropdown-container__open-dropdown"
+      role="button"
+      tabindex="0"
       @keydown.enter="onEnter"
       @keydown.tab="closeDropdownAndRevertToLastSavedValue"
     >
@@ -253,6 +251,7 @@ onBeforeUnmount(() => {
           'dropdown-container__dropdown-item__no-matching-entry':
             item.label === NO_MATCHING_ENTRY,
         }"
+        role="button"
         tabindex="0"
         @click="setChosenItem(item)"
         @keydown.tab="closeDropdownAndRevertToLastSavedValue"

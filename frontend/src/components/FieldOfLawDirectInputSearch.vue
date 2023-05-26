@@ -1,16 +1,15 @@
 <script lang="ts" setup>
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { FieldOfLawComboboxItem } from "@/domain/fieldOfLaw"
+import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
-import { ComboboxInputModelType } from "@/shared/components/input/types"
 
 const emit = defineEmits<{
   (event: "add-to-list", identifier: string): void
 }>()
 
-function handleUpdateModelValue(item: ComboboxInputModelType | undefined) {
+function handleUpdateModelValue(item: FieldOfLawNode) {
   if (!item) return
-  emit("add-to-list", (item as FieldOfLawComboboxItem).label)
+  emit("add-to-list", item.identifier)
 }
 </script>
 

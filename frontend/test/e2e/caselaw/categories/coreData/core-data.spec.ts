@@ -199,8 +199,8 @@ test.describe("core data", () => {
     await expect(page.locator("[aria-label='dropdown-option']")).toHaveCount(
       totalCaselawDocumentTypes
     )
-    await expect(page.locator("text=AnU - Anerkenntnisurteil")).toBeVisible()
-    await expect(page.locator("text=AnH - Anhängiges Verfahren")).toBeVisible()
+    await expect(page.locator("text=Anerkenntnisurteil")).toBeVisible()
+    await expect(page.locator("text=Anhängiges Verfahren")).toBeVisible()
 
     // type search string: 3 results for "zwischen"
     await page.locator("[aria-label='Dokumenttyp']").fill("zwischen")

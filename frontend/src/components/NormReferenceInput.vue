@@ -1,16 +1,16 @@
 <script lang="ts" setup>
+import { useFlag } from "@unleash/proxy-client-vue"
 import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import NormReference from "@/domain/normReference"
+import { NormReference } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
 import CustomDateInput from "@/shared/components/input/CustomDateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
-const props = defineProps<{ modelValue: NormReference }>()
-const emit = defineEmits<{
-  (e: "update:modelValue", value: NormReference): void
-}>()
+const props = defineProps<{ modelValue?: NormReference }>()
+const emit =
+  defineEmits<(e: "update:modelValue", value: NormReference) => void>()
 
 const norm = computed({
   get() {
@@ -20,6 +20,26 @@ const norm = computed({
     emit("update:modelValue", value)
   },
 })
+
+const normAbbreviation = computed({
+  get: () =>
+    norm?.value?.normAbbreviation
+      ? {
+          ...norm.value.normAbbreviation,
+          label: norm.value.normAbbreviation.abbreviation,
+        }
+      : undefined,
+  set: (newValue) => {
+    let normRef = norm.value
+    if (newValue) {
+      normRef = {
+        ...norm.value,
+        normAbbreviation: newValue,
+      }
+    } else delete normRef.normAbbreviation
+    emit("update:modelValue", normRef)
+  },
+})
 </script>
 
 <template>
@@ -27,7 +47,7 @@ const norm = computed({
     <InputField id="norm-reference-search-field" label="Suchfeld">
       <ComboboxInput
         id="norm-reference-search"
-        v-model="norm.risAbbreviation"
+        v-model="normAbbreviation"
         aria-label="Suchfeld"
         clear-on-choosing-item
         :item-service="ComboboxItemService.getRisAbbreviationsAwesome"
@@ -37,7 +57,7 @@ const norm = computed({
     <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">
       <ComboboxInput
         id="norm-reference-abbreviation"
-        v-model="norm.risAbbreviation"
+        v-model="normAbbreviation"
         aria-label="RIS-Abkürzung"
         clear-on-choosing-item
         :item-service="ComboboxItemService.getRisAbbreviations"
