@@ -189,26 +189,26 @@ describe("EuGovernmentGazetteInputGroup", () => {
 
     expect(yearInput).toHaveValue("2023")
     await user.clear(yearInput)
-    expect(modelValue.YEAR).toBe(undefined)
+    expect(modelValue.YEAR).toBeUndefined()
 
     expect(seriesInput).toHaveValue("0")
     await user.clear(seriesInput)
-    expect(modelValue.SERIES).toBe(undefined)
+    expect(modelValue.SERIES).toBeUndefined()
 
     expect(numberInput).toHaveValue("1")
     await user.clear(numberInput)
-    expect(modelValue.NUMBER).toBe(undefined)
+    expect(modelValue.NUMBER).toBeUndefined()
 
     expect(pageInput).toHaveValue("2")
     await user.clear(pageInput)
-    expect(modelValue.PAGE).toBe(undefined)
+    expect(modelValue.PAGE).toBeUndefined()
 
     expect(additionalInfoInput).toHaveValue("foo bar")
     await user.clear(additionalInfoInput)
-    expect(modelValue.ADDITIONAL_INFO).toBe(undefined)
+    expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
 
     expect(explanationInput).toHaveValue("bar foo")
     await user.clear(explanationInput)
-    expect(modelValue.EXPLANATION).toBe(undefined)
+    expect(modelValue.EXPLANATION).toBeUndefined()
   })
 })

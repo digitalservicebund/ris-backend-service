@@ -47,18 +47,16 @@ watch(inputValue, detectSelectedInputType, { immediate: true, deep: true })
 const dateValue = computed({
   get: () => inputValue.value.DATE?.[0],
   set: (value) => {
-    if (value && (inputValue.value.DATE = [value])) {
-      inputValue.value.YEAR = undefined
-    }
+    inputValue.value.DATE = value ? [value] : undefined
+    inputValue.value.YEAR = undefined
   },
 })
 
 const yearValue = computed({
   get: () => inputValue.value.YEAR?.[0],
   set: (value) => {
-    if (value && (inputValue.value.YEAR = [value])) {
-      inputValue.value.DATE = undefined
-    }
+    inputValue.value.YEAR = value ? [value] : undefined
+    inputValue.value.DATE = undefined
   },
 })
 </script>

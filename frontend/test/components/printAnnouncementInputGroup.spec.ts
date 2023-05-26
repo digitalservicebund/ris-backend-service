@@ -173,26 +173,26 @@ describe("PrintAnnouncementInputGroup", () => {
 
     expect(announcementGazetteInput).toHaveValue("abc")
     await user.clear(announcementGazetteInput)
-    expect(modelValue.ANNOUNCEMENT_GAZETTE).toBe(undefined)
+    expect(modelValue.ANNOUNCEMENT_GAZETTE).toBeUndefined()
 
     expect(yearInput).toHaveValue("2012")
     await user.clear(yearInput)
-    expect(modelValue.YEAR).toBe(undefined)
+    expect(modelValue.YEAR).toBeUndefined()
 
     expect(numberInput).toHaveValue("123")
     await user.clear(numberInput)
-    expect(modelValue.NUMBER).toBe(undefined)
+    expect(modelValue.NUMBER).toBeUndefined()
 
     expect(pageInput).toHaveValue("2")
     await user.clear(pageInput)
-    expect(modelValue.PAGE).toBe(undefined)
+    expect(modelValue.PAGE).toBeUndefined()
 
     expect(additionalInfoInput).toHaveValue("Info Text")
     await user.clear(additionalInfoInput)
-    expect(modelValue.ADDITIONAL_INFO).toBe(undefined)
+    expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
 
     expect(explanationInput).toHaveValue("Explanation text")
     await user.clear(explanationInput)
-    expect(modelValue.EXPLANATION).toBe(undefined)
+    expect(modelValue.EXPLANATION).toBeUndefined()
   })
 })

@@ -22,12 +22,13 @@ const inputValue = ref(props.modelValue)
 
 const entity = computed({
   get: () => inputValue.value.ENTITY?.[0],
-  set: (data?: string) => data && (inputValue.value.ENTITY = [data]),
+  set: (data?: string) => (inputValue.value.ENTITY = data ? [data] : undefined),
 })
 
 const decidingBody = computed({
   get: () => inputValue.value.DECIDING_BODY?.[0],
-  set: (data?: string) => data && (inputValue.value.DECIDING_BODY = [data]),
+  set: (data?: string) =>
+    (inputValue.value.DECIDING_BODY = data ? [data] : undefined),
 })
 
 const isResolutionMajority = computed({

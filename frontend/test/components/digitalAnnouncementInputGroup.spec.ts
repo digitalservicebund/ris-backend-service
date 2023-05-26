@@ -224,7 +224,7 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     const {
       announcementMediumInput,
-      // dateInput,
+      dateInput,
       editionInput,
       yearInput,
       areaOfPublicationInput,
@@ -236,28 +236,27 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     expect(announcementMediumInput).toHaveValue("foo")
     await user.clear(announcementMediumInput)
-    expect(modelValue.ANNOUNCEMENT_MEDIUM).toBe(undefined)
+    expect(modelValue.ANNOUNCEMENT_MEDIUM).toBeUndefined()
 
-    // TODO: I couldn't get this to work - fix once we switched to the new date component
-    // expect(dateInput).toHaveValue("2023-04-05")
-    // await user.type(dateInput, "1992-12-10")
-    // expect(modelValue.DATE).toBe(undefined)
+    expect(dateInput).toHaveValue("2023-04-05")
+    await user.type(dateInput, "{backspace}")
+    expect(modelValue.DATE).toBeUndefined()
 
     expect(editionInput).toHaveValue("1")
     await user.clear(editionInput)
-    expect(modelValue.EDITION).toBe(undefined)
+    expect(modelValue.EDITION).toBeUndefined()
 
     expect(yearInput).toHaveValue("2023")
     await user.clear(yearInput)
-    expect(modelValue.YEAR).toBe(undefined)
+    expect(modelValue.YEAR).toBeUndefined()
 
     expect(areaOfPublicationInput).toHaveValue("foo bar")
     await user.clear(areaOfPublicationInput)
-    expect(modelValue.AREA_OF_PUBLICATION).toBe(undefined)
+    expect(modelValue.AREA_OF_PUBLICATION).toBeUndefined()
 
     expect(pageInput).toHaveValue("baz baz")
     await user.clear(pageInput)
-    expect(modelValue.PAGE).toBe(undefined)
+    expect(modelValue.PAGE).toBeUndefined()
 
     expect(numberOfPublicationInRespectiveAreaInput).toHaveValue("bar foo")
     await user.clear(numberOfPublicationInRespectiveAreaInput)
@@ -267,10 +266,10 @@ describe("DigitalAnnouncementInputGroup", () => {
 
     expect(additionalInfoInputInput).toHaveValue("foo baz")
     await user.clear(additionalInfoInputInput)
-    expect(modelValue.ADDITIONAL_INFO).toBe(undefined)
+    expect(modelValue.ADDITIONAL_INFO).toBeUndefined()
 
     expect(explanationInput).toHaveValue("ban baz")
     await user.clear(explanationInput)
-    expect(modelValue.EXPLANATION).toBe(undefined)
+    expect(modelValue.EXPLANATION).toBeUndefined()
   })
 })

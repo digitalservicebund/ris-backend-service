@@ -18,23 +18,26 @@ const inputValue = ref(props.modelValue)
 
 const fna = computed({
   get: () => inputValue.value.SUBJECT_FNA?.[0],
-  set: (data?: string) => data && (inputValue.value.SUBJECT_FNA = [data]),
+  set: (data?: string) =>
+    (inputValue.value.SUBJECT_FNA = data ? [data] : undefined),
 })
 
 const previousFna = computed({
   get: () => inputValue.value.SUBJECT_PREVIOUS_FNA?.[0],
   set: (data?: string) =>
-    data && (inputValue.value.SUBJECT_PREVIOUS_FNA = [data]),
+    (inputValue.value.SUBJECT_PREVIOUS_FNA = data ? [data] : undefined),
 })
 
 const gesta = computed({
   get: () => inputValue.value.SUBJECT_GESTA?.[0],
-  set: (data?: string) => data && (inputValue.value.SUBJECT_GESTA = [data]),
+  set: (data?: string) =>
+    (inputValue.value.SUBJECT_GESTA = data ? [data] : undefined),
 })
 
 const bgb3 = computed({
   get: () => inputValue.value.SUBJECT_BGB_3?.[0],
-  set: (data?: string) => data && (inputValue.value.SUBJECT_BGB_3 = [data]),
+  set: (data?: string) =>
+    (inputValue.value.SUBJECT_BGB_3 = data ? [data] : undefined),
 })
 
 watch(props, () => (inputValue.value = props.modelValue), {

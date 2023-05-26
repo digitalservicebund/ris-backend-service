@@ -1,3 +1,4 @@
+import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import { Metadata, MetadatumType } from "@/domain/Norm"
@@ -35,5 +36,30 @@ describe("AgeIndicationInputGroup", () => {
 
     expect(input).toBeVisible()
     expect(input).toHaveValue("test value")
+  })
+
+  it("clears the input fields for Starting Age and End Age", async () => {
+    const user = userEvent.setup()
+    const modelValue: Metadata = {
+      RANGE_START: ["test start"],
+      RANGE_END: ["test end"],
+    }
+    renderComponent({ modelValue })
+
+    const startInput = screen.queryByRole("textbox", {
+      name: "Anfang",
+    }) as HTMLInputElement
+
+    const endInput = screen.queryByRole("textbox", {
+      name: "Ende",
+    }) as HTMLInputElement
+
+    expect(startInput).toHaveValue("test start")
+    await user.clear(startInput)
+    expect(modelValue.RANGE_START).toBeUndefined()
+
+    expect(endInput).toHaveValue("test end")
+    await user.clear(endInput)
+    expect(modelValue.RANGE_END).toBeUndefined()
   })
 })

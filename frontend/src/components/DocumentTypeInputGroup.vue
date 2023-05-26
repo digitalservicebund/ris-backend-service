@@ -23,7 +23,8 @@ const inputValue = ref(props.modelValue)
 
 const typeName = computed({
   get: () => inputValue.value.TYPE_NAME?.[0],
-  set: (data?: string) => data && (inputValue.value.TYPE_NAME = [data]),
+  set: (data?: string) =>
+    (inputValue.value.TYPE_NAME = data ? [data] : undefined),
 })
 
 const selectedNormCategories = ref<Record<NormCategory, boolean>>(

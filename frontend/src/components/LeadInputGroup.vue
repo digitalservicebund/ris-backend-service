@@ -19,12 +19,14 @@ const inputValue = ref(props.modelValue)
 
 const jurisdiction = computed({
   get: () => inputValue.value.LEAD_JURISDICTION?.[0],
-  set: (data?: string) => data && (inputValue.value.LEAD_JURISDICTION = [data]),
+  set: (data?: string) =>
+    (inputValue.value.LEAD_JURISDICTION = data ? [data] : undefined),
 })
 
 const unit = computed({
   get: () => inputValue.value.LEAD_UNIT?.[0],
-  set: (data?: string) => data && (inputValue.value.LEAD_UNIT = [data]),
+  set: (data?: string) =>
+    (inputValue.value.LEAD_UNIT = data ? [data] : undefined),
 })
 
 watch(props, () => (inputValue.value = props.modelValue), {

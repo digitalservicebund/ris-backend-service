@@ -1,7 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { render, screen } from "@testing-library/vue"
 import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
-import { Metadata, MetadatumType, NormCategory } from "@/domain/Norm"
+import { Metadata, NormCategory } from "@/domain/Norm"
 
 function renderComponent(options?: { modelValue?: Metadata }) {
   const props = {
@@ -10,41 +10,57 @@ function renderComponent(options?: { modelValue?: Metadata }) {
   return render(DocumentTypeInputGroup, { props })
 }
 
+function getControls() {
+  const typeNameInput = screen.queryByRole("textbox", {
+    name: "Typbezeichnung",
+  }) as HTMLInputElement
+
+  const amendmentNormCheckBox = screen.getByRole("checkbox", {
+    name: "Änderungsnorm",
+  }) as HTMLInputElement
+
+  const baseNormCheckBox = screen.getByRole("checkbox", {
+    name: "Stammnorm",
+  }) as HTMLInputElement
+
+  const transitionalNormCheckBox = screen.getByRole("checkbox", {
+    name: "Übergangsnorm",
+  }) as HTMLInputElement
+
+  const templateNameInput = screen.queryByRole("textbox", {
+    name: "Bezeichnung gemäß Vorlage",
+  }) as HTMLInputElement
+
+  return {
+    typeNameInput,
+    amendmentNormCheckBox,
+    baseNormCheckBox,
+    transitionalNormCheckBox,
+    templateNameInput,
+  }
+}
+
 describe("DocumentTypeInputGroup", () => {
   it("should render the components with the initial state of the modelvalue", () => {
     renderComponent({
       modelValue: {
-        [MetadatumType.TYPE_NAME]: ["test value"],
-        [MetadatumType.NORM_CATEGORY]: [
+        TYPE_NAME: ["test value"],
+        NORM_CATEGORY: [
           NormCategory.BASE_NORM,
           NormCategory.TRANSITIONAL_NORM,
           NormCategory.AMENDMENT_NORM,
         ],
-        [MetadatumType.TEMPLATE_NAME]: [
-          "test value 1",
-          "test value 2",
-          "test value 3",
-        ],
+        TEMPLATE_NAME: ["test value 1", "test value 2", "test value 3"],
       },
     })
 
-    const typeNameInput = screen.queryByRole("textbox", {
-      name: "Typbezeichnung",
-    }) as HTMLInputElement
-
-    const amendmentNormCheckBox = screen.getByRole("checkbox", {
-      name: "Änderungsnorm",
-    }) as HTMLInputElement
-    const baseNormCheckBox = screen.getByRole("checkbox", {
-      name: "Stammnorm",
-    }) as HTMLInputElement
-    const transitionalNormCheckBox = screen.getByRole("checkbox", {
-      name: "Übergangsnorm",
-    }) as HTMLInputElement
-
-    const templateNameInput = screen.queryByRole("textbox", {
-      name: "Bezeichnung gemäß Vorlage",
-    }) as HTMLInputElement
+    const {
+      typeNameInput,
+      amendmentNormCheckBox,
+      baseNormCheckBox,
+      transitionalNormCheckBox,
+      templateNameInput,
+    } = getControls()
 
     const chips = screen.getAllByLabelText("chip")
     const expectedValues = ["test value 1", "test value 2", "test value 3"]
@@ -67,35 +83,90 @@ describe("DocumentTypeInputGroup", () => {
     const modelValue = {}
     renderComponent({ modelValue })
 
-    const textInput = screen.getAllByRole("textbox")
-    await user.type(textInput[0], "foo")
-    await user.type(textInput[1], "bar")
-    await user.type(textInput[1], "{enter}")
-    await user.type(textInput[1], "foo")
-    await user.type(textInput[1], "{enter}")
-    await user.type(textInput[1], "baz")
-    await user.type(textInput[1], "{enter}")
+    const {
+      typeNameInput,
+      amendmentNormCheckBox,
+      baseNormCheckBox,
+      transitionalNormCheckBox,
+      templateNameInput,
+    } = getControls()
+
+    await user.type(typeNameInput, "foo")
+    await user.type(templateNameInput, "bar")
+    await user.type(templateNameInput, "{enter}")
+    await user.type(templateNameInput, "foo")
+    await user.type(templateNameInput, "{enter}")
+    await user.type(templateNameInput, "baz")
+    await user.type(templateNameInput, "{enter}")
 
     const chipList = screen.getAllByLabelText("chip")
     expect(chipList.length).toBe(3)
 
-    const checkBoxInputs = screen.getAllByRole("checkbox")
-    await user.click(checkBoxInputs[0])
-    await user.click(checkBoxInputs[1])
-    await user.click(checkBoxInputs[2])
+    await user.click(amendmentNormCheckBox)
+    await user.click(baseNormCheckBox)
+    await user.click(transitionalNormCheckBox)
 
-    expect(checkBoxInputs[0]).toBeChecked()
-    expect(checkBoxInputs[1]).toBeChecked()
-    expect(checkBoxInputs[2]).toBeChecked()
+    expect(amendmentNormCheckBox).toBeChecked()
+    expect(baseNormCheckBox).toBeChecked()
+    expect(transitionalNormCheckBox).toBeChecked()
 
     expect(modelValue).toEqual({
-      [MetadatumType.TYPE_NAME]: ["foo"],
-      [MetadatumType.TEMPLATE_NAME]: ["bar", "foo", "baz"],
-      [MetadatumType.NORM_CATEGORY]: [
+      TYPE_NAME: ["foo"],
+      TEMPLATE_NAME: ["bar", "foo", "baz"],
+      NORM_CATEGORY: [
         NormCategory.AMENDMENT_NORM,
         NormCategory.BASE_NORM,
         NormCategory.TRANSITIONAL_NORM,
       ],
     })
+  })
+
+  it("should change the modelvalue when clearing the input", async () => {
+    const user = userEvent.setup()
+    const modelValue: Metadata = {
+      TYPE_NAME: ["foo"],
+      TEMPLATE_NAME: ["bar", "foo", "baz"],
+      NORM_CATEGORY: [
+        NormCategory.AMENDMENT_NORM,
+        NormCategory.BASE_NORM,
+        NormCategory.TRANSITIONAL_NORM,
+      ],
+    }
+    renderComponent({ modelValue })
+
+    const {
+      typeNameInput,
+      amendmentNormCheckBox,
+      baseNormCheckBox,
+      transitionalNormCheckBox,
+    } = getControls()
+
+    expect(typeNameInput).toHaveValue("foo")
+    await user.clear(typeNameInput)
+    expect(modelValue.TYPE_NAME).toBeUndefined()
+
+    expect(amendmentNormCheckBox).toBeChecked()
+    await user.click(amendmentNormCheckBox)
+    expect(modelValue.NORM_CATEGORY).not.toContain(NormCategory.AMENDMENT_NORM)
+
+    expect(baseNormCheckBox).toBeChecked()
+    await user.click(baseNormCheckBox)
+    expect(modelValue.NORM_CATEGORY).not.toContain(NormCategory.BASE_NORM)
+
+    expect(transitionalNormCheckBox).toBeChecked()
+    await user.click(transitionalNormCheckBox)
+    expect(modelValue.NORM_CATEGORY).not.toContain(
+      NormCategory.TRANSITIONAL_NORM
+    )
+
+    const chipList = screen.getAllByLabelText("chip")
+    expect(chipList.length).toBe(3)
+    await user.click(chipList[0])
+    await user.type(chipList[0], "{enter}")
+    await user.click(chipList[0])
+    await user.type(chipList[0], "{enter}")
+    await user.click(chipList[0])
+    await user.type(chipList[0], "{enter}")
+    expect(modelValue.TEMPLATE_NAME).toHaveLength(0)
   })
 })
