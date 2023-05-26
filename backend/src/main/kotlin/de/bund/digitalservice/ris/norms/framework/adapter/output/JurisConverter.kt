@@ -158,17 +158,10 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         principleEntryIntoForceDate = parseDateString(data.principleEntryIntoForceDate),
         principleEntryIntoForceDateState =
         parseDateStateString(data.principleEntryIntoForceDateState),
-        divergentEntryIntoForceDate = parseDateString(data.divergentEntryIntoForceList.map { it.date }.firstOrNull()),
-        divergentEntryIntoForceDateState =
-        parseDateStateString(data.divergentEntryIntoForceList.map { it.state }.firstOrNull()),
-        entryIntoForceNormCategory = data.divergentEntryIntoForceList.map { it.normCategory }.firstOrNull(),
         expirationDate = parseDateString(data.expirationDate),
         expirationDateState = parseDateStateString(data.expirationDateState),
         principleExpirationDate = parseDateString(data.principleExpirationDate),
         principleExpirationDateState = parseDateStateString(data.principleExpirationDateState),
-        divergentExpirationDate = parseDateString(data.divergentExpirationsList.map { it.date }.firstOrNull()),
-        divergentExpirationDateState = parseDateStateString(data.divergentExpirationsList.map { it.state }.firstOrNull()),
-        expirationNormCategory = data.divergentExpirationsList.map { it.normCategory }.firstOrNull(),
         announcementDate = parseDateString(data.announcementDate),
         statusNote = data.statusNote,
         statusDescription = data.statusDescription,

@@ -61,7 +61,7 @@ describe("DivergentEntryIntoForceGroup", () => {
     renderComponent()
 
     const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Inkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     const divergentEntryIntoForceUndefinedSelection = screen.queryByLabelText(
@@ -94,7 +94,7 @@ describe("DivergentEntryIntoForceGroup", () => {
     await fireEvent.click(divergentEntryIntoForceDefinedSelection)
 
     const divergentEntryIntoForceDefinedDateNew = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Inkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     expect(divergentEntryIntoForceDefinedDateNew).not.toHaveValue()
@@ -117,7 +117,7 @@ describe("DivergentEntryIntoForceGroup", () => {
     expect(divergentEntryIntoForceDefinedSelection).toBeChecked()
 
     const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Inkrafttretedatum Date Input"
     ) as HTMLInputElement
     expect(divergentEntryIntoForceDefinedDate).toBeVisible()
     expect(divergentEntryIntoForceDefinedDate).toHaveValue("2020-05-12")
@@ -133,7 +133,7 @@ describe("DivergentEntryIntoForceGroup", () => {
     expect(divergentEntryIntoForceDefinedSelection).toBeChecked()
 
     const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Inkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     expect(divergentEntryIntoForceDefinedDate).toBeInTheDocument()

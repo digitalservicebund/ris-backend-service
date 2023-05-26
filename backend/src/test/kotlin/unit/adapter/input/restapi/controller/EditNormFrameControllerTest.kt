@@ -121,9 +121,6 @@ class EditNormFrameControllerTest {
         var entryIntoForceDateState: UndefinedDate? = null
         var principleEntryIntoForceDate: String? = null
         var principleEntryIntoForceDateState: UndefinedDate? = null
-        var divergentEntryIntoForceDate: String? = null
-        var divergentEntryIntoForceDateState: UndefinedDate? = null
-        var entryIntoForceNormCategory: String? = null
 
         var expirationDate: String? = null
         var expirationDateState: UndefinedDate? = null
@@ -132,9 +129,6 @@ class EditNormFrameControllerTest {
         var isExpirationDateTemp: Boolean? = null
         var principleExpirationDate: String? = null
         var principleExpirationDateState: UndefinedDate? = null
-        var divergentExpirationDate: String? = null
-        var divergentExpirationDateState: UndefinedDate? = null
-        var expirationNormCategory: String? = null
 
         var announcementDate: String? = null
         var publicationDate: String? = null

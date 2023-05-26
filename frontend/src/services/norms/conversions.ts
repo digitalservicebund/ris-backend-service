@@ -437,18 +437,6 @@ export function encodeFlatMetadata(
     digitalEvidenceRelatedData: encodeString(
       flatMetadata.digitalEvidenceRelatedData
     ),
-    divergentEntryIntoForceDate: encodeNullDate(
-      flatMetadata.divergentEntryIntoForceDate
-    ),
-    divergentEntryIntoForceDateState: encodeString(
-      flatMetadata.divergentEntryIntoForceDateState
-    ),
-    divergentExpirationDate: encodeNullDate(
-      flatMetadata.divergentExpirationDate
-    ),
-    divergentExpirationDateState: encodeString(
-      flatMetadata.divergentExpirationDateState
-    ),
     documentCategory: encodeString(flatMetadata.documentCategory),
     documentNumber: encodeString(flatMetadata.documentNumber),
     documentStatusDate: encodeNullDate(flatMetadata.documentStatusDate),
@@ -464,13 +452,9 @@ export function encodeFlatMetadata(
     documentTextProof: encodeString(flatMetadata.documentTextProof),
     entryIntoForceDate: encodeNullDate(flatMetadata.entryIntoForceDate),
     entryIntoForceDateState: encodeString(flatMetadata.entryIntoForceDateState),
-    entryIntoForceNormCategory: encodeString(
-      flatMetadata.entryIntoForceNormCategory
-    ),
     eli: encodeString(flatMetadata.eli),
     expirationDate: encodeNullDate(flatMetadata.expirationDate),
     expirationDateState: encodeString(flatMetadata.expirationDateState),
-    expirationNormCategory: encodeString(flatMetadata.expirationNormCategory),
     isExpirationDateTemp: encodeBooleanInFlatten(
       flatMetadata.isExpirationDateTemp
     ),

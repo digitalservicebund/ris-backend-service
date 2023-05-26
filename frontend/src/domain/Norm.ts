@@ -165,10 +165,6 @@ export type FlatMetadata = {
   digitalEvidenceExternalDataNote?: string
   digitalEvidenceLink?: string
   digitalEvidenceRelatedData?: string
-  divergentEntryIntoForceDate?: string
-  divergentEntryIntoForceDateState?: string
-  divergentExpirationDate?: string
-  divergentExpirationDateState?: string
   documentCategory?: string
   documentNumber?: string
   documentStatusDate?: string
@@ -180,11 +176,9 @@ export type FlatMetadata = {
   documentTextProof?: string
   entryIntoForceDate?: string
   entryIntoForceDateState?: string
-  entryIntoForceNormCategory?: string
   eli?: string
   expirationDate?: string
   expirationDateState?: string
-  expirationNormCategory?: string
   isExpirationDateTemp?: boolean
   officialAbbreviation?: string
   officialLongTitle: string

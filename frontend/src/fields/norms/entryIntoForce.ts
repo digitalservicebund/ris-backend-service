@@ -30,26 +30,4 @@ export const entryIntoForce: InputField[] = [
     "Unbestimmtes grundsätzliches Inkrafttretedatum",
     undefinedDropDownItems
   ),
-  {
-    name: "divergentEntryIntoForceDate",
-    type: InputType.DATE,
-    label: "Bestimmtes abweichendes Inkrafttretedatum",
-    inputAttributes: {
-      ariaLabel: "Bestimmtes abweichendes Inkrafttretedatum",
-      isFutureDate: true,
-    },
-  },
-  dropdown(
-    "divergentEntryIntoForceDateState",
-    "Unbestimmtes abweichendes Inkrafttretedatum",
-    undefinedDropDownItems
-  ),
-  {
-    name: "entryIntoForceNormCategory",
-    type: InputType.TEXT,
-    label: "Art der Norm",
-    inputAttributes: {
-      ariaLabel: "Art der Norm",
-    },
-  },
 ]

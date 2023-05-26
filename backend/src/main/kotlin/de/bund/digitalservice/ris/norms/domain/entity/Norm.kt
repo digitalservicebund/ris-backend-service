@@ -25,18 +25,12 @@ data class Norm(
     var entryIntoForceDateState: UndefinedDate? = null,
     var principleEntryIntoForceDate: LocalDate? = null,
     var principleEntryIntoForceDateState: UndefinedDate? = null,
-    var divergentEntryIntoForceDate: LocalDate? = null,
-    var divergentEntryIntoForceDateState: UndefinedDate? = null,
-    var entryIntoForceNormCategory: String? = null,
 
     var expirationDate: LocalDate? = null,
     var expirationDateState: UndefinedDate? = null,
     var isExpirationDateTemp: Boolean? = null,
     var principleExpirationDate: LocalDate? = null,
     var principleExpirationDateState: UndefinedDate? = null,
-    var divergentExpirationDate: LocalDate? = null,
-    var divergentExpirationDateState: UndefinedDate? = null,
-    var expirationNormCategory: String? = null,
 
     var announcementDate: LocalDate? = null,
     var publicationDate: LocalDate? = null,

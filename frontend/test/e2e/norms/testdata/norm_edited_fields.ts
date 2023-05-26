@@ -148,7 +148,7 @@ export const newNorm: NormData = {
       {
         DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
           {
-            DATE: ["ABC"],
+            DATE: ["2015-02-23"],
             NORM_CATEGORY: [
               NormCategory.BASE_NORM,
               NormCategory.TRANSITIONAL_NORM,
@@ -160,13 +160,8 @@ export const newNorm: NormData = {
       {
         DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
           {
-            UNDEFINED_DATE: [
-              UndefinedDate.UNDEFINED_UNKNOWN,
-              UndefinedDate.UNDEFINED_FUTURE,
-              UndefinedDate.UNDEFINED_NOT_PRESENT,
-            ],
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN],
             NORM_CATEGORY: [
-              NormCategory.BASE_NORM,
               NormCategory.TRANSITIONAL_NORM,
               NormCategory.AMENDMENT_NORM,
             ],
@@ -178,11 +173,10 @@ export const newNorm: NormData = {
       {
         DIVERGENT_EXPIRATION_DEFINED: [
           {
-            DATE: ["2023-10-10"],
+            DATE: ["1990-10-10"],
             NORM_CATEGORY: [
               NormCategory.BASE_NORM,
               NormCategory.TRANSITIONAL_NORM,
-              NormCategory.AMENDMENT_NORM,
             ],
           },
         ],
@@ -190,16 +184,8 @@ export const newNorm: NormData = {
       {
         DIVERGENT_EXPIRATION_UNDEFINED: [
           {
-            UNDEFINED_DATE: [
-              UndefinedDate.UNDEFINED_UNKNOWN,
-              UndefinedDate.UNDEFINED_FUTURE,
-              UndefinedDate.UNDEFINED_NOT_PRESENT,
-            ],
-            NORM_CATEGORY: [
-              NormCategory.BASE_NORM,
-              NormCategory.TRANSITIONAL_NORM,
-              NormCategory.AMENDMENT_NORM,
-            ],
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_NOT_PRESENT],
+            NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
           },
         ],
       },
@@ -230,10 +216,6 @@ export const newNorm: NormData = {
   digitalEvidenceExternalDataNote: "digitalEvidenceExternalDataNote",
   digitalEvidenceLink: "digitalEvidenceLink",
   digitalEvidenceRelatedData: "digitalEvidenceRelatedData",
-  divergentEntryIntoForceDate: "2022-11-01",
-  divergentEntryIntoForceDateState: "unbestimmt (unbekannt)",
-  divergentExpirationDate: "2022-11-01",
-  divergentExpirationDateState: "nicht vorhanden",
   documentCategory: "documentCategory",
   documentNumber: "documentNumber",
   documentStatusDate: "2022-11-01",
@@ -248,7 +230,6 @@ export const newNorm: NormData = {
   eli: "europeanLegalIdentifier",
   expirationDate: "2022-11-01",
   expirationDateState: "unbestimmt (unbekannt)",
-  expirationNormCategory: "expirationNormCategory",
   otherDocumentNote: "otherDocumentNote",
   otherFootnote: "otherFootnote",
   footnoteChange: "footnoteChange",
