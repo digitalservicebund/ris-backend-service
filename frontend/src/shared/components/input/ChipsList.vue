@@ -115,7 +115,7 @@ defineExpose({ focusPrevious, focusNext, resetFocus, focusFirst })
         @click="setFocusedItemIndex(i)"
         @focus="setFocusedItemIndex(i)"
         @input="emitInputEvent"
-        @keypress.enter="enterDelete"
+        @keypress.enter.stop="enterDelete"
         @keyup.left="focusPrevious"
         @keyup.right="focusNext"
       >
