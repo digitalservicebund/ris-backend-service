@@ -78,6 +78,8 @@ OAUTH2_CLIENT_ID=$(gopass show -o -y neuris/maven.pkg.github.com/digitalserviceb
 OAUTH2_CLIENT_SECRET=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-dev-oauth2-client/client-secret)
 E2E_TEST_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/username)
 E2E_TEST_PASSWORD=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user/password)
+E2E_TEST_USER_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-bgh/username)
+E2E_TEST_PASSWORD_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-bgh/password)
 MY_UID=$(id -u)
 MY_GID=$(id -g)
 EOF
