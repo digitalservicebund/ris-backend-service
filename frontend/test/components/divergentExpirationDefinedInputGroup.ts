@@ -24,7 +24,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
     })
 
     const date = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     const amendmentNormCheckBox = screen.getByRole("checkbox", {
@@ -51,7 +51,7 @@ describe("DivergentExpirationDefinedInputGroup", () => {
     renderComponent({ modelValue })
 
     const Date = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     await userEvent.type(Date, "2020-05-12")

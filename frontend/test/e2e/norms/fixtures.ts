@@ -397,6 +397,35 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
       ],
     },
     {
+      heading: "Inkrafttreten",
+      fields: [
+        {
+          type: FieldType.TEXT,
+          id: "entryIntoForceDate",
+          label: "Datum des Inkrafttretens",
+          value: norm.entryIntoForceDate,
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "entryIntoForceDateState",
+          label: "Unbestimmtes Datum des Inkrafttretens",
+          value: norm.entryIntoForceDateState,
+        },
+        {
+          type: FieldType.TEXT,
+          id: "principleEntryIntoForceDate",
+          label: "Grundsätzliches Inkrafttretedatum",
+          value: norm.principleEntryIntoForceDate,
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "principleEntryIntoForceDateState",
+          label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
+          value: norm.principleEntryIntoForceDateState,
+        },
+      ],
+    },
+    {
       heading: "Abweichendes Inkrafttretedatum",
       isRepeatedSection: true,
       id: "divergentEntryIntoForces",
@@ -412,7 +441,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         {
           type: FieldType.TEXT,
           id: "divergentEntryIntoForceDefinedDate",
-          label: "Bestimmtes grundsätzliches Inkrafttretedatum Date Input",
+          label: "Bestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
             (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
           ).map((section) => section?.DATE?.[0]),
@@ -421,37 +450,40 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           type: FieldType.CHECKBOX,
           id: NormCategory.AMENDMENT_NORM,
           label: "Änderungsnorm",
-          values:
-            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.AMENDMENT_NORM
-                )
-            ),
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.AMENDMENT_NORM
+              )
+          ),
         },
         {
           type: FieldType.CHECKBOX,
           id: NormCategory.BASE_NORM,
           label: "Stammnorm",
-          values:
-            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.BASE_NORM
-                )
-            ),
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.BASE_NORM
+              )
+          ),
         },
         {
           type: FieldType.CHECKBOX,
           id: NormCategory.TRANSITIONAL_NORM,
           label: "Übergangsnorm",
-          values:
-            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.TRANSITIONAL_NORM
-                )
-            ),
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.TRANSITIONAL_NORM
+              )
+          ),
         },
         {
           type: FieldType.RADIO,
@@ -463,53 +495,57 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.DROPDOWN,
-          id: "principleEntryIntoForceDateState",
-          label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
-          values:
-            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
-              (section) => section?.UNDEFINED_DATE?.[0]
-            ).map(undefinedDateToDropdownEntry),
+          id: "divergentEntryIntoForceDateState",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          )
+            .map((section) => section?.UNDEFINED_DATE?.[0])
+            .map(undefinedDateToDropdownEntry),
         },
         {
           type: FieldType.CHECKBOX,
           id: NormCategory.AMENDMENT_NORM,
           label: "Änderungsnorm",
-          values:
-            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.AMENDMENT_NORM
-                )
-            ),
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.AMENDMENT_NORM
+              )
+          ),
         },
         {
           type: FieldType.CHECKBOX,
           id: NormCategory.BASE_NORM,
           label: "Stammnorm",
-          values:
-            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.BASE_NORM
-                )
-            ),
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.BASE_NORM
+              )
+          ),
         },
         {
           type: FieldType.CHECKBOX,
           id: NormCategory.TRANSITIONAL_NORM,
           label: "Übergangsnorm",
-          values:
-            norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
-                  (category) => category == NormCategory.TRANSITIONAL_NORM
-                )
-            ),
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.TRANSITIONAL_NORM
+              )
+          ),
         },
       ],
     },
     {
-      heading: "Abweichendes Außerkrafttretedatum",
+      heading: "Außerkrafttreten",
       fields: [
         {
           type: FieldType.TEXT,
@@ -541,26 +577,128 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           label: "Unbestimmtes grundsätzliches Außerkrafttretdatum",
           value: norm.principleExpirationDateState,
         },
+      ],
+    },
+    {
+      heading: "Abweichendes Außerkrafttretedatum",
+      isRepeatedSection: true,
+      id: "divergentExpirations",
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "divergentExpirationDefinedSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => !!section?.DIVERGENT_EXPIRATION_DEFINED
+          ),
+        },
         {
           type: FieldType.TEXT,
-          id: "divergentExpirationDate",
+          id: "divergentExpirationDefinedDate",
           label: "Bestimmtes abweichendes Außerkrafttretedatum",
-          value: norm.divergentExpirationDate,
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.AMENDMENT_NORM,
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.AMENDMENT_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.BASE_NORM,
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.BASE_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.TRANSITIONAL_NORM,
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.TRANSITIONAL_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "divergentExpirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => !!section?.DIVERGENT_EXPIRATION_UNDEFINED
+          ),
         },
         {
           type: FieldType.DROPDOWN,
           id: "divergentExpirationDateState",
-          label: "Unbestimmtes abweichendes Außerkrafttretdatum",
-          value: norm.divergentExpirationDateState,
+          label: "Unbestimmtes abweichendes Außerkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          )
+            .map((section) => section?.UNDEFINED_DATE?.[0])
+            .map(undefinedDateToDropdownEntry),
         },
         {
-          type: FieldType.TEXT,
-          id: "expirationNormCategory",
-          label: "Art der Norm",
-          value: norm.expirationNormCategory,
+          type: FieldType.CHECKBOX,
+          id: NormCategory.AMENDMENT_NORM,
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.AMENDMENT_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.BASE_NORM,
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.BASE_NORM
+              )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: NormCategory.TRANSITIONAL_NORM,
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map(
+            (section) =>
+              !!section?.NORM_CATEGORY?.find(
+                (category) => category == NormCategory.TRANSITIONAL_NORM
+              )
+          ),
         },
       ],
     },
+
     {
       isSingleFieldSection: true,
       fields: [

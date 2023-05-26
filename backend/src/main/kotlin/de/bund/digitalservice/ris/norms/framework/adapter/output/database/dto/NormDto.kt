@@ -35,12 +35,6 @@ data class NormDto(
     var principleEntryIntoForceDate: LocalDate? = null,
     @Column("principle_entry_into_force_date_state")
     var principleEntryIntoForceDateState: UndefinedDate? = null,
-    @Column("divergent_entry_into_force_date")
-    var divergentEntryIntoForceDate: LocalDate? = null,
-    @Column("divergent_entry_into_force_date_state")
-    var divergentEntryIntoForceDateState: UndefinedDate? = null,
-    @Column("entry_into_force_norm_category")
-    var entryIntoForceNormCategory: String? = null,
 
     @Column("expiration_date")
     var expirationDate: LocalDate? = null,
@@ -52,12 +46,6 @@ data class NormDto(
     var principleExpirationDate: LocalDate? = null,
     @Column("principle_expiration_date_state")
     var principleExpirationDateState: UndefinedDate? = null,
-    @Column("divergent_expiration_date")
-    var divergentExpirationDate: LocalDate? = null,
-    @Column("divergent_expiration_date_state")
-    var divergentExpirationDateState: UndefinedDate? = null,
-    @Column("expiration_norm_category")
-    var expirationNormCategory: String? = null,
 
     @Column("announcement_date")
     var announcementDate: LocalDate? = null,

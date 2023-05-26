@@ -95,6 +95,12 @@ testWithImportedNorm(
     const sectionsWithHeading = sections.filter((section) => !!section.heading)
 
     for (const section of sectionsWithHeading) {
+      if (
+        section.heading === "Abweichendes Inkrafttretedatum" ||
+        section.heading === "Abweichendes Außerkrafttretedatum"
+      ) {
+        continue
+      }
       await expectSectionAppearsAfterScroll(page, section)
     }
   }

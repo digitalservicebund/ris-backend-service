@@ -1,5 +1,5 @@
 import { NormData } from "../fixtures"
-import { NormCategory } from "@/domain/Norm"
+import { NormCategory, UndefinedDate } from "@/domain/Norm"
 
 export const normData: NormData = {
   jurisZipFileName: "Tierarznei.3-0_multi.zip",
@@ -107,6 +107,49 @@ export const normData: NormData = {
         ],
       },
     ],
+    DIVERGENT_ENTRY_INTO_FORCE: [
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
+          { DATE: ["2023-01-13"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
+        ],
+      },
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_FUTURE],
+            NORM_CATEGORY: [NormCategory.AMENDMENT_NORM],
+          },
+        ],
+      },
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN],
+            NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
+          },
+        ],
+      },
+      {
+        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+          { UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN] },
+        ],
+      },
+    ],
+    DIVERGENT_EXPIRATION: [
+      {
+        DIVERGENT_EXPIRATION_DEFINED: [
+          { DATE: ["2023-01-13"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
+        ],
+      },
+      {
+        DIVERGENT_EXPIRATION_UNDEFINED: [
+          {
+            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_FUTURE],
+            NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
+          },
+        ],
+      },
+    ],
     DOCUMENT_TYPE: [
       { TYPE_NAME: ["RV"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
     ],
@@ -118,14 +161,8 @@ export const normData: NormData = {
   documentCategory: "NR",
   entryIntoForceDate: "2007-01-01",
   principleEntryIntoForceDate: "2007-01-01",
-  divergentEntryIntoForceDate: "2023-01-13",
-  divergentEntryIntoForceDateState: "",
-  entryIntoForceNormCategory: "SN",
   expirationDateState: "unbestimmt (unbekannt)",
   principleExpirationDateState: "unbestimmt (unbekannt)",
-  divergentExpirationDate: "2023-01-13",
-  divergentExpirationDateState: "",
-  expirationNormCategory: "SN",
   announcementDate: "2023-01-06",
   printAnnouncementGazette: "BGBl I",
   printAnnouncementYear: "2023",

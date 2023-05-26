@@ -80,13 +80,13 @@ const checkboxStyle = ref({
   <div class="w-384">
     <InputField
       id="divergentEntryIntoForceDefinedDate"
-      aria-label="Bestimmtes grundsätzliches Inkrafttretedatum"
-      label="Bestimmtes grundsätzliches Inkrafttretedatum"
+      aria-label="Bestimmtes abweichendes Inkrafttretedatum"
+      label="Bestimmtes abweichendes Inkrafttretedatum"
     >
       <DateInput
         id="divergentEntryIntoForceDefinedDate"
         v-model="date"
-        aria-label="Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+        aria-label="Bestimmtes abweichendes Inkrafttretedatum Date Input"
         is-future-date
       />
     </InputField>

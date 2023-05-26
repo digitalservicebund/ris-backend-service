@@ -81,7 +81,7 @@ describe("DivergentExpirationGroup", () => {
     ) as HTMLInputElement
 
     const Date = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     expect(Date).toBeInTheDocument()
@@ -110,7 +110,7 @@ describe("DivergentExpirationGroup", () => {
     await fireEvent.click(divergentExpirationDefinedSelection)
 
     const dateNew = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     expect(dateNew).not.toHaveValue()
@@ -133,7 +133,7 @@ describe("DivergentExpirationGroup", () => {
     expect(divergentExpirationDefinedSelection).toBeChecked()
 
     const divergentExpirationDefinedDate = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedDate).toBeVisible()
@@ -150,7 +150,7 @@ describe("DivergentExpirationGroup", () => {
     expect(divergentExpirationDefinedSelection).toBeChecked()
 
     const divergentExpirationDefinedDate = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Außerkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Außerkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedDate).toBeInTheDocument()

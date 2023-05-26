@@ -24,7 +24,7 @@ describe("DivergentEntryIntoForceDefinedInputGroup", () => {
     })
 
     const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Inkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     const amendmentNormCheckBox = screen.getByRole("checkbox", {
@@ -51,7 +51,7 @@ describe("DivergentEntryIntoForceDefinedInputGroup", () => {
     renderComponent({ modelValue })
 
     const divergentEntryIntoForceDefinedDate = screen.getByLabelText(
-      "Bestimmtes grundsätzliches Inkrafttretedatum Date Input"
+      "Bestimmtes abweichendes Inkrafttretedatum Date Input"
     ) as HTMLInputElement
 
     await userEvent.type(divergentEntryIntoForceDefinedDate, "2020-05-12")

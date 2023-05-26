@@ -26,6 +26,8 @@ import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
+import { entryIntoForce } from "@/fields/norms/entryIntoForce"
+import { expiration } from "@/fields/norms/expiration"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
@@ -91,14 +93,6 @@ watch(
       loadedNorm.value.digitalEvidenceLink = data.digitalEvidenceLink as string
       loadedNorm.value.digitalEvidenceRelatedData =
         data.digitalEvidenceRelatedData as string
-      loadedNorm.value.divergentEntryIntoForceDate =
-        data.divergentEntryIntoForceDate as string
-      loadedNorm.value.divergentEntryIntoForceDateState =
-        data.divergentEntryIntoForceDateState as string
-      loadedNorm.value.divergentExpirationDate =
-        data.divergentExpirationDate as string
-      loadedNorm.value.divergentExpirationDateState =
-        data.divergentExpirationDateState as string
       loadedNorm.value.documentCategory = data.documentCategory as string
       loadedNorm.value.documentNumber = data.documentNumber as string
       loadedNorm.value.documentStatusDate = data.documentStatusDate as string
@@ -115,13 +109,9 @@ watch(
       loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate as string
       loadedNorm.value.entryIntoForceDateState =
         data.entryIntoForceDateState as string
-      loadedNorm.value.entryIntoForceNormCategory =
-        data.entryIntoForceNormCategory as string
       loadedNorm.value.eli = data.eli as string
       loadedNorm.value.expirationDate = data.expirationDate as string
       loadedNorm.value.expirationDateState = data.expirationDateState as string
-      loadedNorm.value.expirationNormCategory =
-        data.expirationNormCategory as string
       loadedNorm.value.isExpirationDateTemp =
         data.isExpirationDateTemp as boolean
       loadedNorm.value.officialAbbreviation =
@@ -406,7 +396,9 @@ function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
   const categories =
     data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
 
-  propertyNodes.push(getLabel(undefinedDate))
+  if (undefinedDate !== undefined) {
+    propertyNodes.push(getLabel(undefinedDate))
+  }
 
   if (undefinedDate && categories.length > 0) propertyNodes.push(h("div", "|"))
 
@@ -619,7 +611,19 @@ const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
       label="Nichtamtliche Buchstabenabkürzung"
       :type="InputType.CHIPS"
     />
-
+    <fieldset>
+      <legend
+        id="entryIntoForceFields"
+        class="heading-02-regular mb-[1rem] mt-32"
+      >
+        Inkrafttreten
+      </legend>
+      <InputGroup
+        v-model="flatMetadata"
+        :column-count="1"
+        :fields="entryIntoForce"
+      />
+    </fieldset>
     <ExpandableDataSet
       id="divergentEntryIntoForces"
       border-bottom
@@ -635,6 +639,16 @@ const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
       />
     </ExpandableDataSet>
 
+    <fieldset>
+      <legend id="expirationFields" class="heading-02-regular mb-[1rem]">
+        Außerkrafttreten
+      </legend>
+      <InputGroup
+        v-model="flatMetadata"
+        :column-count="1"
+        :fields="expiration"
+      />
+    </fieldset>
     <ExpandableDataSet
       id="divergentExpirations"
       border-bottom

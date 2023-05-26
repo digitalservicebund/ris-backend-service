@@ -55,9 +55,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var entryIntoForceDateState: UndefinedDate? = null
         var principleEntryIntoForceDate: String? = null
         var principleEntryIntoForceDateState: UndefinedDate? = null
-        var divergentEntryIntoForceDate: String? = null
-        var divergentEntryIntoForceDateState: UndefinedDate? = null
-        var entryIntoForceNormCategory: String? = null
 
         var expirationDate: String? = null
         var expirationDateState: UndefinedDate? = null
@@ -66,9 +63,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var isExpirationDateTemp: Boolean? = null
         var principleExpirationDate: String? = null
         var principleExpirationDateState: UndefinedDate? = null
-        var divergentExpirationDate: String? = null
-        var divergentExpirationDateState: UndefinedDate? = null
-        var expirationNormCategory: String? = null
 
         var announcementDate: String? = null
         var publicationDate: String? = null
@@ -134,17 +128,11 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             this.entryIntoForceDateState,
             decodeLocalDate(this.principleEntryIntoForceDate),
             this.principleEntryIntoForceDateState,
-            decodeLocalDate(this.divergentEntryIntoForceDate),
-            this.divergentEntryIntoForceDateState,
-            this.entryIntoForceNormCategory,
             decodeLocalDate(this.expirationDate),
             this.expirationDateState,
             this.isExpirationDateTemp,
             decodeLocalDate(this.principleExpirationDate),
             this.principleExpirationDateState,
-            decodeLocalDate(this.divergentExpirationDate),
-            this.divergentExpirationDateState,
-            this.expirationNormCategory,
             decodeLocalDate(this.announcementDate),
             decodeLocalDate(this.publicationDate),
             this.completeCitation,
