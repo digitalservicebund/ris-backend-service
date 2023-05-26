@@ -11,12 +11,14 @@ interface Props {
   summaryComponent?: Component
   asColumn?: boolean
   fallbackText?: string
+  borderBottom?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   summaryComponent: DataSetSummary,
   asColumn: false,
   fallbackText: undefined,
+  borderBottom: false,
 })
 
 const isExpanded = ref(false)
@@ -38,7 +40,10 @@ const padding = computed(() => ({
   <ExpandableContent
     v-model:is-expanded="isExpanded"
     class="bg-white p-16 pt-20"
-    :class="{ 'hover:bg-blue-300': !isExpanded }"
+    :class="[
+      borderBottom && 'border-b border-gray-400',
+      { 'hover:bg-blue-300': !isExpanded },
+    ]"
     close-icon-name="expand_less"
     open-icon-name="expand_more"
   >

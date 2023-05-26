@@ -416,6 +416,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="documentTypes"
+      border-bottom
       :data-set="metadataSections.DOCUMENT_TYPE"
       :summary-component="DocumentTypeSummary"
       title="Dokumenttyp"
@@ -431,6 +432,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="normProviders"
+      border-bottom
       :data-set="metadataSections.NORM_PROVIDER"
       :summary-component="NormProviderSummary"
       title="Normgeber"
@@ -445,6 +447,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="participatingInstitutions"
+      border-bottom
       :data-set="metadataSections.PARTICIPATION"
       title="Mitwirkende Organe"
     >
@@ -457,6 +460,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="leads"
+      border-bottom
       :data-set="metadataSections.LEAD"
       title="Federführung"
     >
@@ -469,6 +473,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="subjectAreas"
+      border-bottom
       :data-set="metadataSections.SUBJECT_AREA"
       title="Sachgebiet"
     >
@@ -553,6 +558,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="citationDates"
+      border-bottom
       :data-set="metadataSections.CITATION_DATE"
       :summary-component="CitationDateSummary"
       title="Zitierdatum"
@@ -567,6 +573,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="officialReferences"
+      border-bottom
       :data-set="metadataSections.OFFICIAL_REFERENCE"
       :summary-component="OfficialReferenceSummary"
       title="Amtliche Fundstelle"
@@ -731,6 +738,7 @@ const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 
     <ExpandableDataSet
       id="ageIndications"
+      border-bottom
       :data-set="metadataSections.AGE_INDICATION"
       title="Altersangabe"
     >
