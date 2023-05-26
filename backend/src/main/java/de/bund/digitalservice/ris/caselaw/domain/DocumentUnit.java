@@ -22,5 +22,4 @@ public record DocumentUnit(
     @Valid CoreData coreData,
     List<ProceedingDecision> proceedingDecisions,
     Texts texts,
-    ContentRelatedIndexing contentRelatedIndexing,
-    String status) {}
+    ContentRelatedIndexing contentRelatedIndexing) {}

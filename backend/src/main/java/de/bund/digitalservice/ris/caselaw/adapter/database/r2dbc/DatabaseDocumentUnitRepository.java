@@ -8,9 +8,9 @@ import reactor.core.publisher.Mono;
 
 @Repository
 public interface DatabaseDocumentUnitRepository extends R2dbcRepository<DocumentUnitDTO, Long> {
-  @Query("SELECT * FROM document_unit_with_latest_status WHERE documentnumber = $1")
+  @Query("SELECT * FROM doc_unit WHERE documentnumber = $1")
   Mono<DocumentUnitDTO> findByDocumentnumber(String documentnumber);
 
-  @Query("SELECT * FROM document_unit_with_latest_status WHERE uuid = $1")
+  @Query("SELECT * FROM doc_unit WHERE uuid = $1")
   Mono<DocumentUnitDTO> findByUuid(UUID uuid);
 }
