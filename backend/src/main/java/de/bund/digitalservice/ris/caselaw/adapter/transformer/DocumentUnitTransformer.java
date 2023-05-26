@@ -190,7 +190,8 @@ public class DocumentUnitTransformer {
             documentUnitMetadataDTO.getRegion()),
         null,
         null,
-        null);
+        null,
+        documentUnitMetadataDTO.getStatus());
   }
 
   public static DocumentUnit transformDTO(DocumentUnitDTO documentUnitDTO) {
@@ -309,6 +310,7 @@ public class DocumentUnitTransformer {
             documentUnitDTO.getReasons(),
             documentUnitDTO.getCaseFacts(),
             documentUnitDTO.getDecisionReasons()),
-        new ContentRelatedIndexing(keywords, fieldsOfLaw, norms));
+        new ContentRelatedIndexing(keywords, fieldsOfLaw, norms),
+        documentUnitDTO.getStatus());
   }
 }

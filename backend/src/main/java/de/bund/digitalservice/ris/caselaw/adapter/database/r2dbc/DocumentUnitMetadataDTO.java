@@ -18,7 +18,7 @@ import org.springframework.data.relational.core.mapping.Table;
 @SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@Table("doc_unit")
+@Table("document_unit_with_latest_status")
 public class DocumentUnitMetadataDTO {
 
   @Id private Long id;
@@ -71,6 +71,9 @@ public class DocumentUnitMetadataDTO {
 
   @Column("documentation_office_id")
   private UUID documentationOfficeId;
+
+  @Column("status")
+  private String status;
 
   @Transient private DocumentationOfficeDTO documentationOffice;
 
