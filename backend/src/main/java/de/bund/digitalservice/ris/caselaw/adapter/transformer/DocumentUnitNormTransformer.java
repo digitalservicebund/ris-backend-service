@@ -8,7 +8,7 @@ public class DocumentUnitNormTransformer {
 
   public static DocumentUnitNorm transformToDomain(DocumentUnitNormDTO normDTO) {
     return DocumentUnitNorm.builder()
-        .risAbbreviation(normDTO.getRisAbbreviation())
+        .normAbbreviation(NormAbbreviationTransformer.transformDTO(normDTO.getNormAbbreviation()))
         .singleNorm(normDTO.getSingleNorm())
         .dateOfVersion(normDTO.getDateOfVersion())
         .dateOfRelevance(normDTO.getDateOfRelevance())

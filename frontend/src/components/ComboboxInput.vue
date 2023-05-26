@@ -171,11 +171,11 @@ onBeforeUnmount(() => {
 })
 </script>
 
-<!-- <script lang="ts">
+<script lang="ts">
 export type InputModelProps = {
   label: string
 }
-</script> -->
+</script>
 
 <template>
   <div
