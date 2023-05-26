@@ -11,10 +11,13 @@ const emit = defineEmits<Emits>()
 const store = useLoadedNormStore()
 const { loadedNorm } = storeToRefs(store)
 
-const isDivergentExpirationUndefined =
-  loadedNorm.value?.metadataSections?.DIVERGENT_EXPIRATION?.some(
-    (entry) => entry.DIVERGENT_EXPIRATION_UNDEFINED
-  ) ?? false
+const isDivergentExpirationUndefined = computed(() => {
+  return (
+    loadedNorm.value?.metadataSections?.DIVERGENT_EXPIRATION?.some(
+      (entry) => entry.DIVERGENT_EXPIRATION_UNDEFINED
+    ) ?? false
+  )
+})
 
 interface Props {
   modelValue: MetadataSections
@@ -96,7 +99,13 @@ const component = computed(() => {
           id="divergentExpirationUndefinedSelection"
           v-model="selectedChildSectionName"
           aria-label="Unbestimmtes abweichendes Außerkrafttretedatum Radio"
-          :disabled="isDivergentExpirationUndefined"
+          :disabled="
+            isDivergentExpirationUndefined &&
+            !(
+              selectedChildSectionName ===
+              MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED
+            )
+          "
           name="DivergentExpirationUndefined"
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
