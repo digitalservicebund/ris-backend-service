@@ -1,5 +1,5 @@
 import DocumentationOffice from "./documentationOffice"
-import NormReference from "./normReference"
+import { NormReference } from "./normReference"
 import ProceedingDecision from "./proceedingDecision"
 
 export type CoreData = {

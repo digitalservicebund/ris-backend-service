@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import dayjs from "dayjs"
+import { computed, h } from "vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
+import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import EditableList from "@/shared/components/EditableList.vue"
 
 const props = defineProps<{
@@ -22,6 +24,25 @@ const norms = computed({
 })
 
 const defaultValue = {}
+
+function decisionSummarizer(normEntry: NormReference) {
+  return h(
+    "div",
+    { class: ["link-02-reg"] },
+    [
+      ...(normEntry.normAbbreviation?.abbreviation
+        ? [`${normEntry.normAbbreviation?.abbreviation}`]
+        : []),
+      ...(normEntry.singleNorm ? [normEntry.singleNorm] : []),
+      ...(normEntry.dateOfVersion
+        ? [dayjs(normEntry.dateOfVersion).format("DD.MM.YYYY")]
+        : []),
+      ...(normEntry.dateOfRelevance ? [normEntry.dateOfRelevance] : []),
+    ].join(", ")
+  )
+}
+
+const NormsSummary = withSummarizer(decisionSummarizer)
 </script>
 
 <template>
@@ -31,6 +52,7 @@ const defaultValue = {}
       v-model="norms"
       :default-value="defaultValue"
       :edit-component="NormReferenceInput"
+      :summary-component="NormsSummary"
     />
   </div>
 </template>
