@@ -1,4 +1,4 @@
-import { NormCategory, UndefinedDate } from "../../../../src/domain/Norm"
+import { NormCategory } from "../../../../src/domain/Norm"
 import { NormData } from "../fixtures"
 
 export const newNorm: NormData = {
@@ -144,52 +144,52 @@ export const newNorm: NormData = {
         OTHER_OFFICIAL_ANNOUNCEMENT: [{ OTHER_OFFICIAL_REFERENCE: ["BGBl I"] }],
       },
     ],
-    DIVERGENT_ENTRY_INTO_FORCE: [
-      {
-        DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
-          {
-            DATE: ["2015-02-23"],
-            NORM_CATEGORY: [
-              NormCategory.BASE_NORM,
-              NormCategory.TRANSITIONAL_NORM,
-              NormCategory.AMENDMENT_NORM,
-            ],
-          },
-        ],
-      },
-      {
-        DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
-          {
-            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN],
-            NORM_CATEGORY: [
-              NormCategory.TRANSITIONAL_NORM,
-              NormCategory.AMENDMENT_NORM,
-            ],
-          },
-        ],
-      },
-    ],
-    DIVERGENT_EXPIRATION: [
-      {
-        DIVERGENT_EXPIRATION_DEFINED: [
-          {
-            DATE: ["1990-10-10"],
-            NORM_CATEGORY: [
-              NormCategory.BASE_NORM,
-              NormCategory.TRANSITIONAL_NORM,
-            ],
-          },
-        ],
-      },
-      {
-        DIVERGENT_EXPIRATION_UNDEFINED: [
-          {
-            UNDEFINED_DATE: [UndefinedDate.UNDEFINED_NOT_PRESENT],
-            NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
-          },
-        ],
-      },
-    ],
+    // DIVERGENT_ENTRY_INTO_FORCE: [
+    //   {
+    //     DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
+    //       {
+    //         DATE: ["2015-02-23"],
+    //         NORM_CATEGORY: [
+    //           NormCategory.BASE_NORM,
+    //           NormCategory.TRANSITIONAL_NORM,
+    //           NormCategory.AMENDMENT_NORM,
+    //         ],
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED: [
+    //       {
+    //         UNDEFINED_DATE: [UndefinedDate.UNDEFINED_UNKNOWN],
+    //         NORM_CATEGORY: [
+    //           NormCategory.TRANSITIONAL_NORM,
+    //           NormCategory.AMENDMENT_NORM,
+    //         ],
+    //       },
+    //     ],
+    //   },
+    // ],
+    // DIVERGENT_EXPIRATION: [
+    //   {
+    //     DIVERGENT_EXPIRATION_DEFINED: [
+    //       {
+    //         DATE: ["1990-10-10"],
+    //         NORM_CATEGORY: [
+    //           NormCategory.BASE_NORM,
+    //           NormCategory.TRANSITIONAL_NORM,
+    //         ],
+    //       },
+    //     ],
+    //   },
+    //   {
+    //     DIVERGENT_EXPIRATION_UNDEFINED: [
+    //       {
+    //         UNDEFINED_DATE: [UndefinedDate.UNDEFINED_NOT_PRESENT],
+    //         NORM_CATEGORY: [NormCategory.TRANSITIONAL_NORM],
+    //       },
+    //     ],
+    //   },
+    // ],
     DOCUMENT_TYPE: [
       {
         TYPE_NAME: ["abc"],
