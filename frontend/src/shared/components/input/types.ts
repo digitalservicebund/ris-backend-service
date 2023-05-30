@@ -1,3 +1,4 @@
+import DocumentationOffice from "@/domain/documentationOffice"
 import { Court, DocumentType } from "@/domain/documentUnit"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import { NormAbbreviation } from "@/domain/normAbbreviation"
@@ -181,6 +182,7 @@ export type ModelType =
   | ChipsInputModelType
   | NestedInputModelType
   | ComboboxInputModelType
+  | DocumentationOffice
 
 // TODO We keep the name `defaultMessage` from the backend response,
 // but this could ne misleading. We should rename this to `message`.

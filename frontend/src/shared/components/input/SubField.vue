@@ -57,17 +57,18 @@ const resizeObserver = new ResizeObserver((entries) => {
         >{{ iconName }}</span
       >
     </button>
-    <transition
+    <div
       ref="expandableContainer"
       class="expandable"
       :class="{ expanded: isExpanded }"
-      name="expand"
       :style="{ height: containerHeight.valueOf + 'px' }"
     >
-      <div v-show="isExpanded">
-        <slot />
-      </div>
-    </transition>
+      <transition name="expand">
+        <div v-show="isExpanded">
+          <slot />
+        </div>
+      </transition>
+    </div>
   </div>
 </template>
 

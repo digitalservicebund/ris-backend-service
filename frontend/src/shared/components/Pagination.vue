@@ -1,6 +1,5 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <script setup lang="ts">
-import { withDefaults } from "vue"
 import PaginationButton from "./PaginationButton.vue"
 import { ServiceResponse } from "@/services/httpClient"
 
