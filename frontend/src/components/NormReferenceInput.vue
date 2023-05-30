@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useFlag } from "@unleash/proxy-client-vue"
 import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import NormReference from "@/domain/normReference"
@@ -21,18 +20,18 @@ const norm = computed({
     emit("update:modelValue", value)
   },
 })
-
-const searchFieldActive = useFlag("neuris.norm-abbreviation.search")
 </script>
 
 <template>
   <div>
-    <InputField
-      v-if="searchFieldActive"
-      id="norm-reference-search-field"
-      label="Suchfeld"
-    >
-      <TextInput id="norm-reference-search" aria-label="Suchfeld"></TextInput>
+    <InputField id="norm-reference-search-field" label="Suchfeld">
+      <ComboboxInput
+        id="norm-reference-search"
+        v-model="norm.risAbbreviation"
+        aria-label="Suchfeld"
+        clear-on-choosing-item
+        :item-service="ComboboxItemService.getRisAbbreviationsAwful"
+      ></ComboboxInput>
     </InputField>
     <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">
       <ComboboxInput

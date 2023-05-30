@@ -32,4 +32,13 @@ public class NormAbbreviationController {
   public Mono<NormAbbreviation> getNormAbbreviationController(@PathVariable("uuid") UUID uuid) {
     return service.getNormAbbreviationById(uuid);
   }
+
+  @GetMapping("/search")
+  public Flux<NormAbbreviation> getAllNormAbbreviationsByAwfulSearchQuery(
+      @RequestParam(value = "q", required = false, defaultValue = "") String query,
+      @RequestParam(value = "sz", required = false) Integer size,
+      @RequestParam(value = "pg", required = false) Integer page) {
+
+    return service.getNormAbbreviationByAwfulSearchQuery(query, size, page);
+  }
 }

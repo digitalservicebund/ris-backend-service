@@ -51,6 +51,24 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
         .map(NormAbbreviationTransformer::transformDTO);
   }
 
+  @Override
+  public Flux<NormAbbreviation> findByAwfulSearchQuery(String query, Integer size, Integer page) {
+    String[] queryBlocks = query.replace(",", "").replace(";", "").split(" ");
+    StringBuilder tsQuery = new StringBuilder();
+    for (int i = 0; i < queryBlocks.length; i++) {
+      if (queryBlocks[i].isBlank()) continue;
+      tsQuery.append(queryBlocks[i]).append(":*");
+      if (i < queryBlocks.length - 1) {
+        tsQuery.append(" & ");
+      }
+    }
+
+    return repository
+        .findByAwfulSearchQuery(tsQuery.toString(), size, page)
+        .flatMapSequential(this::injectAdditionalInformation)
+        .map(NormAbbreviationTransformer::transformDTO);
+  }
+
   private Mono<NormAbbreviationDTO> injectAdditionalInformation(
       NormAbbreviationDTO normAbbreviationDTO) {
     Mono<List<DocumentTypeNewDTO>> documentTypes =

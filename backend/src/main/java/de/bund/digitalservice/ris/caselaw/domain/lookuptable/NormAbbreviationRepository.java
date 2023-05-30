@@ -10,4 +10,6 @@ public interface NormAbbreviationRepository {
   public Mono<NormAbbreviation> findById(UUID id);
 
   Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer page);
+
+  Flux<NormAbbreviation> findByAwfulSearchQuery(String query, Integer size, Integer page);
 }

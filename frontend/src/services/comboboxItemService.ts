@@ -9,6 +9,7 @@ enum Endpoint {
   courts = "lookuptable/courts",
   fieldOfLawSearchByIdentifier = "fieldsoflaw/search-by-identifier",
   risAbbreviations = `normabbreviation?pg=0&sz=30`,
+  risAbbreviationsAwful = `normabbreviation/search?pg=0&sz=30`,
 }
 
 type DocumentType = {
@@ -52,6 +53,13 @@ function formatDropdownItems(
       }))
     }
     case Endpoint.risAbbreviations: {
+      return (responseData as NormAbbreviation[]).map((item) => ({
+        label: item.abbreviation,
+        value: item.abbreviation,
+        additionalInformation: item.officialLongTitle,
+      }))
+    }
+    case Endpoint.risAbbreviationsAwful: {
       return (responseData as NormAbbreviation[]).map((item) => ({
         label: item.abbreviation,
         value: item.abbreviation,
@@ -106,6 +114,8 @@ const service: ComboboxItemService = {
     fetchFromEndpoint(Endpoint.fieldOfLawSearchByIdentifier, filter),
   getRisAbbreviations: (filter?: string) =>
     fetchFromEndpoint(Endpoint.risAbbreviations, filter),
+  getRisAbbreviationsAwful: (filter?: string) =>
+    fetchFromEndpoint(Endpoint.risAbbreviationsAwful, filter),
 }
 
 export default service
