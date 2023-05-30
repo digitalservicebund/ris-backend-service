@@ -366,8 +366,7 @@ function divergentEntryIntoForceDefinedSummary(data: Metadata): VNode {
   categories.forEach((category) =>
     propertyNodes.push(
       h("div", { class: ["flex", "gap-4"] }, [
-        h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
-        h("span", NORM_CATEGORY_TRANSLATIONS[category]),
+        h("span", "\u2713 " + NORM_CATEGORY_TRANSLATIONS[category]),
       ])
     )
   )
@@ -387,38 +386,33 @@ function getLabel(value: UndefinedDate): string {
       return "unbestimmt (zukünftig)"
     case UndefinedDate.UNDEFINED_NOT_PRESENT:
       return "nicht vorhanden"
+    default:
+      return ""
   }
 }
 function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
-  const propertyNodes = []
-  const undefinedDate = data.UNDEFINED_DATE?.[0]
-
+  let output = ""
+  const undefinedDate = data?.UNDEFINED_DATE?.[0]
   const categories =
     data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
 
   if (undefinedDate !== undefined) {
-    propertyNodes.push(getLabel(undefinedDate))
+    output += getLabel(undefinedDate)
   }
 
-  if (undefinedDate && categories.length > 0) propertyNodes.push(h("div", "|"))
+  if (undefinedDate && categories.length > 0) output += " | "
 
-  categories.forEach((category) =>
-    propertyNodes.push(
-      h("div", { class: ["flex", "gap-4"] }, [
-        h("img", { src: CheckMark, alt: "checkmark", width: "16" }),
-        h("span", NORM_CATEGORY_TRANSLATIONS[category]),
-      ])
-    )
+  categories.forEach(
+    (category) => (output += "\u2713 " + NORM_CATEGORY_TRANSLATIONS[category])
   )
-
   return h(
     "div",
     { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
-    propertyNodes
+    output
   )
 }
 
-function DivergEntentryIntoForceSummarizer(
+function DivergentEntryIntoForceSummarizer(
   data: MetadataSections
 ): VNode | string {
   if (!data) return ""
@@ -453,7 +447,7 @@ const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
 const DocumentTypeSummary = withSummarizer(documentTypeSummarizer)
 const DivergentEntryIntoForceSummary = withSummarizer(
-  DivergEntentryIntoForceSummarizer
+  DivergentEntryIntoForceSummarizer
 )
 const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
 </script>

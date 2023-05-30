@@ -110,7 +110,7 @@ const component = computed(() => {
           type="radio"
           :value="MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED"
         />
-        unbestimmt
+        <span>unbestimmt</span>
       </label>
     </div>
     <component :is="component" v-model="childSection" />
@@ -164,6 +164,10 @@ input[type="radio"]:checked::before {
 }
 
 input[type="radio"]:disabled {
+  color: #717a88;
+}
+
+input[type="radio"]:disabled + span {
   color: #717a88;
 }
 

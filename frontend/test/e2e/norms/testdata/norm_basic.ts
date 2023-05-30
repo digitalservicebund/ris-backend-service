@@ -110,7 +110,10 @@ export const normData: NormData = {
     DIVERGENT_ENTRY_INTO_FORCE: [
       {
         DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
-          { DATE: ["2023-01-13"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
+          {
+            DATE: ["2023-01-13"],
+            NORM_CATEGORY: [NormCategory.BASE_NORM],
+          },
         ],
       },
       {
