@@ -13,7 +13,6 @@ plugins {
   id "com.github.ben-manes.versions" version "0.46.0"
   id "org.jetbrains.dokka" version "1.8.10"
   id "io.franzbecker.gradle-lombok" version "5.0.0"
-  id "org.flywaydb.flyway" version "9.18.0"
 }
 
 group = "de.bund.digitalservice"
@@ -40,15 +39,6 @@ repositories {
     credentials {
       username = System.getenv("GH_PACKAGES_REPOSITORY_USER")
       password = System.getenv("GH_PACKAGES_REPOSITORY_TOKEN")
-    }
-  }
-}
-
-sourceSets {
-  migration {
-    java {
-      srcDir "src/main/java"
-      include "db/migration/**/*.java"
     }
   }
 }
@@ -169,11 +159,7 @@ dependencies {
   // this is to force transitive dependencies to use 1.0.24 instead of
   // 1.0.23 as that is affected by CVE-2022-31684
   implementation "io.projectreactor.netty:reactor-netty-http:1.1.3"
-
-  def flywayCore = "org.flywaydb:flyway-core:9.18.0"
-  implementation flywayCore
-  migrationImplementation flywayCore
-
+  implementation "org.flywaydb:flyway-core:9.16.1"
   implementation "org.jetbrains.kotlin:kotlin-reflect"
 
   implementation "org.jsoup:jsoup:1.15.4"
@@ -183,19 +169,6 @@ dependencies {
   testImplementation "org.jeasy:easy-random-core:5.0.0"
   testImplementation "com.google.code.gson:gson:2.10.1"
 }
-
-flyway {
-  url = "jdbc:postgresql://localhost:5432/postgres"
-  user = "test"
-  password = "test"
-  locations = [
-    "filesystem:src/main/resources/db/migration/",
-    "classpath:db/migration"
-  ]
-  cleanDisabled = false
-}
-flywayInfo.dependsOn compileMigrationJava
-flywayMigrate.dependsOn compileMigrationJava
 
 jar {
   // We have no need for the plain archive, thus skip creation for build speedup!

@@ -16,7 +16,6 @@ env:
   GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-  REPORTS_REPOSITORY: digitalservicebund/ris-backend-service-reports
 
 jobs:
   backend-build:
@@ -856,76 +855,3 @@ jobs:
         uses: actions/deploy-pages@v2.0.0
         env:
           GITHUB_TOKEN: ${{ github.token }}
-
-  generate-entity-relationship-diagram:
-    runs-on: ubuntu-latest
-    if: ${{ github.ref == 'refs/heads/main' }}
-    needs: e2e-tests
-    steps:
-      - uses: actions/checkout@v3
-      - name: Start localhost database
-        run: docker compose up -d --wait --quiet-pull db
-      - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
-        with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: flywayMigrate
-          build-root-directory: ./backend
-      - name: Generate mermaid ER-diagram
-        uses: digitalservicebund/github-actions/entity-relationship-diagram@0ab3c79a40db4e93f27a226d655f97ee28aeb05d
-        with:
-          configFile: ./backend/mermerd.config.yaml
-          connectionString: postgresql://test:test@localhost:5432/postgres
-          outputFile: /mermerd/latest.mmd
-          version: 0.8.0
-      - name: Upload mermaid ER-diagram
-        uses: actions/upload-artifact@v3
-        with:
-          name: erdiagram
-          retention-days: 3
-          path: /mermerd/latest.mmd
-
-  push-reports:
-    runs-on: ubuntu-latest
-    needs:
-      - generate-entity-relationship-diagram
-    if: ${{ github.ref == 'refs/heads/main' }}
-    env:
-      ER_DIAGRAMS_PATH: entity-relationship-diagrams
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          repository: ${{ env.REPORTS_REPOSITORY }}
-          ssh-key: ${{ secrets.REPORTS_DEPLOY_KEY }}
-      - name: Setup git config
-        run: |
-          git config user.name "${{ github.repository }}"
-          # This email identifies the commit as GitHub Actions - see https://github.com/orgs/community/discussions/26560
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-      - name: ER-diagram - Download artifact
-        uses: actions/download-artifact@v3
-        with:
-          name: erdiagram
-          path: ${{ env.ER_DIAGRAMS_PATH }}
-      - name: ER-diagram - Check if diagram has changed
-        id: erdiagram-check
-        run: |
-          if git status -s | grep latest.mmd; then
-            echo "file_changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "file_changed=false" >> $GITHUB_OUTPUT
-          fi
-        working-directory: ${{ env.ER_DIAGRAMS_PATH }}
-      - name: ER-diagram - Commit
-        run: |
-          NOW=$(TZ=Europe/Berlin date +'%Y-%m-%dT%H%M%S')
-          cp latest.mmd $NOW.mmd
-          git add latest.mmd $NOW.mmd
-          git commit \
-            -m "${{ github.event.head_commit.message }}" \
-            -m "From commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"
-        if: steps.erdiagram-check.outputs.file_changed == 'true'
-        working-directory: ${{ env.ER_DIAGRAMS_PATH }}
-      - name: Push reports
-        run: |
-          git push origin main
-          echo "Pushed reports to ${{ github.server_url }}/${{ env.REPORTS_REPOSITORY }}" >> $GITHUB_STEP_SUMMARY
