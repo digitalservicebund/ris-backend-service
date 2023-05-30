@@ -303,8 +303,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               documentUnitNormDTOs.forEach(
                   documentUnitNormDTO -> {
                     int index = normIndex.getAndIncrement();
+                    UUID normAbbreviationId = null;
+                    if (documentUnitNorms.get(index).normAbbreviation() != null) {
+                      normAbbreviationId = documentUnitNorms.get(index).normAbbreviation().id();
+                    }
                     if (index < documentUnitNorms.size()) {
-                      documentUnitNormDTO.normAbbreviationUuid = documentUnitNorms.get(index).normAbbreviation().id();
+                      documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
                       documentUnitNormDTO.singleNorm = documentUnitNorms.get(index).singleNorm();
                       documentUnitNormDTO.dateOfVersion = documentUnitNorms.get(index).dateOfVersion();
                       documentUnitNormDTO.dateOfRelevance = documentUnitNorms.get(index).dateOfRelevance();
@@ -316,8 +320,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
               while (normIndex.get() < documentUnitNorms.size()) {
                 int index = normIndex.getAndIncrement();
+                UUID normAbbreviationId = null;
+                if (documentUnitNorms.get(index).normAbbreviation() != null) {
+                  normAbbreviationId = documentUnitNorms.get(index).normAbbreviation().id();
+                }
                 DocumentUnitNormDTO documentUnitNormDTO = DocumentUnitNormDTO.builder()
-                    .normAbbreviationUuid(documentUnitNorms.get(index).normAbbreviation().id())
+                    .normAbbreviationUuid(normAbbreviationId)
                     .singleNorm(documentUnitNorms.get(index).singleNorm())
                     .dateOfVersion(documentUnitNorms.get(index).dateOfVersion())
                     .dateOfRelevance(documentUnitNorms.get(index).dateOfRelevance())

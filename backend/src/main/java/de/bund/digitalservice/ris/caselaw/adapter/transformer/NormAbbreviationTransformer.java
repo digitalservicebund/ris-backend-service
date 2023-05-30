@@ -11,6 +11,10 @@ public class NormAbbreviationTransformer {
   private NormAbbreviationTransformer() {}
 
   public static NormAbbreviation transformDTO(NormAbbreviationDTO normAbbreviationDTO) {
+    if (normAbbreviationDTO == null) {
+      return null;
+    }
+
     List<DocumentTypeNew> documentTypes = null;
     if (normAbbreviationDTO.getDocumentTypes() != null) {
       documentTypes =
