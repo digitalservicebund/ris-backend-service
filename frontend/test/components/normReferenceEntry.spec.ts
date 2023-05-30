@@ -24,28 +24,22 @@ describe("NormReferenceEntry", () => {
   it("render values from modelValue prop", () => {
     const { screen } = renderComponent({
       modelValue: {
-        risAbbreviation: "01",
+        normAbbreviation: { id: "123", abbreviation: "ABC" },
         singleNorm: "12",
         dateOfVersion: "2022-01-31T23:00:00Z",
         dateOfRelevance: "2023",
       },
     })
 
-    const abbreviationField = screen.getByLabelText(
-      "RIS-Abkürzung"
-    ) as HTMLInputElement
+    const abbreviationField = screen.getByLabelText("RIS-Abkürzung")
 
-    const singleNormField = screen.getByLabelText(
-      "Einzelnorm"
-    ) as HTMLInputElement
+    const singleNormField = screen.getByLabelText("Einzelnorm")
 
-    const versionField = screen.getByLabelText(
-      "Fassungsdatum"
-    ) as HTMLInputElement
+    const versionField = screen.getByLabelText("Fassungsdatum")
 
-    const relevanceField = screen.getByLabelText("Jahr") as HTMLInputElement
+    const relevanceField = screen.getByLabelText("Jahr")
 
-    expect(abbreviationField).toHaveValue("01")
+    expect(abbreviationField).toHaveValue("ABC")
     expect(singleNormField).toHaveValue("12")
     expect(versionField).toHaveValue("31.01.2022")
     expect(relevanceField).toHaveValue("2023")

@@ -1,14 +1,15 @@
 <script lang="ts" setup>
+import { ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { FieldOfLawNode } from "@/domain/fieldOfLaw"
 import ComboboxItemService from "@/services/comboboxItemService"
 
-const emit = defineEmits<{
-  (event: "add-to-list", identifier: string): void
-}>()
+const emit = defineEmits<(event: "add-to-list", identifier: string) => void>()
+const fieldOfLawNode = ref()
 
 function handleUpdateModelValue(item: FieldOfLawNode) {
   if (!item) return
+  fieldOfLawNode.value = item
   emit("add-to-list", item.identifier)
 }
 </script>
@@ -23,6 +24,7 @@ function handleUpdateModelValue(item: FieldOfLawNode) {
           aria-label="Direkteingabe-Sachgebietssuche eingeben"
           clear-on-choosing-item
           :item-service="ComboboxItemService.getFieldOfLawSearchByIdentifier"
+          :model-value="fieldOfLawNode"
           placeholder="Sachgebiet"
           @update:model-value="handleUpdateModelValue"
         >

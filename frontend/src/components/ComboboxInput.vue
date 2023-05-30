@@ -6,21 +6,19 @@ import {
   ComboboxItem,
 } from "@/shared/components/input/types"
 
-interface Props {
+interface Emits {
+  (event: "update:modelValue", value: ComboboxInputModelType | undefined): void
+  (event: "input", value: Event): void
+}
+
+const props = defineProps<{
   id: string
   itemService: ComboboxAttributes["itemService"]
   modelValue: T
   ariaLabel: string
   placeholder?: string
   clearOnChoosingItem?: boolean
-}
-
-interface Emits {
-  (event: "update:modelValue", value: ComboboxInputModelType | undefined): void
-  (event: "input", value: Event): void
-}
-
-const props = defineProps<Props>()
+}>()
 
 const emit = defineEmits<Emits>()
 
@@ -172,9 +170,11 @@ onBeforeUnmount(() => {
 </script>
 
 <script lang="ts">
-export type InputModelProps = {
-  label: string
-}
+export type InputModelProps =
+  | {
+      label: string
+    }
+  | undefined
 </script>
 
 <template>
