@@ -605,7 +605,7 @@ const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
       label="Nichtamtliche Buchstabenabkürzung"
       :type="InputType.CHIPS"
     />
-    <fieldset>
+    <fieldset class="mt-32">
       <legend
         id="entryIntoForceFields"
         class="heading-02-regular mb-[1rem] mt-32"
@@ -633,7 +633,7 @@ const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
       />
     </ExpandableDataSet>
 
-    <fieldset>
+    <fieldset class="mt-32">
       <legend id="expirationFields" class="heading-02-regular mb-[1rem]">
         Außerkrafttreten
       </legend>
