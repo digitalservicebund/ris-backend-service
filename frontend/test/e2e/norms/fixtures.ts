@@ -427,8 +427,8 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Abweichendes Inkrafttretedatum",
-      isRepeatedSection: true,
       id: "divergentEntryIntoForces",
+      isRepeatedSection: true,
       fields: [
         {
           type: FieldType.RADIO,
@@ -495,7 +495,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.DROPDOWN,
-          id: "divergentEntryIntoForceDateState",
+          id: "divergentEntryIntoForceUndefinedDate",
           label: "Unbestimmtes abweichendes Inkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
             (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
@@ -649,7 +649,7 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
         {
           type: FieldType.DROPDOWN,
-          id: "divergentExpirationDateState",
+          id: "divergentExpirationUndefinedDate",
           label: "Unbestimmtes abweichendes Außerkrafttretedatum",
           values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
             (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
