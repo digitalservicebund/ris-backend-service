@@ -560,6 +560,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
               return documentUnitDTO;
             })
+        .map(DocumentUnitTransformer::transformReadDTO)
         .flatMap(writeRepository::save)
         .map(DocumentUnitTransformer::transformDTO);
   }
@@ -577,6 +578,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
               return documentUnitDTO;
             })
+        .map(DocumentUnitTransformer::transformReadDTO)
         .flatMap(writeRepository::save)
         .map(DocumentUnitTransformer::transformDTO);
   }
