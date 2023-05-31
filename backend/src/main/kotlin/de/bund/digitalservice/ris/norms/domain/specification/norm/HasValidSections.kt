@@ -3,6 +3,7 @@ package de.bund.digitalservice.ris.norms.domain.specification.norm
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CATEGORIZED_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CITATION_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
@@ -33,6 +34,7 @@ val hasValidSections =
                 DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
                 DIVERGENT_EXPIRATION,
                 DIVERGENT_EXPIRATION_UNDEFINED,
+                CATEGORIZED_REFERENCE,
             )
         }
     }

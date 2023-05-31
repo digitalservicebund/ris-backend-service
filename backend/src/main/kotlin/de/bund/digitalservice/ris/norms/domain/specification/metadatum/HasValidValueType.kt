@@ -36,6 +36,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_PREVIOUS_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
@@ -61,7 +62,7 @@ val hasValidValueType =
                 NUMBER, PAGE, ADDITIONAL_INFO, EXPLANATION, ANNOUNCEMENT_MEDIUM,
                 AREA_OF_PUBLICATION, NUMBER_OF_THE_PUBLICATION_IN_THE_RESPECTIVE_AREA,
                 SERIES, DECIDING_BODY, EU_GOVERNMENT_GAZETTE, OTHER_OFFICIAL_REFERENCE, ENTITY,
-                TYPE_NAME, TEMPLATE_NAME, EDITION,
+                TYPE_NAME, TEMPLATE_NAME, EDITION, TEXT,
                 -> instance.value is String
 
                 DATE -> instance.value is LocalDate

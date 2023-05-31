@@ -37,6 +37,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_PREVIOUS_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
@@ -72,6 +73,7 @@ val hasValidMetadata =
             Section.DIVERGENT_EXPIRATION -> hasNone(instance)
             Section.DIVERGENT_EXPIRATION_DEFINED -> hasType(listOf(DATE, NORM_CATEGORY), instance)
             Section.DIVERGENT_EXPIRATION_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
+            Section.CATEGORIZED_REFERENCE -> hasType(listOf(TEXT), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

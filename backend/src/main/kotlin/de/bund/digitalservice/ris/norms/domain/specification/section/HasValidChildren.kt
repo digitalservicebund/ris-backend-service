@@ -4,6 +4,7 @@ import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
 import de.bund.digitalservice.ris.norms.domain.specification.Specification
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.AGE_INDICATION
+import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CATEGORIZED_REFERENCE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.CITATION_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIGITAL_ANNOUNCEMENT
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE
@@ -29,7 +30,7 @@ val hasValidChildren =
             NORM, NORM_PROVIDER, SUBJECT_AREA, LEAD, PARTICIPATION,
             CITATION_DATE, AGE_INDICATION, PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT,
             EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT, DOCUMENT_TYPE, DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
-            DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED,
+            DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED, DIVERGENT_EXPIRATION_DEFINED, DIVERGENT_EXPIRATION_UNDEFINED, CATEGORIZED_REFERENCE,
             -> hasNone(instance)
 
             OFFICIAL_REFERENCE -> hasOneOfType(listOf(PRINT_ANNOUNCEMENT, DIGITAL_ANNOUNCEMENT, EU_ANNOUNCEMENT, OTHER_OFFICIAL_ANNOUNCEMENT), instance)
