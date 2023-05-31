@@ -8,10 +8,9 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitReadRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitWriteRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlMailRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
@@ -73,8 +72,7 @@ class PublishDocumentUnitIntegrationTest {
 
   @Autowired private WebTestClient webClient;
 
-  @Autowired private DatabaseDocumentUnitReadRepository repository;
-  @Autowired private DatabaseDocumentUnitWriteRepository writeRepository;
+  @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseXmlMailRepository xmlMailRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
@@ -83,24 +81,23 @@ class PublishDocumentUnitIntegrationTest {
   @AfterEach
   void cleanUp() {
     xmlMailRepository.deleteAll().block();
-    writeRepository.deleteAll().block();
+    repository.deleteAll().block();
   }
 
   @Test
   void testPublishDocumentUnit() {
     UUID documentUnitUuid1 = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid1)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    DocumentUnitWriteDTO savedDocumentUnitWriteDTO =
-        writeRepository.save(documentUnitWriteDTO).block();
+    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
     XmlMailDTO expectedXmlMailDTO =
         new XmlMailDTO(
             1L,
-            savedDocumentUnitWriteDTO.getId(),
+            savedDocumentUnitDTO.getId(),
             "exporter@neuris.de",
             "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang",
             "xml",
@@ -153,19 +150,18 @@ class PublishDocumentUnitIntegrationTest {
   @Test
   void testGetLastPublishedXml() {
     UUID documentUnitUuid1 = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid1)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    DocumentUnitWriteDTO savedDocumentUnitWriteDTO =
-        writeRepository.save(documentUnitWriteDTO).block();
+    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
 
     XmlMailDTO xmlMailDTO =
         new XmlMailDTO(
             null,
-            savedDocumentUnitWriteDTO.getId(),
+            savedDocumentUnitDTO.getId(),
             "exporter@neuris.de",
             "mailSubject",
             "xml",

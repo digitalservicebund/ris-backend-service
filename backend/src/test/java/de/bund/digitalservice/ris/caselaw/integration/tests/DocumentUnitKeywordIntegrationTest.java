@@ -6,10 +6,9 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingController;
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitReadRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitWriteRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseKeywordRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.KeywordDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
@@ -53,25 +52,24 @@ class DocumentUnitKeywordIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseKeywordRepository keywordRepository;
-  @Autowired private DatabaseDocumentUnitReadRepository documentUnitRepository;
-  @Autowired private DatabaseDocumentUnitWriteRepository documentUnitWriteRepository;
+  @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
 
   @AfterEach
   void cleanUp() {
     keywordRepository.deleteAll().block();
-    documentUnitWriteRepository.deleteAll().block();
+    documentUnitRepository.deleteAll().block();
   }
 
   @Test
   void testGetAllKeywordsForDocumentUnit_withoutKeywords_shouldReturnEmptyList() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitWriteRepository.save(documentUnitWriteDTO).block();
+    documentUnitRepository.save(documentUnitDTO).block();
 
     webClient
         .mutateWith(csrf())
@@ -90,26 +88,20 @@ class DocumentUnitKeywordIntegrationTest {
   @Test
   void testGetAllKeywordsForDocumentUnit_withKeywords_shouldReturnList() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
+    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
 
     KeywordDTO keywordDTO01 =
-        KeywordDTO.builder()
-            .documentUnitId(documentUnitWriteDTO.getId())
-            .keyword("keyword01")
-            .build();
+        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
     keywordRepository.save(keywordDTO01).block();
 
     KeywordDTO keywordDTO02 =
-        KeywordDTO.builder()
-            .documentUnitId(documentUnitWriteDTO.getId())
-            .keyword("keyword02")
-            .build();
+        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword02").build();
     keywordRepository.save(keywordDTO02).block();
 
     webClient
@@ -149,13 +141,13 @@ class DocumentUnitKeywordIntegrationTest {
   @Test
   void testAddKeywordForDocumentUnit_shouldReturnListWithAllKeywords() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitWriteRepository.save(documentUnitWriteDTO).block();
+    documentUnitRepository.save(documentUnitDTO).block();
 
     webClient
         .mutateWith(csrf())
@@ -194,19 +186,16 @@ class DocumentUnitKeywordIntegrationTest {
   void
       testAddExistingKeywordForDocumentUnit_shouldNotAddDuplicateKeywordAndReturnListWithAllKeywords() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitWriteRepository.save(documentUnitWriteDTO).block();
+    documentUnitRepository.save(documentUnitDTO).block();
 
     KeywordDTO keywordDTO01 =
-        KeywordDTO.builder()
-            .documentUnitId(documentUnitWriteDTO.getId())
-            .keyword("keyword01")
-            .build();
+        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
     keywordRepository.save(keywordDTO01).block();
 
     webClient
@@ -227,19 +216,16 @@ class DocumentUnitKeywordIntegrationTest {
   @Test
   void testDeleteKeywordForDocumentUnit_shouldReturnListWithAllKeywords() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitWriteRepository.save(documentUnitWriteDTO).block();
+    documentUnitRepository.save(documentUnitDTO).block();
 
     KeywordDTO keywordDTO01 =
-        KeywordDTO.builder()
-            .documentUnitId(documentUnitWriteDTO.getId())
-            .keyword("keyword01")
-            .build();
+        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
     keywordRepository.save(keywordDTO01).block();
 
     webClient
@@ -259,19 +245,16 @@ class DocumentUnitKeywordIntegrationTest {
   @Test
   void testDeleteNonExistingKeywordForDocumentUnit_shouldReturnListWithAllKeywords() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO documentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitWriteRepository.save(documentUnitWriteDTO).block();
+    documentUnitRepository.save(documentUnitDTO).block();
 
     KeywordDTO keywordDTO01 =
-        KeywordDTO.builder()
-            .documentUnitId(documentUnitWriteDTO.getId())
-            .keyword("keyword01")
-            .build();
+        KeywordDTO.builder().documentUnitId(documentUnitDTO.getId()).keyword("keyword01").build();
     keywordRepository.save(keywordDTO01).block();
 
     webClient

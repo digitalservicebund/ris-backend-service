@@ -17,8 +17,8 @@ import org.springframework.data.relational.core.mapping.Table;
 @AllArgsConstructor
 @Table("doc_unit")
 @EqualsAndHashCode(callSuper = true)
-public class DocumentUnitWriteDTO extends DocumentUnitMetadataDTO {
-  public static final DocumentUnitWriteDTO EMPTY = new DocumentUnitWriteDTO();
+public class DocumentUnitDTO extends DocumentUnitMetadataDTO {
+  public static final DocumentUnitDTO EMPTY = new DocumentUnitDTO();
 
   // RUBRIKEN
   // - Kurz- & Langtexte

@@ -9,11 +9,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.ProceedingDecisionController;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitReadRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitWriteRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -71,8 +70,7 @@ class ProceedingDecisionIntegrationTest {
   }
 
   @Autowired private WebTestClient webClient;
-  @Autowired private DatabaseDocumentUnitReadRepository repository;
-  @Autowired private DatabaseDocumentUnitWriteRepository writeRepository;
+  @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitMetadataRepository metadataRepository;
   @Autowired private DatabaseProceedingDecisionLinkRepository linkRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
@@ -86,7 +84,7 @@ class ProceedingDecisionIntegrationTest {
   void cleanUp() {
     // has to be cleaned first to avoid foreign key constraint violation in the following deletions
     linkRepository.deleteAll().block();
-    writeRepository.deleteAll().block();
+    repository.deleteAll().block();
     metadataRepository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
@@ -95,21 +93,21 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testAddProceedingDecisionLink() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890")
             .dataSource(DataSource.NEURIS)
             .build();
-    writeRepository.save(parentDocumentUnitWriteDTO).block();
+    repository.save(parentDocumentUnitDTO).block();
 
     ProceedingDecision proceedingDecision =
         ProceedingDecision.builder().dataSource(DataSource.PROCEEDING_DECISION).build();
 
     assertThat(
             linkRepository
-                .findAllByParentDocumentUnitId(parentDocumentUnitWriteDTO.getId())
+                .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
                 .collectList()
                 .block())
         .isEmpty();
@@ -126,14 +124,14 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(
             linkRepository
-                .findAllByParentDocumentUnitId(parentDocumentUnitWriteDTO.getId())
+                .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
                 .collectList()
                 .block())
         .hasSize(1);
 
     List<Long> childUuids =
         linkRepository
-            .findAllByParentDocumentUnitId(parentDocumentUnitWriteDTO.getId())
+            .findAllByParentDocumentUnitId(parentDocumentUnitDTO.getId())
             .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId)
             .collectList()
             .block();
@@ -145,29 +143,29 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testAddProceedingDecisionLink_alsoAppendsPreviousDecisionsToDocumentUnit() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO = writeRepository.save(parentDocumentUnitWriteDTO).block();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
 
     UUID childUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO childDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(childUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("abcdefghjikl")
             .dataSource(DataSource.NEURIS)
             .build();
-    childDocumentUnitWriteDTO = writeRepository.save(childDocumentUnitWriteDTO).block();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
     ProceedingDecisionLinkDTO linkDTO =
         ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitWriteDTO.getId())
-            .childDocumentUnitId(childDocumentUnitWriteDTO.getId())
+            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -190,29 +188,29 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testLinkExistingProceedingDecision() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO = writeRepository.save(parentDocumentUnitWriteDTO).block();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
 
     UUID childUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO childDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(childUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("abcdefghjikl")
             .dataSource(DataSource.NEURIS)
             .build();
-    childDocumentUnitWriteDTO = writeRepository.save(childDocumentUnitWriteDTO).block();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
     assertThat(
             linkRepository
                 .findByParentDocumentUnitIdAndChildDocumentUnitId(
-                    parentDocumentUnitWriteDTO.getId(), childDocumentUnitWriteDTO.getId())
+                    parentDocumentUnitDTO.getId(), childDocumentUnitDTO.getId())
                 .block())
         .isNull();
 
@@ -227,7 +225,7 @@ class ProceedingDecisionIntegrationTest {
     assertThat(
             linkRepository
                 .findByParentDocumentUnitIdAndChildDocumentUnitId(
-                    parentDocumentUnitWriteDTO.getId(), childDocumentUnitWriteDTO.getId())
+                    parentDocumentUnitDTO.getId(), childDocumentUnitDTO.getId())
                 .block())
         .isNotNull();
   }
@@ -235,29 +233,29 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testRemoveProceedingDecisionLink() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO = writeRepository.save(parentDocumentUnitWriteDTO).block();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
 
     UUID childUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO childDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(childUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("abcdefghjikl")
             .dataSource(DataSource.NEURIS)
             .build();
-    childDocumentUnitWriteDTO = writeRepository.save(childDocumentUnitWriteDTO).block();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
     ProceedingDecisionLinkDTO linkDTO =
         ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitWriteDTO.getId())
-            .childDocumentUnitId(childDocumentUnitWriteDTO.getId())
+            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -271,35 +269,35 @@ class ProceedingDecisionIntegrationTest {
         .is2xxSuccessful();
 
     assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
-    assertThat(repository.findById(childDocumentUnitWriteDTO.getId()).block()).isNotNull();
+    assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
   }
 
   @Test
   void testRemoveProceedingDecisionLink_alsoRemovesProceedingDecisionFromDocumentUnit() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO = writeRepository.save(parentDocumentUnitWriteDTO).block();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
 
     UUID childUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO childDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(childUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("abcdefghjikl")
             .dataSource(DataSource.NEURIS)
             .build();
-    childDocumentUnitWriteDTO = writeRepository.save(childDocumentUnitWriteDTO).block();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
     ProceedingDecisionLinkDTO linkDTO =
         ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitWriteDTO.getId())
-            .childDocumentUnitId(childDocumentUnitWriteDTO.getId())
+            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -313,7 +311,7 @@ class ProceedingDecisionIntegrationTest {
         .is2xxSuccessful();
 
     assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
-    assertThat(repository.findById(childDocumentUnitWriteDTO.getId()).block()).isNotNull();
+    assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
 
     webClient
         .mutateWith(csrf())
@@ -333,29 +331,29 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testRemoveProceedingDecisionLinkAndDeleteOrphanedDocumentUnit() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO = writeRepository.save(parentDocumentUnitWriteDTO).block();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
 
     UUID childUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO childDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(childUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("abcdefghjikl")
             .dataSource(DataSource.PROCEEDING_DECISION)
             .build();
-    childDocumentUnitWriteDTO = writeRepository.save(childDocumentUnitWriteDTO).block();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
     ProceedingDecisionLinkDTO linkDTO =
         ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitWriteDTO.getId())
-            .childDocumentUnitId(childDocumentUnitWriteDTO.getId())
+            .parentDocumentUnitId(parentDocumentUnitDTO.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
             .build();
     linkDTO = linkRepository.save(linkDTO).block();
     assertThat(linkDTO).isNotNull();
@@ -369,53 +367,53 @@ class ProceedingDecisionIntegrationTest {
         .is2xxSuccessful();
 
     assertThat(linkRepository.findById(linkDTO.getId()).block()).isNull();
-    assertThat(repository.findById(childDocumentUnitWriteDTO.getId()).block()).isNull();
+    assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNull();
   }
 
   @Test
   void testRemoveProceedingDecisionLinkAndKeepLinkedProceedingDecision() {
     UUID parentUuid1 = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO1 =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO1 =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid1)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO1 = writeRepository.save(parentDocumentUnitWriteDTO1).block();
+    parentDocumentUnitDTO1 = repository.save(parentDocumentUnitDTO1).block();
 
     UUID parentUuid2 = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO2 =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO2 =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid2)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890124")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO2 = writeRepository.save(parentDocumentUnitWriteDTO2).block();
+    parentDocumentUnitDTO2 = repository.save(parentDocumentUnitDTO2).block();
 
     UUID childUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO childDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(childUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("abcdefghjikl")
             .dataSource(DataSource.PROCEEDING_DECISION)
             .build();
-    childDocumentUnitWriteDTO = writeRepository.save(childDocumentUnitWriteDTO).block();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
     ProceedingDecisionLinkDTO linkDTO1 =
         ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitWriteDTO1.getId())
-            .childDocumentUnitId(childDocumentUnitWriteDTO.getId())
+            .parentDocumentUnitId(parentDocumentUnitDTO1.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
             .build();
     linkDTO1 = linkRepository.save(linkDTO1).block();
     assertThat(linkDTO1).isNotNull();
 
     ProceedingDecisionLinkDTO linkDTO2 =
         ProceedingDecisionLinkDTO.builder()
-            .parentDocumentUnitId(parentDocumentUnitWriteDTO2.getId())
-            .childDocumentUnitId(childDocumentUnitWriteDTO.getId())
+            .parentDocumentUnitId(parentDocumentUnitDTO2.getId())
+            .childDocumentUnitId(childDocumentUnitDTO.getId())
             .build();
     linkDTO2 = linkRepository.save(linkDTO2).block();
     assertThat(linkDTO2).isNotNull();
@@ -430,20 +428,20 @@ class ProceedingDecisionIntegrationTest {
 
     assertThat(linkRepository.findById(linkDTO1.getId()).block()).isNull();
     assertThat(linkRepository.findById(linkDTO2.getId()).block()).isNotNull();
-    assertThat(repository.findById(childDocumentUnitWriteDTO.getId()).block()).isNotNull();
+    assertThat(repository.findById(childDocumentUnitDTO.getId()).block()).isNotNull();
   }
 
   @Test
   void testRemoveNonExistingProceedingDecisionLink() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    writeRepository.save(parentDocumentUnitWriteDTO).block();
+    repository.save(parentDocumentUnitDTO).block();
 
     webClient
         .mutateWith(csrf())
@@ -458,24 +456,24 @@ class ProceedingDecisionIntegrationTest {
   @Test
   void testLinkTwoExistingDocumentUnits() {
     UUID parentUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO parentDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO parentDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(parentUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .dataSource(DataSource.NEURIS)
             .build();
-    parentDocumentUnitWriteDTO = writeRepository.save(parentDocumentUnitWriteDTO).block();
+    parentDocumentUnitDTO = repository.save(parentDocumentUnitDTO).block();
 
     UUID childUuid = UUID.randomUUID();
-    DocumentUnitWriteDTO childDocumentUnitWriteDTO =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO childDocumentUnitDTO =
+        DocumentUnitDTO.builder()
             .uuid(childUuid)
             .creationtimestamp(Instant.now())
             .documentnumber("abcdefghjikl")
             .dataSource(DataSource.NEURIS)
             .build();
-    childDocumentUnitWriteDTO = writeRepository.save(childDocumentUnitWriteDTO).block();
+    childDocumentUnitDTO = repository.save(childDocumentUnitDTO).block();
 
     webClient
         .mutateWith(csrf())
@@ -495,8 +493,8 @@ class ProceedingDecisionIntegrationTest {
 
     List<ProceedingDecisionLinkDTO> list = linkRepository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getParentDocumentUnitId()).isEqualTo(parentDocumentUnitWriteDTO.getId());
-    assertThat(list.get(0).getChildDocumentUnitId()).isEqualTo(childDocumentUnitWriteDTO.getId());
+    assertThat(list.get(0).getParentDocumentUnitId()).isEqualTo(parentDocumentUnitDTO.getId());
+    assertThat(list.get(0).getChildDocumentUnitId()).isEqualTo(childDocumentUnitDTO.getId());
   }
 
   @Test

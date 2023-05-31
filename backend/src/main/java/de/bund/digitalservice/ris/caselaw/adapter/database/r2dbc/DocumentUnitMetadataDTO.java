@@ -75,6 +75,4 @@ public class DocumentUnitMetadataDTO {
   @Transient private DocumentationOfficeDTO documentationOffice;
 
   @Transient private List<FileNumberDTO> fileNumbers;
-
-  @Transient private String status;
 }

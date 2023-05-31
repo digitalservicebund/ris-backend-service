@@ -10,14 +10,12 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitReadRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitWriteRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitReadDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
@@ -81,8 +79,7 @@ class DocumentUnitIntegrationTest {
   }
 
   @Autowired private WebTestClient webClient;
-  @Autowired private DatabaseDocumentUnitReadRepository repository;
-  @Autowired private DatabaseDocumentUnitWriteRepository writeRepository;
+  @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseDocumentUnitMetadataRepository previousDecisionRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DeviatingEcliRepository deviatingEcliRepository;
@@ -103,7 +100,7 @@ class DocumentUnitIntegrationTest {
     stateRepository.deleteAll().block();
     deviatingDecisionDateRepository.deleteAll().block();
     incorrectCourtRepository.deleteAll().block();
-    writeRepository.deleteAll().block();
+    repository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
   }
 
@@ -125,7 +122,7 @@ class DocumentUnitIntegrationTest {
               assertThat(response.getResponseBody().coreData().dateKnown()).isTrue();
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentnumber()).startsWith("XXRE");
     assertThat(list.get(0).isDateKnown()).isTrue();
@@ -135,14 +132,14 @@ class DocumentUnitIntegrationTest {
   void testForFileNumbersDbEntryAfterUpdateByUuid() {
     UUID uuid = UUID.randomUUID();
 
-    DocumentUnitWriteDTO dto =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
             .uuid(uuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .build();
 
-    DocumentUnitWriteDTO savedDto = writeRepository.save(dto).block();
+    DocumentUnitDTO savedDto = repository.save(dto).block();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -170,7 +167,7 @@ class DocumentUnitIntegrationTest {
                   .isEqualTo("AkteX");
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
 
@@ -184,14 +181,14 @@ class DocumentUnitIntegrationTest {
   void testForDeviatingEcliDbEntryAfterUpdateByUuid() {
     UUID uuid = UUID.randomUUID();
 
-    DocumentUnitWriteDTO dto =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
             .uuid(uuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .build();
 
-    DocumentUnitWriteDTO savedDto = writeRepository.save(dto).block();
+    DocumentUnitDTO savedDto = repository.save(dto).block();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -221,7 +218,7 @@ class DocumentUnitIntegrationTest {
                   .isEqualTo("ecli456");
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
 
@@ -237,14 +234,14 @@ class DocumentUnitIntegrationTest {
   void testForDeviatingDecisionDateDbEntryAfterUpdateByUuid() {
     UUID uuid = UUID.randomUUID();
 
-    DocumentUnitWriteDTO dto =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
             .uuid(uuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .build();
 
-    writeRepository.save(dto).block();
+    repository.save(dto).block();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -280,7 +277,7 @@ class DocumentUnitIntegrationTest {
                   .isEqualTo("2022-01-31T23:00:00Z");
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
 
@@ -299,14 +296,14 @@ class DocumentUnitIntegrationTest {
   void testUpdate_withIncorrectCourts_shouldHaveIncorrectCourtsSavedInDB() {
     UUID uuid = UUID.randomUUID();
 
-    DocumentUnitWriteDTO dto =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
             .uuid(uuid)
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .build();
 
-    DocumentUnitWriteDTO savedDto = writeRepository.save(dto).block();
+    DocumentUnitDTO savedDto = repository.save(dto).block();
 
     IncorrectCourtDTO incorrectCourtDTO =
         IncorrectCourtDTO.builder()
@@ -353,7 +350,7 @@ class DocumentUnitIntegrationTest {
                   .containsExactly("incorrectCourt1", "incorrectCourt3", "incorrectCourt4");
             });
 
-    List<DocumentUnitWriteDTO> list = writeRepository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentnumber()).isEqualTo("1234567890123");
 
@@ -479,8 +476,8 @@ class DocumentUnitIntegrationTest {
                 .build())
         .block();
 
-    DocumentUnitWriteDTO.DocumentUnitWriteDTOBuilder builder =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO.DocumentUnitDTOBuilder builder =
+        DocumentUnitDTO.builder()
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123");
@@ -489,9 +486,9 @@ class DocumentUnitIntegrationTest {
     } else {
       builder.courtType("courttype").courtLocation("courtlocation");
     }
-    DocumentUnitWriteDTO dto = builder.build();
+    DocumentUnitDTO dto = builder.build();
 
-    DocumentUnitWriteDTO savedDto = writeRepository.save(dto).block();
+    DocumentUnitDTO savedDto = repository.save(dto).block();
     assert savedDto != null;
 
     Court court = null;
@@ -531,13 +528,13 @@ class DocumentUnitIntegrationTest {
             .build();
     databaseDocumentTypeRepository.save(documentTypeDTO).block();
 
-    DocumentUnitWriteDTO dto =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .build();
-    writeRepository.save(dto).block();
+    repository.save(dto).block();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -572,7 +569,7 @@ class DocumentUnitIntegrationTest {
                   .isEqualTo(documentTypeDTO.getJurisShortcut());
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentTypeId()).isEqualTo(1L);
     assertThat(list.get(0).getDocumentTypeDTO()).isNull();
@@ -580,14 +577,14 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testUndoSettingDocumentType() {
-    DocumentUnitWriteDTO dto =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .documentTypeId(123L)
             .build();
-    writeRepository.save(dto).block();
+    repository.save(dto).block();
 
     DocumentUnit documentUnitFromFrontend =
         DocumentUnit.builder()
@@ -611,7 +608,7 @@ class DocumentUnitIntegrationTest {
               assertThat(response.getResponseBody().coreData().documentType()).isNull();
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getDocumentTypeId()).isNull();
     assertThat(list.get(0).getDocumentTypeDTO()).isNull();
@@ -640,15 +637,15 @@ class DocumentUnitIntegrationTest {
   private void testLegalEffectChanges(
       LegalEffect valueBefore, String courtType, LegalEffect expectedValueAfter) {
     // outsource and reuse this default way of building a new DocumentUnitDTO? TODO
-    DocumentUnitWriteDTO dto =
-        DocumentUnitWriteDTO.builder()
+    DocumentUnitDTO dto =
+        DocumentUnitDTO.builder()
             .uuid(UUID.randomUUID())
             .creationtimestamp(Instant.now())
             .documentnumber("1234567890123")
             .legalEffect(valueBefore.getLabel())
             .build();
 
-    writeRepository.save(dto).block();
+    repository.save(dto).block();
 
     DocumentUnit documentUnitFromFrontend =
         buildDocumentUnitFromFrontendWithLegalEffect(dto, courtType, valueBefore);
@@ -670,7 +667,7 @@ class DocumentUnitIntegrationTest {
                   .isEqualTo(expectedValueAfter.getLabel());
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getLegalEffect()).isEqualTo(expectedValueAfter.getLabel());
 
@@ -688,7 +685,7 @@ class DocumentUnitIntegrationTest {
   }
 
   private DocumentUnit buildDocumentUnitFromFrontendWithLegalEffect(
-      DocumentUnitWriteDTO dto, String courtType, LegalEffect legalEffect) {
+      DocumentUnitDTO dto, String courtType, LegalEffect legalEffect) {
     CoreData coreData;
     if (courtType == null) {
       coreData = CoreData.builder().legalEffect(legalEffect.getLabel()).build();
@@ -729,7 +726,7 @@ class DocumentUnitIntegrationTest {
                   .isEqualTo(documentUnitFromFrontend.coreData().legalEffect());
             });
 
-    List<DocumentUnitReadDTO> list = repository.findAll().collectList().block();
+    List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
     assertThat(list.get(0).getLegalEffect())
         .isEqualTo(documentUnitFromFrontend.coreData().legalEffect());
@@ -737,17 +734,17 @@ class DocumentUnitIntegrationTest {
 
   @Test
   void testSearchResultsAreDeterministic() {
-    Flux<DocumentUnitWriteDTO> documentUnitDTOs =
+    Flux<DocumentUnitDTO> documentUnitDTOs =
         Flux.range(0, 20)
             .map(index -> UUID.randomUUID())
             .map(
                 uuid ->
-                    DocumentUnitWriteDTO.builder()
+                    DocumentUnitDTO.builder()
                         .uuid(uuid)
                         .creationtimestamp(Instant.now())
                         .documentnumber(RandomStringUtils.random(10, true, true))
                         .build())
-            .flatMap(documentUnitDTO -> writeRepository.save(documentUnitDTO));
+            .flatMap(documentUnitDTO -> repository.save(documentUnitDTO));
 
     documentUnitDTOs.blockLast();
     assertThat(repository.findAll().collectList().block()).hasSize(20);
