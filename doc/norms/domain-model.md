@@ -133,6 +133,7 @@ classDiagram
      DIVERGENT_EXPIRATION
      DIVERGENT_EXPIRATION_DEFINED
      DIVERGENT_EXPIRATION_UNDEFINED
+     CATEGORIZED_REFERENCE
   }
 
   class MetadatumType  {
@@ -178,6 +179,7 @@ classDiagram
     NORM_CATEGORY
     TEMPLATE_NAME
     UNDEFINED_DATE
+    TEXT
   }
 
   class FileReference {

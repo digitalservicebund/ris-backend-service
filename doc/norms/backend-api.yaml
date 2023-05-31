@@ -310,6 +310,7 @@ components:
         - NORM_CATEGORY
         - TEMPLATE_NAME
         - UNDEFINED_DATE
+        - TEXT
 
     MetadataSectionName:
       description: A field that indicates the name of the section
@@ -334,6 +335,7 @@ components:
         - DIVERGENT_EXPIRATION
         - DIVERGENT_EXPIRATION_DEFINED
         - DIVERGENT_EXPIRATION_UNDEFINED
+        - CATEGORIZED_REFERENCE
 
     MetadataSection:
       type: object
