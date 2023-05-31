@@ -117,6 +117,17 @@ services:
       start_period: 3s
       timeout: 5s
 
+  structurizr:
+    profiles:
+      - doc
+    image: structurizr/lite
+    user: "${MY_UID}:${MY_GID}"
+    container_name: docs-structurizr
+    volumes:
+      - ./doc/structurizr:/usr/local/structurizr
+    ports:
+      - "58080:8080"
+
 volumes:
   db-data:
   gradle-cache:

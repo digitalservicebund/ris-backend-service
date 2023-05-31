@@ -118,8 +118,22 @@ _dev() {
   echo "The application is available at http://127.0.0.1"
 }
 
+_doc() {
+  if ! type "docker-compose" > /dev/null
+  then
+    _fail "Running doc environment requires docker-compose, please install first"
+    exit 1
+  fi
+  # TODO : introduce docker-compose profiles and start doc environment by `docker-compose --profile doc up`
+  docker compose up -d --wait structurizr
+  sleep 5
+  open http://127.0.0.1:58080 &
+}
+
 _down() {
   docker compose stop
+  # TODO : introduce profile for dev containers
+  docker compose --profile doc stop
 }
 
 _commit_message_template() {
@@ -164,7 +178,8 @@ _help() {
   echo "dev                   Start full-stack development environment"
   echo "                      Add '-' or '--no-backend' to start backend separately"
   echo "                      Add '-d' or '--detached' to check the health of the services in the background instead of showing the log stream"
-  echo "down                  Stop development environment"
+  echo "doc                   Start doc environment with structurizr"
+  echo "down                  Stop development/doc environment"
   echo "clean-staging         Deletes all existing documentunits on staging"
   echo "cm <issue-number>     Configure commit message template with given issue number;"
   echo "                      issue number can be with or without prefix: 1234, RISDEV-1234."
@@ -177,6 +192,7 @@ case "$cmd" in
   "dev") 
     shift 
     _dev "$@";;
+  "doc") _doc ;;
   "down") _down ;;
   "clean-staging") _clean_staging ;;
   "_start") _start ;;
