@@ -142,6 +142,7 @@ const DECODERS: MetadataValueDecoders = {
   [MetadatumType.NORM_CATEGORY]: decodeNormCategory,
   [MetadatumType.TEMPLATE_NAME]: identity,
   [MetadatumType.UNDEFINED_DATE]: decodeUndefinedDate,
+  [MetadatumType.TEXT]: identity,
 }
 
 const ENCODERS: MetadataValueEncoders = {
@@ -187,6 +188,7 @@ const ENCODERS: MetadataValueEncoders = {
   [MetadatumType.NORM_CATEGORY]: identity,
   [MetadatumType.TEMPLATE_NAME]: identity,
   [MetadatumType.UNDEFINED_DATE]: encodeUndefinedDate,
+  [MetadatumType.TEXT]: identity,
 }
 
 /**

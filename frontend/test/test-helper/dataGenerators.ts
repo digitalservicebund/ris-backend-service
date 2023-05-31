@@ -67,6 +67,7 @@ const METADATA_VALUE_GENERATORS: MetadataValueGenerators = {
   [MetadatumType.NORM_CATEGORY]: pickRandomNormCategory,
   [MetadatumType.TEMPLATE_NAME]: generateString,
   [MetadatumType.UNDEFINED_DATE]: pickRandomUndefinedDate,
+  [MetadatumType.TEXT]: generateString,
 }
 
 const ALPHABET_CHARACTERS = "abcdefghijklmnopqrstuvwxyz"

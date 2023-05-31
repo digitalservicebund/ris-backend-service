@@ -70,6 +70,7 @@ export enum MetadatumType {
   NORM_CATEGORY = "NORM_CATEGORY",
   TEMPLATE_NAME = "TEMPLATE_NAME",
   UNDEFINED_DATE = "UNDEFINED_DATE",
+  TEXT = "TEXT",
 }
 
 export enum NormCategory {
@@ -122,6 +123,7 @@ export type MetadataValueType = {
   [MetadatumType.NORM_CATEGORY]: NormCategory
   [MetadatumType.TEMPLATE_NAME]: string
   [MetadatumType.UNDEFINED_DATE]: UndefinedDate
+  [MetadatumType.TEXT]: string
 }
 
 export type Metadata = {
@@ -148,6 +150,7 @@ export enum MetadataSectionName {
   DIVERGENT_EXPIRATION = "DIVERGENT_EXPIRATION",
   DIVERGENT_EXPIRATION_DEFINED = "DIVERGENT_EXPIRATION_DEFINED",
   DIVERGENT_EXPIRATION_UNDEFINED = "DIVERGENT_EXPIRATION_UNDEFINED",
+  CATEGORIZED_REFERENCE = "CATEGORIZED_REFERENCE",
 }
 
 export type MetadataSections = {
