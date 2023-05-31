@@ -23,7 +23,8 @@ import reactor.test.StepVerifier;
 class PostgresDocumentUnitRepositoryImplTest {
 
   PostgresDocumentUnitRepositoryImpl postgresDocumentUnitRepository;
-  @MockBean private DatabaseDocumentUnitRepository repository;
+  @MockBean private DatabaseDocumentUnitReadRepository repository;
+  @MockBean private DatabaseDocumentUnitWriteRepository writeRepository;
   @MockBean private DatabaseDocumentUnitMetadataRepository metadataRepository;
   @MockBean private FileNumberRepository fileNumberRepository;
   @MockBean private DeviatingEcliRepository deviatingEcliRepository;
@@ -44,6 +45,7 @@ class PostgresDocumentUnitRepositoryImplTest {
     this.postgresDocumentUnitRepository =
         new PostgresDocumentUnitRepositoryImpl(
             repository,
+            writeRepository,
             metadataRepository,
             fileNumberRepository,
             deviatingEcliRepository,

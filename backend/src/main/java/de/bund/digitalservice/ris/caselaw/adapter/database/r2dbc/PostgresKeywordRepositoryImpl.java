@@ -11,14 +11,14 @@ import reactor.core.publisher.Mono;
 public class PostgresKeywordRepositoryImpl implements KeywordRepository {
 
   DatabaseKeywordRepository databaseKeywordRepository;
-  DatabaseDocumentUnitRepository databaseDocumentUnitRepository;
+  DatabaseDocumentUnitReadRepository databaseDocumentUnitReadRepository;
 
   public PostgresKeywordRepositoryImpl(
       DatabaseKeywordRepository databaseKeywordRepository,
-      DatabaseDocumentUnitRepository databaseDocumentUnitRepository) {
+      DatabaseDocumentUnitReadRepository databaseDocumentUnitReadRepository) {
 
     this.databaseKeywordRepository = databaseKeywordRepository;
-    this.databaseDocumentUnitRepository = databaseDocumentUnitRepository;
+    this.databaseDocumentUnitReadRepository = databaseDocumentUnitReadRepository;
   }
 
   @Override
@@ -57,7 +57,9 @@ public class PostgresKeywordRepositoryImpl implements KeywordRepository {
   }
 
   private Mono<Long> getDocumentUnitId(UUID documentUnitUuid) {
-    return databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
+    return databaseDocumentUnitReadRepository
+        .findByUuid(documentUnitUuid)
+        .map(DocumentUnitWriteDTO::getId);
   }
 
   private Flux<String> getAllKeywordsByDocumentUnit(UUID documentUnitUuid) {

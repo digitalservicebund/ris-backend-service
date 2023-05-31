@@ -8,11 +8,11 @@ fileignoreconfig:
   - filename: doc/norms/backend-api.yaml
     checksum: 4f7b649dc4c6c999166f62ba59c6aa88ac98631ff24183c9162551de7dfed34c
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/JurisXmlExporterWrapperIntegrationTest.java
-    checksum: 93b93300cd072d50420c10947a5c215f985c8cd615b56f542749185b3ec0b285
+    checksum: 1a37bea59e5e0132ab95068a78e9615989ddda01982327be669f88e538064fdf
   - filename: backend/src/test/kotlin/unit/adapter/input/restapi/controller/GenerateNormFileControllerTest.kt
     checksum: 07aa4cd7453685661091978479eef00f475a3415d0b26882352e19da66bf1dda
   - filename: backend/src/test/java/de/bund/digitalservice/ris/caselaw/integration/tests/ProceedingDecisionIntegrationTest.java
-    checksum: b23d90b7f3c988b2b3e8a0d5a437c743282fc300d92ffb0dab87b664213dffec
+    checksum: 1bce758292e2916454eb83d760cc53525d894a188ca12aa1a3c9ea1981a9f645
   - filename: "*.sql"
     ignore_detectors: [filename]
   - filename: "_site/*"

@@ -46,7 +46,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private static final Logger LOGGER =
       LoggerFactory.getLogger(PostgresDocumentUnitRepositoryImpl.class);
 
-  private final DatabaseDocumentUnitRepository repository;
+  private final DatabaseDocumentUnitReadRepository repository;
+  private final DatabaseDocumentUnitWriteRepository writeRepository;
   private final DatabaseDocumentUnitMetadataRepository metadataRepository;
   private final FileNumberRepository fileNumberRepository;
   private final DeviatingEcliRepository deviatingEcliRepository;
@@ -63,7 +64,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
-      DatabaseDocumentUnitRepository repository,
+      DatabaseDocumentUnitReadRepository repository,
+      DatabaseDocumentUnitWriteRepository writeRepository,
       DatabaseDocumentUnitMetadataRepository metadataRepository,
       FileNumberRepository fileNumberRepository,
       DeviatingEcliRepository deviatingEcliRepository,
@@ -80,6 +82,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
 
     this.repository = repository;
+    this.writeRepository = writeRepository;
     this.metadataRepository = metadataRepository;
     this.proceedingDecisionLinkRepository = proceedingDecisionLinkRepository;
     this.fileNumberRepository = fileNumberRepository;
@@ -121,7 +124,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             documentationOfficeDTO ->
                 metadataRepository
                     .save(
-                        DocumentUnitMetadataDTO.builder()
+                        DocumentUnitWriteDTO.builder()
                             .uuid(UUID.randomUUID())
                             .creationtimestamp(Instant.now())
                             .documentnumber(documentNumber)
@@ -139,25 +142,27 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<DocumentUnit> save(DocumentUnit documentUnit) {
     return repository
         .findByUuid(documentUnit.uuid())
+        .map(DocumentUnitTransformer::transformReadDTO)
         .flatMap(documentUnitDTO -> enrichDocumentType(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> enrichLegalEffect(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> enrichRegion(documentUnitDTO, documentUnit))
         .map(documentUnitDTO -> DocumentUnitTransformer.enrichDTO(documentUnitDTO, documentUnit))
-        .flatMap(repository::save)
+        .flatMap(writeRepository::save)
         .flatMap(documentUnitDTO -> saveFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingFileNumbers(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingEcli(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveDeviatingDecisionDate(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveIncorrectCourt(documentUnitDTO, documentUnit))
         .flatMap(documentUnitDTO -> saveNorms(documentUnitDTO, documentUnit))
+        // .flatMap(documentUnitDTO -> saveStatus(documentUnitDTO, documentUnit))
         .map(DocumentUnitTransformer::transformDTO);
   }
 
-  private Mono<DocumentUnitDTO> enrichDocumentType(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  private Mono<DocumentUnitWriteDTO> enrichDocumentType(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
     if (documentUnit.coreData() == null || documentUnit.coreData().documentType() == null) {
-      documentUnitDTO.setDocumentTypeId(null);
-      return Mono.just(documentUnitDTO);
+      documentUnitWriteDTO.setDocumentTypeId(null);
+      return Mono.just(documentUnitWriteDTO);
     }
     return databaseDocumentTypeRepository
         .findByJurisShortcut(documentUnit.coreData().documentType().jurisShortcut())
@@ -169,32 +174,34 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 throw new DocumentUnitException(
                     "DocumentType label does not match the database entry, this should not happen");
               }
-              documentUnitDTO.setDocumentTypeDTO(documentTypeDTO);
-              documentUnitDTO.setDocumentTypeId(documentTypeDTO.getId());
-              return documentUnitDTO;
+              documentUnitWriteDTO.setDocumentTypeDTO(documentTypeDTO);
+              documentUnitWriteDTO.setDocumentTypeId(documentTypeDTO.getId());
+              return documentUnitWriteDTO;
             });
   }
 
-  private boolean hasCourtChanged(DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  private boolean hasCourtChanged(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
     return documentUnit == null
         || documentUnit.coreData() == null
         || documentUnit.coreData().court() == null
-        || !Objects.equals(documentUnitDTO.getCourtType(), documentUnit.coreData().court().type())
         || !Objects.equals(
-            documentUnitDTO.getCourtLocation(), documentUnit.coreData().court().location());
+            documentUnitWriteDTO.getCourtType(), documentUnit.coreData().court().type())
+        || !Objects.equals(
+            documentUnitWriteDTO.getCourtLocation(), documentUnit.coreData().court().location());
   }
 
-  private Mono<DocumentUnitDTO> enrichLegalEffect(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    documentUnitDTO.setLegalEffect(
-        LegalEffect.deriveFrom(documentUnit, hasCourtChanged(documentUnitDTO, documentUnit)));
-    return Mono.just(documentUnitDTO);
+  private Mono<DocumentUnitWriteDTO> enrichLegalEffect(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
+    documentUnitWriteDTO.setLegalEffect(
+        LegalEffect.deriveFrom(documentUnit, hasCourtChanged(documentUnitWriteDTO, documentUnit)));
+    return Mono.just(documentUnitWriteDTO);
   }
 
-  private Mono<DocumentUnitDTO> enrichRegion(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
-    if (!hasCourtChanged(documentUnitDTO, documentUnit)) {
-      return Mono.just(documentUnitDTO);
+  private Mono<DocumentUnitWriteDTO> enrichRegion(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
+    if (!hasCourtChanged(documentUnitWriteDTO, documentUnit)) {
+      return Mono.just(documentUnitWriteDTO);
     }
 
     return getCourt(documentUnit)
@@ -209,8 +216,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             })
         .map(
             stateDTO -> {
-              documentUnitDTO.setRegion(stateDTO.getLabel());
-              return documentUnitDTO;
+              documentUnitWriteDTO.setRegion(stateDTO.getLabel());
+              return documentUnitWriteDTO;
             });
   }
 
@@ -227,10 +234,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .defaultIfEmpty(CourtDTO.builder().build());
   }
 
-  public Mono<DocumentUnitDTO> saveFileNumbers(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  public Mono<DocumentUnitWriteDTO> saveFileNumbers(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
     return fileNumberRepository
-        .findAllByDocumentUnitIdAndIsDeviating(documentUnitDTO.getId(), false)
+        .findAllByDocumentUnitIdAndIsDeviating(documentUnitWriteDTO.getId(), false)
         .collectList()
         .flatMap(
             fileNumberDTOs -> {
@@ -259,7 +266,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 FileNumberDTO fileNumberDTO =
                     FileNumberDTO.builder()
                         .fileNumber(fileNumbers.get(fileNumberIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
+                        .documentUnitId(documentUnitWriteDTO.getId())
                         .isDeviating(false)
                         .build();
                 toSave.add(fileNumberDTO);
@@ -270,24 +277,24 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .then(fileNumberRepository.saveAll(toSave).collectList())
                   .map(
                       savedFileNumberList -> {
-                        documentUnitDTO.setFileNumbers(savedFileNumberList);
-                        return documentUnitDTO;
+                        documentUnitWriteDTO.setFileNumbers(savedFileNumberList);
+                        return documentUnitWriteDTO;
                       });
             });
   }
 
-  public Mono<DocumentUnitDTO> saveNorms(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  public Mono<DocumentUnitWriteDTO> saveNorms(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
 
     return documentUnitNormRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .flatMap(
             documentUnitNormDTOs -> {
               List<DocumentUnitNorm> documentUnitNorms = new ArrayList<>();
               if (documentUnit.contentRelatedIndexing() == null
                   || documentUnit.contentRelatedIndexing().norms() == null)
-                return Mono.just(documentUnitDTO);
+                return Mono.just(documentUnitWriteDTO);
 
               documentUnitNorms.addAll(documentUnit.contentRelatedIndexing().norms());
 
@@ -320,7 +327,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .singleNorm(documentUnitNorms.get(index).singleNorm())
                         .dateOfVersion(documentUnitNorms.get(index).dateOfVersion())
                         .dateOfRelevance(documentUnitNorms.get(index).dateOfRelevance())
-                        .documentUnitId(documentUnitDTO.getId())
+                        .documentUnitId(documentUnitWriteDTO.getId())
                         .build();
                 toSave.add(documentUnitNormDTO);
               }
@@ -330,16 +337,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .then(documentUnitNormRepository.saveAll(toSave).collectList())
                   .map(
                       savedNormList -> {
-                        documentUnitDTO.setNorms(savedNormList);
-                        return documentUnitDTO;
+                        documentUnitWriteDTO.setNorms(savedNormList);
+                        return documentUnitWriteDTO;
                       });
             });
   }
 
-  private Mono<DocumentUnitDTO> saveDeviatingFileNumbers(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  private Mono<DocumentUnitWriteDTO> saveDeviatingFileNumbers(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
     return fileNumberRepository
-        .findAllByDocumentUnitIdAndIsDeviating(documentUnitDTO.getId(), true)
+        .findAllByDocumentUnitIdAndIsDeviating(documentUnitWriteDTO.getId(), true)
         .collectList()
         .flatMap(
             deviatingFileNumberDTOs -> {
@@ -370,7 +377,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     FileNumberDTO.builder()
                         .fileNumber(
                             deviatingFileNumbers.get(deviatingFileNumberIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
+                        .documentUnitId(documentUnitWriteDTO.getId())
                         .isDeviating(true)
                         .build();
                 toSave.add(fileNumberDTO);
@@ -381,16 +388,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .then(fileNumberRepository.saveAll(toSave).collectList())
                   .map(
                       savedDeviatingFileNumberList -> {
-                        documentUnitDTO.setDeviatingFileNumbers(savedDeviatingFileNumberList);
-                        return documentUnitDTO;
+                        documentUnitWriteDTO.setDeviatingFileNumbers(savedDeviatingFileNumberList);
+                        return documentUnitWriteDTO;
                       });
             });
   }
 
-  private Mono<DocumentUnitDTO> saveDeviatingEcli(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  private Mono<DocumentUnitWriteDTO> saveDeviatingEcli(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
     return deviatingEcliRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .flatMap(
             deviatingEcliDTOs -> {
@@ -419,7 +426,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 DeviatingEcliDTO deviatingEcliDTO =
                     DeviatingEcliDTO.builder()
                         .ecli(deviatingEclis.get(deviatingEcliIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
+                        .documentUnitId(documentUnitWriteDTO.getId())
                         .build();
                 toSave.add(deviatingEcliDTO);
               }
@@ -429,16 +436,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .then(deviatingEcliRepository.saveAll(toSave).collectList())
                   .map(
                       savedDeviatingEcliList -> {
-                        documentUnitDTO.setDeviatingEclis(savedDeviatingEcliList);
-                        return documentUnitDTO;
+                        documentUnitWriteDTO.setDeviatingEclis(savedDeviatingEcliList);
+                        return documentUnitWriteDTO;
                       });
             });
   }
 
-  private Mono<DocumentUnitDTO> saveDeviatingDecisionDate(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  private Mono<DocumentUnitWriteDTO> saveDeviatingDecisionDate(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
     return deviatingDecisionDateRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .flatMap(
             deviatingDecisionDateDTOs -> {
@@ -472,7 +479,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         .decisionDate(
                             deviatingDecisionDates.get(
                                 deviatingDecisionDateIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
+                        .documentUnitId(documentUnitWriteDTO.getId())
                         .build();
                 toSave.add(deviatingDecisionDateDTO);
               }
@@ -482,16 +489,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .then(deviatingDecisionDateRepository.saveAll(toSave).collectList())
                   .map(
                       savedDeviatingDecisionDateList -> {
-                        documentUnitDTO.setDeviatingDecisionDates(savedDeviatingDecisionDateList);
-                        return documentUnitDTO;
+                        documentUnitWriteDTO.setDeviatingDecisionDates(
+                            savedDeviatingDecisionDateList);
+                        return documentUnitWriteDTO;
                       });
             });
   }
 
-  private Mono<DocumentUnitDTO> saveIncorrectCourt(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  private Mono<DocumentUnitWriteDTO> saveIncorrectCourt(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
     return incorrectCourtRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .flatMap(
             incorrectCourtDTOs -> {
@@ -522,7 +530,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                 IncorrectCourtDTO incorrectCourtDTO =
                     IncorrectCourtDTO.builder()
                         .court(incorrectCourts.get(incorrectCourtIndex.getAndIncrement()))
-                        .documentUnitId(documentUnitDTO.getId())
+                        .documentUnitId(documentUnitWriteDTO.getId())
                         .build();
                 toSave.add(incorrectCourtDTO);
               }
@@ -532,8 +540,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   .then(incorrectCourtRepository.saveAll(toSave).collectList())
                   .map(
                       savedIncorrectCourtList -> {
-                        documentUnitDTO.setIncorrectCourts(savedIncorrectCourtList);
-                        return documentUnitDTO;
+                        documentUnitWriteDTO.setIncorrectCourts(savedIncorrectCourtList);
+                        return documentUnitWriteDTO;
                       });
             });
   }
@@ -552,7 +560,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
               return documentUnitDTO;
             })
-        .flatMap(repository::save)
+        .flatMap(writeRepository::save)
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -569,7 +577,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
               return documentUnitDTO;
             })
-        .flatMap(repository::save)
+        .flatMap(writeRepository::save)
         .map(DocumentUnitTransformer::transformDTO);
   }
 
@@ -577,11 +585,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   public Mono<Void> delete(DocumentUnit documentUnit) {
     return repository
         .findByUuid(documentUnit.uuid())
-        .flatMap(documentUnitDTO -> repository.deleteById(documentUnitDTO.getId()));
+        .flatMap(documentUnitDTO -> writeRepository.deleteById(documentUnitDTO.getId()));
   }
 
-  private Mono<DocumentUnitDTO> injectAdditionalInformation(DocumentUnitDTO documentUnitDTO) {
-    return injectFileNumbers(documentUnitDTO)
+  private Mono<DocumentUnitWriteDTO> injectAdditionalInformation(
+      DocumentUnitWriteDTO documentUnitWriteDTO) {
+    return injectFileNumbers(documentUnitWriteDTO)
         .flatMap(this::injectDeviatingFileNumbers)
         .flatMap(this::injectProceedingDecisions)
         .flatMap(this::injectDeviatingEclis)
@@ -594,11 +603,12 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectDocumentationOffice);
   }
 
-  private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectProceedingDecisions(
+      DocumentUnitWriteDTO documentUnitWriteDTO) {
     return metadataRepository
         .findAllById(
             metadataRepository
-                .findByUuid(documentUnitDTO.uuid)
+                .findByUuid(documentUnitWriteDTO.uuid)
                 .map(DocumentUnitMetadataDTO::getId)
                 .flatMapMany(proceedingDecisionLinkRepository::findAllByParentDocumentUnitId)
                 .map(ProceedingDecisionLinkDTO::getChildDocumentUnitId))
@@ -606,8 +616,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .collectList()
         .map(
             proceedingDecisionDTOS -> {
-              documentUnitDTO.setProceedingDecisions(proceedingDecisionDTOS);
-              return documentUnitDTO;
+              documentUnitWriteDTO.setProceedingDecisions(proceedingDecisionDTOS);
+              return documentUnitWriteDTO;
             });
   }
 
@@ -625,37 +635,40 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> injectDeviatingFileNumbers(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectDeviatingFileNumbers(
+      DocumentUnitWriteDTO documentUnitWriteDTO) {
     return fileNumberRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .flatMap(
             fileNumbers -> {
-              documentUnitDTO.setDeviatingFileNumbers(
+              documentUnitWriteDTO.setDeviatingFileNumbers(
                   fileNumbers.stream().filter(FileNumberDTO::getIsDeviating).toList());
-              return Mono.just(documentUnitDTO);
+              return Mono.just(documentUnitWriteDTO);
             });
   }
 
-  private Mono<DocumentUnitDTO> injectDeviatingEclis(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectDeviatingEclis(
+      DocumentUnitWriteDTO documentUnitWriteDTO) {
     return deviatingEcliRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .flatMap(
             deviatingEcliDTOs -> {
-              documentUnitDTO.setDeviatingEclis(deviatingEcliDTOs);
-              return Mono.just(documentUnitDTO);
+              documentUnitWriteDTO.setDeviatingEclis(deviatingEcliDTOs);
+              return Mono.just(documentUnitWriteDTO);
             });
   }
 
-  private Mono<DocumentUnitDTO> injectDeviatingDecisionDates(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectDeviatingDecisionDates(
+      DocumentUnitWriteDTO documentUnitWriteDTO) {
     return deviatingDecisionDateRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .flatMap(
             deviatingDecisionDateDTOs -> {
-              documentUnitDTO.setDeviatingDecisionDates(deviatingDecisionDateDTOs);
-              return Mono.just(documentUnitDTO);
+              documentUnitWriteDTO.setDeviatingDecisionDates(deviatingDecisionDateDTOs);
+              return Mono.just(documentUnitWriteDTO);
             });
   }
 
@@ -674,46 +687,47 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> injectIncorrectCourt(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectIncorrectCourt(
+      DocumentUnitWriteDTO documentUnitWriteDTO) {
     return incorrectCourtRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .map(
             incorrectCourtDTOs -> {
-              documentUnitDTO.setIncorrectCourts(incorrectCourtDTOs);
-              return documentUnitDTO;
+              documentUnitWriteDTO.setIncorrectCourts(incorrectCourtDTOs);
+              return documentUnitWriteDTO;
             });
   }
 
-  private Mono<DocumentUnitDTO> injectFieldsOfLaw(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectFieldsOfLaw(DocumentUnitWriteDTO documentUnitWriteDTO) {
     return documentUnitFieldsOfLawRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .map(DocumentUnitFieldsOfLawDTO::fieldOfLawId)
         .collectList()
         .flatMapMany(fieldOfLawRepository::findAllById)
         .collectList()
-        .map(fieldsOfLaw -> documentUnitDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
+        .map(fieldsOfLaw -> documentUnitWriteDTO.toBuilder().fieldsOfLaw(fieldsOfLaw).build());
   }
 
-  private Mono<DocumentUnitDTO> injectKeywords(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectKeywords(DocumentUnitWriteDTO documentUnitWriteDTO) {
     return keywordRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .map(
             keywordDTO -> {
-              documentUnitDTO.setKeywords(keywordDTO);
-              return documentUnitDTO;
+              documentUnitWriteDTO.setKeywords(keywordDTO);
+              return documentUnitWriteDTO;
             });
   }
 
-  private Mono<DocumentUnitDTO> injectNorms(DocumentUnitDTO documentUnitDTO) {
+  private Mono<DocumentUnitWriteDTO> injectNorms(DocumentUnitWriteDTO documentUnitWriteDTO) {
     return documentUnitNormRepository
-        .findAllByDocumentUnitId(documentUnitDTO.getId())
+        .findAllByDocumentUnitId(documentUnitWriteDTO.getId())
         .collectList()
         .map(
             documentUnitNormDTO -> {
-              documentUnitDTO.setNorms(documentUnitNormDTO);
-              return documentUnitDTO;
+              documentUnitWriteDTO.setNorms(documentUnitNormDTO);
+              return documentUnitWriteDTO;
             });
   }
 

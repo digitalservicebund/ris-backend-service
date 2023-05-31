@@ -7,9 +7,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.ContentRelatedIndexingControll
 import de.bund.digitalservice.ris.caselaw.adapter.FieldOfLawService;
 import de.bund.digitalservice.ris.caselaw.adapter.KeywordService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitFieldsOfLawRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitReadRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitWriteRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitFieldsOfLawDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresFieldOfLawRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresKeywordRepositoryImpl;
@@ -57,26 +58,27 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Autowired private WebTestClient webClient;
 
   @Autowired private DatabaseFieldOfLawRepository fieldOfLawRepository;
-  @Autowired private DatabaseDocumentUnitRepository documentUnitRepository;
+  @Autowired private DatabaseDocumentUnitReadRepository documentUnitRepository;
+  @Autowired private DatabaseDocumentUnitWriteRepository documentUnitWriteRepository;
   @Autowired private DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository;
 
   @AfterEach
   void cleanUp() {
     fieldOfLawRepository.deleteAll().block();
-    documentUnitRepository.deleteAll().block();
+    documentUnitWriteRepository.deleteAll().block();
     documentUnitFieldsOfLawRepository.deleteAll().block();
   }
 
   @Test
   void testGetAllFieldsOfLawForDocumentUnit_withoutFieldOfLawLinked_shouldReturnEmptyList() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
     generateFieldsOfLaw("SF-01", "SF-02");
 
@@ -98,17 +100,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void
       testGetAllFieldsOfLawForDocumentUnit_withFirstFieldOfLawLinked_shouldReturnListWithLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
     webClient
@@ -132,17 +134,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Test
   void testGetAllFieldsOfLawForDocumentUnit_shouldReturnSortedList() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01", "AR-02", "XR-03", "XR-01-02");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01", "AR-02", "XR-03", "XR-01-02");
 
     webClient
         .mutateWith(csrf())
@@ -183,17 +185,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Test
   void testAddFieldsOfLawForDocumentUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
     webClient
@@ -218,17 +220,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void
       testAddFieldsOfLawForDocumentUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
     webClient
@@ -271,17 +273,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void
       testAddFieldsOfLawForDocumentUnit_withAlreadyLinkedFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
     webClient
@@ -305,17 +307,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Test
   void testRemoveFieldsOfLawForDocumentUnit_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
     webClient
@@ -336,17 +338,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void
       testRemoveFieldsOfLawForDocumentUnit_withNotLinkedFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
     webClient
@@ -371,17 +373,17 @@ class DocumentUnitFieldOfLawIntegrationTest {
   void
       testRemoveFieldsOfLawForDocumentUnit_withNotExistingFieldOfLaw_shouldReturnListWithAllLinkedFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    documentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    documentUnitWriteDTO = documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
-    assertThat(documentUnitDTO).isNotNull();
+    assertThat(documentUnitWriteDTO).isNotNull();
 
-    generateAndAddFieldsOfLaw(documentUnitDTO.getId(), "SF-01");
+    generateAndAddFieldsOfLaw(documentUnitWriteDTO.getId(), "SF-01");
     generateFieldsOfLaw("SF-02");
 
     webClient
@@ -423,25 +425,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Test
   void testDeleteCascadeForDocumentUnit() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    DocumentUnitWriteDTO savedDocumentUnitWriteDTO =
+        documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
     FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().identifier("SF-01").build();
     FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
 
     DocumentUnitFieldsOfLawDTO link =
         DocumentUnitFieldsOfLawDTO.builder()
-            .documentUnitId(documentUnitDTO.getId())
+            .documentUnitId(documentUnitWriteDTO.getId())
             .fieldOfLawId(fieldOfLawDTO.getId())
             .build();
     documentUnitFieldsOfLawRepository.save(link).block();
 
-    assertThat(savedDocumentUnitDTO).isNotNull();
+    assertThat(savedDocumentUnitWriteDTO).isNotNull();
     assertThat(savedFieldOfLawDTO).isNotNull();
 
     StepVerifier.create(documentUnitFieldsOfLawRepository.findAll())
@@ -449,10 +452,10 @@ class DocumentUnitFieldOfLawIntegrationTest {
             link1 ->
                 assertThat(link1)
                     .extracting("documentUnitId", "fieldOfLawId")
-                    .containsExactly(savedDocumentUnitDTO.getId(), savedFieldOfLawDTO.getId()))
+                    .containsExactly(savedDocumentUnitWriteDTO.getId(), savedFieldOfLawDTO.getId()))
         .verifyComplete();
 
-    documentUnitRepository.delete(documentUnitDTO).block();
+    documentUnitWriteRepository.delete(documentUnitWriteDTO).block();
 
     StepVerifier.create(documentUnitFieldsOfLawRepository.findAll()).verifyComplete();
   }
@@ -460,25 +463,26 @@ class DocumentUnitFieldOfLawIntegrationTest {
   @Test
   void testDeleteCascadeForFieldOfLaw() {
     UUID documentUnitUuid = UUID.randomUUID();
-    DocumentUnitDTO documentUnitDTO =
-        DocumentUnitDTO.builder()
+    DocumentUnitWriteDTO documentUnitWriteDTO =
+        DocumentUnitWriteDTO.builder()
             .uuid(documentUnitUuid)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
             .build();
-    DocumentUnitDTO savedDocumentUnitDTO = documentUnitRepository.save(documentUnitDTO).block();
+    DocumentUnitWriteDTO savedDocumentUnitWriteDTO =
+        documentUnitWriteRepository.save(documentUnitWriteDTO).block();
 
     FieldOfLawDTO fieldOfLawDTO = FieldOfLawDTO.builder().identifier("SF-01").build();
     FieldOfLawDTO savedFieldOfLawDTO = fieldOfLawRepository.save(fieldOfLawDTO).block();
 
     DocumentUnitFieldsOfLawDTO link =
         DocumentUnitFieldsOfLawDTO.builder()
-            .documentUnitId(documentUnitDTO.getId())
+            .documentUnitId(documentUnitWriteDTO.getId())
             .fieldOfLawId(fieldOfLawDTO.getId())
             .build();
     documentUnitFieldsOfLawRepository.save(link).block();
 
-    assertThat(savedDocumentUnitDTO).isNotNull();
+    assertThat(savedDocumentUnitWriteDTO).isNotNull();
     assertThat(savedFieldOfLawDTO).isNotNull();
 
     StepVerifier.create(documentUnitFieldsOfLawRepository.findAll())
@@ -486,7 +490,7 @@ class DocumentUnitFieldOfLawIntegrationTest {
             link1 ->
                 assertThat(link1)
                     .extracting("documentUnitId", "fieldOfLawId")
-                    .containsExactly(savedDocumentUnitDTO.getId(), savedFieldOfLawDTO.getId()))
+                    .containsExactly(savedDocumentUnitWriteDTO.getId(), savedFieldOfLawDTO.getId()))
         .verifyComplete();
 
     fieldOfLawRepository.delete(fieldOfLawDTO).block();

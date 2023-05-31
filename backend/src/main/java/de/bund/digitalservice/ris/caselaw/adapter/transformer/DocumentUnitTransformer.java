@@ -2,8 +2,9 @@ package de.bund.digitalservice.ris.caselaw.adapter.transformer;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitMetadataDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitReadDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
@@ -26,16 +27,16 @@ import java.util.List;
 public class DocumentUnitTransformer {
   private DocumentUnitTransformer() {}
 
-  public static DocumentUnitDTO enrichDTO(
-      DocumentUnitDTO documentUnitDTO, DocumentUnit documentUnit) {
+  public static DocumentUnitWriteDTO enrichDTO(
+      DocumentUnitWriteDTO documentUnitWriteDTO, DocumentUnit documentUnit) {
 
     DataSource dataSource = DataSource.NEURIS;
     if (documentUnit.dataSource() != null) {
       dataSource = documentUnit.dataSource();
     }
 
-    DocumentUnitDTO.DocumentUnitDTOBuilder builder =
-        documentUnitDTO.toBuilder()
+    DocumentUnitWriteDTO.DocumentUnitWriteDTOBuilder builder =
+        documentUnitWriteDTO.toBuilder()
             .uuid(documentUnit.uuid())
             .documentnumber(documentUnit.documentNumber())
             .creationtimestamp(documentUnit.creationtimestamp())
@@ -82,7 +83,7 @@ public class DocumentUnitTransformer {
           .courtLocation(null);
     }
 
-    if (documentUnitDTO.getId() == null
+    if (documentUnitWriteDTO.getId() == null
         && documentUnit.proceedingDecisions() != null
         && !documentUnit.proceedingDecisions().isEmpty()) {
 
@@ -190,125 +191,174 @@ public class DocumentUnitTransformer {
             documentUnitMetadataDTO.getRegion()),
         null,
         null,
+        null,
         null);
   }
 
-  public static DocumentUnit transformDTO(DocumentUnitDTO documentUnitDTO) {
-    if (documentUnitDTO == null) {
+  public static DocumentUnit transformDTO(DocumentUnitWriteDTO documentUnitWriteDTO) {
+    if (documentUnitWriteDTO == null) {
       return DocumentUnit.builder().build();
     }
 
     DocumentType documentType = null;
-    DocumentTypeDTO documentTypeDTO = documentUnitDTO.getDocumentTypeDTO();
+    DocumentTypeDTO documentTypeDTO = documentUnitWriteDTO.getDocumentTypeDTO();
     if (documentTypeDTO != null) {
       documentType =
           new DocumentType(documentTypeDTO.getJurisShortcut(), documentTypeDTO.getLabel());
     }
 
     List<ProceedingDecision> proceedingDecisions = null;
-    if (documentUnitDTO.getProceedingDecisions() != null) {
+    if (documentUnitWriteDTO.getProceedingDecisions() != null) {
       proceedingDecisions =
-          documentUnitDTO.getProceedingDecisions().stream()
+          documentUnitWriteDTO.getProceedingDecisions().stream()
               .map(ProceedingDecisionTransformer::transformToDomain)
               .toList();
     }
 
     List<String> fileNumbers = null;
-    if (documentUnitDTO.getFileNumbers() != null) {
+    if (documentUnitWriteDTO.getFileNumbers() != null) {
       fileNumbers =
-          documentUnitDTO.getFileNumbers().stream().map(FileNumberDTO::getFileNumber).toList();
+          documentUnitWriteDTO.getFileNumbers().stream().map(FileNumberDTO::getFileNumber).toList();
     }
 
     List<String> deviatingFileNumbers = null;
-    if (documentUnitDTO.getDeviatingFileNumbers() != null) {
+    if (documentUnitWriteDTO.getDeviatingFileNumbers() != null) {
       deviatingFileNumbers =
-          documentUnitDTO.getDeviatingFileNumbers().stream()
+          documentUnitWriteDTO.getDeviatingFileNumbers().stream()
               .map(FileNumberDTO::getFileNumber)
               .toList();
     }
 
     List<String> deviatingEclis = null;
-    if (documentUnitDTO.getDeviatingEclis() != null) {
+    if (documentUnitWriteDTO.getDeviatingEclis() != null) {
       deviatingEclis =
-          documentUnitDTO.getDeviatingEclis().stream().map(DeviatingEcliDTO::getEcli).toList();
+          documentUnitWriteDTO.getDeviatingEclis().stream().map(DeviatingEcliDTO::getEcli).toList();
     }
 
     List<Instant> deviatingDecisionDates = null;
-    if (documentUnitDTO.getDeviatingDecisionDates() != null) {
+    if (documentUnitWriteDTO.getDeviatingDecisionDates() != null) {
       deviatingDecisionDates =
-          documentUnitDTO.getDeviatingDecisionDates().stream()
+          documentUnitWriteDTO.getDeviatingDecisionDates().stream()
               .map(DeviatingDecisionDateDTO::decisionDate)
               .toList();
     }
 
     List<String> incorrectCourts = null;
-    if (documentUnitDTO.getIncorrectCourts() != null) {
+    if (documentUnitWriteDTO.getIncorrectCourts() != null) {
       incorrectCourts =
-          documentUnitDTO.getIncorrectCourts().stream().map(IncorrectCourtDTO::court).toList();
+          documentUnitWriteDTO.getIncorrectCourts().stream().map(IncorrectCourtDTO::court).toList();
     }
 
     List<FieldOfLaw> fieldsOfLaw = null;
-    if (documentUnitDTO.getFieldsOfLaw() != null) {
+    if (documentUnitWriteDTO.getFieldsOfLaw() != null) {
       fieldsOfLaw =
-          documentUnitDTO.getFieldsOfLaw().stream()
+          documentUnitWriteDTO.getFieldsOfLaw().stream()
               .map(FieldOfLawTransformer::transformToDomain)
               .toList();
     }
 
     List<DocumentUnitNorm> norms = null;
-    if (documentUnitDTO.getNorms() != null) {
+    if (documentUnitWriteDTO.getNorms() != null) {
       norms =
-          documentUnitDTO.getNorms().stream()
+          documentUnitWriteDTO.getNorms().stream()
               .map(DocumentUnitNormTransformer::transformToDomain)
               .toList();
     }
 
     DataSource dataSource = DataSource.NEURIS;
-    if (documentUnitDTO.getDataSource() != null) {
-      dataSource = documentUnitDTO.getDataSource();
+    if (documentUnitWriteDTO.getDataSource() != null) {
+      dataSource = documentUnitWriteDTO.getDataSource();
     }
 
     List<String> keywords = null;
-    if (documentUnitDTO.getKeywords() != null) {
-      keywords = documentUnitDTO.getKeywords().stream().map(KeywordDTO::keyword).toList();
+    if (documentUnitWriteDTO.getKeywords() != null) {
+      keywords = documentUnitWriteDTO.getKeywords().stream().map(KeywordDTO::keyword).toList();
     }
 
     return new DocumentUnit(
-        documentUnitDTO.getUuid(),
-        documentUnitDTO.getDocumentnumber(),
-        documentUnitDTO.getCreationtimestamp(),
-        documentUnitDTO.getFileuploadtimestamp(),
+        documentUnitWriteDTO.getUuid(),
+        documentUnitWriteDTO.getDocumentnumber(),
+        documentUnitWriteDTO.getCreationtimestamp(),
+        documentUnitWriteDTO.getFileuploadtimestamp(),
         dataSource,
-        documentUnitDTO.getS3path(),
-        documentUnitDTO.getFiletype(),
-        documentUnitDTO.getFilename(),
+        documentUnitWriteDTO.getS3path(),
+        documentUnitWriteDTO.getFiletype(),
+        documentUnitWriteDTO.getFilename(),
         new CoreData(
             fileNumbers,
             deviatingFileNumbers,
-            getCourtObject(documentUnitDTO.getCourtType(), documentUnitDTO.getCourtLocation()),
+            getCourtObject(
+                documentUnitWriteDTO.getCourtType(), documentUnitWriteDTO.getCourtLocation()),
             incorrectCourts,
             documentType,
-            documentUnitDTO.getProcedure(),
-            documentUnitDTO.getEcli(),
+            documentUnitWriteDTO.getProcedure(),
+            documentUnitWriteDTO.getEcli(),
             deviatingEclis,
-            documentUnitDTO.getAppraisalBody(),
-            documentUnitDTO.getDecisionDate(),
-            documentUnitDTO.isDateKnown(),
+            documentUnitWriteDTO.getAppraisalBody(),
+            documentUnitWriteDTO.getDecisionDate(),
+            documentUnitWriteDTO.isDateKnown(),
             deviatingDecisionDates,
-            documentUnitDTO.getLegalEffect(),
-            documentUnitDTO.getInputType(),
-            getDocumentationOffice(documentUnitDTO.getDocumentationOffice()),
-            documentUnitDTO.getRegion()),
+            documentUnitWriteDTO.getLegalEffect(),
+            documentUnitWriteDTO.getInputType(),
+            getDocumentationOffice(documentUnitWriteDTO.getDocumentationOffice()),
+            documentUnitWriteDTO.getRegion()),
         proceedingDecisions,
         new Texts(
-            documentUnitDTO.getDecisionName(),
-            documentUnitDTO.getHeadline(),
-            documentUnitDTO.getGuidingPrinciple(),
-            documentUnitDTO.getHeadnote(),
-            documentUnitDTO.getTenor(),
-            documentUnitDTO.getReasons(),
-            documentUnitDTO.getCaseFacts(),
-            documentUnitDTO.getDecisionReasons()),
-        new ContentRelatedIndexing(keywords, fieldsOfLaw, norms));
+            documentUnitWriteDTO.getDecisionName(),
+            documentUnitWriteDTO.getHeadline(),
+            documentUnitWriteDTO.getGuidingPrinciple(),
+            documentUnitWriteDTO.getHeadnote(),
+            documentUnitWriteDTO.getTenor(),
+            documentUnitWriteDTO.getReasons(),
+            documentUnitWriteDTO.getCaseFacts(),
+            documentUnitWriteDTO.getDecisionReasons()),
+        new ContentRelatedIndexing(keywords, fieldsOfLaw, norms),
+        documentUnitWriteDTO.getStatus());
+  }
+
+  public static DocumentUnitWriteDTO transformReadDTO(DocumentUnitReadDTO documentUnitReadDTO) {
+    return DocumentUnitWriteDTO.builder()
+        .id(documentUnitReadDTO.getId())
+        .uuid(documentUnitReadDTO.getUuid())
+        .documentnumber(documentUnitReadDTO.getDocumentnumber())
+        .creationtimestamp(documentUnitReadDTO.getCreationtimestamp())
+        .dataSource(documentUnitReadDTO.getDataSource())
+        .fileuploadtimestamp(documentUnitReadDTO.getFileuploadtimestamp())
+        .s3path(documentUnitReadDTO.getS3path())
+        .filetype(documentUnitReadDTO.getFiletype())
+        .filename(documentUnitReadDTO.getFilename())
+        .courtType(documentUnitReadDTO.getCourtType())
+        .documentTypeId(documentUnitReadDTO.getDocumentTypeId())
+        .documentTypeDTO(documentUnitReadDTO.getDocumentTypeDTO())
+        .procedure(documentUnitReadDTO.getProcedure())
+        .ecli(documentUnitReadDTO.getEcli())
+        .appraisalBody(documentUnitReadDTO.getAppraisalBody())
+        .decisionDate(documentUnitReadDTO.getDecisionDate())
+        .dateKnown(documentUnitReadDTO.isDateKnown())
+        .courtLocation(documentUnitReadDTO.getCourtLocation())
+        .legalEffect(documentUnitReadDTO.getLegalEffect())
+        .inputType(documentUnitReadDTO.getInputType())
+        .region(documentUnitReadDTO.getRegion())
+        .documentationOfficeId(documentUnitReadDTO.getDocumentationOfficeId())
+        .documentationOffice(documentUnitReadDTO.getDocumentationOffice())
+        .fileNumbers(documentUnitReadDTO.getFileNumbers())
+        .status(documentUnitReadDTO.getStatus())
+        .decisionName(documentUnitReadDTO.getDecisionName())
+        .headline(documentUnitReadDTO.getHeadline())
+        .guidingPrinciple(documentUnitReadDTO.getGuidingPrinciple())
+        .headnote(documentUnitReadDTO.getHeadnote())
+        .tenor(documentUnitReadDTO.getTenor())
+        .reasons(documentUnitReadDTO.getReasons())
+        .caseFacts(documentUnitReadDTO.getCaseFacts())
+        .decisionReasons(documentUnitReadDTO.getDecisionReasons())
+        .proceedingDecisions(documentUnitReadDTO.getProceedingDecisions())
+        .deviatingFileNumbers(documentUnitReadDTO.getDeviatingFileNumbers())
+        .incorrectCourts(documentUnitReadDTO.getIncorrectCourts())
+        .deviatingEclis(documentUnitReadDTO.getDeviatingEclis())
+        .deviatingDecisionDates(documentUnitReadDTO.getDeviatingDecisionDates())
+        .keywords(documentUnitReadDTO.getKeywords())
+        .fieldsOfLaw(documentUnitReadDTO.getFieldsOfLaw())
+        .norms(documentUnitReadDTO.getNorms())
+        .build();
   }
 }

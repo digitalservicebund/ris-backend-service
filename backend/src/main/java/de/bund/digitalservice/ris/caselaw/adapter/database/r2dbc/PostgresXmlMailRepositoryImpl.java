@@ -13,10 +13,11 @@ import reactor.core.publisher.Mono;
 public class PostgresXmlMailRepositoryImpl implements XmlMailRepository {
 
   private final DatabaseXmlMailRepository repository;
-  private final DatabaseDocumentUnitRepository documentUnitRepository;
+  private final DatabaseDocumentUnitReadRepository documentUnitRepository;
 
   public PostgresXmlMailRepositoryImpl(
-      DatabaseXmlMailRepository repository, DatabaseDocumentUnitRepository documentUnitRepository) {
+      DatabaseXmlMailRepository repository,
+      DatabaseDocumentUnitReadRepository documentUnitRepository) {
 
     this.repository = repository;
     this.documentUnitRepository = documentUnitRepository;

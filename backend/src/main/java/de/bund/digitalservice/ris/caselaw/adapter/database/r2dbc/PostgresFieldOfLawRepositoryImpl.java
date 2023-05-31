@@ -24,7 +24,7 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   FieldOfLawKeywordRepository fieldOfLawKeywordRepository;
   NormRepository normRepository;
   FieldOfLawLinkRepository fieldOfLawLinkRepository;
-  DatabaseDocumentUnitRepository databaseDocumentUnitRepository;
+  DatabaseDocumentUnitReadRepository databaseDocumentUnitReadRepository;
   DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository;
 
   public PostgresFieldOfLawRepositoryImpl(
@@ -32,14 +32,14 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
       FieldOfLawKeywordRepository fieldOfLawKeywordRepository,
       NormRepository normRepository,
       FieldOfLawLinkRepository fieldOfLawLinkRepository,
-      DatabaseDocumentUnitRepository databaseDocumentUnitRepository,
+      DatabaseDocumentUnitReadRepository databaseDocumentUnitReadRepository,
       DatabaseDocumentUnitFieldsOfLawRepository databaseDocumentUnitFieldsOfLawRepository) {
 
     this.databaseFieldOfLawRepository = databaseFieldOfLawRepository;
     this.fieldOfLawKeywordRepository = fieldOfLawKeywordRepository;
     this.normRepository = normRepository;
     this.fieldOfLawLinkRepository = fieldOfLawLinkRepository;
-    this.databaseDocumentUnitRepository = databaseDocumentUnitRepository;
+    this.databaseDocumentUnitReadRepository = databaseDocumentUnitReadRepository;
     this.databaseDocumentUnitFieldsOfLawRepository = databaseDocumentUnitFieldsOfLawRepository;
   }
 
@@ -127,9 +127,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
 
   @Override
   public Mono<List<FieldOfLaw>> findAllForDocumentUnit(UUID documentUnitUuid) {
-    return databaseDocumentUnitRepository
+    return databaseDocumentUnitReadRepository
         .findByUuid(documentUnitUuid)
-        .map(DocumentUnitDTO::getId)
+        .map(DocumentUnitWriteDTO::getId)
         .flatMapMany(
             documentUnitId ->
                 databaseDocumentUnitFieldsOfLawRepository.findAllByDocumentUnitId(documentUnitId))
@@ -149,7 +149,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Mono<List<FieldOfLaw>> addFieldOfLawToDocumentUnit(
       UUID documentUnitUuid, String identifier) {
     Mono<Long> documentUnitDTOId =
-        databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
+        databaseDocumentUnitReadRepository
+            .findByUuid(documentUnitUuid)
+            .map(DocumentUnitWriteDTO::getId);
 
     Mono<Long> fieldOfLawDTOId =
         databaseFieldOfLawRepository
@@ -202,7 +204,9 @@ public class PostgresFieldOfLawRepositoryImpl implements FieldOfLawRepository {
   public Mono<List<FieldOfLaw>> removeFieldOfLawToDocumentUnit(
       UUID documentUnitUuid, String identifier) {
     Mono<Long> documentUnitDTOId =
-        databaseDocumentUnitRepository.findByUuid(documentUnitUuid).map(DocumentUnitDTO::getId);
+        databaseDocumentUnitReadRepository
+            .findByUuid(documentUnitUuid)
+            .map(DocumentUnitWriteDTO::getId);
 
     Mono<Long> fieldOfLawDTOId =
         databaseFieldOfLawRepository

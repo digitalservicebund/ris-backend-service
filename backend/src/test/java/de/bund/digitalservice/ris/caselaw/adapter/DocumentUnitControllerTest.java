@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.transformer.DocumentUnitTransformer;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitPublishException;
@@ -218,10 +218,10 @@ class DocumentUnitControllerTest {
 
   @Test
   void testUpdateByUuid() {
-    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
-    documentUnitDTO.setDocumentnumber("ABCD202200001");
-    documentUnitDTO.setUuid(TEST_UUID);
-    DocumentUnit documentUnit = DocumentUnitTransformer.transformDTO(documentUnitDTO);
+    DocumentUnitWriteDTO documentUnitWriteDTO = new DocumentUnitWriteDTO();
+    documentUnitWriteDTO.setDocumentnumber("ABCD202200001");
+    documentUnitWriteDTO.setUuid(TEST_UUID);
+    DocumentUnit documentUnit = DocumentUnitTransformer.transformDTO(documentUnitWriteDTO);
     when(service.updateDocumentUnit(documentUnit)).thenReturn(Mono.empty());
     webClient
         .mutateWith(csrf())
@@ -237,14 +237,14 @@ class DocumentUnitControllerTest {
 
   @Test
   void testUpdateByUuid_withInvalidUuid() {
-    DocumentUnitDTO documentUnitDTO = new DocumentUnitDTO();
-    documentUnitDTO.setUuid(TEST_UUID);
+    DocumentUnitWriteDTO documentUnitWriteDTO = new DocumentUnitWriteDTO();
+    documentUnitWriteDTO.setUuid(TEST_UUID);
     webClient
         .mutateWith(csrf())
         .put()
         .uri("/api/v1/caselaw/documentunits/abc")
         .header(HttpHeaders.CONTENT_TYPE, "application/json")
-        .bodyValue(documentUnitDTO)
+        .bodyValue(documentUnitWriteDTO)
         .exchange()
         .expectStatus()
         .is4xxClientError();

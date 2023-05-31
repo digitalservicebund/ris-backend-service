@@ -8,9 +8,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitReadRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitWriteRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitWriteDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
@@ -65,14 +66,15 @@ public class DocumentUnitListEntryIntegrationTest {
   @MockBean EmailPublishService publishService;
 
   @Autowired private WebTestClient webClient;
-  @Autowired private DatabaseDocumentUnitRepository repository;
+  @Autowired private DatabaseDocumentUnitReadRepository repository;
+  @Autowired private DatabaseDocumentUnitWriteRepository writeRepository;
   @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   @BeforeEach
   void setUp() {
-    repository.deleteAll().block();
+    writeRepository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
   }
 
@@ -81,10 +83,10 @@ public class DocumentUnitListEntryIntegrationTest {
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByLabel("BGH").block();
 
-    DocumentUnitDTO neurisDto =
-        repository
+    DocumentUnitWriteDTO neurisDto =
+        writeRepository
             .save(
-                DocumentUnitDTO.builder()
+                DocumentUnitWriteDTO.builder()
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
                     .documentnumber("1234567890123")
@@ -92,10 +94,10 @@ public class DocumentUnitListEntryIntegrationTest {
                     .documentationOfficeId(documentationOfficeDTO.getId())
                     .build())
             .block();
-    DocumentUnitDTO migrationDto =
-        repository
+    DocumentUnitWriteDTO migrationDto =
+        writeRepository
             .save(
-                DocumentUnitDTO.builder()
+                DocumentUnitWriteDTO.builder()
                     .uuid(UUID.randomUUID())
                     .creationtimestamp(Instant.now())
                     .documentnumber("MIGRATION")
@@ -155,9 +157,9 @@ public class DocumentUnitListEntryIntegrationTest {
     Collections.shuffle(timestampsExpected);
 
     for (int i = 0; i < 10; i++) {
-      repository
+      writeRepository
           .save(
-              DocumentUnitDTO.builder()
+              DocumentUnitWriteDTO.builder()
                   .uuid(UUID.randomUUID())
                   .creationtimestamp(timestampsExpected.get(i))
                   .documentnumber("123456789012" + i)
