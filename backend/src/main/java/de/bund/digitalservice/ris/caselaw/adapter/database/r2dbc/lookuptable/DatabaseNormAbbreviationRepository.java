@@ -30,6 +30,6 @@ public interface DatabaseNormAbbreviationRepository
           + " coalesce(official_letter_abbreviation, ''))"
           + " @@ to_tsquery('german', '' || :tsQuery || '')"
           + " limit :size offset :pageOffset")
-  Flux<NormAbbreviationDTO> findByAwfulSearchQuery(
+  Flux<NormAbbreviationDTO> findByAwesomeSearchQuery(
       String tsQuery, Integer size, Integer pageOffset);
 }

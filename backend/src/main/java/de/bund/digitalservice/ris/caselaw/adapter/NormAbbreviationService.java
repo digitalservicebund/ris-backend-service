@@ -30,7 +30,7 @@ public class NormAbbreviationService {
     return repository.findBySearchQuery(query, size, pageOffset);
   }
 
-  public Flux<NormAbbreviation> getNormAbbreviationByAwfulSearchQuery(
+  public Flux<NormAbbreviation> getNormAbbreviationByAwesomeSearchQuery(
       String query, Integer size, Integer page) {
 
     Integer pageOffset = null;
@@ -38,6 +38,6 @@ public class NormAbbreviationService {
       pageOffset = page * size;
     }
 
-    return repository.findByAwfulSearchQuery(query, size, pageOffset);
+    return repository.findByAwesomeSearchQuery(query, size, pageOffset);
   }
 }

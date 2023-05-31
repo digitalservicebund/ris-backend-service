@@ -30,7 +30,8 @@ const norm = computed({
         v-model="norm.risAbbreviation"
         aria-label="Suchfeld"
         clear-on-choosing-item
-        :item-service="ComboboxItemService.getRisAbbreviationsAwful"
+        :item-service="ComboboxItemService.getRisAbbreviationsAwesome"
+        placeholder="Suchfeld"
       ></ComboboxInput>
     </InputField>
     <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">

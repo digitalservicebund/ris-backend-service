@@ -11,5 +11,5 @@ public interface NormAbbreviationRepository {
 
   Flux<NormAbbreviation> findBySearchQuery(String query, Integer size, Integer page);
 
-  Flux<NormAbbreviation> findByAwfulSearchQuery(String query, Integer size, Integer page);
+  Flux<NormAbbreviation> findByAwesomeSearchQuery(String query, Integer size, Integer page);
 }

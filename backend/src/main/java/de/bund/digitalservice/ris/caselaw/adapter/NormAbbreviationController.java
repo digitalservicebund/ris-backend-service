@@ -34,11 +34,11 @@ public class NormAbbreviationController {
   }
 
   @GetMapping("/search")
-  public Flux<NormAbbreviation> getAllNormAbbreviationsByAwfulSearchQuery(
+  public Flux<NormAbbreviation> getAllNormAbbreviationsByAwesomeSearchQuery(
       @RequestParam(value = "q", required = false, defaultValue = "") String query,
       @RequestParam(value = "sz", required = false) Integer size,
       @RequestParam(value = "pg", required = false) Integer page) {
 
-    return service.getNormAbbreviationByAwfulSearchQuery(query, size, page);
+    return service.getNormAbbreviationByAwesomeSearchQuery(query, size, page);
   }
 }
