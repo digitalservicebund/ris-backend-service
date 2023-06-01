@@ -36,19 +36,19 @@ export function useCaseLawMenuItems(
           },
         },
         {
-          label: "Kurz- & Langtexte",
-          route: {
-            ...baseRoute,
-            name: "caselaw-documentUnit-:documentNumber-categories",
-            hash: "#texts",
-          },
-        },
-        {
           label: "Inhaltliche Erschließung",
           route: {
             ...baseRoute,
             name: "caselaw-documentUnit-:documentNumber-categories",
             hash: "#contentRelatedIndexing",
+          },
+        },
+        {
+          label: "Kurz- & Langtexte",
+          route: {
+            ...baseRoute,
+            name: "caselaw-documentUnit-:documentNumber-categories",
+            hash: "#texts",
           },
         },
       ],

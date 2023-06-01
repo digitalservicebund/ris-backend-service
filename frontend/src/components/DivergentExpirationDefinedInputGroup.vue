@@ -36,7 +36,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 
 const date = computed({
   get: () => inputValue.value.DATE?.[0],
-  set: (data?: string) => data && (inputValue.value.DATE = [data]),
+  set: (data?: string) => (inputValue.value.DATE = data ? [data] : undefined),
 })
 
 const NORM_CATEGORY_NAMES = {

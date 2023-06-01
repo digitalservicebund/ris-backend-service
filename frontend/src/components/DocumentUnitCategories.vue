@@ -208,6 +208,12 @@ onUnmounted(() => {
             :proceeding-decisions="documentUnit.proceedingDecisions"
           />
 
+          <DocumentUnitContentRelatedIndexing
+            id="contentRelatedIndexing"
+            v-model="contentRelatedIndexing"
+            :document-unit-uuid="updatedDocumentUnit.uuid"
+          />
+
           <!-- TODO add validationErrors -->
           <DocumentUnitTexts
             id="texts"
@@ -215,12 +221,6 @@ onUnmounted(() => {
             :update-status="updateStatus"
             @update-document-unit="handleUpdateDocumentUnit"
             @update-value="handleUpdateValueDocumentUnitTexts"
-          />
-
-          <DocumentUnitContentRelatedIndexing
-            id="contentRelatedIndexing"
-            v-model="contentRelatedIndexing"
-            :document-unit-uuid="updatedDocumentUnit.uuid"
           />
         </div>
 
