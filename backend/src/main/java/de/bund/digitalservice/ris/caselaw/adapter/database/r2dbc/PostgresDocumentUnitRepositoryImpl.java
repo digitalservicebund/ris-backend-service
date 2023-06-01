@@ -61,7 +61,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
-  private final DocumentUnitStatusRepository documentUnitStatusRepository;
+  private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -79,7 +79,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseKeywordRepository keywordRepository,
       DatabaseDocumentUnitNormRepository documentUnitNormRepository,
       DatabaseDocumentationOfficeRepository documentationOfficeRepository,
-      DocumentUnitStatusRepository documentUnitStatusRepository) {
+      DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -96,7 +96,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.keywordRepository = keywordRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
-    this.documentUnitStatusRepository = documentUnitStatusRepository;
+    this.databaseDocumentUnitStatusRepository = databaseDocumentUnitStatusRepository;
   }
 
   @Override
@@ -117,7 +117,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<DocumentUnit> createNewDocumentUnit(
-      String documentNumber, DocumentationOffice documentationOffice, String status) {
+      String documentNumber, DocumentationOffice documentationOffice) {
     return documentationOfficeRepository
         .findByLabel(documentationOffice.label())
         .flatMap(
@@ -133,7 +133,6 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             .documentationOffice(documentationOfficeDTO)
                             .dateKnown(true)
                             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
-                            .status(status)
                             .build())
                     .map(DocumentUnitTransformer::transformMetadataToDomain));
   }
@@ -595,7 +594,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
         .flatMap(this::injectFieldsOfLaw)
-        .flatMap(this::injectDocumentationOffice);
+        .flatMap(this::injectDocumentationOffice)
+        .flatMap(this::injectStatus);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
@@ -771,6 +771,16 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             documentTypeDTO -> {
               documentUnitMetadataDTO.setDocumentTypeDTO(documentTypeDTO);
               return documentUnitMetadataDTO;
+            });
+  }
+
+  private Mono<DocumentUnitDTO> injectStatus(DocumentUnitDTO documentUnitDTO) {
+    return databaseDocumentUnitStatusRepository
+        .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
+        .map(
+            statusDTO -> {
+              documentUnitDTO.setStatus(statusDTO.getStatus());
+              return documentUnitDTO;
             });
   }
 

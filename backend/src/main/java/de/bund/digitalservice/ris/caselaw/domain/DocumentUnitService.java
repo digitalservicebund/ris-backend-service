@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.domain;
 
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -49,7 +50,7 @@ public class DocumentUnitService {
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
-  private final DocumentUnitStatusService documentUnitStatusService;
+  private final DatabaseDocumentUnitStatusService databaseDocumentUnitStatusService;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -59,13 +60,13 @@ public class DocumentUnitService {
       DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService,
-      DocumentUnitStatusService documentUnitStatusService) {
+      DatabaseDocumentUnitStatusService databaseDocumentUnitStatusService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
-    this.documentUnitStatusService = documentUnitStatusService;
+    this.databaseDocumentUnitStatusService = databaseDocumentUnitStatusService;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
@@ -74,11 +75,10 @@ public class DocumentUnitService {
 
     return Mono.just(documentationOffice)
         .flatMap(documentNumberService::generateNextDocumentNumber)
-        .zipWith(documentUnitStatusService.setInitialStatus(documentUnitUuid, creationTimestamp))
-        .flatMap(
-            tuple ->
-                repository.createNewDocumentUnit(tuple.getT1(), documentationOffice, tuple.getT2()))
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
+        .flatMap(
+            documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
+        .flatMap(databaseDocumentUnitStatusService::setInitialStatus)
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
