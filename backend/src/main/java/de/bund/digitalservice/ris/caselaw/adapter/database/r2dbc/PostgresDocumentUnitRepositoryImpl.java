@@ -61,6 +61,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  private final DocumentUnitStatusRepository documentUnitStatusRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -77,7 +78,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseDocumentUnitNormRepository documentUnitNormRepository,
-      DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository,
+      DocumentUnitStatusRepository documentUnitStatusRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -94,6 +96,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.keywordRepository = keywordRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
+    this.documentUnitStatusRepository = documentUnitStatusRepository;
   }
 
   @Override
@@ -114,7 +117,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
 
   @Override
   public Mono<DocumentUnit> createNewDocumentUnit(
-      String documentNumber, DocumentationOffice documentationOffice) {
+      String documentNumber, DocumentationOffice documentationOffice, String status) {
     return documentationOfficeRepository
         .findByLabel(documentationOffice.label())
         .flatMap(
@@ -130,6 +133,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                             .documentationOffice(documentationOfficeDTO)
                             .dateKnown(true)
                             .legalEffect(LegalEffect.NOT_SPECIFIED.getLabel())
+                            .status(status)
                             .build())
                     .map(DocumentUnitTransformer::transformMetadataToDomain));
   }

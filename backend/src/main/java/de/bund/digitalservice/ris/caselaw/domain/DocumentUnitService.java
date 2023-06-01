@@ -6,6 +6,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class DocumentUnitService {
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
+  private final DocumentUnitStatusService documentUnitStatusService;
 
   @Value("${otc.obs.bucket-name}")
   private String bucketName;
@@ -56,19 +58,26 @@ public class DocumentUnitService {
       DocumentUnitRepository repository,
       DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
-      EmailPublishService publishService) {
+      EmailPublishService publishService,
+      DocumentUnitStatusService documentUnitStatusService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
+    this.documentUnitStatusService = documentUnitStatusService;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
+    UUID documentUnitUuid = UUID.randomUUID(); // TODO pass this into createNewDocumentUnit
+    Instant creationTimestamp = Instant.now(); // TODO pass this into createNewDocumentUnit
+
     return Mono.just(documentationOffice)
         .flatMap(documentNumberService::generateNextDocumentNumber)
+        .zipWith(documentUnitStatusService.setInitialStatus(documentUnitUuid, creationTimestamp))
         .flatMap(
-            documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
+            tuple ->
+                repository.createNewDocumentUnit(tuple.getT1(), documentationOffice, tuple.getT2()))
         .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
