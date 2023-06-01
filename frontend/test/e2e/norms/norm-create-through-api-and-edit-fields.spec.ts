@@ -8,7 +8,7 @@ import {
   expectMetadataInputSectionToHaveCorrectData,
 } from "./utilities"
 
-testWithImportedNorm.skip(
+testWithImportedNorm(
   "Check if fields can be edited",
   async ({ page, normData, guid }) => {
     testWithImportedNorm.slow()

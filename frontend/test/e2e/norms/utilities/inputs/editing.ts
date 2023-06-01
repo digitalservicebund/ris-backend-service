@@ -152,7 +152,15 @@ export async function fillRepeatedMetadataSectionList(
   if (numberOfSectionRepetition > 0) {
     // First entry is automatically in edit mode.
     await fillInputFieldGroup(page, section.fields ?? [], 0)
-    await page.keyboard.press("Enter")
+    if (
+      section.heading !== undefined &&
+      ![
+        "Abweichendes Inkrafttretedatum",
+        "Abweichendes Außerkrafttretedatum",
+      ].includes(section.heading)
+    ) {
+      await page.keyboard.press("Enter")
+    }
   }
 
   for (let index = 1; index < numberOfSectionRepetition; index++) {

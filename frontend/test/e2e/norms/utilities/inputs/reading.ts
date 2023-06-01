@@ -19,6 +19,7 @@ const expectTextInput: FieldExpecter<string> = async (page, id, value) => {
 
 const expectCheckbox: FieldExpecter<boolean> = async (page, id, value) => {
   const checked = await page.locator(`input#${id}`).isChecked()
+  console.log(id, "value" + value)
   expect(checked).toBe(value)
 }
 
@@ -91,20 +92,35 @@ export async function expectRepeatedSectionListHasCorrectEntries(
   expect(entryCount).toBe(numberOfSectionRepetition)
 
   const fields = section.fields ?? []
-
-  async function expectEntry(index: number): Promise<void> {
+  // console.log("OUTSIDE")
+  // console.log(section)
+  async function expectEntry(
+    index: number,
+    section: MetadataInputSection
+  ): Promise<void> {
     await expectInputFieldGroupHasCorrectValues(page, fields, index)
-    await page.keyboard.down("Enter") // Stop editing / close inputs again.
+    console.log("INSIDE")
+    console.log(section)
+    if (
+      section.heading !== undefined &&
+      ![
+        "Abweichendes Inkrafttretedatum",
+        "Abweichendes Außerkrafttretedatum",
+      ].includes(section.heading)
+    ) {
+      await page.keyboard.down("Enter") // Stop editing / close inputs again.
+      console.log("if entered")
+    }
   }
 
   // Single entries are automatically in edit mode.
   if (entryCount == 1) {
-    await expectEntry(0)
+    await expectEntry(0, section)
   } else {
     for (let index = 0; index < numberOfSectionRepetition; index++) {
       const entry = listEntries.nth(index)
       await entry.getByRole("button", { name: "Eintrag bearbeiten" }).click()
-      await expectEntry(index)
+      await expectEntry(index, section)
     }
   }
 }
