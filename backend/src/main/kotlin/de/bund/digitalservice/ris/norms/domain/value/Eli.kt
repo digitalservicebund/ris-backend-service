@@ -7,6 +7,20 @@ import java.time.LocalDate
  * which a legislation can be accessed online. In our application it is a computed value built from the properties
  * passed within the primary constructor.
  *
+ * The ELI is constructed via the `toString()` function of this class, which builds a string representation of the ELI identifier by concatenating the values of `gazetteOrMedium`, `year`, and `page` properties.
+ * The `gazetteOrMedium` property is computed based on the `printAnnouncementGazette` and `digitalAnnouncementMedium` metadata of the norm.
+ * If `printAnnouncementGazette` is not null, then the value of `gazetteOrMedium` is the mapped value of `printAnnouncementGazette`, otherwise, the `digitalAnnouncementMedium` is used
+ * If both `printAnnouncementGazette` and `digitalAnnouncementMedium` are null, then the value of `gazetteOrMedium` is also null.
+ * The `year` property is computed based on the `announcementDate`, `citationDate`, and `citationYear` metadata of the norm.
+ * If `announcementDate` is not null, then the value of `year` is set to the year of the `announcementDate`. If `announcementDate` is null, then the value of `citationDate` is checked.
+ * If `citationDate` is not null, then the value of `year` is set to the year of the `citationDate`. If both `announcementDate` and `citationDate` are null, then the value of `citationYear` is checked.
+ * If `citationYear` is not null, then the value of `year` is set to the integer value of `citationYear`. If all three properties (`announcementDate`, `citationDate`, and `citationYear`) are null, then the value of `year` is also null.
+ * The `page` property is computed based on the `printAnnouncementGazette`, `printAnnouncementPage`, `digitalAnnouncementEdition`, and `digitalAnnouncementPage` metadata of the norm.
+ * If `printAnnouncementGazette` is not null, then the value of `page` is set to the value of `printAnnouncementPage`.
+ * If `printAnnouncementGazette` is null, then the value of `digitalAnnouncementEdition` is checked. If `digitalAnnouncementEdition` is not null, then the value of `page` is set to the value of `digitalAnnouncementEdition`.
+ * If `digitalAnnouncementEdition` is null, then the value of `digitalAnnouncementPage` is checked. If `digitalAnnouncementPage` is not null, then the value of `page` is set to the value of `digitalAnnouncementPage`.
+ * If all four properties (`printAnnouncementGazette`, `printAnnouncementPage`, `digitalAnnouncementEdition`, and `digitalAnnouncementPage`) are null, then the value of `page` is also null.
+ * The ELI string is returned as an empty string if all three properties (`gazetteOrMedium`, `year`, and `page`) are null, otherwise the eli is returned in this format: `eli/{gazetteOrMedium}/{year}/s{page}`.
  *
  * @property printAnnouncementGazette the printed gazette on which the norm was announced.
  * @property announcementDate the date on which the norm was announced.
