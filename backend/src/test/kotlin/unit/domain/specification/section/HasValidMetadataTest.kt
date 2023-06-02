@@ -430,4 +430,29 @@ class HasValidMetadataTest {
 
         assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `can generate categorized reference with right metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.CATEGORIZED_REFERENCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("test reference", MetadatumType.TEXT),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isTrue()
+    }
+
+    @Test
+    fun `it throws an error on categorized reference with right and wrong metadata`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.CATEGORIZED_REFERENCE
+        every { instance.sections } returns null
+        every { instance.metadata } returns listOf(
+            Metadatum("test reference", MetadatumType.TEXT),
+            Metadatum("test medium", MetadatumType.ANNOUNCEMENT_MEDIUM),
+        )
+
+        assertThat(hasValidMetadata.isSatisfiedBy(instance)).isFalse()
+    }
 }

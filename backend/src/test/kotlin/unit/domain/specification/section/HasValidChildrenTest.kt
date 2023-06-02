@@ -254,4 +254,13 @@ class HasValidChildrenTest {
 
         Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isFalse()
     }
+
+    @Test
+    fun `it is satisfied if the categorized reference does not have any children sections`() {
+        val instance = mockk<MetadataSection>()
+        every { instance.name } returns MetadataSectionName.CATEGORIZED_REFERENCE
+        every { instance.sections } returns null
+
+        Assertions.assertThat(hasValidChildren.isSatisfiedBy(instance)).isTrue()
+    }
 }

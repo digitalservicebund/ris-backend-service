@@ -62,6 +62,12 @@ class HasValidSectionsTest {
                     ),
                 ),
             ),
+            MetadataSection(
+                MetadataSectionName.CATEGORIZED_REFERENCE,
+                listOf(Metadatum("test reference", MetadatumType.TEXT)),
+                1,
+                emptyList(),
+            ),
         )
 
         assertThat(hasValidSections.isSatisfiedBy(instance)).isTrue()
