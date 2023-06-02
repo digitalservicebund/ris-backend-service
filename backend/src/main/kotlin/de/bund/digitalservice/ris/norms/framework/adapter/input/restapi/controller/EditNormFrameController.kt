@@ -96,8 +96,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
         var applicationScopeStartDate: String? = null
         var applicationScopeEndDate: String? = null
 
-        var categorizedReference: String? = null
-
         var otherFootnote: String? = null
         var footnoteChange: String? = null
         var footnoteComment: String? = null
@@ -160,7 +158,6 @@ class EditNormFrameController(private val editNormFrameService: EditNormFrameUse
             this.applicationScopeArea,
             decodeLocalDate(this.applicationScopeStartDate),
             decodeLocalDate(this.applicationScopeEndDate),
-            this.categorizedReference,
             this.otherFootnote,
             this.footnoteChange,
             this.footnoteComment,

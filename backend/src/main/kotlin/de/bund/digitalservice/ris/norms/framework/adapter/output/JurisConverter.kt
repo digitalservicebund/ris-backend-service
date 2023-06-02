@@ -188,7 +188,6 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         applicationScopeArea = data.applicationScopeArea,
         applicationScopeStartDate = parseDateString(data.applicationScopeStartDate),
         applicationScopeEndDate = parseDateString(data.applicationScopeEndDate),
-        categorizedReference = data.categorizedReferences.getOrNull(0)?.text,
         otherFootnote = data.otherFootnote,
         celexNumber = data.celexNumber,
         text = data.text,

@@ -65,8 +65,6 @@ interface EditNormFrameUseCase {
         var applicationScopeStartDate: LocalDate? = null,
         var applicationScopeEndDate: LocalDate? = null,
 
-        var categorizedReference: String? = null,
-
         var otherFootnote: String? = null,
         var footnoteChange: String? = null,
         var footnoteComment: String? = null,

@@ -64,7 +64,6 @@ private fun getUpdatedNorm(guid: UUID, properties: EditNormFrameUseCase.NormFram
     applicationScopeArea = properties.applicationScopeArea,
     applicationScopeStartDate = properties.applicationScopeStartDate,
     applicationScopeEndDate = properties.applicationScopeEndDate,
-    categorizedReference = properties.categorizedReference,
     otherFootnote = properties.otherFootnote,
     footnoteChange = properties.footnoteChange,
     footnoteComment = properties.footnoteComment,

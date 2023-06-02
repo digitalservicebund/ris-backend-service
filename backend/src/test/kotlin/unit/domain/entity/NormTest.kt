@@ -26,7 +26,6 @@ class NormTest {
         assertThat(norm.risAbbreviation).isNull()
         assertThat(norm.documentStatusDescription).isNull()
         assertThat(norm.applicationScopeStartDate).isNull()
-        assertThat(norm.categorizedReference).isNull()
         assertThat(norm.digitalEvidenceExternalDataNote).isNull()
         assertThat(norm.text).isNull()
     }
@@ -93,7 +92,6 @@ class NormTest {
                 risAbbreviation = "ABC",
                 documentStatusDescription = "document status description",
                 applicationScopeStartDate = LocalDate.of(2022, 11, 18),
-                categorizedReference = "categorized reference",
                 digitalEvidenceExternalDataNote = "digital evidence external data note",
                 text = "text",
                 metadataSections = listOf(citationDateSection, normProviderSection),
@@ -109,7 +107,6 @@ class NormTest {
         assertThat(norm.risAbbreviation).isEqualTo("ABC")
         assertThat(norm.documentStatusDescription).isEqualTo("document status description")
         assertThat(norm.applicationScopeStartDate).isEqualTo(LocalDate.of(2022, 11, 18))
-        assertThat(norm.categorizedReference).isEqualTo("categorized reference")
         assertThat(norm.digitalEvidenceExternalDataNote)
             .isEqualTo("digital evidence external data note")
         assertThat(norm.text).isEqualTo("text")

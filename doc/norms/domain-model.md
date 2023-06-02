@@ -58,8 +58,6 @@ classDiagram
     Date applicationScopeStartDate
     Date applicationScopeEndDate
 
-    String categorizedReference
-
     String otherFootnote
     String footnoteChange
     String footnoteComment

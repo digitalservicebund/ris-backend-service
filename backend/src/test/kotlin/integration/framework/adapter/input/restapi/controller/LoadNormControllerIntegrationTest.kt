@@ -167,7 +167,6 @@ class LoadNormControllerIntegrationTest : PostgresTestcontainerIntegrationTest()
                   "applicationScopeArea": "${norm.applicationScopeArea}",
                   "applicationScopeStartDate": "${norm.applicationScopeStartDate}",
                   "applicationScopeEndDate": "${norm.applicationScopeEndDate}",
-                  "categorizedReference": "${norm.categorizedReference}",
                   "otherFootnote": "${norm.otherFootnote}",
                   "footnoteChange": "${norm.footnoteChange}",
                   "footnoteComment": "${norm.footnoteComment}",

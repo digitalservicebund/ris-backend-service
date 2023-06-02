@@ -106,9 +106,6 @@ data class NormDto(
     @Column("application_scope_end_date")
     var applicationScopeEndDate: LocalDate? = null,
 
-    @Column("categorized_reference")
-    var categorizedReference: String? = null,
-
     @Column("other_footnote")
     var otherFootnote: String? = null,
     @Column("footnote_change")

@@ -63,7 +63,6 @@ class NormBuilder {
     var applicationScopeArea = randomString()
     var applicationScopeStartDate = LocalDate.now()
     var applicationScopeEndDate = LocalDate.now()
-    var categorizedReference = randomString()
     var otherFootnote = randomString()
     var footnoteChange = randomString()
     var footnoteComment = randomString()
@@ -132,7 +131,6 @@ class NormBuilder {
         applicationScopeArea = applicationScopeArea,
         applicationScopeStartDate = applicationScopeStartDate,
         applicationScopeEndDate = applicationScopeEndDate,
-        categorizedReference = categorizedReference,
         otherFootnote = otherFootnote,
         footnoteChange = footnoteChange,
         footnoteComment = footnoteComment,

@@ -227,7 +227,6 @@ class JurisConverterTest {
             assertThat(norm?.applicationScopeArea).isEqualTo("test application scope area")
             assertThat(norm?.applicationScopeStartDate).isEqualTo(LocalDate.parse("2022-01-13"))
             assertThat(norm?.applicationScopeEndDate).isEqualTo(LocalDate.parse("2022-01-14"))
-            assertThat(norm?.categorizedReference).isEqualTo("test categorized reference 1")
             assertThat(norm?.otherFootnote).isEqualTo("test other footnote")
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")

@@ -162,8 +162,6 @@ class EditNormFrameControllerTest {
         var applicationScopeStartDate: String? = null
         var applicationScopeEndDate: String? = null
 
-        var categorizedReference: String? = null
-
         var otherFootnote: String? = null
         var footnoteChange: String? = null
         var footnoteComment: String? = null
