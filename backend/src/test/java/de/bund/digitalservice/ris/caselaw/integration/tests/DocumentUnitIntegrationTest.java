@@ -6,6 +6,7 @@ import static org.springframework.security.test.web.reactive.server.SecurityMock
 
 import com.jayway.jsonpath.JsonPath;
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
@@ -60,6 +61,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
       DocumentUnitService.class,
       KeycloakUserService.class,
       DatabaseDocumentNumberService.class,
+      DatabaseDocumentUnitStatusService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       FlywayConfig.class,
       PostgresConfig.class

@@ -61,6 +61,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
   private final DatabaseKeywordRepository keywordRepository;
   private final DatabaseDocumentUnitNormRepository documentUnitNormRepository;
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
+  private final DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
 
   public PostgresDocumentUnitRepositoryImpl(
       DatabaseDocumentUnitRepository repository,
@@ -77,7 +78,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
       DatabaseDocumentUnitFieldsOfLawRepository documentUnitFieldsOfLawRepository,
       DatabaseKeywordRepository keywordRepository,
       DatabaseDocumentUnitNormRepository documentUnitNormRepository,
-      DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+      DatabaseDocumentationOfficeRepository documentationOfficeRepository,
+      DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository) {
 
     this.repository = repository;
     this.metadataRepository = metadataRepository;
@@ -94,6 +96,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     this.keywordRepository = keywordRepository;
     this.documentUnitNormRepository = documentUnitNormRepository;
     this.documentationOfficeRepository = documentationOfficeRepository;
+    this.databaseDocumentUnitStatusRepository = databaseDocumentUnitStatusRepository;
   }
 
   @Override
@@ -591,7 +594,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .flatMap(this::injectKeywords)
         .flatMap(this::injectNorms)
         .flatMap(this::injectFieldsOfLaw)
-        .flatMap(this::injectDocumentationOffice);
+        .flatMap(this::injectDocumentationOffice)
+        .flatMap(this::injectStatus);
   }
 
   private Mono<DocumentUnitDTO> injectProceedingDecisions(DocumentUnitDTO documentUnitDTO) {
@@ -768,6 +772,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
               documentUnitMetadataDTO.setDocumentTypeDTO(documentTypeDTO);
               return documentUnitMetadataDTO;
             });
+  }
+
+  private Mono<DocumentUnitDTO> injectStatus(DocumentUnitDTO documentUnitDTO) {
+    return databaseDocumentUnitStatusRepository
+        .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
+        .map(
+            statusDTO -> {
+              documentUnitDTO.setStatus(statusDTO.getStatus());
+              return documentUnitDTO;
+            })
+        .defaultIfEmpty(documentUnitDTO);
   }
 
   public Flux<ProceedingDecision> searchByProceedingDecision(

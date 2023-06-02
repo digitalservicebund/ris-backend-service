@@ -183,6 +183,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             .proceedingDecisions(proceedingDecisions)
             .texts(texts)
             .contentRelatedIndexing(indexing)
+            .status("unpublished")
             .build();
 
     assertThat(documentUnit).hasNoNullFieldsOrProperties();

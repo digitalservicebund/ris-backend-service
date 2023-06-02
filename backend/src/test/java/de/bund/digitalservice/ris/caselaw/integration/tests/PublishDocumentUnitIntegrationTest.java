@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
 import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentNumberService;
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
@@ -44,6 +45,7 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     imports = {
       DocumentUnitService.class,
       KeycloakUserService.class,
+      DatabaseDocumentUnitStatusService.class,
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       PostgresXmlMailRepositoryImpl.class,
@@ -94,6 +96,9 @@ class PublishDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+
+    assertThat(repository.findAll().collectList().block()).hasSize(1);
+
     XmlMailDTO expectedXmlMailDTO =
         new XmlMailDTO(
             1L,
@@ -132,6 +137,8 @@ class PublishDocumentUnitIntegrationTest {
         .expectBody(XmlMailResponse.class)
         .consumeWith(
             response -> {
+              System.out.println(response);
+
               assertThat(response.getResponseBody())
                   .usingRecursiveComparison()
                   .ignoringFields("publishDate")
