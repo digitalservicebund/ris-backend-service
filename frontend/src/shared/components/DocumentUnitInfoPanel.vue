@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import IconBadge from "@/shared/components/IconBadge.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
 interface PropertyInfo {
@@ -6,10 +7,17 @@ interface PropertyInfo {
   value?: string
 }
 
+interface IconBadge {
+  label: string
+  value: string
+  icon: string
+  color: string
+}
+
 interface Props {
   heading?: string
-  firstRow?: PropertyInfo[]
-  secondRow?: PropertyInfo[]
+  firstRow?: (PropertyInfo | IconBadge)[]
+  secondRow?: (PropertyInfo | IconBadge)[]
 }
 
 withDefaults(defineProps<Props>(), {
@@ -17,6 +25,10 @@ withDefaults(defineProps<Props>(), {
   firstRow: () => [],
   secondRow: () => [],
 })
+
+function isBadge(entry: PropertyInfo | IconBadge): entry is IconBadge {
+  return "icon" in entry
+}
 </script>
 
 <template>
@@ -27,7 +39,14 @@ withDefaults(defineProps<Props>(), {
     <div class="flex items-center space-x-[2rem]">
       <div class="text-30">{{ heading }}</div>
       <div v-for="entry in firstRow" :key="entry.label">
+        <IconBadge
+          v-if="isBadge(entry)"
+          :color="entry.color"
+          :icon="entry.icon"
+          :value="entry.value"
+        />
         <PropertyInfo
+          v-else
           direction="row"
           :label="entry.label"
           :value="entry.value || ' - '"
@@ -37,7 +56,14 @@ withDefaults(defineProps<Props>(), {
 
     <div v-if="secondRow.length" class="flex space-x-[2rem]">
       <div v-for="entry in secondRow" :key="entry.label" class="-mt-20">
+        <IconBadge
+          v-if="isBadge(entry)"
+          :color="entry.color"
+          :icon="entry.icon"
+          :value="entry.value"
+        />
         <PropertyInfo
+          v-else
           direction="row"
           :label="entry.label"
           :value="entry.value || ' - '"

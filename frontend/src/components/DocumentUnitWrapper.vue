@@ -37,7 +37,28 @@ const documentationOffice = computed(
 
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)
 
+const statusBadge = computed(() => {
+  if (props.documentUnit.status == "PUBLISHED") {
+    return {
+      label: "status",
+      value: "veröffentlicht",
+      icon: "campaign",
+      color: "black",
+    }
+  }
+  if (props.documentUnit.status == "UNPUBLISHED") {
+    return {
+      label: "status",
+      value: "unveröffentlicht",
+      icon: "disabled_visible",
+      color: "black",
+    }
+  }
+  return null
+})
+
 const firstRowInfos = computed(() => [
+  ...(statusBadge.value ? [statusBadge.value] : []),
   {
     label: "Dokumentationsstelle",
     value: documentationOffice.value,
