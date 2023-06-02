@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import java.time.Instant;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,7 @@ public class DocumentUnitStatusDTO implements Persistable<UUID> {
   @Column("created_at")
   private Instant createdAt;
 
-  private String status;
+  private DocumentUnitStatus status;
 
   @Column("document_unit_id")
   private UUID documentUnitId;

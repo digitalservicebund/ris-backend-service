@@ -2,6 +2,7 @@ package de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc;
 
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DocumentTypeDTO;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -76,5 +77,5 @@ public class DocumentUnitMetadataDTO {
 
   @Transient private List<FileNumberDTO> fileNumbers;
 
-  @Transient private String status;
+  @Transient private DocumentUnitStatus status;
 }

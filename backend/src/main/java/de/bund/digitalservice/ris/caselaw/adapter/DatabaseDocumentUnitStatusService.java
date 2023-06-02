@@ -1,5 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.adapter;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
+
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
@@ -32,7 +34,7 @@ public class DatabaseDocumentUnitStatusService implements DocumentUnitStatusServ
                 .id(UUID.randomUUID())
                 .createdAt(documentUnit.creationtimestamp())
                 .documentUnitId(documentUnit.uuid())
-                .status("unpublished")
+                .status(UNPUBLISHED)
                 .build())
         .then(documentUnitRepository.findByUuid(documentUnit.uuid()));
   }

@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -138,7 +139,7 @@ class DocumentUnitIntegrationTest {
         documentUnitStatusRepository.findAll().collectList().block();
     assertThat(statusList).hasSize(1);
     DocumentUnitStatusDTO status = statusList.get(0);
-    assertThat(status.getStatus()).isEqualTo("unpublished");
+    assertThat(status.getStatus()).isEqualTo(UNPUBLISHED);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
     assertThat(status.getCreatedAt()).isEqualTo(documentUnitDTO.getCreationtimestamp());
   }
