@@ -136,14 +136,11 @@ class PublishDocumentUnitIntegrationTest {
         .isOk()
         .expectBody(XmlMailResponse.class)
         .consumeWith(
-            response -> {
-              System.out.println(response);
-
-              assertThat(response.getResponseBody())
-                  .usingRecursiveComparison()
-                  .ignoringFields("publishDate")
-                  .isEqualTo(expectedXmlResultObject);
-            });
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("publishDate")
+                    .isEqualTo(expectedXmlResultObject));
 
     List<XmlMailDTO> xmlMailList = xmlMailRepository.findAll().collectList().block();
     assertThat(xmlMailList).hasSize(1);
