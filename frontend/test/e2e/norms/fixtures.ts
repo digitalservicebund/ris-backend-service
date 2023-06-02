@@ -1,5 +1,10 @@
 import { expect, test } from "@playwright/test"
-import { Norm, NormCategory } from "../../../src/domain/Norm"
+import {
+  MetadataSectionName,
+  Norm,
+  NormCategory,
+  UndefinedDate,
+} from "../../../src/domain/Norm"
 import { importNormViaApi, loadJurisTestFile } from "./e2e-utils"
 import { normData } from "./testdata/norm_basic"
 import { FieldType, MetadataInputSection } from "./utilities"
@@ -54,20 +59,20 @@ type RecursiveOmit<Type, KeyToOmit extends PropertyKey> = Type extends {
   ? NullUnionOmit<RecursiveOmitHelper<Type, KeyToOmit>, KeyToOmit>
   : RecursiveOmitHelper<Type, KeyToOmit>
 
-// function undefinedDateToDropdownEntry(
-//   unit?: UndefinedDate
-// ): string | undefined {
-//   switch (unit) {
-//     case UndefinedDate.UNDEFINED_UNKNOWN:
-//       return "unbestimmt (unbekannt)"
-//     case UndefinedDate.UNDEFINED_FUTURE:
-//       return "unbestimmt (zukünftig)"
-//     case UndefinedDate.UNDEFINED_NOT_PRESENT:
-//       return "nicht vorhanden"
-//     default:
-//       return undefined
-//   }
-// }
+function undefinedDateToDropdownEntry(
+  unit?: UndefinedDate
+): string | undefined {
+  switch (unit) {
+    case UndefinedDate.UNDEFINED_UNKNOWN:
+      return "unbestimmt (unbekannt)"
+    case UndefinedDate.UNDEFINED_FUTURE:
+      return "unbestimmt (zukünftig)"
+    case UndefinedDate.UNDEFINED_NOT_PRESENT:
+      return "nicht vorhanden"
+    default:
+      return undefined
+  }
+}
 
 export type NormData = RecursiveOmit<Norm, "guid"> & {
   jurisZipFileName: string
@@ -442,56 +447,60 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
           type: FieldType.TEXT,
           id: "divergentEntryIntoForceDefinedDate",
           label: "Bestimmtes abweichendes Inkrafttretedatum",
-          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.filter(
-            (section) => section.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
-          )
-            .map((section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0])
-            .map((section) => section?.DATE?.[0]),
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) => section?.DATE?.[0]),
         },
         {
           type: FieldType.CHECKBOX,
-          id: NormCategory.AMENDMENT_NORM,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
           label: "Änderungsnorm",
-          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.filter(
-            (section) => section.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
-          )
-            .map((section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0])
-            .map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
                   (category) => category == NormCategory.AMENDMENT_NORM
                 )
-            ),
+          ),
         },
         {
           type: FieldType.CHECKBOX,
-          id: NormCategory.BASE_NORM,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
           label: "Stammnorm",
-          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.filter(
-            (section) => section.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
-          )
-            .map((section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0])
-            .map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
                   (category) => category == NormCategory.BASE_NORM
                 )
-            ),
+          ),
         },
         {
           type: FieldType.CHECKBOX,
-          id: NormCategory.TRANSITIONAL_NORM,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_DEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
           label: "Übergangsnorm",
-          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.filter(
-            (section) => section.DIVERGENT_ENTRY_INTO_FORCE_DEFINED
-          )
-            .map((section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0])
-            .map(
-              (section) =>
-                !!section?.NORM_CATEGORY?.find(
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
                   (category) => category == NormCategory.TRANSITIONAL_NORM
                 )
-            ),
+          ),
         },
         {
           type: FieldType.RADIO,
@@ -501,53 +510,67 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
             (section) => !!section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED
           ),
         },
-        // {
-        //   type: FieldType.DROPDOWN,
-        //   id: "divergentEntryIntoForceUndefinedDate",
-        //   label: "Unbestimmtes abweichendes Inkrafttretedatum",
-        //   values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
-        //     (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
-        //   )
-        //     .map((section) => undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0]))
-        // },
-        // {
-        //   type: FieldType.CHECKBOX,
-        //   id: NormCategory.AMENDMENT_NORM,
-        //   label: "Änderungsnorm",
-        //   values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.filter(
-        //     (section)=>section.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED).map(
-        //     (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
-        //   ).map(
-        //     (section) =>
-        //       !!section?.NORM_CATEGORY?.find(
-        //         (category) => category == NormCategory.AMENDMENT_NORM
-        //       )
-        //   ),
-        // },
-        // {
-        //   type: FieldType.CHECKBOX,
-        //   id: NormCategory.BASE_NORM,
-        //   label: "Stammnorm",
-        //   values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.filter(
-        //     (section)=>section.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED).map(
-        //     (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
-        //   ).map(
-        //     (section) =>
-        //       !!section?.NORM_CATEGORY?.find(
-        //         (category) => category == NormCategory.BASE_NORM
-        //       )
-        //   ),
-        // },
-        // {
-        //   type: FieldType.CHECKBOX,
-        //   id: NormCategory.TRANSITIONAL_NORM,
-        //   label: "Übergangsnorm",
-        //   values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.filter(
-        //     (section)=>section.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED &&
-        //     !!section.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED.find(
-        //     (object)=> object?.NORM_CATEGORY?.find(
-        //     (category)=> category == NormCategory.TRANSITIONAL_NORM))).map(()=> true  )
-        // },
+        {
+          type: FieldType.DROPDOWN,
+          id: "divergentEntryIntoForceUndefinedDate",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+          ),
+        },
       ],
     },
     {
@@ -585,126 +608,149 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
       ],
     },
-    // {
-    //   heading: "Abweichendes Außerkrafttretedatum",
-    //   isRepeatedSection: true,
-    //   id: "divergentExpirations",
-    //   fields: [
-    //     {
-    //       type: FieldType.RADIO,
-    //       id: "divergentExpirationDefinedSelection",
-    //       label: "bestimmt",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => !!section?.DIVERGENT_EXPIRATION_DEFINED
-    //       ),
-    //     },
-    //     {
-    //       type: FieldType.TEXT,
-    //       id: "divergentExpirationDefinedDate",
-    //       label: "Bestimmtes abweichendes Außerkrafttretedatum",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
-    //       ).map((section) => section?.DATE?.[0]),
-    //     },
-    //     {
-    //       type: FieldType.CHECKBOX,
-    //       id: NormCategory.AMENDMENT_NORM,
-    //       label: "Änderungsnorm",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
-    //       ).map(
-    //         (section) =>
-    //           !!section?.NORM_CATEGORY?.find(
-    //             (category) => category == NormCategory.AMENDMENT_NORM
-    //           )
-    //       ),
-    //     },
-    //     {
-    //       type: FieldType.CHECKBOX,
-    //       id: NormCategory.BASE_NORM,
-    //       label: "Stammnorm",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
-    //       ).map(
-    //         (section) =>
-    //           !!section?.NORM_CATEGORY?.find(
-    //             (category) => category == NormCategory.BASE_NORM
-    //           )
-    //       ),
-    //     },
-    //     {
-    //       type: FieldType.CHECKBOX,
-    //       id: NormCategory.TRANSITIONAL_NORM,
-    //       label: "Übergangsnorm",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
-    //       ).map(
-    //         (section) =>
-    //           !!section?.NORM_CATEGORY?.find(
-    //             (category) => category == NormCategory.TRANSITIONAL_NORM
-    //           )
-    //       ),
-    //     },
-    //     {
-    //       type: FieldType.RADIO,
-    //       id: "divergentExpirationUndefinedSelection",
-    //       label: "unbestimmt",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => !!section?.DIVERGENT_EXPIRATION_UNDEFINED
-    //       ),
-    //     },
-    //     {
-    //       type: FieldType.DROPDOWN,
-    //       id: "divergentExpirationUndefinedDate",
-    //       label: "Unbestimmtes abweichendes Außerkrafttretedatum",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
-    //       )
-    //         .map((section) => section?.UNDEFINED_DATE?.[0])
-    //         .map(undefinedDateToDropdownEntry),
-    //     },
-    //     {
-    //       type: FieldType.CHECKBOX,
-    //       id: NormCategory.AMENDMENT_NORM,
-    //       label: "Änderungsnorm",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
-    //       ).map(
-    //         (section) =>
-    //           !!section?.NORM_CATEGORY?.find(
-    //             (category) => category == NormCategory.AMENDMENT_NORM
-    //           )
-    //       ),
-    //     },
-    //     {
-    //       type: FieldType.CHECKBOX,
-    //       id: NormCategory.BASE_NORM,
-    //       label: "Stammnorm",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
-    //       ).map(
-    //         (section) =>
-    //           !!section?.NORM_CATEGORY?.find(
-    //             (category) => category == NormCategory.BASE_NORM
-    //           )
-    //       ),
-    //     },
-    //     {
-    //       type: FieldType.CHECKBOX,
-    //       id: NormCategory.TRANSITIONAL_NORM,
-    //       label: "Übergangsnorm",
-    //       values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
-    //         (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
-    //       ).map(
-    //         (section) =>
-    //           !!section?.NORM_CATEGORY?.find(
-    //             (category) => category == NormCategory.TRANSITIONAL_NORM
-    //           )
-    //       ),
-    //     },
-    //   ],
-    // },
-
+    {
+      heading: "Abweichendes Außerkrafttretedatum",
+      id: "divergentExpirations",
+      isRepeatedSection: true,
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "divergentExpirationDefinedSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => !!section?.DIVERGENT_EXPIRATION_DEFINED
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "divergentExpirationDefinedDate",
+          label: "Bestimmtes abweichendes Außerkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) => section?.DATE?.[0]),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_DEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "divergentExpirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => !!section?.DIVERGENT_EXPIRATION_UNDEFINED
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "divergentExpirationUndefinedDate",
+          label: "Unbestimmtes abweichendes Außerkrafttretedatum",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          )
+            .map((section) => section?.UNDEFINED_DATE?.[0])
+            .map(undefinedDateToDropdownEntry),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+            NormCategory.AMENDMENT_NORM,
+          ].join("-"),
+          label: "Änderungsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.AMENDMENT_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+            NormCategory.BASE_NORM,
+          ].join("-"),
+          label: "Stammnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.BASE_NORM
+                )
+          ),
+        },
+        {
+          type: FieldType.CHECKBOX,
+          id: [
+            MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+            NormCategory.TRANSITIONAL_NORM,
+          ].join("-"),
+          label: "Übergangsnorm",
+          values: norm.metadataSections?.DIVERGENT_EXPIRATION?.map(
+            (section) => section?.DIVERGENT_EXPIRATION_UNDEFINED?.[0]
+          ).map((section) =>
+            section === undefined
+              ? undefined
+              : !!section?.NORM_CATEGORY?.find(
+                  (category) => category == NormCategory.TRANSITIONAL_NORM
+                )
+          ),
+        },
+      ],
+    },
     {
       isSingleFieldSection: true,
       fields: [

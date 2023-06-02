@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
-import { Metadata, NormCategory, UndefinedDate } from "@/domain/Norm"
+import {
+  Metadata,
+  MetadataSectionName,
+  NormCategory,
+  UndefinedDate,
+} from "@/domain/Norm"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
 import DropdownInput from "@/shared/components/input/DropdownInput.vue"
 import InputField, {
@@ -119,14 +124,24 @@ const checkboxStyle = ref({
         <div class="flex gap-24">
           <InputField
             v-for="category in NormCategory"
-            :id="category"
+            :id="
+              [
+                MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+                category,
+              ].join('-')
+            "
             :key="category"
             :aria-label="NORM_CATEGORY_NAMES[category]"
             :label="NORM_CATEGORY_NAMES[category]"
             :label-position="LabelPosition.RIGHT"
           >
             <CheckboxInput
-              :id="category"
+              :id="
+                [
+                  MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
+                  category,
+                ].join('-')
+              "
               v-model="selectedNormCategories[category]"
               :aria-label="NORM_CATEGORY_NAMES[category]"
               :style="checkboxStyle"
