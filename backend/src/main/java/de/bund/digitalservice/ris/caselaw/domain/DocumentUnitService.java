@@ -70,10 +70,10 @@ public class DocumentUnitService {
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
     return Mono.just(documentationOffice)
         .flatMap(documentNumberService::generateNextDocumentNumber)
-        .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .flatMap(
             documentNumber -> repository.createNewDocumentUnit(documentNumber, documentationOffice))
         .flatMap(documentUnitStatusService::setInitialStatus)
+        .retryWhen(Retry.backoff(5, Duration.ofSeconds(2)).jitter(0.75))
         .doOnError(ex -> log.error("Couldn't create empty doc unit", ex));
   }
 
