@@ -76,7 +76,9 @@ const component = computed(() => {
     case MetadataSectionName.OTHER_OFFICIAL_ANNOUNCEMENT:
       return OtherOfficialAnnouncementInputGroup
     default:
-      return null
+      throw new Error(
+        `Unknown announcement child section: "${selectedChildSectionName.value}"`
+      )
   }
 })
 </script>

@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { useFlag } from "@unleash/proxy-client-vue"
 import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { NormReference } from "@/domain/normReference"

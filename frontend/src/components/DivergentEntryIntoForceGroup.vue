@@ -63,7 +63,9 @@ const component = computed(() => {
     case MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED:
       return DivergentEntryIntoForceUndefinedInputGroup
     default:
-      return null
+      throw Error(
+        `Unknown divergent entry into force child section: "${selectedChildSectionName.value}"`
+      )
   }
 })
 </script>

@@ -183,7 +183,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Dokumenttyp']").fill("AnU")
-        await page.locator("text=AnU - Anerkenntnisurteil").click()
+        await page.locator("text=Anerkenntnisurteil").click()
       },
       page,
       { clickSaveButton: true, reload: true }

@@ -75,7 +75,9 @@ const component = computed(() => {
     case MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED:
       return DivergentExpirationUndefinedInputGroup
     default:
-      return null
+      throw Error(
+        `Unknown divergent expiration child section: "${selectedChildSectionName.value}"`
+      )
   }
 })
 </script>

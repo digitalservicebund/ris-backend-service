@@ -181,14 +181,10 @@ export type InputModelProps =
   <div
     ref="dropdownContainerRef"
     class="dropdown-container"
-    role="button"
-    tabindex="0"
     @keydown.esc="closeDropdownAndRevertToLastSavedValue"
   >
     <div
       class="dropdown-container__open-dropdown"
-      role="button"
-      tabindex="0"
       @keydown.enter="onEnter"
       @keydown.tab="closeDropdownAndRevertToLastSavedValue"
     >
