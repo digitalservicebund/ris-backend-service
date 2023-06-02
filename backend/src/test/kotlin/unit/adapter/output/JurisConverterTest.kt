@@ -26,6 +26,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIAT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
@@ -39,6 +40,7 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.decodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
 import de.bund.digitalservice.ris.norms.juris.converter.model.DocumentType
@@ -177,7 +179,6 @@ class JurisConverterTest {
                     applicationScopeArea = "test application scope area"
                     applicationScopeStartDate = "2022-01-13"
                     applicationScopeEndDate = "2022-01-14"
-                    categorizedReference = "test categorized reference"
                     otherFootnote = "test other footnote"
                     validityRuleList = listOf("test validity rule")
                     referenceNumberList = listOf("test reference number")
@@ -186,6 +187,7 @@ class JurisConverterTest {
                     ageOfMajorityIndicationList = listOf("test age of majority indication")
                     text = "test text"
                     ageIndicationStartList = listOf("Lebensjahr 10", "Monate 11")
+                    categorizedReferences = listOf(CategorizedReference("test categorized reference 1"), CategorizedReference("test categorized reference 2"))
                 }
             val query = ParseJurisXmlOutputPort.Query(anyGuid, anyZipFile.readBytes(), anyZipFile.name)
             every { extractData(any()) } returns data
@@ -225,7 +227,7 @@ class JurisConverterTest {
             assertThat(norm?.applicationScopeArea).isEqualTo("test application scope area")
             assertThat(norm?.applicationScopeStartDate).isEqualTo(LocalDate.parse("2022-01-13"))
             assertThat(norm?.applicationScopeEndDate).isEqualTo(LocalDate.parse("2022-01-14"))
-            assertThat(norm?.categorizedReference).isEqualTo("test categorized reference")
+            assertThat(norm?.categorizedReference).isEqualTo("test categorized reference 1")
             assertThat(norm?.otherFootnote).isEqualTo("test other footnote")
             assertThat(norm?.celexNumber).isEqualTo("test celex number")
             assertThat(norm?.text).isEqualTo("test text")
@@ -290,6 +292,11 @@ class JurisConverterTest {
             val divergentexpirationUndefinedMetadata = divergentexpirationChildrenSections?.filter { it.name == MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED }?.flatMap { it.metadata }
             assertThat(divergentexpirationUndefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(UndefinedDate.UNDEFINED_UNKNOWN, UNDEFINED_DATE, 1))
             assertThat(divergentexpirationUndefinedMetadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum(NormCategory.BASE_NORM, NORM_CATEGORY, 1))
+
+            val categorizedReferenceSections = norm?.metadataSections?.filter { it.name == MetadataSectionName.CATEGORIZED_REFERENCE }
+            assertThat(categorizedReferenceSections).hasSize(2)
+            assertThat(categorizedReferenceSections?.get(0)?.metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test categorized reference 1", TEXT, 1))
+            assertThat(categorizedReferenceSections?.get(1)?.metadata).usingRecursiveFieldByFieldElementComparatorIgnoringFields("guid").contains(Metadatum("test categorized reference 2", TEXT, 1))
         }
 
         @Test

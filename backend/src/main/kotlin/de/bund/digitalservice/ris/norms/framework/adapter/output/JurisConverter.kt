@@ -35,6 +35,7 @@ import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.RIS_ABBREVIAT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_FNA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.SUBJECT_GESTA
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEMPLATE_NAME
+import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TEXT
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.TYPE_NAME
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNDEFINED_DATE
 import de.bund.digitalservice.ris.norms.domain.value.MetadatumType.UNOFFICIAL_ABBREVIATION
@@ -133,6 +134,11 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
     val ageIndicationSections = data.ageIndicationStartList.mapIndexed { index, value ->
         MetadataSection(MetadataSectionName.AGE_INDICATION, listOf(Metadatum(value, RANGE_START, 1)), index)
     }
+
+    val categorizedReferenceSections = data.categorizedReferences.mapIndexed { index, value ->
+        MetadataSection(MetadataSectionName.CATEGORIZED_REFERENCE, listOf(Metadatum(value.text, TEXT)), index)
+    }
+
     val sections = listOf(createSectionForNorm(data)) +
         createSectionsWithoutGrouping(Section.SUBJECT_AREA, subjectFna + subjectGesta) +
         createSectionsFromMetadata(Section.LEAD, leadJurisdiction + leadUnit) +
@@ -141,7 +147,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         createSectionsForOfficialReference(data.digitalAnnouncementList, data.printAnnouncementList) +
         createSectionsForDivergentEntryIntoForce(data.divergentEntryIntoForceList) +
         createSectionsForDivergentExpiration(data.divergentExpirationsList) +
-        citationDateSections + ageIndicationSections +
+        citationDateSections + ageIndicationSections + categorizedReferenceSections +
         addProviderSections(data.normProviderList)
 
     return Norm(
@@ -182,7 +188,7 @@ fun mapDataToDomain(guid: UUID, data: NormData): Norm {
         applicationScopeArea = data.applicationScopeArea,
         applicationScopeStartDate = parseDateString(data.applicationScopeStartDate),
         applicationScopeEndDate = parseDateString(data.applicationScopeEndDate),
-        categorizedReference = data.categorizedReference,
+        categorizedReference = data.categorizedReferences.getOrNull(0)?.text,
         otherFootnote = data.otherFootnote,
         celexNumber = data.celexNumber,
         text = data.text,
