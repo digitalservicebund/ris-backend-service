@@ -12,11 +12,13 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDeviatingDecisionDateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseIncorrectCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingDecisionDateDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DeviatingEcliRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.IncorrectCourtDTO;
@@ -90,6 +92,7 @@ class DocumentUnitIntegrationTest {
   @Autowired private DatabaseDeviatingDecisionDateRepository deviatingDecisionDateRepository;
   @Autowired private DatabaseDocumentTypeRepository databaseDocumentTypeRepository;
   @Autowired private DatabaseIncorrectCourtRepository incorrectCourtRepository;
+  @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private EmailPublishService publishService;
 
@@ -104,6 +107,7 @@ class DocumentUnitIntegrationTest {
     incorrectCourtRepository.deleteAll().block();
     repository.deleteAll().block();
     databaseDocumentTypeRepository.deleteAll().block();
+    documentUnitStatusRepository.deleteAll().block();
   }
 
   @Test
@@ -126,8 +130,17 @@ class DocumentUnitIntegrationTest {
 
     List<DocumentUnitDTO> list = repository.findAll().collectList().block();
     assertThat(list).hasSize(1);
-    assertThat(list.get(0).getDocumentnumber()).startsWith("XXRE");
-    assertThat(list.get(0).isDateKnown()).isTrue();
+    DocumentUnitDTO documentUnitDTO = list.get(0);
+    assertThat(documentUnitDTO.getDocumentnumber()).startsWith("XXRE");
+    assertThat(documentUnitDTO.isDateKnown()).isTrue();
+
+    List<DocumentUnitStatusDTO> statusList =
+        documentUnitStatusRepository.findAll().collectList().block();
+    assertThat(statusList).hasSize(1);
+    DocumentUnitStatusDTO status = statusList.get(0);
+    assertThat(status.getStatus()).isEqualTo("unpublished");
+    assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
+    assertThat(status.getCreatedAt()).isEqualTo(documentUnitDTO.getCreationtimestamp());
   }
 
   @Test
