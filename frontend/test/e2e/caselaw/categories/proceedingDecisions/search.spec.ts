@@ -22,7 +22,7 @@ test.describe("Search proceeding decisions", () => {
       court: secondaryDocumentUnit.coreData.court?.label,
       fileNumber: secondaryDocumentUnit.coreData.fileNumbers?.[0],
       documentType: secondaryDocumentUnit.coreData.documentType?.jurisShortcut,
-      date: "2020-01-01",
+      date: "01.01.2020",
     })
 
     await page
