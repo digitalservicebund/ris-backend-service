@@ -99,14 +99,23 @@ const checkboxStyle = ref({
         <div class="flex gap-24">
           <InputField
             v-for="category in NormCategory"
-            :id="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED + category"
+            :id="
+              [MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED, category].join(
+                '-'
+              )
+            "
             :key="category"
             :aria-label="NORM_CATEGORY_NAMES[category]"
             :label="NORM_CATEGORY_NAMES[category]"
             :label-position="LabelPosition.RIGHT"
           >
             <CheckboxInput
-              :id="MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED + category"
+              :id="
+                [
+                  MetadataSectionName.DIVERGENT_EXPIRATION_DEFINED,
+                  category,
+                ].join('-')
+              "
               v-model="selectedNormCategories[category]"
               :aria-label="NORM_CATEGORY_NAMES[category]"
               :style="checkboxStyle"

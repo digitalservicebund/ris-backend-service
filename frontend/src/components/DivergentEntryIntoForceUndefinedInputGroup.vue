@@ -126,8 +126,10 @@ const checkboxStyle = ref({
           <InputField
             v-for="category in NormCategory"
             :id="
-              MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED +
-              category
+              [
+                MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+                category,
+              ].join('-')
             "
             :key="category"
             :aria-label="NORM_CATEGORY_NAMES[category]"
@@ -136,8 +138,10 @@ const checkboxStyle = ref({
           >
             <CheckboxInput
               :id="
-                MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED +
-                category
+                [
+                  MetadataSectionName.DIVERGENT_ENTRY_INTO_FORCE_UNDEFINED,
+                  category,
+                ].join('-')
               "
               v-model="selectedNormCategories[category]"
               :aria-label="NORM_CATEGORY_NAMES[category]"

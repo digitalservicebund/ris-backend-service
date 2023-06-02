@@ -89,12 +89,11 @@ export async function expectRepeatedSectionListHasCorrectEntries(
   const listEntries = expandable.getByLabel("Listen Eintrag")
   const entryCount = await listEntries.count()
   expect(entryCount).toBe(numberOfSectionRepetition)
-  console.log(section.heading)
-  console.log(section)
+
   const fields = section.fields ?? []
+
   async function expectEntry(index: number): Promise<void> {
     await expectInputFieldGroupHasCorrectValues(page, fields, index)
-    // await page.pause()
     await page.keyboard.down("Enter") // Stop editing / close inputs again.
   }
 
