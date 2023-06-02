@@ -115,7 +115,6 @@ const component = computed(() => {
     </div>
     <component :is="component" v-model="childSection" />
   </div>
-  <div></div>
 </template>
 
 <style lang="scss" scoped>
