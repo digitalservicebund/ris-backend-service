@@ -98,14 +98,6 @@ class DocumentUnitServiceTest {
     headerMap.put("X-Filename", List.of("testfile.docx"));
     var httpHeaders = HttpHeaders.readOnlyHttpHeaders(headerMap);
 
-    var toSave =
-        DocumentUnit.builder()
-            .uuid(TEST_UUID)
-            .s3path(TEST_UUID.toString())
-            .filetype("docx")
-            .filename("testfile.docx")
-            .build();
-
     var savedDocumentUnit =
         DocumentUnit.builder()
             .uuid(TEST_UUID)
