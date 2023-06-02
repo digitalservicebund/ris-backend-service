@@ -72,11 +72,10 @@ describe("Citation date/year field", () => {
 
       expect(dateInputField).toBeInTheDocument()
       expect(dateInputField).toBeVisible()
-      expect(dateInputField?.type).toBe("date")
 
-      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.type(dateInputField, "12.05.2020")
 
-      expect(dateInputField).toHaveValue("2020-05-12")
+      expect(dateInputField).toHaveValue("12.05.2020")
     })
 
     it("User can clear the date input", async () => {
@@ -88,7 +87,7 @@ describe("Citation date/year field", () => {
         "Zitierdatum Datum"
       ) as HTMLInputElement
 
-      expect(dateInputField).toHaveValue("2020-05-12")
+      expect(dateInputField).toHaveValue("12.05.2020")
       await user.type(dateInputField, "{backspace}")
       expect(modelValue.DATE).toBeUndefined()
     })
@@ -163,10 +162,10 @@ describe("Citation date/year field", () => {
       expect(dateInputField).toBeInTheDocument()
       expect(dateInputField).toBeVisible()
 
-      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.type(dateInputField, "05.12.2020")
       await userEvent.tab()
 
-      expect(dateInputField).toHaveValue("2020-05-12")
+      expect(dateInputField).toHaveValue("05.12.2020")
 
       await changeToYearInput()
 
@@ -208,10 +207,10 @@ describe("Citation date/year field", () => {
       expect(dateInputField).toBeInTheDocument()
       expect(dateInputField).toBeVisible()
 
-      await userEvent.type(dateInputField, "2020-05-12")
+      await userEvent.type(dateInputField, "05.12.2020")
       await userEvent.tab()
 
-      expect(dateInputField).toHaveValue("2020-05-12")
+      expect(dateInputField).toHaveValue("05.12.2020")
 
       await changeToYearInput()
 

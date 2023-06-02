@@ -83,7 +83,7 @@ export const newNorm: NormData = {
         PARTICIPATION_INSTITUTION: ["Neues mitwirkendes Organ 2"],
       },
     ],
-    CITATION_DATE: [{ DATE: ["2022-03-02"] }, { YEAR: ["1990"] }],
+    CITATION_DATE: [{ DATE: ["02.03.2023"] }, { YEAR: ["1990"] }],
     AGE_INDICATION: [
       {
         RANGE_START: ["1 Jahr"],
@@ -118,7 +118,7 @@ export const newNorm: NormData = {
         DIGITAL_ANNOUNCEMENT: [
           {
             ANNOUNCEMENT_MEDIUM: ["ABC"],
-            DATE: ["2023-10-10"],
+            DATE: ["10.10.2023"],
             YEAR: ["2023"],
             EDITION: ["2"],
             AREA_OF_PUBLICATION: ["ABC"],
@@ -148,7 +148,7 @@ export const newNorm: NormData = {
       {
         DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
           {
-            DATE: ["2015-02-23"],
+            DATE: ["23.02.2015"],
             NORM_CATEGORY: [
               NormCategory.BASE_NORM,
               NormCategory.TRANSITIONAL_NORM,
@@ -173,7 +173,7 @@ export const newNorm: NormData = {
       {
         DIVERGENT_EXPIRATION_DEFINED: [
           {
-            DATE: ["1990-10-10"],
+            DATE: ["10.10.1990"],
             NORM_CATEGORY: [
               NormCategory.BASE_NORM,
               NormCategory.TRANSITIONAL_NORM,
@@ -215,7 +215,7 @@ export const newNorm: NormData = {
   officialShortTitle: "officialShortTitle",
   officialAbbreviation: "officialAbbreviation",
   risAbbreviation: "risAbbreviation",
-  publicationDate: "2022-11-01",
+  publicationDate: "01.11.2022",
   isExpirationDateTemp: false,
   celexNumber: "celexNumber",
   completeCitation: "completeCitation",
@@ -225,17 +225,17 @@ export const newNorm: NormData = {
   digitalEvidenceRelatedData: "digitalEvidenceRelatedData",
   documentCategory: "documentCategory",
   documentNumber: "documentNumber",
-  documentStatusDate: "2022-11-01",
+  documentStatusDate: "01.11.2022",
   documentStatusDescription: "documentStatusDescription",
-  documentStatusEntryIntoForceDate: "2022-11-01",
+  documentStatusEntryIntoForceDate: "01.11.2022",
   documentStatusProof: "documentStatusProof",
   documentStatusReference: "documentStatusReference",
   documentStatusWorkNote: "documentStatusWorkNote",
   documentTextProof: "documentTextProof",
-  entryIntoForceDate: "2022-11-01",
+  entryIntoForceDate: "01.11.2022",
   entryIntoForceDateState: "unbestimmt (zukünftig)",
   eli: "europeanLegalIdentifier",
-  expirationDate: "2022-11-01",
+  expirationDate: "01.11.2022",
   expirationDateState: "unbestimmt (unbekannt)",
   otherDocumentNote: "otherDocumentNote",
   otherFootnote: "otherFootnote",
@@ -245,19 +245,19 @@ export const newNorm: NormData = {
   footnoteStateLaw: "footnoteStateLaw",
   footnoteEuLaw: "footnoteEuLaw",
   otherStatusNote: "otherStatusNote",
-  principleEntryIntoForceDate: "2022-11-01",
+  principleEntryIntoForceDate: "01.11.2022",
   principleEntryIntoForceDateState: "nicht vorhanden",
-  principleExpirationDate: "2022-11-01",
+  principleExpirationDate: "01.11.2022",
   principleExpirationDateState: "unbestimmt (zukünftig)",
   reissueArticle: "reissueArticle",
-  reissueDate: "2022-11-01",
+  reissueDate: "01.11.2022",
   reissueNote: "reissueNote",
   reissueReference: "reissueReference",
   repealArticle: "repealArticle",
-  repealDate: "2022-11-01",
+  repealDate: "01.11.2022",
   repealNote: "repealNote",
   repealReferences: "repealReferences",
-  statusDate: "2022-11-01",
+  statusDate: "01.11.2022",
   statusDescription: "statusDescription",
   statusNote: "statusNote",
   statusReference: "statusReference",

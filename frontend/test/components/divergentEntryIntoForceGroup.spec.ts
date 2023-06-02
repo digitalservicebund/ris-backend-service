@@ -70,12 +70,11 @@ describe("DivergentEntryIntoForceGroup", () => {
 
     expect(divergentEntryIntoForceDefinedDate).toBeInTheDocument()
     expect(divergentEntryIntoForceDefinedDate).toBeVisible()
-    expect(divergentEntryIntoForceDefinedDate?.type).toBe("date")
 
-    await userEvent.type(divergentEntryIntoForceDefinedDate, "2020-05-12")
+    await userEvent.type(divergentEntryIntoForceDefinedDate, "12.05.2020")
     await userEvent.tab()
 
-    expect(divergentEntryIntoForceDefinedDate).toHaveValue("2020-05-12")
+    expect(divergentEntryIntoForceDefinedDate).toHaveValue("12.05.2020")
 
     await fireEvent.click(divergentEntryIntoForceUndefinedSelection)
 
@@ -120,7 +119,7 @@ describe("DivergentEntryIntoForceGroup", () => {
       "Bestimmtes abweichendes Inkrafttretedatum Date Input"
     ) as HTMLInputElement
     expect(divergentEntryIntoForceDefinedDate).toBeVisible()
-    expect(divergentEntryIntoForceDefinedDate).toHaveValue("2020-05-12")
+    expect(divergentEntryIntoForceDefinedDate).toHaveValue("12.05.2020")
   })
 
   it("should by default render the  DivergentEntryIntoForceInputGroup if modelValue is empty", function () {

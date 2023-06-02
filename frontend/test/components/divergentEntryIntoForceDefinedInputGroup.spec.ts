@@ -56,7 +56,7 @@ describe("DivergentEntryIntoForceDefinedInputGroup", () => {
     } = getControls()
 
     expect(dateInput).toBeInTheDocument()
-    expect(dateInput).toHaveValue("2023-01-01")
+    expect(dateInput).toHaveValue("01.01.2023")
     expect(amendmentNormCheckBox).toBeChecked()
     expect(baseNormCheckBox).toBeChecked()
     expect(transitionalNormCheckBox).toBeChecked()
@@ -74,7 +74,7 @@ describe("DivergentEntryIntoForceDefinedInputGroup", () => {
       transitionalNormCheckBox,
     } = getControls()
 
-    await userEvent.type(dateInput, "2020-05-12")
+    await userEvent.type(dateInput, "12.05.2020")
     await userEvent.tab()
 
     await user.click(amendmentNormCheckBox)
@@ -110,7 +110,7 @@ describe("DivergentEntryIntoForceDefinedInputGroup", () => {
       transitionalNormCheckBox,
     } = getControls()
 
-    expect(dateInput).toHaveValue("2020-05-12")
+    expect(dateInput).toHaveValue("12.05.2020")
     await user.type(dateInput, "{backspace}")
     expect(modelValue.DATE).toBeUndefined()
 

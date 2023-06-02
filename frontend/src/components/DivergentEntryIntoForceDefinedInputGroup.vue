@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue"
 import { Metadata, MetadataSectionName, NormCategory } from "@/domain/Norm"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
-import DateInput from "@/shared/components/input/DateInput.vue"
+import DateInput from "@/shared/components/input/CustomDateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"

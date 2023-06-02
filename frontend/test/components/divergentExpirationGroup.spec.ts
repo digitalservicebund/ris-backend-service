@@ -86,12 +86,11 @@ describe("DivergentExpirationGroup", () => {
 
     expect(Date).toBeInTheDocument()
     expect(Date).toBeVisible()
-    expect(Date?.type).toBe("date")
 
-    await userEvent.type(Date, "2020-05-12")
+    await userEvent.type(Date, "12.05.2020")
     await userEvent.tab()
 
-    expect(Date).toHaveValue("2020-05-12")
+    expect(Date).toHaveValue("12.05.2020")
 
     await fireEvent.click(divergentExpirationUndefinedSelection)
 
@@ -137,7 +136,7 @@ describe("DivergentExpirationGroup", () => {
     ) as HTMLInputElement
 
     expect(divergentExpirationDefinedDate).toBeVisible()
-    expect(divergentExpirationDefinedDate).toHaveValue("2020-05-12")
+    expect(divergentExpirationDefinedDate).toHaveValue("12.05.2020")
   })
 
   it("should by default render the  DivergentExpirationDefinedInputGroup if modelValue is empty", function () {

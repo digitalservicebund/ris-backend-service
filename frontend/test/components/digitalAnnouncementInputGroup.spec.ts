@@ -15,8 +15,8 @@ function getControls() {
     name: "Verkündungsmedium",
   }) as HTMLInputElement
 
-  const dateInput = screen.getByLabelText("Verkündungsdatum", {
-    selector: 'input[type="date"]',
+  const dateInput = screen.queryByRole("textbox", {
+    name: "Verkündungsdatum",
   }) as HTMLInputElement
 
   const editionInput = screen.queryByRole("textbox", {
@@ -95,7 +95,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     expect(announcementMediumInput).toHaveValue("test value")
 
     expect(dateInput).toBeInTheDocument()
-    expect(dateInput).toHaveValue("2023-01-01")
+    expect(dateInput).toHaveValue("01.01.2023")
 
     expect(editionInput).toBeInTheDocument()
     expect(editionInput).toHaveValue("test value")
@@ -137,11 +137,12 @@ describe("DigitalAnnouncementInputGroup", () => {
     const announcementMediumInput = screen.queryByDisplayValue("foo")
     expect(announcementMediumInput).toBeInTheDocument()
 
-    const dateInput = screen.getByLabelText("Verkündungsdatum", {
-      selector: 'input[type="date"]',
+    const dateInput = screen.queryByRole("textbox", {
+      name: "Verkündungsdatum",
     }) as HTMLInputElement
+
     expect(dateInput).toBeInTheDocument()
-    expect(dateInput).toHaveValue("2023-01-01")
+    expect(dateInput).toHaveValue("01.01.2023")
 
     const editionInput = screen.queryByDisplayValue("1")
     expect(editionInput).toBeInTheDocument()
@@ -184,7 +185,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     } = getControls()
 
     await user.type(announcementMediumInput, "foo")
-    await user.type(dateInput, "2023-04-05")
+    await user.type(dateInput, "05.04.2023")
     await user.type(editionInput, "1")
     await user.type(yearInput, "2023")
     await user.type(areaOfPublicationInput, "baz baz")
@@ -238,7 +239,7 @@ describe("DigitalAnnouncementInputGroup", () => {
     await user.clear(announcementMediumInput)
     expect(modelValue.ANNOUNCEMENT_MEDIUM).toBeUndefined()
 
-    expect(dateInput).toHaveValue("2023-04-05")
+    expect(dateInput).toHaveValue("05.04.2023")
     await user.type(dateInput, "{backspace}")
     expect(modelValue.DATE).toBeUndefined()
 

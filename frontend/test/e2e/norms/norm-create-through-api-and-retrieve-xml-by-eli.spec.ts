@@ -61,8 +61,16 @@ testWithImportedNorm(
     xmlDOM.window.document
       .querySelectorAll("akn\\:FRBRdate")
       .forEach((frbrDate) => {
+        // Our fixtures contain dates in the format a user would use (ie. DD.MM.YYYY),
+        // so we need to convert them back into the format required by the XML.
+        let announcementDate = ""
+        if (norm.announcementDate) {
+          const [day, month, year] = norm.announcementDate.split(".")
+          announcementDate = `${year}-${month}-${day}`
+        }
+
         // eslint-disable-next-line jest-dom/prefer-to-have-attribute
-        expect(frbrDate.getAttribute("date")).toBe(norm.announcementDate)
+        expect(frbrDate.getAttribute("date")).toBe(announcementDate)
       })
 
     // eslint-disable-next-line jest-dom/prefer-to-have-attribute

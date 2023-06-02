@@ -72,7 +72,7 @@ export const normData: NormData = {
       { PARTICIPATION_TYPE: ["EZ"], PARTICIPATION_INSTITUTION: ["BR"] },
       { PARTICIPATION_TYPE: ["RU"], PARTICIPATION_INSTITUTION: ["NT"] },
     ],
-    CITATION_DATE: [{ DATE: ["2023-01-02"] }, { DATE: ["2001-03-10"] }],
+    CITATION_DATE: [{ DATE: ["02.01.2023"] }, { DATE: ["10.03.2001"] }],
     AGE_INDICATION: [
       { RANGE_START: ["Lebensjahr 28"] },
       { RANGE_START: ["Monate 8"] },
@@ -111,7 +111,7 @@ export const normData: NormData = {
       {
         DIVERGENT_ENTRY_INTO_FORCE_DEFINED: [
           {
-            DATE: ["2023-01-13"],
+            DATE: ["13.01.2023"],
             NORM_CATEGORY: [NormCategory.BASE_NORM],
           },
         ],
@@ -141,7 +141,7 @@ export const normData: NormData = {
     DIVERGENT_EXPIRATION: [
       {
         DIVERGENT_EXPIRATION_DEFINED: [
-          { DATE: ["2023-01-13"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
+          { DATE: ["13.01.2023"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
         ],
       },
       {
@@ -166,11 +166,11 @@ export const normData: NormData = {
   officialShortTitle: "Angepasstes Tierarzneimittelrecht",
   risAbbreviation: "Tierarznei",
   documentCategory: "NR",
-  entryIntoForceDate: "2007-01-01",
-  principleEntryIntoForceDate: "2007-01-01",
+  entryIntoForceDate: "01.01.2007",
+  principleEntryIntoForceDate: "01.01.2007",
   expirationDateState: "unbestimmt (unbekannt)",
   principleExpirationDateState: "unbestimmt (unbekannt)",
-  announcementDate: "2023-01-06",
+  announcementDate: "06.01.2023",
   printAnnouncementGazette: "BGBl I",
   printAnnouncementYear: "2023",
   printAnnouncementPage: "3",
