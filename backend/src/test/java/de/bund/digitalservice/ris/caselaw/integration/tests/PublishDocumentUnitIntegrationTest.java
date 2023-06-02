@@ -96,6 +96,9 @@ class PublishDocumentUnitIntegrationTest {
             .creationtimestamp(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+
+    assertThat(repository.findAll().collectList().block()).hasSize(1);
+
     XmlMailDTO expectedXmlMailDTO =
         new XmlMailDTO(
             1L,
@@ -134,6 +137,8 @@ class PublishDocumentUnitIntegrationTest {
         .expectBody(XmlMailResponse.class)
         .consumeWith(
             response -> {
+              System.out.println(response);
+
               assertThat(response.getResponseBody())
                   .usingRecursiveComparison()
                   .ignoringFields("publishDate")

@@ -781,7 +781,8 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             statusDTO -> {
               documentUnitDTO.setStatus(statusDTO.getStatus());
               return documentUnitDTO;
-            });
+            })
+        .defaultIfEmpty(documentUnitDTO);
   }
 
   public Flux<ProceedingDecision> searchByProceedingDecision(

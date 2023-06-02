@@ -14,6 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import de.bund.digitalservice.ris.caselaw.adapter.DatabaseDocumentUnitStatusService;
 import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Arrays;
@@ -47,7 +48,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 import software.amazon.awssdk.services.s3.model.S3Exception;
 
 @ExtendWith(SpringExtension.class)
-@Import(DocumentUnitService.class)
+@Import({DocumentUnitService.class, DatabaseDocumentUnitStatusService.class})
 @TestPropertySource(properties = "otc.obs.bucket-name:testBucket")
 class DocumentUnitServiceTest {
   private static final UUID TEST_UUID = UUID.fromString("88888888-4444-4444-4444-121212121212");
@@ -62,14 +63,19 @@ class DocumentUnitServiceTest {
 
   @MockBean private EmailPublishService publishService;
 
+  @MockBean private DatabaseDocumentUnitStatusService documentUnitStatusService;
+
   @Test
   void testGenerateNewDocumentUnit() {
     DocumentationOffice documentationOffice = DocumentationOffice.builder().build();
+    DocumentUnit documentUnit = DocumentUnit.builder().build();
 
     when(repository.createNewDocumentUnit("nextDocumentNumber", documentationOffice))
-        .thenReturn(Mono.just(DocumentUnit.builder().build()));
+        .thenReturn(Mono.just(documentUnit));
     when(documentNumberService.generateNextDocumentNumber(documentationOffice))
         .thenReturn(Mono.just("nextDocumentNumber"));
+    when(documentUnitStatusService.setInitialStatus(documentUnit))
+        .thenReturn(Mono.just(documentUnit));
     // Can we use a captor to check if the document number was correctly created?
     // The chicken-egg-problem is, that we are dictating what happens when
     // repository.save(), so we can't just use a captor at the same time
