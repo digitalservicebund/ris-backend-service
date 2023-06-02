@@ -167,7 +167,7 @@ public class JurisXmlExporterWrapperIntegrationTest {
             List.of("keyword1", "keyword2"),
             List.of(
                 FieldOfLaw.builder().id(1L).identifier("SF-01").text("field of law text").build()),
-            List.of(DocumentUnitNorm.builder().risAbbreviation("RIS").singleNorm("01").build()));
+            List.of(DocumentUnitNorm.builder().singleNorm("01").build()));
 
     DocumentUnit documentUnit =
         DocumentUnit.builder()

@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseCourtRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseDocumentTypeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseFieldOfLawRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.DatabaseNormAbbreviationRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
@@ -39,6 +40,7 @@ class PostgresDocumentUnitRepositoryImplTest {
   @MockBean private DatabaseDocumentUnitNormRepository documentUnitNormRepository;
   @MockBean private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   @MockBean private DatabaseDocumentUnitStatusRepository databaseDocumentUnitStatusRepository;
+  @MockBean private DatabaseNormAbbreviationRepository normAbbreviationRepository;
 
   @BeforeEach
   public void setup() {
@@ -59,7 +61,8 @@ class PostgresDocumentUnitRepositoryImplTest {
             keywordRepository,
             documentUnitNormRepository,
             documentationOfficeRepository,
-            databaseDocumentUnitStatusRepository);
+            databaseDocumentUnitStatusRepository,
+            normAbbreviationRepository);
   }
 
   @Test
