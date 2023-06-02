@@ -237,7 +237,7 @@ interface NormsMapper {
         }
     }
 
-    // TODO Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
+    // TODO RISDEV-1813 Add UNOFFICIAL_LONG_TITLE & UNOFFICIAL_SHORT_TITLE once all metadata are migrated
     fun queryFieldToDbColumn(field: QueryFields): String {
         return when (field) {
             QueryFields.PRINT_ANNOUNCEMENT_PAGE -> "print_announcement_page"

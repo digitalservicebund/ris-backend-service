@@ -1,13 +1,7 @@
 import userEvent from "@testing-library/user-event"
 import { fireEvent, render, screen } from "@testing-library/vue"
-import dayjs from "dayjs"
-import timezone from "dayjs/plugin/timezone"
-import utc from "dayjs/plugin/utc"
 import { nextTick } from "vue"
 import ChipsDateInput from "@/shared/components/input/ChipsDateInput.vue"
-
-dayjs.extend(utc)
-dayjs.extend(timezone)
 
 function renderComponent(options?: {
   ariaLabel?: string
@@ -28,14 +22,6 @@ function renderComponent(options?: {
 }
 
 describe("ChipsInput", () => {
-  beforeEach(() => {
-    dayjs.tz.setDefault("Europe/Berlin")
-  })
-
-  afterEach(() => {
-    dayjs.tz.setDefault()
-  })
-
   it("shows a chips input element", () => {
     renderComponent({
       ariaLabel: "test-label",

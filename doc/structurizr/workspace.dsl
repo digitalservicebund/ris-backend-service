@@ -4,7 +4,9 @@ workspace {
         caselawDocumentary = person "Caselaw Documentary" 
         normsDocumentary = person "Norms Documentary"
         systemAdministrator = person "System Administrator"
-        human = person "User"
+        user = person "User"
+        publicUser = person "Public User" "A public human user" "future"
+
 
         group "DigitalService" {
             ris = softwareSystem "RIS" {
@@ -14,6 +16,9 @@ workspace {
                 sessionStore = container "Nutzersession Speicher" "Speicher Nutzersession zwischen" "Redis" "datastore"
                 database = container "Datenbank" "Speichert alle Dokumente und Tabellen" "Postgresql" "datastore"
                 fileStore = container "Datei Speicher" "Speichert alle Dokumente und Tabellen" "S3 compatible" "datastore"
+                publicationStore = container "Publikationsspeicher" "Speichert die öffentlich verfügbaren Dokumente für das Portal" "S3(?), LegalDocML" "datastore,future"
+                portalBackend = container "Portal API-Anwendung" "Indiziert und stellt Suchfunktion" "Java(?)" "future"
+                portalFrontend = container "Portal Web-Anwendung" "Grafisches Nutzerinterface zur Recherche" "Typescript, Vue (?)" "future"
             }
         }
         
@@ -39,14 +44,15 @@ workspace {
 
         eLegislation -> ris "search norms"
 
-        human -> openIdProvider "authentifiziert sich" "HTTPS"
+        user -> openIdProvider "authentifiziert sich" "HTTPS"
         normsDocumentary -> openIdProvider "authentifiziert sich" "HTTPS"
         caselawDocumentary -> openIdProvider "authentifiziert sich" "HTTPS"
         systemAdministrator -> openIdProvider "verwaltet Nutzer" "HTTPS"
 
+        publicUser -> portalFrontend "nutzt" "HTTPS"
 
         # relationships to/from containers
-        human -> risFrontend "nutzt" "HTTPS"
+        user -> risFrontend "nutzt" "HTTPS"
         normsDocumentary -> risFrontend "nutzt" "HTTPS"
         caselawDocumentary -> risFrontend "nutzt" "HTTPS"
         
@@ -60,7 +66,11 @@ workspace {
         risBackend -> fileStore "speichern & lesen" "S3 Protocol"
         risBackend -> openIdProvider "prüft Nutzer" "HTTPS"
         risBackend -> emailApiProvider "sendet E-Mails" "XML, HTTPS"
+        risBackend -> publicationStore "publiziert nach" "LegalDocML, HTTPS"
 
+        portalFrontend -> portalBackend "nutzt" "HTTPS"
+        portalFrontend -> publicationStore "verweist auf" "HTTPS"
+        portalBackend -> publicationStore "indiziert" "HTTPS(?)"
 
         # relationships to/from components
 
@@ -93,7 +103,7 @@ workspace {
     views {
         systemContext ris "SystemContext" {
             include *
-            exclude human
+            exclude user
             exclude openIdProvider
             exclude emailApiProvider
         }
@@ -109,6 +119,7 @@ workspace {
             exclude caselawDocumentary
             exclude normsDocumentary
             exclude systemAdministrator
+            exclude publicUser
         }
 
         styles {
@@ -131,6 +142,9 @@ workspace {
             }
             element "saas" {
                 background grey
+            }
+            element "future" {
+                background #DB005B
             }
 
         }
