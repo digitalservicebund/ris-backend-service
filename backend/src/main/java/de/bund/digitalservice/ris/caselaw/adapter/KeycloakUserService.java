@@ -16,11 +16,18 @@ public class KeycloakUserService implements UserService {
   private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
 
   private static final Map<String, String> documentationCenterClaims =
-      Map.of(
-          "/caselaw/BGH", "BGH",
-          "/caselaw/BVerfG", "BVerfG",
-          "/DigitalService", "DigitalService",
-          "/tester/CC-RIS", "CC-RIS");
+      Map.ofEntries(
+          Map.entry("/caselaw/BGH", "BGH"),
+          Map.entry("/caselaw/BVerfG", "BVerfG"),
+          Map.entry("/caselaw/BAG", "BAG"),
+          Map.entry("/caselaw/BFH", "BFH"),
+          Map.entry("/caselaw/BPatG", "BPatG"),
+          Map.entry("/caselaw/BSG", "BSG"),
+          Map.entry("/caselaw/BVerwG", "BVerwG"),
+          Map.entry("/caselaw/OVG_NRW", "OVG NRW"),
+          Map.entry("/caselaw/BZSt", "BZSt"),
+          Map.entry("/DigitalService", "DigitalService"),
+          Map.entry("/CC-RIS", "CC-RIS"));
 
   public KeycloakUserService(DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
     this.documentationOfficeRepository = documentationOfficeRepository;
