@@ -3,9 +3,12 @@ import { ref, computed } from "vue"
 import { RouterLink } from "vue-router"
 import CodeSnippet from "@/components/CodeSnippet.vue"
 import DocumentUnit from "@/domain/documentUnit"
-import ProceedingDecision from "@/domain/proceedingDecision"
+import NormReference, { normFieldLabels } from "@/domain/normReference"
+import ProceedingDecision, {
+  proceedingDecisionFieldLabels,
+} from "@/domain/proceedingDecision"
 import XmlMail from "@/domain/xmlMail"
-import { fieldLabels, proceedingDecisionFieldLabels } from "@/fields/caselaw"
+import { fieldLabels } from "@/fields/caselaw"
 import { ResponseError } from "@/services/httpClient"
 import { InfoStatus } from "@/shared/components/enumInfoStatus"
 import InfoModal from "@/shared/components/InfoModal.vue"
@@ -66,34 +69,69 @@ function selectAll(event: Event) {
   ;(event.target as HTMLInputElement).select()
 }
 
-const missingFields = ref(
+//Required Core Data fields
+const missingCoreDataFields = ref(
   props.documentUnit.missingRequiredFields.map((field) => fieldLabels[field])
 )
 
+//Required Proceeding Decision fields
 const missingProceedingDecisionFields = ref(
   props.documentUnit.proceedingDecisions
     ?.filter((proceedingDecision) => {
-      return getMissingFields(proceedingDecision).length > 0
+      return getMissingProceedingDecisionFields(proceedingDecision).length > 0
     })
     .map((proceedingDecision) => {
       return {
         identifier: proceedingDecision.renderDecision,
-        missingFields: getMissingFields(proceedingDecision),
+        missingFields: getMissingProceedingDecisionFields(proceedingDecision),
       }
     })
 )
 
-const fieldsMissing = computed(() =>
-  missingFields.value.length || missingProceedingDecisionFields.value?.length
-    ? true
-    : false
-)
-
-function getMissingFields(proceedingDecision: ProceedingDecision) {
+function getMissingProceedingDecisionFields(
+  proceedingDecision: ProceedingDecision
+) {
   return proceedingDecision.missingRequiredFields.map(
     (field) => proceedingDecisionFieldLabels[field]
   )
 }
+
+//Required Norms fields
+const missingNormsFields = ref(
+  props.documentUnit.contentRelatedIndexing?.norms
+    ?.filter((normReference) => {
+      return getMissingNormsFields(normReference).length > 0
+    })
+    .map((normReference) => {
+      return {
+        identifier: normReference.renderDecision,
+        missingFields: getMissingNormsFields(normReference),
+      }
+    })
+)
+
+function getMissingNormsFields(normReference: NormReference) {
+  if (
+    normReference.normAbbreviation === null &&
+    normReference.singleNorm === null &&
+    normReference.dateOfRelevance === null &&
+    normReference.dateOfVersion === null
+  )
+    return []
+  else {
+    return normReference.missingRequiredFields.map(
+      (field) => normFieldLabels[field]
+    )
+  }
+}
+
+const fieldsMissing = computed(() =>
+  missingCoreDataFields.value.length ||
+  missingProceedingDecisionFields.value?.length ||
+  missingNormsFields.value?.length
+    ? true
+    : false
+)
 </script>
 
 <template>
@@ -116,7 +154,7 @@ function getMissingFields(proceedingDecision: ProceedingDecision) {
             </p>
             <ul class="list-disc">
               <li
-                v-for="field in missingFields"
+                v-for="field in missingCoreDataFields"
                 :key="field"
                 class="body-01-reg list-item ml-[1rem]"
               >
@@ -134,6 +172,27 @@ function getMissingFields(proceedingDecision: ProceedingDecision) {
                   <li
                     v-for="fields in missingProceedingDecisionFields"
                     :key="missingProceedingDecisionFields.indexOf(fields)"
+                    class="body-01-reg list-item ml-[1rem]"
+                  >
+                    <div v-if="fields && fields.missingFields.length > 0">
+                      <span>{{ fields.identifier }}</span>
+                      -
+                      <span class="label-02-bold">{{
+                        fields.missingFields.join(", ")
+                      }}</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+              <li
+                v-if="missingNormsFields && missingNormsFields.length > 0"
+                class="body-01-reg list-item ml-[1rem]"
+              >
+                Normen
+                <ul>
+                  <li
+                    v-for="fields in missingNormsFields"
+                    :key="missingNormsFields.indexOf(fields)"
                     class="body-01-reg list-item ml-[1rem]"
                   >
                     <div v-if="fields && fields.missingFields.length > 0">

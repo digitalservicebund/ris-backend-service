@@ -1,5 +1,5 @@
 import DocumentationOffice from "./documentationOffice"
-import { NormReference } from "./normReference"
+import NormReference from "./normReference"
 import ProceedingDecision from "./proceedingDecision"
 
 export type CoreData = {
@@ -93,6 +93,11 @@ export default class DocumentUnit {
     if (data.proceedingDecisions)
       data.proceedingDecisions = data.proceedingDecisions.map(
         (decision) => new ProceedingDecision({ ...decision })
+      )
+
+    if (data.contentRelatedIndexing?.norms)
+      data.contentRelatedIndexing.norms = data.contentRelatedIndexing.norms.map(
+        (norm) => new NormReference({ ...norm })
       )
 
     Object.assign(this, data)

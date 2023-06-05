@@ -28,7 +28,7 @@ describe("NormReferenceEntry", () => {
         singleNorm: "12",
         dateOfVersion: "2022-01-31T23:00:00Z",
         dateOfRelevance: "2023",
-      },
+      } as NormReference,
     })
 
     const abbreviationField = screen.getByLabelText("RIS-Abkürzung")

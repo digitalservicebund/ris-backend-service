@@ -220,4 +220,29 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
 
     await expect(page.locator("text=Letzte Veröffentlichung am")).toBeVisible()
   })
+
+  test("publication not possible when required norm abbreviation missing", async ({
+    page,
+    documentNumber,
+  }) => {
+    await navigateToCategories(page, documentNumber)
+
+    await waitForSaving(
+      async () => {
+        await page.locator("[aria-label='Einzelnorm']").fill("abc")
+      },
+      page,
+      { clickSaveButton: true }
+    )
+
+    await navigateToPublication(page, documentNumber)
+
+    await expect(
+      page.locator(
+        "text=Die folgenden Rubriken-Pflichtfelder sind nicht befüllt:"
+      )
+    ).toBeVisible()
+
+    await expect(page.locator("text=Normen abc - RIS-Abkürzung")).toBeVisible()
+  })
 })

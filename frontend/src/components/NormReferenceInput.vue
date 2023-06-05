@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
-import { NormReference } from "@/domain/normReference"
+import NormReference from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
@@ -13,7 +13,7 @@ const emit =
 
 const norm = computed({
   get() {
-    return props.modelValue ?? {}
+    return (props.modelValue as NormReference) ?? {}
   },
   set(value) {
     emit("update:modelValue", value)
@@ -29,12 +29,12 @@ const normAbbreviation = computed({
         }
       : undefined,
   set: (newValue) => {
-    let normRef = norm.value
+    let normRef = new NormReference()
     if (newValue) {
-      normRef = {
+      normRef = new NormReference({
         ...norm.value,
         normAbbreviation: newValue,
-      }
+      })
     } else delete normRef.normAbbreviation
     emit("update:modelValue", normRef)
   },

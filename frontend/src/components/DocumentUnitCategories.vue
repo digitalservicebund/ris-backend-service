@@ -94,7 +94,7 @@ const coreData = computed({
 })
 
 const contentRelatedIndexing = computed({
-  get: () => updatedDocumentUnit.value.contentRelatedIndexing,
+  get: () => (updatedDocumentUnit.value as DocumentUnit).contentRelatedIndexing,
   set: (newValues) => {
     Object.assign(updatedDocumentUnit.value.contentRelatedIndexing, newValues)
   },

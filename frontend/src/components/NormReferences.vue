@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import dayjs from "dayjs"
 import { computed, h } from "vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
@@ -26,20 +25,7 @@ const norms = computed({
 const defaultValue = {}
 
 function decisionSummarizer(normEntry: NormReference) {
-  return h(
-    "div",
-    { class: ["link-02-reg"] },
-    [
-      ...(normEntry.normAbbreviation?.abbreviation
-        ? [`${normEntry.normAbbreviation?.abbreviation}`]
-        : []),
-      ...(normEntry.singleNorm ? [normEntry.singleNorm] : []),
-      ...(normEntry.dateOfVersion
-        ? [dayjs(normEntry.dateOfVersion).format("DD.MM.YYYY")]
-        : []),
-      ...(normEntry.dateOfRelevance ? [normEntry.dateOfRelevance] : []),
-    ].join(", ")
-  )
+  return h("div", { class: ["link-02-reg"] }, normEntry.renderDecision)
 }
 
 const NormsSummary = withSummarizer(decisionSummarizer)
