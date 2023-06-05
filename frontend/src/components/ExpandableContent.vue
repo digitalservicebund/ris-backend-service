@@ -43,7 +43,7 @@ watch(isExpanded, () => emit("update:isExpanded", isExpanded.value))
   <div>
     <button
       :aria-labelledby="headerId"
-      class="flex justify-between w-full"
+      class="flex focus-visible:outline-blue-800 focus:outline-none justify-between w-full"
       @click="toggleContentVisibility"
     >
       <slot name="header">
