@@ -3,6 +3,7 @@ import dayjs from "dayjs"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
+import { useStatusBadge } from "@/composables/useStatusBadge"
 import { useToggleStateInRouteQuery } from "@/composables/useToggleStateInRouteQuery"
 import DocumentUnit from "@/domain/documentUnit"
 import DocumentUnitInfoPanel from "@/shared/components/DocumentUnitInfoPanel.vue"
@@ -37,25 +38,7 @@ const documentationOffice = computed(
 
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)
 
-const statusBadge = computed(() => {
-  if (props.documentUnit.status == "PUBLISHED") {
-    return {
-      label: "status",
-      value: "veröffentlicht",
-      icon: "campaign",
-      color: "black",
-    }
-  }
-  if (props.documentUnit.status == "UNPUBLISHED") {
-    return {
-      label: "status",
-      value: "unveröffentlicht",
-      icon: "disabled_visible",
-      color: "black",
-    }
-  }
-  return null
-})
+const statusBadge = useStatusBadge(props.documentUnit.status)
 
 const firstRowInfos = computed(() => [
   ...(statusBadge.value ? [statusBadge.value] : []),

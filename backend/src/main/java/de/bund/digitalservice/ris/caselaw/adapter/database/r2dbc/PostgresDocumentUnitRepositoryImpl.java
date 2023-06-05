@@ -936,6 +936,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                     .documentationOffice(
                         DocumentationOfficeTransformer.transformDTO(
                             documentUnitDTO.getDocumentationOffice()))
+                    .status(documentUnitDTO.getStatus())
                     .build());
   }
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import IconBadge from "@/shared/components/IconBadge.vue"
+import IconBadge, { IconBadgeProps } from "@/shared/components/IconBadge.vue"
 import PropertyInfo from "@/shared/components/PropertyInfo.vue"
 
 interface PropertyInfo {
@@ -7,17 +7,10 @@ interface PropertyInfo {
   value?: string
 }
 
-interface IconBadge {
-  label: string
-  value: string
-  icon: string
-  color: string
-}
-
 interface Props {
   heading?: string
-  firstRow?: (PropertyInfo | IconBadge)[]
-  secondRow?: (PropertyInfo | IconBadge)[]
+  firstRow?: (PropertyInfo | IconBadgeProps)[]
+  secondRow?: (PropertyInfo | IconBadgeProps)[]
 }
 
 withDefaults(defineProps<Props>(), {
@@ -26,7 +19,9 @@ withDefaults(defineProps<Props>(), {
   secondRow: () => [],
 })
 
-function isBadge(entry: PropertyInfo | IconBadge): entry is IconBadge {
+function isBadge(
+  entry: PropertyInfo | IconBadgeProps
+): entry is IconBadgeProps {
   return "icon" in entry
 }
 </script>

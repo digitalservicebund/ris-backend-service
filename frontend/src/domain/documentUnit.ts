@@ -52,7 +52,7 @@ export default class DocumentUnit {
   readonly id?: string
   readonly documentNumber?: string
   readonly creationtimestamp?: string
-  readonly status?: "PUBLISHED" | "UNPUBLISHED" | "UNKNOWN"
+  readonly status?: "PUBLISHED" | "UNPUBLISHED"
 
   public fileuploadtimestamp?: string
   public s3path?: string

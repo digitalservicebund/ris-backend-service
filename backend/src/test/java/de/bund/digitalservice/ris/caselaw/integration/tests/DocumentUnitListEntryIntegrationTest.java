@@ -141,6 +141,8 @@ public class DocumentUnitListEntryIntegrationTest {
         .isEqualTo("AkteX")
         .jsonPath("$.content[0].documentationOffice.label")
         .isEqualTo("BGH")
+        .jsonPath("$.content[0].status")
+        .isEqualTo("PUBLISHED")
         .jsonPath("$.totalElements")
         .isEqualTo(1);
   }

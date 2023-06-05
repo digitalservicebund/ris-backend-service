@@ -1,13 +1,24 @@
 <script lang="ts" setup>
 import dayjs from "dayjs"
-import { ref } from "vue"
+import { computed, ref } from "vue"
 import { DocumentUnitListEntry } from "../domain/documentUnitListEntry"
+import { useStatusBadge } from "@/composables/useStatusBadge"
+import IconBadge from "@/shared/components/IconBadge.vue"
 import PopupModal from "@/shared/components/PopupModal.vue"
 
-defineProps<{ documentUnitListEntries: DocumentUnitListEntry[] }>()
+const props = defineProps<{
+  documentUnitListEntries: DocumentUnitListEntry[]
+}>()
 const emit = defineEmits<{
   (e: "deleteDocumentUnit", documentUnitListEntry: DocumentUnitListEntry): void
 }>()
+
+const listEntriesWithStatus = computed(() =>
+  props.documentUnitListEntries.map((entry) => ({
+    ...entry,
+    status: useStatusBadge(entry.status).value,
+  }))
+)
 
 const showModal = ref(false)
 const popupModalText = ref("")
@@ -16,7 +27,7 @@ const modalHeaderText = "Dokumentationseinheit löschen"
 const modalCancelButtonType = "ghost"
 const modalConfirmButtonType = "secondary"
 const selectedDocumentUnitListEntry = ref<DocumentUnitListEntry>()
-const toggleModal = () => {
+function toggleModal() {
   showModal.value = !showModal.value
   if (showModal.value) {
     const scrollLeft = document.documentElement.scrollLeft
@@ -30,14 +41,14 @@ const toggleModal = () => {
     }
   }
 }
-const setSelectedDocumentUnitListEntry = (
+function setSelectedDocumentUnitListEntry(
   documentUnitListEntry: DocumentUnitListEntry
-) => {
+) {
   selectedDocumentUnitListEntry.value = documentUnitListEntry
   popupModalText.value = `Möchten Sie die Dokumentationseinheit ${selectedDocumentUnitListEntry.value.documentNumber} wirklich dauerhaft löschen?`
   toggleModal()
 }
-const onDelete = () => {
+function onDelete() {
   if (selectedDocumentUnitListEntry.value) {
     emit("deleteDocumentUnit", selectedDocumentUnitListEntry.value)
     toggleModal()
@@ -69,61 +80,70 @@ const onDelete = () => {
         <div class="table-cell">Angelegt am</div>
         <div class="table-cell">Aktenzeichen</div>
         <div class="table-cell">DokStelle</div>
+        <div class="table-cell">Status</div>
         <div class="table-cell">Dokumente</div>
         <div class="table-cell">Löschen</div>
       </div>
       <div
-        v-for="documentUnitListEntry in documentUnitListEntries"
-        :key="documentUnitListEntry.id"
+        v-for="listEntry in listEntriesWithStatus"
+        :key="listEntry.id"
         class="border-b-2 border-b-gray-100 hover:bg-gray-100 leading-[3] table-row text-18"
       >
         <div class="px-[16px] py-0 table-cell">
           <router-link
             class="underline"
             :to="{
-              name: documentUnitListEntry.fileName
+              name: listEntry.fileName
                 ? 'caselaw-documentUnit-:documentNumber-categories'
                 : 'caselaw-documentUnit-:documentNumber-files',
-              params: { documentNumber: documentUnitListEntry.documentNumber },
+              params: { documentNumber: listEntry.documentNumber },
             }"
           >
-            {{ documentUnitListEntry.documentNumber }}
+            {{ listEntry.documentNumber }}
           </router-link>
         </div>
         <div class="px-[16px] py-0 table-cell">
-          {{
-            dayjs(documentUnitListEntry.creationTimestamp).format("DD.MM.YYYY")
-          }}
+          {{ dayjs(listEntry.creationTimestamp).format("DD.MM.YYYY") }}
+        </div>
+        <div class="px-[16px] py-0 table-cell">
+          {{ listEntry.fileNumber ? listEntry.fileNumber : "-" }}
         </div>
         <div class="px-[16px] py-0 table-cell">
           {{
-            documentUnitListEntry.fileNumber
-              ? documentUnitListEntry.fileNumber
+            listEntry.documentationOffice
+              ? listEntry.documentationOffice.label
               : "-"
           }}
         </div>
         <div class="px-[16px] py-0 table-cell">
-          {{
-            documentUnitListEntry.documentationOffice
-              ? documentUnitListEntry.documentationOffice.label
-              : "-"
-          }}
+          <IconBadge
+            v-if="listEntry.status"
+            :color="listEntry.status.color"
+            :icon="listEntry.status.icon"
+            :value="listEntry.status.value"
+          />
         </div>
         <div class="px-16 py-0 table-cell">
-          {{
-            documentUnitListEntry.fileName
-              ? documentUnitListEntry.fileName
-              : "-"
-          }}
+          {{ listEntry.fileName ? listEntry.fileName : "-" }}
         </div>
         <div class="table-cell text-center">
           <span
             aria-label="Dokumentationseinheit löschen"
             class="cursor-pointer material-icons"
             tabindex="0"
-            @click="setSelectedDocumentUnitListEntry(documentUnitListEntry)"
+            @click="
+              setSelectedDocumentUnitListEntry(
+                documentUnitListEntries.find(
+                  (entry) => entry.uuid == listEntry.uuid
+                ) as DocumentUnitListEntry
+              )
+            "
             @keyup.enter="
-              setSelectedDocumentUnitListEntry(documentUnitListEntry)
+              setSelectedDocumentUnitListEntry(
+                documentUnitListEntries.find(
+                  (entry) => entry.uuid == listEntry.uuid
+                ) as DocumentUnitListEntry
+              )
             "
           >
             delete

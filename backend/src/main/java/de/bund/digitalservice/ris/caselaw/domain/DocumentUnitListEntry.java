@@ -12,4 +12,5 @@ public record DocumentUnitListEntry(
     DataSource dataSource,
     String fileName,
     String fileNumber,
-    DocumentationOffice documentationOffice) {}
+    DocumentationOffice documentationOffice,
+    DocumentUnitStatus status) {}
