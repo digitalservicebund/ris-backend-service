@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.UNPUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
@@ -813,6 +814,36 @@ class DocumentUnitIntegrationTest {
               List<UUID> responseUUIDs2 = uuids.stream().map(UUID::fromString).toList();
 
               assertThat(responseUUIDs2).isEqualTo(responseUUIDs);
+            });
+  }
+
+  @Test
+  void testDefaultStatus() {
+    DocumentUnitDTO dto =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("1234567890123")
+                    .build())
+            .block();
+
+    assertThat(repository.findAll().collectList().block()).hasSize(1);
+
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLogin())
+        .get()
+        .uri("/api/v1/caselaw/documentunits/" + dto.getDocumentnumber())
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(DocumentUnit.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody()).isNotNull();
+              assertThat(response.getResponseBody().status()).isEqualTo(PUBLISHED);
             });
   }
 }

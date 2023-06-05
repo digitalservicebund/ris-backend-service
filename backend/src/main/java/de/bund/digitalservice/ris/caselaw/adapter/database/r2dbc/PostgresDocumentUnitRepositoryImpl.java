@@ -21,6 +21,7 @@ import de.bund.digitalservice.ris.caselaw.domain.DocumentUnit;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitListEntry;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitNorm;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentationOffice;
 import de.bund.digitalservice.ris.caselaw.domain.LegalEffect;
 import de.bund.digitalservice.ris.caselaw.domain.ProceedingDecision;
@@ -807,15 +808,23 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
             });
   }
 
-  private Mono<DocumentUnitDTO> injectStatus(DocumentUnitDTO documentUnitDTO) {
-    return databaseDocumentUnitStatusRepository
-        .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
-        .map(
-            statusDTO -> {
-              documentUnitDTO.setStatus(statusDTO.getStatus());
-              return documentUnitDTO;
-            })
-        .defaultIfEmpty(documentUnitDTO);
+  private <T extends DocumentUnitMetadataDTO> Mono<T> injectStatus(T documentUnitDTO) {
+    return Mono.just(documentUnitDTO)
+        .flatMap(
+            dto ->
+                databaseDocumentUnitStatusRepository
+                    .findFirstByDocumentUnitIdOrderByCreatedAtDesc(documentUnitDTO.uuid)
+                    .map(
+                        statusDTO -> {
+                          dto.setStatus(statusDTO.getStatus());
+                          return dto;
+                        })
+                    .switchIfEmpty(
+                        Mono.defer(
+                            () -> {
+                              dto.setStatus(DocumentUnitStatus.PUBLISHED);
+                              return Mono.just(dto);
+                            })));
   }
 
   public Flux<ProceedingDecision> searchByProceedingDecision(
@@ -910,6 +919,7 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
         .findAllByDataSource(DataSource.NEURIS.name(), pageable)
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentationOffice)
+        .flatMapSequential(this::injectStatus)
         .map(
             documentUnitDTO ->
                 DocumentUnitListEntry.builder()
