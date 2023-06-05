@@ -17,19 +17,20 @@ public interface DatabaseNormAbbreviationRepository
   Flux<NormAbbreviationDTO> findBySearchQuery(String query, Integer size, Integer pageOffset);
 
   @Query(
-      "select *"
-          + " from norm_abbreviation na"
-          + " left outer join norm_abbreviation_region nar"
-          + " on na.id = nar.norm_abbreviation_id"
-          + " left outer join region r"
-          + " on nar.region_id = r.id"
-          + " where"
-          + " to_tsvector('german',"
-          + " coalesce(abbreviation, '') || ' ' ||"
-          + " coalesce(official_long_title, '') || ' ' ||"
-          + " coalesce(official_short_title, '') || ' ' ||"
-          + " coalesce(official_letter_abbreviation, ''))"
-          + " @@ to_tsquery('german', '' || :tsQuery || '')"
+      "select"
+          + " id,"
+          + " abbreviation,"
+          + " decision_date,"
+          + " document_id,"
+          + " document_number,"
+          + " official_letter_abbreviation,"
+          + " official_long_title,"
+          + " official_short_title,"
+          + " source"
+          + " from norm_abbreviation_search"
+          + " where weighted_vector @@ to_tsquery('german', '' || :tsQuery || '')"
+          + " order by"
+          + " ts_rank_cd(weighted_vector, to_tsquery('german', '' || :tsQuery || '')) desc"
           + " limit :size offset :pageOffset")
   Flux<NormAbbreviationDTO> findByAwesomeSearchQuery(
       String tsQuery, Integer size, Integer pageOffset);

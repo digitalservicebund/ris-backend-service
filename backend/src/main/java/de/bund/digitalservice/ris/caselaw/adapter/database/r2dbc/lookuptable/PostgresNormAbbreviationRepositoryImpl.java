@@ -57,9 +57,15 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
     StringBuilder tsQuery = new StringBuilder();
     for (int i = 0; i < queryBlocks.length; i++) {
       if (queryBlocks[i].isBlank()) continue;
-      tsQuery.append(queryBlocks[i]).append(":*");
-      if (i < queryBlocks.length - 1) {
-        tsQuery.append(" & ");
+
+      if (i == 0) {
+        tsQuery.append("(");
+        tsQuery.append(queryBlocks[i]).append(":A*");
+        tsQuery.append(" | ");
+        tsQuery.append(queryBlocks[i]).append(":*");
+        tsQuery.append(")");
+      } else {
+        tsQuery.append(" & ").append(queryBlocks[i]).append(":*");
       }
     }
 
