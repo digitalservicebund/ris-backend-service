@@ -19,7 +19,6 @@ const currentPage = ref<Page<FieldOfLawNode>>()
 const itemsPerPage = 10
 
 async function submitSearch(page: number) {
-  console.log(page)
   const response = await service.searchForFieldsOfLaw(
     page,
     itemsPerPage,

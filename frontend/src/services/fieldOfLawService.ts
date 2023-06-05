@@ -75,7 +75,6 @@ const service: FieldOfLawService = {
     const response = await httpClient.get<FieldOfLawNode>(
       `caselaw/fieldsoflaw/${identifier}/tree`
     )
-    // if (response.data) console.log("service - load tree:", response.data)
     if (response.status >= 300) {
       response.error = {
         title: "Pfad zu ausgewähltem Sachgebiet konnte nicht geladen werden.",

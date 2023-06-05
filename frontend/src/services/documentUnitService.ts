@@ -116,7 +116,6 @@ const service: DocumentUnitService = {
     size: number,
     query = new ProceedingDecision()
   ) {
-    console.log(page, size, query)
     const response = await httpClient.put<
       ProceedingDecision,
       Page<ProceedingDecision>
@@ -136,7 +135,6 @@ const service: DocumentUnitService = {
       }
     }
     response.data = response.data as Page<ProceedingDecision>
-    console.log(response.data)
     return {
       status: response.status,
       data: {
