@@ -156,6 +156,10 @@ export const normData: NormData = {
     DOCUMENT_TYPE: [
       { TYPE_NAME: ["RV"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
     ],
+    CATEGORIZED_REFERENCE: [
+      { TEXT: ["Aktivverweisung 1"] },
+      { TEXT: ["Aktivverweisung 2"] },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",

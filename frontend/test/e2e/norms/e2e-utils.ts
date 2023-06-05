@@ -6,7 +6,7 @@ import { APIRequestContext, expect } from "@playwright/test"
 import jsZip from "jszip"
 import { Page } from "playwright"
 
-const VERSION_TAG = "v0.10.1"
+const VERSION_TAG = "v0.11.0"
 const REMOTE_JURIS_TEST_FILE_FOLDER_URL = `raw.githubusercontent.com/digitalservicebund/ris-norms-juris-converter/${VERSION_TAG}/src/test/resources/juris`
 
 async function getLocalJurisTestFileFolderPath(): Promise<string> {

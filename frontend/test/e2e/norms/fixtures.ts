@@ -1228,12 +1228,16 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
     },
     {
       heading: "Aktivverweisung",
+      isRepeatedSection: true,
+      id: "categorizedReferences",
       fields: [
         {
           type: FieldType.TEXT,
-          id: "categorizedReference",
+          id: "categorizedReferenceText",
           label: "Aktivverweisung",
-          value: norm.categorizedReference,
+          values: norm.metadataSections?.CATEGORIZED_REFERENCE?.map(
+            (section) => section?.TEXT?.[0]
+          ),
         },
       ],
     },

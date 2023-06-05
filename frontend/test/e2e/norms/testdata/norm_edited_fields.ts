@@ -201,6 +201,14 @@ export const newNorm: NormData = {
         TEMPLATE_NAME: ["foo", "bar", "foobar"],
       },
     ],
+    CATEGORIZED_REFERENCE: [
+      {
+        TEXT: ["foo"],
+      },
+      {
+        TEXT: ["bar"],
+      },
+    ],
   },
   officialLongTitle:
     "Verordnung zur Anpassung von Rechtsverordnungen an das Tierarzneimittelrecht",
@@ -209,7 +217,6 @@ export const newNorm: NormData = {
   risAbbreviation: "risAbbreviation",
   publicationDate: "2022-11-01",
   isExpirationDateTemp: false,
-  categorizedReference: "categorizedReference",
   celexNumber: "celexNumber",
   completeCitation: "completeCitation",
   digitalEvidenceAppendix: "digitalEvidenceAppendix",
