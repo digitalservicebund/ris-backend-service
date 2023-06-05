@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia"
-import { computed, toRefs, ref, watch, h, VNode } from "vue"
+import { computed, toRefs, ref, watch, h, VNode, createTextVNode } from "vue"
 import { useRoute } from "vue-router"
 import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
@@ -353,29 +353,40 @@ function documentTypeSummarizer(data?: Metadata): VNode {
 }
 
 function divergentEntryIntoForceDefinedSummary(data: Metadata): VNode {
-  const propertyNodes = []
+  if (!data) return createTextVNode("")
 
   const date = formatDate(data?.DATE)
   const categories =
     data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
 
-  propertyNodes.push(date)
+  if (categories.length === 0 && date) {
+    return h("div", {}, date)
+  }
 
-  if (date && categories.length > 0) propertyNodes.push(h("div", "|"))
+  const elements = []
 
-  categories.forEach((category) =>
-    propertyNodes.push(
-      h("div", { class: ["flex", "gap-4"] }, [
-        h("span", "\u2713 " + NORM_CATEGORY_TRANSLATIONS[category]),
+  if (date) {
+    elements.push(h("div", {}, date))
+  }
+
+  if (date && categories.length > 0) {
+    elements.push(h("div", "|"))
+  }
+
+  categories.forEach((category) => {
+    elements.push(
+      h("div", { class: ["flex", "gap-8"] }, [
+        h("img", {
+          src: CheckMark,
+          width: "16",
+          alt: "Schwarzes Haken",
+        }),
+        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
       ])
     )
-  )
+  })
 
-  return h(
-    "div",
-    { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
-    propertyNodes
-  )
+  return h("div", { class: ["flex", "gap-8"] }, elements)
 }
 
 function getLabel(value: UndefinedDate): string {
@@ -390,26 +401,42 @@ function getLabel(value: UndefinedDate): string {
       return ""
   }
 }
+
 function divergentEntryIntoForceUndefinedSummary(data: Metadata): VNode {
-  let output = ""
+  if (!data) return createTextVNode("")
+
   const undefinedDate = data?.UNDEFINED_DATE?.[0]
   const categories =
     data?.NORM_CATEGORY?.filter((category) => category != null) ?? []
 
-  if (undefinedDate !== undefined) {
-    output += getLabel(undefinedDate)
+  const elements = []
+
+  if (categories.length === 0 && undefinedDate) {
+    return h("div", {}, getLabel(undefinedDate))
   }
 
-  if (undefinedDate && categories.length > 0) output += " | "
+  if (undefinedDate) {
+    elements.push(h("div", {}, getLabel(undefinedDate)))
+  }
 
-  categories.forEach(
-    (category) => (output += "\u2713 " + NORM_CATEGORY_TRANSLATIONS[category])
-  )
-  return h(
-    "div",
-    { class: ["flex", "gap-8", "items-center", "flex-wrap"] },
-    output
-  )
+  if (undefinedDate && categories.length > 0) {
+    elements.push(h("div", "|"))
+  }
+
+  categories.forEach((category) => {
+    elements.push(
+      h("div", { class: ["flex", "gap-8"] }, [
+        h("img", {
+          src: CheckMark,
+          width: "16",
+          alt: "Schwarzes Haken",
+        }),
+        h("span", {}, NORM_CATEGORY_TRANSLATIONS[category]),
+      ])
+    )
+  })
+
+  return h("div", { class: ["flex", "gap-8"] }, elements)
 }
 
 function DivergentEntryIntoForceSummarizer(
