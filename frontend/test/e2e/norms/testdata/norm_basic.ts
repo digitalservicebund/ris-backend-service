@@ -157,8 +157,12 @@ export const normData: NormData = {
       { TYPE_NAME: ["RV"], NORM_CATEGORY: [NormCategory.BASE_NORM] },
     ],
     CATEGORIZED_REFERENCE: [
-      { TEXT: ["Aktivverweisung 1"] },
-      { TEXT: ["Aktivverweisung 2"] },
+      { TEXT: ["&A 31 &B Art 1 Nr 4 Buchst a &E HGB &E3 § 246 &E6 Abs 1"] },
+      {
+        TEXT: [
+          "&A 32 &B Art 1 Nr 4 Buchst b &E HGB &E3 § 246 &E6 Abs 2 S 2 und 3",
+        ],
+      },
     ],
   },
   officialLongTitle:

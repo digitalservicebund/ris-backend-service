@@ -49,6 +49,7 @@ import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
 import de.bund.digitalservice.ris.norms.juris.converter.extractor.extractData
 import de.bund.digitalservice.ris.norms.juris.converter.generator.generateZip
+import de.bund.digitalservice.ris.norms.juris.converter.model.CategorizedReference
 import de.bund.digitalservice.ris.norms.juris.converter.model.DigitalAnnouncement
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentEntryIntoForce
 import de.bund.digitalservice.ris.norms.juris.converter.model.DivergentExpiration
@@ -108,6 +109,7 @@ fun mapDomainToData(norm: Norm): NormData {
         printAnnouncementList = extractPrintAnnouncementList(norm),
         digitalAnnouncementList = extractDigitalAnnouncementList(norm),
         risAbbreviation = norm.risAbbreviation,
+        categorizedReferences = extractCategorizedReferences(norm),
     )
 }
 
@@ -354,6 +356,15 @@ private fun extractFirstStringValue(norm: Norm, sectionName: MetadataSectionName
         .filter { it.type == metadatumType }
         .minByOrNull { it.order }?.value.toString()
 }
+
+private fun extractCategorizedReferences(norm: Norm): List<CategorizedReference> = norm
+    .metadataSections
+    .filter { it.name == MetadataSectionName.CATEGORIZED_REFERENCE }
+    .map { section ->
+        CategorizedReference(
+            section.metadata.find { it.type == TEXT }?.value.toString(),
+        )
+    }
 
 private fun extractPrintAnnouncementList(norm: Norm): List<PrintAnnouncement> = norm
     .metadataSections
