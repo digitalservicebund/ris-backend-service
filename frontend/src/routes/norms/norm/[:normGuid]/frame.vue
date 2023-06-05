@@ -5,6 +5,7 @@ import { useRoute } from "vue-router"
 import CheckMark from "@/assets/icons/ckeckbox_regular.svg"
 import AgeIndicationInputGroup from "@/components/AgeIndicationInputGroup.vue"
 import AnnouncementGroup from "@/components/AnnouncementGroup.vue"
+import CategorizedReferenceInputGroup from "@/components/CategorizedReferenceInputGroup.vue"
 import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
 import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
@@ -22,7 +23,6 @@ import {
   MetadataSections,
   UndefinedDate,
 } from "@/domain/Norm"
-import { categorizedReference } from "@/fields/norms/categorizedReference"
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
@@ -82,8 +82,6 @@ watch(
         data.applicationScopeEndDate as string
       loadedNorm.value.applicationScopeStartDate =
         data.applicationScopeStartDate as string
-      loadedNorm.value.categorizedReference =
-        data.categorizedReference as string
       loadedNorm.value.celexNumber = data.celexNumber as string
       loadedNorm.value.completeCitation = data.completeCitation as string
       loadedNorm.value.digitalEvidenceAppendix =
@@ -816,21 +814,20 @@ const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
       />
     </fieldset>
 
-    <fieldset>
-      <legend
-        id="categorizedReferenceFields"
-        class="heading-02-regular mb-[1rem]"
-      >
-        Aktivverweisung
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="categorizedReference"
+    <ExpandableDataSet
+      id="categorizedReferences"
+      border-bottom
+      :data-set="metadataSections.CATEGORIZED_REFERENCE"
+      title="Aktivverweisung"
+    >
+      <EditableList
+        v-model="metadataSections.CATEGORIZED_REFERENCE"
+        :default-value="{}"
+        :edit-component="CategorizedReferenceInputGroup"
       />
-    </fieldset>
+    </ExpandableDataSet>
 
-    <fieldset>
+    <fieldset class="mt-32">
       <legend id="otherFootnoteFields" class="heading-02-regular mb-[1rem]">
         Fußnoten
       </legend>
