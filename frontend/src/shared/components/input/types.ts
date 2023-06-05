@@ -15,7 +15,6 @@ export enum InputType {
   DATECHIPS = "datechips",
   NESTED = "nested",
   COMBOBOX = "combobox",
-  CUSTOMDATE = "customdate",
 }
 
 //BASE
@@ -90,7 +89,7 @@ export interface DateAttributes extends BaseInputAttributes {
 
 export interface DateInputField extends BaseInputField {
   placeholder?: string
-  type: InputType.DATE | InputType.CUSTOMDATE
+  type: InputType.DATE
   inputAttributes: DateAttributes
 }
 

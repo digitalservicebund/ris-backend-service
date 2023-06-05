@@ -11,7 +11,7 @@ import documentUnitService from "@/services/documentUnitService"
 import proceedingDecisionService from "@/services/proceedingDecisionService"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
 import CheckboxInput from "@/shared/components/input/CheckboxInput.vue"
-import DateInput from "@/shared/components/input/CustomDateInput.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField, {
   LabelPosition,
 } from "@/shared/components/input/InputField.vue"

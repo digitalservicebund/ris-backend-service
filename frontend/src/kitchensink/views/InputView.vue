@@ -101,21 +101,12 @@ const dateInputAttributes: BaseInputAttributes = {
       value=""
     />
 
-    <h1 class="font-bold text-24">Native Date Input</h1>
-    <InputField id="customDateInputField">
+    <h1 class="font-bold text-24">Date Input</h1>
+    <InputField id="dateInputField">
       <InputElement
         id="dateInput"
         :attributes="dateInputAttributes"
         :type="InputType.DATE"
-      />
-    </InputField>
-
-    <h1 class="font-bold text-24">Custom Date Input</h1>
-    <InputField id="customDateInputField">
-      <InputElement
-        id="customDateInput"
-        :attributes="dateInputAttributes"
-        :type="InputType.CUSTOMDATE"
       />
     </InputField>
 

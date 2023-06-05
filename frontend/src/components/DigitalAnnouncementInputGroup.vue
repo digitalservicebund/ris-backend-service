@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue"
 import { Metadata } from "@/domain/Norm"
-import DateInput from "@/shared/components/input/CustomDateInput.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 import YearInput from "@/shared/components/input/YearInput.vue"

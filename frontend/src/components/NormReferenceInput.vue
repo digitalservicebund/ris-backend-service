@@ -3,7 +3,7 @@ import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import { NormReference } from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
-import CustomDateInput from "@/shared/components/input/CustomDateInput.vue"
+import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
 
@@ -73,7 +73,7 @@ const normAbbreviation = computed({
         ></TextInput>
       </InputField>
       <InputField id="norm-date-of-version" label="Fassungsdatum">
-        <CustomDateInput
+        <DateInput
           id="norm-date-of-version"
           v-model="norm.dateOfVersion"
           aria-label="Fassungsdatum"
