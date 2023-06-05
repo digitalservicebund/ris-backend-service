@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
 import java.io.ByteArrayInputStream;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 import reactor.util.retry.Retry;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -261,7 +263,17 @@ public class DocumentUnitService {
   public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String receiverAddress) {
     return repository
         .findByUuid(documentUnitUuid)
-        .flatMap(documentUnit -> publishService.publish(documentUnit, receiverAddress));
+        .flatMap(
+            documentUnit ->
+                Mono.zip(
+                    Mono.just(documentUnit), publishService.publish(documentUnit, receiverAddress)))
+        .flatMap(
+            tuple ->
+                Mono.zip(
+                    documentUnitStatusService.updateStatus(
+                        tuple.getT1(), PUBLISHED, tuple.getT2().getPublishDate()),
+                    Mono.just(tuple.getT2())))
+        .map(Tuple2::getT2);
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
