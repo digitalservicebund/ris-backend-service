@@ -55,7 +55,7 @@ export function useNormMenuItems(
           "Stand der dokumentarischen Bearbeitung",
           "documentProcessingStatusFields"
         ),
-        getChildItem("Aktivverweisung", "categorizedReferenceFields"),
+        getChildItem("Aktivverweisung", "categorizedReferences"),
         getChildItem("Fußnoten", "otherFootnoteFields"),
         getChildItem("Gültigkeitsregelung", "validityRules"),
         getChildItem("Elektronischer Nachweis", "digitalEvidenceFields"),
