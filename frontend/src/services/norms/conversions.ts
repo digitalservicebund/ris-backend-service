@@ -428,7 +428,6 @@ export function encodeFlatMetadata(
     applicationScopeStartDate: encodeNullDate(
       flatMetadata.applicationScopeStartDate
     ),
-    categorizedReference: encodeString(flatMetadata.categorizedReference),
     celexNumber: encodeString(flatMetadata.celexNumber),
     completeCitation: encodeString(flatMetadata.completeCitation),
     digitalEvidenceAppendix: encodeString(flatMetadata.digitalEvidenceAppendix),

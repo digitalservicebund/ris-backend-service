@@ -204,7 +204,6 @@ describe("normsService", () => {
           applicationScopeArea: null,
           applicationScopeEndDate: null,
           applicationScopeStartDate: null,
-          categorizedReference: null,
           celexNumber: null,
           completeCitation: null,
           digitalEvidenceAppendix: null,

@@ -258,7 +258,6 @@ export function generateFlatMetadata(
 ): FlatMetadata {
   return {
     announcementDate: generateString(),
-    categorizedReference: generateString(),
     celexNumber: generateString(),
     completeCitation: generateString(),
     digitalEvidenceAppendix: generateString(),
