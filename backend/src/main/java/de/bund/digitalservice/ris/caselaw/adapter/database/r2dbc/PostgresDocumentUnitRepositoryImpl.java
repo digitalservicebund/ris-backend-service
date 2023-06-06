@@ -308,34 +308,41 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                   documentUnitNormDTO -> {
                     int index = normIndex.getAndIncrement();
                     UUID normAbbreviationId = null;
-                    if (documentUnitNorms.get(index).normAbbreviation() != null) {
-                      normAbbreviationId = documentUnitNorms.get(index).normAbbreviation().id();
-                    }
-                    if (index < documentUnitNorms.size()) {
-                      documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
-                      documentUnitNormDTO.singleNorm = documentUnitNorms.get(index).singleNorm();
-                      documentUnitNormDTO.dateOfVersion =
-                          documentUnitNorms.get(index).dateOfVersion();
-                      documentUnitNormDTO.dateOfRelevance =
-                          documentUnitNorms.get(index).dateOfRelevance();
-                      toSave.add(documentUnitNormDTO);
-                    } else {
+                    DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
+                    if (isEmptyNorm(currentNorm)) {
                       toDelete.add(documentUnitNormDTO);
+                    } else {
+                      if (currentNorm.normAbbreviation() != null) {
+                        normAbbreviationId = currentNorm.normAbbreviation().id();
+                      }
+                      if (index < documentUnitNorms.size()) {
+                        documentUnitNormDTO.normAbbreviationUuid = normAbbreviationId;
+                        documentUnitNormDTO.singleNorm = currentNorm.singleNorm();
+                        documentUnitNormDTO.dateOfVersion = currentNorm.dateOfVersion();
+                        documentUnitNormDTO.dateOfRelevance = currentNorm.dateOfRelevance();
+                        toSave.add(documentUnitNormDTO);
+                      } else {
+                        toDelete.add(documentUnitNormDTO);
+                      }
                     }
                   });
 
               while (normIndex.get() < documentUnitNorms.size()) {
                 int index = normIndex.getAndIncrement();
+                DocumentUnitNorm currentNorm = documentUnitNorms.get(index);
+                if (isEmptyNorm(currentNorm)) {
+                  continue;
+                }
                 UUID normAbbreviationId = null;
-                if (documentUnitNorms.get(index).normAbbreviation() != null) {
-                  normAbbreviationId = documentUnitNorms.get(index).normAbbreviation().id();
+                if (currentNorm.normAbbreviation() != null) {
+                  normAbbreviationId = currentNorm.normAbbreviation().id();
                 }
                 DocumentUnitNormDTO documentUnitNormDTO =
                     DocumentUnitNormDTO.builder()
                         .normAbbreviationUuid(normAbbreviationId)
-                        .singleNorm(documentUnitNorms.get(index).singleNorm())
-                        .dateOfVersion(documentUnitNorms.get(index).dateOfVersion())
-                        .dateOfRelevance(documentUnitNorms.get(index).dateOfRelevance())
+                        .singleNorm(currentNorm.singleNorm())
+                        .dateOfVersion(currentNorm.dateOfVersion())
+                        .dateOfRelevance(currentNorm.dateOfRelevance())
                         .documentUnitId(documentUnitDTO.getId())
                         .build();
                 toSave.add(documentUnitNormDTO);
@@ -354,6 +361,17 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
                         return documentUnitDTO;
                       });
             });
+  }
+
+  private boolean isEmptyNorm(DocumentUnitNorm currentNorm) {
+    if (currentNorm.singleNorm() == null
+        && currentNorm.normAbbreviation() == null
+        && currentNorm.dateOfRelevance() == null
+        && currentNorm.dateOfVersion() == null) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   private Mono<DocumentUnitDTO> saveDeviatingFileNumbers(
