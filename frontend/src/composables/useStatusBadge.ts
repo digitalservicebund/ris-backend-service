@@ -19,6 +19,6 @@ export function useStatusBadge(status: DocumentUnit["status"]) {
         color: "black",
       }
     }
-    return null
+    return undefined
   })
 }

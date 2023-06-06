@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import dayjs from "dayjs"
-import { computed } from "vue"
+import { computed, ref, watchEffect } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { useCaseLawMenuItems } from "@/composables/useCaseLawMenuItems"
 import { useStatusBadge } from "@/composables/useStatusBadge"
@@ -38,7 +38,7 @@ const documentationOffice = computed(
 
 const courtInfo = computed(() => props.documentUnit.coreData.court?.label)
 
-const statusBadge = useStatusBadge(props.documentUnit.status)
+const statusBadge = ref(useStatusBadge(props.documentUnit.status).value)
 
 const firstRowInfos = computed(() => [
   ...(statusBadge.value ? [statusBadge.value] : []),
@@ -53,6 +53,10 @@ const secondRowInfos = computed(() => [
   { label: "Entscheidungsdatum", value: decisionDateInfo.value },
   { label: "Gericht", value: courtInfo.value },
 ])
+
+watchEffect(() => {
+  statusBadge.value = useStatusBadge(props.documentUnit.status).value
+})
 </script>
 
 <template>
