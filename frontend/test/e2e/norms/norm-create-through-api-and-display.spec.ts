@@ -18,7 +18,7 @@ async function expectSectionAppearsAfterScroll(
   if (section.isSingleFieldSection) {
     const firstFieldLabel = section.fields?.[0].label ?? ""
     await expect(
-      page.locator(`h2:text-is("${firstFieldLabel}")`)
+      page.locator(`label:text-is("${firstFieldLabel}")`)
     ).toBeInViewport()
   } else {
     await expect(
