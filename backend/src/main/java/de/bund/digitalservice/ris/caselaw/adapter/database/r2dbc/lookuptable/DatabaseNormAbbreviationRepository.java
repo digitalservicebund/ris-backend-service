@@ -26,14 +26,19 @@ public interface DatabaseNormAbbreviationRepository
           + " official_letter_abbreviation,"
           + " official_long_title,"
           + " official_short_title,"
-          + " source"
+          + " source,"
+          + " case"
+          + "  when lower(abbreviation) like '' || :directInput || '%' then 2"
+          + "  when lower(official_letter_abbreviation) like '' || :directInput || '%' then 1"
+          + "  else 0"
+          + " end +"
+          + " ts_rank_cd(weighted_vector, to_tsquery('german', '' || :tsQuery || '')) rank"
           + " from norm_abbreviation_search"
           + " where weighted_vector @@ to_tsquery('german', '' || :tsQuery || '')"
-          + " order by"
-          + " ts_rank_cd(weighted_vector, to_tsquery('german', '' || :tsQuery || '')) desc"
+          + " order by rank desc"
           + " limit :size offset :pageOffset")
   Flux<NormAbbreviationDTO> findByAwesomeSearchQuery(
-      String tsQuery, Integer size, Integer pageOffset);
+      String directInput, String tsQuery, Integer size, Integer pageOffset);
 
   Mono<NormAbbreviationDTO> findById(UUID normAbbreviationUuid);
 }

@@ -58,19 +58,19 @@ public class PostgresNormAbbreviationRepositoryImpl implements NormAbbreviationR
     for (int i = 0; i < queryBlocks.length; i++) {
       if (queryBlocks[i].isBlank()) continue;
 
-      if (i == 0) {
-        tsQuery.append("(");
-        tsQuery.append(queryBlocks[i]).append(":A*");
-        tsQuery.append(" | ");
-        tsQuery.append(queryBlocks[i]).append(":*");
-        tsQuery.append(")");
-      } else {
-        tsQuery.append(" & ").append(queryBlocks[i]).append(":*");
+      if (i > 0) {
+        tsQuery.append(" & ");
       }
+
+      tsQuery.append(queryBlocks[i]).append(":*");
+    }
+    String directInput = "";
+    if (queryBlocks[0] != null && !queryBlocks[0].isBlank()) {
+      directInput = queryBlocks[0].toLowerCase();
     }
 
     return repository
-        .findByAwesomeSearchQuery(tsQuery.toString(), size, page)
+        .findByAwesomeSearchQuery(directInput, tsQuery.toString(), size, page)
         .flatMapSequential(this::injectAdditionalInformation)
         .map(NormAbbreviationTransformer::transformDTO);
   }
