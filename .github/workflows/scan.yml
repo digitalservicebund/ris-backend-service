@@ -16,21 +16,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Remove all caches and database of the trivy scanner
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         env:
           TRIVY_RESET: true
           TRIVY_DEBUG: true
         with:
           scan-type: "image"
       - name: Download trivy vulnerabilities DB
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         env:
           TRIVY_DEBUG: true
           TRIVY_DOWNLOAD_DB_ONLY: true
         with:
           scan-type: "image"
       - name: Download trivy Java index DB
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         env:
           TRIVY_DEBUG: true
           TRIVY_DOWNLOAD_JAVA_DB_ONLY: true
@@ -49,7 +49,7 @@ jobs:
       - name: Run Trivy vulnerability scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
@@ -57,15 +57,8 @@ jobs:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
           output: "trivy-results.sarif"
-      - name: Check trivy results
-        run: |
-          if grep -qE 'HIGH|CRITICAL' trivy-results.sarif; then
-            echo "Vulnerabilities found"
-            exit 1
-          else
-            echo "No significant vulnerabilities found"
-            exit 0
-          fi
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
@@ -74,7 +67,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
@@ -127,20 +120,13 @@ jobs:
       - name: Run Trivy vulnerability image scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         with:
           image-ref: ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
           format: "sarif"
           output: "trivy-results.sarif"
-      - name: Check trivy results
-        run: |
-          if grep -qE 'HIGH|CRITICAL' trivy-results.sarif; then
-            echo "Vulnerabilities found"
-            exit 1
-          else
-            echo "No significant vulnerabilities found"
-            exit 0
-          fi
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
       - name: Upload Trivy image scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
@@ -150,22 +136,15 @@ jobs:
       - name: Run Trivy vulnerability file scanner
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         with:
           scan-type: "fs"
           scan-ref: "./frontend"
           skip-dirs: "node_modules" # See https://github.com/aquasecurity/trivy/issues/1283
           format: "sarif"
           output: "trivy-results.sarif"
-      - name: Check trivy results
-        run: |
-          if grep -qE 'HIGH|CRITICAL' trivy-results.sarif; then
-            echo "Vulnerabilities found"
-            exit 1
-          else
-            echo "No significant vulnerabilities found"
-            exit 0
-          fi
+          severity: "CRITICAL,HIGH"
+          exit-code: "1" # Fail the build!
       - name: Upload Trivy file scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v2
         if: ${{ always() && github.ref == 'refs/heads/main' }} # Bypass non-zero exit code..
@@ -175,7 +154,7 @@ jobs:
       - name: Generate cosign vulnerability scan record
         # Third-party action, pin to commit SHA!
         # See https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
-        uses: aquasecurity/trivy-action@e5f43133f6e8736992c9f3c1b3296e24b37e17f2
+        uses: aquasecurity/trivy-action@b43daad0c3c96202fc5800b511dfae8e6ecce864
         env:
           TRIVY_USERNAME: ${{ github.actor }}
           TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
