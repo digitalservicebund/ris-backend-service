@@ -33,7 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.function.Tuple2;
 import reactor.util.retry.Retry;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
@@ -265,15 +264,14 @@ public class DocumentUnitService {
         .findByUuid(documentUnitUuid)
         .flatMap(
             documentUnit ->
-                Mono.zip(
-                    Mono.just(documentUnit), publishService.publish(documentUnit, receiverAddress)))
-        .flatMap(
-            tuple ->
-                Mono.zip(
-                    documentUnitStatusService.updateStatus(
-                        tuple.getT1(), PUBLISHED, tuple.getT2().getPublishDate()),
-                    Mono.just(tuple.getT2())))
-        .map(Tuple2::getT2);
+                publishService
+                    .publish(documentUnit, receiverAddress)
+                    .flatMap(
+                        mailResponse ->
+                            documentUnitStatusService
+                                .updateStatus(
+                                    documentUnit, PUBLISHED, mailResponse.getPublishDate())
+                                .thenReturn(mailResponse)));
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {
