@@ -313,10 +313,13 @@ class DocumentUnitServiceTest {
             "200",
             List.of("status messages"),
             "filename",
-            null,
+            Instant.now(),
             PublishState.UNKNOWN);
     when(publishService.publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS))
         .thenReturn(Mono.just(new XmlMailResponse(TEST_UUID, xmlMail)));
+    when(documentUnitStatusService.updateStatus(
+            any(DocumentUnit.class), any(DocumentUnitStatus.class), any(Instant.class)))
+        .thenReturn(Mono.just(DocumentUnit.builder().build()));
     StepVerifier.create(service.publishAsEmail(TEST_UUID, RECEIVER_ADDRESS))
         .consumeNextWith(
             mailResponse ->
@@ -326,6 +329,8 @@ class DocumentUnitServiceTest {
         .verifyComplete();
     verify(repository).findByUuid(TEST_UUID);
     verify(publishService).publish(DocumentUnit.builder().build(), RECEIVER_ADDRESS);
+    verify(documentUnitStatusService)
+        .updateStatus(any(DocumentUnit.class), any(DocumentUnitStatus.class), any(Instant.class));
   }
 
   @Test

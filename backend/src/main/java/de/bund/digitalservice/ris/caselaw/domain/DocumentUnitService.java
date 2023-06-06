@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
 import java.io.ByteArrayInputStream;
@@ -261,7 +262,16 @@ public class DocumentUnitService {
   public Mono<MailResponse> publishAsEmail(UUID documentUnitUuid, String receiverAddress) {
     return repository
         .findByUuid(documentUnitUuid)
-        .flatMap(documentUnit -> publishService.publish(documentUnit, receiverAddress));
+        .flatMap(
+            documentUnit ->
+                publishService
+                    .publish(documentUnit, receiverAddress)
+                    .flatMap(
+                        mailResponse ->
+                            documentUnitStatusService
+                                .updateStatus(
+                                    documentUnit, PUBLISHED, mailResponse.getPublishDate())
+                                .thenReturn(mailResponse)));
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {

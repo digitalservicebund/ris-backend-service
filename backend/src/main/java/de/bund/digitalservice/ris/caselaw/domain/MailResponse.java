@@ -1,3 +1,8 @@
 package de.bund.digitalservice.ris.caselaw.domain;
 
-public interface MailResponse {}
+import java.time.Instant;
+
+public interface MailResponse {
+
+  Instant getPublishDate();
+}

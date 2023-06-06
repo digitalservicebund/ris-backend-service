@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -10,8 +11,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.MockXmlExporter;
 import de.bund.digitalservice.ris.caselaw.adapter.XmlEMailPublishService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseXmlMailRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresDocumentUnitRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.PostgresXmlMailRepositoryImpl;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.XmlMailDTO;
@@ -45,11 +48,11 @@ import software.amazon.awssdk.services.s3.S3AsyncClient;
     imports = {
       DocumentUnitService.class,
       KeycloakUserService.class,
-      DatabaseDocumentUnitStatusService.class,
       DatabaseDocumentNumberService.class,
       PostgresDocumentUnitRepositoryImpl.class,
       PostgresXmlMailRepositoryImpl.class,
       XmlEMailPublishService.class,
+      DatabaseDocumentUnitStatusService.class,
       MockXmlExporter.class,
       FlywayConfig.class,
       PostgresConfig.class
@@ -76,6 +79,7 @@ class PublishDocumentUnitIntegrationTest {
 
   @Autowired private DatabaseDocumentUnitRepository repository;
   @Autowired private DatabaseXmlMailRepository xmlMailRepository;
+  @Autowired private DatabaseDocumentUnitStatusRepository documentUnitStatusRepository;
 
   @MockBean private S3AsyncClient s3AsyncClient;
   @MockBean private HttpMailSender mailSender;
@@ -84,6 +88,7 @@ class PublishDocumentUnitIntegrationTest {
   void cleanUp() {
     xmlMailRepository.deleteAll().block();
     repository.deleteAll().block();
+    documentUnitStatusRepository.deleteAll().block();
   }
 
   @Test
@@ -149,6 +154,13 @@ class PublishDocumentUnitIntegrationTest {
         .usingRecursiveComparison()
         .ignoringFields("publishDate", "id")
         .isEqualTo(expectedXmlMailDTO);
+
+    List<DocumentUnitStatusDTO> statusList =
+        documentUnitStatusRepository.findAll().collectList().block();
+    DocumentUnitStatusDTO status = statusList.get(statusList.size() - 1);
+    assertThat(status.getStatus()).isEqualTo(PUBLISHED);
+    assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
+    assertThat(status.getCreatedAt()).isEqualTo(xmlMail.publishDate());
   }
 
   @Test
