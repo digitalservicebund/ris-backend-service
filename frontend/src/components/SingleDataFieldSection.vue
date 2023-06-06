@@ -52,12 +52,10 @@ watch(value, () => emit("update:modelValue", value.value), { deep: true })
 <template>
   <div class="bg-white border-b border-gray-400 flex p-6 pl-16">
     <label
-      aria-level="2"
       class="label-02-bold max-w-[14rem] min-w-[14rem] my-12 text-left"
       :for="id"
-      role="heading"
     >
-      {{ label }}
+      <h2>{{ label }}</h2>
     </label>
 
     <InputElement
