@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, h } from "vue"
+import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
 import NormReferenceInput from "@/components/NormReferenceInput.vue"
 import NormReference from "@/domain/normReference"
 import { withSummarizer } from "@/shared/components/DataSetSummary.vue"
@@ -32,13 +33,18 @@ const NormsSummary = withSummarizer(decisionSummarizer)
 </script>
 
 <template>
-  <div class="bg-white mb-[2rem] p-16">
-    <h2 class="label-02-bold mb-[1rem]">Normen</h2>
+  <ExpandableDataSet
+    id="normReferences"
+    as-column
+    :data-set="norms"
+    :summary-component="NormsSummary"
+    title="Normen"
+  >
     <EditableList
       v-model="norms"
       :default-value="defaultValue"
       :edit-component="NormReferenceInput"
       :summary-component="NormsSummary"
     />
-  </div>
+  </ExpandableDataSet>
 </template>
