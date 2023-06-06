@@ -169,7 +169,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
   }
 
   &:focus {
-    padding: 1px 0;
+    padding: 3px 2px;
     border: 2px solid #004b76;
   }
 
