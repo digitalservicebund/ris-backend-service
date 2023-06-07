@@ -16,7 +16,7 @@ env:
   GH_PACKAGES_REPOSITORY_USER: ${{ secrets.GH_PACKAGES_REPOSITORY_USER }} # Secrets must not start with "GITHUB_"..
   GH_PACKAGES_REPOSITORY_TOKEN: ${{ secrets.GH_PACKAGES_REPOSITORY_TOKEN }}
   SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
-  REPORTS_REPOSITORY: digitalservicebund/ris-backend-service-reports
+  REPORTS_REPOSITORY: digitalservicebund/ris-reports
 
 jobs:
   backend-build:
@@ -901,7 +901,7 @@ jobs:
       - generate-entity-relationship-diagram
     if: ${{ github.ref == 'refs/heads/main' }}
     env:
-      ER_DIAGRAMS_PATH: entity-relationship-diagrams
+      ER_DIAGRAMS_PATH: entity-relationship-diagrams/ris-backend-service
     steps:
       - uses: actions/checkout@v3
         with:
