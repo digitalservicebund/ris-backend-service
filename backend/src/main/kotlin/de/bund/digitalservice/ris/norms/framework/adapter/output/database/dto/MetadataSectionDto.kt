@@ -18,4 +18,6 @@ data class MetadataSectionDto(
     val normId: Int,
     @Column("section_id")
     val sectionId: Int? = null,
+    @Column("section_guid")
+    val sectionGuid: UUID? = null,
 )

@@ -201,35 +201,36 @@ interface NormsMapper {
         )
     }
 
-    fun articlesToDto(articles: List<Article>, normId: Int, id: Int = 0): List<ArticleDto> {
-        return articles.map { ArticleDto(id, it.guid, it.title, it.marker, normId) }
+    fun articlesToDto(articles: List<Article>, normId: Int, id: Int = 0, normGuid: UUID): List<ArticleDto> {
+        return articles.map { ArticleDto(id, it.guid, it.title, it.marker, normId, normGuid) }
     }
 
-    fun paragraphsToDto(paragraphs: List<Paragraph>, articleId: Int, id: Int = 0): List<ParagraphDto> {
-        return paragraphs.map { ParagraphDto(id, it.guid, it.marker, it.text, articleId) }
+    fun paragraphsToDto(paragraphs: List<Paragraph>, articleId: Int, id: Int = 0, articleGuid: UUID): List<ParagraphDto> {
+        return paragraphs.map { ParagraphDto(id, it.guid, it.marker, it.text, articleId, articleGuid) }
     }
 
-    fun fileReferencesToDto(fileReferences: List<FileReference>, normId: Int, id: Int = 0): List<FileReferenceDto> {
-        return fileReferences.map { fileReferenceToDto(it, normId) }
+    fun fileReferencesToDto(fileReferences: List<FileReference>, normId: Int, normGuid: UUID, id: Int = 0): List<FileReferenceDto> {
+        return fileReferences.map { fileReferenceToDto(fileReference = it, normId = normId, normGuid = normGuid) }
     }
 
-    fun fileReferenceToDto(fileReference: FileReference, normId: Int, id: Int = 0): FileReferenceDto {
-        return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, fileReference.createdAt)
+    fun fileReferenceToDto(fileReference: FileReference, normId: Int, id: Int = 0, normGuid: UUID): FileReferenceDto {
+        return FileReferenceDto(id, fileReference.name, fileReference.hash, normId, normGuid, fileReference.createdAt)
     }
 
     fun metadataListToDto(metadata: List<Metadatum<*>>, sectionId: Int, sectionGuid: UUID, id: Int = 0): List<MetadatumDto> {
         return metadata.map { MetadatumDto(id = id, value = it.value.toString(), type = it.type, order = it.order, sectionId = sectionId, guid = it.guid, sectionGuid = sectionGuid) }
     }
 
-    fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
-        return MetadataSectionDto(id = id, guid = metadataSection.guid, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId)
+    fun metadataSectionToDto(metadataSection: MetadataSection, normId: Int, sectionGuid: UUID? = null, sectionId: Int? = null, id: Int = 0): MetadataSectionDto {
+        return MetadataSectionDto(id = id, guid = metadataSection.guid, name = metadataSection.name, normId = normId, order = metadataSection.order, sectionId = sectionId, sectionGuid = sectionGuid)
     }
 
-    fun metadataSectionsToDto(sections: List<MetadataSection>, normId: Int, sectionId: Int? = null, id: Int = 0): List<MetadataSectionDto> {
+    fun metadataSectionsToDto(sections: List<MetadataSection>, normId: Int, sectionGuid: UUID? = null, sectionId: Int? = null, id: Int = 0): List<MetadataSectionDto> {
         return sections.map {
             metadataSectionToDto(
                 it,
                 normId,
+                sectionGuid,
                 sectionId,
             )
         }

@@ -122,14 +122,14 @@ class NormsService(
     override fun saveFileReference(command: SaveFileReferenceOutputPort.Command): Mono<Boolean> {
         return normsRepository
             .findByGuid(command.norm.guid)
-            .map { normDto -> fileReferenceToDto(command.fileReference, normDto.id) }
+            .map { normDto -> fileReferenceToDto(fileReference = command.fileReference, normId = normDto.id, normGuid = normDto.guid) }
             .flatMap(fileReferenceRepository::save)
             .map { true }
     }
 
     private fun saveNormArticles(norm: Norm, normDto: NormDto): Flux<ParagraphDto> {
         return articlesRepository
-            .saveAll(articlesToDto(norm.articles, normDto.id))
+            .saveAll(articlesToDto(articles = norm.articles, normId = normDto.id, normGuid = normDto.guid))
             .flatMap { article -> saveArticleParagraphs(norm, article) }
     }
 
@@ -159,6 +159,7 @@ class NormsService(
                     .find { it.guid == parentSection.guid }
                     ?.sections ?: listOf(),
                 parentSection.normId,
+                parentSection.guid,
                 parentSection.id,
             ),
         ).flatMap { childrenSectionDto ->
@@ -176,7 +177,7 @@ class NormsService(
     }
 
     private fun saveNormFiles(norm: Norm, normDto: NormDto): Flux<FileReferenceDto> {
-        return fileReferenceRepository.saveAll(fileReferencesToDto(norm.files, normDto.id))
+        return fileReferenceRepository.saveAll(fileReferencesToDto(norm.files, normDto.id, normDto.guid))
     }
 
     private fun saveSectionMetadata(metadataSectionDto: MetadataSectionDto, metadata: List<Metadatum<*>>): Flux<MetadatumDto> {
@@ -191,10 +192,11 @@ class NormsService(
     private fun saveArticleParagraphs(norm: Norm, article: ArticleDto): Flux<ParagraphDto> {
         return paragraphsRepository.saveAll(
             paragraphsToDto(
-                norm.articles
+                paragraphs = norm.articles
                     .find { it.guid == article.guid }
                     ?.paragraphs ?: listOf(),
-                article.id,
+                articleId = article.id,
+                articleGuid = article.guid,
             ),
         )
     }
