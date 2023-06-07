@@ -3,6 +3,7 @@ import {
   fillProceedingDecisionInputs,
   navigateToCategories,
   navigateToPublication,
+  toggleNormsSection,
   toggleProceedingDecisionsSection,
   waitForSaving,
 } from "../e2e-utils"
@@ -231,6 +232,7 @@ test.describe("ensuring the publishing of documentunits works as expected", () =
   }) => {
     await navigateToCategories(page, documentNumber)
 
+    await toggleNormsSection(page)
     await waitForSaving(
       async () => {
         await page.locator("[aria-label='Einzelnorm']").fill("abc")
