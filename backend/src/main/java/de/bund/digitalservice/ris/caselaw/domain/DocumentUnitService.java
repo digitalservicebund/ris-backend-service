@@ -267,11 +267,18 @@ public class DocumentUnitService {
                 publishService
                     .publish(documentUnit, receiverAddress)
                     .flatMap(
-                        mailResponse ->
-                            documentUnitStatusService
+                        mailResponse -> {
+                          if (mailResponse
+                              .getStatusCode()
+                              .equals(String.valueOf(HttpStatus.OK.value()))) {
+                            return documentUnitStatusService
                                 .updateStatus(
                                     documentUnit, PUBLISHED, mailResponse.getPublishDate())
-                                .thenReturn(mailResponse)));
+                                .thenReturn(mailResponse);
+                          } else {
+                            return Mono.just(mailResponse);
+                          }
+                        }));
   }
 
   public Mono<MailResponse> getLastPublishedXmlMail(UUID documentUuid) {

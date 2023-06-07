@@ -13,8 +13,9 @@ public class MockXmlExporter implements XmlExporter {
   @Override
   public XmlResultObject generateXml(DocumentUnit documentUnit)
       throws ParserConfigurationException, TransformerException {
+    String statusCode = documentUnit.coreData().decisionDate() == null ? "400" : "200";
     return new XmlResultObject(
-        "xml", "200", List.of("message 1", "message 2"), "test.xml", Instant.now());
+        "xml", statusCode, List.of("message 1", "message 2"), "test.xml", Instant.now());
   }
 
   @Override

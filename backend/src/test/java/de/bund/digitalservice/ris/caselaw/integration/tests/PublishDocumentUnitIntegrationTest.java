@@ -99,6 +99,7 @@ class PublishDocumentUnitIntegrationTest {
             .uuid(documentUnitUuid1)
             .documentnumber("docnr12345678")
             .creationtimestamp(Instant.now())
+            .decisionDate(Instant.now())
             .build();
     DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
 
@@ -161,6 +162,58 @@ class PublishDocumentUnitIntegrationTest {
     assertThat(status.getStatus()).isEqualTo(PUBLISHED);
     assertThat(status.getDocumentUnitId()).isEqualTo(documentUnitDTO.getUuid());
     assertThat(status.getCreatedAt()).isEqualTo(xmlMail.publishDate());
+  }
+
+  @Test
+  void testPublishDocumentUnitWithNotAllMandatoryFieldsFilled_shouldNotUpdateStatus() {
+    UUID documentUnitUuid = UUID.randomUUID();
+    DocumentUnitDTO documentUnitDTO =
+        DocumentUnitDTO.builder()
+            .uuid(documentUnitUuid)
+            .documentnumber("docnr12345678")
+            .creationtimestamp(Instant.now())
+            .build();
+    DocumentUnitDTO savedDocumentUnitDTO = repository.save(documentUnitDTO).block();
+
+    assertThat(repository.findAll().collectList().block()).hasSize(1);
+
+    XmlMail expectedXmlMail =
+        new XmlMail(
+            documentUnitUuid,
+            null,
+            null,
+            null,
+            "400",
+            List.of("message 1", "message 2"),
+            "text.xml",
+            null,
+            PublishState.UNKNOWN);
+    XmlMailResponse expectedXmlResultObject =
+        new XmlMailResponse(documentUnitUuid, expectedXmlMail);
+
+    webClient
+        .mutateWith(csrf())
+        .put()
+        .uri("/api/v1/caselaw/documentunits/" + documentUnitUuid + "/publish")
+        .contentType(MediaType.TEXT_PLAIN)
+        .bodyValue("exporter@neuris.de")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(XmlMailResponse.class)
+        .consumeWith(
+            response ->
+                assertThat(response.getResponseBody())
+                    .usingRecursiveComparison()
+                    .ignoringFields("publishDate")
+                    .isEqualTo(expectedXmlResultObject));
+
+    List<XmlMailDTO> xmlMailList = xmlMailRepository.findAll().collectList().block();
+    assertThat(xmlMailList).isEmpty();
+
+    List<DocumentUnitStatusDTO> statusList =
+        documentUnitStatusRepository.findAll().collectList().block();
+    assertThat(statusList).isEmpty();
   }
 
   @Test

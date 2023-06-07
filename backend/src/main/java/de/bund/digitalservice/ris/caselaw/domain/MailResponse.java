@@ -5,4 +5,6 @@ import java.time.Instant;
 public interface MailResponse {
 
   Instant getPublishDate();
+
+  String getStatusCode();
 }
