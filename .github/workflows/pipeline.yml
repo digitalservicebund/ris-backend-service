@@ -903,7 +903,7 @@ jobs:
       - name: Generate mermaid ER-diagram
         uses: digitalservicebund/github-actions/entity-relationship-diagram@b0e67dbb3637296eeb2ae0c9110cd42d4d8de6fb
         with:
-          configFile: ./mermerd.config.yaml
+          configFile: ./backend/mermerd.config.yaml
           connectionString: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
           outputFile: latest.mmd
           flags: --debug
