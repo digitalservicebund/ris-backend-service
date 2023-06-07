@@ -51,7 +51,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
 </script>
 
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col gap-8">
     <div class="flex">
       <InputField
         id="subjectFna"
@@ -75,7 +75,7 @@ watch(inputValue, () => emit("update:modelValue", inputValue.value), {
         />
       </InputField>
     </div>
-    <div class="flex mt-24">
+    <div class="flex">
       <InputField
         id="subjectGesta"
         aria-label="GESTA-Nummer"

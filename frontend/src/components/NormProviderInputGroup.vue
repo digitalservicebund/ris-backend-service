@@ -53,8 +53,8 @@ const checkboxStyle = ref({
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <div class="mb-12">
+  <div class="flex flex-col gap-8">
+    <div class="">
       <InputField
         id="normProviderEntity"
         aria-label="Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt "
@@ -85,7 +85,7 @@ const checkboxStyle = ref({
         />
       </InputField>
     </div>
-    <div class="mb-24 mt-12">
+    <div>
       <InputField
         id="normProviderIsResolutionMajority"
         aria-label="Beschlussfassung mit qualifizierter Mehrheit"

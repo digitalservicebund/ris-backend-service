@@ -83,8 +83,8 @@ const component = computed(() => {
 </script>
 
 <template>
-  <div class="mt-16 w-384">
-    <div class="radio-group w-320">
+  <div>
+    <div class="flex justify-between mb-24 w-320">
       <label class="form-control">
         <input
           id="divergentExpirationDefinedSelection"
@@ -120,12 +120,6 @@ const component = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-.radio-group {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
 .form-control {
   display: flex;
   flex-direction: row;

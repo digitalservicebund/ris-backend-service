@@ -101,7 +101,7 @@ const checkboxStyle = ref({
 </script>
 
 <template>
-  <div class="w-384">
+  <div class="flex flex-col gap-8 w-384">
     <InputField
       id="divergentExpirationUndefinedDate"
       label="Unbestimmtes abweichendes Außerkrafttretedatum"
@@ -115,40 +115,37 @@ const checkboxStyle = ref({
         placeholder="Bitte auswählen"
       />
     </InputField>
-    <div class="mb-24 mt-24">
-      <InputField
-        id="documentNormCategory"
-        aria-label="Art der Norm"
-        label="Art der Norm"
-      >
-        <div class="flex gap-24">
-          <InputField
-            v-for="category in NormCategory"
+    <InputField
+      id="documentNormCategory"
+      aria-label="Art der Norm"
+      label="Art der Norm"
+    >
+      <div class="flex gap-24">
+        <InputField
+          v-for="category in NormCategory"
+          :id="
+            [MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED, category].join(
+              '-'
+            )
+          "
+          :key="category"
+          :aria-label="NORM_CATEGORY_NAMES[category]"
+          :label="NORM_CATEGORY_NAMES[category]"
+          :label-position="LabelPosition.RIGHT"
+        >
+          <CheckboxInput
             :id="
               [
                 MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
                 category,
               ].join('-')
             "
-            :key="category"
+            v-model="selectedNormCategories[category]"
             :aria-label="NORM_CATEGORY_NAMES[category]"
-            :label="NORM_CATEGORY_NAMES[category]"
-            :label-position="LabelPosition.RIGHT"
-          >
-            <CheckboxInput
-              :id="
-                [
-                  MetadataSectionName.DIVERGENT_EXPIRATION_UNDEFINED,
-                  category,
-                ].join('-')
-              "
-              v-model="selectedNormCategories[category]"
-              :aria-label="NORM_CATEGORY_NAMES[category]"
-              :style="checkboxStyle"
-            />
-          </InputField>
-        </div>
-      </InputField>
-    </div>
+            :style="checkboxStyle"
+          />
+        </InputField>
+      </div>
+    </InputField>
   </div>
 </template>

@@ -88,130 +88,124 @@ const explanation = computed({
 })
 </script>
 <template>
-  <div>
-    <div class="gap-16">
-      <div class="flex ful-w gap-16">
-        <InputField
-          id="digitalAnnouncementMedium"
-          aria-label="Verkündungsmedium"
-          class="w-1/2"
-          label="Verkündungsmedium"
-        >
-          <TextInput
-            id="digitalAnnouncementMedium"
-            v-model="announcementMedium"
-            alt-text="Verkündungsmedium"
-            aria-label="Verkündungsmedium"
-          />
-        </InputField>
-        <InputField
-          id="digitalAnnouncementDate"
-          aria-label="Verkündungsdatum"
-          class="w-1/2"
-          label="Verkündungsdatum"
-        >
-          <DateInput
-            id="digitalAnnouncementDate"
-            v-model="date"
-            alt-text="Verkündungsdatum"
-            aria-label="Verkündungsdatum"
-            is-future-date
-          />
-        </InputField>
-      </div>
-      <div class="flex ful-w gap-16">
-        <InputField
-          id="digitalAnnouncementEdition"
-          aria-label="Ausgabenummer"
-          class="w-1/3"
-          label="Ausgabenummer"
-        >
-          <TextInput
-            id="digitalAnnouncementEdition"
-            v-model="edition"
-            alt-text="Ausgabenummer"
-            aria-label="Ausgabenummer"
-          />
-        </InputField>
-        <InputField
-          id="digitalAnnouncementYear"
-          aria-label="Jahr"
-          class="w-1/3"
-          label="Jahr"
-        >
-          <YearInput
-            id="digitalAnnouncementYear"
-            v-model="year"
-            alt-text="Jahr"
-            aria-label="Jahr"
-          />
-        </InputField>
-        <InputField
-          id="digitalAnnouncementPageNumber"
-          aria-label="Seitenzahlen"
-          class="w-1/3"
-          label="Seitenzahlen"
-        >
-          <TextInput
-            id="digitalAnnouncementPageNumber"
-            v-model="pageNumber"
-            alt-text="Seitenzahlen"
-            aria-label="Seitenzahlen"
-          />
-        </InputField>
-      </div>
-      <div class="flex ful-w gap-16">
-        <InputField
-          id="digitalAnnouncementArea"
-          aria-label="Bereich der Veröffentlichung"
-          class="w-1/2"
-          label="Bereich der Veröffentlichung"
-        >
-          <TextInput
-            id="digitalAnnouncementArea"
-            v-model="areaOfPublication"
-            alt-text="Bereich der Veröffentlichung"
-            aria-label="Bereich der Veröffentlichung"
-          />
-        </InputField>
-        <InputField
-          id="digitalAnnouncementAreaNumber"
-          aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-          class="w-1/2"
-          label="Nummer der Veröffentlichung im jeweiligen Bereich"
-        >
-          <TextInput
-            id="digitalAnnouncementAreaNumber"
-            v-model="numberOfThePublicationInTheRespectiveArea"
-            alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
-            aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
-          />
-        </InputField>
-      </div>
-    </div>
-  </div>
-  <div>
+  <div class="flex ful-w gap-16">
     <InputField
+      id="digitalAnnouncementMedium"
+      aria-label="Verkündungsmedium"
+      class="w-1/2"
+      label="Verkündungsmedium"
+    >
+      <TextInput
+        id="digitalAnnouncementMedium"
+        v-model="announcementMedium"
+        alt-text="Verkündungsmedium"
+        aria-label="Verkündungsmedium"
+      />
+    </InputField>
+    <InputField
+      id="digitalAnnouncementDate"
+      aria-label="Verkündungsdatum"
+      class="w-1/2"
+      label="Verkündungsdatum"
+    >
+      <DateInput
+        id="digitalAnnouncementDate"
+        v-model="date"
+        alt-text="Verkündungsdatum"
+        aria-label="Verkündungsdatum"
+        is-future-date
+      />
+    </InputField>
+  </div>
+  <div class="flex ful-w gap-16">
+    <InputField
+      id="digitalAnnouncementEdition"
+      aria-label="Ausgabenummer"
+      class="w-1/3"
+      label="Ausgabenummer"
+    >
+      <TextInput
+        id="digitalAnnouncementEdition"
+        v-model="edition"
+        alt-text="Ausgabenummer"
+        aria-label="Ausgabenummer"
+      />
+    </InputField>
+    <InputField
+      id="digitalAnnouncementYear"
+      aria-label="Jahr"
+      class="w-1/3"
+      label="Jahr"
+    >
+      <YearInput
+        id="digitalAnnouncementYear"
+        v-model="year"
+        alt-text="Jahr"
+        aria-label="Jahr"
+      />
+    </InputField>
+    <InputField
+      id="digitalAnnouncementPageNumber"
+      aria-label="Seitenzahlen"
+      class="w-1/3"
+      label="Seitenzahlen"
+    >
+      <TextInput
+        id="digitalAnnouncementPageNumber"
+        v-model="pageNumber"
+        alt-text="Seitenzahlen"
+        aria-label="Seitenzahlen"
+      />
+    </InputField>
+  </div>
+  <div class="flex ful-w gap-16">
+    <InputField
+      id="digitalAnnouncementArea"
+      aria-label="Bereich der Veröffentlichung"
+      class="w-1/2"
+      label="Bereich der Veröffentlichung"
+    >
+      <TextInput
+        id="digitalAnnouncementArea"
+        v-model="areaOfPublication"
+        alt-text="Bereich der Veröffentlichung"
+        aria-label="Bereich der Veröffentlichung"
+      />
+    </InputField>
+    <InputField
+      id="digitalAnnouncementAreaNumber"
+      aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
+      class="w-1/2"
+      label="Nummer der Veröffentlichung im jeweiligen Bereich"
+    >
+      <TextInput
+        id="digitalAnnouncementAreaNumber"
+        v-model="numberOfThePublicationInTheRespectiveArea"
+        alt-text="Nummer der Veröffentlichung im jeweiligen Bereich"
+        aria-label="Nummer der Veröffentlichung im jeweiligen Bereich"
+      />
+    </InputField>
+  </div>
+  <InputField
+    id="digitalAnnouncementInfo"
+    aria-label="Zusatzangaben"
+    label="Zusatzangaben"
+  >
+    <TextInput
       id="digitalAnnouncementInfo"
+      v-model="additionalInfo"
       aria-label="Zusatzangaben"
-      label="Zusatzangaben"
-    >
-      <TextInput
-        id="digitalAnnouncementInfo"
-        v-model="additionalInfo"
-        aria-label="Zusatzangaben"
-      />
-    </InputField>
-    <InputField
+    />
+  </InputField>
+  <InputField
+    id="digitalAnnouncementExplanations"
+    aria-label="Erläuterungen"
+    label="Erläuterungen"
+  >
+    <TextInput
       id="digitalAnnouncementExplanations"
+      v-model="explanation"
       aria-label="Erläuterungen"
-      label="Erläuterungen"
-    >
-      <TextInput
-        id="digitalAnnouncementExplanations"
-        v-model="explanation"
-        aria-label="Erläuterungen"
-      />
-    </InputField>
-  </div>
+    />
+  </InputField>
 </template>

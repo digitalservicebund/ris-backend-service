@@ -53,7 +53,8 @@ export enum LabelPosition {
     <label
       v-if="labelConverted.length !== 0"
       :aria-label="id"
-      class="grid items-center label-03-reg mb-2 text-gray-900"
+      class="grid items-center label-03-reg text-gray-900"
+      :class="{ 'mb-2': labelPosition === LabelPosition.TOP }"
       :for="id"
     >
       <span v-for="(line, index) in labelConverted" :key="line">

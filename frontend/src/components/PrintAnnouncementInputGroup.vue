@@ -120,29 +120,27 @@ const explanation = computed({
       />
     </InputField>
   </div>
-  <div>
-    <InputField
+  <InputField
+    id="printAnnouncementInfo"
+    aria-label="Zusatzangaben"
+    label="Zusatzangaben"
+  >
+    <TextInput
       id="printAnnouncementInfo"
+      v-model="additionalInfo"
       aria-label="Zusatzangaben"
-      label="Zusatzangaben"
-    >
-      <TextInput
-        id="printAnnouncementInfo"
-        v-model="additionalInfo"
-        aria-label="Zusatzangaben"
-      />
-    </InputField>
+    />
+  </InputField>
 
-    <InputField
+  <InputField
+    id="printAnnouncementExplanations"
+    aria-label="Erläuterungen"
+    label="Erläuterungen"
+  >
+    <TextInput
       id="printAnnouncementExplanations"
+      v-model="explanation"
       aria-label="Erläuterungen"
-      label="Erläuterungen"
-    >
-      <TextInput
-        id="printAnnouncementExplanations"
-        v-model="explanation"
-        aria-label="Erläuterungen"
-      />
-    </InputField>
-  </div>
+    />
+  </InputField>
 </template>

@@ -62,8 +62,8 @@ const yearValue = computed({
 </script>
 
 <template>
-  <div class="pb-32 w-288">
-    <div class="radio-group w-320">
+  <div class="w-320">
+    <div class="flex justify-between mb-24">
       <label class="form-control">
         <input
           id="citationTypeDate"
@@ -114,12 +114,6 @@ const yearValue = computed({
 </template>
 
 <style lang="scss" scoped>
-.radio-group {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
 .form-control {
   display: flex;
   flex-direction: row;

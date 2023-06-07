@@ -67,22 +67,20 @@ const explanation = computed({
 })
 </script>
 <template>
-  <div class="w-full">
-    <InputField
+  <InputField
+    id="euAnnouncementGazette"
+    aria-label="Amtsblatt der EU"
+    label="Amtsblatt der EU"
+  >
+    <TextInput
       id="euAnnouncementGazette"
+      alt-text="Amtsblatt der EU"
       aria-label="Amtsblatt der EU"
-      label="Amtsblatt der EU"
-    >
-      <TextInput
-        id="euAnnouncementGazette"
-        alt-text="Amtsblatt der EU"
-        aria-label="Amtsblatt der EU"
-        class="border-gray-800 read-only:!border-solid"
-        read-only
-        :value="defaultValueEuGovernmentGazette"
-      />
-    </InputField>
-  </div>
+      class="border-gray-800 read-only:!border-solid"
+      read-only
+      :value="defaultValueEuGovernmentGazette"
+    />
+  </InputField>
   <div class="flex gap-16 justify-between">
     <InputField
       id="euAnnouncementYear"

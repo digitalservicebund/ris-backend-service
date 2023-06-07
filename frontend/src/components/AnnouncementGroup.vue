@@ -84,9 +84,9 @@ const component = computed(() => {
 </script>
 
 <template>
-  <div class="pb-32">
+  <div class="flex flex-col gap-8">
     <div class="flex flex-wrap gap-176">
-      <div class="flex flex-col gap-24 radio-group">
+      <div class="flex flex-col gap-24 mb-24">
         <label class="form-control">
           <input
             id="printAnnouncementSelection"
@@ -110,7 +110,7 @@ const component = computed(() => {
           Amtsblatt der EU
         </label>
       </div>
-      <div class="flex flex-col gap-24 radio-group">
+      <div class="flex flex-col gap-24 mb-24">
         <label class="flex form-control items-start">
           <input
             id="digitalAnnouncementSelection"
@@ -140,12 +140,6 @@ const component = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-.radio-group {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
 .form-control {
   display: flex;
   flex-direction: row;

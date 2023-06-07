@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed, nextTick, ref, useAttrs, watch, onMounted } from "vue"
 import type { Component } from "vue"
+import { computed, nextTick, onMounted, ref, useAttrs, watch } from "vue"
 import DataSetSummary from "@/shared/components/DataSetSummary.vue"
 
 interface Props {
@@ -102,11 +102,12 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
       :key="index"
       ref="elementList"
       aria-label="Listen Eintrag"
+      class="border-b-1 border-gray-400 group"
     >
       <div
         v-if="index !== editIndex"
         :key="index"
-        class="border-b-1 border-b-blue-500 cursor-pointer flex justify-between py-10"
+        class="cursor-pointer flex gap-8 group-first:pt-0 items-center justify-between py-8"
       >
         <component
           :is="summaryComponent"
@@ -117,10 +118,10 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
           @keypress.enter="setEditIndex(index)"
         />
 
-        <div class="flex">
+        <div class="flex gap-8">
           <button
             aria-label="Eintrag bearbeiten"
-            class="icon material-icons"
+            class="active:bg-blue-500 active:outline-none focus:outline-2 focus:outline-blue-800 hover:bg-blue-200 material-icons outline-none outline-offset-2 p-2 text-blue-800"
             @click="setEditIndex(index)"
           >
             edit_note
@@ -128,7 +129,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
 
           <button
             aria-label="Eintrag löschen"
-            class="icon material-icons"
+            class="active:bg-blue-500 active:outline-none focus:outline-2 focus:outline-blue-800 hover:bg-blue-200 material-icons outline-none outline-offset-2 p-2 text-blue-800"
             @click="removeModelEntry(index)"
           >
             delete_outline
@@ -141,7 +142,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
         v-else
         v-bind="attributes"
         v-model="modelValueList[index]"
-        class="mt-16"
+        class="group-first:pt-0 py-16"
         @keypress.enter="setEditIndex(undefined)"
       />
     </div>
@@ -149,7 +150,7 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
     <button
       v-if="!disableMultiEntry"
       aria-label="Weitere Angabe"
-      class="add-button bg-blue-300 focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white inline-flex items-center leading-18 mt-16 outline-0 outline-blue-800 outline-none outline-offset-4 pr-[0.25rem] py-[0.125rem] text-14 text-blue-800 whitespace-nowrap"
+      class="add-button bg-blue-300 flex focus:outline-4 font-bold gap-0.5 hover:bg-blue-800 hover:text-white items-center leading-18 mt-16 outline-0 outline-blue-800 outline-none outline-offset-4 px-8 py-2 text-14 text-blue-800 whitespace-nowrap"
       @click="addNewModelEntry"
     >
       <span class="material-icons text-14">add</span>
@@ -159,27 +160,6 @@ watch(editIndex, focusFirstFocusableElementOfCurrentEditElement)
 </template>
 
 <style lang="scss" scoped>
-.icon {
-  padding: 3px 2px;
-  color: #004b76;
-  outline: none;
-
-  &:hover {
-    background-color: #ecf1f4;
-  }
-
-  &:focus {
-    padding: 3px 2px;
-    border: 2px solid #004b76;
-  }
-
-  &:active {
-    border: none !important;
-    background: #b3c9d6;
-    outline: none;
-  }
-}
-
 .add-button {
   &:focus:not(:focus-visible) {
     @apply outline-transparent;
