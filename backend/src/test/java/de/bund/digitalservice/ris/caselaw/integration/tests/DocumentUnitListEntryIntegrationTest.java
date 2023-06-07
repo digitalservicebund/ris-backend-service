@@ -126,6 +126,7 @@ public class DocumentUnitListEntryIntegrationTest {
 
     webClient
         .mutateWith(csrf())
+        .mutateWith(getMockLogin())
         .get()
         .uri("/api/v1/caselaw/documentunits?pg=0&sz=3")
         .exchange()
