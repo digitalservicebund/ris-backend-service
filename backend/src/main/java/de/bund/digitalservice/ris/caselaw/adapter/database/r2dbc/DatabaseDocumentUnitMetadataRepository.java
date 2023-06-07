@@ -26,6 +26,9 @@ public interface DatabaseDocumentUnitMetadataRepository
 
   Flux<DocumentUnitMetadataDTO> findAllByDataSource(String dataSource, Pageable pageable);
 
+  Flux<DocumentUnitMetadataDTO> findAllByDataSourceAndDocumentationOfficeId(
+      String dataSource, Pageable pageable, UUID documentationOfficeId);
+
   @Query(
       "SELECT * FROM doc_unit WHERE "
           + WHERE

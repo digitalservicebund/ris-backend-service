@@ -9,6 +9,7 @@ import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.Dat
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.lookuptable.StateRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.proceedingdecision.DatabaseProceedingDecisionLinkRepository;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,15 +69,19 @@ class PostgresDocumentUnitRepositoryImplTest {
   @Test
   void testFindAll() {
     Sort sort = Sort.unsorted();
+    var documentationOfficeId = UUID.randomUUID();
     Mockito.when(
-            metadataRepository.findAllByDataSource(
-                DataSource.NEURIS.name(), PageRequest.of(0, 10, sort)))
+            metadataRepository.findAllByDataSourceAndDocumentationOfficeId(
+                DataSource.NEURIS.name(), PageRequest.of(0, 10, sort), documentationOfficeId))
         .thenReturn(Flux.empty());
 
-    StepVerifier.create(postgresDocumentUnitRepository.findAll(PageRequest.of(0, 10, sort)))
+    StepVerifier.create(
+            postgresDocumentUnitRepository.findAll(
+                PageRequest.of(0, 10, sort), documentationOfficeId))
         .verifyComplete();
 
     verify(metadataRepository)
-        .findAllByDataSource(DataSource.NEURIS.name(), PageRequest.of(0, 10, sort));
+        .findAllByDataSourceAndDocumentationOfficeId(
+            DataSource.NEURIS.name(), PageRequest.of(0, 10, sort), documentationOfficeId);
   }
 }

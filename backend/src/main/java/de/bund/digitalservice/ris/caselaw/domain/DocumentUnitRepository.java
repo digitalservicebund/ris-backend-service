@@ -34,7 +34,7 @@ public interface DocumentUnitRepository {
 
   Mono<Long> countByDataSource(DataSource dataSource);
 
-  Flux<DocumentUnitListEntry> findAll(Pageable pageable);
+  Flux<DocumentUnitListEntry> findAll(Pageable pageable, UUID documentationOfficeId);
 
   Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
       UUID parentDocumentUnitUuid);

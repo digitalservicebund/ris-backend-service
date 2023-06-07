@@ -932,9 +932,10 @@ public class PostgresDocumentUnitRepositoryImpl implements DocumentUnitRepositor
     return list.isEmpty() ? null : list.toArray(Long[]::new);
   }
 
-  public Flux<DocumentUnitListEntry> findAll(Pageable pageable) {
+  public Flux<DocumentUnitListEntry> findAll(Pageable pageable, UUID documentationOfficeId) {
     return metadataRepository
-        .findAllByDataSource(DataSource.NEURIS.name(), pageable)
+        .findAllByDataSourceAndDocumentationOfficeId(
+            DataSource.NEURIS.name(), pageable, documentationOfficeId)
         .flatMapSequential(this::injectFileNumbers)
         .flatMapSequential(this::injectDocumentationOffice)
         .flatMapSequential(this::injectStatus)
