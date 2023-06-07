@@ -1,4 +1,4 @@
-FROM node:16.14.2 AS builder
+FROM node:20.2.0 AS builder
 WORKDIR /usr/src/app
 COPY . .
 RUN npm install && npx vite build
