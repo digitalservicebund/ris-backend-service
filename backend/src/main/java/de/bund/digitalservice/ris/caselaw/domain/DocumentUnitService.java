@@ -3,7 +3,6 @@ package de.bund.digitalservice.ris.caselaw.domain;
 import static de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus.PUBLISHED;
 import static de.bund.digitalservice.ris.caselaw.domain.ServiceUtils.byteBufferToArray;
 
-import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -47,7 +46,6 @@ import software.amazon.awssdk.services.s3.model.PutObjectResponse;
 public class DocumentUnitService {
 
   private final DocumentUnitRepository repository;
-  private final DatabaseDocumentationOfficeRepository documentationOfficeRepository;
   private final DocumentNumberService documentNumberService;
   private final S3AsyncClient s3AsyncClient;
   private final EmailPublishService publishService;
@@ -61,15 +59,13 @@ public class DocumentUnitService {
       DocumentNumberService documentNumberService,
       S3AsyncClient s3AsyncClient,
       EmailPublishService publishService,
-      DocumentUnitStatusService documentUnitStatusService,
-      DatabaseDocumentationOfficeRepository documentationOfficeRepository) {
+      DocumentUnitStatusService documentUnitStatusService) {
 
     this.repository = repository;
     this.documentNumberService = documentNumberService;
     this.s3AsyncClient = s3AsyncClient;
     this.publishService = publishService;
     this.documentUnitStatusService = documentUnitStatusService;
-    this.documentationOfficeRepository = documentationOfficeRepository;
   }
 
   public Mono<DocumentUnit> generateNewDocumentUnit(DocumentationOffice documentationOffice) {
@@ -177,20 +173,18 @@ public class DocumentUnitService {
 
   public Mono<Page<DocumentUnitListEntry>> getAll(
       Pageable pageable, DocumentationOffice documentationOffice) {
-    return documentationOfficeRepository
-        .findByLabel(documentationOffice.label())
-        .flatMap(
-            docOffice ->
-                repository
-                    .findAll(
-                        PageRequest.of(
-                            pageable.getPageNumber(),
-                            pageable.getPageSize(),
-                            Sort.by(Order.desc("creationtimestamp"))),
-                        docOffice.getId())
-                    .collectList()
-                    .zipWith(repository.countByDataSource(DataSource.NEURIS))
-                    .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2())));
+    return repository
+        .findAll(
+            PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Order.desc("creationtimestamp"))),
+            documentationOffice)
+        .collectList()
+        .zipWith(
+            repository.countByDataSourceAndDocumentationOffice(
+                DataSource.NEURIS, documentationOffice))
+        .map(tuple -> new PageImpl<>(tuple.getT1(), pageable, tuple.getT2()));
   }
 
   public Mono<DocumentUnit> getByDocumentNumber(String documentNumber) {

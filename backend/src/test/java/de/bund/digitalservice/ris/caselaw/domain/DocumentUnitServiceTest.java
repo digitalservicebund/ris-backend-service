@@ -202,8 +202,8 @@ class DocumentUnitServiceTest {
     when(documentationOfficeRepository.findByLabel("do1"))
         .thenReturn(
             Mono.just(DocumentationOfficeDTO.builder().label("do1").id(docOfficeUuid).build()));
-    when(repository.findAll(pageRequest, docOfficeUuid)).thenReturn(Flux.fromIterable(entries));
-    when(repository.countByDataSource(DataSource.NEURIS))
+    when(repository.findAll(pageRequest, docOffice)).thenReturn(Flux.fromIterable(entries));
+    when(repository.countByDataSourceAndDocumentationOffice(DataSource.NEURIS, docOffice))
         .thenReturn(Mono.just((long) entries.size()));
 
     StepVerifier.create(service.getAll(pageRequest, docOffice))
@@ -214,7 +214,7 @@ class DocumentUnitServiceTest {
             })
         .verifyComplete();
 
-    verify(repository).findAll(pageRequest, docOfficeUuid);
+    verify(repository).findAll(pageRequest, docOffice);
   }
 
   @Test

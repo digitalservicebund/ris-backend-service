@@ -32,9 +32,10 @@ public interface DocumentUnitRepository {
 
   Mono<Long> countByProceedingDecision(ProceedingDecision proceedingDecision);
 
-  Mono<Long> countByDataSource(DataSource dataSource);
+  Mono<Long> countByDataSourceAndDocumentationOffice(
+      DataSource dataSource, DocumentationOffice documentationOfficeId);
 
-  Flux<DocumentUnitListEntry> findAll(Pageable pageable, UUID documentationOfficeId);
+  Flux<DocumentUnitListEntry> findAll(Pageable pageable, DocumentationOffice documentationOfficeId);
 
   Flux<ProceedingDecision> findAllLinkedDocumentUnitsByParentDocumentUnitId(
       UUID parentDocumentUnitUuid);
