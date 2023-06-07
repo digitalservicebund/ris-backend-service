@@ -860,7 +860,7 @@ jobs:
   generate-entity-relationship-diagram:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
-#    needs: e2e-tests
+    needs: e2e-tests
     env:
       POSTGRES_DB: ris-erd
       POSTGRES_PASSWORD: postgres
