@@ -881,6 +881,10 @@ jobs:
           - 5432:5432
     steps:
       - uses: actions/checkout@v3
+      - name: Get Gradle version
+        working-directory: ./backend
+        run: |
+          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
         uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 # v3.11.0
         with:
@@ -889,7 +893,9 @@ jobs:
           cache: gradle
       - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
+          gradle-version: ${{ env.GRADLE_VERSION }}
           arguments: migrateDatabaseForERD
+          build-root-directory: ./backend
         env:
           DB_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
           DB_USER: ${{ env.POSTGRES_USER }}
