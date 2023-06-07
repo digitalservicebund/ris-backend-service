@@ -183,18 +183,18 @@ dependencies {
   testImplementation "com.google.code.gson:gson:2.10.1"
 }
 
-flyway {
-  url = "jdbc:postgresql://localhost:5432/postgres"
-  user = "test"
-  password = "test"
+import org.flywaydb.gradle.task.FlywayMigrateTask
+
+tasks.register("migrateDatabaseForERD", FlywayMigrateTask) {
+  url = System.getenv("DB_URL")
+  user = System.getenv("DB_USER")
+  password = System.getenv("DB_PASSWORD")
   locations = [
     "filesystem:src/main/resources/db/migration/",
     "classpath:db/migration"
   ]
-  cleanDisabled = false
+  dependsOn compileMigrationJava
 }
-flywayInfo.dependsOn compileMigrationJava
-flywayMigrate.dependsOn compileMigrationJava
 
 jar {
   // We have no need for the plain archive, thus skip creation for build speedup!

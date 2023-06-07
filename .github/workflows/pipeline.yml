@@ -861,31 +861,45 @@ jobs:
     runs-on: ubuntu-latest
     if: ${{ github.ref == 'refs/heads/main' }}
 #    needs: e2e-tests
+    env:
+      POSTGRES_DB: ris-erd
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+    services:
+      postgres:
+        image: postgres:12-alpine
+        env:
+          POSTGRES_DB: ris-erd
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v3
-      - name: Get Gradle version
-        working-directory: ./backend
-        run: |
-          echo "GRADLE_VERSION=$(sed -n 's/.*gradle-\([0-9]*\(\.[0-9]*\)*\)-.*/\1/p' ./gradle/wrapper/gradle-wrapper.properties)" >> $GITHUB_ENV
       - name: Set up JDK
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@5ffc13f4174014e2d4d4572b3d74c3fa61aeb2c2 # v3.11.0
         with:
           java-version: "17.0"
           distribution: "temurin"
           cache: gradle
-      - name: Start localhost database
-        run: docker compose up -d --wait --quiet-pull db
       - uses: gradle/gradle-build-action@749f47bda3e44aa060e82d7b3ef7e40d953bd629
         with:
-          gradle-version: ${{ env.GRADLE_VERSION }}
-          arguments: flywayMigrate
-          build-root-directory: ./backend
+          arguments: migrateDatabaseForERD
+        env:
+          DB_URL: jdbc:postgresql://localhost:5432/${{ env.POSTGRES_DB }}
+          DB_USER: ${{ env.POSTGRES_USER }}
+          DB_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
       - name: Generate mermaid ER-diagram
         uses: digitalservicebund/github-actions/entity-relationship-diagram@b0e67dbb3637296eeb2ae0c9110cd42d4d8de6fb
         with:
-          configFile: ./backend/mermerd.config.yaml
-          connectionString: postgresql://test:test@localhost:5432/postgres
-          outputFile: latest-erdiagram.mmd
+          configFile: ./mermerd.config.yaml
+          connectionString: postgresql://${{ env.POSTGRES_USER }}:${{ env.POSTGRES_PASSWORD }}@localhost:5432/${{ env.POSTGRES_DB }}
+          outputFile: latest.mmd
           flags: --debug
           version: 0.8.0
       - name: Upload mermaid ER-diagram
@@ -893,7 +907,7 @@ jobs:
         with:
           name: erdiagram
           retention-days: 3
-          path: latest-erdiagram.mmd
+          path: latest.mmd
 
   push-reports:
     runs-on: ubuntu-latest
@@ -920,7 +934,7 @@ jobs:
       - name: ER-diagram - Check if diagram has changed
         id: erdiagram-check
         run: |
-          if git status -s | grep latest-erdiagram.mmd; then
+          if git status -s | grep latest.mmd; then
             echo "file_changed=true" >> "$GITHUB_OUTPUT"
           else
             echo "file_changed=false" >> $GITHUB_OUTPUT
@@ -929,8 +943,8 @@ jobs:
       - name: ER-diagram - Commit
         run: |
           NOW=$(TZ=Europe/Berlin date +'%Y-%m-%dT%H%M%S')
-          cp latest-erdiagram.mmd $NOW.mmd
-          git add latest-erdiagram.mmd $NOW.mmd
+          cp latest.mmd $NOW.mmd
+          git add latest.mmd $NOW.mmd
           git commit \
             -m "${{ github.event.head_commit.message }}" \
             -m "From commit: ${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}"

@@ -42,7 +42,7 @@ _setup_git_hooks() {
 }
 
 _setup_direnv() {
-  # Allow direnv to use `.env` files as described here: 
+  # Allow direnv to use `.env` files as described here:
   # https://github.com/direnv/direnv/blob/master/man/direnv.toml.1.md#codeloaddotenvcode
   [ -d ~/.config/direnv/. ] || mkdir ~/.config/direnv
   cat > ~/.config/direnv/direnv.toml<< EOF
@@ -69,7 +69,7 @@ _env() {
     fail "Setup requires gopass, please install first"
     exit 1
   fi
-  
+
   cat > ./.env<< EOF
 GH_PACKAGES_REPOSITORY_USER=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/username)
 GH_PACKAGES_REPOSITORY_TOKEN=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-juris-xml-export/token)
@@ -82,6 +82,9 @@ E2E_TEST_USER_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservice
 E2E_TEST_PASSWORD_BGH=$(gopass show -o -y neuris/maven.pkg.github.com/digitalservicebund/neuris-e2e-test-user-bgh/password)
 MY_UID=$(id -u)
 MY_GID=$(id -g)
+DB_URL=jdbc:postgresql://localhost:5432/postgres
+DB_USER=test
+DB_PASSWORD=test
 EOF
 
   if ! command -v direnv > /dev/null 2>&1; then
@@ -100,7 +103,7 @@ _dev() {
     exit 1
   fi
   docker build ./frontend -f frontend/Dockerfile -t neuris/frontend
-  
+
   wait=""
   services=""
   for arg in "$@"; do
@@ -189,8 +192,8 @@ cmd="${1:-}"
 case "$cmd" in
   "init") _init ;;
   "env") _env ;;
-  "dev") 
-    shift 
+  "dev")
+    shift
     _dev "$@";;
   "doc") _doc ;;
   "down") _down ;;
