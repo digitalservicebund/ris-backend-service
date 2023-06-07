@@ -179,6 +179,8 @@ dependencies {
 
   implementation "com.github.loki4j:loki-logback-appender:1.4.0"
 
+  implementation "io.getunleash:unleash-client-java:7.1.0"
+
   testImplementation "org.jeasy:easy-random-core:5.0.0"
   testImplementation "com.google.code.gson:gson:2.10.1"
 }

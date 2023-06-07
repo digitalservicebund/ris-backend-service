@@ -3,6 +3,7 @@ import { computed } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import NormReference from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
+import FeatureToggleService from "@/services/featureToggleService"
 import DateInput from "@/shared/components/input/DateInput.vue"
 import InputField from "@/shared/components/input/InputField.vue"
 import TextInput from "@/shared/components/input/TextInput.vue"
@@ -39,6 +40,11 @@ const normAbbreviation = computed({
     emit("update:modelValue", normRef)
   },
 })
+
+const response = await FeatureToggleService.isEnabled(
+  "neuris.disable-ris-abbreviation-input"
+)
+const disableRisAbbreviationInput = response.data
 </script>
 
 <template>
@@ -53,7 +59,11 @@ const normAbbreviation = computed({
         placeholder="Suchfeld"
       ></ComboboxInput>
     </InputField>
-    <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">
+    <InputField
+      v-if="!disableRisAbbreviationInput"
+      id="norm-reference-abbreviation-field"
+      label="RIS-Abkürzung"
+    >
       <ComboboxInput
         id="norm-reference-abbreviation"
         v-model="normAbbreviation"

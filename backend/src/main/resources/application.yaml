@@ -54,3 +54,5 @@ spring:
             scope:
               - openid
               - profile
+unleash:
+  appName: unleash-proxy
