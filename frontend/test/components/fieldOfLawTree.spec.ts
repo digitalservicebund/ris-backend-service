@@ -89,11 +89,8 @@ describe("FieldOfLawTree", () => {
     const nonLinkText = screen.getByText("And text for CD with link to")
 
     expect(node1ids).toHaveLength(2)
-    expect(node1ids[1] as HTMLElement).toHaveAttribute("class", "linked-field")
-    expect(nonLinkText as HTMLElement).not.toHaveAttribute(
-      "class",
-      "linked-field"
-    )
+    expect(node1ids[1] as HTMLElement).toHaveClass("linked-field")
+    expect(nonLinkText as HTMLElement).not.toHaveClass("linked-field")
     // expect(emitted()["linkedField:clicked"]).toHaveLength(1)
   })
 })
