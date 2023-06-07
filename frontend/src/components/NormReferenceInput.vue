@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue"
+import { computed, onMounted, ref } from "vue"
 import ComboboxInput from "@/components/ComboboxInput.vue"
 import NormReference from "@/domain/normReference"
 import ComboboxItemService from "@/services/comboboxItemService"
@@ -41,14 +41,18 @@ const normAbbreviation = computed({
   },
 })
 
-const response = await FeatureToggleService.isEnabled(
-  "neuris.disable-ris-abbreviation-input"
-)
-const disableRisAbbreviationInput = response.data
+const disableRisAbbreviationInput = ref(false)
+onMounted(async () => {
+  const response = await FeatureToggleService.isEnabled(
+    "neuris.disable-ris-abbreviation-input"
+  )
+  disableRisAbbreviationInput.value = !!response.data
+})
 </script>
 
 <template>
   <div>
+    <span v-if="disableRisAbbreviationInput">feature toggle enabled</span>
     <InputField id="norm-reference-search-field" label="Suchfeld">
       <ComboboxInput
         id="norm-reference-search"
@@ -59,11 +63,7 @@ const disableRisAbbreviationInput = response.data
         placeholder="Suchfeld"
       ></ComboboxInput>
     </InputField>
-    <InputField
-      v-if="!disableRisAbbreviationInput"
-      id="norm-reference-abbreviation-field"
-      label="RIS-Abkürzung"
-    >
+    <InputField id="norm-reference-abbreviation-field" label="RIS-Abkürzung">
       <ComboboxInput
         id="norm-reference-abbreviation"
         v-model="normAbbreviation"

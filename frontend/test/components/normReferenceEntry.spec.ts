@@ -13,6 +13,14 @@ function renderComponent(options?: { modelValue?: NormReference }) {
 }
 
 describe("NormReferenceEntry", () => {
+  vi.mock("@/services/featureToggleService", () => {
+    return {
+      default: {
+        isEnabled: vi.fn().mockReturnValue(true),
+      },
+    }
+  })
+
   it("render empty norm input entry", () => {
     renderComponent()
     expect(screen.getByLabelText("RIS-Abkürzung")).toBeInTheDocument()
