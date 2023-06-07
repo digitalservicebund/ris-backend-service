@@ -61,18 +61,21 @@ watchEffect(() => {
 
 <template>
   <div class="flex grow w-screen">
-    <SideToggle
-      v-model:is-expanded="navigationIsOpen"
-      class="border-gray-400 border-r-1 border-solid"
-      label="Navigation"
+    <div
+      class="bg-white border-gray-400 border-r-1 border-solid flex flex-col sticky top-0 z-20"
     >
-      <NavbarSide
-        go-back-label="Zurück"
-        :go-back-route="goBackRoute"
-        :menu-items="menuItems"
-      />
-    </SideToggle>
-
+      <SideToggle
+        v-model:is-expanded="navigationIsOpen"
+        class="sticky top-0 z-20"
+        label="Navigation"
+      >
+        <NavbarSide
+          go-back-label="Zurück"
+          :go-back-route="goBackRoute"
+          :menu-items="menuItems"
+        />
+      </SideToggle>
+    </div>
     <div class="bg-gray-100 flex flex-col w-full">
       <DocumentUnitInfoPanel
         :first-row="firstRowInfos"

@@ -2,15 +2,11 @@
 import { computed, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import TextEditor from "@/shared/components/input/TextEditor.vue"
-import SideToggle, {
-  OpeningDirection,
-} from "@/shared/components/SideToggle.vue"
 
 const props = defineProps<{
   open?: boolean
   hasFile: boolean
   file?: string
-  fixedPanelPosition?: boolean
 }>()
 
 const emit = defineEmits<{ (e: "update:open", value: boolean): void }>()
@@ -43,46 +39,33 @@ export default {
 </script>
 
 <template>
-  <SideToggle
-    v-model:is-expanded="open"
-    label="Originaldokument"
-    :opening-direction="OpeningDirection.LEFT"
-  >
-    <div v-bind="$attrs">
-      <div
-        class="basis-1/3! flex flex-col gap-56"
-        :class="{ sticky: fixedPanelPosition }"
-      >
-        <div class="flex items-center">
-          <h2 class="grow heading-02-regular">Originaldokument</h2>
-        </div>
+  <div v-bind="$attrs">
+    <div class="basis-1/3! flex flex-col gap-56 w-full">
+      <div class="flex items-center">
+        <h2 class="grow heading-02-regular">Originaldokument</h2>
+      </div>
 
-        <div v-if="!hasFile" class="flex flex-col gap-24">
-          <span class="material-icons odoc-upload-icon">cloud_upload</span>
+      <div v-if="!hasFile" class="flex flex-col gap-24">
+        <span class="material-icons odoc-upload-icon">cloud_upload</span>
 
-          Es wurde noch kein Originaldokument hochgeladen.
+        Es wurde noch kein Originaldokument hochgeladen.
 
-          <router-link
-            class="flex gap-2 items-center link-01-bold"
-            :to="uploadFileRoute"
-          >
-            <span class="material-icons">arrow_forward</span>
-            <span>Zum Upload</span>
-          </router-link>
-        </div>
-
-        <div v-else-if="!file">Dokument wird geladen</div>
-
-        <div
-          v-else
-          class="border-1 border-gray-400 border-solid overflow-scroll"
-          :class="{ 'editor-height': fixedPanelPosition }"
+        <router-link
+          class="flex gap-2 items-center link-01-bold"
+          :to="uploadFileRoute"
         >
-          <TextEditor element-id="odoc" field-size="max" :value="file" />
-        </div>
+          <span class="material-icons">arrow_forward</span>
+          <span>Zum Upload</span>
+        </router-link>
+      </div>
+
+      <div v-else-if="!file">Dokument wird geladen</div>
+
+      <div v-else class="border-1 border-gray-400 border-solid overflow-scroll">
+        <TextEditor element-id="odoc" field-size="max" :value="file" />
       </div>
     </div>
-  </SideToggle>
+  </div>
 </template>
 
 <style lang="scss" scoped>
@@ -117,15 +100,5 @@ export default {
 .odoc-upload-icon {
   font-size: 50px;
   @apply text-blue-800;
-}
-
-.sticky {
-  @apply fixed top-0 pt-[2rem] pr-[2rem];
-
-  overflow: scroll;
-}
-
-.editor-height {
-  height: calc(100vh - 150px);
 }
 </style>
