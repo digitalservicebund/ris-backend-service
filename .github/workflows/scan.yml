@@ -97,7 +97,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Attest vulnerability scan
-        run: cosign attest --replace --predicate vuln-backend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign attest --yes --replace --predicate vuln-backend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}:${{ env.CONTAINER_IMAGE_VERSION }}
         env:
           COSIGN_EXPERIMENTAL: "true"
       - name: Send status to Slack
@@ -202,7 +202,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Attest vulnerability scan
-        run: cosign attest --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
+        run: cosign attest --yes --replace --predicate vuln-frontend.json --type vuln ${{ env.CONTAINER_REGISTRY }}/${{ env.CONTAINER_IMAGE_NAME }}/frontend:${{ env.CONTAINER_IMAGE_VERSION }}
         env:
           COSIGN_EXPERIMENTAL: "true"
       - name: Send status to Slack
