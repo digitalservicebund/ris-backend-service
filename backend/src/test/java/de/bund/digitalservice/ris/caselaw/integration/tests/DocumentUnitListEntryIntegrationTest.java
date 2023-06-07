@@ -1,5 +1,6 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -150,7 +151,7 @@ public class DocumentUnitListEntryIntegrationTest {
   @Test
   void testForCorrectOrdering() {
     DocumentationOfficeDTO documentationOfficeDTO =
-        documentationOfficeRepository.findByLabel("BGH").block();
+        documentationOfficeRepository.findByLabel("DigitalService").block();
 
     List<Instant> timestampsExpected = new ArrayList<>();
     for (int i = 0; i < 10; i++) {
@@ -174,6 +175,7 @@ public class DocumentUnitListEntryIntegrationTest {
     EntityExchangeResult<String> result =
         webClient
             .mutateWith(csrf())
+            .mutateWith(getMockLogin())
             .get()
             .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
             .exchange()

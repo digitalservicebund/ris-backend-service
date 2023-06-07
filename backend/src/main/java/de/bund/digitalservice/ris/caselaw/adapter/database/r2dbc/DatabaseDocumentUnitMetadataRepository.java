@@ -40,7 +40,7 @@ public interface DatabaseDocumentUnitMetadataRepository
           + "  docunit.documentation_office_id = :documentationOffice OR "
           + "  status.status = 'PUBLISHED' OR "
           + "  status.status IS NULL"
-          + ")")
+          + ") ORDER BY docunit.creationtimestamp DESC")
   Flux<DocumentUnitMetadataDTO> findAllByDataSourceAndDocumentationOfficeId(
       String dataSource, Pageable pageable, UUID documentationOffice);
 
