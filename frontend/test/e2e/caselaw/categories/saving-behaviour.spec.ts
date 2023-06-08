@@ -18,14 +18,9 @@ test.describe("saving behaviour", () => {
       await route.abort("internetdisconnected")
     })
 
-    await page.locator("[aria-label='Stammdaten Speichern Button']").click()
+    await page.locator("[aria-label='Speichern Button']").click()
 
-    await expect(
-      page.locator("text='Fehler beim Speichern'").nth(0)
-    ).toBeVisible()
-    await expect(
-      page.locator("text='Fehler beim Speichern'").nth(1)
-    ).toBeVisible()
+    await expect(page.locator("text='Fehler beim Speichern'")).toBeVisible()
   })
 
   test("change Spruchkörper two times, saving after each change", async ({
