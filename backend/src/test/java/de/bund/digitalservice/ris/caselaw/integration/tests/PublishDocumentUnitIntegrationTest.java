@@ -110,7 +110,10 @@ class PublishDocumentUnitIntegrationTest {
             1L,
             savedDocumentUnitDTO.getId(),
             "exporter@neuris.de",
-            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang",
+            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                + DELIVER_DATE
+                + " vg="
+                + savedDocumentUnitDTO.getDocumentnumber(),
             "xml",
             "200",
             "message 1|message 2",
@@ -121,7 +124,10 @@ class PublishDocumentUnitIntegrationTest {
         new XmlMail(
             documentUnitUuid1,
             "exporter@neuris.de",
-            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld=" + DELIVER_DATE + " vg=Testvorgang",
+            "id=juris name=NeuRIS da=R df=X dt=N mod=T ld="
+                + DELIVER_DATE
+                + " vg="
+                + savedDocumentUnitDTO.getDocumentnumber(),
             "xml",
             "200",
             List.of("message 1", "message 2"),
