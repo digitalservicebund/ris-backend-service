@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 
@@ -11,8 +12,10 @@ import de.bund.digitalservice.ris.caselaw.adapter.DocumentUnitController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitMetadataRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitRepository;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentUnitStatusRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DatabaseDocumentationOfficeRepository;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitDTO;
+import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentUnitStatusDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.DocumentationOfficeDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberDTO;
 import de.bund.digitalservice.ris.caselaw.adapter.database.r2dbc.FileNumberRepository;
@@ -21,6 +24,7 @@ import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.DataSource;
 import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitService;
+import de.bund.digitalservice.ris.caselaw.domain.DocumentUnitStatus;
 import de.bund.digitalservice.ris.caselaw.domain.EmailPublishService;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -69,6 +73,7 @@ public class DocumentUnitListEntryIntegrationTest {
 
   @Autowired private WebTestClient webClient;
   @Autowired private DatabaseDocumentUnitRepository repository;
+  @Autowired private DatabaseDocumentUnitStatusRepository statusRepository;
   @Autowired private DatabaseDocumentUnitMetadataRepository listEntryRepository;
   @Autowired private FileNumberRepository fileNumberRepository;
   @Autowired private DatabaseDocumentationOfficeRepository documentationOfficeRepository;
@@ -77,10 +82,12 @@ public class DocumentUnitListEntryIntegrationTest {
   void setUp() {
     repository.deleteAll().block();
     fileNumberRepository.deleteAll().block();
+    statusRepository.deleteAll().block();
   }
 
   @Test
   void testForCorrectResponseWhenRequestingAll() {
+    // created via db migration V0_79__caselaw_insert_default_documentation_offices
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByLabel("BGH").block();
 
@@ -151,6 +158,7 @@ public class DocumentUnitListEntryIntegrationTest {
 
   @Test
   void testForCorrectOrdering() {
+    // created via db migration V0_79__caselaw_insert_default_documentation_offices
     DocumentationOfficeDTO documentationOfficeDTO =
         documentationOfficeRepository.findByLabel("DigitalService").block();
 
@@ -195,5 +203,80 @@ public class DocumentUnitListEntryIntegrationTest {
       Instant tNext = timestampsActual.get(i + 1);
       assertThat(tThis).isAfter(tNext);
     }
+  }
+
+  @Test
+  void testForCorrectFilteringDependingOnUser() {
+
+    // test setup
+    // created via db migration V0_79__caselaw_insert_default_documentation_offices
+    DocumentationOfficeDTO documentationOfficeDTO =
+        documentationOfficeRepository.findByLabel("CC-RIS").block();
+
+    // docOffice1: new docUnit1
+    DocumentUnitDTO docUnit1 =
+        repository
+            .save(
+                DocumentUnitDTO.builder()
+                    .uuid(UUID.randomUUID())
+                    .creationtimestamp(Instant.now())
+                    .documentnumber("1234567890121")
+                    .dataSource(DataSource.NEURIS)
+                    .documentationOfficeId(documentationOfficeDTO.getId())
+                    .build())
+            .block();
+
+    statusRepository
+        .save(
+            DocumentUnitStatusDTO.builder()
+                .documentUnitId(docUnit1.getUuid())
+                .status(DocumentUnitStatus.UNPUBLISHED)
+                .createdAt(docUnit1.getCreationtimestamp())
+                .id(UUID.randomUUID())
+                .newEntry(true)
+                .build())
+        .block();
+
+    // docOffice1: new docUnit2
+    // docOffice1: publish docUnit2
+
+    // docOffice2: new docUnit3
+    // docOffice2: new docUnit4
+    // docOffice2: publish docUnit4
+    // docOffice2: new docUnit5 with no status (create via repo)
+
+    // without docOffice: new docUnit6 with no status (create via repo)
+
+    // desired state:
+    // --> docUnit1: docOffice1 & unpublished
+    // --> docUnit2: docOffice1 & published
+    // --> docUnit3: docOffice2 & unpublished
+    // --> docUnit4: docOffice2 & published
+    // --> docUnit5: docOffice2 & no state (legacy)
+    // --> docUnit6: no docOffice & no state (legacy)
+
+    // expectation
+    // expect user1 to see only docUnit1, docUnit2, docUnit4, docUnit5, docUnit6
+    EntityExchangeResult<String> result =
+        webClient
+            .mutateWith(csrf())
+            .mutateWith(getMockLoginWithDocOffice("CC-RIS"))
+            .get()
+            .uri("/api/v1/caselaw/documentunits?pg=0&sz=10")
+            .exchange()
+            .expectStatus()
+            .isOk()
+            .expectBody(String.class)
+            .returnResult();
+
+    System.out.println(result.getResponseBody());
+
+    var docUnit1Status = JsonPath.read(result.getResponseBody(), "$.content[0].status");
+
+    System.out.println(docUnit1Status);
+    assertThat(docUnit1Status).isEqualTo(DocumentUnitStatus.UNPUBLISHED.toString());
+
+    // expect user2 to see only docUnit2, docUnit3, docUnit4, docUnit5, docUnit6
+
   }
 }

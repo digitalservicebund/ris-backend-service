@@ -1,6 +1,7 @@
 package de.bund.digitalservice.ris.caselaw.integration.tests;
 
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
+import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOidcLogin;
@@ -58,6 +59,25 @@ class AuthIntegrationTest {
               assertThat(response.getResponseBody().name()).isEqualTo("testUser");
               assertThat(response.getResponseBody().documentationOffice().label())
                   .isEqualTo("DigitalService");
+            });
+  }
+
+  @Test
+  void testGetUserForOtherOffice() {
+    webClient
+        .mutateWith(csrf())
+        .mutateWith(getMockLoginWithDocOffice("CC-RIS"))
+        .get()
+        .uri("/api/v1/auth/me")
+        .exchange()
+        .expectStatus()
+        .isOk()
+        .expectBody(User.class)
+        .consumeWith(
+            response -> {
+              assertThat(response.getResponseBody().name()).isEqualTo("testUser");
+              assertThat(response.getResponseBody().documentationOffice().label())
+                  .isEqualTo("CC-RIS");
             });
   }
 
