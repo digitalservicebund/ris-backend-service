@@ -5,12 +5,8 @@ import { testWithDocumentUnit as test } from "./fixtures"
 test.describe("test the different layout options", () => {
   test("ensure default layout", async ({ page, documentNumber }) => {
     await navigateToCategories(page, documentNumber)
-    await expect(
-      page.locator("span:text-is('Navigation schließen') + button")
-    ).toBeVisible()
-    await expect(
-      page.locator("span:text-is('Originaldokument öffnen') + button")
-    ).toBeVisible()
+    await expect(page.getByLabel("Navigation schließen")).toBeVisible()
+    await expect(page.getByLabel("Originaldokument öffnen")).toBeVisible()
     await expect(
       page.locator("text=Es wurde noch kein Originaldokument hochgeladen")
     ).toBeHidden()
@@ -21,9 +17,7 @@ test.describe("test the different layout options", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await page
-      .locator("span:text-is('Originaldokument öffnen') + button")
-      .click()
+    await page.getByLabel("Originaldokument öffnen").click()
     await expect(
       page.locator("text=Es wurde noch kein Originaldokument hochgeladen")
     ).toBeVisible()
@@ -35,11 +29,11 @@ test.describe("test the different layout options", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await page.locator("span:text-is('Navigation schließen') + button").click()
+    await page.getByLabel("Navigation schließen").click()
     await expect(page).toHaveURL(/showNavBar=false/)
     await expect(page.locator("aside", { hasText: "Zurück" })).toBeHidden()
 
-    await page.locator("span:text-is('Navigation öffnen') + button").click()
+    await page.getByLabel("Navigation öffnen").click()
     await expect(page).toHaveURL(/showNavBar=true/)
     await expect(page.locator("aside", { hasText: "Zurück" })).toBeVisible()
   })
@@ -49,12 +43,10 @@ test.describe("test the different layout options", () => {
     documentNumber,
   }) => {
     await navigateToCategories(page, documentNumber)
-    await page
-      .locator("span:text-is('Originaldokument öffnen') + button")
-      .click()
+    await page.getByLabel("Originaldokument öffnen").click()
     await expect(page).toHaveURL(/showDocPanel=true/)
 
-    await page.locator("span:text-is('Navigation schließen') + button").click()
+    await page.getByLabel("Navigation schließen").click()
     await expect(page).toHaveURL(/showNavBar=false/)
 
     await page.locator("a >> text=Zum Upload").click()

@@ -68,9 +68,8 @@ export enum OpeningDirection {
 
 <template>
   <div class="bg-white pr-[1.25rem]">
-    <span class="block h-[1px] overflow-hidden w-[1px]">{{ label }}</span>
     <button
-      aria-label="sidebarNavigationCloseButton"
+      :aria-label="label"
       class="absolute flex items-center top-28"
       :class="classes"
       @click="toggleContentVisibility"
