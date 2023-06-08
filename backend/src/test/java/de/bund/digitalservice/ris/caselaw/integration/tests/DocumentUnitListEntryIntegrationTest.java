@@ -280,8 +280,7 @@ public class DocumentUnitListEntryIntegrationTest {
         .isEqualTo(PUBLISHED.toString());
     assertThat(extractStatusByUuid(result.getResponseBody(), docUnit6.getUuid()))
         .isEqualTo(PUBLISHED.toString());
-    // TODO
-    // assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit7.getUuid())).isEmpty();
+    assertThat(extractDocUnitsByUuid(result.getResponseBody(), docUnit7.getUuid())).isEmpty();
 
     // expect user2 to see only docUnit2, docUnit3, docUnit4, docUnit5, docUnit6
   }

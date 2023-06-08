@@ -27,20 +27,17 @@ public interface DatabaseDocumentUnitMetadataRepository
   Flux<DocumentUnitMetadataDTO> findAllByDataSource(String dataSource, Pageable pageable);
 
   @Query(
-      "SELECT docunit.*, status.* "
-          + "FROM doc_unit AS docunit "
-          + "LEFT JOIN document_unit_status AS status ON docunit.uuid = status.document_unit_id  "
-          + "LEFT JOIN (  "
-          + "  SELECT document_unit_id, MAX(created_at) as maxCreatedAt  "
-          + "  FROM document_unit_status  "
-          + "  GROUP BY document_unit_id  "
-          + ") AS latest_status ON status.document_unit_id = latest_status.document_unit_id   "
-          + "AND status.created_at = latest_status.maxCreatedAt  "
+      "SELECT docunit.* "
+          + "FROM doc_unit docunit "
+          + "LEFT JOIN ( "
+          + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
+          + "    FROM public.document_unit_status "
+          + "    ORDER BY document_unit_id, created_at DESC "
+          + ") status ON docunit.uuid = status.document_unit_id "
           + "WHERE docunit.data_source = :dataSource AND ( "
-          + "  docunit.documentation_office_id = :documentationOffice OR "
-          + "  status.status = 'PUBLISHED' OR "
-          + "  status.status IS NULL"
-          + ") ORDER BY docunit.creationtimestamp DESC")
+          + "    docunit.documentation_office_id = :documentationOffice OR"
+          + "    status.status IS NULL OR "
+          + "    status.status = 'PUBLISHED') ")
   Flux<DocumentUnitMetadataDTO> findAllByDataSourceAndDocumentationOfficeId(
       String dataSource, Pageable pageable, UUID documentationOffice);
 
