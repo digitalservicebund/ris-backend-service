@@ -37,6 +37,7 @@ export type MetadataInputSection = {
   heading?: string
   isRepeatedSection?: boolean
   isSingleFieldSection?: boolean
+  isExpandableNotRepeatable?: boolean
   fields?: AnyField[]
   sections?: MetadataInputSection[]
 }

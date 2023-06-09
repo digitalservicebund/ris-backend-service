@@ -15,17 +15,6 @@ classDiagram
     String officialShortTitle
     String officialAbbreviation
 
-    Date entryIntoForceDate
-    UndefinedDate entryIntoForceDateState
-    Date principleEntryIntoForceDate
-    UndefinedDate principleEntryIntoForceDateState
-
-    Date expirationDate
-    String expirationDateState
-    Boolean isExpirationDateTemp
-    Date principleExpirationDate
-    UndefinedDate principleExpirationDateState
-
     Date announcementDate
     Date publicationDate
 
@@ -132,6 +121,10 @@ classDiagram
      DIVERGENT_EXPIRATION_DEFINED
      DIVERGENT_EXPIRATION_UNDEFINED
      CATEGORIZED_REFERENCE
+     ENTRY_INTO_FORCE
+     PRINCIPLE_ENTRY_INTO_FORCE
+     EXPIRATION
+     PRINCIPLE_EXPIRATION
   }
 
   class MetadatumType  {

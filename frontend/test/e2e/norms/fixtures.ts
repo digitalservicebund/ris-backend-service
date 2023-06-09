@@ -94,342 +94,500 @@ export const testWithImportedNorm = test.extend<MyFixtures>({
 
 export function getNormBySections(norm: NormData): MetadataInputSection[] {
   return [
+    // {
+    //   heading: "Allgemeine Angaben",
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "officialLongTitle",
+    //       label: "Amtliche Langüberschrift",
+    //       value: norm.officialLongTitle,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "risAbbreviation",
+    //       label: "Juris-Abkürzung",
+    //       value: norm.risAbbreviation,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.CHIPS,
+    //       id: "risAbbreviationInternationalLaw",
+    //       label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
+    //       value:
+    //         norm.metadataSections?.NORM?.[0].RIS_ABBREVIATION_INTERNATIONAL_LAW,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "documentNumber",
+    //       label: "Dokumentnummer",
+    //       value: norm.documentNumber,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.CHIPS,
+    //       id: "divergentDocumentNumbers",
+    //       label: "Abweichende Dokumentnummer",
+    //       value: norm.metadataSections?.NORM?.[0].DIVERGENT_DOCUMENT_NUMBER,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "documentCategory",
+    //       label: "Dokumentart",
+    //       value: norm.documentCategory,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.CHIPS,
+    //       id: "frameKeywords",
+    //       label: "Schlagwörter im Rahmenelement",
+    //       value: norm.metadataSections?.NORM?.[0].KEYWORD,
+    //     },
+    //   ],
+    // },
+    // {
+    //   heading: "Dokumenttyp",
+    //   isExpandableNotRepeatable: true,
+    //   id: "documentTypes",
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "documentTypeName",
+    //       label: "Typbezeichnung",
+    //       values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+    //         (section) => section?.TYPE_NAME?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.CHECKBOX,
+    //       id: NormCategory.AMENDMENT_NORM,
+    //       label: "Änderungsnorm",
+    //       values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+    //         (section) =>
+    //           !!section?.NORM_CATEGORY?.find(
+    //             (category) => category == NormCategory.AMENDMENT_NORM
+    //           )
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.CHECKBOX,
+    //       id: NormCategory.BASE_NORM,
+    //       label: "Stammnorm",
+    //       values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+    //         (section) =>
+    //           !!section?.NORM_CATEGORY?.find(
+    //             (category) => category == NormCategory.BASE_NORM
+    //           )
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.CHECKBOX,
+    //       id: NormCategory.TRANSITIONAL_NORM,
+    //       label: "Übergangsnorm",
+    //       values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+    //         (section) =>
+    //           !!section?.NORM_CATEGORY?.find(
+    //             (category) => category == NormCategory.TRANSITIONAL_NORM
+    //           )
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.CHIPS,
+    //       id: "documentTemplateName",
+    //       label: "Bezeichnung gemäß Vorlage",
+    //       values: norm.metadataSections?.DOCUMENT_TYPE?.map(
+    //         (section) => section?.TEMPLATE_NAME
+    //       ),
+    //     },
+    //   ],
+    // },
+    // {
+    //   heading: "Normgeber",
+    //   isRepeatedSection: true,
+    //   id: "normProviders",
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "normProviderEntity",
+    //       label:
+    //         "Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt",
+    //       values: norm.metadataSections?.NORM_PROVIDER?.map(
+    //         (section) => section?.ENTITY?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "normProviderDecidingBody",
+    //       label: "Beschließendes Organ",
+    //       values: norm.metadataSections?.NORM_PROVIDER?.map(
+    //         (section) => section?.DECIDING_BODY?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.CHECKBOX,
+    //       id: "normProviderIsResolutionMajority",
+    //       label: "Beschlussfassung mit qualifizierter Mehrheit",
+    //       values: norm.metadataSections?.NORM_PROVIDER?.map(
+    //         (section) => section?.RESOLUTION_MAJORITY?.[0]
+    //       ),
+    //     },
+    //   ],
+    // },
+    // {
+    //   heading: "Mitwirkende Organe",
+    //   id: "participatingInstitutions",
+    //   isRepeatedSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "participationType",
+    //       label: "Art der Mitwirkung",
+    //       values: norm.metadataSections?.PARTICIPATION?.map(
+    //         (section) => section?.PARTICIPATION_TYPE?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "participationInstitution",
+    //       label: "Mitwirkendes Organ",
+    //       values: norm.metadataSections?.PARTICIPATION?.map(
+    //         (section) => section?.PARTICIPATION_INSTITUTION?.[0]
+    //       ),
+    //     },
+    //   ],
+    // },
+    // {
+    //   heading: "Federführung",
+    //   isRepeatedSection: true,
+    //   id: "leads",
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "leadJurisdiction",
+    //       label: "Ressort",
+    //       values: norm.metadataSections?.LEAD?.map(
+    //         (section) => section?.LEAD_JURISDICTION?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "leadUnit",
+    //       label: "Organisationseinheit",
+    //       values: norm.metadataSections?.LEAD?.map(
+    //         (section) => section?.LEAD_UNIT?.[0]
+    //       ),
+    //     },
+    //   ],
+    // },
+    // {
+    //   heading: "Sachgebiet",
+    //   isRepeatedSection: true,
+    //   id: "subjectAreas",
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "subjectFna",
+    //       label: "FNA-Nummer",
+    //       values: norm.metadataSections?.SUBJECT_AREA?.map(
+    //         (section) => section?.SUBJECT_FNA?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "subjectPreviousFna",
+    //       label: "Frühere FNA-Nummer",
+    //       values: norm.metadataSections?.SUBJECT_AREA?.map(
+    //         (section) => section?.SUBJECT_PREVIOUS_FNA?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "subjectGesta",
+    //       label: "GESTA-Nummer",
+    //       values: norm.metadataSections?.SUBJECT_AREA?.map(
+    //         (section) => section?.SUBJECT_GESTA?.[0]
+    //       ),
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "subjectBgb3",
+    //       label: "Bundesgesetzblatt Teil III",
+    //       values: norm.metadataSections?.SUBJECT_AREA?.map(
+    //         (section) => section?.SUBJECT_BGB_3?.[0]
+    //       ),
+    //     },
+    //   ],
+    // },
+    // {
+    //   heading: "Überschriften und Abkürzungen",
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "officialShortTitle",
+    //       label: "Amtliche Kurzüberschrift",
+    //       value: norm.officialShortTitle,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "officialAbbreviation",
+    //       label: "Amtliche Buchstabenabkürzung",
+    //       value: norm.officialAbbreviation,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.CHIPS,
+    //       id: "unofficialLongTitles",
+    //       label: "Nichtamtliche Langüberschrift",
+    //       value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_LONG_TITLE,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.CHIPS,
+    //       id: "unofficialShortTitles",
+    //       label: "Nichtamtliche Kurzüberschrift",
+    //       value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_SHORT_TITLE,
+    //     },
+    //   ],
+    // },
+    // {
+    //   isSingleFieldSection: true,
+    //   fields: [
+    //     {
+    //       type: FieldType.CHIPS,
+    //       id: "unofficialAbbreviations",
+    //       label: "Nichtamtliche Buchstabenabkürzung",
+    //       value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_ABBREVIATION,
+    //     },
+    //   ],
+    // },
     {
-      heading: "Allgemeine Angaben",
-      isSingleFieldSection: true,
+      heading: "Datum des Inkrafttretens",
+      isExpandableNotRepeatable: true,
+      id: "entryIntoForces",
       fields: [
         {
-          type: FieldType.TEXT,
-          id: "officialLongTitle",
-          label: "Amtliche Langüberschrift",
-          value: norm.officialLongTitle,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "risAbbreviation",
-          label: "Juris-Abkürzung",
-          value: norm.risAbbreviation,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.CHIPS,
-          id: "risAbbreviationInternationalLaw",
-          label: "Juris-Abkürzung für völkerrechtliche Vereinbarungen",
-          value:
-            norm.metadataSections?.NORM?.[0].RIS_ABBREVIATION_INTERNATIONAL_LAW,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "documentNumber",
-          label: "Dokumentnummer",
-          value: norm.documentNumber,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.CHIPS,
-          id: "divergentDocumentNumbers",
-          label: "Abweichende Dokumentnummer",
-          value: norm.metadataSections?.NORM?.[0].DIVERGENT_DOCUMENT_NUMBER,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "documentCategory",
-          label: "Dokumentart",
-          value: norm.documentCategory,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.CHIPS,
-          id: "frameKeywords",
-          label: "Schlagwörter im Rahmenelement",
-          value: norm.metadataSections?.NORM?.[0].KEYWORD,
-        },
-      ],
-    },
-    {
-      heading: "Dokumenttyp",
-      id: "documentTypes",
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "documentTypeName",
-          label: "Typbezeichnung",
-          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
-            (section) => section?.TYPE_NAME?.[0]
+          type: FieldType.RADIO,
+          id: "entryIntoForceSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DATE
           ),
         },
-        {
-          type: FieldType.CHECKBOX,
-          id: NormCategory.AMENDMENT_NORM,
-          label: "Änderungsnorm",
-          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
-            (section) =>
-              !!section?.NORM_CATEGORY?.find(
-                (category) => category == NormCategory.AMENDMENT_NORM
-              )
-          ),
-        },
-        {
-          type: FieldType.CHECKBOX,
-          id: NormCategory.BASE_NORM,
-          label: "Stammnorm",
-          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
-            (section) =>
-              !!section?.NORM_CATEGORY?.find(
-                (category) => category == NormCategory.BASE_NORM
-              )
-          ),
-        },
-        {
-          type: FieldType.CHECKBOX,
-          id: NormCategory.TRANSITIONAL_NORM,
-          label: "Übergangsnorm",
-          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
-            (section) =>
-              !!section?.NORM_CATEGORY?.find(
-                (category) => category == NormCategory.TRANSITIONAL_NORM
-              )
-          ),
-        },
-        {
-          type: FieldType.CHIPS,
-          id: "documentTemplateName",
-          label: "Bezeichnung gemäß Vorlage",
-          values: norm.metadataSections?.DOCUMENT_TYPE?.map(
-            (section) => section?.TEMPLATE_NAME
-          ),
-        },
-      ],
-    },
-    {
-      heading: "Normgeber",
-      isRepeatedSection: true,
-      id: "normProviders",
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "normProviderEntity",
-          label:
-            "Staat, Land, Stadt, Landkreis oder juristische Person, deren Hoheitsgewalt oder Rechtsmacht die Norm trägt",
-          values: norm.metadataSections?.NORM_PROVIDER?.map(
-            (section) => section?.ENTITY?.[0]
-          ),
-        },
-        {
-          type: FieldType.TEXT,
-          id: "normProviderDecidingBody",
-          label: "Beschließendes Organ",
-          values: norm.metadataSections?.NORM_PROVIDER?.map(
-            (section) => section?.DECIDING_BODY?.[0]
-          ),
-        },
-        {
-          type: FieldType.CHECKBOX,
-          id: "normProviderIsResolutionMajority",
-          label: "Beschlussfassung mit qualifizierter Mehrheit",
-          values: norm.metadataSections?.NORM_PROVIDER?.map(
-            (section) => section?.RESOLUTION_MAJORITY?.[0]
-          ),
-        },
-      ],
-    },
-    {
-      heading: "Mitwirkende Organe",
-      id: "participatingInstitutions",
-      isRepeatedSection: true,
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "participationType",
-          label: "Art der Mitwirkung",
-          values: norm.metadataSections?.PARTICIPATION?.map(
-            (section) => section?.PARTICIPATION_TYPE?.[0]
-          ),
-        },
-        {
-          type: FieldType.TEXT,
-          id: "participationInstitution",
-          label: "Mitwirkendes Organ",
-          values: norm.metadataSections?.PARTICIPATION?.map(
-            (section) => section?.PARTICIPATION_INSTITUTION?.[0]
-          ),
-        },
-      ],
-    },
-    {
-      heading: "Federführung",
-      isRepeatedSection: true,
-      id: "leads",
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "leadJurisdiction",
-          label: "Ressort",
-          values: norm.metadataSections?.LEAD?.map(
-            (section) => section?.LEAD_JURISDICTION?.[0]
-          ),
-        },
-        {
-          type: FieldType.TEXT,
-          id: "leadUnit",
-          label: "Organisationseinheit",
-          values: norm.metadataSections?.LEAD?.map(
-            (section) => section?.LEAD_UNIT?.[0]
-          ),
-        },
-      ],
-    },
-    {
-      heading: "Sachgebiet",
-      isRepeatedSection: true,
-      id: "subjectAreas",
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "subjectFna",
-          label: "FNA-Nummer",
-          values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_FNA?.[0]
-          ),
-        },
-        {
-          type: FieldType.TEXT,
-          id: "subjectPreviousFna",
-          label: "Frühere FNA-Nummer",
-          values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_PREVIOUS_FNA?.[0]
-          ),
-        },
-        {
-          type: FieldType.TEXT,
-          id: "subjectGesta",
-          label: "GESTA-Nummer",
-          values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_GESTA?.[0]
-          ),
-        },
-        {
-          type: FieldType.TEXT,
-          id: "subjectBgb3",
-          label: "Bundesgesetzblatt Teil III",
-          values: norm.metadataSections?.SUBJECT_AREA?.map(
-            (section) => section?.SUBJECT_BGB_3?.[0]
-          ),
-        },
-      ],
-    },
-    {
-      heading: "Überschriften und Abkürzungen",
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "officialShortTitle",
-          label: "Amtliche Kurzüberschrift",
-          value: norm.officialShortTitle,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "officialAbbreviation",
-          label: "Amtliche Buchstabenabkürzung",
-          value: norm.officialAbbreviation,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.CHIPS,
-          id: "unofficialLongTitles",
-          label: "Nichtamtliche Langüberschrift",
-          value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_LONG_TITLE,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.CHIPS,
-          id: "unofficialShortTitles",
-          label: "Nichtamtliche Kurzüberschrift",
-          value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_SHORT_TITLE,
-        },
-      ],
-    },
-    {
-      isSingleFieldSection: true,
-      fields: [
-        {
-          type: FieldType.CHIPS,
-          id: "unofficialAbbreviations",
-          label: "Nichtamtliche Buchstabenabkürzung",
-          value: norm.metadataSections?.NORM?.[0].UNOFFICIAL_ABBREVIATION,
-        },
-      ],
-    },
-    {
-      heading: "Inkrafttreten",
-      fields: [
         {
           type: FieldType.TEXT,
           id: "entryIntoForceDate",
-          label: "Datum des Inkrafttretens",
-          value: norm.entryIntoForceDate,
+          label: "Bestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "entryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "entryIntoForceDateState",
-          label: "Unbestimmtes Datum des Inkrafttretens",
-          value: norm.entryIntoForceDateState,
+          id: "entryIntoForceUndefinedDateState",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.ENTRY_INTO_FORCE?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+      ],
+    },
+    {
+      heading: "Grundsätzliches Inkrafttretedatum",
+      isExpandableNotRepeatable: true,
+      id: "principleEntryIntoForces",
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "principleEntryIntoForceSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.DATE
+          ),
         },
         {
           type: FieldType.TEXT,
           id: "principleEntryIntoForceDate",
-          label: "Grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDate,
+          label: "Bestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "principleEntryIntoForceUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
         },
         {
           type: FieldType.DROPDOWN,
-          id: "principleEntryIntoForceDateState",
-          label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
-          value: norm.principleEntryIntoForceDateState,
+          id: "principleEntryIntoForceUndefinedDateState",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_ENTRY_INTO_FORCE?.map(
+            (section) =>
+              undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
         },
       ],
     },
+    {
+      heading: "Datum des Außerkrafttretens",
+      isExpandableNotRepeatable: true,
+      id: "expirations",
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "expirationSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => !!section?.DATE
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "expirationDate",
+          label: "Bestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "expirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.EXPIRATION?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "expirationUndefinedDate",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.EXPIRATION?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+      ],
+    },
+    {
+      heading: "Grundsätzliches Außerkrafttretedatum",
+      isExpandableNotRepeatable: true,
+      id: "principleExpirations",
+      fields: [
+        {
+          type: FieldType.RADIO,
+          id: "principleExpirationSelection",
+          label: "bestimmt",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => !!section?.DATE
+          ),
+        },
+        {
+          type: FieldType.TEXT,
+          id: "principleExpirationDate",
+          label: "Bestimmtes Inkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => section?.DATE?.[0]
+          ),
+        },
+        {
+          type: FieldType.RADIO,
+          id: "principleExpirationUndefinedSelection",
+          label: "unbestimmt",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map(
+            (section) => !!section?.UNDEFINED_DATE
+          ),
+        },
+        {
+          type: FieldType.DROPDOWN,
+          id: "principleExpirationUndefinedDate",
+          label: "Unbestimmtes abweichendes Inkrafttretedatum",
+          values: norm.metadataSections?.PRINCIPLE_EXPIRATION?.map((section) =>
+            undefinedDateToDropdownEntry(section?.UNDEFINED_DATE?.[0])
+          ),
+        },
+      ],
+    },
+    // {
+    //   heading: "Inkrafttreten",
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "entryIntoForceDate",
+    //       label: "Datum des Inkrafttretens",
+    //       value: norm.entryIntoForceDate,
+    //     },
+    //     {
+    //       type: FieldType.DROPDOWN,
+    //       id: "entryIntoForceDateState",
+    //       label: "Unbestimmtes Datum des Inkrafttretens",
+    //       value: norm.entryIntoForceDateState,
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "principleEntryIntoForceDate",
+    //       label: "Grundsätzliches Inkrafttretedatum",
+    //       value: norm.principleEntryIntoForceDate,
+    //     },
+    //     {
+    //       type: FieldType.DROPDOWN,
+    //       id: "principleEntryIntoForceDateState",
+    //       label: "Unbestimmtes grundsätzliches Inkrafttretedatum",
+    //       value: norm.principleEntryIntoForceDateState,
+    //     },
+    //   ],
+    // },
     {
       heading: "Abweichendes Inkrafttretedatum",
       id: "divergentEntryIntoForces",
@@ -573,41 +731,41 @@ export function getNormBySections(norm: NormData): MetadataInputSection[] {
         },
       ],
     },
-    {
-      heading: "Außerkrafttreten",
-      fields: [
-        {
-          type: FieldType.TEXT,
-          id: "expirationDate",
-          label: "Datum des Außerkrafttretens",
-          value: norm.expirationDate,
-        },
-        {
-          type: FieldType.DROPDOWN,
-          id: "expirationDateState",
-          label: "Unbestimmtes Datum des Außerkrafttretens",
-          value: norm.expirationDateState,
-        },
-        {
-          type: FieldType.CHECKBOX,
-          id: "isExpirationDateTemp",
-          label: "Befristet",
-          value: norm.isExpirationDateTemp,
-        },
-        {
-          type: FieldType.TEXT,
-          id: "principleExpirationDate",
-          label: "Grundsätzliches Außerkrafttretedatum",
-          value: norm.principleExpirationDate,
-        },
-        {
-          type: FieldType.DROPDOWN,
-          id: "principleExpirationDateState",
-          label: "Unbestimmtes grundsätzliches Außerkrafttretdatum",
-          value: norm.principleExpirationDateState,
-        },
-      ],
-    },
+    // {
+    //   heading: "Außerkrafttreten",
+    //   fields: [
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "expirationDate",
+    //       label: "Datum des Außerkrafttretens",
+    //       value: norm.expirationDate,
+    //     },
+    //     {
+    //       type: FieldType.DROPDOWN,
+    //       id: "expirationDateState",
+    //       label: "Unbestimmtes Datum des Außerkrafttretens",
+    //       value: norm.expirationDateState,
+    //     },
+    //     {
+    //       type: FieldType.CHECKBOX,
+    //       id: "isExpirationDateTemp",
+    //       label: "Befristet",
+    //       value: norm.isExpirationDateTemp,
+    //     },
+    //     {
+    //       type: FieldType.TEXT,
+    //       id: "principleExpirationDate",
+    //       label: "Grundsätzliches Außerkrafttretedatum",
+    //       value: norm.principleExpirationDate,
+    //     },
+    //     {
+    //       type: FieldType.DROPDOWN,
+    //       id: "principleExpirationDateState",
+    //       label: "Unbestimmtes grundsätzliches Außerkrafttretdatum",
+    //       value: norm.principleExpirationDateState,
+    //     },
+    //   ],
+    // },
     {
       heading: "Abweichendes Außerkrafttretedatum",
       id: "divergentExpirations",

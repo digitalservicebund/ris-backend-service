@@ -151,6 +151,10 @@ export enum MetadataSectionName {
   DIVERGENT_EXPIRATION_DEFINED = "DIVERGENT_EXPIRATION_DEFINED",
   DIVERGENT_EXPIRATION_UNDEFINED = "DIVERGENT_EXPIRATION_UNDEFINED",
   CATEGORIZED_REFERENCE = "CATEGORIZED_REFERENCE",
+  ENTRY_INTO_FORCE = "ENTRY_INTO_FORCE",
+  PRINCIPLE_ENTRY_INTO_FORCE = "PRINCIPLE_ENTRY_INTO_FORCE",
+  EXPIRATION = "EXPIRATION",
+  PRINCIPLE_EXPIRATION = "PRINCIPLE_EXPIRATION",
 }
 
 export type MetadataSections = {
@@ -177,12 +181,7 @@ export type FlatMetadata = {
   documentStatusReference?: string
   documentStatusWorkNote?: string
   documentTextProof?: string
-  entryIntoForceDate?: string
-  entryIntoForceDateState?: string
   eli?: string
-  expirationDate?: string
-  expirationDateState?: string
-  isExpirationDateTemp?: boolean
   officialAbbreviation?: string
   officialLongTitle: string
   officialShortTitle?: string
@@ -194,10 +193,6 @@ export type FlatMetadata = {
   footnoteStateLaw?: string
   footnoteEuLaw?: string
   otherStatusNote?: string
-  principleEntryIntoForceDate?: string
-  principleEntryIntoForceDateState?: string
-  principleExpirationDate?: string
-  principleExpirationDateState?: string
   printAnnouncementGazette?: string
   printAnnouncementPage?: string
   printAnnouncementYear?: string

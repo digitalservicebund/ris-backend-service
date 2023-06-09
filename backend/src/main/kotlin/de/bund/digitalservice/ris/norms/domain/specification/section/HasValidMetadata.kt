@@ -74,6 +74,10 @@ val hasValidMetadata =
             Section.DIVERGENT_EXPIRATION_DEFINED -> hasType(listOf(DATE, NORM_CATEGORY), instance)
             Section.DIVERGENT_EXPIRATION_UNDEFINED -> hasType(listOf(UNDEFINED_DATE, NORM_CATEGORY), instance)
             Section.CATEGORIZED_REFERENCE -> hasType(listOf(TEXT), instance)
+            Section.ENTRY_INTO_FORCE -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.PRINCIPLE_ENTRY_INTO_FORCE -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
+            Section.PRINCIPLE_EXPIRATION -> hasOneOfType(listOf(DATE, UNDEFINED_DATE), instance)
         }
 
         private fun hasNone(instance: MetadataSection): Boolean =

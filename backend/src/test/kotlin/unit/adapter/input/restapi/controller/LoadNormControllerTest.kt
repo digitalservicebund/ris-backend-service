@@ -1,6 +1,5 @@
 package de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.controller
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.ninjasquad.springmockk.MockkBean
 import de.bund.digitalservice.ris.norms.application.port.input.LoadNormUseCase
 import de.bund.digitalservice.ris.norms.domain.entity.Article
@@ -10,7 +9,6 @@ import de.bund.digitalservice.ris.norms.domain.entity.Metadatum
 import de.bund.digitalservice.ris.norms.domain.entity.Norm
 import de.bund.digitalservice.ris.norms.domain.entity.Paragraph
 import de.bund.digitalservice.ris.norms.domain.value.MetadataSectionName
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeEli
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeGuid
 import de.bund.digitalservice.ris.norms.framework.adapter.input.restapi.encodeLocalDate
@@ -138,15 +136,6 @@ class LoadNormControllerTest {
         var documentCategory: String?,
         var officialShortTitle: String?,
         var officialAbbreviation: String?,
-        var entryIntoForceDate: String?,
-        var entryIntoForceDateState: UndefinedDate?,
-        var principleEntryIntoForceDate: String?,
-        var principleEntryIntoForceDateState: UndefinedDate?,
-        var expirationDate: String?,
-        var expirationDateState: UndefinedDate?,
-        @get:JsonProperty("isExpirationDateTemp") var isExpirationDateTemp: Boolean?,
-        var principleExpirationDate: String?,
-        var principleExpirationDateState: UndefinedDate?,
         var announcementDate: String?,
         var publicationDate: String?,
         var completeCitation: String?,
@@ -204,15 +193,6 @@ class LoadNormControllerTest {
                     data.documentCategory,
                     data.officialShortTitle,
                     data.officialAbbreviation,
-                    encodeLocalDate(data.entryIntoForceDate),
-                    data.entryIntoForceDateState,
-                    encodeLocalDate(data.principleEntryIntoForceDate),
-                    data.principleEntryIntoForceDateState,
-                    encodeLocalDate(data.expirationDate),
-                    data.expirationDateState,
-                    data.isExpirationDateTemp,
-                    encodeLocalDate(data.principleExpirationDate),
-                    data.principleExpirationDateState,
                     encodeLocalDate(data.announcementDate),
                     encodeLocalDate(data.publicationDate),
                     data.completeCitation,

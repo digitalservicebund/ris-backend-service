@@ -109,6 +109,31 @@ export async function expectRepeatedSectionListHasCorrectEntries(
   }
 }
 
+export async function expectExpandableSectionNotRepeatableToHaveCorrectValues(
+  page: Page,
+  section: MetadataInputSection
+): Promise<void> {
+  const expandable = page.locator(`#${section.id}`)
+  await expect(expandable).toBeVisible()
+  await expect(expandable).toContainText(section.heading ?? "")
+
+  await expandable.click()
+
+  for (const field of section.fields ?? []) {
+    if (field.values !== undefined && field.values[0] !== undefined) {
+      const label = page.locator(`label:has-text("${field.label}")`).first()
+      await expect(label).toBeVisible()
+
+      await expectInputFieldHasCorrectValue(
+        page,
+        field.type,
+        field.id,
+        field.values[0]
+      )
+    }
+  }
+}
+
 export async function expectMetadataInputSectionToHaveCorrectData(
   page: Page,
   section: MetadataInputSection
@@ -117,6 +142,8 @@ export async function expectMetadataInputSectionToHaveCorrectData(
     await expectRepeatedSectionListHasCorrectEntries(page, section)
   } else if (section.isSingleFieldSection) {
     await expectInputFieldGroupHasCorrectValues(page, section.fields ?? [])
+  } else if (section.isExpandableNotRepeatable) {
+    await expectExpandableSectionNotRepeatableToHaveCorrectValues(page, section)
   } else {
     const heading = page.locator(`a span:text-is("${section.heading}")`)
     await expect(heading).toBeVisible()

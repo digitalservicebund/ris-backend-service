@@ -43,7 +43,7 @@ export function useNormMenuItems(
         getChildItem("Federführung", "leads"),
         getChildItem("Sachgebiet", "subjectAreas"),
         getChildItem("Überschriften und Abkürzungen", "officialShortTitle"),
-        getChildItem("Inkrafttreten", "entryIntoForceFields"),
+        getChildItem("Inkrafttreten", "entryIntoForces"),
         getChildItem("Außerkrafttreten", "expirationFields"),
         getChildItem("Verkündungsdatum", "announcementDate"),
         getChildItem("Zitierdatum", "citationDates"),

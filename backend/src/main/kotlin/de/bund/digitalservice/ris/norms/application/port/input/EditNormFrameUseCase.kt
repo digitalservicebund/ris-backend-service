@@ -1,7 +1,6 @@
 package de.bund.digitalservice.ris.norms.application.port.input
 
 import de.bund.digitalservice.ris.norms.domain.entity.MetadataSection
-import de.bund.digitalservice.ris.norms.domain.value.UndefinedDate
 import reactor.core.publisher.Mono
 import java.time.LocalDate
 import java.util.UUID
@@ -21,17 +20,6 @@ interface EditNormFrameUseCase {
 
         var officialShortTitle: String? = null,
         var officialAbbreviation: String? = null,
-
-        var entryIntoForceDate: LocalDate? = null,
-        var entryIntoForceDateState: UndefinedDate? = null,
-        var principleEntryIntoForceDate: LocalDate? = null,
-        var principleEntryIntoForceDateState: UndefinedDate? = null,
-
-        var expirationDate: LocalDate? = null,
-        var expirationDateState: UndefinedDate? = null,
-        var isExpirationDateTemp: Boolean? = null,
-        var principleExpirationDate: LocalDate? = null,
-        var principleExpirationDateState: UndefinedDate? = null,
 
         var announcementDate: LocalDate? = null,
         var publicationDate: LocalDate? = null,

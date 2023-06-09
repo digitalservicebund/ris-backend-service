@@ -10,10 +10,14 @@ import CitationDateInputGroup from "@/components/CitationDateInputGroup.vue"
 import DivergentEntryIntoForceGroup from "@/components/DivergentEntryIntoForceGroup.vue"
 import DivergentExpirationGroup from "@/components/DivergentExpirationGroup.vue"
 import DocumentTypeInputGroup from "@/components/DocumentTypeInputGroup.vue"
+import EntryIntoForceInputGroup from "@/components/EntryIntoForceInputGroup.vue"
 import ExpandableDataSet from "@/components/ExpandableDataSet.vue"
+import ExpirationInputGroup from "@/components/ExpirationInputGroup.vue"
 import LeadInputGroup from "@/components/LeadInputGroup.vue"
 import NormProviderInputGroup from "@/components/NormProviderInputGroup.vue"
 import ParticipatingInstitutionInputGroup from "@/components/ParticipatingInstitutionInputGroup.vue"
+import PrincipleEntryIntoForceInputGroup from "@/components/PrincipleEntryIntoForceInputGroup.vue"
+import PrincipleExpirationInputGroup from "@/components/PrincipleExpirationInputGroup.vue"
 import SingleDataFieldSection from "@/components/SingleDataFieldSection.vue"
 import SubjectAreaInputGroup from "@/components/SubjectAreaInputGroup.vue"
 import { useScrollToHash } from "@/composables/useScrollToHash"
@@ -26,8 +30,6 @@ import {
 import { digitalEvidence } from "@/fields/norms/digitalEvidence"
 import { documentStatus } from "@/fields/norms/documentStatus"
 import { documentTextProof } from "@/fields/norms/documentTextProof"
-import { entryIntoForce } from "@/fields/norms/entryIntoForce"
-import { expiration } from "@/fields/norms/expiration"
 import { otherDocumentNote } from "@/fields/norms/otherDocumentNote"
 import { otherFootnote } from "@/fields/norms/otherFootnote"
 import { otherStatusNote } from "@/fields/norms/otherStatusNote"
@@ -104,14 +106,7 @@ watch(
       loadedNorm.value.documentStatusWorkNote =
         data.documentStatusWorkNote as string
       loadedNorm.value.documentTextProof = data.documentTextProof as string
-      loadedNorm.value.entryIntoForceDate = data.entryIntoForceDate as string
-      loadedNorm.value.entryIntoForceDateState =
-        data.entryIntoForceDateState as string
       loadedNorm.value.eli = data.eli as string
-      loadedNorm.value.expirationDate = data.expirationDate as string
-      loadedNorm.value.expirationDateState = data.expirationDateState as string
-      loadedNorm.value.isExpirationDateTemp =
-        data.isExpirationDateTemp as boolean
       loadedNorm.value.officialAbbreviation =
         data.officialAbbreviation as string
       loadedNorm.value.officialLongTitle = data.officialLongTitle as string
@@ -124,14 +119,6 @@ watch(
       loadedNorm.value.footnoteStateLaw = data.footnoteStateLaw as string
       loadedNorm.value.footnoteEuLaw = data.footnoteEuLaw as string
       loadedNorm.value.otherStatusNote = data.otherStatusNote as string
-      loadedNorm.value.principleEntryIntoForceDate =
-        data.principleEntryIntoForceDate as string
-      loadedNorm.value.principleEntryIntoForceDateState =
-        data.principleEntryIntoForceDateState as string
-      loadedNorm.value.principleExpirationDate =
-        data.principleExpirationDate as string
-      loadedNorm.value.principleExpirationDateState =
-        data.principleExpirationDateState as string
       loadedNorm.value.announcementDate = data.announcementDate as string
       loadedNorm.value.publicationDate = data.publicationDate as string
       loadedNorm.value.reissueArticle = data.reissueArticle as string
@@ -467,6 +454,18 @@ function DivergentExpirationSummarizer(data: MetadataSections): VNode | string {
   } else return ""
 }
 
+function GeneralSummarizer(data: Metadata): string {
+  if (!data) return ""
+
+  const undefinedDate = data?.UNDEFINED_DATE?.[0]
+
+  if (undefinedDate) {
+    return getLabel(undefinedDate)
+  } else {
+    return formatDate(data.DATE)
+  }
+}
+
 const CitationDateSummary = withSummarizer(citationDateSummarizer)
 const OfficialReferenceSummary = withSummarizer(officialReferenceSummarizer)
 const NormProviderSummary = withSummarizer(normProviderSummarizer)
@@ -475,6 +474,7 @@ const DivergentEntryIntoForceSummary = withSummarizer(
   DivergentEntryIntoForceSummarizer
 )
 const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
+const GeneralSummary = withSummarizer(GeneralSummarizer)
 </script>
 
 <template>
@@ -630,19 +630,39 @@ const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
       label="Nichtamtliche Buchstabenabkürzung"
       :type="InputType.CHIPS"
     />
-    <fieldset class="mt-32">
-      <legend
-        id="entryIntoForceFields"
-        class="heading-02-regular mb-[1rem] mt-32"
-      >
-        Inkrafttreten
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="entryIntoForce"
+
+    <ExpandableDataSet
+      id="entryIntoForces"
+      border-bottom
+      :data-set="metadataSections.ENTRY_INTO_FORCE"
+      :summary-component="GeneralSummary"
+      title="Datum des Inkrafttretens"
+    >
+      <EditableList
+        v-model="metadataSections.ENTRY_INTO_FORCE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="EntryIntoForceInputGroup"
+        :summary-component="GeneralSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
+
+    <ExpandableDataSet
+      id="principleEntryIntoForces"
+      border-bottom
+      :data-set="metadataSections.PRINCIPLE_ENTRY_INTO_FORCE"
+      :summary-component="GeneralSummary"
+      title="Grundsätzliches Inkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.PRINCIPLE_ENTRY_INTO_FORCE"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="PrincipleEntryIntoForceInputGroup"
+        :summary-component="GeneralSummary"
+      />
+    </ExpandableDataSet>
+
     <ExpandableDataSet
       id="divergentEntryIntoForces"
       border-bottom
@@ -658,16 +678,38 @@ const DivergentExpirationSummary = withSummarizer(DivergentExpirationSummarizer)
       />
     </ExpandableDataSet>
 
-    <fieldset class="mt-32">
-      <legend id="expirationFields" class="heading-02-regular mb-[1rem]">
-        Außerkrafttreten
-      </legend>
-      <InputGroup
-        v-model="flatMetadata"
-        :column-count="1"
-        :fields="expiration"
+    <ExpandableDataSet
+      id="expirations"
+      border-bottom
+      :data-set="metadataSections.EXPIRATION"
+      :summary-component="GeneralSummary"
+      title="Datum des Außerkrafttretens"
+    >
+      <EditableList
+        v-model="metadataSections.EXPIRATION"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="ExpirationInputGroup"
+        :summary-component="GeneralSummary"
       />
-    </fieldset>
+    </ExpandableDataSet>
+
+    <ExpandableDataSet
+      id="principleExpirations"
+      border-bottom
+      :data-set="metadataSections.PRINCIPLE_EXPIRATION"
+      :summary-component="GeneralSummary"
+      title="Grundsätzliches Außerkrafttretedatum"
+    >
+      <EditableList
+        v-model="metadataSections.PRINCIPLE_EXPIRATION"
+        :default-value="{}"
+        disable-multi-entry
+        :edit-component="PrincipleExpirationInputGroup"
+        :summary-component="GeneralSummary"
+      />
+    </ExpandableDataSet>
+
     <ExpandableDataSet
       id="divergentExpirations"
       border-bottom
