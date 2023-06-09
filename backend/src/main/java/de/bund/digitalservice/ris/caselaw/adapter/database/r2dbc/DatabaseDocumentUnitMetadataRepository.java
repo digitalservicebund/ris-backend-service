@@ -62,6 +62,18 @@ public interface DatabaseDocumentUnitMetadataRepository
       Long[] docUnitIds,
       Long docTypeId);
 
+  @Query(
+      "SELECT COUNT(*) "
+          + "FROM doc_unit docunit "
+          + "LEFT JOIN ( "
+          + "    SELECT DISTINCT ON (document_unit_id) document_unit_id, status "
+          + "    FROM public.document_unit_status "
+          + "    ORDER BY document_unit_id, created_at DESC "
+          + ") status ON docunit.uuid = status.document_unit_id "
+          + "WHERE docunit.data_source = :dataSource AND ( "
+          + "    docunit.documentation_office_id = :documentationOfficeId OR "
+          + "    status.status IS NULL OR "
+          + "    status.status = 'PUBLISHED')")
   Mono<Long> countByDataSourceAndDocumentationOfficeId(
       DataSource dataSource, UUID documentationOfficeId);
 }

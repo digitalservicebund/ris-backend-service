@@ -193,7 +193,7 @@ public class DocumentUnitListEntryIntegrationTest {
     List<String> timestampActualStrings =
         JsonPath.read(result.getResponseBody(), "$.content[*].creationTimestamp");
     List<Instant> timestampsActual = timestampActualStrings.stream().map(Instant::parse).toList();
-    assertThat(timestampsActual).hasSize(10); // test pagination
+    assertThat(timestampsActual).hasSize(10);
 
     for (int i = 0; i < timestampsActual.size() - 1; i++) {
       Instant tThis = timestampsActual.get(i);
