@@ -92,6 +92,7 @@ class ProceedingDecisionIntegrationTest {
     databaseDocumentTypeRepository.deleteAll().block();
   }
 
+  // This test is flaky if executed locally, but reliable in the pipeline
   @Test
   void testAddProceedingDecisionLink() {
     UUID parentUuid = UUID.randomUUID();

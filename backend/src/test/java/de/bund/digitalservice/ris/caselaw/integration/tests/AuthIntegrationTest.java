@@ -4,14 +4,12 @@ import static de.bund.digitalservice.ris.caselaw.Utils.getMockLogin;
 import static de.bund.digitalservice.ris.caselaw.Utils.getMockLoginWithDocOffice;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.csrf;
-import static org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers.mockOidcLogin;
 
 import de.bund.digitalservice.ris.caselaw.adapter.AuthController;
 import de.bund.digitalservice.ris.caselaw.adapter.KeycloakUserService;
 import de.bund.digitalservice.ris.caselaw.config.FlywayConfig;
 import de.bund.digitalservice.ris.caselaw.config.PostgresConfig;
 import de.bund.digitalservice.ris.caselaw.domain.User;
-import java.util.Collections;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -66,7 +64,7 @@ class AuthIntegrationTest {
   void testGetUserForOtherOffice() {
     webClient
         .mutateWith(csrf())
-        .mutateWith(getMockLoginWithDocOffice("CC-RIS"))
+        .mutateWith(getMockLoginWithDocOffice("/CC-RIS"))
         .get()
         .uri("/api/v1/auth/me")
         .exchange()
@@ -75,6 +73,7 @@ class AuthIntegrationTest {
         .expectBody(User.class)
         .consumeWith(
             response -> {
+              assertThat(response.getResponseBody()).isNotNull();
               assertThat(response.getResponseBody().name()).isEqualTo("testUser");
               assertThat(response.getResponseBody().documentationOffice().label())
                   .isEqualTo("CC-RIS");
@@ -85,15 +84,7 @@ class AuthIntegrationTest {
   void testGetUserNameWithoutKnownGroup() {
     webClient
         .mutateWith(csrf())
-        .mutateWith(
-            mockOidcLogin()
-                .idToken(
-                    token ->
-                        token.claims(
-                            claims -> {
-                              claims.put("groups", Collections.singletonList("foo"));
-                              claims.put("name", "testUser");
-                            })))
+        .mutateWith(getMockLoginWithDocOffice("foo"))
         .get()
         .uri("/api/v1/auth/me")
         .exchange()
